@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMCredential.h"
+#import "RLMSyncCredential.h"
 #import "RLMSyncUtil_Private.h"
 
 RLMIdentityProvider const RLMIdentityProviderDebug                  = @"debug";
@@ -27,7 +27,7 @@ RLMIdentityProvider const RLMIdentityProviderTwitter                = @"twitter"
 RLMIdentityProvider const RLMIdentityProviderGoogle                 = @"google";
 RLMIdentityProvider const RLMIdentityProviderICloud                 = @"icloud";
 
-@interface RLMCredential ()
+@interface RLMSyncCredential ()
 
 @property (nonatomic, readwrite) RLMCredentialToken token;
 @property (nonatomic, readwrite) RLMIdentityProvider provider;
@@ -35,7 +35,7 @@ RLMIdentityProvider const RLMIdentityProviderICloud                 = @"icloud";
 
 @end
 
-@implementation RLMCredential
+@implementation RLMSyncCredential
 
 + (instancetype)credentialWithFacebookToken:(RLMCredentialToken)token {
     return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderFacebook userInfo:nil];

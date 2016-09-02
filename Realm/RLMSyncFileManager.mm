@@ -18,7 +18,7 @@
 
 #import "RLMSyncFileManager.h"
 
-#import "RLMUser.h"
+#import "RLMSyncUser.h"
 #import "RLMUtil.hpp"
 
 static NSString *const RLMSyncUtilityFolderName = @"io.realm.object-server-metadata";
@@ -95,7 +95,7 @@ static NSString *const RLMSyncMetadataRealmName = @"sync_metadata.realm";
 /**
  Return the file URL for a given combination of a Realm Object Server URL and Realm Sync user.
  */
-+ (NSURL *)fileURLForRawRealmURL:(NSURL *)url user:(RLMUser *)user {
++ (NSURL *)fileURLForRawRealmURL:(NSURL *)url user:(RLMSyncUser *)user {
     NSAssert(user.identity, @"Cannot call this method on a user that doesn't yet have an identity...");
 
     NSCharacterSet *alpha = [NSCharacterSet alphanumericCharacterSet];

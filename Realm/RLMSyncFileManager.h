@@ -18,13 +18,13 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMUser;
+@class RLMSyncUser;
 
 @interface RLMSyncFileManager : NSObject
 
 NS_ASSUME_NONNULL_BEGIN
 
-+ (NSURL *)fileURLForRawRealmURL:(NSURL *)url user:(RLMUser *)user;
++ (NSURL *)fileURLForRawRealmURL:(NSURL *)url user:(RLMSyncUser *)user;
 + (NSURL *)fileURLForMetadata;
 + (void)removeFilesForUserIdentity:(NSString *)identity error:(NSError * _Nullable* _Nullable)error;
 

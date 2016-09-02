@@ -19,7 +19,6 @@
 #import <Foundation/Foundation.h>
 
 #import <Realm/RLMArray.h>
-#import <Realm/RLMCredential.h>
 #import <Realm/RLMMigration.h>
 #import <Realm/RLMObject.h>
 #import <Realm/RLMObjectSchema.h>
@@ -30,7 +29,8 @@
 #import <Realm/RLMRealmConfiguration+Sync.h>
 #import <Realm/RLMResults.h>
 #import <Realm/RLMSchema.h>
+#import <Realm/RLMSyncCredential.h>
 #import <Realm/RLMSyncManager.h>
 #import <Realm/RLMSyncSession.h>
+#import <Realm/RLMSyncUser.h>
 #import <Realm/RLMSyncUtil.h>
-#import <Realm/RLMUser.h>

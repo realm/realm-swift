@@ -16,12 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUser.h"
+#import "RLMSyncUser.h"
+
+#import "RLMSyncUtil_Private.h"
 
 #import "shared_realm.hpp"
 #import "sync_metadata.hpp"
 
-@interface RLMUser ()
+@interface RLMSyncUser ()
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -40,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)_registerRealmForBindingWithFileURL:(NSURL *)fileURL
                                    realmURL:(NSURL *)realmURL
-                               onCompletion:(nullable RLMErrorReportingBlock)completion;
+                               onCompletion:(nullable RLMSyncBasicErrorReportingBlock)completion;
 
 - (void)_invalidate;
 - (void)_deregisterSessionWithRealmURL:(NSURL *)realmURL;

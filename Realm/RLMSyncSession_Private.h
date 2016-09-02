@@ -20,19 +20,19 @@
 
 #import "RLMSyncUtil_Private.h"
 
-@class RLMUser;
+@class RLMSyncUser;
 
 @interface RLMRealmBindingPackage : NSObject
 
 NS_ASSUME_NONNULL_BEGIN
 
-@property (nullable, nonatomic, copy) RLMErrorReportingBlock block;
+@property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock block;
 @property (nonatomic) NSURL *fileURL;
 @property (nonatomic) NSURL *realmURL;
 
 - (instancetype)initWithFileURL:(NSURL *)fileURL
                        realmURL:(NSURL *)realmURL
-                          block:(nullable RLMErrorReportingBlock)block;
+                          block:(nullable RLMSyncBasicErrorReportingBlock)block;
 
 @end
 
@@ -58,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) NSTimer *refreshTimer;
 
-- (void)configureWithAccessToken:(RLMServerToken)token expiry:(NSTimeInterval)expiry user:(RLMUser *)user;
+- (void)configureWithAccessToken:(RLMServerToken)token expiry:(NSTimeInterval)expiry user:(RLMSyncUser *)user;
 
 NS_ASSUME_NONNULL_END
 

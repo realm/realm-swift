@@ -20,29 +20,29 @@
 
 #import "RLMSyncUtil.h"
 
-@class RLMUser, RLMCredential, RLMSyncSession, RLMRealm;
+@class RLMSyncUser, RLMSyncCredential, RLMSyncSession, RLMRealm;
 
 typedef NS_OPTIONS(NSUInteger, RLMAuthenticationActions) {
     RLMAuthenticationActionsCreateAccount            = 1 << 0,
     RLMAuthenticationActionsUseExistingAccount       = 1 << 1,
 };
 
-typedef void(^RLMUserCompletionBlock)(RLMUser * _Nullable, NSError * _Nullable);
+typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
 typedef void(^RLMFetchedRealmCompletionBlock)(NSError * _Nullable, RLMRealm * _Nullable, BOOL * _Nonnull);
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A `RLMUser` instance represents a single Realm Object Server user account (or just user).
+ A `RLMSyncUser` instance represents a single Realm Object Server user account (or just user).
 
  A user may have one or more credentials associated with it. These credentials uniquely identify the user to a
  third-party auth provider, and are used to sign into a Realm Object Server user account.
  */
-@interface RLMUser : NSObject RLM_SYNC_UNINITIALIZABLE
+@interface RLMSyncUser : NSObject RLM_SYNC_UNINITIALIZABLE
 
-+ (NSArray<RLMUser *> *)all;
++ (NSArray<RLMSyncUser *> *)all;
 
-@property (nonatomic, readonly) RLMIdentity identity;
+@property (nonatomic, readonly) NSString *identity;
 
 /**
  The URL of the authentication server this user will communicate with. If the user is anonymous, this property may be
@@ -62,13 +62,13 @@ NS_ASSUME_NONNULL_BEGIN
  user becomes available in the completion block, at which point it is guaranteed to be non-anonymous and ready for use
  opening synced Realms.
  */
-+ (void)authenticateWithCredential:(RLMCredential *)credential
++ (void)authenticateWithCredential:(RLMSyncCredential *)credential
                            actions:(RLMAuthenticationActions)actions
                      authServerURL:(NSURL *)authServerURL
                            timeout:(NSTimeInterval)timeout
                       onCompletion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
-+ (void)authenticateWithCredential:(RLMCredential *)credential
++ (void)authenticateWithCredential:(RLMSyncCredential *)credential
                            actions:(RLMAuthenticationActions)actions
                      authServerURL:(NSURL *)authServerURL
                       onCompletion:(RLMUserCompletionBlock)completion
@@ -91,7 +91,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  This method should be called whenever the application is committed to not using a user again unless they are recreated.
  Failing to call this method may result in unused files and metadata needlessly taking up space.
  */
-//- (void)logOut;
+- (void)logOut;
 
 - (NSDictionary<NSURL *, RLMSyncSession *> *)sessions;
 

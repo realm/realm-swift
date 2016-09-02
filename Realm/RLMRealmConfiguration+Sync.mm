@@ -20,7 +20,7 @@
 
 #import "RLMRealmConfiguration_Private.hpp"
 
-#import "RLMUser_Private.hpp"
+#import "RLMSyncUser_Private.hpp"
 #import "RLMSyncFileManager.h"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncUtil_Private.h"
@@ -38,14 +38,14 @@ static BOOL isValidRealmURL(NSURL *url) {
 
 @interface RLMSyncConfiguration ()
 
-@property (nonatomic, readwrite) RLMUser *user;
+@property (nonatomic, readwrite) RLMSyncUser *user;
 @property (nonatomic, readwrite) NSURL *realmURL;
 
 @end
 
 @implementation RLMSyncConfiguration
 
-- (instancetype)initWithUser:(RLMUser *)user realmURL:(NSURL *)url {
+- (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url {
     if (self = [super init]) {
         self.user = user;
         if (!isValidRealmURL(url)) {
@@ -64,7 +64,7 @@ static BOOL isValidRealmURL(NSURL *url) {
 #pragma mark - API
 
 - (void)setSyncConfiguration:(RLMSyncConfiguration *)syncConfiguration {
-    RLMUser *user = syncConfiguration.user;
+    RLMSyncUser *user = syncConfiguration.user;
     if (!user.isValid) {
         @throw RLMException(@"Cannot set a sync configuration which has an invalid user.");
     }
@@ -100,7 +100,7 @@ static BOOL isValidRealmURL(NSURL *url) {
     }
     realm::SyncConfig& sync_config = *self.config.sync_config;
     // Try to get the user
-    RLMUser *thisUser = [[RLMSyncManager sharedManager] _userForIdentity:@(sync_config.user_tag.c_str())];
+    RLMSyncUser *thisUser = [[RLMSyncManager sharedManager] _userForIdentity:@(sync_config.user_tag.c_str())];
     if (!thisUser) {
         @throw RLMException(@"Could not find the user this configuration refers to.");
     }

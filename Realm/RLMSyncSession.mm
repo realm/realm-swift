@@ -22,16 +22,16 @@
 #import "RLMNetworkClient.h"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncManager_Private.hpp"
+#import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil.h"
 #import "RLMTokenModels.h"
-#import "RLMUser_Private.hpp"
 #import "RLMUtil.hpp"
 
 @implementation RLMRealmBindingPackage
 
 - (instancetype)initWithFileURL:(NSURL *)fileURL
                        realmURL:(NSURL *)realmURL
-                          block:(RLMErrorReportingBlock)block {
+                          block:(RLMSyncBasicErrorReportingBlock)block {
     if (self = [super init]) {
         self.fileURL = fileURL;
         self.realmURL = realmURL;
@@ -46,7 +46,7 @@
 @interface RLMSyncSession ()
 
 @property (nonatomic, readwrite) RLMSyncSessionState state;
-@property (nonatomic, readwrite) RLMUser *parentUser;
+@property (nonatomic, readwrite) RLMSyncUser *parentUser;
 @property (nonatomic, readwrite) NSURL *realmURL;
 
 @end
@@ -66,7 +66,7 @@
 }
 
 - (nullable RLMSyncConfiguration *)configuration {
-    RLMUser *user = self.parentUser;
+    RLMSyncUser *user = self.parentUser;
     if (user && self.state != RLMSyncSessionStateInvalid) {
         return [[RLMSyncConfiguration alloc] initWithUser:user realmURL:self.realmURL];
     }
@@ -82,7 +82,7 @@
 
 #pragma mark - per-Realm access token API
 
-- (void)configureWithAccessToken:(RLMServerToken)token expiry:(NSTimeInterval)expiry user:(RLMUser *)user {
+- (void)configureWithAccessToken:(RLMServerToken)token expiry:(NSTimeInterval)expiry user:(RLMSyncUser *)user {
     self.parentUser = user;
     self.accessToken = token;
     self.accessTokenExpiry = expiry;
@@ -105,7 +105,7 @@
 }
 
 - (void)_refresh {
-    RLMUser *user = self.parentUser;
+    RLMSyncUser *user = self.parentUser;
     if (!user || !self.resolvedPath) {
         return;
     }
@@ -118,7 +118,7 @@
                            kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
                            };
 
-    RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
+    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         if (json && !error) {
             RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithDictionary:json
                                                                         requireAccessToken:YES

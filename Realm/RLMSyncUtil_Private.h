@@ -17,7 +17,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncUtil.h"
-#import "RLMCredential.h"
+
+#import "RLMSyncCredential.h"
+
+typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
+typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
+
+typedef NSString* RLMServerPath;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -43,14 +49,14 @@ extern "C" {
 NS_ASSUME_NONNULL_END
 
 /// A macro to parse a string out of a JSON dictionary, or return nil.
-#define RLMSERVER_PARSE_STRING_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
+#define RLM_SYNC_PARSE_STRING_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
 { \
 id data = json_macro_val[key_macro_val]; \
 if (![data isKindOfClass:[NSString class]]) { return nil; } \
 self.prop_macro_val = data; \
 } \
 
-#define RLMSERVER_PARSE_OPTIONAL_STRING(json_macro_val, key_macro_val, prop_macro_val) \
+#define RLM_SYNC_PARSE_OPTIONAL_STRING(json_macro_val, key_macro_val, prop_macro_val) \
 { \
 id data = json_macro_val[key_macro_val]; \
 if (![data isKindOfClass:[NSString class]]) { data = nil; } \
@@ -58,7 +64,7 @@ self.prop_macro_val = data; \
 } \
 
 /// A macro to parse a double out of a JSON dictionary, or return nil.
-#define RLMSERVER_PARSE_DOUBLE_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
+#define RLM_SYNC_PARSE_DOUBLE_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
 { \
 id data = json_macro_val[key_macro_val]; \
 if (![data isKindOfClass:[NSNumber class]]) { return nil; } \
@@ -66,7 +72,7 @@ self.prop_macro_val = [data doubleValue]; \
 } \
 
 /// A macro to build a sub-model out of a JSON dictionary, or return nil.
-#define RLMSERVER_PARSE_MODEL_OR_ABORT(json_macro_val, key_macro_val, class_macro_val, prop_macro_val) \
+#define RLM_SYNC_PARSE_MODEL_OR_ABORT(json_macro_val, key_macro_val, class_macro_val, prop_macro_val) \
 { \
 id raw = json_macro_val[key_macro_val]; \
 if (![raw isKindOfClass:[NSDictionary class]]) { return nil; } \
@@ -75,7 +81,7 @@ if (!model) { return nil; } \
 self.prop_macro_val = model; \
 } \
 
-#define RLMSERVER_PARSE_OPTIONAL_MODEL(json_macro_val, key_macro_val, class_macro_val, prop_macro_val) \
+#define RLM_SYNC_PARSE_OPTIONAL_MODEL(json_macro_val, key_macro_val, class_macro_val, prop_macro_val) \
 { \
 id model; \
 id raw = json_macro_val[key_macro_val]; \

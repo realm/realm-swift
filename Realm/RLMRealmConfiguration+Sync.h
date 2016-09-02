@@ -20,24 +20,24 @@
 
 #import "RLMSyncUtil.h"
 
-@class RLMUser;
+@class RLMSyncUser;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncConfiguration : NSObject RLM_SYNC_UNINITIALIZABLE
 
-@property (nonatomic, readonly) RLMUser *user;
+@property (nonatomic, readonly) RLMSyncUser *user;
 @property (nonatomic, readonly) NSURL *realmURL;
 
 /**
  Create a sync configuration instance.
  
- @param user    A `RLMUser` that owns the Realm at the given URL.
+ @param user    A `RLMSyncUser` that owns the Realm at the given URL.
  @param url     The full, unresolved URL to the Realm on the Realm Object Server. "Full" means that this URL is fully
                 qualified; e.g. `realm://example.org/~/path/to/my.realm`. "Unresolved" means the path should contain
                 the wildcard marker `~`.
  */
-- (instancetype)initWithUser:(RLMUser *)user realmURL:(NSURL *)url;
+- (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url;
 
 @end
 

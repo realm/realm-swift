@@ -72,7 +72,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 + (void)postRequestToEndpoint:(RLMServerEndpoint)endpoint
                        server:(NSURL *)serverURL
                          JSON:(NSDictionary *)jsonDictionary
-                   completion:(RLMServerCompletionBlock)completionBlock {
+                   completion:(RLMSyncCompletionBlock)completionBlock {
     static NSTimeInterval const defaultTimeout = 60;
     [self postRequestToEndpoint:endpoint
                          server:serverURL
@@ -86,7 +86,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
                        server:(NSURL *)serverURL
                          JSON:(NSDictionary *)jsonDictionary
                       timeout:(NSTimeInterval)timeout
-                   completion:(RLMServerCompletionBlock)completionBlock {
+                   completion:(RLMSyncCompletionBlock)completionBlock {
 
     NSError *localError = nil;
 

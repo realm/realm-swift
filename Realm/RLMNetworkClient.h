@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
+#import "RLMSyncUtil_Private.h"
 
 /**
  An enum describing all possible endpoints on the Realm Object Server.
@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)postRequestToEndpoint:(RLMServerEndpoint)endpoint
                        server:(NSURL *)serverURL
                          JSON:(NSDictionary *)jsonDictionary
-                   completion:(RLMServerCompletionBlock)completionBlock;
+                   completion:(RLMSyncCompletionBlock)completionBlock;
 
 /**
  Post some JSON data to the authentication server, and asynchronously call a completion block with a JSON response
@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
                        server:(NSURL *)serverURL
                          JSON:(NSDictionary *)jsonDictionary
                       timeout:(NSTimeInterval)timeout
-                   completion:(RLMServerCompletionBlock)completionBlock;
+                   completion:(RLMSyncCompletionBlock)completionBlock;
 
 NS_ASSUME_NONNULL_END
 

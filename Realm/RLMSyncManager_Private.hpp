@@ -21,7 +21,7 @@
 #import "sync_config.hpp"
 #import "sync_metadata.hpp"
 
-@class RLMUser;
+@class RLMSyncUser;
 
 // All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
 // called very infrequently, this should pose no issues.
@@ -42,13 +42,13 @@ NS_ASSUME_NONNULL_BEGIN
 // Note that this method doesn't need to be threadsafe, since all locking is coordinated internally.
 - (realm::SyncMetadataManager&)_metadataManager;
 
-- (NSArray<RLMUser *> *)_allUsers;
+- (NSArray<RLMSyncUser *> *)_allUsers;
 
-- (void)_registerUser:(RLMUser *)user;
+- (void)_registerUser:(RLMSyncUser *)user;
 
-- (void)_deregisterUser:(RLMUser *)user;
+- (void)_deregisterUser:(RLMSyncUser *)user;
 
-- (nullable RLMUser *)_userForIdentity:(NSString *)identity;
+- (nullable RLMSyncUser *)_userForIdentity:(NSString *)identity;
 
 NS_ASSUME_NONNULL_END
 

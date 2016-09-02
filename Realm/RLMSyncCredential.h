@@ -33,7 +33,7 @@ extern RLMIdentityProvider const RLMIdentityProviderGoogle;
 extern RLMIdentityProvider const RLMIdentityProviderICloud;
 // FIXME: add more providers as necessary...
 
-@interface RLMCredential : NSObject
+@interface RLMSyncCredential : NSObject
 
 @property (nonatomic, readonly) RLMCredentialToken token;
 @property (nonatomic, readonly) RLMIdentityProvider provider;

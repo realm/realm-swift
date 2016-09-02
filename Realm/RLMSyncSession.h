@@ -32,7 +32,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncSessionState) {
     RLMSyncSessionStateInvalid
 };
 
-@class RLMUser, RLMSyncConfiguration;
+@class RLMSyncUser, RLMSyncConfiguration;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSURL *realmURL;
 
-@property (nonatomic, weak, nullable, readonly) RLMUser *parentUser;
+@property (nonatomic, weak, nullable, readonly) RLMSyncUser *parentUser;
 
 /// If the session is valid, return a sync configuration that can be used to open the Realm associated with this
 /// session.

@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUser_Private.hpp"
+#import "RLMSyncUser_Private.hpp"
 
 #import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
@@ -30,12 +30,12 @@
 
 using namespace realm;
 
-@interface RLMUser ()
+@interface RLMSyncUser ()
 
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readwrite) BOOL isValid;
-@property (nonatomic, readwrite) RLMIdentity identity;
+@property (nonatomic, readwrite) NSString *identity;
 @property (nonatomic, readwrite) NSURL *authenticationServer;
 
 @property (nonatomic) NSMutableDictionary<NSURL *, RLMSyncSession *> *sessionsStorage;
@@ -44,7 +44,7 @@ using namespace realm;
 
 @end
 
-@implementation RLMUser
+@implementation RLMSyncUser
 
 #pragma mark - static API
 
@@ -68,7 +68,7 @@ using namespace realm;
 }
 
 + (instancetype)userWithAccessToken:(RLMServerToken)accessToken identity:(nullable NSString *)identity {
-    RLMUser *user = [[RLMUser alloc] initWithAuthServer:nil];
+    RLMSyncUser *user = [[RLMSyncUser alloc] initWithAuthServer:nil];
     user.directAccessToken = accessToken;
     user.isValid = YES;
     user.identity = identity ?: [[NSUUID UUID] UUIDString];
@@ -77,7 +77,7 @@ using namespace realm;
     return user;
 }
 
-+ (void)authenticateWithCredential:(RLMCredential *)credential
++ (void)authenticateWithCredential:(RLMSyncCredential *)credential
                            actions:(RLMAuthenticationActions)actions
                      authServerURL:(NSURL *)authServerURL
                       onCompletion:(RLMUserCompletionBlock)completion {
@@ -88,22 +88,22 @@ using namespace realm;
                         onCompletion:completion];
 }
 
-+ (void)authenticateWithCredential:(RLMCredential *)credential
++ (void)authenticateWithCredential:(RLMSyncCredential *)credential
                             actions:(RLMAuthenticationActions)actions
                      authServerURL:(NSURL *)authServerURL
                            timeout:(NSTimeInterval)timeout
                       onCompletion:(RLMUserCompletionBlock)completion {
-    RLMUser *user = [[RLMUser alloc] initWithAuthServer:authServerURL];
-    [RLMUser _performLogInForUser:user
-                       credential:credential
-                          actions:actions
-                    authServerURL:authServerURL
-                          timeout:timeout
-                  completionBlock:completion];
+    RLMSyncUser *user = [[RLMSyncUser alloc] initWithAuthServer:authServerURL];
+    [RLMSyncUser _performLogInForUser:user
+                           credential:credential
+                              actions:actions
+                        authServerURL:authServerURL
+                              timeout:timeout
+                      completionBlock:completion];
 }
 
 - (void)logOut {
-    if (self.isValid || !self.identity) {
+    if (!self.isValid || !self.identity) {
         @throw RLMException(@"Cannot log out a user that is already logged out.");
     }
     self.isValid = NO;
@@ -161,14 +161,14 @@ using namespace realm;
     metadata.set_state(server, token);
 }
 
-+ (void)_performLogInForUser:(RLMUser *)user
-                  credential:(RLMCredential *)credential
++ (void)_performLogInForUser:(RLMSyncUser *)user
+                  credential:(RLMSyncCredential *)credential
                      actions:(RLMAuthenticationActions)actions
                authServerURL:(NSURL *)authServerURL
                      timeout:(NSTimeInterval)timeout
              completionBlock:(RLMUserCompletionBlock)completion {
     // Wrap the completion block.
-    RLMUserCompletionBlock theBlock = ^(RLMUser *user, NSError *error){
+    RLMUserCompletionBlock theBlock = ^(RLMSyncUser *user, NSError *error){
         if (!completion) { return; }
         dispatch_async(dispatch_get_main_queue(), ^{
             completion(user, error);
@@ -194,7 +194,7 @@ using namespace realm;
         json[@"user_info"] = info;
     }
 
-    RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
+    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         if (json && !error) {
             RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithDictionary:json
                                                                         requireAccessToken:NO
@@ -243,7 +243,7 @@ using namespace realm;
 // Immediately begin the handshake to get the resolved remote path and the access token.
 - (void)_bindRealmWithLocalFileURL:(NSURL *)fileURL
                           realmURL:(NSURL *)realmURL
-                      onCompletion:(RLMErrorReportingBlock)completion {
+                      onCompletion:(RLMSyncBasicErrorReportingBlock)completion {
     RLMServerPath unresolvedPath = [realmURL path];
     NSDictionary *json = @{
                            kRLMSyncPathKey: unresolvedPath,
@@ -252,7 +252,7 @@ using namespace realm;
                            kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
                            };
 
-    RLMServerCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
+    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         if (json && !error) {
             RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithDictionary:json
                                                                         requireAccessToken:YES
@@ -320,7 +320,7 @@ using namespace realm;
 // A callback handler for a Realm, used to get an updated access token which can then be used to bind the Realm.
 - (void)_registerRealmForBindingWithFileURL:(NSURL *)fileURL
                                    realmURL:(NSURL *)realmURL
-                               onCompletion:(nullable RLMErrorReportingBlock)completion {
+                               onCompletion:(nullable RLMSyncBasicErrorReportingBlock)completion {
     if ([self.sessionsStorage objectForKey:realmURL]) {
         // The Realm at this particular path has already been registered to this user.
         return;

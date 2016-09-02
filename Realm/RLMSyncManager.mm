@@ -20,8 +20,8 @@
 
 #import "RLMSyncFileManager.h"
 #import "RLMSyncSession_Private.h"
+#import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil.h"
-#import "RLMUser_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import "sync_config.hpp"
@@ -68,7 +68,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
 - (instancetype)initPrivate NS_DESIGNATED_INITIALIZER;
 
-@property (nonnull, nonatomic) NSMutableDictionary<NSString *, RLMUser *> *activeUsers;
+@property (nonnull, nonatomic) NSMutableDictionary<NSString *, RLMSyncUser *> *activeUsers;
 
 @end
 
@@ -199,7 +199,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     @synchronized (self) {
         SyncUserMetadataResults users = _metadata_manager->all_unmarked_users();
         for (size_t i = 0; i < users.size(); i++) {
-            RLMUser *user = [[RLMUser alloc] initWithMetadata:users.get(i)];
+            RLMSyncUser *user = [[RLMSyncUser alloc] initWithMetadata:users.get(i)];
             self.activeUsers[user.identity] = user;
         }
     }
@@ -207,20 +207,22 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
 /// Clean up marked users and destroy them.
 - (void)_cleanUpMarkedUsers {
-    SyncUserMetadataResults users_to_remove = _metadata_manager->all_users_marked_for_removal();
-    for (size_t i = 0; i < users_to_remove.size(); i++) {
-        auto user = users_to_remove.get(i);
-        // FIXME: delete user data in a different way? (This deletes a logged-out user's data as soon as the app
-        // launches again, which might not be how some apps want to treat their data.)
-        [RLMSyncFileManager removeFilesForUserIdentity:@(user.identity().c_str()) error:nil];
-        user.remove();
+    @synchronized (self) {
+        SyncUserMetadataResults users_to_remove = _metadata_manager->all_users_marked_for_removal();
+        for (size_t i = 0; i < users_to_remove.size(); i++) {
+            auto user = users_to_remove.get(i);
+            // FIXME: delete user data in a different way? (This deletes a logged-out user's data as soon as the app
+            // launches again, which might not be how some apps want to treat their data.)
+            [RLMSyncFileManager removeFilesForUserIdentity:@(user.identity().c_str()) error:nil];
+            user.remove();
+        }
     }
 }
 
 - (void)_handleBindRequestForTag:(NSString *)tag
                           rawURL:(NSString *)urlString
                    localFilePath:(NSString *)filePathString {
-    RLMUser *user = [self _userForIdentity:tag];
+    RLMSyncUser *user = [self _userForIdentity:tag];
     if (!user || !user.isValid) {
         // FIXME: should we throw an exception instead? report an error?
         return;
@@ -237,7 +239,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     }
 }
 
-- (void)_registerUser:(RLMUser *)user {
+- (void)_registerUser:(RLMSyncUser *)user {
     @synchronized(self) {
         NSString *identity = user.identity;
         if ([self.activeUsers objectForKey:identity]) {
@@ -247,7 +249,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     }
 }
 
-- (void)_deregisterUser:(RLMUser *)user {
+- (void)_deregisterUser:(RLMSyncUser *)user {
     @synchronized(self) {
         NSString *identity = user.identity;
         if (![self.activeUsers objectForKey:identity]) {
@@ -257,7 +259,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     }
 }
 
-- (RLMUser *)_userForIdentity:(NSString *)identity {
+- (RLMSyncUser *)_userForIdentity:(NSString *)identity {
     @synchronized (self) {
         return [self.activeUsers objectForKey:identity];
     }

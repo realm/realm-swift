@@ -19,15 +19,10 @@
 #import <Foundation/Foundation.h>
 #import "RLMConstants.h"
 
-typedef void(^RLMErrorReportingBlock)(NSError * _Nullable);
-
 @class RLMRealmConfiguration;
 
-typedef NSString* RLMIdentity;
-typedef NSString* RLMServerToken;
 typedef NSString* RLMCredentialToken;
-typedef NSString* RLMServerPath;
-typedef void(^RLMServerCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
+typedef NSString* RLMServerToken;
 
 NS_ASSUME_NONNULL_BEGIN
 

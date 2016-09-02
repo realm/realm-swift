@@ -20,7 +20,7 @@ import Realm
 import Realm.Private
 import Foundation
 
-public typealias User = RLMUser
+public typealias User = RLMSyncUser
 
 public typealias SyncManager = RLMSyncManager
 
@@ -28,7 +28,7 @@ public typealias SyncSession = RLMSyncSession
 
 public typealias AuthenticationActions = RLMAuthenticationActions
 
-public typealias ErrorReportingBlock = RLMErrorReportingBlock
+public typealias ErrorReportingBlock = RLMSyncErrorReportingBlock
 
 public typealias UserCompletionBlock = RLMUserCompletionBlock
 
@@ -105,22 +105,22 @@ public struct Credential {
         self.userInfo = userInfo
     }
 
-    private init(_ credential: RLMCredential) {
+    private init(_ credential: RLMSyncCredential) {
         self.token = credential.token
         self.provider = credential.provider
         self.userInfo = credential.userInfo
     }
 
     static func facebook(token: Token) -> Credential {
-        return Credential(RLMCredential(facebookToken: token))
+        return Credential(RLMSyncCredential(facebookToken: token))
     }
 
     static func usernamePassword(username: String, password: String) -> Credential {
-        return Credential(RLMCredential(username: username, password: password))
+        return Credential(RLMSyncCredential(username: username, password: password))
     }
 }
 
-extension RLMCredential {
+extension RLMSyncCredential {
     private convenience init(_ credential: Credential) {
         self.init(customToken: credential.token, provider: credential.provider, userInfo: credential.userInfo)
     }
@@ -134,7 +134,7 @@ extension User {
                                                   authServerURL: NSURL,
                                                   timeout: NSTimeInterval = 30,
                                                   onCompletion completion: UserCompletionBlock) {
-        return User.__authenticateWithCredential(RLMCredential(credential),
+        return User.__authenticateWithCredential(RLMSyncCredential(credential),
                                                  actions: actions,
                                                  authServerURL: authServerURL,
                                                  timeout: timeout,
