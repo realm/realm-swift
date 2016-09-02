@@ -47,10 +47,17 @@ class SwiftDefaultObject: RLMObject {
 }
 
 class SwiftOptionalNumberObject: RLMObject {
-    dynamic var intCol: NSNumber? = 1
-    dynamic var floatCol: NSNumber? = 2.2 as Float as NSNumber
-    dynamic var doubleCol: NSNumber? = 3.3
+    dynamic var intCol: NSNumber? = .int(1)
+    dynamic var floatCol: NSNumber? = .float(2.2)
+    dynamic var doubleCol: NSNumber? = .double(3.3)
     dynamic var boolCol: NSNumber? = true
+}
+
+class SwiftNilDefaultOptionalNumberObject: RLMObject {
+    dynamic var intCol: NSNumber? = .int(nil)
+    dynamic var floatCol: NSNumber? = .float(nil)
+    dynamic var doubleCol: NSNumber? = .double(nil)
+    dynamic var boolCol: NSNumber? = .bool(nil)
 }
 
 class SwiftObjectInterfaceTests: RLMTestCase {
@@ -180,6 +187,62 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(2.2 as Float as NSNumber, no.floatCol!)
         XCTAssertEqual(3.3, no.doubleCol!)
         XCTAssertEqual(false, no.boolCol!)
+    }
+
+    func testNilDefaultOptionalNumberObject() {
+        let realm = realmWithTestPath()
+
+        // Ensure that the static methods return NSNumbers when not passed nil
+        XCTAssertEqual(1, NSNumber.int(1))
+        XCTAssertEqual(2.2 as Float as NSNumber, NSNumber.float(2.2))
+        XCTAssertEqual(3.3, NSNumber.double(3.3))
+        XCTAssertEqual(true, NSNumber.bool(true))
+
+        // Ensure the object schema was correclty parsed
+        let objectSchema = SwiftNilDefaultOptionalNumberObject.sharedSchema()!
+        XCTAssertEqual(RLMPropertyType.int,    objectSchema["intCol"]?.type)
+        XCTAssertEqual(RLMPropertyType.float,  objectSchema["floatCol"]?.type)
+        XCTAssertEqual(RLMPropertyType.double, objectSchema["doubleCol"]?.type)
+        XCTAssertEqual(RLMPropertyType.bool,   objectSchema["boolCol"]?.type)
+
+        // Ensure the default initialized object has nil properties
+        let empty = SwiftNilDefaultOptionalNumberObject()
+        XCTAssertNil(empty.intCol)
+        XCTAssertNil(empty.floatCol)
+        XCTAssertNil(empty.doubleCol)
+        XCTAssertNil(empty.boolCol)
+
+        // Ensure the properties can be initialized to non-nil values
+        let initialized = SwiftNilDefaultOptionalNumberObject(value: [1, 2.2 as Float, 3.3, true])
+        XCTAssertEqual(.int(1),      initialized.intCol)
+        XCTAssertEqual(.float(2.2),  initialized.floatCol)
+        XCTAssertEqual(.double(3.3), initialized.doubleCol)
+        XCTAssertEqual(.bool(true),  initialized.boolCol)
+
+        // Ensure unmanaged properties can be set back to nil by setting `RLMNumericNull`
+        let unmanaged = SwiftNilDefaultOptionalNumberObject(value: [1, 2.2 as Float, 3.3, true])
+        unmanaged.intCol    = .int(nil)
+        unmanaged.floatCol  = .float(nil)
+        unmanaged.doubleCol = .double(nil)
+        unmanaged.boolCol   = .bool(nil)
+        XCTAssertNil(unmanaged.intCol)
+        XCTAssertNil(unmanaged.floatCol)
+        XCTAssertNil(unmanaged.doubleCol)
+        XCTAssertNil(unmanaged.boolCol)
+
+        // Ensure managed properties can be set back to nil by setting `RLMNumericNull`
+        let managed = SwiftNilDefaultOptionalNumberObject(value: [1, 2.2 as Float, 3.3, true])
+        try! realm.transaction {
+            realm.add(managed)
+            managed.intCol    = .int(nil)
+            managed.floatCol  = .float(nil)
+            managed.doubleCol = .double(nil)
+            managed.boolCol   = .bool(nil)
+        }
+        XCTAssertNil(managed.intCol)
+        XCTAssertNil(managed.floatCol)
+        XCTAssertNil(managed.doubleCol)
+        XCTAssertNil(managed.boolCol)
     }
 
     func testOptionalSwiftProperties() {
@@ -320,6 +383,13 @@ class SwiftOptionalNumberObject: RLMObject {
     dynamic var boolCol: NSNumber? = true
 }
 
+class SwiftNilDefaultOptionalNumberObject: RLMObject {
+    dynamic var intCol: NSNumber? = .int(nil)
+    dynamic var floatCol: NSNumber? = .float(nil)
+    dynamic var doubleCol: NSNumber? = .double(nil)
+    dynamic var boolCol: NSNumber? = .bool(nil)
+}
+
 class SwiftObjectInterfaceTests: RLMTestCase {
 
     // Swift models
@@ -447,6 +517,62 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(2.2 as Float, no.floatCol!)
         XCTAssertEqual(3.3, no.doubleCol!)
         XCTAssertEqual(false, no.boolCol!)
+    }
+
+    func testNilDefaultOptionalNumberObject() {
+        let realm = realmWithTestPath()
+
+        // Ensure that the static methods return NSNumbers when not passed nil
+        XCTAssertEqual(1, NSNumber.int(1))
+        XCTAssertEqual(2.2 as Float as NSNumber, NSNumber.float(2.2))
+        XCTAssertEqual(3.3, NSNumber.double(3.3))
+        XCTAssertEqual(true, NSNumber.bool(true))
+
+        // Ensure the object schema was correclty parsed
+        let objectSchema = SwiftNilDefaultOptionalNumberObject.sharedSchema()!
+        XCTAssertEqual(RLMPropertyType.Int,    objectSchema["intCol"]?.type)
+        XCTAssertEqual(RLMPropertyType.Float,  objectSchema["floatCol"]?.type)
+        XCTAssertEqual(RLMPropertyType.Double, objectSchema["doubleCol"]?.type)
+        XCTAssertEqual(RLMPropertyType.Bool,   objectSchema["boolCol"]?.type)
+
+        // Ensure the default initialized object has nil properties
+        let empty = SwiftNilDefaultOptionalNumberObject()
+        XCTAssertNil(empty.intCol)
+        XCTAssertNil(empty.floatCol)
+        XCTAssertNil(empty.doubleCol)
+        XCTAssertNil(empty.boolCol)
+
+        // Ensure the properties can be initialized to non-nil values
+        let initialized = SwiftNilDefaultOptionalNumberObject(value: [1, 2.2 as Float, 3.3, true])
+        XCTAssertEqual(.int(1),      initialized.intCol)
+        XCTAssertEqual(.float(2.2),  initialized.floatCol)
+        XCTAssertEqual(.double(3.3), initialized.doubleCol)
+        XCTAssertEqual(.bool(true),  initialized.boolCol)
+
+        // Ensure unmanaged properties can be set back to nil by setting `RLMNumericNull`
+        let unmanaged = SwiftNilDefaultOptionalNumberObject(value: [1, 2.2 as Float, 3.3, true])
+        unmanaged.intCol    = .int(nil)
+        unmanaged.floatCol  = .float(nil)
+        unmanaged.doubleCol = .double(nil)
+        unmanaged.boolCol   = .bool(nil)
+        XCTAssertNil(unmanaged.intCol)
+        XCTAssertNil(unmanaged.floatCol)
+        XCTAssertNil(unmanaged.doubleCol)
+        XCTAssertNil(unmanaged.boolCol)
+
+        // Ensure managed properties can be set back to nil by setting `RLMNumericNull`
+        let managed = SwiftNilDefaultOptionalNumberObject(value: [1, 2.2 as Float, 3.3, true])
+        try! realm.transactionWithBlock {
+            realm.addObject(managed)
+            managed.intCol    = .int(nil)
+            managed.floatCol  = .float(nil)
+            managed.doubleCol = .double(nil)
+            managed.boolCol   = .bool(nil)
+        }
+        XCTAssertNil(managed.intCol)
+        XCTAssertNil(managed.floatCol)
+        XCTAssertNil(managed.doubleCol)
+        XCTAssertNil(managed.boolCol)
     }
 
     func testOptionalSwiftProperties() {

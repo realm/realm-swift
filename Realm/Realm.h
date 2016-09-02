@@ -20,6 +20,7 @@
 
 #import <Realm/RLMArray.h>
 #import <Realm/RLMMigration.h>
+#import <Realm/RLMNumericNull.h>
 #import <Realm/RLMObject.h>
 #import <Realm/RLMObjectSchema.h>
 #import <Realm/RLMPlatform.h>

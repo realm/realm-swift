@@ -256,7 +256,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
                                __unsafe_unretained NSNumber<RLMInt> *const intObject) {
     RLMVerifyInWriteTransaction(obj);
 
-    if (intObject) {
+    if (!RLMIsNullNumber(intObject)) {
         obj->_row.set_int(colIndex, intObject.longLongValue);
     }
     else {
@@ -269,7 +269,8 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
 
     long long longLongValue = 0;
     size_t row;
-    if (intObject) {
+    bool isNull = RLMIsNullNumber(intObject);
+    if (!isNull) {
         longLongValue = intObject.longLongValue;
         row = obj->_row.get_table()->find_first_int(colIndex, longLongValue);
     }
@@ -281,7 +282,7 @@ static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const ob
         @throw RLMException(@"Can't set primary key property '%@' to existing value '%@'.", propName, intObject);
     }
 
-    if (intObject) {
+    if (!isNull) {
         obj->_row.set_int_unique(colIndex, longLongValue);
     }
     else {
@@ -293,7 +294,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
                                __unsafe_unretained NSNumber<RLMFloat> *const floatObject) {
     RLMVerifyInWriteTransaction(obj);
 
-    if (floatObject) {
+    if (RLMCoerceToNil(floatObject)) {
         obj->_row.set_float(colIndex, floatObject.floatValue);
     }
     else {
@@ -305,7 +306,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
                                __unsafe_unretained NSNumber<RLMDouble> *const doubleObject) {
     RLMVerifyInWriteTransaction(obj);
 
-    if (doubleObject) {
+    if (!RLMIsNullNumber(doubleObject)) {
         obj->_row.set_double(colIndex, doubleObject.doubleValue);
     }
     else {
@@ -317,7 +318,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
                                __unsafe_unretained NSNumber<RLMBool> *const boolObject) {
     RLMVerifyInWriteTransaction(obj);
 
-    if (boolObject) {
+    if (!RLMIsNullNumber(boolObject)) {
         obj->_row.set_bool(colIndex, boolObject.boolValue);
     }
     else {
@@ -498,40 +499,63 @@ static void RLMSuperSet(RLMObjectBase *obj, NSString *propName, id val) {
 
 // getter/setter for unmanaged object
 static IMP RLMAccessorUnmanagedGetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
-    // only override getters for RLMArray and linking objects properties
-    if (accessorCode == RLMAccessorCodeArray) {
-        NSString *objectClassName = prop.objectClassName;
-        NSString *propName = prop.name;
+    switch (accessorCode) {
+        case RLMAccessorCodeArray: {
+            NSString *objectClassName = prop.objectClassName;
+            NSString *propName = prop.name;
 
-        return imp_implementationWithBlock(^(RLMObjectBase *obj) {
-            id val = RLMSuperGet(obj, propName);
-            if (!val) {
-                val = [[RLMArray alloc] initWithObjectClassName:objectClassName];
-                RLMSuperSet(obj, propName, val);
-            }
-            return val;
-        });
+            return imp_implementationWithBlock(^(RLMObjectBase *obj) {
+                id val = RLMSuperGet(obj, propName);
+                if (!val) {
+                    val = [[RLMArray alloc] initWithObjectClassName:objectClassName];
+                    RLMSuperSet(obj, propName, val);
+                }
+                return val;
+            });
+        }
+        case RLMAccessorCodeLinkingObjects:
+            return imp_implementationWithBlock(^(RLMObjectBase *){
+                return [RLMResults emptyDetachedResults];
+            });
+        case RLMAccessorCodeIntObject:
+        case RLMAccessorCodeFloatObject:
+        case RLMAccessorCodeDoubleObject:
+        case RLMAccessorCodeBoolObject: {
+            NSString *propName = prop.name;
+            return imp_implementationWithBlock(^(RLMObjectBase *obj){
+                return RLMCoerceToNil(RLMSuperGet(obj, propName)); // coerce default values
+            });
+        }
+        default:
+            // unnecessary to provide a custom getter
+            return nil;
     }
-    else if (accessorCode == RLMAccessorCodeLinkingObjects) {
-        return imp_implementationWithBlock(^(RLMObjectBase *){
-            return [RLMResults emptyDetachedResults];
-        });
-    }
-    return nil;
 }
 static IMP RLMAccessorUnmanagedSetter(RLMProperty *prop, RLMAccessorCode accessorCode) {
-    // only override getters for RLMArray and linking objects properties
-    if (accessorCode == RLMAccessorCodeArray) {
-        NSString *propName = prop.name;
-        NSString *objectClassName = prop.objectClassName;
-        return imp_implementationWithBlock(^(RLMObjectBase *obj, id<NSFastEnumeration> ar) {
-            // make copy when setting (as is the case for all other variants)
-            RLMArray *unmanagedAr = [[RLMArray alloc] initWithObjectClassName:objectClassName];
-            [unmanagedAr addObjects:ar];
-            RLMSuperSet(obj, propName, unmanagedAr);
-        });
+    switch (accessorCode) {
+        case RLMAccessorCodeArray: {
+            NSString *propName = prop.name;
+            NSString *objectClassName = prop.objectClassName;
+            return imp_implementationWithBlock(^(RLMObjectBase *obj, id<NSFastEnumeration> ar) {
+                // make copy when setting (as is the case for all other variants)
+                RLMArray *unmanagedAr = [[RLMArray alloc] initWithObjectClassName:objectClassName];
+                [unmanagedAr addObjects:ar];
+                RLMSuperSet(obj, propName, unmanagedAr);
+            });
+        }
+        case RLMAccessorCodeIntObject:
+        case RLMAccessorCodeFloatObject:
+        case RLMAccessorCodeDoubleObject:
+        case RLMAccessorCodeBoolObject: {
+            NSString *propName = prop.name;
+            return imp_implementationWithBlock(^(RLMObjectBase *obj, NSNumber *number) {
+                RLMSuperSet(obj, propName, RLMCoerceToNil(number)); // unnecessary to keep alive null value
+            });
+        }
+        default:
+            // unnecessary to provide a custom setter
+            return nil;
     }
-    return nil;
 }
 
 // macros/helpers to generate objc type strings for registering methods

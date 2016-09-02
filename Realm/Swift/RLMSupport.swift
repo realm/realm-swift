@@ -89,6 +89,48 @@ import Realm
         }
     }
 
+    extension NSNumber {
+        static func float(_ value: Float?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullFloat() }
+            return NSNumber(value: value)
+        }
+
+        static func double(_ value: Double?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullDouble() }
+            return NSNumber(value: value)
+        }
+
+        static func bool(_ value: Bool?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullBool() }
+            return NSNumber(value: value)
+        }
+
+        static func int(_ value: Int?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullInt() }
+            return NSNumber(value: value)
+        }
+
+        static func int8(_ value: Int8?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullInt8() }
+            return NSNumber(value: value)
+        }
+
+        static func int16(_ value: Int16?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullInt16() }
+            return NSNumber(value: value)
+        }
+
+        static func int32(_ value: Int32?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullInt32() }
+            return NSNumber(value: value)
+        }
+
+        static func int64(_ value: Int64?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullInt64() }
+            return NSNumber(value: value)
+        }
+    }
+
 #else
     extension RLMRealm {
         @nonobjc public class func schemaVersionAtURL(url: NSURL, encryptionKey key: NSData? = nil,
@@ -152,6 +194,48 @@ import Realm
 
         public func objectsWhere(predicateFormat: String, _ args: CVarArgType...) -> RLMResults {
             return objectsWithPredicate(NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+        }
+    }
+
+    extension NSNumber {
+        static func float(value: Float?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullFloat() }
+            return NSNumber(float: value)
+        }
+
+        static func double(value: Double?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullDouble() }
+            return NSNumber(double: value)
+        }
+
+        static func bool(value: Bool?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullBool() }
+            return NSNumber(bool: value)
+        }
+
+        static func int(value: Int?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullInt() }
+            return NSNumber(integer: value)
+        }
+
+        static func int8(value: Int8?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullInt8() }
+            return NSNumber(char: value)
+        }
+
+        static func int16(value: Int16?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullInt16() }
+            return NSNumber(short: value)
+        }
+
+        static func int32(value: Int32?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullInt32() }
+            return NSNumber(int: value)
+        }
+
+        static func int64(value: Int64?) -> NSNumber {
+            guard let value = value else { return RLMNumericNull.nullInt64() }
+            return NSNumber(longLong: value)
         }
     }
 #endif

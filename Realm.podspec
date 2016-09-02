@@ -20,6 +20,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMCollection.h',
                               'include/**/RLMConstants.h',
                               'include/**/RLMListBase.h',
+                              'include/**/RLMNumericNull.h’,
                               'include/**/RLMMigration.h',
                               'include/**/RLMObject.h',
                               'include/**/RLMObjectBase.h',
