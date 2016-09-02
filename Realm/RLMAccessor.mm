@@ -80,14 +80,6 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
     RLMVerifyInWriteTransaction(obj);
     obj->_row.set_int(colIndex, val);
 }
-static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, NSString *propName, long long val) {
-    RLMVerifyInWriteTransaction(obj);
-    size_t row = obj->_row.get_table()->find_first_int(colIndex, val);
-    if (row != obj->_row.get_index() && row != realm::not_found) {
-        @throw RLMException(@"Can't set primary key property '%@' to existing value '%lld'.", propName, val);
-    }
-    obj->_row.set_int_unique(colIndex, val);
-}
 
 // float getter/setter
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, float val) {
@@ -115,21 +107,6 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
     RLMVerifyInWriteTransaction(obj);
     try {
         obj->_row.set_string(colIndex, RLMStringDataWithNSString(val));
-    }
-    catch (std::exception const& e) {
-        @throw RLMException(e);
-    }
-}
-static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, NSString *propName,
-                                     __unsafe_unretained NSString *const val) {
-    RLMVerifyInWriteTransaction(obj);
-    realm::StringData str = RLMStringDataWithNSString(val);
-    size_t row = obj->_row.get_table()->find_first_string(colIndex, str);
-    if (row != obj->_row.get_index() && row != realm::not_found) {
-        @throw RLMException(@"Can't set primary key property '%@' to existing value '%@'.", propName, val);
-    }
-    try {
-        obj->_row.set_string_unique(colIndex, str);
     }
     catch (std::exception const& e) {
         @throw RLMException(e);
@@ -261,31 +238,6 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
     }
     else {
         obj->_row.set_null(colIndex);
-    }
-}
-static inline void RLMSetValueUnique(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, NSString *propName,
-                                     __unsafe_unretained NSNumber<RLMInt> *const intObject) {
-    RLMVerifyInWriteTransaction(obj);
-
-    long long longLongValue = 0;
-    size_t row;
-    if (intObject) {
-        longLongValue = intObject.longLongValue;
-        row = obj->_row.get_table()->find_first_int(colIndex, longLongValue);
-    }
-    else {
-        row = obj->_row.get_table()->find_first_null(colIndex);
-    }
-
-    if (row != obj->_row.get_index() && row != realm::not_found) {
-        @throw RLMException(@"Can't set primary key property '%@' to existing value '%@'.", propName, intObject);
-    }
-
-    if (intObject) {
-        obj->_row.set_int_unique(colIndex, longLongValue);
-    }
-    else {
-        obj->_row.set_null(colIndex); // FIXME: Use `set_null_unique` once Core implements it.
     }
 }
 
@@ -731,8 +683,11 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     RLMDynamicSet(obj, prop, RLMCoerceToNil(val), RLMCreationOptionsPromoteUnmanaged);
 }
 
+// Precondition: the property is not a primary key
 void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained RLMProperty *const prop,
                    __unsafe_unretained id const val, RLMCreationOptions creationOptions) {
+    REALM_ASSERT_DEBUG(!prop.isPrimary);
+
     auto col = obj->_info->tableColumn(prop);
     RLMWrapSetter(obj, prop.name, [&] {
         switch (accessorCodeForType(prop.objcType, prop.type)) {
@@ -741,12 +696,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
             case RLMAccessorCodeInt:
             case RLMAccessorCodeLong:
             case RLMAccessorCodeLongLong:
-                if (prop.isPrimary) {
-                    RLMSetValueUnique(obj, col, prop.name, [val longLongValue]);
-                }
-                else {
-                    RLMSetValue(obj, col, [val longLongValue]);
-                }
+                RLMSetValue(obj, col, [val longLongValue]);
                 break;
             case RLMAccessorCodeFloat:
                 RLMSetValue(obj, col, [val floatValue]);
@@ -758,12 +708,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
                 RLMSetValue(obj, col, [val boolValue]);
                 break;
             case RLMAccessorCodeIntObject:
-                if (prop.isPrimary) {
-                    RLMSetValueUnique(obj, col, prop.name, (NSNumber<RLMInt> *)val);
-                }
-                else {
-                    RLMSetValue(obj, col, (NSNumber<RLMInt> *)val);
-                }
+                RLMSetValue(obj, col, (NSNumber<RLMInt> *)val);
                 break;
             case RLMAccessorCodeFloatObject:
                 RLMSetValue(obj, col, (NSNumber<RLMFloat> *)val);
@@ -775,12 +720,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
                 RLMSetValue(obj, col, (NSNumber<RLMBool> *)val);
                 break;
             case RLMAccessorCodeString:
-                if (prop.isPrimary) {
-                    RLMSetValueUnique(obj, col, prop.name, (NSString *)val);
-                }
-                else {
-                    RLMSetValue(obj, col, (NSString *)val);
-                }
+                RLMSetValue(obj, col, (NSString *)val);
                 break;
             case RLMAccessorCodeDate:
                 RLMSetValue(obj, col, (NSDate *)val);
