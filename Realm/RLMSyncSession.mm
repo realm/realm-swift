@@ -20,7 +20,8 @@
 
 #import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
-#import "RLMSyncManager_Private.h"
+#import "RLMRealmConfiguration+Sync.h"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMSyncUtil.h"
 #import "RLMTokenModels.h"
 #import "RLMUser_Private.h"
@@ -44,21 +45,39 @@
 
 @interface RLMSyncSession ()
 
+@property (nonatomic, readwrite) RLMSyncSessionState state;
 @property (nonatomic, readwrite) RLMUser *parentUser;
+@property (nonatomic, readwrite) NSURL *realmURL;
 
 @end
 
 @implementation RLMSyncSession
 
-- (instancetype)initWithFileURL:(NSURL *)fileURL {
+- (instancetype)initWithFileURL:(NSURL *)fileURL realmURL:(NSURL *)realmURL {
     if (self = [super init]) {
         self.fileURL = fileURL;
+        self.realmURL = realmURL;
         self.resolvedPath = nil;
         self.deferredBindingPackage = nil;
-        self.isBound = NO;
+        self.state = RLMSyncSessionStateUnbound;
         return self;
     }
     return nil;
+}
+
+- (nullable RLMSyncConfiguration *)configuration {
+    RLMUser *user = self.parentUser;
+    if (user && self.state != RLMSyncSessionStateInvalid) {
+        return [[RLMSyncConfiguration alloc] initWithUser:user realmURL:self.realmURL];
+    }
+    return nil;
+}
+
+- (void)_invalidate {
+    [self.refreshTimer invalidate];
+    self.state = RLMSyncSessionStateInvalid;
+    [self.parentUser _deregisterSessionWithRealmURL:self.realmURL];
+    self.parentUser = nil;
 }
 
 #pragma mark - per-Realm access token API
@@ -85,7 +104,7 @@
     self.refreshTimer = timer;
 }
 
-- (void)refresh {
+- (void)_refresh {
     RLMUser *user = self.parentUser;
     if (!user || !self.resolvedPath) {
         return;
@@ -120,7 +139,7 @@
                 realm::Realm::refresh_sync_access_token(std::string([tokenModel.token UTF8String]),
                                                         RLMStringDataWithNSString([self.fileURL path]),
                                                         realm::util::none);
-                self.isBound = YES;
+                self.state = RLMSyncSessionStateActive;
             }
         } else {
             // Something else went wrong
@@ -134,9 +153,9 @@
                                  completion:handler];
 }
 
-- (void)setIsBound:(BOOL)isBound {
-    _isBound = isBound;
-    if (isBound) {
+- (void)setState:(RLMSyncSessionState)state {
+    _state = state;
+    if (state == RLMSyncSessionStateActive) {
         self.deferredBindingPackage = nil;
     }
 }

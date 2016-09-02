@@ -18,6 +18,8 @@
 
 #import "RLMSyncManager.h"
 
+#import "sync_config.hpp"
+
 @class RLMUser;
 
 // All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
@@ -27,11 +29,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/**
- Manually fire the application's error notification callback, if one is set. An error must be passed in. If the error is
- associated with a particular Realm, a session object representing that Realm can also be passed in.
- */
-- (void)_fireError:(NSError *)error forSession:(nullable RLMSyncSession *)session;
+- (void)_handleErrorWithCode:(int)errorCode
+                     message:(NSString *)message
+                     session:(nullable RLMSyncSession *)session
+                  errorClass:(realm::SyncSessionError)errorClass;
 
 - (NSArray<RLMUser *> *)_allUsers;
 

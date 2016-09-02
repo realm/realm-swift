@@ -37,6 +37,9 @@ NS_ASSUME_NONNULL_BEGIN
                                    realmURL:(NSURL *)realmURL
                                onCompletion:(nullable RLMErrorReportingBlock)completion;
 
+- (void)_invalidate;
+- (void)_deregisterSessionWithRealmURL:(NSURL *)realmURL;
+
 NS_ASSUME_NONNULL_END
 
 @end

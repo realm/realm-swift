@@ -21,7 +21,7 @@
 #import "RLMRealmConfiguration_Private.hpp"
 
 #import "RLMUser_Private.h"
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMSyncUtil_Private.h"
 #import "RLMUtil.hpp"
 
@@ -72,14 +72,12 @@ static BOOL isValidRealmURL(NSURL *url) {
     std::string rawURLString = [[realmURL absoluteString] UTF8String];
 
     // Automatically configure the per-Realm error handler.
-    auto error_handler = [=](int error_code, std::string message) {
-        NSString *nativeMessage = @(message.c_str());
-        NSError *error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                             code:RLMSyncInternalError
-                                         userInfo:@{@"description": nativeMessage,
-                                                    @"error": @(error_code)}];
+    auto error_handler = [=](int error_code, std::string message, realm::SyncSessionError error_type) {
         RLMSyncSession *session = [user.sessions objectForKey:realmURL];
-        [[RLMSyncManager sharedManager] _fireError:error forSession:session];
+        [[RLMSyncManager sharedManager] _handleErrorWithCode:error_code
+                                                     message:@(message.c_str())
+                                                     session:session
+                                                  errorClass:error_type];
     };
 
     NSURL *localFilePath = [RLMRealmConfiguration _filePathForRawRealmURL:realmURL

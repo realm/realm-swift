@@ -20,13 +20,33 @@
 
 #import "RLMSyncUtil.h"
 
-@class RLMUser;
+/**
+ The current state of a sync session object.
+ */
+typedef NS_ENUM(NSUInteger, RLMSyncSessionState) {
+    /// The sync session is valid, but has not yet been bound to the Realm Object Server.
+    RLMSyncSessionStateUnbound,
+    /// The sync session is bound to the Realm Object Server and communicating with it.
+    RLMSyncSessionStateActive,
+    /// The sync session encountered and error and is invalid; it should be discarded.
+    RLMSyncSessionStateInvalid
+};
+
+@class RLMUser, RLMSyncConfiguration;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncSession : NSObject RLM_SYNC_UNINITIALIZABLE
 
+@property (nonatomic, readonly) RLMSyncSessionState state;
+
+@property (nonatomic, readonly) NSURL *realmURL;
+
 @property (nonatomic, weak, nullable, readonly) RLMUser *parentUser;
+
+/// If the session is valid, return a sync configuration that can be used to open the Realm associated with this
+/// session.
+- (nullable RLMSyncConfiguration *)configuration;
 
 NS_ASSUME_NONNULL_END
 

@@ -45,8 +45,14 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
     /// `userInfo` dictionary contains the actual error code value.
     RLMSyncErrorHTTPStatusCodeError     = 3,
 
-    /// An error that indicates an issue with the underlying Realm Object Server engine.
-    RLMSyncInternalError                = 4,
+    /// An error that indicates a problem with the session (a specific Realm opened for sync).
+    RLMSyncClientSessionError           = 4,
+
+    /// An error that indicates a problem with a specific user.
+    RLMSyncClientUserError              = 5,
+
+    /// An error that indicates an internal error with the underlying synchronization engine. Only for information.
+    RLMSyncClientInternalError          = 6,
 };
 
 NS_ASSUME_NONNULL_END
