@@ -39,9 +39,9 @@ extern RLMIdentityProvider const RLMIdentityProviderICloud;
 @property (nonatomic, readonly) RLMIdentityProvider provider;
 @property (nonatomic, readonly) NSDictionary<NSString *, id> *userInfo;
 
-- (instancetype)initWithFacebookToken:(RLMCredentialToken)token;
++ (instancetype)credentialWithFacebookToken:(RLMCredentialToken)token;
 
-- (instancetype)initWithUsername:(NSString *)username password:(NSString *)password;
++ (instancetype)credentialWithUsername:(NSString *)username password:(NSString *)password;
 
 - (instancetype)initWithCustomToken:(RLMCredentialToken)token
                            provider:(RLMIdentityProvider)provider

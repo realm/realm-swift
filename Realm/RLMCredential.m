@@ -37,14 +37,14 @@ RLMIdentityProvider const RLMIdentityProviderICloud                 = @"icloud";
 
 @implementation RLMCredential
 
-- (instancetype)initWithFacebookToken:(RLMCredentialToken)token {
-    return [self initWithCustomToken:token provider:RLMIdentityProviderFacebook userInfo:nil];
++ (instancetype)credentialWithFacebookToken:(RLMCredentialToken)token {
+    return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderFacebook userInfo:nil];
 }
 
-- (instancetype)initWithUsername:(NSString *)username password:(NSString *)password {
-    return [self initWithCustomToken:username
-                            provider:RLMIdentityProviderUsernamePassword
-                            userInfo:@{kRLMSyncPasswordKey: password}];
++ (instancetype)credentialWithUsername:(NSString *)username password:(NSString *)password {
+    return [[self alloc] initWithCustomToken:username
+                                    provider:RLMIdentityProviderUsernamePassword
+                                    userInfo:@{kRLMSyncPasswordKey: password}];
 }
 
 - (instancetype)initWithCustomToken:(RLMCredentialToken)token
