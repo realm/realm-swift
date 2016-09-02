@@ -19,8 +19,6 @@
 #import <Foundation/Foundation.h>
 #import "RLMConstants.h"
 
-@class RLMRealmConfiguration;
-
 typedef NSString* RLMCredentialToken;
 typedef NSString* RLMServerToken;
 

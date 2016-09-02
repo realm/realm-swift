@@ -67,16 +67,6 @@ using namespace realm;
     return nil;
 }
 
-+ (instancetype)userWithAccessToken:(RLMServerToken)accessToken identity:(nullable NSString *)identity {
-    RLMSyncUser *user = [[RLMSyncUser alloc] initWithAuthServer:nil];
-    user.directAccessToken = accessToken;
-    user.isValid = YES;
-    user.identity = identity ?: [[NSUUID UUID] UUIDString];
-
-    // Note that we explicitly do NOT persist users with direct access tokens.
-    return user;
-}
-
 + (void)authenticateWithCredential:(RLMSyncCredential *)credential
                            actions:(RLMAuthenticationActions)actions
                      authServerURL:(NSURL *)authServerURL
@@ -175,6 +165,12 @@ using namespace realm;
         });
     };
 
+    // Special credential login should be treated differently.
+    if (credential.provider == RLMIdentityProviderAccessToken) {
+        [self _performLoginForDirectAccessTokenCredential:credential user:user completionBlock:theBlock];
+        return;
+    }
+
     // Prepare login network request
     NSMutableDictionary *json = [@{
                                    kRLMSyncProviderKey: credential.provider,
@@ -228,9 +224,22 @@ using namespace realm;
                                  completion:handler];
 }
 
++ (void)_performLoginForDirectAccessTokenCredential:(RLMSyncCredential *)credential
+                                               user:(RLMSyncUser *)user
+                                    completionBlock:(nonnull RLMUserCompletionBlock)completion {
+    user.directAccessToken = credential.token;
+    NSString *identity = credential.userInfo[kRLMSyncIdentityKey];
+    NSAssert(identity != nil, @"Improperly created direct access token credential.");
+    user.identity = identity;
+    user.isValid = YES;
+    [[RLMSyncManager sharedManager] _registerUser:user];
+    [user _bindAllDeferredRealms];
+    completion(user, nil);
+}
+
 // Upon successfully logging in, bind any Realm which was opened and registered to the user previously.
 - (void)_bindAllDeferredRealms {
-    NSAssert(self.isValid, @"Logic error: _bindAllDeferredRealms can't be called unless the User is logged in.");
+    NSAssert(self.isValid, @"_bindAllDeferredRealms can't be called unless the user is logged in.");
     for (NSURL *key in self.sessionsStorage) {
         RLMSyncSession *session = self.sessionsStorage[key];
         RLMRealmBindingPackage *package = session.deferredBindingPackage;
@@ -240,10 +249,42 @@ using namespace realm;
     }
 }
 
+- (void)_bindRealmWithDirectAccessToken:(RLMServerToken)accessToken
+                           localFileURL:(NSURL *)fileURL
+                               realmURL:(NSURL *)realmURL
+                           onCompletion:(RLMSyncBasicErrorReportingBlock)completion{
+    RLMSyncSession *session = self.sessionsStorage[realmURL];
+    std::string realm_url = [[realmURL absoluteString] UTF8String];
+    bool success = Realm::refresh_sync_access_token(std::string([accessToken UTF8String]),
+                                                    RLMStringDataWithNSString([fileURL path]),
+                                                    realm_url);
+    if (success) {
+        [session configureWithAccessToken:accessToken
+                                   expiry:[[NSDate distantFuture] timeIntervalSince1970]
+                                     user:self];
+        [session setState:RLMSyncSessionStateActive];
+    } else {
+        [session _invalidate];
+    }
+    if (completion) {
+        completion(success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
+                                                       code:RLMSyncErrorClientSessionError
+                                                   userInfo:nil]);
+    }
+}
+
 // Immediately begin the handshake to get the resolved remote path and the access token.
 - (void)_bindRealmWithLocalFileURL:(NSURL *)fileURL
                           realmURL:(NSURL *)realmURL
                       onCompletion:(RLMSyncBasicErrorReportingBlock)completion {
+    if (self.directAccessToken) {
+        [self _bindRealmWithDirectAccessToken:self.directAccessToken
+                                 localFileURL:fileURL
+                                     realmURL:realmURL
+                                 onCompletion:completion];
+        return;
+    }
+
     RLMServerPath unresolvedPath = [realmURL path];
     NSDictionary *json = @{
                            kRLMSyncPathKey: unresolvedPath,
@@ -328,28 +369,6 @@ using namespace realm;
 
     RLMSyncSession *session = [[RLMSyncSession alloc] initWithFileURL:fileURL realmURL:realmURL];
     self.sessionsStorage[realmURL] = session;
-
-    if (self.directAccessToken) {
-        // Special case for when the access token is provided by the host app.
-        std::string realm_url = [[realmURL absoluteString] UTF8String];
-        bool success = Realm::refresh_sync_access_token(std::string([self.directAccessToken UTF8String]),
-                                                        RLMStringDataWithNSString([fileURL path]),
-                                                        realm_url);
-        [session configureWithAccessToken:self.directAccessToken
-                                   expiry:[[NSDate distantFuture] timeIntervalSince1970]
-                                     user:self];
-        if (success) {
-            [session setState:RLMSyncSessionStateActive];
-        } else {
-            [session _invalidate];
-        }
-        if (completion) {
-            completion(success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
-                                                           code:RLMSyncErrorClientSessionError
-                                                       userInfo:nil]);
-        }
-        return;
-    }
 
     if (!self.isValid) {
         // We will delay the path resolution/access token handshake until the user logs in

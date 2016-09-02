@@ -20,13 +20,16 @@
 
 #import "RLMSyncUtil_Private.h"
 
+RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
+
 NSString *const RLMSyncErrorDomain = @"io.realm.sync";
 
-NSString *const kRLMSyncProviderKey      = @"provider";
-NSString *const kRLMSyncDataKey          = @"data";
-NSString *const kRLMSyncAppIDKey         = @"app_id";
-NSString *const kRLMSyncPathKey          = @"path";
-NSString *const kRLMSyncPasswordKey      = @"password";
-NSString *const kRLMSyncRegisterKey      = @"register";
-NSString *const kRLMSyncErrorJSONKey     = @"json";
+NSString *const kRLMSyncAppIDKey                = @"app_id";
+NSString *const kRLMSyncDataKey                 = @"data";
+NSString *const kRLMSyncErrorJSONKey            = @"json";
+NSString *const kRLMSyncIdentityKey             = @"identity";
+NSString *const kRLMSyncPasswordKey             = @"password";
+NSString *const kRLMSyncPathKey                 = @"path";
+NSString *const kRLMSyncProviderKey             = @"provider";
+NSString *const kRLMSyncRegisterKey             = @"register";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
