@@ -40,12 +40,12 @@ const uint64_t RLMNotVersioned = realm::ObjectStore::NotVersioned;
 
 // RLMSchema private properties
 @interface RLMSchema ()
-@property (nonatomic, readwrite) NSMutableDictionary *objectSchemaByName;
+@property (nonatomic, readwrite) NSMutableDictionary<NSString *, RLMObjectSchema *> *objectSchemaByName;
 @end
 
 static RLMSchema *s_sharedSchema = [[RLMSchema alloc] init];
-static NSMutableDictionary *s_classByName = [[NSMutableDictionary alloc] init];
-static NSMutableDictionary *s_objectSchemaByName = [[NSMutableDictionary alloc] init];
+static NSMutableDictionary<NSString *, Class> *s_classByName = [[NSMutableDictionary alloc] init];
+static NSMutableDictionary<NSString *, RLMObjectSchema *> *s_objectSchemaByName = [[NSMutableDictionary alloc] init];
 
 static enum class SharedSchemaState {
     Uninitialized,
