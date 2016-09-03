@@ -16,63 +16,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealmConfiguration+Sync_Private.h"
+#import "RLMRealmConfiguration+Sync.h"
 
 #import "RLMRealmConfiguration_Private.hpp"
-
+#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncFileManager.h"
 #import "RLMSyncManager_Private.hpp"
-#import "RLMSyncUtil_Private.h"
+#import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import "sync_config.hpp"
-
-NSString *const RLMSyncPrivateCustomFileURLKey = @"_custom_file_url";
-
-static BOOL isValidRealmURL(NSURL *url) {
-    NSString *scheme = [url scheme];
-    if (![scheme isEqualToString:@"realm"] && ![scheme isEqualToString:@"realms"]) {
-        return NO;
-    }
-    return YES;
-}
-
-@interface RLMSyncConfiguration ()
-
-@property (nonatomic, readwrite) RLMSyncUser *user;
-@property (nonatomic, readwrite) NSURL *realmURL;
-@property (nonatomic) NSMutableDictionary<NSString *, id> *userInfo;
-
-@end
-
-@implementation RLMSyncConfiguration
-
-- (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url {
-    if (self = [super init]) {
-        self.user = user;
-        if (!isValidRealmURL(url)) {
-            @throw RLMException(@"The provided URL (%@) was not a valid Realm URL.", [url absoluteString]);
-        }
-        self.realmURL = url;
-        return self;
-    }
-    return nil;
-}
-
-- (void)setCustomFileURL:(NSURL *)customFileURL {
-    NSAssert(customFileURL.isFileURL, @"Cannot call setCustomFileURL: with a non-file URL.");
-    [self.userInfo setValue:customFileURL forKey:RLMSyncPrivateCustomFileURLKey];
-}
-
-- (NSMutableDictionary *)userInfo {
-    if (!_userInfo) {
-        _userInfo = [NSMutableDictionary dictionary];
-    }
-    return _userInfo;
-}
-
-@end
+#import "sync_manager.hpp"
 
 @implementation RLMRealmConfiguration (Sync)
 
@@ -88,27 +43,13 @@ static BOOL isValidRealmURL(NSURL *url) {
     // Ensure sync manager is initialized, if it hasn't already been.
     [RLMSyncManager sharedManager];
     NSAssert(user.identity, @"Cannot call this method on a user that doesn't have an identity.");
-    std::string identity = [user.identity UTF8String];
-    std::string rawURLString = [[realmURL absoluteString] UTF8String];
-
-    // Automatically configure the per-Realm error handler.
-    auto error_handler = [=](int error_code, std::string message, realm::SyncSessionError error_type) {
-        RLMSyncSession *session = [user.sessions objectForKey:realmURL];
-        [[RLMSyncManager sharedManager] _fireErrorWithCode:error_code
-                                                   message:@(message.c_str())
-                                                   session:session
-                                                errorClass:error_type];
-    };
-
     NSURL *localFileURL = [RLMSyncFileManager fileURLForRawRealmURL:realmURL user:user];
-    if (NSURL *customURL = [syncConfiguration.userInfo objectForKey:RLMSyncPrivateCustomFileURLKey]) {
-        localFileURL = customURL;
+    if (syncConfiguration.customFileURL) {
+        localFileURL = syncConfiguration.customFileURL;
     }
-    realm::SyncConfig syncConfig { std::move(identity), std::move(rawURLString), std::move(error_handler) };
-
     self.config.path = [[localFileURL path] UTF8String];
     self.config.in_memory = false;
-    self.config.sync_config = std::make_shared<realm::SyncConfig>(std::move(syncConfig));
+    self.config.sync_config = std::make_shared<realm::SyncConfig>([syncConfiguration rawConfiguration]);
     self.config.schema_mode = realm::SchemaMode::Additive;
 }
 
@@ -122,8 +63,11 @@ static BOOL isValidRealmURL(NSURL *url) {
     if (!thisUser) {
         @throw RLMException(@"Could not find the user this configuration refers to.");
     }
-    return [[RLMSyncConfiguration alloc] initWithUser:thisUser
-                                             realmURL:[NSURL URLWithString:@(sync_config.realm_url.c_str())]];
+    NSURL *realmURL = [NSURL URLWithString:@(sync_config.realm_url.c_str())];
+    RLMSyncConfiguration *c = [[RLMSyncConfiguration alloc] initWithUser:thisUser
+                                                                realmURL:realmURL];
+    c.stopPolicy = realm::translateStopPolicy(sync_config.stop_policy);
+    return c;
 }
 
 @end

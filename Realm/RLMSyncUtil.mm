@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil_Private.h"
+#import "RLMSyncUtil_Private.hpp"
 
 RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
 
@@ -33,3 +33,26 @@ NSString *const kRLMSyncPathKey                 = @"path";
 NSString *const kRLMSyncProviderKey             = @"provider";
 NSString *const kRLMSyncRegisterKey             = @"register";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
+
+namespace realm {
+
+SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy) {
+    switch (stopPolicy) {
+        case RLMSyncStopPolicyImmediately:              return SyncSessionStopPolicy::Immediately;
+        case RLMSyncStopPolicyLiveIndefinitely:         return SyncSessionStopPolicy::LiveIndefinitely;
+        case RLMSyncStopPolicyAfterChangesUploaded:     return SyncSessionStopPolicy::AfterChangesUploaded;
+    }
+    REALM_UNREACHABLE();    // Unrecognized stop policy.
+}
+
+RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy)
+{
+    switch (stop_policy) {
+        case SyncSessionStopPolicy::Immediately:            return RLMSyncStopPolicyImmediately;
+        case SyncSessionStopPolicy::LiveIndefinitely:       return RLMSyncStopPolicyLiveIndefinitely;
+        case SyncSessionStopPolicy::AfterChangesUploaded:   return RLMSyncStopPolicyAfterChangesUploaded;
+    }
+    REALM_UNREACHABLE();
+}
+
+}

@@ -18,20 +18,23 @@
 
 #import "RLMSyncSession.h"
 
+#import "RLMSyncConfiguration.h"
 #import "RLMSyncUtil_Private.h"
 
-@class RLMSyncUser;
+@class RLMSyncUser, RLMSyncSessionHandle;
 
-@interface RLMRealmBindingPackage : NSObject
+@interface RLMSessionBindingPackage : NSObject
 
 NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock block;
 @property (nonatomic) NSURL *fileURL;
-@property (nonatomic) NSURL *realmURL;
+@property (nonatomic) RLMSyncConfiguration *syncConfig;
+@property (nonatomic) BOOL isStandalone;
 
 - (instancetype)initWithFileURL:(NSURL *)fileURL
-                       realmURL:(NSURL *)realmURL
+                     syncConfig:(RLMSyncConfiguration *)syncConfig
+                     standalone:(BOOL)isStandalone
                           block:(nullable RLMSyncBasicErrorReportingBlock)block;
 
 @end
@@ -39,6 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMSyncSession ()
 
 - (void)_refresh;
+- (void)_logOut;
 - (void)_invalidate;
 
 - (void)setState:(RLMSyncSessionState)state;
@@ -46,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// The path on disk where the Realm file backing this synced Realm is stored.
 @property (nonatomic) NSURL *fileURL;
 
-@property (nullable, nonatomic) RLMRealmBindingPackage *deferredBindingPackage;
+@property (nullable, nonatomic) RLMSessionBindingPackage *deferredBindingPackage;
 @property (nullable, nonatomic) RLMServerPath resolvedPath;
 
 - (instancetype)initWithFileURL:(NSURL *)fileURL realmURL:(NSURL *)realmURL NS_DESIGNATED_INITIALIZER;
@@ -58,7 +62,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) NSTimer *refreshTimer;
 
-- (void)configureWithAccessToken:(RLMServerToken)token expiry:(NSTimeInterval)expiry user:(RLMSyncUser *)user;
+- (void)configureWithAccessToken:(RLMServerToken)token
+                          expiry:(NSTimeInterval)expiry
+                            user:(RLMSyncUser *)user
+                          handle:(RLMSyncSessionHandle *)session;
+
+- (void)refreshAccessToken:(NSString *)token serverURL:(nullable NSURL *)serverURL;
 
 NS_ASSUME_NONNULL_END
 

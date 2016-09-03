@@ -83,7 +83,15 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (void)logOut;
 
-- (NSDictionary<NSURL *, RLMSyncSession *> *)sessions;
+/**
+ Retrieve a valid session object for a given URL, or `nil` if no such object exists.
+ */
+- (nullable RLMSyncSession *)sessionForURL:(NSURL *)url;
+
+/**
+ Retrieve all the valid sessions.
+ */
+- (NSArray<RLMSyncSession *> *)allSessions;
 
 NS_ASSUME_NONNULL_END
 

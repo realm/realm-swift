@@ -16,18 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMRealmConfiguration.h>
-
-#import "RLMSyncUtil.h"
-
-@class RLMSyncConfiguration;
-
-@interface RLMRealmConfiguration (Sync)
+#import <Realm/RLMSyncConfiguration.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@property (nullable, nonatomic) RLMSyncConfiguration *syncConfiguration;
+@interface RLMSyncConfiguration ()
 
-NS_ASSUME_NONNULL_END
+@property (nonatomic) RLMSyncStopPolicy stopPolicy;
+
+// Internal-only APIs
+@property (nullable, nonatomic) NSURL *customFileURL;
 
 @end
+
+NS_ASSUME_NONNULL_END

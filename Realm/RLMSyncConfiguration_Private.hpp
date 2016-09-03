@@ -16,16 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMRealmConfiguration+Sync.h>
+#import "RLMSyncConfiguration_Private.h"
 
-NS_ASSUME_NONNULL_BEGIN
-
-extern NSString *const RLMSyncPrivateCustomFileURLKey;
+namespace realm {
+struct SyncConfig;
+}
 
 @interface RLMSyncConfiguration ()
 
-- (void)setCustomFileURL:(NSURL *)customFileURL;
+- (instancetype)initWithRawConfig:(realm::SyncConfig)config;
+
+- (realm::SyncConfig)rawConfiguration;
 
 @end
-
-NS_ASSUME_NONNULL_END

@@ -20,15 +20,22 @@
 
 #import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
+#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.h"
-#import "RLMSyncUtil_Private.h"
+#import "RLMSyncSessionHandle.hpp"
 #import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
+#import "sync_manager.hpp"
 #import "sync_metadata.hpp"
+#import "sync_session.hpp"
 
 using namespace realm;
+
+@interface RLMSyncSession ()
+- (id)sessionHandle;
+@end
 
 @interface RLMSyncUser ()
 
@@ -97,6 +104,10 @@ using namespace realm;
         @throw RLMException(@"Cannot log out a user that is already logged out.");
     }
     self.isValid = NO;
+    for (NSURL *url in self.sessionsStorage) {
+        [self.sessionsStorage[url] _logOut];
+    }
+    [self.sessionsStorage removeAllObjects];
     [[RLMSyncManager sharedManager] _deregisterUser:self];
     auto metadata = SyncUserMetadata([[RLMSyncManager sharedManager] _metadataManager],
                                      [self.identity UTF8String],
@@ -104,8 +115,28 @@ using namespace realm;
     metadata.mark_for_removal();
 }
 
-- (NSDictionary<NSURL *, RLMSyncSession *> *)sessions {
-    return [self.sessionsStorage copy];
+- (nullable RLMSyncSession *)sessionForURL:(NSURL *)url {
+    RLMSyncSession *session = [self.sessionsStorage objectForKey:url];
+    if (![[session sessionHandle] sessionStillExists]) {
+        [self.sessionsStorage removeObjectForKey:url];
+        return nil;
+    } else if ([[session sessionHandle] sessionIsInErrorState]) {
+        [session _invalidate];
+        return nil;
+    }
+    return session;
+}
+
+- (NSArray<RLMSyncSession *> *)allSessions {
+    NSMutableArray<RLMSyncSession *> *buffer = [NSMutableArray arrayWithCapacity:self.sessionsStorage.count];
+    NSArray<NSURL *> *allURLs = [self.sessionsStorage allKeys];
+    for (NSURL *url in allURLs) {
+        RLMSyncSession *session = [self sessionForURL:url];
+        if (session) {
+            [buffer addObject:session];
+        }
+    }
+    return [buffer copy];
 }
 
 
@@ -272,31 +303,41 @@ using namespace realm;
     NSAssert(self.isValid, @"_bindAllDeferredRealms can't be called unless the user is logged in.");
     for (NSURL *key in self.sessionsStorage) {
         RLMSyncSession *session = self.sessionsStorage[key];
-        RLMRealmBindingPackage *package = session.deferredBindingPackage;
+        RLMSessionBindingPackage *package = session.deferredBindingPackage;
         if (session.state == RLMSyncSessionStateUnbound && package) {
-            [self _bindRealmWithLocalFileURL:package.fileURL realmURL:package.realmURL onCompletion:package.block];
+            [self _bindSessionWithLocalFileURL:package.fileURL
+                                    syncConfig:package.syncConfig
+                                    standalone:package.isStandalone
+                                  onCompletion:package.block];
         }
     }
 }
 
-- (void)_bindRealmWithDirectAccessToken:(RLMServerToken)accessToken
-                           localFileURL:(NSURL *)fileURL
-                               realmURL:(NSURL *)realmURL
-                           onCompletion:(RLMSyncBasicErrorReportingBlock)completion{
+- (void)_bindSessionWithDirectAccessToken:(RLMServerToken)accessToken
+                               syncConfig:(RLMSyncConfiguration *)syncConfig
+                             localFileURL:(NSURL *)fileURL
+                               standalone:(BOOL)isStandalone
+                             onCompletion:(RLMSyncBasicErrorReportingBlock)completion {
+    NSURL *realmURL = syncConfig.realmURL;
     RLMSyncSession *session = self.sessionsStorage[realmURL];
+    std::string file_path = [[fileURL path] UTF8String];
     std::string realm_url = [[realmURL absoluteString] UTF8String];
-    bool success = Realm::refresh_sync_access_token(std::string([accessToken UTF8String]),
-                                                    RLMStringDataWithNSString([fileURL path]),
-                                                    realm_url);
-    if (success) {
-        [session configureWithAccessToken:accessToken
-                                   expiry:[[NSDate distantFuture] timeIntervalSince1970]
-                                     user:self];
-        [session setState:RLMSyncSessionStateActive];
+
+    RLMSyncSessionHandle *sessionHandle;
+    auto underlyingSession = SyncManager::shared().get_session(file_path, syncConfig.rawConfiguration);
+    if (isStandalone) {
+        sessionHandle = [RLMSyncSessionHandle syncSessionHandleForPointer:underlyingSession];
     } else {
-        [session _invalidate];
+        sessionHandle = [RLMSyncSessionHandle syncSessionHandleForWeakPointer:underlyingSession];
     }
+    [session configureWithAccessToken:accessToken
+                               expiry:[[NSDate distantFuture] timeIntervalSince1970]
+                                 user:self
+                               handle:sessionHandle];
+    [session refreshAccessToken:accessToken serverURL:realmURL];
+
     if (completion) {
+        bool success = session.state != RLMSyncSessionStateInvalid;
         completion(success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
                                                        code:RLMSyncErrorClientSessionError
                                                    userInfo:nil]);
@@ -304,17 +345,20 @@ using namespace realm;
 }
 
 // Immediately begin the handshake to get the resolved remote path and the access token.
-- (void)_bindRealmWithLocalFileURL:(NSURL *)fileURL
-                          realmURL:(NSURL *)realmURL
-                      onCompletion:(RLMSyncBasicErrorReportingBlock)completion {
+- (void)_bindSessionWithLocalFileURL:(NSURL *)fileURL
+                          syncConfig:(RLMSyncConfiguration *)syncConfig
+                          standalone:(BOOL)isStandalone
+                        onCompletion:(RLMSyncBasicErrorReportingBlock)completion {
     if (self.directAccessToken) {
-        [self _bindRealmWithDirectAccessToken:self.directAccessToken
-                                 localFileURL:fileURL
-                                     realmURL:realmURL
-                                 onCompletion:completion];
+        [self _bindSessionWithDirectAccessToken:self.directAccessToken
+                                     syncConfig:syncConfig
+                                   localFileURL:fileURL
+                                     standalone:isStandalone
+                                   onCompletion:completion];
         return;
     }
 
+    NSURL *realmURL = syncConfig.realmURL;
     RLMServerPath unresolvedPath = [realmURL path];
     NSDictionary *json = @{
                            kRLMSyncPathKey: unresolvedPath,
@@ -338,6 +382,7 @@ using namespace realm;
             } else {
                 // Success
                 // For now, assume just one access token.
+                std::string file_path = [[fileURL path] UTF8String];
                 RLMTokenModel *tokenModel = model.accessToken;
                 NSString *accessToken = tokenModel.token;
 
@@ -348,8 +393,17 @@ using namespace realm;
                 NSAssert(session,
                          @"Could not get a sync session object for the path '%@', this is an error",
                          unresolvedPath);
-
-                [session configureWithAccessToken:accessToken expiry:tokenModel.tokenData.expires user:self];
+                RLMSyncSessionHandle *sessionHandle;
+                auto underlyingSession = SyncManager::shared().get_session(file_path, syncConfig.rawConfiguration);
+                if (isStandalone) {
+                    sessionHandle = [RLMSyncSessionHandle syncSessionHandleForPointer:underlyingSession];
+                } else {
+                    sessionHandle = [RLMSyncSessionHandle syncSessionHandleForWeakPointer:underlyingSession];
+                }
+                [session configureWithAccessToken:accessToken
+                                           expiry:tokenModel.tokenData.expires
+                                             user:self
+                                           handle:sessionHandle];
 
                 // Bind the Realm
                 NSURLComponents *urlBuffer = [NSURLComponents componentsWithURL:realmURL resolvingAgainstBaseURL:YES];
@@ -358,17 +412,10 @@ using namespace realm;
                 if (!resolvedURL) {
                     @throw RLMException(@"Resolved path returned from the server was invalid (%@).", resolvedPath);
                 }
-                std::string resolved_realm_url = [[resolvedURL absoluteString] UTF8String];
-                bool success = Realm::refresh_sync_access_token([accessToken UTF8String],
-                                                                RLMStringDataWithNSString([fileURL path]),
-                                                                resolved_realm_url);
-                session.deferredBindingPackage = nil;
-                if (success) {
-                    [session setState:RLMSyncSessionStateActive];
-                } else {
-                    [session _invalidate];
-                }
+                [session refreshAccessToken:accessToken serverURL:resolvedURL];
+
                 if (completion) {
+                    bool success = session.state != RLMSyncSessionStateInvalid;
                     completion(success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
                                                                    code:RLMSyncErrorClientSessionError
                                                                userInfo:nil]);
@@ -389,26 +436,41 @@ using namespace realm;
 }
 
 // A callback handler for a Realm, used to get an updated access token which can then be used to bind the Realm.
-- (void)_registerRealmForBindingWithFileURL:(NSURL *)fileURL
-                                   realmURL:(NSURL *)realmURL
-                               onCompletion:(nullable RLMSyncBasicErrorReportingBlock)completion {
-    if ([self.sessionsStorage objectForKey:realmURL]) {
+- (RLMSyncSession *)_registerSessionForBindingWithFileURL:(NSURL *)fileURL
+                                               syncConfig:(RLMSyncConfiguration *)syncConfig
+                                        standaloneSession:(BOOL)isStandalone
+                                             onCompletion:(nullable RLMSyncBasicErrorReportingBlock)completion {
+    NSURL *realmURL = syncConfig.realmURL;
+    if (RLMSyncSession *session = [self.sessionsStorage objectForKey:realmURL]) {
+        RLMSyncSessionHandle *handle = [session sessionHandle];
         // The Realm at this particular path has already been registered to this user.
-        return;
+        if ([handle sessionStillExists]) {
+            [session _refresh];
+            return session;
+        } else if ([handle sessionIsInErrorState]) {
+            // Prohibit registering an invalid session.
+            // FIXME: Inform the app somehow, perhaps through the global error callback?
+            return nil;
+        }
     }
 
     RLMSyncSession *session = [[RLMSyncSession alloc] initWithFileURL:fileURL realmURL:realmURL];
     self.sessionsStorage[realmURL] = session;
 
     if (!self.isValid) {
-        // We will delay the path resolution/access token handshake until the user logs in
-        session.deferredBindingPackage = [[RLMRealmBindingPackage alloc] initWithFileURL:fileURL
-                                                                                realmURL:realmURL
-                                                                                   block:completion];
+        // We will delay the path resolution/access token handshake until the user logs in.
+        session.deferredBindingPackage = [[RLMSessionBindingPackage alloc] initWithFileURL:fileURL
+                                                                                syncConfig:syncConfig
+                                                                                standalone:isStandalone
+                                                                                     block:completion];
     } else {
         // User is logged in, start the handshake immediately.
-        [self _bindRealmWithLocalFileURL:fileURL realmURL:realmURL onCompletion:completion];
+        [self _bindSessionWithLocalFileURL:fileURL
+                                syncConfig:syncConfig
+                                standalone:isStandalone
+                              onCompletion:completion];
     }
+    return session;
 }
 
 @end

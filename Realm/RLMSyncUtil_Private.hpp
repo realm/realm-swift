@@ -16,18 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMRealmConfiguration.h>
+#import "RLMSyncUtil_Private.h"
 
-#import "RLMSyncUtil.h"
+#import "RLMSyncConfiguration.h"
 
-@class RLMSyncConfiguration;
+#import "sync_manager.hpp"
 
-@interface RLMRealmConfiguration (Sync)
+namespace realm {
 
-NS_ASSUME_NONNULL_BEGIN
+SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy);
+RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy);
 
-@property (nullable, nonatomic) RLMSyncConfiguration *syncConfiguration;
-
-NS_ASSUME_NONNULL_END
-
-@end
+}

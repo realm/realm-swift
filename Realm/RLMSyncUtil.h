@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 #import "RLMConstants.h"
 
 typedef NSString* RLMCredentialToken;
