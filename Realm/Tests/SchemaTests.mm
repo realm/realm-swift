@@ -738,7 +738,6 @@ RLM_ARRAY_TYPE(NotARealClass)
         RLMRunChildAndWait();
         return;
     }
-    XCTAssertTrue(RLMSchema.partialSharedSchema.objectSchema.count == 0);
     XCTAssertNoThrow([[IntObject alloc] initWithValue:@[@0]]);
 }
 
@@ -747,7 +746,6 @@ RLM_ARRAY_TYPE(NotARealClass)
         RLMRunChildAndWait();
         return;
     }
-    XCTAssertTrue(RLMSchema.partialSharedSchema.objectSchema.count == 0);
     XCTAssertNoThrow([[IntegerArrayPropertyObject alloc] initWithValue:(@[@0, @[@[@0]]])]);
 }
 

@@ -126,12 +126,20 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
 
 - (NSArray *)objectSchema {
     if (!_objectSchema) {
+        if (self == s_sharedSchema) {
+            // Ensure the schema is fully initialized
+            [RLMSchema sharedSchema];
+        }
         _objectSchema = [_objectSchemaByName allValues];
     }
     return _objectSchema;
 }
 
 - (void)setObjectSchema:(NSArray *)objectSchema {
+    if (self == s_sharedSchema) {
+        @throw RLMException(@"Cannot set object schema for shared schema, which is based on runtime objects.");
+    }
+
     _objectSchema = objectSchema;
     _objectSchemaByName = [NSMutableDictionary dictionaryWithCapacity:objectSchema.count];
     for (RLMObjectSchema *object in objectSchema) {
