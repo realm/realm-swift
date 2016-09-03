@@ -148,14 +148,20 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
 }
 
 - (RLMObjectSchema *)schemaForClassName:(NSString *)className {
-    if (RLMObjectSchema *schema = _objectSchemaByName[className]) {
-        return schema; // fast path for already-initialized schemas
-    } else if (Class cls = [RLMSchema classForString:className]) {
-        [cls sharedSchema];                    // initialize the schema
-        return _objectSchemaByName[className]; // try again
-    } else {
+    // fast path for already-initialized schemas
+    if (RLMObjectSchema *schema = _objectSchemaByName[className])
+        return schema;
+
+    // non-shared schemas aren't based on runtime objects
+    if (self != s_sharedSchema)
         return nil;
+
+    // initialize the schema and try again
+    if (Class cls = [RLMSchema classForString:className]) {
+        [cls sharedSchema];
+        return _objectSchemaByName[className];
     }
+    return nil;
 }
 
 - (RLMObjectSchema *)objectForKeyedSubscript:(__unsafe_unretained NSString *const)className {
