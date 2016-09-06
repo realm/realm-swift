@@ -95,8 +95,8 @@ class TestCase: XCTestCase {
 
         // Verify that there are no remaining realm files after the test
         let parentDir = (testDir as NSString).deletingLastPathComponent
-        for url in FileManager().enumerator(atPath: parentDir)! {
-            let url = url as! URL
+        for url in FileManager.default.enumerator(atPath: parentDir)! {
+            let url = url as! NSString
             XCTAssertNotEqual(url.pathExtension, "realm", "Lingering realm file at \(parentDir)/\(url)")
             assert(url.pathExtension != "realm")
         }
@@ -123,6 +123,7 @@ class TestCase: XCTestCase {
 
     func assertThrows<T>(_ block: @autoclosure @escaping () -> T, reason regexString: String,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
         RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
     }
 
@@ -271,6 +272,7 @@ class TestCase: XCTestCase {
 
     func assertThrows<T>(@autoclosure(escaping) block: () -> T, reason regexString: String,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
         RLMAssertThrowsWithReasonMatching(self, { _ = block() } as dispatch_block_t, regexString, message, fileName, lineNumber)
     }
 

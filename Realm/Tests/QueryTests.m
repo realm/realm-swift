@@ -137,8 +137,11 @@
     XCTAssertThrows([[realm objects:@"" where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"missing class name");
 
     // nil class name
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
     XCTAssertThrows([realm objects:nil where:@"age > 25"], @"nil class name");
     XCTAssertThrows([[realm objects:nil where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"nil class name");
+#pragma clang diagnostic pop
 }
 
 - (void)testPredicateValidUse

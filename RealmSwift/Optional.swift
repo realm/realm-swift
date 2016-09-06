@@ -21,9 +21,7 @@ import Realm
 #if swift(>=3.0)
 
 /// Types that can be represented in a `RealmOptional`.
-public protocol RealmOptionalType {
-    // Must conform to ObjectiveCBridgeable
-}
+public protocol RealmOptionalType {}
 extension Int: RealmOptionalType {}
 extension Int8: RealmOptionalType {}
 extension Int16: RealmOptionalType {}
@@ -32,14 +30,6 @@ extension Int64: RealmOptionalType {}
 extension Float: RealmOptionalType {}
 extension Double: RealmOptionalType {}
 extension Bool: RealmOptionalType {}
-extension RealmOptionalType {
-    internal static func bridging(objCValue value: Any) -> Self {
-        return (Self.self as! ObjectiveCBridgeable.Type).bridging(objCValue: value) as! Self
-    }
-    var objCValue: Any {
-        return (self as! ObjectiveCBridgeable).objCValue
-    }
-}
 
 /**
 A `RealmOptional` represents a optional value for types that can't be directly
@@ -52,10 +42,10 @@ public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
     /// The value this optional represents.
     public var value: T? {
         get {
-            return underlyingValue.map(T.bridging)
+            return underlyingValue.map(dynamicBridgeCast)
         }
         set {
-            underlyingValue = newValue.map({ $0.objCValue })
+            underlyingValue = newValue.map(dynamicBridgeCast)
         }
     }
 
@@ -73,9 +63,7 @@ public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
 #else
 
 /// A protocol describing types that can parameterize a `RealmOptional`.
-public protocol RealmOptionalType {
-    // Must conform to ObjectiveCBridgeable
-}
+public protocol RealmOptionalType {}
 extension Int: RealmOptionalType {}
 extension Int8: RealmOptionalType {}
 extension Int16: RealmOptionalType {}
@@ -84,14 +72,6 @@ extension Int64: RealmOptionalType {}
 extension Float: RealmOptionalType {}
 extension Double: RealmOptionalType {}
 extension Bool: RealmOptionalType {}
-extension RealmOptionalType {
-    internal static func bridging(objCValue objCValue: AnyObject) -> Self {
-        return (Self.self as! ObjectiveCBridgeable.Type).bridging(objCValue: objCValue) as! Self
-    }
-    var objCValue: AnyObject {
-        return (self as! ObjectiveCBridgeable).objCValue
-    }
-}
 
 /**
  A `RealmOptional` instance represents a optional value for types that can't be directly declared as `dynamic` in Swift,
@@ -103,10 +83,10 @@ public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
     /// The value this optional represents.
     public var value: T? {
         get {
-            return underlyingValue.map(T.bridging)
+            return underlyingValue.map(dynamicBridgeCast)
         }
         set {
-            underlyingValue = newValue.map({ $0.objCValue })
+            underlyingValue = newValue.map(dynamicBridgeCast)
         }
     }
 

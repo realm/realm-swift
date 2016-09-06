@@ -138,7 +138,7 @@ public final class Migration {
     - parameter object: Object to be deleted from the Realm being migrated.
     */
     public func delete(_ object: MigrationObject) {
-        RLMDeleteObjectFromRealm(object, RLMObjectBaseRealm(object))
+        RLMDeleteObjectFromRealm(object, RLMObjectBaseRealm(object)!)
     }
 
     /**
@@ -363,7 +363,7 @@ public final class Migration {
      - parameter object: An object to be deleted from the Realm being migrated.
      */
     public func delete(object: MigrationObject) {
-        RLMDeleteObjectFromRealm(object, RLMObjectBaseRealm(object))
+        RLMDeleteObjectFromRealm(object, RLMObjectBaseRealm(object)!)
     }
 
     /**

@@ -68,6 +68,10 @@ public:
     // not used by the current schema
     RLMProperty *_Nullable propertyForTableColumn(NSUInteger) const noexcept;
 
+    // Get the RLMProperty that's used as the primary key, or `nil` if there is
+    // no primary key for the current schema
+    RLMProperty *_Nullable propertyForPrimaryKey() const noexcept;
+
     // Get the table column for the given property. The property must be a valid
     // persisted property.
     NSUInteger tableColumn(NSString *propertyName) const;
