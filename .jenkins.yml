@@ -5,8 +5,6 @@ swift_version:
   - 2.2
 target:
   - osx
-  - ios-device-objc
-  - ios-device-swift
   - docs
   - ios-static
   - ios-dynamic
@@ -16,8 +14,11 @@ target:
   - cocoapods
   - swiftlint
   - tvos
-  - tvos-device
   - osx-encryption
+  # FIXME: Re-enable device tests when they can be made to run reliably
+  # - ios-device-objc
+  # - ios-device-swift
+  # - tvos-device
 configuration:
   - Debug
   - Release

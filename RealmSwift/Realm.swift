@@ -415,8 +415,9 @@ public final class Realm {
 
     - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
     */
-    public func object<T: Object>(ofType type: T.Type, forPrimaryKey key: Any) -> T? {
-        return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(), key) as! RLMObjectBase?,
+    public func object<T: Object, K>(ofType type: T.Type, forPrimaryKey key: K) -> T? {
+        return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(),
+                                          dynamicBridgeCast(fromSwift: key)) as! RLMObjectBase?,
                              to: Optional<T>.self)
     }
 

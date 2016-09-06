@@ -93,8 +93,7 @@ class KVOTests: TestCase {
             // FIXME: Remove once Swift fixes `value as! T?` for `value: Any`.
             func forceCast<T, U>(_ value: T, to type: U.Type) -> U { return value as! U }
 
-            if value is NSNull { return nil }
-            else { return forceCast(value, to: Optional<T>.self) }
+            return (value is NSNull) ? nil : forceCast(value, to: Optional<T>.self)
         }
         let actualOld = forceCoerce(changeDictionary![NSKeyValueChangeKey.oldKey]!)
         let actualNew = forceCoerce(changeDictionary![NSKeyValueChangeKey.newKey]!)

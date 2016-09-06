@@ -191,7 +191,7 @@ class ObjectSchemaInitializationTests: TestCase {
         let types = Set(schema.properties.map { $0.type })
         XCTAssertEqual(types, Set([.string, .string, .data, .date, .object, .int, .float, .double, .bool]))
     }
-    
+
     func testImplicitlyUnwrappedOptionalsAreParsedAsOptionals() {
         let schema = SwiftImplicitlyUnwrappedOptionalObject().objectSchema
         XCTAssertTrue(schema["optObjectCol"]!.isOptional)

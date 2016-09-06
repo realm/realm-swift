@@ -141,7 +141,7 @@ class MigrationTests: TestCase {
         let prop = RLMProperty(name: "stringCol", type: RLMPropertyType.int, objectClassName: nil,
                                linkOriginPropertyName: nil, indexed: false, optional: false)
         _ = autoreleasepool {
-            realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftStringObject", properties: [prop!])
+            realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftStringObject", properties: [prop])
         }
 
         migrateAndTestDefaultRealm() { migration, oldSchemaVersion in
@@ -303,7 +303,7 @@ class MigrationTests: TestCase {
             let prop = RLMProperty(name: "id", type: .int, objectClassName: nil,
                                    linkOriginPropertyName: nil, indexed: false, optional: false)
             let realm = realmWithSingleClassProperties(defaultRealmURL(),
-                className: "DeletedClass", properties: [prop!])
+                className: "DeletedClass", properties: [prop])
             try! realm.transaction {
                 realm.createObject("DeletedClass", withValue: [0])
             }
@@ -330,7 +330,7 @@ class MigrationTests: TestCase {
                 linkOriginPropertyName: nil, indexed: false, optional: false)
             autoreleasepool {
                 let realm = realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftStringObject",
-                    properties: [prop!])
+                    properties: [prop])
                 try! realm.transaction {
                     realm.createObject("SwiftStringObject", withValue: ["a"])
                 }
@@ -451,7 +451,7 @@ class MigrationTests: TestCase {
         let prop = RLMProperty(name: "name", type: RLMPropertyType.string, objectClassName: nil,
                                linkOriginPropertyName: nil, indexed: false, optional: false)
         _ = autoreleasepool {
-            realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftEmployeeObject", properties: [prop!])
+            realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftEmployeeObject", properties: [prop])
         }
 
         let config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
@@ -466,7 +466,7 @@ class MigrationTests: TestCase {
         let prop = RLMProperty(name: "name", type: RLMPropertyType.string, objectClassName: nil,
                                linkOriginPropertyName: nil, indexed: false, optional: false)
         _ = autoreleasepool {
-            realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftEmployeeObject", properties: [prop!])
+            realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftEmployeeObject", properties: [prop])
         }
 
         var config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
@@ -797,7 +797,7 @@ class MigrationTests: TestCase {
             let prop = RLMProperty(name: "id", type: .Int, objectClassName: nil,
                 linkOriginPropertyName: nil, indexed: false, optional: false)
             let realm = realmWithSingleClassProperties(defaultRealmURL(),
-                className: "DeletedClass", properties: [prop!])
+                className: "DeletedClass", properties: [prop])
             try! realm.transactionWithBlock {
                 realm.createObject("DeletedClass", withValue: [])
             }

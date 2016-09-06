@@ -54,6 +54,10 @@ RLMProperty *RLMClassInfo::propertyForTableColumn(NSUInteger col) const noexcept
     return nil;
 }
 
+RLMProperty *RLMClassInfo::propertyForPrimaryKey() const noexcept {
+    return rlmObjectSchema.primaryKeyProperty;
+}
+
 NSUInteger RLMClassInfo::tableColumn(NSString *propertyName) const {
     return tableColumn(RLMValidatedProperty(rlmObjectSchema, propertyName));
 }
