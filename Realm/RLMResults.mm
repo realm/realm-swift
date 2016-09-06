@@ -184,22 +184,37 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     query.and_query(RLMPredicateToQuery(predicate, _info->rlmObjectSchema, _realm.schema, _realm.group));
     query.sync_view_if_needed();
 
+#if REALM_VER_MAJOR >= 2
+    size_t indexInTable;
+    if (const auto& sort = _results.get_sort()) {
+        // A sort order is specified so we need to return the first match given that ordering.
+        TableView table_view = query.find_all();
+        table_view.sort(sort);
+        if (!table_view.size()) {
+            return NSNotFound;
+        }
+        indexInTable = table_view.get_source_ndx(0);
+    } else {
+        indexInTable = query.find();
+    }
+    if (indexInTable == realm::not_found) {
+        return NSNotFound;
+    }
+    return RLMConvertNotFound(_results.index_of(indexInTable));
+#else
     TableView table_view;
     if (const auto& sort = _results.get_sort()) {
         // A sort order is specified so we need to return the first match given that ordering.
         table_view = query.find_all();
         table_view.sort(sort);
     } else {
-        // No sort order is specified so we only need to find a single match.
-        // FIXME: We're only looking for a single object so we'd like to be able to use `Query::find`
-        // for this, but as of core v0.97.1 it gives incorrect results if the query is restricted
-        // to a link view (<https://github.com/realm/realm-core/issues/1565>).
         table_view = query.find_all(0, -1, 1);
     }
     if (!table_view.size()) {
         return NSNotFound;
     }
     return _results.index_of(table_view.get_source_ndx(0));
+#endif
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
