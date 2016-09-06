@@ -492,28 +492,32 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     }
 
     key = RLMCoerceToNil(key);
+    if (!key && !primaryProperty->is_nullable) {
+        @throw RLMException(@"Invalid null value for non-nullable primary key.");
+    }
 
     size_t row = realm::not_found;
-    if (primaryProperty->type == PropertyType::String) {
-        NSString *str = RLMDynamicCast<NSString>(key);
-        if (str || (!key && primaryProperty->is_nullable)) {
-            row = table->find_first_string(primaryProperty->table_column, RLMStringDataWithNSString(str));
+    switch (primaryProperty->type) {
+        case PropertyType::String: {
+            NSString *string = RLMDynamicCast<NSString>(key);
+            if (!key || string) {
+                row = table->find_first_string(primaryProperty->table_column, RLMStringDataWithNSString(string));
+            } else {
+                @throw RLMException(@"Invalid value '%@' of type '%@' for string primary key.", key, [key class]);
+            }
+            break;
         }
-        else {
-            @throw RLMException(@"Invalid value '%@' for primary key", key);
-        }
-    }
-    else {
-        NSNumber *number = RLMDynamicCast<NSNumber>(key);
-        if (number) {
-            row = table->find_first_int(primaryProperty->table_column, number.longLongValue);
-        }
-        else if (!key && primaryProperty->is_nullable) {
-            row = table->find_first_null(primaryProperty->table_column);
-        }
-        else {
-            @throw RLMException(@"Invalid value '%@' for primary key", key);
-        }
+        case PropertyType::Int:
+            if (NSNumber *number = RLMDynamicCast<NSNumber>(key)) {
+                row = table->find_first_int(primaryProperty->table_column, number.longLongValue);
+            } else if (!key) {
+                row = table->find_first_null(primaryProperty->table_column);
+            } else {
+                @throw RLMException(@"Invalid value '%@' of type '%@' for int primary key.", key, [key class]);
+            }
+            break;
+        default:
+            REALM_UNREACHABLE();
     }
 
     if (row == realm::not_found) {
