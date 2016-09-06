@@ -108,10 +108,8 @@ class ObjectTests: TestCase {
     }
 
     func testSchemaHasPrimaryKey() {
-        XCTAssertNil(Object.primaryKey(), "primary key should default to nil")
-        XCTAssertNil(SwiftStringObject.primaryKey())
         XCTAssertNil(SwiftStringObject().objectSchema.primaryKeyProperty)
-        XCTAssertEqual(SwiftPrimaryStringObject.primaryKey()!, "stringCol")
+        XCTAssertEqual(SwiftPrimaryStringObject.primaryKey, "stringCol")
         XCTAssertEqual(SwiftPrimaryStringObject().objectSchema.primaryKeyProperty!.name, "stringCol")
     }
 

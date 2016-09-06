@@ -138,20 +138,24 @@ using namespace realm;
         }
     }
 
-    if (NSString *primaryKey = [objectClass primaryKey]) {
-        for (RLMProperty *prop in schema.properties) {
-            if ([primaryKey isEqualToString:prop.name]) {
-                prop.indexed = YES;
-                schema.primaryKeyProperty = prop;
-                break;
+    // Swift classes without primary keys don't respond
+    if ([objectClass respondsToSelector:@selector(primaryKey)]) {
+        // Objective-C classes without primary keys return nil
+        if (NSString *primaryKey = [objectClass primaryKey]) {
+            for (RLMProperty *prop in schema.properties) {
+                if ([primaryKey isEqualToString:prop.name]) {
+                    prop.indexed = YES;
+                    schema.primaryKeyProperty = prop;
+                    break;
+                }
             }
-        }
 
-        if (!schema.primaryKeyProperty) {
-            @throw RLMException(@"Primary key property '%@' does not exist on object '%@'", primaryKey, className);
-        }
-        if (schema.primaryKeyProperty.type != RLMPropertyTypeInt && schema.primaryKeyProperty.type != RLMPropertyTypeString) {
-            @throw RLMException(@"Only 'string' and 'int' properties can be designated the primary key");
+            if (!schema.primaryKeyProperty) {
+                @throw RLMException(@"Primary key property '%@' does not exist on object '%@'", primaryKey, className);
+            }
+            if (schema.primaryKeyProperty.type != RLMPropertyTypeInt && schema.primaryKeyProperty.type != RLMPropertyTypeString) {
+                @throw RLMException(@"Only 'string' and 'int' properties can be designated the primary key");
+            }
         }
     }
 

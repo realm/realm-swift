@@ -406,16 +406,16 @@ public final class Realm {
 
     Returns `nil` if no object exists with the given primary key.
 
-    This method requires that `primaryKey()` be overridden on the given subclass.
+    This method requires that `primaryKey` be overridden on the given subclass.
 
-    - see: Object.primaryKey()
+    - see: Object.primaryKey
 
     - parameter type: The type of the objects to be returned.
     - parameter key:  The primary key of the desired object.
 
     - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
     */
-    public func object<T: Object, K>(ofType type: T.Type, forPrimaryKey key: K) -> T? {
+    public func object<T: Object>(ofType type: T.Type, forPrimaryKey key: T.PrimaryKey) -> T? where T: PrimaryKeyed {
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(),
                                           dynamicBridgeCast(fromSwift: key)) as! RLMObjectBase?,
                              to: Optional<T>.self)
@@ -430,9 +430,9 @@ public final class Realm {
 
     Returns `nil` if no object exists with the given class name and primary key.
 
-    This method requires that `primaryKey()` be overridden on the given subclass.
+    This method requires that `primaryKey` be overridden on the given subclass.
 
-    - see: Object.primaryKey()
+    - see: Object.primaryKey
 
     - warning: This method is useful only in specialized circumstances.
 
