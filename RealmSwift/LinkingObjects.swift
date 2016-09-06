@@ -27,9 +27,9 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
     internal let objectClassName: String
     internal let propertyName: String
 
-    private var cachedRLMResults: RLMResults<RLMObject>?
-    @objc private var object: RLMWeakObjectHandle?
-    @objc private var property: RLMProperty?
+    fileprivate var cachedRLMResults: RLMResults<RLMObject>?
+    @objc fileprivate var object: RLMWeakObjectHandle?
+    @objc fileprivate var property: RLMProperty?
 
     internal var rlmResults: RLMResults<RLMObject> {
         if cachedRLMResults == nil {
@@ -395,6 +395,48 @@ extension LinkingObjects : RealmCollection {
             return rlmResults.addNotificationBlock { _, change, error in
                 block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
             }
+    }
+}
+
+// MARK: AssistedObjectiveCBridgeable
+
+extension LinkingObjects: AssistedObjectiveCBridgeable {
+    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> LinkingObjects {
+        guard let metadata = metadata as? LinkingObjectsBridgingMetadata else { preconditionFailure() }
+
+        let swiftValue = LinkingObjects(fromType: T.self, property: metadata.propertyName)
+        switch (objectiveCValue, metadata) {
+        case (let object as RLMWeakObjectHandle, .uncached(let property)):
+            swiftValue.object = object
+            swiftValue.property = property
+        case (let results as RLMResults<RLMObject>, .cached):
+            swiftValue.cachedRLMResults = results
+        default:
+            preconditionFailure()
+        }
+        return swiftValue
+    }
+
+    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
+        if let results = cachedRLMResults {
+            return (objectiveCValue: results,
+                    metadata: LinkingObjectsBridgingMetadata.cached(propertyName: propertyName))
+        } else {
+            return (objectiveCValue: object!.copy() as! RLMWeakObjectHandle,
+                    metadata: LinkingObjectsBridgingMetadata.uncached(property: property!))
+        }
+    }
+}
+
+internal enum LinkingObjectsBridgingMetadata {
+    case uncached(property: RLMProperty)
+    case cached(propertyName: String)
+
+    fileprivate var propertyName: String {
+        switch self {
+        case .uncached(let property):   return property.name
+        case .cached(let propertyName): return propertyName
+        }
     }
 }
 
@@ -803,6 +845,48 @@ extension LinkingObjects: RealmCollectionType {
             return rlmResults.addNotificationBlock { _, change, error in
                 block(RealmCollectionChange.fromObjc(anyCollection, change: change, error: error))
             }
+    }
+}
+
+// MARK: AssistedObjectiveCBridgeable
+
+extension LinkingObjects: AssistedObjectiveCBridgeable {
+    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> LinkingObjects {
+        guard let metadata = metadata as? LinkingObjectsBridgingMetadata else { preconditionFailure() }
+
+        let swiftValue = LinkingObjects(fromType: T.self, property: metadata.propertyName)
+        switch (objectiveCValue, metadata) {
+        case (let object as RLMWeakObjectHandle, .uncached(let property)):
+            swiftValue.object = object
+            swiftValue.property = property
+        case (let results as RLMResults, .cached):
+            swiftValue.cachedRLMResults = results
+        default:
+            preconditionFailure()
+        }
+        return swiftValue
+    }
+
+    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
+        if let results = cachedRLMResults {
+            return (objectiveCValue: results,
+                    metadata: LinkingObjectsBridgingMetadata.cached(propertyName: propertyName))
+        } else {
+            return (objectiveCValue: object!.copy() as! RLMWeakObjectHandle,
+                    metadata: LinkingObjectsBridgingMetadata.uncached(property: property!))
+        }
+    }
+}
+
+internal enum LinkingObjectsBridgingMetadata {
+    case uncached(property: RLMProperty)
+    case cached(propertyName: String)
+
+    private var propertyName: String {
+        switch self {
+        case .uncached(let property):   return property.name
+        case .cached(let propertyName): return propertyName
+        }
     }
 }
 

@@ -377,6 +377,23 @@ public class ObjectUtil: NSObject {
     }
 }
 
+// MARK: AssistedObjectiveCBridgeable
+
+// FIXME: Remove when `as! Self` can be written
+private func forceCastToInferred<T, V>(_ x: T) -> V {
+    return x as! V
+}
+
+extension Object: AssistedObjectiveCBridgeable {
+    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
+        return forceCastToInferred(objectiveCValue)
+    }
+
+    var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return (objectiveCValue: unsafeCastToRLMObject(), metadata: nil)
+    }
+}
+
 #else
 
 /**
@@ -731,6 +748,23 @@ public class ObjectUtil: NSObject {
             d[name] = ["class": results.objectClassName, "property": results.propertyName]
             return d
         }
+    }
+}
+
+// MARK: AssistedObjectiveCBridgeable
+
+// FIXME: Remove when `as! Self` can be written
+private func forceCastToInferred<T, V>(x: T) -> V {
+    return x as! V
+}
+
+extension Object: AssistedObjectiveCBridgeable {
+    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
+        return forceCastToInferred(objectiveCValue)
+    }
+
+    var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return (objectiveCValue: unsafeCastToRLMObject(), metadata: nil)
     }
 }
 

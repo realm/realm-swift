@@ -220,4 +220,12 @@
     return object;
 }
 
+- (id)copyWithZone:(__unused NSZone *)zone {
+    RLMWeakObjectHandle *copy = [[RLMWeakObjectHandle alloc] init];
+    copy->_row = _row;
+    copy->_info = _info;
+    copy->_objectClass = _objectClass;
+    return copy;
+}
+
 @end

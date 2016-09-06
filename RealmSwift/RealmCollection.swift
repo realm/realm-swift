@@ -125,6 +125,7 @@ public enum RealmCollectionChange<T> {
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
 public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible {
+    // Must also conform to `AssistedObjectiveCBridgeable`
 
     /// The type of the objects contained in the collection.
     associatedtype Element: Object
@@ -351,7 +352,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
     func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
-private class _AnyRealmCollectionBase<T: Object> {
+private class _AnyRealmCollectionBase<T: Object>: AssistedObjectiveCBridgeable {
     typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T
     var realm: Realm? { fatalError() }
@@ -380,6 +381,8 @@ private class _AnyRealmCollectionBase<T: Object> {
     func setValue(_ value: Any?, forKey key: String) { fatalError() }
     func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
+    class func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self { fatalError() }
+    var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.Element> {
@@ -484,6 +487,17 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     /// :nodoc:
     override func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block) }
+
+    // MARK: AssistedObjectiveCBridgeable
+
+    override class func bridging(from objectiveCValue: Any, with metadata: Any?) -> _AnyRealmCollection {
+        return _AnyRealmCollection(
+            base: (C.self as! AssistedObjectiveCBridgeable.Type).bridging(from: objectiveCValue, with: metadata) as! C)
+    }
+
+    override var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return (base as! AssistedObjectiveCBridgeable).bridged
+    }
 }
 
 /**
@@ -498,7 +512,11 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     /// The type of the objects contained in the collection.
     public typealias Element = T
-    private let base: _AnyRealmCollectionBase<T>
+    fileprivate let base: _AnyRealmCollectionBase<T>
+
+    fileprivate init(base: _AnyRealmCollectionBase<T>) {
+        self.base = base
+    }
 
     /// Creates an `AnyRealmCollection` wrapping `base`.
     public init<C: RealmCollection>(_ base: C) where C.Element == T {
@@ -769,6 +787,26 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
         -> NotificationToken { return base._addNotificationBlock(block) }
 }
 
+// MARK: AssistedObjectiveCBridgeable
+
+private struct AnyRealmCollectionBridgingMetadata<T: Object> {
+    var baseMetadata: Any?
+    var baseType: _AnyRealmCollectionBase<T>.Type
+}
+
+extension AnyRealmCollection: AssistedObjectiveCBridgeable {
+    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> AnyRealmCollection {
+        guard let metadata = metadata as? AnyRealmCollectionBridgingMetadata<T> else { preconditionFailure() }
+        return AnyRealmCollection(base: metadata.baseType.bridging(from: objectiveCValue, with: metadata.baseMetadata))
+    }
+
+    var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return (
+            objectiveCValue: base.bridged.objectiveCValue,
+            metadata: AnyRealmCollectionBridgingMetadata(baseMetadata: base.bridged.metadata, baseType: type(of: base))
+        )
+    }
+}
 
 // MARK: Unavailable
 
@@ -906,6 +944,7 @@ public enum RealmCollectionChange<T> {
  and operated upon.
 */
 public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
+    // Must also conform to `AssistedObjectiveCBridgeable`
 
     /// The type of the objects contained in the collection.
     associatedtype Element: Object
@@ -1137,7 +1176,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
-private class _AnyRealmCollectionBase<T: Object> {
+private class _AnyRealmCollectionBase<T: Object>: AssistedObjectiveCBridgeable {
     typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T
     var realm: Realm? { fatalError() }
@@ -1166,6 +1205,8 @@ private class _AnyRealmCollectionBase<T: Object> {
     func setValue(value: AnyObject?, forKey key: String) { fatalError() }
     func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
+    class func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self { fatalError() }
+    var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollectionBase<C.Element> {
@@ -1260,6 +1301,17 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     /// :nodoc:
     override func _addNotificationBlock(block: (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block) }
+
+    // MARK: AssistedObjectiveCBridgeable
+
+    override class func bridging(from objectiveCValue: Any, with metadata: Any?) -> _AnyRealmCollection {
+        return _AnyRealmCollection(
+            base: (C.self as! AssistedObjectiveCBridgeable.Type).bridging(from: objectiveCValue, with: metadata) as! C)
+    }
+
+    override var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return (base as! AssistedObjectiveCBridgeable).bridged
+    }
 }
 
 /**
@@ -1273,6 +1325,10 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     /// The type of the objects contained in the collection.
     public typealias Element = T
     private let base: _AnyRealmCollectionBase<T>
+
+    private init(base: _AnyRealmCollectionBase<T>) {
+        self.base = base
+    }
 
     /// Creates an `AnyRealmCollection` wrapping `base`.
     public init<C: RealmCollectionType where C.Element == T>(_ base: C) {
@@ -1538,6 +1594,27 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
     /// :nodoc:
     public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block) }
+}
+
+// MARK: AssistedObjectiveCBridgeable
+
+private struct AnyRealmCollectionBridgingMetadata<T: Object> {
+    var baseMetadata: Any?
+    var baseType: _AnyRealmCollectionBase<T>.Type
+}
+
+extension AnyRealmCollection: AssistedObjectiveCBridgeable {
+    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> AnyRealmCollection {
+        guard let metadata = metadata as? AnyRealmCollectionBridgingMetadata<T> else { preconditionFailure() }
+        return AnyRealmCollection(base: metadata.baseType.bridging(from: objectiveCValue, with: metadata.baseMetadata))
+    }
+
+    var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return (
+            objectiveCValue: base.bridged.objectiveCValue,
+            metadata: AnyRealmCollectionBridgingMetadata(baseMetadata: base.bridged.metadata, baseType: base.dynamicType)
+        )
+    }
 }
 
 #endif

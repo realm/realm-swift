@@ -130,6 +130,13 @@ extension Optional: CustomObjectiveCBridgeable {
     }
 }
 
+// MARK: AssistedObjectiveCBridgeable
+
+internal protocol AssistedObjectiveCBridgeable {
+    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self
+    var bridged: (objectiveCValue: Any, metadata: Any?) { get }
+}
+
 #else
 
 internal func throwRealmException(message: String, userInfo: [String:AnyObject] = [:]) {
@@ -214,6 +221,13 @@ extension Int64: CustomObjectiveCBridgeable {
     var objCValue: AnyObject {
         return NSNumber(longLong: self)
     }
+}
+
+// MARK: AssistedObjectiveCBridgeable
+
+internal protocol AssistedObjectiveCBridgeable {
+    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self
+    var bridged: (objectiveCValue: Any, metadata: Any?) { get }
 }
 
 #endif
