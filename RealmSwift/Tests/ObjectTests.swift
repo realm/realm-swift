@@ -306,7 +306,7 @@ class ObjectTests: TestCase {
     }
 
     // Yields a read-write migration `SwiftObject` to the given block
-    private func withMigrationObject(block: ((MigrationObject, Migration) -> ())) {
+    private func withMigrationObject(block: @escaping ((MigrationObject, Migration) -> ())) {
         autoreleasepool {
             let realm = self.realmWithTestPath()
             try! realm.write {

@@ -68,7 +68,7 @@ class SwiftPerformanceTests: TestCase {
         // Do nothing, as we need to keep our in-memory realms around between tests
     }
 
-    override func measure(_ block: (() -> Void)) {
+    override func measure(_ block: @escaping (() -> Void)) {
         super.measure {
             autoreleasepool {
                 block()

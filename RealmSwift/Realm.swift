@@ -475,7 +475,7 @@ public final class Realm {
 
     - returns: A token which must be held for as long as you want notifications to be delivered.
     */
-    public func addNotificationBlock(block: NotificationBlock) -> NotificationToken {
+    public func addNotificationBlock(block: @escaping NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
             switch rlmNotification {
             case RLMNotification.DidChange:
@@ -630,7 +630,7 @@ public enum Notification: String {
 }
 
 /// Closure to run when the data in a Realm was modified.
-public typealias NotificationBlock = @escaping (_ notification: Notification, _ realm: Realm) -> Void
+public typealias NotificationBlock = (_ notification: Notification, _ realm: Realm) -> Void
 
 
 // MARK: Unavailable
