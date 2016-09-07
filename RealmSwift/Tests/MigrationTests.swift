@@ -80,7 +80,7 @@ class MigrationTests: TestCase {
         XCTAssertEqual(didRun, shouldRun)
     }
 
-    private func migrateAndTestDefaultRealm(_ schemaVersion: UInt64 = 1, block: MigrationBlock) {
+    private func migrateAndTestDefaultRealm(_ schemaVersion: UInt64 = 1, block: @escaping MigrationBlock) {
         migrateAndTestRealm(defaultRealmURL(), schemaVersion: schemaVersion, block: block)
         let config = Realm.Configuration(fileURL: defaultRealmURL(),
                                          schemaVersion: schemaVersion)
