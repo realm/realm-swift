@@ -52,10 +52,7 @@ class SwiftArrayTests: RLMTestCase {
 
         var totalSum = 0
 
-        // Temporary fix until we figure out why iterators segfault
-        //        for obj in array.array {
-        for i in 0..<result.count {
-            let obj = result[i]
+        for obj in result {
             if let ao = obj as? SwiftAggregateObject {
                 totalSum += ao.intCol
             }
@@ -282,10 +279,7 @@ class SwiftArrayTests: RLMTestCase {
 
         var totalSum: CInt = 0
 
-        // Temporary fix until we figure out why iterators segfault
-        //        for obj in array.array {
-        for i in 0..<result.count {
-            let obj = result[i]
+        for obj in result {
             if let ao = obj as? AggregateObject {
                 totalSum += ao.intCol
             }
