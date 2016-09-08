@@ -30,9 +30,7 @@ class SwiftDynamicTests: RLMTestCase {
     func testDynamicRealmExists() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm(url
-
-                : RLMTestRealmURL())
+            let realm = RLMRealm(url: RLMTestRealmURL())
             realm.beginWriteTransaction()
             _ = SwiftDynamicObject.create(in: realm, withValue: ["column1", 1])
             _ = SwiftDynamicObject.create(in: realm, withValue: ["column2", 2])
