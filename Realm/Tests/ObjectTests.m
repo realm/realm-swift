@@ -390,7 +390,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertEqual(fromRealm.age, 25, @"Age should be equal");
     XCTAssertEqual(fromRealm.hired, YES, @"Hired should be equal");
     
-    XCTAssertThrows([[EmployeeObject alloc] initWithValue:@{}], @"Initialization with missing values should throw");
+    XCTAssertNoThrow([[EmployeeObject alloc] initWithValue:@{}], @"Initialization with missing values should not throw");
     XCTAssertNoThrow([[DefaultObject alloc] initWithValue:@{@"intCol": @1}],
                      "Overriding some default values at initialization should not throw");
 
@@ -445,7 +445,6 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
 - (void)testInitFromDictionaryMissingPropertyKey {
     CompanyObject *co = nil;
-    XCTAssertThrows([[DogExtraObject alloc] initWithValue:@{}]);
     XCTAssertNoThrow(co = [[CompanyObject alloc] initWithValue:@{@"name": @"a"}]);
     XCTAssertEqualObjects(co.name, @"a");
     XCTAssertEqual(co.employees.count, 0U);
