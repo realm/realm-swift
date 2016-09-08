@@ -199,15 +199,14 @@ class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
     let boolArray = List<SwiftBoolObject>()
 }
 
-class SwiftLinkToPrimaryStringObject: Object {
+class SwiftLinkToPrimaryStringObject: Object, PrimaryKeyed {
     // swiftlint:disable:next variable_name
     dynamic var pk = ""
     dynamic var object: SwiftPrimaryStringObject?
     let objects = List<SwiftPrimaryStringObject>()
 
-    override class func primaryKey() -> String? {
-        return "pk"
-    }
+    typealias PrimaryKey = String
+    static let primaryKey = "pk"
 }
 
 class SwiftUTF8Object: Object {
@@ -231,129 +230,100 @@ class SwiftRecursiveObject: Object {
     let objects = List<SwiftRecursiveObject>()
 }
 
-protocol SwiftPrimaryKeyObjectType {
-    associatedtype PrimaryKey
-    static func primaryKey() -> String?
-}
-
-class SwiftPrimaryStringObject: Object, SwiftPrimaryKeyObjectType {
+class SwiftPrimaryStringObject: Object, PrimaryKeyed {
     dynamic var stringCol = ""
     dynamic var intCol = 0
 
     typealias PrimaryKey = String
-    override class func primaryKey() -> String? {
-        return "stringCol"
-    }
+    static let primaryKey = "stringCol"
 }
 
-class SwiftPrimaryOptionalStringObject: Object, SwiftPrimaryKeyObjectType {
+class SwiftPrimaryOptionalStringObject: Object, PrimaryKeyed {
     dynamic var stringCol: String? = ""
     dynamic var intCol = 0
 
     typealias PrimaryKey = String?
-    override class func primaryKey() -> String? {
-        return "stringCol"
-    }
+    static let primaryKey = "stringCol"
 }
 
-class SwiftPrimaryIntObject: Object, SwiftPrimaryKeyObjectType {
+class SwiftPrimaryIntObject: Object, PrimaryKeyed {
     dynamic var stringCol = ""
     dynamic var intCol = 0
 
     typealias PrimaryKey = Int
-    override class func primaryKey() -> String? {
-        return "intCol"
-    }
+    static let primaryKey = "intCol"
 }
 
-class SwiftPrimaryOptionalIntObject: Object, SwiftPrimaryKeyObjectType {
+class SwiftPrimaryOptionalIntObject: Object, PrimaryKeyed {
     dynamic var stringCol = ""
     let intCol = RealmOptional<Int>()
 
-    typealias PrimaryKey = RealmOptional<Int>
-    override class func primaryKey() -> String? {
-        return "intCol"
-    }
+    typealias PrimaryKey = Int?
+    static let primaryKey = "intCol"
 }
 
-class SwiftPrimaryInt8Object: Object, SwiftPrimaryKeyObjectType {
+class SwiftPrimaryInt8Object: Object, PrimaryKeyed {
     dynamic var stringCol = ""
     dynamic var int8Col: Int8 = 0
 
     typealias PrimaryKey = Int8
-    override class func primaryKey() -> String? {
-        return "int8Col"
-    }
+    static let primaryKey = "int8Col"
 }
 
-class SwiftPrimaryOptionalInt8Object: Object, SwiftPrimaryKeyObjectType {
+class SwiftPrimaryOptionalInt8Object: Object, PrimaryKeyed {
     dynamic var stringCol = ""
     let int8Col = RealmOptional<Int8>()
 
-    typealias PrimaryKey = RealmOptional<Int8>
-    override class func primaryKey() -> String? {
-        return "int8Col"
-    }
+    typealias PrimaryKey = Int8?
+    static let primaryKey = "int8Col"
 }
 
-class SwiftPrimaryInt16Object: Object, SwiftPrimaryKeyObjectType {
+class SwiftPrimaryInt16Object: Object, PrimaryKeyed {
     dynamic var stringCol = ""
     dynamic var int16Col: Int16 = 0
 
     typealias PrimaryKey = Int16
-    override class func primaryKey() -> String? {
-        return "int16Col"
-    }
+    static let primaryKey = "int16Col"
 }
 
-class SwiftPrimaryOptionalInt16Object: Object, SwiftPrimaryKeyObjectType {
+class SwiftPrimaryOptionalInt16Object: Object, PrimaryKeyed {
     dynamic var stringCol = ""
     let int16Col = RealmOptional<Int16>()
 
-    typealias PrimaryKey = RealmOptional<Int16>
-    override class func primaryKey() -> String? {
-        return "int16Col"
-    }
+    typealias PrimaryKey = Int16?
+    static let primaryKey = "int16Col"
 }
 
-class SwiftPrimaryInt32Object: Object, SwiftPrimaryKeyObjectType {
+class SwiftPrimaryInt32Object: Object, PrimaryKeyed {
     dynamic var stringCol = ""
     dynamic var int32Col: Int32 = 0
 
     typealias PrimaryKey = Int32
-    override class func primaryKey() -> String? {
-        return "int32Col"
-    }
+    static let primaryKey = "int32Col"
 }
 
-class SwiftPrimaryOptionalInt32Object: Object, SwiftPrimaryKeyObjectType {
+class SwiftPrimaryOptionalInt32Object: Object, PrimaryKeyed {
     dynamic var stringCol = ""
     let int32Col = RealmOptional<Int32>()
 
-    typealias PrimaryKey = RealmOptional<Int32>
-    override class func primaryKey() -> String? {
-        return "int32Col"
-    }
+    typealias PrimaryKey = Int32?
+    static let primaryKey = "int32Col"
 }
 
-class SwiftPrimaryInt64Object: Object, SwiftPrimaryKeyObjectType {
+class SwiftPrimaryInt64Object: Object, PrimaryKeyed {
     dynamic var stringCol = ""
     dynamic var int64Col: Int64 = 0
 
     typealias PrimaryKey = Int64
-    override class func primaryKey() -> String? {
-        return "int64Col"
-    }
+    static let primaryKey = "int64Col"
 }
 
-class SwiftPrimaryOptionalInt64Object: Object, SwiftPrimaryKeyObjectType {
+class SwiftPrimaryOptionalInt64Object: Object, PrimaryKeyed {
     dynamic var stringCol = ""
     let int64Col = RealmOptional<Int64>()
 
-    typealias PrimaryKey = RealmOptional<Int64>
-    override class func primaryKey() -> String? {
-        return "int64Col"
-    }
+    typealias PrimaryKey = Int64?
+    static let primaryKey = "int64Col"
 }
 
 class SwiftIndexedPropertiesObject: Object {

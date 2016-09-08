@@ -22,6 +22,21 @@ import Realm.Private
 
 #if swift(>=3.0)
 
+/* sealed */ public protocol PrimaryKeyType { }
+extension String: PrimaryKeyType { }
+extension Int: PrimaryKeyType { }
+extension Int8: PrimaryKeyType { }
+extension Int16: PrimaryKeyType { }
+extension Int32: PrimaryKeyType { }
+extension Int64: PrimaryKeyType { }
+// FIXME: Conditionally conform to `PrimaryKey` once Swift supports conditional conformances.
+extension Optional: PrimaryKeyType /* where Wrapped: PrimaryKey */ { }
+
+public protocol PrimaryKeyed {
+    associatedtype PrimaryKey: PrimaryKeyType
+    static var primaryKey: String { get }
+}
+    
 /**
 In Realm you define your model classes by subclassing `Object` and adding properties to be persisted.
 You then instantiate and use your custom subclasses instead of using the Object class directly.
@@ -141,16 +156,6 @@ open class Object: RLMObjectBase {
 
 
     // MARK: Object Customization
-
-    /**
-    Override to designate a property as the primary key for an `Object` subclass. Only properties of
-    type String and Int can be designated as the primary key. Primary key
-    properties enforce uniqueness for each value whenever the property is set which incurs some overhead.
-    Indexes are created automatically for primary key properties.
-
-    - returns: Name of the property designated as the primary key, or `nil` if the model has no primary key.
-    */
-    open class func primaryKey() -> String? { return nil }
 
     /**
     Override to return an array of property names to ignore. These properties will not be persisted
