@@ -531,8 +531,11 @@ class RealmTests: TestCase {
                     realm.createObject(ofType: type, populatedWith: ["b", 2])
                 }
 
-                let object1 = realm.object(ofType: type, forPrimaryKey: NSNull())
-                XCTAssertNotNil(object1)
+                let object1a = realm.object(ofType: type, forPrimaryKey: NSNull())
+                XCTAssertNotNil(object1a)
+
+                let object1b = realm.object(ofType: type, forPrimaryKey: nil as Wrapped?)
+                XCTAssertNotNil(object1b)
 
                 let object2 = realm.object(ofType: type, forPrimaryKey: 2 as Wrapped)
                 XCTAssertNotNil(object2)
@@ -1270,8 +1273,11 @@ class RealmTests: TestCase {
                 realm.create(type, value: ["b", 2])
             }
 
-            let object1 = realm.objectForPrimaryKey(type, key: NSNull())
-            XCTAssertNotNil(object1)
+            let object1a = realm.objectForPrimaryKey(type, key: NSNull())
+            XCTAssertNotNil(object1a)
+
+            let object1b = realm.objectForPrimaryKey(type, key: nil as Int?)
+            XCTAssertNotNil(object1b)
 
             let object2 = realm.objectForPrimaryKey(type, key: 2)
             XCTAssertNotNil(object2)
