@@ -206,11 +206,15 @@ using namespace realm;
                 // Success: store the tokens.
                 user.identity = model.refreshToken.tokenData.identity;
                 user.refreshToken = model.refreshToken.token;
-                [[RLMSyncManager sharedManager] _registerUser:user];
-                user.isValid = YES;
-                [user _updatePersistedMetadata];
-                [user _bindAllDeferredRealms];
-                theBlock(user, nil);
+                RLMSyncUser *existingUser = [[RLMSyncManager sharedManager] _registerUser:user];
+                RLMSyncUser *actualUser = existingUser ?: user;
+                if (existingUser) {
+                    [actualUser _mergeDataFromDuplicateUser:user];
+                }
+                actualUser.isValid = YES;
+                [actualUser _updatePersistedMetadata];
+                [actualUser _bindAllDeferredRealms];
+                theBlock(actualUser, nil);
             }
         } else {
             // Something else went wrong
@@ -231,10 +235,36 @@ using namespace realm;
     NSString *identity = credential.userInfo[kRLMSyncIdentityKey];
     NSAssert(identity != nil, @"Improperly created direct access token credential.");
     user.identity = identity;
-    user.isValid = YES;
-    [[RLMSyncManager sharedManager] _registerUser:user];
-    [user _bindAllDeferredRealms];
-    completion(user, nil);
+    RLMSyncUser *existingUser = [[RLMSyncManager sharedManager] _registerUser:user];
+    RLMSyncUser *actualUser = existingUser ?: user;
+    if (existingUser) {
+        [actualUser _mergeDataFromDuplicateUser:user];
+    }
+    actualUser.isValid = YES;
+    [actualUser _bindAllDeferredRealms];
+    completion(actualUser, nil);
+}
+
+/**
+ The argument to this method represents a duplicate, not-yet-active user; the receiver is an existing user. Merge the
+ state of the duplicate user into the existing user, including the most up-to-date tokens and any sessions that are
+ waiting to be activated.
+ */
+- (void)_mergeDataFromDuplicateUser:(RLMSyncUser *)user {
+    NSAssert(!user.isValid, @"Erroneous user-to-be-merged: user can't be active.");
+    NSAssert([self.identity isEqualToString:user.identity], @"Logic error: can only merge two equivalent users.");
+
+    self.directAccessToken = user.directAccessToken;
+    self.refreshToken = user.refreshToken;
+    // Move over any sessions that are waiting to be started up.
+    for (NSURL *url in user.sessionsStorage) {
+        RLMSyncSession *session = [user.sessionsStorage objectForKey:url];
+        NSAssert(session.state != RLMSyncSessionStateActive,
+                 @"Logic error: a newly-created user can't have active sessions.");
+        if (session.state == RLMSyncSessionStateUnbound) {
+            [self.sessionsStorage setObject:session forKey:url];
+        }
+    }
 }
 
 // Upon successfully logging in, bind any Realm which was opened and registered to the user previously.
@@ -379,20 +409,6 @@ using namespace realm;
         // User is logged in, start the handshake immediately.
         [self _bindRealmWithLocalFileURL:fileURL realmURL:realmURL onCompletion:completion];
     }
-}
-
-#pragma mark - Temporary API
-
-- (instancetype)initWithIdentity:(NSString *)identity
-                    refreshToken:(RLMServerToken)refreshToken
-                   authServerURL:(NSURL *)authServerURL {
-    if (self = [self initWithAuthServer:authServerURL]) {
-        self.refreshToken = refreshToken;
-        self.identity = identity;
-        self.isValid = YES;
-        [[RLMSyncManager sharedManager] _registerUser:self];
-    }
-    return self;
 }
 
 @end
