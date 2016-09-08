@@ -107,7 +107,7 @@ public final class Migration {
     - parameter objectClassName: The name of the `Object` class to enumerate.
     - parameter block:           The block providing both the old and new versions of an object in this Realm.
     */
-    public func enumerateObjects(ofType typeName: String, _ block: MigrationObjectEnumerateBlock) {
+    public func enumerateObjects(ofType typeName: String, _ block: @escaping MigrationObjectEnumerateBlock) {
         rlmMigration.enumerateObjects(typeName) { oldObject, newObject in
             block(unsafeBitCast(oldObject, to: MigrationObject.self),
                   unsafeBitCast(newObject, to: MigrationObject.self))
@@ -177,7 +177,7 @@ public final class Migration {
 
 // MARK: Private Helpers
 
-internal func accessorMigrationBlock(_ migrationBlock: MigrationBlock)
+internal func accessorMigrationBlock(_ migrationBlock: @escaping MigrationBlock)
     -> RLMMigrationBlock {
     return { migration, oldVersion in
         // set all accessor classes to MigrationObject
