@@ -16,6 +16,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix compilation with Swift 2.3 using Xcode 8 beta 2.
 * Further reduce the download size of the prebuilt static libraries.
 * Improve sort performance, especially on non-nullable columns.
+* Allow partial initialization of object by `initWithValue:`, deferring
+  required property checks until object is added to Realm.
 
 ### Bugfixes
 
