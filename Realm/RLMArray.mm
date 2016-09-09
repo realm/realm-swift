@@ -24,6 +24,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
+#import "RLMThreadSafeReference_Private.hpp"
 
 #import <realm/link_view.hpp>
 
@@ -434,6 +435,27 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (instancetype)reversedSortDescriptor {
     return [self.class sortDescriptorWithProperty:_property ascending:!_ascending];
+}
+
+@end
+
+@interface RLMArray (ThreadConfined) <RLMThreadConfined_Private>
+@end
+
+@implementation RLMArray (ThreadConfined)
+
+- (std::unique_ptr<realm::ThreadSafeReferenceBase>)rlm_newThreadSafeReference {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
+}
+
+- (id)rlm_objectiveCMetadata {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
+}
+
++ (instancetype)rlm_objectWithThreadSafeReference:(__unused std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
+                                         metadata:(__unused id)metadata
+                                            realm:(__unused RLMRealm *)realm {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
 }
 
 @end

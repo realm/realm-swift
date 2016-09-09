@@ -26,6 +26,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema.h"
+#import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import "list.hpp"
@@ -46,17 +47,30 @@
     std::unique_ptr<RLMObservationInfo> _observationInfo;
 }
 
-- (RLMArrayLinkView *)initWithParent:(__unsafe_unretained RLMObjectBase *const)parentObject
-                            property:(__unsafe_unretained RLMProperty *const)property {
+- (RLMArrayLinkView *)initWithList:(realm::List)list
+                             realm:(__unsafe_unretained RLMRealm *const)realm
+                        parentInfo:(RLMClassInfo *)parentInfo
+                          property:(__unsafe_unretained RLMProperty *const)property {
     self = [self initWithObjectClassName:property.objectClassName];
     if (self) {
-        _realm = parentObject->_realm;
-        _backingList = realm::List(_realm->_realm, parentObject->_row.get_linklist(parentObject->_info->tableColumn(property)));
-        _objectInfo = &parentObject->_info->linkTargetType(property.index);
-        _ownerInfo = parentObject->_info;
+        _realm = realm;
+        REALM_ASSERT_DEBUG(list.get_realm() == realm->_realm);
+        _backingList = std::move(list);
+        _objectInfo = &parentInfo->linkTargetType(property.index);
+        _ownerInfo = parentInfo;
         _key = property.name;
     }
     return self;
+}
+
+- (RLMArrayLinkView *)initWithParent:(__unsafe_unretained RLMObjectBase *const)parentObject
+                            property:(__unsafe_unretained RLMProperty *const)property {
+    __unsafe_unretained RLMRealm *const realm = parentObject->_realm;
+    realm::List list(realm->_realm, parentObject->_row.get_linklist(parentObject->_info->tableColumn(property)));
+    return [self initWithList:std::move(list)
+                        realm:realm
+                   parentInfo:parentObject->_info
+                     property:property];
 }
 
 void RLMValidateArrayObservationKey(__unsafe_unretained NSString *const keyPath,
@@ -425,5 +439,48 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     return RLMAddNotificationBlock(self, _backingList, block);
 }
 #pragma clang diagnostic pop
+
+@end
+
+@interface RLMArrayLinkViewHandoverMetadata : NSObject
+
+@property (nonatomic) NSString *parentClassName;
+@property (nonatomic) NSString *key;
+
+@end
+
+@implementation RLMArrayLinkViewHandoverMetadata
+@end
+
+@interface RLMArrayLinkView (ThreadConfined) <RLMThreadConfined_Private>
+@end
+
+@implementation RLMArrayLinkView (ThreadConfined)
+
+- (std::unique_ptr<realm::ThreadSafeReferenceBase>)rlm_newThreadSafeReference {
+    realm::ThreadSafeReference<realm::List> list_reference = _realm->_realm->obtain_thread_safe_reference(_backingList);
+    return std::make_unique<realm::ThreadSafeReference<realm::List>>(std::move(list_reference));
+}
+
+- (RLMArrayLinkViewHandoverMetadata *)rlm_objectiveCMetadata {
+    RLMArrayLinkViewHandoverMetadata *metadata = [[RLMArrayLinkViewHandoverMetadata alloc] init];
+    metadata.parentClassName = @(_ownerInfo->objectSchema->name.c_str());
+    metadata.key = _key;
+    return metadata;
+}
+
++ (instancetype)rlm_objectWithThreadSafeReference:(std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
+                                         metadata:(RLMArrayLinkViewHandoverMetadata *)metadata
+                                            realm:(RLMRealm *)realm {
+    REALM_ASSERT_DEBUG(dynamic_cast<realm::ThreadSafeReference<realm::List> *>(reference.get()));
+    auto list_reference = static_cast<realm::ThreadSafeReference<realm::List> *>(reference.get());
+
+    realm::List list = realm->_realm->resolve_thread_safe_reference(std::move(*list_reference));
+
+    return [[RLMArrayLinkView alloc] initWithList:std::move(list)
+                                            realm:realm
+                                       parentInfo:&realm->_info[metadata.parentClassName]
+                                         property:realm.schema[metadata.parentClassName][metadata.key]];
+}
 
 @end

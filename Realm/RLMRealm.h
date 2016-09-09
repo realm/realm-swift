@@ -18,6 +18,7 @@
 
 #import <Foundation/Foundation.h>
 #import "RLMConstants.h"
+#import "RLMThreadSafeReference.h"
 
 @class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
 
@@ -406,6 +407,8 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
 #pragma mark - Accessing Objects
 
+// TODO: Document
+- (nullable id)resolveThreadSafeReference:(RLMThreadSafeReference *)reference;
 
 #pragma mark - Adding and Removing Objects from a Realm
 
