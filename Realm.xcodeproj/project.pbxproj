@@ -66,6 +66,8 @@
 		1A3410921D821A01003A20E5 /* RLMRealmConfiguration+Sync_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3410911D8219A9003A20E5 /* RLMRealmConfiguration+Sync_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1A3410931D821A02003A20E5 /* RLMRealmConfiguration+Sync_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3410911D8219A9003A20E5 /* RLMRealmConfiguration+Sync_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1A4FFC991D35A71000B4B65C /* RLMSyncUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A4FFC971D35A71000B4B65C /* RLMSyncUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1A64CA8B1D8763B400BC0F9B /* keychain_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A64CA891D8763B400BC0F9B /* keychain_helper.cpp */; };
+		1A64CA8C1D8763B400BC0F9B /* keychain_helper.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1A64CA8A1D8763B400BC0F9B /* keychain_helper.hpp */; };
 		1A6921D31D779774004C3232 /* RLMTokenModels.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A6921D11D779774004C3232 /* RLMTokenModels.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1A6921D41D779774004C3232 /* RLMTokenModels.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A6921D21D779774004C3232 /* RLMTokenModels.m */; };
 		1A7003081D5270C400FD9EE3 /* RLMSyncSession.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1AD3870B1D4A7FBB00479110 /* RLMSyncSession.mm */; };
@@ -574,6 +576,8 @@
 		1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMSyncUtil_Private.h; sourceTree = "<group>"; };
 		1A3410911D8219A9003A20E5 /* RLMRealmConfiguration+Sync_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RLMRealmConfiguration+Sync_Private.h"; sourceTree = "<group>"; };
 		1A4FFC971D35A71000B4B65C /* RLMSyncUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncUtil.h; sourceTree = "<group>"; };
+		1A64CA891D8763B400BC0F9B /* keychain_helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = keychain_helper.cpp; sourceTree = "<group>"; };
+		1A64CA8A1D8763B400BC0F9B /* keychain_helper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = keychain_helper.hpp; sourceTree = "<group>"; };
 		1A6921D11D779774004C3232 /* RLMTokenModels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTokenModels.h; sourceTree = "<group>"; };
 		1A6921D21D779774004C3232 /* RLMTokenModels.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTokenModels.m; sourceTree = "<group>"; };
 		1A7B82391D51259F00750296 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
@@ -966,6 +970,8 @@
 			children = (
 				3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */,
 				3F2118A91B97CBE1005A4CFE /* external_commit_helper.hpp */,
+				1A64CA891D8763B400BC0F9B /* keychain_helper.cpp */,
+				1A64CA8A1D8763B400BC0F9B /* keychain_helper.hpp */,
 			);
 			name = Apple;
 			path = apple;
@@ -1401,6 +1407,7 @@
 				1ABF256F1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.h in Headers */,
 				5D659EC21BE04556006515A0 /* RLMRealmConfiguration.h in Headers */,
 				1A3410931D821A02003A20E5 /* RLMRealmConfiguration+Sync_Private.h in Headers */,
+				1A64CA8C1D8763B400BC0F9B /* keychain_helper.hpp in Headers */,
 				5D659EC31BE04556006515A0 /* RLMRealmConfiguration_Private.h in Headers */,
 				E86900E21CC04F5B0008A8B6 /* RLMRealmConfiguration_Private.hpp in Headers */,
 				5D659EC41BE04556006515A0 /* RLMRealmUtil.hpp in Headers */,
@@ -2023,6 +2030,7 @@
 				5D659E9C1BE04556006515A0 /* schema.cpp in Sources */,
 				5D659E9D1BE04556006515A0 /* shared_realm.cpp in Sources */,
 				3F6864EC1D5B8272000024C3 /* thread_confined.cpp in Sources */,
+				1A64CA8B1D8763B400BC0F9B /* keychain_helper.cpp in Sources */,
 				5D659E9E1BE04556006515A0 /* transact_log_handler.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

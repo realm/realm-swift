@@ -115,7 +115,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
         SyncManager::shared().set_error_handler(errorLambda);
         SyncManager::shared().set_login_function(loginLambda);
         NSString *metadataDirectory = [[RLMSyncFileManager fileURLForMetadata] path];
-        _metadata_manager = std::make_unique<SyncMetadataManager>([metadataDirectory UTF8String]);
+        _metadata_manager = std::make_unique<SyncMetadataManager>([metadataDirectory UTF8String], true);
         [self _cleanUpMarkedUsers];
         [self _loadPersistedUsers];
         return self;
