@@ -611,10 +611,8 @@ case "$COMMAND" in
         sh build.sh test-ios-swift-cocoapods
         sh build.sh test-osx-objc-cocoapods
         sh build.sh test-osx-swift-cocoapods
-        if [ "$REALM_SWIFT_VERSION" == "2.2" ]; then # Skip Xcode 8 watchOS CocoaPods for now.
-          sh build.sh test-watchos-objc-cocoapods
-          sh build.sh test-watchos-swift-cocoapods
-        fi
+        sh build.sh test-watchos-objc-cocoapods
+        sh build.sh test-watchos-swift-cocoapods
         ;;
 
     "verify-osx-encryption")
