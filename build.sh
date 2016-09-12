@@ -747,19 +747,21 @@ case "$COMMAND" in
         ;;
 
     "examples-ios-swift")
-        if [ "$REALM_SWIFT_VERSION" != "2.2" ]; then # Skip Swift 2.3/3.0 examples for now.
+        if [ "$REALM_SWIFT_VERSION" == "2.3" ]; then # Skip Swift 2.3 examples for now.
             exit 0
         fi
         sh build.sh prelaunch-simulator
         workspace="examples/ios/swift-$REALM_SWIFT_VERSION/RealmExamples.xcworkspace"
-        pod install --project-directory="$workspace/.." --no-repo-update
         xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme Migration -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme Encryption -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme Backlink -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme GroupedTableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme ReactKitTableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
+        if [ "$REALM_SWIFT_VERSION" == "2.2" ]; then # Only Swift 2.2 has the ReactKitTableView example
+            pod install --project-directory="$workspace/.." --no-repo-update
+            xc "-workspace $workspace -scheme ReactKitTableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
+        fi
         exit 0
         ;;
 
