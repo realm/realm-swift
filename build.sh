@@ -608,15 +608,13 @@ case "$COMMAND" in
         cd examples/installation
         sh build.sh test-ios-objc-cocoapods
         sh build.sh test-ios-objc-cocoapods-dynamic
-        if [ "$REALM_SWIFT_VERSION" != "2.2" ]; then # Skip Swift 2.3/3.0 & watchOS CocoaPods for now.
-            sh build.sh test-ios-swift-cocoapods
-            sh build.sh test-osx-objc-cocoapods
-            exit 0
-        fi
+        sh build.sh test-ios-swift-cocoapods
         sh build.sh test-osx-objc-cocoapods
         sh build.sh test-osx-swift-cocoapods
-        sh build.sh test-watchos-objc-cocoapods
-        sh build.sh test-watchos-swift-cocoapods
+        if [ "$REALM_SWIFT_VERSION" == "2.2" ]; then # Skip Xcode 8 watchOS CocoaPods for now.
+          sh build.sh test-watchos-objc-cocoapods
+          sh build.sh test-watchos-swift-cocoapods
+        fi
         ;;
 
     "verify-osx-encryption")
