@@ -921,8 +921,22 @@ EOM
             # Verify that no Realm files still exist
             ! find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm' | grep -q .
 
-            sh build.sh verify-$target | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || \
-                (echo "\n\n***\nbuild/build.log\n***\n\n" && cat build/build.log && exit 1)
+            failed=0
+            sh build.sh verify-$target 2>&1 | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || failed=1
+            if [ "$failed" = "1" ] && cat build/build.log | grep -E 'DTXProxyChannel|DTXChannel|out of date and needs to be rebuilt'; then
+                echo "Known Xcode error detected. Running job again."
+                failed=0
+                sh build.sh verify-$target | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || failed=1
+            elif [ "$failed" = "1" ] && tail ~/Library/Logs/CoreSimulator/CoreSimulator.log | grep "Operation not supported"; then
+                echo "Known Xcode error detected. Running job again."
+                failed=0
+                sh build.sh verify-$target | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || failed=1
+            fi
+            if [ "$failed" = "1" ]; then
+                echo "\n\n***\nbuild/build.log\n***\n\n" && cat build/build.log
+                echo "\n\n***\nCoreSimulator.log\n***\n\n" && tail -n2000 ~/Library/Logs/CoreSimulator/CoreSimulator.log
+                exit 1
+            fi
         fi
 
         if [ "$target" = "osx" ] && [ "$configuration" = "Debug" ]; then
