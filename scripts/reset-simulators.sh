@@ -10,11 +10,6 @@ while pgrep -q Simulator; do
     pkill -9 Simulator 2>/dev/null
 done
 
-# Install jq if needed
-if ! which jq >/dev/null; then
-    brew install jq
-fi
-
 # Shut down booted simulators
 xcrun simctl list devices -j | jq -c -r '.devices | flatten | map(select(.availability == "(available)")) | map(select(.state == "Booted")) | map(.udid) | .[]' | while read udid; do
     echo "shutting down simulator with ID: $udid"
