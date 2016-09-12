@@ -1,0 +1,399 @@
+--- /Users/austinzheng/Desktop/APIDUMP-2.2	2016-09-08 10:46:03.000000000 -0700
++++ /Users/austinzheng/Desktop/APIDUMP-3.0	2016-09-08 11:43:15.000000000 -0700
+@@ -1,117 +1,129 @@
+ public typealias NotificationToken = RLMNotificationToken
+ public typealias PropertyType = RLMPropertyType
+-public enum Error: ErrorType
+-    public var _code: Int
+-    public var _domain: String
+-public func == (lhs: ErrorType, rhs: ErrorType) -> Bool
+-    public func == (lhs: ErrorType, rhs: ErrorType) -> Bool
+-public func ~= (lhs: Error, rhs: ErrorType) -> Bool
+-    public func ~= (lhs: Error, rhs: ErrorType) -> Bool
++public struct Error
++    public enum Code : Int
++    public static let fail: Code = .fail
++    public static let fileAccess: Code = .fileAccess
++    public static let filePermissionDenied: Code = .filePermissionDenied
++    public static let fileExists: Code = .fileExists
++    public static let fileNotFound: Code = .fileNotFound
++    public static let incompatibleLockFile: Code = .incompatibleLockFile
++    public static let fileFormatUpgradeRequired: Code = .fileFormatUpgradeRequired
++    public static let addressSpaceExhausted: Code = .addressSpaceExhausted
++    public static let schemaMismatch: Code = .schemaMismatch
++    public var code: Code
++    public var _nsError: NSError
++    public init(_nsError error: NSError)
++public typealias _ErrorType = RLMError
++    public static var _nsErrorDomain = RLMErrorDomain
+ public class LinkingObjectsBase: NSObject, NSFastEnumeration
+-    public func countByEnumeratingWithState(state: UnsafeMutablePointer<NSFastEnumerationState>, objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>, count len: Int) -> Int
++    public func countByEnumerating(with state: UnsafeMutablePointer<NSFastEnumerationState>, objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>!, count len: Int) -> Int
+ public final class LinkingObjects<T: Object>: LinkingObjectsBase
+     public subscript(index: Int) -> T
+     public typealias Element = T
+     public var realm: Realm? 
+-    public var invalidated: Bool 
++    public var isInvalidated: Bool
+     public var count: Int 
+     public init(fromType type: T.Type, property propertyName: String)
+     public override var description: String
+-    public func indexOf(object: T) -> Int?
+-    public func indexOf(predicate: NSPredicate) -> Int?
+-    public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int?
++    public func index(of object: T) -> Int?
++    public func indexOfObject(for predicate: NSPredicate) -> Int?
++    public func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int?
+     public var first: T? 
+     public var last: T? 
+-    public override func valueForKey(key: String) -> AnyObject?
+-    public override func valueForKeyPath(keyPath: String) -> AnyObject?
+-    public override func setValue(value: AnyObject?, forKey key: String)
+-    public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<T>
+-    public func filter(predicate: NSPredicate) -> Results<T>
+-    public func sorted(property: String, ascending: Bool = true) -> Results<T>
+-    public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T>
+-    public func min<U: MinMaxType>(property: String) -> U?
+-    public func max<U: MinMaxType>(property: String) -> U?
+-    public func sum<U: AddableType>(property: String) -> U
+-    public func average<U: AddableType>(property: String) -> U?
+-    public func addNotificationBlock(block: (RealmCollectionChange<LinkingObjects> -> Void)) -> NotificationToken
+-    public func generate() -> RLMGenerator<T>
++    public override func value(forKey key: String) -> Any?
++    public override func value(forKeyPath keyPath: String) -> Any?
++    public override func setValue(_ value: Any?, forKey key: String)
++    public func filter(using predicateFormat: String, _ args: Any...) -> Results<T>
++    public func filter(using predicate: NSPredicate) -> Results<T>
++    public func sorted(onProperty property: String, ascending: Bool = true) -> Results<T>
++    public func sorted<S: Sequence>(with sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor
++    public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U?
++    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U?
++    public func sum<U: AddableType>(ofProperty property: String) -> U
++    public func average<U: AddableType>(ofProperty property: String) -> U?
++    public func addNotificationBlock(block: @escaping (RealmCollectionChange<LinkingObjects>) -> Void) -> NotificationToken
++    public func makeIterator() -> RLMIterator<T>
+     public var startIndex: Int 
+     public var endIndex: Int 
+-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) -> NotificationToken
++    public func index(after: Int) -> Int
++    public func index(before: Int) -> Int
++    public func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) -> NotificationToken
+ public class ListBase: RLMListBase
+     @objc public override var description: String
+     public var count: Int 
+ public final class List<T: Object>: ListBase
+-    public subscript(index: Int) -> T
++    public subscript(position: Int) -> T
+     public typealias Element = T
+     public var realm: Realm?
+-    public var invalidated: Bool 
++    public var isInvalidated: Bool
+     public override init()
+-    public func indexOf(object: T) -> Int?
+-    public func indexOf(predicate: NSPredicate) -> Int?
+-    public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int?
++    public func index(of object: T) -> Int?
++    public func indexOfObject(for predicate: NSPredicate) -> Int?
++    public func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int?
+     public var first: T? 
+     public var last: T? 
+-    public override func valueForKey(key: String) -> AnyObject?
+-    public override func valueForKeyPath(keyPath: String) -> AnyObject?
+-    public override func setValue(value: AnyObject?, forKey key: String)
+-    public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<T>
+-    public func filter(predicate: NSPredicate) -> Results<T>
+-    public func sorted(property: String, ascending: Bool = true) -> Results<T>
+-    public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T>
+-    public func min<U: MinMaxType>(property: String) -> U?
+-    public func max<U: MinMaxType>(property: String) -> U?
+-    public func sum<U: AddableType>(property: String) -> U
+-    public func average<U: AddableType>(property: String) -> U?
+-    public func append(object: T)
+-    public func appendContentsOf<S: SequenceType where S.Generator.Element == T>(objects: S)
+-    public func insert(object: T, atIndex index: Int)
+-    public func removeAtIndex(index: Int)
+-    public func removeLast()
+-    public func removeAll()
++    public override func value(forKey key: String) -> Any?
++    public override func value(forKeyPath keyPath: String) -> Any?
++    public override func setValue(_ value: Any?, forKey key: String)
++    public func filter(using predicateFormat: String, _ args: Any...) -> Results<T>
++    public func filter(using predicate: NSPredicate) -> Results<T>
++    public func sorted(onProperty property: String, ascending: Bool = true) -> Results<T>
++    public func sorted<S: Sequence>(with sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor
++    public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U?
++    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U?
++    public func sum<U: AddableType>(ofProperty property: String) -> U
++    public func average<U: AddableType>(ofProperty property: String) -> U?
++    public func append(_ object: T)
++    public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == T
++    public func insert(_ object: T, at index: Int)
++    public func remove(objectAtIndex index: Int)
++    public func removeLastObject()
++    public func removeAllObjects()
+     public func replace(index: Int, object: T)
+-    public func move(from from: Int, to: Int)
++    public func move(from: Int, to: Int)
+     public func swap(index1: Int, _ index2: Int)
+-    public func addNotificationBlock(block: (RealmCollectionChange<List>) -> ()) -> NotificationToken
+-    public func generate() -> RLMGenerator<T>
+-    public func replaceRange<C: CollectionType where C.Generator.Element == T>(subRange: Range<Int>, with newElements: C)
++    public func addNotificationBlock(block: @escaping (RealmCollectionChange<List>) -> ()) -> NotificationToken
++    public func makeIterator() -> RLMIterator<T>
++    public func replaceSubrange<C : Collection>(_ subrange: Range<Int>, with newElements: C) where C.Iterator.Element == T
+     public var startIndex: Int 
+     public var endIndex: Int 
+-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) -> NotificationToken
++    public func index(after i: Int) -> Int
++    public func index(before i: Int) -> Int
++    public func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) -> NotificationToken
++public func schemaVersionAtURL(_ fileURL: URL, encryptionKey: Data? = nil) throws -> UInt64
++public typealias MigrationObjectEnumerateBlock = (_ oldObject: MigrationObject?, _ newObject: MigrationObject?) -> Void
++public typealias MigrationBlock = (_ migration: Migration, _ oldSchemaVersion: UInt64) -> Void
+ public typealias MigrationObject = DynamicObject
+-public typealias MigrationBlock = (migration: Migration, oldSchemaVersion: UInt64) -> Void
+-public typealias MigrationObjectEnumerateBlock = (oldObject: MigrationObject?, newObject: MigrationObject?) -> Void
+-public func schemaVersionAtURL(fileURL: NSURL, encryptionKey: NSData? = nil) throws -> UInt64
+-public func migrateRealm(configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) -> NSError?
+     public static func performMigration(for configuration: Realm.Configuration = Realm.Configuration.defaultConfiguration) throws
+ public final class Migration
+     public var oldSchema: Schema 
+     public var newSchema: Schema 
+-    public func enumerate(objectClassName: String, _ block: MigrationObjectEnumerateBlock)
+-    public func create(className: String, value: AnyObject = [:]) -> MigrationObject
+-    public func delete(object: MigrationObject)
+-    public func deleteData(objectClassName: String) -> Bool
+-    public func renamePropertyForClass(className: String, oldName: String, newName: String)
++    public func enumerateObjects(ofType typeName: String, _ block: MigrationObjectEnumerateBlock)
++    public func createObject(ofType typeName: String, populatedWith value: Any = [:]) -> MigrationObject
++    public func delete(_ object: MigrationObject)
++    public func deleteData(forType typeName: String) -> Bool
++    public func renameProperty(onType typeName: String, from oldName: String, to newName: String)
+ public class Object: RLMObjectBase
+-    public subscript(key: String) -> AnyObject?
++    public subscript(key: String) -> Any?
+     public override required init()
+-    public init(value: AnyObject)
++    public init(value: Any)
+     public var realm: Realm?
+     public var objectSchema: ObjectSchema
+-    public override var invalidated: Bool 
++    public override var isInvalidated: Bool
+     public override var description: String 
+     public final override var className: String 
+-    public override class func objectUtilClass(isSwift: Bool) -> AnyClass
++    public override class func objectUtilClass(_ isSwift: Bool) -> AnyClass
+     public class func primaryKey() -> String? 
+     public class func ignoredProperties() -> [String] 
+     public class func indexedProperties() -> [String] 
+-    public func dynamicList(propertyName: String) -> List<DynamicObject>
+-    public override func isEqual(object: AnyObject?) -> Bool
++    public func dynamicList(_ propertyName: String) -> List<DynamicObject>
++    public override func isEqual(_ object: Any?) -> Bool
+     public override required init(realm: RLMRealm, schema: RLMObjectSchema)
+-    public override required init(value: AnyObject, schema: RLMSchema)
++    public override required init(value: Any, schema: RLMSchema)
+ public final class DynamicObject: Object
+-    public override func valueForUndefinedKey(key: String) -> AnyObject?
+-    public override func setValue(value: AnyObject?, forUndefinedKey key: String)
++    public override func value(forUndefinedKey key: String) -> Any?
++    public override func setValue(_ value: Any?, forUndefinedKey key: String)
+     public override class func shouldIncludeInDefaultSchema() -> Bool
+ public class ObjectUtil: NSObject
+ public final class ObjectSchema: CustomStringConvertible
+@@ -129,83 +141,85 @@
+ public final class Property: CustomStringConvertible
+     public var name: String 
+     public var type: PropertyType 
+-    public var indexed: Bool 
+-    public var optional: Bool 
++    public var isIndexed: Bool
++    public var isOptional: Bool
+     public var objectClassName: String? 
+     public var description: String 
+ public func == (lhs: Property, rhs: Property) -> Bool
+     public func == (lhs: Property, rhs: Property) -> Bool
+-public typealias NotificationBlock = (notification: Notification, realm: Realm) -> Void
+ public final class Realm
+     public var schema: Schema 
+     public var configuration: Configuration 
+     public var isEmpty: Bool 
+     public convenience init() throws
+     public convenience init(configuration: Configuration) throws
+-    public convenience init(fileURL: NSURL) throws
+-    public func write(@noescape block: (() throws -> Void)) throws
++    public convenience init(fileURL: URL) throws
++    public func write(block: () -> Void) throws
+     public func beginWrite()
+     public func commitWrite() throws
+     public func cancelWrite()
+-    public var inWriteTransaction: Bool
+-    public func add(object: Object, update: Bool = false)
+-    public func add<S: SequenceType where S.Generator.Element: Object>(objects: S, update: Bool = false)
+-    public func create<T: Object>(type: T.Type, value: AnyObject = [:], update: Bool = false) -> T
+-    public func dynamicCreate(className: String, value: AnyObject = [:], update: Bool = false) -> DynamicObject
+-    public func delete(object: Object)
+-    public func delete<S: SequenceType where S.Generator.Element: Object>(objects: S)
+-    public func delete<T: Object>(objects: List<T>)
+-    public func delete<T: Object>(objects: Results<T>)
+-    public func deleteAll()
+-    public func objects<T: Object>(type: T.Type) -> Results<T>
+-    public func dynamicObjects(className: String) -> Results<DynamicObject>
+-    public func objectForPrimaryKey<T: Object>(type: T.Type, key: AnyObject?) -> T?
+-    public func dynamicObjectForPrimaryKey(className: String, key: AnyObject?) -> DynamicObject?
+-    public func addNotificationBlock(block: NotificationBlock) -> NotificationToken
+-    public var autorefresh: Bool
++    public var isInWriteTransaction: Bool
++    public func add(_ object: Object, update: Bool = false)
++    public func add<S: Sequence>(_ objects: S, update: Bool = false) where S.Iterator.Element: Object
++    public func createObject<T: Object>(ofType type: T.Type, populatedWith value: Any = [:], update: Bool = false) -> T
++    public func createDynamicObject(ofType typeName: String, populatedWith value: Any = [:], update: Bool = false) -> DynamicObject
++    public func delete(_ object: Object)
++    public func delete<S: Sequence>(_ objects: S) where S.Iterator.Element: Object
++    public func delete<T: Object>(_ objects: List<T>)
++    public func delete<T: Object>(_ objects: Results<T>)
++    public func deleteAllObjects()
++    public func allObjects<T: Object>(ofType type: T.Type) -> Results<T>
++    public func allDynamicObjects(ofType typeName: String) -> Results<DynamicObject>
++    public func object<T: Object, K>(ofType type: T.Type, forPrimaryKey key: K) -> T?
++    public func dynamicObject(ofType typeName: String, forPrimaryKey key: Any) -> DynamicObject?
++    public func addNotificationBlock(block: @escaping NotificationBlock) -> NotificationToken
++    public var shouldAutorefresh: Bool
+     public func refresh() -> Bool
+     public func invalidate()
+-    public func writeCopyToURL(fileURL: NSURL, encryptionKey: NSData? = nil) throws
++    public func writeCopy(toFileURL url: URL, encryptionKey: Data? = nil) throws
++public typealias NotificationBlock = (_ notification: Notification, _ realm: Realm) -> Void
+ public func == (lhs: Realm, rhs: Realm) -> Bool
+     public func == (lhs: Realm, rhs: Realm) -> Bool
+ public enum Notification: String
+-public final class RLMGenerator<T: Object>: GeneratorType
++public final class RLMIterator<T: Object>: IteratorProtocol
+     public func next() -> T?
+ public enum RealmCollectionChange<T>
+-public protocol RealmCollectionType: CollectionType, CustomStringConvertible
+-public final class AnyRealmCollection<T: Object>: RealmCollectionType
++public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible
++public final class AnyRealmCollection<T: Object>: RealmCollection
++    public func index(after i: Int) -> Int
+     public typealias Element = T
+-    public subscript(index: Int) -> T 
+-    public init<C: RealmCollectionType where C.Element == T>(_ base: C)
++    public subscript(position: Int) -> T
++    public func index(before i: Int) -> Int
++    public init<C: RealmCollection>(_ base: C) where C.Element == T
+     public var realm: Realm? 
+-    public var invalidated: Bool 
++    public var isInvalidated: Bool
+     public var count: Int 
+     public var description: String 
+-    public func indexOf(object: Element) -> Int? 
+-    public func indexOf(predicate: NSPredicate) -> Int? 
+-    public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int?
+-    public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<Element>
+-    public func filter(predicate: NSPredicate) -> Results<Element> 
+-    public func sorted(property: String, ascending: Bool) -> Results<Element>
+-    public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor> (sortDescriptors: S) -> Results<Element>
+-    public func min<U: MinMaxType>(property: String) -> U? 
+-    public func max<U: MinMaxType>(property: String) -> U? 
+-    public func sum<U: AddableType>(property: String) -> U 
+-    public func average<U: AddableType>(property: String) -> U? 
+-    public func generate() -> RLMGenerator<T> 
++    public func index(of object: Element) -> Int?
++    public func indexOfObject(for predicate: NSPredicate) -> Int?
++    public func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int?
++    public func filter(using predicateFormat: String, _ args: Any...) -> Results<Element>
++    public func filter(using predicate: NSPredicate) -> Results<Element>
++    public func sorted(onProperty property: String, ascending: Bool) -> Results<Element>
++    public func sorted<S: Sequence>(with sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor
++    public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U?
++    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U?
++    public func sum<U: AddableType>(ofProperty property: String) -> U
++    public func average<U: AddableType>(ofProperty property: String) -> U?
++    public func makeIterator() -> RLMIterator<T>
+     public var startIndex: Int 
+     public var endIndex: Int 
+-    public func valueForKey(key: String) -> AnyObject? 
+-    public func valueForKeyPath(keyPath: String) -> AnyObject? 
+-    public func setValue(value: AnyObject?, forKey key: String) { base.setValue(value, forKey: key) }
+-    public func addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ()) -> NotificationToken 
+-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ()) -> NotificationToken 
++    public func value(forKey key: String) -> Any?
++    public func value(forKeyPath keyPath: String) -> Any?
++    public func setValue(_ value: Any?, forKey key: String) { base.setValue(value, forKey: key) }
++    public func addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> ()) -> NotificationToken
++    public func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> ()) -> NotificationToken
+     public struct Configuration
+         public static var defaultConfiguration: Configuration
+-        public init(fileURL: NSURL? = NSURL(fileURLWithPath: RLMRealmPathForFile(\"default.realm\"), isDirectory: false), inMemoryIdentifier: String? = nil, encryptionKey: NSData? = nil, readOnly: Bool = false, schemaVersion: UInt64 = 0, migrationBlock: MigrationBlock? = nil, deleteRealmIfMigrationNeeded: Bool = false, objectTypes: [Object.Type]? = nil)
+-        public var fileURL: NSURL?
++        public init(fileURL: URL? = URL(fileURLWithPath: RLMRealmPathForFile(\"default.realm\"), isDirectory: false), inMemoryIdentifier: String? = nil, encryptionKey: Data? = nil, readOnly: Bool = false, schemaVersion: UInt64 = 0, migrationBlock: MigrationBlock? = nil, deleteRealmIfMigrationNeeded: Bool = false, objectTypes: [Object.Type]? = nil)
++        public var fileURL: URL?
+         public var inMemoryIdentifier: String?
+-        public var encryptionKey: NSData? = nil
++        public var encryptionKey: Data? = nil
+         public var readOnly: Bool = false
+         public var schemaVersion: UInt64 = 0
+         public var migrationBlock: MigrationBlock? = nil
+@@ -214,36 +228,37 @@
+     public var description: String
+ public protocol MinMaxType {}
+ public protocol AddableType {}
+-public class ResultsBase: NSObject, NSFastEnumeration
+-    public override var description: String
+-    public func countByEnumeratingWithState(state: UnsafeMutablePointer<NSFastEnumerationState>, objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>, count len: Int) -> Int
+-public final class Results<T: Object>: ResultsBase
+-    public subscript(index: Int) -> T
++public final class Results<T: Object>: NSObject, NSFastEnumeration
+     public typealias Element = T
++    public subscript(position: Int) -> T
++    public override var description: String
++    public func countByEnumerating(with state: UnsafeMutablePointer<NSFastEnumerationState>, objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>!, count len: Int) -> Int
+     public var realm: Realm? 
+-    public var invalidated: Bool 
++    public var isInvalidated: Bool
+     public var count: Int 
+-    public func indexOf(object: T) -> Int?
+-    public func indexOf(predicate: NSPredicate) -> Int?
+-    public func indexOf(predicateFormat: String, _ args: AnyObject...) -> Int?
++    public func index(of object: T) -> Int?
++    public func indexOfObject(for predicate: NSPredicate) -> Int?
++    public func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int?
+     public var first: T? 
+     public var last: T? 
+-    public override func valueForKey(key: String) -> AnyObject?
+-    public override func valueForKeyPath(keyPath: String) -> AnyObject?
+-    public override func setValue(value: AnyObject?, forKey key: String)
+-    public func filter(predicateFormat: String, _ args: AnyObject...) -> Results<T>
+-    public func filter(predicate: NSPredicate) -> Results<T>
+-    public func sorted(property: String, ascending: Bool = true) -> Results<T>
+-    public func sorted<S: SequenceType where S.Generator.Element == SortDescriptor>(sortDescriptors: S) -> Results<T>
+-    public func min<U: MinMaxType>(property: String) -> U?
+-    public func max<U: MinMaxType>(property: String) -> U?
+-    public func sum<U: AddableType>(property: String) -> U
+-    public func average<U: AddableType>(property: String) -> U?
+-    public func addNotificationBlock(block: (RealmCollectionChange<Results> -> Void)) -> NotificationToken
+-    public func generate() -> RLMGenerator<T>
++    public override func value(forKey key: String) -> Any?
++    public override func value(forKeyPath keyPath: String) -> Any?
++    public override func setValue(_ value: Any?, forKey key: String)
++    public func filter(using predicateFormat: String, _ args: Any...) -> Results<T>
++    public func filter(using predicate: NSPredicate) -> Results<T>
++    public func sorted(onProperty property: String, ascending: Bool = true) -> Results<T>
++    public func sorted<S: Sequence>(with sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor
++    public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U?
++    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U?
++    public func sum<U: AddableType>(ofProperty property: String) -> U
++    public func average<U: AddableType>(ofProperty property: String) -> U?
++    public func addNotificationBlock(block: @escaping (RealmCollectionChange<Results>) -> Void) -> NotificationToken
++    public func makeIterator() -> RLMIterator<T>
+     public var startIndex: Int 
+     public var endIndex: Int 
+-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) -> NotificationToken
++    public func index(after i: Int) -> Int
++    public func index(before i: Int) -> Int
++    public func _addNotificationBlock(block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) -> NotificationToken
+ public final class Schema: CustomStringConvertible
+     public subscript(className: String) -> ObjectSchema?
+     public var objectSchema: [ObjectSchema]
+
