@@ -239,13 +239,14 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     }
 }
 
-- (void)_registerUser:(RLMSyncUser *)user {
+- (RLMSyncUser *)_registerUser:(RLMSyncUser *)user {
     @synchronized(self) {
         NSString *identity = user.identity;
-        if ([self.activeUsers objectForKey:identity]) {
-            @throw RLMException(@"Cannot create a user whose identity is already used by another user.");
+        if (RLMSyncUser *user = [self.activeUsers objectForKey:identity]) {
+            return user;
         }
         [self.activeUsers setObject:user forKey:identity];
+        return nil;
     }
 }
 

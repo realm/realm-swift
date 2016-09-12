@@ -85,15 +85,6 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 - (NSDictionary<NSURL *, RLMSyncSession *> *)sessions;
 
-
-#pragma mark - Temporary APIs
-
-- (instancetype)initWithIdentity:(NSString *)identity
-                    refreshToken:(RLMServerToken)refreshToken
-                   authServerURL:(NSURL *)authServerURL;
-
-- (RLMServerToken)refreshToken;
-
 NS_ASSUME_NONNULL_END
 
 @end
