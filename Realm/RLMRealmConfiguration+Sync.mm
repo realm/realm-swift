@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMRealmConfiguration+Sync.h"
+#import "RLMRealmConfiguration+Sync_Private.h"
 
 #import "RLMRealmConfiguration_Private.hpp"
 
@@ -27,6 +27,8 @@
 #import "RLMUtil.hpp"
 
 #import "sync_config.hpp"
+
+NSString *const RLMSyncPrivateCustomFileURLKey = @"_custom_file_url";
 
 static BOOL isValidRealmURL(NSURL *url) {
     NSString *scheme = [url scheme];
@@ -40,6 +42,7 @@ static BOOL isValidRealmURL(NSURL *url) {
 
 @property (nonatomic, readwrite) RLMSyncUser *user;
 @property (nonatomic, readwrite) NSURL *realmURL;
+@property (nonatomic) NSMutableDictionary<NSString *, id> *userInfo;
 
 @end
 
@@ -57,9 +60,21 @@ static BOOL isValidRealmURL(NSURL *url) {
     return nil;
 }
 
+- (void)setCustomFileURL:(NSURL *)customFileURL {
+    NSAssert(customFileURL.isFileURL, @"Cannot call setCustomFileURL: with a non-file URL.");
+    [self.userInfo setValue:customFileURL forKey:RLMSyncPrivateCustomFileURLKey];
+}
+
+- (NSMutableDictionary *)userInfo {
+    if (!_userInfo) {
+        _userInfo = [NSMutableDictionary dictionary];
+    }
+    return _userInfo;
+}
+
 @end
 
-@implementation RLMRealmConfiguration (Server)
+@implementation RLMRealmConfiguration (Sync)
 
 #pragma mark - API
 
@@ -86,6 +101,9 @@ static BOOL isValidRealmURL(NSURL *url) {
     };
 
     NSURL *localFileURL = [RLMSyncFileManager fileURLForRawRealmURL:realmURL user:user];
+    if (NSURL *customURL = [syncConfiguration.userInfo objectForKey:RLMSyncPrivateCustomFileURLKey]) {
+        localFileURL = customURL;
+    }
     realm::SyncConfig syncConfig { std::move(identity), std::move(rawURLString), std::move(error_handler) };
 
     self.config.path = [[localFileURL path] UTF8String];

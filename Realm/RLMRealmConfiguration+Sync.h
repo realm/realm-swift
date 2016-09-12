@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface RLMRealmConfiguration (Server)
+@interface RLMRealmConfiguration (Sync)
 
 @property (nullable, nonatomic) RLMSyncConfiguration *syncConfiguration;
 

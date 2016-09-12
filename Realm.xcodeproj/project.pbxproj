@@ -63,6 +63,8 @@
 		02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBA1955FE0100FDED82 /* DynamicTests.m */; };
 		1A1C6E251D3FFD0C0077B6E7 /* RLMSyncUtil_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1A1C6E261D3FFD0D0077B6E7 /* RLMSyncUtil_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		1A3410921D821A01003A20E5 /* RLMRealmConfiguration+Sync_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3410911D8219A9003A20E5 /* RLMRealmConfiguration+Sync_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		1A3410931D821A02003A20E5 /* RLMRealmConfiguration+Sync_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3410911D8219A9003A20E5 /* RLMRealmConfiguration+Sync_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1A4FFC991D35A71000B4B65C /* RLMSyncUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A4FFC971D35A71000B4B65C /* RLMSyncUtil.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		1A6921D31D779774004C3232 /* RLMTokenModels.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A6921D11D779774004C3232 /* RLMTokenModels.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		1A6921D41D779774004C3232 /* RLMTokenModels.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A6921D21D779774004C3232 /* RLMTokenModels.m */; };
@@ -570,6 +572,7 @@
 		02E334C21A5F3C45009F8810 /* module.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = module.modulemap; sourceTree = "<group>"; };
 		02E334C41A5F4923009F8810 /* RLMRealm_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMRealm_Private.hpp; sourceTree = "<group>"; };
 		1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMSyncUtil_Private.h; sourceTree = "<group>"; };
+		1A3410911D8219A9003A20E5 /* RLMRealmConfiguration+Sync_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RLMRealmConfiguration+Sync_Private.h"; sourceTree = "<group>"; };
 		1A4FFC971D35A71000B4B65C /* RLMSyncUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncUtil.h; sourceTree = "<group>"; };
 		1A6921D11D779774004C3232 /* RLMTokenModels.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMTokenModels.h; sourceTree = "<group>"; };
 		1A6921D21D779774004C3232 /* RLMTokenModels.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMTokenModels.m; sourceTree = "<group>"; };
@@ -930,6 +933,7 @@
 				1AAF4D1F1D66585B00058FAD /* RLMSyncCredential.h */,
 				1AAF4D201D66585B00058FAD /* RLMSyncCredential.m */,
 				1ABF256D1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.h */,
+				1A3410911D8219A9003A20E5 /* RLMRealmConfiguration+Sync_Private.h */,
 				1ABF256E1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.mm */,
 				1AF7EA941D340AF70001A9B5 /* RLMSyncManager.h */,
 				1AF7EA981D340D1F0001A9B5 /* RLMSyncManager_Private.hpp */,
@@ -1396,6 +1400,7 @@
 				5D659EC11BE04556006515A0 /* RLMRealm_Private.h in Headers */,
 				1ABF256F1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.h in Headers */,
 				5D659EC21BE04556006515A0 /* RLMRealmConfiguration.h in Headers */,
+				1A3410931D821A02003A20E5 /* RLMRealmConfiguration+Sync_Private.h in Headers */,
 				5D659EC31BE04556006515A0 /* RLMRealmConfiguration_Private.h in Headers */,
 				E86900E21CC04F5B0008A8B6 /* RLMRealmConfiguration_Private.hpp in Headers */,
 				5D659EC41BE04556006515A0 /* RLMRealmUtil.hpp in Headers */,
@@ -1441,6 +1446,7 @@
 				5DD7559E1BE056DE002800DA /* external_commit_helper.hpp in Headers */,
 				5DD7559F1BE056DE002800DA /* index_set.hpp in Headers */,
 				5DD755A01BE056DE002800DA /* object_schema.hpp in Headers */,
+				1A3410921D821A01003A20E5 /* RLMRealmConfiguration+Sync_Private.h in Headers */,
 				5DD755A11BE056DE002800DA /* object_store.hpp in Headers */,
 				5DD755A21BE056DE002800DA /* property.hpp in Headers */,
 				5DD755A31BE056DE002800DA /* Realm.h in Headers */,
