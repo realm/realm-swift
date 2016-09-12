@@ -7,6 +7,7 @@ find_xcode_for_swift() {
     # First check if the currently active one is fine
     version="$(get_swift_version xcrun swift || true)"
     if [[ "$version" = "$1" ]]; then
+        export DEVELOPER_DIR="$(xcode-select -p)"
         return 0
     fi
 
