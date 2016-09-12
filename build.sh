@@ -608,6 +608,10 @@ case "$COMMAND" in
         cd examples/installation
         sh build.sh test-ios-objc-cocoapods
         sh build.sh test-ios-objc-cocoapods-dynamic
+        if [ "$REALM_SWIFT_VERSION" != "2.2" ]; then # Skip Swift 2.3/3.0 & watchOS CocoaPods for now.
+            sh build.sh test-osx-objc-cocoapods
+            exit 0
+        fi
         sh build.sh test-ios-swift-cocoapods
         sh build.sh test-osx-objc-cocoapods
         sh build.sh test-osx-swift-cocoapods
@@ -747,6 +751,9 @@ case "$COMMAND" in
         ;;
 
     "examples-ios-swift")
+        if [ "$REALM_SWIFT_VERSION" != "2.2" ]; then # Skip Swift 2.3/3.0 examples for now.
+            exit 0
+        fi
         sh build.sh prelaunch-simulator
         workspace="examples/ios/swift-$REALM_SWIFT_VERSION/RealmExamples.xcworkspace"
         pod install --project-directory="$workspace/.." --no-repo-update
@@ -772,6 +779,9 @@ case "$COMMAND" in
         ;;
 
     "examples-tvos-swift")
+        if [ "$REALM_SWIFT_VERSION" != "2.2" ]; then # Skip Swift 2.3/3.0 examples for now.
+            exit 0
+        fi
         workspace="examples/tvos/swift/RealmExamples.xcworkspace"
         xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
