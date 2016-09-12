@@ -777,10 +777,10 @@ case "$COMMAND" in
         ;;
 
     "examples-tvos-swift")
-        if [ "$REALM_SWIFT_VERSION" != "2.2" ]; then # Skip Swift 2.3/3.0 examples for now.
+        if [ "$REALM_SWIFT_VERSION" == "2.3" ]; then # Skip Swift 2.3 examples for now.
             exit 0
         fi
-        workspace="examples/tvos/swift/RealmExamples.xcworkspace"
+        workspace="examples/tvos/swift-$REALM_SWIFT_VERSION/RealmExamples.xcworkspace"
         xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
         exit 0
