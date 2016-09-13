@@ -638,13 +638,7 @@ public typealias NotificationBlock = (_ notification: Notification, _ realm: Rea
 extension Realm {
 
     @available(*, unavailable, renamed: "isInWriteTransaction")
-    public var inWriteTransaction : Bool { fatalError() }
-
-    @available(*, unavailable, renamed: "delete(_:)")
-    public func delete<T: Object>(objects: List<T>) { }
-
-    @available(*, unavailable, renamed: "delete(_:)")
-    public func delete<T: Object>(objects: Results<T>) { }
+    public var inWriteTransaction: Bool { fatalError() }
 
     @available(*, unavailable, renamed: "object(ofType:forPrimaryKey:)")
     public func objectForPrimaryKey<T: Object>(_ type: T.Type, key: AnyObject) -> T? { fatalError() }

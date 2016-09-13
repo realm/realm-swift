@@ -530,10 +530,10 @@ extension List {
     public func appendContentsOf<S: Sequence>(_ objects: S) where S.Iterator.Element == T { fatalError() }
 
     @available(*, unavailable, renamed: "remove(objectAtIndex:)")
-    public func remove(at index: Int) { }
+    public func remove(at index: Int) { fatalError() }
 
     @available(*, unavailable, renamed: "isInvalidated")
-    public var invalidated : Bool { fatalError() }
+    public var invalidated: Bool { fatalError() }
 
     @available(*, unavailable, renamed: "index(matching:)")
     public func index(of predicate: NSPredicate) -> Int? { fatalError() }

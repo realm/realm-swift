@@ -419,7 +419,7 @@ extension Results: RealmCollection {
 
 extension Results {
     @available(*, unavailable, renamed: "isInvalidated")
-    public var invalidated : Bool { fatalError() }
+    public var invalidated: Bool { fatalError() }
 
     @available(*, unavailable, renamed: "index(matching:)")
     public func index(of predicate: NSPredicate) -> Int? { fatalError() }
