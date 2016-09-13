@@ -207,7 +207,7 @@ class RealmTests: TestCase {
         try! Realm().write {
             self.assertThrows(try! Realm().beginWrite())
             self.assertThrows(try! Realm().write { })
-            try! Realm().createDynamicObject(ofType: "SwiftStringObject", populatedWith: ["1"])
+            try! Realm().dynamicCreate("SwiftStringObject", value: ["1"])
             XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
         }
         XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
@@ -215,7 +215,7 @@ class RealmTests: TestCase {
 
     func testDynamicWriteSubscripting() {
         try! Realm().beginWrite()
-        let object = try! Realm().createDynamicObject(ofType: "SwiftStringObject", populatedWith: ["1"])
+        let object = try! Realm().dynamicCreate("SwiftStringObject", value: ["1"])
         try! Realm().commitWrite()
 
         XCTAssertNotNil(object, "Dynamic Object Creation Failed")

@@ -300,7 +300,7 @@ public final class Realm {
     :nodoc:
     */
     @discardableResult
-    public func createDynamicObject(ofType typeName: String, populatedWith value: Any = [:], update: Bool = false) -> DynamicObject {
+    public func dynamicCreate(_ typeName: String, value: Any = [:], update: Bool = false) -> DynamicObject {
         if update && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
         }
@@ -642,11 +642,6 @@ extension Realm {
 
     @available(*, unavailable, renamed: "createObject(ofType:populatedWith:update:)")
     public func create<T: Object>(_ type: T.Type, value: AnyObject = [:] as NSDictionary, update: Bool = false) -> T { fatalError() }
-
-    @available(*, unavailable, renamed: "createDynamicObject(ofType:populatedWith:update:)")
-    public func dynamicCreate(_ className: String, value: AnyObject = [:] as NSDictionary, update: Bool = false) -> DynamicObject {
-        fatalError()
-    }
 
     @available(*, unavailable, renamed: "delete(_:)")
     public func delete<T: Object>(objects: List<T>) { }
