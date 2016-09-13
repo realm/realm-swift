@@ -195,19 +195,19 @@ class RealmCollectionTypeTests: TestCase {
         let pred2 = NSPredicate(format: "stringCol = '2'")
         let pred3 = NSPredicate(format: "stringCol = '3'")
 
-        XCTAssertEqual(0, collection.indexOfObject(for: pred1)!)
-        XCTAssertEqual(1, collection.indexOfObject(for: pred2)!)
-        XCTAssertNil(collection.indexOfObject(for: pred3))
+        XCTAssertEqual(0, collection.index(matching: pred1)!)
+        XCTAssertEqual(1, collection.index(matching: pred2)!)
+        XCTAssertNil(collection.index(matching: pred3))
     }
 
     func testIndexOfFormat() {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        XCTAssertEqual(0, collection.indexOfObject(for: "stringCol = '1'")!)
-        XCTAssertEqual(0, collection.indexOfObject(for: "stringCol = %@", "1")!)
-        XCTAssertEqual(1, collection.indexOfObject(for: "stringCol = %@", "2")!)
-        XCTAssertNil(collection.indexOfObject(for: "stringCol = %@", "3"))
+        XCTAssertEqual(0, collection.index(matching: "stringCol = '1'")!)
+        XCTAssertEqual(0, collection.index(matching: "stringCol = %@", "1")!)
+        XCTAssertEqual(1, collection.index(matching: "stringCol = %@", "2")!)
+        XCTAssertNil(collection.index(matching: "stringCol = %@", "3"))
     }
 
     func testSubscript() {

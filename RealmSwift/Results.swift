@@ -137,7 +137,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func indexOfObject(for predicate: NSPredicate) -> Int? {
+    public func index(matching predicate: NSPredicate) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: predicate))
     }
 
@@ -149,7 +149,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int? {
+    public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: NSPredicate(format: predicateFormat,
                                                                                argumentArray: args)))
     }
@@ -421,10 +421,10 @@ extension Results {
     @available(*, unavailable, renamed: "isInvalidated")
     public var invalidated : Bool { fatalError() }
 
-    @available(*, unavailable, renamed: "indexOfObject(for:)")
+    @available(*, unavailable, renamed: "index(matching:)")
     public func index(of predicate: NSPredicate) -> Int? { fatalError() }
 
-    @available(*, unavailable, renamed: "indexOfObject(for:_:)")
+    @available(*, unavailable, renamed: "index(matching:_:)")
     public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
 
     @available(*, unavailable, renamed: "filter(using:)")

@@ -99,7 +99,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func indexOfObject(for predicate: NSPredicate) -> Int? {
+    public func index(matching predicate: NSPredicate) -> Int? {
         return notFoundToNil(index: _rlmArray.indexOfObject(with: predicate))
     }
 
@@ -112,8 +112,8 @@ public final class List<T: Object>: ListBase {
 
     - returns: The index of the first matching object, or `nil` if no objects match.
     */
-    public func indexOfObject(for predicateFormat: String, _ args: Any...) -> Int? {
-        return indexOfObject(for: NSPredicate(format: predicateFormat, argumentArray: args))
+    public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
+        return index(matching: NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     // MARK: Object Retrieval
@@ -541,10 +541,10 @@ extension List {
     @available(*, unavailable, renamed: "isInvalidated")
     public var invalidated : Bool { fatalError() }
 
-    @available(*, unavailable, renamed: "indexOfObject(for:)")
+    @available(*, unavailable, renamed: "index(matching:)")
     public func index(of predicate: NSPredicate) -> Int? { fatalError() }
 
-    @available(*, unavailable, renamed: "indexOfObject(for:_:)")
+    @available(*, unavailable, renamed: "index(matching:_:)")
     public func index(of predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
 
     @available(*, unavailable, renamed: "filter(using:)")
