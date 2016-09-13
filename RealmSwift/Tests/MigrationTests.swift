@@ -261,11 +261,11 @@ class MigrationTests: TestCase {
         }
 
         migrateAndTestDefaultRealm() { migration, oldSchemaVersion in
-            migration.createObject(ofType: "SwiftStringObject", populatedWith: ["string"])
-            migration.createObject(ofType: "SwiftStringObject", populatedWith: ["stringCol": "string"])
-            migration.createObject(ofType: "SwiftStringObject")
+            migration.create("SwiftStringObject", value: ["string"])
+            migration.create("SwiftStringObject", value: ["stringCol": "string"])
+            migration.create("SwiftStringObject")
 
-            self.assertThrows(migration.createObject(ofType: "NoSuchObject", populatedWith: []))
+            self.assertThrows(migration.create("NoSuchObject", value: []))
         }
 
         let objects = try! Realm().allObjects(ofType: SwiftStringObject.self)
@@ -315,7 +315,7 @@ class MigrationTests: TestCase {
             XCTAssertTrue(migration.deleteData(forType: "DeletedClass"))
             XCTAssertFalse(migration.deleteData(forType: "NoSuchClass"))
 
-            migration.createObject(ofType: SwiftStringObject.className(), populatedWith: ["migration"])
+            migration.create(SwiftStringObject.className(), value: ["migration"])
             XCTAssertTrue(migration.deleteData(forType: SwiftStringObject.className()))
         }
 
@@ -406,7 +406,7 @@ class MigrationTests: TestCase {
                 list[0]["boolCol"] = true
                 list.append(newObj!["objectCol"] as! MigrationObject)
 
-                let trueObj = migration.createObject(ofType: SwiftBoolObject.className(), populatedWith: [true])
+                let trueObj = migration.create(SwiftBoolObject.className(), value: [true])
                 list.append(trueObj)
 
                 // verify list property

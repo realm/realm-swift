@@ -338,7 +338,7 @@ class ObjectTests: TestCase {
         }
 
         withMigrationObject { migrationObject, migration in
-            let boolObject = migration.createObject(ofType: "SwiftBoolObject", populatedWith: [true])
+            let boolObject = migration.create("SwiftBoolObject", value: [true])
             self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
         }
 
@@ -359,7 +359,7 @@ class ObjectTests: TestCase {
         }
 
         withMigrationObject { migrationObject, migration in
-            let boolObject = migration.createObject(ofType: "SwiftBoolObject", populatedWith: [true])
+            let boolObject = migration.create("SwiftBoolObject", value: [true])
             self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
         }
 

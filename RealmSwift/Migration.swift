@@ -127,7 +127,7 @@ public final class Migration {
     - returns: The created object.
     */
     @discardableResult
-    public func createObject(ofType typeName: String, populatedWith value: Any = [:]) -> MigrationObject {
+    public func create(_ typeName: String, value: Any = [:]) -> MigrationObject {
         return unsafeBitCast(rlmMigration.createObject(typeName, withValue: value), to: MigrationObject.self)
     }
 
@@ -201,11 +201,6 @@ internal func accessorMigrationBlock(_ migrationBlock: @escaping MigrationBlock)
 extension Migration {
     @available(*, unavailable, renamed: "enumerateObjects(ofType:_:)")
     public func enumerate(_ objectClassName: String, _ block: MigrationObjectEnumerateBlock) { }
-
-    @available(*, unavailable, renamed: "createObject(ofType:populatedWith:)")
-    public func create(_ className: String, value: Any = [:]) -> MigrationObject {
-        fatalError()
-    }
 
     @available(*, unavailable, renamed: "deleteData(forType:)")
     public func deleteData(_ objectClassName: String) -> Bool {
