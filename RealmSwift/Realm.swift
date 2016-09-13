@@ -391,13 +391,13 @@ public final class Realm {
 
     - warning: This method is useful only in specialized circumstances.
 
-    - parameter className: The class name of the objects to be returned.
+    - parameter typeName: The class name of the objects to be returned.
 
     - returns: All objects for the given class name as dynamic objects
 
     :nodoc:
     */
-    public func allDynamicObjects(ofType typeName: String) -> Results<DynamicObject> {
+    public func dynamicObjects(_ typeName: String) -> Results<DynamicObject> {
         return Results<DynamicObject>(RLMGetObjects(rlmRealm, typeName, nil))
     }
 
@@ -645,9 +645,6 @@ extension Realm {
 
     @available(*, unavailable, renamed: "delete(_:)")
     public func delete<T: Object>(objects: Results<T>) { }
-
-    @available(*, unavailable, renamed: "allDynamicObjects(ofType:)")
-    public func dynamicObjects(_ className: String) -> Results<DynamicObject> { fatalError() }
 
     @available(*, unavailable, renamed: "object(ofType:forPrimaryKey:)")
     public func objectForPrimaryKey<T: Object>(_ type: T.Type, key: AnyObject) -> T? { fatalError() }

@@ -452,9 +452,9 @@ class RealmTests: TestCase {
             try! Realm().create(SwiftIntObject.self, value: [300])
         }
 
-        XCTAssertEqual(0, try! Realm().allDynamicObjects(ofType: "SwiftStringObject").count)
-        XCTAssertEqual(3, try! Realm().allDynamicObjects(ofType: "SwiftIntObject").count)
-        assertThrows(try! Realm().allDynamicObjects(ofType: "Object"))
+        XCTAssertEqual(0, try! Realm().dynamicObjects("SwiftStringObject").count)
+        XCTAssertEqual(3, try! Realm().dynamicObjects("SwiftIntObject").count)
+        assertThrows(try! Realm().dynamicObjects("Object"))
     }
 
     func testDynamicObjectProperties() {
@@ -462,7 +462,7 @@ class RealmTests: TestCase {
             try! Realm().create(SwiftObject.self)
         }
 
-        let object = try! Realm().allDynamicObjects(ofType: "SwiftObject")[0]
+        let object = try! Realm().dynamicObjects("SwiftObject")[0]
         let dictionary = SwiftObject.defaultValues()
 
         XCTAssertEqual(object["boolCol"] as? NSNumber, dictionary["boolCol"] as! NSNumber?)
@@ -480,7 +480,7 @@ class RealmTests: TestCase {
             try! Realm().create(SwiftOptionalDefaultValuesObject.self)
         }
 
-        let object = try! Realm().allDynamicObjects(ofType: "SwiftOptionalDefaultValuesObject")[0]
+        let object = try! Realm().dynamicObjects("SwiftOptionalDefaultValuesObject")[0]
         let dictionary = SwiftOptionalDefaultValuesObject.defaultValues()
 
         XCTAssertEqual(object["optIntCol"] as? NSNumber, dictionary["optIntCol"] as! NSNumber?)
