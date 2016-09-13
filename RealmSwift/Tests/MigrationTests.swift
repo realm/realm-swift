@@ -268,7 +268,7 @@ class MigrationTests: TestCase {
             self.assertThrows(migration.create("NoSuchObject", value: []))
         }
 
-        let objects = try! Realm().allObjects(ofType: SwiftStringObject.self)
+        let objects = try! Realm().objects(SwiftStringObject.self)
         XCTAssertEqual(objects.count, 3)
 
         XCTAssertEqual(objects[0].stringCol, "string")
@@ -295,7 +295,7 @@ class MigrationTests: TestCase {
             })
         }
 
-        XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
+        XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 1)
     }
 
     func testDeleteData() {
@@ -431,7 +431,7 @@ class MigrationTests: TestCase {
         try! Realm().refresh()
 
         // check edited values
-        let object = try! Realm().allObjects(ofType: SwiftObject.self).first!
+        let object = try! Realm().objects(SwiftObject.self).first!
         XCTAssertEqual(object.boolCol, false)
         XCTAssertEqual(object.intCol, 1)
         XCTAssertEqual(object.floatCol, 1.0 as Float)
@@ -444,7 +444,7 @@ class MigrationTests: TestCase {
         XCTAssertEqual(object.arrayCol[1].boolCol, true)
 
         // make sure we added new bool objects as object property and in the list
-        XCTAssertEqual(try! Realm().allObjects(ofType: SwiftBoolObject.self).count, 4)
+        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 4)
     }
 
     func testFailOnSchemaMismatch() {

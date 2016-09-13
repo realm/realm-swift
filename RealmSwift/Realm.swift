@@ -378,7 +378,7 @@ public final class Realm {
 
     - returns: All objects of the given type in Realm.
     */
-    public func allObjects<T: Object>(ofType type: T.Type) -> Results<T> {
+    public func objects<T: Object>(_ type: T.Type) -> Results<T> {
         return Results<T>(RLMGetObjects(rlmRealm, (type as Object.Type).className(), nil))
     }
 
@@ -645,9 +645,6 @@ extension Realm {
 
     @available(*, unavailable, renamed: "delete(_:)")
     public func delete<T: Object>(objects: Results<T>) { }
-
-    @available(*, unavailable, renamed: "allObjects(ofType:)")
-    public func objects<T: Object>(_ type: T.Type) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed: "allDynamicObjects(ofType:)")
     public func dynamicObjects(_ className: String) -> Results<DynamicObject> { fatalError() }

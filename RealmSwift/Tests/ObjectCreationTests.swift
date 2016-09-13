@@ -160,7 +160,7 @@ class ObjectCreationTests: TestCase {
         assertThrows(realm.create(SwiftObject.self), "Must be in write transaction")
 
         var object: SwiftObject!
-        let objects = realm.allObjects(ofType: SwiftObject.self)
+        let objects = realm.objects(SwiftObject.self)
         XCTAssertEqual(0, objects.count)
         try! realm.write {
             // test create with all defaults
@@ -308,7 +308,7 @@ class ObjectCreationTests: TestCase {
 
         verifySwiftObjectWithDictionaryLiteral(objectWithKVCObject, dictionary: valueDict, boolObjectValue: false,
             boolObjectListValues: [])
-        XCTAssertEqual(try! Realm().allObjects(ofType: SwiftObject.self).count, 2, "Object should have been copied")
+        XCTAssertEqual(try! Realm().objects(SwiftObject.self).count, 2, "Object should have been copied")
     }
 
     func testCreateWithNestedObjects() {
@@ -319,7 +319,7 @@ class ObjectCreationTests: TestCase {
             [standalone]])
         try! Realm().commitWrite()
 
-        let stringObjects = try! Realm().allObjects(ofType: SwiftPrimaryStringObject.self)
+        let stringObjects = try! Realm().objects(SwiftPrimaryStringObject.self)
         XCTAssertEqual(stringObjects.count, 2)
         let persistedObject = stringObjects.first!
 
@@ -342,7 +342,7 @@ class ObjectCreationTests: TestCase {
             [["primary", 12]]], update: true)
         try! Realm().commitWrite()
 
-        let stringObjects = try! Realm().allObjects(ofType: SwiftPrimaryStringObject.self)
+        let stringObjects = try! Realm().objects(SwiftPrimaryStringObject.self)
         XCTAssertEqual(stringObjects.count, 1)
         let persistedObject = object.object!
 
@@ -425,8 +425,8 @@ class ObjectCreationTests: TestCase {
         try! Realm().commitWrite()
 
         XCTAssertNotEqual(otherRealmObject, object) // the object from the other realm should be copied into this realm
-        XCTAssertEqual(try! Realm().allObjects(ofType: SwiftLinkToPrimaryStringObject.self).count, 1)
-        XCTAssertEqual(try! Realm().allObjects(ofType: SwiftPrimaryStringObject.self).count, 4)
+        XCTAssertEqual(try! Realm().objects(SwiftLinkToPrimaryStringObject.self).count, 1)
+        XCTAssertEqual(try! Realm().objects(SwiftPrimaryStringObject.self).count, 4)
     }
 
     func testCreateWithNSNullLinks() {
