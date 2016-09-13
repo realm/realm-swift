@@ -37,7 +37,7 @@ class Cell: UITableViewCell {
 class TableViewController: UITableViewController {
 
     let realm = try! Realm()
-    let results = try! Realm().allObjects(ofType: DemoObject.self).sorted(onProperty: "date")
+    let results = try! Realm().objects(DemoObject.self).sorted(byProperty: "date")
     var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
@@ -114,7 +114,7 @@ class TableViewController: UITableViewController {
             realm.beginWrite()
             for _ in 0..<5 {
                 // Add row via dictionary. Order is ignored.
-                realm.createObject(ofType: DemoObject.self, populatedWith: ["title": TableViewController.randomString(), "date": TableViewController.randomDate()])
+                realm.create(DemoObject.self, value: ["title": TableViewController.randomString(), "date": TableViewController.randomDate()])
             }
             try! realm.commitWrite()
         }
@@ -122,7 +122,7 @@ class TableViewController: UITableViewController {
 
     func add() {
         realm.beginWrite()
-        realm.createObject(ofType: DemoObject.self, populatedWith: [TableViewController.randomString(), TableViewController.randomDate()])
+        realm.create(DemoObject.self, value: [TableViewController.randomString(), TableViewController.randomDate()])
         try! realm.commitWrite()
     }
 

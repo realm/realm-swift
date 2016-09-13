@@ -54,8 +54,8 @@ class TableViewController: UITableViewController {
             self.tableView.reloadData()
         }
         for section in sectionTitles {
-            let unsortedObjects = realm.allObjects(ofType: DemoObject.self).filter(using: "sectionTitle == '\(section)'")
-            let sortedObjects = unsortedObjects.sorted(onProperty: "date", ascending: true)
+            let unsortedObjects = realm.objects(DemoObject.self).filter("sectionTitle == '\(section)'")
+            let sortedObjects = unsortedObjects.sorted(byProperty: "date", ascending: true)
             objectsBySection.append(sortedObjects)
         }
         tableView.reloadData()
@@ -113,7 +113,7 @@ class TableViewController: UITableViewController {
             realm.beginWrite()
             for _ in 0..<5 {
                 // Add row via dictionary. Order is ignored.
-                realm.createObject(ofType: DemoObject.self, populatedWith: ["title": randomTitle(), "date": NSDate(), "sectionTitle": randomSectionTitle()])
+                realm.create(DemoObject.self, value: ["title": randomTitle(), "date": NSDate(), "sectionTitle": randomSectionTitle()])
             }
             try! realm.commitWrite()
         }
@@ -121,7 +121,7 @@ class TableViewController: UITableViewController {
 
     func add() {
         try! realm.write {
-            realm.createObject(ofType: DemoObject.self, populatedWith: [randomTitle(), NSDate(), randomSectionTitle()])
+            realm.create(DemoObject.self, value: [randomTitle(), NSDate(), randomSectionTitle()])
         }
     }
 }

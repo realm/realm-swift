@@ -53,11 +53,11 @@ class PlacesViewController: UITableViewController, UITextFieldDelegate {
 
     func reloadData() {
         let realm = try! Realm()
-        results = realm.allObjects(ofType: Place.self)
+        results = realm.objects(Place.self)
         if let text = searchField.text, !text.isEmpty {
-            results = results?.filter(using: "postalCode beginswith %@", text)
+            results = results?.filter("postalCode beginswith %@", text)
         }
-        results = results?.sorted(onProperty: "postalCode")
+        results = results?.sorted(byProperty: "postalCode")
 
         tableView?.reloadData()
     }

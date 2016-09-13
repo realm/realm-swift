@@ -75,7 +75,7 @@ class ViewController: UIViewController {
         autoreleasepool {
             let configuration = Realm.Configuration(encryptionKey: getKey() as Data)
             let realm = try! Realm(configuration: configuration)
-            if let stringProp = realm.allObjects(ofType: EncryptionObject.self).first?.stringProp {
+            if let stringProp = realm.objects(EncryptionObject.self).first?.stringProp {
                 log(text: "Saved object: \(stringProp)")
             }
         }
