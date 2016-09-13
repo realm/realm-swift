@@ -192,7 +192,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: `Results` containing elements that match the given predicate.
     */
-    public func filter(using predicateFormat: String, _ args: Any...) -> Results<T> {
+    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> {
         return Results<T>(_rlmArray.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
@@ -203,7 +203,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: `Results` containing elements that match the given predicate.
     */
-    public func filter(using predicate: NSPredicate) -> Results<T> {
+    public func filter(_ predicate: NSPredicate) -> Results<T> {
         return Results<T>(_rlmArray.objects(with: predicate))
     }
 
@@ -244,7 +244,7 @@ public final class List<T: Object>: ListBase {
     - returns: The minimum value for the property amongst objects in the List, or `nil` if the List is empty.
     */
     public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return filter(using: NSPredicate(value: true)).minimumValue(ofProperty: property)
+        return filter(NSPredicate(value: true)).minimumValue(ofProperty: property)
     }
 
     /**
@@ -257,7 +257,7 @@ public final class List<T: Object>: ListBase {
     - returns: The maximum value for the property amongst objects in the List, or `nil` if the List is empty.
     */
     public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return filter(using: NSPredicate(value: true)).maximumValue(ofProperty: property)
+        return filter(NSPredicate(value: true)).maximumValue(ofProperty: property)
     }
 
     /**
@@ -270,7 +270,7 @@ public final class List<T: Object>: ListBase {
     - returns: The sum of the given property over all objects in the List.
     */
     public func sum<U: AddableType>(ofProperty property: String) -> U {
-        return filter(using: NSPredicate(value: true)).sum(ofProperty: property)
+        return filter(NSPredicate(value: true)).sum(ofProperty: property)
     }
 
     /**
@@ -283,7 +283,7 @@ public final class List<T: Object>: ListBase {
     - returns: The average of the given property over all objects in the List, or `nil` if the List is empty.
     */
     public func average<U: AddableType>(ofProperty property: String) -> U? {
-        return filter(using: NSPredicate(value: true)).average(ofProperty: property)
+        return filter(NSPredicate(value: true)).average(ofProperty: property)
     }
 
     // MARK: Mutation
@@ -546,12 +546,6 @@ extension List {
 
     @available(*, unavailable, renamed: "index(matching:_:)")
     public func index(of predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
-
-    @available(*, unavailable, renamed: "filter(using:)")
-    public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
-
-    @available(*, unavailable, renamed: "filter(using:_:)")
-    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed: "sorted(onProperty:ascending:)")
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }

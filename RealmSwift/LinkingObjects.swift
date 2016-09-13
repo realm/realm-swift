@@ -221,7 +221,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: Results containing objects that match the given predicate.
      */
-    public func filter(using predicateFormat: String, _ args: Any...) -> Results<T> {
+    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> {
         return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
     }
 
@@ -232,7 +232,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - returns: Results containing objects that match the given predicate.
      */
-    public func filter(using predicate: NSPredicate) -> Results<T> {
+    public func filter(_ predicate: NSPredicate) -> Results<T> {
         return Results<T>(rlmResults.objects(with: predicate))
     }
 
@@ -433,12 +433,6 @@ extension LinkingObjects {
 
     @available(*, unavailable, renamed: "index(matching:_:)")
     public func index(of predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
-
-    @available(*, unavailable, renamed: "filter(using:)")
-    public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
-
-    @available(*, unavailable, renamed: "filter(using:_:)")
-    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed: "sorted(onProperty:ascending:)")
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }

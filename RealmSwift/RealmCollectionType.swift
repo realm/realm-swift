@@ -186,7 +186,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    func filter(using predicateFormat: String, _ args: Any...) -> Results<Element>
+    func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element>
 
     /**
     Returns `Results` containing collection elements that match the given predicate.
@@ -195,7 +195,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    func filter(using predicate: NSPredicate) -> Results<Element>
+    func filter(_ predicate: NSPredicate) -> Results<Element>
 
 
     // MARK: Sorting
@@ -373,8 +373,8 @@ private class _AnyRealmCollectionBase<T: Object> {
     func index(of object: Element) -> Int? { fatalError() }
     func index(matching predicate: NSPredicate) -> Int? { fatalError() }
     func index(matching predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
-    func filter(using predicateFormat: String, _ args: Any...) -> Results<Element> { fatalError() }
-    func filter(using predicate: NSPredicate) -> Results<Element> { fatalError() }
+    func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> { fatalError() }
+    func filter(_ predicate: NSPredicate) -> Results<Element> { fatalError() }
     func sorted(onProperty property: String, ascending: Bool) -> Results<Element> { fatalError() }
     func sorted<S: Sequence>(with sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
         fatalError()
@@ -462,8 +462,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    override func filter(using predicateFormat: String, _ args: Any...) -> Results<C.Element> {
-        return base.filter(using: NSPredicate(format: predicateFormat, argumentArray: args))
+    override func filter(_ predicateFormat: String, _ args: Any...) -> Results<C.Element> {
+        return base.filter(NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     /**
@@ -473,7 +473,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    override func filter(using predicate: NSPredicate) -> Results<C.Element> { return base.filter(using: predicate) }
+    override func filter(_ predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
 
 
     // MARK: Sorting
@@ -721,8 +721,8 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    public func filter(using predicateFormat: String, _ args: Any...) -> Results<Element> {
-        return base.filter(using: NSPredicate(format: predicateFormat, argumentArray: args))
+    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
+        return base.filter(NSPredicate(format: predicateFormat, argumentArray: args))
     }
 
     /**
@@ -732,7 +732,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: `Results` containing collection elements that match the given predicate.
     */
-    public func filter(using predicate: NSPredicate) -> Results<Element> { return base.filter(using: predicate) }
+    public func filter(_ predicate: NSPredicate) -> Results<Element> { return base.filter(predicate) }
 
 
     // MARK: Sorting
@@ -950,12 +950,6 @@ extension AnyRealmCollection {
 
     @available(*, unavailable, renamed: "index(matching:_:)")
     public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
-
-    @available(*, unavailable, renamed: "filter(using:)")
-    public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
-
-    @available(*, unavailable, renamed: "filter(using:_:)")
-    public func filter(_ predicateFormat: String, _ args: AnyObject...) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed: "sorted(onProperty:ascending:)")
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }

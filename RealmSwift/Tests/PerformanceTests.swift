@@ -151,7 +151,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(largeRealm)
         measure {
             for _ in 0..<50 {
-                let results = realm.allObjects(ofType: SwiftStringObject.self).filter(using: "stringCol = 'a'")
+                let results = realm.allObjects(ofType: SwiftStringObject.self).filter("stringCol = 'a'")
                 _ = results.count
             }
         }
@@ -161,7 +161,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(mediumRealm)
         measure {
             for _ in 0..<50 {
-                let results = realm.allObjects(ofType: SwiftStringObject.self).filter(using: "stringCol = 'a'")
+                let results = realm.allObjects(ofType: SwiftStringObject.self).filter("stringCol = 'a'")
                 _ = results.first
                 _ = results.count
             }
@@ -171,7 +171,7 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndAccessQuery() {
         let realm = copyRealmToTestPath(largeRealm)
         measure {
-            for stringObject in realm.allObjects(ofType: SwiftStringObject.self).filter(using: "stringCol = 'a'") {
+            for stringObject in realm.allObjects(ofType: SwiftStringObject.self).filter("stringCol = 'a'") {
                 _ = stringObject.stringCol
             }
         }
@@ -240,7 +240,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = copyRealmToTestPath(largeRealm)
         measure {
             try! realm.write {
-                for stringObject in realm.allObjects(ofType: SwiftStringObject.self).filter(using: "stringCol != 'b'") {
+                for stringObject in realm.allObjects(ofType: SwiftStringObject.self).filter("stringCol != 'b'") {
                     stringObject.stringCol = "c"
                 }
             }
@@ -263,7 +263,7 @@ class SwiftPerformanceTests: TestCase {
             let realm = self.copyRealmToTestPath(mediumRealm)
             self.startMeasuring()
             try! realm.write {
-                realm.delete(realm.allObjects(ofType: SwiftStringObject.self).filter(using: "stringCol = 'a' OR stringCol = 'b'"))
+                realm.delete(realm.allObjects(ofType: SwiftStringObject.self).filter("stringCol = 'a' OR stringCol = 'b'"))
             }
             self.stopMeasuring()
         }
@@ -290,7 +290,7 @@ class SwiftPerformanceTests: TestCase {
         }
         measure {
             for i in 0..<1000 {
-                _ = realm.allObjects(ofType: SwiftStringObject.self).filter(using: "stringCol = %@", i.description).first
+                _ = realm.allObjects(ofType: SwiftStringObject.self).filter("stringCol = %@", i.description).first
             }
         }
     }
@@ -304,7 +304,7 @@ class SwiftPerformanceTests: TestCase {
         }
         measure {
             for i in 0..<1000 {
-                _ = realm.allObjects(ofType: SwiftIndexedPropertiesObject.self).filter(using: "stringCol = %@", i.description).first
+                _ = realm.allObjects(ofType: SwiftIndexedPropertiesObject.self).filter("stringCol = %@", i.description).first
             }
         }
     }
@@ -321,7 +321,7 @@ class SwiftPerformanceTests: TestCase {
         }
         try! realm.commitWrite()
         measure {
-            _ = realm.allObjects(ofType: SwiftIntObject.self).filter(using: "intCol IN %@", ids).first
+            _ = realm.allObjects(ofType: SwiftIntObject.self).filter("intCol IN %@", ids).first
         }
     }
 

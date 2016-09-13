@@ -416,7 +416,7 @@ class RealmTests: TestCase {
             realm.add(SwiftIntObject(value: [1]))
             realm.add(SwiftIntObject(value: [2]))
             XCTAssertEqual(3, realm.allObjects(ofType: SwiftIntObject.self).count)
-            realm.delete(realm.allObjects(ofType: SwiftIntObject.self).filter(using: "intCol = 1"))
+            realm.delete(realm.allObjects(ofType: SwiftIntObject.self).filter("intCol = 1"))
             XCTAssertEqual(1, realm.allObjects(ofType: SwiftIntObject.self).count)
         }
         XCTAssertEqual(1, realm.allObjects(ofType: SwiftIntObject.self).count)
