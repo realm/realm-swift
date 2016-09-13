@@ -285,7 +285,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: The maximum value for the property amongst objects in the Results, or `nil` if the Results is empty.
     */
-    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func max<U: MinMaxType>(ofProperty property: String) -> U? {
         return rlmResults.max(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -438,7 +438,7 @@ extension Results {
     @available(*, unavailable, renamed: "min(ofProperty:)")
     public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
 
-    @available(*, unavailable, renamed: "maximumValue(ofProperty:)")
+    @available(*, unavailable, renamed: "max(ofProperty:)")
     public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
 
     @available(*, unavailable, renamed: "sum(ofProperty:)")

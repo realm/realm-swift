@@ -256,8 +256,8 @@ public final class List<T: Object>: ListBase {
 
     - returns: The maximum value for the property amongst objects in the List, or `nil` if the List is empty.
     */
-    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return filter(NSPredicate(value: true)).maximumValue(ofProperty: property)
+    public func max<U: MinMaxType>(ofProperty property: String) -> U? {
+        return filter(NSPredicate(value: true)).max(ofProperty: property)
     }
 
     /**
@@ -558,7 +558,7 @@ extension List {
     @available(*, unavailable, renamed: "min(ofProperty:)")
     public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
 
-    @available(*, unavailable, renamed: "maximumValue(ofProperty:)")
+    @available(*, unavailable, renamed: "max(ofProperty:)")
     public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
 
     @available(*, unavailable, renamed: "sum(ofProperty:)")

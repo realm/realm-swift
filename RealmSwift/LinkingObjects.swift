@@ -287,7 +287,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: The maximum value for the property amongst objects in the collection, or `nil` if the collection
        is empty.
      */
-    public func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func max<U: MinMaxType>(ofProperty property: String) -> U? {
         return rlmResults.max(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -445,7 +445,7 @@ extension LinkingObjects {
     @available(*, unavailable, renamed: "min(ofProperty:)")
     public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
 
-    @available(*, unavailable, renamed: "maximumValue(ofProperty:)")
+    @available(*, unavailable, renamed: "max(ofProperty:)")
     public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
 
     @available(*, unavailable, renamed: "sum(ofProperty:)")
