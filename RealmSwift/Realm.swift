@@ -519,7 +519,7 @@ public final class Realm {
 
     Defaults to true.
     */
-    public var shouldAutorefresh: Bool {
+    public var autorefresh: Bool {
         get {
             return rlmRealm.autorefresh
         }
@@ -651,9 +651,6 @@ extension Realm {
 
     @available(*, unavailable, renamed: "dynamicObject(ofType:forPrimaryKey:)")
     public func dynamicObjectForPrimaryKey(_ className: String, key: AnyObject) -> DynamicObject? { fatalError() }
-
-    @available(*, unavailable, renamed: "shouldAutorefresh")
-    public var autorefresh : Bool { get { fatalError() } set { fatalError() } }
 
     @available(*, unavailable, renamed: "writeCopy(toFileURL:encryptionKey:)")
     public func writeCopyToURL(_ fileURL: NSURL, encryptionKey: Data? = nil) throws { fatalError() }

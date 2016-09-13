@@ -638,11 +638,11 @@ class RealmTests: TestCase {
 
     func testAutorefresh() {
         let realm = try! Realm()
-        XCTAssertTrue(realm.shouldAutorefresh, "Autorefresh should default to true")
-        realm.shouldAutorefresh = false
-        XCTAssertFalse(realm.shouldAutorefresh)
-        realm.shouldAutorefresh = true
-        XCTAssertTrue(realm.shouldAutorefresh)
+        XCTAssertTrue(realm.autorefresh, "Autorefresh should default to true")
+        realm.autorefresh = false
+        XCTAssertFalse(realm.autorefresh)
+        realm.autorefresh = true
+        XCTAssertTrue(realm.autorefresh)
 
         // test that autoreresh is applied
         // we have two notifications, one for opening the realm, and a second when performing our transaction
@@ -662,15 +662,14 @@ class RealmTests: TestCase {
         token.stop()
 
         // get object
-        let results = realm.objects(SwiftStringObject.self
-        )
+        let results = realm.objects(SwiftStringObject.self)
         XCTAssertEqual(results.count, Int(1), "There should be 1 object of type StringObject")
         XCTAssertEqual(results[0].stringCol, "string", "Value of first column should be 'string'")
     }
 
     func testRefresh() {
         let realm = try! Realm()
-        realm.shouldAutorefresh = false
+        realm.autorefresh = false
 
         // test that autoreresh is not applied
         // we have two notifications, one for opening the realm, and a second when performing our transaction
