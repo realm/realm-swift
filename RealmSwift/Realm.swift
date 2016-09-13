@@ -637,42 +637,42 @@ public typealias NotificationBlock = (_ notification: Notification, _ realm: Rea
 
 extension Realm {
 
-    @available(*, unavailable, renamed:"isInWriteTransaction")
+    @available(*, unavailable, renamed: "isInWriteTransaction")
     public var inWriteTransaction : Bool { fatalError() }
 
-    @available(*, unavailable, renamed:"createObject(ofType:populatedWith:update:)")
+    @available(*, unavailable, renamed: "createObject(ofType:populatedWith:update:)")
     public func create<T: Object>(_ type: T.Type, value: AnyObject = [:] as NSDictionary, update: Bool = false) -> T { fatalError() }
 
-    @available(*, unavailable, renamed:"createDynamicObject(ofType:populatedWith:update:)")
+    @available(*, unavailable, renamed: "createDynamicObject(ofType:populatedWith:update:)")
     public func dynamicCreate(_ className: String, value: AnyObject = [:] as NSDictionary, update: Bool = false) -> DynamicObject {
         fatalError()
     }
 
-    @available(*, unavailable, renamed:"delete(_:)")
+    @available(*, unavailable, renamed: "delete(_:)")
     public func delete<T: Object>(objects: List<T>) { }
 
-    @available(*, unavailable, renamed:"delete(_:)")
+    @available(*, unavailable, renamed: "delete(_:)")
     public func delete<T: Object>(objects: Results<T>) { }
 
-    @available(*, unavailable, renamed:"deleteAllObjects()")
+    @available(*, unavailable, renamed: "deleteAllObjects()")
     public func deleteAll() { }
 
-    @available(*, unavailable, renamed:"allObjects(ofType:)")
+    @available(*, unavailable, renamed: "allObjects(ofType:)")
     public func objects<T: Object>(_ type: T.Type) -> Results<T> { fatalError() }
 
-    @available(*, unavailable, renamed:"allDynamicObjects(ofType:)")
+    @available(*, unavailable, renamed: "allDynamicObjects(ofType:)")
     public func dynamicObjects(_ className: String) -> Results<DynamicObject> { fatalError() }
 
-    @available(*, unavailable, renamed:"object(ofType:forPrimaryKey:)")
+    @available(*, unavailable, renamed: "object(ofType:forPrimaryKey:)")
     public func objectForPrimaryKey<T: Object>(_ type: T.Type, key: AnyObject) -> T? { fatalError() }
 
-    @available(*, unavailable, renamed:"dynamicObject(ofType:forPrimaryKey:)")
+    @available(*, unavailable, renamed: "dynamicObject(ofType:forPrimaryKey:)")
     public func dynamicObjectForPrimaryKey(_ className: String, key: AnyObject) -> DynamicObject? { fatalError() }
 
-    @available(*, unavailable, renamed:"shouldAutorefresh")
+    @available(*, unavailable, renamed: "shouldAutorefresh")
     public var autorefresh : Bool { get { fatalError() } set { fatalError() } }
 
-    @available(*, unavailable, renamed:"writeCopy(toFileURL:encryptionKey:)")
+    @available(*, unavailable, renamed: "writeCopy(toFileURL:encryptionKey:)")
     public func writeCopyToURL(_ fileURL: NSURL, encryptionKey: Data? = nil) throws { fatalError() }
 }
 

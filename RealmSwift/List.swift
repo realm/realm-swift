@@ -526,51 +526,51 @@ extension List : RealmCollection, RangeReplaceableCollection {
 // MARK: Unavailable
 
 extension List {
-    @available(*, unavailable, renamed:"append(objectsIn:)")
+    @available(*, unavailable, renamed: "append(objectsIn:)")
     public func appendContentsOf<S: Sequence>(_ objects: S) where S.Iterator.Element == T { fatalError() }
 
-    @available(*, unavailable, renamed:"removeAllObjects()")
+    @available(*, unavailable, renamed: "removeAllObjects()")
     public func removeAll() { }
 
-    @available(*, unavailable, renamed:"removeLastObject()")
+    @available(*, unavailable, renamed: "removeLastObject()")
     public func removeLast() { }
 
     @available(*, unavailable, renamed: "remove(objectAtIndex:)")
     public func remove(at index: Int) { }
 
-    @available(*, unavailable, renamed:"isInvalidated")
+    @available(*, unavailable, renamed: "isInvalidated")
     public var invalidated : Bool { fatalError() }
 
-    @available(*, unavailable, renamed:"indexOfObject(for:)")
+    @available(*, unavailable, renamed: "indexOfObject(for:)")
     public func index(of predicate: NSPredicate) -> Int? { fatalError() }
 
-    @available(*, unavailable, renamed:"indexOfObject(for:_:)")
+    @available(*, unavailable, renamed: "indexOfObject(for:_:)")
     public func index(of predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
 
-    @available(*, unavailable, renamed:"filter(using:)")
+    @available(*, unavailable, renamed: "filter(using:)")
     public func filter(_ predicate: NSPredicate) -> Results<T> { fatalError() }
 
-    @available(*, unavailable, renamed:"filter(using:_:)")
+    @available(*, unavailable, renamed: "filter(using:_:)")
     public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> { fatalError() }
 
-    @available(*, unavailable, renamed:"sorted(onProperty:ascending:)")
+    @available(*, unavailable, renamed: "sorted(onProperty:ascending:)")
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
-    @available(*, unavailable, renamed:"sorted(with:)")
+    @available(*, unavailable, renamed: "sorted(with:)")
     public func sorted<S: Sequence>(_ sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
 
-    @available(*, unavailable, renamed:"minimumValue(ofProperty:)")
+    @available(*, unavailable, renamed: "minimumValue(ofProperty:)")
     public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
 
-    @available(*, unavailable, renamed:"maximumValue(ofProperty:)")
+    @available(*, unavailable, renamed: "maximumValue(ofProperty:)")
     public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
 
-    @available(*, unavailable, renamed:"sum(ofProperty:)")
+    @available(*, unavailable, renamed: "sum(ofProperty:)")
     public func sum<U: AddableType>(_ property: String) -> U { fatalError() }
 
-    @available(*, unavailable, renamed:"average(ofProperty:)")
+    @available(*, unavailable, renamed: "average(ofProperty:)")
     public func average<U: AddableType>(_ property: String) -> U? { fatalError() }
 }
 

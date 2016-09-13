@@ -72,10 +72,10 @@ public func == (lhs: Property, rhs: Property) -> Bool { // swiftlint:disable:thi
 // MARK: Unavailable
 
 extension Property {
-    @available(*, unavailable, renamed:"isIndexed")
+    @available(*, unavailable, renamed: "isIndexed")
     public var indexed : Bool { fatalError() }
 
-    @available(*, unavailable, renamed:"isOptional")
+    @available(*, unavailable, renamed: "isOptional")
     public var optional : Bool { fatalError() }
 }
 
