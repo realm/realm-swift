@@ -37,7 +37,7 @@ class RealmTests: TestCase {
             XCTAssertEqual(try! Realm().configuration.readOnly, false)
 
             try! Realm().write {
-                try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [100])
+                try! Realm().create(SwiftIntObject.self, value: [100])
             }
         }
         let config = Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true)
@@ -58,7 +58,7 @@ class RealmTests: TestCase {
         autoreleasepool {
             let realm = try! Realm(fileURL: testRealmURL())
             try! realm.write {
-                realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["a"])
+                realm.create(SwiftStringObject.self, value: ["a"])
             }
         }
 
@@ -129,14 +129,14 @@ class RealmTests: TestCase {
         XCTAssert(realm.isEmpty, "Realm should be empty on creation.")
 
         realm.beginWrite()
-        realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["a"])
+        realm.create(SwiftStringObject.self, value: ["a"])
         XCTAssertFalse(realm.isEmpty, "Realm should not be empty within a write transaction after adding an object.")
         realm.cancelWrite()
 
         XCTAssertTrue(realm.isEmpty, "Realm should be empty after canceling a write transaction that added an object.")
 
         realm.beginWrite()
-        realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["a"])
+        realm.create(SwiftStringObject.self, value: ["a"])
         try! realm.commitWrite()
         XCTAssertFalse(realm.isEmpty,
             "Realm should not be empty after committing a write transaction that added an object.")
@@ -166,7 +166,7 @@ class RealmTests: TestCase {
         autoreleasepool {
             let realm = inMemoryRealm("identifier")
             try! realm.write {
-                realm.createObject(ofType: SwiftIntObject.self, populatedWith: [1])
+                realm.create(SwiftIntObject.self, value: [1])
                 return
             }
         }
@@ -174,10 +174,10 @@ class RealmTests: TestCase {
         XCTAssertEqual(realm.allObjects(ofType: SwiftIntObject.self).count, 0)
 
         try! realm.write {
-            realm.createObject(ofType: SwiftIntObject.self, populatedWith: [1])
+            realm.create(SwiftIntObject.self, value: [1])
             XCTAssertEqual(realm.allObjects(ofType: SwiftIntObject.self).count, 1)
 
-            inMemoryRealm("identifier").createObject(ofType: SwiftIntObject.self, populatedWith: [1])
+            inMemoryRealm("identifier").create(SwiftIntObject.self, value: [1])
             XCTAssertEqual(realm.allObjects(ofType: SwiftIntObject.self).count, 2)
         }
 
@@ -197,7 +197,7 @@ class RealmTests: TestCase {
         try! Realm().write {
             self.assertThrows(try! Realm().beginWrite())
             self.assertThrows(try! Realm().write { })
-            try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["1"])
+            try! Realm().create(SwiftStringObject.self, value: ["1"])
             XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
         }
         XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
@@ -229,13 +229,13 @@ class RealmTests: TestCase {
         assertThrows(try! Realm().beginWrite())
         try! Realm().cancelWrite()
         try! Realm().beginWrite()
-        try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["1"])
+        try! Realm().create(SwiftStringObject.self, value: ["1"])
         XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
     }
 
     func testCommitWrite() {
         try! Realm().beginWrite()
-        try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["1"])
+        try! Realm().create(SwiftStringObject.self, value: ["1"])
         try! Realm().commitWrite()
         XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
         try! Realm().beginWrite()
@@ -244,13 +244,13 @@ class RealmTests: TestCase {
     func testCancelWrite() {
         assertThrows(try! Realm().cancelWrite())
         try! Realm().beginWrite()
-        try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["1"])
+        try! Realm().create(SwiftStringObject.self, value: ["1"])
         try! Realm().cancelWrite()
         XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 0)
 
         try! Realm().write {
             self.assertThrows(self.realmWithTestPath().cancelWrite())
-            let object = try! Realm().createObject(ofType: SwiftStringObject.self)
+            let object = try! Realm().create(SwiftStringObject.self)
             try! Realm().cancelWrite()
             XCTAssertTrue(object.isInvalidated)
             XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 0)
@@ -435,9 +435,9 @@ class RealmTests: TestCase {
 
     func testObjects() {
         try! Realm().write {
-            try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [100])
-            try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [200])
-            try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [300])
+            try! Realm().create(SwiftIntObject.self, value: [100])
+            try! Realm().create(SwiftIntObject.self, value: [200])
+            try! Realm().create(SwiftIntObject.self, value: [300])
         }
 
         XCTAssertEqual(0, try! Realm().allObjects(ofType: SwiftStringObject.self).count)
@@ -447,9 +447,9 @@ class RealmTests: TestCase {
 
     func testDynamicObjects() {
         try! Realm().write {
-            try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [100])
-            try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [200])
-            try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [300])
+            try! Realm().create(SwiftIntObject.self, value: [100])
+            try! Realm().create(SwiftIntObject.self, value: [200])
+            try! Realm().create(SwiftIntObject.self, value: [300])
         }
 
         XCTAssertEqual(0, try! Realm().allDynamicObjects(ofType: "SwiftStringObject").count)
@@ -459,7 +459,7 @@ class RealmTests: TestCase {
 
     func testDynamicObjectProperties() {
         try! Realm().write {
-            try! Realm().createObject(ofType: SwiftObject.self)
+            try! Realm().create(SwiftObject.self)
         }
 
         let object = try! Realm().allDynamicObjects(ofType: "SwiftObject")[0]
@@ -477,7 +477,7 @@ class RealmTests: TestCase {
 
     func testDynamicObjectOptionalProperties() {
         try! Realm().write {
-            try! Realm().createObject(ofType: SwiftOptionalDefaultValuesObject.self)
+            try! Realm().create(SwiftOptionalDefaultValuesObject.self)
         }
 
         let object = try! Realm().allDynamicObjects(ofType: "SwiftOptionalDefaultValuesObject")[0]
@@ -503,8 +503,8 @@ class RealmTests: TestCase {
 
                 let realm = try! Realm()
                 try! realm.write {
-                    realm.createObject(ofType: type, populatedWith: ["a", 1])
-                    realm.createObject(ofType: type, populatedWith: ["b", 2])
+                    realm.create(type, value: ["a", 1])
+                    realm.create(type, value: ["b", 2])
                 }
 
                 let object = realm.object(ofType: type, forPrimaryKey: 1 as O.PrimaryKey)
@@ -527,8 +527,8 @@ class RealmTests: TestCase {
                   Wrapped: ExpressibleByIntegerLiteral {
                 let realm = try! Realm()
                 try! realm.write {
-                    realm.createObject(ofType: type, populatedWith: ["a", NSNull()])
-                    realm.createObject(ofType: type, populatedWith: ["b", 2])
+                    realm.create(type, value: ["a", NSNull()])
+                    realm.create(type, value: ["b", 2])
                 }
 
                 let object1a = realm.object(ofType: type, forPrimaryKey: NSNull())
@@ -554,8 +554,8 @@ class RealmTests: TestCase {
     func testStringPrimaryKey() {
         let realm = try! Realm()
         try! realm.write {
-            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["a", 1])
-            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["b", 2])
+            realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
+            realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
         }
 
         // When this is directly inside the XCTAssertNotNil, it doesn't work
@@ -570,11 +570,11 @@ class RealmTests: TestCase {
     func testOptionalStringPrimaryKey() {
         let realm = try! Realm()
         try! realm.write {
-            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["a", 1])
-            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["b", 2])
+            realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
+            realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
 
-            realm.createObject(ofType: SwiftPrimaryOptionalStringObject.self, populatedWith: [NSNull(), 1])
-            realm.createObject(ofType: SwiftPrimaryOptionalStringObject.self, populatedWith: ["b", 2])
+            realm.create(SwiftPrimaryOptionalStringObject.self, value: [NSNull(), 1])
+            realm.create(SwiftPrimaryOptionalStringObject.self, value: ["b", 2])
         }
 
         let object1 = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: NSNull())
@@ -590,8 +590,8 @@ class RealmTests: TestCase {
     func testDynamicObjectForPrimaryKey() {
         let realm = try! Realm()
         try! realm.write {
-            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["a", 1])
-            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["b", 2])
+            realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
+            realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
         }
 
         XCTAssertNotNil(realm.dynamicObject(ofType: "SwiftPrimaryStringObject", forPrimaryKey: "a"))
@@ -601,7 +601,7 @@ class RealmTests: TestCase {
     func testDynamicObjectForPrimaryKeySubscripting() {
         let realm = try! Realm()
         try! realm.write {
-            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["a", 1])
+            realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
         }
 
         let object = realm.dynamicObject(ofType: "SwiftPrimaryStringObject", forPrimaryKey: "a")
@@ -655,7 +655,7 @@ class RealmTests: TestCase {
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {
-                realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["string"])
+                realm.create(SwiftStringObject.self, value: ["string"])
             }
         }
         waitForExpectations(timeout: 1, handler: nil)
@@ -685,7 +685,7 @@ class RealmTests: TestCase {
 
         dispatchSyncNewThread {
             try! Realm().write {
-                try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["string"])
+                try! Realm().create(SwiftStringObject.self, value: ["string"])
                 return
             }
         }

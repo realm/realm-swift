@@ -329,7 +329,7 @@ class ListTests: TestCase {
         let obj = SwiftStringObject()
         obj.stringCol = "a"
         array.append(obj)
-        array.append(realmWithTestPath().createObject(ofType: SwiftStringObject.self, populatedWith: ["b"]))
+        array.append(realmWithTestPath().create(SwiftStringObject.self, value: ["b"]))
         array.append(obj)
 
         XCTAssertEqual(array.count, 3)
@@ -401,7 +401,7 @@ class ListNewlyCreatedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = realmWithTestPath()
         realm.beginWrite()
-        let array = realm.createObject(ofType: SwiftArrayPropertyObject.self, populatedWith: ["name", [], []])
+        let array = realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
         try! realm.commitWrite()
 
         XCTAssertNotNil(array.realm)
@@ -411,7 +411,7 @@ class ListNewlyCreatedTests: ListTests {
     override func createArrayWithLinks() -> SwiftListOfSwiftObject {
         let realm = try! Realm()
         realm.beginWrite()
-        let array = realm.createObject(ofType: SwiftListOfSwiftObject.self)
+        let array = realm.create(SwiftListOfSwiftObject.self)
         try! realm.commitWrite()
 
         XCTAssertNotNil(array.realm)
@@ -423,7 +423,7 @@ class ListRetrievedTests: ListTests {
     override func createArray() -> SwiftArrayPropertyObject {
         let realm = realmWithTestPath()
         realm.beginWrite()
-        realm.createObject(ofType: SwiftArrayPropertyObject.self, populatedWith: ["name", [], []])
+        realm.create(SwiftArrayPropertyObject.self, value: ["name", [], []])
         try! realm.commitWrite()
         let array = realm.allObjects(ofType: SwiftArrayPropertyObject.self).first!
 
@@ -434,7 +434,7 @@ class ListRetrievedTests: ListTests {
     override func createArrayWithLinks() -> SwiftListOfSwiftObject {
         let realm = try! Realm()
         realm.beginWrite()
-        realm.createObject(ofType: SwiftListOfSwiftObject.self)
+        realm.create(SwiftListOfSwiftObject.self)
         try! realm.commitWrite()
         let array = realm.allObjects(ofType: SwiftListOfSwiftObject.self).first!
 

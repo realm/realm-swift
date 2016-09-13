@@ -263,7 +263,7 @@ public final class Realm {
     - returns: The created object.
     */
     @discardableResult
-    public func createObject<T: Object>(ofType type: T.Type, populatedWith value: Any = [:], update: Bool = false) -> T {
+    public func create<T: Object>(_ type: T.Type, value: Any = [:], update: Bool = false) -> T {
         let typeName = (type as Object.Type).className()
         if update && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
@@ -639,9 +639,6 @@ extension Realm {
 
     @available(*, unavailable, renamed: "isInWriteTransaction")
     public var inWriteTransaction : Bool { fatalError() }
-
-    @available(*, unavailable, renamed: "createObject(ofType:populatedWith:update:)")
-    public func create<T: Object>(_ type: T.Type, value: AnyObject = [:] as NSDictionary, update: Bool = false) -> T { fatalError() }
 
     @available(*, unavailable, renamed: "delete(_:)")
     public func delete<T: Object>(objects: List<T>) { }

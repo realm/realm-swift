@@ -79,8 +79,8 @@ class ObjectAccessorTests: TestCase {
     func testPersistedAccessors() {
         let realm = try! Realm()
         realm.beginWrite()
-        let object = realm.createObject(ofType: SwiftObject.self)
-        let optionalObject = realm.createObject(ofType: SwiftOptionalObject.self)
+        let object = realm.create(SwiftObject.self)
+        let optionalObject = realm.create(SwiftOptionalObject.self)
         setAndTestAllProperties(object)
         setAndTestAllOptionalProperties(optionalObject)
         try! realm.commitWrite()
@@ -155,9 +155,9 @@ class ObjectAccessorTests: TestCase {
         let realm = realmWithTestPath()
 
         realm.beginWrite()
-        realm.createObject(ofType: SwiftLongObject.self, populatedWith: [NSNumber(value: longNumber)])
-        realm.createObject(ofType: SwiftLongObject.self, populatedWith: [NSNumber(value: intNumber)])
-        realm.createObject(ofType: SwiftLongObject.self, populatedWith: [NSNumber(value: negativeLongNumber)])
+        realm.create(SwiftLongObject.self, value: [NSNumber(value: longNumber)])
+        realm.create(SwiftLongObject.self, value: [NSNumber(value: intNumber)])
+        realm.create(SwiftLongObject.self, value: [NSNumber(value: negativeLongNumber)])
         try! realm.commitWrite()
 
         let objects = realm.allObjects(ofType: SwiftLongObject.self)
@@ -216,7 +216,7 @@ class ObjectAccessorTests: TestCase {
     func testSettingOptionalPropertyOnDeletedObjectsThrows() {
         let realm = try! Realm()
         try! realm.write {
-            let obj = realm.createObject(ofType: SwiftOptionalObject.self)
+            let obj = realm.create(SwiftOptionalObject.self)
             let copy = realm.allObjects(ofType: SwiftOptionalObject.self).first!
             realm.delete(obj)
 

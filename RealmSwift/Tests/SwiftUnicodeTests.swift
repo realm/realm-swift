@@ -28,7 +28,7 @@ class SwiftUnicodeTests: TestCase {
         let realm = realmWithTestPath()
 
         try! realm.write {
-            realm.createObject(ofType: SwiftStringObject.self, populatedWith: [utf8TestString])
+            realm.create(SwiftStringObject.self, value: [utf8TestString])
             return
         }
 
@@ -45,7 +45,7 @@ class SwiftUnicodeTests: TestCase {
     func testUTF8PropertyWithUTF8StringContents() {
         let realm = realmWithTestPath()
         try! realm.write {
-            realm.createObject(ofType: SwiftUTF8Object.self, populatedWith: [utf8TestString])
+            realm.create(SwiftUTF8Object.self, value: [utf8TestString])
             return
         }
 

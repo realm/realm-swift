@@ -170,7 +170,7 @@ class MigrationTests: TestCase {
         autoreleasepool {
             // add object
             try! Realm().write {
-                try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["string"])
+                try! Realm().create(SwiftStringObject.self, value: ["string"])
                 return
             }
         }
@@ -191,7 +191,7 @@ class MigrationTests: TestCase {
 
         autoreleasepool {
             try! Realm().write {
-                try! Realm().createObject(ofType: SwiftArrayPropertyObject.self, populatedWith: ["string", [["array"]], [[2]]])
+                try! Realm().create(SwiftArrayPropertyObject.self, value: ["string", [["array"]], [[2]]])
             }
         }
 
@@ -279,8 +279,8 @@ class MigrationTests: TestCase {
     func testDelete() {
         autoreleasepool {
             try! Realm().write {
-                try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["string1"])
-                try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["string2"])
+                try! Realm().create(SwiftStringObject.self, value: ["string1"])
+                try! Realm().create(SwiftStringObject.self, value: ["string2"])
                 return
             }
         }

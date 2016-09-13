@@ -562,7 +562,7 @@ class ResultsTests: RealmCollectionTypeTests {
     func addObjectToResults() {
         let realm = realmWithTestPath()
         try! realm.write {
-            realm.createObject(ofType: CTTStringObjectWithLink.self, populatedWith: ["a"])
+            realm.create(CTTStringObjectWithLink.self, value: ["a"])
         }
     }
 
@@ -678,7 +678,7 @@ class ResultsFromLinkViewTests: ResultsTests {
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failed")
         }
-        let array = realmWithTestPath().createObject(ofType: CTTStringList.self, populatedWith: [[str1, str2]])
+        let array = realmWithTestPath().create(CTTStringList.self, value: [[str1, str2]])
         return array.array.filter(NSPredicate(value: true))
     }
 
@@ -696,7 +696,7 @@ class ResultsFromLinkViewTests: ResultsTests {
         let realm = realmWithTestPath()
         try! realm.write {
             let array = realm.allObjects(ofType: CTTStringList.self).last!
-            array.array.append(realm.createObject(ofType: CTTStringObjectWithLink.self, populatedWith: ["a"]))
+            array.array.append(realm.create(CTTStringObjectWithLink.self, value: ["a"]))
         }
     }
 }
@@ -985,15 +985,15 @@ class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
-        let array = realmWithTestPath().createObject(ofType: CTTStringList.self, populatedWith: [[str1, str2]])
+        let array = realmWithTestPath().create(CTTStringList.self, value: [[str1, str2]])
         return array.array
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
         var list: CTTAggregateObjectList?
         try! realmWithTestPath().write {
-            list = realmWithTestPath().createObject(ofType: CTTAggregateObjectList.self,
-                                                    populatedWith: [makeAggregateableObjectsInWriteTransaction()])
+            list = realmWithTestPath().create(CTTAggregateObjectList.self,
+                                                    value: [makeAggregateableObjectsInWriteTransaction()])
         }
         return AnyRealmCollection(list!.list)
     }
@@ -1004,7 +1004,7 @@ class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
-        _ = realmWithTestPath().createObject(ofType: CTTStringList.self, populatedWith: [[str1, str2]])
+        _ = realmWithTestPath().create(CTTStringList.self, value: [[str1, str2]])
         let array = realmWithTestPath().allObjects(ofType: CTTStringList.self).first!
         return array.array
     }
@@ -1012,8 +1012,8 @@ class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
         var list: CTTAggregateObjectList?
         try! realmWithTestPath().write {
-            _ = realmWithTestPath().createObject(ofType: CTTAggregateObjectList.self,
-                                                 populatedWith: [makeAggregateableObjectsInWriteTransaction()])
+            _ = realmWithTestPath().create(CTTAggregateObjectList.self,
+                                                 value: [makeAggregateableObjectsInWriteTransaction()])
             list = realmWithTestPath().allObjects(ofType: CTTAggregateObjectList.self).first
         }
         return AnyRealmCollection(list!.list)
@@ -1022,7 +1022,7 @@ class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
 class LinkingObjectsCollectionTypeTests: RealmCollectionTypeTests {
     func collectionBaseInWriteTransaction() -> LinkingObjects<CTTStringObjectWithLink> {
-        let target = realmWithTestPath().createObject(ofType: CTTLinkTarget.self, populatedWith: [0])
+        let target = realmWithTestPath().create(CTTLinkTarget.self, value: [0])
         for object in realmWithTestPath().allObjects(ofType: CTTStringObjectWithLink.self) {
             object.linkCol = target
         }
@@ -1045,7 +1045,7 @@ class LinkingObjectsCollectionTypeTests: RealmCollectionTypeTests {
         var target: CTTLinkTarget?
         try! realmWithTestPath().write {
             let objects = makeAggregateableObjectsInWriteTransaction()
-            target = realmWithTestPath().createObject(ofType: CTTLinkTarget.self, populatedWith: [0])
+            target = realmWithTestPath().create(CTTLinkTarget.self, value: [0])
             for object in objects {
                 object.linkCol = target
             }

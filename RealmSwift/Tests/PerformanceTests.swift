@@ -25,8 +25,8 @@ private func createStringObjects(_ factor: Int) -> Realm {
     let realm = inMemoryRealm(factor.description)
     try! realm.write {
         for _ in 0..<(1000 * factor) {
-            realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["a"])
-            realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["b"])
+            realm.create(SwiftStringObject.self, value: ["a"])
+            realm.create(SwiftStringObject.self, value: ["b"])
         }
     }
     return realm
@@ -125,7 +125,7 @@ class SwiftPerformanceTests: TestCase {
             self.startMeasuring()
             for _ in 0..<50 {
                 try! realm.write {
-                    _ = realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["a"])
+                    _ = realm.create(SwiftStringObject.self, value: ["a"])
                 }
             }
             self.stopMeasuring()
@@ -139,7 +139,7 @@ class SwiftPerformanceTests: TestCase {
             self.startMeasuring()
             try! realm.write {
                 for _ in 0..<5000 {
-                    realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["a"])
+                    realm.create(SwiftStringObject.self, value: ["a"])
                 }
             }
             self.stopMeasuring()
@@ -199,8 +199,8 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndAccessArrayProperty() {
         let realm = copyRealmToTestPath(largeRealm)
         realm.beginWrite()
-        let arrayPropertyObject = realm.createObject(ofType: SwiftArrayPropertyObject.self,
-                                                     populatedWith: ["name", realm.allObjects(ofType: SwiftStringObject.self).map { $0 } as NSArray, []])
+        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self,
+                                                     value: ["name", realm.allObjects(ofType: SwiftStringObject.self).map { $0 } as NSArray, []])
         try! realm.commitWrite()
 
         measure {
@@ -213,8 +213,8 @@ class SwiftPerformanceTests: TestCase {
     func testEnumerateAndAccessArrayPropertySlow() {
         let realm = copyRealmToTestPath(largeRealm)
         realm.beginWrite()
-        let arrayPropertyObject = realm.createObject(ofType: SwiftArrayPropertyObject.self,
-                                                     populatedWith: ["name", realm.allObjects(ofType: SwiftStringObject.self).map { $0 } as NSArray, []])
+        let arrayPropertyObject = realm.create(SwiftArrayPropertyObject.self,
+                                                     value: ["name", realm.allObjects(ofType: SwiftStringObject.self).map { $0 } as NSArray, []])
         try! realm.commitWrite()
 
         measure {
@@ -285,7 +285,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = realmWithTestPath()
         try! realm.write {
             for i in 0..<1000 {
-                realm.createObject(ofType: SwiftStringObject.self, populatedWith: [i.description])
+                realm.create(SwiftStringObject.self, value: [i.description])
             }
         }
         measure {
@@ -299,7 +299,7 @@ class SwiftPerformanceTests: TestCase {
         let realm = realmWithTestPath()
         try! realm.write {
             for i in 0..<1000 {
-                realm.createObject(ofType: SwiftIndexedPropertiesObject.self, populatedWith: [i.description, i])
+                realm.create(SwiftIndexedPropertiesObject.self, value: [i.description, i])
             }
         }
         measure {
@@ -314,7 +314,7 @@ class SwiftPerformanceTests: TestCase {
         realm.beginWrite()
         var ids = [Int]()
         for i in 0..<10000 {
-            realm.createObject(ofType: SwiftIntObject.self, populatedWith: [i])
+            realm.create(SwiftIntObject.self, value: [i])
             if i % 2 != 0 {
                 ids.append(i)
             }
@@ -330,7 +330,7 @@ class SwiftPerformanceTests: TestCase {
         try! realm.write {
             for _ in 0..<8000 {
                 let randomNumber = Int(arc4random_uniform(UInt32(INT_MAX)))
-                realm.createObject(ofType: SwiftIntObject.self, populatedWith: [randomNumber])
+                realm.create(SwiftIntObject.self, value: [randomNumber])
             }
         }
         measure {
@@ -368,7 +368,7 @@ class SwiftPerformanceTests: TestCase {
         inMeasureBlock {
             let realm = inMemoryRealm("test")
             realm.beginWrite()
-            let object = realm.createObject(ofType: SwiftIntObject.self)
+            let object = realm.create(SwiftIntObject.self)
             try! realm.commitWrite()
 
             self.startMeasuring()
@@ -383,7 +383,7 @@ class SwiftPerformanceTests: TestCase {
         inMeasureBlock {
             let realm = inMemoryRealm("test")
             realm.beginWrite()
-            let object = realm.createObject(ofType: SwiftIntObject.self)
+            let object = realm.create(SwiftIntObject.self)
             try! realm.commitWrite()
 
             let token = realm.addNotificationBlock { _, _ in }
@@ -401,7 +401,7 @@ class SwiftPerformanceTests: TestCase {
         inMeasureBlock {
             let realm = inMemoryRealm("test")
             realm.beginWrite()
-            let object = realm.createObject(ofType: SwiftIntObject.self)
+            let object = realm.create(SwiftIntObject.self)
             try! realm.commitWrite()
 
             let queue = DispatchQueue(label: "background")
@@ -442,7 +442,7 @@ class SwiftPerformanceTests: TestCase {
         inMeasureBlock {
             let realm = inMemoryRealm("test")
             realm.beginWrite()
-            let object = realm.createObject(ofType: SwiftIntObject.self)
+            let object = realm.create(SwiftIntObject.self)
             try! realm.commitWrite()
 
             queue.async {
