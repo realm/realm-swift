@@ -217,7 +217,7 @@ public final class List<T: Object>: ListBase {
 
     - returns: `Results` containing elements sorted by the given property.
     */
-    public func sorted(onProperty property: String, ascending: Bool = true) -> Results<T> {
+    public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T> {
         return sorted(with: [SortDescriptor(property: property, ascending: ascending)])
     }
 
@@ -547,7 +547,7 @@ extension List {
     @available(*, unavailable, renamed: "index(matching:_:)")
     public func index(of predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
 
-    @available(*, unavailable, renamed: "sorted(onProperty:ascending:)")
+    @available(*, unavailable, renamed: "sorted(byProperty:ascending:)")
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed: "sorted(with:)")

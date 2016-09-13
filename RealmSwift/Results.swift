@@ -246,7 +246,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: `Results` with elements sorted by the given property name.
     */
-    public func sorted(onProperty property: String, ascending: Bool = true) -> Results<T> {
+    public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T> {
         return sorted(with: [SortDescriptor(property: property, ascending: ascending)])
     }
 
@@ -427,7 +427,7 @@ extension Results {
     @available(*, unavailable, renamed: "index(matching:_:)")
     public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
 
-    @available(*, unavailable, renamed: "sorted(onProperty:ascending:)")
+    @available(*, unavailable, renamed: "sorted(byProperty:ascending:)")
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed: "sorted(with:)")

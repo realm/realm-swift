@@ -334,7 +334,7 @@ class SwiftPerformanceTests: TestCase {
             }
         }
         measure {
-            _ = realm.allObjects(ofType: SwiftIntObject.self).sorted(onProperty: "intCol", ascending: true).last
+            _ = realm.allObjects(ofType: SwiftIntObject.self).sorted(byProperty: "intCol", ascending: true).last
         }
     }
 

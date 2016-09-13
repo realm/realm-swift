@@ -311,15 +311,15 @@ class RealmCollectionTypeTests: TestCase {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        var sorted = collection.sorted(onProperty: "stringCol", ascending: true)
+        var sorted = collection.sorted(byProperty: "stringCol", ascending: true)
         XCTAssertEqual("1", sorted[0].stringCol)
         XCTAssertEqual("2", sorted[1].stringCol)
 
-        sorted = collection.sorted(onProperty: "stringCol", ascending: false)
+        sorted = collection.sorted(byProperty: "stringCol", ascending: false)
         XCTAssertEqual("2", sorted[0].stringCol)
         XCTAssertEqual("1", sorted[1].stringCol)
 
-        assertThrows(collection.sorted(onProperty: "noSuchCol", ascending: true), named: "Invalid sort property")
+        assertThrows(collection.sorted(byProperty: "noSuchCol", ascending: true), named: "Invalid sort property")
     }
 
     func testSortWithDescriptor() {
@@ -833,8 +833,8 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        assertThrows(collection.sorted(onProperty: "stringCol", ascending: true))
-        assertThrows(collection.sorted(onProperty: "noSuchCol", ascending: true))
+        assertThrows(collection.sorted(byProperty: "stringCol", ascending: true))
+        assertThrows(collection.sorted(byProperty: "noSuchCol", ascending: true))
     }
 
     override func testFilterFormat() {

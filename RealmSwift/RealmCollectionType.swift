@@ -208,7 +208,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
 
     - returns: `Results` containing collection elements sorted by the given property.
     */
-    func sorted(onProperty property: String, ascending: Bool) -> Results<Element>
+    func sorted(byProperty property: String, ascending: Bool) -> Results<Element>
 
     /**
     Returns `Results` with elements sorted by the given sort descriptors.
@@ -375,7 +375,7 @@ private class _AnyRealmCollectionBase<T: Object> {
     func index(matching predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
     func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> { fatalError() }
     func filter(_ predicate: NSPredicate) -> Results<Element> { fatalError() }
-    func sorted(onProperty property: String, ascending: Bool) -> Results<Element> { fatalError() }
+    func sorted(byProperty property: String, ascending: Bool) -> Results<Element> { fatalError() }
     func sorted<S: Sequence>(with sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
@@ -486,8 +486,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     - returns: `Results` containing collection elements sorted by the given property.
     */
-    override func sorted(onProperty property: String, ascending: Bool) -> Results<C.Element> {
-        return base.sorted(onProperty: property, ascending: ascending)
+    override func sorted(byProperty property: String, ascending: Bool) -> Results<C.Element> {
+        return base.sorted(byProperty: property, ascending: ascending)
     }
 
     /**
@@ -745,8 +745,8 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: `Results` containing collection elements sorted by the given property.
     */
-    public func sorted(onProperty property: String, ascending: Bool) -> Results<Element> {
-        return base.sorted(onProperty: property, ascending: ascending)
+    public func sorted(byProperty property: String, ascending: Bool) -> Results<Element> {
+        return base.sorted(byProperty: property, ascending: ascending)
     }
 
     /**
@@ -951,7 +951,7 @@ extension AnyRealmCollection {
     @available(*, unavailable, renamed: "index(matching:_:)")
     public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
 
-    @available(*, unavailable, renamed: "sorted(onProperty:ascending:)")
+    @available(*, unavailable, renamed: "sorted(byProperty:ascending:)")
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed: "sorted(with:)")
