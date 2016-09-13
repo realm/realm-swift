@@ -356,7 +356,7 @@ public final class List<T: Object>: ListBase {
 
     - warning: This method can only be called during a write transaction.
     */
-    public func removeAllObjects() {
+    public func removeAll() {
         _rlmArray.removeAllObjects()
     }
 
@@ -528,9 +528,6 @@ extension List : RealmCollection, RangeReplaceableCollection {
 extension List {
     @available(*, unavailable, renamed: "append(objectsIn:)")
     public func appendContentsOf<S: Sequence>(_ objects: S) where S.Iterator.Element == T { fatalError() }
-
-    @available(*, unavailable, renamed: "removeAllObjects()")
-    public func removeAll() { }
 
     @available(*, unavailable, renamed: "removeLastObject()")
     public func removeLast() { }

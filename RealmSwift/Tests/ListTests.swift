@@ -199,10 +199,10 @@ class ListTests: TestCase {
 
         array.append(objectsIn: [str1, str2])
 
-        array.removeAllObjects()
+        array.removeAll()
         XCTAssertEqual(Int(0), array.count)
 
-        array.removeAllObjects() // should be a no-op
+        array.removeAll() // should be a no-op
         XCTAssertEqual(Int(0), array.count)
     }
 

@@ -253,7 +253,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 1)
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
 
-        list.removeAllObjects()
+        list.removeAll()
         setter(object, list, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
 
@@ -296,7 +296,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
 
         let list = getter(object, "arrayCol") as! List<DynamicObject>
-        list.removeAllObjects()
+        list.removeAll()
         setter(object, list, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 0)
 
