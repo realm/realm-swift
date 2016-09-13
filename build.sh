@@ -240,7 +240,6 @@ build_docs() {
     local objc="--objc"
 
     if [[ "$language" == "swift" ]]; then
-        : ${REALM_SWIFT_VERSION:=2.2}
         sh build.sh set-swift-version
         xcodebuild_arguments="-scheme,RealmSwift"
         module="RealmSwift"
@@ -250,7 +249,6 @@ build_docs() {
     touch Realm/RLMPlatform.h # jazzy will fail if it can't find all public header files
     jazzy \
       ${objc} \
-      --swift-version 2.2 \
       --clean \
       --author Realm \
       --author_url https://realm.io \
@@ -669,7 +667,7 @@ case "$COMMAND" in
         sh build.sh docs
         for lang in swift objc; do
             undocumented="docs/${lang}_output/undocumented.json"
-            if ! cat "$undocumented" | grep '"warnings":\[\]' > /dev/null 2>&1; then
+            if ruby -rjson -e "j = JSON.parse(File.read('docs/${lang}_output/undocumented.json')); exit j['warnings'].length != 0"; then
               echo "Undocumented Realm $lang declarations:"
               cat "$undocumented"
               exit 1
@@ -904,6 +902,7 @@ EOM
 
     "ci-pr")
         mkdir -p build/reports
+        export REALM_SWIFT_VERSION=$swift_version
 
         if [ "$target" = "docs" ]; then
             sh build.sh set-swift-version
@@ -912,7 +911,6 @@ EOM
             sh build.sh verify-swiftlint
         else
             export sha=$GITHUB_PR_SOURCE_BRANCH
-            export REALM_SWIFT_VERSION=$swift_version
             export CONFIGURATION=$configuration
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
             sh build.sh prelaunch-simulator

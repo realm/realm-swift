@@ -84,6 +84,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     // MARK: Fast Enumeration
 
+    /// :nodoc:
     public func countByEnumerating(with state: UnsafeMutablePointer<NSFastEnumerationState>,
                    objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>!,
                    count len: Int) -> Int {
