@@ -64,12 +64,12 @@
 +    public override func setValue(_ value: Any?, forKey key: String)
 +    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T>
 +    public func filter(_ predicate: NSPredicate) -> Results<T>
-+    public func sorted(by property: String, ascending: Bool = true) -> Results<T>
++    public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T>
 +    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor
-+    public func min<U: MinMaxType>(of property: String) -> U?
-+    public func max<U: MinMaxType>(of property: String) -> U?
-+    public func sum<U: AddableType>(of property: String) -> U
-+    public func average<U: AddableType>(of property: String) -> U?
++    public func min<U: MinMaxType>(ofProperty property: String) -> U?
++    public func max<U: MinMaxType>(ofProperty property: String) -> U?
++    public func sum<U: AddableType>(ofProperty property: String) -> U
++    public func average<U: AddableType>(ofProperty property: String) -> U?
 +    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<LinkingObjects>) -> Void) -> NotificationToken
 +    public func makeIterator() -> RLMIterator<T>
      public var startIndex: Int 
@@ -119,12 +119,12 @@
 +    public override func setValue(_ value: Any?, forKey key: String)
 +    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T>
 +    public func filter(_ predicate: NSPredicate) -> Results<T>
-+    public func sorted(by property: String, ascending: Bool = true) -> Results<T>
++    public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T>
 +    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor
-+    public func min<U: MinMaxType>(of property: String) -> U?
-+    public func max<U: MinMaxType>(of property: String) -> U?
-+    public func sum<U: AddableType>(of property: String) -> U
-+    public func average<U: AddableType>(of property: String) -> U?
++    public func min<U: MinMaxType>(ofProperty property: String) -> U?
++    public func max<U: MinMaxType>(ofProperty property: String) -> U?
++    public func sum<U: AddableType>(ofProperty property: String) -> U
++    public func average<U: AddableType>(ofProperty property: String) -> U?
 +    public func append(_ object: T)
 +    public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == T
 +    public func insert(_ object: T, at index: Int)
@@ -304,12 +304,12 @@
 +    public func index(matching predicateFormat: String, _ args: Any...) -> Int?
 +    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element>
 +    public func filter(_ predicate: NSPredicate) -> Results<Element>
-+    public func sorted(by property: String, ascending: Bool) -> Results<Element>
++    public func sorted(byProperty property: String, ascending: Bool) -> Results<Element>
 +    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor
-+    public func min<U: MinMaxType>(of property: String) -> U?
-+    public func max<U: MinMaxType>(of property: String) -> U?
-+    public func sum<U: AddableType>(of property: String) -> U
-+    public func average<U: AddableType>(of property: String) -> U?
++    public func min<U: MinMaxType>(ofProperty property: String) -> U?
++    public func max<U: MinMaxType>(ofProperty property: String) -> U?
++    public func sum<U: AddableType>(ofProperty property: String) -> U
++    public func average<U: AddableType>(ofProperty property: String) -> U?
 +    public func makeIterator() -> RLMIterator<T>
      public var startIndex: Int 
      public var endIndex: Int 
@@ -379,12 +379,12 @@
 +    public override func setValue(_ value: Any?, forKey key: String)
 +    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T>
 +    public func filter(_ predicate: NSPredicate) -> Results<T>
-+    public func sorted(by property: String, ascending: Bool = true) -> Results<T>
++    public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T>
 +    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor
-+    public func min<U: MinMaxType>(of property: String) -> U?
-+    public func max<U: MinMaxType>(of property: String) -> U?
-+    public func sum<U: AddableType>(of property: String) -> U
-+    public func average<U: AddableType>(of property: String) -> U?
++    public func min<U: MinMaxType>(ofProperty property: String) -> U?
++    public func max<U: MinMaxType>(ofProperty property: String) -> U?
++    public func sum<U: AddableType>(ofProperty property: String) -> U
++    public func average<U: AddableType>(ofProperty property: String) -> U?
 +    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<Results>) -> Void) -> NotificationToken
 +    public func makeIterator() -> RLMIterator<T>
      public var startIndex: Int 
