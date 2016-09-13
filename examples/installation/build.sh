@@ -94,7 +94,7 @@ xctest() {
     else
         ACTION="build test"
     fi
-    xcodebuild $CMD -scheme $NAME clean $ACTION $DESTINATION
+    xcodebuild $CMD -scheme $NAME clean $ACTION $DESTINATION CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
 }
 
 source "$(dirname "$0")/../../scripts/swift-version.sh"

@@ -3,6 +3,8 @@
 
 swift_version:
   - 2.2
+  - 2.3
+  - 3.0
 target:
   - osx
   - docs
@@ -23,16 +25,130 @@ configuration:
   - Debug
   - Release
 
+# Combinations have to be excluded in a way that's hard to read.
+# This table shows which jobs will run:
+
+# +------------------------------------------------------------------------------------------------------------------------------------------------+
+# | Configuration Matrix | osx | docs | ios-static | ios-dynamic | ios-swift | osx-swift | watchos | cocoapods | swiftlint | tvos | osx-encryption |
+# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- |
+# | 2.2 | Debug          | X   |      |            |             |           |           |         |           |           |      |                |
+# | 2.2 | Release        | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |
+# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- |
+# | 2.3 | Debug          |     |      |            |             |           |           |         |           |           |      |                |
+# | 2.3 | Release        |     |      |            |             | X         | X         | X       | X         |           | X    |                |
+# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- |
+# | 3.0 | Debug          | X   |      | X          | X           | X         | X         | X       |           |           | X    |                |
+# | 3.0 | Release        | X   | X    | X          | X           | X         | X         | X       | X         | X         | X    | X              |
+# +------------------------------------------------------------------------------------------------------------------------------------------------+
+
 exclude:
-  - target: ios-device-objc
-    configuration: Debug
-  - target: ios-device-swift
-    configuration: Debug
+  ################
+  # osx
+  ################
+  # Skip on 2.3
+  - swift_version: 2.3
+    target: osx
+
+  ################
+  # docs
+  ################
+  # Just run on 3.0 Release
+  - swift_version: 2.2
+    target: docs
+  - swift_version: 2.3
+    target: docs
   - target: docs
     configuration: Debug
+
+  ################
+  # ios-static
+  ################
+  # Skip on 2.2 Debug & 2.3
+  - swift_version: 2.2
+    target: ios-static
+    configuration: Debug
+  - swift_version: 2.3
+    target: ios-static
+
+  ################
+  # ios-dynamic
+  ################
+  # Skip on 2.2 Debug & 2.3
+  - swift_version: 2.2
+    target: ios-dynamic
+    configuration: Debug
+  - swift_version: 2.3
+    target: ios-dynamic
+
+  ################
+  # ios-swift
+  ################
+  # Skip 2.2/2.3 Debug
+  - swift_version: 2.2
+    target: ios-swift
+    configuration: Debug
+  - swift_version: 2.3
+    target: ios-swift
+    configuration: Debug
+
+  ################
+  # osx-swift
+  ################
+  # Skip 2.2/2.3 Debug
+  - swift_version: 2.2
+    target: osx-swift
+    configuration: Debug
+  - swift_version: 2.3
+    target: osx-swift
+    configuration: Debug
+
+  ################
+  # watchos
+  ################
+  # Skip 2.2/2.3 Debug
+  - swift_version: 2.2
+    target: watchos
+    configuration: Debug
+  - swift_version: 2.3
+    target: watchos
+    configuration: Debug
+
+  ################
+  # cocoapods
+  ################
+  # Skip Debug
   - target: cocoapods
     configuration: Debug
+
+  ################
+  # swiftlint
+  ################
+  # Just run on 3.0 Release
+  - swift_version: 2.2
+    target: swiftlint
+  - swift_version: 2.3
+    target: swiftlint
   - target: swiftlint
     configuration: Debug
-  - target: tvos-device
+
+  ################
+  # tvos
+  ################
+  # Skip 2.2/2.3 Debug
+  - swift_version: 2.2
+    target: tvos
+    configuration: Debug
+  - swift_version: 2.3
+    target: tvos
+    configuration: Debug
+
+  ################
+  # osx-encryption
+  ################
+  # Just run on 3.0 Release
+  - swift_version: 2.2
+    target: osx-encryption
+  - swift_version: 2.3
+    target: osx-encryption
+  - target: osx-encryption
     configuration: Debug
