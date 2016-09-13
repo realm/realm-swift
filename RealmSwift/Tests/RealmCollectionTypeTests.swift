@@ -325,11 +325,11 @@ class RealmCollectionTypeTests: TestCase {
     func testSortWithDescriptor() {
         let collection = getAggregateableCollection()
 
-        var sorted = collection.sorted(with: [SortDescriptor(property: "intCol", ascending: true)])
+        var sorted = collection.sorted(by: [SortDescriptor(property: "intCol", ascending: true)])
         XCTAssertEqual(1, sorted[0].intCol)
         XCTAssertEqual(2, sorted[1].intCol)
 
-        sorted = collection.sorted(with: [SortDescriptor(property: "doubleCol", ascending: false),
+        sorted = collection.sorted(by: [SortDescriptor(property: "doubleCol", ascending: false),
             SortDescriptor(property: "intCol", ascending: false)])
         XCTAssertEqual(2.22, sorted[0].doubleCol)
         XCTAssertEqual(3, sorted[0].intCol)
@@ -337,7 +337,7 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(2, sorted[1].intCol)
         XCTAssertEqual(1.11, sorted[2].doubleCol)
 
-        assertThrows(collection.sorted(with: [SortDescriptor(property: "noSuchCol")]), named: "Invalid sort property")
+        assertThrows(collection.sorted(by: [SortDescriptor(property: "noSuchCol")]), named: "Invalid sort property")
     }
 
     func testMin() {
@@ -804,8 +804,8 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
     override func testSortWithDescriptor() {
         let collection = getAggregateableCollection()
-        assertThrows(collection.sorted(with: [SortDescriptor(property: "intCol", ascending: true)]))
-        assertThrows(collection.sorted(with: [SortDescriptor(property: "doubleCol", ascending: false),
+        assertThrows(collection.sorted(by: [SortDescriptor(property: "intCol", ascending: true)]))
+        assertThrows(collection.sorted(by: [SortDescriptor(property: "doubleCol", ascending: false),
             SortDescriptor(property: "intCol", ascending: false)]))
     }
 

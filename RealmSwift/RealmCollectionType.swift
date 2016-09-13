@@ -217,7 +217,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    func sorted<S: Sequence>(with sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor
+    func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor
 
 
     // MARK: Aggregate Operations
@@ -376,7 +376,7 @@ private class _AnyRealmCollectionBase<T: Object> {
     func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> { fatalError() }
     func filter(_ predicate: NSPredicate) -> Results<Element> { fatalError() }
     func sorted(byProperty property: String, ascending: Bool) -> Results<Element> { fatalError() }
-    func sorted<S: Sequence>(with sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
+    func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
     func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
@@ -498,8 +498,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
     override func sorted<S: Sequence>
-        (with sortDescriptors: S) -> Results<C.Element> where S.Iterator.Element == SortDescriptor {
-        return base.sorted(with: sortDescriptors)
+        (by sortDescriptors: S) -> Results<C.Element> where S.Iterator.Element == SortDescriptor {
+        return base.sorted(by: sortDescriptors)
     }
 
 
@@ -756,9 +756,9 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    public func sorted<S: Sequence>(with sortDescriptors: S) -> Results<Element>
+    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element>
         where S.Iterator.Element == SortDescriptor {
-        return base.sorted(with: sortDescriptors)
+        return base.sorted(by: sortDescriptors)
     }
 
 
@@ -954,7 +954,7 @@ extension AnyRealmCollection {
     @available(*, unavailable, renamed: "sorted(byProperty:ascending:)")
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
-    @available(*, unavailable, renamed: "sorted(with:)")
+    @available(*, unavailable, renamed: "sorted(by:)")
     public func sorted<S: Sequence>(_ sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }

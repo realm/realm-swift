@@ -247,7 +247,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     - returns: `Results` with elements sorted by the given property name.
     */
     public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T> {
-        return sorted(with: [SortDescriptor(property: property, ascending: ascending)])
+        return sorted(by: [SortDescriptor(property: property, ascending: ascending)])
     }
 
     /**
@@ -257,7 +257,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     - returns: `Results` with elements sorted by the given sort descriptors.
     */
-    public func sorted<S: Sequence>(with sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
+    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         return Results<T>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
@@ -430,7 +430,7 @@ extension Results {
     @available(*, unavailable, renamed: "sorted(byProperty:ascending:)")
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
-    @available(*, unavailable, renamed: "sorted(with:)")
+    @available(*, unavailable, renamed: "sorted(by:)")
     public func sorted<S: Sequence>(_ sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
