@@ -475,7 +475,7 @@ public final class Realm {
 
     - returns: A token which must be held for as long as you want notifications to be delivered.
     */
-    public func addNotificationBlock(block: @escaping NotificationBlock) -> NotificationToken {
+    public func addNotificationBlock(_ block: @escaping NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
             switch rlmNotification {
             case RLMNotification.DidChange:
