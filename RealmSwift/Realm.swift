@@ -581,8 +581,8 @@ public final class Realm {
 
     - throws: An NSError if the copy could not be written.
     */
-    public func writeCopy(toFileURL url: URL, encryptionKey: Data? = nil) throws {
-        try rlmRealm.writeCopy(to: url, encryptionKey: encryptionKey)
+    public func writeCopy(toFile fileURL: URL, encryptionKey: Data? = nil) throws {
+        try rlmRealm.writeCopy(to: fileURL, encryptionKey: encryptionKey)
     }
 
     // MARK: Internal
@@ -652,7 +652,7 @@ extension Realm {
     @available(*, unavailable, renamed: "dynamicObject(ofType:forPrimaryKey:)")
     public func dynamicObjectForPrimaryKey(_ className: String, key: AnyObject) -> DynamicObject? { fatalError() }
 
-    @available(*, unavailable, renamed: "writeCopy(toFileURL:encryptionKey:)")
+    @available(*, unavailable, renamed: "writeCopy(toFile:encryptionKey:)")
     public func writeCopyToURL(_ fileURL: NSURL, encryptionKey: Data? = nil) throws { fatalError() }
 }
 

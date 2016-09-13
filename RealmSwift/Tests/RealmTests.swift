@@ -725,7 +725,7 @@ class RealmTests: TestCase {
         }
         let fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("copy.realm")
         do {
-            try realm.writeCopy(toFileURL: fileURL)
+            try realm.writeCopy(toFile: fileURL)
         } catch {
             XCTFail("writeCopyToURL failed")
         }
