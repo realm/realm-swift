@@ -365,7 +365,7 @@ public final class Realm {
 
     - warning: This method can only be called during a write transaction.
     */
-    public func deleteAllObjects() {
+    public func deleteAll() {
         RLMDeleteAllObjectsFromRealm(rlmRealm)
     }
 
@@ -645,9 +645,6 @@ extension Realm {
 
     @available(*, unavailable, renamed: "delete(_:)")
     public func delete<T: Object>(objects: Results<T>) { }
-
-    @available(*, unavailable, renamed: "deleteAllObjects()")
-    public func deleteAll() { }
 
     @available(*, unavailable, renamed: "allObjects(ofType:)")
     public func objects<T: Object>(_ type: T.Type) -> Results<T> { fatalError() }

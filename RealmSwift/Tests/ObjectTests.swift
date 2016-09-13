@@ -90,7 +90,7 @@ class ObjectTests: TestCase {
         }
 
         try! realm.write {
-            realm.deleteAllObjects()
+            realm.deleteAll()
             XCTAssertTrue(object.isInvalidated)
         }
         XCTAssertTrue(object.isInvalidated)

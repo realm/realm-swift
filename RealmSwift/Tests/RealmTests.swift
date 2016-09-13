@@ -427,7 +427,7 @@ class RealmTests: TestCase {
         try! realm.write {
             realm.add(SwiftObject())
             XCTAssertEqual(1, realm.allObjects(ofType: SwiftObject.self).count)
-            realm.deleteAllObjects()
+            realm.deleteAll()
             XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
         }
         XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
