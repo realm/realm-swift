@@ -232,7 +232,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
     - returns: The minimum value for the property amongst objects in the collection, or `nil` if the
                collection is empty.
     */
-    func minimumValue<U: MinMaxType>(ofProperty property: String) -> U?
+    func min<U: MinMaxType>(ofProperty property: String) -> U?
 
     /**
     Returns the maximum value of the given property.
@@ -379,7 +379,7 @@ private class _AnyRealmCollectionBase<T: Object> {
     func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
-    func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
+    func min<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
     func maximumValue<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
     func sum<U: AddableType>(ofProperty property: String) -> U { fatalError() }
     func average<U: AddableType>(ofProperty property: String) -> U? { fatalError() }
@@ -515,8 +515,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     - returns: The minimum value for the property amongst objects in the collection, or `nil` if the
                collection is empty.
     */
-    override func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return base.minimumValue(ofProperty: property)
+    override func min<U: MinMaxType>(ofProperty property: String) -> U? {
+        return base.min(ofProperty: property)
     }
 
     /**
@@ -774,8 +774,8 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     - returns: The minimum value for the property amongst objects in the collection, or `nil` if the
                collection is empty.
     */
-    public func minimumValue<U: MinMaxType>(ofProperty property: String) -> U? {
-        return base.minimumValue(ofProperty: property)
+    public func min<U: MinMaxType>(ofProperty property: String) -> U? {
+        return base.min(ofProperty: property)
     }
 
     /**
@@ -959,7 +959,7 @@ extension AnyRealmCollection {
         fatalError()
     }
 
-    @available(*, unavailable, renamed: "minimumValue(ofProperty:)")
+    @available(*, unavailable, renamed: "min(ofProperty:)")
     public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
 
     @available(*, unavailable, renamed: "maximumValue(ofProperty:)")
