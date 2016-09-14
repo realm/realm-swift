@@ -1171,6 +1171,7 @@ EOF
         export WORKSPACE
         cd $WORKSPACE
         git clone $REALM_SOURCE tightdb_objc
+        (cd tightdb_objc && git submodule update --init)
 
         echo 'Packaging iOS static'
         sh tightdb_objc/build.sh package-ios-static
@@ -1218,7 +1219,6 @@ EOF
 
         echo 'Testing packaged examples'
         sh tightdb_objc/build.sh package-test-examples
-
         ;;
 
     "github-release")
