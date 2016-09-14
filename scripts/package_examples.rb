@@ -52,7 +52,7 @@ framework_directory_for_example = {
   'examples/osx/objc' => '../../../osx',
   'examples/tvos/objc' => '../../../tvos',
   'examples/ios/swift-2.2' => '../../../ios/swift-2.2',
-  'examples/tvos/swift-2.2' => '../../../tvos',
+  'examples/tvos/swift-2.2' => '../../../tvos/swift-2.2',
 }
 
 # Update the paths to the prebuilt frameworks
