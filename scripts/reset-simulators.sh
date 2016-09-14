@@ -14,14 +14,14 @@ while pgrep -q Simulator; do
 done
 
 # Shut down booted simulators
-xcrun simctl list devices -j | jq -c -r '.devices | flatten | map(select(.availability == "(available)")) | map(select(.state == "Booted")) | map(.udid) | .[]' | while read udid; do
+xcrun simctl list devices -j | ruby -rjson -e 'puts JSON.parse($stdin.read)["devices"].flat_map { |d| d[1] }.select { |d| d["state"] == "Booted" && d["availability"] == "(available)" }.map { |d| d["udid"] }' | while read udid; do
     echo "shutting down simulator with ID: $udid"
     xcrun simctl shutdown $udid
 done
 
 # Erase all available simulators
 echo "erasing simulators"
-xcrun simctl list devices -j | jq -c -r '.devices | flatten | map(select(.availability == "(available)")) | map(.udid) | .[]' | while read udid; do
+xcrun simctl list devices -j | ruby -rjson -e 'puts JSON.parse($stdin.read)["devices"].flat_map { |d| d[1] }.select { |d| d["availability"] == "(available)" }.map { |d| d["udid"] }' | while read udid; do
     xcrun simctl erase $udid &
 done
 wait
@@ -32,7 +32,7 @@ fi
 
 # Wait until the boot completes
 echo "waiting for simulator to boot..."
-while xcrun simctl list devices -j | jq -c -r '.devices | flatten | map(select(.availability == "(available)")) | map(select(.state == "Booted")) | length' | grep 0 >/dev/null; do
+until xcrun simctl list devices -j | ruby -rjson -e 'exit JSON.parse($stdin.read)["devices"].flat_map { |d| d[1] }.any? { |d| d["state"] == "Booted" }'; do
     sleep 1
 done
 
