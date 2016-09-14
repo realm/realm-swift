@@ -34,7 +34,7 @@ happening when initializing a Realm instance.
 
 */
 public struct Error {
-    public enum Code : Int {
+    public enum Code: Int {
         /// Error thrown by Realm if no other specific error is returned when a realm is opened.
         case fail
 
@@ -120,7 +120,7 @@ public struct Error {
     }
 
     /// :nodoc:
-    public var _nsError: NSError
+    public var _nsError: NSError // swiftlint:disable:this variable_name
 
     /// :nodoc:
     public init(_nsError error: NSError) {
@@ -130,13 +130,13 @@ public struct Error {
 
 /// :nodoc:
 // Provide bridging from errors with domain RLMErrorDomain to Error.
-extension Error : _BridgedStoredNSError {
+extension Error: _BridgedStoredNSError {
     /// :nodoc:
-    public static var _nsErrorDomain = RLMErrorDomain
+    public static var _nsErrorDomain = RLMErrorDomain // swiftlint:disable:this variable_name
 }
 
 /// :nodoc:
-extension Error.Code : _ErrorCodeProtocol {
+extension Error.Code: _ErrorCodeProtocol {
     /// :nodoc:
     public typealias _ErrorType = RLMError
 }

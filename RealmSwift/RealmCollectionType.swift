@@ -26,7 +26,7 @@ Encapsulates iteration state and interface for iteration over a `RealmCollection
 */
 public final class RLMIterator<T: Object>: IteratorProtocol {
     private var i: UInt = 0
-    private let generatorBase : NSFastEnumerationIterator
+    private let generatorBase: NSFastEnumerationIterator
 
     init(collection: RLMCollection) {
         generatorBase = NSFastEnumerationIterator(collection)
