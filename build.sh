@@ -1131,9 +1131,9 @@ EOM
             unzip ${WORKSPACE}/realm-examples.zip
             cd examples
             if [[ "${LANG}" == "objc" ]]; then
-                rm -rf ios/swift-2.2
+                rm -rf ios/swift-* tvos/swift-*
             else
-                rm -rf ios/objc ios/rubymotion osx
+                rm -rf ios/objc ios/rubymotion osx tvos/objc
             fi
         )
 
