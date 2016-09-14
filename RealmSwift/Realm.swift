@@ -113,7 +113,7 @@ public final class Realm {
 
     - throws: An NSError if the transaction could not be written.
     */
-    public func write(block: () -> Void) throws {
+    public func write(_ block: () -> Void) throws {
         try rlmRealm.transaction(block)
     }
 
