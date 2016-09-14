@@ -1346,26 +1346,25 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
      Returns a `Results` containing the objects in the collection, but sorted.
 
      Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
-     youngest to oldest based on their `age` property, you might call
-     `students.sorted(byProperty: "age", ascending: true)`.
+     youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
 
-     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
+     - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
+                point, integer, and string types.
 
      - parameter property:  The name of the property to sort by.
      - parameter ascending: The direction to sort in.
      */
-    public func sorted(byProperty: String, ascending: Bool) -> Results<Element> {
+    public func sorted(property: String, ascending: Bool) -> Results<Element> {
         return base.sorted(property, ascending: ascending)
     }
 
     /**
      Returns a `Results` containing the objects in the collection, but sorted.
 
-     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
+     - warning: Collections may only be sorted by properties of boolean, `NSDate`, single and double-precision floating
+                point, integer, and string types.
 
-     - see: `sorted(byProperty:ascending:)`
+     - see: `sorted(_:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */

@@ -713,26 +713,25 @@ public final class List<T: Object>: ListBase {
      Returns a `Results` containing the objects in the list, but sorted.
 
      Objects are sorted based on the values of the given property. For example, to sort a list of `Student`s from
-     youngest to oldest based on their `age` property, you might call
-     `students.sorted(byProperty: "age", ascending: true)`.
+     youngest to oldest based on their `age` property, you might call `students.sorted("age", ascending: true)`.
 
-     - warning: Lists may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
+     - warning: Lists may only be sorted by properties of boolean, `NSDate`, single and double-precision floating point,
+                integer, and string types.
 
      - parameter property:  The name of the property to sort by.
      - parameter ascending: The direction to sort in.
      */
-    public func sorted(byProperty: String, ascending: Bool = true) -> Results<T> {
+    public func sorted(property: String, ascending: Bool = true) -> Results<T> {
         return sorted([SortDescriptor(property: property, ascending: ascending)])
     }
 
     /**
      Returns a `Results` containing the objects in the list, but sorted.
 
-     - warning: Lists may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
+     - warning: Lists may only be sorted by properties of boolean, `NSDate`, single and double-precision floating point,
+                integer, and string types.
 
-     - see: `sorted(byProperty:ascending:)`
+     - see: `sorted(_:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
