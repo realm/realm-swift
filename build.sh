@@ -1182,8 +1182,7 @@ EOF
         WORKSPACE="$(cd "$WORKSPACE" && pwd)"
         export WORKSPACE
         cd $WORKSPACE
-        git clone $REALM_SOURCE tightdb_objc
-        (cd tightdb_objc && git submodule update --init)
+        git clone --recursive $REALM_SOURCE tightdb_objc
 
         echo 'Packaging iOS'
         sh tightdb_objc/build.sh package-ios-static
