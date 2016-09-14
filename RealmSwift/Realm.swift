@@ -605,32 +605,34 @@ public func == (lhs: Realm, rhs: Realm) -> Bool { // swiftlint:disable:this vali
 
 // MARK: Notifications
 
-/// A notification due to changes to a realm.
-public enum Notification: String {
-    /**
-    Posted when the data in a realm has changed.
+extension Realm {
+    /// A notification due to changes to a realm.
+    public enum Notification: String {
+        /**
+        Posted when the data in a realm has changed.
 
-    DidChange is posted after a realm has been refreshed to reflect a write transaction, i.e. when
-    an autorefresh occurs, `refresh()` is called, after an implicit refresh from
-    `write(_:)`/`beginWrite()`, and after a local write transaction is committed.
-    */
-    case DidChange = "RLMRealmDidChangeNotification"
+        DidChange is posted after a realm has been refreshed to reflect a write transaction, i.e. when
+        an autorefresh occurs, `refresh()` is called, after an implicit refresh from
+        `write(_:)`/`beginWrite()`, and after a local write transaction is committed.
+        */
+        case DidChange = "RLMRealmDidChangeNotification"
 
-    /**
-    Posted when a write transaction has been committed to a Realm on a different thread for the same
-    file. This is not posted if `autorefresh` is enabled or if the Realm is refreshed before the
-    notification has a chance to run.
+        /**
+        Posted when a write transaction has been committed to a Realm on a different thread for the same
+        file. This is not posted if `autorefresh` is enabled or if the Realm is refreshed before the
+        notification has a chance to run.
 
-    Realms with autorefresh disabled should normally have a handler for this notification which
-    calls `refresh()` after doing some work.
-    While not refreshing is allowed, it may lead to large Realm files as Realm has to keep an extra
-    copy of the data for the un-refreshed Realm.
-    */
-    case RefreshRequired = "RLMRealmRefreshRequiredNotification"
+        Realms with autorefresh disabled should normally have a handler for this notification which
+        calls `refresh()` after doing some work.
+        While not refreshing is allowed, it may lead to large Realm files as Realm has to keep an extra
+        copy of the data for the un-refreshed Realm.
+        */
+        case RefreshRequired = "RLMRealmRefreshRequiredNotification"
+    }
 }
 
 /// Closure to run when the data in a Realm was modified.
-public typealias NotificationBlock = (_ notification: Notification, _ realm: Realm) -> Void
+public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
 
 
 // MARK: Unavailable
