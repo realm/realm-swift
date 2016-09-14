@@ -1185,45 +1185,35 @@ EOF
         git clone $REALM_SOURCE tightdb_objc
         (cd tightdb_objc && git submodule update --init)
 
-        echo 'Packaging iOS static'
+        echo 'Packaging iOS'
         sh tightdb_objc/build.sh package-ios-static
         cp tightdb_objc/build/ios-static/realm-framework-ios.zip .
-
-        echo 'Packaging iOS dynamic'
         sh tightdb_objc/build.sh package-ios-dynamic
         cp tightdb_objc/build/ios/realm-dynamic-framework-ios.zip .
+        sh tightdb_objc/build.sh package-ios-swift
+        cp tightdb_objc/build/ios/realm-swift-framework-ios.zip .
 
         echo 'Packaging OS X'
         sh tightdb_objc/build.sh package-osx
         cp tightdb_objc/build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip .
-
-        echo 'Packaging examples'
-        (
-            cd tightdb_objc/examples
-            git clean -xfd
-        )
-        sh tightdb_objc/build.sh package-examples
-        cp tightdb_objc/realm-examples.zip .
-
-        echo 'Packaging iOS Swift'
-        sh tightdb_objc/build.sh package-ios-swift
-        cp tightdb_objc/build/ios/realm-swift-framework-ios.zip .
-
-        echo 'Packaging OS X Swift'
         sh tightdb_objc/build.sh package-osx-swift
         cp tightdb_objc/build/osx/realm-swift-framework-osx.zip .
 
         echo 'Packaging watchOS'
         sh tightdb_objc/build.sh package-watchos
+        cp tightdb_objc/build/watchos/realm-framework-watchos.zip .
         sh tightdb_objc/build.sh package-watchos-swift
         cp tightdb_objc/build/watchos/realm-swift-framework-watchos.zip .
-        cp tightdb_objc/build/watchos/realm-framework-watchos.zip .
 
         echo 'Packaging tvOS'
         sh tightdb_objc/build.sh package-tvos
+        cp tightdb_objc/build/tvos/realm-framework-tvos.zip .
         sh tightdb_objc/build.sh package-tvos-swift
         cp tightdb_objc/build/tvos/realm-swift-framework-tvos.zip .
-        cp tightdb_objc/build/tvos/realm-framework-tvos.zip .
+
+        echo 'Packaging examples'
+        sh tightdb_objc/build.sh package-examples
+        cp tightdb_objc/realm-examples.zip .
 
         echo 'Building final release packages'
         sh tightdb_objc/build.sh package-release objc
