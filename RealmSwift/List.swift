@@ -102,7 +102,7 @@ public final class List<T: Object>: ListBase {
 
     /**
      Returns the index of the first object in the list matching the predicate, or `nil` if no objects match.
-   
+
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
     */
     public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
@@ -745,10 +745,10 @@ public final class List<T: Object>: ListBase {
      Returns the minimum (lowest) value of the given property among all the objects in the list, or `nil` if the list is
      empty.
 
-    - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
+     - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
 
-    - parameter property: The name of a property whose minimum value is desired.
-    */
+     - parameter property: The name of a property whose minimum value is desired.
+     */
     public func min<U: MinMaxType>(property: String) -> U? {
         return filter(NSPredicate(value: true)).min(property)
     }
@@ -933,7 +933,7 @@ public final class List<T: Object>: ListBase {
      other activity. When notifications can't be delivered instantly, multiple
      notifications may be coalesced into a single notification. This can include
      the notification with the initial list.
-     
+
      For example, the following code performs a write transaction immediately after adding the notification block, so
      there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
      will reflect the state of the Realm after the write transaction, and will not include change information.

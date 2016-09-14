@@ -594,7 +594,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
      - warning:  Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
                  floating point, integer, and string types.
-       
+
      - see: `sorted(byProperty:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
@@ -1493,7 +1493,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
      notifications can't be delivered instantly, multiple notifications may be
      coalesced into a single notification. This can include the notification
      with the initial collection.
-     
+
      For example, the following code performs a write
      transaction immediately after adding the notification block, so there is no
      opportunity for the initial notification to be delivered first. As a

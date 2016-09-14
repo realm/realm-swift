@@ -73,7 +73,7 @@ extension Int64: AddableType {}
 
  Once the results have been evaluated or a notification block has been added, the results are eagerly kept up-to-date,
  with the work done to keep them up-to-date done on a background thread whenever possible.
- 
+
  Results instances cannot be directly instantiated.
  */
 public final class Results<T: Object>: NSObject, NSFastEnumeration {
@@ -131,7 +131,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     /**
      Returns the index of the first object matching the predicate, or `nil` if no objects match.
-   
+
      - parameter predicate: The predicate with which to filter the objects.
      */
     public func index(matching predicate: NSPredicate) -> Int? {
@@ -140,7 +140,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     /**
      Returns the index of the first object matching the predicate, or `nil` if no objects match.
-   
+
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
     public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
@@ -243,7 +243,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
      - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
                 floating point, integer, and string types.
-   
+
      - see: `sorted(byProperty:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.

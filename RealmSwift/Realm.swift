@@ -156,7 +156,7 @@ public final class Realm {
      This rolls back all objects in the Realm to the state they were in at the beginning of the write transaction, and
      then ends the transaction.
 
-     This restores the data for deleted objects, but does not revive invalidated object instances. Any `Object`s which 
+     This restores the data for deleted objects, but does not revive invalidated object instances. Any `Object`s which
      were added to the Realm will be invalidated rather than becoming unmanaged.
 
      Given the following code:
@@ -293,7 +293,7 @@ public final class Realm {
      - parameter update:     If true will try to update existing objects with the same primary key.
 
      - returns: The created object.
-     
+
      :nodoc:
      */
     @discardableResult
@@ -432,7 +432,7 @@ public final class Realm {
      - parameter key:        The primary key of the desired object.
 
      - returns: An object of type `DynamicObject` or `nil` if an object with the given primary key does not exist.
-     
+
      :nodoc:
      */
     public func dynamicObject(ofType typeName: String, forPrimaryKey key: Any) -> DynamicObject? {

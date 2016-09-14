@@ -63,9 +63,9 @@ import Realm.Private
  ### Querying
 
  You can retrieve all objects of a given type from a Realm by calling the `objects(_:)` instance method.
- 
+
  ### Relationships
- 
+
  See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
  */
 @objc(RealmSwiftObject)
