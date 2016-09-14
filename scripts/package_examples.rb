@@ -40,6 +40,8 @@ examples = [
   "examples/tvos/objc",
   "examples/ios/swift-2.2",
   "examples/tvos/swift-2.2",
+  "examples/ios/swift-3.0",
+  "examples/tvos/swift-3.0",
 ]
 
 # Remove reference to Realm.xcodeproj from all example workspaces.
@@ -53,6 +55,8 @@ framework_directory_for_example = {
   'examples/tvos/objc' => '../../../tvos',
   'examples/ios/swift-2.2' => '../../../ios/swift-2.2',
   'examples/tvos/swift-2.2' => '../../../tvos/swift-2.2',
+  'examples/ios/swift-3.0' => '../../../ios/swift-3.0',
+  'examples/tvos/swift-3.0' => '../../../tvos/swift-3.0',
 }
 
 # Update the paths to the prebuilt frameworks
