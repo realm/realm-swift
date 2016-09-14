@@ -960,6 +960,7 @@ EOM
         cp -r $(dirname $0)/scripts ${OBJC}
         cd ${OBJC}
         sh build.sh examples-ios
+        sh build.sh examples-tvos
         sh build.sh examples-osx
         cd ..
         rm -rf ${OBJC}
@@ -970,6 +971,7 @@ EOM
         cp -r $(dirname $0)/scripts ${SWIFT}
         cd ${SWIFT}
         sh build.sh examples-ios-swift
+        sh build.sh examples-tvos-swift
         cd ..
         rm -rf ${SWIFT}
         ;;
