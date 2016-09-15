@@ -35,7 +35,7 @@ class ObjectTests: TestCase {
         let realm = try! Realm()
         var persisted: SwiftStringObject!
         try! realm.write {
-            persisted = realm.createObject(ofType: SwiftStringObject.self, populatedWith: [:])
+            persisted = realm.create(SwiftStringObject.self, value: [:])
             XCTAssertNotNil(persisted.realm)
             XCTAssertEqual(realm, persisted.realm!)
         }
@@ -90,7 +90,7 @@ class ObjectTests: TestCase {
         }
 
         try! realm.write {
-            realm.deleteAllObjects()
+            realm.deleteAll()
             XCTAssertTrue(object.isInvalidated)
         }
         XCTAssertTrue(object.isInvalidated)
@@ -213,7 +213,7 @@ class ObjectTests: TestCase {
 
         test(SwiftObject())
         try! Realm().write {
-            let persistedObject = try! Realm().createObject(ofType: SwiftObject.self, populatedWith: [:])
+            let persistedObject = try! Realm().create(SwiftObject.self, value: [:])
             test(persistedObject)
         }
     }
@@ -253,7 +253,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 1)
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
 
-        list.removeAllObjects()
+        list.removeAll()
         setter(object, list, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
 
@@ -296,7 +296,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
 
         let list = getter(object, "arrayCol") as! List<DynamicObject>
-        list.removeAllObjects()
+        list.removeAll()
         setter(object, list, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 0)
 
@@ -310,7 +310,7 @@ class ObjectTests: TestCase {
         autoreleasepool {
             let realm = self.realmWithTestPath()
             try! realm.write {
-                _ = realm.createObject(ofType: SwiftObject.self)
+                _ = realm.create(SwiftObject.self)
             }
         }
         autoreleasepool {
@@ -338,13 +338,13 @@ class ObjectTests: TestCase {
         }
 
         withMigrationObject { migrationObject, migration in
-            let boolObject = migration.createObject(ofType: "SwiftBoolObject", populatedWith: [true])
+            let boolObject = migration.create("SwiftBoolObject", value: [true])
             self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
         }
 
         setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
         try! Realm().write {
-            let persistedObject = try! Realm().createObject(ofType: SwiftObject.self, populatedWith: [:])
+            let persistedObject = try! Realm().create(SwiftObject.self, value: [:])
             self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
     }
@@ -359,13 +359,13 @@ class ObjectTests: TestCase {
         }
 
         withMigrationObject { migrationObject, migration in
-            let boolObject = migration.createObject(ofType: "SwiftBoolObject", populatedWith: [true])
+            let boolObject = migration.create("SwiftBoolObject", value: [true])
             self.dynamicSetAndTestAllTypes(setter, getter: getter, object: migrationObject, boolObject: boolObject)
         }
 
         setAndTestAllTypes(setter, getter: getter, object: SwiftObject())
         try! Realm().write {
-            let persistedObject = try! Realm().createObject(ofType: SwiftObject.self, populatedWith: [:])
+            let persistedObject = try! Realm().create(SwiftObject.self, value: [:])
             self.setAndTestAllTypes(setter, getter: getter, object: persistedObject)
         }
     }

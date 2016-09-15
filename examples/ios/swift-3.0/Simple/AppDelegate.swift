@@ -60,10 +60,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         try! realm.commitWrite()
 
         // Query
-        let results = realm.allObjects(ofType: Dog.self).filter(using: NSPredicate(format:"name contains 'x'"))
+        let results = realm.objects(Dog.self).filter(NSPredicate(format: "name contains 'x'"))
 
         // Queries are chainable!
-        let results2 = results.filter(using: "age > 8")
+        let results2 = results.filter("age > 8")
         print("Number of dogs: \(results.count)")
         print("Dogs older than eight: \(results2.count)")
 
@@ -79,7 +79,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Multi-threading
         DispatchQueue.global().async {
             let otherRealm = try! Realm()
-            let otherResults = otherRealm.allObjects(ofType: Dog.self).filter(using: NSPredicate(format:"name contains 'Rex'"))
+            let otherResults = otherRealm.objects(Dog.self).filter(NSPredicate(format: "name contains 'Rex'"))
             print("Number of dogs \(otherResults.count)")
         }
 

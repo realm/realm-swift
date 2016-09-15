@@ -23,72 +23,72 @@ import Realm.Private
 #if swift(>=3.0)
 
 /**
-A Realm instance (also referred to as "a realm") represents a Realm
-database.
+ A `Realm` instance (also referred to as "a Realm") represents a Realm database.
 
-Realms can either be stored on disk (see `init(path:)`) or in
-memory (see `Configuration`).
+ Realms can either be stored on disk (see `init(path:)`) or in memory (see `Configuration`).
 
-Realm instances are cached internally, and constructing equivalent Realm
-objects (with the same path or identifier) produces limited overhead.
+ `Realm` instances are cached internally, and constructing equivalent `Realm` objects (for example, by using the same
+ path or identifier) produces limited overhead.
 
-If you specifically want to ensure a Realm object is
-destroyed (for example, if you wish to open a realm, check some property, and
-then possibly delete the realm file and re-open it), place the code which uses
-the realm within an `autoreleasepool {}` and ensure you have no other
-strong references to it.
+ If you specifically want to ensure a `Realm` instance is destroyed (for example, if you wish to open a Realm, check
+ some property, and then possibly delete the Realm file and re-open it), place the code which uses the Realm within an
+ `autoreleasepool {}` and ensure you have no other strong references to it.
 
-- warning: Realm instances are not thread safe and can not be shared across
-           threads or dispatch queues. You must construct a new instance on each thread you want
-           to interact with the realm on. For dispatch queues, this means that you must
-           call it in each block which is dispatched, as a queue is not guaranteed to run
-           on a consistent thread.
-*/
+ - warning: `Realm` instances are not thread safe and cannot be shared across threads or dispatch queues. You must
+ construct a new instance for each thread in which a Realm will be accessed. For dispatch queues, this means
+ that you must construct a new instance in each block which is dispatched, as a queue is not guaranteed to
+ run all of its blocks on the same thread.
+ */
 public final class Realm {
 
     // MARK: Properties
 
-    /// The Schema used by this realm.
+    /// The `Schema` used by the Realm.
     public var schema: Schema { return Schema(rlmRealm.schema) }
 
-    /// Returns the `Configuration` that was used to create this `Realm` instance.
+    /// The `Configuration` value that was used to create the `Realm` instance.
     public var configuration: Configuration { return Configuration.fromRLMRealmConfiguration(rlmConfiguration: rlmRealm.configuration) }
 
-    /// Indicates if this Realm contains any objects.
+    /// Indicates if the Realm contains any objects.
     public var isEmpty: Bool { return rlmRealm.isEmpty }
 
     // MARK: Initializers
 
     /**
-    Obtains a Realm instance with the default Realm configuration, which can be
-    changed by setting `Realm.Configuration.defaultConfiguration`.
+     Obtains an instance of the default Realm.
 
-    - throws: An NSError if the Realm could not be initialized.
-    */
+     The default Realm is persisted as *default.realm* under the *Documents* directory of your Application on iOS, and
+     in your application's *Application Support* directory on OS X.
+
+     The default Realm is created using the default `Configuration`, which can be changed by setting the
+     `Realm.Configuration.defaultConfiguration` property to a new value.
+
+     - throws: An `NSError` if the Realm could not be initialized.
+     */
     public convenience init() throws {
         let rlmRealm = try RLMRealm(configuration: RLMRealmConfiguration.default())
         self.init(rlmRealm)
     }
 
     /**
-    Obtains a Realm instance with the given configuration.
+     Obtains a `Realm` instance with the given configuration.
 
-    - parameter configuration: The configuration to use when creating the Realm instance.
+     - parameter configuration: A configuration value to use when creating the Realm.
 
-    - throws: An NSError if the Realm could not be initialized.
-    */
+     - throws: An `NSError` if the Realm could not be initialized.
+     */
     public convenience init(configuration: Configuration) throws {
         let rlmRealm = try RLMRealm(configuration: configuration.rlmConfiguration)
         self.init(rlmRealm)
     }
 
     /**
-    Obtains a Realm instance persisted at the specified file URL.
+     Obtains a `Realm` instance persisted at a specified file URL.
 
-    - parameter fileURL: Local URL to the realm file.
+     - parameter fileURL: The local URL of the file the Realm should be saved at.
 
-    - throws: An NSError if the Realm could not be initialized.
-    */
+     - throws: An `NSError` if the Realm could not be initialized.
+     */
     public convenience init(fileURL: URL) throws {
         var configuration = Configuration.defaultConfiguration
         configuration.fileURL = fileURL
@@ -98,99 +98,95 @@ public final class Realm {
     // MARK: Transactions
 
     /**
-    Performs actions contained within the given block inside a write transaction.
+     Performs actions contained within the given block inside a write transaction.
 
-    Write transactions cannot be nested, and trying to execute a write transaction
-    on a `Realm` which is already in a write transaction will throw an exception.
-    Calls to `write` from `Realm` instances in other threads will block
-    until the current write transaction completes.
+     If the block throws an error, the transaction will be canceled, reverting any writes made in the block before the
+     error was thrown.
 
-    Before executing the write transaction, `write` updates the `Realm` to the
-    latest Realm version, as if `refresh()` was called, and generates notifications
-    if applicable. This has no effect if the `Realm` was already up to date.
+     Write transactions cannot be nested, and trying to execute a write transaction on a Realm which is already
+     participating in a write transaction will throw an error. Calls to `write` from `Realm` instances in other threads
+     will block until the current write transaction completes.
 
-    - parameter block: The block to be executed inside a write transaction.
+     Before executing the write transaction, `write` updates the `Realm` instance to the latest Realm version, as if
+     `refresh()` had been called, and generates notifications if applicable. This has no effect if the Realm was already
+     up to date.
 
-    - throws: An NSError if the transaction could not be written.
-    */
-    public func write(block: () -> Void) throws {
+     - parameter block: The block containing actions to perform.
+
+     - throws: An `NSError` if the transaction could not be completed successfully.
+               If `block` throws, the function throws the propagated `ErrorType` instead.
+     */
+    public func write(_ block: () -> Void) throws {
         try rlmRealm.transaction(block)
     }
 
     /**
-    Begins a write transaction in a `Realm`.
+     Begins a write transaction on the Realm.
 
-    Only one write transaction can be open at a time. Write transactions cannot be
-    nested, and trying to begin a write transaction on a `Realm` which is
-    already in a write transaction will throw an exception. Calls to
-    `beginWrite` from `Realm` instances in other threads will block
-    until the current write transaction completes.
+     Only one write transaction can be open at a time. Write transactions cannot be nested, and trying to begin a write
+     transaction on a Realm which is already in a write transaction will throw an error. Calls to `beginWrite` from
+     `Realm` instances in other threads will block until the current write transaction completes.
 
-    Before beginning the write transaction, `beginWrite` updates the
-    `Realm` to the latest Realm version, as if `refresh()` was called, and
-    generates notifications if applicable. This has no effect if the `Realm`
-    was already up to date.
+     Before beginning the write transaction, `beginWrite` updates the `Realm` instance to the latest Realm version, as
+     if `refresh()` had been called, and generates notifications if applicable. This has no effect if the Realm was
+     already up to date.
 
-    It is rarely a good idea to have write transactions span multiple cycles of
-    the run loop, but if you do wish to do so you will need to ensure that the
-    `Realm` in the write transaction is kept alive until the write transaction
-    is committed.
-    */
+     It is rarely a good idea to have write transactions span multiple cycles of the run loop, but if you do wish to do
+     so you will need to ensure that the Realm in the write transaction is kept alive until the write transaction is
+     committed.
+     */
     public func beginWrite() {
         rlmRealm.beginWriteTransaction()
     }
 
     /**
-    Commits all writes operations in the current write transaction, and ends
-    the transaction.
+     Commits all write operations in the current write transaction, and ends the transaction.
 
-    Calling this when not in a write transaction will throw an exception.
+     - warning: This method may only be called during a write transaction.
 
-    - throws: An NSError if the transaction could not be written.
-    */
+     - throws: An `NSError` if the transaction could not be written.
+     */
     public func commitWrite() throws {
         try rlmRealm.commitWriteTransaction()
     }
 
     /**
-    Reverts all writes made in the current write transaction and end the transaction.
+     Reverts all writes made in the current write transaction and ends the transaction.
 
-    This rolls back all objects in the Realm to the state they were in at the
-    beginning of the write transaction, and then ends the transaction.
+     This rolls back all objects in the Realm to the state they were in at the beginning of the write transaction, and
+     then ends the transaction.
 
-    This restores the data for deleted objects, but does not revive invalidated
-    object instances. Any `Object`s which were added to the Realm will be
-    invalidated rather than switching back to standalone objects.
-    Given the following code:
+     This restores the data for deleted objects, but does not revive invalidated object instances. Any `Object`s which
+     were added to the Realm will be invalidated rather than becoming unmanaged.
 
-    ```swift
-    let oldObject = objects(ObjectType).first!
-    let newObject = ObjectType()
+     Given the following code:
 
-    realm.beginWrite()
-    realm.add(newObject)
-    realm.delete(oldObject)
-    realm.cancelWrite()
-    ```
+     ```swift
+     let oldObject = objects(ObjectType).first!
+     let newObject = ObjectType()
 
-    Both `oldObject` and `newObject` will return `true` for `invalidated`,
-    but re-running the query which provided `oldObject` will once again return
-    the valid object.
+     realm.beginWrite()
+     realm.add(newObject)
+     realm.delete(oldObject)
+     realm.cancelWrite()
+     ```
 
-    Calling this when not in a write transaction will throw an exception.
-    */
+     Both `oldObject` and `newObject` will return `true` for `isInvalidated`, but re-running the query which provided
+     `oldObject` will once again return the valid object.
+
+     - warning: This method may only be called during a write transaction.
+     */
     public func cancelWrite() {
         rlmRealm.cancelWriteTransaction()
     }
 
     /**
-    Indicates if this Realm is currently in a write transaction.
+     Indicates whether the Realm is currently in a write transaction.
 
-    - warning: Wrapping mutating operations in a write transaction if this property returns `false`
-               may cause a large number of write transactions to be created, which could negatively
-               impact Realm's performance. Always prefer performing multiple mutations in a single
-               transaction when possible.
-    */
+     - warning:  Do not simply check this property and then start a write transaction whenever an object needs to be
+                 created, updated, or removed. Doing so might cause a large number of write transactions to be created,
+                 degrading performance. Instead, always prefer performing multiple updates during a single transaction.
+     */
     public var isInWriteTransaction: Bool {
         return rlmRealm.inWriteTransaction
     }
@@ -198,24 +194,22 @@ public final class Realm {
     // MARK: Adding and Creating objects
 
     /**
-    Adds or updates an object to be persisted it in this Realm.
+     Adds or updates an existing object into the Realm.
 
-    When 'update' is 'true', the object must have a primary key. If no objects exist in
-    the Realm instance with the same primary key value, the object is inserted. Otherwise,
-    the existing object is updated with any changed values.
+     Only pass `true` to `update` if the object has a primary key. If no objects exist in the Realm with the same
+     primary key value, the object is inserted. Otherwise, the existing object is updated with any changed values.
 
-    When added, all (child) relationships referenced by this object will also be
-    added to the Realm if they are not already in it. If the object or any related
-    objects already belong to a different Realm an exception will be thrown. Use one
-    of the `create` functions to insert a copy of a persisted object into a different
-    Realm.
+     When added, all child relationships referenced by this object will also be added to the Realm if they are not
+     already in it. If the object or any related objects are already being managed by a different Realm an error will be
+     thrown. Instead, use one of the `create` functions to insert a copy of a managed object into a different Realm.
 
-    The object to be added must be valid and cannot have been previously deleted
-    from a Realm (i.e. `invalidated` must be false).
+     The object to be added must be valid and cannot have been previously deleted from a Realm (i.e. `isInvalidated`
+     must be `false`).
 
-    - parameter object: Object to be added to this Realm.
-    - parameter update: If true will try to update existing objects with the same primary key.
-    */
+     - parameter object: The object to be added to this Realm.
+     - parameter update: If `true`, the Realm will try to find an existing copy of the object (with the same primary
+                         key), and update it. Otherwise, the object will be added.
+     */
     public func add(_ object: Object, update: Bool = false) {
         if update && object.objectSchema.primaryKeyProperty == nil {
             throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
@@ -224,15 +218,15 @@ public final class Realm {
     }
 
     /**
-    Adds or updates objects in the given sequence to be persisted it in this Realm.
+     Adds or updates all the objects in a collection into the Realm.
 
-    - see: add(_:update:)
+     - see: `add(_:update:)`
 
-    - warning: This method can only be called during a write transaction.
+     - warning: This method may only be called during a write transaction.
 
-    - parameter objects: A sequence which contains objects to be added to this Realm.
-    - parameter update: If true will try to update existing objects with the same primary key.
-    */
+     - parameter objects: A sequence which contains objects to be added to the Realm.
+     - parameter update: If `true`, objects that are already in the Realm will be updated instead of added anew.
+     */
     public func add<S: Sequence>(_ objects: S, update: Bool = false) where S.Iterator.Element: Object {
         for obj in objects {
             add(obj, update: update)
@@ -240,30 +234,31 @@ public final class Realm {
     }
 
     /**
-    Create an `Object` with the given value.
+     Creates or updates a Realm object with a given value, adding it to the Realm and returning it.
 
-    Creates or updates an instance of this object and adds it to the `Realm` populating
-    the object with the given value.
+     Only pass `true` to `update` if the object has a primary key. If no objects exist in
+     the Realm with the same primary key value, the object is inserted. Otherwise,
+     the existing object is updated with any changed values.
 
-    When 'update' is 'true', the object must have a primary key. If no objects exist in
-    the Realm instance with the same primary key value, the object is inserted. Otherwise,
-    the existing object is updated with any changed values.
+     The `value` argument can be a key-value coding compliant object, an array or dictionary returned from the methods
+     in `NSJSONSerialization`, or an `Array` containing one element for each managed property. An exception will be
+     thrown if any required properties are not present and those properties were not defined with default values. Do not
+     pass in a `LinkingObjects` instance, either by itself or as a member of a collection.
 
-    - warning: This method can only be called during a write transaction.
+     When passing in an `Array` as the `value` argument, all properties must be present, valid and in the same order as
+     the properties defined in the model.
 
-    - parameter type:   The object type to create.
-    - parameter value:  The value used to populate the object. This can be any key/value coding compliant
-                        object, or a JSON dictionary such as those returned from the methods in `NSJSONSerialization`,
-                        or an `Array` with one object for each persisted property. An exception will be
-                        thrown if any required properties are not present and no default is set.
-                        When passing in an `Array`, all properties must be present,
-                        valid and in the same order as the properties defined in the model.
-    - parameter update: If true will try to update existing objects with the same primary key.
+     - warning: This method may only be called during a write transaction.
 
-    - returns: The created object.
-    */
+     - parameter type:   The type of the object to create.
+     - parameter value:  The value used to populate the object.
+     - parameter update: If `true`, the Realm will try to find an existing copy of the object (with the same primary
+                         key), and update it. Otherwise, the object will be added.
+
+     - returns: The newly created object.
+     */
     @discardableResult
-    public func createObject<T: Object>(ofType type: T.Type, populatedWith value: Any = [:], update: Bool = false) -> T {
+    public func create<T: Object>(_ type: T.Type, value: Any = [:], update: Bool = false) -> T {
         let typeName = (type as Object.Type).className()
         if update && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
@@ -272,35 +267,37 @@ public final class Realm {
     }
 
     /**
-    This method is useful only in specialized circumstances, for example, when building
-    components that integrate with Realm. If you are simply building an app on Realm, it is
-    recommended to use the typed method `create(_:value:update:)`.
+     This method is useful only in specialized circumstances, for example, when building
+     components that integrate with Realm. If you are simply building an app on Realm, it is
+     recommended to use the typed method `create(_:value:update:)`.
 
-    Creates or updates an object with the given class name and adds it to the `Realm`, populating
-    the object with the given value.
+     Creates or updates an object with the given class name and adds it to the `Realm`, populating
+     the object with the given value.
 
-    When 'update' is 'true', the object must have a primary key. If no objects exist in
-    the Realm instance with the same primary key value, the object is inserted. Otherwise,
-    the existing object is updated with any changed values.
+     When 'update' is 'true', the object must have a primary key. If no objects exist in
+     the Realm instance with the same primary key value, the object is inserted. Otherwise,
+     the existing object is updated with any changed values.
 
-    - warning: This method can only be called during a write transaction.
+     The `value` argument is used to populate the object. It can be a key-value coding compliant object, an array or
+     dictionary returned from the methods in `NSJSONSerialization`, or an `Array` containing one element for each
+     managed property. An exception will be thrown if any required properties are not present and those properties were
+     not defined with default values.
 
-    - parameter className:  The class name of the object to create.
-    - parameter value:      The value used to populate the object. This can be any key/value coding compliant
-    object, or a JSON dictionary such as those returned from the methods in `NSJSONSerialization`,
-    or an `Array` with one object for each persisted property. An exception will be
-    thrown if any required properties are not present and no default is set.
+     When passing in an `Array` as the `value` argument, all properties must be present, valid and in the same order as
+     the properties defined in the model.
 
-    When passing in an `Array`, all properties must be present,
-    valid and in the same order as the properties defined in the model.
-    - parameter update:     If true will try to update existing objects with the same primary key.
+     - warning: This method can only be called during a write transaction.
 
-    - returns: The created object.
+     - parameter className:  The class name of the object to create.
+     - parameter value:      The value used to populate the object.
+     - parameter update:     If true will try to update existing objects with the same primary key.
 
-    :nodoc:
-    */
+     - returns: The created object.
+
+     :nodoc:
+     */
     @discardableResult
-    public func createDynamicObject(ofType typeName: String, populatedWith value: Any = [:], update: Bool = false) -> DynamicObject {
+    public func dynamicCreate(_ typeName: String, value: Any = [:], update: Bool = false) -> DynamicObject {
         if update && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
         }
@@ -310,24 +307,24 @@ public final class Realm {
     // MARK: Deleting objects
 
     /**
-    Deletes the given object from this Realm.
+     Deletes an object from the Realm. Once the object is deleted it is considered invalidated.
 
-    - warning: This method can only be called during a write transaction.
+     - warning: This method may only be called during a write transaction.
 
-    - parameter object: The object to be deleted.
-    */
+     - parameter object: The object to be deleted.
+     */
     public func delete(_ object: Object) {
         RLMDeleteObjectFromRealm(object, rlmRealm)
     }
 
     /**
-    Deletes the given objects from this Realm.
+     Deletes zero or more objects from the Realm.
 
-    - warning: This method can only be called during a write transaction.
+     - warning: This method may only be called during a write transaction.
 
-    - parameter objects: The objects to be deleted. This can be a `List<Object>`, `Results<Object>`,
-                         or any other enumerable SequenceType which generates Object.
-    */
+     - parameter objects:   The objects to be deleted. This can be a `List<Object>`, `Results<Object>`, or any other
+                            Swift `Sequence` whose elements are `Object`s.
+     */
     public func delete<S: Sequence>(_ objects: S) where S.Iterator.Element: Object {
         for obj in objects {
             delete(obj)
@@ -335,86 +332,81 @@ public final class Realm {
     }
 
     /**
-    Deletes the given objects from this Realm.
+     Deletes zero or more objects from the Realm.
 
-    - warning: This method can only be called during a write transaction.
+     - warning: This method may only be called during a write transaction.
 
-    - parameter objects: The objects to be deleted. Must be `List<Object>`.
+     - parameter objects: A list of objects to delete.
 
-    :nodoc:
-    */
+     :nodoc:
+     */
     public func delete<T: Object>(_ objects: List<T>) {
         rlmRealm.deleteObjects(objects._rlmArray)
     }
 
     /**
-    Deletes the given objects from this Realm.
+     Deletes zero or more objects from the Realm.
 
-    - warning: This method can only be called during a write transaction.
+     - warning: This method may only be called during a write transaction.
 
-    - parameter objects: The objects to be deleted. Must be `Results<Object>`.
+     - parameter objects: A `Results` containing the objects to be deleted.
 
-    :nodoc:
-    */
+     :nodoc:
+     */
     public func delete<T: Object>(_ objects: Results<T>) {
         rlmRealm.deleteObjects(objects.rlmResults)
     }
 
     /**
-    Deletes all objects from this Realm.
+     Deletes all objects from the Realm.
 
-    - warning: This method can only be called during a write transaction.
-    */
-    public func deleteAllObjects() {
+     - warning: This method may only be called during a write transaction.
+     */
+    public func deleteAll() {
         RLMDeleteAllObjectsFromRealm(rlmRealm)
     }
 
     // MARK: Object Retrieval
 
     /**
-    Returns all objects of the given type in the Realm.
+     Returns all objects of the given type stored in the Realm.
 
-    - parameter type: The type of the objects to be returned.
+     - parameter type: The type of the objects to be returned.
 
-    - returns: All objects of the given type in Realm.
-    */
-    public func allObjects<T: Object>(ofType type: T.Type) -> Results<T> {
+     - returns: A `Results` containing the objects.
+     */
+    public func objects<T: Object>(_ type: T.Type) -> Results<T> {
         return Results<T>(RLMGetObjects(rlmRealm, (type as Object.Type).className(), nil))
     }
 
     /**
-    This method is useful only in specialized circumstances, for example, when building
-    components that integrate with Realm. If you are simply building an app on Realm, it is
-    recommended to use the typed method `objects(type:)`.
+     This method is useful only in specialized circumstances, for example, when building
+     components that integrate with Realm. If you are simply building an app on Realm, it is
+     recommended to use the typed method `objects(type:)`.
 
-    Returns all objects for a given class name in the Realm.
+     Returns all objects for a given class name in the Realm.
 
-    - warning: This method is useful only in specialized circumstances.
+     - parameter typeName: The class name of the objects to be returned.
+     - returns: All objects for the given class name as dynamic objects
 
-    - parameter className: The class name of the objects to be returned.
-
-    - returns: All objects for the given class name as dynamic objects
-
-    :nodoc:
-    */
-    public func allDynamicObjects(ofType typeName: String) -> Results<DynamicObject> {
+     :nodoc:
+     */
+    public func dynamicObjects(_ typeName: String) -> Results<DynamicObject> {
         return Results<DynamicObject>(RLMGetObjects(rlmRealm, typeName, nil))
     }
 
     /**
-    Get an object with the given primary key.
+     Retrieves the single instance of a given object type with the given primary key from the Realm.
 
-    Returns `nil` if no object exists with the given primary key.
+     This method requires that `primaryKey()` be overridden on the given object class.
 
-    This method requires that `primaryKey()` be overridden on the given subclass.
+     - see: `Object.primaryKey()`
 
-    - see: Object.primaryKey()
+     - parameter type: The type of the object to be returned.
+     - parameter key:  The primary key of the desired object.
 
-    - parameter type: The type of the objects to be returned.
-    - parameter key:  The primary key of the desired object.
-
-    - returns: An object of type `type` or `nil` if an object with the given primary key does not exist.
-    */
+     - returns: An object of type `type`, or `nil` if no instance with the given primary key exists.
+     */
     public func object<T: Object, K>(ofType type: T.Type, forPrimaryKey key: K) -> T? {
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(),
                                           dynamicBridgeCast(fromSwift: key)) as! RLMObjectBase?,
@@ -422,27 +414,27 @@ public final class Realm {
     }
 
     /**
-    This method is useful only in specialized circumstances, for example, when building
-    components that integrate with Realm. If you are simply building an app on Realm, it is
-    recommended to use the typed method `objectForPrimaryKey(_:key:)`.
+     This method is useful only in specialized circumstances, for example, when building
+     components that integrate with Realm. If you are simply building an app on Realm, it is
+     recommended to use the typed method `objectForPrimaryKey(_:key:)`.
 
-    Get a dynamic object with the given class name and primary key.
+     Get a dynamic object with the given class name and primary key.
 
-    Returns `nil` if no object exists with the given class name and primary key.
+     Returns `nil` if no object exists with the given class name and primary key.
 
-    This method requires that `primaryKey()` be overridden on the given subclass.
+     This method requires that `primaryKey()` be overridden on the given subclass.
 
-    - see: Object.primaryKey()
+     - see: Object.primaryKey()
 
-    - warning: This method is useful only in specialized circumstances.
+     - warning: This method is useful only in specialized circumstances.
 
-    - parameter className:  The class name of the object to be returned.
-    - parameter key:        The primary key of the desired object.
+     - parameter className:  The class name of the object to be returned.
+     - parameter key:        The primary key of the desired object.
 
-    - returns: An object of type `DynamicObject` or `nil` if an object with the given primary key does not exist.
+     - returns: An object of type `DynamicObject` or `nil` if an object with the given primary key does not exist.
 
-    :nodoc:
-    */
+     :nodoc:
+     */
     public func dynamicObject(ofType typeName: String, forPrimaryKey key: Any) -> DynamicObject? {
         return unsafeBitCast(RLMGetObject(rlmRealm, typeName, key) as! RLMObjectBase?, to: Optional<DynamicObject>.self)
     }
@@ -450,38 +442,33 @@ public final class Realm {
     // MARK: Notifications
 
     /**
-    Add a notification handler for changes in this Realm.
+     Adds a notification handler for changes made to this Realm, and returns a notification token.
 
-    Notification handlers are called after each write transaction is committed,
-    independent from the thread or process.
+     Notification handlers are called after each write transaction is committed, independent of the thread or process.
 
-    The block is called on the same thread as it was added on, and can only
-    be added on threads which are currently within a run loop. Unless you are
-    specifically creating and running a run loop on a background thread, this
-    normally will only be the main thread.
+     Handler blocks are called on the same thread that they were added on, and may only be added on threads which are
+     currently within a run loop. Unless you are specifically creating and running a run loop on a background thread,
+     this will normally only be the main thread.
 
-    Notifications can't be delivered as long as the runloop is blocked by
-    other activity. When notifications can't be delivered instantly, multiple
-    notifications may be coalesced.
+     Notifications can't be delivered as long as the run loop is blocked by other activity. When notifications can't be
+     delivered instantly, multiple notifications may be coalesced.
 
-    You must retain the returned token for as long as you want updates to continue
-    to be sent to the block. To stop receiving updates, call stop() on the token.
+     You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
+     updates, call `stop()` on the token.
 
-    - parameter block: A block which is called to process Realm notifications.
-                       It receives the following parameters:
+     - parameter block: A block which is called to process Realm notifications. It receives the following parameters:
+                        `notification`: the incoming notification; `realm`: the Realm for which the notification
+                        occurred.
 
-                       - `Notification`: The incoming notification.
-                       - `Realm`:        The realm for which this notification occurred.
-
-    - returns: A token which must be held for as long as you want notifications to be delivered.
-    */
-    public func addNotificationBlock(block: @escaping NotificationBlock) -> NotificationToken {
+     - returns: A token which must be held for as long as you wish to continue receiving change notifications.
+     */
+    public func addNotificationBlock(_ block: @escaping NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
             switch rlmNotification {
             case RLMNotification.DidChange:
-                block(.DidChange, self)
+                block(.didChange, self)
             case RLMNotification.RefreshRequired:
-                block(.RefreshRequired, self)
+                block(.refreshRequired, self)
             default:
                 fatalError("Unhandled notification type: \(rlmNotification)")
             }
@@ -491,35 +478,29 @@ public final class Realm {
     // MARK: Autorefresh and Refresh
 
     /**
-    Whether this Realm automatically updates when changes happen in other threads.
+     Set this property to `true` to automatically update this Realm when changes happen in other threads.
 
-    If set to `true` (the default), changes made on other threads will be reflected
-    in this Realm on the next cycle of the run loop after the changes are
-    committed.  If set to `false`, you must manually call `refresh()` on the Realm to
-    update it to get the latest version.
+     If set to `true` (the default), changes made on other threads will be reflected in this Realm on the next cycle of
+     the run loop after the changes are committed.  If set to `false`, you must manually call `refresh()` on the Realm
+     to update it to get the latest data.
 
-    Note that by default, background threads do not have an active run loop and you
-    will need to manually call `refresh()` in order to update to the latest version,
-    even if `autorefresh` is set to `true`.
+     Note that by default, background threads do not have an active run loop and you will need to manually call
+     `refresh()` in order to update to the latest version, even if `autorefresh` is set to `true`.
 
-    Even with this enabled, you can still call `refresh()` at any time to update the
-    Realm before the automatic refresh would occur.
+     Even with this property enabled, you can still call `refresh()` at any time to update the Realm before the
+     automatic refresh would occur.
 
-    Notifications are sent when a write transaction is committed whether or not
-    this is enabled.
+     Notifications are sent when a write transaction is committed whether or not automatic refreshing is enabled.
 
-    Disabling this on a `Realm` without any strong references to it will not
-    have any effect, and it will switch back to YES the next time the `Realm`
-    object is created. This is normally irrelevant as it means that there is
-    nothing to refresh (as persisted `Object`s, `List`s, and `Results` have strong
-    references to the containing `Realm`), but it means that setting
-    `Realm().autorefresh = false` in
-    `application(_:didFinishLaunchingWithOptions:)` and only later storing Realm
-    objects will not work.
+     Disabling `autorefresh` on a `Realm` without any strong references to it will not have any effect, and
+     `autorefresh` will revert back to `true` the next time the Realm is created. This is normally irrelevant as it
+     means that there is nothing to refresh (as managed `Object`s, `List`s, and `Results` have strong references to the
+     `Realm` that manages them), but it means that setting `autorefresh = false` in
+     `application(_:didFinishLaunchingWithOptions:)` and only later storing Realm objects will not work.
 
-    Defaults to true.
-    */
-    public var shouldAutorefresh: Bool {
+     Defaults to `true`.
+     */
+    public var autorefresh: Bool {
         get {
             return rlmRealm.autorefresh
         }
@@ -529,12 +510,11 @@ public final class Realm {
     }
 
     /**
-    Update a `Realm` and outstanding objects to point to the most recent
-    data for this `Realm`.
+     Updates the Realm and outstanding objects managed by the Realm to point to the most recent data.
 
-    - returns: Whether the realm had any updates.
-               Note that this may return true even if no data has actually changed.
-    */
+     - returns: Whether there were any updates for the Realm. Note that `true` may be returned even if no data actually
+     changed.
+     */
     @discardableResult
     public func refresh() -> Bool {
         return rlmRealm.refresh()
@@ -543,25 +523,24 @@ public final class Realm {
     // MARK: Invalidation
 
     /**
-    Invalidate all `Object`s and `Results` read from this Realm.
+     Invalidates all `Object`s, `Results`, `LinkingObjects`, and `List`s managed by the Realm.
 
-    A Realm holds a read lock on the version of the data accessed by it, so
-    that changes made to the Realm on different threads do not modify or delete the
-    data seen by this Realm. Calling this method releases the read lock,
-    allowing the space used on disk to be reused by later write transactions rather
-    than growing the file. This method should be called before performing long
-    blocking operations on a background thread on which you previously read data
-    from the Realm which you no longer need.
+     A Realm holds a read lock on the version of the data accessed by it, so
+     that changes made to the Realm on different threads do not modify or delete the
+     data seen by this Realm. Calling this method releases the read lock,
+     allowing the space used on disk to be reused by later write transactions rather
+     than growing the file. This method should be called before performing long
+     blocking operations on a background thread on which you previously read data
+     from the Realm which you no longer need.
 
-    All `Object`, `Results` and `List` instances obtained from this
-    `Realm` on the current thread are invalidated, and can not longer be used.
-    The `Realm` itself remains valid, and a new read transaction is implicitly
-    begun the next time data is read from the Realm.
+     All `Object`, `Results` and `List` instances obtained from this `Realm` instance on the current thread are
+     invalidated. `Object`s and `Array`s cannot be used. `Results` will become empty. The Realm itself remains valid,
+     and a new read transaction is implicitly begun the next time data is read from the Realm.
 
-    Calling this method multiple times in a row without reading any data from the
-    Realm, or before ever reading any data from the Realm is a no-op. This method
-    cannot be called on a read-only Realm.
-    */
+     Calling this method multiple times in a row without reading any data from the
+     Realm, or before ever reading any data from the Realm, is a no-op. This method
+     may not be called on a read-only Realm.
+     */
     public func invalidate() {
         rlmRealm.invalidate()
     }
@@ -569,20 +548,20 @@ public final class Realm {
     // MARK: Writing a Copy
 
     /**
-    Write an encrypted and compacted copy of the Realm to the given local URL.
+     Writes a compacted and optionally encrypted copy of the Realm to the given local URL.
 
-    The destination file cannot already exist.
+     The destination file cannot already exist.
 
-    Note that if this is called from within a write transaction it writes the
-    *current* data, and not data when the last write transaction was committed.
+     Note that if this method is called from within a write transaction, the *current* data is written, not the data
+     from the point when the previous write transaction was committed.
 
-    - parameter fileURL:       Local URL to save the Realm to.
-    - parameter encryptionKey: Optional 64-byte encryption key to encrypt the new file with.
+     - parameter fileURL:       Local URL to save the Realm to.
+     - parameter encryptionKey: Optional 64-byte encryption key to encrypt the new file with.
 
-    - throws: An NSError if the copy could not be written.
-    */
-    public func writeCopy(toFileURL url: URL, encryptionKey: Data? = nil) throws {
-        try rlmRealm.writeCopy(to: url, encryptionKey: encryptionKey)
+     - throws: An `NSError` if the copy could not be written.
+     */
+    public func writeCopy(toFile fileURL: URL, encryptionKey: Data? = nil) throws {
+        try rlmRealm.writeCopy(to: fileURL, encryptionKey: encryptionKey)
     }
 
     // MARK: Internal
@@ -598,81 +577,58 @@ public final class Realm {
 
 extension Realm: Equatable { }
 
-/// Returns whether the two realms are equal.
+/// Returns whether two `Realm` isntances are equal.
 public func == (lhs: Realm, rhs: Realm) -> Bool { // swiftlint:disable:this valid_docs
     return lhs.rlmRealm == rhs.rlmRealm
 }
 
 // MARK: Notifications
 
-/// A notification due to changes to a realm.
-public enum Notification: String {
-    /**
-    Posted when the data in a realm has changed.
+extension Realm {
+    /// A notification indicating that changes were made to a Realm.
+    public enum Notification: String {
+        /**
+         This notification is posted when the data in a Realm has changed.
 
-    DidChange is posted after a realm has been refreshed to reflect a write transaction, i.e. when
-    an autorefresh occurs, `refresh()` is called, after an implicit refresh from
-    `write(_:)`/`beginWrite()`, and after a local write transaction is committed.
-    */
-    case DidChange = "RLMRealmDidChangeNotification"
+         `didChange` is posted after a Realm has been refreshed to reflect a write transaction, This can happen when an
+         autorefresh occurs, `refresh()` is called, after an implicit refresh from `write(_:)`/`beginWrite()`, or after
+         a local write transaction is committed.
+         */
+        case didChange = "RLMRealmDidChangeNotification"
 
-    /**
-    Posted when a write transaction has been committed to a Realm on a different thread for the same
-    file. This is not posted if `autorefresh` is enabled or if the Realm is refreshed before the
-    notification has a chance to run.
+        /**
+         This notification is posted when a write transaction has been committed to a Realm on a different thread for
+         the same file.
 
-    Realms with autorefresh disabled should normally have a handler for this notification which
-    calls `refresh()` after doing some work.
-    While not refreshing is allowed, it may lead to large Realm files as Realm has to keep an extra
-    copy of the data for the un-refreshed Realm.
-    */
-    case RefreshRequired = "RLMRealmRefreshRequiredNotification"
+         It is not posted if `autorefresh` is enabled, or if the Realm is refreshed before the notification has a chance
+         to run.
+
+         Realms with autorefresh disabled should normally install a handler for this notification which calls
+         `refresh()` after doing some work. Refreshing the Realm is optional, but not refreshing the Realm may lead to
+         large Realm files. This is because an extra copy of the data must be kept for the stale Realm.
+         */
+        case refreshRequired = "RLMRealmRefreshRequiredNotification"
+    }
 }
 
-/// Closure to run when the data in a Realm was modified.
-public typealias NotificationBlock = (_ notification: Notification, _ realm: Realm) -> Void
+/// The type of a block to run for notification purposes when the data in a Realm is modified.
+public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
 
 
 // MARK: Unavailable
 
 extension Realm {
 
-    @available(*, unavailable, renamed:"isInWriteTransaction")
-    public var inWriteTransaction : Bool { fatalError() }
+    @available(*, unavailable, renamed: "isInWriteTransaction")
+    public var inWriteTransaction: Bool { fatalError() }
 
-    @available(*, unavailable, renamed:"createObject(ofType:populatedWith:update:)")
-    public func create<T: Object>(_ type: T.Type, value: AnyObject = [:] as NSDictionary, update: Bool = false) -> T { fatalError() }
-
-    @available(*, unavailable, renamed:"createDynamicObject(ofType:populatedWith:update:)")
-    public func dynamicCreate(_ className: String, value: AnyObject = [:] as NSDictionary, update: Bool = false) -> DynamicObject {
-        fatalError()
-    }
-
-    @available(*, unavailable, renamed:"delete(_:)")
-    public func delete<T: Object>(objects: List<T>) { }
-
-    @available(*, unavailable, renamed:"delete(_:)")
-    public func delete<T: Object>(objects: Results<T>) { }
-
-    @available(*, unavailable, renamed:"deleteAllObjects()")
-    public func deleteAll() { }
-
-    @available(*, unavailable, renamed:"allObjects(ofType:)")
-    public func objects<T: Object>(_ type: T.Type) -> Results<T> { fatalError() }
-
-    @available(*, unavailable, renamed:"allDynamicObjects(ofType:)")
-    public func dynamicObjects(_ className: String) -> Results<DynamicObject> { fatalError() }
-
-    @available(*, unavailable, renamed:"object(ofType:forPrimaryKey:)")
+    @available(*, unavailable, renamed: "object(ofType:forPrimaryKey:)")
     public func objectForPrimaryKey<T: Object>(_ type: T.Type, key: AnyObject) -> T? { fatalError() }
 
-    @available(*, unavailable, renamed:"dynamicObject(ofType:forPrimaryKey:)")
+    @available(*, unavailable, renamed: "dynamicObject(ofType:forPrimaryKey:)")
     public func dynamicObjectForPrimaryKey(_ className: String, key: AnyObject) -> DynamicObject? { fatalError() }
 
-    @available(*, unavailable, renamed:"shouldAutorefresh")
-    public var autorefresh : Bool { get { fatalError() } set { fatalError() } }
-
-    @available(*, unavailable, renamed:"writeCopy(toFileURL:encryptionKey:)")
+    @available(*, unavailable, renamed: "writeCopy(toFile:encryptionKey:)")
     public func writeCopyToURL(_ fileURL: NSURL, encryptionKey: Data? = nil) throws { fatalError() }
 }
 
@@ -987,7 +943,7 @@ public final class Realm {
     }
 
     /**
-     Deletes one or more objects from the Realm.
+     Deletes zero or more objects from the Realm.
 
      - warning: This method may only be called during a write transaction.
 
@@ -1001,7 +957,7 @@ public final class Realm {
     }
 
     /**
-     Deletes one or more objects from the Realm.
+     Deletes zero or more objects from the Realm.
 
      - warning: This method may only be called during a write transaction.
 
@@ -1014,7 +970,7 @@ public final class Realm {
     }
 
     /**
-     Deletes one or more objects from the Realm.
+     Deletes zero or more objects from the Realm.
 
      - warning: This method may only be called during a write transaction.
 
@@ -1130,7 +1086,7 @@ public final class Realm {
                         `notification`: the incoming notification; `realm`: the Realm for which the notification
                         occurred.
 
-     - returns: A token which must be retained for as long as you wish to continue receiving change notifications.
+     - returns: A token which must be held for as long as you wish to continue receiving change notifications.
      */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
     public func addNotificationBlock(block: NotificationBlock) -> NotificationToken {
@@ -1283,7 +1239,7 @@ public enum Notification: String {
 
      Realms with autorefresh disabled should normally install a handler for this notification which calls `refresh()`
      after doing some work. Refreshing the Realm is optional, but not refreshing the Realm may lead to large Realm
-     files. This is because Realm must keep an extra copy of the data for the stale Realm.
+     files. This is because an extra copy of the data must be kept for the stale Realm.
     */
     case RefreshRequired = "RLMRealmRefreshRequiredNotification"
 }

@@ -48,12 +48,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let realm = try! Realm()
         try! realm.write {
-            realm.createObject(ofType: Person.self, populatedWith: ["John", [["Fido", 1]]])
-            realm.createObject(ofType: Person.self, populatedWith: ["Mary", [["Rex", 2]]])
+            realm.create(Person.self, value: ["John", [["Fido", 1]]])
+            realm.create(Person.self, value: ["Mary", [["Rex", 2]]])
         }
 
         // Log all dogs and their owners using the "owners" inverse relationship
-        let allDogs = realm.allObjects(ofType: Dog.self)
+        let allDogs = realm.objects(Dog.self)
         for dog in allDogs {
             let ownerNames = dog.owners.map { $0.name }
             print("\(dog.name) has \(ownerNames.count) owners (\(ownerNames))")

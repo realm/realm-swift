@@ -90,7 +90,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 migration.enumerateObjects(ofType: Person.className()) { oldObject, newObject in
                     // give JP a dog
                     if newObject?["fullName"] as? String == "JP McDonald" {
-                        let jpsDog = migration.createObject(ofType: Pet.className(), populatedWith: ["Jimbo", "dog"])
+                        let jpsDog = migration.create(Pet.className(), value: ["Jimbo", "dog"])
                         let dogs = newObject?["pets"] as? List<MigrationObject>
                         dogs?.append(jpsDog)
                     }
@@ -103,7 +103,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // print out all migrated objects in the default realm
         // migration is performed implicitly on Realm access
-        print("Migrated objects in the default Realm: \(try! Realm().allObjects(ofType: Person.self))")
+        print("Migrated objects in the default Realm: \(try! Realm().objects(Person.self))")
 
         //
         // Migrate a realms at a custom paths
@@ -127,9 +127,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
             // print out all migrated objects in the migrated realms
             let realmv1 = try! Realm(configuration: realmv1Configuration)
-            print("Migrated objects in the Realm migrated from v1: \(realmv1.allObjects(ofType: Person.self))")
+            print("Migrated objects in the Realm migrated from v1: \(realmv1.objects(Person.self))")
             let realmv2 = try! Realm(configuration: realmv2Configuration)
-            print("Migrated objects in the Realm migrated from v2: \(realmv2.allObjects(ofType: Person.self))")
+            print("Migrated objects in the Realm migrated from v2: \(realmv2.objects(Person.self))")
         }
 
         return true

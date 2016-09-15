@@ -37,7 +37,7 @@ class Cell: UITableViewCell {
 class TableViewController: UITableViewController {
 
     let realm = try! Realm()
-    let results = try! Realm().allObjects(ofType: DemoObject.self).sorted(onProperty: "date")
+    let results = try! Realm().objects(DemoObject.self).sorted(byProperty: "date")
     var notificationToken: NotificationToken?
 
     override func viewDidLoad() {
@@ -48,11 +48,11 @@ class TableViewController: UITableViewController {
         // Set results notification block
         self.notificationToken = results.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
-            case .Initial:
+            case .initial:
                 // Results are now populated and can be accessed without blocking the UI
                 self.tableView.reloadData()
                 break
-            case .Update(_, let deletions, let insertions, let modifications):
+            case .update(_, let deletions, let insertions, let modifications):
                 // Query results have changed, so apply them to the TableView
                 self.tableView.beginUpdates()
                 self.tableView.insertRows(at: insertions.map { IndexPath(row: $0, section: 0) }, with: .automatic)
@@ -60,7 +60,7 @@ class TableViewController: UITableViewController {
                 self.tableView.reloadRows(at: modifications.map { IndexPath(row: $0, section: 0) }, with: .automatic)
                 self.tableView.endUpdates()
                 break
-            case .Error(let err):
+            case .error(let err):
                 // An error occurred while opening the Realm file on the background worker thread
                 fatalError("\(err)")
                 break
@@ -114,7 +114,7 @@ class TableViewController: UITableViewController {
             realm.beginWrite()
             for _ in 0..<5 {
                 // Add row via dictionary. Order is ignored.
-                realm.createObject(ofType: DemoObject.self, populatedWith: ["title": TableViewController.randomString(), "date": TableViewController.randomDate()])
+                realm.create(DemoObject.self, value: ["title": TableViewController.randomString(), "date": TableViewController.randomDate()])
             }
             try! realm.commitWrite()
         }
@@ -122,7 +122,7 @@ class TableViewController: UITableViewController {
 
     func add() {
         realm.beginWrite()
-        realm.createObject(ofType: DemoObject.self, populatedWith: [TableViewController.randomString(), TableViewController.randomDate()])
+        realm.create(DemoObject.self, value: [TableViewController.randomString(), TableViewController.randomDate()])
         try! realm.commitWrite()
     }
 
