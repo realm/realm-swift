@@ -341,6 +341,15 @@ RLMObjectSchema *RLMObjectBaseObjectSchema(__unsafe_unretained RLMObjectBase *ob
     return object ? object->_objectSchema : nil;
 }
 
+static RLMProperty *getPropertyWithName(__unsafe_unretained RLMObjectBase *object, __unsafe_unretained NSString *name) {
+    if (RLMProperty *property = object->_objectSchema[name]) {
+        return property;
+    } else {
+        @throw RLMException(@"Invalid property name '%@' for class '%@'.",
+                            name, object->_objectSchema.className);
+    }
+}
+
 id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key) {
     if (!object) {
         return nil;
@@ -350,7 +359,7 @@ id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key) {
         return RLMDynamicGetByName(object, key, false);
     }
     else {
-        return [object valueForKey:key];
+        return [object valueForKey:getPropertyWithName(object, key).name];
     }
 }
 
@@ -363,7 +372,7 @@ void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *object, NSString *ke
         RLMDynamicValidatedSet(object, key, obj);
     }
     else {
-        [object setValue:obj forKey:key];
+        [object setValue:obj forKey:getPropertyWithName(object, key).name];
     }
 }
 

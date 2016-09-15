@@ -174,17 +174,15 @@ open class Object: RLMObjectBase {
     /// Returns or sets the value of the property with the given name.
     open subscript(key: String) -> Any? {
         get {
-            if realm == nil {
-                return value(forKey: key)
-            }
-            return RLMDynamicGetByName(self, key, true)
-        }
-        set(value) {
-            if realm == nil {
-                setValue(value, forKey: key)
+            let value = RLMObjectBaseObjectForKeyedSubscript(self, key)
+            if let array = value as? RLMArray {
+                return List<DynamicObject>(rlmArray: array)
             } else {
-                RLMDynamicValidatedSet(self, key, value)
+                return value
             }
+        }
+        set {
+            RLMObjectBaseSetObjectForKeyedSubscript(self, key, newValue)
         }
     }
 
