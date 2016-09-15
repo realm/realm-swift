@@ -74,7 +74,7 @@
 		14AACA8F1BFE7B740046BD85 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		14AACA911BFE7B740046BD85 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		14AACA951BFE7C260046BD85 /* Place.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Place.swift; sourceTree = "<group>"; };
-		14AACA971BFE7C420046BD85 /* Places.realm */ = {isa = PBXFileReference; lastKnownFileType = file; name = Places.realm; path = "../../objc/PreloadedData/Seed Data/Places.realm"; sourceTree = "<group>"; };
+		14AACA971BFE7C420046BD85 /* Places.realm */ = {isa = PBXFileReference; lastKnownFileType = file; name = Places.realm; path = "Seed Data/Places.realm"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
