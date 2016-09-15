@@ -7,7 +7,7 @@ Prebuilt frameworks are now built with Xcode 7.3.1 and Xcode 8.0.
 ### API breaking changes
 
 * Deprecate `migrateRealm:` in favor of new `performMigrationForConfiguration:error:` method
-  that follows Cocoa's' NSError conventions.
+  that follows Cocoa's NSError conventions.
 * Fix issue where `RLMResults` used `id `instead of its generic type as the return
   type of subscript.
 
