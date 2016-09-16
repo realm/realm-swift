@@ -73,6 +73,9 @@
              @"stringCol" : [[NSUUID UUID] UUIDString],
              @"binaryCol" : [[[NSUUID UUID] UUIDString] dataUsingEncoding:NSUTF8StringEncoding]};
 }
++ (NSString *)primaryKey {
+    return @"intCol";
+}
 @end
 
 

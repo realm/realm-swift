@@ -29,6 +29,10 @@ class RandomDefaultObject: Object {
     dynamic var dateCol = Date(timeIntervalSinceReferenceDate: TimeInterval(arc4random()))
     dynamic var stringCol = UUID().uuidString
     dynamic var binaryCol = UUID().uuidString.data(using: .utf8)
+
+    override static func primaryKey() -> String? {
+        return "intCol"
+    }
 }
 
 class ObjectTests: TestCase {
@@ -441,6 +445,10 @@ class RandomDefaultObject: Object {
     dynamic var dateCol = NSDate(timeIntervalSinceReferenceDate: NSTimeInterval(arc4random()))
     dynamic var stringCol = NSUUID().UUIDString
     dynamic var binaryCol = NSUUID().UUIDString.dataUsingEncoding(NSUTF8StringEncoding)
+
+    override static func primaryKey() -> String? {
+        return "intCol"
+    }
 }
 
 class ObjectTests: TestCase {
