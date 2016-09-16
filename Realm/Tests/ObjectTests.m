@@ -55,7 +55,8 @@
 @end
 
 
-@interface RandomDefaultObject : RLMObject
+NSInteger dynamicDefaultSeed = 0;
+@interface DynamicDefaultObject : RLMObject
 @property int       intCol;
 @property float     floatCol;
 @property double    doubleCol;
@@ -64,12 +65,13 @@
 @property NSData   *binaryCol;
 @end
 
-@implementation RandomDefaultObject
+@implementation DynamicDefaultObject
 + (NSDictionary *)defaultPropertyValues {
-    return @{@"intCol" : @(arc4random()),
-             @"floatCol" : @(arc4random() / 1000.0f),
-             @"doubleCol" : @(arc4random() / 1000.0),
-             @"dateCol" : [NSDate dateWithTimeIntervalSince1970:arc4random()],
+    dynamicDefaultSeed++;
+    return @{@"intCol" : @(dynamicDefaultSeed),
+             @"floatCol" : @((float)dynamicDefaultSeed),
+             @"doubleCol" : @((double)dynamicDefaultSeed),
+             @"dateCol" : [NSDate dateWithTimeIntervalSince1970:dynamicDefaultSeed],
              @"stringCol" : [[NSUUID UUID] UUIDString],
              @"binaryCol" : [[[NSUUID UUID] UUIDString] dataUsingEncoding:NSUTF8StringEncoding]};
 }
@@ -1267,8 +1269,8 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     [realm cancelWriteTransaction];
 }
 
-- (void)testRandomDefaultPropertyValues {
-    void (^assertDifferentPropertyValues)(RandomDefaultObject *, RandomDefaultObject *) = ^(RandomDefaultObject *obj1, RandomDefaultObject *obj2) {
+- (void)testDynamicDefaultPropertyValues {
+    void (^assertDifferentPropertyValues)(DynamicDefaultObject *, DynamicDefaultObject *) = ^(DynamicDefaultObject *obj1, DynamicDefaultObject *obj2) {
         XCTAssertNotEqual(obj1.intCol, obj2.intCol);
         XCTAssertNotEqual(obj1.floatCol, obj2.floatCol);
         XCTAssertNotEqual(obj1.doubleCol, obj2.doubleCol);
@@ -1276,10 +1278,10 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
         XCTAssertNotEqualObjects(obj1.stringCol, obj2.stringCol);
         XCTAssertNotEqualObjects(obj1.binaryCol, obj2.binaryCol);
     };
-    assertDifferentPropertyValues([[RandomDefaultObject alloc] init], [[RandomDefaultObject alloc] init]);
+    assertDifferentPropertyValues([[DynamicDefaultObject alloc] init], [[DynamicDefaultObject alloc] init]);
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    assertDifferentPropertyValues([RandomDefaultObject createInRealm:realm withValue:@{}], [RandomDefaultObject createInRealm:realm withValue:@{}]);
+    assertDifferentPropertyValues([DynamicDefaultObject createInRealm:realm withValue:@{}], [DynamicDefaultObject createInRealm:realm withValue:@{}]);
     [realm cancelWriteTransaction];
 }
 

@@ -22,11 +22,16 @@ import Foundation
 
 #if swift(>=3.0)
 
-class RandomDefaultObject: Object {
-    dynamic var intCol = Int(arc4random())
-    dynamic var floatCol = Float(arc4random()) / 1000
-    dynamic var doubleCol = Double(arc4random()) / 1000
-    dynamic var dateCol = Date(timeIntervalSinceReferenceDate: TimeInterval(arc4random()))
+private var dynamicDefaultSeed = 0
+private func nextDynamicDefaultSeed() -> Int {
+    dynamicDefaultSeed += 1
+    return dynamicDefaultSeed
+}
+class DynamicDefaultObject: Object {
+    dynamic var intCol = nextDynamicDefaultSeed()
+    dynamic var floatCol = Float(nextDynamicDefaultSeed())
+    dynamic var doubleCol = Double(nextDynamicDefaultSeed())
+    dynamic var dateCol = Date(timeIntervalSinceReferenceDate: TimeInterval(nextDynamicDefaultSeed()))
     dynamic var stringCol = UUID().uuidString
     dynamic var binaryCol = UUID().uuidString.data(using: .utf8)
 
@@ -207,8 +212,8 @@ class ObjectTests: TestCase {
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDoubleCol"]!.isIndexed)
     }
 
-    func testRandomDefaultPropertyValues() {
-        func assertDifferentPropertyValues(_ obj1: RandomDefaultObject, _ obj2: RandomDefaultObject) {
+    func testDynamicDefaultPropertyValues() {
+        func assertDifferentPropertyValues(_ obj1: DynamicDefaultObject, _ obj2: DynamicDefaultObject) {
             XCTAssertNotEqual(obj1.intCol, obj2.intCol)
             XCTAssertNotEqual(obj1.floatCol, obj2.floatCol)
             XCTAssertNotEqual(obj1.doubleCol, obj2.doubleCol)
@@ -216,10 +221,10 @@ class ObjectTests: TestCase {
             XCTAssertNotEqual(obj1.stringCol, obj2.stringCol)
             XCTAssertNotEqual(obj1.binaryCol, obj2.binaryCol)
         }
-        assertDifferentPropertyValues(RandomDefaultObject(), RandomDefaultObject())
+        assertDifferentPropertyValues(DynamicDefaultObject(), DynamicDefaultObject())
         let realm = try! Realm()
         try! realm.write {
-            assertDifferentPropertyValues(realm.create(RandomDefaultObject.self), realm.create(RandomDefaultObject.self))
+            assertDifferentPropertyValues(realm.create(DynamicDefaultObject.self), realm.create(DynamicDefaultObject.self))
         }
     }
 
@@ -438,11 +443,16 @@ class ObjectTests: TestCase {
 
 #else
 
-class RandomDefaultObject: Object {
-    dynamic var intCol = Int(arc4random())
-    dynamic var floatCol = Float(arc4random()) / 1000
-    dynamic var doubleCol = Double(arc4random()) / 1000
-    dynamic var dateCol = NSDate(timeIntervalSinceReferenceDate: NSTimeInterval(arc4random()))
+private var dynamicDefaultSeed = 0
+private func nextDynamicDefaultSeed() -> Int {
+    dynamicDefaultSeed += 1
+    return dynamicDefaultSeed
+}
+class DynamicDefaultObject: Object {
+    dynamic var intCol = nextDynamicDefaultSeed()
+    dynamic var floatCol = Float(nextDynamicDefaultSeed())
+    dynamic var doubleCol = Double(nextDynamicDefaultSeed())
+    dynamic var dateCol = NSDate(timeIntervalSinceReferenceDate: NSTimeInterval(nextDynamicDefaultSeed()))
     dynamic var stringCol = NSUUID().UUIDString
     dynamic var binaryCol = NSUUID().UUIDString.dataUsingEncoding(NSUTF8StringEncoding)
 
@@ -623,8 +633,8 @@ class ObjectTests: TestCase {
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDoubleCol"]!.indexed)
     }
 
-    func testRandomDefaultPropertyValues() {
-        func assertDifferentPropertyValues(obj1: RandomDefaultObject, _ obj2: RandomDefaultObject) {
+    func testDynamicDefaultPropertyValues() {
+        func assertDifferentPropertyValues(obj1: DynamicDefaultObject, _ obj2: DynamicDefaultObject) {
             XCTAssertNotEqual(obj1.intCol, obj2.intCol)
             XCTAssertNotEqual(obj1.floatCol, obj2.floatCol)
             XCTAssertNotEqual(obj1.doubleCol, obj2.doubleCol)
@@ -632,10 +642,10 @@ class ObjectTests: TestCase {
             XCTAssertNotEqual(obj1.stringCol, obj2.stringCol)
             XCTAssertNotEqual(obj1.binaryCol, obj2.binaryCol)
         }
-        assertDifferentPropertyValues(RandomDefaultObject(), RandomDefaultObject())
+        assertDifferentPropertyValues(DynamicDefaultObject(), DynamicDefaultObject())
         let realm = try! Realm()
         try! realm.write {
-            assertDifferentPropertyValues(realm.create(RandomDefaultObject.self), realm.create(RandomDefaultObject.self))
+            assertDifferentPropertyValues(realm.create(DynamicDefaultObject.self), realm.create(DynamicDefaultObject.self))
         }
     }
 
