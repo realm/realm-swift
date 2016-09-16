@@ -66,6 +66,9 @@ NSInteger dynamicDefaultSeed = 0;
 @end
 
 @implementation DynamicDefaultObject
++ (BOOL)shouldIncludeInDefaultSchema {
+    return NO;
+}
 + (NSDictionary *)defaultPropertyValues {
     dynamicDefaultSeed++;
     return @{@"intCol" : @(dynamicDefaultSeed),
@@ -1279,7 +1282,9 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
         XCTAssertNotEqualObjects(obj1.binaryCol, obj2.binaryCol);
     };
     assertDifferentPropertyValues([[DynamicDefaultObject alloc] init], [[DynamicDefaultObject alloc] init]);
-    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.objectClasses = @[[DynamicDefaultObject class]];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
     [realm beginWriteTransaction];
     assertDifferentPropertyValues([DynamicDefaultObject createInRealm:realm withValue:@{}], [DynamicDefaultObject createInRealm:realm withValue:@{}]);
     [realm cancelWriteTransaction];
