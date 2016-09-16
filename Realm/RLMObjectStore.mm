@@ -387,7 +387,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         }
     }
     else {
-        __block bool foundExisting;
+        __block bool foundExisting = false;
         __block NSDictionary *defaultValues = nil;
         auto getValue = ^(RLMProperty *prop) {
             id propValue = RLMValidatedValueForProperty(value, prop.name, info.rlmObjectSchema.className);
