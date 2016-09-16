@@ -387,21 +387,10 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         }
     }
     else {
-        // get or create our accessor
-        bool foundExisting;
-        auto primaryGetter = [=](RLMProperty *p) { return [value valueForKey:p.name]; };
-        object->_row = (*info.table())[createOrGetRowForObject(info, primaryGetter, createOrUpdate, &foundExisting)];
-
-        // populate
-        NSDictionary *defaultValues = nil;
-        for (RLMProperty *prop in info.rlmObjectSchema.properties) {
-
-            // skip primary key when updating since it doesn't change
-            if (prop.isPrimary)
-                continue;
-
+        __block bool foundExisting = false;
+        __block NSDictionary *defaultValues = nil;
+        auto getValue = ^(RLMProperty *prop) {
             id propValue = RLMValidatedValueForProperty(value, prop.name, info.rlmObjectSchema.className);
-
             if (!propValue && !foundExisting) {
                 if (!defaultValues) {
                     defaultValues = RLMDefaultValuesForObjectSchema(info.rlmObjectSchema);
@@ -411,8 +400,18 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
                     propValue = NSNull.null;
                 }
             }
+            return propValue;
+        };
+        // get or create our accessor
+        object->_row = (*info.table())[createOrGetRowForObject(info, getValue, createOrUpdate, &foundExisting)];
 
-            if (propValue) {
+        // populate
+        for (RLMProperty *prop in info.rlmObjectSchema.properties) {
+            // skip primary key when updating since it doesn't change
+            if (prop.isPrimary)
+                continue;
+
+            if (id propValue = getValue(prop)) {
                 validateValueForProperty(propValue, prop);
                 RLMDynamicSet(object, prop, RLMCoerceToNil(propValue), creationOptions);
             }
