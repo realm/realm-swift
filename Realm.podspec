@@ -47,6 +47,7 @@ Pod::Spec.new do |s|
                            'Realm/*_Dynamic.h',
                            
                            # Sync
+                           'Realm/RLMSyncConfiguration.h',
                            'Realm/RLMSyncCredential.h',
                            'Realm/RLMRealmConfiguration+Sync.h',
                            'Realm/RLMSyncManager.h',

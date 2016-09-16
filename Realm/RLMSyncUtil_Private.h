@@ -39,14 +39,6 @@ extern NSString *const kRLMSyncProviderKey;
 extern NSString *const kRLMSyncRegisterKey;
 extern NSString *const kRLMSyncUnderlyingErrorKey;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
 NS_ASSUME_NONNULL_END
 
 /// A macro to parse a string out of a JSON dictionary, or return nil.

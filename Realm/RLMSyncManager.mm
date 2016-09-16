@@ -18,15 +18,17 @@
 
 #import "RLMSyncManager_Private.hpp"
 
+#import "RLMRealmConfiguration+Sync.h"
+#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncFileManager.h"
 #import "RLMSyncSession_Private.h"
 #import "RLMSyncUser_Private.hpp"
-#import "RLMSyncUtil.h"
 #import "RLMUtil.hpp"
 
 #import "sync_config.hpp"
 #import "sync_manager.hpp"
 #import "sync_metadata.hpp"
+#import "sync_session.hpp"
 
 using namespace realm;
 using Level = realm::util::Logger::Level;
@@ -83,6 +85,14 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     return sharedManager;
 }
 
+- (RLMSyncSession *)sessionForSyncConfiguration:(RLMSyncConfiguration *)config {
+    NSURL *fileURL = [RLMSyncFileManager fileURLForRawRealmURL:config.realmURL user:config.user];
+    return [config.user _registerSessionForBindingWithFileURL:fileURL
+                                                   syncConfig:config
+                                            standaloneSession:YES
+                                                 onCompletion:nil];
+}
+
 - (instancetype)initPrivate {
     if (self = [super init]) {
         // Create the global error handler.
@@ -96,13 +106,12 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
         // Create the static login callback. This is called whenever any Realm wishes to BIND to the Realm Object Server
         // for the first time.
-        SyncLoginFunction loginLambda = [=](const Realm::Config& config) {
-            REALM_ASSERT(config.sync_config);   // Precondition for object store calling this function.
-            NSString *userTag = @(config.sync_config->user_tag.c_str());
-            NSString *rawURL = @(config.sync_config->realm_url.c_str());
-            NSString *localFilePath = @(config.path.c_str());
+        SyncLoginFunction loginLambda = [=](const std::string& path, const SyncConfig& config) {
+            NSString *localFilePath = @(path.c_str());
+            RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:config];
             dispatch_async(dispatch_get_main_queue(), ^{
-                [self _handleBindRequestForTag:userTag rawURL:rawURL localFilePath:localFilePath];
+                [self _handleBindRequestForSyncConfig:syncConfig
+                                        localFilePath:localFilePath];
             });
         };
 
@@ -169,10 +178,6 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
                                     userInfo:@{@"description": message,
                                                @"error": @(errorCode)}];
             break;
-        case realm::SyncSessionError::SessionTokenExpired:
-            // Just attempt to refresh the session. Don't bother the user.
-            [session _refresh];
-            return;
         case realm::SyncSessionError::Debug:
             // Report the error. There's nothing the user can do about it, though.
             error = [NSError errorWithDomain:RLMSyncErrorDomain
@@ -219,18 +224,20 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     }
 }
 
-- (void)_handleBindRequestForTag:(NSString *)tag
-                          rawURL:(NSString *)urlString
-                   localFilePath:(NSString *)filePathString {
-    RLMSyncUser *user = [self _userForIdentity:tag];
+- (void)_handleBindRequestForSyncConfig:(RLMSyncConfiguration *)syncConfig
+                          localFilePath:(NSString *)filePathString {
+    RLMSyncUser *user = syncConfig.user;
     if (!user || !user.isValid) {
-        // FIXME: should we throw an exception instead? report an error?
+        if (auto session = SyncManager::shared().get_existing_active_session(filePathString.UTF8String)) {
+            session->close_if_connecting();
+        }
         return;
     }
     // FIXME: should the completion block actually do anything?
-    [user _registerRealmForBindingWithFileURL:[NSURL fileURLWithPath:filePathString]
-                                     realmURL:[NSURL URLWithString:urlString]
-                                 onCompletion:nil];
+    [user _registerSessionForBindingWithFileURL:[NSURL fileURLWithPath:filePathString]
+                                     syncConfig:syncConfig
+                              standaloneSession:NO
+                                   onCompletion:nil];
 }
 
 - (NSArray *)_allUsers {

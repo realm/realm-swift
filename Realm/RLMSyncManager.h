@@ -20,7 +20,7 @@
 
 #import "RLMSyncUtil.h"
 
-@class RLMSyncSession;
+@class RLMSyncSession, RLMSyncConfiguration;
 
 typedef NS_ENUM(NSUInteger, RLMSyncLogLevel) {
     RLMSyncLogLevelOff,
@@ -51,6 +51,14 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 @property (nonatomic) RLMSyncLogLevel logLevel;
 
 + (instancetype)sharedManager;
+
+/**
+ Given a sync configuration, open and return a standalone session.
+ 
+ If a standalone session was previously opened but encountered a fatal error, attempting to open an equivalent session
+ (by using the same configuration) will return `nil`.
+ */
+- (nullable RLMSyncSession *)sessionForSyncConfiguration:(RLMSyncConfiguration *)config;
 
 NS_ASSUME_NONNULL_END
 

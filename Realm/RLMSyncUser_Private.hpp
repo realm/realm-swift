@@ -18,10 +18,13 @@
 
 #import "RLMSyncUser.h"
 
+#import "RLMSyncConfiguration.h"
 #import "RLMSyncUtil_Private.h"
 
-#import "shared_realm.hpp"
-#import "sync_metadata.hpp"
+#include "sync_config.hpp"
+#include "sync_metadata.hpp"
+
+@class RLMSyncConfiguration;
 
 @interface RLMSyncUser ()
 
@@ -37,12 +40,12 @@ NS_ASSUME_NONNULL_BEGIN
  Register a Realm to a user.
  
  @param fileURL     The location of the file on disk where the local copy of the Realm will be saved.
- @param realmURL    The fully qualified, unresolved URL of the remote Realm on the Realm Object Server.
  @param completion  An optional completion block.
  */
-- (void)_registerRealmForBindingWithFileURL:(NSURL *)fileURL
-                                   realmURL:(NSURL *)realmURL
-                               onCompletion:(nullable RLMSyncBasicErrorReportingBlock)completion;
+- (RLMSyncSession *)_registerSessionForBindingWithFileURL:(NSURL *)fileURL
+                                               syncConfig:(RLMSyncConfiguration *)syncConfig
+                                        standaloneSession:(BOOL)isStandalone
+                                             onCompletion:(nullable RLMSyncBasicErrorReportingBlock)completion;
 
 - (void)_invalidate;
 - (void)_deregisterSessionWithRealmURL:(NSURL *)realmURL;

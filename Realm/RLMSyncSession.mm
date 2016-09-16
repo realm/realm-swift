@@ -21,20 +21,26 @@
 #import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
 #import "RLMRealmConfiguration+Sync.h"
+#import "RLMSyncConfiguration.h"
 #import "RLMSyncManager_Private.hpp"
+#import "RLMSyncSessionHandle.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil.h"
 #import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
-@implementation RLMRealmBindingPackage
+#import "sync_manager.hpp"
+
+@implementation RLMSessionBindingPackage
 
 - (instancetype)initWithFileURL:(NSURL *)fileURL
-                       realmURL:(NSURL *)realmURL
+                     syncConfig:(RLMSyncConfiguration *)syncConfig
+                     standalone:(BOOL)isStandalone
                           block:(RLMSyncBasicErrorReportingBlock)block {
     if (self = [super init]) {
         self.fileURL = fileURL;
-        self.realmURL = realmURL;
+        self.syncConfig = syncConfig;
+        self.isStandalone = isStandalone;
         self.block = block;
         return self;
     }
@@ -49,6 +55,8 @@
 @property (nonatomic, readwrite) RLMSyncUser *parentUser;
 @property (nonatomic, readwrite) NSURL *realmURL;
 
+@property (nullable, nonatomic) RLMSyncSessionHandle *sessionHandle;
+
 @end
 
 @implementation RLMSyncSession
@@ -59,7 +67,7 @@
         self.realmURL = realmURL;
         self.resolvedPath = nil;
         self.deferredBindingPackage = nil;
-        self.state = RLMSyncSessionStateUnbound;
+        _state = RLMSyncSessionStateUnbound;
         return self;
     }
     return nil;
@@ -73,19 +81,29 @@
     return nil;
 }
 
+- (void)_logOut {
+    [self.sessionHandle logOut];
+    [self _invalidate];
+}
+
 - (void)_invalidate {
     [self.refreshTimer invalidate];
-    self.state = RLMSyncSessionStateInvalid;
+    _state = RLMSyncSessionStateInvalid;
+    self.sessionHandle = nil;
     [self.parentUser _deregisterSessionWithRealmURL:self.realmURL];
     self.parentUser = nil;
 }
 
 #pragma mark - per-Realm access token API
 
-- (void)configureWithAccessToken:(RLMServerToken)token expiry:(NSTimeInterval)expiry user:(RLMSyncUser *)user {
+- (void)configureWithAccessToken:(RLMServerToken)token
+                          expiry:(NSTimeInterval)expiry
+                            user:(RLMSyncUser *)user
+                          handle:(RLMSyncSessionHandle *)handle {
     self.parentUser = user;
     self.accessToken = token;
     self.accessTokenExpiry = expiry;
+    self.sessionHandle = handle;
     [self _scheduleRefreshTimer];
 }
 
@@ -138,10 +156,7 @@
                 self.accessTokenExpiry = tokenModel.tokenData.expires;
                 [self _scheduleRefreshTimer];
 
-                realm::Realm::refresh_sync_access_token(std::string([tokenModel.token UTF8String]),
-                                                        RLMStringDataWithNSString([self.fileURL path]),
-                                                        realm::util::none);
-                self.state = RLMSyncSessionStateActive;
+                [self refreshAccessToken:tokenModel.token serverURL:nil];
             }
         } else {
             // Something else went wrong
@@ -157,7 +172,22 @@
                                  completion:handler];
 }
 
+- (void)refreshAccessToken:(NSString *)token serverURL:(NSURL *)serverURL
+{
+    if ([self.sessionHandle refreshAccessToken:token serverURL:serverURL]) {
+        self.state = RLMSyncSessionStateActive;
+    }
+    else {
+        [self _invalidate];
+    }
+}
+
 - (void)setState:(RLMSyncSessionState)state {
+    // At all state transitions, check to see if the session should be invalidated.
+    if ([self.sessionHandle sessionIsInErrorState]) {
+        [self _invalidate];
+        return;
+    }
     _state = state;
     if (state == RLMSyncSessionStateActive) {
         self.deferredBindingPackage = nil;
