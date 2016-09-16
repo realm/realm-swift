@@ -22,6 +22,15 @@ import Foundation
 
 #if swift(>=3.0)
 
+class RandomDefaultObject: Object {
+    dynamic var intCol = Int(arc4random())
+    dynamic var floatCol = Float(arc4random()) / 1000
+    dynamic var doubleCol = Double(arc4random()) / 1000
+    dynamic var dateCol = Date(timeIntervalSinceReferenceDate: TimeInterval(arc4random()))
+    dynamic var stringCol = UUID().uuidString
+    dynamic var binaryCol = UUID().uuidString.data(using: .utf8)
+}
+
 class ObjectTests: TestCase {
 
     // init() Tests are in ObjectCreationTests.swift
@@ -192,6 +201,22 @@ class ObjectTests: TestCase {
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDataCol"]!.isIndexed)
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalFloatCol"]!.isIndexed)
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDoubleCol"]!.isIndexed)
+    }
+
+    func testRandomDefaultPropertyValues() {
+        func assertDifferentPropertyValues(_ obj1: RandomDefaultObject, _ obj2: RandomDefaultObject) {
+            XCTAssertNotEqual(obj1.intCol, obj2.intCol)
+            XCTAssertNotEqual(obj1.floatCol, obj2.floatCol)
+            XCTAssertNotEqual(obj1.doubleCol, obj2.doubleCol)
+            XCTAssertNotEqualWithAccuracy(obj1.dateCol.timeIntervalSinceReferenceDate, obj2.dateCol.timeIntervalSinceReferenceDate, 0.01)
+            XCTAssertNotEqual(obj1.stringCol, obj2.stringCol)
+            XCTAssertNotEqual(obj1.binaryCol, obj2.binaryCol)
+        }
+        assertDifferentPropertyValues(RandomDefaultObject(), RandomDefaultObject())
+        let realm = try! Realm()
+        try! realm.write {
+            assertDifferentPropertyValues(realm.create(RandomDefaultObject.self), realm.create(RandomDefaultObject.self))
+        }
     }
 
     func testValueForKey() {
@@ -409,6 +434,15 @@ class ObjectTests: TestCase {
 
 #else
 
+class RandomDefaultObject: Object {
+    dynamic var intCol = Int(arc4random())
+    dynamic var floatCol = Float(arc4random()) / 1000
+    dynamic var doubleCol = Double(arc4random()) / 1000
+    dynamic var dateCol = NSDate(timeIntervalSinceReferenceDate: NSTimeInterval(arc4random()))
+    dynamic var stringCol = NSUUID().UUIDString
+    dynamic var binaryCol = NSUUID().UUIDString.dataUsingEncoding(NSUTF8StringEncoding)
+}
+
 class ObjectTests: TestCase {
 
     // init() Tests are in ObjectCreationTests.swift
@@ -579,6 +613,22 @@ class ObjectTests: TestCase {
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDataCol"]!.indexed)
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalFloatCol"]!.indexed)
         XCTAssertFalse(SwiftIndexedOptionalPropertiesObject().objectSchema["optionalDoubleCol"]!.indexed)
+    }
+
+    func testRandomDefaultPropertyValues() {
+        func assertDifferentPropertyValues(obj1: RandomDefaultObject, _ obj2: RandomDefaultObject) {
+            XCTAssertNotEqual(obj1.intCol, obj2.intCol)
+            XCTAssertNotEqual(obj1.floatCol, obj2.floatCol)
+            XCTAssertNotEqual(obj1.doubleCol, obj2.doubleCol)
+            XCTAssertNotEqualWithAccuracy(obj1.dateCol.timeIntervalSinceReferenceDate, obj2.dateCol.timeIntervalSinceReferenceDate, 0.01)
+            XCTAssertNotEqual(obj1.stringCol, obj2.stringCol)
+            XCTAssertNotEqual(obj1.binaryCol, obj2.binaryCol)
+        }
+        assertDifferentPropertyValues(RandomDefaultObject(), RandomDefaultObject())
+        let realm = try! Realm()
+        try! realm.write {
+            assertDifferentPropertyValues(realm.create(RandomDefaultObject.self), realm.create(RandomDefaultObject.self))
+        }
     }
 
     func testValueForKey() {

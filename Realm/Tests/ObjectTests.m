@@ -55,6 +55,27 @@
 @end
 
 
+@interface RandomDefaultObject : RLMObject
+@property int       intCol;
+@property float     floatCol;
+@property double    doubleCol;
+@property NSDate   *dateCol;
+@property NSString *stringCol;
+@property NSData   *binaryCol;
+@end
+
+@implementation RandomDefaultObject
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"intCol" : @(arc4random()),
+             @"floatCol" : @(arc4random() / 1000.0f),
+             @"doubleCol" : @(arc4random() / 1000.0),
+             @"dateCol" : [NSDate dateWithTimeIntervalSince1970:arc4random()],
+             @"stringCol" : [[NSUUID UUID] UUIDString],
+             @"binaryCol" : [[[NSUUID UUID] UUIDString] dataUsingEncoding:NSUTF8StringEncoding]};
+}
+@end
+
+
 @interface IgnoredURLObject : RLMObject
 @property NSString *name;
 @property NSURL *url;
@@ -1240,6 +1261,22 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     assertDefaults([NumberDefaultsObject createInRealm:realm withValue:@{}]);
+    [realm cancelWriteTransaction];
+}
+
+- (void)testRandomDefaultPropertyValues {
+    void (^assertDifferentPropertyValues)(RandomDefaultObject *, RandomDefaultObject *) = ^(RandomDefaultObject *obj1, RandomDefaultObject *obj2) {
+        XCTAssertNotEqual(obj1.intCol, obj2.intCol);
+        XCTAssertNotEqual(obj1.floatCol, obj2.floatCol);
+        XCTAssertNotEqual(obj1.doubleCol, obj2.doubleCol);
+        XCTAssertNotEqualWithAccuracy(obj1.dateCol.timeIntervalSinceReferenceDate, obj2.dateCol.timeIntervalSinceReferenceDate, 0.01f);
+        XCTAssertNotEqualObjects(obj1.stringCol, obj2.stringCol);
+        XCTAssertNotEqualObjects(obj1.binaryCol, obj2.binaryCol);
+    };
+    assertDifferentPropertyValues([[RandomDefaultObject alloc] init], [[RandomDefaultObject alloc] init]);
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    assertDifferentPropertyValues([RandomDefaultObject createInRealm:realm withValue:@{}], [RandomDefaultObject createInRealm:realm withValue:@{}]);
     [realm cancelWriteTransaction];
 }
 
