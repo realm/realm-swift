@@ -22,11 +22,6 @@
 
 @class RLMSyncUser, RLMSyncCredential, RLMSyncSession, RLMRealm;
 
-typedef NS_OPTIONS(NSUInteger, RLMAuthenticationActions) {
-    RLMAuthenticationActionsCreateAccount            = 1 << 0,
-    RLMAuthenticationActionsUseExistingAccount       = 1 << 1,
-};
-
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
 typedef void(^RLMFetchedRealmCompletionBlock)(NSError * _Nullable, RLMRealm * _Nullable, BOOL * _Nonnull);
 
@@ -57,22 +52,19 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) BOOL isValid;
 
++ (void)authenticateWithCredential:(RLMSyncCredential *)credential
+                     authServerURL:(NSURL *)authServerURL
+                           timeout:(NSTimeInterval)timeout
+                      onCompletion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
+
 /**
  Create, log in, and asynchronously return a new user object. A credential identifying the user must be passed in. The
  user becomes available in the completion block, at which point it is guaranteed to be non-anonymous and ready for use
  opening synced Realms.
  */
 + (void)authenticateWithCredential:(RLMSyncCredential *)credential
-                           actions:(RLMAuthenticationActions)actions
                      authServerURL:(NSURL *)authServerURL
-                           timeout:(NSTimeInterval)timeout
-                      onCompletion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
-
-+ (void)authenticateWithCredential:(RLMSyncCredential *)credential
-                           actions:(RLMAuthenticationActions)actions
-                     authServerURL:(NSURL *)authServerURL
-                      onCompletion:(RLMUserCompletionBlock)completion
-NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
+                      onCompletion:(RLMUserCompletionBlock)completion NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 /**
  Log a user out, destroying their server state, deregistering them from the SDK, and removing any synced Realms

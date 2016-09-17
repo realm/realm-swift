@@ -38,6 +38,7 @@ extern NSString *const kRLMSyncPathKey;
 extern NSString *const kRLMSyncProviderKey;
 extern NSString *const kRLMSyncRegisterKey;
 extern NSString *const kRLMSyncUnderlyingErrorKey;
+extern NSString *const kRLMSyncActionsKey;
 
 NS_ASSUME_NONNULL_END
 

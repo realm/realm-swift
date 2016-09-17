@@ -63,8 +63,10 @@ public struct Credential {
         return Credential(RLMSyncCredential(facebookToken: token))
     }
 
-    public static func usernamePassword(username: String, password: String) -> Credential {
-        return Credential(RLMSyncCredential(username: username, password: password))
+    public static func usernamePassword(username: String,
+                                        password: String,
+                                        actions: AuthenticationActions) -> Credential {
+        return Credential(RLMSyncCredential(username: username, password: password, actions: actions))
     }
 
     public static func accessToken(_ accessToken: String, identity: String) -> Credential {
@@ -80,12 +82,10 @@ extension RLMSyncCredential {
 
 extension User {
     public static func authenticate(with credential: Credential,
-                                    actions: AuthenticationActions,
                                     server authServerURL: URL,
                                     timeout: TimeInterval = 30,
-                                    onCompletion completion: UserCompletionBlock) {
+                                    onCompletion completion: @escaping UserCompletionBlock) {
         return User.__authenticate(with: RLMSyncCredential(credential),
-                                   actions: actions,
                                    authServerURL: authServerURL,
                                    timeout: timeout,
                                    onCompletion: completion)
@@ -119,8 +119,10 @@ public struct Credential {
         return Credential(RLMSyncCredential(facebookToken: token))
     }
 
-    public static func usernamePassword(username: String, password: String) -> Credential {
-        return Credential(RLMSyncCredential(username: username, password: password))
+    public static func usernamePassword(username: String,
+                                        password: String,
+                                        actions: AuthenticationActions) -> Credential {
+        return Credential(RLMSyncCredential(username: username, password: password, actions: actions))
     }
 
     public static func accessToken(accessToken: String, identity: String) -> Credential {
@@ -138,12 +140,10 @@ extension RLMSyncCredential {
 extension User {
 
     public static func authenticateWithCredential(credential: Credential,
-                                                  actions: AuthenticationActions,
                                                   authServerURL: NSURL,
                                                   timeout: NSTimeInterval = 30,
                                                   onCompletion completion: UserCompletionBlock) {
         return User.__authenticateWithCredential(RLMSyncCredential(credential),
-                                                 actions: actions,
                                                  authServerURL: authServerURL,
                                                  timeout: timeout,
                                                  onCompletion: completion)
