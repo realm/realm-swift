@@ -24,6 +24,12 @@
 static NSString *const RLMSyncUtilityFolderName = @"io.realm.object-server-metadata";
 static NSString *const RLMSyncMetadataRealmName = @"sync_metadata.realm";
 
+/// Given an `NSError` outputted from a call to `removeItemAtURL:error:`, return whether or not we should consider the
+/// file deletion a success.
+static BOOL fileDeletionSucceeded(NSError * _Nullable error) {
+    return !error || (error.domain == NSCocoaErrorDomain && error.code == NSFileNoSuchFileError);
+}
+
 @implementation RLMSyncFileManager
 
 /**
@@ -113,6 +119,25 @@ static NSString *const RLMSyncMetadataRealmName = @"sync_metadata.realm";
     NSURL *userDir = [self _folderPathForUserIdentity:identity];
     NSFileManager *manager = [NSFileManager defaultManager];
     return [manager removeItemAtURL:userDir error:error];
+}
+
++ (BOOL)deleteRealmAtPath:(NSURL *)realmPath {
+    BOOL success = YES;
+    NSFileManager *manager = [NSFileManager defaultManager];
+    // Delete the primary Realm file.
+    NSError *error = nil;
+    [manager removeItemAtURL:realmPath error:&error];
+    success = success && fileDeletionSucceeded(error);
+    // Delete the lock file.
+    error = nil;
+    NSURL *lockURL = [realmPath URLByAppendingPathExtension:@"lock"];
+    [manager removeItemAtURL:lockURL error:&error];
+    success = success && fileDeletionSucceeded(error);
+    // Delete the management directory.
+    NSURL *managementURL = [realmPath URLByAppendingPathExtension:@"management"];
+    [manager removeItemAtURL:managementURL error:nil];
+    success = success && fileDeletionSucceeded(error);
+    return success;
 }
 
 @end

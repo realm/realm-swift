@@ -20,8 +20,8 @@
 
 #import "RLMSyncCredential.h"
 
-typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
+typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
 
 typedef NSString* RLMServerPath;
 

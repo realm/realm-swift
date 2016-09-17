@@ -20,6 +20,7 @@
 
 #import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
+#import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.h"
@@ -111,6 +112,26 @@ using namespace realm;
     metadata.mark_for_removal();
 }
 
+- (void)getRealmForURL:(NSURL *)realmURL onCompletion:(RLMFetchedRealmCompletionBlock)completion {
+    RLMSyncConfigCompletionBlock theBlock = ^BOOL(NSError *error, RLMRealmConfiguration *config, RLMSyncSession *session) {
+        if (error) {
+            completion(error, nil);
+            return NO;
+        }
+        NSError *openRealmError = nil;
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:&openRealmError];
+        if (error) {
+            completion(error, nil);
+            return NO;
+        }
+        BOOL keepRealm = completion(nil, realm);
+        // Keep session alive until Realm has been opened
+        session = nil;
+        return keepRealm;
+    };
+    [self _getRealmAtURL:realmURL onConfigCompletion:theBlock];
+}
+
 - (nullable RLMSyncSession *)sessionForURL:(NSURL *)url {
     RLMSyncSession *session = [self.sessionsStorage objectForKey:url];
     RLMSyncSessionHandle *handle = [session sessionHandle];
@@ -147,10 +168,42 @@ using namespace realm;
     self.state = RLMSyncUserStateActive;
 }
 
+- (void)_getRealmAtURL:(NSURL *)realmURL onConfigCompletion:(RLMSyncConfigCompletionBlock)completion {
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self realmURL:realmURL];
+    config.syncConfiguration = syncConfig;
+
+    RLMSyncSessionCompletionBlock sessionCompletion = ^(NSError *error, RLMSyncSession *session) {
+        if (error) {
+            completion(error, nil, nil);
+            return;
+        }
+        RLMSyncSessionHandle *handle = [session sessionHandle];
+        [handle waitForDownloadCompletionOnQueue:dispatch_get_main_queue() callback:^{
+            if ([handle sessionIsInErrorState]) {
+                // The download waiter "completed" because of an error. Report it to the client.
+                NSError *error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                     code:RLMSyncErrorClientSessionError
+                                                 userInfo:nil];
+                completion(error, nil, nil);
+                return;
+            }
+            BOOL keepRealm = completion(nil, config, session);
+            if (!keepRealm) {
+                // Mark the Realm as needing to be thrown out.
+                [session _markFilesForDeletion];
+            }
+        }];
+    };
+    [[RLMSyncManager sharedManager] _fetchSessionForFetchingRealm:syncConfig
+                                                     onCompletion:sessionCompletion];
+
+}
+
 - (void)_deregisterSessionWithRealmURL:(NSURL *)realmURL {
     [self.sessionsStorage removeObjectForKey:realmURL];
 }
-    
+
 - (instancetype)initWithMetadata:(SyncUserMetadata)metadata {
     NSURL *url = nil;
     if (metadata.server_url()) {
@@ -309,7 +362,7 @@ using namespace realm;
         if (session.state == RLMSyncSessionStateUnbound && package) {
             [self _bindSessionWithLocalFileURL:package.fileURL
                                     syncConfig:package.syncConfig
-                                    standalone:package.isStandalone
+                                       purpose:package.purpose
                                   onCompletion:package.block];
         }
     }
@@ -329,8 +382,8 @@ using namespace realm;
 - (void)_bindSessionWithDirectAccessToken:(RLMServerToken)accessToken
                                syncConfig:(RLMSyncConfiguration *)syncConfig
                              localFileURL:(NSURL *)fileURL
-                               standalone:(BOOL)isStandalone
-                             onCompletion:(RLMSyncBasicErrorReportingBlock)completion {
+                                  purpose:(RLMSyncSessionPurpose)purpose
+                             onCompletion:(RLMSyncSessionCompletionBlock)completion {
     NSURL *realmURL = syncConfig.realmURL;
     RLMSyncSession *session = self.sessionsStorage[realmURL];
     std::string file_path = [[fileURL path] UTF8String];
@@ -338,10 +391,14 @@ using namespace realm;
 
     RLMSyncSessionHandle *sessionHandle;
     auto underlyingSession = SyncManager::shared().get_session(file_path, syncConfig.rawConfiguration);
-    if (isStandalone) {
-        sessionHandle = [RLMSyncSessionHandle syncSessionHandleForPointer:underlyingSession];
-    } else {
-        sessionHandle = [RLMSyncSessionHandle syncSessionHandleForWeakPointer:underlyingSession];
+    switch (purpose) {
+        case RLMSyncSessionPurposeOpenRealm:
+            sessionHandle = [RLMSyncSessionHandle syncSessionHandleForWeakPointer:underlyingSession];
+            break;
+        case RLMSyncSessionPurposeFetchRealm:
+        case RLMSyncSessionPurposeStandalone:
+            sessionHandle = [RLMSyncSessionHandle syncSessionHandleForPointer:underlyingSession];
+            break;
     }
     [session configureWithAccessToken:accessToken
                                expiry:[[NSDate distantFuture] timeIntervalSince1970]
@@ -351,17 +408,33 @@ using namespace realm;
 
     if (completion) {
         bool success = session.state != RLMSyncSessionStateInvalid;
-        completion(success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
-                                                       code:RLMSyncErrorClientSessionError
-                                                   userInfo:nil]);
+        NSError *error = success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
+                                                             code:RLMSyncErrorClientSessionError
+                                                         userInfo:nil];
+        completion(error, success ? session : nil);
     }
 }
 
 // Immediately begin the handshake to get the resolved remote path and the access token.
 - (void)_bindSessionWithLocalFileURL:(NSURL *)fileURL
                           syncConfig:(RLMSyncConfiguration *)syncConfig
-                          standalone:(BOOL)isStandalone
-                        onCompletion:(RLMSyncBasicErrorReportingBlock)completion {
+                             purpose:(RLMSyncSessionPurpose)purpose
+                        onCompletion:(RLMSyncSessionCompletionBlock)completion {
+    switch (purpose) {
+        case RLMSyncSessionPurposeFetchRealm:
+            break;
+        case RLMSyncSessionPurposeOpenRealm:
+        case RLMSyncSessionPurposeStandalone:
+            // If a Realm was previously fetched, opening it again via another method should ensure it does not get
+            // discarded (even if it were set to be discarded when fetched).
+            std::string path = [[fileURL path] UTF8String];
+            auto action = [[RLMSyncManager sharedManager] _metadataManager].get_existing_file_action(std::move(path));
+            if (action) {
+                action->remove();
+            }
+            break;
+    }
+
     if (self.directAccessToken) {
         /// Like with the normal authentication methods below, make binding asynchronous so we don't recursively
         /// try to acquire the session lock.
@@ -369,7 +442,7 @@ using namespace realm;
             [self _bindSessionWithDirectAccessToken:self.directAccessToken
                                          syncConfig:syncConfig
                                        localFileURL:fileURL
-                                         standalone:isStandalone
+                                            purpose:purpose
                                        onCompletion:completion];
         });
         return;
@@ -395,7 +468,7 @@ using namespace realm;
                                             code:RLMSyncErrorBadResponse
                                         userInfo:@{kRLMSyncErrorJSONKey: json}];
                 if (completion) {
-                    completion(error);
+                    completion(error, nil);
                 }
                 [[RLMSyncManager sharedManager] _fireError:error];
                 return;
@@ -415,10 +488,14 @@ using namespace realm;
                          unresolvedPath);
                 RLMSyncSessionHandle *sessionHandle;
                 auto underlyingSession = SyncManager::shared().get_session(file_path, syncConfig.rawConfiguration);
-                if (isStandalone) {
-                    sessionHandle = [RLMSyncSessionHandle syncSessionHandleForPointer:underlyingSession];
-                } else {
-                    sessionHandle = [RLMSyncSessionHandle syncSessionHandleForWeakPointer:underlyingSession];
+                switch (purpose) {
+                    case RLMSyncSessionPurposeOpenRealm:
+                        sessionHandle = [RLMSyncSessionHandle syncSessionHandleForWeakPointer:underlyingSession];
+                        break;
+                    case RLMSyncSessionPurposeFetchRealm:
+                    case RLMSyncSessionPurposeStandalone:
+                        sessionHandle = [RLMSyncSessionHandle syncSessionHandleForPointer:underlyingSession];
+                        break;
                 }
                 [session configureWithAccessToken:accessToken
                                            expiry:tokenModel.tokenData.expires
@@ -436,9 +513,10 @@ using namespace realm;
 
                 if (completion) {
                     bool success = session.state != RLMSyncSessionStateInvalid;
-                    completion(success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
-                                                                   code:RLMSyncErrorClientSessionError
-                                                               userInfo:nil]);
+                    NSError *error = success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
+                                                                         code:RLMSyncErrorClientSessionError
+                                                                     userInfo:nil];
+                    completion(error, success ? session : nil);
                 }
             }
         } else {
@@ -447,7 +525,7 @@ using namespace realm;
                                                      code:RLMSyncErrorBadResponse
                                                  userInfo:@{kRLMSyncUnderlyingErrorKey: error}];
             if (completion) {
-                completion(syncError);
+                completion(syncError, nil);
             }
             [[RLMSyncManager sharedManager] _fireError:syncError];
         }
@@ -461,8 +539,8 @@ using namespace realm;
 // A callback handler for a Realm, used to get an updated access token which can then be used to bind the Realm.
 - (RLMSyncSession *)_registerSessionForBindingWithFileURL:(NSURL *)fileURL
                                                syncConfig:(RLMSyncConfiguration *)syncConfig
-                                        standaloneSession:(BOOL)isStandalone
-                                             onCompletion:(nullable RLMSyncBasicErrorReportingBlock)completion {
+                                                  purpose:(RLMSyncSessionPurpose)purpose
+                                             onCompletion:(nullable RLMSyncSessionCompletionBlock)completion {
     NSURL *realmURL = syncConfig.realmURL;
     if (RLMSyncSession *session = [self.sessionsStorage objectForKey:realmURL]) {
         RLMSyncSessionHandle *handle = [session sessionHandle];
@@ -470,7 +548,7 @@ using namespace realm;
         if ([handle sessionStillExists]) {
             [session _refresh];
             if (completion) {
-                completion(nil);
+                completion(nil, session);
             }
             return session;
         } else if ([handle sessionIsInErrorState]) {
@@ -479,7 +557,7 @@ using namespace realm;
                 NSError *error = [NSError errorWithDomain:RLMSyncErrorDomain
                                                      code:RLMSyncErrorClientSessionError
                                                  userInfo:nil];
-                completion(error);
+                completion(error, nil);
             }
             return nil;
         }
@@ -492,13 +570,13 @@ using namespace realm;
         // We will delay the path resolution/access token handshake until the user logs in.
         session.deferredBindingPackage = [[RLMSessionBindingPackage alloc] initWithFileURL:fileURL
                                                                                 syncConfig:syncConfig
-                                                                                standalone:isStandalone
+                                                                                   purpose:purpose
                                                                                      block:completion];
     } else {
         // User is logged in, start the handshake immediately.
         [self _bindSessionWithLocalFileURL:fileURL
                                 syncConfig:syncConfig
-                                standalone:isStandalone
+                                   purpose:purpose
                               onCompletion:completion];
     }
     return session;

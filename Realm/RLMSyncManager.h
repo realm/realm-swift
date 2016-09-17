@@ -22,6 +22,9 @@
 
 @class RLMSyncSession, RLMSyncConfiguration;
 
+/// A block type allowing an API to vend a sync session asynchronously.
+typedef void(^RLMSyncSessionCompletionBlock)(NSError * _Nullable, RLMSyncSession * _Nullable);
+
 /// An enum representing different levels of sync-related logging that can be configured.
 typedef NS_ENUM(NSUInteger, RLMSyncLogLevel) {
     /// Nothing will ever be logged.
@@ -90,6 +93,15 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 
 /// The sole instance of the singleton.
 + (instancetype)sharedManager;
+
+/**
+ Given a sync configuration, open and return a standalone session.
+
+ If a standalone session was previously opened but encountered a fatal error, attempting to open an equivalent session
+ (by using the same configuration) will return `nil`.
+ */
+- (void)fetchSessionForSyncConfiguration:(RLMSyncConfiguration *)config
+                            onCompletion:(nullable RLMSyncSessionCompletionBlock)completion;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncManager cannot be created directly")));

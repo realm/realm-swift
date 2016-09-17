@@ -85,6 +85,11 @@ public typealias SyncLogLevel = RLMSyncLogLevel
  */
 public typealias Provider = RLMIdentityProvider
 
+/**
+ A closure type that allows an API to vend a Realm asynchronously.
+ */
+public typealias GetRealmCompletionBlock = (Swift.Error?, Realm?) -> Bool
+
 /// A `Credential` represents data that uniquely identifies a Realm Object Server user.
 public struct Credential {
     public typealias Token = String
@@ -153,9 +158,35 @@ extension User {
                                    timeout: timeout,
                                    onCompletion: completion)
     }
+
+    public func getRealm(at url: URL, completion: @escaping GetRealmCompletionBlock) {
+        let theBlock: RLMSyncConfigCompletionBlock = { (error, config, session) in
+            if let error = error {
+                _ = completion(error, nil)
+                return false
+            }
+            guard let config = config else {
+                fatalError("Internal error: if error is nil, config can never be nil")
+            }
+            do {
+                let swiftConfig = Realm.Configuration.fromRLMRealmConfiguration(rlmConfiguration: config)
+                let realm = try Realm(configuration: swiftConfig)
+                return completion(nil, realm)
+            } catch let error {
+                _ = completion(error, nil)
+                return false
+            }
+        }
+        _getRealm(at: url, onConfigCompletion: theBlock)
+    }
 }
 
 #else
+
+/**
+ A closure type that allows an API to vend a Realm asynchronously.
+ */
+public typealias GetRealmCompletionBlock = (NSError?, Realm?) -> Bool
 
 /**
  A data type whose values represent different authentication providers that can be used with the Realm Object Server.
@@ -232,6 +263,27 @@ extension User {
                                                  authServerURL: authServerURL,
                                                  timeout: timeout,
                                                  onCompletion: completion)
+    }
+
+    public func getRealm(at url: NSURL, completion: GetRealmCompletionBlock) {
+        let theBlock: RLMSyncConfigCompletionBlock = { (error, config, session) in
+            if let error = error {
+                _ = completion(error, nil)
+                return false
+            }
+            guard let config = config else {
+                fatalError("Internal error: if error is nil, config can never be nil")
+            }
+            do {
+                let swiftConfig = Realm.Configuration.fromRLMRealmConfiguration(config)
+                let realm = try Realm(configuration: swiftConfig)
+                return completion(nil, realm)
+            } catch let error as NSError {
+                _ = completion(error, nil)
+                return false
+            }
+        }
+        _getRealmAtURL(url, onConfigCompletion: theBlock)
     }
 }
 

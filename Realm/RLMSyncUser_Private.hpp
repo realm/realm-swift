@@ -16,42 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncUser.h"
+#import "RLMSyncUser_Private.h"
 
-#import "RLMSyncConfiguration.h"
-#import "RLMSyncUtil_Private.h"
-
-#include "sync_config.hpp"
-#include "sync_metadata.hpp"
-
-@class RLMSyncConfiguration;
-
-typedef void(^RLMFetchedRealmCompletionBlock)(NSError * _Nullable, RLMRealm * _Nullable, BOOL * _Nonnull);
+#import "sync_config.hpp"
+#import "sync_metadata.hpp"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncUser ()
 
-@property (nullable, nonatomic) RLMServerToken refreshToken;
-
 /// Create a user based on a `SyncUserMetadata` object. This method does NOT register the user to the sync manager's
 /// user store.
 - (instancetype)initWithMetadata:(realm::SyncUserMetadata)metadata;
 
-/**
- Register a Realm to a user.
- 
- @param fileURL     The location of the file on disk where the local copy of the Realm will be saved.
- @param completion  An optional completion block.
- */
-- (nullable RLMSyncSession *)_registerSessionForBindingWithFileURL:(NSURL *)fileURL
-                                                        syncConfig:(RLMSyncConfiguration *)syncConfig
-                                                 standaloneSession:(BOOL)isStandalone
-                                                      onCompletion:(nullable RLMSyncBasicErrorReportingBlock)completion;
-
-- (void)setState:(RLMSyncUserState)state;
-- (void)_deregisterSessionWithRealmURL:(NSURL *)realmURL;
+@end
 
 NS_ASSUME_NONNULL_END
-
-@end

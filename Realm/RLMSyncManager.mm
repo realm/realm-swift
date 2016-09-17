@@ -87,12 +87,22 @@ static dispatch_once_t s_onceToken;
     return s_sharedManager;
 }
 
-- (RLMSyncSession *)sessionForSyncConfiguration:(RLMSyncConfiguration *)config {
+- (void)fetchSessionForSyncConfiguration:(RLMSyncConfiguration *)config
+                            onCompletion:(nullable RLMSyncSessionCompletionBlock)completion {
     NSURL *fileURL = [RLMSyncFileManager fileURLForRawRealmURL:config.realmURL user:config.user];
-    return [config.user _registerSessionForBindingWithFileURL:fileURL
-                                                   syncConfig:config
-                                            standaloneSession:YES
-                                                 onCompletion:nil];
+    [config.user _registerSessionForBindingWithFileURL:fileURL
+                                            syncConfig:config
+                                               purpose:RLMSyncSessionPurposeStandalone
+                                          onCompletion:completion];
+}
+
+- (void)_fetchSessionForFetchingRealm:(RLMSyncConfiguration *)config
+                         onCompletion:(RLMSyncSessionCompletionBlock)completion {
+    NSURL *fileURL = [RLMSyncFileManager fileURLForRawRealmURL:config.realmURL user:config.user];
+    [config.user _registerSessionForBindingWithFileURL:fileURL
+                                            syncConfig:config
+                                               purpose:RLMSyncSessionPurposeFetchRealm
+                                          onCompletion:completion];
 }
 
 - (instancetype)initPrivate {
@@ -128,6 +138,7 @@ static dispatch_once_t s_onceToken;
         NSString *metadataDirectory = [[RLMSyncFileManager fileURLForMetadata] path];
         bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION");
         _metadata_manager = std::make_unique<SyncMetadataManager>([metadataDirectory UTF8String], should_encrypt);
+        [self _performFileActions];
         [self _cleanUpMarkedUsers];
         [self _loadPersistedUsers];
         return self;
@@ -260,6 +271,32 @@ static dispatch_once_t s_onceToken;
     }
 }
 
+- (void)_performFileActions {
+    @synchronized (self) {
+        std::vector<SyncFileActionMetadata> remove_queue;
+        // Get and execute the outstanding tasks.
+        SyncFileActionMetadataResults outstanding = _metadata_manager->all_file_actions();
+        for (size_t i=0; i<outstanding.size(); i++) {
+            SyncFileActionMetadata task = outstanding.get(i);
+            switch (task.action()) {
+                case SyncFileActionMetadata::Action::DeleteRealmFiles: {
+                    NSURL *realmURL = [NSURL fileURLWithPath:@(task.current_path().c_str())];
+                    if ([RLMSyncFileManager deleteRealmAtPath:realmURL]) {
+                        remove_queue.emplace_back(std::move(task));
+                    }
+                    break;
+                }
+                case SyncFileActionMetadata::Action::MoveRealmFiles:
+                    // FIXME: implement this once we need it
+                    break;
+            }
+        }
+        for (auto task : remove_queue) {
+            task.remove();
+        }
+    }
+}
+
 - (void)_handleBindRequestForSyncConfig:(RLMSyncConfiguration *)syncConfig
                           localFilePath:(NSString *)filePathString {
     @synchronized(self) {
@@ -272,7 +309,7 @@ static dispatch_once_t s_onceToken;
             // FIXME: should the completion block actually do anything?
             [user _registerSessionForBindingWithFileURL:[NSURL fileURLWithPath:filePathString]
                                              syncConfig:syncConfig
-                                      standaloneSession:NO
+                                                purpose:RLMSyncSessionPurposeOpenRealm
                                            onCompletion:self.sessionCompletionNotifier];
         }
     }

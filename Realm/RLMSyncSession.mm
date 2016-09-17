@@ -23,24 +23,26 @@
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration.h"
 #import "RLMSyncManager_Private.hpp"
+#import "RLMSyncSession_Private.h"
 #import "RLMSyncSessionHandle.hpp"
-#import "RLMSyncUser_Private.hpp"
+#import "RLMSyncUser_Private.h"
 #import "RLMSyncUtil.h"
 #import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
 #import "sync_manager.hpp"
+#import "sync_metadata.hpp"
 
 @implementation RLMSessionBindingPackage
 
 - (instancetype)initWithFileURL:(NSURL *)fileURL
                      syncConfig:(RLMSyncConfiguration *)syncConfig
-                     standalone:(BOOL)isStandalone
-                          block:(RLMSyncBasicErrorReportingBlock)block {
+                        purpose:(RLMSyncSessionPurpose)purpose
+                          block:(RLMSyncSessionCompletionBlock)block {
     if (self = [super init]) {
         self.fileURL = fileURL;
         self.syncConfig = syncConfig;
-        self.isStandalone = isStandalone;
+        self.purpose = purpose;
         self.block = block;
         return self;
     }
@@ -54,8 +56,6 @@
 @property (nonatomic, readwrite) RLMSyncSessionState state;
 @property (nonatomic, readwrite) RLMSyncUser *parentUser;
 @property (nonatomic, readwrite) NSURL *realmURL;
-
-@property (nullable, nonatomic) RLMSyncSessionHandle *sessionHandle;
 
 @end
 
@@ -93,6 +93,12 @@
     self.sessionHandle = nil;
     [self.parentUser _deregisterSessionWithRealmURL:self.realmURL];
     self.parentUser = nil;
+}
+
+- (void)_markFilesForDeletion {
+    realm::SyncFileActionMetadata file_action_metadata([[RLMSyncManager sharedManager] _metadataManager],
+                                                       realm::SyncFileActionMetadata::Action::DeleteRealmFiles,
+                                                       [[self.fileURL path] UTF8String]);
 }
 
 #pragma mark - per-Realm access token API
@@ -160,8 +166,9 @@
                 self.accessToken = model.accessToken.token;
                 self.accessTokenExpiry = tokenModel.tokenData.expires;
                 [self _scheduleRefreshTimer];
+                NSString *accessToken = tokenModel.token;
 
-                [self refreshAccessToken:tokenModel.token serverURL:nil];
+                [self refreshAccessToken:accessToken serverURL:nil];
             }
         } else {
             // Something else went wrong
