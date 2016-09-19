@@ -608,6 +608,22 @@
     XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"key.path" ascending:NO]);
 }
 
+- (void)testSortByNoColumns {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DogObject *a2 = [DogObject createInDefaultRealmWithValue:@[@"a", @2]];
+    DogObject *b1 = [DogObject createInDefaultRealmWithValue:@[@"b", @1]];
+    DogObject *a1 = [DogObject createInDefaultRealmWithValue:@[@"a", @1]];
+    DogObject *b2 = [DogObject createInDefaultRealmWithValue:@[@"b", @2]];
+    [realm commitWriteTransaction];
+
+    RLMResults *notActuallySorted = [DogObject.allObjects sortedResultsUsingDescriptors:@[]];
+    XCTAssertTrue([a2 isEqualToObject:notActuallySorted[0]]);
+    XCTAssertTrue([b1 isEqualToObject:notActuallySorted[1]]);
+    XCTAssertTrue([a1 isEqualToObject:notActuallySorted[2]]);
+    XCTAssertTrue([b2 isEqualToObject:notActuallySorted[3]]);
+}
+
 - (void)testSortByMultipleColumns {
     RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];

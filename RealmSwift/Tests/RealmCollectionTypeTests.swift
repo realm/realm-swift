@@ -325,6 +325,10 @@ class RealmCollectionTypeTests: TestCase {
     func testSortWithDescriptor() {
         let collection = getAggregateableCollection()
 
+        let notActuallySorted = collection.sorted(by: [])
+        XCTAssertEqual(collection[0], notActuallySorted[0])
+        XCTAssertEqual(collection[1], notActuallySorted[1])
+
         var sorted = collection.sorted(by: [SortDescriptor(property: "intCol", ascending: true)])
         XCTAssertEqual(1, sorted[0].intCol)
         XCTAssertEqual(2, sorted[1].intCol)
@@ -1331,6 +1335,10 @@ class RealmCollectionTypeTests: TestCase {
 
     func testSortWithDescriptor() {
         let collection = getAggregateableCollection()
+
+        let notActuallySorted = collection.sorted([])
+        XCTAssertEqual(collection[0], notActuallySorted[0])
+        XCTAssertEqual(collection[1], notActuallySorted[1])
 
         var sorted = collection.sorted([SortDescriptor(property: "intCol", ascending: true)])
         XCTAssertEqual(1, sorted[0].intCol)
