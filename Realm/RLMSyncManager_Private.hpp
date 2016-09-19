@@ -30,9 +30,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMSyncManager () {
-    std::unique_ptr<realm::SyncMetadataManager> _metadata_manager;
-}
+@interface RLMSyncManager ()
 
 @property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock sessionCompletionNotifier;
 
@@ -58,6 +56,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (realm::SyncMetadataManager&)_metadataManager;
 
 - (NSArray<RLMSyncUser *> *)_allUsers;
+
+- (NSURL *)_fileURLForRawRealmURL:(NSURL *)url user:(RLMSyncUser *)user;
 
 /**
  Register a user. If an equivalent user has already been registered, the argument is not added to the store, and the

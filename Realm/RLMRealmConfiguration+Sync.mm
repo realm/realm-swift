@@ -21,12 +21,12 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
-#import "RLMSyncFileManager.h"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import "sync_config.hpp"
+#import "sync_file.hpp"
 #import "sync_manager.hpp"
 
 @implementation RLMRealmConfiguration (Sync)
@@ -43,10 +43,9 @@
     // Ensure sync manager is initialized, if it hasn't already been.
     [RLMSyncManager sharedManager];
     NSAssert(user.identity, @"Cannot call this method on a user that doesn't have an identity.");
-    NSURL *localFileURL = [RLMSyncFileManager fileURLForRawRealmURL:realmURL user:user];
-    if (syncConfiguration.customFileURL) {
-        localFileURL = syncConfiguration.customFileURL;
-    }
+    NSURL *localFileURL;
+    localFileURL = (syncConfiguration.customFileURL
+                    ?: [[RLMSyncManager sharedManager] _fileURLForRawRealmURL:realmURL user:user]);
     self.config.path = [[localFileURL path] UTF8String];
     self.config.in_memory = false;
     self.config.sync_config = std::make_shared<realm::SyncConfig>([syncConfiguration rawConfiguration]);
