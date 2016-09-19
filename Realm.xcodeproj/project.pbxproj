@@ -209,6 +209,7 @@
 		3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = E88C36FF19745E5500C9963D /* RLMSupport.swift */; };
 		3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */; };
 		5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */; };
+		4D49AA7B1D837EF8003ED789 /* ThreadSafeReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D49AA791D837E6B003ED789 /* ThreadSafeReferenceTests.swift */; };
 		5BC537161DD5B8D70055C524 /* ObjectiveCSupportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */; };
 		5D03FB1F1E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
 		5D03FB201E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
@@ -426,6 +427,7 @@
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
 		C0CDC0831B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
+		D40BA0621D834CDE0041A9DF /* ThreadSafeReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40BA0611D834CDE0041A9DF /* ThreadSafeReference.swift */; };
 		D41ABB831D80DC010031D38C /* RLMThreadSafeReference.h in Headers */ = {isa = PBXBuildFile; fileRef = D41ABB811D80DC010031D38C /* RLMThreadSafeReference.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D41ABB841D80DC010031D38C /* RLMThreadSafeReference.h in Headers */ = {isa = PBXBuildFile; fileRef = D41ABB811D80DC010031D38C /* RLMThreadSafeReference.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		D41ABB851D80DC010031D38C /* RLMThreadSafeReference.mm in Sources */ = {isa = PBXBuildFile; fileRef = D41ABB821D80DC010031D38C /* RLMThreadSafeReference.mm */; };
@@ -758,6 +760,7 @@
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
 		5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupport.swift; sourceTree = "<group>"; };
+		4D49AA791D837E6B003ED789 /* ThreadSafeReferenceTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadSafeReferenceTests.swift; sourceTree = "<group>"; };
 		5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupportTests.swift; sourceTree = "<group>"; };
 		5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PredicateUtilTests.mm; sourceTree = "<group>"; };
 		5D1534B71CCFF545008976D7 /* LinkingObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkingObjects.swift; sourceTree = "<group>"; };
@@ -832,6 +835,7 @@
 		C0D2DD0F1B6BE0DD004E8919 /* RLMRealmConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration_Private.h; sourceTree = "<group>"; };
 		C0D6E4101AFBFAF7001F3027 /* RLMAssertions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAssertions.h; sourceTree = "<group>"; };
 		C2841D5A1DDC673300943503 /* RLMSyncErrorResponseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncErrorResponseModel.h; sourceTree = "<group>"; };
+		D40BA0611D834CDE0041A9DF /* ThreadSafeReference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadSafeReference.swift; sourceTree = "<group>"; };
 		D41ABB811D80DC010031D38C /* RLMThreadSafeReference.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMThreadSafeReference.h; sourceTree = "<group>"; };
 		D41ABB821D80DC010031D38C /* RLMThreadSafeReference.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMThreadSafeReference.mm; sourceTree = "<group>"; };
 		D41ABB871D80DE1D0031D38C /* RLMThreadSafeReference_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMThreadSafeReference_Private.hpp; sourceTree = "<group>"; };
@@ -1205,6 +1209,7 @@
 				5D660FEF1BE98D670021E04F /* SortDescriptor.swift */,
 				E8BF67FB1C24D07100E591CD /* SwiftVersion.swift */,
 				1A7DE7021D38460B0029F0AE /* Sync.swift */,
+				D40BA0611D834CDE0041A9DF /* ThreadSafeReference.swift */,
 				5D660FF01BE98D670021E04F /* Util.swift */,
 			);
 			path = RealmSwift;
@@ -1234,6 +1239,7 @@
 				5D6610101BE98D880021E04F /* SwiftTestObjects.swift */,
 				5D6610111BE98D880021E04F /* SwiftUnicodeTests.swift */,
 				5D6610121BE98D880021E04F /* TestCase.swift */,
+				4D49AA791D837E6B003ED789 /* ThreadSafeReferenceTests.swift */,
 				5D6610131BE98D880021E04F /* TestUtils.h */,
 				5D6610141BE98D880021E04F /* TestUtils.mm */,
 			);
@@ -2242,6 +2248,7 @@
 				5D660FF21BE98D670021E04F /* List.swift in Sources */,
 				5D660FF31BE98D670021E04F /* Migration.swift in Sources */,
 				5D660FF41BE98D670021E04F /* Object.swift in Sources */,
+				D40BA0621D834CDE0041A9DF /* ThreadSafeReference.swift in Sources */,
 				5D660FF51BE98D670021E04F /* ObjectSchema.swift in Sources */,
 				5D660FF61BE98D670021E04F /* Optional.swift in Sources */,
 				5D660FF71BE98D670021E04F /* Property.swift in Sources */,
@@ -2270,6 +2277,7 @@
 				5D66101A1BE98D880021E04F /* ObjectSchemaInitializationTests.swift in Sources */,
 				5D66101B1BE98D880021E04F /* ObjectSchemaTests.swift in Sources */,
 				5D66101C1BE98D880021E04F /* ObjectTests.swift in Sources */,
+				4D49AA7B1D837EF8003ED789 /* ThreadSafeReferenceTests.swift in Sources */,
 				5D66101D1BE98D880021E04F /* PerformanceTests.swift in Sources */,
 				5D66101E1BE98D880021E04F /* PropertyTests.swift in Sources */,
 				5BC537161DD5B8D70055C524 /* ObjectiveCSupportTests.swift in Sources */,

@@ -124,7 +124,7 @@ public enum RealmCollectionChange<T> {
 /**
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
-public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible {
+public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined {
     // Must also conform to `AssistedObjectiveCBridgeable`
 
     /// The type of the objects contained in the collection.

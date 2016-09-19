@@ -406,8 +406,8 @@ extension LinkingObjects: AssistedObjectiveCBridgeable {
 
         let swiftValue = LinkingObjects(fromType: T.self, property: metadata.propertyName)
         switch (objectiveCValue, metadata) {
-        case (let object as RLMWeakObjectHandle, .uncached(let property)):
-            swiftValue.object = object
+        case (let object as RLMObjectBase, .uncached(let property)):
+            swiftValue.object = RLMWeakObjectHandle(object: object)
             swiftValue.property = property
         case (let results as RLMResults<RLMObject>, .cached):
             swiftValue.cachedRLMResults = results
@@ -422,7 +422,7 @@ extension LinkingObjects: AssistedObjectiveCBridgeable {
             return (objectiveCValue: results,
                     metadata: LinkingObjectsBridgingMetadata.cached(propertyName: propertyName))
         } else {
-            return (objectiveCValue: object!.copy() as! RLMWeakObjectHandle,
+            return (objectiveCValue: (object!.copy() as! RLMWeakObjectHandle).object,
                     metadata: LinkingObjectsBridgingMetadata.uncached(property: property!))
         }
     }

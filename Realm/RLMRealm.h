@@ -408,7 +408,8 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 #pragma mark - Accessing Objects
 
 // TODO: Document
-- (nullable id)resolveThreadSafeReference:(RLMThreadSafeReference *)reference;
+- (nullable id)resolveThreadSafeReference:(RLMThreadSafeReference *)reference
+NS_REFINED_FOR_SWIFT;
 
 #pragma mark - Adding and Removing Objects from a Realm
 
