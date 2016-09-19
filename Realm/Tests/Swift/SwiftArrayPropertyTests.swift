@@ -74,10 +74,7 @@ class SwiftArrayPropertyTests: RLMTestCase {
         XCTAssertEqual((array.array[1] as! SwiftStringObject).stringCol, "b", "Second element should have property value 'b'")
         XCTAssertEqual((array.array[2] as! SwiftStringObject).stringCol, "a", "Third element should have property value 'a'")
 
-        // Temporary fix until we figure out why iterators segfault
-//        for obj in array.array {
-        for i in 0..<array.array.count {
-            let obj = array.array[i]
+        for obj in array.array {
             XCTAssertFalse(obj.description.isEmpty, "Object should have description")
         }
     }

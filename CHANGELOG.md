@@ -3,22 +3,41 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix an assertion failure when sorting by zero properties.
+
+1.1.0 Release notes (2016-09-16)
+=============================================================
+
+This release brings official support for Xcode 8, Swift 2.3 and Swift 3.0.
+Prebuilt frameworks are now built with Xcode 7.3.1 and Xcode 8.0.
+
+### API breaking changes
+
 * Deprecate `migrateRealm:` in favor of new `performMigrationForConfiguration:error:` method
-  that follows Cocoa's' NSError conventions.
-* Fix issue where `RLMResults` used `id `instead of its generic type type as the return
+  that follows Cocoa's NSError conventions.
+* Fix issue where `RLMResults` used `id `instead of its generic type as the return
   type of subscript.
-* Fix incorrect truncation of the constant value for queries of the form
-  `column < value` for `float` and `double` columns.
 
 ### Enhancements
 
 * Improve error message when using NSNumber incorrectly in Swift models.
-* Fix compilation with Swift 2.3 using Xcode 8 beta 2.
 * Further reduce the download size of the prebuilt static libraries.
 * Improve sort performance, especially on non-nullable columns.
+* Allow partial initialization of object by `initWithValue:`, deferring
+  required property checks until object is added to Realm.
 
 ### Bugfixes
 
+* Fix incorrect truncation of the constant value for queries of the form
+  `column < value` for `float` and `double` columns.
 * Fix crash when an aggregate is accessed as an `Int8`, `Int16`, `Int32`, or `Int64`.
 * Fix a race condition that could lead to a crash if an RLMArray or List was
   deallocated on a different thread than it was created on.

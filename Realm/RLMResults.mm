@@ -359,6 +359,9 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties {
+    if (properties.count == 0) {
+        return self;
+    }
     return translateErrors([&] {
         if (_results.get_mode() == Results::Mode::Empty) {
             return self;

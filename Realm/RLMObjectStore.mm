@@ -387,21 +387,10 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         }
     }
     else {
-        // get or create our accessor
-        bool foundExisting;
-        auto primaryGetter = [=](RLMProperty *p) { return [value valueForKey:p.name]; };
-        object->_row = (*info.table())[createOrGetRowForObject(info, primaryGetter, createOrUpdate, &foundExisting)];
-
-        // populate
-        NSDictionary *defaultValues = nil;
-        for (RLMProperty *prop in info.rlmObjectSchema.properties) {
-
-            // skip primary key when updating since it doesn't change
-            if (prop.isPrimary)
-                continue;
-
+        __block bool foundExisting = false;
+        __block NSDictionary *defaultValues = nil;
+        auto getValue = ^(RLMProperty *prop) {
             id propValue = RLMValidatedValueForProperty(value, prop.name, info.rlmObjectSchema.className);
-
             if (!propValue && !foundExisting) {
                 if (!defaultValues) {
                     defaultValues = RLMDefaultValuesForObjectSchema(info.rlmObjectSchema);
@@ -411,8 +400,18 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
                     propValue = NSNull.null;
                 }
             }
+            return propValue;
+        };
+        // get or create our accessor
+        object->_row = (*info.table())[createOrGetRowForObject(info, getValue, createOrUpdate, &foundExisting)];
 
-            if (propValue) {
+        // populate
+        for (RLMProperty *prop in info.rlmObjectSchema.properties) {
+            // skip primary key when updating since it doesn't change
+            if (prop.isPrimary)
+                continue;
+
+            if (id propValue = getValue(prop)) {
                 validateValueForProperty(propValue, prop);
                 RLMDynamicSet(object, prop, RLMCoerceToNil(propValue), creationOptions);
             }
@@ -492,28 +491,32 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     }
 
     key = RLMCoerceToNil(key);
+    if (!key && !primaryProperty->is_nullable) {
+        @throw RLMException(@"Invalid null value for non-nullable primary key.");
+    }
 
     size_t row = realm::not_found;
-    if (primaryProperty->type == PropertyType::String) {
-        NSString *str = RLMDynamicCast<NSString>(key);
-        if (str || (!key && primaryProperty->is_nullable)) {
-            row = table->find_first_string(primaryProperty->table_column, RLMStringDataWithNSString(str));
+    switch (primaryProperty->type) {
+        case PropertyType::String: {
+            NSString *string = RLMDynamicCast<NSString>(key);
+            if (!key || string) {
+                row = table->find_first_string(primaryProperty->table_column, RLMStringDataWithNSString(string));
+            } else {
+                @throw RLMException(@"Invalid value '%@' of type '%@' for string primary key.", key, [key class]);
+            }
+            break;
         }
-        else {
-            @throw RLMException(@"Invalid value '%@' for primary key", key);
-        }
-    }
-    else {
-        NSNumber *number = RLMDynamicCast<NSNumber>(key);
-        if (number) {
-            row = table->find_first_int(primaryProperty->table_column, number.longLongValue);
-        }
-        else if (!key && primaryProperty->is_nullable) {
-            row = table->find_first_null(primaryProperty->table_column);
-        }
-        else {
-            @throw RLMException(@"Invalid value '%@' for primary key", key);
-        }
+        case PropertyType::Int:
+            if (NSNumber *number = RLMDynamicCast<NSNumber>(key)) {
+                row = table->find_first_int(primaryProperty->table_column, number.longLongValue);
+            } else if (!key) {
+                row = table->find_first_null(primaryProperty->table_column);
+            } else {
+                @throw RLMException(@"Invalid value '%@' of type '%@' for int primary key.", key, [key class]);
+            }
+            break;
+        default:
+            REALM_UNREACHABLE();
     }
 
     if (row == realm::not_found) {

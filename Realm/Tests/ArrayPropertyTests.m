@@ -750,6 +750,24 @@
     }];
 }
 
+- (void)testSortByNoColumns {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DogObject *a2 = [DogObject createInDefaultRealmWithValue:@[@"a", @2]];
+    DogObject *b1 = [DogObject createInDefaultRealmWithValue:@[@"b", @1]];
+    DogObject *a1 = [DogObject createInDefaultRealmWithValue:@[@"a", @1]];
+    DogObject *b2 = [DogObject createInDefaultRealmWithValue:@[@"b", @2]];
+
+    RLMArray<DogObject *> *array = [DogArrayObject createInDefaultRealmWithValue:@[@[a2, b1, a1, b2]]].dogs;
+    [realm commitWriteTransaction];
+
+    RLMResults *notActuallySorted = [array sortedResultsUsingDescriptors:@[]];
+    XCTAssertTrue([array[0] isEqualToObject:notActuallySorted[0]]);
+    XCTAssertTrue([array[1] isEqualToObject:notActuallySorted[1]]);
+    XCTAssertTrue([array[2] isEqualToObject:notActuallySorted[2]]);
+    XCTAssertTrue([array[3] isEqualToObject:notActuallySorted[3]]);
+}
+
 - (void)testSortByMultipleColumns {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];

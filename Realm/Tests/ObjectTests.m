@@ -55,6 +55,35 @@
 @end
 
 
+NSInteger dynamicDefaultSeed = 0;
+@interface DynamicDefaultObject : RLMObject
+@property int       intCol;
+@property float     floatCol;
+@property double    doubleCol;
+@property NSDate   *dateCol;
+@property NSString *stringCol;
+@property NSData   *binaryCol;
+@end
+
+@implementation DynamicDefaultObject
++ (BOOL)shouldIncludeInDefaultSchema {
+    return NO;
+}
++ (NSDictionary *)defaultPropertyValues {
+    dynamicDefaultSeed++;
+    return @{@"intCol" : @(dynamicDefaultSeed),
+             @"floatCol" : @((float)dynamicDefaultSeed),
+             @"doubleCol" : @((double)dynamicDefaultSeed),
+             @"dateCol" : [NSDate dateWithTimeIntervalSince1970:dynamicDefaultSeed],
+             @"stringCol" : [[NSUUID UUID] UUIDString],
+             @"binaryCol" : [[[NSUUID UUID] UUIDString] dataUsingEncoding:NSUTF8StringEncoding]};
+}
++ (NSString *)primaryKey {
+    return @"intCol";
+}
+@end
+
+
 @interface IgnoredURLObject : RLMObject
 @property NSString *name;
 @property NSURL *url;
@@ -390,7 +419,7 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
     XCTAssertEqual(fromRealm.age, 25, @"Age should be equal");
     XCTAssertEqual(fromRealm.hired, YES, @"Hired should be equal");
     
-    XCTAssertThrows([[EmployeeObject alloc] initWithValue:@{}], @"Initialization with missing values should throw");
+    XCTAssertNoThrow([[EmployeeObject alloc] initWithValue:@{}], @"Initialization with missing values should not throw");
     XCTAssertNoThrow([[DefaultObject alloc] initWithValue:@{@"intCol": @1}],
                      "Overriding some default values at initialization should not throw");
 
@@ -445,7 +474,6 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 
 - (void)testInitFromDictionaryMissingPropertyKey {
     CompanyObject *co = nil;
-    XCTAssertThrows([[DogExtraObject alloc] initWithValue:@{}]);
     XCTAssertNoThrow(co = [[CompanyObject alloc] initWithValue:@{@"name": @"a"}]);
     XCTAssertEqualObjects(co.name, @"a");
     XCTAssertEqual(co.employees.count, 0U);
@@ -1241,6 +1269,24 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     assertDefaults([NumberDefaultsObject createInRealm:realm withValue:@{}]);
+    [realm cancelWriteTransaction];
+}
+
+- (void)testDynamicDefaultPropertyValues {
+    void (^assertDifferentPropertyValues)(DynamicDefaultObject *, DynamicDefaultObject *) = ^(DynamicDefaultObject *obj1, DynamicDefaultObject *obj2) {
+        XCTAssertNotEqual(obj1.intCol, obj2.intCol);
+        XCTAssertNotEqual(obj1.floatCol, obj2.floatCol);
+        XCTAssertNotEqual(obj1.doubleCol, obj2.doubleCol);
+        XCTAssertNotEqualWithAccuracy(obj1.dateCol.timeIntervalSinceReferenceDate, obj2.dateCol.timeIntervalSinceReferenceDate, 0.01f);
+        XCTAssertNotEqualObjects(obj1.stringCol, obj2.stringCol);
+        XCTAssertNotEqualObjects(obj1.binaryCol, obj2.binaryCol);
+    };
+    assertDifferentPropertyValues([[DynamicDefaultObject alloc] init], [[DynamicDefaultObject alloc] init]);
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.objectClasses = @[[DynamicDefaultObject class]];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    [realm beginWriteTransaction];
+    assertDifferentPropertyValues([DynamicDefaultObject createInRealm:realm withValue:@{}], [DynamicDefaultObject createInRealm:realm withValue:@{}]);
     [realm cancelWriteTransaction];
 }
 
