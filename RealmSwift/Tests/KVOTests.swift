@@ -151,7 +151,7 @@ class KVOTests: TestCase {
             obj.arrayCol.append(obj)
         }
         observeListChange(obj, "arrayCol", .removal, NSIndexSet(index: 0)) {
-            obj.arrayCol.removeAllObjects()
+            obj.arrayCol.removeAll()
         }
 
         observeChange(obj, "optIntCol", nil, 10) { obj.optIntCol.value = 10 }
@@ -195,7 +195,7 @@ class KVOTests: TestCase {
             obj.arrayCol.append(obj)
         }
         observeListChange(obj, "arrayCol", .removal, NSIndexSet(index: 0)) {
-            obj.arrayCol.removeAllObjects()
+            obj.arrayCol.removeAll()
         }
 
         observeChange(obj, "optIntCol", nil, 10) { obj.optIntCol.value = 10 }
@@ -250,7 +250,7 @@ class KVOTests: TestCase {
             obj.arrayCol.append(obj)
         }
         observeListChange(obs, "arrayCol", .removal, NSIndexSet(index: 0)) {
-            obj.arrayCol.removeAllObjects()
+            obj.arrayCol.removeAll()
         }
 
         observeChange(obs, "optIntCol", nil, 10) { obj.optIntCol.value = 10 }

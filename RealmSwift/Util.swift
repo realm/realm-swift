@@ -113,6 +113,22 @@ extension Int64: CustomObjectiveCBridgeable {
         return NSNumber(value: self)
     }
 }
+extension Optional: CustomObjectiveCBridgeable {
+    static func bridging(objCValue: Any) -> Optional {
+        if objCValue is NSNull {
+            return nil
+        } else {
+            return .some(dynamicBridgeCast(fromObjectiveC: objCValue))
+        }
+    }
+    var objCValue: Any {
+        if let value = self {
+            return value
+        } else {
+            return NSNull()
+        }
+    }
+}
 
 #else
 

@@ -34,17 +34,14 @@ end
 # Script
 ##########################
 
-# Create iOS examples
-FileUtils.mkdir 'examples/ios/xcode-7'
-FileUtils.move 'examples/ios/objc', 'examples/ios/xcode-7'
-FileUtils.move 'examples/ios/rubymotion', 'examples/ios/xcode-7'
-
 examples = [
-  "examples/ios/xcode-7/objc",
+  "examples/ios/objc",
   "examples/osx/objc",
   "examples/tvos/objc",
   "examples/ios/swift-2.2",
-  "examples/tvos/swift",
+  "examples/tvos/swift-2.2",
+  "examples/ios/swift-3.0",
+  "examples/tvos/swift-3.0",
 ]
 
 # Remove reference to Realm.xcodeproj from all example workspaces.
@@ -53,11 +50,13 @@ examples.each do |example|
 end
 
 framework_directory_for_example = {
-  'examples/ios/xcode-7/objc' => '../../../../ios/static/xcode-7',
+  'examples/ios/objc' => '../../../ios/static',
   'examples/osx/objc' => '../../../osx',
   'examples/tvos/objc' => '../../../tvos',
   'examples/ios/swift-2.2' => '../../../ios/swift-2.2',
-  'examples/tvos/swift' => '../../../tvos',
+  'examples/tvos/swift-2.2' => '../../../tvos/swift-2.2',
+  'examples/ios/swift-3.0' => '../../../ios/swift-3.0',
+  'examples/tvos/swift-3.0' => '../../../tvos/swift-3.0',
 }
 
 # Update the paths to the prebuilt frameworks
@@ -79,4 +78,4 @@ replace_in_file(playground_file,
 
 # Update RubyMotion sample
 
-replace_in_file('examples/ios/xcode-7/rubymotion/Simple/Rakefile', '/build/ios', '/ios/static/xcode-7')
+replace_in_file('examples/ios/rubymotion/Simple/Rakefile', '/build/ios-', '/ios/')

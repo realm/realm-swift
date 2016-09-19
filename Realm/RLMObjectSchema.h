@@ -63,8 +63,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable RLMProperty *)objectForKeyedSubscript:(NSString *)propertyName;
 
 /**
-  Returns a Boolean value that indicates whether two `RLMObjectSchema` instances are equal.
-*/
+ Returns whether two `RLMObjectSchema` instances are equal.
+ */
 - (BOOL)isEqualToObjectSchema:(RLMObjectSchema *)objectSchema;
 
 @end

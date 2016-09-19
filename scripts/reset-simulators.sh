@@ -3,57 +3,45 @@
 set -o pipefail
 set -e
 
+source "$(dirname "$0")/swift-version.sh"
+
 while pgrep -q Simulator; do
     # Kill all the current simulator processes as they may be from a
     # different Xcode version
     pkill Simulator 2>/dev/null || true
     # CoreSimulatorService doesn't exit when sent SIGTERM
     pkill -9 Simulator 2>/dev/null || true
-  done
-
-# Shut down simulators until there's no booted ones left
-# Only do one at a time because devices sometimes show up multiple times
-while xcrun simctl list | grep -q Booted; do
-  xcrun simctl list | grep Booted | sed 's/.* (\(.*\)) (Booted)/\1/' | head -n 1 | xargs xcrun simctl shutdown
 done
 
-# Clean up all available simulators
-(
-    previous_device=''
-    IFS=$'\n' # make newlines the only separator
-    for LINE in $(xcrun simctl list); do
-        if [[ $LINE =~ unavailable || $LINE =~ disconnected ]]; then
-            # skip unavailable simulators
-            continue
-        fi
+# Run until we get a result since switching simulator versions often causes CoreSimulatorService to throw an exception.
+devices=""
+until [ "$devices" != "" ]; do
+    devices="$(xcrun simctl list devices -j || true)"
+done
 
-        if [[ $LINE =~ "--" ]]; then
-            # Reset the last seen device so we won't consider devices with the same name to be duplicates
-            # if they appear in different sections.
-            previous_device=""
-            continue
-        fi
+# Shut down booted simulators
+echo "$devices" | ruby -rjson -e 'puts JSON.parse($stdin.read)["devices"].flat_map { |d| d[1] }.select { |d| d["state"] == "Booted" && d["availability"] == "(available)" }.map { |d| d["udid"] }' | while read udid; do
+    echo "shutting down simulator with ID: $udid"
+    xcrun simctl shutdown $udid
+done
 
-        regex='^(.*) [(]([0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12})[)]'
-        if [[ $LINE =~ $regex ]]; then
-            device="${BASH_REMATCH[1]}"
-            guid="${BASH_REMATCH[2]}"
+# Erase all available simulators
+echo "erasing simulators"
+echo "$devices" | ruby -rjson -e 'puts JSON.parse($stdin.read)["devices"].flat_map { |d| d[1] }.select { |d| d["availability"] == "(available)" }.map { |d| d["udid"] }' | while read udid; do
+    xcrun simctl erase $udid &
+done
+wait
 
-            # Delete the simulator if it's a duplicate of the last seen one
-            # Otherwise delete all contents and settings for it
-            if [[ $device == $previous_device ]]; then
-                xcrun simctl delete $guid
-            else
-                xcrun simctl erase $guid
-                previous_device="$device"
-            fi
-        fi
-    done
-)
-
-if [[ -a "${DEVELOPER_DIR}/Applications/iOS Simulator.app" ]]; then
-    open "${DEVELOPER_DIR}/Applications/iOS Simulator.app"
-elif [[ -a "${DEVELOPER_DIR}/Applications/Simulator.app" ]]; then
+if [[ -a "${DEVELOPER_DIR}/Applications/Simulator.app" ]]; then
     open "${DEVELOPER_DIR}/Applications/Simulator.app"
 fi
 
+# Wait until the boot completes
+echo "waiting for simulator to boot..."
+until xcrun simctl list devices -j | ruby -rjson -e 'exit JSON.parse($stdin.read)["devices"].flat_map { |d| d[1] }.any? { |d| d["availability"] == "(available)" && d["state"] == "Booted" }'; do
+    sleep 1
+done
+
+# Wait until the simulator is fully booted by waiting for it to launch SpringBoard
+xcrun simctl launch booted com.apple.springboard >/dev/null 2>&1 || true
+echo "simulator booted"

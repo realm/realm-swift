@@ -1,0 +1,617 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D26EA716ECDD1CDDB1FACAB6 /* Pods_CocoaPodsExample_WatchKit_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EB6F27BF57298B95B7496718 /* Pods_CocoaPodsExample_WatchKit_Extension.framework */; };
+		E806E98A1C7921FE00C5C9A8 /* InterfaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E806E9891C7921FE00C5C9A8 /* InterfaceController.swift */; };
+		E8645B891C7913D600C241AA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8645B881C7913D600C241AA /* main.m */; };
+		E8645B9C1C7913D600C241AA /* CocoaPodsExample WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E8645B9B1C7913D600C241AA /* CocoaPodsExample WatchKit App.app */; };
+		E8645BA21C7913D600C241AA /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8645BA01C7913D600C241AA /* Interface.storyboard */; };
+		E8645BAB1C7913D600C241AA /* CocoaPodsExample WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = E8645BAA1C7913D600C241AA /* CocoaPodsExample WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E8645B9D1C7913D600C241AA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8645B7C1C7913D600C241AA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8645B9A1C7913D600C241AA;
+			remoteInfo = "CocoaPodsExample WatchKit App";
+		};
+		E8645BAC1C7913D600C241AA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8645B7C1C7913D600C241AA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8645BA91C7913D600C241AA;
+			remoteInfo = "CocoaPodsExample WatchKit Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E8645BBD1C7913D600C241AA /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E8645BAB1C7913D600C241AA /* CocoaPodsExample WatchKit Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8645BC11C7913D600C241AA /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				E8645B9C1C7913D600C241AA /* CocoaPodsExample WatchKit App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		519BD935439568BC2D0A6720 /* Pods-CocoaPodsExample WatchKit Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPodsExample WatchKit Extension.release.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension.release.xcconfig"; sourceTree = "<group>"; };
+		E0FA897D5F5D1D4371811311 /* Pods-CocoaPodsExample WatchKit Extension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPodsExample WatchKit Extension.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension.debug.xcconfig"; sourceTree = "<group>"; };
+		E806E9891C7921FE00C5C9A8 /* InterfaceController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InterfaceController.swift; sourceTree = "<group>"; };
+		E8645B841C7913D600C241AA /* CocoaPodsExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoaPodsExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8645B881C7913D600C241AA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		E8645B981C7913D600C241AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E8645B9B1C7913D600C241AA /* CocoaPodsExample WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CocoaPodsExample WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8645BA11C7913D600C241AA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
+		E8645BA51C7913D600C241AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E8645BAA1C7913D600C241AA /* CocoaPodsExample WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "CocoaPodsExample WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8645BB71C7913D600C241AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EB6F27BF57298B95B7496718 /* Pods_CocoaPodsExample_WatchKit_Extension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CocoaPodsExample_WatchKit_Extension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		401941BCA573B683139D196B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8645B811C7913D600C241AA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8645BA71C7913D600C241AA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D26EA716ECDD1CDDB1FACAB6 /* Pods_CocoaPodsExample_WatchKit_Extension.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7109EA92DB1087B4447E838F /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				E0FA897D5F5D1D4371811311 /* Pods-CocoaPodsExample WatchKit Extension.debug.xcconfig */,
+				519BD935439568BC2D0A6720 /* Pods-CocoaPodsExample WatchKit Extension.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		C37AE0E9D90B6BAE7A91280A /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				EB6F27BF57298B95B7496718 /* Pods_CocoaPodsExample_WatchKit_Extension.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E8645B7B1C7913D600C241AA = {
+			isa = PBXGroup;
+			children = (
+				E8645B861C7913D600C241AA /* CocoaPodsExample */,
+				E8645B9F1C7913D600C241AA /* CocoaPodsExample WatchKit App */,
+				E8645BAE1C7913D600C241AA /* CocoaPodsExample WatchKit Extension */,
+				E8645B851C7913D600C241AA /* Products */,
+				7109EA92DB1087B4447E838F /* Pods */,
+				C37AE0E9D90B6BAE7A91280A /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		E8645B851C7913D600C241AA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E8645B841C7913D600C241AA /* CocoaPodsExample.app */,
+				E8645B9B1C7913D600C241AA /* CocoaPodsExample WatchKit App.app */,
+				E8645BAA1C7913D600C241AA /* CocoaPodsExample WatchKit Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E8645B861C7913D600C241AA /* CocoaPodsExample */ = {
+			isa = PBXGroup;
+			children = (
+				E8645B881C7913D600C241AA /* main.m */,
+				E8645B981C7913D600C241AA /* Info.plist */,
+			);
+			path = CocoaPodsExample;
+			sourceTree = "<group>";
+		};
+		E8645B9F1C7913D600C241AA /* CocoaPodsExample WatchKit App */ = {
+			isa = PBXGroup;
+			children = (
+				E8645BA01C7913D600C241AA /* Interface.storyboard */,
+				E8645BA51C7913D600C241AA /* Info.plist */,
+			);
+			path = "CocoaPodsExample WatchKit App";
+			sourceTree = "<group>";
+		};
+		E8645BAE1C7913D600C241AA /* CocoaPodsExample WatchKit Extension */ = {
+			isa = PBXGroup;
+			children = (
+				E806E9891C7921FE00C5C9A8 /* InterfaceController.swift */,
+				E8645BB71C7913D600C241AA /* Info.plist */,
+			);
+			path = "CocoaPodsExample WatchKit Extension";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E8645B831C7913D600C241AA /* CocoaPodsExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8645BC21C7913D600C241AA /* Build configuration list for PBXNativeTarget "CocoaPodsExample" */;
+			buildPhases = (
+				E8645B801C7913D600C241AA /* Sources */,
+				E8645B811C7913D600C241AA /* Frameworks */,
+				E8645B821C7913D600C241AA /* Resources */,
+				E8645BC11C7913D600C241AA /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E8645B9E1C7913D600C241AA /* PBXTargetDependency */,
+			);
+			name = CocoaPodsExample;
+			productName = CocoaPodsExample;
+			productReference = E8645B841C7913D600C241AA /* CocoaPodsExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E8645B9A1C7913D600C241AA /* CocoaPodsExample WatchKit App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8645BBE1C7913D600C241AA /* Build configuration list for PBXNativeTarget "CocoaPodsExample WatchKit App" */;
+			buildPhases = (
+				E8645B991C7913D600C241AA /* Resources */,
+				E8645BBD1C7913D600C241AA /* Embed App Extensions */,
+				401941BCA573B683139D196B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E8645BAD1C7913D600C241AA /* PBXTargetDependency */,
+			);
+			name = "CocoaPodsExample WatchKit App";
+			productName = "CocoaPodsExample WatchKit App";
+			productReference = E8645B9B1C7913D600C241AA /* CocoaPodsExample WatchKit App.app */;
+			productType = "com.apple.product-type.application.watchapp2";
+		};
+		E8645BA91C7913D600C241AA /* CocoaPodsExample WatchKit Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8645BBA1C7913D600C241AA /* Build configuration list for PBXNativeTarget "CocoaPodsExample WatchKit Extension" */;
+			buildPhases = (
+				F4B66E2D18C858408237A5D8 /* [CP] Check Pods Manifest.lock */,
+				E8645BA61C7913D600C241AA /* Sources */,
+				E8645BA71C7913D600C241AA /* Frameworks */,
+				E8645BA81C7913D600C241AA /* Resources */,
+				2B0A7EAA6DD976230E6D0DC6 /* [CP] Embed Pods Frameworks */,
+				3A2635C065E1F421AECEE8DB /* [CP] Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "CocoaPodsExample WatchKit Extension";
+			productName = "CocoaPodsExample WatchKit Extension";
+			productReference = E8645BAA1C7913D600C241AA /* CocoaPodsExample WatchKit Extension.appex */;
+			productType = "com.apple.product-type.watchkit2-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E8645B7C1C7913D600C241AA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0800;
+				ORGANIZATIONNAME = Realm;
+				TargetAttributes = {
+					E8645B831C7913D600C241AA = {
+						CreatedOnToolsVersion = 7.2.1;
+						LastSwiftMigration = 0800;
+					};
+					E8645B9A1C7913D600C241AA = {
+						CreatedOnToolsVersion = 7.2.1;
+						LastSwiftMigration = 0800;
+					};
+					E8645BA91C7913D600C241AA = {
+						CreatedOnToolsVersion = 7.2.1;
+						LastSwiftMigration = 0800;
+					};
+				};
+			};
+			buildConfigurationList = E8645B7F1C7913D600C241AA /* Build configuration list for PBXProject "CocoaPodsExample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E8645B7B1C7913D600C241AA;
+			productRefGroup = E8645B851C7913D600C241AA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E8645B831C7913D600C241AA /* CocoaPodsExample */,
+				E8645B9A1C7913D600C241AA /* CocoaPodsExample WatchKit App */,
+				E8645BA91C7913D600C241AA /* CocoaPodsExample WatchKit Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E8645B821C7913D600C241AA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8645B991C7913D600C241AA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8645BA21C7913D600C241AA /* Interface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8645BA81C7913D600C241AA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		2B0A7EAA6DD976230E6D0DC6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		3A2635C065E1F421AECEE8DB /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F4B66E2D18C858408237A5D8 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E8645B801C7913D600C241AA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8645B891C7913D600C241AA /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8645BA61C7913D600C241AA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E806E98A1C7921FE00C5C9A8 /* InterfaceController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E8645B9E1C7913D600C241AA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8645B9A1C7913D600C241AA /* CocoaPodsExample WatchKit App */;
+			targetProxy = E8645B9D1C7913D600C241AA /* PBXContainerItemProxy */;
+		};
+		E8645BAD1C7913D600C241AA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8645BA91C7913D600C241AA /* CocoaPodsExample WatchKit Extension */;
+			targetProxy = E8645BAC1C7913D600C241AA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		E8645BA01C7913D600C241AA /* Interface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E8645BA11C7913D600C241AA /* Base */,
+			);
+			name = Interface.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		E8645BB81C7913D600C241AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E8645BB91C7913D600C241AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E8645BBB1C7913D600C241AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = E0FA897D5F5D1D4371811311 /* Pods-CocoaPodsExample WatchKit Extension.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = "CocoaPodsExample WatchKit Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CocoaPodsExample.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 2.1;
+			};
+			name = Debug;
+		};
+		E8645BBC1C7913D600C241AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 519BD935439568BC2D0A6720 /* Pods-CocoaPodsExample WatchKit Extension.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = "CocoaPodsExample WatchKit Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CocoaPodsExample.watchkitapp.watchkitextension;
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 2.1;
+			};
+			name = Release;
+		};
+		E8645BBF1C7913D600C241AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				IBSC_MODULE = CocoaPodsExample_WatchKit_Extension;
+				INFOPLIST_FILE = "CocoaPodsExample WatchKit App/Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CocoaPodsExample.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 2.1;
+			};
+			name = Debug;
+		};
+		E8645BC01C7913D600C241AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				IBSC_MODULE = CocoaPodsExample_WatchKit_Extension;
+				INFOPLIST_FILE = "CocoaPodsExample WatchKit App/Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CocoaPodsExample.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 2.1;
+			};
+			name = Release;
+		};
+		E8645BC31C7913D600C241AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = CocoaPodsExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CocoaPodsExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		E8645BC41C7913D600C241AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = CocoaPodsExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.CocoaPodsExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E8645B7F1C7913D600C241AA /* Build configuration list for PBXProject "CocoaPodsExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8645BB81C7913D600C241AA /* Debug */,
+				E8645BB91C7913D600C241AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8645BBA1C7913D600C241AA /* Build configuration list for PBXNativeTarget "CocoaPodsExample WatchKit Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8645BBB1C7913D600C241AA /* Debug */,
+				E8645BBC1C7913D600C241AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8645BBE1C7913D600C241AA /* Build configuration list for PBXNativeTarget "CocoaPodsExample WatchKit App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8645BBF1C7913D600C241AA /* Debug */,
+				E8645BC01C7913D600C241AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8645BC21C7913D600C241AA /* Build configuration list for PBXNativeTarget "CocoaPodsExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8645BC31C7913D600C241AA /* Debug */,
+				E8645BC41C7913D600C241AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E8645B7C1C7913D600C241AA /* Project object */;
+}
