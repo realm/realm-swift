@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix an assertion failure when sorting by zero properties.
+
 1.1.0 Release notes (2016-09-16)
 =============================================================
 
