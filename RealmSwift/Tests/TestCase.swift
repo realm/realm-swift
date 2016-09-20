@@ -152,6 +152,21 @@ class TestCase: XCTestCase {
         }
     }
 
+    func assertFails<T>(_ expectedError: Swift.Error, _ message: String? = nil,
+                     fileName: StaticString = #file, lineNumber: UInt = #line,
+                     block: () throws -> T) {
+        do {
+            _ = try block()
+            XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",
+                file: fileName, line: lineNumber)
+        } catch let e where e._code == expectedError._code {
+            // Success!
+        } catch {
+            XCTFail("Expected to catch <\(expectedError)>, but instead caught <\(error)>.",
+                file: fileName, line: lineNumber)
+        }
+    }
+
     func assertNil<T>(block: @autoclosure() -> T?, _ message: String? = nil,
                       fileName: StaticString = #file, lineNumber: UInt = #line) {
         XCTAssert(block() == nil, message ?? "", file: fileName, line: lineNumber)
