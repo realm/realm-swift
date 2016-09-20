@@ -46,6 +46,8 @@ typedef NS_OPTIONS(NSUInteger, RLMCreationOptions) {
     // Allow unmanaged objects to be promoted to managed objects
     // if false objects are copied during object creation
     RLMCreationOptionsPromoteUnmanaged = 1 << 1,
+    // Use the SetDefault instruction.
+    RLMCreationOptionsSetDefault = 1 << 2,
 };
 
 

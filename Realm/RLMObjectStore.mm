@@ -389,9 +389,11 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     else {
         __block bool foundExisting = false;
         __block NSDictionary *defaultValues = nil;
+        __block bool usedDefault = false;
         auto getValue = ^(RLMProperty *prop) {
             id propValue = RLMValidatedValueForProperty(value, prop.name, info.rlmObjectSchema.className);
-            if (!propValue && !foundExisting) {
+            usedDefault = !propValue && !foundExisting;
+            if (usedDefault) {
                 if (!defaultValues) {
                     defaultValues = RLMDefaultValuesForObjectSchema(info.rlmObjectSchema);
                 }
@@ -413,7 +415,12 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 
             if (id propValue = getValue(prop)) {
                 validateValueForProperty(propValue, prop);
-                RLMDynamicSet(object, prop, RLMCoerceToNil(propValue), creationOptions);
+                // add SetDefault to creationoptions
+                RLMCreationOptions propertyCreationOptions = creationOptions;
+                if (usedDefault) {
+                    propertyCreationOptions |= RLMCreationOptionsSetDefault;
+                }
+                RLMDynamicSet(object, prop, RLMCoerceToNil(propValue), propertyCreationOptions);
             }
             else if (!foundExisting && !prop.optional) {
                 @throw RLMException(@"Property '%@' of object of type '%@' cannot be nil.", prop.name, info.rlmObjectSchema.className);
