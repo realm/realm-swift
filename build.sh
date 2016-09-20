@@ -279,6 +279,15 @@ fi
 # Downloading
 ######################################
 
+download_object_server() {
+    local release_name="1.0.0-beta-33.0"
+    local archive_name="realm-mobile-platform-$release_name.zip"
+    /usr/local/bin/s3cmd get "s3://realm-ci-artifacts/bundle/$release_name/$archive_name"
+    rm -rf sync
+    ditto -x -k $archive_name sync
+    rm  $archive_name
+}
+
 download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
     TMP_DIR="$TMPDIR/core_bin"
@@ -366,6 +375,14 @@ case "$COMMAND" in
     ######################################
     "clean")
         find . -type d -name build -exec rm -r "{}" +\;
+        exit 0
+        ;;
+
+    ######################################
+    # Object Server
+    ######################################
+    "download-object-server")
+        download_object_server
         exit 0
         ;;
 
