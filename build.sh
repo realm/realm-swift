@@ -386,6 +386,11 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "start-object-server")
+        ./sync/start-object-server.command
+        exit 0
+        ;;
+
     ######################################
     # Core
     ######################################
