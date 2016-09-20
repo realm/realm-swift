@@ -115,6 +115,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
             });
         };
 
+        _disableSSLValidation = NO;
         self.logLevel = RLMSyncLogLevelInfo;
         realm::SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
 
@@ -143,6 +144,12 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     }
     return _appID;
 }
+
+- (void)setDisableSSLValidation:(BOOL)disableSSLValidation {
+    _disableSSLValidation = disableSSLValidation;
+    realm::SyncManager::shared().set_client_should_validate_ssl(!disableSSLValidation);
+}
+
 
 #pragma mark - Private API
 
