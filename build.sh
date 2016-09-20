@@ -391,6 +391,19 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "reset-object-server")
+        package="$( cd "$( dirname "${BASH_SOURCE[0]}" )/sync" && pwd )"
+        for file in "$package"/realm-object-server-*; do
+            if [ -d "$file" ]; then
+                package="$file"
+                break
+            fi
+        done
+        rm -rf "$package/object-server/root_dir/"
+        rm -rf "$package/object-server/temp_dir/"
+        exit 0
+        ;;
+
     ######################################
     # Core
     ######################################
