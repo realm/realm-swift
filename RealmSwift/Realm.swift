@@ -116,8 +116,15 @@ public final class Realm {
      - throws: An `NSError` if the transaction could not be completed successfully.
                If `block` throws, the function throws the propagated `ErrorType` instead.
      */
-    public func write(_ block: () -> Void) throws {
-        try rlmRealm.transaction(block)
+    public func write(_ block: (() throws -> Void)) throws {
+        beginWrite()
+        do {
+            try block()
+        } catch let error {
+            if isInWriteTransaction { cancelWrite() }
+            throw error
+        }
+        if isInWriteTransaction { try commitWrite() }
     }
 
     /**
