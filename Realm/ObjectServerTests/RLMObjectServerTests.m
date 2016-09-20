@@ -18,6 +18,14 @@
 
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
+#import <Realm/RLMRealm_Private.h>
+#import "RLMTestCase.h"
+
+@interface SyncObject : RLMObject
+@property NSString *stringProp;
+@end
+@implementation SyncObject
+@end
 
 @interface RLMObjectServerTests : RLMTestCase
 @property (nonatomic, strong) NSTask *task;
@@ -25,14 +33,28 @@
 
 @implementation RLMObjectServerTests
 
-+ (NSString *)rootRealmCocoaPath {
-    return [[[[[NSURL fileURLWithPath:@(__FILE__)] URLByDeletingLastPathComponent] URLByDeletingLastPathComponent] URLByDeletingLastPathComponent] path];
++ (NSURL *)rootRealmCocoaURL {
+    return [[[[NSURL fileURLWithPath:@(__FILE__)] URLByDeletingLastPathComponent] URLByDeletingLastPathComponent] URLByDeletingLastPathComponent];
+}
+
++ (NSURL *)authServerURL {
+    return [NSURL URLWithString:@"http://127.0.0.1:8080"];
+}
+
++ (void)setUp {
+    [super setUp];
+    NSString *syncDirectory = [[[RLMObjectServerTests rootRealmCocoaURL] URLByAppendingPathComponent:@"sync"] path];
+    BOOL isDirectory = NO;
+    if (![[NSFileManager defaultManager] fileExistsAtPath:syncDirectory isDirectory:&isDirectory] || !isDirectory) {
+        NSLog(@"sync/ directory doesn't exist. You need to run 'build.sh download-object-server' prior to running these tests");
+        abort();
+    }
 }
 
 - (void)setUp {
     [super setUp];
     self.task = [[NSTask alloc] init];
-    self.task.currentDirectoryPath = [RLMObjectServerTests rootRealmCocoaPath];
+    self.task.currentDirectoryPath = [[RLMObjectServerTests rootRealmCocoaURL] path];
     self.task.launchPath = @"/bin/sh";
     self.task.arguments = @[@"build.sh", @"start-object-server"];
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
@@ -52,25 +74,126 @@
     [super tearDown];
     [self.task terminate];
     self.task = [[NSTask alloc] init];
-    self.task.currentDirectoryPath = [RLMObjectServerTests rootRealmCocoaPath];
+    self.task.currentDirectoryPath = [[RLMObjectServerTests rootRealmCocoaURL] path];
     self.task.launchPath = @"/bin/sh";
-    self.task.arguments = @[@"sync/realm-object-server-1.0.0-beta-15.0/reset-server-realms.command"];
+    self.task.arguments = @[@"build.sh", @"reset-object-server"];
     self.task.standardOutput = [NSPipe pipe];
     [self.task launch];
     [self.task waitUntilExit];
 }
 
+#pragma mark - Authentication
+
 - (void)testUsernamePasswordAuthentication {
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    [RLMSyncUser authenticateWithCredential:[RLMSyncCredential credentialWithUsername:@"test" password:@"test"]
+    RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:@"a" password:@"a"];
+    [RLMSyncUser authenticateWithCredential:credential
                                     actions:RLMAuthenticationActionsCreateAccount
-                              authServerURL:[NSURL URLWithString:@"http://127.0.0.1:8080"]
+                              authServerURL:[RLMObjectServerTests authServerURL]
                                onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNotNil(user);
         XCTAssertNil(error);
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    expectation = [self expectationWithDescription:@""];
+    [RLMSyncUser authenticateWithCredential:credential
+                                    actions:RLMAuthenticationActionsUseExistingAccount
+                              authServerURL:[RLMObjectServerTests authServerURL]
+                               onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNotNil(user);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    expectation = [self expectationWithDescription:@""];
+    [RLMSyncUser authenticateWithCredential:credential
+                                    actions:RLMAuthenticationActionsCreateAccount
+                              authServerURL:[RLMObjectServerTests authServerURL]
+                               onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNil(user);
+        XCTAssertNotNil(error);
+        // FIXME: Improve error message
+        XCTAssertEqualObjects(error.localizedDescription, @"The operation couldn’t be completed. (io.realm.sync error 3.)");
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+- (void)testAdminTokenAuthentication {
+    NSString *adminTokenFilePath = @"sync/realm-object-server-1.0.0-beta-15.0/admin_token.base64";
+    NSURL *adminTokenFileURL = [[RLMObjectServerTests rootRealmCocoaURL] URLByAppendingPathComponent:adminTokenFilePath];
+    NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
+    XCTAssertNotNil(adminToken);
+    RLMSyncCredential *credential = [RLMSyncCredential credentialWithAccessToken:adminToken identity:@"test"];
+    XCTAssertNotNil(credential);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    [RLMSyncUser authenticateWithCredential:credential
+                                    actions:RLMAuthenticationActionsUseExistingAccount
+                              authServerURL:[RLMObjectServerTests authServerURL]
+                               onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNotNil(user);
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+#pragma mark - User Persistence
+
+- (void)testBasicUserPersistence {
+    // FIXME: Uncomment once +[RLMRealm resetRealmState] also resets sync-related things
+    // XCTAssertEqual([[RLMSyncUser all] count], 0U);
+
+    __block RLMSyncUser *user = nil;
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:@"a" password:@"a"];
+    [RLMSyncUser authenticateWithCredential:credential
+                                    actions:RLMAuthenticationActionsCreateAccount
+                              authServerURL:[RLMObjectServerTests authServerURL]
+                               onCompletion:^(RLMSyncUser *completionUser, NSError *error) {
+        XCTAssertNotNil(completionUser);
+        user = completionUser;
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    XCTAssertNotNil(user);
+    // FIXME: Uncomment once +[RLMRealm resetRealmState] also resets sync-related things
+    // XCTAssertEqual([[RLMSyncUser all] count], 1U);
+    XCTAssertTrue([[RLMSyncUser all] containsObject:user]);
+}
+
+#pragma mark - Sync
+
+- (void)testBasicSync {
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:@"a" password:@"a"];
+    __block RLMSyncUser *user = nil;
+    [RLMSyncUser authenticateWithCredential:credential
+                                    actions:RLMAuthenticationActionsCreateAccount
+                              authServerURL:[RLMObjectServerTests authServerURL]
+                               onCompletion:^(RLMSyncUser *completionUser, NSError *error) {
+        XCTAssertNotNil(completionUser);
+        user = completionUser;
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:[NSURL URLWithString:@"realm://localhost:8080/~/testBasicSync"]];
+    NSError *error = nil;
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:&error];
+    XCTAssertNil(error);
+    XCTAssertTrue(realm.isEmpty);
+
+    // FIXME: remove once https://github.com/realm/realm-cocoa-private/issues/281 is resolved
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:1.0]];
 }
 
 @end
