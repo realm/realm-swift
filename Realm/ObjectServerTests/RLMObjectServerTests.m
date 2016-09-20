@@ -19,11 +19,11 @@
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
 
-@interface RLMObjectServerTestCase : XCTestCase
+@interface RLMObjectServerTests : RLMTestCase
 @property (nonatomic, strong) NSTask *task;
 @end
 
-@implementation RLMObjectServerTestCase
+@implementation RLMObjectServerTests
 
 + (NSString *)rootRealmCocoaPath {
     return [[[[[NSURL fileURLWithPath:@(__FILE__)] URLByDeletingLastPathComponent] URLByDeletingLastPathComponent] URLByDeletingLastPathComponent] path];
@@ -32,7 +32,7 @@
 - (void)setUp {
     [super setUp];
     self.task = [[NSTask alloc] init];
-    self.task.currentDirectoryPath = [RLMObjectServerTestCase rootRealmCocoaPath];
+    self.task.currentDirectoryPath = [RLMObjectServerTests rootRealmCocoaPath];
     self.task.launchPath = @"/bin/sh";
     self.task.arguments = @[@"build.sh", @"start-object-server"];
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
@@ -52,7 +52,7 @@
     [super tearDown];
     [self.task terminate];
     self.task = [[NSTask alloc] init];
-    self.task.currentDirectoryPath = [RLMObjectServerTestCase rootRealmCocoaPath];
+    self.task.currentDirectoryPath = [RLMObjectServerTests rootRealmCocoaPath];
     self.task.launchPath = @"/bin/sh";
     self.task.arguments = @[@"sync/realm-object-server-1.0.0-beta-15.0/reset-server-realms.command"];
     self.task.standardOutput = [NSPipe pipe];

@@ -455,6 +455,7 @@
 		E856D21F195615B100FB2FCF /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC51955FE0100FDED82 /* RLMTestCase.m */; };
 		E86900E21CC04F5B0008A8B6 /* RLMRealmConfiguration_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E86900E11CC04F5B0008A8B6 /* RLMRealmConfiguration_Private.hpp */; };
 		E86900E31CC04F5B0008A8B6 /* RLMRealmConfiguration_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = E86900E11CC04F5B0008A8B6 /* RLMRealmConfiguration_Private.hpp */; };
+		E86E61241D91E4E200DC2419 /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC51955FE0100FDED82 /* RLMTestCase.m */; };
 		E8917598197A1B350068ACC6 /* UnicodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8917597197A1B350068ACC6 /* UnicodeTests.m */; };
 		E8917599197A1B350068ACC6 /* UnicodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8917597197A1B350068ACC6 /* UnicodeTests.m */; };
 		E8BF67FC1C24D07100E591CD /* SwiftVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BF67FB1C24D07100E591CD /* SwiftVersion.swift */; };
@@ -2279,6 +2280,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8267FF11D90B8E700E001C7 /* RLMObjectServerTests.m in Sources */,
+				E86E61241D91E4E200DC2419 /* RLMTestCase.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
