@@ -18,7 +18,6 @@
 
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
-#import <Realm/RLMRealm_Private.h>
 #import "RLMTestCase.h"
 
 @interface SyncObject : RLMObject
@@ -86,9 +85,7 @@
 
 - (void)testUsernamePasswordAuthentication {
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:@"a" password:@"a"];
-    [RLMSyncUser authenticateWithCredential:credential
-                                    actions:RLMAuthenticationActionsCreateAccount
+    [RLMSyncUser authenticateWithCredential:[RLMSyncCredential credentialWithUsername:@"a" password:@"a" actions:RLMAuthenticationActionsCreateAccount]
                               authServerURL:[RLMObjectServerTests authServerURL]
                                onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNotNil(user);
@@ -98,8 +95,7 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     expectation = [self expectationWithDescription:@""];
-    [RLMSyncUser authenticateWithCredential:credential
-                                    actions:RLMAuthenticationActionsUseExistingAccount
+    [RLMSyncUser authenticateWithCredential:[RLMSyncCredential credentialWithUsername:@"a" password:@"a" actions:RLMAuthenticationActionsUseExistingAccount]
                               authServerURL:[RLMObjectServerTests authServerURL]
                                onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNotNil(user);
@@ -109,8 +105,7 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     expectation = [self expectationWithDescription:@""];
-    [RLMSyncUser authenticateWithCredential:credential
-                                    actions:RLMAuthenticationActionsCreateAccount
+    [RLMSyncUser authenticateWithCredential:[RLMSyncCredential credentialWithUsername:@"a" password:@"a" actions:RLMAuthenticationActionsCreateAccount]
                               authServerURL:[RLMObjectServerTests authServerURL]
                                onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNil(user);
@@ -123,8 +118,16 @@
 }
 
 - (void)testAdminTokenAuthentication {
-    NSString *adminTokenFilePath = @"sync/realm-object-server-1.0.0-beta-15.0/admin_token.base64";
-    NSURL *adminTokenFileURL = [[RLMObjectServerTests rootRealmCocoaURL] URLByAppendingPathComponent:adminTokenFilePath];
+    NSString *syncDirectoryPath = [[[RLMObjectServerTests rootRealmCocoaURL] URLByAppendingPathComponent:@"sync"] path];
+    NSDirectoryEnumerator *fileEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:syncDirectoryPath];
+
+    NSURL *adminTokenFileURL = nil;
+    for (NSString *filename in fileEnumerator) {
+        if ([[filename lastPathComponent] isEqualToString:@"admin_token.base64"]) {
+            adminTokenFileURL = [[[RLMObjectServerTests rootRealmCocoaURL] URLByAppendingPathComponent:@"sync"] URLByAppendingPathComponent:filename];
+        }
+    }
+    XCTAssertNotNil(adminTokenFileURL);
     NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
     XCTAssertNotNil(adminToken);
     RLMSyncCredential *credential = [RLMSyncCredential credentialWithAccessToken:adminToken identity:@"test"];
@@ -132,7 +135,6 @@
 
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
     [RLMSyncUser authenticateWithCredential:credential
-                                    actions:RLMAuthenticationActionsUseExistingAccount
                               authServerURL:[RLMObjectServerTests authServerURL]
                                onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNotNil(user);
@@ -150,9 +152,7 @@
 
     __block RLMSyncUser *user = nil;
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:@"a" password:@"a"];
-    [RLMSyncUser authenticateWithCredential:credential
-                                    actions:RLMAuthenticationActionsCreateAccount
+    [RLMSyncUser authenticateWithCredential:[RLMSyncCredential credentialWithUsername:@"a" password:@"a" actions:RLMAuthenticationActionsCreateAccount]
                               authServerURL:[RLMObjectServerTests authServerURL]
                                onCompletion:^(RLMSyncUser *completionUser, NSError *error) {
         XCTAssertNotNil(completionUser);
@@ -172,10 +172,8 @@
 
 - (void)testBasicSync {
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:@"a" password:@"a"];
     __block RLMSyncUser *user = nil;
-    [RLMSyncUser authenticateWithCredential:credential
-                                    actions:RLMAuthenticationActionsCreateAccount
+    [RLMSyncUser authenticateWithCredential:[RLMSyncCredential credentialWithUsername:@"a" password:@"a" actions:RLMAuthenticationActionsCreateAccount]
                               authServerURL:[RLMObjectServerTests authServerURL]
                                onCompletion:^(RLMSyncUser *completionUser, NSError *error) {
         XCTAssertNotNil(completionUser);
