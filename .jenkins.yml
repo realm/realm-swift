@@ -17,6 +17,7 @@ target:
   - swiftlint
   # - tvos # Disabled for sync until we can re-add tests when they start passing again
   - osx-encryption
+  - osx-object-server
   # FIXME: Re-enable device tests when they can be made to run reliably
   # - ios-device-objc
   # - ios-device-swift
