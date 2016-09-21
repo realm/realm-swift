@@ -279,6 +279,14 @@ fi
 # Downloading
 ######################################
 
+download_object_server() {
+    local archive_name="realm-mobile-platform-$REALM_SYNC_VERSION.zip"
+    /usr/local/bin/s3cmd get "s3://realm-ci-artifacts/bundle/$REALM_SYNC_VERSION/$archive_name"
+    rm -rf sync
+    ditto -x -k $archive_name sync
+    rm  $archive_name
+}
+
 download_core() {
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
     TMP_DIR="$TMPDIR/core_bin"
@@ -366,6 +374,32 @@ case "$COMMAND" in
     ######################################
     "clean")
         find . -type d -name build -exec rm -r "{}" +\;
+        exit 0
+        ;;
+
+    ######################################
+    # Object Server
+    ######################################
+    "download-object-server")
+        download_object_server
+        exit 0
+        ;;
+
+    "start-object-server")
+        ./sync/start-object-server.command
+        exit 0
+        ;;
+
+    "reset-object-server")
+        package="$( cd "$( dirname "${BASH_SOURCE[0]}" )/sync" && pwd )"
+        for file in "$package"/realm-object-server-*; do
+            if [ -d "$file" ]; then
+                package="$file"
+                break
+            fi
+        done
+        rm -rf "$package/object-server/root_dir/"
+        rm -rf "$package/object-server/temp_dir/"
         exit 0
         ;;
 
@@ -584,6 +618,11 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "test-osx-object-server")
+        xc "-scheme 'Object Server Tests' -configuration $CONFIGURATION -sdk macosx test"
+        exit 0
+        ;;
+
     ######################################
     # Full verification
     ######################################
@@ -609,6 +648,7 @@ case "$COMMAND" in
         sh build.sh verify-tvos-debug
         sh build.sh verify-tvos-device
         sh build.sh verify-swiftlint
+        sh build.sh verify-osx-object-server
         ;;
 
     "verify-cocoapods")
@@ -719,6 +759,12 @@ case "$COMMAND" in
 
     "verify-swiftlint")
         swiftlint lint --strict
+        exit 0
+        ;;
+
+    "verify-osx-object-server")
+        sh build.sh download-object-server
+        sh build.sh test-osx-object-server
         exit 0
         ;;
 
