@@ -76,13 +76,14 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
 @implementation RLMSyncManager
 
+static RLMSyncManager *s_sharedManager = nil;
+static dispatch_once_t s_onceToken;
+
 + (instancetype)sharedManager {
-    static RLMSyncManager *sharedManager = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        sharedManager = [[RLMSyncManager alloc] initPrivate];
+    dispatch_once(&s_onceToken, ^{
+        s_sharedManager = [[RLMSyncManager alloc] initPrivate];
     });
-    return sharedManager;
+    return s_sharedManager;
 }
 
 - (RLMSyncSession *)sessionForSyncConfiguration:(RLMSyncConfiguration *)config {
@@ -152,6 +153,27 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
 
 #pragma mark - Private API
+
++ (void)_resetStateForTesting {
+    // Log out all the logged-in users. This will immediately kill any open sessions.
+    if (s_sharedManager) {
+        for (id key in s_sharedManager.activeUsers) {
+            [s_sharedManager.activeUsers[key] logOut];
+        }
+    }
+
+    // Reset the singleton.
+    s_onceToken = 0;
+    s_sharedManager = nil;
+
+    // Destroy the metadata Realm.
+    NSURL *metadataURL = [RLMSyncFileManager fileURLForMetadata];
+    // FIXME: replace this with the appropriate call to `[RLMSyncFileManager deleteRealmAtPath:]` once that code is in.
+    NSFileManager *manager = [NSFileManager defaultManager];
+    [manager removeItemAtURL:metadataURL error:nil];
+    [manager removeItemAtURL:[metadataURL URLByAppendingPathExtension:@"lock"] error:nil];
+    [manager removeItemAtURL:[metadataURL URLByAppendingPathExtension:@"management"] error:nil];
+}
 
 - (void)_fireError:(NSError *)error {
     dispatch_async(dispatch_get_main_queue(), ^{
