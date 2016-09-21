@@ -92,7 +92,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 
     // Attempt to convert the JSON
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:jsonDictionary
-                                                       options:NSJSONWritingPrettyPrinted
+                                                       options:(NSJSONWritingOptions)0
                                                          error:&localError];
     if (!jsonData) {
         completionBlock(localError, nil);
