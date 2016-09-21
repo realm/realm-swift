@@ -22,6 +22,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NS_OPTIONS(NSUInteger, RLMAuthenticationActions) {
+    RLMAuthenticationActionsCreateAccount            = 1 << 0,
+    RLMAuthenticationActionsUseExistingAccount       = 1 << 1,
+};
+
 typedef NSString *RLMIdentityProvider RLM_EXTENSIBLE_STRING_ENUM;
 
 extern RLMIdentityProvider const RLMIdentityProviderDebug;
@@ -47,7 +52,9 @@ extern RLMIdentityProvider const RLMIdentityProviderICloud;
 /**
  Construct and return a credential from a Realm Object Server username and password.
  */
-+ (instancetype)credentialWithUsername:(NSString *)username password:(NSString *)password;
++ (instancetype)credentialWithUsername:(NSString *)username
+                              password:(NSString *)password
+                               actions:(RLMAuthenticationActions)actions;
 
 /**
  Construct and return a special credential representing a token that can be directly used to open a Realm. The identity

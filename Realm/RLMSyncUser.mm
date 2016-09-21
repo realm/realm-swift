@@ -75,25 +75,21 @@ using namespace realm;
 }
 
 + (void)authenticateWithCredential:(RLMSyncCredential *)credential
-                           actions:(RLMAuthenticationActions)actions
                      authServerURL:(NSURL *)authServerURL
                       onCompletion:(RLMUserCompletionBlock)completion {
     [self authenticateWithCredential:credential
-                             actions:actions
                        authServerURL:authServerURL
                              timeout:30
                         onCompletion:completion];
 }
 
 + (void)authenticateWithCredential:(RLMSyncCredential *)credential
-                            actions:(RLMAuthenticationActions)actions
                      authServerURL:(NSURL *)authServerURL
                            timeout:(NSTimeInterval)timeout
                       onCompletion:(RLMUserCompletionBlock)completion {
     RLMSyncUser *user = [[RLMSyncUser alloc] initWithAuthServer:authServerURL];
     [RLMSyncUser _performLogInForUser:user
                            credential:credential
-                              actions:actions
                         authServerURL:authServerURL
                               timeout:timeout
                       completionBlock:completion];
@@ -184,7 +180,6 @@ using namespace realm;
 
 + (void)_performLogInForUser:(RLMSyncUser *)user
                   credential:(RLMSyncCredential *)credential
-                     actions:(RLMAuthenticationActions)actions
                authServerURL:(NSURL *)authServerURL
                      timeout:(NSTimeInterval)timeout
              completionBlock:(RLMUserCompletionBlock)completion {
@@ -210,10 +205,11 @@ using namespace realm;
                                    } mutableCopy];
     NSMutableDictionary *info = [(credential.userInfo ?: @{}) mutableCopy];
 
-    // FIXME: handle the 'actions' flag for the general case (not just username/password)
-    if (credential.provider == RLMIdentityProviderUsernamePassword
-        && (actions & RLMAuthenticationActionsCreateAccount)) {
-        info[kRLMSyncRegisterKey] = @(YES);
+    if (credential.provider == RLMIdentityProviderUsernamePassword) {
+        RLMAuthenticationActions actions = [info[kRLMSyncActionsKey] integerValue];
+        if (actions & RLMAuthenticationActionsCreateAccount) {
+            info[kRLMSyncRegisterKey] = @(YES);
+        }
     }
 
     if ([info count] > 0) {
