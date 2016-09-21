@@ -14,7 +14,9 @@ set -o pipefail
 set -e
 
 # You can override the version of the core library
-: ${REALM_CORE_VERSION:=1.5.0} # set to "current" to always use the current build
+: ${REALM_CORE_VERSION:=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' dependencies.list)} # set to "current" to always use the current build
+
+: ${REALM_SYNC_VERSION:=$(sed -n 's/^REALM_SYNC_VERSION=\(.*\)$/\1/p' dependencies.list)}
 
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
@@ -274,7 +276,7 @@ if [ "$#" -eq 0 -o "$#" -gt 3 ]; then
 fi
 
 ######################################
-# Variables
+# Downloading
 ######################################
 
 download_core() {
@@ -308,6 +310,41 @@ download_core() {
     ln -s core-${REALM_CORE_VERSION} core
 }
 
+download_sync() {
+    echo "Downloading dependency: sync ${REALM_SYNC_VERSION}"
+    TMP_DIR="$TMPDIR/sync_bin"
+    mkdir -p "${TMP_DIR}"
+    SYNC_TMP_TAR="${TMP_DIR}/sync-${REALM_SYNC_VERSION}.tar.xz.tmp"
+    SYNC_TAR="${TMP_DIR}/sync-${REALM_SYNC_VERSION}.tar.xz"
+    if [ ! -f "${SYNC_TAR}" ]; then
+        local SYNC_URL="https://static.realm.io/downloads/sync/sync-${REALM_SYNC_VERSION}.tar.xz"
+        set +e # temporarily disable immediate exit
+        local ERROR # sweeps the exit code unless declared separately
+        ERROR=$(curl --fail --silent --show-error --location "$SYNC_URL" --output "${SYNC_TMP_TAR}" 2>&1 >/dev/null)
+        if [[ $? -ne 0 ]]; then
+            echo "Downloading sync failed:\n${ERROR}"
+            exit 1
+        fi
+        set -e # re-enable flag
+        mv "${SYNC_TMP_TAR}" "${SYNC_TAR}"
+    fi
+
+    (
+        cd "${TMP_DIR}"
+        rm -rf sync
+        tar xf "${SYNC_TAR}" --xz
+        mv core sync-${REALM_SYNC_VERSION}
+    )
+
+    rm -rf sync-${REALM_SYNC_VERSION} core
+    mv ${TMP_DIR}/sync-${REALM_SYNC_VERSION} .
+    ln -s sync-${REALM_SYNC_VERSION} core
+}
+
+######################################
+# Variables
+######################################
+
 COMMAND="$1"
 
 # Use Debug config if command ends with -debug, otherwise default to Release
@@ -336,30 +373,16 @@ case "$COMMAND" in
     # Core
     ######################################
     "download-core")
+        # FIXME: Distinguish between downloading core & sync
         if [ "$REALM_CORE_VERSION" = "current" ]; then
             echo "Using version of core already in core/ directory"
             exit 0
         fi
         if [ -d core -a -d ../realm-core -a ! -L core ]; then
-          # Allow newer versions than expected for local builds as testing
-          # with unreleased versions is one of the reasons to use a local build
-          if ! $(grep -i "${REALM_CORE_VERSION} Release notes" core/release_notes.txt >/dev/null); then
-              echo "Local build of core is out of date."
-              exit 1
-          else
-              echo "The core library seems to be up to date."
-          fi
-        elif ! [ -L core ]; then
-            echo "core is not a symlink. Deleting..."
-            rm -rf core
-            download_core
-        # With a prebuilt version we only want to check the first non-empty
-        # line so that checking out an older commit will download the
-        # appropriate version of core if the already-present version is too new
-        elif ! $(grep -m 1 . core/release_notes.txt | grep -i "${REALM_CORE_VERSION} RELEASE NOTES" >/dev/null); then
-            download_core
+            echo "Using version of core already in core/ directory"
         else
-            echo "The core library seems to be up to date."
+            # FIXME: Check sync version rather than downloading every time
+            download_sync
         fi
         exit 0
         ;;
