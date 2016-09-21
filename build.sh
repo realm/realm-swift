@@ -378,8 +378,12 @@ case "$COMMAND" in
             echo "Using version of core already in core/ directory"
             exit 0
         fi
-        # FIXME: Check sync version rather than downloading every time
-        download_sync
+        if [ -d core -a -d ../realm-core -a ! -L core ]; then
+            echo "Using version of core already in core/ directory"
+        else
+            # FIXME: Check sync version rather than downloading every time
+            download_sync
+        fi
         exit 0
         ;;
 
