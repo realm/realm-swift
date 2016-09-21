@@ -29,6 +29,7 @@ def findValueInDepFile(String depFile, String key) {
 def buildComponent(String target, String archive) {
     withEnv([
             "REALM_CORE_VERSION=current",
+            "REALM_SWIFT_VERSION=2.3"
     ]) {
         sh """
             sh tightdb_objc/build.sh ${target}
@@ -143,7 +144,7 @@ node('osx') {
             ])
         }
     }
-    
+
     def depFile = readFile('realm-cocoa/dependencies.list')
     def syncVersionNumber = findValueInDepFile(depFile, 'REALM_SYNC_VERSION')
     def currentVersionNumber = findValueInDepFile(depFile, 'VERSION')
@@ -156,7 +157,7 @@ node('osx') {
 
     echo "Sync version: ${syncVersionNumber}"
     sh 'rm -rf realm-*.zip'
-    
+
     dir('temp') {
         sh 'rm -rf *'
         sh "/usr/local/bin/s3cmd get --recursive 's3://realm-ci-artifacts/sync/${syncVersionNumber}/cocoa/'"
@@ -166,7 +167,7 @@ node('osx') {
     sh 'ln -s "$(pwd)/temp/sync" realm-cocoa/core'
     sh 'ln -s "$(pwd)/realm-cocoa" tightdb_objc'
     sh 'bash realm-cocoa/scripts/reset-simulators.sh'
-    
+
     stage 'Build'
     buildComponent('package-ios-static', 'tightdb_objc/build/ios-static/realm-framework-ios.zip')
     buildComponent('package-ios-dynamic', 'tightdb_objc/build/ios/realm-dynamic-framework-ios.zip')
@@ -175,7 +176,7 @@ node('osx') {
     buildComponent('package-osx-swift', 'tightdb_objc/build/osx/realm-swift-framework-osx.zip')
     buildComponent('package-tvos', 'tightdb_objc/build/tvos/realm-framework-tvos.zip')
     buildComponent('package-tvos-swift', 'tightdb_objc/build/tvos/realm-swift-framework-tvos.zip')
-    
+
     stage 'Archive'
     repackArchives(objcArchiveName, swiftArchiveName, osxArchiveName, swiftOsxArchiveName)
 
