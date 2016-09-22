@@ -47,9 +47,6 @@ extern RLMIdentityProvider const RLMIdentityProviderUsernamePassword;
 /// A Facebook account as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderFacebook;
 
-/// A Twitter account as an identity provider.
-extern RLMIdentityProvider const RLMIdentityProviderTwitter;
-
 /// A Google account as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderGoogle;
 
@@ -74,6 +71,16 @@ extern RLMIdentityProvider const RLMIdentityProviderICloud;
  Construct and return a credential from a Facebook account token.
  */
 + (instancetype)credentialWithFacebookToken:(RLMCredentialToken)token;
+
+/**
+ Construct and return a credential from a Google account token.
+ */
++ (instancetype)credentialWithGoogleToken:(RLMCredentialToken)token;
+
+/**
+ Construct and return a credential from an iCloud account token.
+ */
++ (instancetype)credentialWithICloudToken:(RLMCredentialToken)token;
 
 /**
  Construct and return a credential from a Realm Object Server username and password.

@@ -19,6 +19,9 @@
 #import "RLMSyncCredential.h"
 #import "RLMSyncUtil_Private.h"
 
+/// A Twitter account as an identity provider.
+//extern RLMIdentityProvider const RLMIdentityProviderTwitter;
+
 RLMIdentityProvider const RLMIdentityProviderDebug                  = @"debug";
 RLMIdentityProvider const RLMIdentityProviderRealm                  = @"realm";
 RLMIdentityProvider const RLMIdentityProviderUsernamePassword       = @"password";
@@ -43,6 +46,14 @@ RLMIdentityProvider const RLMIdentityProviderICloud                 = @"icloud";
 
 + (instancetype)credentialWithFacebookToken:(RLMCredentialToken)token {
     return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderFacebook userInfo:nil];
+}
+
++ (instancetype)credentialWithGoogleToken:(RLMCredentialToken)token {
+    return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderGoogle userInfo:nil];
+}
+
++ (instancetype)credentialWithICloudToken:(RLMCredentialToken)token {
+    return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderICloud userInfo:nil];
 }
 
 + (instancetype)credentialWithUsername:(NSString *)username

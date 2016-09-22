@@ -112,6 +112,16 @@ public struct Credential {
         return Credential(RLMSyncCredential(facebookToken: token))
     }
 
+    /// Initialize a new credential using a Google account token.
+    public static func google(token: Token) -> Credential {
+        return Credential(RLMSyncCredential(googleToken: token))
+    }
+
+    /// Initialize a new credential using an iCloud account token.
+    public static func iCloud(token: Token) -> Credential {
+        return Credential(RLMSyncCredential(iCloudToken: token))
+    }
+
     /// Initialize a new credential using a Realm Object Server username and password.
     public static func usernamePassword(username: String,
                                         password: String,
@@ -179,6 +189,16 @@ public struct Credential {
     /// Initialize a new credential using a Facebook account token.
     public static func facebook(token: Token) -> Credential {
         return Credential(RLMSyncCredential(facebookToken: token))
+    }
+
+    /// Initialize a new credential using a Google account token.
+    public static func google(token: Token) -> Credential {
+        return Credential(RLMSyncCredential(googleToken: token))
+    }
+
+    /// Initialize a new credential using an iCloud account token.
+    public static func iCloud(token: Token) -> Credential {
+        return Credential(RLMSyncCredential(ICloudToken: token))
     }
 
     /// Initialize a new credential using a Realm Object Server username and password.
