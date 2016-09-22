@@ -26,9 +26,11 @@
 
 @class RLMSyncConfiguration;
 
-@interface RLMSyncUser ()
+typedef void(^RLMFetchedRealmCompletionBlock)(NSError * _Nullable, RLMRealm * _Nullable, BOOL * _Nonnull);
 
 NS_ASSUME_NONNULL_BEGIN
+
+@interface RLMSyncUser ()
 
 @property (nullable, nonatomic) RLMServerToken refreshToken;
 

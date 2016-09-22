@@ -18,8 +18,6 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
-
 /**
  The current state of a sync session object.
  */
@@ -36,12 +34,23 @@ typedef NS_ENUM(NSUInteger, RLMSyncSessionState) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMSyncSession : NSObject RLM_SYNC_UNINITIALIZABLE
+/**
+ An object encapsulating a Realm Object Server "session". Sessions represent the communication between the client (and a
+ local Realm file on disk), and the server (and a remote Realm at a given URL stored on a Realm Object Server).
+ 
+ Sessions are always created by the SDK and vended out through various APIs. The lifespans of sessions associated with
+ Realms are managed automatically.
+ */
+@interface RLMSyncSession : NSObject
 
+/// The session's current state.
 @property (nonatomic, readonly) RLMSyncSessionState state;
 
+/// The Realm Object Server URL of the remote Realm this session corresponds to.
 @property (nonatomic, readonly) NSURL *realmURL;
 
+/// A reference to the user object owning the Realm this session corresponds to. If the session object is invalid, this
+/// property may automatically be set to `nil`.
 @property (nonatomic, weak, nullable, readonly) RLMSyncUser *parentUser;
 
 /// If the session is valid, return a sync configuration that can be used to open the Realm associated with this

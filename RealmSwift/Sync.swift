@@ -20,26 +20,72 @@ import Realm
 import Realm.Private
 import Foundation
 
+/**
+ An object representing a Realm Object Server user.
+
+ - see: `RLMSyncUser`
+ */
 public typealias User = RLMSyncUser
 
+/**
+ A singleton which configures and manages the Realm Object Server synchronization-related functionality.
+
+ - see: `RLMSyncManager`
+ */
 public typealias SyncManager = RLMSyncManager
 
+/**
+ A session object which represents communication between the client and server for a specific Realm.
+
+ - see: `RLMSyncSession`
+ */
 public typealias SyncSession = RLMSyncSession
 
+/**
+ An options type which represents certain authentication actions that can be associated with certain credential types.
+
+ - see: `RLMAuthenticationActions`
+ */
 public typealias AuthenticationActions = RLMAuthenticationActions
 
+/**
+ A closure type for a closure which can be set on the `SyncManager` to allow errors to be reported to the application.
+
+ - see: `RLMSyncErrorReportingBlock`
+ */
 public typealias ErrorReportingBlock = RLMSyncErrorReportingBlock
 
+/**
+ A closure type for a closure which is used by certain APIs to asynchronously return a `User` object to the application.
+
+ - see: `RLMUserCompletionBlock`
+ */
 public typealias UserCompletionBlock = RLMUserCompletionBlock
 
+/**
+ An error associated with the SDK's synchronization functionality.
+
+ - see: `RLMSyncError`
+ */
 public typealias SyncError = RLMSyncError
 
+/**
+ An enum which can be used to specify the level of logging.
+
+ - see: `RLMSyncLogLevel`
+ */
 public typealias SyncLogLevel = RLMSyncLogLevel
 
 #if swift(>=3.0)
 
+/**
+ A data type whose values represent different authentication providers that can be used with the Realm Object Server.
+
+ - see: `RLMIdentityProvider`
+ */
 public typealias Provider = RLMIdentityProvider
 
+/// A `Credential` represents data that uniquely identifies a Realm Object Server user.
 public struct Credential {
     public typealias Token = String
 
@@ -47,6 +93,8 @@ public struct Credential {
     var provider: Provider
     var userInfo: [String: Any]
 
+    /// Initialize a new credential using a custom token, authentication provider, and user information dictionary. In
+    /// most cases, the convenience initializers should be used instead.
     public init(customToken token: Token, provider: Provider, userInfo: [String: Any] = [:]) {
         self.token = token
         self.provider = provider
@@ -59,16 +107,19 @@ public struct Credential {
         self.userInfo = credential.userInfo
     }
 
+    /// Initialize a new credential using a Facebook account token.
     public static func facebook(token: Token) -> Credential {
         return Credential(RLMSyncCredential(facebookToken: token))
     }
 
+    /// Initialize a new credential using a Realm Object Server username and password.
     public static func usernamePassword(username: String,
                                         password: String,
                                         actions: AuthenticationActions) -> Credential {
         return Credential(RLMSyncCredential(username: username, password: password, actions: actions))
     }
 
+    /// Initialize a new credential using a Realm Object Server access token.
     public static func accessToken(_ accessToken: String, identity: String) -> Credential {
         return Credential(RLMSyncCredential(accessToken: accessToken, identity: identity))
     }
@@ -81,6 +132,8 @@ extension RLMSyncCredential {
 }
 
 extension User {
+    /// Given a credential and server URL, log in a user and asynchronously return a `User` object which can be used to
+    /// open Realms and Sessions.
     public static func authenticate(with credential: Credential,
                                     server authServerURL: URL,
                                     timeout: TimeInterval = 30,
@@ -94,8 +147,14 @@ extension User {
 
 #else
 
+/**
+ A data type whose values represent different authentication providers that can be used with the Realm Object Server.
+
+ - see: `RLMIdentityProvider`
+ */
 public typealias Provider = String // `RLMIdentityProvider` imports as `NSString`
 
+/// A `Credential` represents data that uniquely identifies a Realm Object Server user.
 public struct Credential {
     public typealias Token = String
 
@@ -103,6 +162,8 @@ public struct Credential {
     var provider: Provider
     var userInfo: [String: AnyObject]
 
+    /// Initialize a new credential using a custom token, authentication provider, and user information dictionary. In
+    /// most cases, the convenience initializers should be used instead.
     public init(customToken token: Token, provider: Provider, userInfo: [String: AnyObject] = [:]) {
         self.token = token
         self.provider = provider
@@ -115,16 +176,19 @@ public struct Credential {
         self.userInfo = credential.userInfo
     }
 
+    /// Initialize a new credential using a Facebook account token.
     public static func facebook(token: Token) -> Credential {
         return Credential(RLMSyncCredential(facebookToken: token))
     }
 
+    /// Initialize a new credential using a Realm Object Server username and password.
     public static func usernamePassword(username: String,
                                         password: String,
                                         actions: AuthenticationActions) -> Credential {
         return Credential(RLMSyncCredential(username: username, password: password, actions: actions))
     }
 
+    /// Initialize a new credential using a Realm Object Server access token.
     public static func accessToken(accessToken: String, identity: String) -> Credential {
         return Credential(RLMSyncCredential(accessToken: accessToken, identity: identity))
     }
@@ -138,7 +202,8 @@ extension RLMSyncCredential {
 
 
 extension User {
-
+    /// Given a credential and server URL, log in a user and asynchronously return a `User` object which can be used to
+    /// open Realms and Sessions.
     public static func authenticateWithCredential(credential: Credential,
                                                   authServerURL: NSURL,
                                                   timeout: NSTimeInterval = 30,

@@ -18,12 +18,10 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
-
 @class RLMSyncUser, RLMSyncCredential, RLMSyncSession, RLMRealm;
 
+/// A block type used for APIs which asynchronously vend a `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
-typedef void(^RLMFetchedRealmCompletionBlock)(NSError * _Nullable, RLMRealm * _Nullable, BOOL * _Nonnull);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -33,15 +31,20 @@ NS_ASSUME_NONNULL_BEGIN
  A user may have one or more credentials associated with it. These credentials uniquely identify the user to a
  third-party auth provider, and are used to sign into a Realm Object Server user account.
  */
-@interface RLMSyncUser : NSObject RLM_SYNC_UNINITIALIZABLE
+@interface RLMSyncUser : NSObject
 
+/** 
+ An array of all valid, logged-in users.
+ */
 + (NSArray<RLMSyncUser *> *)all;
 
+/**
+ The unique Realm Object Server user ID string identifying this user.
+ */
 @property (nonatomic, readonly) NSString *identity;
 
 /**
- The URL of the authentication server this user will communicate with. If the user is anonymous, this property may be
- nil.
+ The URL of the authentication server this user will communicate with.
  */
 @property (nullable, nonatomic, readonly) NSURL *authenticationServer;
 
@@ -52,6 +55,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) BOOL isValid;
 
+/**
+ Create, log in, and asynchronously return a new user object, specifying a custom timeout for the network request. A
+ credential identifying the user must be passed in. The user becomes available in the completion block, at which point
+ it is ready for use.
+ */
 + (void)authenticateWithCredential:(RLMSyncCredential *)credential
                      authServerURL:(NSURL *)authServerURL
                            timeout:(NSTimeInterval)timeout
@@ -59,16 +67,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Create, log in, and asynchronously return a new user object. A credential identifying the user must be passed in. The
- user becomes available in the completion block, at which point it is guaranteed to be non-anonymous and ready for use
- opening synced Realms.
+ user becomes available in the completion block, at which point it is ready for use.
  */
 + (void)authenticateWithCredential:(RLMSyncCredential *)credential
                      authServerURL:(NSURL *)authServerURL
-                      onCompletion:(RLMUserCompletionBlock)completion NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
+                      onCompletion:(RLMUserCompletionBlock)completion
+NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 /**
  Log a user out, destroying their server state, deregistering them from the SDK, and removing any synced Realms
- associated with them from on-disk storage. This method may be called on an anonymous user.
+ associated with them from on-disk storage.
+
+ @warning It is an error to call this method on an invalid (logged-out or errored out) user. Check `isValid` before
+          calling this method.
 
  This method should be called whenever the application is committed to not using a user again unless they are recreated.
  Failing to call this method may result in unused files and metadata needlessly taking up space.
@@ -76,14 +87,20 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)logOut;
 
 /**
- Retrieve a valid session object for a given URL, or `nil` if no such object exists.
+ Retrieve a valid session object belonging to this user for a given URL, or `nil` if no such object exists.
  */
 - (nullable RLMSyncSession *)sessionForURL:(NSURL *)url;
 
 /**
- Retrieve all the valid sessions.
+ Retrieve all the valid sessions belonging to this user.
  */
 - (NSArray<RLMSyncSession *> *)allSessions;
+
+/// :nodoc:
+- (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));
+
+/// :nodoc:
++ (instancetype)new __attribute__((unavailable("RLMSyncUser cannot be created directly")));
 
 NS_ASSUME_NONNULL_END
 

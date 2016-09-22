@@ -28,6 +28,7 @@ typedef NSString* RLMServerPath;
 NS_ASSUME_NONNULL_BEGIN
 
 extern RLMIdentityProvider const RLMIdentityProviderAccessToken;
+extern RLMIdentityProvider const RLMIdentityProviderRealm;
 
 extern NSString *const kRLMSyncAppIDKey;
 extern NSString *const kRLMSyncDataKey;
@@ -39,6 +40,10 @@ extern NSString *const kRLMSyncProviderKey;
 extern NSString *const kRLMSyncRegisterKey;
 extern NSString *const kRLMSyncUnderlyingErrorKey;
 extern NSString *const kRLMSyncActionsKey;
+
+#define RLM_SYNC_UNINITIALIZABLE \
+- (instancetype)init __attribute__((unavailable("This type cannot be created directly"))); \
++ (instancetype)new __attribute__((unavailable("This type cannot be created directly")));
 
 NS_ASSUME_NONNULL_END
 

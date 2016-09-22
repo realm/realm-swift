@@ -18,8 +18,6 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
-
 /**
  An internal class representing a valid JSON response to an auth request.
  
@@ -34,7 +32,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMAuthResponseModel : NSObject RLM_SYNC_UNINITIALIZABLE
+@interface RLMAuthResponseModel : NSObject
 
 @property (nonatomic, readonly, nullable) RLMTokenModel *accessToken;
 @property (nonatomic, readonly, nullable) RLMTokenModel *refreshToken;
@@ -42,6 +40,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary
                 requireAccessToken:(BOOL)requireAccessToken
                requireRefreshToken:(BOOL)requireRefreshToken;
+
+/// :nodoc:
+- (instancetype)init __attribute__((unavailable("RLMTokenModel cannot be created directly")));
+
+/// :nodoc:
++ (instancetype)new __attribute__((unavailable("RLMTokenModel cannot be created directly")));
 
 @end
 

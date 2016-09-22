@@ -22,26 +22,52 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// A token representing an identity provider's credential.
+typedef NSString* RLMCredentialToken;
+
+/// An options type representing different account actions which can be associated with certain types of credentials.
 typedef NS_OPTIONS(NSUInteger, RLMAuthenticationActions) {
+    /// Create a new Realm Object Server account.
     RLMAuthenticationActionsCreateAccount            = 1 << 0,
+    /// Use an existing Realm Object Server account.
     RLMAuthenticationActionsUseExistingAccount       = 1 << 1,
 };
 
+/// A type representing the unique identifier of a Realm Object Server identity provider.
 typedef NSString *RLMIdentityProvider RLM_EXTENSIBLE_STRING_ENUM;
 
+/// The debug identity provider, which accepts any token string and creates a user associated with that token if one
+/// does not yet exist. Not enabled for Realm Object Server configured for production.
 extern RLMIdentityProvider const RLMIdentityProviderDebug;
-extern RLMIdentityProvider const RLMIdentityProviderRealm;
-extern RLMIdentityProvider const RLMIdentityProviderUsernamePassword;
-extern RLMIdentityProvider const RLMIdentityProviderFacebook;
-extern RLMIdentityProvider const RLMIdentityProviderTwitter;
-extern RLMIdentityProvider const RLMIdentityProviderGoogle;
-extern RLMIdentityProvider const RLMIdentityProviderICloud;
-// FIXME: add more providers as necessary...
 
+/// The username/password identity provider. User accounts are handled by the Realm Object Server directly without the
+/// involvement of a third-party identity provider.
+extern RLMIdentityProvider const RLMIdentityProviderUsernamePassword;
+
+/// A Facebook account as an identity provider.
+extern RLMIdentityProvider const RLMIdentityProviderFacebook;
+
+/// A Twitter account as an identity provider.
+extern RLMIdentityProvider const RLMIdentityProviderTwitter;
+
+/// A Google account as an identity provider.
+extern RLMIdentityProvider const RLMIdentityProviderGoogle;
+
+/// An iCloud account as an identity provider.
+extern RLMIdentityProvider const RLMIdentityProviderICloud;
+
+/**
+ An opaque credential representing a specific Realm Object Server user.
+ */
 @interface RLMSyncCredential : NSObject
 
+/// An opaque credential token containing information that uniquely identifies a Realm Object Server user.
 @property (nonatomic, readonly) RLMCredentialToken token;
+
+/// The name of the identity provider which generated the credential token.
 @property (nonatomic, readonly) RLMIdentityProvider provider;
+
+/// A dictionary containing additional pertinent information. In most cases this is automatically configured.
 @property (nonatomic, readonly) NSDictionary<NSString *, id> *userInfo;
 
 /**
@@ -62,12 +88,19 @@ extern RLMIdentityProvider const RLMIdentityProviderICloud;
  */
 + (instancetype)credentialWithAccessToken:(RLMServerToken)accessToken identity:(NSString *)identity;
 
+/**
+ Construct and return a credential with a custom token string, identity provider string, and optional user info. In most
+ cases, the convenience initializers should be used instead.
+ */
 - (instancetype)initWithCustomToken:(RLMCredentialToken)token
                            provider:(RLMIdentityProvider)provider
                            userInfo:(nullable NSDictionary *)userInfo NS_DESIGNATED_INITIALIZER;
 
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
+/// :nodoc:
+- (instancetype)init __attribute__((unavailable("RLMSyncCredential cannot be created directly")));
+
+/// :nodoc:
++ (instancetype)new __attribute__((unavailable("RLMSyncCredential cannot be created directly")));
 
 NS_ASSUME_NONNULL_END
 

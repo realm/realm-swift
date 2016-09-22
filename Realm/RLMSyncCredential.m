@@ -29,6 +29,10 @@ RLMIdentityProvider const RLMIdentityProviderICloud                 = @"icloud";
 
 @interface RLMSyncCredential ()
 
+- (instancetype)initWithCustomToken:(RLMCredentialToken)token
+                           provider:(RLMIdentityProvider)provider
+                           userInfo:(NSDictionary *)userInfo NS_DESIGNATED_INITIALIZER;
+
 @property (nonatomic, readwrite) RLMCredentialToken token;
 @property (nonatomic, readwrite) RLMIdentityProvider provider;
 @property (nonatomic, readwrite) NSDictionary *userInfo;
