@@ -32,6 +32,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// Reset the singleton instance, and any saved state. Only for use with Realm Object Store tests.
++ (void)_resetStateForTesting;
+
 - (void)_fireError:(NSError *)error;
 
 - (void)_fireErrorWithCode:(int)errorCode

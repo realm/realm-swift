@@ -84,12 +84,14 @@
 #pragma mark - Authentication
 
 - (void)testUsernamePasswordAuthentication {
+    __block RLMSyncUser *firstUser = nil;
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
     [RLMSyncUser authenticateWithCredential:[RLMSyncCredential credentialWithUsername:@"a" password:@"a" actions:RLMAuthenticationActionsCreateAccount]
                               authServerURL:[RLMObjectServerTests authServerURL]
                                onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNotNil(user);
         XCTAssertNil(error);
+        firstUser = user;
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -100,6 +102,8 @@
                                onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNotNil(user);
         XCTAssertNil(error);
+        // Logging in with equivalent credentials should return the same user object instance.
+        XCTAssertEqual(user, firstUser);
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -147,8 +151,7 @@
 #pragma mark - User Persistence
 
 - (void)testBasicUserPersistence {
-    // FIXME: Uncomment once +[RLMRealm resetRealmState] also resets sync-related things
-    // XCTAssertEqual([[RLMSyncUser all] count], 0U);
+    XCTAssertEqual([[RLMSyncUser all] count], 0U);
 
     __block RLMSyncUser *user = nil;
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
@@ -163,8 +166,7 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     XCTAssertNotNil(user);
-    // FIXME: Uncomment once +[RLMRealm resetRealmState] also resets sync-related things
-    // XCTAssertEqual([[RLMSyncUser all] count], 1U);
+    XCTAssertEqual([[RLMSyncUser all] count], 1U);
     XCTAssertTrue([[RLMSyncUser all] containsObject:user]);
 }
 
