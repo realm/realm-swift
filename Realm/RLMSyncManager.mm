@@ -242,12 +242,16 @@ static dispatch_once_t s_onceToken;
 /// Clean up marked users and destroy them.
 - (void)_cleanUpMarkedUsers {
     @synchronized (self) {
+        std::vector<SyncUserMetadata> dead_users;
         SyncUserMetadataResults users_to_remove = _metadata_manager->all_users_marked_for_removal();
         for (size_t i = 0; i < users_to_remove.size(); i++) {
             auto user = users_to_remove.get(i);
             // FIXME: delete user data in a different way? (This deletes a logged-out user's data as soon as the app
             // launches again, which might not be how some apps want to treat their data.)
             [RLMSyncFileManager removeFilesForUserIdentity:@(user.identity().c_str()) error:nil];
+            dead_users.emplace_back(std::move(user));
+        }
+        for (auto user : dead_users) {
             user.remove();
         }
     }
