@@ -61,6 +61,10 @@
 		02AFB4671A80343600E11938 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4621A80343600E11938 /* ResultsTests.m */; };
 		02AFB4681A80343600E11938 /* ResultsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 02AFB4621A80343600E11938 /* ResultsTests.m */; };
 		02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBA1955FE0100FDED82 /* DynamicTests.m */; };
+		17051FCD1D93D66200EF8E67 /* RLMSyncFileManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ABDCDA91D790AD0003489E3 /* RLMSyncFileManager.mm */; };
+		17051FCE1D93DA0A00EF8E67 /* RLMSyncUser.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ABDCDAF1D793008003489E3 /* RLMSyncUser.mm */; };
+		17051FCF1D93E05D00EF8E67 /* RLMTokenModels.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A6921D21D779774004C3232 /* RLMTokenModels.m */; };
+		17051FD01D93E0CC00EF8E67 /* RLMSyncCredential.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AAF4D201D66585B00058FAD /* RLMSyncCredential.m */; };
 		1A0512721D873F3300806AEC /* RLMSyncConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A3623661D8384BA00945A54 /* RLMSyncConfiguration.mm */; };
 		1A0512741D8742FF00806AEC /* RLMSyncUtil_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1A0512731D87413000806AEC /* RLMSyncUtil_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		1A0512751D8742FF00806AEC /* RLMSyncUtil_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1A0512731D87413000806AEC /* RLMSyncUtil_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -2235,8 +2239,10 @@
 				5DD755821BE056DE002800DA /* object_store.cpp in Sources */,
 				3F0543ED1C56F71900AA5322 /* realm_coordinator.cpp in Sources */,
 				3F75566D1BE94CEA0058BC7E /* results.cpp in Sources */,
+				17051FD01D93E0CC00EF8E67 /* RLMSyncCredential.m in Sources */,
 				3F9801B11C90FD31000A8B07 /* results_notifier.cpp in Sources */,
 				5DD755831BE056DE002800DA /* RLMAccessor.mm in Sources */,
+				17051FCE1D93DA0A00EF8E67 /* RLMSyncUser.mm in Sources */,
 				5DD755841BE056DE002800DA /* RLMAnalytics.mm in Sources */,
 				5DD755851BE056DE002800DA /* RLMArray.mm in Sources */,
 				5DD755861BE056DE002800DA /* RLMArrayLinkView.mm in Sources */,
@@ -2275,9 +2281,11 @@
 				5DD755991BE056DE002800DA /* RLMUtil.mm in Sources */,
 				5DD7559A1BE056DE002800DA /* schema.cpp in Sources */,
 				5DD7559B1BE056DE002800DA /* shared_realm.cpp in Sources */,
+				17051FCD1D93D66200EF8E67 /* RLMSyncFileManager.mm in Sources */,
 				5D274C4E1D6D15FD006FEBB1 /* weak_realm_notifier.cpp in Sources */,
 				3F6864EE1D5B8275000024C3 /* thread_confined.cpp in Sources */,
 				5DD7559C1BE056DE002800DA /* transact_log_handler.cpp in Sources */,
+				17051FCF1D93E05D00EF8E67 /* RLMTokenModels.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
