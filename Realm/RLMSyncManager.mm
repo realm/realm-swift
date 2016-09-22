@@ -273,14 +273,26 @@ static dispatch_once_t s_onceToken;
                                    onCompletion:nil];
 }
 
+- (void)_removeInvalidUsers {
+    NSMutableArray<NSString *> *keyBuffer = [NSMutableArray array];
+    for (NSString *key in self.activeUsers) {
+        if (!self.activeUsers[key].isValid) {
+            [keyBuffer addObject:key];
+        }
+    }
+    [self.activeUsers removeObjectsForKeys:keyBuffer];
+}
+
 - (NSArray *)_allUsers {
     @synchronized (self) {
+        [self _removeInvalidUsers];
         return [self.activeUsers allValues];
     }
 }
 
 - (RLMSyncUser *)_registerUser:(RLMSyncUser *)user {
     @synchronized(self) {
+        [self _removeInvalidUsers];
         NSString *identity = user.identity;
         if (RLMSyncUser *user = [self.activeUsers objectForKey:identity]) {
             return user;
