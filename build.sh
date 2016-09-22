@@ -286,10 +286,7 @@ download_object_server() {
     /usr/local/bin/s3cmd get --force "s3://realm-ci-artifacts/services-bundle/$REALM_OBJECT_SERVER_VERSION/$archive_name"
     rm -rf sync
     mkdir sync
-    (
-        cd sync
-        tar -xf  ../$archive_name
-    )
+    tar -C sync -xf $archive_name
     rm  $archive_name
 }
 
