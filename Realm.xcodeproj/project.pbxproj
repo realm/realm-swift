@@ -63,6 +63,7 @@
 		02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBA1955FE0100FDED82 /* DynamicTests.m */; };
 		17051FCD1D93D66200EF8E67 /* RLMSyncFileManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ABDCDA91D790AD0003489E3 /* RLMSyncFileManager.mm */; };
 		17051FCE1D93DA0A00EF8E67 /* RLMSyncUser.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1ABDCDAF1D793008003489E3 /* RLMSyncUser.mm */; };
+		17051FCF1D93E05D00EF8E67 /* RLMTokenModels.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A6921D21D779774004C3232 /* RLMTokenModels.m */; };
 		1A0512721D873F3300806AEC /* RLMSyncConfiguration.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A3623661D8384BA00945A54 /* RLMSyncConfiguration.mm */; };
 		1A0512741D8742FF00806AEC /* RLMSyncUtil_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1A0512731D87413000806AEC /* RLMSyncUtil_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		1A0512751D8742FF00806AEC /* RLMSyncUtil_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1A0512731D87413000806AEC /* RLMSyncUtil_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -2282,6 +2283,7 @@
 				5D274C4E1D6D15FD006FEBB1 /* weak_realm_notifier.cpp in Sources */,
 				3F6864EE1D5B8275000024C3 /* thread_confined.cpp in Sources */,
 				5DD7559C1BE056DE002800DA /* transact_log_handler.cpp in Sources */,
+				17051FCF1D93E05D00EF8E67 /* RLMTokenModels.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
