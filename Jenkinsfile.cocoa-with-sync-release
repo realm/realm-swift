@@ -3,14 +3,14 @@
 @NonCPS
 def findBuildByTagName(String jobName, String tagName) {
   return Jenkins.instance.getItem('sync_release').getItem(jobName).builds
-  	.findAll {
-  	    it ->
- 		it.result.equals(Result.SUCCESS) &&
+    .findAll {
+        it ->
+        it.result.equals(Result.SUCCESS) &&
         it.getAction(hudson.plugins.git.util.BuildData.class)
           .lastBuild
           .revision
           .containsBranchName("refs/tags/${tagName}")
-  	}.collect {
+    }.collect {
         it -> it.number
     }.find { true }
 }
@@ -161,10 +161,10 @@ node('osx') {
     dir('temp') {
         sh 'rm -rf *'
         sh "/usr/local/bin/s3cmd get --recursive 's3://realm-ci-artifacts/sync/${syncVersionNumber}/cocoa/'"
-        sh 'unzip -q realm-sync-cocoa-1.*.zip -d sync'
+        sh 'tar xf realm-sync-cocoa-1.*.tar.xz'
     }
 
-    sh 'ln -s "$(pwd)/temp/sync" realm-cocoa/core'
+    sh 'ln -s "$(pwd)/temp/core" realm-cocoa/core'
     sh 'ln -s "$(pwd)/realm-cocoa" tightdb_objc'
     sh 'bash realm-cocoa/scripts/reset-simulators.sh'
 
