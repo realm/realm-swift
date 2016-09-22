@@ -12,7 +12,7 @@ target:
   - ios-dynamic
   - ios-swift
   - osx-swift
-  # - watchos # Disabled because sync releases don't include watchos binaries at the moment: https://github.com/realm/realm-sync/pull/824
+  - watchos
   # - cocoapods # Disabled for realm-cocoa-private because these tests target branches on the public repo
   - swiftlint
   - tvos
