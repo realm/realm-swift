@@ -18,6 +18,8 @@ set -e
 
 : ${REALM_SYNC_VERSION:=$(sed -n 's/^REALM_SYNC_VERSION=\(.*\)$/\1/p' dependencies.list)}
 
+: ${REALM_OBJECT_SERVER_VERSION:=$(sed -n 's/^REALM_OBJECT_SERVER_VERSION=\(.*\)$/\1/p' dependencies.list)}
+
 # You can override the xcmode used
 : ${XCMODE:=xcodebuild} # must be one of: xcodebuild (default), xcpretty, xctool
 
@@ -280,10 +282,14 @@ fi
 ######################################
 
 download_object_server() {
-    local archive_name="realm-mobile-platform-$REALM_SYNC_VERSION.zip"
-    /usr/local/bin/s3cmd get "s3://realm-ci-artifacts/bundle/$REALM_SYNC_VERSION/$archive_name"
+    local archive_name="realm-object-server-bundled_node_darwin-$REALM_OBJECT_SERVER_VERSION.tar.gz"
+    /usr/local/bin/s3cmd get --force "s3://realm-ci-artifacts/services-bundle/$REALM_OBJECT_SERVER_VERSION/$archive_name"
     rm -rf sync
-    ditto -x -k $archive_name sync
+    mkdir sync
+    (
+        cd sync
+        tar -xf  ../$archive_name
+    )
     rm  $archive_name
 }
 
