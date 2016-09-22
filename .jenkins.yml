@@ -7,13 +7,13 @@ swift_version:
   - 3.0
 target:
   - osx
-  # - docs # Disabled for sync until we can re-add tests when they start passing again
-  # - ios-static # Disabled for sync until we can re-add tests when they start passing again
+  # - docs # Disabled because it's failing due to undocumented APIs: https://github.com/realm/realm-cocoa-private/issues/285
+  # - ios-static # Disabled because CocoaPods examples fail
   - ios-dynamic
-  # - ios-swift # Disabled for sync until we can re-add tests when they start passing again
-  # - osx-swift # Disabled for sync until we can re-add tests when they start passing again
-  # - watchos # Disabled for sync until we can re-add tests when they start passing again
-  # - cocoapods # Disabled for sync until we can re-add tests when they start passing again
+  - ios-swift
+  - osx-swift
+  # - watchos # Disabled because sync releases don't include watchos binaries at the moment: https://github.com/realm/realm-sync/pull/824
+  # - cocoapods # Disabled for realm-cocoa-private because these tests target branches on the public repo
   - swiftlint
   - tvos
   - osx-encryption
