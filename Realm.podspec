@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
                               Realm is a mobile database: a replacement for Core Data & SQLite. You can use it on iOS & OS X. Realm is not an ORM on top SQLite: instead it uses its own persistence engine, built for simplicity (& speed). Learn more and get help at https://realm.io
                               DESC
   s.homepage                = "https://realm.io"
-  s.source                  = { :git => 'https://github.com/realm/realm-cocoa.git', :tag => "v#{s.version}", :submodules => true }
+  s.source                  = { :git => 'https://github.com/realm/realm-cocoa-private.git', :tag => "v#{s.version}", :submodules => true }
   s.author                  = { 'Realm' => 'help@realm.io' }
   s.library                 = 'c++'
   s.requires_arc            = true
