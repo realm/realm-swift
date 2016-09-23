@@ -28,9 +28,16 @@ Pod::Spec.new do |s|
                               'include/**/RLMPlatform.h',
                               'include/**/RLMProperty.h',
                               'include/**/RLMRealm.h',
+                              'include/**/RLMRealmConfiguration+Sync.h',
                               'include/**/RLMRealmConfiguration.h',
                               'include/**/RLMResults.h',
                               'include/**/RLMSchema.h',
+                              'include/**/RLMSyncConfiguration.h',
+                              'include/**/RLMSyncCredential.h',
+                              'include/**/RLMSyncManager.h',
+                              'include/**/RLMSyncSession.h',
+                              'include/**/RLMSyncUser.h',
+                              'include/**/RLMSyncUtil.h',
                               'include/**/Realm.h',
 
                               # Realm.Dynamic module
