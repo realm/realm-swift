@@ -26,11 +26,19 @@
 // All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
 // called very infrequently, this should pose no issues.
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface RLMSyncManager () {
     std::unique_ptr<realm::SyncMetadataManager> _metadata_manager;
 }
 
-NS_ASSUME_NONNULL_BEGIN
+/**
+ Given a sync configuration, open and return a standalone session.
+
+ If a standalone session was previously opened but encountered a fatal error, attempting to open an equivalent session
+ (by using the same configuration) will return `nil`.
+ */
+- (nullable RLMSyncSession *)sessionForSyncConfiguration:(RLMSyncConfiguration *)config NS_UNAVAILABLE;
 
 /// Reset the singleton instance, and any saved state. Only for use with Realm Object Store tests.
 + (void)_resetStateForTesting;

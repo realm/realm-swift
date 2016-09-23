@@ -91,6 +91,9 @@ extension Realm {
         }
 
         // MARK: Configuration Properties
+
+        /// A tuple used to configure a Realm for synchronization with the Realm Object Server. Mutually exclusive with
+        /// `inMemoryIdentifier` and `fileURL`.
         public var syncConfiguration: (user: User, realmURL: URL)? {
             set {
                 _path = nil
@@ -103,7 +106,7 @@ extension Realm {
 
         private var _syncConfiguration: (user: User, realmURL: URL)?
 
-        /// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`.
+        /// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier` and `syncConfiguration`.
         public var fileURL: URL? {
             set {
                 _inMemoryIdentifier = nil
@@ -117,7 +120,8 @@ extension Realm {
 
         private var _path: String?
 
-        /// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL`.
+        /// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL` and
+        /// `syncConfiguration`.
         public var inMemoryIdentifier: String? {
             set {
                 _path = nil
@@ -311,6 +315,9 @@ extension Realm {
         }
 
         // MARK: Configuration Properties
+
+        /// A tuple used to configure a Realm for synchronization with the Realm Object Server. Mutually exclusive with
+        /// `inMemoryIdentifier` and `fileURL`.
         public var syncConfiguration: (user: User, realmURL: NSURL)? {
             set {
                 _path = nil
@@ -324,7 +331,7 @@ extension Realm {
 
         private var _syncConfiguration: (user: User, realmURL: NSURL)?
 
-        /// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`.
+        /// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier` and `syncConfiguration`.
         public var fileURL: NSURL? {
             set {
                 _inMemoryIdentifier = nil
@@ -338,7 +345,8 @@ extension Realm {
 
         private var _path: String?
 
-        /// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL`.
+        /// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL` and
+        /// `syncConfiguration`.
         public var inMemoryIdentifier: String? {
             set {
                 _path = nil

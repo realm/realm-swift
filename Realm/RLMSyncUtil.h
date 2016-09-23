@@ -18,13 +18,15 @@
 
 #import "RLMConstants.h"
 
-typedef NSString* RLMCredentialToken;
+/// A token originating from the Realm Object Server.
 typedef NSString* RLMServerToken;
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// The error domain string for all SDK errors related to synchronization functionality.
 extern NSString *const RLMSyncErrorDomain;
 
+/// An error which is related to synchronization with a Realm Object Server.
 typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
     /// An error that indicates that the response received from the authentication server was malformed.
     RLMSyncErrorBadResponse             = 1,
@@ -48,7 +50,3 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
 };
 
 NS_ASSUME_NONNULL_END
-
-#define RLM_SYNC_UNINITIALIZABLE \
-- (instancetype)init NS_UNAVAILABLE; \
-+ (instancetype)new NS_UNAVAILABLE;

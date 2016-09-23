@@ -18,21 +18,20 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
-
 @class RLMSyncUser;
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, RLMSyncStopPolicy) {
-    RLMSyncStopPolicyImmediately,
-    RLMSyncStopPolicyLiveIndefinitely,
-    RLMSyncStopPolicyAfterChangesUploaded,
-};
+/**
+ A configuration object representing configuration state for a Realm which is intended to sync with a Realm Object
+ Server.
+ */
+@interface RLMSyncConfiguration : NSObject
 
-@interface RLMSyncConfiguration : NSObject RLM_SYNC_UNINITIALIZABLE
-
+/// The user to which the remote Realm belongs.
 @property (nonatomic, readonly) RLMSyncUser *user;
+
+/// The URL of the remote Realm upon the Realm Object Server.
 @property (nonatomic, readonly) NSURL *realmURL;
 
 /**
@@ -44,6 +43,12 @@ typedef NS_ENUM(NSUInteger, RLMSyncStopPolicy) {
                 wildcard marker `~`.
  */
 - (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url;
+
+/// :nodoc:
+- (instancetype)init __attribute__((unavailable("This type cannot be created directly")));
+
+/// :nodoc:
++ (instancetype)new __attribute__((unavailable("This type cannot be created directly")));
 
 @end
 

@@ -7,7 +7,7 @@ swift_version:
   - 3.0
 target:
   - osx
-  # - docs # Disabled because it's failing due to undocumented APIs: https://github.com/realm/realm-cocoa-private/issues/285
+  - docs
   # - ios-static # Disabled because CocoaPods examples fail
   - ios-dynamic
   - ios-swift

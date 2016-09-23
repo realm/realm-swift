@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-@interface RLMSyncSession ()
+@interface RLMSyncSession () RLM_SYNC_UNINITIALIZABLE
 
 - (void)_refresh;
 - (void)_logOut;
@@ -53,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic) RLMSessionBindingPackage *deferredBindingPackage;
 @property (nullable, nonatomic) RLMServerPath resolvedPath;
 
-- (instancetype)initWithFileURL:(NSURL *)fileURL realmURL:(NSURL *)realmURL NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithFileURL:(NSURL *)fileURL realmURL:(NSURL *)realmURL;
 
 #pragma mark - per-Realm access token API
 
