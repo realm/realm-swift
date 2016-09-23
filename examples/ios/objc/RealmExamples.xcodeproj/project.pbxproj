@@ -21,26 +21,6 @@
 		227D20E41CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E51CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E61CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
-		22C389E81B44FB6C0055CE88 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389D21B44FB6C0055CE88 /* AppDelegate.m */; };
-		22C389E91B44FB6C0055CE88 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 22C389D41B44FB6C0055CE88 /* LaunchScreen.xib */; };
-		22C389EA1B44FB6C0055CE88 /* RLMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389D81B44FB6C0055CE88 /* RLMViewController.m */; };
-		22C389EB1B44FB6C0055CE88 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22C389D91B44FB6C0055CE88 /* Images.xcassets */; };
-		22C389ED1B44FB6C0055CE88 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389DB1B44FB6C0055CE88 /* main.m */; };
-		22C389EE1B44FB6C0055CE88 /* RLMPuzzlePiece.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389DE1B44FB6C0055CE88 /* RLMPuzzlePiece.m */; };
-		22C389EF1B44FB6C0055CE88 /* AYVibrantButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389E11B44FB6C0055CE88 /* AYVibrantButton.m */; };
-		22C389F01B44FB6C0055CE88 /* RLMPuzzlePieceView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389E31B44FB6C0055CE88 /* RLMPuzzlePieceView.m */; };
-		22C389F11B44FB6C0055CE88 /* RLMPuzzleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389E51B44FB6C0055CE88 /* RLMPuzzleView.m */; };
-		22C389F21B44FB6C0055CE88 /* RLMStartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389E71B44FB6C0055CE88 /* RLMStartView.m */; };
-		22C389F51B44FD220055CE88 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
-		22C389F61B44FDAE0055CE88 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
-		22C389F71B44FDB30055CE88 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
-		22C389F81B44FDC10055CE88 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
-		22C389F91B44FE890055CE88 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
-		22C389FC1B451F3C0055CE88 /* RLMPuzzle.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389FB1B451F3C0055CE88 /* RLMPuzzle.m */; };
-		22C389FF1B452FE80055CE88 /* RLMPuzzlesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C389FE1B452FE80055CE88 /* RLMPuzzlesTableViewController.m */; };
-		22CFE2871B0A393B00D5EC93 /* SwatchColor.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE2841B0A393B00D5EC93 /* SwatchColor.m */; };
-		22CFE2881B0A393B00D5EC93 /* SwatchesView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22CFE2861B0A393B00D5EC93 /* SwatchesView.m */; };
-		22D55CCA1B54F1FA00F493A6 /* RLMPuzzleListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D55CC91B54F1FA00F493A6 /* RLMPuzzleListViewController.m */; };
 		3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
@@ -78,18 +58,6 @@
 		C0DC42101A7079D00067156A /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C0DC420F1A7079D00067156A /* MainInterface.storyboard */; };
 		C0DC42181A707B960067156A /* Tick.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DC41FB1A7072DE0067156A /* Tick.m */; };
 		C0DC42191A707BF80067156A /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
-		E80ABD751AF2A9DA00A37843 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
-		E80ABD761AF2A9DA00A37843 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
-		E80ABD771AF2A9DA00A37843 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
-		E80ABD781AF2A9DA00A37843 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
-		E80ABD791AF2A9DA00A37843 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
-		E80ABD8B1AF2AA3F00A37843 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E80ABD811AF2AA3F00A37843 /* AppDelegate.m */; };
-		E80ABD8C1AF2AA3F00A37843 /* DrawPath.m in Sources */ = {isa = PBXBuildFile; fileRef = E80ABD831AF2AA3F00A37843 /* DrawPath.m */; };
-		E80ABD8D1AF2AA3F00A37843 /* DrawPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = E80ABD851AF2AA3F00A37843 /* DrawPoint.m */; };
-		E80ABD8E1AF2AA3F00A37843 /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = E80ABD871AF2AA3F00A37843 /* DrawView.m */; };
-		E80ABD8F1AF2AA3F00A37843 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E80ABD8A1AF2AA3F00A37843 /* main.m */; };
-		E821CAAE1AFC2A8800AB8106 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E80ABD881AF2AA3F00A37843 /* Images.xcassets */; };
-		E821CAB01AFC2B1400AB8106 /* Launch Screen.xib in Resources */ = {isa = PBXBuildFile; fileRef = E821CAAF1AFC2B1400AB8106 /* Launch Screen.xib */; };
 		E879D9CE1A12AA120035E2EB /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
 		E879D9CF1A12AA120035E2EB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		E879D9D01A12AA120035E2EB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
@@ -187,36 +155,7 @@
 /* Begin PBXFileReference section */
 		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
-		22C389AB1B44FB030055CE88 /* Puzzle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Puzzle.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		227D20DD1CB6009D008F641B /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
-		22C389D11B44FB6C0055CE88 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		22C389D21B44FB6C0055CE88 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		22C389D51B44FB6C0055CE88 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = LaunchScreen.xib; sourceTree = "<group>"; };
-		22C389D71B44FB6C0055CE88 /* RLMViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMViewController.h; sourceTree = "<group>"; };
-		22C389D81B44FB6C0055CE88 /* RLMViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMViewController.m; sourceTree = "<group>"; };
-		22C389D91B44FB6C0055CE88 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		22C389DA1B44FB6C0055CE88 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		22C389DB1B44FB6C0055CE88 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		22C389DD1B44FB6C0055CE88 /* RLMPuzzlePiece.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzlePiece.h; sourceTree = "<group>"; };
-		22C389DE1B44FB6C0055CE88 /* RLMPuzzlePiece.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzlePiece.m; sourceTree = "<group>"; };
-		22C389E01B44FB6C0055CE88 /* AYVibrantButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYVibrantButton.h; sourceTree = "<group>"; };
-		22C389E11B44FB6C0055CE88 /* AYVibrantButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYVibrantButton.m; sourceTree = "<group>"; };
-		22C389E21B44FB6C0055CE88 /* RLMPuzzlePieceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzlePieceView.h; sourceTree = "<group>"; };
-		22C389E31B44FB6C0055CE88 /* RLMPuzzlePieceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzlePieceView.m; sourceTree = "<group>"; };
-		22C389E41B44FB6C0055CE88 /* RLMPuzzleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzleView.h; sourceTree = "<group>"; };
-		22C389E51B44FB6C0055CE88 /* RLMPuzzleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzleView.m; sourceTree = "<group>"; };
-		22C389E61B44FB6C0055CE88 /* RLMStartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMStartView.h; sourceTree = "<group>"; };
-		22C389E71B44FB6C0055CE88 /* RLMStartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMStartView.m; sourceTree = "<group>"; };
-		22C389FA1B451F3C0055CE88 /* RLMPuzzle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzle.h; sourceTree = "<group>"; };
-		22C389FB1B451F3C0055CE88 /* RLMPuzzle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzle.m; sourceTree = "<group>"; };
-		22C389FD1B452FE80055CE88 /* RLMPuzzlesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzlesTableViewController.h; sourceTree = "<group>"; };
-		22C389FE1B452FE80055CE88 /* RLMPuzzlesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzlesTableViewController.m; sourceTree = "<group>"; };
-		22CFE2831B0A393B00D5EC93 /* SwatchColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchColor.h; sourceTree = "<group>"; };
-		22CFE2841B0A393B00D5EC93 /* SwatchColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchColor.m; sourceTree = "<group>"; };
-		22CFE2851B0A393B00D5EC93 /* SwatchesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchesView.h; sourceTree = "<group>"; };
-		22CFE2861B0A393B00D5EC93 /* SwatchesView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchesView.m; sourceTree = "<group>"; };
-		22D55CC81B54F1FA00F493A6 /* RLMPuzzleListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzleListViewController.h; sourceTree = "<group>"; };
-		22D55CC91B54F1FA00F493A6 /* RLMPuzzleListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzleListViewController.m; sourceTree = "<group>"; };
 		3F78C9AB1B431CDF00A0988E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RACTableView/AppDelegate.h; sourceTree = "<group>"; };
 		3F78C9AC1B431CDF00A0988E /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = RACTableView/TableViewController.h; sourceTree = "<group>"; };
 		3F78C9AD1B431CDF00A0988E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RACTableView/Images.xcassets; sourceTree = "<group>"; };
@@ -255,19 +194,6 @@
 		C0DC420F1A7079D00067156A /* MainInterface.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainInterface.storyboard; sourceTree = "<group>"; };
 		C0DC421B1A717B660067156A /* TodayExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = TodayExtension.entitlements; sourceTree = "<group>"; };
 		C0DC421C1A717BD00067156A /* Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Extension.entitlements; sourceTree = "<group>"; };
-		E80ABD7D1AF2A9DA00A37843 /* Draw.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Draw.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		E80ABD801AF2AA3F00A37843 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
-		E80ABD811AF2AA3F00A37843 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		E80ABD821AF2AA3F00A37843 /* DrawPath.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawPath.h; sourceTree = "<group>"; };
-		E80ABD831AF2AA3F00A37843 /* DrawPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawPath.m; sourceTree = "<group>"; };
-		E80ABD841AF2AA3F00A37843 /* DrawPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawPoint.h; sourceTree = "<group>"; };
-		E80ABD851AF2AA3F00A37843 /* DrawPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawPoint.m; sourceTree = "<group>"; };
-		E80ABD861AF2AA3F00A37843 /* DrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
-		E80ABD871AF2AA3F00A37843 /* DrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
-		E80ABD881AF2AA3F00A37843 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		E80ABD891AF2AA3F00A37843 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		E80ABD8A1AF2AA3F00A37843 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		E821CAAF1AFC2B1400AB8106 /* Launch Screen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "Launch Screen.xib"; sourceTree = "<group>"; };
 		E879D9D81A12AA120035E2EB /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E879D9DB1A12AA400035E2EB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E879D9DC1A12AA400035E2EB /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -324,18 +250,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		22C389A81B44FB030055CE88 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				22C389F91B44FE890055CE88 /* libc++.dylib in Frameworks */,
-				22C389F81B44FDC10055CE88 /* UIKit.framework in Frameworks */,
-				22C389F71B44FDB30055CE88 /* Foundation.framework in Frameworks */,
-				22C389F61B44FDAE0055CE88 /* CoreGraphics.framework in Frameworks */,
-				22C389F51B44FD220055CE88 /* Realm.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		3F78C9BC1B431CF300A0988E /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -379,18 +293,6 @@
 				C0DC42191A707BF80067156A /* libc++.dylib in Frameworks */,
 				C0DC42081A7079D00067156A /* NotificationCenter.framework in Frameworks */,
 				C06134E41A71AA4E00D22D12 /* Realm.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E80ABD741AF2A9DA00A37843 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E80ABD751AF2A9DA00A37843 /* CoreGraphics.framework in Frameworks */,
-				E80ABD761AF2A9DA00A37843 /* Foundation.framework in Frameworks */,
-				E80ABD771AF2A9DA00A37843 /* libc++.dylib in Frameworks */,
-				E80ABD781AF2A9DA00A37843 /* Realm.framework in Frameworks */,
-				E80ABD791AF2A9DA00A37843 /* UIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,69 +391,6 @@
 			path = Common;
 			sourceTree = "<group>";
 		};
-		22C389AC1B44FB030055CE88 /* Puzzle */ = {
-			isa = PBXGroup;
-			children = (
-				22C389D11B44FB6C0055CE88 /* AppDelegate.h */,
-				22C389D21B44FB6C0055CE88 /* AppDelegate.m */,
-				22C389D31B44FB6C0055CE88 /* Base.lproj */,
-				22C389D61B44FB6C0055CE88 /* Controllers */,
-				22C389D91B44FB6C0055CE88 /* Images.xcassets */,
-				22C389DA1B44FB6C0055CE88 /* Info.plist */,
-				22C389DB1B44FB6C0055CE88 /* main.m */,
-				22C389DC1B44FB6C0055CE88 /* Models */,
-				22C389DF1B44FB6C0055CE88 /* Views */,
-			);
-			path = Puzzle;
-			sourceTree = "<group>";
-		};
-		22C389D31B44FB6C0055CE88 /* Base.lproj */ = {
-			isa = PBXGroup;
-			children = (
-				22C389D41B44FB6C0055CE88 /* LaunchScreen.xib */,
-			);
-			path = Base.lproj;
-			sourceTree = "<group>";
-		};
-		22C389D61B44FB6C0055CE88 /* Controllers */ = {
-			isa = PBXGroup;
-			children = (
-				22C389D71B44FB6C0055CE88 /* RLMViewController.h */,
-				22C389D81B44FB6C0055CE88 /* RLMViewController.m */,
-				22C389FD1B452FE80055CE88 /* RLMPuzzlesTableViewController.h */,
-				22C389FE1B452FE80055CE88 /* RLMPuzzlesTableViewController.m */,
-				22D55CC81B54F1FA00F493A6 /* RLMPuzzleListViewController.h */,
-				22D55CC91B54F1FA00F493A6 /* RLMPuzzleListViewController.m */,
-			);
-			path = Controllers;
-			sourceTree = "<group>";
-		};
-		22C389DC1B44FB6C0055CE88 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				22C389FA1B451F3C0055CE88 /* RLMPuzzle.h */,
-				22C389FB1B451F3C0055CE88 /* RLMPuzzle.m */,
-				22C389DD1B44FB6C0055CE88 /* RLMPuzzlePiece.h */,
-				22C389DE1B44FB6C0055CE88 /* RLMPuzzlePiece.m */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		22C389DF1B44FB6C0055CE88 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				22C389E01B44FB6C0055CE88 /* AYVibrantButton.h */,
-				22C389E11B44FB6C0055CE88 /* AYVibrantButton.m */,
-				22C389E21B44FB6C0055CE88 /* RLMPuzzlePieceView.h */,
-				22C389E31B44FB6C0055CE88 /* RLMPuzzlePieceView.m */,
-				22C389E41B44FB6C0055CE88 /* RLMPuzzleView.h */,
-				22C389E51B44FB6C0055CE88 /* RLMPuzzleView.m */,
-				22C389E61B44FB6C0055CE88 /* RLMStartView.h */,
-				22C389E71B44FB6C0055CE88 /* RLMStartView.m */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
 		3F78C9AA1B431CB200A0988E /* RACTableView */ = {
 			isa = PBXGroup;
 			children = (
@@ -647,29 +486,6 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		E80ABD7F1AF2AA3F00A37843 /* Draw */ = {
-			isa = PBXGroup;
-			children = (
-				E80ABD801AF2AA3F00A37843 /* AppDelegate.h */,
-				E80ABD811AF2AA3F00A37843 /* AppDelegate.m */,
-				E80ABD821AF2AA3F00A37843 /* DrawPath.h */,
-				E80ABD831AF2AA3F00A37843 /* DrawPath.m */,
-				E80ABD841AF2AA3F00A37843 /* DrawPoint.h */,
-				E80ABD851AF2AA3F00A37843 /* DrawPoint.m */,
-				E80ABD861AF2AA3F00A37843 /* DrawView.h */,
-				E80ABD871AF2AA3F00A37843 /* DrawView.m */,
-				22CFE2831B0A393B00D5EC93 /* SwatchColor.h */,
-				22CFE2841B0A393B00D5EC93 /* SwatchColor.m */,
-				22CFE2851B0A393B00D5EC93 /* SwatchesView.h */,
-				22CFE2861B0A393B00D5EC93 /* SwatchesView.m */,
-				E80ABD881AF2AA3F00A37843 /* Images.xcassets */,
-				E80ABD891AF2AA3F00A37843 /* Info.plist */,
-				E80ABD8A1AF2AA3F00A37843 /* main.m */,
-				E821CAAF1AFC2B1400AB8106 /* Launch Screen.xib */,
-			);
-			path = Draw;
-			sourceTree = "<group>";
-		};
 		E879D9DA1A12AA400035E2EB /* GroupedTableView */ = {
 			isa = PBXGroup;
 			children = (
@@ -689,11 +505,9 @@
 			children = (
 				E8BDBFC71A116FCB00450CFF /* Backlink */,
 				227D20DC1CB6009D008F641B /* Common */,
-				E80ABD7F1AF2AA3F00A37843 /* Draw */,
 				E8F70EBF19BA50AB006F60D5 /* Encryption */,
 				C0DC41CD1A7072670067156A /* Extension */,
 				C0658DC31A76CBD8002F7A84 /* extension WatchKit App */,
-				22C389AC1B44FB030055CE88 /* Puzzle */,
 				C0658DB51A76CBD8002F7A84 /* extension WatchKit Extension */,
 				E8AB71A819BA502500F3EDB4 /* Frameworks */,
 				E879D9DA1A12AA400035E2EB /* GroupedTableView */,
@@ -724,8 +538,6 @@
 				E8AB71DC19BA503500F3EDB4 /* Simple.app */,
 				E8AB726619BA504500F3EDB4 /* TableView.app */,
 				C0DC42061A7079D00067156A /* TodayExtension.appex */,
-				E80ABD7D1AF2A9DA00A37843 /* Draw.app */,
-				22C389AB1B44FB030055CE88 /* Puzzle.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -826,23 +638,6 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		22C389AA1B44FB030055CE88 /* Puzzle */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 22C389CF1B44FB030055CE88 /* Build configuration list for PBXNativeTarget "Puzzle" */;
-			buildPhases = (
-				22C389A71B44FB030055CE88 /* Sources */,
-				22C389A81B44FB030055CE88 /* Frameworks */,
-				22C389A91B44FB030055CE88 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Puzzle;
-			productName = Puzzle;
-			productReference = 22C389AB1B44FB030055CE88 /* Puzzle.app */;
-			productType = "com.apple.product-type.application";
-		};
 		3F78C9B51B431CF300A0988E /* RACTableView */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3F78C9C41B431CF300A0988E /* Build configuration list for PBXNativeTarget "RACTableView" */;
@@ -931,23 +726,6 @@
 			productName = TodayExtension;
 			productReference = C0DC42061A7079D00067156A /* TodayExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
-		};
-		E80ABD6E1AF2A9DA00A37843 /* Draw */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = E80ABD7A1AF2A9DA00A37843 /* Build configuration list for PBXNativeTarget "Draw" */;
-			buildPhases = (
-				E80ABD711AF2A9DA00A37843 /* Sources */,
-				E80ABD741AF2A9DA00A37843 /* Frameworks */,
-				E821CAAD1AFC2A8000AB8106 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = Draw;
-			productName = Simple;
-			productReference = E80ABD7D1AF2A9DA00A37843 /* Draw.app */;
-			productType = "com.apple.product-type.application";
 		};
 		E879D9C61A12AA120035E2EB /* GroupedTableView */ = {
 			isa = PBXNativeTarget;
@@ -1078,9 +856,6 @@
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
-					22C389AA1B44FB030055CE88 = {
-						CreatedOnToolsVersion = 6.4;
-					};
 					C0658DB31A76CBD8002F7A84 = {
 						CreatedOnToolsVersion = 6.2;
 						DevelopmentTeam = 9GCBJ97HG6;
@@ -1130,7 +905,6 @@
 			projectRoot = "";
 			targets = (
 				E8BDBFA01A116FAC00450CFF /* Backlink */,
-				E80ABD6E1AF2A9DA00A37843 /* Draw */,
 				E8AB723719BA504000F3EDB4 /* Encryption */,
 				C0DC41CB1A7072670067156A /* extension */,
 				C0DC42051A7079D00067156A /* TodayExtension */,
@@ -1142,7 +916,6 @@
 				E8AB726519BA504500F3EDB4 /* TableView */,
 				C0658DB31A76CBD8002F7A84 /* extension WatchKit Extension */,
 				C0658DBE1A76CBD8002F7A84 /* extension WatchKit App */,
-				22C389AA1B44FB030055CE88 /* Puzzle */,
 			);
 		};
 /* End PBXProject section */
@@ -1185,7 +958,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				227D20E51CB6009D008F641B /* LaunchScreen.xib in Resources */,
-				22C389EB1B44FB6C0055CE88 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1221,15 +993,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				C0DC42101A7079D00067156A /* MainInterface.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E821CAAD1AFC2A8000AB8106 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E821CAAE1AFC2A8800AB8106 /* Images.xcassets in Resources */,
-				E821CAB01AFC2B1400AB8106 /* Launch Screen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1298,24 +1061,6 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		22C389A71B44FB030055CE88 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				22C389EA1B44FB6C0055CE88 /* RLMViewController.m in Sources */,
-				22C389F01B44FB6C0055CE88 /* RLMPuzzlePieceView.m in Sources */,
-				22C389ED1B44FB6C0055CE88 /* main.m in Sources */,
-				22C389F11B44FB6C0055CE88 /* RLMPuzzleView.m in Sources */,
-				22C389EF1B44FB6C0055CE88 /* AYVibrantButton.m in Sources */,
-				22C389FF1B452FE80055CE88 /* RLMPuzzlesTableViewController.m in Sources */,
-				22C389F21B44FB6C0055CE88 /* RLMStartView.m in Sources */,
-				22C389EE1B44FB6C0055CE88 /* RLMPuzzlePiece.m in Sources */,
-				22C389E81B44FB6C0055CE88 /* AppDelegate.m in Sources */,
-				22D55CCA1B54F1FA00F493A6 /* RLMPuzzleListViewController.m in Sources */,
-				22C389FC1B451F3C0055CE88 /* RLMPuzzle.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		3F78C9B81B431CF300A0988E /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1351,20 +1096,6 @@
 			files = (
 				C0DC42181A707B960067156A /* Tick.m in Sources */,
 				C0DC420E1A7079D00067156A /* TodayViewController.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		E80ABD711AF2A9DA00A37843 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				22CFE2881B0A393B00D5EC93 /* SwatchesView.m in Sources */,
-				E80ABD8C1AF2AA3F00A37843 /* DrawPath.m in Sources */,
-				22CFE2871B0A393B00D5EC93 /* SwatchColor.m in Sources */,
-				E80ABD8E1AF2AA3F00A37843 /* DrawView.m in Sources */,
-				E80ABD8B1AF2AA3F00A37843 /* AppDelegate.m in Sources */,
-				E80ABD8F1AF2AA3F00A37843 /* main.m in Sources */,
-				E80ABD8D1AF2AA3F00A37843 /* DrawPoint.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1456,59 +1187,7 @@
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXVariantGroup section */
-		22C389D41B44FB6C0055CE88 /* LaunchScreen.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				22C389D51B44FB6C0055CE88 /* Base */,
-			);
-			name = LaunchScreen.xib;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
-
 /* Begin XCBuildConfiguration section */
-		22C389CB1B44FB030055CE88 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_BITCODE = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = Puzzle/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		22C389CC1B44FB030055CE88 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				ENABLE_BITCODE = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_NO_COMMON_BLOCKS = YES;
-				INFOPLIST_FILE = Puzzle/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.4;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 		3F78C9C51B431CF300A0988E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BD5E18798F030DC45369A649 /* Pods-RACTableView.debug.xcconfig */;
@@ -1706,38 +1385,6 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
-		E80ABD7B1AF2A9DA00A37843 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ENABLE_BITCODE = NO;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = Draw/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				PRODUCT_NAME = Draw;
-				WRAPPER_EXTENSION = app;
-			};
-			name = Debug;
-		};
-		E80ABD7C1AF2A9DA00A37843 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ENABLE_BITCODE = NO;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = "";
-				INFOPLIST_FILE = Draw/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
-				PRODUCT_NAME = Draw;
-				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
 		};
@@ -2030,15 +1677,6 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		22C389CF1B44FB030055CE88 /* Build configuration list for PBXNativeTarget "Puzzle" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				22C389CB1B44FB030055CE88 /* Debug */,
-				22C389CC1B44FB030055CE88 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		3F78C9C41B431CF300A0988E /* Build configuration list for PBXNativeTarget "RACTableView" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -2080,15 +1718,6 @@
 			buildConfigurations = (
 				C0DC42151A7079D00067156A /* Debug */,
 				C0DC42161A7079D00067156A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		E80ABD7A1AF2A9DA00A37843 /* Build configuration list for PBXNativeTarget "Draw" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				E80ABD7B1AF2A9DA00A37843 /* Debug */,
-				E80ABD7C1AF2A9DA00A37843 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
