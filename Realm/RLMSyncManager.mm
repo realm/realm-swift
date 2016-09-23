@@ -156,11 +156,13 @@ static dispatch_once_t s_onceToken;
 
 + (void)_resetStateForTesting {
     // Log out all the logged-in users. This will immediately kill any open sessions.
+    NSMutableArray<RLMSyncUser *> *buffer = [NSMutableArray array];
     if (s_sharedManager) {
         for (id key in s_sharedManager.activeUsers) {
-            [s_sharedManager.activeUsers[key] logOut];
+            [buffer addObject:s_sharedManager.activeUsers[key]];
         }
     }
+    [[s_sharedManager.activeUsers allValues] makeObjectsPerformSelector:@selector(logOut)];
 
     // Reset the singleton.
     s_onceToken = 0;
@@ -270,7 +272,7 @@ static dispatch_once_t s_onceToken;
             [user _registerSessionForBindingWithFileURL:[NSURL fileURLWithPath:filePathString]
                                              syncConfig:syncConfig
                                       standaloneSession:NO
-                                           onCompletion:nil];
+                                           onCompletion:self.sessionCompletionNotifier];
         }
     }
 }

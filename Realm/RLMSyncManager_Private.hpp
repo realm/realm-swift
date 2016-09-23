@@ -18,6 +18,8 @@
 
 #import "RLMSyncManager.h"
 
+#import "RLMSyncUtil_Private.h"
+
 #import "sync_config.hpp"
 #import "sync_metadata.hpp"
 
@@ -31,6 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMSyncManager () {
     std::unique_ptr<realm::SyncMetadataManager> _metadata_manager;
 }
+
+@property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock sessionCompletionNotifier;
 
 /**
  Given a sync configuration, open and return a standalone session.
