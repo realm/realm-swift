@@ -122,16 +122,7 @@
 }
 
 - (void)testAdminTokenAuthentication {
-    NSString *syncDirectoryPath = [[[RLMObjectServerTests rootRealmCocoaURL] URLByAppendingPathComponent:@"sync"] path];
-    NSDirectoryEnumerator *fileEnumerator = [[NSFileManager defaultManager] enumeratorAtPath:syncDirectoryPath];
-
-    NSURL *adminTokenFileURL = nil;
-    for (NSString *filename in fileEnumerator) {
-        if ([[filename lastPathComponent] isEqualToString:@"admin_token.base64"]) {
-            adminTokenFileURL = [[[RLMObjectServerTests rootRealmCocoaURL] URLByAppendingPathComponent:@"sync"] URLByAppendingPathComponent:filename];
-        }
-    }
-    XCTAssertNotNil(adminTokenFileURL);
+    NSURL *adminTokenFileURL = [[RLMObjectServerTests rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
     NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
     XCTAssertNotNil(adminToken);
     RLMSyncCredential *credential = [RLMSyncCredential credentialWithAccessToken:adminToken identity:@"test"];
