@@ -44,10 +44,10 @@ NS_ASSUME_NONNULL_BEGIN
  @param fileURL     The location of the file on disk where the local copy of the Realm will be saved.
  @param completion  An optional completion block.
  */
-- (RLMSyncSession *)_registerSessionForBindingWithFileURL:(NSURL *)fileURL
-                                               syncConfig:(RLMSyncConfiguration *)syncConfig
-                                        standaloneSession:(BOOL)isStandalone
-                                             onCompletion:(nullable RLMSyncBasicErrorReportingBlock)completion;
+- (nullable RLMSyncSession *)_registerSessionForBindingWithFileURL:(NSURL *)fileURL
+                                                        syncConfig:(RLMSyncConfiguration *)syncConfig
+                                                 standaloneSession:(BOOL)isStandalone
+                                                      onCompletion:(nullable RLMSyncBasicErrorReportingBlock)completion;
 
 - (void)_invalidate;
 - (void)_deregisterSessionWithRealmURL:(NSURL *)realmURL;
