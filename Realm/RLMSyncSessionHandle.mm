@@ -77,8 +77,8 @@ using namespace realm;
 
 - (BOOL)refreshAccessToken:(NSString *)accessToken serverURL:(NSURL *)serverURL {
     _ptr->refresh_access_token(accessToken.UTF8String,
-                               serverURL ? util::none
-                               : util::make_optional<std::string>(serverURL.absoluteString.UTF8String));
+                               serverURL ? util::make_optional<std::string>(serverURL.absoluteString.UTF8String)
+                                         : util::none);
     return YES;
 }
 
