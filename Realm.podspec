@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.homepage                = "https://realm.io"
   s.source                  = { :git => 'https://github.com/realm/realm-cocoa-private.git', :tag => "v#{s.version}", :submodules => true }
   s.author                  = { 'Realm' => 'help@realm.io' }
-  s.library                 = 'c++'
+  s.library                 = 'c++', 'z'
   s.requires_arc            = true
   s.social_media_url        = 'https://twitter.com/realm'
   s.documentation_url       = "https://realm.io/docs/objc/#{s.version}"
