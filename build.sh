@@ -328,7 +328,7 @@ download_sync() {
     SYNC_TMP_TAR="${TMP_DIR}/sync-${REALM_SYNC_VERSION}.tar.xz.tmp"
     SYNC_TAR="${TMP_DIR}/sync-${REALM_SYNC_VERSION}.tar.xz"
     if [ ! -f "${SYNC_TAR}" ]; then
-        local SYNC_URL="https://static.realm.io/downloads/sync/sync-${REALM_SYNC_VERSION}.tar.xz"
+        local SYNC_URL="https://static.realm.io/downloads/sync/realm-sync-cocoa-${REALM_SYNC_VERSION}.tar.xz"
         set +e # temporarily disable immediate exit
         local ERROR # sweeps the exit code unless declared separately
         ERROR=$(curl --fail --silent --show-error --location "$SYNC_URL" --output "${SYNC_TMP_TAR}" 2>&1 >/dev/null)
