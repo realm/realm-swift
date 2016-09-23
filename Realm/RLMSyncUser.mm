@@ -33,10 +33,6 @@
 
 using namespace realm;
 
-@interface RLMSyncSession ()
-- (id)sessionHandle;
-@end
-
 @interface RLMSyncUser ()
 
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer NS_DESIGNATED_INITIALIZER;
@@ -113,10 +109,11 @@ using namespace realm;
 
 - (nullable RLMSyncSession *)sessionForURL:(NSURL *)url {
     RLMSyncSession *session = [self.sessionsStorage objectForKey:url];
-    if (![[session sessionHandle] sessionStillExists]) {
+    RLMSyncSessionHandle *handle = [session sessionHandle];
+    if (handle && ![handle sessionStillExists]) {
         [self.sessionsStorage removeObjectForKey:url];
         return nil;
-    } else if ([[session sessionHandle] sessionIsInErrorState]) {
+    } else if ([handle sessionIsInErrorState]) {
         [session _invalidate];
         return nil;
     }

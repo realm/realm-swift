@@ -62,6 +62,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) NSTimer *refreshTimer;
 
+- (nullable RLMSyncSessionHandle *)sessionHandle;
+
 - (void)configureWithAccessToken:(RLMServerToken)token
                           expiry:(NSTimeInterval)expiry
                             user:(RLMSyncUser *)user
