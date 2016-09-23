@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSURL *)fileURLForRawRealmURL:(NSURL *)url user:(RLMSyncUser *)user;
 + (NSURL *)fileURLForMetadata;
-+ (void)removeFilesForUserIdentity:(NSString *)identity error:(NSError * _Nullable* _Nullable)error;
++ (BOOL)removeFilesForUserIdentity:(NSString *)identity error:(NSError * _Nullable* _Nullable)error;
 
 NS_ASSUME_NONNULL_END
 

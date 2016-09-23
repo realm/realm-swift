@@ -109,10 +109,10 @@ static NSString *const RLMSyncMetadataRealmName = @"sync_metadata.realm";
 /**
  Remove all Realm state for a user.
  */
-+ (void)removeFilesForUserIdentity:(NSString *)identity error:(NSError **)error {
++ (BOOL)removeFilesForUserIdentity:(NSString *)identity error:(NSError **)error {
     NSURL *userDir = [self _folderPathForUserIdentity:identity];
     NSFileManager *manager = [NSFileManager defaultManager];
-    [manager removeItemAtURL:userDir error:error];
+    return [manager removeItemAtURL:userDir error:error];
 }
 
 @end
