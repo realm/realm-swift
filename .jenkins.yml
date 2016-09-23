@@ -2,8 +2,8 @@
 # https://wiki.jenkins-ci.org/display/JENKINS/Yaml+Axis+Plugin
 
 swift_version:
-  # - 2.2 # Disabled for sync until we can re-add tests when they start passing again
-  # - 2.3 # Disabled for sync until we can re-add tests when they start passing again
+  - 2.2
+  - 2.3
   - 3.0
 target:
   - osx
@@ -23,7 +23,7 @@ target:
   # - ios-device-swift
   # - tvos-device
 configuration:
-  # - Debug # Disabled for sync until we can re-add tests when they start passing again
+  - Debug
   - Release
 
 # Combinations have to be excluded in a way that's hard to read.
