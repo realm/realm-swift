@@ -48,7 +48,8 @@ Pod::Spec.new do |s|
                               'Realm/ObjectStore/src/*.cpp',
                               'Realm/ObjectStore/src/impl/*.cpp',
                               'Realm/ObjectStore/src/impl/apple/*.cpp',
-                              'Realm/ObjectStore/src/util/*.cpp'
+                              'Realm/ObjectStore/src/util/*.cpp',
+                              'Realm/ObjectStore/src/util/apple/*.cpp'
 
   s.module_map              = 'Realm/module.modulemap'
   s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__"
