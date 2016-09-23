@@ -2,8 +2,8 @@
 # https://wiki.jenkins-ci.org/display/JENKINS/Yaml+Axis+Plugin
 
 swift_version:
-  # - 2.2 # Disabled for sync until we can re-add tests when they start passing again
-  # - 2.3 # Disabled for sync until we can re-add tests when they start passing again
+  - 2.2
+  - 2.3
   - 3.0
 target:
   - osx
@@ -23,24 +23,24 @@ target:
   # - ios-device-swift
   # - tvos-device
 configuration:
-  # - Debug # Disabled for sync until we can re-add tests when they start passing again
+  - Debug
   - Release
 
 # Combinations have to be excluded in a way that's hard to read.
 # This table shows which jobs will run:
 
-# +------------------------------------------------------------------------------------------------------------------------------------------------+
-# | Configuration Matrix | osx | docs | ios-static | ios-dynamic | ios-swift | osx-swift | watchos | cocoapods | swiftlint | tvos | osx-encryption |
-# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- |
-# | 2.2 | Debug          | X   |      |            |             |           |           |         |           |           |      |                |
-# | 2.2 | Release        | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |
-# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- |
-# | 2.3 | Debug          |     |      |            |             |           |           |         |           |           |      |                |
-# | 2.3 | Release        |     |      |            |             | X         | X         | X       | X         |           | X    |                |
-# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- |
-# | 3.0 | Debug          | X   |      | X          | X           | X         | X         | X       |           |           | X    |                |
-# | 3.0 | Release        | X   | X    | X          | X           | X         | X         | X       | X         | X         | X    | X              |
-# +------------------------------------------------------------------------------------------------------------------------------------------------+
+# +--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+# | Configuration Matrix | osx | docs | ios-static | ios-dynamic | ios-swift | osx-swift | watchos | cocoapods | swiftlint | tvos | osx-encryption | osx-object-server |
+# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- |
+# | 2.2 | Debug          | X   |      |            |             |           |           |         |           |           |      |                |                   |
+# | 2.2 | Release        | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |
+# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- |
+# | 2.3 | Debug          |     |      |            |             |           |           |         |           |           |      |                |                   |
+# | 2.3 | Release        |     |      |            |             | X         | X         | X       | X         |           | X    |                |                   |
+# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- |
+# | 3.0 | Debug          | X   |      | X          | X           | X         | X         | X       |           |           | X    |                |                   |
+# | 3.0 | Release        | X   | X    | X          | X           | X         | X         | X       | X         | X         | X    | X              | X                 |
+# +--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 exclude:
   ################
@@ -152,4 +152,15 @@ exclude:
   - swift_version: 2.3
     target: osx-encryption
   - target: osx-encryption
+    configuration: Debug
+
+  ################
+  # osx-object-server
+  ################
+  # Just run on 3.0 Release
+  - swift_version: 2.2
+    target: osx-object-server
+  - swift_version: 2.3
+    target: osx-object-server
+  - target: osx-object-server
     configuration: Debug
