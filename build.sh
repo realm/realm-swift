@@ -288,6 +288,8 @@ download_object_server() {
     mkdir sync
     tar -C sync -xf $archive_name
     rm  $archive_name
+    echo "\nenterprise:\n  skip_setup: true" >> "sync/object-server/configuration.yml"
+    touch "sync/object-server/do_not_open_browser"
 }
 
 download_core() {
