@@ -117,7 +117,7 @@ static dispatch_once_t s_onceToken;
         };
 
         _disableSSLValidation = NO;
-        self.logLevel = RLMSyncLogLevelInfo;
+        self.logLevel = RLMSyncLogLevelWarn;
         realm::SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
 
         self.activeUsers = [NSMutableDictionary dictionary];
