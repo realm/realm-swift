@@ -36,8 +36,7 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) {
 
 @implementation UtilTests
 
-// FIXME: Re-enable once sync properly sets REALM_VERSION in config.h
-- (void)DISABLED_testRLMExceptionWithReasonAndUserInfo {
+- (void)testRLMExceptionWithReasonAndUserInfo {
     NSString *const reason = @"Reason";
     NSDictionary *expectedUserInfo = @{
                                        RLMRealmVersionKey : REALM_COCOA_VERSION,
@@ -48,8 +47,7 @@ static BOOL RLMEqualExceptions(NSException *actual, NSException *expected) {
                                      [NSException exceptionWithName:RLMExceptionName reason:reason userInfo:expectedUserInfo]));
 }
 
-// FIXME: Re-enable once sync properly sets REALM_VERSION in config.h
-- (void)DISABLED_testRLMExceptionWithCPlusPlusException {
+- (void)testRLMExceptionWithCPlusPlusException {
     std::runtime_error exception("Reason");
     NSDictionary *expectedUserInfo = @{
                                        RLMRealmVersionKey : REALM_COCOA_VERSION,
