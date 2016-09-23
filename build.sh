@@ -915,7 +915,7 @@ case "$COMMAND" in
         if [ ! -d core ]; then
           sh build.sh download-core
           rm core
-          mv core-* core
+          mv sync-* core
         fi
 
         if [[ "$2" != "swift" ]]; then
