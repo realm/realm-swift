@@ -72,6 +72,8 @@
 #import "RLMVersion.h"
 #endif
 
+#import <realm/sync/version.hpp>
+
 // Declared for RealmSwiftObjectUtil
 @interface NSObject (SwiftVersion)
 + (NSString *)swiftVersion;
@@ -197,6 +199,7 @@ static NSDictionary *RLMAnalyticsPayload() {
                      @"Binding": @"cocoa",
                      @"Language": isSwift ? @"swift" : @"objc",
                      @"Realm Version": REALM_COCOA_VERSION,
+                     @"Sync Version": @(REALM_SYNC_VER_STRING),
 #if TARGET_OS_WATCH
                      @"Target OS Type": @"watchos",
 #elif TARGET_OS_TV
