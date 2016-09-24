@@ -1169,6 +1169,16 @@ EOM
                 cd ${FOLDER}/ios/dynamic
                 unzip ${WORKSPACE}/realm-dynamic-framework-ios.zip
             )
+
+            (
+                cd ${FOLDER}/watchos
+                unzip ${WORKSPACE}/realm-framework-watchos.zip
+            )
+
+            (
+                cd ${FOLDER}/tvos
+                unzip ${WORKSPACE}/realm-framework-tvos.zip
+            )
         else
             (
                 cd ${FOLDER}/osx
@@ -1178,6 +1188,16 @@ EOM
             (
                 cd ${FOLDER}/ios
                 unzip ${WORKSPACE}/realm-swift-framework-ios.zip
+            )
+
+            (
+                cd ${FOLDER}/watchos
+                unzip ${WORKSPACE}/realm-swift-framework-watchos.zip
+            )
+
+            (
+                cd ${FOLDER}/tvos
+                unzip ${WORKSPACE}/realm-swift-framework-tvos.zip
             )
         fi
 
@@ -1237,7 +1257,6 @@ EOF
         export WORKSPACE
         cd $WORKSPACE
         git clone --recursive $REALM_SOURCE tightdb_objc
-        cp -R $REALM_SOURCE/core tightdb_objc/core
 
         echo 'Packaging iOS'
         sh tightdb_objc/build.sh package-ios-static
