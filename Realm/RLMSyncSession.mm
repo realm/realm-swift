@@ -115,11 +115,15 @@
     NSTimer *timer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSince1970:refreshTime]
                                               interval:1
                                                 target:self
-                                              selector:@selector(refresh)
+                                              selector:@selector(_refreshForTimer:)
                                               userInfo:nil
                                                repeats:NO];
     [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
     self.refreshTimer = timer;
+}
+
+- (void)_refreshForTimer:(__unused NSTimer *)timer {
+    [self _refresh];
 }
 
 - (void)_refresh {
@@ -164,6 +168,31 @@
                                                      code:RLMSyncErrorBadResponse
                                                  userInfo:@{kRLMSyncUnderlyingErrorKey: error}];
             [[RLMSyncManager sharedManager] _fireError:syncError];
+            // Certain errors should trigger a retry.
+            if (error.domain == NSURLErrorDomain) {
+                BOOL shouldRetry = NO;
+                switch (error.code) {
+                    case NSURLErrorCannotConnectToHost:
+                        shouldRetry = YES;
+                        // FIXME: 120 seconds is an arbitrarily chosen value, consider rationalizing it.
+                        self.accessTokenExpiry = [[NSDate dateWithTimeIntervalSinceNow:120] timeIntervalSince1970];
+                        break;
+                    case NSURLErrorNotConnectedToInternet:
+                    case NSURLErrorNetworkConnectionLost:
+                    case NSURLErrorTimedOut:
+                    case NSURLErrorDNSLookupFailed:
+                    case NSURLErrorCannotFindHost:
+                        shouldRetry = YES;
+                        // FIXME: 30 seconds is an arbitrarily chosen value, consider rationalizing it.
+                        self.accessTokenExpiry = [[NSDate dateWithTimeIntervalSinceNow:30] timeIntervalSince1970];
+                        break;
+                    default:
+                        break;
+                }
+                if (shouldRetry) {
+                    [self _scheduleRefreshTimer];
+                }
+            }
         }
     };
     [RLMNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
