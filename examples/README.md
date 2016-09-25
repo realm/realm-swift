@@ -6,28 +6,6 @@ Included in this folder are sample iOS/OSX apps using Realm.
 
 The following examples are located in the `ios/objc/RealmExamples.xcodeproj` project:
 
-### Chat
-
-Chat app to demonstrate how to use a synced realm. To run, follow these steps:
-
-* Checkout realm-core’s [sync-demo-4 branch](https://github.com/tightdb/tightdb/tree/sync-demo-4)
-* Build realm-core by running `sh build.sh build && sh build.sh build-cocoa`
-* Copy the `core` directory from your realm-cocoa to your realm-cocoa-private directory
-* In realm-core start the realm server by running `./src/realm/realm-server-noinst <HOSTNAME>`
-* Edit `examples/ios/objc/Chat/AppDelegate.m` to use the hostname of the computer running the realm server
-* Run the "Chat" scheme
-
-### Draw
-
-Drawing app to demonstrate how to use a synced realm. To run, follow these steps:
-
-* Checkout realm-core’s [sync-demo-4 branch](https://github.com/tightdb/tightdb/tree/sync-demo-4)
-* Build realm-core by running `sh build.sh build && sh build.sh build-cocoa`
-* Copy the `core` directory from your realm-cocoa to your realm-cocoa-private directory
-* In realm-core start the realm server by running `./src/realm/realm-server-noinst <HOSTNAME>`
-* Edit `examples/ios/objc/Draw/AppDelegate.m` and `examples/osx/objc/Draw/AppDelegate.m` to use the hostname of the computer running the realm server
-* Run the "Draw" scheme in both examples projects
-
 ### Simple
 
 This app covers several introductory concepts about Realm. Without any UI distractions, just a little console output.

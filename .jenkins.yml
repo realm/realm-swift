@@ -8,7 +8,7 @@ swift_version:
 target:
   - osx
   - docs
-  # - ios-static # Disabled because CocoaPods examples fail
+  - ios-static
   - ios-dynamic
   - ios-swift
   - osx-swift
