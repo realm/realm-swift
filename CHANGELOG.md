@@ -1,5 +1,9 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.0.0 Release notes (2016-09-27)
 =============================================================
+
+This release introduces support for the Realm Mobile Platform!
+See <insert launch blog post here> for an overview of these
+great new features.
 
 ### API breaking changes
 
@@ -14,6 +18,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Fix an assertion failure when sorting by zero properties.
+* Fix a mid-commit crash in one process also crashing all other processes with
+  the same Realm open.
 
 1.1.0 Release notes (2016-09-16)
 =============================================================
