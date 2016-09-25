@@ -20,6 +20,18 @@
 
 @class RLMSyncUser, RLMSyncCredential, RLMSyncSession, RLMRealm;
 
+/**
+ The state of the user object.
+ */
+typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
+    /// The user is logged out. Call `authenticateWithCredential:...` with a valid credential to log the user back in.
+    RLMSyncUserStateLoggedOut,
+    /// The user is logged in, and any Realms associated with it are syncing with the Realm Object Server.
+    RLMSyncUserStateActive,
+    /// The user has encountered a fatal error state, and cannot be used.
+    RLMSyncUserStateError,
+};
+
 /// A block type used for APIs which asynchronously vend a `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
 
@@ -30,6 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  A user may have one or more credentials associated with it. These credentials uniquely identify the user to a
  third-party auth provider, and are used to sign into a Realm Object Server user account.
+
+ Note that users are only vended out via SDK APIs, and only one user instance ever exists for a given user account.
  */
 @interface RLMSyncUser : NSObject
 
@@ -49,11 +63,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, readonly) NSURL *authenticationServer;
 
 /**
- Whether or not this user is valid. A user may be invalidated by logging out or due to an error condition.
-
- @warning It is an error to use invalid Realms for creating Realm configurations.
+ The current state of the user.
  */
-@property (nonatomic, readonly) BOOL isValid;
+@property (nonatomic, readonly) RLMSyncUserState state;
 
 /**
  Create, log in, and asynchronously return a new user object, specifying a custom timeout for the network request. A
@@ -76,10 +88,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 /**
  Log a user out, destroying their server state, deregistering them from the SDK, and removing any synced Realms
- associated with them from on-disk storage.
-
- @warning It is an error to call this method on an invalid (logged-out or errored out) user. Check `isValid` before
-          calling this method.
+ associated with them from on-disk storage. If the user is already logged out or in an error state, this is a no-op.
 
  This method should be called whenever the application is committed to not using a user again unless they are recreated.
  Failing to call this method may result in unused files and metadata needlessly taking up space.

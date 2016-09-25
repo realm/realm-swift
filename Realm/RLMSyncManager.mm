@@ -71,6 +71,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 - (instancetype)initPrivate NS_DESIGNATED_INITIALIZER;
 
 @property (nonnull, nonatomic) NSMutableDictionary<NSString *, RLMSyncUser *> *activeUsers;
+@property (nonnull, nonatomic) NSMutableDictionary<NSString *, RLMSyncUser *> *loggedOutUsers;
 
 @end
 
@@ -110,10 +111,8 @@ static dispatch_once_t s_onceToken;
         SyncLoginFunction loginLambda = [=](const std::string& path, const SyncConfig& config) {
             NSString *localFilePath = @(path.c_str());
             RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:config];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self _handleBindRequestForSyncConfig:syncConfig
-                                        localFilePath:localFilePath];
-            });
+            [self _handleBindRequestForSyncConfig:syncConfig
+                                    localFilePath:localFilePath];
         };
 
         _disableSSLValidation = NO;
@@ -121,6 +120,7 @@ static dispatch_once_t s_onceToken;
         realm::SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
 
         self.activeUsers = [NSMutableDictionary dictionary];
+        self.loggedOutUsers = [NSMutableDictionary dictionary];
 
         // Initialize the sync engine.
         SyncManager::shared().set_error_handler(errorLambda);
@@ -192,7 +192,7 @@ static dispatch_once_t s_onceToken;
     switch (errorClass) {
         case realm::SyncSessionError::UserFatal:
             // Kill the user.
-            [[session parentUser] _invalidate];
+            [[session parentUser] setState:RLMSyncUserStateError];
             error = [NSError errorWithDomain:RLMSyncErrorDomain
                                         code:RLMSyncErrorClientUserError
                                     userInfo:@{@"description": message,
@@ -230,7 +230,7 @@ static dispatch_once_t s_onceToken;
 
 /// Load persisted users from the object store, and then turn them into actual users.
 - (void)_loadPersistedUsers {
-    @synchronized (self) {
+    @synchronized(_activeUsers) {
         SyncUserMetadataResults users = _metadata_manager->all_unmarked_users();
         for (size_t i = 0; i < users.size(); i++) {
             RLMSyncUser *user = [[RLMSyncUser alloc] initWithMetadata:users.get(i)];
@@ -241,7 +241,7 @@ static dispatch_once_t s_onceToken;
 
 /// Clean up marked users and destroy them.
 - (void)_cleanUpMarkedUsers {
-    @synchronized (self) {
+    @synchronized(_activeUsers) {
         std::vector<SyncUserMetadata> dead_users;
         SyncUserMetadataResults users_to_remove = _metadata_manager->all_users_marked_for_removal();
         for (size_t i = 0; i < users_to_remove.size(); i++) {
@@ -259,24 +259,26 @@ static dispatch_once_t s_onceToken;
 
 - (void)_handleBindRequestForSyncConfig:(RLMSyncConfiguration *)syncConfig
                           localFilePath:(NSString *)filePathString {
-    RLMSyncUser *user = syncConfig.user;
-    if (!user || !user.isValid) {
-        if (auto session = SyncManager::shared().get_existing_active_session(filePathString.UTF8String)) {
-            session->close_if_connecting();
+    @synchronized(self) {
+        RLMSyncUser *user = syncConfig.user;
+        if (!user || (user.state == RLMSyncUserStateError)) {
+            // Can't do anything, the configuration is malformed.
+            // FIXME: report an error via the global error handler.
+            return;
+        } else {
+            // FIXME: should the completion block actually do anything?
+            [user _registerSessionForBindingWithFileURL:[NSURL fileURLWithPath:filePathString]
+                                             syncConfig:syncConfig
+                                      standaloneSession:NO
+                                           onCompletion:nil];
         }
-        return;
     }
-    // FIXME: should the completion block actually do anything?
-    [user _registerSessionForBindingWithFileURL:[NSURL fileURLWithPath:filePathString]
-                                     syncConfig:syncConfig
-                              standaloneSession:NO
-                                   onCompletion:nil];
 }
 
 - (void)_removeInvalidUsers {
     NSMutableArray<NSString *> *keyBuffer = [NSMutableArray array];
     for (NSString *key in self.activeUsers) {
-        if (!self.activeUsers[key].isValid) {
+        if (self.activeUsers[key].state == RLMSyncUserStateError) {
             [keyBuffer addObject:key];
         }
     }
@@ -284,17 +286,22 @@ static dispatch_once_t s_onceToken;
 }
 
 - (NSArray *)_allUsers {
-    @synchronized (self) {
+    @synchronized(_activeUsers) {
         [self _removeInvalidUsers];
         return [self.activeUsers allValues];
     }
 }
 
 - (RLMSyncUser *)_registerUser:(RLMSyncUser *)user {
-    @synchronized(self) {
+    @synchronized(_activeUsers) {
         [self _removeInvalidUsers];
         NSString *identity = user.identity;
         if (RLMSyncUser *user = [self.activeUsers objectForKey:identity]) {
+            return user;
+        } else if (RLMSyncUser *user = [self.loggedOutUsers objectForKey:identity]) {
+            [user setState:RLMSyncUserStateActive];
+            [self.loggedOutUsers removeObjectForKey:identity];
+            [self.activeUsers setObject:user forKey:identity];
             return user;
         }
         [self.activeUsers setObject:user forKey:identity];
@@ -302,19 +309,21 @@ static dispatch_once_t s_onceToken;
     }
 }
 
-- (void)_deregisterUser:(RLMSyncUser *)user {
-    @synchronized(self) {
+- (void)_deregisterLoggedOutUser:(RLMSyncUser *)user {
+    @synchronized(_activeUsers) {
         NSString *identity = user.identity;
-        if (![self.activeUsers objectForKey:identity]) {
+        RLMSyncUser *user = [self.activeUsers objectForKey:identity];
+        if (!user) {
             @throw RLMException(@"Cannot unregister a user that isn't registered.");
         }
         [self.activeUsers removeObjectForKey:identity];
+        self.loggedOutUsers[identity] = user;
     }
 }
 
 - (RLMSyncUser *)_userForIdentity:(NSString *)identity {
-    @synchronized (self) {
-        return [self.activeUsers objectForKey:identity];
+    @synchronized (_activeUsers) {
+        return [self.activeUsers objectForKey:identity] ?: [self.loggedOutUsers objectForKey:identity];
     }
 }
 

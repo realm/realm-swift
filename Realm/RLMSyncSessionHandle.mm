@@ -63,6 +63,12 @@ using namespace realm;
     }
 }
 
+- (void)revive {
+    if (auto pointer = _ptr.lock()) {
+        pointer->revive_if_needed();
+    }
+}
+
 @end
 
 @implementation RLMSyncStrongSessionHandle
@@ -84,6 +90,10 @@ using namespace realm;
 
 - (void)logOut {
     _ptr->log_out();
+}
+
+- (void)revive {
+    _ptr->revive_if_needed();
 }
 
 @end
@@ -119,6 +129,10 @@ using namespace realm;
 - (BOOL)refreshAccessToken:(__unused NSString *)accessToken serverURL:(__unused NSURL *)serverURL {
     NSAssert(NO, @"Subclasses must override...");
     return NO;
+}
+
+- (void)revive {
+    NSAssert(NO, @"Subclasses must override...");
 }
 
 @end

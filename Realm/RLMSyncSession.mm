@@ -83,7 +83,8 @@
 
 - (void)_logOut {
     [self.sessionHandle logOut];
-    [self _invalidate];
+    [self.refreshTimer invalidate];
+    _state = RLMSyncSessionStateLoggedOut;
 }
 
 - (void)_invalidate {

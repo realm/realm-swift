@@ -49,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                  standaloneSession:(BOOL)isStandalone
                                                       onCompletion:(nullable RLMSyncBasicErrorReportingBlock)completion;
 
-- (void)_invalidate;
+- (void)setState:(RLMSyncUserState)state;
 - (void)_deregisterSessionWithRealmURL:(NSURL *)realmURL;
 
 NS_ASSUME_NONNULL_END

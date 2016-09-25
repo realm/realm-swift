@@ -56,12 +56,14 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSArray<RLMSyncUser *> *)_allUsers;
 
 /**
- Registers a user. If an equivalent user has already been registered, the argument is not added to the store, and the
+ Register a user. If an equivalent user has already been registered, the argument is not added to the store, and the
  existing user is returned. Otherwise, the argument is added to the store and `nil` is returned.
+
+ Precondition: registered user is in the `active` state (is valid).
  */
 - (nullable RLMSyncUser *)_registerUser:(RLMSyncUser *)user;
 
-- (void)_deregisterUser:(RLMSyncUser *)user;
+- (void)_deregisterLoggedOutUser:(RLMSyncUser *)user;
 
 - (nullable RLMSyncUser *)_userForIdentity:(NSString *)identity;
 

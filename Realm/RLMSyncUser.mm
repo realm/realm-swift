@@ -37,11 +37,13 @@ using namespace realm;
 
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer NS_DESIGNATED_INITIALIZER;
 
-@property (nonatomic, readwrite) BOOL isValid;
+@property (nonatomic, readwrite) RLMSyncUserState state;
+
 @property (nonatomic, readwrite) NSString *identity;
 @property (nonatomic, readwrite) NSURL *authenticationServer;
 
 @property (nonatomic) NSMutableDictionary<NSURL *, RLMSyncSession *> *sessionsStorage;
+@property (nonatomic) NSDictionary<NSURL *, RLMSyncSession *> *loggedOutSessions;
 
 @property (nonatomic) RLMServerToken directAccessToken;
 
@@ -59,7 +61,7 @@ using namespace realm;
 
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer {
     if (self = [super init]) {
-        self.isValid = NO;
+        self.state = RLMSyncUserStateLoggedOut;
         self.directAccessToken = nil;
         self.authenticationServer = authServer;
         self.sessionsStorage = [NSMutableDictionary dictionary];
@@ -92,15 +94,17 @@ using namespace realm;
 }
 
 - (void)logOut {
-    if (!self.isValid || !self.identity) {
-        @throw RLMException(@"Cannot log out a user that is already logged out.");
+    if (self.state != RLMSyncUserStateActive || !self.identity) {
+        // FIXME: report a warning to the global error handler?
+        return;
     }
-    self.isValid = NO;
+    self.state = RLMSyncUserStateLoggedOut;
     for (NSURL *url in self.sessionsStorage) {
         [self.sessionsStorage[url] _logOut];
     }
-    [self.sessionsStorage removeAllObjects];
-    [[RLMSyncManager sharedManager] _deregisterUser:self];
+    self.loggedOutSessions = [self.sessionsStorage copy];
+    self.sessionsStorage = [NSMutableDictionary dictionary];
+    [[RLMSyncManager sharedManager] _deregisterLoggedOutUser:self];
     auto metadata = SyncUserMetadata([[RLMSyncManager sharedManager] _metadataManager],
                                      [self.identity UTF8String],
                                      false);
@@ -135,8 +139,12 @@ using namespace realm;
 
 #pragma mark - Private API
 
-- (void)_invalidate {
-    self.isValid = NO;
+- (void)_enterErrorState {
+    self.state = RLMSyncUserStateError;
+}
+
+- (void)_enterActiveState {
+    self.state = RLMSyncUserStateActive;
 }
 
 - (void)_deregisterSessionWithRealmURL:(NSURL *)realmURL {
@@ -153,7 +161,7 @@ using namespace realm;
     if (auto user_token = metadata.user_token()) {
         // FIXME: Once the new auth system is enabled, rename "refreshToken" to "userToken" to reflect its new role.
         self.refreshToken = @(user_token->c_str());
-        self.isValid = YES;
+        self.state = RLMSyncUserStateActive;
     } else {
         // For now, throw an exception. In the future we may want to allow for "anonymous" style users.
         @throw RLMException(@"Invalid persisted user: there must be a valid access token.");
@@ -235,7 +243,7 @@ using namespace realm;
                 if (existingUser) {
                     [actualUser _mergeDataFromDuplicateUser:user];
                 }
-                actualUser.isValid = YES;
+                actualUser.state = RLMSyncUserStateActive;
                 [actualUser _updatePersistedMetadata];
                 [actualUser _bindAllDeferredRealms];
                 theBlock(actualUser, nil);
@@ -264,7 +272,7 @@ using namespace realm;
     if (existingUser) {
         [actualUser _mergeDataFromDuplicateUser:user];
     }
-    actualUser.isValid = YES;
+    actualUser.state = RLMSyncUserStateActive;
     [actualUser _bindAllDeferredRealms];
     completion(actualUser, nil);
 }
@@ -275,7 +283,7 @@ using namespace realm;
  waiting to be activated.
  */
 - (void)_mergeDataFromDuplicateUser:(RLMSyncUser *)user {
-    NSAssert(!user.isValid, @"Erroneous user-to-be-merged: user can't be active.");
+    NSAssert(user.state != RLMSyncUserStateActive, @"Erroneous user-to-be-merged: user can't be active.");
     NSAssert([self.identity isEqualToString:user.identity], @"Logic error: can only merge two equivalent users.");
 
     self.directAccessToken = user.directAccessToken;
@@ -293,7 +301,8 @@ using namespace realm;
 
 // Upon successfully logging in, bind any Realm which was opened and registered to the user previously.
 - (void)_bindAllDeferredRealms {
-    NSAssert(self.isValid, @"_bindAllDeferredRealms can't be called unless the user is logged in.");
+    NSAssert(self.state == RLMSyncUserStateActive,
+             @"_bindAllDeferredRealms can't be called unless the user is logged in.");
     for (NSURL *key in self.sessionsStorage) {
         RLMSyncSession *session = self.sessionsStorage[key];
         RLMSessionBindingPackage *package = session.deferredBindingPackage;
@@ -304,6 +313,17 @@ using namespace realm;
                                   onCompletion:package.block];
         }
     }
+    for (NSURL *key in self.loggedOutSessions) {
+        RLMSyncSession *session = self.loggedOutSessions[key];
+        RLMSyncSessionHandle *handle = session.sessionHandle;
+        if ([handle sessionStillExists] && ![handle sessionIsInErrorState]) {
+            // If the session still exists, there's at least one strong reference to it somewhere. Revive it.
+            // This will start the login handshake if necessary.
+            [handle revive];
+        }
+        self.sessionsStorage[key] = session;
+    }
+    self.loggedOutSessions = nil;
 }
 
 - (void)_bindSessionWithDirectAccessToken:(RLMServerToken)accessToken
@@ -450,7 +470,7 @@ using namespace realm;
     RLMSyncSession *session = [[RLMSyncSession alloc] initWithFileURL:fileURL realmURL:realmURL];
     self.sessionsStorage[realmURL] = session;
 
-    if (!self.isValid) {
+    if (self.state == RLMSyncUserStateLoggedOut) {
         // We will delay the path resolution/access token handshake until the user logs in.
         session.deferredBindingPackage = [[RLMSessionBindingPackage alloc] initWithFileURL:fileURL
                                                                                 syncConfig:syncConfig
