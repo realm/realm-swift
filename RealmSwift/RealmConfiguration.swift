@@ -225,7 +225,6 @@ extension Realm {
             configuration.deleteRealmIfMigrationNeeded = rlmConfiguration.deleteRealmIfMigrationNeeded
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
-            // TODO (az-ros): retrieve the error handler and other miscellaneous data.
             return configuration
         }
     }
