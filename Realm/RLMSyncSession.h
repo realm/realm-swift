@@ -26,6 +26,8 @@ typedef NS_ENUM(NSUInteger, RLMSyncSessionState) {
     RLMSyncSessionStateUnbound,
     /// The sync session is bound to the Realm Object Server and communicating with it.
     RLMSyncSessionStateActive,
+    /// The sync session is logged out, but could be rebound to the Realm Object Server.
+    RLMSyncSessionStateLoggedOut,
     /// The sync session encountered an error and is invalid; it should be discarded.
     RLMSyncSessionStateInvalid
 };

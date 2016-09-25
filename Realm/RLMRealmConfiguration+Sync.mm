@@ -35,8 +35,8 @@
 
 - (void)setSyncConfiguration:(RLMSyncConfiguration *)syncConfiguration {
     RLMSyncUser *user = syncConfiguration.user;
-    if (!user.isValid) {
-        @throw RLMException(@"Cannot set a sync configuration which has an invalid user.");
+    if (user.state == RLMSyncUserStateError) {
+        @throw RLMException(@"Cannot set a sync configuration which has an errored-out user.");
     }
 
     NSURL *realmURL = syncConfiguration.realmURL;

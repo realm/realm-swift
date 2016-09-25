@@ -42,6 +42,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// Refresh the access token for the session.
 - (BOOL)refreshAccessToken:(NSString *)accessToken serverURL:(nullable NSURL *)serverURL;
 
+/// Revive the session.
+- (void)revive;
+
 @end
 
 NS_ASSUME_NONNULL_END
