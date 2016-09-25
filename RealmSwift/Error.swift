@@ -20,135 +20,139 @@ import Realm
 
 #if swift(>=3.0)
 
-/**
-Struct that describes the error codes within the Realm error domain.
-The values can be used to catch a variety of _recoverable_ errors, especially those
-happening when initializing a Realm instance.
+/// :nodoc:
+extension Realm {
+    /**
+     Struct that describes the error codes within the Realm error domain.
+     The values can be used to catch a variety of _recoverable_ errors, especially those
+     happening when initializing a Realm instance.
 
-```swift
-let realm: Realm?
-do {
-    realm = Realm()
-} catch RealmSwift.Error.incompatibleLockFile {
-    print("Realm Browser app may be attached to Realm on device?")
-}
-```
-*/
-public struct Error {
-    public enum Code: Int {
-        /// - see: `Error.fail`
-        case fail
+     ```swift
+     let realm: Realm?
+     do {
+         realm = Realm()
+     } catch Realm.Error.incompatibleLockFile {
+         print("Realm Browser app may be attached to Realm on device?")
+     }
+     ```
+    */
+    public struct Error {
+        // swiftlint:disable:next nesting
+        public enum Code: Int {
+            /// - see: `Realm.Error.fail`
+            case fail
 
-        /// - see: `Error.fileAccess`
-        case fileAccess
+            /// - see: `Realm.Error.fileAccess`
+            case fileAccess
 
-        /// - see: `Error.filePermissionDenied`
-        case filePermissionDenied
+            /// - see: `Realm.Error.filePermissionDenied`
+            case filePermissionDenied
 
-        /// - see: `Error.fileExists`
-        case fileExists
+            /// - see: `Realm.Error.fileExists`
+            case fileExists
 
-        /// - see: `Error.fileNotFound`
-        case fileNotFound
+            /// - see: `Realm.Error.fileNotFound`
+            case fileNotFound
 
-        /// - see: `Error.incompatibleLockFile`
-        case incompatibleLockFile
+            /// - see: `Realm.Error.incompatibleLockFile`
+            case incompatibleLockFile
 
-        /// - see: `Error.fileFormatUpgradeRequired`
-        case fileFormatUpgradeRequired
+            /// - see: `Realm.Error.fileFormatUpgradeRequired`
+            case fileFormatUpgradeRequired
 
-        /// - see: `Error.addressSpaceExhausted`
-        case addressSpaceExhausted
+            /// - see: `Realm.Error.addressSpaceExhausted`
+            case addressSpaceExhausted
 
-        /// - see: `Error.schemaMismatch`
-        case schemaMismatch
-    }
-
-    /// Error thrown by Realm if no other specific error is returned when a realm is opened.
-    public static let fail: Code = .fail
-
-    /// Error thrown by Realm for any I/O related exception scenarios when a realm is opened.
-    public static let fileAccess: Code = .fileAccess
-
-    /// Error thrown by Realm if the user does not have permission to open or create
-    /// the specified file in the specified access mode when the realm is opened.
-    public static let filePermissionDenied: Code = .filePermissionDenied
-
-    /// Error thrown by Realm if the file already exists when a copy should be written.
-    public static let fileExists: Code = .fileExists
-
-    /// Error thrown by Realm if no file was found when a realm was opened as
-    /// read-only or if the directory part of the specified path was not found
-    /// when a copy should be written.
-    public static let fileNotFound: Code = .fileNotFound
-
-    /// Error thrown by Realm if the database file is currently open in another process which
-    /// cannot share with the current process due to an architecture mismatch.
-    public static let incompatibleLockFile: Code = .incompatibleLockFile
-
-    /// Error thrown by Realm if a file format upgrade is required to open the file,
-    /// but upgrades were explicitly disabled.
-    public static let fileFormatUpgradeRequired: Code = .fileFormatUpgradeRequired
-
-    /// Error thrown by Realm if there is insufficient available address space.
-    public static let addressSpaceExhausted: Code = .addressSpaceExhausted
-
-    /// Error thrown by Realm if there is a schema version mismatch, so that a migration is required.
-    public static let schemaMismatch: Code = .schemaMismatch
-
-    /// :nodoc:
-    public var code: Code {
-        let rlmError = _nsError as! RLMError
-        switch rlmError.code {
-        case .fail:
-            return .fail
-        case .fileAccess:
-            return .fileAccess
-        case .filePermissionDenied:
-            return .filePermissionDenied
-        case .fileExists:
-            return .fileExists
-        case .fileNotFound:
-            return .fileNotFound
-        case .incompatibleLockFile:
-            return .incompatibleLockFile
-        case .fileFormatUpgradeRequired:
-            return .fileFormatUpgradeRequired
-        case .addressSpaceExhausted:
-            return .addressSpaceExhausted
-        case .schemaMismatch:
-            return .schemaMismatch
+            /// - see: `Realm.Error.schemaMismatch`
+            case schemaMismatch
         }
-    }
 
-    /// :nodoc:
-    public var _nsError: NSError // swiftlint:disable:this variable_name
+        /// Error thrown by Realm if no other specific error is returned when a realm is opened.
+        public static let fail: Code = .fail
 
-    /// :nodoc:
-    public init(_nsError error: NSError) {
-        _nsError = error
+        /// Error thrown by Realm for any I/O related exception scenarios when a realm is opened.
+        public static let fileAccess: Code = .fileAccess
+
+        /// Error thrown by Realm if the user does not have permission to open or create
+        /// the specified file in the specified access mode when the realm is opened.
+        public static let filePermissionDenied: Code = .filePermissionDenied
+
+        /// Error thrown by Realm if the file already exists when a copy should be written.
+        public static let fileExists: Code = .fileExists
+
+        /// Error thrown by Realm if no file was found when a realm was opened as
+        /// read-only or if the directory part of the specified path was not found
+        /// when a copy should be written.
+        public static let fileNotFound: Code = .fileNotFound
+
+        /// Error thrown by Realm if the database file is currently open in another process which
+        /// cannot share with the current process due to an architecture mismatch.
+        public static let incompatibleLockFile: Code = .incompatibleLockFile
+
+        /// Error thrown by Realm if a file format upgrade is required to open the file,
+        /// but upgrades were explicitly disabled.
+        public static let fileFormatUpgradeRequired: Code = .fileFormatUpgradeRequired
+
+        /// Error thrown by Realm if there is insufficient available address space.
+        public static let addressSpaceExhausted: Code = .addressSpaceExhausted
+
+        /// Error thrown by Realm if there is a schema version mismatch, so that a migration is required.
+        public static let schemaMismatch: Code = .schemaMismatch
+
+        /// :nodoc:
+        public var code: Code {
+            let rlmError = _nsError as! RLMError
+            switch rlmError.code {
+            case .fail:
+                return .fail
+            case .fileAccess:
+                return .fileAccess
+            case .filePermissionDenied:
+                return .filePermissionDenied
+            case .fileExists:
+                return .fileExists
+            case .fileNotFound:
+                return .fileNotFound
+            case .incompatibleLockFile:
+                return .incompatibleLockFile
+            case .fileFormatUpgradeRequired:
+                return .fileFormatUpgradeRequired
+            case .addressSpaceExhausted:
+                return .addressSpaceExhausted
+            case .schemaMismatch:
+                return .schemaMismatch
+            }
+        }
+
+        /// :nodoc:
+        public var _nsError: NSError // swiftlint:disable:this variable_name
+
+        /// :nodoc:
+        public init(_nsError error: NSError) {
+            _nsError = error
+        }
     }
 }
 
 /// :nodoc:
 // Provide bridging from errors with domain RLMErrorDomain to Error.
-extension Error: _BridgedStoredNSError {
+extension Realm.Error: _BridgedStoredNSError {
     /// :nodoc:
     public static var _nsErrorDomain = RLMErrorDomain // swiftlint:disable:this variable_name
 }
 
 /// :nodoc:
-extension Error.Code: _ErrorCodeProtocol {
+extension Realm.Error.Code: _ErrorCodeProtocol {
     /// :nodoc:
     public typealias _ErrorType = RLMError
 }
 
 // MARK: Equatable
 
-extension Error: Equatable {}
+extension Realm.Error: Equatable {}
 
 /// Returns a Boolean indicating whether the errors are identical.
-public func == (lhs: Swift.Error, rhs: Swift.Error) -> Bool { // swiftlint:disable:this valid_docs
+public func == (lhs: Error, rhs: Error) -> Bool { // swiftlint:disable:this valid_docs
     return lhs._code == rhs._code
         && lhs._domain == rhs._domain
 }
@@ -159,7 +163,7 @@ public func == (lhs: Swift.Error, rhs: Swift.Error) -> Bool { // swiftlint:disab
  Pattern matching matching for `Realm.Error`, so that the instances can be used with Swift's
  `do { ... } catch { ... }` syntax.
 */
-public func ~= (lhs: Error, rhs: Swift.Error) -> Bool { // swiftlint:disable:this valid_docs
+public func ~= (lhs: Realm.Error, rhs: Error) -> Bool { // swiftlint:disable:this valid_docs
     return lhs == rhs
 }
 

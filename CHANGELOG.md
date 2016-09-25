@@ -3,7 +3,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* By popular demand, `RealmSwift.Error` has been moved from the top-level
+  namespace into a `Realm` extension and is now `Realm.Error`, so that it no
+  longer conflicts with `Swift.Error`.
 
 ### Enhancements
 

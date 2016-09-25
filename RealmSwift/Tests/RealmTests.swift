@@ -27,7 +27,7 @@ import Foundation
 #if swift(>=3.0)
 
 class RealmTests: TestCase {
-    enum TestError: Swift.Error {
+    enum TestError: Error {
         case intentional
     }
 
