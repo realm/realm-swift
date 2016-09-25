@@ -105,9 +105,9 @@ public enum RealmCollectionChange<T> {
      details about the error. This can only currently happen if the Realm is opened on a background worker thread to
      calculate the change set.
      */
-    case error(Swift.Error)
+    case error(Error)
 
-    static func fromObjc(value: T, change: RLMCollectionChange?, error: Swift.Error?) -> RealmCollectionChange {
+    static func fromObjc(value: T, change: RLMCollectionChange?, error: Error?) -> RealmCollectionChange {
         if let error = error {
             return .error(error)
         }
