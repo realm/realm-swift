@@ -57,13 +57,13 @@ extension Realm {
 
          - parameter fileURL:            The local URL to the Realm file.
          - parameter inMemoryIdentifier: A string used to identify a particular in-memory Realm.
-        - parameter syncConfiguration:  A `User` and URL that, together, identify a remote Realm.
+         - parameter syncConfiguration:  A `User` and URL that, together, identify a remote Realm.
          - parameter encryptionKey:      An optional 64-byte key to use to encrypt the data.
          - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
          - parameter schemaVersion:      The current schema version.
          - parameter migrationBlock:     The block which migrates the Realm to the current version.
          - parameter deleteRealmIfMigrationNeeded: If `true`, recreate the Realm file with the provided
-         schema if a migration is required.
+                                                   schema if a migration is required.
          - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
         */
         public init(fileURL: URL? = URL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
@@ -280,13 +280,13 @@ extension Realm {
 
          - parameter fileURL:            The local URL to the Realm file.
          - parameter inMemoryIdentifier: A string used to identify a particular in-memory Realm.
-        - parameter syncConfiguration:  A `User` and URL that, together, identify a remote Realm.
+         - parameter syncConfiguration:  A `User` and URL that, together, identify a remote Realm.
          - parameter encryptionKey:      An optional 64-byte key to use to encrypt the data.
          - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
          - parameter schemaVersion:      The current schema version.
          - parameter migrationBlock:     The block which migrates the Realm to the current version.
          - parameter deleteRealmIfMigrationNeeded: If `true`, recreate the Realm file with the provided
-         schema if a migration is required.
+                                                   schema if a migration is required.
          - parameter objectTypes:        The subset of `Object` subclasses managed by the Realm.
          */
         public init(fileURL: NSURL? = NSURL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
@@ -297,8 +297,7 @@ extension Realm {
             schemaVersion: UInt64 = 0,
             migrationBlock: MigrationBlock? = nil,
             deleteRealmIfMigrationNeeded: Bool = false,
-            objectTypes: [Object.Type]? = nil
-            ) {
+            objectTypes: [Object.Type]? = nil) {
                 self.fileURL = fileURL
                 if let inMemoryIdentifier = inMemoryIdentifier {
                     self.inMemoryIdentifier = inMemoryIdentifier
