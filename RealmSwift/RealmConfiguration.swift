@@ -98,6 +98,7 @@ extension Realm {
             set {
                 _path = nil
                 _inMemoryIdentifier = nil
+                _syncConfiguration = newValue
             }
             get {
                 return _syncConfiguration
