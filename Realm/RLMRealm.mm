@@ -36,27 +36,16 @@
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
-#include <memory>
-#include <set>
-#include <thread>
-
 #include "impl/realm_coordinator.hpp"
 #include "object_store.hpp"
 #include "schema.hpp"
 #include "shared_realm.hpp"
 
-#include <realm/util/memory_stream.hpp>
-#include <realm/util/logger.hpp>
 #include <realm/disable_sync_to_disk.hpp>
-#include <realm/lang_bind_helper.hpp>
 #include <realm/version.hpp>
 
 using namespace realm;
 using util::File;
-
-@interface RLMRealmConfiguration ()
-- (realm::Realm::Config&)config;
-@end
 
 @interface RLMRealm ()
 @property (nonatomic, strong) NSHashTable *notificationHandlers;
