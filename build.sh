@@ -391,6 +391,10 @@ case "$COMMAND" in
         ;;
 
     "start-object-server")
+        # kill any object servers that are still running
+        (pgrep -f realm-object-server || true) | while read pid; do
+            kill $pid
+        done
         ./sync/start-object-server.command
         exit 0
         ;;
