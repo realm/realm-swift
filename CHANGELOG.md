@@ -2,8 +2,8 @@
 =============================================================
 
 This release introduces support for the Realm Mobile Platform!
-See <insert launch blog post here> for an overview of these
-great new features.
+See <https://realm.io/news/introducing-realm-mobile-platform/> for an overview
+of these great new features.
 
 ### API breaking changes
 
