@@ -37,7 +37,7 @@
 }
 
 + (NSURL *)authServerURL {
-    return [NSURL URLWithString:@"http://127.0.0.1:8080"];
+    return [NSURL URLWithString:@"http://127.0.0.1:9080"];
 }
 
 + (void)setUp {
@@ -177,7 +177,7 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:[NSURL URLWithString:@"realm://localhost:8080/~/testBasicSync"]];
+    config.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:[NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"]];
     NSError *error = nil;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:&error];
     XCTAssertNil(error);
