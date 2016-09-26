@@ -1649,7 +1649,7 @@
 			buildPhases = (
 				5D6156F41BE06FF500A4BD3F /* Generate RLMPlatform.h */,
 				5D659E7E1BE04556006515A0 /* Get Version Number */,
-				5D659E7F1BE04556006515A0 /* Download Core */,
+				5D659E7F1BE04556006515A0 /* Download Core and Sync */,
 				5D659E801BE04556006515A0 /* Sources */,
 				5D659E9F1BE04556006515A0 /* Headers */,
 				1A7B82351D51235600750296 /* Frameworks */,
@@ -1710,7 +1710,7 @@
 			buildPhases = (
 				5D6156F91BE083C600A4BD3F /* Generate RLMPlatform.h */,
 				5DD7557C1BE056DE002800DA /* Get Version Number */,
-				5DD7557D1BE056DE002800DA /* Download Core */,
+				5DD7557D1BE056DE002800DA /* Download Core and Sync */,
 				5DD7557E1BE056DE002800DA /* Sources */,
 				5DD7559D1BE056DE002800DA /* Headers */,
 			);
@@ -2013,19 +2013,19 @@
 			shellPath = /bin/sh;
 			shellScript = "exec \"${SRCROOT}/scripts/generate-rlmversion.sh\"\n";
 		};
-		5D659E7F1BE04556006515A0 /* Download Core */ = {
+		5D659E7F1BE04556006515A0 /* Download Core and Sync */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Download Core";
+			name = "Download Core and Sync";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh build.sh download-core";
+			shellScript = "sh build.sh download-sync";
 		};
 		5DD7557C1BE056DE002800DA /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2043,19 +2043,19 @@
 			shellPath = /bin/sh;
 			shellScript = "exec \"${SRCROOT}/scripts/generate-rlmversion.sh\"\n";
 		};
-		5DD7557D1BE056DE002800DA /* Download Core */ = {
+		5DD7557D1BE056DE002800DA /* Download Core and Sync */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Download Core";
+			name = "Download Core and Sync";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh build.sh download-core";
+			shellScript = "sh build.sh download-sync";
 		};
 		C04B4BDB1B55C47A00FAE58E /* Set Swift Version */ = {
 			isa = PBXShellScriptBuildPhase;

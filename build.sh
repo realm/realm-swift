@@ -42,6 +42,7 @@ Usage: sh $0 command [argument]
 command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
+  download-sync:        downloads sync library (binary version, core+sync)
   build:                builds all iOS  and OS X frameworks
   ios-static:           builds fat iOS static framework
   ios-dynamic:          builds iOS dynamic frameworks
@@ -416,16 +417,59 @@ case "$COMMAND" in
     # Core
     ######################################
     "download-core")
-        # FIXME: Distinguish between downloading core & sync
         if [ "$REALM_CORE_VERSION" = "current" ]; then
             echo "Using version of core already in core/ directory"
             exit 0
         fi
         if [ -d core -a -d ../realm-core -a ! -L core ]; then
-            echo "Using version of core already in core/ directory"
+          # Allow newer versions than expected for local builds as testing
+          # with unreleased versions is one of the reasons to use a local build
+          if ! $(grep -i "${REALM_CORE_VERSION} Release notes" core/release_notes.txt >/dev/null); then
+              echo "Local build of core is out of date."
+              exit 1
+          else
+              echo "The core library seems to be up to date."
+          fi
+        elif ! [ -L core ]; then
+            echo "core is not a symlink. Deleting..."
+            rm -rf core
+            download_core
+        # With a prebuilt version we only want to check the first non-empty
+        # line so that checking out an older commit will download the
+        # appropriate version of core if the already-present version is too new
+        elif ! $(grep -m 1 . core/release_notes.txt | grep -i "${REALM_CORE_VERSION} RELEASE NOTES" >/dev/null); then
+            download_core
         else
-            # FIXME: Check sync version rather than downloading every time
+            echo "The core library seems to be up to date."
+        fi
+        exit 0
+        ;;
+
+    ######################################
+    # Sync
+    ######################################
+    "download-sync")
+        if [ "$REALM_SYNC_VERSION" = "current" ]; then
+            echo "Using version of core already in core/ directory"
+            exit 0
+        fi
+        if [ -d core -a -d ../realm-core -a -d ../realm-sync -a ! -L core ]; then
+          # Allow newer versions than expected for local builds as testing
+          # with unreleased versions is one of the reasons to use a local build
+          if [[ "$(cat core/version.txt)" != "$REALM_SYNC_VERSION" ]]; then
+              echo "Local build of core is out of date."
+              exit 1
+          else
+              echo "Using version of core already in core/ directory"
+          fi
+        elif ! [ -L core ]; then
+            echo "core is not a symlink. Deleting..."
+            rm -rf core
             download_sync
+        elif [[ "$(cat core/version.txt)" != "$REALM_SYNC_VERSION" ]]; then
+            download_sync
+        else
+            echo "The core library seems to be up to date."
         fi
         exit 0
         ;;
@@ -919,7 +963,7 @@ case "$COMMAND" in
     ######################################
     "cocoapods-setup")
         if [ ! -d core ]; then
-          sh build.sh download-core
+          sh build.sh download-sync
           rm core
           mv sync-* core
         fi
