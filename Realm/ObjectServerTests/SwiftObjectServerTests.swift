@@ -22,7 +22,7 @@ import RealmSwift
 #if swift(>=3.0)
 class SwiftObjectServerTests: SwiftSyncTestCase {
     /// It should be possible to successfully open a Realm configured for sync.
-    func testBasicSwiftSync() {
+    func DISABLED_testBasicSwiftSync() {
         let url = URL(string: "realm://localhost:9080/~/testBasicSync")!
         do {
             let user = try synchronouslyLogInUser(for: basicCredential(create: true), server: authURL)
@@ -34,7 +34,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     /// If client B adds objects to a Realm, client A should see those new objects.
-    func testSwiftRemoteAddObjects() {
+    func DISABLED_testSwiftRemoteAddObjects() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredential(create: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
@@ -60,7 +60,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     /// If client B removes objects from a Realm, client A should see those changes.
-    func testSwiftRemoteDeleteObjects() {
+    func DISABLED_testSwiftRemoteDeleteObjects() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredential(create: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
