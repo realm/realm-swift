@@ -449,11 +449,11 @@ case "$COMMAND" in
     # Sync
     ######################################
     "download-sync")
-        if [ "$REALM_CORE_VERSION" = "current" ]; then
+        if [ "$REALM_SYNC_VERSION" = "current" ]; then
             echo "Using version of core already in core/ directory"
             exit 0
         fi
-        if [ -d core -a -d ../realm-core -a ! -L core ]; then
+        if [ -d core -a -d ../realm-core -a -d ../realm-sync -a ! -L core ]; then
           # Allow newer versions than expected for local builds as testing
           # with unreleased versions is one of the reasons to use a local build
           if [[ "$(cat core/version.txt)" != "$REALM_SYNC_VERSION" ]]; then
