@@ -77,8 +77,26 @@
 
 #pragma mark - Sync
 
-/// It should be possible to successfully open a Realm configured for sync.
-- (void)testBasicSync {
+/// It should be possible to successfully open a Realm configured for sync with an access token.
+- (void)testOpenRealmWithAdminToken {
+    // FIXME (tests): opening a Realm with the access token, then opening a Realm at the same virtual path
+    // with a normal credential, causes Realms to fail to bind with a "bad virtual path" error.
+    NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
+    NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
+    XCTAssertNotNil(adminToken);
+    RLMSyncCredential *credential = [RLMSyncCredential credentialWithAccessToken:adminToken identity:@"test"];
+    XCTAssertNotNil(credential);
+    RLMSyncUser *user = [self logInUserForCredential:credential
+                                              server:[RLMObjectServerTests authServerURL]];
+    NSError *error = nil;
+    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/testSyncWithAdminToken"];
+    RLMRealm *realm = [self openRealmForURL:url user:user error:&error];
+    XCTAssertNil(error);
+    XCTAssertTrue(realm.isEmpty);
+}
+
+/// It should be possible to successfully open a Realm configured for sync with a normal user.
+- (void)testOpenRealmWithNormalCredential {
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:YES]
                                               server:[RLMObjectServerTests authServerURL]];
     NSError *error = nil;
