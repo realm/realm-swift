@@ -390,6 +390,9 @@ using namespace realm;
                 error = [NSError errorWithDomain:RLMSyncErrorDomain
                                             code:RLMSyncErrorBadResponse
                                         userInfo:@{kRLMSyncErrorJSONKey: json}];
+                if (completion) {
+                    completion(error);
+                }
                 [[RLMSyncManager sharedManager] _fireError:error];
                 return;
             } else {
@@ -439,6 +442,9 @@ using namespace realm;
             NSError *syncError = [NSError errorWithDomain:RLMSyncErrorDomain
                                                      code:RLMSyncErrorBadResponse
                                                  userInfo:@{kRLMSyncUnderlyingErrorKey: error}];
+            if (completion) {
+                completion(syncError);
+            }
             [[RLMSyncManager sharedManager] _fireError:syncError];
         }
     };
@@ -459,10 +465,18 @@ using namespace realm;
         // The Realm at this particular path has already been registered to this user.
         if ([handle sessionStillExists]) {
             [session _refresh];
+            if (completion) {
+                completion(nil);
+            }
             return session;
         } else if ([handle sessionIsInErrorState]) {
             // Prohibit registering an invalid session.
-            // FIXME: Inform the app somehow, perhaps through the global error callback?
+            if (completion) {
+                NSError *error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                     code:RLMSyncErrorClientSessionError
+                                                 userInfo:nil];
+                completion(error);
+            }
             return nil;
         }
     }

@@ -45,6 +45,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// Revive the session.
 - (void)revive;
 
+/// Wait for pending uploads to complete or the session to expire, and dispatch the callback onto the specified queue.
+- (BOOL)waitForUploadCompletionOnQueue:(nullable dispatch_queue_t)queue callback:(void(^)(void))callback;
+
+/// Wait for pending downloads to complete or the session to expire, and dispatch the callback onto the specified queue.
+- (BOOL)waitForDownloadCompletionOnQueue:(nullable dispatch_queue_t)queue callback:(void(^)(void))callback;
+
 @end
 
 NS_ASSUME_NONNULL_END

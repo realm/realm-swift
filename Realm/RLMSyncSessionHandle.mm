@@ -34,6 +34,8 @@ using namespace realm;
 }
 @end
 
+#pragma mark - Weak session handle
+
 @implementation RLMSyncWeakSessionHandle
 
 - (BOOL)sessionIsInErrorState {
@@ -69,7 +71,37 @@ using namespace realm;
     }
 }
 
+- (BOOL)waitForUploadCompletionOnQueue:(dispatch_queue_t)queue
+                              callback:(void(^)(void))callback {
+    if (auto pointer = _ptr.lock()) {
+        queue = queue ?: dispatch_get_main_queue();
+        pointer->wait_for_upload_completion([=](){
+            dispatch_async(queue, ^{
+                callback();
+            });
+        });
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL)waitForDownloadCompletionOnQueue:(dispatch_queue_t)queue
+                                callback:(void(^)(void))callback {
+    if (auto pointer = _ptr.lock()) {
+        queue = queue ?: dispatch_get_main_queue();
+        pointer->wait_for_download_completion([=](){
+            dispatch_async(queue, ^{
+                callback();
+            });
+        });
+        return YES;
+    }
+    return NO;
+}
+
 @end
+
+#pragma mark - Strong session handle
 
 @implementation RLMSyncStrongSessionHandle
 
@@ -96,7 +128,31 @@ using namespace realm;
     _ptr->revive_if_needed();
 }
 
+- (BOOL)waitForUploadCompletionOnQueue:(dispatch_queue_t)queue
+                              callback:(void(^)(void))callback {
+    queue = queue ?: dispatch_get_main_queue();
+    _ptr->wait_for_upload_completion([=](){
+        dispatch_async(queue, ^{
+            callback();
+        });
+    });
+    return YES;
+}
+
+- (BOOL)waitForDownloadCompletionOnQueue:(dispatch_queue_t)queue
+                                callback:(void(^)(void))callback {
+    queue = queue ?: dispatch_get_main_queue();
+    _ptr->wait_for_download_completion([=](){
+        dispatch_async(queue, ^{
+            callback();
+        });
+    });
+    return YES;
+}
+
 @end
+
+#pragma mark - Abstract base class
 
 @implementation RLMSyncSessionHandle
 
@@ -133,6 +189,18 @@ using namespace realm;
 
 - (void)revive {
     NSAssert(NO, @"Subclasses must override...");
+}
+
+- (BOOL)waitForUploadCompletionOnQueue:(__unused dispatch_queue_t)queue
+                              callback:(__unused void(^)(void))callback {
+    NSAssert(NO, @"Subclasses must override...");
+    return NO;
+}
+
+- (BOOL)waitForDownloadCompletionOnQueue:(__unused dispatch_queue_t)queue
+                                callback:(__unused void(^)(void))callback {
+    NSAssert(NO, @"Subclasses must override...");
+    return NO;
 }
 
 @end
