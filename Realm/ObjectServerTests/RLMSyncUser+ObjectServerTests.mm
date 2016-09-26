@@ -27,7 +27,8 @@
 
 @implementation RLMSyncUser (ObjectServerTests)
 
-- (void)waitForUploadToFinish:(NSURL *)url {
+- (BOOL)waitForUploadToFinish:(NSURL *)url {
+    const NSTimeInterval timeout = 20;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncSession *session = [self sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
@@ -35,10 +36,12 @@
                                                    callback:^{
                                                        dispatch_semaphore_signal(sema);
                                                    }];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+
+    return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
 }
 
-- (void)waitForDownloadToFinish:(NSURL *)url {
+- (BOOL)waitForDownloadToFinish:(NSURL *)url {
+    const NSTimeInterval timeout = 20;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncSession *session = [self sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
@@ -46,7 +49,7 @@
                                                      callback:^{
                                                          dispatch_semaphore_signal(sema);
                                                      }];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
 }
 
 @end

@@ -81,27 +81,60 @@ static NSURL *syncDirectoryForChildProcess() {
                                                       : RLMAuthenticationActionsUseExistingAccount)];
 }
 
-- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user error:(NSError **)error {
-    dispatch_semaphore_t handshake_sema = dispatch_semaphore_create(0);;
+- (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions {
+    [realm beginWriteTransaction];
+    for (NSString *desc in descriptions) {
+        [realm addObject:[[SyncObject alloc] initWithValue:@[desc]]];
+    }
+    [realm commitWriteTransaction];
+}
+
+- (void)waitForDownloadsForUser:(RLMSyncUser *)user
+                         realms:(NSArray<RLMRealm *> *)realms
+                      realmURLs:(NSArray<NSURL *> *)realmURLs
+                 expectedCounts:(NSArray<NSNumber *> *)counts {
+    NSAssert(realms.count == counts.count && realms.count == realmURLs.count,
+             @"Test logic error: all array arguments must be the same size.");
+    XCTestExpectation *checkCountExpectation = [self expectationWithDescription:@"Downloads should complete"];
+    for (NSUInteger i = 0; i < realms.count; i++) {
+        WAIT_FOR_DOWNLOAD(user, realmURLs[i]);
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (NSUInteger i = 0; i < realms.count; i++) {
+            CHECK_COUNT([counts[i] integerValue], SyncObject, realms[i]);
+        }
+        [checkCountExpectation fulfill];
+    });
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+}
+
+- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
+    NSError *error = nil;
+    const NSTimeInterval timeout = 4;
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncBasicErrorReportingBlock basicBlock = ^(NSError *error) {
         if (error) {
             XCTFail(@"Received an asynchronous error: %@ (process: %@)", error, self.isParent ? @"parent" : @"child");
         }
-        dispatch_semaphore_signal(handshake_sema);
+        dispatch_semaphore_signal(sema);
     };
     [[RLMSyncManager sharedManager] setSessionCompletionNotifier:basicBlock];
     RLMRealmConfiguration *c = [[RLMRealmConfiguration defaultConfiguration] copy];
-    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];;
-    RLMRealm *r = [RLMRealm realmWithConfiguration:c error:error];
+    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    RLMRealm *r = [RLMRealm realmWithConfiguration:c error:&error];
     // Wait for login to succeed or fail.
-    dispatch_semaphore_wait(handshake_sema, DISPATCH_TIME_FOREVER);
+    XCTAssert(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0,
+              @"Timed out while trying to asynchronously open Realm for URL: %@", url);
     return r;
 }
 
-- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user error:(NSError **)error {
+- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
+    NSError *error = nil;
     RLMRealmConfiguration *c = [[RLMRealmConfiguration defaultConfiguration] copy];
-    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];;
-    return [RLMRealm realmWithConfiguration:c error:error];
+    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    RLMRealm *r = [RLMRealm realmWithConfiguration:c error:&error];
+    XCTAssertNil(error, @"Experienced an error opening the Realm at %@: %@", url, error);
+    return r;
 }
 
 - (RLMSyncUser *)logInUserForCredential:(RLMSyncCredential *)credential
@@ -139,6 +172,7 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (void)setUp {
     [super setUp];
+    self.continueAfterFailure = NO;
 
     if (!self.isParent) {
         // Don't start the sync server if not the originating process.
@@ -167,7 +201,9 @@ static NSURL *syncDirectoryForChildProcess() {
         }
     }];
     [self.task launch];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    const NSTimeInterval timeout = 60;
+    XCTAssert(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0,
+              @"Object server did not launch properly, terminating test...");
 }
 
 - (void)tearDown {
@@ -182,6 +218,7 @@ static NSURL *syncDirectoryForChildProcess() {
         self.task.standardOutput = [NSPipe pipe];
         [self.task launch];
         [self.task waitUntilExit];
+        usleep(500000);
     }
     s_managerForTest = nil;
     [super tearDown];
