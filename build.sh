@@ -1021,6 +1021,8 @@ EOM
     "ci-pr")
         mkdir -p build/reports
         export REALM_SWIFT_VERSION=$swift_version
+        # FIXME: Re-enable once CI can properly unlock the keychain
+        export REALM_DISABLE_METADATA_ENCRYPTION=1
 
         if [ "$target" = "docs" ]; then
             sh build.sh set-swift-version
