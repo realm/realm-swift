@@ -454,14 +454,7 @@ case "$COMMAND" in
             exit 0
         fi
         if [ -d core -a -d ../realm-core -a -d ../realm-sync -a ! -L core ]; then
-          # Allow newer versions than expected for local builds as testing
-          # with unreleased versions is one of the reasons to use a local build
-          if [[ "$(cat core/version.txt)" != "$REALM_SYNC_VERSION" ]]; then
-              echo "Local build of core is out of date."
-              exit 1
-          else
-              echo "Using version of core already in core/ directory"
-          fi
+          echo "Using version of core already in core/ directory"
         elif ! [ -L core ]; then
             echo "core is not a symlink. Deleting..."
             rm -rf core
