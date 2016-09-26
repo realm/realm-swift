@@ -254,16 +254,19 @@ EXPORT COMPLIANCE
 
 You understand that the Software may contain cryptographic functions that may be
 subject to export restrictions, and you represent and warrant that you are not
-located in a country that is subject to United States export restriction or embargo,
-including Cuba, Iran, North Korea, Sudan, Syria or the Crimea region, and that you
-are not on the Department of Commerce list of Denied Persons, Unverified Parties,
-or affiliated with a Restricted Entity.
+(i) located in a jurisdiction that is subject to United States economic
+sanctions (“Prohibited Jurisdiction”), including Cuba, Iran, North Korea,
+Sudan, Syria or the Crimea region, (ii) a person listed on any U.S. government
+blacklist (to include the List of Specially Designated Nationals and Blocked
+Persons or the Consolidated Sanctions List administered by the U.S. Department
+of the Treasury’s Office of Foreign Assets Control, or the Denied Persons List
+or Entity List administered by the U.S. Department of Commerce)
+(“Sanctioned Person”), or (iii) controlled or 50% or more owned by a Sanctioned
+Person.
 
 You agree to comply with all export, re-export and import restrictions and
-regulations of the Department of Commerce or other agency or authority of the
-United States or other applicable countries. You also agree not to transfer, or
-authorize the transfer of, directly or indirectly, the Software to any prohibited
-country, including Cuba, Iran, North Korea, Sudan, Syria or the Crimea region,
-or to any person or organization on or affiliated with the Department of
-Commerce lists of Denied Persons, Unverified Parties or Restricted Entities, or
-otherwise in violation of any such restrictions or regulations.
+regulations of the U.S. Department of Commerce or other agency or authority of
+the United States or other applicable countries. You also agree not to transfer,
+or authorize the transfer of, directly or indirectly, of the Software to any
+Prohibited Jurisdiction, or otherwise in violation of any such restrictions or
+regulations.
