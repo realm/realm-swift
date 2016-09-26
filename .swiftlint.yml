@@ -1,4 +1,5 @@
 included:
+  - Realm/ObjectServerTests
   - RealmSwift
   - Realm/Swift
 variable_name:
