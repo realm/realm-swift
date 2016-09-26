@@ -13,7 +13,7 @@ target:
   - ios-swift
   - osx-swift
   - watchos
-  # - cocoapods # Disabled for realm-cocoa-private because these tests target branches on the public repo
+  - cocoapods
   - swiftlint
   - tvos
   - osx-encryption
