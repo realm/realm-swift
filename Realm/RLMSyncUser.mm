@@ -363,11 +363,15 @@ using namespace realm;
                           standalone:(BOOL)isStandalone
                         onCompletion:(RLMSyncBasicErrorReportingBlock)completion {
     if (self.directAccessToken) {
-        [self _bindSessionWithDirectAccessToken:self.directAccessToken
-                                     syncConfig:syncConfig
-                                   localFileURL:fileURL
-                                     standalone:isStandalone
-                                   onCompletion:completion];
+        /// Like with the normal authentication methods below, make binding asynchronous so we don't recursively
+        /// try to acquire the session lock.
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [self _bindSessionWithDirectAccessToken:self.directAccessToken
+                                         syncConfig:syncConfig
+                                       localFileURL:fileURL
+                                         standalone:isStandalone
+                                       onCompletion:completion];
+        });
         return;
     }
 
