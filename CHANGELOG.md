@@ -10,16 +10,30 @@ of these great new features.
 * By popular demand, `RealmSwift.Error` has been moved from the top-level
   namespace into a `Realm` extension and is now `Realm.Error`, so that it no
   longer conflicts with `Swift.Error`.
+* Files written by Realm 2.0 cannot be read by 1.x or earlier versions. Old
+  files can still be opened.
 
 ### Enhancements
 
-* None.
+* The .log, .log_a and .log_b files no longer exist and the state tracked in
+  them has been moved to the main Realm file. This reduces the number of open
+  files needed by Realm, improves performance of both opening and writing to
+  Realms, and eliminates a small window where committing write transactions
+  would prevent other processes from opening the file.
 
 ### Bugfixes
 
 * Fix an assertion failure when sorting by zero properties.
 * Fix a mid-commit crash in one process also crashing all other processes with
   the same Realm open.
+* Properly initialize new nullable float and double properties added to
+  existing objects to null rather than 0.
+* Fix a stack overflow when objects with indexed string properties had very
+  long common prefixes.
+* Fix a race condition which could lead to crashes when using async queries or
+  collection notifications.
+* Fix a bug which could lead to incorrect state when an object which links to
+  itself is deleted from the Realm.
 
 1.1.0 Release notes (2016-09-16)
 =============================================================
