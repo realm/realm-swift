@@ -130,7 +130,7 @@ node('osx') {
                   $class: 'GitSCM',
                   branches: [[name: GIT_REF]],
                   browser: [$class: 'GithubWeb',
-                  repoUrl: 'https://github.com/realm/realm-cocoa-private'],
+                  repoUrl: 'https://github.com/realm/realm-cocoa'],
                   extensions: [
                     [$class: 'SubmoduleOption', disableSubmodules: false, recursiveSubmodules: true, reference: '', trackingSubmodules: false],
                     [$class: 'CleanCheckout']],
@@ -139,7 +139,7 @@ node('osx') {
                     credentialsId: '3e71241e-8920-4ecc-884b-418eb92b81ea',
                     name: 'origin',
                     refspec: '+refs/tags/*:refs/remotes/origin/tags/* +refs/heads/*:refs/remotes/origin/*',
-                    url: 'https://github.com/realm/realm-cocoa-private.git'
+                    url: 'https://github.com/realm/realm-cocoa.git'
                   ]]
             ])
         }
