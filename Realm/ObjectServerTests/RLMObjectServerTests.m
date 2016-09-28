@@ -54,7 +54,7 @@
 
 /// A valid admin token should be able to log in a user.
 - (void)testAdminTokenAuthentication {
-    NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
+    NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/realm-object-server/admin_token.base64"];
     NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
     XCTAssertNotNil(adminToken);
     RLMSyncCredential *credential = [RLMSyncCredential credentialWithAccessToken:adminToken identity:@"test"];
@@ -81,7 +81,7 @@
 - (void)testOpenRealmWithAdminToken {
     // FIXME (tests): opening a Realm with the access token, then opening a Realm at the same virtual path
     // with a normal credential, causes Realms to fail to bind with a "bad virtual path" error.
-    NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
+    NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/realm-object-server/admin_token.base64"];
     NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
     XCTAssertNotNil(adminToken);
     RLMSyncCredential *credential = [RLMSyncCredential credentialWithAccessToken:adminToken identity:@"test"];
