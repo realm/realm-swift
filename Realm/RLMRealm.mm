@@ -336,7 +336,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 + (void)resetRealmState {
-    [RLMSyncManager _resetStateForTesting];
     RLMClearRealmCache();
     realm::_impl::RealmCoordinator::clear_cache();
     [RLMRealmConfiguration resetRealmConfigurationState];

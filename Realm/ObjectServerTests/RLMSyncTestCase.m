@@ -21,11 +21,17 @@
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
 
+#import "RLMSyncManager+ObjectServerTests.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 
 #if !TARGET_OS_MAC
 #error These tests can only be run on a macOS host.
 #endif
+
+@interface RLMSyncManager ()
++ (void)_setCustomBundleID:(NSString *)customBundleID;
+- (instancetype)initWithCustomRootDirectory:(NSURL *)rootDirectory;
+@end
 
 @interface RLMSyncTestCase ()
 @property (nonatomic) NSTask *task;
@@ -34,7 +40,26 @@
 @implementation SyncObject
 @end
 
+static NSTask *s_task;
+static RLMSyncManager *s_managerForTest;
+
+static NSURL *syncDirectoryForChildProcess() {
+    NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
+    NSBundle *bundle = [NSBundle mainBundle];
+    NSString *bundleIdentifier = bundle.bundleIdentifier ?: bundle.executablePath.lastPathComponent;
+    path = [path stringByAppendingPathComponent:[NSString stringWithFormat:@"%@-child", bundleIdentifier]];
+    [[NSFileManager defaultManager] createDirectoryAtPath:path
+                              withIntermediateDirectories:YES
+                                               attributes:nil
+                                                    error:nil];
+    return [NSURL fileURLWithPath:path isDirectory:YES];
+}
+
 @implementation RLMSyncTestCase
+
++ (RLMSyncManager *)managerForCurrentTest {
+    return s_managerForTest;
+}
 
 #pragma mark - Helper methods
 
@@ -49,35 +74,68 @@
     return [NSURL URLWithString:@"http://127.0.0.1:9080"];
 }
 
-+ (RLMSyncCredential *)basicCredential:(BOOL)createAccount {
-    return [RLMSyncCredential credentialWithUsername:@"a"
++ (RLMSyncCredential *)basicCredentialWithName:(NSString *)name createAccount:(BOOL)createAccount {
+    return [RLMSyncCredential credentialWithUsername:name
                                             password:@"a"
                                              actions:(createAccount
                                                       ? RLMAuthenticationActionsCreateAccount
                                                       : RLMAuthenticationActionsUseExistingAccount)];
 }
 
-- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user error:(NSError **)error {
-    dispatch_semaphore_t handshake_sema = dispatch_semaphore_create(0);;
+- (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions {
+    [realm beginWriteTransaction];
+    for (NSString *desc in descriptions) {
+        [realm addObject:[[SyncObject alloc] initWithValue:@[desc]]];
+    }
+    [realm commitWriteTransaction];
+}
+
+- (void)waitForDownloadsForUser:(RLMSyncUser *)user
+                         realms:(NSArray<RLMRealm *> *)realms
+                      realmURLs:(NSArray<NSURL *> *)realmURLs
+                 expectedCounts:(NSArray<NSNumber *> *)counts {
+    NSAssert(realms.count == counts.count && realms.count == realmURLs.count,
+             @"Test logic error: all array arguments must be the same size.");
+    XCTestExpectation *checkCountExpectation = [self expectationWithDescription:@"Downloads should complete"];
+    for (NSUInteger i = 0; i < realms.count; i++) {
+        WAIT_FOR_DOWNLOAD(user, realmURLs[i]);
+    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (NSUInteger i = 0; i < realms.count; i++) {
+            CHECK_COUNT([counts[i] integerValue], SyncObject, realms[i]);
+        }
+        [checkCountExpectation fulfill];
+    });
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+}
+
+- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
+    NSError *error = nil;
+    const NSTimeInterval timeout = 4;
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncBasicErrorReportingBlock basicBlock = ^(NSError *error) {
         if (error) {
             XCTFail(@"Received an asynchronous error: %@ (process: %@)", error, self.isParent ? @"parent" : @"child");
         }
-        dispatch_semaphore_signal(handshake_sema);
+        dispatch_semaphore_signal(sema);
     };
     [[RLMSyncManager sharedManager] setSessionCompletionNotifier:basicBlock];
     RLMRealmConfiguration *c = [[RLMRealmConfiguration defaultConfiguration] copy];
-    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];;
-    RLMRealm *r = [RLMRealm realmWithConfiguration:c error:error];
+    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:&error];
     // Wait for login to succeed or fail.
-    dispatch_semaphore_wait(handshake_sema, DISPATCH_TIME_FOREVER);
-    return r;
+    XCTAssert(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0,
+              @"Timed out while trying to asynchronously open Realm for URL: %@", url);
+    return realm;
 }
 
-- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user error:(NSError **)error {
+- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
+    NSError *error = nil;
     RLMRealmConfiguration *c = [[RLMRealmConfiguration defaultConfiguration] copy];
-    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];;
-    return [RLMRealm realmWithConfiguration:c error:error];
+    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:&error];
+    XCTAssertNil(error, @"Experienced an error opening the Realm at %@: %@", url, error);
+    return realm;
 }
 
 - (RLMSyncUser *)logInUserForCredential:(RLMSyncCredential *)credential
@@ -88,10 +146,10 @@
     [RLMSyncUser authenticateWithCredential:credential
                               authServerURL:url
                                onCompletion:^(RLMSyncUser *user, NSError *error) {
-                                   XCTAssertNotNil(user);
                                    XCTAssertNil(error,
                                                 @"Error when trying to log in a user: %@ (process: %@)",
                                                 error, process);
+                                   XCTAssertNotNil(user);
                                    theUser = user;
                                    [expectation fulfill];
                                }];
@@ -99,6 +157,18 @@
     XCTAssertTrue(theUser.state == RLMSyncUserStateActive,
                   @"User should have been valid, but wasn't. (process: %@)", process);
     return theUser;
+}
+
+// FIXME: remove this API once the new token system is implemented.
+- (void)primeSyncManagerWithSemaphore:(dispatch_semaphore_t)semaphore {
+    if (semaphore == nil) {
+        [[RLMSyncManager sharedManager] setSessionCompletionNotifier:^(__unused NSError *error){ }];
+        return;
+    }
+    [[RLMSyncManager sharedManager] setSessionCompletionNotifier:^(NSError *error) {
+        XCTAssertNil(error, @"Session completion block returned with an error: %@", error);
+        dispatch_semaphore_signal(semaphore);
+    }];
 }
 
 #pragma mark - XCUnitTest Lifecycle
@@ -113,44 +183,68 @@
     }
 }
 
-- (void)setUp {
-    [super setUp];
-    if (!self.isParent) {
-        // Don't start the sync server if not the originating process.
+- (void)lazilyInitializeObjectServer {
+    if (!self.isParent || s_task) {
         return;
     }
-    // FIXME: we need a more robust way of waiting till a test's server process has completed cleaning
-    // up before starting another test.
-    sleep(1);
-    [RLMSyncManager sharedManager].logLevel = RLMSyncLogLevelOff;
-    self.task = [[NSTask alloc] init];
-    self.task.currentDirectoryPath = [[RLMSyncTestCase rootRealmCocoaURL] path];
-    self.task.launchPath = @"/bin/sh";
-    self.task.arguments = @[@"build.sh", @"start-object-server"];
+    [RLMSyncTestCase runResetObjectServer:YES];
+    NSTask *task = [[NSTask alloc] init];
+    task.currentDirectoryPath = [[RLMSyncTestCase rootRealmCocoaURL] path];
+    task.launchPath = @"/bin/sh";
+    task.arguments = @[@"build.sh", @"start-object-server"];
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    self.task.standardOutput = [NSPipe pipe];
-    [[self.task.standardOutput fileHandleForReading] setReadabilityHandler:^(NSFileHandle *file) {
+    task.standardOutput = [NSPipe pipe];
+    [[task.standardOutput fileHandleForReading] setReadabilityHandler:^(NSFileHandle *file) {
         NSData *data = [file availableData];
         NSString *output = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         if ([output containsString:@"Received: IDENT"]) {
             dispatch_semaphore_signal(sema);
         }
     }];
-    [self.task launch];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    s_task = task;
+    [task launch];
+    const NSTimeInterval timeout = 60;
+    BOOL wait_result = dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
+    if (!wait_result) {
+        s_task = nil;
+        XCTFail(@"Server did not start up within the allotted timeout interval.");
+    }
+}
+
++ (void)tearDown {
+    [s_task terminate];
+    [super tearDown];
+}
+
++ (void)runResetObjectServer:(BOOL)initial {
+    NSTask *task = [[NSTask alloc] init];
+    task.currentDirectoryPath = [[RLMSyncTestCase rootRealmCocoaURL] path];
+    task.launchPath = @"/bin/sh";
+    task.arguments = @[@"build.sh", initial ? @"reset-object-server" : @"reset-object-server-between-tests"];
+    task.standardOutput = [NSPipe pipe];
+    [task launch];
+    [task waitUntilExit];
+}
+
+- (void)setUp {
+    [super setUp];
+    self.continueAfterFailure = NO;
+    [self lazilyInitializeObjectServer];
+
+    if (self.isParent) {
+        XCTAssertNotNil(s_task, @"Test suite setup did not complete: server did not start properly.");
+        [RLMSyncTestCase runResetObjectServer:NO];
+        s_managerForTest = [[RLMSyncManager alloc] initWithCustomRootDirectory:nil];
+    } else {
+        // Configure the sync manager to use a different directory than the parent process.
+        s_managerForTest = [[RLMSyncManager alloc] initWithCustomRootDirectory:syncDirectoryForChildProcess()];
+    }
+    [RLMSyncManager sharedManager].logLevel = RLMSyncLogLevelOff;
 }
 
 - (void)tearDown {
-    if (self.isParent) {
-        [self.task terminate];
-        self.task = [[NSTask alloc] init];
-        self.task.currentDirectoryPath = [[RLMSyncTestCase rootRealmCocoaURL] path];
-        self.task.launchPath = @"/bin/sh";
-        self.task.arguments = @[@"build.sh", @"reset-object-server"];
-        self.task.standardOutput = [NSPipe pipe];
-        [self.task launch];
-        [self.task waitUntilExit];
-    }
+    [s_managerForTest prepareForDestruction];
+    s_managerForTest = nil;
     [super tearDown];
 }
 
