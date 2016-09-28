@@ -283,7 +283,7 @@ fi
 ######################################
 
 download_object_server() {
-    curl -C - -L -O "http://static.realm.io/downloads/mobile-platform/v$REALM_OBJECT_SERVER_VERSION/realm-mobile-platform.zip"
+    curl -C - -L -O "https://static.realm.io/downloads/mobile-platform/v$REALM_OBJECT_SERVER_VERSION/realm-mobile-platform.zip"
     rm -rf sync
     mkdir sync
     (cd sync && unzip ../realm-mobile-platform.zip)
