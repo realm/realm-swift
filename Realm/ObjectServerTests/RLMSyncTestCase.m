@@ -21,11 +21,17 @@
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
 
+#import "RLMSyncManager+ObjectServerTests.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 
 #if !TARGET_OS_MAC
 #error These tests can only be run on a macOS host.
 #endif
+
+@interface RLMSyncManager ()
++ (void)_setCustomBundleID:(NSString *)customBundleID;
+- (instancetype)initWithCustomRootDirectory:(NSURL *)rootDirectory;
+@end
 
 @interface RLMSyncTestCase ()
 @property (nonatomic) NSTask *task;
@@ -34,7 +40,25 @@
 @implementation SyncObject
 @end
 
+static RLMSyncManager *s_managerForTest;
+
+static NSURL *syncDirectoryForChildProcess() {
+    NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
+    NSBundle *bundle = [NSBundle mainBundle];
+    NSString *bundleIdentifier = bundle.bundleIdentifier ?: bundle.executablePath.lastPathComponent;
+    path = [path stringByAppendingPathComponent:[NSString stringWithFormat:@"%@-child", bundleIdentifier]];
+    [[NSFileManager defaultManager] createDirectoryAtPath:path
+                              withIntermediateDirectories:YES
+                                               attributes:nil
+                                                    error:nil];
+    return [NSURL fileURLWithPath:path isDirectory:YES];
+}
+
 @implementation RLMSyncTestCase
+
++ (RLMSyncManager *)managerForCurrentTest {
+    return s_managerForTest;
+}
 
 #pragma mark - Helper methods
 
@@ -115,10 +139,16 @@
 
 - (void)setUp {
     [super setUp];
+
     if (!self.isParent) {
         // Don't start the sync server if not the originating process.
+        // Do configure the sync manager to use a different directory than the parent process.
+        s_managerForTest = [[RLMSyncManager alloc] initWithCustomRootDirectory:syncDirectoryForChildProcess()];
         return;
+    } else {
+        s_managerForTest = [[RLMSyncManager alloc] initWithCustomRootDirectory:nil];
     }
+
     // FIXME: we need a more robust way of waiting till a test's server process has completed cleaning
     // up before starting another test.
     sleep(1);
@@ -141,6 +171,8 @@
 }
 
 - (void)tearDown {
+    [s_managerForTest prepareForDestruction];
+    usleep(500000);
     if (self.isParent) {
         [self.task terminate];
         self.task = [[NSTask alloc] init];
@@ -151,7 +183,15 @@
         [self.task launch];
         [self.task waitUntilExit];
     }
+    s_managerForTest = nil;
     [super tearDown];
+}
+
+- (int)runChildAndWait {
+    int value = [super runChildAndWait];
+    // Give client some time to stop asynchronous work before killing server.
+    usleep(20000);
+    return value;
 }
 
 @end

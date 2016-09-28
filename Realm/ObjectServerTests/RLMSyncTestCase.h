@@ -32,6 +32,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncTestCase : RLMMultiProcessTestCase
 
++ (RLMSyncManager *)managerForCurrentTest;
+
 + (NSURL *)rootRealmCocoaURL;
 
 + (NSURL *)authServerURL;
