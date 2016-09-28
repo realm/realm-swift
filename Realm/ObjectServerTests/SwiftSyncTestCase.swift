@@ -41,7 +41,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return Credential.usernamePassword(username: "a", password: "a", actions: actions)
     }
 
-    func synchronouslyOpenRealm(url: URL, user: User, file: StaticString = #file, line: UInt = #line) throws -> Realm {
+    func synchronouslyOpenRealm(url: URL, user: SyncUser, file: StaticString = #file, line: UInt = #line) throws -> Realm {
         let semaphore = DispatchSemaphore(value: 0)
         let basicBlock = { (error: Error?) in
             if let error = error {
@@ -58,18 +58,18 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return realm
     }
 
-    func immediatelyOpenRealm(url: URL, user: User) throws -> Realm {
+    func immediatelyOpenRealm(url: URL, user: SyncUser) throws -> Realm {
         return try Realm(configuration: Realm.Configuration(syncConfiguration: (user, url)))
     }
 
     func synchronouslyLogInUser(for credential: Credential,
                                 server url: URL,
                                 file: StaticString = #file,
-                                line: UInt = #line) throws -> User {
+                                line: UInt = #line) throws -> SyncUser {
         let process = isParent ? "parent" : "child"
-        var theUser: User! = nil
+        var theUser: SyncUser! = nil
         let ex = expectation(description: "Should log in the user properly")
-        User.authenticate(with: credential, server: url) { (user, error) in
+        SyncUser.authenticate(with: credential, server: url) { (user, error) in
             XCTAssertNotNil(user, file: file, line: line)
             XCTAssertNil(error,
                          "Error when trying to log in a user: \(error!) (process: \(process))",
@@ -116,7 +116,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     func synchronouslyOpenRealm(url url: NSURL,
-                                user: User) throws -> Realm {
+                                user: SyncUser) throws -> Realm {
         let semaphore = dispatch_semaphore_create(0)
         let basicBlock = { (error: NSError?) in
             if let error = error {
@@ -133,15 +133,15 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return realm
     }
 
-    func immediatelyOpenRealm(url: NSURL, user: User) throws -> Realm {
+    func immediatelyOpenRealm(url: NSURL, user: SyncUser) throws -> Realm {
         return try Realm(configuration: Realm.Configuration(syncConfiguration: (user, url)))
     }
 
-    func synchronouslyLogInUser(for credential: Credential, server url: NSURL) throws -> User {
+    func synchronouslyLogInUser(for credential: Credential, server url: NSURL) throws -> SyncUser {
         let process = isParent ? "parent" : "child"
-        var theUser: User! = nil
+        var theUser: SyncUser! = nil
         let ex = expectationWithDescription("Should log in the user properly")
-        User.authenticateWithCredential(credential, authServerURL: url) { (user, error) in
+        SyncUser.authenticateWithCredential(credential, authServerURL: url) { (user, error) in
             XCTAssertNotNil(user)
             XCTAssertNil(error, "Error when trying to log in a user: \(error!) (process: \(process))")
             theUser = user

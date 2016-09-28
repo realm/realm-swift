@@ -15,6 +15,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix incorrect merging of RLMArray/List changes when objects with the same
   primary key are created on multiple devices.
 * Fix bad transaction log errors after deleting objects on a different device.
+* Rename `User` to `SyncUser` in Realm Swift.
 
 2.0.1 Release notes (2016-09-29)
 =============================================================
