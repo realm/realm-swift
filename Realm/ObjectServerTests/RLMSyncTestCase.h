@@ -18,6 +18,8 @@
 
 #import "RLMMultiProcessTestCase.h"
 
+#import "RLMSyncUser+ObjectServerTests.h"
+
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
@@ -32,29 +34,57 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncTestCase : RLMMultiProcessTestCase
 
++ (RLMSyncManager *)managerForCurrentTest;
+
 + (NSURL *)rootRealmCocoaURL;
 
 + (NSURL *)authServerURL;
 
-+ (RLMSyncCredential *)basicCredential:(BOOL)createAccount;
++ (RLMSyncCredential *)basicCredentialWithName:(NSString *)name createAccount:(BOOL)createAccount;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
-- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user error:(NSError **)error;
+- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
 
 /// Immediately open a synced Realm.
-- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user error:(NSError **)error;
+- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
 
 /// Synchronously create, log in, and return a user.
 - (RLMSyncUser *)logInUserForCredential:(RLMSyncCredential *)credential
                                  server:(NSURL *)url;
 
+/// Add a number of objects to a Realm.
+- (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions;
+
+/// Synchronously wait for downloads to complete for any number of Realms, and then check their `SyncObject` counts.
+- (void)waitForDownloadsForUser:(RLMSyncUser *)user
+                         realms:(NSArray<RLMRealm *> *)realms
+                      realmURLs:(NSArray<NSURL *> *)realmURLs
+                 expectedCounts:(NSArray<NSNumber *> *)counts;
+
+/// "Prime" the sync manager to signal the given semaphore the next time a session is bound. This method should be
+/// called right before a Realm is opened if that Realm's session is the one to be monitored.
+- (void)primeSyncManagerWithSemaphore:(nullable dispatch_semaphore_t)semaphore;
+
 @end
 
 NS_ASSUME_NONNULL_END
 
+#define WAIT_FOR_SEMAPHORE(macro_semaphore, macro_timeout) \
+{                                                                                                                      \
+    int64_t delay_in_ns = (int64_t)(macro_timeout * NSEC_PER_SEC);                                                     \
+    BOOL sema_success = dispatch_semaphore_wait(macro_semaphore, dispatch_time(DISPATCH_TIME_NOW, delay_in_ns)) == 0;  \
+    XCTAssertTrue(sema_success, @"Semaphore timed out.");                                                              \
+}
+
+#define WAIT_FOR_UPLOAD(macro_user, macro_url) \
+    XCTAssertTrue([macro_user waitForUploadToFinish:macro_url], @"Upload timed out for URL: %@", macro_url);
+
+#define WAIT_FOR_DOWNLOAD(macro_user, macro_url) \
+    XCTAssertTrue([macro_user waitForDownloadToFinish:macro_url], @"Download timed out for URL: %@", macro_url);
+
 #define CHECK_COUNT(d_count, macro_object_type, macro_realm) \
-{ \
-NSInteger c = [macro_object_type allObjectsInRealm:r].count; \
-NSString *w = self.isParent ? @"parent" : @"child"; \
-XCTAssert(d_count == c, @"Expected %@ items, but actually got %@ (%@)", @(d_count), @(c), w); \
+{                                                                                                       \
+    NSInteger c = [macro_object_type allObjectsInRealm:macro_realm].count;                              \
+    NSString *w = self.isParent ? @"parent" : @"child";                                                 \
+    XCTAssert(d_count == c, @"Expected %@ items, but actually got %@ (%@)", @(d_count), @(c), w);       \
 }

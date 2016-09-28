@@ -16,17 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/Realm.h>
+#import "RLMSyncManager.h"
 
-NS_ASSUME_NONNULL_BEGIN
+@interface RLMSyncManager (ObjectServerTests)
 
-@interface RLMSyncUser (ObjectServerTests)
-
-// NOTE: Don't use these from Objective-C directly. Use the XCTest macros instead.
-
-- (BOOL)waitForUploadToFinish:(NSURL *)url;
-- (BOOL)waitForDownloadToFinish:(NSURL *)url;
+- (void)prepareForDestruction;
 
 @end
-
-NS_ASSUME_NONNULL_END
