@@ -916,6 +916,7 @@ case "$COMMAND" in
             PlistBuddy -c "Set :CFBundleVersion $realm_version" "$version_file"
             PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
         done
+        sed -i '' "s/^VERSION=.*/VERSION=$realm_version/" dependencies.list
         exit 0
         ;;
 
