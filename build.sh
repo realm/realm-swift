@@ -286,12 +286,13 @@ fi
 
 download_object_server() {
     local archive_name="realm-object-server-bundled_node_darwin-$REALM_OBJECT_SERVER_VERSION.tar.gz"
-    /usr/local/bin/s3cmd get --force "s3://realm-ci-artifacts/services-bundle/$REALM_OBJECT_SERVER_VERSION/$archive_name"
+    curl -L -O "https://static.realm.io/downloads/object-server/$archive_name"
     rm -rf sync
     mkdir sync
-    tar -C sync -xf $archive_name
-    rm  $archive_name
+    tar xf $archive_name -C sync
+    rm $archive_name
     echo "\nenterprise:\n  skip_setup: true" >> "sync/object-server/configuration.yml"
+    sed -i '' -e "s/    listen_address: '0\.0\.0\.0'/    listen_address: '::'/" "sync/object-server/configuration.yml"
     touch "sync/object-server/do_not_open_browser"
 }
 
