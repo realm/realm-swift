@@ -1,3 +1,10 @@
+2.0.2 Release notes (XXXX-XX-XX)
+=============================================================
+
+### API breaking changes
+
+* Rename `User` to `SyncUser` in Realm Swift.
+
 2.0.1 Release notes (2016-09-29)
 =============================================================
 
