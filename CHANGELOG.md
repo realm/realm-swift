@@ -1,3 +1,11 @@
+2.0.1 Release notes (2016-09-29)
+=============================================================
+
+### Bugfixes
+
+* Fix an assertion failure when opening a Realm file written by a 1.x version
+  of Realm which has an indexed nullable int or bool property.
+
 2.0.0 Release notes (2016-09-27)
 =============================================================
 
