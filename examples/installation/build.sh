@@ -6,8 +6,8 @@ Usage: sh $0 command [argument]
 
 command:
   test-all:                        tests all projects in this repo.
-  test-xcode6:                     tests all Xcode 6 projects in this repo.
   test-xcode7:                     tests all Xcode 7 projects in this repo.
+  test-xcode8:                     tests all Xcode 8 projects in this repo.
 
   test-ios-objc-static:            tests iOS Objective-C static example.
   test-ios-objc-dynamic:           tests iOS Objective-C dynamic example.
@@ -101,19 +101,20 @@ source "$(dirname "$0")/../../scripts/swift-version.sh"
 
 case "$COMMAND" in
     "test-all")
-        ./build.sh test-xcode6 || exit 1
         ./build.sh test-xcode7 || exit 1
-        ;;
-
-    "test-xcode6")
-        for target in ios-objc-static ios-objc-dynamic ios-objc-cocoapods ios-objc-cocoapods-dynamic ios-objc-carthage osx-objc-dynamic osx-objc-cocoapods osx-objc-carthage; do
-            REALM_SWIFT_VERSION=1.2 ./build.sh test-$target || exit 1
-        done
+        ./build.sh test-xcode8 || exit 1
         ;;
 
     "test-xcode7")
         for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage watchos-objc-dynamic test-watchos-objc-cocoapods test-watchos-objc-carthage watchos-swift-dynamic test-watchos-swift-cocoapods test-watchos-swift-carthage; do
             REALM_SWIFT_VERSION=2.2 ./build.sh test-$target || exit 1
+        done
+        ;;
+
+    "test-xcode8")
+        for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage watchos-objc-dynamic test-watchos-objc-cocoapods test-watchos-objc-carthage watchos-swift-dynamic test-watchos-swift-cocoapods test-watchos-swift-carthage; do
+            REALM_SWIFT_VERSION=2.3 ./build.sh test-$target || exit 1
+            REALM_SWIFT_VERSION=3.0 ./build.sh test-$target || exit 1
         done
         ;;
 

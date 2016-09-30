@@ -185,9 +185,11 @@
 				TargetAttributes = {
 					E8219DCF1B3CD4A2006F2638 = {
 						CreatedOnToolsVersion = 6.3.2;
+						LastSwiftMigration = 0800;
 					};
 					E8219DE11B3CD4A2006F2638 = {
 						CreatedOnToolsVersion = 6.3.2;
+						LastSwiftMigration = 0800;
 						TestTargetID = E8219DCF1B3CD4A2006F2638;
 					};
 				};
@@ -361,6 +363,7 @@
 				INFOPLIST_FILE = CarthageExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Debug;
 		};
@@ -373,6 +376,7 @@
 				INFOPLIST_FILE = CarthageExample/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
 			};
 			name = Release;
 		};
@@ -392,6 +396,7 @@
 				INFOPLIST_FILE = CarthageExampleTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CarthageExample.app/Contents/MacOS/CarthageExample";
 			};
 			name = Debug;
@@ -408,6 +413,7 @@
 				INFOPLIST_FILE = CarthageExampleTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 2.3;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CarthageExample.app/Contents/MacOS/CarthageExample";
 			};
 			name = Release;
