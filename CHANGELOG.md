@@ -12,6 +12,9 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Fix Realm headers to be compatible with pre-C++11 dialects of Objective-C++.
+* Fix incorrect merging of RLMArray/List changes when objects with the same
+  primary key are created on multiple devices.
+* Fix bad transaction log errors after deleting objects on a different device.
 
 2.0.1 Release notes (2016-09-29)
 =============================================================
