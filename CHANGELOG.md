@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix Realm headers to be compatible with pre-C++11 dialects of Objective-C++.
+
 2.0.1 Release notes (2016-09-29)
 =============================================================
 
