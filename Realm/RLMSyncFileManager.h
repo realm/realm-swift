@@ -28,6 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSURL *)fileURLForMetadata;
 + (BOOL)removeFilesForUserIdentity:(NSString *)identity error:(NSError * _Nullable* _Nullable)error;
 
+/// Delete a Realm file and all associated state. Specify the path of the primary file (the Realm file itself).
++ (BOOL)deleteRealmAtPath:(NSURL *)realmPath;
+
 NS_ASSUME_NONNULL_END
 
 @end

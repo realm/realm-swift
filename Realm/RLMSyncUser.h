@@ -35,6 +35,9 @@ typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
 /// A block type used for APIs which asynchronously vend a `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
 
+/// A block type used for APIs which asynchronously vend a `RLMRealm`.
+typedef BOOL(^RLMFetchedRealmCompletionBlock)(NSError * _Nullable, RLMRealm * _Nullable);
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -97,6 +100,13 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 /**
  Retrieve a valid session object belonging to this user for a given URL, or `nil` if no such object exists.
+ Fetch a remote Realm and download pending changes before exposing it within a completion block.
+ */
+- (void)getRealmForURL:(NSURL *)realmURL
+          onCompletion:(RLMFetchedRealmCompletionBlock)completion NS_SWIFT_UNAVAILABLE("Use getRealm(at:completion:)");
+
+/**
+ Retrieve a valid session object for a given URL, or `nil` if no such object exists.
  */
 - (nullable RLMSyncSession *)sessionForURL:(NSURL *)url;
 

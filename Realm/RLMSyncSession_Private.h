@@ -19,6 +19,8 @@
 #import "RLMSyncSession.h"
 
 #import "RLMSyncConfiguration.h"
+#import "RLMSyncManager.h"
+#import "RLMSyncUser_Private.h"
 #import "RLMSyncUtil_Private.h"
 
 @class RLMSyncUser, RLMSyncSessionHandle;
@@ -27,15 +29,15 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock block;
+@property (nullable, nonatomic, copy) RLMSyncSessionCompletionBlock block;
 @property (nonatomic) NSURL *fileURL;
 @property (nonatomic) RLMSyncConfiguration *syncConfig;
-@property (nonatomic) BOOL isStandalone;
+@property (nonatomic) RLMSyncSessionPurpose purpose;
 
 - (instancetype)initWithFileURL:(NSURL *)fileURL
                      syncConfig:(RLMSyncConfiguration *)syncConfig
-                     standalone:(BOOL)isStandalone
-                          block:(nullable RLMSyncBasicErrorReportingBlock)block;
+                        purpose:(RLMSyncSessionPurpose)purpose
+                          block:(nullable RLMSyncSessionCompletionBlock)block;
 
 @end
 
@@ -45,7 +47,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)_logOut;
 - (void)_invalidate;
 
+- (void)_markFilesForDeletion;
+
 - (void)setState:(RLMSyncSessionState)state;
+
+@property (nullable, nonatomic) RLMSyncSessionHandle *sessionHandle;
 
 /// The path on disk where the Realm file backing this synced Realm is stored.
 @property (nonatomic) NSURL *fileURL;
