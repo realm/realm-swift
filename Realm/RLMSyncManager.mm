@@ -20,12 +20,12 @@
 
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncFileManager.h"
 #import "RLMSyncSession_Private.h"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import "sync_config.hpp"
+#import "sync_file.hpp"
 #import "sync_manager.hpp"
 #import "sync_metadata.hpp"
 #import "sync_session.hpp"
@@ -66,7 +66,10 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
 } // anonymous namespace
 
-@interface RLMSyncManager ()
+@interface RLMSyncManager () {
+    std::unique_ptr<realm::SyncFileManager> _file_manager;
+    std::unique_ptr<realm::SyncMetadataManager> _metadata_manager;
+}
 
 - (instancetype)initPrivate NS_DESIGNATED_INITIALIZER;
 
@@ -88,7 +91,7 @@ static dispatch_once_t s_onceToken;
 }
 
 - (RLMSyncSession *)sessionForSyncConfiguration:(RLMSyncConfiguration *)config {
-    NSURL *fileURL = [RLMSyncFileManager fileURLForRawRealmURL:config.realmURL user:config.user];
+    NSURL *fileURL = [self _fileURLForRawRealmURL:config.realmURL user:config.user];
     return [config.user _registerSessionForBindingWithFileURL:fileURL
                                                    syncConfig:config
                                             standaloneSession:YES
@@ -125,9 +128,9 @@ static dispatch_once_t s_onceToken;
         // Initialize the sync engine.
         SyncManager::shared().set_error_handler(errorLambda);
         SyncManager::shared().set_login_function(loginLambda);
-        NSString *metadataDirectory = [[RLMSyncFileManager fileURLForMetadata] path];
-        bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION");
-        _metadata_manager = std::make_unique<SyncMetadataManager>([metadataDirectory UTF8String], should_encrypt);
+        _file_manager = std::make_unique<SyncFileManager>([RLMDefaultDirectoryForBundleIdentifier(nil) UTF8String]);
+        _metadata_manager = std::make_unique<SyncMetadataManager>(_file_manager->metadata_path(),
+                                                                  !getenv("REALM_DISABLE_METADATA_ENCRYPTION"));
         [self _cleanUpMarkedUsers];
         [self _loadPersistedUsers];
         return self;
@@ -165,17 +168,20 @@ static dispatch_once_t s_onceToken;
     }
     [[s_sharedManager.activeUsers allValues] makeObjectsPerformSelector:@selector(logOut)];
 
+    // Steal the manager so we can use it to clean up other things.
+    auto manager = std::move(s_sharedManager->_file_manager);
+
     // Reset the singleton.
     s_onceToken = 0;
     s_sharedManager = nil;
 
     // Destroy the metadata Realm.
-    NSURL *metadataURL = [RLMSyncFileManager fileURLForMetadata];
-    // FIXME: replace this with the appropriate call to `[RLMSyncFileManager deleteRealmAtPath:]` once that code is in.
-    NSFileManager *manager = [NSFileManager defaultManager];
-    [manager removeItemAtURL:metadataURL error:nil];
-    [manager removeItemAtURL:[metadataURL URLByAppendingPathExtension:@"lock"] error:nil];
-    [manager removeItemAtURL:[metadataURL URLByAppendingPathExtension:@"management"] error:nil];
+    manager->remove_metadata_realm();
+}
+
+- (NSURL *)_fileURLForRawRealmURL:(NSURL *)url user:(RLMSyncUser *)user {
+    auto path = _file_manager->path([user.identity UTF8String], [[url absoluteString] UTF8String]);
+    return [NSURL fileURLWithPath:@(path.c_str())];
 }
 
 - (void)_fireError:(NSError *)error {
@@ -251,10 +257,10 @@ static dispatch_once_t s_onceToken;
             auto user = users_to_remove.get(i);
             // FIXME: delete user data in a different way? (This deletes a logged-out user's data as soon as the app
             // launches again, which might not be how some apps want to treat their data.)
-            [RLMSyncFileManager removeFilesForUserIdentity:@(user.identity().c_str()) error:nil];
             dead_users.emplace_back(std::move(user));
         }
         for (auto user : dead_users) {
+            _file_manager->remove_user_directory(user.identity());
             user.remove();
         }
     }
