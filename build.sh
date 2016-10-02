@@ -285,14 +285,14 @@ fi
 ######################################
 
 download_object_server() {
-    local archive_name="realm-object-server-bundled_node_darwin-$REALM_OBJECT_SERVER_VERSION.tar.gz"
-    /usr/local/bin/s3cmd get --force "s3://realm-ci-artifacts/services-bundle/$REALM_OBJECT_SERVER_VERSION/$archive_name"
+    curl -C - -L -O "https://static.realm.io/downloads/mobile-platform/v$REALM_OBJECT_SERVER_VERSION/realm-mobile-platform.zip"
     rm -rf sync
     mkdir sync
-    tar -C sync -xf $archive_name
-    rm  $archive_name
-    echo "\nenterprise:\n  skip_setup: true" >> "sync/object-server/configuration.yml"
-    touch "sync/object-server/do_not_open_browser"
+    (cd sync && unzip ../realm-mobile-platform.zip)
+    rm realm-mobile-platform.zip
+    echo "\nenterprise:\n  skip_setup: true" >> "sync/realm-object-server/object-server/configuration.yml"
+    sed -i '' -e "s/    listen_address: '0\.0\.0\.0'/    listen_address: '::'/" "sync/realm-object-server/object-server/configuration.yml"
+    touch "sync/realm-object-server/object-server/do_not_open_browser"
 }
 
 download_core() {
@@ -410,8 +410,8 @@ case "$COMMAND" in
                 break
             fi
         done
-        rm -rf "$package/object-server/root_dir/"
-        rm -rf "$package/object-server/temp_dir/"
+        rm -rf "sync/realm-object-server/object-server/root_dir/"
+        rm -rf "sync/realm-object-server/object-server/temp_dir/"
         exit 0
         ;;
 
