@@ -20,6 +20,20 @@
 
 #import "RLMSyncUser+ObjectServerTests.h"
 
+static NSURL *makeRealmURL(const char *function, NSString *identifier) {
+    // 'function' is expected to be an Objective-C method name: "[MyClass fooBarBaz]"
+    NSString *functionAsString = @(function);
+    NSString *reduced = [functionAsString substringWithRange:NSMakeRange(1, [functionAsString length] - 2)];
+    NSString *methodName = [reduced componentsSeparatedByCharactersInSet:[NSCharacterSet whitespaceCharacterSet]][1];
+    return [NSURL URLWithString:[NSString stringWithFormat:@"realm://localhost:9080/~/%@%@",
+                                 [methodName stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet alphanumericCharacterSet]],
+                                 identifier ?: @""]];
+}
+
+#define CUSTOM_REALM_URL(realm_identifier) makeRealmURL(__FUNCTION__, realm_identifier)
+
+#define REALM_URL() CUSTOM_REALM_URL(@"")
+
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
 
@@ -100,7 +114,7 @@
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:YES]
                                               server:[RLMObjectServerTests authServerURL]];
     NSError *error = nil;
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     RLMRealm *realm = [self openRealmForURL:url user:user error:&error];
     XCTAssertNil(error);
     XCTAssertTrue(realm.isEmpty);
@@ -108,7 +122,7 @@
 
 /// If client B adds objects to a synced Realm, client A should see those objects.
 - (void)testRemoteAddObjects {
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
     NSError *error = nil;
@@ -134,7 +148,7 @@
 
 /// If client B deletes objects from a synced Realm, client A should see the effects of that deletion.
 - (void)testRemoteDeleteObjects {
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
     NSError *error = nil;
@@ -167,7 +181,7 @@
 /// When a session opened by a Realm goes out of scope, it should stay alive long enough to finish any waiting uploads.
 - (void)testUploadChangesWhenRealmOutOfScope {
     const NSInteger OBJECT_COUNT = 10000;
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     // Log in the user.
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
@@ -200,7 +214,7 @@
 
 /// A Realm that was opened before a user logged out should be able to resume uploading if the user logs back in.
 - (void)testLogBackInSameRealmUpload {
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     // Log in the user.
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
@@ -237,7 +251,7 @@
 
 /// A Realm that was opened before a user logged out should be able to resume downloading if the user logs back in.
 - (void)testLogBackInSameRealmDownload {
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     // Log in the user.
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
@@ -275,7 +289,7 @@
 
 /// A Realm that was opened while a user was logged out should be able to start uploading if the user logs back in.
 - (void)testLogBackInDeferredRealmUpload {
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     // Log in the user.
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
@@ -313,7 +327,7 @@
 
 /// A Realm that was opened while a user was logged out should be able to start downloading if the user logs back in.
 - (void)testLogBackInDeferredRealmDownload {
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     // Log in the user.
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
@@ -357,7 +371,7 @@
 
 /// After logging back in, a Realm whose path has been opened for the first time should properly upload changes.
 - (void)testLogBackInOpenFirstTimePathUpload {
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     // Log in the user.
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
@@ -391,7 +405,7 @@
 
 /// After logging back in, a Realm whose path has been opened for the first time should properly download changes.
 - (void)testLogBackInOpenFirstTimePathDownload {
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     // Log in the user.
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
@@ -431,7 +445,7 @@
 /// If a client logs in, connects, logs out, and logs back in, sync should properly upload changes for a new
 /// `RLMRealm` that is opened for the same path as a previously-opened Realm.
 - (void)testLogBackInReopenRealmUpload {
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     // Log in the user.
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
@@ -472,7 +486,7 @@
 /// If a client logs in, connects, logs out, and logs back in, sync should properly download changes for a new
 /// `RLMRealm` that is opened for the same path as a previously-opened Realm.
 - (void)testLogBackInReopenRealmDownload {
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     // Log in the user.
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
@@ -521,7 +535,7 @@
 /// If a client logs out, the session should be immediately terminated.
 - (void)testImmediateSessionTerminationWhenLoggingOut {
     const NSInteger OBJECT_COUNT = 10000;
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/~/testBasicSync"];
+    NSURL *url = REALM_URL();
     // Log in the user.
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredential:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];

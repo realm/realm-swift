@@ -16,20 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMSyncManager.h"
 
-@class RLMSyncUser;
+@interface RLMSyncManager (ObjectServerTests)
 
-@interface RLMSyncFileManager : NSObject
-
-NS_ASSUME_NONNULL_BEGIN
-
-- (instancetype)initWithRootDirectory:(NSURL *)rootDirectory;
-
-- (NSURL *)fileURLForRawRealmURL:(NSURL *)url user:(RLMSyncUser *)user;
-- (NSURL *)fileURLForMetadata;
-- (BOOL)removeFilesForUserIdentity:(NSString *)identity error:(NSError * _Nullable* _Nullable)error;
-
-NS_ASSUME_NONNULL_END
+- (void)prepareForDestruction;
 
 @end
