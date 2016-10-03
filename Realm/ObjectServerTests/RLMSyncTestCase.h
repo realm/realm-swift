@@ -18,6 +18,8 @@
 
 #import "RLMMultiProcessTestCase.h"
 
+#import "RLMSyncUser+ObjectServerTests.h"
+
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
@@ -32,6 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncTestCase : RLMMultiProcessTestCase
 
++ (RLMSyncManager *)managerForCurrentTest;
+
 + (NSURL *)rootRealmCocoaURL;
 
 + (NSURL *)authServerURL;
@@ -39,22 +43,37 @@ NS_ASSUME_NONNULL_BEGIN
 + (RLMSyncCredential *)basicCredential:(BOOL)createAccount;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
-- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user error:(NSError **)error;
+- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
 
 /// Immediately open a synced Realm.
-- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user error:(NSError **)error;
+- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
 
 /// Synchronously create, log in, and return a user.
 - (RLMSyncUser *)logInUserForCredential:(RLMSyncCredential *)credential
                                  server:(NSURL *)url;
 
+/// Add a number of objects to a Realm.
+- (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions;
+
+/// Synchronously wait for downloads to complete for any number of Realms, and then check their `SyncObject` counts.
+- (void)waitForDownloadsForUser:(RLMSyncUser *)user
+                         realms:(NSArray<RLMRealm *> *)realms
+                      realmURLs:(NSArray<NSURL *> *)realmURLs
+                 expectedCounts:(NSArray<NSNumber *> *)counts;
+
 @end
 
 NS_ASSUME_NONNULL_END
 
+#define WAIT_FOR_UPLOAD(macro_user, macro_url) \
+XCTAssertTrue([macro_user waitForUploadToFinish:macro_url], @"Upload timed out for URL: %@", macro_url);
+
+#define WAIT_FOR_DOWNLOAD(macro_user, macro_url) \
+XCTAssertTrue([macro_user waitForDownloadToFinish:macro_url], @"Download timed out for URL: %@", macro_url);
+
 #define CHECK_COUNT(d_count, macro_object_type, macro_realm) \
 { \
-NSInteger c = [macro_object_type allObjectsInRealm:r].count; \
+NSInteger c = [macro_object_type allObjectsInRealm:macro_realm].count; \
 NSString *w = self.isParent ? @"parent" : @"child"; \
 XCTAssert(d_count == c, @"Expected %@ items, but actually got %@ (%@)", @(d_count), @(c), w); \
 }

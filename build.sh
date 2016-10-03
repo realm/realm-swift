@@ -410,6 +410,8 @@ case "$COMMAND" in
                 break
             fi
         done
+        rm -rf "~/Library/Application Support/xctest"
+        rm -rf "~/Library/Application Support/xctest-child"
         rm -rf "$package/object-server/root_dir/"
         rm -rf "$package/object-server/temp_dir/"
         exit 0
