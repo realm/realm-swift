@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "0720"
+   LastUpgradeVersion = "0800"
    wasCreatedForAppExtension = "YES"
    version = "2.0">
    <BuildAction
@@ -12,8 +12,7 @@
             buildForRunning = "YES"
             buildForProfiling = "YES"
             buildForArchiving = "YES"
-            buildForAnalyzing = "YES"
-            hideIssues = "NO">
+            buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "5DD7557B1BE056DE002800DA"
@@ -27,8 +26,7 @@
             buildForRunning = "YES"
             buildForProfiling = "YES"
             buildForArchiving = "YES"
-            buildForAnalyzing = "YES"
-            hideIssues = "NO">
+            buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C0DC42051A7079D00067156A"
@@ -42,8 +40,7 @@
             buildForRunning = "YES"
             buildForProfiling = "YES"
             buildForArchiving = "YES"
-            buildForAnalyzing = "YES"
-            hideIssues = "NO">
+            buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "C0DC41CB1A7072670067156A"

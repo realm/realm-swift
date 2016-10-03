@@ -111,7 +111,7 @@
     realmv2Configuration.fileURL = realmv2URL;
 
     // manully migration v1Path, v2Path is migrated implicitly on access
-    [RLMRealm migrateRealm:realmv1Configuration];
+    [RLMRealm performMigrationForConfiguration:realmv1Configuration error:nil];
 
     // print out all migrated objects in the migrated realms
     RLMRealm *realmv1 = [RLMRealm realmWithConfiguration:realmv1Configuration error:nil];

@@ -1294,9 +1294,13 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.examples.extension.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				PROVISIONING_PROFILE = "";
+				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Debug;
 		};
@@ -1312,9 +1316,13 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.examples.extension.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				PROVISIONING_PROFILE = "";
+				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Release;
 		};
@@ -1331,12 +1339,13 @@
 				);
 				IBSC_MODULE = extension_WatchKit_Extension;
 				INFOPLIST_FILE = "extension WatchKit App/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.examples.extension.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
-				"TARGETED_DEVICE_FAMILY[sdk=iphonesimulator*]" = "1,4";
+				WATCHOS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Debug;
 		};
@@ -1349,12 +1358,13 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				IBSC_MODULE = extension_WatchKit_Extension;
 				INFOPLIST_FILE = "extension WatchKit App/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.examples.extension.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = 4;
-				"TARGETED_DEVICE_FAMILY[sdk=iphonesimulator*]" = "1,4";
+				WATCHOS_DEPLOYMENT_TARGET = 2.0;
 			};
 			name = Release;
 		};
@@ -1372,9 +1382,10 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Extension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.examples.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -1390,9 +1401,10 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				INFOPLIST_FILE = Extension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.examples.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -1414,6 +1426,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.examples.extension.$(PRODUCT_NAME:rfc1034identifier)-2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -1432,6 +1445,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.examples.extension.$(PRODUCT_NAME:rfc1034identifier)-2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -1450,6 +1464,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = GroupedTableView;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1463,6 +1478,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = GroupedTableView;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1481,15 +1497,21 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static";
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -1523,15 +1545,20 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static";
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -1558,6 +1585,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Simple/Simple-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1571,6 +1599,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Simple/Simple-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1588,6 +1617,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Migration/Migration-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1601,6 +1631,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Migration/Migration-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1618,6 +1649,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Encryption/Encryption-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1631,6 +1663,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Encryption/Encryption-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1648,6 +1681,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "TableView/TableView-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1661,6 +1695,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "TableView/TableView-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1678,6 +1713,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "REST/REST-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1691,6 +1727,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "REST/REST-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1709,6 +1746,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Backlink/Backlink-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1722,6 +1760,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Backlink/Backlink-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
