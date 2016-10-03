@@ -1031,6 +1031,7 @@ EOM
             export CONFIGURATION=$configuration
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
             sh build.sh prelaunch-simulator
+            rm ~/Library/Logs/CoreSimulator/CoreSimulator.log
             # Verify that no Realm files still exist
             ! find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm' | grep -q .
 
