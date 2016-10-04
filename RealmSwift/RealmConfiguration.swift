@@ -57,7 +57,9 @@ extension Realm {
 
          - parameter fileURL:            The local URL to the Realm file.
          - parameter inMemoryIdentifier: A string used to identify a particular in-memory Realm.
-         - parameter syncConfiguration:  A `SyncUser` and URL that, together, identify a remote Realm.
+         - parameter syncConfiguration:  A `SyncUser` and URL that, together, identify a remote Realm. Note that the
+                                         URL must be absolute (e.g. `realm://example.com/~/foo`), and cannot end with
+                                         `.realm`, `.realm.lock` or `.realm.management`.
          - parameter encryptionKey:      An optional 64-byte key to use to encrypt the data.
          - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
          - parameter schemaVersion:      The current schema version.
@@ -92,8 +94,12 @@ extension Realm {
 
         // MARK: Configuration Properties
 
-        /// A tuple used to configure a Realm for synchronization with the Realm Object Server. Mutually exclusive with
-        /// `inMemoryIdentifier` and `fileURL`.
+        /**
+         A tuple used to configure a Realm for synchronization with the Realm Object Server. Mutually exclusive with
+         `inMemoryIdentifier` and `fileURL`.
+         
+         - warning: The URL cannot end with `.realm`, `.realm.lock` or `.realm.management`.
+         */
         public var syncConfiguration: (user: SyncUser, realmURL: URL)? {
             set {
                 _path = nil
@@ -280,7 +286,9 @@ extension Realm {
 
          - parameter fileURL:            The local URL to the Realm file.
          - parameter inMemoryIdentifier: A string used to identify a particular in-memory Realm.
-         - parameter syncConfiguration:  A `SyncUser` and URL that, together, identify a remote Realm.
+         - parameter syncConfiguration:  A `SyncUser` and URL that, together, identify a remote Realm. Note that the
+                                         URL must be absolute (e.g. `realm://example.com/~/foo`), and cannot end with
+                                         `.realm`, `.realm.lock` or `.realm.management`.
          - parameter encryptionKey:      An optional 64-byte key to use to encrypt the data.
          - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
          - parameter schemaVersion:      The current schema version.
@@ -315,8 +323,12 @@ extension Realm {
 
         // MARK: Configuration Properties
 
-        /// A tuple used to configure a Realm for synchronization with the Realm Object Server. Mutually exclusive with
-        /// `inMemoryIdentifier` and `fileURL`.
+        /**
+         A tuple used to configure a Realm for synchronization with the Realm Object Server. Mutually exclusive with
+         `inMemoryIdentifier` and `fileURL`.
+
+         - warning: The URL cannot end with `.realm`, `.realm.lock` or `.realm.management`.
+         */
         public var syncConfiguration: (user: SyncUser, realmURL: NSURL)? {
             set {
                 _path = nil
