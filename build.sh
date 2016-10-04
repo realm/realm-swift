@@ -1030,9 +1030,12 @@ EOM
             export sha=$GITHUB_PR_SOURCE_BRANCH
             export CONFIGURATION=$configuration
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
-            sh build.sh prelaunch-simulator
-            # Verify that no Realm files still exist
-            ! find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm' | grep -q .
+
+            if [[ "$target" != osx* ]]; then
+                sh build.sh prelaunch-simulator
+                # Verify that no Realm files still exist
+                ! find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm' | grep -q .
+            fi
 
             failed=0
             sh build.sh verify-$target 2>&1 | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || failed=1
