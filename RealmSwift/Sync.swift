@@ -25,7 +25,7 @@ import Foundation
 
  - see: `RLMSyncUser`
  */
-public typealias User = RLMSyncUser
+public typealias SyncUser = RLMSyncUser
 
 /**
  A singleton which configures and manages the Realm Object Server synchronization-related functionality.
@@ -141,14 +141,14 @@ extension RLMSyncCredential {
     }
 }
 
-extension User {
-    /// Given a credential and server URL, log in a user and asynchronously return a `User` object which can be used to
+extension SyncUser {
+    /// Given a credential and server URL, log in a user and asynchronously return a `SyncUser` object which can be used to
     /// open Realms and Sessions.
     public static func authenticate(with credential: Credential,
                                     server authServerURL: URL,
                                     timeout: TimeInterval = 30,
                                     onCompletion completion: @escaping UserCompletionBlock) {
-        return User.__authenticate(with: RLMSyncCredential(credential),
+        return SyncUser.__authenticate(with: RLMSyncCredential(credential),
                                    authServerURL: authServerURL,
                                    timeout: timeout,
                                    onCompletion: completion)
@@ -221,14 +221,14 @@ extension RLMSyncCredential {
 }
 
 
-extension User {
-    /// Given a credential and server URL, log in a user and asynchronously return a `User` object which can be used to
+extension SyncUser {
+    /// Given a credential and server URL, log in a user and asynchronously return a `SyncUser` object which can be used to
     /// open Realms and Sessions.
     public static func authenticateWithCredential(credential: Credential,
                                                   authServerURL: NSURL,
                                                   timeout: NSTimeInterval = 30,
                                                   onCompletion completion: UserCompletionBlock) {
-        return User.__authenticateWithCredential(RLMSyncCredential(credential),
+        return SyncUser.__authenticateWithCredential(RLMSyncCredential(credential),
                                                  authServerURL: authServerURL,
                                                  timeout: timeout,
                                                  onCompletion: completion)

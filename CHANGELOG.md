@@ -3,7 +3,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* Rename Realm Swift's `User` to `SyncUser` to make clear that it relates to the
+  Realm Mobile Platform, and to avoid potential conflicts with other `User` types.
 
 ### Enhancements
 
