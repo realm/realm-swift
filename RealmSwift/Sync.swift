@@ -172,6 +172,8 @@ public struct Credential {
     var provider: Provider
     var userInfo: [String: AnyObject]
 
+    // swiftlint:disable valid_docs
+
     /// Initialize a new credential using a custom token, authentication provider, and user information dictionary. In
     /// most cases, the convenience initializers should be used instead.
     public init(customToken token: Token, provider: Provider, userInfo: [String: AnyObject] = [:]) {
