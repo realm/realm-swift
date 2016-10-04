@@ -31,16 +31,21 @@ NS_ASSUME_NONNULL_BEGIN
 /// The user to which the remote Realm belongs.
 @property (nonatomic, readonly) RLMSyncUser *user;
 
-/// The URL of the remote Realm upon the Realm Object Server.
+/**
+ The URL of the remote Realm upon the Realm Object Server.
+ 
+ @warning The URL cannot end with `.realm`, `.realm.lock` or `.realm.management`.
+ */
 @property (nonatomic, readonly) NSURL *realmURL;
 
 /**
  Create a sync configuration instance.
 
  @param user    A `RLMSyncUser` that owns the Realm at the given URL.
- @param url     The full, unresolved URL to the Realm on the Realm Object Server. "Full" means that this URL is fully
-                qualified; e.g. `realm://example.org/~/path/to/my.realm`. "Unresolved" means the path should contain the
-                wildcard marker `~`.
+ @param url     The unresolved absolute URL to the Realm on the Realm Object Server, e.g.
+                `realm://example.org/~/path/to/realm`. "Unresolved" means the path should
+                contain the wildcard marker `~`, which will automatically be filled in with
+                the user identity by the Realm Object Server.
  */
 - (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url;
 
