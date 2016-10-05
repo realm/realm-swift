@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.0.2 Release notes (2016-10-05)
 =============================================================
 
 This release is not protocol-compatible with previous version of the Realm
@@ -8,10 +8,6 @@ Mobile Platform.
 
 * Rename Realm Swift's `User` to `SyncUser` to make clear that it relates to the
   Realm Mobile Platform, and to avoid potential conflicts with other `User` types.
-
-### Enhancements
-
-* None.
 
 ### Bugfixes
 
