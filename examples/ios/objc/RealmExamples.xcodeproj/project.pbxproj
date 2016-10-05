@@ -31,20 +31,10 @@
 		3F78C9CA1B431D7400A0988E /* TableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F78C9B01B431CDF00A0988E /* TableViewController.m */; };
 		3F78C9CB1B431D7A00A0988E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F78C9AF1B431CDF00A0988E /* main.m */; };
 		3FC898FD1A140F550067CBEC /* LabelViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FC1A140F550067CBEC /* LabelViewController.m */; };
-		41D186AC1C6E8BA883A87D87 /* libPods-RACTableView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A6095331EBF052A74372F887 /* libPods-RACTableView.a */; };
 		C06134DF1A718BB800D22D12 /* TodayExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C0DC42061A7079D00067156A /* TodayExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C06134E41A71AA4E00D22D12 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		C06134E51A71AA5600D22D12 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		C06134E61A71AA5A00D22D12 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
-		C0658DBA1A76CBD8002F7A84 /* InterfaceController.m in Sources */ = {isa = PBXBuildFile; fileRef = C0658DB91A76CBD8002F7A84 /* InterfaceController.m */; };
-		C0658DBC1A76CBD8002F7A84 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C0658DBB1A76CBD8002F7A84 /* Images.xcassets */; };
-		C0658DC01A76CBD8002F7A84 /* extension WatchKit App.app in Resources */ = {isa = PBXBuildFile; fileRef = C0658DBF1A76CBD8002F7A84 /* extension WatchKit App.app */; };
-		C0658DC71A76CBD8002F7A84 /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C0658DC61A76CBD8002F7A84 /* Interface.storyboard */; };
-		C0658DC91A76CBD8002F7A84 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C0658DC81A76CBD8002F7A84 /* Images.xcassets */; };
-		C0658DCC1A76CBD8002F7A84 /* extension WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = C0658DB41A76CBD8002F7A84 /* extension WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		C0DBF4DD1A76D1330099BC95 /* Tick.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DC41FB1A7072DE0067156A /* Tick.m */; };
-		C0DBF4DE1A76D2B80099BC95 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
-		C0DBF4DF1A76D2BA0099BC95 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
 		C0DC41D41A7072680067156A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DC41D31A7072670067156A /* AppDelegate.m */; };
 		C0DC41F41A70729D0067156A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		C0DC41F51A70729D0067156A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
@@ -58,6 +48,7 @@
 		C0DC42101A7079D00067156A /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C0DC420F1A7079D00067156A /* MainInterface.storyboard */; };
 		C0DC42181A707B960067156A /* Tick.m in Sources */ = {isa = PBXBuildFile; fileRef = C0DC41FB1A7072DE0067156A /* Tick.m */; };
 		C0DC42191A707BF80067156A /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
+		C895987FDBFA45AF50225642 /* libPods-RACTableView.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1FAC448B13A56875E51ABBA /* libPods-RACTableView.a */; };
 		E879D9CE1A12AA120035E2EB /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
 		E879D9CF1A12AA120035E2EB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		E879D9D01A12AA120035E2EB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
@@ -121,30 +112,25 @@
 			remoteGlobalIDString = C0DC42051A7079D00067156A;
 			remoteInfo = TodayExtension;
 		};
-		C0658DC11A76CBD8002F7A84 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C0658DBE1A76CBD8002F7A84;
-			remoteInfo = "extension WatchKit App";
-		};
-		C0658DCA1A76CBD8002F7A84 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8AB719E19BA502500F3EDB4 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C0658DB31A76CBD8002F7A84;
-			remoteInfo = "extension WatchKit Extension";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		3F336E871DA2F8A4006CB5A0 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C06134E21A718BB800D22D12 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				C0658DCC1A76CBD8002F7A84 /* extension WatchKit Extension.appex in Embed App Extensions */,
 				C06134DF1A718BB800D22D12 /* TodayExtension.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
@@ -166,19 +152,7 @@
 		3F78C9C71B431CF300A0988E /* RACTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RACTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3FC898FB1A140F550067CBEC /* LabelViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabelViewController.h; sourceTree = "<group>"; };
 		3FC898FC1A140F550067CBEC /* LabelViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LabelViewController.m; sourceTree = "<group>"; };
-		A09DC4EDBB24E8E1D139F2D9 /* Pods-RACTableView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACTableView.release.xcconfig"; path = "Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView.release.xcconfig"; sourceTree = "<group>"; };
-		A6095331EBF052A74372F887 /* libPods-RACTableView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RACTableView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		BD5E18798F030DC45369A649 /* Pods-RACTableView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACTableView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView.debug.xcconfig"; sourceTree = "<group>"; };
-		C0658DB41A76CBD8002F7A84 /* extension WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "extension WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C0658DB71A76CBD8002F7A84 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C0658DB81A76CBD8002F7A84 /* InterfaceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InterfaceController.h; sourceTree = "<group>"; };
-		C0658DB91A76CBD8002F7A84 /* InterfaceController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InterfaceController.m; sourceTree = "<group>"; };
-		C0658DBB1A76CBD8002F7A84 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		C0658DBF1A76CBD8002F7A84 /* extension WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "extension WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		C0658DC51A76CBD8002F7A84 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C0658DC61A76CBD8002F7A84 /* Interface.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Interface.storyboard; sourceTree = "<group>"; };
-		C0658DC81A76CBD8002F7A84 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
-		C0DBF4E01A76D2F20099BC95 /* extension WatchKit Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = "extension WatchKit Extension.entitlements"; sourceTree = "<group>"; };
+		BCC00CB8F0405D9A0E8A33E2 /* Pods-RACTableView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACTableView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView.debug.xcconfig"; sourceTree = "<group>"; };
 		C0DC41CC1A7072670067156A /* extension.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = extension.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C0DC41D21A7072670067156A /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		C0DC41D31A7072670067156A /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -194,6 +168,8 @@
 		C0DC420F1A7079D00067156A /* MainInterface.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = MainInterface.storyboard; sourceTree = "<group>"; };
 		C0DC421B1A717B660067156A /* TodayExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = TodayExtension.entitlements; sourceTree = "<group>"; };
 		C0DC421C1A717BD00067156A /* Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Extension.entitlements; sourceTree = "<group>"; };
+		C1FAC448B13A56875E51ABBA /* libPods-RACTableView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-RACTableView.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D0E769395C2774DEBC9BBAF8 /* Pods-RACTableView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACTableView.release.xcconfig"; path = "Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView.release.xcconfig"; sourceTree = "<group>"; };
 		E879D9D81A12AA120035E2EB /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E879D9DB1A12AA400035E2EB /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E879D9DC1A12AA400035E2EB /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -257,18 +233,9 @@
 				3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */,
 				3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */,
 				3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */,
-				41D186AC1C6E8BA883A87D87 /* libPods-RACTableView.a in Frameworks */,
 				3F78C9C01B431CF300A0988E /* Realm.framework in Frameworks */,
 				3F78C9C11B431CF300A0988E /* UIKit.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C0658DB11A76CBD8002F7A84 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C0DBF4DF1A76D2BA0099BC95 /* libc++.dylib in Frameworks */,
-				C0DBF4DE1A76D2B80099BC95 /* Realm.framework in Frameworks */,
+				C895987FDBFA45AF50225642 /* libPods-RACTableView.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -405,51 +372,13 @@
 			name = RACTableView;
 			sourceTree = "<group>";
 		};
-		47280049B9F241AC6D6968C6 /* Pods */ = {
+		52233CA796AF2EA4A29B84C2 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				BD5E18798F030DC45369A649 /* Pods-RACTableView.debug.xcconfig */,
-				A09DC4EDBB24E8E1D139F2D9 /* Pods-RACTableView.release.xcconfig */,
+				BCC00CB8F0405D9A0E8A33E2 /* Pods-RACTableView.debug.xcconfig */,
+				D0E769395C2774DEBC9BBAF8 /* Pods-RACTableView.release.xcconfig */,
 			);
 			name = Pods;
-			sourceTree = "<group>";
-		};
-		C0658DB51A76CBD8002F7A84 /* extension WatchKit Extension */ = {
-			isa = PBXGroup;
-			children = (
-				C0658DB61A76CBD8002F7A84 /* Supporting Files */,
-				C0DBF4E01A76D2F20099BC95 /* extension WatchKit Extension.entitlements */,
-				C0658DBB1A76CBD8002F7A84 /* Images.xcassets */,
-				C0658DB81A76CBD8002F7A84 /* InterfaceController.h */,
-				C0658DB91A76CBD8002F7A84 /* InterfaceController.m */,
-			);
-			path = "extension WatchKit Extension";
-			sourceTree = "<group>";
-		};
-		C0658DB61A76CBD8002F7A84 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				C0658DB71A76CBD8002F7A84 /* Info.plist */,
-			);
-			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		C0658DC31A76CBD8002F7A84 /* extension WatchKit App */ = {
-			isa = PBXGroup;
-			children = (
-				C0658DC41A76CBD8002F7A84 /* Supporting Files */,
-				C0658DC81A76CBD8002F7A84 /* Images.xcassets */,
-				C0658DC61A76CBD8002F7A84 /* Interface.storyboard */,
-			);
-			path = "extension WatchKit App";
-			sourceTree = "<group>";
-		};
-		C0658DC41A76CBD8002F7A84 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				C0658DC51A76CBD8002F7A84 /* Info.plist */,
-			);
-			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		C0DC41CD1A7072670067156A /* Extension */ = {
@@ -507,12 +436,9 @@
 				227D20DC1CB6009D008F641B /* Common */,
 				E8F70EBF19BA50AB006F60D5 /* Encryption */,
 				C0DC41CD1A7072670067156A /* Extension */,
-				C0658DC31A76CBD8002F7A84 /* extension WatchKit App */,
-				C0658DB51A76CBD8002F7A84 /* extension WatchKit Extension */,
 				E8AB71A819BA502500F3EDB4 /* Frameworks */,
 				E879D9DA1A12AA400035E2EB /* GroupedTableView */,
 				E8F70EAE19BA50A3006F60D5 /* Migration */,
-				47280049B9F241AC6D6968C6 /* Pods */,
 				E8AB71A719BA502500F3EDB4 /* Products */,
 				3F78C9AA1B431CB200A0988E /* RACTableView */,
 				E8F70EA319BA5093006F60D5 /* REST */,
@@ -520,6 +446,7 @@
 				E8F70E9619BA508B006F60D5 /* TableView */,
 				C0DC42091A7079D00067156A /* TodayExtension */,
 				0A73D4401B1442B200E1E8EE /* README.md */,
+				52233CA796AF2EA4A29B84C2 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -528,8 +455,6 @@
 			children = (
 				E8BDBFA11A116FAC00450CFF /* Backlink.app */,
 				E8AB723819BA504000F3EDB4 /* Encryption.app */,
-				C0658DBF1A76CBD8002F7A84 /* extension WatchKit App.app */,
-				C0658DB41A76CBD8002F7A84 /* extension WatchKit Extension.appex */,
 				C0DC41CC1A7072670067156A /* extension.app */,
 				E879D9D81A12AA120035E2EB /* GroupedTableView.app */,
 				E8AB720A19BA503B00F3EDB4 /* Migration.app */,
@@ -548,11 +473,11 @@
 				E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */,
 				E8AB71A919BA502500F3EDB4 /* Foundation.framework */,
 				E8F70ED019BA52E8006F60D5 /* libc++.dylib */,
-				A6095331EBF052A74372F887 /* libPods-RACTableView.a */,
 				C0DC42071A7079D00067156A /* NotificationCenter.framework */,
 				0295B8FE19D102880036D6C3 /* Realm.framework */,
 				E8AB71AD19BA502500F3EDB4 /* UIKit.framework */,
 				E8AB71C219BA502500F3EDB4 /* XCTest.framework */,
+				C1FAC448B13A56875E51ABBA /* libPods-RACTableView.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -642,11 +567,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3F78C9C41B431CF300A0988E /* Build configuration list for PBXNativeTarget "RACTableView" */;
 			buildPhases = (
-				026D2BA9FD4350CE0245BCD3 /* Check Pods Manifest.lock */,
+				CDFC500ABD9C1292B3084DB9 /* [CP] Check Pods Manifest.lock */,
 				3F78C9B81B431CF300A0988E /* Sources */,
 				3F78C9BC1B431CF300A0988E /* Frameworks */,
 				3F78C9C21B431CF300A0988E /* Resources */,
-				998B2F45899A851A95DECA6F /* Copy Pods Resources */,
+				517C4DA749010A7E7454D282 /* [CP] Embed Pods Frameworks */,
+				ADBC5B55E58034754080DDFD /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -657,39 +583,6 @@
 			productReference = 3F78C9C71B431CF300A0988E /* RACTableView.app */;
 			productType = "com.apple.product-type.application";
 		};
-		C0658DB31A76CBD8002F7A84 /* extension WatchKit Extension */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C0658DD21A76CBD8002F7A84 /* Build configuration list for PBXNativeTarget "extension WatchKit Extension" */;
-			buildPhases = (
-				C0658DB01A76CBD8002F7A84 /* Sources */,
-				C0658DB11A76CBD8002F7A84 /* Frameworks */,
-				C0658DB21A76CBD8002F7A84 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				C0658DC21A76CBD8002F7A84 /* PBXTargetDependency */,
-			);
-			name = "extension WatchKit Extension";
-			productName = "extension WatchKit Extension";
-			productReference = C0658DB41A76CBD8002F7A84 /* extension WatchKit Extension.appex */;
-			productType = "com.apple.product-type.watchkit-extension";
-		};
-		C0658DBE1A76CBD8002F7A84 /* extension WatchKit App */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = C0658DD11A76CBD8002F7A84 /* Build configuration list for PBXNativeTarget "extension WatchKit App" */;
-			buildPhases = (
-				C0658DBD1A76CBD8002F7A84 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "extension WatchKit App";
-			productName = "extension WatchKit App";
-			productReference = C0658DBF1A76CBD8002F7A84 /* extension WatchKit App.app */;
-			productType = "com.apple.product-type.application.watchapp";
-		};
 		C0DC41CB1A7072670067156A /* extension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C0DC41EC1A7072680067156A /* Build configuration list for PBXNativeTarget "extension" */;
@@ -698,12 +591,12 @@
 				C0DC41C91A7072670067156A /* Frameworks */,
 				C06134E21A718BB800D22D12 /* Embed App Extensions */,
 				227D20831CB4E4B9008F641B /* Resources */,
+				3F336E871DA2F8A4006CB5A0 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				C06134E11A718BB800D22D12 /* PBXTargetDependency */,
-				C0658DCB1A76CBD8002F7A84 /* PBXTargetDependency */,
 			);
 			name = extension;
 			productName = Extension;
@@ -853,21 +746,9 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = RLM;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
-					C0658DB31A76CBD8002F7A84 = {
-						CreatedOnToolsVersion = 6.2;
-						DevelopmentTeam = 9GCBJ97HG6;
-						SystemCapabilities = {
-							com.apple.ApplicationGroups.iOS = {
-								enabled = 1;
-							};
-						};
-					};
-					C0658DBE1A76CBD8002F7A84 = {
-						CreatedOnToolsVersion = 6.2;
-					};
 					C0DC41CB1A7072670067156A = {
 						CreatedOnToolsVersion = 6.2;
 						DevelopmentTeam = 9GCBJ97HG6;
@@ -914,8 +795,6 @@
 				E8AB729319BA504900F3EDB4 /* REST */,
 				E8AB71DB19BA503500F3EDB4 /* Simple */,
 				E8AB726519BA504500F3EDB4 /* TableView */,
-				C0658DB31A76CBD8002F7A84 /* extension WatchKit Extension */,
-				C0658DBE1A76CBD8002F7A84 /* extension WatchKit App */,
 			);
 		};
 /* End PBXProject section */
@@ -970,24 +849,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		C0658DB21A76CBD8002F7A84 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C0658DC01A76CBD8002F7A84 /* extension WatchKit App.app in Resources */,
-				C0658DBC1A76CBD8002F7A84 /* Images.xcassets in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C0658DBD1A76CBD8002F7A84 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C0658DC91A76CBD8002F7A84 /* Images.xcassets in Resources */,
-				C0658DC71A76CBD8002F7A84 /* Interface.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		C0DC42041A7079D00067156A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1028,34 +889,49 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		026D2BA9FD4350CE0245BCD3 /* Check Pods Manifest.lock */ = {
+		517C4DA749010A7E7454D282 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		998B2F45899A851A95DECA6F /* Copy Pods Resources */ = {
+		ADBC5B55E58034754080DDFD /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-RACTableView/Pods-RACTableView-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		CDFC500ABD9C1292B3084DB9 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -1068,15 +944,6 @@
 				3F78C9C91B431D6F00A0988E /* AppDelegate.m in Sources */,
 				3F78C9CB1B431D7A00A0988E /* main.m in Sources */,
 				3F78C9CA1B431D7400A0988E /* TableViewController.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		C0658DB01A76CBD8002F7A84 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				C0658DBA1A76CBD8002F7A84 /* InterfaceController.m in Sources */,
-				C0DBF4DD1A76D1330099BC95 /* Tick.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1175,22 +1042,12 @@
 			target = C0DC42051A7079D00067156A /* TodayExtension */;
 			targetProxy = C06134E01A718BB800D22D12 /* PBXContainerItemProxy */;
 		};
-		C0658DC21A76CBD8002F7A84 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C0658DBE1A76CBD8002F7A84 /* extension WatchKit App */;
-			targetProxy = C0658DC11A76CBD8002F7A84 /* PBXContainerItemProxy */;
-		};
-		C0658DCB1A76CBD8002F7A84 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C0658DB31A76CBD8002F7A84 /* extension WatchKit Extension */;
-			targetProxy = C0658DCA1A76CBD8002F7A84 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		3F78C9C51B431CF300A0988E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BD5E18798F030DC45369A649 /* Pods-RACTableView.debug.xcconfig */;
+			baseConfigurationReference = BCC00CB8F0405D9A0E8A33E2 /* Pods-RACTableView.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -1202,9 +1059,11 @@
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/RACTableView/Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					"$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
-					"$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/ReactiveCocoa",
+					"$(inherited)",
+					"\"$PODS_CONFIGURATION_BUILD_DIR\"",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/ReactiveCocoa\"",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RACTableView;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1212,7 +1071,7 @@
 		};
 		3F78C9C61B431CF300A0988E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A09DC4EDBB24E8E1D139F2D9 /* Pods-RACTableView.release.xcconfig */;
+			baseConfigurationReference = D0E769395C2774DEBC9BBAF8 /* Pods-RACTableView.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
@@ -1220,91 +1079,13 @@
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "$(SRCROOT)/RACTableView/Info.plist";
 				LIBRARY_SEARCH_PATHS = (
-					"$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
-					"$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/ReactiveCocoa",
+					"$(inherited)",
+					"\"$PODS_CONFIGURATION_BUILD_DIR\"",
+					"\"$PODS_CONFIGURATION_BUILD_DIR/ReactiveCocoa\"",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = RACTableView;
 				WRAPPER_EXTENSION = app;
-			};
-			name = Release;
-		};
-		C0658DCD1A76CBD8002F7A84 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = "extension WatchKit Extension/extension WatchKit Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				INFOPLIST_FILE = "extension WatchKit Extension/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE = "";
-				SKIP_INSTALL = YES;
-			};
-			name = Debug;
-		};
-		C0658DCE1A76CBD8002F7A84 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_ENTITLEMENTS = "extension WatchKit Extension/extension WatchKit Extension.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				INFOPLIST_FILE = "extension WatchKit Extension/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "${TARGET_NAME}";
-				PROVISIONING_PROFILE = "";
-				SKIP_INSTALL = YES;
-			};
-			name = Release;
-		};
-		C0658DCF1A76CBD8002F7A84 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				IBSC_MODULE = extension_WatchKit_Extension;
-				INFOPLIST_FILE = "extension WatchKit App/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = 4;
-				"TARGETED_DEVICE_FAMILY[sdk=iphonesimulator*]" = "1,4";
-			};
-			name = Debug;
-		};
-		C0658DD01A76CBD8002F7A84 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				IBSC_MODULE = extension_WatchKit_Extension;
-				INFOPLIST_FILE = "extension WatchKit App/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = 4;
-				"TARGETED_DEVICE_FAMILY[sdk=iphonesimulator*]" = "1,4";
 			};
 			name = Release;
 		};
@@ -1322,9 +1103,10 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Extension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.examples.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -1340,9 +1122,10 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				INFOPLIST_FILE = Extension/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.examples.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 			};
@@ -1364,6 +1147,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.examples.extension.$(PRODUCT_NAME:rfc1034identifier)-2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -1382,6 +1166,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.2;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.examples.extension.$(PRODUCT_NAME:rfc1034identifier)-2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SKIP_INSTALL = YES;
@@ -1400,6 +1185,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = GroupedTableView;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1413,6 +1199,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = GroupedTableView;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1431,15 +1218,21 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static";
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static";
 				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -1473,15 +1266,20 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static";
 				CONFIGURATION_TEMP_DIR = "$(PROJECT_TEMP_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)-static";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -1508,6 +1306,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Simple/Simple-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1521,6 +1320,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Simple/Simple-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1538,6 +1338,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Migration/Migration-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1551,6 +1352,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Migration/Migration-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1568,6 +1370,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "Encryption/Encryption-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1581,6 +1384,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "Encryption/Encryption-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1598,6 +1402,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "TableView/TableView-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1611,6 +1416,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "TableView/TableView-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1628,6 +1434,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "REST/REST-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1641,6 +1448,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "";
 				INFOPLIST_FILE = "REST/REST-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -1659,6 +1467,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Backlink/Backlink-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -1672,6 +1481,7 @@
 				INFOPLIST_FILE = "$(SRCROOT)/Backlink/Backlink-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -1684,24 +1494,6 @@
 			buildConfigurations = (
 				3F78C9C51B431CF300A0988E /* Debug */,
 				3F78C9C61B431CF300A0988E /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		C0658DD11A76CBD8002F7A84 /* Build configuration list for PBXNativeTarget "extension WatchKit App" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C0658DCF1A76CBD8002F7A84 /* Debug */,
-				C0658DD01A76CBD8002F7A84 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		C0658DD21A76CBD8002F7A84 /* Build configuration list for PBXNativeTarget "extension WatchKit Extension" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				C0658DCD1A76CBD8002F7A84 /* Debug */,
-				C0658DCE1A76CBD8002F7A84 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
