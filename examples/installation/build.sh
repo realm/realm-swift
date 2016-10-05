@@ -84,17 +84,18 @@ xctest() {
     if [[ $PLATFORM == ios ]]; then
         DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
     fi
-    CMD="-project $PROJECT"
+    PROJECT="-project $PROJECT"
     if [ -d $WORKSPACE ]; then
-        CMD="-workspace $WORKSPACE"
+        PROJECT="-workspace $WORKSPACE"
     fi
-    ACTION=""
+    ACTION="build test"
     if [[ $PLATFORM == watchos ]]; then
         ACTION="build"
-    else
-        ACTION="build test"
     fi
-    xcodebuild $CMD -scheme $NAME clean $ACTION $DESTINATION CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
+    CMD="$PROJECT -scheme $NAME clean $ACTION $DESTINATION CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO"
+    if ! xcodebuild $CMD | tee build.log && grep 'operation never finished bootstrapping' build.log; then
+        xcodebuild $CMD
+    fi
 }
 
 source "$(dirname "$0")/../../scripts/swift-version.sh"
