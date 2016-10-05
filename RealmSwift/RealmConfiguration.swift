@@ -97,7 +97,7 @@ extension Realm {
         /**
          A tuple used to configure a Realm for synchronization with the Realm Object Server. Mutually exclusive with
          `inMemoryIdentifier` and `fileURL`.
-         
+
          - warning: The URL cannot end with `.realm`, `.realm.lock` or `.realm.management`.
          */
         public var syncConfiguration: (user: SyncUser, realmURL: URL)? {
