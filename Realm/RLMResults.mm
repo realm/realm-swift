@@ -138,10 +138,6 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return RLMStringDataToNSString(_results.get_object_type());
 }
 
-- (RLMObjectSchema *)objectSchema {
-    return _info->rlmObjectSchema;
-}
-
 - (RLMClassInfo *)objectInfo {
     return _info;
 }
@@ -149,6 +145,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                   objects:(__unused __unsafe_unretained id [])buffer
                                     count:(NSUInteger)len {
+    if (!_info) {
+        return 0;
+    }
+
     __autoreleasing RLMFastEnumerator *enumerator;
     if (state->state == 0) {
         enumerator = [[RLMFastEnumerator alloc] initWithCollection:self objectSchema:*_info];
@@ -376,6 +376,9 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (id)aggregate:(NSString *)property method:(util::Optional<Mixed> (Results::*)(size_t))method methodName:(NSString *)methodName {
+    if (_results.get_mode() == Results::Mode::Empty) {
+        return nil;
+    }
     size_t column = _info->tableColumn(property);
     auto value = translateErrors([&] { return (_results.*method)(column); }, methodName);
     if (!value) {
@@ -404,7 +407,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return translateErrors([&] {
         if (_results.get_mode() == Results::Mode::Table) {
             RLMResultsValidateInWriteTransaction(self);
-            RLMClearTable(*self.objectInfo);
+            RLMClearTable(*_info);
         }
         else {
             RLMTrackDeletions(_realm, ^{ _results.clear(); });

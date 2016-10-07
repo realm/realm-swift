@@ -23,6 +23,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix an assertion failure when a write transaction is in progress at the point
   of process termination.
 
+* Fix a crash that could occur when working with a `RLMLinkingObject` property
+  of an unmanaged object.
+
 2.0.2 Release notes (2016-10-05)
 =============================================================
 
