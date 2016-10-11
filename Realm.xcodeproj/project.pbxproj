@@ -2533,6 +2533,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULE_DEBUGGING = NO;
 			};
 			name = Debug;
 		};
@@ -2540,6 +2541,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */;
 			buildSettings = {
+				CLANG_ENABLE_MODULE_DEBUGGING = NO;
 			};
 			name = Release;
 		};
