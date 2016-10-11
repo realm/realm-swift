@@ -92,13 +92,55 @@ public typealias SyncLogLevel = RLMSyncLogLevel
  */
 public typealias Provider = RLMIdentityProvider
 
+/// A `SyncConfiguration` represents configuration parameters for Realms intended to sync with a Realm Object Server.
+public struct SyncConfiguration {
+    /// The `SyncUser` who owns the Realm that this configuration should open.
+    public let user: SyncUser
+
+    /**
+     The URL of the Realm on the Realm Object Server that this configuration should open.
+
+     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
+                `.realm`, `.realm.lock` or `.realm.management`.
+     */
+    public let realmURL: URL
+
+    /// A policy that determines what should happen when all references to Realms opened by this configuration
+    /// go out of scope.
+    internal let stopPolicy: RLMSyncStopPolicy
+
+    internal init(config: RLMSyncConfiguration) {
+        self.user = config.user
+        self.realmURL = config.realmURL
+        self.stopPolicy = config.stopPolicy
+    }
+
+    func asConfig() -> RLMSyncConfiguration {
+        let config = RLMSyncConfiguration(user: user, realmURL: realmURL)
+        config.stopPolicy = stopPolicy
+        return config
+    }
+
+    /**
+     Initialize a sync configuration with a user and a Realm URL.
+
+     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
+                `.realm`, `.realm.lock` or `.realm.management`.
+     */
+    public init(user: SyncUser, realmURL: URL) {
+        self.user = user
+        self.realmURL = realmURL
+        self.stopPolicy = .afterChangesUploaded
+    }
+}
+
 /// A `Credential` represents data that uniquely identifies a Realm Object Server user.
 public struct Credential {
     public typealias Token = String
 
-    var token: Token
-    var provider: Provider
-    var userInfo: [String: Any]
+    internal var token: Token
+    internal var provider: Provider
+    internal var userInfo: [String: Any]
 
     /// Initialize a new credential using a custom token, authentication provider, and user information dictionary. In
     /// most cases, the convenience initializers should be used instead.
@@ -176,13 +218,55 @@ extension SyncUser {
  */
 public typealias Provider = String // `RLMIdentityProvider` imports as `NSString`
 
+/// A `SyncConfiguration` represents configuration parameters for Realms intended to sync with a Realm Object Server.
+public struct SyncConfiguration {
+    /// The `SyncUser` who owns the Realm that this configuration should open.
+    public let user: SyncUser
+
+    /**
+     The URL of the Realm on the Realm Object Server that this configuration should open.
+
+     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
+                `.realm`, `.realm.lock` or `.realm.management`.
+     */
+    public let realmURL: NSURL
+
+    /// A policy that determines what should happen when all references to Realms opened by this configuration
+    /// go out of scope.
+    internal let stopPolicy: RLMSyncStopPolicy
+
+    internal init(config: RLMSyncConfiguration) {
+        self.user = config.user
+        self.realmURL = config.realmURL
+        self.stopPolicy = config.stopPolicy
+    }
+
+    func asConfig() -> RLMSyncConfiguration {
+        let config = RLMSyncConfiguration(user: user, realmURL: realmURL)
+        config.stopPolicy = stopPolicy
+        return config
+    }
+
+    /**
+     Initialize a sync configuration with a user and a Realm URL.
+
+     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
+                `.realm`, `.realm.lock` or `.realm.management`.
+     */
+    public init(user: SyncUser, realmURL: NSURL) {
+        self.user = user
+        self.realmURL = realmURL
+        self.stopPolicy = .AfterChangesUploaded
+    }
+}
+
 /// A `Credential` represents data that uniquely identifies a Realm Object Server user.
 public struct Credential {
     public typealias Token = String
 
-    var token: Token
-    var provider: Provider
-    var userInfo: [String: AnyObject]
+    internal var token: Token
+    internal var provider: Provider
+    internal var userInfo: [String: AnyObject]
 
     // swiftlint:disable valid_docs
 
