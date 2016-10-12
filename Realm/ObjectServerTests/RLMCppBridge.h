@@ -16,23 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMSyncConfiguration.h>
+#import <Foundation/Foundation.h>
 
-NS_ASSUME_NONNULL_BEGIN
+// Helper methods intended to bridge C++ functionality to test or support files that can't themselves be C++ files.
+@interface RLMCppBridge : NSObject
 
-typedef NS_ENUM(NSUInteger, RLMSyncStopPolicy) {
-    RLMSyncStopPolicyImmediately,
-    RLMSyncStopPolicyLiveIndefinitely,
-    RLMSyncStopPolicyAfterChangesUploaded,
-};
-
-@interface RLMSyncConfiguration ()
-
-@property (nonatomic, readonly) RLMSyncStopPolicy stopPolicy;
-
-// Internal-only APIs
-@property (nullable, nonatomic) NSURL *customFileURL;
++ (void)resetObjectStoreSyncManager;
 
 @end
-
-NS_ASSUME_NONNULL_END

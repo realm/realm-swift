@@ -16,34 +16,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMSyncSession.h"
+
+#import "RLMSyncUtil_Private.h"
 #import <memory>
 
 namespace realm {
-struct SyncSession;
+class SyncSession;
 }
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMSyncSessionHandle : NSObject
+@interface RLMSyncSession () RLM_SYNC_UNINITIALIZABLE
 
-+ (instancetype)syncSessionHandleForWeakPointer:(std::shared_ptr<realm::SyncSession>)pointer;
-+ (instancetype)syncSessionHandleForPointer:(std::shared_ptr<realm::SyncSession>)pointer;
-
-/// Whether the underlying session is in an unrecoverable error state.
-- (BOOL)sessionIsInErrorState;
-
-/// Whether the underlying session still exists, if the session reference is weak.
-- (BOOL)sessionStillExists;
-
-/// Inform the session that the user that owns it has logged out.
-- (void)logOut;
-
-/// Refresh the access token for the session.
-- (BOOL)refreshAccessToken:(NSString *)accessToken serverURL:(nullable NSURL *)serverURL;
-
-/// Revive the session.
-- (void)revive;
+- (instancetype)initWithSyncSession:(std::shared_ptr<realm::SyncSession>)session;
 
 /// Wait for pending uploads to complete or the session to expire, and dispatch the callback onto the specified queue.
 - (BOOL)waitForUploadCompletionOnQueue:(nullable dispatch_queue_t)queue callback:(void(^)(void))callback;

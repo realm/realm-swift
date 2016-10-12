@@ -16,23 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMSyncConfiguration.h>
+#import "RLMCppBridge.h"
 
-NS_ASSUME_NONNULL_BEGIN
+#import "sync_manager.hpp"
 
-typedef NS_ENUM(NSUInteger, RLMSyncStopPolicy) {
-    RLMSyncStopPolicyImmediately,
-    RLMSyncStopPolicyLiveIndefinitely,
-    RLMSyncStopPolicyAfterChangesUploaded,
-};
+using namespace realm;
 
-@interface RLMSyncConfiguration ()
+@implementation RLMCppBridge
 
-@property (nonatomic, readonly) RLMSyncStopPolicy stopPolicy;
-
-// Internal-only APIs
-@property (nullable, nonatomic) NSURL *customFileURL;
++ (void)resetObjectStoreSyncManager {
+    SyncManager::shared().reset_for_testing();
+}
 
 @end
-
-NS_ASSUME_NONNULL_END

@@ -20,12 +20,14 @@
 
 #import "RLMSyncUtil_Private.h"
 
-namespace realm {
-enum class SyncSessionError;
-class SyncMetadataManager;
-}
+typedef NS_ENUM(NSUInteger, RLMSyncSessionErrorKind) {
+    RLMSyncSessionErrorKindDebug,
+    RLMSyncSessionErrorKindSessionFatal,
+    RLMSyncSessionErrorKindAccessDenied,
+    RLMSyncSessionErrorKindUserFatal,
+};
 
-@class RLMSyncUser, RLMSyncFileManager;
+@class RLMSyncUser, RLMSyncConfiguration;
 
 // All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
 // called very infrequently, this should pose no issues.
@@ -48,30 +50,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)_fireErrorWithCode:(int)errorCode
                    message:(NSString *)message
-                   session:(nullable RLMSyncSession *)session
-                errorClass:(realm::SyncSessionError)errorClass;
-
-// Note that this method doesn't need to be threadsafe, since all locking is coordinated internally.
-- (realm::SyncMetadataManager&)_metadataManager;
+                   session:(RLMSyncSession *)session
+                errorClass:(RLMSyncSessionErrorKind)errorClass;
 
 - (NSArray<RLMSyncUser *> *)_allUsers;
-
-- (RLMSyncFileManager *)fileManager;
-
-/**
- Register a user. If an equivalent user has already been registered, the argument is not added to the store, and the
- existing user is returned. Otherwise, the argument is added to the store and `nil` is returned.
-
- Precondition: registered user is in the `active` state (is valid).
- */
-- (nullable RLMSyncUser *)_registerUser:(RLMSyncUser *)user;
-
-- (void)_deregisterLoggedOutUser:(RLMSyncUser *)user;
-
-- (nullable RLMSyncUser *)_userForIdentity:(NSString *)identity;
-
-- (void)_handleBindRequestForSyncConfig:(RLMSyncConfiguration *)syncConfig
-                          localFilePath:(NSString *)filePathString;
 
 NS_ASSUME_NONNULL_END
 

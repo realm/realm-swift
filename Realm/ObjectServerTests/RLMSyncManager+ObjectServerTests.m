@@ -16,15 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMCppBridge.h"
 #import "RLMSyncManager+ObjectServerTests.h"
 #import "RLMSyncTestCase.h"
-#import "RLMSyncFileManager.h"
 
 #import <objc/runtime.h>
 
 @interface RLMSyncManager ()
-- (NSMutableDictionary<NSString *, RLMSyncUser *> *)activeUsers;
-- (RLMSyncFileManager *)fileManager;
+- (NSArray<RLMSyncUser *> *)_allUsers;
 @end
 
 @implementation RLMSyncManager (ObjectServerTests)
@@ -54,16 +53,9 @@
 }
 
 - (void)prepareForDestruction {
-    // Log out all the logged-in users. This will immediately kill any open sessions.
-    NSMutableArray<RLMSyncUser *> *buffer = [NSMutableArray array];
-    for (id key in [self activeUsers]) {
-        [buffer addObject:[self activeUsers][key]];
-    }
-    [self.activeUsers.allValues makeObjectsPerformSelector:@selector(logOut)];
-    NSURL *metadataURL = [self.fileManager fileURLForMetadata];
-
-    // Destroy the metadata Realm.
-    [[[RLMTestCase alloc] init] deleteRealmFileAtURL:metadataURL];
+    // Log out all the logged-in users.
+    [[self _allUsers] makeObjectsPerformSelector:@selector(logOut)];
+    [RLMCppBridge resetObjectStoreSyncManager];
 }
 
 @end
