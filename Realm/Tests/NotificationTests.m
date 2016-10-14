@@ -132,6 +132,66 @@
         [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 2"]];
     }];
 }
+
+- (void)testSuppressCollectionNotification {
+    _called = false;
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm deleteAllObjects];
+    [realm commitWriteTransactionWithoutNotifying:@[_token] error:nil];
+
+    // Add a new callback that we can wait for, as we can't wait for a
+    // notification to not be delivered
+    RLMNotificationToken *token = [self.query addNotificationBlock:^(__unused RLMResults *results,
+                                                                     __unused RLMCollectionChange *change,
+                                                                     __unused NSError *error) {
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    }];
+    CFRunLoopRun();
+    [token stop];
+
+    XCTAssertFalse(_called);
+}
+
+- (void)testSuppressRealmNotification {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused RLMNotification notification, __unused RLMRealm *realm) {
+        XCTFail(@"should not have been called");
+    }];
+
+    [realm beginWriteTransaction];
+    [realm deleteAllObjects];
+    [realm commitWriteTransactionWithoutNotifying:@[token] error:nil];
+
+    // local realm notifications are called synchronously so no need to wait for anything
+}
+
+- (void)testSuppressRealmNotificationForWrongRealm {
+    RLMRealm *otherRealm = [self realmWithTestPath];
+    RLMNotificationToken *token = [otherRealm addNotificationBlock:^(__unused RLMNotification notification, __unused RLMRealm *realm) {
+        XCTFail(@"should not have been called");
+    }];
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    XCTAssertThrows([realm commitWriteTransactionWithoutNotifying:@[token] error:nil]);
+    [realm cancelWriteTransaction];
+}
+
+- (void)testSuppressCollectionNotificationForWrongRealm {
+    // Test with the token's realm not in a write transaction
+    RLMRealm *otherRealm = [self realmWithTestPath];
+    [otherRealm beginWriteTransaction];
+    XCTAssertThrows([otherRealm commitWriteTransactionWithoutNotifying:@[_token] error:nil]);
+
+    // and in a write transaction
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    XCTAssertThrows([otherRealm commitWriteTransactionWithoutNotifying:@[_token] error:nil]);
+    [realm cancelWriteTransaction];
+    [otherRealm cancelWriteTransaction];
+}
 @end
 
 @interface SortedNotificationTests : NotificationTests
@@ -400,6 +460,41 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
         // Move the now-matching object over a previously matching object
         [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 2"]];
     });
+}
+
+- (void)testExcludingChangesFromSkippedTransaction {
+    [self prepare];
+
+    __block bool first = true;
+    RLMResults *query = [self query];
+    __block RLMCollectionChange *changes;
+    RLMNotificationToken *token = [query addNotificationBlock:^(RLMResults *results, RLMCollectionChange *c, NSError *error) {
+        XCTAssertNotNil(results);
+        XCTAssertNil(error);
+        changes = c;
+        XCTAssertTrue(first || changes);
+        first = false;
+        CFRunLoopStop(CFRunLoopGetCurrent());
+    }];
+    CFRunLoopRun();
+
+    [query.realm beginWriteTransaction];
+    [IntObject createInRealm:query.realm withValue:@[@3]];
+    [query.realm commitWriteTransactionWithoutNotifying:@[token] error:nil];
+
+    [self waitForNotification:RLMRealmDidChangeNotification realm:RLMRealm.defaultRealm block:^{
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm transactionWithBlock:^{
+            [IntObject createInRealm:realm withValue:@[@3]];
+        }];
+    }];
+
+    [token stop];
+    token = nil;
+
+    XCTAssertNotNil(changes);
+    // Should only have the row inserted in the background transaction
+    XCTAssertEqualObjects(@[@5], changes.insertions);
 }
 
 @end

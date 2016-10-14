@@ -70,6 +70,13 @@ void RLMDisableSyncToDisk() {
     _block = nil;
 }
 
+- (void)suppressNextNotification {
+    auto block = _block;
+    _block = ^(RLMNotification, RLMRealm *) {
+        _block = block;
+    };
+}
+
 - (void)dealloc {
     if (_realm || _block) {
         NSLog(@"RLMNotificationToken released without unregistering a notification. You must hold "
@@ -387,7 +394,8 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     if (count == 0) {
         return;
     }
-    // call this realms notification blocks
+
+    // call this realm's notification blocks
     if (count == 1) {
         if (auto block = [_notificationHandlers.anyObject block]) {
             block(notification, self);
@@ -430,6 +438,24 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
     catch (...) {
         RLMRealmTranslateException(outError);
+        return NO;
+    }
+}
+
+- (BOOL)commitWriteTransactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens error:(NSError **)error {
+    for (RLMNotificationToken *token in tokens) {
+        if (token.realm != self) {
+            @throw RLMException(@"Incorrect Realm: only notifications for the Realm being modified can be skipped.");
+        }
+        [token suppressNextNotification];
+    }
+
+    try {
+        _realm->commit_transaction();
+        return YES;
+    }
+    catch (...) {
+        RLMRealmTranslateException(error);
         return NO;
     }
 }

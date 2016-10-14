@@ -7,11 +7,18 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add the ability to skip calling specific notification blocks when committing
+  a write transaction.
 
 ### Bugfixes
 
-* None.
+* Deliver collection notifications when beginning a write transaction which
+  advances the read version of a Realm (previously only Realm-level
+  notifications were sent).
+* Fix some scenarios which would lead to inconsistent states when using
+  collection notifications.
+* Fix several race conditions in the notification functionality.
+* Don't send Realm change notifications when canceling a write transaction.
 
 2.0.4 Release notes (2016-11-14)
 =============================================================
