@@ -166,7 +166,7 @@ static inline RLMObjectBase *RLMGetLinkedObjectForValue(__unsafe_unretained RLMR
 
     if (creationOptions & RLMCreationOptionsPromoteUnmanaged) {
         if (!link->_realm) {
-            RLMAddObjectToRealm(link, realm, creationOptions & RLMCreationOptionsCreateOrUpdate);
+            RLMAddOrUpdateObjectToRealm(link, realm, creationOptions & RLMCreationOptionsCreateOrUpdate);
             return link;
         }
         @throw RLMException(@"Can not add objects from a different Realm");

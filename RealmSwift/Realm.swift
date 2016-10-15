@@ -199,12 +199,28 @@ public final class Realm {
     }
 
     // MARK: Adding and Creating objects
+    /**
+     Adds object into the Realm.
+     
+     When added, all child relationships referenced by this object will also be added to the Realm if they are not
+     already in it. If the object or any related objects are already being managed by a different Realm an error will be
+     thrown. Instead, use one of the `create` functions to insert a copy of a managed object into a different Realm.
+     
+     The object to be added must be valid and cannot have been previously deleted from a Realm (i.e. `isInvalidated`
+     must be `false`).
+     
+     - parameter object: The object to be added to this Realm.
+     */
+    public func add(_ object: Object) {
+        RLMAddObjectToRealm(object, rlmRealm)
+    }
 
     /**
      Adds or updates an existing object into the Realm.
 
      Only pass `true` to `update` if the object has a primary key. If no objects exist in the Realm with the same
-     primary key value, the object is inserted. Otherwise, the existing object is updated with any changed values.
+     primary key value, the object is inserted. Otherwise, the existing object is updated with any changed values. 
+     If object with such ID already exists and `update` is set to `false` - the object will be skiped with no changes.
 
      When added, all child relationships referenced by this object will also be added to the Realm if they are not
      already in it. If the object or any related objects are already being managed by a different Realm an error will be
@@ -221,7 +237,8 @@ public final class Realm {
         if update && object.objectSchema.primaryKeyProperty == nil {
             throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
         }
-        RLMAddObjectToRealm(object, rlmRealm, update)
+        
+        RLMAddOrUpdateObjectToRealm(object, rlmRealm, update)
     }
 
     /**
