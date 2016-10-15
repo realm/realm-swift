@@ -89,22 +89,18 @@
         case RLMPuzzlePieceIdentifierA2: return CGPointMake(143.5,0);
         case RLMPuzzlePieceIdentifierA3: return CGPointMake(245,-0.5f);
         case RLMPuzzlePieceIdentifierA4: return CGPointMake(449.5,0);
-        case RLMPuzzlePieceIdentifierA5: return CGPointMake(542.5,-0.5f);
         case RLMPuzzlePieceIdentifierB1: return CGPointMake(-0.5f,121.5f);
         case RLMPuzzlePieceIdentifierB2: return CGPointMake(105.5,173.5);
         case RLMPuzzlePieceIdentifierB3: return CGPointMake(284,130);
         case RLMPuzzlePieceIdentifierB4: return CGPointMake(400,193);
-        case RLMPuzzlePieceIdentifierB5: return CGPointMake(583,129.5);
         case RLMPuzzlePieceIdentifierC1: return CGPointMake(-0.5f,370 );
         case RLMPuzzlePieceIdentifierC2: return CGPointMake(144,309);
         case RLMPuzzlePieceIdentifierC3: return CGPointMake(245.5,363.5);
         case RLMPuzzlePieceIdentifierC4: return CGPointMake(439,306.5);
-        case RLMPuzzlePieceIdentifierC5: return CGPointMake(541.5,367.5);
         case RLMPuzzlePieceIdentifierD1: return CGPointMake(-0.5f,488);
         case RLMPuzzlePieceIdentifierD2: return CGPointMake(104,542);
         case RLMPuzzlePieceIdentifierD3: return CGPointMake(290.5,501);
         case RLMPuzzlePieceIdentifierD4: return CGPointMake(393,557);
-        case RLMPuzzlePieceIdentifierD5: return CGPointMake(590.5,485.5);
     }
     
     return CGPointZero;
