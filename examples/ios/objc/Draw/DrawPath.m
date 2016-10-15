@@ -28,7 +28,7 @@
     path.lineWidth = 4.0f;
     NSUInteger index = 0;
     for (DrawPoint *point in self.points) {
-        CGPoint cgPoint = [DrawPath translatedPointToScreenSpaceWithPoint:CGPointMake(point.x, point.y)];
+        CGPoint cgPoint = CGPointMake(point.x, point.y);
         if (index == 0) {
             [path moveToPoint:cgPoint];
         } else {
@@ -39,24 +39,14 @@
     return path;
 }
 
-+ (NSString *)primaryKey
++ (NSDictionary *)defaultPropertyValues
 {
-    return @"pathID";
+    return @{ @"drawerID" : @"" };
 }
 
 + (NSArray *)ignoredProperties
 {
     return @[@"path"];
-}
-
-+ (CGPoint)translatedPointToScreenSpaceWithPoint:(CGPoint)point
-{
-    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
-    
-    CGPoint translatedPoint = CGPointZero;
-    translatedPoint.x = point.x * screenSize.width;
-    translatedPoint.y = point.y * screenSize.height;
-    return translatedPoint;
 }
 
 @end

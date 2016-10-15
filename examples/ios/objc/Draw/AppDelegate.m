@@ -24,9 +24,52 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    [RLMRealm enableServerSyncOnPath:[RLMRealm defaultRealmPath]
-                      serverBaseURL:@"realm://Alexanders-MacBook-Pro.local/draw"];
-    [RLMRealm setServerSyncLogLevel:1]; // `level >= 2` means "everything"
+    application.applicationSupportsShakeToEdit = YES;
+    
+    // Setup Global Error Handler
+    RLMSyncErrorReportingBlock globalErrorHandler = ^(NSError *error, RLMSyncSession *session) {
+        NSLog(@"A global error has occurred! %@", error);
+    };
+    
+    [RLMSyncManager sharedManager].errorHandler = globalErrorHandler;
+    
+    if ([RLMSyncUser all].count > 0) {
+        NSURL *syncURL = [NSURL URLWithString:@"realm://52.183.43.180:9080/~/Draw"];
+        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:[RLMSyncUser all].firstObject realmURL:syncURL];
+        RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
+        defaultConfig.syncConfiguration = syncConfig;
+        [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
+    }
+    else {
+        // The base server path
+        // Set to connect to local or online host
+        NSURL *authURL = [NSURL URLWithString:@"http://127.0.0.1:9080"];
+        
+        // Creating a debug credential since this demo is just using the generated access token
+        // produced when running the Realm Object Server via the `start-object-server.command`
+        RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:@"demo@realm.io"
+                                                                         password:@"demo"
+                                                                          actions:RLMAuthenticationActionsUseExistingAccount];
+        
+        // Log the user in (async, the Realm will start syncing once the user is logged in automatically)
+        [RLMSyncUser authenticateWithCredential:credential
+                                  authServerURL:authURL
+                                   onCompletion:^(RLMSyncUser *user, NSError *error) {
+                                       if (error) {
+                                           NSLog(@"A login error has occurred! %@", error);
+                                       }
+                                       else { // Logged in setup the default Realm
+                                           // The Realm virtual path on the server.
+                                           // The `~` represents the Realm user ID. Since the user ID is not known until you
+                                           // log in, the ~ is used as short-hand to represent this.
+                                           NSURL *syncURL = [NSURL URLWithString:@"realm://127.0.0.1:9080/~/Draw"];
+                                           RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:syncURL];
+                                           RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
+                                           defaultConfig.syncConfiguration = syncConfig;
+                                           [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
+                                       }
+        }];
+    }
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UIViewController alloc] init];

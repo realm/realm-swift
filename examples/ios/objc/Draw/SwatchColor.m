@@ -39,37 +39,37 @@
 
 + (instancetype)swatchColorForName:(NSString *)name
 {
-    if ([name isEqualToString:@"Black"]) {
+    if ([name isEqualToString:@"Charcoal"]) {
         return [SwatchColor blackSwatchColor];
     }
-    else if ([name isEqualToString:@"Gray"]) {
+    else if ([name isEqualToString:@"Elephant"]) {
         return [SwatchColor graySwatchColor];
     }
-    else if ([name isEqualToString:@"Red"]) {
+    else if ([name isEqualToString:@"Dove"]) {
         return [SwatchColor redSwatchColor];
     }
-    else if ([name isEqualToString:@"Blue"]) {
+    else if ([name isEqualToString:@"Ultramarine"]) {
         return [SwatchColor blueSwatchColor];
     }
-    else if ([name isEqualToString:@"Green"]) {
+    else if ([name isEqualToString:@"Indigo"]) {
         return [SwatchColor greenSwatchColor];
     }
-    else if ([name isEqualToString:@"LightGreen"]) {
+    else if ([name isEqualToString:@"GrapeJelly"]) {
         return [SwatchColor lightGreenSwatchColor];
     }
-    else if ([name isEqualToString:@"LightBlue"]) {
+    else if ([name isEqualToString:@"Mulberry"]) {
         return [SwatchColor lightBlueSwatchColor];
     }
-    else if ([name isEqualToString:@"Brown"]) {
+    else if ([name isEqualToString:@"Flamingo"]) {
         return [SwatchColor brownSwatchColor];
     }
-    else if ([name isEqualToString:@"Orange"]) {
+    else if ([name isEqualToString:@"SexySalmon"]) {
         return [SwatchColor orangeSwatchColor];
     }
-    else if ([name isEqualToString:@"Yellow"]) {
+    else if ([name isEqualToString:@"Peach"]) {
         return [SwatchColor yellowSwatchColor];
     }
-    else if ([name isEqualToString:@"Realm"]) {
+    else if ([name isEqualToString:@"Melon"]) {
         return [SwatchColor realmSwatchColor];
     }
     
@@ -93,57 +93,68 @@
 
 + (instancetype)blackSwatchColor
 {
-    return [[SwatchColor alloc] initWithName:@"Black" color:[UIColor blackColor]];
+    // Charcoal
+    return [[SwatchColor alloc] initWithName:@"Charcoal" color:[UIColor colorWithRed:28.0f/255.0f green:35.0f/255.0f blue:63.0f/255.0f alpha:1.0f]];
 }
 
 + (instancetype)graySwatchColor
 {
-    return [[SwatchColor alloc] initWithName:@"Gray" color:[UIColor grayColor]];
+    // Elephant
+    return [[SwatchColor alloc] initWithName:@"Elephant" color:[UIColor colorWithRed:154.0f/255.0f green:155.0f/255.0f blue:165.0f/255.0f alpha:1.0f]];
 }
 
 + (instancetype)redSwatchColor
 {
-    return [[SwatchColor alloc] initWithName:@"Red" color:[UIColor redColor]];
+    // Dove
+    return [[SwatchColor alloc] initWithName:@"Dove" color:[UIColor colorWithRed:235.0f/255.0f green:235.0f/255.0f blue:242.0f/255.0f alpha:1.0f]];
 }
 
 + (instancetype)blueSwatchColor
 {
-    return [[SwatchColor alloc] initWithName:@"Blue" color:[UIColor blueColor]];
+    // Ultramarine
+    return [[SwatchColor alloc] initWithName:@"Ultramarine" color:[UIColor colorWithRed:57.0f/255.0f green:71.0f/255.0f blue:127.0f/255.0f alpha:1.0f]];
 }
 
 + (instancetype)greenSwatchColor
 {
-    return [[SwatchColor alloc] initWithName:@"Green" color:[UIColor greenColor]];
+    // Indigo
+    return [[SwatchColor alloc] initWithName:@"Indigo" color:[UIColor colorWithRed:89.0f/255.0f green:86.0f/255.0f blue:158.0f/255.0f alpha:1.0f]];
 }
 
 + (instancetype)lightGreenSwatchColor
 {
-    return [[SwatchColor alloc] initWithName:@"LightGreen" color:[UIColor colorWithRed:21.0f/255.0f green:240.0f/255.0f blue:11.0f/255.0f alpha:1.0f]];
+    // Grape Jelly
+    return [[SwatchColor alloc] initWithName:@"GrapeJelly" color:[UIColor colorWithRed:154.0f/255.0f green:80.0f/255.0f blue:165.0f/255.0f alpha:1.0f]];
 }
 
 + (instancetype)lightBlueSwatchColor
 {
-    return [[SwatchColor alloc] initWithName:@"LightBlue" color:[UIColor colorWithRed:0.0f green:169.0f/255.0f blue:217.0f alpha:1.0f]];
+    // Mulberry
+    return [[SwatchColor alloc] initWithName:@"Mulberry" color:[UIColor colorWithRed:211.0f/255.0f green:76.0f/255.0f blue:163.0f/255.0f alpha:1.0f]];
 }
 
 + (instancetype)brownSwatchColor
 {
-    return [[SwatchColor alloc] initWithName:@"Brown" color:[UIColor brownColor]];
+    // Flamingo
+    return [[SwatchColor alloc] initWithName:@"Flamingo" color:[UIColor colorWithRed:242.0f/255.0f green:81.0f/255.0f blue:146.0f/255.0f alpha:1.0f]];
 }
 
 + (instancetype)orangeSwatchColor
 {
-    return [[SwatchColor alloc] initWithName:@"Orange" color:[UIColor orangeColor]];
+    // Sexy Salmon
+    return [[SwatchColor alloc] initWithName:@"SexySalmon" color:[UIColor colorWithRed:247.0f/255.0f green:124.0f/255.0f blue:136.0f/255.0f alpha:1.0f]];
 }
 
 + (instancetype)yellowSwatchColor
 {
-    return [[SwatchColor alloc] initWithName:@"Yellow" color:[UIColor yellowColor]];
+    // Peach
+    return [[SwatchColor alloc] initWithName:@"Peach" color:[UIColor colorWithRed:252.0f/255.0f green:159.0f/255.0f blue:149.0f/255.0f alpha:1.0f]];
 }
 
 + (instancetype)realmSwatchColor
 {
-    return [[SwatchColor alloc] initWithName:@"Realm" color:[UIColor colorWithRed:230/255.0f green:102.0f/255.0f blue:102.0f/255.0f alpha:1.0f]];
+    // Melon
+    return [[SwatchColor alloc] initWithName:@"Melon" color:[UIColor colorWithRed:252.0f/255.0f green:195.0f/255.0f blue:151.0f/255.0f alpha:1.0f]];
 }
 
 @end

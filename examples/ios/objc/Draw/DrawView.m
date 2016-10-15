@@ -24,6 +24,7 @@
 
 @interface DrawView ()
 
+@property DrawPath *drawPath;
 @property NSString *pathID;
 @property NSMutableSet *drawnPathIDs;
 @property RLMResults *paths;
@@ -35,8 +36,6 @@
 @property CGLayerRef offscreenLayer;
 @property CGContextRef offscreenContext;
 
-- (CGPoint)translatedPointWithPoint:(CGPoint)point;
-
 @end
 
 @implementation DrawView
@@ -45,18 +44,31 @@
 {
     self = [super initWithFrame:frame];
     if (self) {
+        typeof(self) __weak weakSelf = self;
         self.notificationToken = [[RLMRealm defaultRealm] addNotificationBlock:^(NSString *notification, RLMRealm *realm) {
-            self.paths = [DrawPath allObjects];
-            [self setNeedsDisplay];
+            weakSelf.paths = [DrawPath allObjects];
+            
+            if (weakSelf.paths.count == 0) {
+                //Clear the onscreen context
+                CGContextSetFillColorWithColor(weakSelf.onscreenContext, [UIColor whiteColor].CGColor);
+                CGContextFillRect(weakSelf.onscreenContext, weakSelf.bounds);
+                
+                //Clear the offscreen context
+                CGContextSetFillColorWithColor(weakSelf.offscreenContext, [UIColor whiteColor].CGColor);
+                CGContextFillRect(weakSelf.offscreenContext, weakSelf.bounds);
+                
+                [weakSelf setNeedsDisplay];
+            }
+            
+            [weakSelf setNeedsDisplay];
         }];
         self.vendorID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         self.paths = [DrawPath allObjects];
         self.swatchesView = [[SwatchesView alloc] initWithFrame:CGRectZero];
         [self addSubview:self.swatchesView];
         
-        __block typeof(self) blockSelf = self;
         self.swatchesView.swatchColorChangedHandler = ^{
-            blockSelf.currentColor = blockSelf.swatchesView.selectedColor;
+            weakSelf.currentColor = weakSelf.swatchesView.selectedColor;
         };
         self.drawnPathIDs = [[NSMutableSet alloc] init];
     }
@@ -76,24 +88,39 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    self.pathID = [[NSUUID UUID] UUIDString];
+    NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
+    
+    // Create a draw path object
+    self.drawPath = [[DrawPath alloc] init];
+    self.drawPath.color = colorName;
+    
+    // Create a draw point object
     CGPoint point = [[touches anyObject] locationInView:self];
-    [[RLMRealm defaultRealm] transactionWithBlock:^{
-        NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
-        [DrawPath createInDefaultRealmWithValue:@[self.pathID, self.vendorID, colorName, @[]]];
-        
-        CGPoint translatedPoint = [self translatedPointWithPoint:point];
-        [DrawPoint createInDefaultRealmWithValue:@[[NSUUID UUID].UUIDString, @(translatedPoint.x), @(translatedPoint.y)]];
+    DrawPoint *drawPoint = [[DrawPoint alloc] init];
+    drawPoint.x = point.x;
+    drawPoint.y = point.y;
+    
+    // Add the draw point to the draw path
+    [self.drawPath.points addObject:drawPoint];
+    
+    // Add the draw path to the Realm
+    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+    [defaultRealm transactionWithBlock:^{
+        [defaultRealm addObject:self.drawPath];
     }];
 }
 
 - (void)addPoint:(CGPoint)point
 {
-    DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        CGPoint translatedPoint = [self translatedPointWithPoint:point];
-        DrawPoint *newPoint = [DrawPoint createInDefaultRealmWithValue:@[[NSUUID UUID].UUIDString, @(translatedPoint.x), @(translatedPoint.y)]];
-        [currentPath.points addObject:newPoint];
+        if (self.drawPath.isInvalidated) {
+            self.drawPath = [[DrawPath alloc] init];
+            self.drawPath.color = self.currentColor ? self.currentColor.name : @"Black";
+            [[RLMRealm defaultRealm] addObject:self.drawPath];
+        }
+
+        DrawPoint *newPoint = [DrawPoint createInDefaultRealmWithValue:@[@(point.x), @(point.y)]];
+        [self.drawPath.points addObject:newPoint];
     }];
 }
 
@@ -108,9 +135,10 @@
     CGPoint point = [[touches anyObject] locationInView:self];
     [self addPoint:point];
     [[RLMRealm defaultRealm] transactionWithBlock:^{
-        DrawPath *currentPath = [DrawPath objectForPrimaryKey:self.pathID];
-        currentPath.drawerID = @""; // mark this path as ended
+        self.drawPath.drawerID = @""; // mark this path as ended
     }];
+
+    self.drawPath = nil;
 }
 
 - (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
@@ -150,12 +178,7 @@
     for (DrawPath *path in self.paths) {
         BOOL pathEnded = [path.drawerID isEqualToString:@""];
         if (pathEnded) {
-            BOOL pathAlreadyDrawn = [self.drawnPathIDs containsObject:path.pathID];
-            if (pathAlreadyDrawn) {
-                continue;
-            }
             [self drawPath:path withContext:self.offscreenContext];
-            [self.drawnPathIDs addObject:path.pathID];
         } else {
             [activePaths addObject:path];
         }
@@ -175,14 +198,37 @@
     return YES;
 }
 
-- (CGPoint)translatedPointWithPoint:(CGPoint)point
+- (void)motionEnded:(UIEventSubtype)motion withEvent:(UIEvent *)event
 {
-    CGSize screenSize = [[UIScreen mainScreen] bounds].size;
+    if (motion != UIEventSubtypeMotionShake) {
+        return;
+    }
     
-    CGPoint translatedPoint = CGPointZero;
-    translatedPoint.x = point.x / screenSize.width;
-    translatedPoint.y = point.y / screenSize.height;
-    return translatedPoint;
+    UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Reset Canvas?"
+                                                                             message:@"This will clear the Realm database and reset the canvas. Are you sure you wish to proceed?"
+                                                                      preferredStyle:UIAlertControllerStyleAlert];
+    
+    typeof(self) __weak weakSelf = self;
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Reset"
+                                                        style:UIAlertActionStyleDefault
+                                                      handler:^(UIAlertAction *action) {
+        [[RLMRealm defaultRealm] transactionWithBlock:^{
+            [[RLMRealm defaultRealm] deleteAllObjects];
+        }];
+        
+        //Clear the onscreen context
+        CGContextSetFillColorWithColor(weakSelf.onscreenContext, [UIColor whiteColor].CGColor);
+        CGContextFillRect(weakSelf.onscreenContext, weakSelf.bounds);
+        
+        //Clear the offscreen context
+        CGContextSetFillColorWithColor(weakSelf.offscreenContext, [UIColor whiteColor].CGColor);
+        CGContextFillRect(weakSelf.offscreenContext, weakSelf.bounds);
+        
+        [weakSelf setNeedsDisplay];
+    }]];
+    [alertController addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    
+    [[[[UIApplication sharedApplication] keyWindow] rootViewController] presentViewController:alertController animated:YES completion:nil];
 }
 
 @end

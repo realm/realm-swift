@@ -56,8 +56,7 @@ static CGFloat kSwatchPencilPadding = 1.0f;
     
     NSInteger tag = 0;
     for (SwatchColor *color in [SwatchColor allSwatchColors]) {
-        NSString *imageName = [NSString stringWithFormat:@"%@Pencil", color.name];
-        UIImage *pencilImage = [[UIImage imageNamed:imageName] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+        UIImage *pencilImage = [[UIImage imageNamed:color.name] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
         button.tag = tag++;
