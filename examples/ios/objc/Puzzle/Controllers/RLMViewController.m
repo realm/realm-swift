@@ -129,7 +129,8 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
         [RLMRealmConfiguration setDefaultConfiguration:configuration];
         
         RLMRealm *realm = [RLMRealm defaultRealm];
-        if (realm.isEmpty) {
+        RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:UUID];
+        if (!puzzle) {
             RLMPuzzle *puzzle = [[RLMPuzzle alloc] init];
             puzzle.uuid = UUID;
             [realm transactionWithBlock:^{

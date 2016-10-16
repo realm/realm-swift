@@ -25,6 +25,7 @@
 @property (nonatomic, strong) NSDictionary *pieceDefaultLocations; //The CGPoints for each piece in default space
 @property (nonatomic, assign) CGPoint gestureOrigin;
 @property (nonatomic, assign) CGPoint gesturePieceOrigin;
+@property (nonatomic, weak)   UIView *draggingView;
 
 - (void)setupPuzzlePieces;
 - (CGPoint)pointForPiece:(RLMPuzzlePieceIdentifier)piece;
@@ -150,6 +151,9 @@
 - (void)movePiece:(RLMPuzzlePieceIdentifier)piece toPoint:(CGPoint)point animated:(BOOL)animated
 {
     RLMPuzzlePieceView *pieceView = self.puzzlePieces[piece];
+    if (pieceView == self.draggingView) {
+        return;
+    }
     
     if (animated == NO) {
         pieceView.center = point;
@@ -170,9 +174,11 @@
     if (gestureRecognizer.state == UIGestureRecognizerStateBegan) {
         self.gestureOrigin = point;
         self.gesturePieceOrigin = piecePoint;
+        self.draggingView = pieceView;
     }
     else if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
         [pieceView touchesEnded:nil withEvent:nil];
+        self.draggingView = nil;
     }
     
     point.x -= self.gestureOrigin.x;
