@@ -30,6 +30,8 @@
 
 @property (nonatomic, strong) UIButton *connectButton;
 
+@property (nonatomic, strong) UIActivityIndicatorView *activityindicator;
+
 - (void)buttonTapped:(id)sender;
 - (UITextField *)newTextField;
 
@@ -103,7 +105,14 @@
         self.connectButton.clipsToBounds = YES;
         self.connectButton.layer.cornerRadius = 20.0f;
         [self.connectButton setTitle:@"Connect" forState:UIControlStateNormal];
+        [self.connectButton addTarget:self action:@selector(buttonTapped:) forControlEvents:UIControlEventTouchUpInside];
         [self.contentView addSubview:self.connectButton];
+    }
+    
+    if (self.activityindicator == nil) {
+        self.activityindicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        self.activityindicator.hidden = YES;
+        [self addSubview:self.activityindicator];
     }
 }
 
@@ -125,6 +134,8 @@
     frame.origin.x = self.tableView.frame.origin.x;
     frame.origin.y = CGRectGetMaxY(self.tableView.frame) + 40;
     self.connectButton.frame = frame;
+    
+    self.activityindicator.center = self.connectButton.center;
 }
 
 #pragma mark - Table View Delegate/Data Source -
@@ -181,13 +192,44 @@
 
 - (void)buttonTapped:(id)sender
 {
-    if (self.startButtonTapped) {
-        self.startButtonTapped();
-    }
-    else if (self.joinButtonTapped) {
-        self.joinButtonTapped();
+    if (self.connectButtonTapped) {
+        self.connectButtonTapped();
     }
 }
+
+#pragma mark - Accessors -
+- (void)setLoading:(BOOL)loading
+{
+    _loading = loading;
+    
+    if (_loading) {
+        [self.connectButton setTitle:@"" forState:UIControlStateNormal];
+        self.activityindicator.hidden = NO;
+        [self.activityindicator startAnimating];
+    }
+    else {
+        [self.connectButton setTitle:@"Connect" forState:UIControlStateNormal];
+        self.activityindicator.hidden = YES;
+        [self.activityindicator stopAnimating];
+    }
+}
+
+- (NSString *)hostName
+{
+    return self.hostNameField.text.length > 0 ? self.hostNameField.text : self.hostNameField.placeholder;
+}
+
+- (NSString *)userName
+{
+    return self.userNameField.text.length > 0 ? self.userNameField.text : self.userNameField.placeholder;
+}
+
+- (NSString *)password
+{
+    return self.passwordField.text.length > 0 ? self.passwordField.text : self.passwordField.placeholder;
+}
+
+#pragma mark - Image Creation -
 
 + (UIImage *)cellBackgroundImageBottom:(BOOL)bottom
 {

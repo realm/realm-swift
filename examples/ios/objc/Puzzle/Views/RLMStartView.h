@@ -20,7 +20,11 @@
 
 @interface RLMStartView : UIVisualEffectView
 
-@property (nonatomic, copy) void (^startButtonTapped)(void);
-@property (nonatomic, copy) void (^joinButtonTapped)(void);
+@property (nonatomic, assign) BOOL loading;
+@property (nonatomic, copy) void (^connectButtonTapped)(void);
+
+@property (nonatomic, readonly) NSString *hostName;
+@property (nonatomic, readonly) NSString *userName;
+@property (nonatomic, readonly) NSString *password;
 
 @end

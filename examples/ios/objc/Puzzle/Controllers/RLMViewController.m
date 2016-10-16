@@ -18,11 +18,15 @@
 
 #import "RLMViewController.h"
 #import <Realm/Realm.h>
+#import <Realm/RLMRealmConfiguration+Sync.h>
+#import <Realm/RLMSyncConfiguration.h>
 #import "RLMPuzzle.h"
 #import "RLMPuzzlePiece.h"
 #import "RLMPuzzleView.h"
 #import "RLMStartView.h"
 #import "RLMPuzzleListViewController.h"
+
+static NSString *UUID = @"7387fa06-dffa-4891-97e1-9e35c3898658";
 
 static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 
@@ -40,8 +44,8 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 - (void)setupNotifications;
 - (void)removeNotifications;
 
-- (void)startNewPuzzle;
-- (void)startNewPuzzleWithName:(NSString *)name;
+- (void)connectToServer;
+- (void)startPuzzle;
 - (void)joinExistingPuzzle;
 
 - (void)updatePuzzleState;
@@ -91,12 +95,8 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
     [self.view addSubview:self.startView];
     
     __weak typeof(self) weakSelf = self;
-    self.startView.startButtonTapped = ^{
-        [weakSelf startNewPuzzle];
-    };
-    
-    self.startView.joinButtonTapped = ^{
-        [weakSelf joinExistingPuzzle];
+    self.startView.connectButtonTapped = ^{
+        [weakSelf connectToServer];
     };
 }
 
@@ -106,56 +106,76 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 }
 
 #pragma mark - Puzzle State Management -
-- (void)startNewPuzzle
+- (void)connectToServer
 {
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Puzzle Name" message:@"Please enter a name for this new puzzle" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"OK",nil];
-    alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [alertView textFieldAtIndex:0].text = @"My Puzzle";
-    [alertView show];
-}
-
-- (void)alertView:(nonnull UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-    if (buttonIndex == 0)
-        return;
+    self.startView.loading = YES;
     
-    NSString *name = [alertView textFieldAtIndex:0].text;
-    if (name.length == 0)
-        name = @"My Puzzle";
+    NSURL *authURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:9080", self.startView.hostName]];
     
-    [self startNewPuzzleWithName:name];
-}
-
-- (void)startNewPuzzleWithName:(NSString *)name
-{
-    //Create the over-arching puzzle object
-    RLMPuzzle *newPuzzle = [[RLMPuzzle alloc] init];
-    newPuzzle.name = name;
-    self.currentPuzzleID = newPuzzle.uuid;
-    
-    //Create a data point for each puzzle piece
-    NSMutableArray *puzzlePieces = [NSMutableArray array];
-    for (NSInteger i = RLMPuzzlePieceIdentifierA1; i < RLMPuzzlePieceIdentifierNum; i++) {
-        RLMPuzzlePiece *puzzlePiece = [[RLMPuzzlePiece alloc] init];
-        puzzlePiece.identifier = i;
-        [puzzlePieces addObject:puzzlePiece];
-    }
-    
-    RLMRealm *defaultRealm = [RLMRealm defaultRealm];
-    [defaultRealm transactionWithBlock:^{
-        for (RLMPuzzlePiece *piece in puzzlePieces) {
-            [newPuzzle.pieces addObject:piece];
+    RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:self.startView.userName password:self.startView.password actions:RLMAuthenticationActionsUseExistingAccount];
+    [RLMSyncUser authenticateWithCredential:credential authServerURL:authURL onCompletion:^(RLMSyncUser *user, NSError *error) {
+        if (error) {
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"An Error Ocurred" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
+            [alertController addAction:[UIAlertAction actionWithTitle:@"Okay" style:UIAlertActionStyleDefault handler:nil]];
+            self.startView.loading = NO;
+            [self presentViewController:alertController animated:YES completion:nil];
+            return;
         }
         
-        [defaultRealm addObject:newPuzzle];
+        NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Puzzle", self.startView.hostName]];
+        
+        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+        [configuration setSyncConfiguration:[[RLMSyncConfiguration alloc] initWithUser:user realmURL:syncURL]];
+        [RLMRealmConfiguration setDefaultConfiguration:configuration];
+        
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        if (realm.isEmpty) {
+            RLMPuzzle *puzzle = [[RLMPuzzle alloc] init];
+            puzzle.uuid = UUID;
+            [realm transactionWithBlock:^{
+                [realm addObject:puzzle];
+            }];
+        }
+        
+        [self startPuzzle];
     }];
+    
+}
+
+- (void)startPuzzle
+{
+    //Create the over-arching puzzle object
+    RLMPuzzle *newPuzzle = [RLMPuzzle objectForPrimaryKey:UUID];
+    self.currentPuzzleID = newPuzzle.uuid;
+    
+    BOOL firstTime = NO;
+    if (newPuzzle.pieces.count == 0) {
+        //Create a data point for each puzzle piece
+        NSMutableArray *puzzlePieces = [NSMutableArray array];
+        for (NSInteger i = RLMPuzzlePieceIdentifierA1; i < RLMPuzzlePieceIdentifierNum; i++) {
+            RLMPuzzlePiece *puzzlePiece = [[RLMPuzzlePiece alloc] init];
+            puzzlePiece.identifier = i;
+            [puzzlePieces addObject:puzzlePiece];
+        }
+        
+        RLMRealm *defaultRealm = [RLMRealm defaultRealm];
+        [defaultRealm transactionWithBlock:^{
+            for (RLMPuzzlePiece *piece in puzzlePieces) {
+                [newPuzzle.pieces addObject:piece];
+            }
+        }];
+        
+        firstTime = YES;
+    }
 
     [UIView animateWithDuration:0.5f animations:^{
         self.startView.alpha = 0.0f;
     } completion:^(BOOL complete) {
         [self.startView removeFromSuperview];
         
-        [self.puzzleView scramblePiecesAnimated];
+        if (firstTime) {
+            [self.puzzleView scramblePiecesAnimated];
+        }
         [self setupNotifications];
     }];
 }

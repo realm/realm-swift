@@ -39,9 +39,9 @@
 {
     if (self = [super initWithFrame:frame])
     {
-        self.backgroundColor = [UIColor colorWithWhite:0.98f alpha:1.0f];
-        self.layer.borderColor = [UIColor colorWithWhite:0.7f alpha:1.0f].CGColor;
-        self.layer.borderWidth = 1.0f;
+        self.backgroundColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
+        //self.layer.borderColor = [UIColor colorWithWhite:0.7f alpha:1.0f].CGColor;
+        //self.layer.borderWidth = 1.0f;
     }
         
     return self;
@@ -62,7 +62,7 @@
     NSMutableArray *puzzlePieces = [NSMutableArray array];
     
     NSArray *verticalSlices = @[@"A", @"B", @"C", @"D"];
-    NSArray *horizontalSlices = @[@"1", @"2", @"3", @"4", @"5"];
+    NSArray *horizontalSlices = @[@"1", @"2", @"3", @"4"];
     
     NSInteger i = 0;
     for (NSString *verticalSlice in verticalSlices) {
@@ -87,21 +87,21 @@
 - (CGPoint)pointForPiece:(RLMPuzzlePieceIdentifier)piece
 {
     switch (piece) {
-        case RLMPuzzlePieceIdentifierA1: return CGPointMake(-0.5f,0);
-        case RLMPuzzlePieceIdentifierA2: return CGPointMake(143.5,0);
-        case RLMPuzzlePieceIdentifierA3: return CGPointMake(245,-0.5f);
-        case RLMPuzzlePieceIdentifierA4: return CGPointMake(449.5,0);
-        case RLMPuzzlePieceIdentifierB1: return CGPointMake(-0.5f,121.5f);
-        case RLMPuzzlePieceIdentifierB2: return CGPointMake(105.5,173.5);
-        case RLMPuzzlePieceIdentifierB3: return CGPointMake(284,130);
-        case RLMPuzzlePieceIdentifierB4: return CGPointMake(400,193);
-        case RLMPuzzlePieceIdentifierC1: return CGPointMake(-0.5f,370 );
-        case RLMPuzzlePieceIdentifierC2: return CGPointMake(144,309);
-        case RLMPuzzlePieceIdentifierC3: return CGPointMake(245.5,363.5);
-        case RLMPuzzlePieceIdentifierC4: return CGPointMake(439,306.5);
-        case RLMPuzzlePieceIdentifierD1: return CGPointMake(-0.5f,488);
-        case RLMPuzzlePieceIdentifierD2: return CGPointMake(104,542);
-        case RLMPuzzlePieceIdentifierD3: return CGPointMake(290.5,501);
+        case RLMPuzzlePieceIdentifierA1: return CGPointMake(0,0);
+        case RLMPuzzlePieceIdentifierA2: return CGPointMake(193,0);
+        case RLMPuzzlePieceIdentifierA3: return CGPointMake(318,-0.5f);
+        case RLMPuzzlePieceIdentifierA4: return CGPointMake(572,0);
+        case RLMPuzzlePieceIdentifierB1: return CGPointMake(-0.0f,124);
+        case RLMPuzzlePieceIdentifierB2: return CGPointMake(1260,190);
+        case RLMPuzzlePieceIdentifierB3: return CGPointMake(386,121);
+        case RLMPuzzlePieceIdentifierB4: return CGPointMake(504,190);
+        case RLMPuzzlePieceIdentifierC1: return CGPointMake(-0.0f,382);
+        case RLMPuzzlePieceIdentifierC2: return CGPointMake(191,316);
+        case RLMPuzzlePieceIdentifierC3: return CGPointMake(315.5,383.5);
+        case RLMPuzzlePieceIdentifierC4: return CGPointMake(574,313.5);
+        case RLMPuzzlePieceIdentifierD1: return CGPointMake(0.0,508);
+        case RLMPuzzlePieceIdentifierD2: return CGPointMake(124,576);
+        case RLMPuzzlePieceIdentifierD3: return CGPointMake(385.5,506);
         case RLMPuzzlePieceIdentifierD4: return CGPointMake(393,557);
     }
     
@@ -120,7 +120,7 @@
 
 - (void)scramblePiecesAnimated
 {
-    CGRect frame = self.superview.frame;
+    CGRect frame = self.superview.bounds;
     frame.origin.x += 75.0f;
     frame.origin.y += 75.0f;
     frame.size.width -= (75 * 2);
@@ -130,8 +130,8 @@
     NSMutableArray *points = [NSMutableArray array];
     for (NSInteger pieceIndex = RLMPuzzlePieceIdentifierA1; pieceIndex < RLMPuzzlePieceIdentifierNum; pieceIndex++) {
         CGPoint point = CGPointZero;
-        point.x = frame.origin.x + arc4random() % (NSInteger)((frame.origin.x+frame.size.width)-frame.origin.x);
-        point.y = frame.origin.y + arc4random() % (NSInteger)((frame.origin.y+frame.size.height)-frame.origin.y);
+        point.x = arc4random() % (NSInteger)((frame.origin.x+frame.size.width)-frame.origin.x);
+        point.y = arc4random() % (NSInteger)((frame.origin.y+frame.size.height)-frame.origin.y);
         [points addObject:[NSValue valueWithCGPoint:point]];
         
         if ([self.delegate respondsToSelector:@selector(puzzleView:pieceMoved:toPoint:)]) {

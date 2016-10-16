@@ -40,7 +40,7 @@
     return self;
 }
 
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+/*- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
     [super touchesBegan:touches withEvent:event];
     
@@ -55,6 +55,6 @@
     [UIView animateWithDuration:0.25f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.5f options:0 animations:^{
         self.transform = CGAffineTransformScale(CGAffineTransformIdentity, 1.0f, 1.0f);
     } completion:nil];
-}
+}*/
 
 @end

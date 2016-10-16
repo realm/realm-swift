@@ -117,7 +117,6 @@
 		F15766C21DAD9B0900F21319 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		F15766C31DAD9B1700F21319 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
 		F15766C51DAD9B2900F21319 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F15766C41DAD9B2900F21319 /* libc++.tbd */; };
-		F1F239651DB2C46B0027F30B /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1F239601DB2C2E80027F30B /* Realm.framework */; };
 		F1F239841DB2CF890027F30B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F1F239831DB2CF890027F30B /* main.m */; };
 		F1F239961DB2CFD90027F30B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F1F239871DB2CFD90027F30B /* AppDelegate.m */; };
 		F1F239971DB2CFD90027F30B /* DrawPath.m in Sources */ = {isa = PBXBuildFile; fileRef = F1F239891DB2CFD90027F30B /* DrawPath.m */; };
@@ -131,6 +130,7 @@
 		F1F239A11DB2D13D0027F30B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		F1F239A21DB2D1410027F30B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
 		F1F239A31DB2D1C20027F30B /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F15766C41DAD9B2900F21319 /* libc++.tbd */; };
+		F1F239A41DB30E690027F30B /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1F239601DB2C2E80027F30B /* Realm.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -296,6 +296,7 @@
 		F1F239921DB2CFD90027F30B /* SwatchColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchColor.m; sourceTree = "<group>"; };
 		F1F239931DB2CFD90027F30B /* SwatchesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchesView.h; sourceTree = "<group>"; };
 		F1F239941DB2CFD90027F30B /* SwatchesView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchesView.m; sourceTree = "<group>"; };
+		F1F239A51DB318970027F30B /* Puzzle.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Puzzle.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -424,7 +425,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F1F239651DB2C46B0027F30B /* Realm.framework in Frameworks */,
+				F1F239A41DB30E690027F30B /* Realm.framework in Frameworks */,
 				F15766C51DAD9B2900F21319 /* libc++.tbd in Frameworks */,
 				F15766C31DAD9B1700F21319 /* UIKit.framework in Frameworks */,
 				F15766C21DAD9B0900F21319 /* Foundation.framework in Frameworks */,
@@ -667,6 +668,7 @@
 		F15766891DAD996400F21319 /* Puzzle */ = {
 			isa = PBXGroup;
 			children = (
+				F1F239A51DB318970027F30B /* Puzzle.entitlements */,
 				F15766A01DAD9A1C00F21319 /* Controllers */,
 				F15766A71DAD9A1C00F21319 /* Images.xcassets */,
 				F15766A81DAD9A1C00F21319 /* Models */,
@@ -1003,6 +1005,11 @@
 						CreatedOnToolsVersion = 8.1;
 						DevelopmentTeam = QX5CR2FTN2;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Keychain = {
+								enabled = 1;
+							};
+						};
 					};
 					F1F239691DB2CF580027F30B = {
 						CreatedOnToolsVersion = 8.1;
@@ -1784,12 +1791,17 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CODE_SIGN_ENTITLEMENTS = Puzzle/Puzzle.entitlements;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = QX5CR2FTN2;
 				INFOPLIST_FILE = Puzzle/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = (
+					"-lz",
+					"-all_load",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Puzzle;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 2;
@@ -1803,6 +1815,7 @@
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_SUSPICIOUS_MOVES = YES;
+				CODE_SIGN_ENTITLEMENTS = Puzzle/Puzzle.entitlements;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = QX5CR2FTN2;
@@ -1810,6 +1823,10 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = (
+					"-lz",
+					"-all_load",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Puzzle;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TARGETED_DEVICE_FAMILY = 2;
