@@ -111,7 +111,6 @@
 		F15766B91DAD9A1C00F21319 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F15766A71DAD9A1C00F21319 /* Images.xcassets */; };
 		F15766BA1DAD9A1C00F21319 /* RLMPuzzle.m in Sources */ = {isa = PBXBuildFile; fileRef = F15766AA1DAD9A1C00F21319 /* RLMPuzzle.m */; };
 		F15766BB1DAD9A1C00F21319 /* RLMPuzzlePiece.m in Sources */ = {isa = PBXBuildFile; fileRef = F15766AC1DAD9A1C00F21319 /* RLMPuzzlePiece.m */; };
-		F15766BC1DAD9A1C00F21319 /* AYVibrantButton.m in Sources */ = {isa = PBXBuildFile; fileRef = F15766AF1DAD9A1C00F21319 /* AYVibrantButton.m */; };
 		F15766BD1DAD9A1C00F21319 /* RLMPuzzlePieceView.m in Sources */ = {isa = PBXBuildFile; fileRef = F15766B11DAD9A1C00F21319 /* RLMPuzzlePieceView.m */; };
 		F15766BE1DAD9A1C00F21319 /* RLMPuzzleView.m in Sources */ = {isa = PBXBuildFile; fileRef = F15766B31DAD9A1C00F21319 /* RLMPuzzleView.m */; };
 		F15766BF1DAD9A1C00F21319 /* RLMStartView.m in Sources */ = {isa = PBXBuildFile; fileRef = F15766B51DAD9A1C00F21319 /* RLMStartView.m */; };
@@ -269,8 +268,6 @@
 		F15766AA1DAD9A1C00F21319 /* RLMPuzzle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzle.m; sourceTree = "<group>"; };
 		F15766AB1DAD9A1C00F21319 /* RLMPuzzlePiece.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzlePiece.h; sourceTree = "<group>"; };
 		F15766AC1DAD9A1C00F21319 /* RLMPuzzlePiece.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzlePiece.m; sourceTree = "<group>"; };
-		F15766AE1DAD9A1C00F21319 /* AYVibrantButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AYVibrantButton.h; sourceTree = "<group>"; };
-		F15766AF1DAD9A1C00F21319 /* AYVibrantButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AYVibrantButton.m; sourceTree = "<group>"; };
 		F15766B01DAD9A1C00F21319 /* RLMPuzzlePieceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzlePieceView.h; sourceTree = "<group>"; };
 		F15766B11DAD9A1C00F21319 /* RLMPuzzlePieceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzlePieceView.m; sourceTree = "<group>"; };
 		F15766B21DAD9A1C00F21319 /* RLMPuzzleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzleView.h; sourceTree = "<group>"; };
@@ -717,8 +714,6 @@
 		F15766AD1DAD9A1C00F21319 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				F15766AE1DAD9A1C00F21319 /* AYVibrantButton.h */,
-				F15766AF1DAD9A1C00F21319 /* AYVibrantButton.m */,
 				F15766B01DAD9A1C00F21319 /* RLMPuzzlePieceView.h */,
 				F15766B11DAD9A1C00F21319 /* RLMPuzzlePieceView.m */,
 				F15766B21DAD9A1C00F21319 /* RLMPuzzleView.h */,
@@ -1303,7 +1298,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F15766BC1DAD9A1C00F21319 /* AYVibrantButton.m in Sources */,
 				F15766BD1DAD9A1C00F21319 /* RLMPuzzlePieceView.m in Sources */,
 				F15766BE1DAD9A1C00F21319 /* RLMPuzzleView.m in Sources */,
 				F15766B61DAD9A1C00F21319 /* RLMPuzzleListViewController.m in Sources */,

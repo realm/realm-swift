@@ -23,22 +23,18 @@ typedef NS_ENUM(NSInteger, RLMPuzzlePieceIdentifier) {
     RLMPuzzlePieceIdentifierA2,
     RLMPuzzlePieceIdentifierA3,
     RLMPuzzlePieceIdentifierA4,
-    RLMPuzzlePieceIdentifierA5,
     RLMPuzzlePieceIdentifierB1,
     RLMPuzzlePieceIdentifierB2,
     RLMPuzzlePieceIdentifierB3,
     RLMPuzzlePieceIdentifierB4,
-    RLMPuzzlePieceIdentifierB5,
     RLMPuzzlePieceIdentifierC1,
     RLMPuzzlePieceIdentifierC2,
     RLMPuzzlePieceIdentifierC3,
     RLMPuzzlePieceIdentifierC4,
-    RLMPuzzlePieceIdentifierC5,
     RLMPuzzlePieceIdentifierD1,
     RLMPuzzlePieceIdentifierD2,
     RLMPuzzlePieceIdentifierD3,
     RLMPuzzlePieceIdentifierD4,
-    RLMPuzzlePieceIdentifierD5,
     RLMPuzzlePieceIdentifierNum
 };
 

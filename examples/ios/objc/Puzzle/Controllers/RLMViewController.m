@@ -24,7 +24,7 @@
 #import "RLMStartView.h"
 #import "RLMPuzzleListViewController.h"
 
-static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
+static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 
 @interface RLMViewController () <RLMPuzzleViewDelegate, UIAlertViewDelegate>
 
@@ -68,7 +68,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 735.0f;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor colorWithWhite:0.1f alpha:1.0f];
+    self.view.backgroundColor = [UIColor colorWithWhite:1.0f alpha:1.0f];
     
     //Scale the frame depending on screen size
     CGRect frame = CGRectZero;
