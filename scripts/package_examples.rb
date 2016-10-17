@@ -70,11 +70,14 @@ end
 
 # Update Playground imports and instructions
 
-playground_file = 'examples/ios/swift-2.2/GettingStarted.playground/Contents.swift'
-replace_in_file(playground_file, 'choose RealmSwift', 'choose PlaygroundFrameworkWrapper')
-replace_in_file(playground_file,
-                "import Foundation\n",
-                "import Foundation\nimport PlaygroundFrameworkWrapper // only necessary to use a binary release of Realm Swift in this playground.\n")
+playground_swift_versions = ['2.2', '3.0']
+playground_swift_versions.each do |swift_version|
+  playground_file = "examples/ios/swift-#{swift_version}/GettingStarted.playground/Contents.swift"
+  replace_in_file(playground_file, 'choose RealmSwift', 'choose PlaygroundFrameworkWrapper')
+  replace_in_file(playground_file,
+                  "import Foundation\n",
+                  "import Foundation\nimport PlaygroundFrameworkWrapper // only necessary to use a binary release of Realm Swift in this playground.\n")
+end
 
 # Update RubyMotion sample
 
