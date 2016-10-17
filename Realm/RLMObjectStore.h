@@ -56,7 +56,10 @@ typedef NS_OPTIONS(NSUInteger, RLMCreationOptions) {
 //
 
 // add an object to the given realm
-void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm, bool createOrUpdate);
+void RLMAddObjectToRealm(RLMObjectBase *object, RLMRealm *realm);
+    
+// adds or updates an object to the given realm
+void RLMAddOrUpdateObjectToRealm(RLMObjectBase *object, RLMRealm *realm, bool createOrUpdate);
 
 // delete an object from its realm
 void RLMDeleteObjectFromRealm(RLMObjectBase *object, RLMRealm *realm);

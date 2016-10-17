@@ -524,7 +524,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 - (void)addObject:(__unsafe_unretained RLMObject *const)object {
-    RLMAddObjectToRealm(object, self, false);
+    RLMAddObjectToRealm(object, self);
 }
 
 - (void)addObjects:(id<NSFastEnumeration>)array {
@@ -543,7 +543,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         @throw RLMException(@"'%@' does not have a primary key and can not be updated", object.objectSchema.className);
     }
 
-    RLMAddObjectToRealm(object, self, true);
+    RLMAddOrUpdateObjectToRealm(object, self, true);
 }
 
 - (void)addOrUpdateObjectsFromArray:(id)array {
