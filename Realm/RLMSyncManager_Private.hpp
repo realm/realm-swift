@@ -70,6 +70,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable RLMSyncUser *)_userForIdentity:(NSString *)identity;
 
+- (void)_handleBindRequestForSyncConfig:(RLMSyncConfiguration *)syncConfig
+                          localFilePath:(NSString *)filePathString;
+
 NS_ASSUME_NONNULL_END
 
 @end

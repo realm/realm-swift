@@ -110,15 +110,6 @@ static dispatch_once_t s_onceToken;
             [self _fireError:error];
         };
 
-        // Create the static login callback. This is called whenever any Realm wishes to BIND to the Realm Object Server
-        // for the first time.
-        SyncLoginFunction loginLambda = [=](const std::string& path, const SyncConfig& config) {
-            NSString *localFilePath = @(path.c_str());
-            RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:config];
-            [self _handleBindRequestForSyncConfig:syncConfig
-                                    localFilePath:localFilePath];
-        };
-
         _disableSSLValidation = NO;
         self.logLevel = RLMSyncLogLevelWarn;
         realm::SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
@@ -131,7 +122,6 @@ static dispatch_once_t s_onceToken;
 
         // Initialize the sync engine.
         SyncManager::shared().set_error_handler(errorLambda);
-        SyncManager::shared().set_login_function(loginLambda);
         NSString *metadataDirectory = [[self.fileManager fileURLForMetadata] path];
         bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION");
         _metadata_manager = std::make_unique<SyncMetadataManager>([metadataDirectory UTF8String], should_encrypt);
