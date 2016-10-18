@@ -185,7 +185,7 @@
 
 // FIXME: get these tests working reliably on CI
 /// A client should be able to open multiple Realms and add objects to each of them.
-- (void)DISABLED_testMultipleRealmsAddObjects {
+- (void)testMultipleRealmsAddObjects {
     NSURL *urlA = CUSTOM_REALM_URL(@"a");
     NSURL *urlB = CUSTOM_REALM_URL(@"b");
     NSURL *urlC = CUSTOM_REALM_URL(@"c");
@@ -225,7 +225,7 @@
 }
 
 /// A client should be able to open multiple Realms and delete objects from each of them.
-- (void)DISABLED_testMultipleRealmsDeleteObjects {
+- (void)testMultipleRealmsDeleteObjects {
     NSURL *urlA = CUSTOM_REALM_URL(@"a");
     NSURL *urlB = CUSTOM_REALM_URL(@"b");
     NSURL *urlC = CUSTOM_REALM_URL(@"c");
@@ -287,7 +287,7 @@
 
 // FIXME: figure out how to get this test to reliably pass.
 /// When a session opened by a Realm goes out of scope, it should stay alive long enough to finish any waiting uploads.
-- (void)DISABLED_testUploadChangesWhenRealmOutOfScope {
+- (void)testUploadChangesWhenRealmOutOfScope {
     const NSInteger OBJECT_COUNT = 10000;
     NSURL *url = REALM_URL();
     // Log in the user.
