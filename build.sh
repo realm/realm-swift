@@ -415,6 +415,8 @@ case "$COMMAND" in
 
     "reset-object-server")
         kill_object_server
+        # Add a short delay, so file system doesn't complain about files in use
+        sleep 1
         package="${source_root}/sync"
         for file in "$package"/realm-object-server-*; do
             if [ -d "$file" ]; then
@@ -826,6 +828,7 @@ case "$COMMAND" in
     "verify-osx-object-server")
         sh build.sh download-object-server
         sh build.sh test-osx-object-server
+        sh build.sh reset-object-server
         exit 0
         ;;
 

@@ -97,14 +97,18 @@ static NSURL *syncDirectoryForChildProcess() {
     NSAssert(realms.count == counts.count && realms.count == realmURLs.count,
              @"Test logic error: all array arguments must be the same size.");
     XCTestExpectation *checkCountExpectation = [self expectationWithDescription:@"Downloads should complete"];
-    for (NSUInteger i = 0; i < realms.count; i++) {
-        WAIT_FOR_DOWNLOAD(user, realmURLs[i]);
-    }
+    // FIXME: This double async dispatch seems to fix the issue where tests sporadically fail, but only on CI
+    // Figure out why this is happening, and come up with a better solution (refresh-based?).
     dispatch_async(dispatch_get_main_queue(), ^{
         for (NSUInteger i = 0; i < realms.count; i++) {
-            CHECK_COUNT([counts[i] integerValue], SyncObject, realms[i]);
+            WAIT_FOR_DOWNLOAD(user, realmURLs[i]);
         }
-        [checkCountExpectation fulfill];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            for (NSUInteger i = 0; i < realms.count; i++) {
+                CHECK_COUNT([counts[i] integerValue], SyncObject, realms[i]);
+            }
+            [checkCountExpectation fulfill];
+        });
     });
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
 }
@@ -209,11 +213,6 @@ static NSURL *syncDirectoryForChildProcess() {
         s_task = nil;
         XCTFail(@"Server did not start up within the allotted timeout interval.");
     }
-}
-
-+ (void)tearDown {
-    [s_task terminate];
-    [super tearDown];
 }
 
 + (void)runResetObjectServer:(BOOL)initial {
