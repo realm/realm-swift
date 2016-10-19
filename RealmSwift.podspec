@@ -25,7 +25,12 @@ Pod::Spec.new do |s|
   s.dependency                  'Realm', "= #{s.version}"
   s.source_files              = 'RealmSwift/*.swift'
   s.prepare_command           = 'sh build.sh set-swift-version'
-  s.preserve_paths            = %w(build.sh)
-  s.pod_target_xcconfig       = { 'SWIFT_WHOLE_MODULE_OPTIMIZATION' => 'YES',
-                                  'APPLICATION_EXTENSION_API_ONLY' => 'YES' }
+  xcconfig                    = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES',
+                                  'SWIFT_WHOLE_MODULE_OPTIMIZATION' => 'YES' }
+  if ENV['REALM_DISABLE_SYNC']
+    s.exclude_files           = 'RealmSwift/Sync.swift'
+    s.pod_target_xcconfig     = xcconfig
+  else
+    s.pod_target_xcconfig     = xcconfig.merge({ 'OTHER_SWIFT_FLAGS' => '-DREALM_ENABLE_SYNC' })
+  end
 end

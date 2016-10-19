@@ -975,6 +975,12 @@ case "$COMMAND" in
     # CocoaPods
     ######################################
     "cocoapods-setup")
+        if ! [ -z "${REALM_DISABLE_SYNC}" ]; then
+          touch Realm/RLMPlatform.h
+          sed -i.bak '/Sync/d' Realm/Realm.h
+          exit 0
+        fi
+
         if [ ! -d core ]; then
           sh build.sh download-sync
           rm core
