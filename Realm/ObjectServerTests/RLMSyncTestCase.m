@@ -96,21 +96,11 @@ static NSURL *syncDirectoryForChildProcess() {
                  expectedCounts:(NSArray<NSNumber *> *)counts {
     NSAssert(realms.count == counts.count && realms.count == realmURLs.count,
              @"Test logic error: all array arguments must be the same size.");
-    XCTestExpectation *checkCountExpectation = [self expectationWithDescription:@"Downloads should complete"];
-    // FIXME: This double async dispatch seems to fix the issue where tests sporadically fail, but only on CI
-    // Figure out why this is happening, and come up with a better solution (refresh-based?).
-    dispatch_async(dispatch_get_main_queue(), ^{
-        for (NSUInteger i = 0; i < realms.count; i++) {
-            WAIT_FOR_DOWNLOAD(user, realmURLs[i]);
-        }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            for (NSUInteger i = 0; i < realms.count; i++) {
-                CHECK_COUNT([counts[i] integerValue], SyncObject, realms[i]);
-            }
-            [checkCountExpectation fulfill];
-        });
-    });
-    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+    for (NSUInteger i = 0; i < realms.count; i++) {
+        WAIT_FOR_DOWNLOAD(user, realmURLs[i]);
+        [realms[i] refresh];
+        CHECK_COUNT([counts[i] integerValue], SyncObject, realms[i]);
+    }
 }
 
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {

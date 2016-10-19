@@ -409,6 +409,7 @@ case "$COMMAND" in
     "reset-object-server-between-tests")
         # Leave the server files alone to avoid 'bad_server_ident' errors
         rm -rf "~/Library/Application Support/xctest"
+        rm -rf "~/Library/Application Support/io.realm.TestHost"
         rm -rf "~/Library/Application Support/xctest-child"
         exit 0
         ;;
