@@ -981,9 +981,8 @@ case "$COMMAND" in
           mv sync-* core
         fi
 
-        if [[ "$2" != "swift" ]]; then
-          if [ ! -d Realm/ObjectStore/src ]; then
-            cat >&2 <<EOM
+        if [ ! -d Realm/ObjectStore/src ]; then
+          cat >&2 <<EOM
 
 
 ERROR: One of Realm's submodules is missing!
@@ -993,37 +992,34 @@ their entries in your Podfile.
 
 
 EOM
-            exit 1
-          fi
+          exit 1
+        fi
 
-          rm -rf include
-          mkdir -p include
-          mv core/include include/core
+        rm -rf include
+        mkdir -p include
+        mv core/include include/core
 
-          mkdir -p include/impl/apple
-          mkdir -p include/util/apple
-          cp Realm/*.hpp include
-          cp Realm/ObjectStore/src/*.hpp include
-          cp Realm/ObjectStore/src/impl/*.hpp include/impl
-          cp Realm/ObjectStore/src/impl/apple/*.hpp include/impl/apple
-          cp Realm/ObjectStore/src/util/*.hpp include/util
-          cp Realm/ObjectStore/src/util/apple/*.hpp include/util/apple
+        mkdir -p include/impl/apple
+        mkdir -p include/util/apple
+        cp Realm/*.hpp include
+        cp Realm/ObjectStore/src/*.hpp include
+        cp Realm/ObjectStore/src/impl/*.hpp include/impl
+        cp Realm/ObjectStore/src/impl/apple/*.hpp include/impl/apple
+        cp Realm/ObjectStore/src/util/*.hpp include/util
+        cp Realm/ObjectStore/src/util/apple/*.hpp include/util/apple
 
-          touch Realm/RLMPlatform.h
-          if [ -n "$COCOAPODS_VERSION" ]; then
-            # This variable is set for the prepare_command available
-            # from the 1.0 prereleases, which requires a different
-            # header layout within the header_mappings_dir.
-            cp Realm/*.h include
-          else
-            # For CocoaPods < 1.0, we need to scope the headers within
-            # the header_mappings_dir by another subdirectory to avoid
-            # Clang from complaining about non-modular headers.
-            mkdir -p include/Realm
-            cp Realm/*.h include/Realm
-          fi
+        touch Realm/RLMPlatform.h
+        if [ -n "$COCOAPODS_VERSION" ]; then
+          # This variable is set for the prepare_command available
+          # from the 1.0 prereleases, which requires a different
+          # header layout within the header_mappings_dir.
+          cp Realm/*.h include
         else
-          sh build.sh set-swift-version
+          # For CocoaPods < 1.0, we need to scope the headers within
+          # the header_mappings_dir by another subdirectory to avoid
+          # Clang from complaining about non-modular headers.
+          mkdir -p include/Realm
+          cp Realm/*.h include/Realm
         fi
         ;;
 
