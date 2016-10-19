@@ -75,7 +75,6 @@ static BOOL isValidRealmURL(NSURL *url) {
     auto loginLambda = [=](const std::string& path, const realm::SyncConfig& config) {
         NSString *localFilePath = @(path.c_str());
         RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:config];
-        NSLog(@"%@ %@", localFilePath, syncConfig);
         [[RLMSyncManager sharedManager] _handleBindRequestForSyncConfig:syncConfig
                                                           localFilePath:localFilePath];
     };
