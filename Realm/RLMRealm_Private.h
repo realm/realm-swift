@@ -47,8 +47,6 @@ void RLMRealmTranslateException(NSError **error);
 - (void)verifyThread;
 - (void)verifyNotificationsAreSupported;
 
-+ (NSString *)writeableTemporaryPathForFile:(NSString *)fileName;
-
 @end
 
 NS_ASSUME_NONNULL_END

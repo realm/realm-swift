@@ -1825,8 +1825,4 @@
     [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
-- (void)runBlock:(void (^)())block {
-    block();
-}
-
 @end
