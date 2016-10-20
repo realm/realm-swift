@@ -17,6 +17,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix an assertion failure when additional model classes are added and
   `deleteRealmIfMigrationNeeded` is enabled.
 
+* Fix a `BadTransactLog` exception when deleting an `RLMResults` in a synced
+  Realm.
+
 2.0.2 Release notes (2016-10-05)
 =============================================================
 
