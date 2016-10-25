@@ -50,6 +50,8 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 
 - (void)updatePuzzleState;
 
+- (void)resetGestureRecognized:(UIGestureRecognizer *)gestureRecognizer;
+
 @end
 
 @implementation RLMViewController
@@ -98,6 +100,11 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
     self.startView.connectButtonTapped = ^{
         [weakSelf connectToServer];
     };
+    
+    UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resetGestureRecognized:)];
+    tapRecognizer.numberOfTouchesRequired = 3;
+    tapRecognizer.numberOfTapsRequired = 2;
+    [self.view addGestureRecognizer:tapRecognizer];
 }
 
 - (BOOL)prefersStatusBarHidden
@@ -173,6 +180,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
         self.startView.alpha = 0.0f;
     } completion:^(BOOL complete) {
         [self.startView removeFromSuperview];
+        self.startView = nil;
         
         if (firstTime) {
             [self.puzzleView scramblePiecesAnimated];
@@ -234,6 +242,20 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 }
 
 #pragma mark - Notifications -
+- (void)resetGestureRecognized:(UITapGestureRecognizer *)gestureRecognizer
+{
+    if (self.startView) {
+        return;
+    }
+
+    UIAlertController *controller = [UIAlertController alertControllerWithTitle:@"Reset Puzzle" message:@"Do you want to re-shuffle the puzzle pieces?" preferredStyle:UIAlertControllerStyleAlert];
+    [controller addAction:[UIAlertAction actionWithTitle:@"Yes" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self.puzzleView scramblePiecesAnimated];
+    }]];
+    [controller addAction:[UIAlertAction actionWithTitle:@"No" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:controller animated:YES completion:nil];
+}
+
 - (void)setupNotifications
 {
     __weak typeof(self) weakSelf = self;

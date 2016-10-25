@@ -41,8 +41,6 @@
     if (self = [super initWithFrame:frame])
     {
         self.backgroundColor = [UIColor colorWithWhite:0.9f alpha:1.0f];
-        //self.layer.borderColor = [UIColor colorWithWhite:0.7f alpha:1.0f].CGColor;
-        //self.layer.borderWidth = 1.0f;
     }
         
     return self;
@@ -89,21 +87,21 @@
 {
     switch (piece) {
         case RLMPuzzlePieceIdentifierA1: return CGPointMake(0,0);
-        case RLMPuzzlePieceIdentifierA2: return CGPointMake(193,0);
-        case RLMPuzzlePieceIdentifierA3: return CGPointMake(318,-0.5f);
-        case RLMPuzzlePieceIdentifierA4: return CGPointMake(572,0);
-        case RLMPuzzlePieceIdentifierB1: return CGPointMake(-0.0f,124);
-        case RLMPuzzlePieceIdentifierB2: return CGPointMake(1260,190);
-        case RLMPuzzlePieceIdentifierB3: return CGPointMake(386,121);
-        case RLMPuzzlePieceIdentifierB4: return CGPointMake(504,190);
-        case RLMPuzzlePieceIdentifierC1: return CGPointMake(-0.0f,382);
-        case RLMPuzzlePieceIdentifierC2: return CGPointMake(191,316);
-        case RLMPuzzlePieceIdentifierC3: return CGPointMake(315.5,383.5);
-        case RLMPuzzlePieceIdentifierC4: return CGPointMake(574,313.5);
-        case RLMPuzzlePieceIdentifierD1: return CGPointMake(0.0,508);
-        case RLMPuzzlePieceIdentifierD2: return CGPointMake(124,576);
-        case RLMPuzzlePieceIdentifierD3: return CGPointMake(385.5,506);
-        case RLMPuzzlePieceIdentifierD4: return CGPointMake(393,557);
+        case RLMPuzzlePieceIdentifierA2: return CGPointMake(190,0);
+        case RLMPuzzlePieceIdentifierA3: return CGPointMake(313.5,0);
+        case RLMPuzzlePieceIdentifierA4: return CGPointMake(573,0);
+        case RLMPuzzlePieceIdentifierB1: return CGPointMake(0,121);
+        case RLMPuzzlePieceIdentifierB2: return CGPointMake(122.5f,188.5f);
+        case RLMPuzzlePieceIdentifierB3: return CGPointMake(381.5,120.5f);
+        case RLMPuzzlePieceIdentifierB4: return CGPointMake(505,188.5f);
+        case RLMPuzzlePieceIdentifierC1: return CGPointMake(0.0f,380.5f);
+        case RLMPuzzlePieceIdentifierC2: return CGPointMake(189.5f,312.5f);
+        case RLMPuzzlePieceIdentifierC3: return CGPointMake(314,381);
+        case RLMPuzzlePieceIdentifierC4: return CGPointMake(573,313.5);
+        case RLMPuzzlePieceIdentifierD1: return CGPointMake(0.0,505);
+        case RLMPuzzlePieceIdentifierD2: return CGPointMake(122.5,575);
+        case RLMPuzzlePieceIdentifierD3: return CGPointMake(382,505);
+        case RLMPuzzlePieceIdentifierD4: return CGPointMake(506.5,573.5);
     }
     
     return CGPointZero;
