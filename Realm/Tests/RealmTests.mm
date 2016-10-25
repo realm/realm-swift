@@ -1339,7 +1339,7 @@
     XCTAssertNil([results maxOfProperty:@"intCol"]);
     XCTAssertNil([results minOfProperty:@"intCol"]);
     XCTAssertNil([results averageOfProperty:@"intCol"]);
-    XCTAssertNil([results sumOfProperty:@"intCol"]);
+    XCTAssertEqualObjects(@0, [results sumOfProperty:@"intCol"]);
     XCTAssertNil([results firstObject]);
     XCTAssertNil([results lastObject]);
     for (__unused id obj in results) {

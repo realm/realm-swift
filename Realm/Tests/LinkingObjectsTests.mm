@@ -53,6 +53,37 @@
     XCTAssertEqualObjects(asArray(hannahsParents), (@[ ]));
 }
 
+- (void)testLinkingObjectsOnUnmanagedObject {
+    PersonObject *don = [[PersonObject alloc] initWithValue:@[ @"Don", @60, @[] ]];
+
+    XCTAssertEqual(0u, don.parents.count);
+    XCTAssertNil(don.parents.firstObject);
+    XCTAssertNil(don.parents.lastObject);
+
+    for (__unused id parent in don.parents) {
+        XCTFail(@"Got an item in empty linking objects");
+    }
+
+    XCTAssertEqual(0u, [don.parents sortedResultsUsingProperty:@"age" ascending:YES].count);
+    XCTAssertEqual(0u, [don.parents objectsWhere:@"TRUEPREDICATE"].count);
+
+    XCTAssertNil([don.parents minOfProperty:@"age"]);
+    XCTAssertNil([don.parents maxOfProperty:@"age"]);
+    XCTAssertEqualObjects(@0, [don.parents sumOfProperty:@"age"]);
+    XCTAssertNil([don.parents averageOfProperty:@"age"]);
+
+    XCTAssertEqualObjects(@[], [don.parents valueForKey:@"age"]);
+    XCTAssertEqualObjects(@0, [don.parents valueForKeyPath:@"@count"]);
+    XCTAssertNil([don.parents valueForKeyPath:@"@min.age"]);
+    XCTAssertNil([don.parents valueForKeyPath:@"@max.age"]);
+    XCTAssertEqualObjects(@0, [don.parents valueForKeyPath:@"@sum.age"]);
+    XCTAssertNil([don.parents valueForKeyPath:@"@avg.age"]);
+
+    PersonObject *mark = [[PersonObject alloc] initWithValue:@[ @"Mark", @30, @[] ]];
+    XCTAssertEqual(NSNotFound, [don.parents indexOfObject:mark]);
+    XCTAssertEqual(NSNotFound, [don.parents indexOfObjectWhere:@"TRUEPREDICATE"]);
+}
+
 - (void)testFilteredLinkingObjects {
     NSArray *(^asArray)(id) = ^(id arrayLike) {
         return [arrayLike valueForKeyPath:@"self"];
