@@ -17,8 +17,11 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMStartView.h"
+#import "Constants.h"
 
 @interface RLMStartView () <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate>
+
+@property (nonatomic, strong) UIImageView *logoView;
 
 @property (nonatomic, strong) UITableView *tableView;
 @property (nonatomic, strong) UIImageView *topCellBackgroundView;
@@ -29,13 +32,17 @@
 @property (nonatomic, strong) UITextField *passwordField;
 
 @property (nonatomic, strong) UIButton *connectButton;
-
 @property (nonatomic, strong) UIActivityIndicatorView *activityindicator;
+
+@property (nonatomic, assign) CGFloat keyboardHeight;
 
 - (void)buttonTapped:(id)sender;
 - (UITextField *)newTextField;
 
 + (UIImage *)cellBackgroundImageBottom:(BOOL)bottom;
+
+- (void)keyboardWillShow:(NSNotification *)notification;
+- (void)keyboardWillHide:(NSNotification *)notification;
 
 @end
 
@@ -53,21 +60,38 @@
 
 - (void)didMoveToSuperview
 {
+    if (self.superview) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    }
+    else {
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+    }
+
+    if (self.logoView == nil) {
+        self.logoView = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"RealmLogo"]];
+        [self addSubview:self.logoView];
+    }
+
     if (self.tableView == nil) {
-        self.tableView = [[UITableView alloc] initWithFrame:(CGRect){CGPointZero, (CGSize){520.0f, 64.0f*3.0f}} style:UITableViewStylePlain];
+        self.tableView = [[UITableView alloc] initWithFrame:(CGRect){CGPointZero, (CGSize){520.0f, 54.0f*3.0f}} style:UITableViewStylePlain];
         self.tableView.backgroundColor = [UIColor clearColor];
         self.tableView.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin
                                             | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
         self.tableView.dataSource = self;
         self.tableView.delegate = self;
-        self.tableView.tableFooterView = [[UIView alloc] init]; // suppress bottom separator
         self.tableView.scrollEnabled = NO;
-        self.tableView.rowHeight = 64.0f;
+        self.tableView.rowHeight = 54.0f;
         self.tableView.layer.shadowRadius = 20.0f;
         self.tableView.layer.shadowOpacity = 0.1f;
         self.tableView.layer.shadowPath = [UIBezierPath bezierPathWithRoundedRect:self.tableView.frame cornerRadius:20.0f].CGPath;
         self.tableView.clipsToBounds = NO;
         [self.contentView addSubview:self.tableView];
+        
+        //Suppress the separator line at the bottom
+        UIView *fillerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,1,1)];
+        self.tableView.tableFooterView = fillerView;
     }
     
     if (self.topCellBackgroundView == nil) {
@@ -83,6 +107,11 @@
     if (self.hostNameField == nil) {
         self.hostNameField = [self newTextField];
         self.hostNameField.placeholder = @"localhost";
+#if !(TARGET_IPHONE_SIMULATOR)
+        if (kLocalIPAddress.length > 0) {
+            self.hostNameField.text = kLocalIPAddress;
+        }
+#endif
     }
     
     if (self.userNameField == nil) {
@@ -128,12 +157,21 @@
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    self.tableView.center = self.center;
+    
+    CGPoint center = self.center;
+    center.y -= (self.keyboardHeight) * 0.5f;
+    
+    self.tableView.center = center;
     
     CGRect frame = self.connectButton.frame;
     frame.origin.x = self.tableView.frame.origin.x;
-    frame.origin.y = CGRectGetMaxY(self.tableView.frame) + 40;
+    frame.origin.y = CGRectGetMaxY(self.tableView.frame) + 30;
     self.connectButton.frame = frame;
+    
+    self.logoView.center = center;
+    frame = self.logoView.frame;
+    frame.origin.y = CGRectGetMinY(self.tableView.frame) - (CGRectGetHeight(frame) + 30);
+    self.logoView.frame = frame;
     
     self.activityindicator.center = self.connectButton.center;
 }
@@ -195,6 +233,27 @@
     if (self.connectButtonTapped) {
         self.connectButtonTapped();
     }
+}
+
+- (void)keyboardWillShow:(NSNotification *)notification
+{
+    CGRect endFrame = [notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    self.keyboardHeight = endFrame.size.height;
+
+    [self setNeedsLayout];
+    [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.1f options:0 animations:^{
+        [self layoutIfNeeded];
+    } completion:nil];
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification
+{
+    self.keyboardHeight = 0.0f;
+
+    [self setNeedsLayout];
+    [UIView animateWithDuration:0.5f delay:0.0f usingSpringWithDamping:1.0f initialSpringVelocity:0.1f options:0 animations:^{
+        [self layoutIfNeeded];
+    } completion:nil];
 }
 
 #pragma mark - Accessors -

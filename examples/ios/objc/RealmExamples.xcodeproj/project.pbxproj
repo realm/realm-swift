@@ -276,6 +276,7 @@
 		F15766B51DAD9A1C00F21319 /* RLMStartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMStartView.m; sourceTree = "<group>"; };
 		F15766C01DAD9B0000F21319 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/RealmExamples-gsjamjmqammcffbjztqzisbumbqs/Build/Products/Debug-iphonesimulator-static/Realm.framework"; sourceTree = "<group>"; };
 		F15766C41DAD9B2900F21319 /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		F1B658881DBE87AA00A3264F /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		F1F2395E1DB2C2CD0027F30B /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../build/Debug-static/Realm.framework"; sourceTree = "<group>"; };
 		F1F239601DB2C2E80027F30B /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../../../Library/Developer/Xcode/DerivedData/RealmExamples-gsjamjmqammcffbjztqzisbumbqs/Build/Products/Debug-iphoneos/Realm.framework"; sourceTree = "<group>"; };
 		F1F239621DB2C32B0027F30B /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../build/Debug-static/Realm.framework"; sourceTree = "<group>"; };
@@ -673,6 +674,7 @@
 				F15766A71DAD9A1C00F21319 /* Images.xcassets */,
 				F15766A81DAD9A1C00F21319 /* Models */,
 				F15766AD1DAD9A1C00F21319 /* Views */,
+				F1B658881DBE87AA00A3264F /* Constants.h */,
 				F157668D1DAD996400F21319 /* AppDelegate.h */,
 				F157668E1DAD996400F21319 /* AppDelegate.m */,
 				F157669B1DAD996400F21319 /* Info.plist */,
@@ -940,6 +942,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F157669E1DAD996400F21319 /* Build configuration list for PBXNativeTarget "Puzzle" */;
 			buildPhases = (
+				F1B658871DBE875B00A3264F /* Write IP Address */,
 				F15766841DAD996400F21319 /* Sources */,
 				F15766851DAD996400F21319 /* Frameworks */,
 				F15766861DAD996400F21319 /* Resources */,
@@ -1200,6 +1203,20 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
+		};
+		F1B658871DBE875B00A3264F /* Write IP Address */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Write IP Address";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "LOCAL_IP_ADDR=$(ipconfig getifaddr $(netstat -f inet -rant | awk '/default/ { print $6; exit }'))\necho \"static NSString * const kLocalIPAddress = @\\\"$LOCAL_IP_ADDR\\\";\" > \"$SRCROOT/Puzzle/Constants.h\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
