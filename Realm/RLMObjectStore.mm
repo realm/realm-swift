@@ -301,6 +301,10 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
 
     // populate all properties
     for (RLMProperty *prop in info.rlmObjectSchema.properties) {
+        // skip primary key when updating since it doesn't change
+        if (prop.isPrimary)
+            continue;
+
         // get object from ivar using key value coding
         id value = nil;
         if (prop.swiftIvar) {
@@ -330,10 +334,6 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
                 ((void(*)(id, SEL, id))objc_msgSend)(object, prop.setterSel, nil);
             }
         }
-
-        // skip primary key when updating since it doesn't change
-        if (prop.isPrimary)
-            continue;
 
         // set in table with out validation
         RLMDynamicSet(object, prop, RLMCoerceToNil(value), creationOptions);
