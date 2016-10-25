@@ -20,6 +20,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix a `BadTransactLog` exception when deleting an `RLMResults` in a synced
   Realm.
 
+* Fix an assertion failure when a write transaction is in progress at the point
+  of process termination.
+
 2.0.2 Release notes (2016-10-05)
 =============================================================
 
