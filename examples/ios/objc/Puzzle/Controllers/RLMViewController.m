@@ -177,6 +177,10 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
         if (firstTime) {
             [self.puzzleView scramblePiecesAnimated];
         }
+        else {
+            [self updatePuzzleState];
+        }
+        
         [self setupNotifications];
     }];
 }

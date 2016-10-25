@@ -25,4 +25,9 @@
     return @{@"userID":@""};
 }
 
++ (NSString *)primaryKey
+{
+    return @"identifier";
+}
+
 @end
