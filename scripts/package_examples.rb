@@ -46,8 +46,13 @@ examples = [
   "examples/tvos/swift-3.0.1",
 ]
 
-# Remove reference to Realm.xcodeproj from all example workspaces.
+# Remove reference to Realm.xcodeproj from all example workspaces and realize symlinks.
 examples.each do |example|
+  if File.lstat(example).symlink?
+    real_example = File.readlink(example)
+    File.rm(example)
+    File.cp_r(real_example, example)
+  end
   remove_reference_to_realm_xcode_project("#{example}/RealmExamples.xcworkspace")
 end
 
