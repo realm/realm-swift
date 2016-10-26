@@ -119,18 +119,16 @@
 
 - (void)scramblePiecesAnimated
 {
-    CGRect frame = self.superview.bounds;
-    frame.origin.x += 75.0f;
-    frame.origin.y += 75.0f;
-    frame.size.width -= (75 * 2);
-    frame.size.height -= (75 * 2);
+    CGRect frame = self.bounds;
+    frame.origin.x -= 75.0f;
+    frame.size.width += (75 * 2);
     
     //Work out the random placement before animating so the delegate can be informed at the same time
     NSMutableArray *points = [NSMutableArray array];
     for (NSInteger pieceIndex = RLMPuzzlePieceIdentifierA1; pieceIndex < RLMPuzzlePieceIdentifierNum; pieceIndex++) {
         CGPoint point = CGPointZero;
-        point.x = arc4random() % (NSInteger)((frame.origin.x+frame.size.width)-frame.origin.x);
-        point.y = arc4random() % (NSInteger)((frame.origin.y+frame.size.height)-frame.origin.y);
+        point.x = frame.origin.x + arc4random_uniform(frame.size.width);
+        point.y = frame.origin.y + arc4random_uniform(frame.size.height);
         [points addObject:[NSValue valueWithCGPoint:point]];
         
         if ([self.delegate respondsToSelector:@selector(puzzleView:pieceMoved:toPoint:)]) {
