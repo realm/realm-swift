@@ -105,8 +105,6 @@
 		F157668C1DAD996400F21319 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F157668B1DAD996400F21319 /* main.m */; };
 		F157668F1DAD996400F21319 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F157668E1DAD996400F21319 /* AppDelegate.m */; };
 		F157669F1DAD99D000F21319 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
-		F15766B61DAD9A1C00F21319 /* RLMPuzzleListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F15766A21DAD9A1C00F21319 /* RLMPuzzleListViewController.m */; };
-		F15766B71DAD9A1C00F21319 /* RLMPuzzlesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F15766A41DAD9A1C00F21319 /* RLMPuzzlesTableViewController.m */; };
 		F15766B81DAD9A1C00F21319 /* RLMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F15766A61DAD9A1C00F21319 /* RLMViewController.m */; };
 		F15766B91DAD9A1C00F21319 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F15766A71DAD9A1C00F21319 /* Images.xcassets */; };
 		F15766BA1DAD9A1C00F21319 /* RLMPuzzle.m in Sources */ = {isa = PBXBuildFile; fileRef = F15766AA1DAD9A1C00F21319 /* RLMPuzzle.m */; };
@@ -257,10 +255,6 @@
 		F157668D1DAD996400F21319 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		F157668E1DAD996400F21319 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		F157669B1DAD996400F21319 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F15766A11DAD9A1C00F21319 /* RLMPuzzleListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzleListViewController.h; sourceTree = "<group>"; };
-		F15766A21DAD9A1C00F21319 /* RLMPuzzleListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzleListViewController.m; sourceTree = "<group>"; };
-		F15766A31DAD9A1C00F21319 /* RLMPuzzlesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzlesTableViewController.h; sourceTree = "<group>"; };
-		F15766A41DAD9A1C00F21319 /* RLMPuzzlesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzlesTableViewController.m; sourceTree = "<group>"; };
 		F15766A51DAD9A1C00F21319 /* RLMViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMViewController.h; sourceTree = "<group>"; };
 		F15766A61DAD9A1C00F21319 /* RLMViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMViewController.m; sourceTree = "<group>"; };
 		F15766A71DAD9A1C00F21319 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -694,10 +688,6 @@
 		F15766A01DAD9A1C00F21319 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				F15766A11DAD9A1C00F21319 /* RLMPuzzleListViewController.h */,
-				F15766A21DAD9A1C00F21319 /* RLMPuzzleListViewController.m */,
-				F15766A31DAD9A1C00F21319 /* RLMPuzzlesTableViewController.h */,
-				F15766A41DAD9A1C00F21319 /* RLMPuzzlesTableViewController.m */,
 				F15766A51DAD9A1C00F21319 /* RLMViewController.h */,
 				F15766A61DAD9A1C00F21319 /* RLMViewController.m */,
 			);
@@ -1324,8 +1314,6 @@
 			files = (
 				F15766BD1DAD9A1C00F21319 /* RLMPuzzlePieceView.m in Sources */,
 				F15766BE1DAD9A1C00F21319 /* RLMPuzzleView.m in Sources */,
-				F15766B61DAD9A1C00F21319 /* RLMPuzzleListViewController.m in Sources */,
-				F15766B71DAD9A1C00F21319 /* RLMPuzzlesTableViewController.m in Sources */,
 				F157668F1DAD996400F21319 /* AppDelegate.m in Sources */,
 				F15766B81DAD9A1C00F21319 /* RLMViewController.m in Sources */,
 				F15766BB1DAD9A1C00F21319 /* RLMPuzzlePiece.m in Sources */,

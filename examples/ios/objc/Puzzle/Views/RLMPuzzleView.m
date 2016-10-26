@@ -102,6 +102,7 @@
         case RLMPuzzlePieceIdentifierD2: return CGPointMake(122.5,575);
         case RLMPuzzlePieceIdentifierD3: return CGPointMake(382,505);
         case RLMPuzzlePieceIdentifierD4: return CGPointMake(506.5,573.5);
+        default: break;
     }
     
     return CGPointZero;
@@ -173,7 +174,6 @@
         self.draggingView = pieceView;
     }
     else if (gestureRecognizer.state == UIGestureRecognizerStateEnded) {
-        [pieceView touchesEnded:nil withEvent:nil];
         self.draggingView = nil;
     }
     

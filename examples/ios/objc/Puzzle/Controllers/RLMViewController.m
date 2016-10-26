@@ -24,10 +24,8 @@
 #import "RLMPuzzlePiece.h"
 #import "RLMPuzzleView.h"
 #import "RLMStartView.h"
-#import "RLMPuzzleListViewController.h"
 
-static NSString *UUID = @"7387fa06-dffa-4891-97e1-9e35c3898658";
-
+static NSString *kRLMPuzzleUUID = @"7387fa06-dffa-4891-97e1-9e35c3898658";
 static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 
 @interface RLMViewController () <RLMPuzzleViewDelegate, UIAlertViewDelegate>
@@ -46,8 +44,6 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 
 - (void)connectToServer;
 - (void)startPuzzle;
-- (void)joinExistingPuzzle;
-
 - (void)updatePuzzleState;
 
 - (void)resetGestureRecognized:(UIGestureRecognizer *)gestureRecognizer;
@@ -136,10 +132,10 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
         [RLMRealmConfiguration setDefaultConfiguration:configuration];
         
         RLMRealm *realm = [RLMRealm defaultRealm];
-        RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:UUID];
+        RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:kRLMPuzzleUUID];
         if (!puzzle) {
             RLMPuzzle *puzzle = [[RLMPuzzle alloc] init];
-            puzzle.uuid = UUID;
+            puzzle.uuid = kRLMPuzzleUUID;
             [realm transactionWithBlock:^{
                 [realm addObject:puzzle];
             }];
@@ -153,7 +149,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 - (void)startPuzzle
 {
     //Create the over-arching puzzle object
-    RLMPuzzle *newPuzzle = [RLMPuzzle objectForPrimaryKey:UUID];
+    RLMPuzzle *newPuzzle = [RLMPuzzle objectForPrimaryKey:kRLMPuzzleUUID];
     self.currentPuzzleID = newPuzzle.uuid;
     
     BOOL firstTime = NO;
@@ -191,29 +187,6 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
         
         [self setupNotifications];
     }];
-}
-
-- (void)joinExistingPuzzle
-{
-    RLMPuzzleListViewController *puzzleListController = [[RLMPuzzleListViewController alloc] init];
-    UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:puzzleListController];
-    navController.modalPresentationStyle = UIModalPresentationFormSheet;
-    [self presentViewController:navController animated:YES completion:nil];
-    
-    __weak typeof(self) weakSelf = self;
-    puzzleListController.puzzleChosenHandler = ^(RLMPuzzle *puzzle) {
-        weakSelf.currentPuzzleID = puzzle.uuid;
-        [weakSelf updatePuzzleState];
-        
-        [self dismissViewControllerAnimated:YES completion:nil];
-        
-        [UIView animateWithDuration:0.5f animations:^{
-            weakSelf.startView.alpha = 0.0f;
-        } completion:^(BOOL complete) {
-            [weakSelf.startView removeFromSuperview];
-             [self setupNotifications];
-        }];
-    };
 }
 
 - (void)updatePuzzleState
