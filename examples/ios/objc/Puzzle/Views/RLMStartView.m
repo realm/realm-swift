@@ -19,6 +19,9 @@
 #import "RLMStartView.h"
 #import "Constants.h"
 
+static NSString * const kRLMPuzzleUserNameKey = @"RLMPuzzleUserNameKey";
+static NSString * const kRLMPuzzlePasswordKey = @"RLMPuzzlePasswordKey";
+
 @interface RLMStartView () <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate>
 
 @property (nonatomic, strong) UIImageView *logoView;
@@ -117,12 +120,22 @@
     if (self.userNameField == nil) {
         self.userNameField = [self newTextField];
         self.userNameField.placeholder = @"demo@realm.io";
+        
+        NSString *userName = [[NSUserDefaults standardUserDefaults] stringForKey:kRLMPuzzleUserNameKey];
+        if (userName.length > 0) {
+            self.userNameField.text = userName;
+        }
     }
     
     if (self.passwordField == nil) {
         self.passwordField = [self newTextField];
         self.passwordField.placeholder = @"password";
         self.passwordField.secureTextEntry = YES;
+        
+        NSString *password = [[NSUserDefaults standardUserDefaults] stringForKey:kRLMPuzzlePasswordKey];
+        if (password.length > 0) {
+            self.passwordField.text = password;
+        }
     }
     
     if (self.connectButton == nil) {
@@ -142,6 +155,13 @@
         self.activityindicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
         self.activityindicator.hidden = YES;
         [self addSubview:self.activityindicator];
+    }
+    
+    if (self.superview == nil) {
+        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+        [defaults setObject:self.userNameField.text forKey:kRLMPuzzleUserNameKey];
+        [defaults setObject:self.passwordField.text forKey:kRLMPuzzlePasswordKey];
+        [defaults synchronize];
     }
 }
 
