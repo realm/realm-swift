@@ -171,6 +171,7 @@ static NSString * const kRLMPuzzlePasswordKey = @"RLMPuzzlePasswordKey";
     textField.delegate = self;
     textField.font = [UIFont systemFontOfSize:20.0f];
     textField.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    textField.autocapitalizationType = UITextAutocapitalizationTypeNone;
     return textField;
 }
 
