@@ -95,11 +95,11 @@
         case RLMPuzzlePieceIdentifierB3: return CGPointMake(381.5,120.5f);
         case RLMPuzzlePieceIdentifierB4: return CGPointMake(505,188.5f);
         case RLMPuzzlePieceIdentifierC1: return CGPointMake(0.0f,380.5f);
-        case RLMPuzzlePieceIdentifierC2: return CGPointMake(189.5f,312.5f);
-        case RLMPuzzlePieceIdentifierC3: return CGPointMake(314,381);
+        case RLMPuzzlePieceIdentifierC2: return CGPointMake(190.0f,313.0f);
+        case RLMPuzzlePieceIdentifierC3: return CGPointMake(314.5f,380);
         case RLMPuzzlePieceIdentifierC4: return CGPointMake(573,313.5);
         case RLMPuzzlePieceIdentifierD1: return CGPointMake(0.0,505);
-        case RLMPuzzlePieceIdentifierD2: return CGPointMake(122.5,575);
+        case RLMPuzzlePieceIdentifierD2: return CGPointMake(122.5,572.5);
         case RLMPuzzlePieceIdentifierD3: return CGPointMake(382,505);
         case RLMPuzzlePieceIdentifierD4: return CGPointMake(506.5,573.5);
         default: break;
