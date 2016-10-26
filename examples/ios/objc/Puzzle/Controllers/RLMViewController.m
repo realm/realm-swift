@@ -103,7 +103,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
     
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(resetGestureRecognized:)];
     tapRecognizer.numberOfTouchesRequired = 3;
-    tapRecognizer.numberOfTapsRequired = 2;
+    tapRecognizer.numberOfTapsRequired = 3;
     [self.view addGestureRecognizer:tapRecognizer];
 }
 
