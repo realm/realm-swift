@@ -257,6 +257,7 @@
 		F18464621DC16CDA00DAB8B9 /* SwatchesView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchesView.m; sourceTree = "<group>"; };
 		F18464681DC16D3700DAB8B9 /* CanvasView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CanvasView.h; sourceTree = "<group>"; };
 		F18464691DC16D3700DAB8B9 /* CanvasView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CanvasView.m; sourceTree = "<group>"; };
+		F18DC0A31DC2AFCB007D2D69 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -615,6 +616,7 @@
 				F18464571DC16CD900DAB8B9 /* Models */,
 				F184645E1DC16CDA00DAB8B9 /* Views */,
 				F18464561DC1597C00DAB8B9 /* Draw.entitlements */,
+				F18DC0A31DC2AFCB007D2D69 /* Constants.h */,
 				F18464351DC151F000DAB8B9 /* AppDelegate.h */,
 				F18464361DC151F000DAB8B9 /* AppDelegate.m */,
 				F184643F1DC151F000DAB8B9 /* Images.xcassets */,
@@ -833,6 +835,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F18464331DC151CD00DAB8B9 /* Build configuration list for PBXNativeTarget "Draw" */;
 			buildPhases = (
+				F18DC0A41DC2B197007D2D69 /* Get Device IP Address */,
 				F18464191DC151CD00DAB8B9 /* Sources */,
 				F184641A1DC151CD00DAB8B9 /* Frameworks */,
 				F184641B1DC151CD00DAB8B9 /* Resources */,
@@ -1060,6 +1063,20 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
+		};
+		F18DC0A41DC2B197007D2D69 /* Get Device IP Address */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Get Device IP Address";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "LOCAL_IP_ADDR=$(ipconfig getifaddr $(netstat -f inet -rant | awk '/default/ { print $6; exit }'))\necho \"static NSString * const kIPAddress = @\\\"$LOCAL_IP_ADDR\\\";\" > \"$SRCROOT/Draw/Constants.h\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 

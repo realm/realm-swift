@@ -19,11 +19,18 @@
 #import "AppDelegate.h"
 #import <Realm/Realm.h>
 #import "DrawView.h"
+#import "Constants.h"
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+#if TARGET_IPHONE_SIMULATOR
+    NSString *ipAddress = @"localhost";
+#else
+    NSString *ipAddress = kIPAddress;
+#endif
+
     application.applicationSupportsShakeToEdit = YES;
     
     // Setup Global Error Handler
@@ -34,7 +41,7 @@
     [RLMSyncManager sharedManager].errorHandler = globalErrorHandler;
     
     if ([RLMSyncUser all].count > 0) {
-        NSURL *syncURL = [NSURL URLWithString:@"realm://127.0.0.1:9080/~/Draw"];
+        NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", ipAddress]];
         RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:[RLMSyncUser all].firstObject realmURL:syncURL];
         RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
         defaultConfig.syncConfiguration = syncConfig;
@@ -43,7 +50,7 @@
     else {
         // The base server path
         // Set to connect to local or online host
-        NSURL *authURL = [NSURL URLWithString:@"http://127.0.0.1:9080"];
+        NSURL *authURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:9080/~/Draw", ipAddress]];
         
         // Creating a debug credential since this demo is just using the generated access token
         // produced when running the Realm Object Server via the `start-object-server.command`
@@ -62,7 +69,7 @@
                                            // The Realm virtual path on the server.
                                            // The `~` represents the Realm user ID. Since the user ID is not known until you
                                            // log in, the ~ is used as short-hand to represent this.
-                                           NSURL *syncURL = [NSURL URLWithString:@"realm://127.0.0.1:9080/~/Draw"];
+                                           NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", ipAddress]];
                                            RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:syncURL];
                                            RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
                                            defaultConfig.syncConfiguration = syncConfig;
