@@ -61,6 +61,8 @@ framework_directory_for_example = {
   'examples/tvos/objc' => '../../../tvos',
   'examples/ios/swift-2.2' => '../../../ios/swift-2.2',
   'examples/tvos/swift-2.2' => '../../../tvos/swift-2.2',
+  'examples/ios/swift-3.0.1' => '../../../ios/swift-3.0.1',
+  'examples/tvos/swift-3.0.1' => '../../../tvos/swift-3.0.1',
   'examples/ios/swift-3.0' => '../../../ios/swift-3.0',
   'examples/tvos/swift-3.0' => '../../../tvos/swift-3.0',
 }
