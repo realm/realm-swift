@@ -105,6 +105,20 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (NSArray<RLMSyncSession *> *)allSessions;
 
+/**
+ Retrieve special realm for the permission management.
+ */
+- (RLMRealm *)managementRealm NS_REFINED_FOR_SWIFT;
+
+/**
+ Retrieve special realm for the permission management.
+
+ @param error If an error occurs, upon return contains an `NSError` object
+ that describes the problem. If you are not interested in
+ possible errors, pass in `NULL`.
+ */
+- (RLMRealm *)managementRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
+
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));
 

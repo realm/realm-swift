@@ -20,8 +20,12 @@
 
 #import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
+#import "RLMRealmConfiguration+Sync.h"
+#import "RLMRealmConfiguration_Private.hpp"
+#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
+#import "RLMSyncPermissionChange.h"
 #import "RLMSyncSession_Private.h"
 #import "RLMSyncSessionHandle.hpp"
 #import "RLMTokenModels.h"
@@ -134,6 +138,27 @@ using namespace realm;
         }
     }
     return [buffer copy];
+}
+
+- (RLMRealm *)managementRealm {
+    return [self managementRealmWithError:nil];
+}
+
+- (RLMRealm *)managementRealmWithError:(NSError **)error {
+    NSURLComponents *components = [NSURLComponents componentsWithURL:self.authenticationServer resolvingAgainstBaseURL:NO];
+    components.scheme = @"realm";
+    components.path = @"/~/__management";
+
+    NSURL *managementRealmURL = components.URL;
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self realmURL:managementRealmURL];
+    config.syncConfiguration = syncConfig;
+    config.objectClasses = @[RLMSyncPermissionChange.class];
+
+    config.schemaMode = realm::SchemaMode::Additive;
+
+    return [RLMRealm realmWithConfiguration:config error:error];
 }
 
 
