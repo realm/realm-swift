@@ -32,6 +32,8 @@
 #import <Realm/RLMSyncConfiguration.h>
 #import <Realm/RLMSyncCredential.h>
 #import <Realm/RLMSyncManager.h>
+#import <Realm/RLMSyncPermissionBaseObject.h>
+#import <Realm/RLMSyncPermissionChange.h>
 #import <Realm/RLMSyncSession.h>
 #import <Realm/RLMSyncUser.h>
 #import <Realm/RLMSyncUtil.h>
