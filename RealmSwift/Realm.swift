@@ -47,7 +47,7 @@ public final class Realm {
     public var schema: Schema { return Schema(rlmRealm.schema) }
 
     /// The `Configuration` value that was used to create the `Realm` instance.
-    public var configuration: Configuration { return Configuration.fromRLMRealmConfiguration(rlmConfiguration: rlmRealm.configuration) }
+    public var configuration: Configuration { return Configuration.fromRLMRealmConfiguration(rlmRealm.configuration) }
 
     /// Indicates if the Realm contains any objects.
     public var isEmpty: Bool { return rlmRealm.isEmpty }
