@@ -210,13 +210,6 @@ using namespace realm;
                                    } mutableCopy];
     NSMutableDictionary *info = [(credential.userInfo ?: @{}) mutableCopy];
 
-    if (credential.provider == RLMIdentityProviderUsernamePassword) {
-        RLMAuthenticationActions actions = [info[kRLMSyncActionsKey] integerValue];
-        if (actions & RLMAuthenticationActionsCreateAccount) {
-            info[kRLMSyncRegisterKey] = @(YES);
-        }
-    }
-
     if ([info count] > 0) {
         // Munge user info into the JSON request.
         json[@"user_info"] = info;

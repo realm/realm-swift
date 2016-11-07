@@ -3,7 +3,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
-* None.
+* Remove `RLMAuthenticationActions` and replace
+  `+[RLMSyncCredential credentialWithUsername:password:actions:]` with
+  `+[RLMSyncCredential credentialWithUsername:password:register:]`.
 
 ### Enhancements
 

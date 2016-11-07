@@ -74,12 +74,10 @@ static NSURL *syncDirectoryForChildProcess() {
     return [NSURL URLWithString:@"http://127.0.0.1:9080"];
 }
 
-+ (RLMSyncCredential *)basicCredentialWithName:(NSString *)name createAccount:(BOOL)createAccount {
++ (RLMSyncCredential *)basicCredentialWithName:(NSString *)name register:(BOOL)shouldRegister {
     return [RLMSyncCredential credentialWithUsername:name
                                             password:@"a"
-                                             actions:(createAccount
-                                                      ? RLMAuthenticationActionsCreateAccount
-                                                      : RLMAuthenticationActionsUseExistingAccount)];
+                                            register:shouldRegister];
 }
 
 - (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions {

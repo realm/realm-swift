@@ -42,13 +42,6 @@ public typealias SyncManager = RLMSyncManager
 public typealias SyncSession = RLMSyncSession
 
 /**
- An options type which represents certain authentication actions that can be associated with certain credential types.
-
- - see: `RLMAuthenticationActions`
- */
-public typealias AuthenticationActions = RLMAuthenticationActions
-
-/**
  A closure type for a closure which can be set on the `SyncManager` to allow errors to be reported to the application.
 
  - see: `RLMSyncErrorReportingBlock`
@@ -125,8 +118,8 @@ public struct Credential {
     /// Initialize a new credential using a Realm Object Server username and password.
     public static func usernamePassword(username: String,
                                         password: String,
-                                        actions: AuthenticationActions) -> Credential {
-        return Credential(RLMSyncCredential(username: username, password: password, actions: actions))
+                                        register: Bool = false) -> Credential {
+        return Credential(RLMSyncCredential(username: username, password: password, register: register))
     }
 
     /// Initialize a new credential using a Realm Object Server access token.
@@ -206,8 +199,8 @@ public struct Credential {
     /// Initialize a new credential using a Realm Object Server username and password.
     public static func usernamePassword(username: String,
                                         password: String,
-                                        actions: AuthenticationActions) -> Credential {
-        return Credential(RLMSyncCredential(username: username, password: password, actions: actions))
+                                        register: Bool = false) -> Credential {
+        return Credential(RLMSyncCredential(username: username, password: password, register: register))
     }
 
     /// Initialize a new credential using a Realm Object Server access token.

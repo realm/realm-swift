@@ -39,7 +39,6 @@ extern NSString *const kRLMSyncPathKey;
 extern NSString *const kRLMSyncProviderKey;
 extern NSString *const kRLMSyncRegisterKey;
 extern NSString *const kRLMSyncUnderlyingErrorKey;
-extern NSString *const kRLMSyncActionsKey;
 
 #define RLM_SYNC_UNINITIALIZABLE \
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly"))); \
