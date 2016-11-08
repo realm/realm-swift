@@ -34,6 +34,20 @@ public typealias SyncUser = RLMSyncUser
  */
 public typealias SyncManager = RLMSyncManager
 
+extension SyncManager {
+#if swift(>=3.0)
+    /// The sole instance of the singleton.
+    public static var shared: SyncManager {
+        return __shared()
+    }
+#else
+    /// The sole instance of the singleton.
+    public static func sharedManager() -> SyncManager {
+        return __sharedManager()
+    }
+#endif
+}
+
 /**
  A session object which represents communication between the client and server for a specific Realm.
 
@@ -219,7 +233,6 @@ extension RLMSyncCredential {
         self.init(customToken: credential.token, provider: credential.provider, userInfo: credential.userInfo)
     }
 }
-
 
 extension SyncUser {
     /// Given a credential and server URL, log in a user and asynchronously return a `SyncUser` object which can be used to

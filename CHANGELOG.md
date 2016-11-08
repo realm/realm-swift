@@ -12,6 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
   * `+[RLMSyncUser allUsers]` in Objective-C.
   * `SyncUser.allUsers()` in Swift 2.
   * `SyncUser.all` in Swift 3.
+* Rename `SyncManager.sharedManager()` to `SyncManager.shared` in Swift 3.
 
 ### Enhancements
 

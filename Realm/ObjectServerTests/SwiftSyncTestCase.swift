@@ -49,7 +49,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
             }
             semaphore.signal()
         }
-        SyncManager.shared().setSessionCompletionNotifier(basicBlock)
+        SyncManager.shared.setSessionCompletionNotifier(basicBlock)
         let config = Realm.Configuration(syncConfiguration: (user, url))
         let realm = try Realm(configuration: config)
         // FIXME: Perhaps we should have a reasonable timeout here, instead of allowing bad code to stall forever.
