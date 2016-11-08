@@ -48,10 +48,9 @@
 
     // Trying to "create" a username/password account that already exists should cause an error.
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    [RLMSyncUser authenticateWithCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                 register:YES]
-                              authServerURL:[RLMObjectServerTests authServerURL]
-                               onCompletion:^(RLMSyncUser *user, NSError *error) {
+    [RLMSyncUser logInWithCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME() register:YES]
+                       authServerURL:[RLMObjectServerTests authServerURL]
+                        onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         // FIXME: Improve error message

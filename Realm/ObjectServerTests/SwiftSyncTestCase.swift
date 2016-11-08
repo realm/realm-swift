@@ -68,7 +68,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         let process = isParent ? "parent" : "child"
         var theUser: SyncUser! = nil
         let ex = expectation(description: "Should log in the user properly")
-        SyncUser.authenticate(with: credential, server: url) { (user, error) in
+        SyncUser.logIn(with: credential, server: url) { (user, error) in
             XCTAssertNotNil(user, file: file, line: line)
             XCTAssertNil(error,
                          "Error when trying to log in a user: \(error!) (process: \(process))",
@@ -139,7 +139,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         let process = isParent ? "parent" : "child"
         var theUser: SyncUser! = nil
         let ex = expectationWithDescription("Should log in the user properly")
-        SyncUser.authenticateWithCredential(credential, authServerURL: url) { (user, error) in
+        SyncUser.logInWithCredential(credential, authServerURL: url) { (user, error) in
             XCTAssertNotNil(user)
             XCTAssertNil(error, "Error when trying to log in a user: \(error!) (process: \(process))")
             theUser = user
