@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** 
  An array of all valid, logged-in users.
  */
-+ (NSArray<RLMSyncUser *> *)allUsers;
++ (NSArray<RLMSyncUser *> *)allUsers NS_REFINED_FOR_SWIFT;
 
 /**
  The unique Realm Object Server user ID string identifying this user.

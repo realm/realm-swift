@@ -146,6 +146,11 @@ extension SyncUser {
                                 timeout: timeout,
                                 onCompletion: completion)
     }
+
+    /// An array of all valid, logged-in users.
+    public static var all: [SyncUser] {
+        return __allUsers()
+    }
 }
 
 #else
@@ -223,10 +228,15 @@ extension SyncUser {
                                            authServerURL: NSURL,
                                            timeout: NSTimeInterval = 30,
                                            onCompletion completion: UserCompletionBlock) {
-        return SyncUser.__logInWithCredential(RLMSyncCredential(credential),
-                                              authServerURL: authServerURL,
-                                              timeout: timeout,
-                                              onCompletion: completion)
+        return __logInWithCredential(RLMSyncCredential(credential),
+                                     authServerURL: authServerURL,
+                                     timeout: timeout,
+                                     onCompletion: completion)
+    }
+
+    /// An array of all valid, logged-in users.
+    public static func allUsers() -> [SyncUser] {
+        return __allUsers()
     }
 }
 
