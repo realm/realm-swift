@@ -8,6 +8,7 @@ x.x.x Release notes (yyyy-MM-dd)
   `+[RLMSyncCredential credentialWithUsername:password:register:]`.
 * Rename `+[RLMSyncUser authenticateWithCredential:]` to
   `+[RLMSyncUser logInWithCredential:]`.
+* Rename `+[RLMSyncUser all]` to `+[RLMSyncUser allUsers]`.
 
 ### Enhancements
 

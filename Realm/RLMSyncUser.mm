@@ -53,7 +53,7 @@ using namespace realm;
 
 #pragma mark - static API
 
-+ (NSArray *)all {
++ (NSArray *)allUsers {
     return [[RLMSyncManager sharedManager] _allUsers];
 }
 
