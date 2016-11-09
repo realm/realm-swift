@@ -23,8 +23,8 @@
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
-#import "sync_manager.hpp"
-#import "sync_config.hpp"
+#import "sync/sync_manager.hpp"
+#import "sync/sync_config.hpp"
 
 using namespace realm;
 

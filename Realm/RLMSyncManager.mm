@@ -24,9 +24,9 @@
 #import "RLMSyncUser_Private.hpp"
 #import "RLMUtil.hpp"
 
-#import "sync_config.hpp"
-#import "sync_manager.hpp"
-#import "sync_session.hpp"
+#import "sync/sync_config.hpp"
+#import "sync/sync_manager.hpp"
+#import "sync/sync_session.hpp"
 
 using namespace realm;
 using Level = realm::util::Logger::Level;
@@ -94,15 +94,6 @@ static dispatch_once_t s_onceToken;
     });
     return s_sharedManager;
 }
-
-//- (RLMSyncSession *)sessionForSyncConfiguration:(RLMSyncConfiguration *)config {
-//    NSURL *fileURL = [RLMSyncFileManager fileURLForRawRealmURL:config.realmURL user:config.user];
-//    return [config.user _registerSessionForBindingWithFileURL:fileURL
-//                                                   syncConfig:config
-//                                            standaloneSession:YES
-//                                                 onCompletion:nil];
-//    return nil;
-//}
 
 - (instancetype)initWithCustomRootDirectory:(NSURL *)rootDirectory {
     if (self = [super init]) {

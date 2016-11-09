@@ -21,8 +21,8 @@
 #import "RLMSyncConfiguration.h"
 #import "RLMSyncUtil_Private.h"
 
-#include "sync_config.hpp"
-#include "sync_metadata.hpp"
+#include "sync/sync_config.hpp"
+#include "sync/impl/sync_metadata.hpp"
 
 @class RLMSyncConfiguration;
 

@@ -38,14 +38,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock sessionCompletionNotifier;
 
-/**
- Given a sync configuration, open and return a standalone session.
-
- If a standalone session was previously opened but encountered a fatal error, attempting to open an equivalent session
- (by using the same configuration) will return `nil`.
- */
-- (nullable RLMSyncSession *)sessionForSyncConfiguration:(RLMSyncConfiguration *)config NS_UNAVAILABLE;
-
 - (void)_fireError:(NSError *)error;
 
 - (void)_fireErrorWithCode:(int)errorCode

@@ -26,9 +26,9 @@
 #import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
-#import "sync_manager.hpp"
-#import "sync_session.hpp"
-#import "sync_user.hpp"
+#import "sync/sync_manager.hpp"
+#import "sync/sync_session.hpp"
+#import "sync/sync_user.hpp"
 
 using namespace realm;
 

@@ -24,7 +24,7 @@
 #import "RLMSyncUser_Private.hpp"
 #import "RLMTokenModels.h"
 
-#import "sync_session.hpp"
+#import "sync/sync_session.hpp"
 
 using namespace realm;
 

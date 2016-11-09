@@ -20,7 +20,7 @@
 
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
-#import "sync_session.hpp"
+#import "sync/sync_session.hpp"
 
 using namespace realm;
 
