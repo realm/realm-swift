@@ -34,6 +34,20 @@ public typealias SyncUser = RLMSyncUser
  */
 public typealias SyncManager = RLMSyncManager
 
+extension SyncManager {
+#if swift(>=3.0)
+    /// The sole instance of the singleton.
+    public static var shared: SyncManager {
+        return __shared()
+    }
+#else
+    /// The sole instance of the singleton.
+    @nonobjc public static func sharedManager() -> SyncManager {
+        return __sharedManager()
+    }
+#endif
+}
+
 /**
  A session object which represents communication between the client and server for a specific Realm.
 
@@ -146,6 +160,11 @@ extension SyncUser {
                                 timeout: timeout,
                                 onCompletion: completion)
     }
+
+    /// An array of all valid, logged-in users.
+    public static var all: [SyncUser] {
+        return __allUsers()
+    }
 }
 
 #else
@@ -215,7 +234,6 @@ extension RLMSyncCredential {
     }
 }
 
-
 extension SyncUser {
     /// Given a credential and server URL, log in a user and asynchronously return a `SyncUser` object which can be used to
     /// open Realms and Sessions.
@@ -223,10 +241,15 @@ extension SyncUser {
                                            authServerURL: NSURL,
                                            timeout: NSTimeInterval = 30,
                                            onCompletion completion: UserCompletionBlock) {
-        return SyncUser.__logInWithCredential(RLMSyncCredential(credential),
-                                              authServerURL: authServerURL,
-                                              timeout: timeout,
-                                              onCompletion: completion)
+        return __logInWithCredential(RLMSyncCredential(credential),
+                                     authServerURL: authServerURL,
+                                     timeout: timeout,
+                                     onCompletion: completion)
+    }
+
+    /// An array of all valid, logged-in users.
+    @nonobjc public static func allUsers() -> [SyncUser] {
+        return __allUsers()
     }
 }
 

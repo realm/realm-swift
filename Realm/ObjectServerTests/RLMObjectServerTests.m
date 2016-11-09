@@ -76,13 +76,13 @@
 
 /// `[RLMSyncUser all]` should be updated once a user is logged in.
 - (void)testBasicUserPersistence {
-    XCTAssertEqual([[RLMSyncUser all] count], 0U);
+    XCTAssertEqual([[RLMSyncUser allUsers] count], 0U);
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
                                                                                           register:YES]
                                               server:[RLMObjectServerTests authServerURL]];
     XCTAssertNotNil(user);
-    XCTAssertEqual([[RLMSyncUser all] count], 1U);
-    XCTAssertTrue([[RLMSyncUser all] containsObject:user]);
+    XCTAssertEqual([[RLMSyncUser allUsers] count], 1U);
+    XCTAssertTrue([[RLMSyncUser allUsers] containsObject:user]);
 }
 
 #pragma mark - Basic Sync
