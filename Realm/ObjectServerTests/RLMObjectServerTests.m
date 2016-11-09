@@ -582,801 +582,197 @@
     }
 }
 
-- (void)testPermissionChangeForRealmAndUserGrantAdministrativeAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+/// Grant/revoke access a user's Realm to another user. Another user has no access permission by default.
+- (void)testPermissionChange {
+    NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
+    RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
+                                                                                      createAccount:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSString *userNameB = [NSString stringWithFormat:@"%@_B", NSStringFromSelector(_cmd)];
+    RLMSyncUser *userB = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameB
+                                                                                      createAccount:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
 
     NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
+    RLMRealm *realm = [self openRealmForURL:url user:userA];
 
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+    NSArray *administrativePermissions = @[
+                                           @[@YES, @YES, @YES],
+                                           @[@NO, @YES, @YES],
+                                           @[@YES, @NO, @YES],
+                                           @[@NO, @NO, @YES]
+                                           ];
+    NSArray *readWritePermissions = @[
+                                      @[@YES, @YES, @NO]
+                                      ];
+    NSArray *readOnlyPermissions = @[
+                                     @[@YES, @NO, @NO]
+                                     ];
+    NSArray *noAccessPermissions = @[
+                                     @[@NO, @NO, @NO],
+                                     @[[NSNull null], [NSNull null], [NSNull null]]
+                                     ];
 
-    {
-        RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:user read:@YES write:@YES manage:@YES];
+    NSArray *permissions = @[administrativePermissions,
+                             readWritePermissions,
+                             readOnlyPermissions,
+                             noAccessPermissions];
+    NSArray *statusMessages = @[@"administrative access",
+                                @"read-write access",
+                                @"read-only access",
+                                @"no access"];
 
-        XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-        RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                     where:@"id = %@", permissionChange.id];
-        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-            RLMSyncPermissionChange *permissionChange = results[0];
-            if (permissionChange.statusCode) {
-                XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-                XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"administrative access"].location != NSNotFound);
-                [expectation fulfill];
-            }
-        }];
-
-        [managementRealm transactionWithBlock:^{
-            [managementRealm addObject:permissionChange];
-        } error:&error];
-        XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-        [self waitForExpectationsWithTimeout:2.0 handler:nil];
-        [token stop];
-    }
-
-    {
-        RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:user read:@NO write:@YES manage:@YES];
-
-        XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-        RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                     where:@"id = %@", permissionChange.id];
-        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-            RLMSyncPermissionChange *permissionChange = results[0];
-            if (permissionChange.statusCode) {
-                XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-                XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"administrative access"].location != NSNotFound);
-                [expectation fulfill];
-            }
-        }];
-
-        [managementRealm transactionWithBlock:^{
-            [managementRealm addObject:permissionChange];
-        } error:&error];
-        XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-        [self waitForExpectationsWithTimeout:2.0 handler:nil];
-        [token stop];
-    }
-
-    {
-        RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:user read:@YES write:@NO manage:@YES];
-
-        XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-        RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                     where:@"id = %@", permissionChange.id];
-        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-            RLMSyncPermissionChange *permissionChange = results[0];
-            if (permissionChange.statusCode) {
-                XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-                XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"administrative access"].location != NSNotFound);
-                [expectation fulfill];
-            }
-        }];
-
-        [managementRealm transactionWithBlock:^{
-            [managementRealm addObject:permissionChange];
-        } error:&error];
-        XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-        [self waitForExpectationsWithTimeout:2.0 handler:nil];
-        [token stop];
-    }
-
-    {
-        RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:user read:@NO write:@NO manage:@YES];
-
-        XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-        RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                     where:@"id = %@", permissionChange.id];
-        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-            RLMSyncPermissionChange *permissionChange = results[0];
-            if (permissionChange.statusCode) {
-                XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-                XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"administrative access"].location != NSNotFound);
-                [expectation fulfill];
-            }
-        }];
-
-        [managementRealm transactionWithBlock:^{
-            [managementRealm addObject:permissionChange];
-        } error:&error];
-        XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-        [self waitForExpectationsWithTimeout:2.0 handler:nil];
-        [token stop];
-    }
+    [permissions enumerateObjectsUsingBlock:^(id  _Nonnull accessPermissions, NSUInteger idx, BOOL * _Nonnull stop __unused) {
+        for (NSArray *permissions in accessPermissions) {
+            NSNumber<RLMBool> *mayRead = permissions[0] == [NSNull null] ? nil : permissions[0];
+            NSNumber<RLMBool> *mayWrite = permissions[1] == [NSNull null] ? nil : permissions[1];
+            NSNumber<RLMBool> *mayManage = permissions[2] == [NSNull null] ? nil : permissions[2];
+            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm
+                                                                                                  forUser:userB
+                                                                                                     read:mayRead
+                                                                                                    write:mayWrite
+                                                                                                   manage:mayManage];
+            [self verifyChangePermission:permissionChange statusMessage:statusMessages[idx] owner:userA];
+        }
+    }];
 }
 
-- (void)testPermissionChangeForRealmAndUserGrantReadWriteAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+/// Grant/revoke access a user's Realm to every users.
+- (void)testPermissionChangeForRealm {
+    NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
+    RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
+                                                                                      createAccount:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
 
     NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
+    RLMRealm *realm = [self openRealmForURL:url user:userA];
 
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+    NSArray *administrativePermissions = @[
+                                           @[@YES, @YES, @YES],
+                                           @[@NO, @YES, @YES],
+                                           @[@YES, @NO, @YES],
+                                           @[@NO, @NO, @YES]
+                                           ];
+    NSArray *readWritePermissions = @[
+                                      @[@YES, @YES, @NO]
+                                      ];
+    NSArray *readOnlyPermissions = @[
+                                     @[@YES, @NO, @NO]
+                                     ];
+    NSArray *noAccessPermissions = @[
+                                     @[@NO, @NO, @NO],
+                                     @[[NSNull null], [NSNull null], [NSNull null]]
+                                     ];
 
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:user read:@YES write:@YES manage:@NO];
+    NSArray *permissions = @[administrativePermissions,
+                             readWritePermissions,
+                             readOnlyPermissions,
+                             noAccessPermissions];
+    NSArray *statusMessages = @[@"administrative access",
+                                @"read-write access",
+                                @"read-only access",
+                                @"no access"];
+
+    [permissions enumerateObjectsUsingBlock:^(id  _Nonnull accessPermissions, NSUInteger idx, BOOL * _Nonnull stop __unused) {
+        for (NSArray *permissions in accessPermissions) {
+            NSNumber<RLMBool> *mayRead = permissions[0] == [NSNull null] ? nil : permissions[0];
+            NSNumber<RLMBool> *mayWrite = permissions[1] == [NSNull null] ? nil : permissions[1];
+            NSNumber<RLMBool> *mayManage = permissions[2] == [NSNull null] ? nil : permissions[2];
+            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm
+                                                                                                  forUser:nil
+                                                                                                     read:mayRead
+                                                                                                    write:mayWrite
+                                                                                                   manage:mayManage];
+            [self verifyChangePermission:permissionChange statusMessage:statusMessages[idx] owner:userA];
+        }
+    }];
+}
+
+/// Grant/revoke access user's all Realms to another user.
+- (void)testPermissionChangeForUser {
+    NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
+    RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
+                                                                                      createAccount:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSString *userNameB = [NSString stringWithFormat:@"%@_B", NSStringFromSelector(_cmd)];
+    RLMSyncUser *userB = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameB
+                                                                                      createAccount:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSArray *administrativePermissions = @[
+                                           @[@YES, @YES, @YES],
+                                           @[@NO, @YES, @YES],
+                                           @[@YES, @NO, @YES],
+                                           @[@NO, @NO, @YES]
+                                           ];
+    NSArray *readWritePermissions = @[
+                                      @[@YES, @YES, @NO]
+                                      ];
+    NSArray *readOnlyPermissions = @[
+                                     @[@YES, @NO, @NO]
+                                     ];
+    NSArray *noAccessPermissions = @[
+                                     @[@NO, @NO, @NO],
+                                     @[[NSNull null], [NSNull null], [NSNull null]]
+                                     ];
+
+    NSArray *permissions = @[administrativePermissions,
+                             readWritePermissions,
+                             readOnlyPermissions,
+                             noAccessPermissions];
+    NSArray *statusMessages = @[@"administrative access",
+                                @"read-write access",
+                                @"read-only access",
+                                @"no access"];
+
+    [permissions enumerateObjectsUsingBlock:^(id  _Nonnull accessPermissions, NSUInteger idx, BOOL * _Nonnull stop __unused) {
+        for (NSArray *permissions in accessPermissions) {
+            NSNumber<RLMBool> *mayRead = permissions[0] == [NSNull null] ? nil : permissions[0];
+            NSNumber<RLMBool> *mayWrite = permissions[1] == [NSNull null] ? nil : permissions[1];
+            NSNumber<RLMBool> *mayManage = permissions[2] == [NSNull null] ? nil : permissions[2];
+            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:nil
+                                                                                                  forUser:userB
+                                                                                                     read:mayRead
+                                                                                                    write:mayWrite
+                                                                                                   manage:mayManage];
+            [self verifyChangePermission:permissionChange statusMessage:statusMessages[idx] owner:userA];
+        }
+    }];
+}
+
+- (void)verifyChangePermission:(RLMSyncPermissionChange *)permissionChange statusMessage:(NSString *)message owner:(RLMSyncUser *)owner {
+    RLMRealm *managementRealm = [self managementRealmForUser:owner];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
+
     RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
                                                                                  where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results,
+                                                            RLMCollectionChange * _Nullable change __unused,
+                                                            NSError * _Nullable error __unused) {
         RLMSyncPermissionChange *permissionChange = results[0];
         if (permissionChange.statusCode) {
             XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"read-write access"].location != NSNotFound);
+            XCTAssertTrue([permissionChange.statusMessage rangeOfString:message].location != NSNotFound);
             [expectation fulfill];
         }
     }];
 
+    NSError *error = nil;
     [managementRealm transactionWithBlock:^{
         [managementRealm addObject:permissionChange];
     } error:&error];
     XCTAssertNil(error, @"Error when writing permission change object: %@", error);
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
     [token stop];
 }
 
-- (void)testPermissionChangeForRealmAndUserGrantReadOnlyAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:user read:@YES write:@NO manage:@NO];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"read-only access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeForRealmAndUserGrantNoAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:user read:@NO write:@NO manage:@NO];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"no access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeForRealmAndUserNoChanges {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:user read:nil write:nil manage:nil];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"administrative access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeForRealmGrantAdministrativeAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:nil read:@YES write:@YES manage:@YES];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"administrative access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeForRealmGrantReadWriteAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:nil read:@YES write:@YES manage:@NO];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"read-write access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeForRealmGrantReadOnlyAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:nil read:@YES write:@NO manage:@NO];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"read-only access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeForRealmGrantNoAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:nil read:@NO write:@NO manage:@NO];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"no access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeForRealmGrantNoChanges {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:nil read:nil write:nil manage:nil];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"administrative access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeForUserGrantAdministrativeAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:nil forUser:user read:@YES write:@YES manage:@YES];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"administrative access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeForUserGrantReadWriteAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:nil forUser:user read:@YES write:@YES manage:@NO];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"read-write access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeForUserGrantReadOnlyAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:nil forUser:user read:@YES write:@NO manage:@NO];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"read-only access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeForUserGrantNoAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:nil forUser:user read:@NO write:@NO manage:@NO];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"no access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeForUserGrantNoChanges {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:nil forUser:user read:nil write:nil manage:nil];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"administrative access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeGrantAdministrativeAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:nil forUser:nil read:@YES write:@YES manage:@YES];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"administrative access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeGrantReadWriteAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:nil forUser:nil read:@YES write:@YES manage:@NO];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"read-write access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeGrantReadOnlyAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:nil forUser:nil read:@YES write:@NO manage:@NO];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"read-only access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeGrantNoAccess {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:nil forUser:nil read:@NO write:@NO manage:@NO];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"no access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeGrantNoChanges {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-
-    NSURL *url = REALM_URL();
-    NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:nil forUser:nil read:nil write:nil manage:nil];
-
-    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
-        RLMSyncPermissionChange *permissionChange = results[0];
-        if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:@"administrative access"].location != NSNotFound);
-            [expectation fulfill];
-        }
-    }];
-
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
-    } error:&error];
-    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
-}
-
-- (void)testPermissionChangeErrorByInvalidRealmPath {
+/// Changing unowned Realm permission should fail
+- (void)testPermissionChangeErrorByUnownedRealm {
     NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
     RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
                                                                                       createAccount:self.isParent]
@@ -1401,7 +797,7 @@
         XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
         RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
                                                                                      where:@"id = %@", permissionChange.id];
-        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
+        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change __unused, NSError * _Nullable error __unused) {
             RLMSyncPermissionChange *permissionChange = results[0];
             if (permissionChange.statusCode) {
                 XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusError);
@@ -1425,7 +821,7 @@
         XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
         RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
                                                                                      where:@"id = %@", permissionChange.id];
-        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change, NSError * _Nullable error) {
+        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change __unused, NSError * _Nullable error __unused) {
             RLMSyncPermissionChange *permissionChange = results[0];
             if (permissionChange.statusCode) {
                 XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusError);
