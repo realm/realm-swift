@@ -42,7 +42,7 @@ extension SyncManager {
     }
 #else
     /// The sole instance of the singleton.
-    public static func sharedManager() -> SyncManager {
+    @nonobjc public static func sharedManager() -> SyncManager {
         return __sharedManager()
     }
 #endif
@@ -248,7 +248,7 @@ extension SyncUser {
     }
 
     /// An array of all valid, logged-in users.
-    public static func allUsers() -> [SyncUser] {
+    @nonobjc public static func allUsers() -> [SyncUser] {
         return __allUsers()
     }
 }
