@@ -25,7 +25,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testBasicSwiftSync() {
         let url = URL(string: "realm://localhost:9080/~/testBasicSync")!
         do {
-            let user = try synchronouslyLogInUser(for: basicCredential(create: true), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredential(register: true), server: authURL)
             let realm = try synchronouslyOpenRealm(url: url, user: user)
             XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
         } catch {
@@ -36,7 +36,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// If client B adds objects to a Realm, client A should see those new objects.
     func testSwiftAddObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredential(create: isParent), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredential(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             if isParent {
                 user.waitForDownload(toFinish: realmURL)
@@ -62,7 +62,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// If client B removes objects from a Realm, client A should see those changes.
     func testSwiftDeleteObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredential(create: isParent), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredential(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             if isParent {
                 try realm.write {
@@ -93,7 +93,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testBasicSwiftSync() {
         let url = NSURL(string: "realm://localhost:9080/~/testBasicSync")!
         do {
-            let user = try synchronouslyLogInUser(for: basicCredential(create: true), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredential(register: true), server: authURL)
             let realm = try synchronouslyOpenRealm(url: url, user: user)
             XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
         } catch {
@@ -104,7 +104,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// If client B adds objects to a Realm, client A should see those new objects.
     func testSwiftAddObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredential(create: isParent), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredential(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             if isParent {
                 user.waitForDownloadToFinish(realmURL)
@@ -130,7 +130,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// If client B removes objects from a Realm, client A should see those changes.
     func testSwiftDeleteObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredential(create: isParent), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredential(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             if isParent {
                 try realm.write {

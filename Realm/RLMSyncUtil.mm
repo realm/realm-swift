@@ -33,7 +33,6 @@ NSString *const kRLMSyncPathKey                 = @"path";
 NSString *const kRLMSyncProviderKey             = @"provider";
 NSString *const kRLMSyncRegisterKey             = @"register";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
-NSString *const kRLMSyncActionsKey              = @"actions";
 
 namespace realm {
 

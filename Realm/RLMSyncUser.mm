@@ -72,19 +72,19 @@ using namespace realm;
     return nil;
 }
 
-+ (void)authenticateWithCredential:(RLMSyncCredential *)credential
-                     authServerURL:(NSURL *)authServerURL
-                      onCompletion:(RLMUserCompletionBlock)completion {
-    [self authenticateWithCredential:credential
-                       authServerURL:authServerURL
-                             timeout:30
-                        onCompletion:completion];
++ (void)logInWithCredential:(RLMSyncCredential *)credential
+              authServerURL:(NSURL *)authServerURL
+               onCompletion:(RLMUserCompletionBlock)completion {
+    [self logInWithCredential:credential
+                authServerURL:authServerURL
+                      timeout:30
+                 onCompletion:completion];
 }
 
-+ (void)authenticateWithCredential:(RLMSyncCredential *)credential
-                     authServerURL:(NSURL *)authServerURL
-                           timeout:(NSTimeInterval)timeout
-                      onCompletion:(RLMUserCompletionBlock)completion {
++ (void)logInWithCredential:(RLMSyncCredential *)credential
+              authServerURL:(NSURL *)authServerURL
+                    timeout:(NSTimeInterval)timeout
+               onCompletion:(RLMUserCompletionBlock)completion {
     RLMSyncUser *user = [[RLMSyncUser alloc] initWithAuthServer:authServerURL];
     [RLMSyncUser _performLogInForUser:user
                            credential:credential
@@ -209,13 +209,6 @@ using namespace realm;
                                    kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
                                    } mutableCopy];
     NSMutableDictionary *info = [(credential.userInfo ?: @{}) mutableCopy];
-
-    if (credential.provider == RLMIdentityProviderUsernamePassword) {
-        RLMAuthenticationActions actions = [info[kRLMSyncActionsKey] integerValue];
-        if (actions & RLMAuthenticationActionsCreateAccount) {
-            info[kRLMSyncRegisterKey] = @(YES);
-        }
-    }
 
     if ([info count] > 0) {
         // Munge user info into the JSON request.

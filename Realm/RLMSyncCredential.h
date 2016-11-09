@@ -23,15 +23,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /// A token representing an identity provider's credential.
-typedef NSString* RLMCredentialToken;
-
-/// An options type representing different account actions which can be associated with certain types of credentials.
-typedef NS_OPTIONS(NSUInteger, RLMAuthenticationActions) {
-    /// Create a new Realm Object Server account.
-    RLMAuthenticationActionsCreateAccount            = 1 << 0,
-    /// Use an existing Realm Object Server account.
-    RLMAuthenticationActionsUseExistingAccount       = 1 << 1,
-};
+typedef NSString *RLMCredentialToken;
 
 /// A type representing the unique identifier of a Realm Object Server identity provider.
 typedef NSString *RLMIdentityProvider RLM_EXTENSIBLE_STRING_ENUM;
@@ -87,7 +79,7 @@ extern RLMIdentityProvider const RLMIdentityProviderICloud;
  */
 + (instancetype)credentialWithUsername:(NSString *)username
                               password:(NSString *)password
-                               actions:(RLMAuthenticationActions)actions;
+                              register:(BOOL)shouldRegister;
 
 /**
  Construct and return a special credential representing a token that can be directly used to open a Realm. The identity

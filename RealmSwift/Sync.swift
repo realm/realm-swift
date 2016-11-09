@@ -42,13 +42,6 @@ public typealias SyncManager = RLMSyncManager
 public typealias SyncSession = RLMSyncSession
 
 /**
- An options type which represents certain authentication actions that can be associated with certain credential types.
-
- - see: `RLMAuthenticationActions`
- */
-public typealias AuthenticationActions = RLMAuthenticationActions
-
-/**
  A closure type for a closure which can be set on the `SyncManager` to allow errors to be reported to the application.
 
  - see: `RLMSyncErrorReportingBlock`
@@ -125,8 +118,8 @@ public struct Credential {
     /// Initialize a new credential using a Realm Object Server username and password.
     public static func usernamePassword(username: String,
                                         password: String,
-                                        actions: AuthenticationActions) -> Credential {
-        return Credential(RLMSyncCredential(username: username, password: password, actions: actions))
+                                        register: Bool = false) -> Credential {
+        return Credential(RLMSyncCredential(username: username, password: password, register: register))
     }
 
     /// Initialize a new credential using a Realm Object Server access token.
@@ -144,14 +137,14 @@ extension RLMSyncCredential {
 extension SyncUser {
     /// Given a credential and server URL, log in a user and asynchronously return a `SyncUser` object which can be used to
     /// open Realms and Sessions.
-    public static func authenticate(with credential: Credential,
-                                    server authServerURL: URL,
-                                    timeout: TimeInterval = 30,
-                                    onCompletion completion: @escaping UserCompletionBlock) {
-        return SyncUser.__authenticate(with: RLMSyncCredential(credential),
-                                   authServerURL: authServerURL,
-                                   timeout: timeout,
-                                   onCompletion: completion)
+    public static func logIn(with credential: Credential,
+                             server authServerURL: URL,
+                             timeout: TimeInterval = 30,
+                             onCompletion completion: @escaping UserCompletionBlock) {
+        return SyncUser.__logIn(with: RLMSyncCredential(credential),
+                                authServerURL: authServerURL,
+                                timeout: timeout,
+                                onCompletion: completion)
     }
 }
 
@@ -206,8 +199,8 @@ public struct Credential {
     /// Initialize a new credential using a Realm Object Server username and password.
     public static func usernamePassword(username: String,
                                         password: String,
-                                        actions: AuthenticationActions) -> Credential {
-        return Credential(RLMSyncCredential(username: username, password: password, actions: actions))
+                                        register: Bool = false) -> Credential {
+        return Credential(RLMSyncCredential(username: username, password: password, register: register))
     }
 
     /// Initialize a new credential using a Realm Object Server access token.
@@ -226,14 +219,14 @@ extension RLMSyncCredential {
 extension SyncUser {
     /// Given a credential and server URL, log in a user and asynchronously return a `SyncUser` object which can be used to
     /// open Realms and Sessions.
-    public static func authenticateWithCredential(credential: Credential,
-                                                  authServerURL: NSURL,
-                                                  timeout: NSTimeInterval = 30,
-                                                  onCompletion completion: UserCompletionBlock) {
-        return SyncUser.__authenticateWithCredential(RLMSyncCredential(credential),
-                                                 authServerURL: authServerURL,
-                                                 timeout: timeout,
-                                                 onCompletion: completion)
+    public static func logInWithCredential(credential: Credential,
+                                           authServerURL: NSURL,
+                                           timeout: NSTimeInterval = 30,
+                                           onCompletion completion: UserCompletionBlock) {
+        return SyncUser.__logInWithCredential(RLMSyncCredential(credential),
+                                              authServerURL: authServerURL,
+                                              timeout: timeout,
+                                              onCompletion: completion)
     }
 }
 
