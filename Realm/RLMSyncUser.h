@@ -53,6 +53,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSArray<RLMSyncUser *> *)allUsers NS_REFINED_FOR_SWIFT;
 
 /**
+ The logged-in user. `nil` if none exists.
+
+ @warning Throws an exception if more than one logged-in user exists.
+ */
++ (nullable RLMSyncUser *)currentUser NS_REFINED_FOR_SWIFT;
+
+/**
  The unique Realm Object Server user ID string identifying this user.
  */
 @property (nonatomic, readonly) NSString *identity;

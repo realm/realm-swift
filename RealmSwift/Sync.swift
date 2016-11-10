@@ -207,6 +207,15 @@ extension SyncUser {
     public static var all: [SyncUser] {
         return __allUsers()
     }
+
+    /**
+     The logged-in user. `nil` if none exists.
+
+     - warning: Throws an Objective-C exception if more than one logged-in user exists.
+     */
+    public static var current: SyncUser? {
+        return __current()
+    }
 }
 
 #else
@@ -334,6 +343,15 @@ extension SyncUser {
     /// An array of all valid, logged-in users.
     @nonobjc public static func allUsers() -> [SyncUser] {
         return __allUsers()
+    }
+
+    /**
+     The logged-in user. `nil` if none exists.
+
+     - warning: Throws an Objective-C exception if more than one logged-in user exists.
+     */
+    @nonobjc public static func currentUser() -> SyncUser? {
+        return __currentUser()
     }
 }
 

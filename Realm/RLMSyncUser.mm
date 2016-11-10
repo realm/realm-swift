@@ -57,6 +57,14 @@ using namespace realm;
     return [[RLMSyncManager sharedManager] _allUsers];
 }
 
++ (RLMSyncUser *)currentUser {
+    NSArray *allUsers = [[RLMSyncManager sharedManager] _allUsers];
+    if (allUsers.count > 1) {
+        @throw RLMException(@"+currentUser cannot be called if more that one valid, logged-in user exists.");
+    }
+    return allUsers.firstObject;
+}
+
 #pragma mark - API
 
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer {

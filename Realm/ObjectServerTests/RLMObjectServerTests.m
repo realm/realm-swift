@@ -76,6 +76,7 @@
 
 /// `[RLMSyncUser all]` should be updated once a user is logged in.
 - (void)testBasicUserPersistence {
+    XCTAssertNil([RLMSyncUser currentUser]);
     XCTAssertEqual([[RLMSyncUser allUsers] count], 0U);
     RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
                                                                                           register:YES]
@@ -83,6 +84,14 @@
     XCTAssertNotNil(user);
     XCTAssertEqual([[RLMSyncUser allUsers] count], 1U);
     XCTAssertTrue([[RLMSyncUser allUsers] containsObject:user]);
+    XCTAssertEqualObjects([RLMSyncUser currentUser], user);
+
+    RLMSyncUser *user2 = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:[ACCOUNT_NAME() stringByAppendingString:@"2"]
+                                                                                           register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
+    XCTAssertEqual([[RLMSyncUser allUsers] count], 2U);
+    XCTAssertTrue([[RLMSyncUser allUsers] containsObject:user2]);
+    RLMAssertThrowsWithReasonMatching([RLMSyncUser currentUser], @"currentUser cannot be called if more that one valid, logged-in user exists");
 }
 
 #pragma mark - Basic Sync
