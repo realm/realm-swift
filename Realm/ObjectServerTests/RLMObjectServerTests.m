@@ -108,7 +108,7 @@
     RLMSyncUser *user = [self logInUserForCredential:credential
                                               server:[RLMObjectServerTests authServerURL]];
     NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/testSyncWithAdminToken"];
-    RLMRealmConfiguration *c = [[RLMRealmConfiguration defaultConfiguration] copy];
+    RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
     c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
     NSError *error = nil;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:&error];
