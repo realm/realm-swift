@@ -18,7 +18,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add `+[RLMSyncUser currentUser]`.
 
 ### Bugfixes
 
