@@ -13,6 +13,8 @@ x.x.x Release notes (yyyy-MM-dd)
   * `SyncUser.allUsers()` in Swift 2.
   * `SyncUser.all` in Swift 3.
 * Rename `SyncManager.sharedManager()` to `SyncManager.shared` in Swift 3.
+* Change `Realm.Configuration.syncConfiguration` to take a `SyncConfiguration`
+  struct rather than a named tuple.
 
 ### Enhancements
 
