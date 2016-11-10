@@ -360,7 +360,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     });
 }
 
-- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties {
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties {
     if (properties.count == 0) {
         auto results = translateErrors([&] { return _backingList.filter({}); });
         return [RLMResults resultsWithObjectInfo:*_objectInfo results:std::move(results)];
