@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMCppBridge.h"
+#import "RLMSyncManager_Private.h"
 #import "RLMSyncManager+ObjectServerTests.h"
 #import "RLMSyncTestCase.h"
 
@@ -55,7 +55,7 @@
 - (void)prepareForDestruction {
     // Log out all the logged-in users.
     [[self _allUsers] makeObjectsPerformSelector:@selector(logOut)];
-    [RLMCppBridge resetObjectStoreSyncManager];
+    [RLMSyncManager resetForTesting];
 }
 
 @end

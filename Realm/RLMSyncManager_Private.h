@@ -47,6 +47,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSArray<RLMSyncUser *> *)_allUsers;
 
++ (void)resetForTesting;
+
 NS_ASSUME_NONNULL_END
 
 @end

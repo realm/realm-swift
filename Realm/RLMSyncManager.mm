@@ -207,4 +207,8 @@ static dispatch_once_t s_onceToken;
     return buffer;
 }
 
++ (void)resetForTesting {
+    SyncManager::shared().reset_for_testing();
+}
+
 @end
