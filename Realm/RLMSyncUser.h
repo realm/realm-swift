@@ -48,9 +48,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMSyncUser : NSObject
 
 /**
- An array of all valid, logged-in users.
+ A dictionary of all valid, logged-in user identities corresponding to their `RLMSyncUser` objects.
  */
-+ (NSArray<RLMSyncUser *> *)allUsers NS_REFINED_FOR_SWIFT;
++ (NSDictionary<NSString *, RLMSyncUser *> *)allUsers NS_REFINED_FOR_SWIFT;
 
 /**
  The logged-in user. `nil` if none exists.

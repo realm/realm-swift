@@ -47,8 +47,10 @@ using namespace realm;
 
 #pragma mark - static API
 
-+ (NSArray *)allUsers {
-    return [[RLMSyncManager sharedManager] _allUsers];
++ (NSDictionary *)allUsers {
+    NSArray *allUsers = [[RLMSyncManager sharedManager] _allUsers];
+    return [NSDictionary dictionaryWithObjects:allUsers
+                                       forKeys:[allUsers valueForKey:@"identity"]];
 }
 
 + (RLMSyncUser *)currentUser {

@@ -11,7 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Rename "credential"-related types and methods to
   `RLMSyncCredentials`/`SyncCredentials` and consistently refer to credentials
   in the plural form.
-* Rename `+[RLMSyncUser all]` to:
+* Change `+[RLMSyncUser all]` to return a dictionary of identifiers to users and
+  rename to:
   * `+[RLMSyncUser allUsers]` in Objective-C.
   * `SyncUser.allUsers()` in Swift 2.
   * `SyncUser.all` in Swift 3.

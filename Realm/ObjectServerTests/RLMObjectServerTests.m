@@ -83,14 +83,15 @@
                                                server:[RLMObjectServerTests authServerURL]];
     XCTAssertNotNil(user);
     XCTAssertEqual([[RLMSyncUser allUsers] count], 1U);
-    XCTAssertTrue([[[RLMSyncUser allUsers] firstObject].identity isEqualToString:user.identity]);
+    XCTAssertEqualObjects([RLMSyncUser allUsers], @{user.identity: user});
     XCTAssertEqualObjects([RLMSyncUser currentUser], user);
 
     RLMSyncUser *user2 = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:[ACCOUNT_NAME() stringByAppendingString:@"2"]
                                                                                              register:YES]
                                                server:[RLMObjectServerTests authServerURL]];
     XCTAssertEqual([[RLMSyncUser allUsers] count], 2U);
-    XCTAssertTrue([[RLMSyncUser allUsers] containsObject:user2]);
+    NSDictionary *dict2 = @{user.identity: user, user2.identity: user2};
+    XCTAssertEqualObjects([RLMSyncUser allUsers], dict2);
     RLMAssertThrowsWithReasonMatching([RLMSyncUser currentUser], @"currentUser cannot be called if more that one valid, logged-in user exists");
 }
 
