@@ -145,15 +145,6 @@ static dispatch_once_t s_onceToken;
 
 #pragma mark - Private API
 
-+ (void)_resetStateForTesting {
-    // Log out all the users.
-    [[s_sharedManager _allUsers] makeObjectsPerformSelector:@selector(logOut)];
-    // Reset the singleton.
-    SyncManager::shared().reset_for_testing();
-    s_onceToken = 0;
-    s_sharedManager = nil;
-}
-
 - (void)_fireError:(NSError *)error {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (self.errorHandler) {
