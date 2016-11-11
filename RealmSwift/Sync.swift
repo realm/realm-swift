@@ -226,7 +226,7 @@ extension SyncUser {
 
         let managementRealmUrl = components.url!
 
-        let config = Realm.Configuration(syncConfiguration: (user: self, realmURL: managementRealmUrl), objectTypes: [PermissionChange.self])
+        let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: self, realmURL: managementRealmUrl), objectTypes: [PermissionChange.self])
         return try Realm(configuration: config)
     }
 }

@@ -594,12 +594,12 @@
 - (void)testPermissionChange {
     NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
     RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
-                                                                                      createAccount:self.isParent]
+                                                                                           register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
 
     NSString *userNameB = [NSString stringWithFormat:@"%@_B", NSStringFromSelector(_cmd)];
     RLMSyncUser *userB = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameB
-                                                                                      createAccount:self.isParent]
+                                                                                           register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
 
     NSURL *url = REALM_URL();
@@ -650,7 +650,7 @@
 - (void)testPermissionChangeForRealm {
     NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
     RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
-                                                                                      createAccount:self.isParent]
+                                                                                           register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
 
     NSURL *url = REALM_URL();
@@ -701,12 +701,12 @@
 - (void)testPermissionChangeForUser {
     NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
     RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
-                                                                                      createAccount:self.isParent]
+                                                                                           register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
 
     NSString *userNameB = [NSString stringWithFormat:@"%@_B", NSStringFromSelector(_cmd)];
     RLMSyncUser *userB = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameB
-                                                                                      createAccount:self.isParent]
+                                                                                           register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
 
     NSArray *administrativePermissions = @[
@@ -783,12 +783,12 @@
 - (void)testPermissionChangeErrorByUnownedRealm {
     NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
     RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
-                                                                                      createAccount:self.isParent]
+                                                                                           register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
 
     NSString *userNameB = [NSString stringWithFormat:@"%@_B", NSStringFromSelector(_cmd)];
     RLMSyncUser *userB = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameB
-                                                                                      createAccount:self.isParent]
+                                                                                           register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
 
     NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"realm://localhost:9080/~/%@", userNameB]];
