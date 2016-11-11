@@ -590,14 +590,16 @@
     }
 }
 
+#pragma mark - Permissions
+
 /// Grant/revoke access a user's Realm to another user. Another user has no access permission by default.
 - (void)testPermissionChange {
-    NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
+    NSString *userNameA = [ACCOUNT_NAME() stringByAppendingString:@"_A"];
     RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
                                                                                            register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
 
-    NSString *userNameB = [NSString stringWithFormat:@"%@_B", NSStringFromSelector(_cmd)];
+    NSString *userNameB = [ACCOUNT_NAME() stringByAppendingString:@"_B"];
     RLMSyncUser *userB = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameB
                                                                                            register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
@@ -648,7 +650,7 @@
 
 /// Grant/revoke access a user's Realm to every users.
 - (void)testPermissionChangeForRealm {
-    NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
+    NSString *userNameA = [ACCOUNT_NAME() stringByAppendingString:@"_A"];
     RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
                                                                                            register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
@@ -699,12 +701,12 @@
 
 /// Grant/revoke access user's all Realms to another user.
 - (void)testPermissionChangeForUser {
-    NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
+    NSString *userNameA = [ACCOUNT_NAME() stringByAppendingString:@"_A"];
     RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
                                                                                            register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
 
-    NSString *userNameB = [NSString stringWithFormat:@"%@_B", NSStringFromSelector(_cmd)];
+    NSString *userNameB = [ACCOUNT_NAME() stringByAppendingString:@"_B"];
     RLMSyncUser *userB = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameB
                                                                                            register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
@@ -781,12 +783,12 @@
 
 /// Changing unowned Realm permission should fail
 - (void)testPermissionChangeErrorByUnownedRealm {
-    NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
+    NSString *userNameA = [ACCOUNT_NAME() stringByAppendingString:@"_A"];
     RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
                                                                                            register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
 
-    NSString *userNameB = [NSString stringWithFormat:@"%@_B", NSStringFromSelector(_cmd)];
+    NSString *userNameB = [ACCOUNT_NAME() stringByAppendingString:@"_B"];
     RLMSyncUser *userB = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameB
                                                                                            register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
@@ -823,7 +825,6 @@
     }
 
     {
-
         RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:nil read:@YES write:@YES manage:@NO];
 
         XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
