@@ -590,4 +590,261 @@
     }
 }
 
+/// Grant/revoke access a user's Realm to another user. Another user has no access permission by default.
+- (void)testPermissionChange {
+    NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
+    RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
+                                                                                      createAccount:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSString *userNameB = [NSString stringWithFormat:@"%@_B", NSStringFromSelector(_cmd)];
+    RLMSyncUser *userB = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameB
+                                                                                      createAccount:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSURL *url = REALM_URL();
+    RLMRealm *realm = [self openRealmForURL:url user:userA];
+
+    NSArray *administrativePermissions = @[
+                                           @[@YES, @YES, @YES],
+                                           @[@NO, @YES, @YES],
+                                           @[@YES, @NO, @YES],
+                                           @[@NO, @NO, @YES]
+                                           ];
+    NSArray *readWritePermissions = @[
+                                      @[@YES, @YES, @NO]
+                                      ];
+    NSArray *readOnlyPermissions = @[
+                                     @[@YES, @NO, @NO]
+                                     ];
+    NSArray *noAccessPermissions = @[
+                                     @[@NO, @NO, @NO],
+                                     @[[NSNull null], [NSNull null], [NSNull null]]
+                                     ];
+
+    NSArray *permissions = @[administrativePermissions,
+                             readWritePermissions,
+                             readOnlyPermissions,
+                             noAccessPermissions];
+    NSArray *statusMessages = @[@"administrative access",
+                                @"read-write access",
+                                @"read-only access",
+                                @"no access"];
+
+    [permissions enumerateObjectsUsingBlock:^(id  _Nonnull accessPermissions, NSUInteger idx, BOOL * _Nonnull stop __unused) {
+        for (NSArray *permissions in accessPermissions) {
+            NSNumber<RLMBool> *mayRead = permissions[0] == [NSNull null] ? nil : permissions[0];
+            NSNumber<RLMBool> *mayWrite = permissions[1] == [NSNull null] ? nil : permissions[1];
+            NSNumber<RLMBool> *mayManage = permissions[2] == [NSNull null] ? nil : permissions[2];
+            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm
+                                                                                                  forUser:userB
+                                                                                                     read:mayRead
+                                                                                                    write:mayWrite
+                                                                                                   manage:mayManage];
+            [self verifyChangePermission:permissionChange statusMessage:statusMessages[idx] owner:userA];
+        }
+    }];
+}
+
+/// Grant/revoke access a user's Realm to every users.
+- (void)testPermissionChangeForRealm {
+    NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
+    RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
+                                                                                      createAccount:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSURL *url = REALM_URL();
+    RLMRealm *realm = [self openRealmForURL:url user:userA];
+
+    NSArray *administrativePermissions = @[
+                                           @[@YES, @YES, @YES],
+                                           @[@NO, @YES, @YES],
+                                           @[@YES, @NO, @YES],
+                                           @[@NO, @NO, @YES]
+                                           ];
+    NSArray *readWritePermissions = @[
+                                      @[@YES, @YES, @NO]
+                                      ];
+    NSArray *readOnlyPermissions = @[
+                                     @[@YES, @NO, @NO]
+                                     ];
+    NSArray *noAccessPermissions = @[
+                                     @[@NO, @NO, @NO],
+                                     @[[NSNull null], [NSNull null], [NSNull null]]
+                                     ];
+
+    NSArray *permissions = @[administrativePermissions,
+                             readWritePermissions,
+                             readOnlyPermissions,
+                             noAccessPermissions];
+    NSArray *statusMessages = @[@"administrative access",
+                                @"read-write access",
+                                @"read-only access",
+                                @"no access"];
+
+    [permissions enumerateObjectsUsingBlock:^(id  _Nonnull accessPermissions, NSUInteger idx, BOOL * _Nonnull stop __unused) {
+        for (NSArray *permissions in accessPermissions) {
+            NSNumber<RLMBool> *mayRead = permissions[0] == [NSNull null] ? nil : permissions[0];
+            NSNumber<RLMBool> *mayWrite = permissions[1] == [NSNull null] ? nil : permissions[1];
+            NSNumber<RLMBool> *mayManage = permissions[2] == [NSNull null] ? nil : permissions[2];
+            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm
+                                                                                                  forUser:nil
+                                                                                                     read:mayRead
+                                                                                                    write:mayWrite
+                                                                                                   manage:mayManage];
+            [self verifyChangePermission:permissionChange statusMessage:statusMessages[idx] owner:userA];
+        }
+    }];
+}
+
+/// Grant/revoke access user's all Realms to another user.
+- (void)testPermissionChangeForUser {
+    NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
+    RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
+                                                                                      createAccount:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSString *userNameB = [NSString stringWithFormat:@"%@_B", NSStringFromSelector(_cmd)];
+    RLMSyncUser *userB = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameB
+                                                                                      createAccount:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSArray *administrativePermissions = @[
+                                           @[@YES, @YES, @YES],
+                                           @[@NO, @YES, @YES],
+                                           @[@YES, @NO, @YES],
+                                           @[@NO, @NO, @YES]
+                                           ];
+    NSArray *readWritePermissions = @[
+                                      @[@YES, @YES, @NO]
+                                      ];
+    NSArray *readOnlyPermissions = @[
+                                     @[@YES, @NO, @NO]
+                                     ];
+    NSArray *noAccessPermissions = @[
+                                     @[@NO, @NO, @NO],
+                                     @[[NSNull null], [NSNull null], [NSNull null]]
+                                     ];
+
+    NSArray *permissions = @[administrativePermissions,
+                             readWritePermissions,
+                             readOnlyPermissions,
+                             noAccessPermissions];
+    NSArray *statusMessages = @[@"administrative access",
+                                @"read-write access",
+                                @"read-only access",
+                                @"no access"];
+
+    [permissions enumerateObjectsUsingBlock:^(id  _Nonnull accessPermissions, NSUInteger idx, BOOL * _Nonnull stop __unused) {
+        for (NSArray *permissions in accessPermissions) {
+            NSNumber<RLMBool> *mayRead = permissions[0] == [NSNull null] ? nil : permissions[0];
+            NSNumber<RLMBool> *mayWrite = permissions[1] == [NSNull null] ? nil : permissions[1];
+            NSNumber<RLMBool> *mayManage = permissions[2] == [NSNull null] ? nil : permissions[2];
+            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:nil
+                                                                                                  forUser:userB
+                                                                                                     read:mayRead
+                                                                                                    write:mayWrite
+                                                                                                   manage:mayManage];
+            [self verifyChangePermission:permissionChange statusMessage:statusMessages[idx] owner:userA];
+        }
+    }];
+}
+
+- (void)verifyChangePermission:(RLMSyncPermissionChange *)permissionChange statusMessage:(NSString *)message owner:(RLMSyncUser *)owner {
+    RLMRealm *managementRealm = [self managementRealmForUser:owner];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
+
+    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
+                                                                                 where:@"id = %@", permissionChange.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results,
+                                                            RLMCollectionChange * _Nullable change __unused,
+                                                            NSError * _Nullable error __unused) {
+        RLMSyncPermissionChange *permissionChange = results[0];
+        if (permissionChange.statusCode) {
+            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
+            XCTAssertTrue([permissionChange.statusMessage rangeOfString:message].location != NSNotFound);
+            [expectation fulfill];
+        }
+    }];
+
+    NSError *error = nil;
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionChange];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
+/// Changing unowned Realm permission should fail
+- (void)testPermissionChangeErrorByUnownedRealm {
+    NSString *userNameA = [NSString stringWithFormat:@"%@_A", NSStringFromSelector(_cmd)];
+    RLMSyncUser *userA = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameA
+                                                                                      createAccount:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSString *userNameB = [NSString stringWithFormat:@"%@_B", NSStringFromSelector(_cmd)];
+    RLMSyncUser *userB = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:userNameB
+                                                                                      createAccount:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"realm://localhost:9080/~/%@", userNameB]];
+    NSError *error = nil;
+    RLMRealm *realm = [self openRealmForURL:url user:userB];
+
+    RLMRealm *managementRealm = [userA managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    {
+        RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:userB read:@YES write:@YES manage:@NO];
+
+        XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
+        RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
+                                                                                     where:@"id = %@", permissionChange.id];
+        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change __unused, NSError * _Nullable error __unused) {
+            RLMSyncPermissionChange *permissionChange = results[0];
+            if (permissionChange.statusCode) {
+                XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusError);
+                [expectation fulfill];
+            }
+        }];
+
+        [managementRealm transactionWithBlock:^{
+            [managementRealm addObject:permissionChange];
+        } error:&error];
+        XCTAssertNil(error, @"Error when writing permission change object: %@", error);
+
+        [self waitForExpectationsWithTimeout:2.0 handler:nil];
+        [token stop];
+    }
+
+    {
+
+        RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealm:realm forUser:nil read:@YES write:@YES manage:@NO];
+
+        XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
+        RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
+                                                                                     where:@"id = %@", permissionChange.id];
+        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change __unused, NSError * _Nullable error __unused) {
+            RLMSyncPermissionChange *permissionChange = results[0];
+            if (permissionChange.statusCode) {
+                XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusError);
+                [expectation fulfill];
+            }
+        }];
+        
+        [managementRealm transactionWithBlock:^{
+            [managementRealm addObject:permissionChange];
+        } error:&error];
+        XCTAssertNil(error, @"Error when writing permission change object: %@", error);
+        
+        [self waitForExpectationsWithTimeout:2.0 handler:nil];
+        [token stop];
+    }
+}
+
 @end
