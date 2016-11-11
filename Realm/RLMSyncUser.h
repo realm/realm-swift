@@ -24,7 +24,7 @@
  The state of the user object.
  */
 typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
-    /// The user is logged out. Call `authenticateWithCredential:...` with a valid credential to log the user back in.
+    /// The user is logged out. Call `logInWithCredential:...` with a valid credential to log the user back in.
     RLMSyncUserStateLoggedOut,
     /// The user is logged in, and any Realms associated with it are syncing with the Realm Object Server.
     RLMSyncUserStateActive,
@@ -47,10 +47,17 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface RLMSyncUser : NSObject
 
-/** 
+/**
  An array of all valid, logged-in users.
  */
-+ (NSArray<RLMSyncUser *> *)all;
++ (NSArray<RLMSyncUser *> *)allUsers NS_REFINED_FOR_SWIFT;
+
+/**
+ The logged-in user. `nil` if none exists.
+
+ @warning Throws an exception if more than one logged-in user exists.
+ */
++ (nullable RLMSyncUser *)currentUser NS_REFINED_FOR_SWIFT;
 
 /**
  The unique Realm Object Server user ID string identifying this user.
@@ -72,18 +79,18 @@ NS_ASSUME_NONNULL_BEGIN
  credential identifying the user must be passed in. The user becomes available in the completion block, at which point
  it is ready for use.
  */
-+ (void)authenticateWithCredential:(RLMSyncCredential *)credential
-                     authServerURL:(NSURL *)authServerURL
-                           timeout:(NSTimeInterval)timeout
-                      onCompletion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
++ (void)logInWithCredential:(RLMSyncCredential *)credential
+              authServerURL:(NSURL *)authServerURL
+                    timeout:(NSTimeInterval)timeout
+               onCompletion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
 /**
  Create, log in, and asynchronously return a new user object. A credential identifying the user must be passed in. The
  user becomes available in the completion block, at which point it is ready for use.
  */
-+ (void)authenticateWithCredential:(RLMSyncCredential *)credential
-                     authServerURL:(NSURL *)authServerURL
-                      onCompletion:(RLMUserCompletionBlock)completion
++ (void)logInWithCredential:(RLMSyncCredential *)credential
+              authServerURL:(NSURL *)authServerURL
+               onCompletion:(RLMUserCompletionBlock)completion
 NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 /**

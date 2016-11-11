@@ -3,6 +3,35 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
+* Remove `RLMAuthenticationActions` and replace
+  `+[RLMSyncCredential credentialWithUsername:password:actions:]` with
+  `+[RLMSyncCredential credentialWithUsername:password:register:]`.
+* Rename `+[RLMSyncUser authenticateWithCredential:]` to
+  `+[RLMSyncUser logInWithCredential:]`.
+* Rename `+[RLMSyncUser all]` to:
+  * `+[RLMSyncUser allUsers]` in Objective-C.
+  * `SyncUser.allUsers()` in Swift 2.
+  * `SyncUser.all` in Swift 3.
+* Rename `SyncManager.sharedManager()` to `SyncManager.shared` in Swift 3.
+* Change `Realm.Configuration.syncConfiguration` to take a `SyncConfiguration`
+  struct rather than a named tuple.
+
+### Enhancements
+
+* Add `+[RLMSyncUser currentUser]`.
+
+### Bugfixes
+
+* None.
+
+2.0.3 Release notes (2016-10-27)
+=============================================================
+
+This release adds binary versions of Swift 3.0.1 frameworks built with Xcode 8.1
+GM seed.
+
+### API breaking changes
+
 * None.
 
 ### Enhancements
@@ -11,7 +40,16 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix a `BadVersion` exception caused by a race condition when delivering
+  collection change notifications.
+* Fix an assertion failure when additional model classes are added and
+  `deleteRealmIfMigrationNeeded` is enabled.
+* Fix a `BadTransactLog` exception when deleting an `RLMResults` in a synced
+  Realm.
+* Fix an assertion failure when a write transaction is in progress at the point
+  of process termination.
+* Fix a crash that could occur when working with a `RLMLinkingObject` property
+  of an unmanaged object.
 
 2.0.2 Release notes (2016-10-05)
 =============================================================

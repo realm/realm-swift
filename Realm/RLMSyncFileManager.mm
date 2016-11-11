@@ -24,7 +24,7 @@
 static NSString *const RLMSyncUtilityFolderName = @"io.realm.object-server-metadata";
 static NSString *const RLMSyncMetadataRealmName = @"sync_metadata.realm";
 
-@implementation RLMSyncFileManager
+@interface RLMSyncFileManager ()
 
 /**
  The directory within which all Realm Object Server related Realm database and support files are stored. This directory
@@ -33,36 +33,40 @@ static NSString *const RLMSyncMetadataRealmName = @"sync_metadata.realm";
  The directory will be created if it does not already exist, and then verified. If there was an error setting it up an
  exception will be thrown.
  */
-+ (NSURL *)_baseDirectory {
-    static NSURL *s_baseDirectory;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
+@property (nonatomic) NSURL *baseDirectory;
+
+@end
+
+@implementation RLMSyncFileManager
+
+- (instancetype)initWithRootDirectory:(NSURL *)rootDirectory {
+    if (self = [super init]) {
         // Create the path.
         NSFileManager *manager = [NSFileManager defaultManager];
-        NSURL *base = [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
-        s_baseDirectory = [base URLByAppendingPathComponent:@"realm-object-server" isDirectory:YES];
+        self.baseDirectory = [rootDirectory URLByAppendingPathComponent:@"realm-object-server" isDirectory:YES];
 
         // If the directory does not already exist, create it.
-        [manager createDirectoryAtURL:s_baseDirectory
+        [manager createDirectoryAtURL:self.baseDirectory
           withIntermediateDirectories:YES
                            attributes:nil
                                 error:nil];
         BOOL isDirectory = YES;
-        BOOL fileExists = [manager fileExistsAtPath:[s_baseDirectory path] isDirectory:&isDirectory];
+        BOOL fileExists = [manager fileExistsAtPath:[self.baseDirectory path] isDirectory:&isDirectory];
         if (!fileExists || !isDirectory) {
             @throw RLMException(@"Could not prepare the directory for storing synchronized Realm files.");
         }
-    });
-    return s_baseDirectory;
+        return self;
+    }
+    return nil;
 }
 
 /**
  Return the file URL for a directory contained within the sync base directory. If the diretory does not already exist,
  it will automatically be created.
  */
-+ (NSURL *)_folderPathForString:(nonnull NSString *)folderName {
+- (NSURL *)_folderPathForString:(nonnull NSString *)folderName {
     NSFileManager *manager = [NSFileManager defaultManager];
-    NSURL *userDir = [[self _baseDirectory] URLByAppendingPathComponent:folderName];
+    NSURL *userDir = [self.baseDirectory URLByAppendingPathComponent:folderName];
     [manager createDirectoryAtURL:userDir withIntermediateDirectories:YES attributes:nil error:nil];
     BOOL isDirectory = YES;
     BOOL fileExists = [manager fileExistsAtPath:[userDir path] isDirectory:&isDirectory];
@@ -75,7 +79,7 @@ static NSString *const RLMSyncMetadataRealmName = @"sync_metadata.realm";
 /**
  Return the file URL for the directory storing a given Realm Sync user's state.
  */
-+ (NSURL *)_folderPathForUserIdentity:(nonnull NSString *)identity {
+- (NSURL *)_folderPathForUserIdentity:(nonnull NSString *)identity {
     NSCharacterSet *alpha = [NSCharacterSet alphanumericCharacterSet];
     NSString *escapedName = [identity stringByAddingPercentEncodingWithAllowedCharacters:alpha];
     if ([escapedName isEqualToString:RLMSyncUtilityFolderName]) {
@@ -87,7 +91,7 @@ static NSString *const RLMSyncMetadataRealmName = @"sync_metadata.realm";
 /**
  Return the file URL for the sync metadata Realm.
  */
-+ (NSURL *)fileURLForMetadata {
+- (NSURL *)fileURLForMetadata {
     NSURL *utilityFolder = [self _folderPathForString:RLMSyncUtilityFolderName];
     return [utilityFolder URLByAppendingPathComponent:RLMSyncMetadataRealmName];
 }
@@ -95,7 +99,7 @@ static NSString *const RLMSyncMetadataRealmName = @"sync_metadata.realm";
 /**
  Return the file URL for a given combination of a Realm Object Server URL and Realm Sync user.
  */
-+ (NSURL *)fileURLForRawRealmURL:(NSURL *)url user:(RLMSyncUser *)user {
+- (NSURL *)fileURLForRawRealmURL:(NSURL *)url user:(RLMSyncUser *)user {
     NSAssert(user.identity, @"Cannot call this method on a user that doesn't yet have an identity...");
 
     NSCharacterSet *alpha = [NSCharacterSet alphanumericCharacterSet];
@@ -109,7 +113,7 @@ static NSString *const RLMSyncMetadataRealmName = @"sync_metadata.realm";
 /**
  Remove all Realm state for a user.
  */
-+ (BOOL)removeFilesForUserIdentity:(NSString *)identity error:(NSError **)error {
+- (BOOL)removeFilesForUserIdentity:(NSString *)identity error:(NSError **)error {
     NSURL *userDir = [self _folderPathForUserIdentity:identity];
     NSFileManager *manager = [NSFileManager defaultManager];
     return [manager removeItemAtURL:userDir error:error];

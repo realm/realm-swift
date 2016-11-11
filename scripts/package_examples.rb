@@ -7,14 +7,13 @@ require 'xcodeproj'
 ##########################
 
 def remove_reference_to_realm_xcode_project(workspace_path)
-  old_workspace = Xcodeproj::Workspace.new_from_xcworkspace(workspace_path)
-  old_workspace.file_references.reject! do |file_reference|
-    file_reference.path == "../../../Realm.xcodeproj"
+  workspace = Xcodeproj::Workspace.new_from_xcworkspace(workspace_path)
+  file_references = workspace.file_references.reject do |file_reference|
+    file_reference.path == '../../../Realm.xcodeproj'
   end
-
-  File.open("#{workspace_path}/contents.xcworkspacedata", "w") do |file|
-    file.puts old_workspace
-  end
+  workspace = Xcodeproj::Workspace.new(nil)
+  file_references.each { |ref| workspace << ref }
+  workspace.save_as(workspace_path)
 end
 
 def set_framework_search_path(project_path, search_path)
@@ -42,10 +41,17 @@ examples = [
   "examples/tvos/swift-2.2",
   "examples/ios/swift-3.0",
   "examples/tvos/swift-3.0",
+  "examples/ios/swift-3.0.1",
+  "examples/tvos/swift-3.0.1",
 ]
 
-# Remove reference to Realm.xcodeproj from all example workspaces.
+# Remove reference to Realm.xcodeproj from all example workspaces and realize symlinks.
 examples.each do |example|
+  if File.lstat(example).symlink?
+    real_example = File.readlink(example)
+    File.rm(example)
+    File.cp_r(real_example, example)
+  end
   remove_reference_to_realm_xcode_project("#{example}/RealmExamples.xcworkspace")
 end
 
@@ -55,6 +61,8 @@ framework_directory_for_example = {
   'examples/tvos/objc' => '../../../tvos',
   'examples/ios/swift-2.2' => '../../../ios/swift-2.2',
   'examples/tvos/swift-2.2' => '../../../tvos/swift-2.2',
+  'examples/ios/swift-3.0.1' => '../../../ios/swift-3.0.1',
+  'examples/tvos/swift-3.0.1' => '../../../tvos/swift-3.0.1',
   'examples/ios/swift-3.0' => '../../../ios/swift-3.0',
   'examples/tvos/swift-3.0' => '../../../tvos/swift-3.0',
 }
@@ -70,11 +78,14 @@ end
 
 # Update Playground imports and instructions
 
-playground_file = 'examples/ios/swift-2.2/GettingStarted.playground/Contents.swift'
-replace_in_file(playground_file, 'choose RealmSwift', 'choose PlaygroundFrameworkWrapper')
-replace_in_file(playground_file,
-                "import Foundation\n",
-                "import Foundation\nimport PlaygroundFrameworkWrapper // only necessary to use a binary release of Realm Swift in this playground.\n")
+playground_swift_versions = ['2.2', '3.0', '3.0.1']
+playground_swift_versions.each do |swift_version|
+  playground_file = "examples/ios/swift-#{swift_version}/GettingStarted.playground/Contents.swift"
+  replace_in_file(playground_file, 'choose RealmSwift', 'choose PlaygroundFrameworkWrapper')
+  replace_in_file(playground_file,
+                  "import Foundation\n",
+                  "import Foundation\nimport PlaygroundFrameworkWrapper // only necessary to use a binary release of Realm Swift in this playground.\n")
+end
 
 # Update RubyMotion sample
 

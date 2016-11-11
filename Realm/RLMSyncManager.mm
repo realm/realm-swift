@@ -66,9 +66,13 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
 } // anonymous namespace
 
-@interface RLMSyncManager ()
+@interface RLMSyncManager () {
+    std::unique_ptr<realm::SyncMetadataManager> _metadata_manager;
+}
 
-- (instancetype)initPrivate NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithCustomRootDirectory:(nullable NSURL *)rootDirectory NS_DESIGNATED_INITIALIZER;
+
+@property (nonnull, nonatomic) RLMSyncFileManager *fileManager;
 
 @property (nonnull, nonatomic) NSMutableDictionary<NSString *, RLMSyncUser *> *activeUsers;
 @property (nonnull, nonatomic) NSMutableDictionary<NSString *, RLMSyncUser *> *loggedOutUsers;
@@ -82,20 +86,20 @@ static dispatch_once_t s_onceToken;
 
 + (instancetype)sharedManager {
     dispatch_once(&s_onceToken, ^{
-        s_sharedManager = [[RLMSyncManager alloc] initPrivate];
+        s_sharedManager = [[RLMSyncManager alloc] initWithCustomRootDirectory:nil];
     });
     return s_sharedManager;
 }
 
 - (RLMSyncSession *)sessionForSyncConfiguration:(RLMSyncConfiguration *)config {
-    NSURL *fileURL = [RLMSyncFileManager fileURLForRawRealmURL:config.realmURL user:config.user];
+    NSURL *fileURL = [self.fileManager fileURLForRawRealmURL:config.realmURL user:config.user];
     return [config.user _registerSessionForBindingWithFileURL:fileURL
                                                    syncConfig:config
                                             standaloneSession:YES
                                                  onCompletion:nil];
 }
 
-- (instancetype)initPrivate {
+- (instancetype)initWithCustomRootDirectory:(NSURL *)rootDirectory {
     if (self = [super init]) {
         // Create the global error handler.
         auto errorLambda = [=](int error_code, std::string message) {
@@ -106,15 +110,6 @@ static dispatch_once_t s_onceToken;
             [self _fireError:error];
         };
 
-        // Create the static login callback. This is called whenever any Realm wishes to BIND to the Realm Object Server
-        // for the first time.
-        SyncLoginFunction loginLambda = [=](const std::string& path, const SyncConfig& config) {
-            NSString *localFilePath = @(path.c_str());
-            RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:config];
-            [self _handleBindRequestForSyncConfig:syncConfig
-                                    localFilePath:localFilePath];
-        };
-
         _disableSSLValidation = NO;
         self.logLevel = RLMSyncLogLevelWarn;
         realm::SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
@@ -122,10 +117,12 @@ static dispatch_once_t s_onceToken;
         self.activeUsers = [NSMutableDictionary dictionary];
         self.loggedOutUsers = [NSMutableDictionary dictionary];
 
+        rootDirectory = rootDirectory ?: [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
+        self.fileManager = [[RLMSyncFileManager alloc] initWithRootDirectory:rootDirectory];
+
         // Initialize the sync engine.
         SyncManager::shared().set_error_handler(errorLambda);
-        SyncManager::shared().set_login_function(loginLambda);
-        NSString *metadataDirectory = [[RLMSyncFileManager fileURLForMetadata] path];
+        NSString *metadataDirectory = [[self.fileManager fileURLForMetadata] path];
         bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION");
         _metadata_manager = std::make_unique<SyncMetadataManager>([metadataDirectory UTF8String], should_encrypt);
         [self _cleanUpMarkedUsers];
@@ -154,29 +151,6 @@ static dispatch_once_t s_onceToken;
 
 
 #pragma mark - Private API
-
-+ (void)_resetStateForTesting {
-    // Log out all the logged-in users. This will immediately kill any open sessions.
-    NSMutableArray<RLMSyncUser *> *buffer = [NSMutableArray array];
-    if (s_sharedManager) {
-        for (id key in s_sharedManager.activeUsers) {
-            [buffer addObject:s_sharedManager.activeUsers[key]];
-        }
-    }
-    [[s_sharedManager.activeUsers allValues] makeObjectsPerformSelector:@selector(logOut)];
-
-    // Reset the singleton.
-    s_onceToken = 0;
-    s_sharedManager = nil;
-
-    // Destroy the metadata Realm.
-    NSURL *metadataURL = [RLMSyncFileManager fileURLForMetadata];
-    // FIXME: replace this with the appropriate call to `[RLMSyncFileManager deleteRealmAtPath:]` once that code is in.
-    NSFileManager *manager = [NSFileManager defaultManager];
-    [manager removeItemAtURL:metadataURL error:nil];
-    [manager removeItemAtURL:[metadataURL URLByAppendingPathExtension:@"lock"] error:nil];
-    [manager removeItemAtURL:[metadataURL URLByAppendingPathExtension:@"management"] error:nil];
-}
 
 - (void)_fireError:(NSError *)error {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -251,7 +225,7 @@ static dispatch_once_t s_onceToken;
             auto user = users_to_remove.get(i);
             // FIXME: delete user data in a different way? (This deletes a logged-out user's data as soon as the app
             // launches again, which might not be how some apps want to treat their data.)
-            [RLMSyncFileManager removeFilesForUserIdentity:@(user.identity().c_str()) error:nil];
+            [self.fileManager removeFilesForUserIdentity:@(user.identity().c_str()) error:nil];
             dead_users.emplace_back(std::move(user));
         }
         for (auto user : dead_users) {

@@ -284,6 +284,12 @@ fi
 # Downloading
 ######################################
 
+kill_object_server() {
+    (pgrep -f realm-object-server || true) | while read pid; do
+        kill $pid 2>/dev/null
+    done
+}
+
 download_object_server() {
     local archive_name="realm-object-server-bundled_node_darwin-$REALM_OBJECT_SERVER_VERSION.tar.gz"
     curl -L -O "https://static.realm.io/downloads/object-server/$archive_name"
@@ -395,15 +401,23 @@ case "$COMMAND" in
         ;;
 
     "start-object-server")
-        # kill any object servers that are still running
-        (pgrep -f realm-object-server || true) | while read pid; do
-            kill $pid
-        done
+        kill_object_server
         ./sync/start-object-server.command
         exit 0
         ;;
 
+    "reset-object-server-between-tests")
+        # Leave the server files alone to avoid 'bad_server_ident' errors
+        rm -rf "~/Library/Application Support/xctest"
+        rm -rf "~/Library/Application Support/io.realm.TestHost"
+        rm -rf "~/Library/Application Support/xctest-child"
+        exit 0
+        ;;
+
     "reset-object-server")
+        kill_object_server
+        # Add a short delay, so file system doesn't complain about files in use
+        sleep 1
         package="${source_root}/sync"
         for file in "$package"/realm-object-server-*; do
             if [ -d "$file" ]; then
@@ -413,6 +427,7 @@ case "$COMMAND" in
         done
         rm -rf "$package/object-server/root_dir/"
         rm -rf "$package/object-server/temp_dir/"
+        sh build.sh reset-object-server-between-tests
         exit 0
         ;;
 
@@ -814,6 +829,7 @@ case "$COMMAND" in
     "verify-osx-object-server")
         sh build.sh download-object-server
         sh build.sh test-osx-object-server
+        sh build.sh reset-object-server
         exit 0
         ;;
 
@@ -1129,24 +1145,24 @@ EOM
 
     "package-ios-swift")
         cd tightdb_objc
-        for version in 2.2 2.3 3.0; do
+        for version in 2.2 2.3 3.0 3.0.1; do
             REALM_SWIFT_VERSION="$version" sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION="$version" sh build.sh ios-swift
         done
 
         cd build/ios
-        zip --symlinks -r realm-swift-framework-ios.zip swift-2.2 swift-2.3 swift-3.0
+        zip --symlinks -r realm-swift-framework-ios.zip swift-2.2 swift-2.3 swift-3.0 swift-3.0.1
         ;;
 
     "package-osx-swift")
         cd tightdb_objc
-        for version in 2.2 2.3 3.0; do
+        for version in 2.2 2.3 3.0 3.0.1; do
             REALM_SWIFT_VERSION="$version" sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION="$version" sh build.sh osx-swift
         done
 
         cd build/osx
-        zip --symlinks -r realm-swift-framework-osx.zip swift-2.2 swift-2.3 swift-3.0
+        zip --symlinks -r realm-swift-framework-osx.zip swift-2.2 swift-2.3 swift-3.0 swift-3.0.1
         ;;
 
     "package-watchos")
@@ -1159,13 +1175,13 @@ EOM
 
     "package-watchos-swift")
         cd tightdb_objc
-        for version in 2.2 2.3 3.0; do
+        for version in 2.2 2.3 3.0 3.0.1; do
             REALM_SWIFT_VERSION="$version" sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION="$version" sh build.sh watchos-swift
         done
 
         cd build/watchos
-        zip --symlinks -r realm-swift-framework-watchos.zip swift-2.2 swift-2.3 swift-3.0
+        zip --symlinks -r realm-swift-framework-watchos.zip swift-2.2 swift-2.3 swift-3.0 swift-3.0.1
         ;;
 
     "package-tvos")
@@ -1178,13 +1194,13 @@ EOM
 
     "package-tvos-swift")
         cd tightdb_objc
-        for version in 2.2 2.3 3.0; do
+        for version in 2.2 2.3 3.0 3.0.1; do
             REALM_SWIFT_VERSION="$version" sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION="$version" sh build.sh tvos-swift
         done
 
         cd build/tvos
-        zip --symlinks -r realm-swift-framework-tvos.zip swift-2.2 swift-2.3 swift-3.0
+        zip --symlinks -r realm-swift-framework-tvos.zip swift-2.2 swift-2.3 swift-3.0 swift-3.0.1
         ;;
 
     "package-release")

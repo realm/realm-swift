@@ -20,8 +20,8 @@
 
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncUser_Private.hpp"
 #import "RLMSyncFileManager.h"
+#import "RLMSyncUser_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
@@ -43,7 +43,7 @@
     // Ensure sync manager is initialized, if it hasn't already been.
     [RLMSyncManager sharedManager];
     NSAssert(user.identity, @"Cannot call this method on a user that doesn't have an identity.");
-    NSURL *localFileURL = [RLMSyncFileManager fileURLForRawRealmURL:realmURL user:user];
+    NSURL *localFileURL = [[[RLMSyncManager sharedManager] fileManager] fileURLForRawRealmURL:realmURL user:user];
     if (syncConfiguration.customFileURL) {
         localFileURL = syncConfiguration.customFileURL;
     }

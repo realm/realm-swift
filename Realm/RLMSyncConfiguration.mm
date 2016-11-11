@@ -70,7 +70,16 @@ static BOOL isValidRealmURL(NSURL *url) {
     std::string realm_url = [[self.realmURL absoluteString] UTF8String];
     auto stop_policy = realm::translateStopPolicy(self.stopPolicy);
 
-    return realm::SyncConfig(std::move(user_tag), std::move(realm_url), _error_handler, std::move(stop_policy));
+    // Create the static login callback. This is called whenever any Realm wishes to BIND to the Realm Object Server
+    // for the first time.
+    auto loginLambda = [=](const std::string& path, const realm::SyncConfig& config) {
+        NSString *localFilePath = @(path.c_str());
+        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithRawConfig:config];
+        [[RLMSyncManager sharedManager] _handleBindRequestForSyncConfig:syncConfig
+                                                          localFilePath:localFilePath];
+    };
+
+    return realm::SyncConfig(std::move(user_tag), std::move(realm_url), std::move(stop_policy), std::move(loginLambda), _error_handler);
 }
 
 - (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url {

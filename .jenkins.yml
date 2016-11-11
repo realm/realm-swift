@@ -5,6 +5,7 @@ swift_version:
   - 2.2
   - 2.3
   - 3.0
+  - 3.0.1
 target:
   - osx
   - docs
@@ -32,14 +33,17 @@ configuration:
 # +--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 # | Configuration Matrix | osx | docs | ios-static | ios-dynamic | ios-swift | osx-swift | watchos | cocoapods | swiftlint | tvos | osx-encryption | osx-object-server |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- |
-# | 2.2 | Debug          | X   |      |            |             |           |           |         |           |           |      |                |                   |
-# | 2.2 | Release        | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |
+# | 2.2   | Debug        | X   |      |            |             |           |           |         |           |           |      |                |                   |
+# | 2.2   | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- |
-# | 2.3 | Debug          |     |      |            |             |           |           |         |           |           |      |                |                   |
-# | 2.3 | Release        |     |      |            |             | X         | X         | X       | X         |           | X    |                |                   |
+# | 2.3   | Debug        |     |      |            |             |           |           |         |           |           |      |                |                   |
+# | 2.3   | Release      |     |      |            |             | X         | X         | X       | X         |           | X    |                |                   |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- |
-# | 3.0 | Debug          | X   |      | X          | X           | X         | X         | X       |           |           | X    |                |                   |
-# | 3.0 | Release        | X   | X    | X          | X           | X         | X         | X       | X         | X         | X    | X              | X                 |
+# | 3.0   | Debug        | X   |      |            |             |           |           |         |           |           |      |                |                   |
+# | 3.0   | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |
+# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- |
+# | 3.0.1 | Debug        | X   |      | X          | X           | X         | X         | X       |           |           | X    |                |                   |
+# | 3.0.1 | Release      | X   | X    | X          | X           | X         | X         | X       | X         | X         | X    | X              | X                 |
 # +--------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 exclude:
@@ -53,10 +57,12 @@ exclude:
   ################
   # docs
   ################
-  # Just run on 3.0 Release
+  # Just run on 3.0.1 Release
   - swift_version: 2.2
     target: docs
   - swift_version: 2.3
+    target: docs
+  - swift_version: 3.0
     target: docs
   - target: docs
     configuration: Debug
@@ -64,8 +70,11 @@ exclude:
   ################
   # ios-static
   ################
-  # Skip on 2.2 Debug & 2.3
+  # Skip on 2.2/3.0 Debug & 2.3
   - swift_version: 2.2
+    target: ios-static
+    configuration: Debug
+  - swift_version: 3.0
     target: ios-static
     configuration: Debug
   - swift_version: 2.3
@@ -74,8 +83,11 @@ exclude:
   ################
   # ios-dynamic
   ################
-  # Skip on 2.2 Debug & 2.3
+  # Skip on 2.2/3.0 Debug & 2.3
   - swift_version: 2.2
+    target: ios-dynamic
+    configuration: Debug
+  - swift_version: 3.0
     target: ios-dynamic
     configuration: Debug
   - swift_version: 2.3
@@ -84,33 +96,42 @@ exclude:
   ################
   # ios-swift
   ################
-  # Skip 2.2/2.3 Debug
+  # Skip 2.2/2.3/3.0 Debug
   - swift_version: 2.2
     target: ios-swift
     configuration: Debug
   - swift_version: 2.3
+    target: ios-swift
+    configuration: Debug
+  - swift_version: 3.0
     target: ios-swift
     configuration: Debug
 
   ################
   # osx-swift
   ################
-  # Skip 2.2/2.3 Debug
+  # Skip 2.2/2.3/3.0 Debug
   - swift_version: 2.2
     target: osx-swift
     configuration: Debug
   - swift_version: 2.3
+    target: osx-swift
+    configuration: Debug
+  - swift_version: 3.0
     target: osx-swift
     configuration: Debug
 
   ################
   # watchos
   ################
-  # Skip 2.2/2.3 Debug
+  # Skip 2.2/2.3/3.0 Debug
   - swift_version: 2.2
     target: watchos
     configuration: Debug
   - swift_version: 2.3
+    target: watchos
+    configuration: Debug
+  - swift_version: 3.0
     target: watchos
     configuration: Debug
 
@@ -124,10 +145,12 @@ exclude:
   ################
   # swiftlint
   ################
-  # Just run on 3.0 Release
+  # Just run on 3.0.1 Release
   - swift_version: 2.2
     target: swiftlint
   - swift_version: 2.3
+    target: swiftlint
+  - swift_version: 3.0
     target: swiftlint
   - target: swiftlint
     configuration: Debug
@@ -135,21 +158,26 @@ exclude:
   ################
   # tvos
   ################
-  # Skip 2.2/2.3 Debug
+  # Skip 2.2/2.3/3.0 Debug
   - swift_version: 2.2
     target: tvos
     configuration: Debug
   - swift_version: 2.3
+    target: tvos
+    configuration: Debug
+  - swift_version: 3.0
     target: tvos
     configuration: Debug
 
   ################
   # osx-encryption
   ################
-  # Just run on 3.0 Release
+  # Just run on 3.0.1 Release
   - swift_version: 2.2
     target: osx-encryption
   - swift_version: 2.3
+    target: osx-encryption
+  - swift_version: 3.0
     target: osx-encryption
   - target: osx-encryption
     configuration: Debug
@@ -157,10 +185,12 @@ exclude:
   ################
   # osx-object-server
   ################
-  # Just run on 3.0 Release
+  # Just run on 3.0.1 Release
   - swift_version: 2.2
     target: osx-object-server
   - swift_version: 2.3
+    target: osx-object-server
+  - swift_version: 3.0
     target: osx-object-server
   - target: osx-object-server
     configuration: Debug

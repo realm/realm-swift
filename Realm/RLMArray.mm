@@ -378,7 +378,7 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
     return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
 }
 
-- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties
 {
     @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
 }
