@@ -49,8 +49,9 @@ Any number of users may drag the number of puzzle pieces around the screen with 
 1. [Download the macOS version](https://realm.io/docs/realm-mobile-platform/get-started/) of the Realm Mobile Platform.
 2. Run a local instance of the Realm Mobile Platform.
 3. Open the Realm Object Server Dashboard in your browser by visiting 'http://localhost:9080'.
-4. Create a user account with the email 'demo@realm.io' and the password 'demo'.
+4. Create a user account in the Realm Object Server Dashboard using any username / password combination you wish.
 5. Build the Puzzle app and deploy it to iOS devices on the same network as your Mac.
+6. In the login form, enter in the username and password you registered in the Dashboard and tap 'Connect'.
 
 ## iOS (Swift)
 
