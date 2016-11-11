@@ -116,6 +116,7 @@
 		F18464661DC16CDA00DAB8B9 /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464601DC16CDA00DAB8B9 /* DrawView.m */; };
 		F18464671DC16CDA00DAB8B9 /* SwatchesView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464621DC16CDA00DAB8B9 /* SwatchesView.m */; };
 		F184646A1DC16D3700DAB8B9 /* CanvasView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464691DC16D3700DAB8B9 /* CanvasView.m */; };
+		F196C2EF1DD6442400AFB53B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1013,6 +1014,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F184644B1DC151F000DAB8B9 /* Images.xcassets in Resources */,
+				F196C2EF1DD6442400AFB53B /* LaunchScreen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
