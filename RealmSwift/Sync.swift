@@ -220,22 +220,13 @@ extension SyncUser {
     }
 
     public func managementRealm() throws -> Realm {
-        let components = NSURLComponents(url: authenticationServer!, resolvingAgainstBaseURL: false)!
-        components.scheme = "realm"
-        components.path = "/~/__management"
-
-        let managementRealmUrl = components.url!
-
-        let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: self, realmURL: managementRealmUrl), objectTypes: [PermissionChange.self])
+        var config = Realm.Configuration.fromRLMRealmConfiguration(rlmConfiguration: RLMRealmConfiguration(for: self))
+        config.objectTypes = [SyncPermissionChange.self]
         return try Realm(configuration: config)
     }
 }
 
-/**
- * This is the base class managing the meta info. The inheritance from the other
- * classes is assumed to be flattened out in the schema.
- */
-public class PermissionBaseObject: Object {
+public final class SyncPermissionChange: Object {
     public dynamic var id = UUID().uuidString
     public dynamic var createdAt = Date()
     public dynamic var updatedAt = Date()
@@ -252,13 +243,6 @@ public class PermissionBaseObject: Object {
         }
         return .error
     }
-
-    override public class func shouldIncludeInDefaultSchema() -> Bool {
-        return false
-    }
-}
-
-public final class PermissionChange: PermissionBaseObject {
     public dynamic var realmUrl = "*"
     public dynamic var userId = "*"
 
@@ -266,7 +250,7 @@ public final class PermissionChange: PermissionBaseObject {
     public let mayWrite = RealmOptional<Bool>()
     public let mayManage = RealmOptional<Bool>()
 
-    public convenience init(forRealm realm: Realm?, forUser user: SyncUser?, read mayRead: Bool?, write mayWrite: Bool?, manage mayManage: Bool?) {
+    public convenience init(realm: Realm?, user: SyncUser?, mayRead: Bool?, mayWrite: Bool?, mayManage: Bool?) {
         self.init()
 
         if let realmUrl = realm?.configuration.syncConfiguration?.realmURL.absoluteString {
@@ -280,6 +264,10 @@ public final class PermissionChange: PermissionBaseObject {
         self.mayRead.value = mayRead
         self.mayWrite.value = mayWrite
         self.mayManage.value = mayManage
+    }
+
+    override public class func shouldIncludeInDefaultSchema() -> Bool {
+        return false
     }
 }
 
@@ -420,22 +408,13 @@ extension SyncUser {
     }
 
     public func managementRealm() throws -> Realm {
-        let components = NSURLComponents(URL: authenticationServer!, resolvingAgainstBaseURL: false)!
-        components.scheme = "realm"
-        components.path = "/~/__management"
-
-        let managementRealmURL = components.URL!
-
-        let config = Realm.Configuration(syncConfiguration: (user: self, realmURL: managementRealmURL), objectTypes: [PermissionChange.self])
+        var config = Realm.Configuration.fromRLMRealmConfiguration(RLMRealmConfiguration(forUser: self))
+        config.objectTypes = [SyncPermissionChange.self]
         return try Realm(configuration: config)
     }
 }
 
-/**
- * This is the base class managing the meta info. The inheritance from the other
- * classes is assumed to be flattened out in the schema.
- */
-public class PermissionBaseObject: Object {
+public final class SyncPermissionChange: Object {
     public dynamic var id = NSUUID().UUIDString
     public dynamic var createdAt = NSDate()
     public dynamic var updatedAt = NSDate()
@@ -452,13 +431,6 @@ public class PermissionBaseObject: Object {
         }
         return .Error
     }
-
-    override public class func shouldIncludeInDefaultSchema() -> Bool {
-        return false
-    }
-}
-
-public final class PermissionChange: PermissionBaseObject {
     public dynamic var realmUrl = "*"
     public dynamic var userId = "*"
 
@@ -466,7 +438,7 @@ public final class PermissionChange: PermissionBaseObject {
     public let mayWrite = RealmOptional<Bool>()
     public let mayManage = RealmOptional<Bool>()
 
-    public convenience init(forRealm realm: Realm?, forUser user: SyncUser?, read mayRead: Bool?, write mayWrite: Bool?, manage mayManage: Bool?) {
+    public convenience init(realm: Realm?, user: SyncUser?, mayRead: Bool?, mayWrite: Bool?, mayManage: Bool?) {
         self.init()
 
         if let realmUrl = realm?.configuration.syncConfiguration?.realmURL.absoluteString {
@@ -480,6 +452,10 @@ public final class PermissionChange: PermissionBaseObject {
         self.mayRead.value = mayRead
         self.mayWrite.value = mayWrite
         self.mayManage.value = mayManage
+    }
+    
+    override public class func shouldIncludeInDefaultSchema() -> Bool {
+        return false
     }
 }
 

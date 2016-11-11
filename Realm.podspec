@@ -35,7 +35,6 @@ Pod::Spec.new do |s|
                               'include/**/RLMSyncConfiguration.h',
                               'include/**/RLMSyncCredential.h',
                               'include/**/RLMSyncManager.h',
-                              'include/**/RLMSyncPermissionBaseObject.h',
                               'include/**/RLMSyncPermissionChange.h',
                               'include/**/RLMSyncSession.h',
                               'include/**/RLMSyncUser.h',

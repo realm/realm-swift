@@ -16,15 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncPermissionBaseObject.h"
+#import "RLMSyncPermissionChange.h"
 
-@interface RLMSyncPermissionBaseObject ()
+NS_ASSUME_NONNULL_BEGIN
+
+@interface RLMSyncPermissionChange()
 
 @property (readwrite) NSString *id;
 @property (readwrite) NSDate *createdAt;
 @property (readwrite) NSDate *updatedAt;
+@property (nullable, readwrite) NSNumber<RLMInt> *statusCode;
+@property (nullable, readwrite) NSString *statusMessage;
+@property (readwrite) NSString *realmUrl;
+@property (readwrite) NSString *userId;
 
-@property (readwrite) NSNumber<RLMInt> *statusCode;
-@property (readwrite) NSString *statusMessage;
+@property (nullable, readwrite) NSNumber<RLMBool> *mayRead;
+@property (nullable, readwrite) NSNumber<RLMBool> *mayWrite;
+@property (nullable, readwrite) NSNumber<RLMBool> *mayManage;
 
 @end
+
+NS_ASSUME_NONNULL_END

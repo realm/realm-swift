@@ -17,28 +17,64 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-
-#import "RLMSyncPermissionBaseObject.h"
+#import <Realm/RLMObject.h>
+#import <Realm/RLMProperty.h>
 
 @class RLMSyncUser;
 
+typedef NS_ENUM(NSUInteger, RLMSyncManagementObjectStatus) {
+    RLMSyncManagementObjectStatusNotProcessed,
+    RLMSyncManagementObjectStatusSuccess,
+    RLMSyncManagementObjectStatusError,
+};
+
 NS_ASSUME_NONNULL_BEGIN
 
-@interface PermissionChange : RLMSyncPermissionBaseObject
+@interface RLMSyncPermissionChange : RLMObject
+
+/**
+ The unique ID string of a Permission Object.
+ */
+@property (readonly) NSString *id;
+
+/**
+ Creation date.
+ */
+@property (readonly) NSDate *createdAt;
+
+/**
+ Modification date.
+ */
+@property (readonly) NSDate *updatedAt;
+
+/**
+ The status code of the object that was processed by Realm Object Server.
+ */
+@property (nullable, readonly) NSNumber<RLMInt> *statusCode;
+
+/**
+ Error message.
+ */
+@property (nullable, readonly) NSString *statusMessage;
+
+/**
+ Sync management object status.
+ */
+@property (readonly) RLMSyncManagementObjectStatus status;
 
 /**
  the URL to the realm
  */
-@property NSString *realmUrl;
+@property (readonly) NSString *realmUrl;
 
 /**
  the identity of a user
  */
-@property NSString *userId;
+@property (readonly) NSString *userId;
 
-@property (nullable) NSNumber<RLMBool> *mayRead;
-@property (nullable) NSNumber<RLMBool> *mayWrite;
-@property (nullable) NSNumber<RLMBool> *mayManage;
+@property (nullable, readonly) NSNumber<RLMBool> *mayRead;
+@property (nullable, readonly) NSNumber<RLMBool> *mayWrite;
+@property (nullable, readonly) NSNumber<RLMBool> *mayManage;
 
 + (instancetype)permissionChangeForRealm:(nullable RLMRealm *)realm
                                  forUser:(nullable RLMSyncUser *)user
@@ -49,5 +85,3 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 NS_ASSUME_NONNULL_END
-
-@compatibility_alias RLMSyncPermissionChange PermissionChange;

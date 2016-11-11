@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncPermissionChange.h"
+#import "RLMSyncPermissionChange_Private.h"
 
 #import "RLMRealm.h"
 #import "RLMRealmConfiguration+Sync.h"
@@ -49,15 +49,32 @@
 }
 
 + (NSArray<NSString *> *)requiredProperties {
-    return [[super requiredProperties]
-            arrayByAddingObjectsFromArray:@[@"realmUrl", @"userId"]];
+    return @[@"id", @"createdAt", @"updatedAt", @"realmUrl", @"userId"];
 }
 
 + (NSDictionary *)defaultPropertyValues {
-    NSMutableDictionary *defaultPropertyValues = [[super defaultPropertyValues] mutableCopy];
-    defaultPropertyValues[@"realmUrl"] = @"*";
-    defaultPropertyValues[@"userId"] = @"*";
-    return defaultPropertyValues.copy;
+    NSDate *now = [NSDate date];
+    return @{
+        @"id": [NSUUID UUID].UUIDString,
+        @"createdAt": now,
+        @"updatedAt": now,
+        @"realmUrl": @"*",
+        @"userId": @"*"
+    };
+}
+
++ (BOOL)shouldIncludeInDefaultSchema {
+    return NO;
+}
+
+- (RLMSyncManagementObjectStatus)status {
+    if (!self.statusCode) {
+        return RLMSyncManagementObjectStatusNotProcessed;
+    }
+    if (self.statusCode.integerValue == 0) {
+        return RLMSyncManagementObjectStatusSuccess;
+    }
+    return RLMSyncManagementObjectStatusError;
 }
 
 @end

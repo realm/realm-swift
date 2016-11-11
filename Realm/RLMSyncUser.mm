@@ -138,37 +138,17 @@ using namespace realm;
 
 - (NSArray<RLMSyncSession *> *)allSessions {
     NSMutableArray<RLMSyncSession *> *buffer = [NSMutableArray arrayWithCapacity:self.sessionsStorage.count];
-    NSArray<NSURL *> *allURLs = [self.sessionsStorage allKeys];
-    for (NSURL *url in allURLs) {
-        RLMSyncSession *session = [self sessionForURL:url];
-        if (session) {
+    for (NSURL *url in self.sessionsStorage.allKeys) {
+        if (RLMSyncSession *session = [self sessionForURL:url]) {
             [buffer addObject:session];
         }
     }
     return [buffer copy];
 }
 
-- (RLMRealm *)managementRealm {
-    return [self managementRealmWithError:nil];
-}
-
 - (RLMRealm *)managementRealmWithError:(NSError **)error {
-    NSURLComponents *components = [NSURLComponents componentsWithURL:self.authenticationServer resolvingAgainstBaseURL:NO];
-    components.scheme = @"realm";
-    components.path = @"/~/__management";
-
-    NSURL *managementRealmURL = components.URL;
-
-    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
-    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self realmURL:managementRealmURL];
-    config.syncConfiguration = syncConfig;
-    config.objectClasses = @[RLMSyncPermissionChange.class];
-
-    config.schemaMode = realm::SchemaMode::Additive;
-
-    return [RLMRealm realmWithConfiguration:config error:error];
+    return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration configurationForUser:self] error:error];
 }
-
 
 #pragma mark - Private API
 

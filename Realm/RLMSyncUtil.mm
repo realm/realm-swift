@@ -19,6 +19,25 @@
 #import <Foundation/Foundation.h>
 
 #import "RLMSyncUtil_Private.hpp"
+#import "RLMSyncUser_Private.hpp"
+#import "RLMRealmConfiguration+Sync.h"
+#import "RLMRealmConfiguration_Private.hpp"
+#import "RLMSyncPermissionChange.h"
+
+@implementation RLMRealmConfiguration (RealmSync)
++ (instancetype)configurationForUser:(RLMSyncUser *)user {
+    NSURLComponents *components = [NSURLComponents componentsWithURL:user.authenticationServer resolvingAgainstBaseURL:NO];
+    components.scheme = @"realm";
+    components.path = @"/~/__management";
+    NSURL *managementRealmURL = components.URL;
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:managementRealmURL];
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.syncConfiguration = syncConfig;
+    config.objectClasses = @[RLMSyncPermissionChange.class];
+    config.schemaMode = realm::SchemaMode::Additive;
+    return config;
+}
+@end
 
 RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
 
