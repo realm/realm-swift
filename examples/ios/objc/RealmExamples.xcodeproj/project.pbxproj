@@ -241,7 +241,7 @@
 		F157668B1DAD996400F21319 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		F157668D1DAD996400F21319 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		F157668E1DAD996400F21319 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		F157669B1DAD996400F21319 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F157669B1DAD996400F21319 /* Puzzle-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Puzzle-Info.plist"; sourceTree = "<group>"; };
 		F15766A51DAD9A1C00F21319 /* RLMViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMViewController.h; sourceTree = "<group>"; };
 		F15766A61DAD9A1C00F21319 /* RLMViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMViewController.m; sourceTree = "<group>"; };
 		F15766A71DAD9A1C00F21319 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -628,7 +628,7 @@
 				F1B658881DBE87AA00A3264F /* Constants.h */,
 				F157668D1DAD996400F21319 /* AppDelegate.h */,
 				F157668E1DAD996400F21319 /* AppDelegate.m */,
-				F157669B1DAD996400F21319 /* Info.plist */,
+				F157669B1DAD996400F21319 /* Puzzle-Info.plist */,
 				F157668A1DAD996400F21319 /* Supporting Files */,
 			);
 			path = Puzzle;
@@ -1678,7 +1678,7 @@
 				CODE_SIGN_ENTITLEMENTS = Puzzle/Puzzle.entitlements;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = QX5CR2FTN2;
-				INFOPLIST_FILE = Puzzle/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Puzzle/Puzzle-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -1703,7 +1703,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = QX5CR2FTN2;
-				INFOPLIST_FILE = Puzzle/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/Puzzle/Puzzle-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
