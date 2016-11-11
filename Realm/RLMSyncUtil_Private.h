@@ -16,10 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncUtil.h"
+#import <Realm/RLMSyncUtil.h>
 
-#import "RLMSyncCredential.h"
-#import "RLMRealmConfiguration.h"
+#import <Realm/RLMSyncCredential.h>
+#import <Realm/RLMRealmConfiguration.h>
 
 @class RLMSyncUser;
 
