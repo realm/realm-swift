@@ -40,9 +40,9 @@
     
     [RLMSyncManager sharedManager].errorHandler = globalErrorHandler;
     
-    if ([RLMSyncUser all].count > 0) {
+    if ([RLMSyncUser allUsers].count > 0) {
         NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", ipAddress]];
-        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:[RLMSyncUser all].firstObject realmURL:syncURL];
+        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:[RLMSyncUser allUsers].firstObject realmURL:syncURL];
         RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
         defaultConfig.syncConfiguration = syncConfig;
         [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
@@ -56,25 +56,25 @@
         // produced when running the Realm Object Server via the `start-object-server.command`
         RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:@"demo@realm.io"
                                                                          password:@"demo"
-                                                                          actions:RLMAuthenticationActionsUseExistingAccount];
+                                                                          register:NO];
         
         // Log the user in (async, the Realm will start syncing once the user is logged in automatically)
-        [RLMSyncUser authenticateWithCredential:credential
+        [RLMSyncUser logInWithCredential:credential
                                   authServerURL:authURL
                                    onCompletion:^(RLMSyncUser *user, NSError *error) {
-                                       if (error) {
-                                           NSLog(@"A login error has occurred! %@", error);
-                                       }
-                                       else { // Logged in setup the default Realm
-                                           // The Realm virtual path on the server.
-                                           // The `~` represents the Realm user ID. Since the user ID is not known until you
-                                           // log in, the ~ is used as short-hand to represent this.
-                                           NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", ipAddress]];
-                                           RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:syncURL];
-                                           RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
-                                           defaultConfig.syncConfiguration = syncConfig;
-                                           [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
-                                       }
+           if (error) {
+               NSLog(@"A login error has occurred! %@", error);
+           }
+           else { // Logged in setup the default Realm
+               // The Realm virtual path on the server.
+               // The `~` represents the Realm user ID. Since the user ID is not known until you
+               // log in, the ~ is used as short-hand to represent this.
+               NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", ipAddress]];
+               RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:syncURL];
+               RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
+               defaultConfig.syncConfiguration = syncConfig;
+               [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
+           }
         }];
     }
 

@@ -102,10 +102,10 @@
 		E8F70ED519BA530C006F60D5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
 		E8F70ED919BA534E006F60D5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
 		E8F70EDD19BA5380006F60D5 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
+		F12EFBFF1DD66AC50015F7AA /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		F18464461DC151F000DAB8B9 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464361DC151F000DAB8B9 /* AppDelegate.m */; };
 		F184644B1DC151F000DAB8B9 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F184643F1DC151F000DAB8B9 /* Images.xcassets */; };
 		F184644D1DC151F000DAB8B9 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464411DC151F000DAB8B9 /* main.m */; };
-		F18464501DC1550C00DAB8B9 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0295B8FE19D102880036D6C3 /* Realm.framework */; };
 		F18464521DC1551200DAB8B9 /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F18464511DC1551200DAB8B9 /* libc++.tbd */; };
 		F18464531DC1551700DAB8B9 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
 		F18464541DC1551D00DAB8B9 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
@@ -390,8 +390,8 @@
 				F18464551DC1569B00DAB8B9 /* CoreGraphics.framework in Frameworks */,
 				F18464541DC1551D00DAB8B9 /* Foundation.framework in Frameworks */,
 				F18464531DC1551700DAB8B9 /* UIKit.framework in Frameworks */,
+				F12EFBFF1DD66AC50015F7AA /* Realm.framework in Frameworks */,
 				F18464521DC1551200DAB8B9 /* libc++.tbd in Frameworks */,
-				F18464501DC1550C00DAB8B9 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
