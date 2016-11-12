@@ -93,7 +93,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let userA = try synchronouslyLogInUser(for: basicCredential(register: isParent, usernameSuffix: "_A"), server: authURL)
             let userB = try synchronouslyLogInUser(for: basicCredential(register: isParent, usernameSuffix: "_B"), server: authURL)
-            let realm = try synchronouslyOpenRealm(url: realmURL, user: userA)
+            _ = try synchronouslyOpenRealm(url: realmURL, user: userA)
 
             let adminPermissions = [
                 [true, true, true],
@@ -118,8 +118,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             for (accessPermissions, statusMessage) in zip(permissions, statusMessages) {
                 for permissions in accessPermissions {
                     let permissionChange = SyncPermissionChange(
-                        realm: realm,
-                        user: userB,
+                        realmURL: realmURL.absoluteString,
+                        userID: userB.identity,
                         mayRead: permissions[0],
                         mayWrite: permissions[1],
                         mayManage: permissions[2]
@@ -227,7 +227,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let userA = try synchronouslyLogInUser(for: basicCredential(register: isParent, usernameSuffix: "_A"), server: authURL)
             let userB = try synchronouslyLogInUser(for: basicCredential(register: isParent, usernameSuffix: "_B"), server: authURL)
-            let realm = try synchronouslyOpenRealm(url: realmURL, user: userA)
+            _ = try synchronouslyOpenRealm(url: realmURL, user: userA)
 
             let adminPermissions: [[Bool?]] = [
                 [true, true, true],
@@ -252,8 +252,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             for (accessPermissions, statusMessage) in zip(permissions, statusMessages) {
                 for permissions in accessPermissions {
                     let permissionChange = SyncPermissionChange(
-                        realm: realm,
-                        user: userB,
+                        realmURL: realmURL.absoluteString,
+                        userID: userB.identity,
                         mayRead: permissions[0],
                         mayWrite: permissions[1],
                         mayManage: permissions[2]

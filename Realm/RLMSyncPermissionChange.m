@@ -25,26 +25,17 @@
 
 @implementation RLMSyncPermissionChange
 
-+ (instancetype)permissionChangeForRealm:(nullable RLMRealm *)realm
-                                 forUser:(nullable RLMSyncUser *)user
-                                    read:(nullable NSNumber<RLMBool> *)mayRead
-                                   write:(nullable NSNumber<RLMBool> *)mayWrite
-                                  manage:(nullable NSNumber<RLMBool> *)mayManage {
-    NSURL *realmURL = realm.configuration.syncConfiguration.realmURL;
-
++ (instancetype)permissionChangeForRealmURL:(NSString *)realmURL
+                                  forUserID:(NSString *)userID
+                                       read:(nullable NSNumber<RLMBool> *)mayRead
+                                      write:(nullable NSNumber<RLMBool> *)mayWrite
+                                     manage:(nullable NSNumber<RLMBool> *)mayManage {
     RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange new];
-
-    if (realmURL.absoluteString) {
-        permissionChange.realmUrl = realmURL.absoluteString;
-    }
-    if (user.identity) {
-        permissionChange.userId = user.identity;
-    }
-
+    permissionChange.realmUrl = realmURL;
+    permissionChange.userId = userID;
     permissionChange.mayRead = mayRead;
     permissionChange.mayWrite = mayWrite;
     permissionChange.mayManage = mayManage;
-
     return permissionChange;
 }
 

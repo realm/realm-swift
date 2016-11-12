@@ -113,11 +113,10 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 - (NSArray<RLMSyncSession *> *)allSessions;
 
 /**
- Retrieve special realm for the permission management.
-
- @param error If an error occurs, upon return contains an `NSError` object
- that describes the problem. If you are not interested in
- possible errors, pass in `NULL`.
+ Returns an instance of the Management Realm owned by the user.
+ 
+ This Realm can be used to control access permissions for Realms managed by the user.
+ This includes granting other users access to Realms.
  */
 - (RLMRealm *)managementRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
 

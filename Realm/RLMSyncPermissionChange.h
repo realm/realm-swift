@@ -20,67 +20,87 @@
 #import <Realm/RLMObject.h>
 #import <Realm/RLMProperty.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 @class RLMSyncUser;
 
+/// An enum representing the different states a sync management object can take.
 typedef NS_ENUM(NSUInteger, RLMSyncManagementObjectStatus) {
+    /// The management object has not yet been processed by the object server.
     RLMSyncManagementObjectStatusNotProcessed,
+    /// The operations encoded in the management object have been successfully
+    /// performed by the object server.
     RLMSyncManagementObjectStatusSuccess,
+    /**
+     The operations encoded in the management object were not successfully
+     performed by the object server.
+
+     Refer to the `statusCode` and `statusMessage` properties for more details
+     about the error.
+     */
     RLMSyncManagementObjectStatusError,
 };
 
-NS_ASSUME_NONNULL_BEGIN
+/**
+ This model is used for requesting changes to a Realm's permissions.
 
+ It should be used in conjunction with an `RLMSyncUser`'s management Realm.
+
+ See https://realm.io/docs/realm-object-server/#permissions for general
+ documentation.
+ */
 @interface RLMSyncPermissionChange : RLMObject
 
-/**
- The unique ID string of a Permission Object.
- */
+/// The globally unique ID string of this permission change object.
 @property (readonly) NSString *id;
 
-/**
- Creation date.
- */
+/// The date this object was initially created.
 @property (readonly) NSDate *createdAt;
 
-/**
- Modification date.
- */
+/// The date this object was last modified.
 @property (readonly) NSDate *updatedAt;
 
-/**
- The status code of the object that was processed by Realm Object Server.
- */
+/// The status code of the object that was processed by Realm Object Server.
 @property (nullable, readonly) NSNumber<RLMInt> *statusCode;
 
-/**
- Error message.
- */
+/// An error or informational message, typically written to by the Realm Object Server.
 @property (nullable, readonly) NSString *statusMessage;
 
-/**
- Sync management object status.
- */
+/// Sync management object status.
 @property (readonly) RLMSyncManagementObjectStatus status;
 
-/**
- the URL to the realm
- */
+/// The remote URL to the realm.
 @property (readonly) NSString *realmUrl;
 
-/**
- the identity of a user
- */
+/// The identity of a user affected by this permission change.
 @property (readonly) NSString *userId;
 
+/// Define read access. Set to `YES` or `NO` to update this value. Leave unset to preserve the existing setting.
 @property (nullable, readonly) NSNumber<RLMBool> *mayRead;
+/// Define write access. Set to `YES` or `NO` to update this value. Leave unset to preserve the existing setting.
 @property (nullable, readonly) NSNumber<RLMBool> *mayWrite;
+/// Define management access. Set to `YES` or `NO` to update this value. Leave unset to preserve the existing setting.
 @property (nullable, readonly) NSNumber<RLMBool> *mayManage;
 
-+ (instancetype)permissionChangeForRealm:(nullable RLMRealm *)realm
-                                 forUser:(nullable RLMSyncUser *)user
-                                    read:(nullable NSNumber<RLMBool> *)mayRead
-                                   write:(nullable NSNumber<RLMBool> *)mayWrite
-                                  manage:(nullable NSNumber<RLMBool> *)mayManage;
+/**
+ Construct a permission change object used to change the access permissions for a user on a Realm.
+
+ @param realmURL  The Realm URL whose permissions settings should be changed.
+                  Use `*` to change the permissions of all Realms managed by the management Realm's `RLMSyncUser`.
+ @param userID    The user or users who should be granted these permission changes.
+                  Use `*` to change the permissions for all users.
+ @param mayRead   Define read access. Set to `YES` or `NO` to update this value.
+                  Leave unset to preserve the existing setting.
+ @param mayWrite  Define write access. Set to `YES` or `NO` to update this value.
+                  Leave unset to preserve the existing setting.
+ @param mayManage Define management access. Set to `YES` or `NO` to update this value.
+                  Leave unset to preserve the existing setting.
+ */
++ (instancetype)permissionChangeForRealmURL:(NSString *)realmURL
+                                  forUserID:(NSString *)userID
+                                       read:(nullable NSNumber<RLMBool> *)mayRead
+                                      write:(nullable NSNumber<RLMBool> *)mayWrite
+                                     manage:(nullable NSNumber<RLMBool> *)mayManage;
 
 @end
 
