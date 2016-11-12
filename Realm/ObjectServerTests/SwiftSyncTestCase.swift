@@ -36,8 +36,8 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
 
-    func basicCredential(register: Bool, file: StaticString = #file, line: UInt = #line) -> Credential {
-        return Credential.usernamePassword(username: "\(file)\(line)", password: "a", register: register)
+    func basicCredential(register: Bool, usernameSuffix: String = "", file: StaticString = #file, line: UInt = #line) -> Credential {
+        return Credential.usernamePassword(username: "\(file)\(line)\(usernameSuffix)", password: "a", register: register)
     }
 
     func synchronouslyOpenRealm(url: URL, user: SyncUser, file: StaticString = #file, line: UInt = #line) throws -> Realm {
@@ -109,8 +109,8 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed")
     }
 
-    func basicCredential(register register: Bool, file: StaticString = #file, line: UInt = #line) -> Credential {
-        return Credential.usernamePassword("\(file)\(line)", password: "a", register: register)
+    func basicCredential(register register: Bool, usernameSuffix: String = "", file: StaticString = #file, line: UInt = #line) -> Credential {
+        return Credential.usernamePassword("\(file)\(line)\(usernameSuffix)", password: "a", register: register)
     }
 
     func synchronouslyOpenRealm(url url: NSURL,

@@ -30,10 +30,6 @@
 
 #import "object_store.hpp"
 
-@interface RLMObjectBase ()
-+ (NSString *)_realmTableName;
-@end
-
 using namespace realm;
 
 // private properties
@@ -107,11 +103,7 @@ using namespace realm;
     }
     schema.className = className;
 
-    if ([objectClass respondsToSelector:@selector(_realmTableName)]) {
-        schema.tableName = [objectClass performSelector:@selector(_realmTableName)];
-    } else {
-        schema.tableName = @(ObjectStore::table_name_for_object_type(className.UTF8String).c_str());
-    }
+    schema.tableName = [objectClass _realmTableName] ?: @(ObjectStore::table_name_for_object_type(className.UTF8String).c_str());
     schema.objectClass = objectClass;
     schema.accessorClass = objectClass;
     schema.isSwiftClass = isSwift;

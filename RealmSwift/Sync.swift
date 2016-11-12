@@ -269,6 +269,10 @@ public final class SyncPermissionChange: Object {
     override public class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
+
+    override public class func _realmTableName() -> String? {
+        return "class_PermissionChange"
+    }
 }
 
 #else
@@ -456,6 +460,10 @@ public final class SyncPermissionChange: Object {
 
     override public class func shouldIncludeInDefaultSchema() -> Bool {
         return false
+    }
+
+    override public class func _realmTableName() -> String? {
+        return "class_PermissionChange"
     }
 }
 
