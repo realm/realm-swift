@@ -29,6 +29,7 @@
 #import "object_store.hpp"
 #import "schema.hpp"
 
+#import <realm/group.hpp>
 #import <realm/table.hpp>
 
 using namespace realm;
@@ -39,7 +40,7 @@ RLMClassInfo::RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
 
 realm::Table *RLMClassInfo::table() const {
     if (!m_table) {
-        m_table = ObjectStore::table_for_object_type(realm.group, objectSchema->name).get();
+        m_table = realm.group.get_table(objectSchema->table_name).get();
     }
     return m_table;
 }

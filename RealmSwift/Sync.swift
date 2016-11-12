@@ -453,7 +453,7 @@ public final class SyncPermissionChange: Object {
         self.mayWrite.value = mayWrite
         self.mayManage.value = mayManage
     }
-    
+
     override public class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }

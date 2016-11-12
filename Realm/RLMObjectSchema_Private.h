@@ -28,7 +28,12 @@ NS_ASSUME_NONNULL_BEGIN
     bool _isSwiftClass;
 }
 
-// writable redecleration
+/**
+ The name of the underlying table in the Realm file.
+ */
+@property (nonatomic, readwrite) NSString *tableName;
+
+// writable redeclaration
 @property (nonatomic, readwrite, copy) NSArray<RLMProperty *> *properties;
 @property (nonatomic, readwrite, assign) bool isSwiftClass;
 
