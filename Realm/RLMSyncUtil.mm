@@ -27,7 +27,11 @@
 @implementation RLMRealmConfiguration (RealmSync)
 + (instancetype)configurationForUser:(RLMSyncUser *)user {
     NSURLComponents *components = [NSURLComponents componentsWithURL:user.authenticationServer resolvingAgainstBaseURL:NO];
-    components.scheme = @"realm";
+    if ([components.scheme isEqualToString:@"https"]) {
+        components.scheme = @"realms";
+    } else {
+        components.scheme = @"realm";
+    }
     components.path = @"/~/__management";
     NSURL *managementRealmURL = components.URL;
     RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:managementRealmURL];
