@@ -38,7 +38,6 @@
     RLMRealmConfiguration *config = [RLMRealmConfiguration new];
     config.syncConfiguration = syncConfig;
     config.objectClasses = @[RLMSyncPermissionChange.class];
-    config.schemaMode = realm::SchemaMode::Additive;
     return config;
 }
 @end
