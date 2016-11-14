@@ -32,7 +32,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
-#import "RLMSyncManager_Private.hpp"
+#import "RLMSyncManager_Private.h"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
@@ -204,6 +204,16 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
             case RealmFileException::Kind::Exists:
                 RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileExists, ex), error);
                 break;
+            case RealmFileException::Kind::BadHistoryError: {
+                NSString *err = @"Realm file's history format is incompatible with the "
+                                 "settings in the configuration object being used to open "
+                                 "the Realm. Note that Realms configured for sync cannot be "
+                                 "opened as non-synced Realms, and vice versa. Otherwise, the "
+                                 "file may be corrupt.";
+                RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileAccess,
+                                                File::AccessError(err.UTF8String, ex.path())), error);
+                break;
+            }
             case RealmFileException::Kind::AccessError:
                 RLMSetErrorOrThrow(RLMMakeError(RLMErrorFileAccess, ex), error);
                 break;

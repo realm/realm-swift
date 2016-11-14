@@ -53,6 +53,8 @@ Pod::Spec.new do |s|
 
   source_files              = 'Realm/*.{m,mm}',
                               'Realm/ObjectStore/src/*.cpp',
+                              'Realm/ObjectStore/src/sync/*.cpp',
+                              'Realm/ObjectStore/src/sync/impl/*.cpp',
                               'Realm/ObjectStore/src/impl/*.cpp',
                               'Realm/ObjectStore/src/impl/apple/*.cpp',
                               'Realm/ObjectStore/src/util/*.cpp',

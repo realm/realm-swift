@@ -62,7 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The unique Realm Object Server user ID string identifying this user.
  */
-@property (nonatomic, readonly) NSString *identity;
+@property (nullable, nonatomic, readonly) NSString *identity;
 
 /**
  The URL of the authentication server this user will communicate with.

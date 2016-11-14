@@ -71,6 +71,16 @@ RLMIdentityProvider const RLMIdentityProviderICloud                 = @"icloud";
                                     userInfo:@{kRLMSyncIdentityKey: identity}];
 }
 
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:[RLMSyncCredential class]]) {
+        return NO;
+    }
+    RLMSyncCredential *that = (RLMSyncCredential *)object;
+    return ([self.token isEqualToString:that.token]
+            && [self.provider isEqualToString:that.provider]
+            && [self.userInfo isEqual:that.userInfo]);
+}
+
 - (instancetype)initWithCustomToken:(RLMCredentialToken)token
                            provider:(RLMIdentityProvider)provider
                            userInfo:(NSDictionary *)userInfo {
