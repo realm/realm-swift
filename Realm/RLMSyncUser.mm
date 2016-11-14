@@ -20,14 +20,9 @@
 
 #import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
-#import "RLMRealmConfiguration+Sync.h"
-#import "RLMRealmConfiguration_Private.hpp"
-#import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncManager_Private.hpp"
-#import "RLMSyncPermissionChange.h"
-#import "RLMSyncSession_Private.h"
-#import "RLMSyncSessionHandle.hpp"
+#import "RLMSyncManager_Private.h"
+#import "RLMSyncSession_Private.hpp"
+#import "RLMSyncSessionRefreshHandle.hpp"
 #import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
@@ -160,6 +155,10 @@ using namespace realm;
         case SyncUser::State::Error:
             return RLMSyncUserStateError;
     }
+}
+
+- (RLMRealm *)managementRealmWithError:(NSError **)error {
+    return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration managementConfigurationForUser:self] error:error];
 }
 
 #pragma mark - Private API

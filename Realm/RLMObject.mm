@@ -19,7 +19,6 @@
 #import "RLMObject_Private.hpp"
 
 #import "RLMAccessor.h"
-#import "RLMObjectSchema_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMQueryUtil.hpp"

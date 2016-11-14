@@ -119,7 +119,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 for permissions in accessPermissions {
                     let permissionChange = SyncPermissionChange(
                         realmURL: realmURL.absoluteString,
-                        userID: userB.identity,
+                        userID: userB.identity!,
                         mayRead: permissions[0],
                         mayWrite: permissions[1],
                         mayManage: permissions[2]
@@ -253,7 +253,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 for permissions in accessPermissions {
                     let permissionChange = SyncPermissionChange(
                         realmURL: realmURL.absoluteString,
-                        userID: userB.identity,
+                        userID: userB.identity!,
                         mayRead: permissions[0],
                         mayWrite: permissions[1],
                         mayManage: permissions[2]
