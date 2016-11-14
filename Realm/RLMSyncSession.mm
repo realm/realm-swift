@@ -94,9 +94,7 @@ using namespace realm;
         }
         queue = queue ?: dispatch_get_main_queue();
         session->wait_for_upload_completion([=](){
-            dispatch_async(queue, ^{
-                callback();
-            });
+            dispatch_async(queue, callback);
         });
         return YES;
     }
