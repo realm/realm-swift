@@ -45,8 +45,8 @@
     if (syncConfiguration.customFileURL) {
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
     } else {
-        self.config.path = std::move(SyncManager::shared().path_for_realm([user.identity UTF8String],
-                                                                          [realmURL.absoluteString UTF8String]));
+        self.config.path = SyncManager::shared().path_for_realm([user.identity UTF8String],
+                                                                [realmURL.absoluteString UTF8String]);
     }
     self.config.in_memory = false;
     self.config.sync_config = std::make_shared<realm::SyncConfig>([syncConfiguration rawConfiguration]);
