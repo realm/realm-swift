@@ -1099,7 +1099,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "LOCAL_IP_ADDR=$(ipconfig getifaddr $(netstat -f inet -rant | awk '/default/ { print $6; exit }'))\necho \"static NSString * const kLocalIPAddress = @\\\"$LOCAL_IP_ADDR\\\";\" > \"$SRCROOT/Puzzle/Constants.h\"\n";
+			shellScript = "LOCAL_IP_ADDR=$(ipconfig getifaddr $(netstat -f inet -rant | awk '/default/ { print $6; exit }'))\necho \"static NSString * const kLocalIPAddress = @\\\"${LOCAL_IP_ADDR:-127.0.0.1}\\\";\" > \"$SRCROOT/Puzzle/Constants.h\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 

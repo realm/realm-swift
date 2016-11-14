@@ -110,11 +110,9 @@ static NSString * const kRLMPuzzlePasswordKey = @"RLMPuzzlePasswordKey";
     if (self.hostNameField == nil) {
         self.hostNameField = [self newTextField];
         self.hostNameField.placeholder = @"localhost";
-#if !(TARGET_IPHONE_SIMULATOR)
         if (kLocalIPAddress.length > 0) {
             self.hostNameField.text = kLocalIPAddress;
         }
-#endif
     }
     
     if (self.userNameField == nil) {
