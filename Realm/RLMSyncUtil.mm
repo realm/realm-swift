@@ -25,7 +25,7 @@
 #import "RLMSyncPermissionChange.h"
 
 @implementation RLMRealmConfiguration (RealmSync)
-+ (instancetype)configurationForUser:(RLMSyncUser *)user {
++ (instancetype)managementConfigurationForUser:(RLMSyncUser *)user {
     NSURLComponents *components = [NSURLComponents componentsWithURL:user.authenticationServer resolvingAgainstBaseURL:NO];
     if ([components.scheme isEqualToString:@"https"]) {
         components.scheme = @"realms";

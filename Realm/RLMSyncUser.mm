@@ -147,7 +147,7 @@ using namespace realm;
 }
 
 - (RLMRealm *)managementRealmWithError:(NSError **)error {
-    return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration configurationForUser:self] error:error];
+    return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration managementConfigurationForUser:self] error:error];
 }
 
 #pragma mark - Private API

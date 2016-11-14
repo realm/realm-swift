@@ -231,7 +231,7 @@ extension SyncUser {
      This includes granting other users access to Realms.
      */
     public func managementRealm() throws -> Realm {
-        var config = Realm.Configuration.fromRLMRealmConfiguration(rlmConfiguration: RLMRealmConfiguration(for: self))
+        var config = Realm.Configuration.fromRLMRealmConfiguration(rlmConfiguration: .managementConfiguration(for: self))
         config.objectTypes = [SyncPermissionChange.self]
         return try Realm(configuration: config)
     }
@@ -457,7 +457,7 @@ extension SyncUser {
      This includes granting other users access to Realms.
      */
     public func managementRealm() throws -> Realm {
-        var config = Realm.Configuration.fromRLMRealmConfiguration(RLMRealmConfiguration(forUser: self))
+        var config = Realm.Configuration.fromRLMRealmConfiguration(.managementConfigurationForUser(self))
         config.objectTypes = [SyncPermissionChange.self]
         return try Realm(configuration: config)
     }

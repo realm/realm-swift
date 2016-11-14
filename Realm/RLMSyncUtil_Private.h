@@ -31,7 +31,7 @@ typedef NSString* RLMServerPath;
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMRealmConfiguration (RealmSync)
-+ (instancetype)configurationForUser:(RLMSyncUser *)user;
++ (instancetype)managementConfigurationForUser:(RLMSyncUser *)user;
 @end
 
 extern RLMIdentityProvider const RLMIdentityProviderAccessToken;
