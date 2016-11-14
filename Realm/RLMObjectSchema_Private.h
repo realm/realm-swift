@@ -28,9 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
     bool _isSwiftClass;
 }
 
-/**
- The name of the underlying table in the Realm file.
- */
+/// The object type name reported to the object store and core.
 @property (nonatomic, readonly) NSString *objectName;
 
 // writable redeclaration
