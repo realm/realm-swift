@@ -25,11 +25,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-#if TARGET_IPHONE_SIMULATOR
-    NSString *ipAddress = @"localhost";
-#else
     NSString *ipAddress = kIPAddress;
-#endif
 
     application.applicationSupportsShakeToEdit = YES;
     
