@@ -40,15 +40,6 @@ using namespace realm;
     return nil;
 }
 
-- (BOOL)isEqual:(id)object {
-    if (![object isKindOfClass:[RLMSyncSession class]]) {
-        return NO;
-    }
-    auto this_ptr = _session.lock();
-    auto that_ptr = ((RLMSyncSession *)object)->_session.lock();
-    return this_ptr && that_ptr && (this_ptr == that_ptr);
-}
-
 - (RLMSyncConfiguration *)configuration {
     if (auto session = _session.lock()) {
         if (session->is_valid()) {
