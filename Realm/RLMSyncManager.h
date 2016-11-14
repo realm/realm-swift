@@ -20,7 +20,7 @@
 
 #import "RLMSyncUtil.h"
 
-@class RLMSyncSession, RLMSyncConfiguration;
+@class RLMSyncSession;
 
 /// An enum representing different levels of sync-related logging that can be configured.
 typedef NS_ENUM(NSUInteger, RLMSyncLogLevel) {
