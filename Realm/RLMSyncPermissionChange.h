@@ -96,11 +96,11 @@ typedef NS_ENUM(NSUInteger, RLMSyncManagementObjectStatus) {
  @param mayManage Define management access. Set to `YES` or `NO` to update this value.
                   Leave unset to preserve the existing setting.
  */
-+ (instancetype)permissionChangeForRealmURL:(NSString *)realmURL
-                                  forUserID:(NSString *)userID
-                                       read:(nullable NSNumber<RLMBool> *)mayRead
-                                      write:(nullable NSNumber<RLMBool> *)mayWrite
-                                     manage:(nullable NSNumber<RLMBool> *)mayManage;
++ (instancetype)permissionChangeWithRealmURL:(NSString *)realmURL
+                                      userID:(NSString *)userID
+                                        read:(nullable NSNumber<RLMBool> *)mayRead
+                                       write:(nullable NSNumber<RLMBool> *)mayWrite
+                                      manage:(nullable NSNumber<RLMBool> *)mayManage;
 
 @end
 

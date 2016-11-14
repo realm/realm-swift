@@ -639,11 +639,11 @@
             NSNumber<RLMBool> *mayWrite = permissions[1] == [NSNull null] ? nil : permissions[1];
             NSNumber<RLMBool> *mayManage = permissions[2] == [NSNull null] ? nil : permissions[2];
             NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
-            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealmURL:realmURL
-                                                                                                   forUserID:userB.identity
-                                                                                                        read:mayRead
-                                                                                                       write:mayWrite
-                                                                                                     manage:mayManage];
+            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:realmURL
+                                                                                                       userID:userB.identity
+                                                                                                         read:mayRead
+                                                                                                        write:mayWrite
+                                                                                                      manage:mayManage];
             [self verifyChangePermission:permissionChange statusMessage:statusMessages[idx] owner:userA];
         }
     }];
@@ -691,11 +691,11 @@
             NSNumber<RLMBool> *mayWrite = permissions[1] == [NSNull null] ? nil : permissions[1];
             NSNumber<RLMBool> *mayManage = permissions[2] == [NSNull null] ? nil : permissions[2];
             NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
-            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealmURL:realmURL
-                                                                                                   forUserID:@"*"
-                                                                                                        read:mayRead
-                                                                                                       write:mayWrite
-                                                                                                      manage:mayManage];
+            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:realmURL
+                                                                                                   userID:@"*"
+                                                                                                         read:mayRead
+                                                                                                        write:mayWrite
+                                                                                                       manage:mayManage];
             [self verifyChangePermission:permissionChange statusMessage:statusMessages[idx] owner:userA];
         }
     }];
@@ -744,11 +744,11 @@
             NSNumber<RLMBool> *mayRead = permissions[0] == [NSNull null] ? nil : permissions[0];
             NSNumber<RLMBool> *mayWrite = permissions[1] == [NSNull null] ? nil : permissions[1];
             NSNumber<RLMBool> *mayManage = permissions[2] == [NSNull null] ? nil : permissions[2];
-            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealmURL:@"*"
-                                                                                                   forUserID:userB.identity
-                                                                                                        read:mayRead
-                                                                                                       write:mayWrite
-                                                                                                      manage:mayManage];
+            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:@"*"
+                                                                                                   userID:userB.identity
+                                                                                                         read:mayRead
+                                                                                                        write:mayWrite
+                                                                                                       manage:mayManage];
             [self verifyChangePermission:permissionChange statusMessage:statusMessages[idx] owner:userA];
         }
     }];
@@ -806,11 +806,11 @@
     NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
 
     {
-        RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealmURL:realmURL
-                                                                                               forUserID:userB.identity
-                                                                                                    read:@YES
-                                                                                                   write:@YES
-                                                                                                  manage:@NO];
+        RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:realmURL
+                                                                                               userID:userB.identity
+                                                                                                     read:@YES
+                                                                                                    write:@YES
+                                                                                                   manage:@NO];
 
         XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
         RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
@@ -833,11 +833,11 @@
     }
 
     {
-        RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeForRealmURL:realmURL
-                                                                                               forUserID:@"*"
-                                                                                                    read:@YES
-                                                                                                   write:@YES
-                                                                                                  manage:@NO];
+        RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:realmURL
+                                                                                               userID:@"*"
+                                                                                                     read:@YES
+                                                                                                    write:@YES
+                                                                                                   manage:@NO];
 
         XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
         RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
