@@ -19,7 +19,7 @@
 #import "RLMClassInfo.hpp"
 
 #import "RLMRealm_Private.hpp"
-#import "RLMObjectSchema.h"
+#import "RLMObjectSchema_Private.h"
 #import "RLMSchema.h"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
@@ -29,7 +29,6 @@
 #import "object_store.hpp"
 #import "schema.hpp"
 
-#import <realm/group.hpp>
 #import <realm/table.hpp>
 
 using namespace realm;
@@ -40,7 +39,7 @@ RLMClassInfo::RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
 
 realm::Table *RLMClassInfo::table() const {
     if (!m_table) {
-        m_table = realm.group.get_table(objectSchema->table_name).get();
+        m_table = ObjectStore::table_for_object_type(realm.group, objectSchema->name).get();
     }
     return m_table;
 }
@@ -103,6 +102,6 @@ RLMSchemaInfo::RLMSchemaInfo(RLMRealm *realm, RLMSchema *rlmSchema, realm::Schem
         m_objects.emplace(std::piecewise_construct,
                           std::forward_as_tuple(rlmObjectSchema.className),
                           std::forward_as_tuple(realm, rlmObjectSchema,
-                                                &*schema.find(rlmObjectSchema.className.UTF8String)));
+                                                &*schema.find(rlmObjectSchema.objectName.UTF8String)));
     }
 }

@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The name of the underlying table in the Realm file.
  */
-@property (nonatomic, readwrite) NSString *tableName;
+@property (nonatomic, readonly) NSString *objectName;
 
 // writable redeclaration
 @property (nonatomic, readwrite, copy) NSArray<RLMProperty *> *properties;

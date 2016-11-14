@@ -293,7 +293,7 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
     return RLMIsObjectSubclass(self);
 }
 
-+ (NSString *)_realmTableName {
++ (NSString *)_realmObjectName {
     return nil;
 }
 

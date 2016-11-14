@@ -45,7 +45,6 @@ using namespace realm;
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties {
     self = [super init];
     self.className = objectClassName;
-    self.tableName = @(ObjectStore::table_name_for_object_type(objectClassName.UTF8String).c_str());
     self.properties = properties;
     self.objectClass = objectClass;
     self.accessorClass = objectClass;
@@ -102,8 +101,6 @@ using namespace realm;
         className = [RLMSwiftSupport demangleClassName:className];
     }
     schema.className = className;
-
-    schema.tableName = [objectClass _realmTableName] ?: @(ObjectStore::table_name_for_object_type(className.UTF8String).c_str());
     schema.objectClass = objectClass;
     schema.accessorClass = objectClass;
     schema.isSwiftClass = isSwift;
@@ -322,7 +319,6 @@ using namespace realm;
     RLMObjectSchema *schema = [[RLMObjectSchema allocWithZone:zone] init];
     schema->_objectClass = _objectClass;
     schema->_className = _className;
-    schema->_tableName = _tableName;
     schema->_objectClass = _objectClass;
     schema->_accessorClass = _objectClass;
     schema->_unmanagedClass = _unmanagedClass;
@@ -361,10 +357,13 @@ using namespace realm;
     return [NSString stringWithFormat:@"%@ {\n%@}", self.className, propertiesString];
 }
 
+- (NSString *)objectName {
+    return [self.objectClass _realmObjectName] ?: _className;
+}
+
 - (realm::ObjectSchema)objectStoreCopy {
     ObjectSchema objectSchema;
-    objectSchema.name = _className.UTF8String;
-    objectSchema.table_name = _tableName.UTF8String;
+    objectSchema.name = self.objectName.UTF8String;
     objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.name.UTF8String : "";
     for (RLMProperty *prop in _properties) {
         Property p = [prop objectStoreCopy];
@@ -380,7 +379,6 @@ using namespace realm;
 + (instancetype)objectSchemaForObjectStoreSchema:(realm::ObjectSchema const&)objectSchema {
     RLMObjectSchema *schema = [RLMObjectSchema new];
     schema.className = @(objectSchema.name.c_str());
-    schema.tableName = @(objectSchema.table_name.c_str());
 
     // create array of RLMProperties
     NSMutableArray *properties = [NSMutableArray arrayWithCapacity:objectSchema.persisted_properties.size()];

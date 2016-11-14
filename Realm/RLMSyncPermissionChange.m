@@ -68,8 +68,8 @@
     return RLMSyncManagementObjectStatusError;
 }
 
-+ (NSString *)_realmTableName {
-    return @"class_PermissionChange";
++ (NSString *)_realmObjectName {
+    return @"PermissionChange";
 }
 
 @end

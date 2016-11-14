@@ -309,8 +309,8 @@ public final class SyncPermissionChange: Object {
     }
 
     /// :nodoc:
-    override public class func _realmTableName() -> String? {
-        return "class_PermissionChange"
+    override public class func _realmObjectName() -> String? {
+        return "PermissionChange"
     }
 }
 
@@ -535,8 +535,8 @@ public final class SyncPermissionChange: Object {
     }
 
     /// :nodoc:
-    override public class func _realmTableName() -> String? {
-        return "class_PermissionChange"
+    override public class func _realmObjectName() -> String? {
+        return "PermissionChange"
     }
 }
 
