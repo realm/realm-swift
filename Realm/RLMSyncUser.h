@@ -112,6 +112,14 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (NSArray<RLMSyncSession *> *)allSessions;
 
+/**
+ Returns an instance of the Management Realm owned by the user.
+ 
+ This Realm can be used to control access permissions for Realms managed by the user.
+ This includes granting other users access to Realms.
+ */
+- (RLMRealm *)managementRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
+
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));
 

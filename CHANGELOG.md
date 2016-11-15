@@ -19,6 +19,10 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Add `+[RLMSyncUser currentUser]`.
+* Add the ability to change read, write and management permissions for
+  synchronized Realms using the management Realm obtained via the
+  `-[RLMSyncUser managementRealmWithError:]` API and the
+  `RLMSyncPermissionChange` class.
 
 ### Bugfixes
 

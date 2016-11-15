@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2016 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,23 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMSyncPermissionChange.h"
 
-#import <Realm/RLMArray.h>
-#import <Realm/RLMMigration.h>
-#import <Realm/RLMObject.h>
-#import <Realm/RLMObjectSchema.h>
-#import <Realm/RLMPlatform.h>
-#import <Realm/RLMProperty.h>
-#import <Realm/RLMRealm.h>
-#import <Realm/RLMRealmConfiguration.h>
-#import <Realm/RLMRealmConfiguration+Sync.h>
-#import <Realm/RLMResults.h>
-#import <Realm/RLMSchema.h>
-#import <Realm/RLMSyncConfiguration.h>
-#import <Realm/RLMSyncCredential.h>
-#import <Realm/RLMSyncManager.h>
-#import <Realm/RLMSyncPermissionChange.h>
-#import <Realm/RLMSyncSession.h>
-#import <Realm/RLMSyncUser.h>
-#import <Realm/RLMSyncUtil.h>
+NS_ASSUME_NONNULL_BEGIN
+
+@interface RLMSyncPermissionChange()
+
+@property (readwrite) NSString *id;
+@property (readwrite) NSDate *createdAt;
+@property (readwrite) NSDate *updatedAt;
+@property (nullable, readwrite) NSNumber<RLMInt> *statusCode;
+@property (nullable, readwrite) NSString *statusMessage;
+@property (readwrite) NSString *realmUrl;
+@property (readwrite) NSString *userId;
+
+@property (nullable, readwrite) NSNumber<RLMBool> *mayRead;
+@property (nullable, readwrite) NSNumber<RLMBool> *mayWrite;
+@property (nullable, readwrite) NSNumber<RLMBool> *mayManage;
+
+@end
+
+NS_ASSUME_NONNULL_END

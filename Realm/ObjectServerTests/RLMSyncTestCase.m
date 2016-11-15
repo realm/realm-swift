@@ -121,6 +121,16 @@ static NSURL *syncDirectoryForChildProcess() {
     return realm;
 }
 
+- (RLMRealm *)managementRealmForUser:(RLMSyncUser *)user {
+    NSError *error = nil;
+    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    return managementRealm;
+}
+
 - (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
     NSError *error = nil;
     RLMRealmConfiguration *c = [[RLMRealmConfiguration defaultConfiguration] copy];
