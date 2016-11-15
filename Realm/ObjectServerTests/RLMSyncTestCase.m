@@ -74,10 +74,10 @@ static NSURL *syncDirectoryForChildProcess() {
     return [NSURL URLWithString:@"http://127.0.0.1:9080"];
 }
 
-+ (RLMSyncCredential *)basicCredentialWithName:(NSString *)name register:(BOOL)shouldRegister {
-    return [RLMSyncCredential credentialWithUsername:name
-                                            password:@"a"
-                                            register:shouldRegister];
++ (RLMSyncCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
+    return [RLMSyncCredentials credentialsWithUsername:name
+                                              password:@"a"
+                                              register:shouldRegister];
 }
 
 - (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions {
@@ -140,21 +140,21 @@ static NSURL *syncDirectoryForChildProcess() {
     return realm;
 }
 
-- (RLMSyncUser *)logInUserForCredential:(RLMSyncCredential *)credential
-                                 server:(NSURL *)url {
+- (RLMSyncUser *)logInUserForCredentials:(RLMSyncCredentials *)credentials
+                                  server:(NSURL *)url {
     NSString *process = self.isParent ? @"parent" : @"child";
     __block RLMSyncUser *theUser = nil;
     XCTestExpectation *expectation = [self expectationWithDescription:@"Should log in the user properly"];
-    [RLMSyncUser logInWithCredential:credential
-                       authServerURL:url
-                        onCompletion:^(RLMSyncUser *user, NSError *error) {
-                            XCTAssertNil(error,
-                                         @"Error when trying to log in a user: %@ (process: %@)",
-                                         error, process);
-                            XCTAssertNotNil(user);
-                            theUser = user;
-                            [expectation fulfill];
-                        }];
+    [RLMSyncUser logInWithCredentials:credentials
+                        authServerURL:url
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+                             XCTAssertNil(error,
+                                          @"Error when trying to log in a user: %@ (process: %@)",
+                                          error, process);
+                             XCTAssertNotNil(user);
+                             theUser = user;
+                             [expectation fulfill];
+                         }];
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
     XCTAssertTrue(theUser.state == RLMSyncUserStateActive,
                   @"User should have been valid, but wasn't. (process: %@)", process);

@@ -141,15 +141,15 @@ public struct SyncConfiguration {
     }
 }
 
-/// A `Credential` represents data that uniquely identifies a Realm Object Server user.
-public struct Credential {
+/// A `SyncCredentials` represents data that uniquely identifies a Realm Object Server user.
+public struct SyncCredentials {
     public typealias Token = String
 
     internal var token: Token
     internal var provider: Provider
     internal var userInfo: [String: Any]
 
-    /// Initialize a new credential using a custom token, authentication provider, and user information dictionary. In
+    /// Initialize new credentials using a custom token, authentication provider, and user information dictionary. In
     /// most cases, the convenience initializers should be used instead.
     public init(customToken token: Token, provider: Provider, userInfo: [String: Any] = [:]) {
         self.token = token
@@ -157,61 +157,61 @@ public struct Credential {
         self.userInfo = userInfo
     }
 
-    private init(_ credential: RLMSyncCredential) {
-        self.token = credential.token
-        self.provider = credential.provider
-        self.userInfo = credential.userInfo
+    private init(_ credentials: RLMSyncCredentials) {
+        self.token = credentials.token
+        self.provider = credentials.provider
+        self.userInfo = credentials.userInfo
     }
 
-    /// Initialize a new credential using a Facebook account token.
-    public static func facebook(token: Token) -> Credential {
-        return Credential(RLMSyncCredential(facebookToken: token))
+    /// Initialize new credentials using a Facebook account token.
+    public static func facebook(token: Token) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(facebookToken: token))
     }
 
-    /// Initialize a new credential using a Google account token.
-    public static func google(token: Token) -> Credential {
-        return Credential(RLMSyncCredential(googleToken: token))
+    /// Initialize new credentials using a Google account token.
+    public static func google(token: Token) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(googleToken: token))
     }
 
-    /// Initialize a new credential using an iCloud account token.
-    public static func iCloud(token: Token) -> Credential {
-        return Credential(RLMSyncCredential(iCloudToken: token))
+    /// Initialize new credentials using an iCloud account token.
+    public static func iCloud(token: Token) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(iCloudToken: token))
     }
 
-    /// Initialize a new credential using a Realm Object Server username and password.
+    /// Initialize new credentials using a Realm Object Server username and password.
     public static func usernamePassword(username: String,
                                         password: String,
-                                        register: Bool = false) -> Credential {
-        return Credential(RLMSyncCredential(username: username, password: password, register: register))
+                                        register: Bool = false) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(username: username, password: password, register: register))
     }
 
-    /// Initialize a new credential using a Realm Object Server access token.
-    public static func accessToken(_ accessToken: String, identity: String) -> Credential {
-        return Credential(RLMSyncCredential(accessToken: accessToken, identity: identity))
+    /// Initialize new credentials using a Realm Object Server access token.
+    public static func accessToken(_ accessToken: String, identity: String) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(accessToken: accessToken, identity: identity))
     }
 }
 
-extension RLMSyncCredential {
-    fileprivate convenience init(_ credential: Credential) {
-        self.init(customToken: credential.token, provider: credential.provider, userInfo: credential.userInfo)
+extension RLMSyncCredentials {
+    fileprivate convenience init(_ credentials: SyncCredentials) {
+        self.init(customToken: credentials.token, provider: credentials.provider, userInfo: credentials.userInfo)
     }
 }
 
 extension SyncUser {
-    /// Given a credential and server URL, log in a user and asynchronously return a `SyncUser` object which can be used to
+    /// Given credentials and a server URL, log in a user and asynchronously return a `SyncUser` object which can be used to
     /// open Realms and Sessions.
-    public static func logIn(with credential: Credential,
+    public static func logIn(with credentials: SyncCredentials,
                              server authServerURL: URL,
                              timeout: TimeInterval = 30,
                              onCompletion completion: @escaping UserCompletionBlock) {
-        return SyncUser.__logIn(with: RLMSyncCredential(credential),
+        return SyncUser.__logIn(with: RLMSyncCredentials(credentials),
                                 authServerURL: authServerURL,
                                 timeout: timeout,
                                 onCompletion: completion)
     }
 
-    /// An array of all valid, logged-in users.
-    public static var all: [SyncUser] {
+    /// A dictionary of all valid, logged-in user identities corresponding to their `SyncUser` objects.
+    public static var all: [String: SyncUser] {
         return __allUsers()
     }
 
@@ -365,8 +365,8 @@ public struct SyncConfiguration {
     }
 }
 
-/// A `Credential` represents data that uniquely identifies a Realm Object Server user.
-public struct Credential {
+/// A `SyncCredentials` represents data that uniquely identifies a Realm Object Server user.
+public struct SyncCredentials {
     public typealias Token = String
 
     internal var token: Token
@@ -375,7 +375,7 @@ public struct Credential {
 
     // swiftlint:disable valid_docs
 
-    /// Initialize a new credential using a custom token, authentication provider, and user information dictionary. In
+    /// Initialize new credentials using a custom token, authentication provider, and user information dictionary. In
     /// most cases, the convenience initializers should be used instead.
     public init(customToken token: Token, provider: Provider, userInfo: [String: AnyObject] = [:]) {
         self.token = token
@@ -383,61 +383,61 @@ public struct Credential {
         self.userInfo = userInfo
     }
 
-    private init(_ credential: RLMSyncCredential) {
-        self.token = credential.token
-        self.provider = credential.provider
-        self.userInfo = credential.userInfo
+    private init(_ credentials: RLMSyncCredentials) {
+        self.token = credentials.token
+        self.provider = credentials.provider
+        self.userInfo = credentials.userInfo
     }
 
-    /// Initialize a new credential using a Facebook account token.
-    public static func facebook(token: Token) -> Credential {
-        return Credential(RLMSyncCredential(facebookToken: token))
+    /// Initialize new credentials using a Facebook account token.
+    public static func facebook(token: Token) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(facebookToken: token))
     }
 
-    /// Initialize a new credential using a Google account token.
-    public static func google(token: Token) -> Credential {
-        return Credential(RLMSyncCredential(googleToken: token))
+    /// Initialize new credentials using a Google account token.
+    public static func google(token: Token) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(googleToken: token))
     }
 
-    /// Initialize a new credential using an iCloud account token.
-    public static func iCloud(token: Token) -> Credential {
-        return Credential(RLMSyncCredential(ICloudToken: token))
+    /// Initialize new credentials using an iCloud account token.
+    public static func iCloud(token: Token) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(ICloudToken: token))
     }
 
-    /// Initialize a new credential using a Realm Object Server username and password.
+    /// Initialize new credentials using a Realm Object Server username and password.
     public static func usernamePassword(username: String,
                                         password: String,
-                                        register: Bool = false) -> Credential {
-        return Credential(RLMSyncCredential(username: username, password: password, register: register))
+                                        register: Bool = false) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(username: username, password: password, register: register))
     }
 
-    /// Initialize a new credential using a Realm Object Server access token.
-    public static func accessToken(accessToken: String, identity: String) -> Credential {
-        return Credential(RLMSyncCredential(accessToken: accessToken, identity: identity))
+    /// Initialize new credentials using a Realm Object Server access token.
+    public static func accessToken(accessToken: String, identity: String) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(accessToken: accessToken, identity: identity))
     }
 }
 
-extension RLMSyncCredential {
-    private convenience init(_ credential: Credential) {
-        self.init(customToken: credential.token, provider: credential.provider, userInfo: credential.userInfo)
+extension RLMSyncCredentials {
+    private convenience init(_ credentials: SyncCredentials) {
+        self.init(customToken: credentials.token, provider: credentials.provider, userInfo: credentials.userInfo)
     }
 }
 
 extension SyncUser {
-    /// Given a credential and server URL, log in a user and asynchronously return a `SyncUser` object which can be used to
+    /// Given credentials and a server URL, log in a user and asynchronously return a `SyncUser` object which can be used to
     /// open Realms and Sessions.
-    public static func logInWithCredential(credential: Credential,
-                                           authServerURL: NSURL,
-                                           timeout: NSTimeInterval = 30,
-                                           onCompletion completion: UserCompletionBlock) {
-        return __logInWithCredential(RLMSyncCredential(credential),
-                                     authServerURL: authServerURL,
-                                     timeout: timeout,
-                                     onCompletion: completion)
+    public static func logInWithCredentials(credentials: SyncCredentials,
+                                            authServerURL: NSURL,
+                                            timeout: NSTimeInterval = 30,
+                                            onCompletion completion: UserCompletionBlock) {
+        return __logInWithCredentials(RLMSyncCredentials(credentials),
+                                      authServerURL: authServerURL,
+                                      timeout: timeout,
+                                      onCompletion: completion)
     }
 
-    /// An array of all valid, logged-in users.
-    @nonobjc public static func allUsers() -> [SyncUser] {
+    /// A dictionary of all valid, logged-in user identities corresponding to their `SyncUser` objects.
+    @nonobjc public static func allUsers() -> [String: SyncUser] {
         return __allUsers()
     }
 
