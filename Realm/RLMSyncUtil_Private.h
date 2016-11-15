@@ -18,7 +18,7 @@
 
 #import <Realm/RLMSyncUtil.h>
 
-#import <Realm/RLMSyncCredential.h>
+#import <Realm/RLMSyncCredentials.h>
 #import <Realm/RLMRealmConfiguration.h>
 
 @class RLMSyncUser;

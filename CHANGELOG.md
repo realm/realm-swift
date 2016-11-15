@@ -5,9 +5,12 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Remove `RLMAuthenticationActions` and replace
   `+[RLMSyncCredential credentialWithUsername:password:actions:]` with
-  `+[RLMSyncCredential credentialWithUsername:password:register:]`.
+  `+[RLMSyncCredential credentialsWithUsername:password:register:]`.
 * Rename `+[RLMSyncUser authenticateWithCredential:]` to
-  `+[RLMSyncUser logInWithCredential:]`.
+  `+[RLMSyncUser logInWithCredentials:]`.
+* Rename "credential"-related types and methods to
+  `RLMSyncCredentials`/`SyncCredentials` and consistently refer to credentials
+  in the plural form.
 * Rename `+[RLMSyncUser all]` to:
   * `+[RLMSyncUser allUsers]` in Objective-C.
   * `SyncUser.allUsers()` in Swift 2.

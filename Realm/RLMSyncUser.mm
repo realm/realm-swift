@@ -85,22 +85,22 @@ using namespace realm;
     return _user == ((RLMSyncUser *)object)->_user;
 }
 
-+ (void)logInWithCredential:(RLMSyncCredential *)credential
-              authServerURL:(NSURL *)authServerURL
-               onCompletion:(RLMUserCompletionBlock)completion {
-    [self logInWithCredential:credential
-                authServerURL:authServerURL
-                      timeout:30
-                 onCompletion:completion];
++ (void)logInWithCredentials:(RLMSyncCredentials *)credential
+               authServerURL:(NSURL *)authServerURL
+                onCompletion:(RLMUserCompletionBlock)completion {
+    [self logInWithCredentials:credential
+                 authServerURL:authServerURL
+                       timeout:30
+                  onCompletion:completion];
 }
 
-+ (void)logInWithCredential:(RLMSyncCredential *)credential
-              authServerURL:(NSURL *)authServerURL
-                    timeout:(NSTimeInterval)timeout
-               onCompletion:(RLMUserCompletionBlock)completion {
++ (void)logInWithCredentials:(RLMSyncCredentials *)credential
+               authServerURL:(NSURL *)authServerURL
+                     timeout:(NSTimeInterval)timeout
+                onCompletion:(RLMUserCompletionBlock)completion {
     RLMSyncUser *user = [[RLMSyncUser alloc] initWithAuthServer:authServerURL];
     [RLMSyncUser _performLogInForUser:user
-                           credential:credential
+                          credentials:credential
                         authServerURL:authServerURL
                               timeout:timeout
                       completionBlock:completion];
@@ -255,7 +255,7 @@ using namespace realm;
 }
 
 + (void)_performLogInForUser:(RLMSyncUser *)user
-                  credential:(RLMSyncCredential *)credential
+                 credentials:(RLMSyncCredentials *)credentials
                authServerURL:(NSURL *)authServerURL
                      timeout:(NSTimeInterval)timeout
              completionBlock:(RLMUserCompletionBlock)completion {
@@ -268,18 +268,18 @@ using namespace realm;
     };
 
     // Special credential login should be treated differently.
-    if (credential.provider == RLMIdentityProviderAccessToken) {
-        [self _performLoginForDirectAccessTokenCredential:credential user:user completionBlock:theBlock];
+    if (credentials.provider == RLMIdentityProviderAccessToken) {
+        [self _performLoginForDirectAccessTokenCredentials:credentials user:user completionBlock:theBlock];
         return;
     }
 
     // Prepare login network request
     NSMutableDictionary *json = [@{
-                                   kRLMSyncProviderKey: credential.provider,
-                                   kRLMSyncDataKey: credential.token,
+                                   kRLMSyncProviderKey: credentials.provider,
+                                   kRLMSyncDataKey: credentials.token,
                                    kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
                                    } mutableCopy];
-    NSMutableDictionary *info = [(credential.userInfo ?: @{}) mutableCopy];
+    NSMutableDictionary *info = [(credentials.userInfo ?: @{}) mutableCopy];
 
     if ([info count] > 0) {
         // Munge user info into the JSON request.
@@ -324,12 +324,12 @@ using namespace realm;
                                  completion:handler];
 }
 
-+ (void)_performLoginForDirectAccessTokenCredential:(RLMSyncCredential *)credential
-                                               user:(RLMSyncUser *)user
-                                    completionBlock:(nonnull RLMUserCompletionBlock)completion {
-    NSString *identity = credential.userInfo[kRLMSyncIdentityKey];
++ (void)_performLoginForDirectAccessTokenCredentials:(RLMSyncCredentials *)credentials
+                                                user:(RLMSyncUser *)user
+                                     completionBlock:(nonnull RLMUserCompletionBlock)completion {
+    NSString *identity = credentials.userInfo[kRLMSyncIdentityKey];
     NSAssert(identity != nil, @"Improperly created direct access token credential.");
-    auto sync_user = SyncManager::shared().get_user([identity UTF8String], [credential.token UTF8String], none, true);
+    auto sync_user = SyncManager::shared().get_user([identity UTF8String], [credentials.token UTF8String], none, true);
     if (!sync_user) {
         completion(nil, [NSError errorWithDomain:RLMSyncErrorDomain
                                             code:RLMSyncErrorClientSessionError
