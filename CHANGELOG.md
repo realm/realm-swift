@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.0.4 Release notes (2016-11-14)
 =============================================================
 
 ### API breaking changes
@@ -19,6 +19,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Rename `SyncManager.sharedManager()` to `SyncManager.shared` in Swift 3.
 * Change `Realm.Configuration.syncConfiguration` to take a `SyncConfiguration`
   struct rather than a named tuple.
+* `+[RLMSyncUser logInWithCredentials:]` now invokes its callback block on a
+  background queue.
 
 ### Enhancements
 
