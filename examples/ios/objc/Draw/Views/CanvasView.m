@@ -79,11 +79,11 @@
 
 - (void)clearCanvas
 {
-    //Clear the onscreen context
+    // Clear the onscreen context
     CGContextSetFillColorWithColor(self.onscreenContext, [UIColor whiteColor].CGColor);
     CGContextFillRect(self.onscreenContext, self.bounds);
     
-    //Clear the offscreen context
+    // Clear the offscreen context
     CGContextSetFillColorWithColor(self.offscreenContext, [UIColor whiteColor].CGColor);
     CGContextFillRect(self.offscreenContext, self.bounds);
     

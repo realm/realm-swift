@@ -51,13 +51,13 @@
         // Creating a debug credential since this demo is just using the generated access token
         // produced when running the Realm Object Server via the `start-object-server.command`
         RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:@"demo@realm.io"
-                                                                         password:@"demo"
+                                                                         password:@"password"
                                                                           register:NO];
         
         // Log the user in (async, the Realm will start syncing once the user is logged in automatically)
         [RLMSyncUser logInWithCredential:credential
-                                  authServerURL:authURL
-                                   onCompletion:^(RLMSyncUser *user, NSError *error) {
+                           authServerURL:authURL
+                            onCompletion:^(RLMSyncUser *user, NSError *error) {
            if (error) {
                NSLog(@"A login error has occurred! %@", error);
            }

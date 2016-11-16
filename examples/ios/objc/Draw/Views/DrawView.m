@@ -30,7 +30,6 @@
 @property NSMutableSet *drawnPathIDs;
 @property RLMResults *paths;
 @property RLMNotificationToken *notificationToken;
-@property NSString *vendorID;
 @property CanvasView *canvasView;
 @property SwatchesView *swatchesView;
 @property SwatchColor *currentColor;
@@ -53,7 +52,6 @@
                 [weakSelf.canvasView setNeedsDisplay];
             }
         }];
-        self.vendorID = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
         self.paths = [DrawPath allObjects];
         
         self.canvasView = [[CanvasView alloc] init];

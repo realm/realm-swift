@@ -22,9 +22,8 @@
 
 @interface DrawPath : RLMObject
 
-@property NSString *drawerID;
 @property NSString *color;
-@property RLMArray<DrawPoint> *points;
+@property RLMArray<DrawPoint *><DrawPoint> *points;
 @property (readonly) UIBezierPath *path;
 
 @end

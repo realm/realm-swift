@@ -57,7 +57,7 @@ static CGFloat kSwatchPencilPadding = 1.0f;
     NSMutableArray *buttons = [NSMutableArray array];
     
     NSInteger tag = 0;
-    for (SwatchColor *color in [SwatchColor allSwatchColors]) {
+    for (SwatchColor *color in self.colors) {
         UIImage *pencilImage = [[UIImage imageNamed:color.name] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -112,10 +112,6 @@ static CGFloat kSwatchPencilPadding = 1.0f;
 - (void)buttonTapped:(id)sender
 {
     UIButton *button = (UIButton *)sender;
-    if (button == nil) {
-        return;
-    }
-    
     self.selectedColor = self.colors[button.tag];
 }
 
