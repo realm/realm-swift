@@ -104,7 +104,7 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-/// Registereing a user with existing username should return corresponding error.
+/// Registering a user with existing username should return corresponding error.
 - (void)testExistingUsernameRegistration {
     RLMSyncCredential *credential = [RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
                                                                     createAccount:YES];
