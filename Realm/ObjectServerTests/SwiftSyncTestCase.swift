@@ -36,8 +36,8 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
 
-    func basicCredential(register: Bool, file: StaticString = #file, line: UInt = #line) -> Credential {
-        return Credential.usernamePassword(username: "\(file)\(line)", password: "a", register: register)
+    func basicCredentials(register: Bool, usernameSuffix: String = "", file: StaticString = #file, line: UInt = #line) -> SyncCredentials {
+        return .usernamePassword(username: "\(file)\(line)\(usernameSuffix)", password: "a", register: register)
     }
 
     func synchronouslyOpenRealm(url: URL, user: SyncUser, file: StaticString = #file, line: UInt = #line) throws -> Realm {
@@ -61,14 +61,14 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return try Realm(configuration: Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: url)))
     }
 
-    func synchronouslyLogInUser(for credential: Credential,
+    func synchronouslyLogInUser(for credentials: SyncCredentials,
                                 server url: URL,
                                 file: StaticString = #file,
                                 line: UInt = #line) throws -> SyncUser {
         let process = isParent ? "parent" : "child"
         var theUser: SyncUser! = nil
         let ex = expectation(description: "Should log in the user properly")
-        SyncUser.logIn(with: credential, server: url) { (user, error) in
+        SyncUser.logIn(with: credentials, server: url) { user, error in
             XCTAssertNotNil(user, file: file, line: line)
             XCTAssertNil(error,
                          "Error when trying to log in a user: \(error!) (process: \(process))",
@@ -109,8 +109,8 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed")
     }
 
-    func basicCredential(register register: Bool, file: StaticString = #file, line: UInt = #line) -> Credential {
-        return Credential.usernamePassword("\(file)\(line)", password: "a", register: register)
+    func basicCredentials(register register: Bool, usernameSuffix: String = "", file: StaticString = #file, line: UInt = #line) -> SyncCredentials {
+        return .usernamePassword("\(file)\(line)\(usernameSuffix)", password: "a", register: register)
     }
 
     func synchronouslyOpenRealm(url url: NSURL,
@@ -135,11 +135,11 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return try Realm(configuration: Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: url)))
     }
 
-    func synchronouslyLogInUser(for credential: Credential, server url: NSURL) throws -> SyncUser {
+    func synchronouslyLogInUser(for credentials: SyncCredentials, server url: NSURL) throws -> SyncUser {
         let process = isParent ? "parent" : "child"
         var theUser: SyncUser! = nil
         let ex = expectationWithDescription("Should log in the user properly")
-        SyncUser.logInWithCredential(credential, authServerURL: url) { (user, error) in
+        SyncUser.logInWithCredentials(credentials, authServerURL: url) { user, error in
             XCTAssertNotNil(user)
             XCTAssertNil(error, "Error when trying to log in a user: \(error!) (process: \(process))")
             theUser = user

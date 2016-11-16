@@ -3,22 +3,47 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API breaking changes
 
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
+2.0.4 Release notes (2016-11-14)
+=============================================================
+
+### API breaking changes
+
 * Remove `RLMAuthenticationActions` and replace
   `+[RLMSyncCredential credentialWithUsername:password:actions:]` with
-  `+[RLMSyncCredential credentialWithUsername:password:register:]`.
+  `+[RLMSyncCredential credentialsWithUsername:password:register:]`.
 * Rename `+[RLMSyncUser authenticateWithCredential:]` to
-  `+[RLMSyncUser logInWithCredential:]`.
-* Rename `+[RLMSyncUser all]` to:
+  `+[RLMSyncUser logInWithCredentials:]`.
+* Rename "credential"-related types and methods to
+  `RLMSyncCredentials`/`SyncCredentials` and consistently refer to credentials
+  in the plural form.
+* Change `+[RLMSyncUser all]` to return a dictionary of identifiers to users and
+  rename to:
   * `+[RLMSyncUser allUsers]` in Objective-C.
   * `SyncUser.allUsers()` in Swift 2.
   * `SyncUser.all` in Swift 3.
 * Rename `SyncManager.sharedManager()` to `SyncManager.shared` in Swift 3.
 * Change `Realm.Configuration.syncConfiguration` to take a `SyncConfiguration`
   struct rather than a named tuple.
+* `+[RLMSyncUser logInWithCredentials:]` now invokes its callback block on a
+  background queue.
 
 ### Enhancements
 
 * Add `+[RLMSyncUser currentUser]`.
+* Add the ability to change read, write and management permissions for
+  synchronized Realms using the management Realm obtained via the
+  `-[RLMSyncUser managementRealmWithError:]` API and the
+  `RLMSyncPermissionChange` class.
 
 ### Bugfixes
 

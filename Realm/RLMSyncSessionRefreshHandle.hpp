@@ -18,18 +18,23 @@
 
 #import <Foundation/Foundation.h>
 
+#import <memory>
+
+namespace realm {
+class SyncSession;
+}
+
 @class RLMSyncUser;
 
-@interface RLMSyncFileManager : NSObject
+/// An object that handles refreshing a session's auth token periodically, as long as that session remains viable.
+/// Intended for easy removal once the new auth system is in place.
+@interface RLMSyncSessionRefreshHandle : NSObject
 
-NS_ASSUME_NONNULL_BEGIN
+- (instancetype)initWithFullURLPath:(NSString *)urlPath
+                               user:(RLMSyncUser *)user
+                            session:(std::shared_ptr<realm::SyncSession>)session;
 
-- (instancetype)initWithRootDirectory:(NSURL *)rootDirectory;
-
-- (NSURL *)fileURLForRawRealmURL:(NSURL *)url user:(RLMSyncUser *)user;
-- (NSURL *)fileURLForMetadata;
-- (BOOL)removeFilesForUserIdentity:(NSString *)identity error:(NSError * _Nullable* _Nullable)error;
-
-NS_ASSUME_NONNULL_END
+- (void)scheduleRefreshTimer:(NSTimeInterval)fireTime;
+- (void)invalidate;
 
 @end

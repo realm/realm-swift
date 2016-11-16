@@ -53,12 +53,12 @@ using namespace realm;
 }
 
 // return properties by name
--(RLMProperty *)objectForKeyedSubscript:(__unsafe_unretained NSString *const)key {
+- (RLMProperty *)objectForKeyedSubscript:(__unsafe_unretained NSString *const)key {
     return _allPropertiesByName[key];
 }
 
 // create property map when setting property array
--(void)setProperties:(NSArray *)properties {
+- (void)setProperties:(NSArray *)properties {
     _properties = properties;
     [self _propertiesDidChange];
 }
@@ -357,9 +357,13 @@ using namespace realm;
     return [NSString stringWithFormat:@"%@ {\n%@}", self.className, propertiesString];
 }
 
+- (NSString *)objectName {
+    return [self.objectClass _realmObjectName] ?: _className;
+}
+
 - (realm::ObjectSchema)objectStoreCopy {
     ObjectSchema objectSchema;
-    objectSchema.name = _className.UTF8String;
+    objectSchema.name = self.objectName.UTF8String;
     objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.name.UTF8String : "";
     for (RLMProperty *prop in _properties) {
         Property p = [prop objectStoreCopy];

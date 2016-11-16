@@ -36,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 // Returns whether the class is included in the default set of classes managed by a Realm.
 + (BOOL)shouldIncludeInDefaultSchema;
 
++ (nullable NSString *)_realmObjectName;
+
 @end
 
 NS_ASSUME_NONNULL_END
