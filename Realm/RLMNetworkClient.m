@@ -193,7 +193,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
         return NO;
     }
 
-    if (data == nil) {
+    if (!data) {
         // FIXME: provide error message
         *error = [NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadResponse userInfo:nil];
         return NO;
@@ -215,7 +215,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     }
 
     RLMSyncErrorResponseModel *responseModel = [[RLMSyncErrorResponseModel alloc] initWithDictionary:json];
-    if (responseModel == nil) {
+    if (!responseModel) {
         return nil;
     }
 
