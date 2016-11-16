@@ -772,7 +772,7 @@
 }
 
 - (void)verifyChangePermission:(RLMSyncPermissionChange *)permissionChange statusMessage:(NSString *)message owner:(RLMSyncUser *)owner {
-    RLMRealm *managementRealm = [self managementRealmForUser:owner];
+    RLMRealm *managementRealm = [owner managementRealmWithError:nil];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
 
