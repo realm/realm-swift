@@ -18,13 +18,13 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMSyncUser, RLMSyncCredential, RLMSyncSession, RLMRealm;
+@class RLMSyncUser, RLMSyncCredentials, RLMSyncSession, RLMRealm;
 
 /**
  The state of the user object.
  */
 typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
-    /// The user is logged out. Call `authenticateWithCredential:...` with a valid credential to log the user back in.
+    /// The user is logged out. Call `logInWithCredentials:...` with valid credentials to log the user back in.
     RLMSyncUserStateLoggedOut,
     /// The user is logged in, and any Realms associated with it are syncing with the Realm Object Server.
     RLMSyncUserStateActive,
@@ -47,15 +47,22 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface RLMSyncUser : NSObject
 
-/** 
- An array of all valid, logged-in users.
+/**
+ A dictionary of all valid, logged-in user identities corresponding to their `RLMSyncUser` objects.
  */
-+ (NSArray<RLMSyncUser *> *)all;
++ (NSDictionary<NSString *, RLMSyncUser *> *)allUsers NS_REFINED_FOR_SWIFT;
+
+/**
+ The logged-in user. `nil` if none exists.
+
+ @warning Throws an exception if more than one logged-in user exists.
+ */
++ (nullable RLMSyncUser *)currentUser NS_REFINED_FOR_SWIFT;
 
 /**
  The unique Realm Object Server user ID string identifying this user.
  */
-@property (nonatomic, readonly) NSString *identity;
+@property (nullable, nonatomic, readonly) NSString *identity;
 
 /**
  The URL of the authentication server this user will communicate with.
@@ -68,22 +75,22 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) RLMSyncUserState state;
 
 /**
- Create, log in, and asynchronously return a new user object, specifying a custom timeout for the network request. A
- credential identifying the user must be passed in. The user becomes available in the completion block, at which point
+ Create, log in, and asynchronously return a new user object, specifying a custom timeout for the network request.
+ Credentials identifying the user must be passed in. The user becomes available in the completion block, at which point
  it is ready for use.
  */
-+ (void)authenticateWithCredential:(RLMSyncCredential *)credential
-                     authServerURL:(NSURL *)authServerURL
-                           timeout:(NSTimeInterval)timeout
-                      onCompletion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
++ (void)logInWithCredentials:(RLMSyncCredentials *)credentials
+               authServerURL:(NSURL *)authServerURL
+                     timeout:(NSTimeInterval)timeout
+                onCompletion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
 /**
- Create, log in, and asynchronously return a new user object. A credential identifying the user must be passed in. The
+ Create, log in, and asynchronously return a new user object. Credentials identifying the user must be passed in. The
  user becomes available in the completion block, at which point it is ready for use.
  */
-+ (void)authenticateWithCredential:(RLMSyncCredential *)credential
-                     authServerURL:(NSURL *)authServerURL
-                      onCompletion:(RLMUserCompletionBlock)completion
++ (void)logInWithCredentials:(RLMSyncCredentials *)credentials
+               authServerURL:(NSURL *)authServerURL
+                onCompletion:(RLMUserCompletionBlock)completion
 NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 /**
@@ -104,6 +111,14 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  Retrieve all the valid sessions belonging to this user.
  */
 - (NSArray<RLMSyncSession *> *)allSessions;
+
+/**
+ Returns an instance of the Management Realm owned by the user.
+ 
+ This Realm can be used to control access permissions for Realms managed by the user.
+ This includes granting other users access to Realms.
+ */
+- (RLMRealm *)managementRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));

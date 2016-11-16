@@ -19,7 +19,7 @@
 #import "RLMClassInfo.hpp"
 
 #import "RLMRealm_Private.hpp"
-#import "RLMObjectSchema.h"
+#import "RLMObjectSchema_Private.h"
 #import "RLMSchema.h"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
@@ -102,6 +102,6 @@ RLMSchemaInfo::RLMSchemaInfo(RLMRealm *realm, RLMSchema *rlmSchema, realm::Schem
         m_objects.emplace(std::piecewise_construct,
                           std::forward_as_tuple(rlmObjectSchema.className),
                           std::forward_as_tuple(realm, rlmObjectSchema,
-                                                &*schema.find(rlmObjectSchema.className.UTF8String)));
+                                                &*schema.find(rlmObjectSchema.objectName.UTF8String)));
     }
 }

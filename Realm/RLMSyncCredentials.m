@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncCredential.h"
+#import "RLMSyncCredentials.h"
 #import "RLMSyncUtil_Private.h"
 
 /// A Twitter account as an identity provider.
@@ -30,48 +30,58 @@ RLMIdentityProvider const RLMIdentityProviderTwitter                = @"twitter"
 RLMIdentityProvider const RLMIdentityProviderGoogle                 = @"google";
 RLMIdentityProvider const RLMIdentityProviderICloud                 = @"icloud";
 
-@interface RLMSyncCredential ()
+@interface RLMSyncCredentials ()
 
-- (instancetype)initWithCustomToken:(RLMCredentialToken)token
+- (instancetype)initWithCustomToken:(RLMSyncCredentialsToken)token
                            provider:(RLMIdentityProvider)provider
                            userInfo:(NSDictionary *)userInfo NS_DESIGNATED_INITIALIZER;
 
-@property (nonatomic, readwrite) RLMCredentialToken token;
+@property (nonatomic, readwrite) RLMSyncCredentialsToken token;
 @property (nonatomic, readwrite) RLMIdentityProvider provider;
 @property (nonatomic, readwrite) NSDictionary *userInfo;
 
 @end
 
-@implementation RLMSyncCredential
+@implementation RLMSyncCredentials
 
-+ (instancetype)credentialWithFacebookToken:(RLMCredentialToken)token {
++ (instancetype)credentialsWithFacebookToken:(RLMSyncCredentialsToken)token {
     return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderFacebook userInfo:nil];
 }
 
-+ (instancetype)credentialWithGoogleToken:(RLMCredentialToken)token {
++ (instancetype)credentialsWithGoogleToken:(RLMSyncCredentialsToken)token {
     return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderGoogle userInfo:nil];
 }
 
-+ (instancetype)credentialWithICloudToken:(RLMCredentialToken)token {
++ (instancetype)credentialsWithICloudToken:(RLMSyncCredentialsToken)token {
     return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderICloud userInfo:nil];
 }
 
-+ (instancetype)credentialWithUsername:(NSString *)username
-                              password:(NSString *)password
-                               actions:(RLMAuthenticationActions)actions {
++ (instancetype)credentialsWithUsername:(NSString *)username
+                               password:(NSString *)password
+                               register:(BOOL)shouldRegister {
     return [[self alloc] initWithCustomToken:username
                                     provider:RLMIdentityProviderUsernamePassword
                                     userInfo:@{kRLMSyncPasswordKey: password,
-                                               kRLMSyncActionsKey: @(actions)}];
+                                               kRLMSyncRegisterKey: @(shouldRegister)}];
 }
 
-+ (instancetype)credentialWithAccessToken:(RLMServerToken)accessToken identity:(NSString *)identity {
++ (instancetype)credentialsWithAccessToken:(RLMServerToken)accessToken identity:(NSString *)identity {
     return [[self alloc] initWithCustomToken:accessToken
                                     provider:RLMIdentityProviderAccessToken
                                     userInfo:@{kRLMSyncIdentityKey: identity}];
 }
 
-- (instancetype)initWithCustomToken:(RLMCredentialToken)token
+- (BOOL)isEqual:(id)object {
+    if (![object isKindOfClass:[RLMSyncCredentials class]]) {
+        return NO;
+    }
+    RLMSyncCredentials *that = (RLMSyncCredentials *)object;
+    return ([self.token isEqualToString:that.token]
+            && [self.provider isEqualToString:that.provider]
+            && [self.userInfo isEqual:that.userInfo]);
+}
+
+- (instancetype)initWithCustomToken:(RLMSyncCredentialsToken)token
                            provider:(RLMIdentityProvider)provider
                            userInfo:(NSDictionary *)userInfo {
     if (self = [super init]) {

@@ -11,11 +11,70 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
+* None.
+
+2.0.4 Release notes (2016-11-14)
+=============================================================
+
+### API breaking changes
+
+* Remove `RLMAuthenticationActions` and replace
+  `+[RLMSyncCredential credentialWithUsername:password:actions:]` with
+  `+[RLMSyncCredential credentialsWithUsername:password:register:]`.
+* Rename `+[RLMSyncUser authenticateWithCredential:]` to
+  `+[RLMSyncUser logInWithCredentials:]`.
+* Rename "credential"-related types and methods to
+  `RLMSyncCredentials`/`SyncCredentials` and consistently refer to credentials
+  in the plural form.
+* Change `+[RLMSyncUser all]` to return a dictionary of identifiers to users and
+  rename to:
+  * `+[RLMSyncUser allUsers]` in Objective-C.
+  * `SyncUser.allUsers()` in Swift 2.
+  * `SyncUser.all` in Swift 3.
+* Rename `SyncManager.sharedManager()` to `SyncManager.shared` in Swift 3.
+* Change `Realm.Configuration.syncConfiguration` to take a `SyncConfiguration`
+  struct rather than a named tuple.
+* `+[RLMSyncUser logInWithCredentials:]` now invokes its callback block on a
+  background queue.
+
+### Enhancements
+
+* Add `+[RLMSyncUser currentUser]`.
+* Add the ability to change read, write and management permissions for
+  synchronized Realms using the management Realm obtained via the
+  `-[RLMSyncUser managementRealmWithError:]` API and the
+  `RLMSyncPermissionChange` class.
+
+### Bugfixes
+
+* None.
+
+2.0.3 Release notes (2016-10-27)
+=============================================================
+
+This release adds binary versions of Swift 3.0.1 frameworks built with Xcode 8.1
+GM seed.
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
 * Fix a `BadVersion` exception caused by a race condition when delivering
   collection change notifications.
-
 * Fix an assertion failure when additional model classes are added and
   `deleteRealmIfMigrationNeeded` is enabled.
+* Fix a `BadTransactLog` exception when deleting an `RLMResults` in a synced
+  Realm.
+* Fix an assertion failure when a write transaction is in progress at the point
+  of process termination.
+* Fix a crash that could occur when working with a `RLMLinkingObject` property
+  of an unmanaged object.
 
 2.0.2 Release notes (2016-10-05)
 =============================================================

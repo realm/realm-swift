@@ -36,9 +36,8 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
 
-    func basicCredential(create: Bool, file: StaticString = #file, line: UInt = #line) -> Credential {
-        let actions: AuthenticationActions = create ? .createAccount : .useExistingAccount
-        return Credential.usernamePassword(username: "\(file)\(line)", password: "a", actions: actions)
+    func basicCredentials(register: Bool, usernameSuffix: String = "", file: StaticString = #file, line: UInt = #line) -> SyncCredentials {
+        return .usernamePassword(username: "\(file)\(line)\(usernameSuffix)", password: "a", register: register)
     }
 
     func synchronouslyOpenRealm(url: URL, user: SyncUser, file: StaticString = #file, line: UInt = #line) throws -> Realm {
@@ -50,8 +49,8 @@ class SwiftSyncTestCase: RLMSyncTestCase {
             }
             semaphore.signal()
         }
-        SyncManager.shared().setSessionCompletionNotifier(basicBlock)
-        let config = Realm.Configuration(syncConfiguration: (user, url))
+        SyncManager.shared.setSessionCompletionNotifier(basicBlock)
+        let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: url))
         let realm = try Realm(configuration: config)
         // FIXME: Perhaps we should have a reasonable timeout here, instead of allowing bad code to stall forever.
         _ = semaphore.wait(timeout: .distantFuture)
@@ -59,17 +58,17 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     func immediatelyOpenRealm(url: URL, user: SyncUser) throws -> Realm {
-        return try Realm(configuration: Realm.Configuration(syncConfiguration: (user, url)))
+        return try Realm(configuration: Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: url)))
     }
 
-    func synchronouslyLogInUser(for credential: Credential,
+    func synchronouslyLogInUser(for credentials: SyncCredentials,
                                 server url: URL,
                                 file: StaticString = #file,
                                 line: UInt = #line) throws -> SyncUser {
         let process = isParent ? "parent" : "child"
         var theUser: SyncUser! = nil
         let ex = expectation(description: "Should log in the user properly")
-        SyncUser.authenticate(with: credential, server: url) { (user, error) in
+        SyncUser.logIn(with: credentials, server: url) { user, error in
             XCTAssertNotNil(user, file: file, line: line)
             XCTAssertNil(error,
                          "Error when trying to log in a user: \(error!) (process: \(process))",
@@ -110,9 +109,8 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed")
     }
 
-    func basicCredential(create create: Bool, file: StaticString = #file, line: UInt = #line) -> Credential {
-        let actions: AuthenticationActions = create ? .CreateAccount : .UseExistingAccount
-        return Credential.usernamePassword("\(file)\(line)", password: "a", actions: actions)
+    func basicCredentials(register register: Bool, usernameSuffix: String = "", file: StaticString = #file, line: UInt = #line) -> SyncCredentials {
+        return .usernamePassword("\(file)\(line)\(usernameSuffix)", password: "a", register: register)
     }
 
     func synchronouslyOpenRealm(url url: NSURL,
@@ -126,7 +124,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
             dispatch_semaphore_signal(semaphore)
         }
         SyncManager.sharedManager().setSessionCompletionNotifier(basicBlock)
-        let config = Realm.Configuration(syncConfiguration: (user, url))
+        let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: url))
         let realm = try Realm(configuration: config)
         // FIXME: Perhaps we should have a reasonable timeout here, instead of allowing bad code to stall forever.
         dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
@@ -134,14 +132,14 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     func immediatelyOpenRealm(url: NSURL, user: SyncUser) throws -> Realm {
-        return try Realm(configuration: Realm.Configuration(syncConfiguration: (user, url)))
+        return try Realm(configuration: Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: url)))
     }
 
-    func synchronouslyLogInUser(for credential: Credential, server url: NSURL) throws -> SyncUser {
+    func synchronouslyLogInUser(for credentials: SyncCredentials, server url: NSURL) throws -> SyncUser {
         let process = isParent ? "parent" : "child"
         var theUser: SyncUser! = nil
         let ex = expectationWithDescription("Should log in the user properly")
-        SyncUser.authenticateWithCredential(credential, authServerURL: url) { (user, error) in
+        SyncUser.logInWithCredentials(credentials, authServerURL: url) { user, error in
             XCTAssertNotNil(user)
             XCTAssertNil(error, "Error when trying to log in a user: \(error!) (process: \(process))")
             theUser = user

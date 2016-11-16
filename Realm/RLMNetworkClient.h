@@ -26,8 +26,8 @@
 typedef NS_ENUM(NSUInteger, RLMServerEndpoint) {
     RLMServerEndpointAuth,
     RLMServerEndpointLogout,
-    RLMServerEndpointAddCredential,
-    RLMServerEndpointRemoveCredential,
+    RLMServerEndpointAddCredentials,
+    RLMServerEndpointRemoveCredentials,
 };
 
 /**

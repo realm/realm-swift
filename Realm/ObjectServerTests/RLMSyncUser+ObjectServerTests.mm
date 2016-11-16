@@ -18,12 +18,7 @@
 
 #import "RLMSyncUser+ObjectServerTests.h"
 
-#import "RLMSyncSession_Private.h"
-#import "RLMSyncSessionHandle.hpp"
-
-@interface RLMSyncSession ()
-- (RLMSyncSessionHandle *)sessionHandle;
-@end
+#import "RLMSyncSession_Private.hpp"
 
 @implementation RLMSyncUser (ObjectServerTests)
 
@@ -32,11 +27,10 @@
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncSession *session = [self sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
-    [[session sessionHandle] waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                   callback:^{
-                                                       dispatch_semaphore_signal(sema);
-                                                   }];
-
+    [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
+                                   callback:^{
+                                       dispatch_semaphore_signal(sema);
+                                   }];
     return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
 }
 
@@ -45,10 +39,10 @@
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncSession *session = [self sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
-    [[session sessionHandle] waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                     callback:^{
-                                                         dispatch_semaphore_signal(sema);
-                                                     }];
+    [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
+                                     callback:^{
+                                         dispatch_semaphore_signal(sema);
+                                     }];
     return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
 }
 

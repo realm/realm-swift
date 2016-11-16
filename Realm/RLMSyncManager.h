@@ -20,7 +20,7 @@
 
 #import "RLMSyncUtil.h"
 
-@class RLMSyncSession, RLMSyncConfiguration;
+@class RLMSyncSession;
 
 /// An enum representing different levels of sync-related logging that can be configured.
 typedef NS_ENUM(NSUInteger, RLMSyncLogLevel) {
@@ -77,7 +77,7 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 /**
  Whether SSL certificate validation should be disabled. SSL certificate validation is ON by default. Setting this
  property after at least one synced Realm or standalone Session has been opened is a no-op.
- 
+
  @warning NEVER disable certificate validation for clients and servers in production.
  */
 @property (nonatomic) BOOL disableSSLValidation;
@@ -89,7 +89,7 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 @property (nonatomic) RLMSyncLogLevel logLevel;
 
 /// The sole instance of the singleton.
-+ (instancetype)sharedManager;
++ (instancetype)sharedManager NS_REFINED_FOR_SWIFT;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncManager cannot be created directly")));

@@ -255,4 +255,5 @@
 + (NSArray *)requiredProperties { return nil; }
 + (NSDictionary *)linkingObjectsProperties { return nil; }
 + (BOOL)shouldIncludeInDefaultSchema { return NO; }
++ (NSString *)_realmObjectName { return nil; }
 @end

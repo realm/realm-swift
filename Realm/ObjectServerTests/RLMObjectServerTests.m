@@ -32,17 +32,17 @@
 
 #pragma mark - Authentication
 
-/// A valid username/password credential should be able to log in a user. Using the same credential should return the
+/// Valid username/password credentials should be able to log in a user. Using the same credentials should return the
 /// same user object.
 - (void)testUsernamePasswordAuthentication {
-    RLMSyncUser *firstUser = [self logInUserForCredential:[RLMSyncTestCase basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:YES]
-                                                   server:[RLMSyncTestCase authServerURL]];
-    RLMSyncUser *secondUser = [self logInUserForCredential:[RLMSyncTestCase basicCredentialWithName:ACCOUNT_NAME()
-                                                                                      createAccount:NO]
+    RLMSyncUser *firstUser = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:YES]
                                                     server:[RLMSyncTestCase authServerURL]];
-    // Logging in with equivalent credentials should return the same user object instance.
-    XCTAssertEqual(firstUser, secondUser);
+    RLMSyncUser *secondUser = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                             register:NO]
+                                                     server:[RLMSyncTestCase authServerURL]];
+    // Two users created with the same credential should resolve to the same actual user.
+    XCTAssertTrue([firstUser.identity isEqualToString:secondUser.identity]);
     // Authentication server property should be properly set.
     XCTAssertEqualObjects(firstUser.authenticationServer, [RLMSyncTestCase authServerURL]);
 }
@@ -52,27 +52,27 @@
     NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
     NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
     XCTAssertNotNil(adminToken);
-    RLMSyncCredential *credential = [RLMSyncCredential credentialWithAccessToken:adminToken identity:@"test"];
-    XCTAssertNotNil(credential);
+    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken identity:@"test"];
+    XCTAssertNotNil(credentials);
 
-    [self logInUserForCredential:credential server:[RLMObjectServerTests authServerURL]];
+    [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
 }
 
 #pragma mark - Authentication Errors
 
 /// An invalid username/password credential should not be able to log in a user and a corresponding error should be generated.
 - (void)testInvalidPasswordAuthentication {
-    [self logInUserForCredential:[RLMSyncTestCase basicCredentialWithName:ACCOUNT_NAME() createAccount:YES]
+    [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:ACCOUNT_NAME() register:YES]
                           server:[RLMSyncTestCase authServerURL]];
 
-    RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:ACCOUNT_NAME()
-                                                                     password:@"INVALID_PASSWORD"
-                                                                      actions:RLMAuthenticationActionsUseExistingAccount];
+    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithUsername:ACCOUNT_NAME()
+                                                                         password:@"INVALID_PASSWORD"
+                                                                         register:NO];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    [RLMSyncUser authenticateWithCredential:credential
-                              authServerURL:[RLMObjectServerTests authServerURL]
-                               onCompletion:^(RLMSyncUser *user, NSError *error) {
+    [RLMSyncUser logInWithCredentials:credentials
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, RLMSyncErrorDomain);
@@ -86,13 +86,13 @@
 
 /// A non-existsing user should not be able to log in and a corresponding error should be generated.
 - (void)testNonExistingUsernameAuthentication {
-    RLMSyncCredential *credential = [RLMSyncTestCase basicCredentialWithName:ACCOUNT_NAME()
-                                                               createAccount:NO];
+    RLMSyncCredentials *credentials = [RLMSyncTestCase basicCredentialsWithName:ACCOUNT_NAME()
+                                                                       register:NO];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    [RLMSyncUser authenticateWithCredential:credential
-                              authServerURL:[RLMObjectServerTests authServerURL]
-                               onCompletion:^(RLMSyncUser *user, NSError *error) {
+    [RLMSyncUser logInWithCredentials:credentials
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, RLMSyncErrorDomain);
@@ -106,15 +106,15 @@
 
 /// Registering a user with existing username should return corresponding error.
 - (void)testExistingUsernameRegistration {
-    RLMSyncCredential *credential = [RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                    createAccount:YES];
+    RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                            register:YES];
 
-    [self logInUserForCredential:credential server:[RLMSyncTestCase authServerURL]];
+    [self logInUserForCredentials:credentials server:[RLMSyncTestCase authServerURL]];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    [RLMSyncUser authenticateWithCredential:credential
-                              authServerURL:[RLMObjectServerTests authServerURL]
-                               onCompletion:^(RLMSyncUser *user, NSError *error) {
+    [RLMSyncUser logInWithCredentials:credentials
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                        onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, RLMSyncErrorDomain);
@@ -130,13 +130,23 @@
 
 /// `[RLMSyncUser all]` should be updated once a user is logged in.
 - (void)testBasicUserPersistence {
-    XCTAssertEqual([[RLMSyncUser all] count], 0U);
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:YES]
-                                              server:[RLMObjectServerTests authServerURL]];
+    XCTAssertNil([RLMSyncUser currentUser]);
+    XCTAssertEqual([[RLMSyncUser allUsers] count], 0U);
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
     XCTAssertNotNil(user);
-    XCTAssertEqual([[RLMSyncUser all] count], 1U);
-    XCTAssertTrue([[RLMSyncUser all] containsObject:user]);
+    XCTAssertEqual([[RLMSyncUser allUsers] count], 1U);
+    XCTAssertEqualObjects([RLMSyncUser allUsers], @{user.identity: user});
+    XCTAssertEqualObjects([RLMSyncUser currentUser], user);
+
+    RLMSyncUser *user2 = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:[ACCOUNT_NAME() stringByAppendingString:@"2"]
+                                                                                             register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
+    XCTAssertEqual([[RLMSyncUser allUsers] count], 2U);
+    NSDictionary *dict2 = @{user.identity: user, user2.identity: user2};
+    XCTAssertEqualObjects([RLMSyncUser allUsers], dict2);
+    RLMAssertThrowsWithReasonMatching([RLMSyncUser currentUser], @"currentUser cannot be called if more that one valid, logged-in user exists");
 }
 
 #pragma mark - Basic Sync
@@ -144,24 +154,28 @@
 /// It should be possible to successfully open a Realm configured for sync with an access token.
 - (void)testOpenRealmWithAdminToken {
     // FIXME (tests): opening a Realm with the access token, then opening a Realm at the same virtual path
-    // with a normal credential, causes Realms to fail to bind with a "bad virtual path" error.
+    // with normal credentials, causes Realms to fail to bind with a "bad virtual path" error.
     NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
     NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
     XCTAssertNotNil(adminToken);
-    RLMSyncCredential *credential = [RLMSyncCredential credentialWithAccessToken:adminToken identity:@"test"];
-    XCTAssertNotNil(credential);
-    RLMSyncUser *user = [self logInUserForCredential:credential
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken identity:@"test"];
+    XCTAssertNotNil(credentials);
+    RLMSyncUser *user = [self logInUserForCredentials:credentials
+                                               server:[RLMObjectServerTests authServerURL]];
     NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/testSyncWithAdminToken"];
-    RLMRealm *realm = [self openRealmForURL:url user:user];
+    RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
+    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    NSError *error = nil;
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:&error];
+    XCTAssertNil(error);
     XCTAssertTrue(realm.isEmpty);
 }
 
 /// It should be possible to successfully open a Realm configured for sync with a normal user.
-- (void)testOpenRealmWithNormalCredential {
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:YES]
-                                              server:[RLMObjectServerTests authServerURL]];
+- (void)testOpenRealmWithNormalCredentials {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
     NSURL *url = REALM_URL();
     RLMRealm *realm = [self openRealmForURL:url user:user];
     XCTAssertTrue(realm.isEmpty);
@@ -170,8 +184,8 @@
 /// If client B adds objects to a synced Realm, client A should see those objects.
 - (void)testAddObjects {
     NSURL *url = REALM_URL();
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
     RLMRealm *realm = [self openRealmForURL:url user:user];
     if (self.isParent) {
@@ -189,9 +203,9 @@
 /// If client B deletes objects from a synced Realm, client A should see the effects of that deletion.
 - (void)testDeleteObjects {
     NSURL *url = REALM_URL();
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
     RLMRealm *realm = [self openRealmForURL:url user:user];
     if (self.isParent) {
         // Add objects.
@@ -219,9 +233,9 @@
     NSURL *urlA = CUSTOM_REALM_URL(@"a");
     NSURL *urlB = CUSTOM_REALM_URL(@"b");
     NSURL *urlC = CUSTOM_REALM_URL(@"c");
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
     // Open three Realms.
     __attribute__((objc_precise_lifetime)) RLMRealm *realmealmA = [self openRealmForURL:urlA user:user];
     __attribute__((objc_precise_lifetime)) RLMRealm *realmealmB = [self openRealmForURL:urlB user:user];
@@ -242,9 +256,9 @@
     NSURL *urlA = CUSTOM_REALM_URL(@"a");
     NSURL *urlB = CUSTOM_REALM_URL(@"b");
     NSURL *urlC = CUSTOM_REALM_URL(@"c");
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
     RLMRealm *realmA = [self openRealmForURL:urlA user:user];
     RLMRealm *realmB = [self openRealmForURL:urlB user:user];
     RLMRealm *realmC = [self openRealmForURL:urlC user:user];
@@ -282,9 +296,9 @@
     NSURL *urlA = CUSTOM_REALM_URL(@"a");
     NSURL *urlB = CUSTOM_REALM_URL(@"b");
     NSURL *urlC = CUSTOM_REALM_URL(@"c");
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
     RLMRealm *realmA = [self openRealmForURL:urlA user:user];
     RLMRealm *realmB = [self openRealmForURL:urlB user:user];
     RLMRealm *realmC = [self openRealmForURL:urlC user:user];
@@ -344,9 +358,9 @@
     const NSInteger OBJECT_COUNT = 10000;
     NSURL *url = REALM_URL();
     // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME() 
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
 
     if (self.isParent) {
         // Open the Realm in an autorelease pool so that it is destroyed as soon as possible.
@@ -379,9 +393,9 @@
 - (void)testLogBackInSameRealmUpload {
     NSURL *url = REALM_URL();
     // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
     RLMRealm *realm = [self openRealmForURL:url user:user];
 
     if (self.isParent) {
@@ -391,9 +405,9 @@
         // Log out the user.
         [user logOut];
         // Log the user back in.
-        user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                            createAccount:NO]
-                                     server:[RLMObjectServerTests authServerURL]];
+        user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                   register:NO]
+                                      server:[RLMObjectServerTests authServerURL]];
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-2", @"parent-3"]];
         WAIT_FOR_UPLOAD(user, url);
         CHECK_COUNT(3, SyncObject, realm);
@@ -408,9 +422,9 @@
 - (void)testLogBackInSameRealmDownload {
     NSURL *url = REALM_URL();
     // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
     RLMRealm *realm = [self openRealmForURL:url user:user];
 
     if (self.isParent) {
@@ -420,9 +434,9 @@
         // Log out the user.
         [user logOut];
         // Log the user back in.
-        user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                            createAccount:NO]
-                                     server:[RLMObjectServerTests authServerURL]];
+        user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                   register:NO]
+                                      server:[RLMObjectServerTests authServerURL]];
         RLMRunChildAndWait();
         WAIT_FOR_DOWNLOAD(user, url);
         CHECK_COUNT(3, SyncObject, realm);
@@ -438,9 +452,9 @@
 - (void)testLogBackInDeferredRealmUpload {
     NSURL *url = REALM_URL();
     // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
     NSError *error = nil;
     if (self.isParent) {
         // Semaphore for knowing when the Realm is successfully opened for sync.
@@ -454,9 +468,9 @@
         XCTAssertNil(error, @"Error when opening Realm: %@", error);
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1"]];
         CHECK_COUNT(1, SyncObject, realm);
-        user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                            createAccount:NO]
-                                     server:[RLMObjectServerTests authServerURL]];
+        user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                   register:NO]
+                                      server:[RLMObjectServerTests authServerURL]];
         // Wait for the Realm's session to be bound.
         WAIT_FOR_SEMAPHORE(sema, 30);
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-2", @"parent-3"]];
@@ -475,9 +489,9 @@
 - (void)testLogBackInDeferredRealmDownload {
     NSURL *url = REALM_URL();
     // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
     NSError *error = nil;
     if (self.isParent) {
         dispatch_semaphore_t sema = dispatch_semaphore_create(0);
@@ -491,9 +505,9 @@
         XCTAssertNil(error, @"Error when opening Realm: %@", error);
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1"]];
         CHECK_COUNT(1, SyncObject, realm);
-        user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                            createAccount:NO]
-                                     server:[RLMObjectServerTests authServerURL]];
+        user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                   register:NO]
+                                      server:[RLMObjectServerTests authServerURL]];
         // Wait for the Realm's session to be bound.
         WAIT_FOR_SEMAPHORE(sema, 30);
         [self waitForDownloadsForUser:user realms:@[realm] realmURLs:@[url] expectedCounts:@[@4]];
@@ -510,17 +524,17 @@
 - (void)testLogBackInOpenFirstTimePathUpload {
     NSURL *url = REALM_URL();
     // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
 
     // Now run a basic multi-client test.
     if (self.isParent) {
         // Log out the user.
         [user logOut];
         // Log the user back in.
-        user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                            createAccount:NO]
+        user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                   register:NO]
                                      server:[RLMObjectServerTests authServerURL]];
         // Open the Realm (for the first time).
         RLMRealm *realm = [self openRealmForURL:url user:user];
@@ -540,18 +554,18 @@
 - (void)testLogBackInOpenFirstTimePathDownload {
     NSURL *url = REALM_URL();
     // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
 
     // Now run a basic multi-client test.
     if (self.isParent) {
         // Log out the user.
         [user logOut];
         // Log the user back in.
-        user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                            createAccount:NO]
-                                     server:[RLMObjectServerTests authServerURL]];
+        user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                   register:NO]
+                                      server:[RLMObjectServerTests authServerURL]];
         // Open the Realm (for the first time).
         RLMRealm *realm = [self openRealmForURL:url user:user];
         // Run the sub-test.
@@ -573,9 +587,9 @@
 - (void)testLogBackInReopenRealmUpload {
     NSURL *url = REALM_URL();
     // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
     // Open the Realm
     RLMRealm *realm = [self openRealmForURL:url user:user];
     if (self.isParent) {
@@ -585,9 +599,9 @@
         // Log out the user.
         [user logOut];
         // Log the user back in.
-        user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                            createAccount:NO]
-                                     server:[RLMObjectServerTests authServerURL]];
+        user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                   register:NO]
+                                      server:[RLMObjectServerTests authServerURL]];
         // Open the Realm again.
         realm = [self immediatelyOpenRealmForURL:url user:user];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3", @"child-4"]];
@@ -605,8 +619,8 @@
 - (void)testLogBackInReopenRealmDownload {
     NSURL *url = REALM_URL();
     // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                                     createAccount:self.isParent]
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
                                               server:[RLMObjectServerTests authServerURL]];
     // Open the Realm
     RLMRealm *realm = [self openRealmForURL:url user:user];
@@ -617,9 +631,9 @@
         // Log out the user.
         [user logOut];
         // Log the user back in.
-        user = [self logInUserForCredential:[RLMObjectServerTests basicCredentialWithName:ACCOUNT_NAME()
-                                                                            createAccount:NO]
-                                     server:[RLMObjectServerTests authServerURL]];
+        user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                   register:NO]
+                                      server:[RLMObjectServerTests authServerURL]];
         // Run the sub-test.
         RLMRunChildAndWait();
         // Open the Realm again and get the items.
@@ -632,6 +646,276 @@
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3", @"child-4"]];
         WAIT_FOR_UPLOAD(user, url);
         CHECK_COUNT(5, SyncObject, realm);
+    }
+}
+
+#pragma mark - Permissions
+
+/// Grant/revoke access a user's Realm to another user. Another user has no access permission by default.
+- (void)testPermissionChange {
+    NSString *userNameA = [ACCOUNT_NAME() stringByAppendingString:@"_A"];
+    RLMSyncUser *userA = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameA
+                                                                                             register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSString *userNameB = [ACCOUNT_NAME() stringByAppendingString:@"_B"];
+    RLMSyncUser *userB = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameB
+                                                                                             register:self.isParent]
+                                                server:[RLMObjectServerTests authServerURL]];
+
+    NSURL *url = REALM_URL();
+    RLMRealm *realm = [self openRealmForURL:url user:userA];
+
+    NSArray *administrativePermissions = @[
+                                           @[@YES, @YES, @YES],
+                                           @[@NO, @YES, @YES],
+                                           @[@YES, @NO, @YES],
+                                           @[@NO, @NO, @YES]
+                                           ];
+    NSArray *readWritePermissions = @[
+                                      @[@YES, @YES, @NO]
+                                      ];
+    NSArray *readOnlyPermissions = @[
+                                     @[@YES, @NO, @NO]
+                                     ];
+    NSArray *noAccessPermissions = @[
+                                     @[@NO, @NO, @NO],
+                                     @[[NSNull null], [NSNull null], [NSNull null]]
+                                     ];
+
+    NSArray *permissions = @[administrativePermissions,
+                             readWritePermissions,
+                             readOnlyPermissions,
+                             noAccessPermissions];
+    NSArray *statusMessages = @[@"administrative access",
+                                @"read-write access",
+                                @"read-only access",
+                                @"no access"];
+
+    [permissions enumerateObjectsUsingBlock:^(id  _Nonnull accessPermissions, NSUInteger idx, BOOL * _Nonnull stop __unused) {
+        for (NSArray *permissions in accessPermissions) {
+            NSNumber<RLMBool> *mayRead = permissions[0] == [NSNull null] ? nil : permissions[0];
+            NSNumber<RLMBool> *mayWrite = permissions[1] == [NSNull null] ? nil : permissions[1];
+            NSNumber<RLMBool> *mayManage = permissions[2] == [NSNull null] ? nil : permissions[2];
+            NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:realmURL
+                                                                                                       userID:userB.identity
+                                                                                                         read:mayRead
+                                                                                                        write:mayWrite
+                                                                                                      manage:mayManage];
+            [self verifyChangePermission:permissionChange statusMessage:statusMessages[idx] owner:userA];
+        }
+    }];
+}
+
+/// Grant/revoke access a user's Realm to every users.
+- (void)testPermissionChangeForRealm {
+    NSString *userNameA = [ACCOUNT_NAME() stringByAppendingString:@"_A"];
+    RLMSyncUser *userA = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameA
+                                                                                             register:self.isParent]
+                                                server:[RLMObjectServerTests authServerURL]];
+
+    NSURL *url = REALM_URL();
+    RLMRealm *realm = [self openRealmForURL:url user:userA];
+
+    NSArray *administrativePermissions = @[
+                                           @[@YES, @YES, @YES],
+                                           @[@NO, @YES, @YES],
+                                           @[@YES, @NO, @YES],
+                                           @[@NO, @NO, @YES]
+                                           ];
+    NSArray *readWritePermissions = @[
+                                      @[@YES, @YES, @NO]
+                                      ];
+    NSArray *readOnlyPermissions = @[
+                                     @[@YES, @NO, @NO]
+                                     ];
+    NSArray *noAccessPermissions = @[
+                                     @[@NO, @NO, @NO],
+                                     @[[NSNull null], [NSNull null], [NSNull null]]
+                                     ];
+
+    NSArray *permissions = @[administrativePermissions,
+                             readWritePermissions,
+                             readOnlyPermissions,
+                             noAccessPermissions];
+    NSArray *statusMessages = @[@"administrative access",
+                                @"read-write access",
+                                @"read-only access",
+                                @"no access"];
+
+    [permissions enumerateObjectsUsingBlock:^(id  _Nonnull accessPermissions, NSUInteger idx, BOOL * _Nonnull stop __unused) {
+        for (NSArray *permissions in accessPermissions) {
+            NSNumber<RLMBool> *mayRead = permissions[0] == [NSNull null] ? nil : permissions[0];
+            NSNumber<RLMBool> *mayWrite = permissions[1] == [NSNull null] ? nil : permissions[1];
+            NSNumber<RLMBool> *mayManage = permissions[2] == [NSNull null] ? nil : permissions[2];
+            NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:realmURL
+                                                                                                   userID:@"*"
+                                                                                                         read:mayRead
+                                                                                                        write:mayWrite
+                                                                                                       manage:mayManage];
+            [self verifyChangePermission:permissionChange statusMessage:statusMessages[idx] owner:userA];
+        }
+    }];
+}
+
+/// Grant/revoke access user's all Realms to another user.
+- (void)testPermissionChangeForUser {
+    NSString *userNameA = [ACCOUNT_NAME() stringByAppendingString:@"_A"];
+    RLMSyncUser *userA = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameA
+                                                                                             register:self.isParent]
+                                                server:[RLMObjectServerTests authServerURL]];
+
+    NSString *userNameB = [ACCOUNT_NAME() stringByAppendingString:@"_B"];
+    RLMSyncUser *userB = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameB
+                                                                                             register:self.isParent]
+                                                server:[RLMObjectServerTests authServerURL]];
+
+    NSArray *administrativePermissions = @[
+                                           @[@YES, @YES, @YES],
+                                           @[@NO, @YES, @YES],
+                                           @[@YES, @NO, @YES],
+                                           @[@NO, @NO, @YES]
+                                           ];
+    NSArray *readWritePermissions = @[
+                                      @[@YES, @YES, @NO]
+                                      ];
+    NSArray *readOnlyPermissions = @[
+                                     @[@YES, @NO, @NO]
+                                     ];
+    NSArray *noAccessPermissions = @[
+                                     @[@NO, @NO, @NO],
+                                     @[[NSNull null], [NSNull null], [NSNull null]]
+                                     ];
+
+    NSArray *permissions = @[administrativePermissions,
+                             readWritePermissions,
+                             readOnlyPermissions,
+                             noAccessPermissions];
+    NSArray *statusMessages = @[@"administrative access",
+                                @"read-write access",
+                                @"read-only access",
+                                @"no access"];
+
+    [permissions enumerateObjectsUsingBlock:^(id  _Nonnull accessPermissions, NSUInteger idx, BOOL * _Nonnull stop __unused) {
+        for (NSArray *permissions in accessPermissions) {
+            NSNumber<RLMBool> *mayRead = permissions[0] == [NSNull null] ? nil : permissions[0];
+            NSNumber<RLMBool> *mayWrite = permissions[1] == [NSNull null] ? nil : permissions[1];
+            NSNumber<RLMBool> *mayManage = permissions[2] == [NSNull null] ? nil : permissions[2];
+            RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:@"*"
+                                                                                                   userID:userB.identity
+                                                                                                         read:mayRead
+                                                                                                        write:mayWrite
+                                                                                                       manage:mayManage];
+            [self verifyChangePermission:permissionChange statusMessage:statusMessages[idx] owner:userA];
+        }
+    }];
+}
+
+- (void)verifyChangePermission:(RLMSyncPermissionChange *)permissionChange statusMessage:(NSString *)message owner:(RLMSyncUser *)owner {
+    RLMRealm *managementRealm = [self managementRealmForUser:owner];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
+
+    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
+                                                                                 where:@"id = %@", permissionChange.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results,
+                                                            RLMCollectionChange * _Nullable change __unused,
+                                                            NSError * _Nullable error __unused) {
+        RLMSyncPermissionChange *permissionChange = results[0];
+        if (permissionChange.statusCode) {
+            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
+            XCTAssertTrue([permissionChange.statusMessage rangeOfString:message].location != NSNotFound);
+            [expectation fulfill];
+        }
+    }];
+
+    NSError *error = nil;
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionChange];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
+/// Changing unowned Realm permission should fail
+- (void)testPermissionChangeErrorByUnownedRealm {
+    NSString *userNameA = [ACCOUNT_NAME() stringByAppendingString:@"_A"];
+    RLMSyncUser *userA = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameA
+                                                                                             register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSString *userNameB = [ACCOUNT_NAME() stringByAppendingString:@"_B"];
+    RLMSyncUser *userB = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameB
+                                                                                             register:self.isParent]
+                                                server:[RLMObjectServerTests authServerURL]];
+
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"realm://localhost:9080/~/%@", userNameB]];
+    NSError *error = nil;
+    RLMRealm *realm = [self openRealmForURL:url user:userB];
+
+    RLMRealm *managementRealm = [userA managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+
+    {
+        RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:realmURL
+                                                                                               userID:userB.identity
+                                                                                                     read:@YES
+                                                                                                    write:@YES
+                                                                                                   manage:@NO];
+
+        XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
+        RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
+                                                                                     where:@"id = %@", permissionChange.id];
+        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change __unused, NSError * _Nullable error __unused) {
+            RLMSyncPermissionChange *permissionChange = results[0];
+            if (permissionChange.statusCode) {
+                XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusError);
+                [expectation fulfill];
+            }
+        }];
+
+        [managementRealm transactionWithBlock:^{
+            [managementRealm addObject:permissionChange];
+        } error:&error];
+        XCTAssertNil(error, @"Error when writing permission change object: %@", error);
+
+        [self waitForExpectationsWithTimeout:2.0 handler:nil];
+        [token stop];
+    }
+
+    {
+        RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:realmURL
+                                                                                               userID:@"*"
+                                                                                                     read:@YES
+                                                                                                    write:@YES
+                                                                                                   manage:@NO];
+
+        XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
+        RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
+                                                                                     where:@"id = %@", permissionChange.id];
+        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change __unused, NSError * _Nullable error __unused) {
+            RLMSyncPermissionChange *permissionChange = results[0];
+            if (permissionChange.statusCode) {
+                XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusError);
+                [expectation fulfill];
+            }
+        }];
+
+        [managementRealm transactionWithBlock:^{
+            [managementRealm addObject:permissionChange];
+        } error:&error];
+        XCTAssertNil(error, @"Error when writing permission change object: %@", error);
+
+        [self waitForExpectationsWithTimeout:2.0 handler:nil];
+        [token stop];
     }
 }
 

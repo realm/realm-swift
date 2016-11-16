@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMConstants.h"
+#import <Realm/RLMConstants.h>
 
 /// A token originating from the Realm Object Server.
 typedef NSString* RLMServerToken;

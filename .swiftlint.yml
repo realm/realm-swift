@@ -14,3 +14,4 @@ disabled_rules:
   - todo
   - type_body_length
   - line_length
+  - vertical_whitespace

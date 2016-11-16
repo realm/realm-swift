@@ -25,7 +25,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testBasicSwiftSync() {
         let url = URL(string: "realm://localhost:9080/~/testBasicSync")!
         do {
-            let user = try synchronouslyLogInUser(for: basicCredential(create: true), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: true), server: authURL)
             let realm = try synchronouslyOpenRealm(url: url, user: user)
             XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
         } catch {
@@ -36,7 +36,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// If client B adds objects to a Realm, client A should see those new objects.
     func testSwiftAddObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredential(create: isParent), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             if isParent {
                 user.waitForDownload(toFinish: realmURL)
@@ -62,7 +62,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// If client B removes objects from a Realm, client A should see those changes.
     func testSwiftDeleteObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredential(create: isParent), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             if isParent {
                 try realm.write {
@@ -85,6 +85,72 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
+    }
+
+    // MARK: Permissions
+
+    func testPermissionChange() {
+        do {
+            let userA = try synchronouslyLogInUser(for: basicCredentials(register: isParent, usernameSuffix: "_A"), server: authURL)
+            let userB = try synchronouslyLogInUser(for: basicCredentials(register: isParent, usernameSuffix: "_B"), server: authURL)
+            _ = try synchronouslyOpenRealm(url: realmURL, user: userA)
+
+            let adminPermissions = [
+                [true, true, true],
+                [false, true, true],
+                [true, false, true],
+                [false, false, true]
+            ]
+            let readWritePermissions = [[true, true, false]]
+            let readOnlyPermissions = [[true, false, false]]
+            let noAccessPermissions: [[Bool?]] = [
+                [false, false, false],
+                [nil, nil, nil]
+            ]
+            let permissions = [adminPermissions, readWritePermissions, readOnlyPermissions, noAccessPermissions]
+            let statusMessages = [
+                "administrative access",
+                "read-write access",
+                "read-only access",
+                "no access"
+            ]
+
+            for (accessPermissions, statusMessage) in zip(permissions, statusMessages) {
+                for permissions in accessPermissions {
+                    let permissionChange = SyncPermissionChange(
+                        realmURL: realmURL.absoluteString,
+                        userID: userB.identity!,
+                        mayRead: permissions[0],
+                        mayWrite: permissions[1],
+                        mayManage: permissions[2]
+                    )
+                    try verifyChangePermission(change: permissionChange, statusMessage: statusMessage, owner: userA)
+                }
+            }
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    func verifyChangePermission(change: SyncPermissionChange, statusMessage: String, owner: SyncUser) throws {
+        let managementRealm = try owner.managementRealm()
+
+        let exp = expectation(description: "A new permission will be granted by the server")
+        let token = managementRealm.objects(SyncPermissionChange.self).filter("id = %@", change.id).addNotificationBlock { changes in
+            if case .update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
+                XCTAssertEqual(statusCode, 0)
+                XCTAssertEqual(change[0].status, .success)
+                XCTAssertNotNil(change[0].statusMessage?.range(of: statusMessage))
+                exp.fulfill()
+            }
+        }
+
+        try managementRealm.write {
+            managementRealm.add(change)
+        }
+
+        waitForExpectations(timeout: 2)
+        token.stop()
     }
 }
 #else
@@ -93,7 +159,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testBasicSwiftSync() {
         let url = NSURL(string: "realm://localhost:9080/~/testBasicSync")!
         do {
-            let user = try synchronouslyLogInUser(for: basicCredential(create: true), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: true), server: authURL)
             let realm = try synchronouslyOpenRealm(url: url, user: user)
             XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
         } catch {
@@ -104,7 +170,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// If client B adds objects to a Realm, client A should see those new objects.
     func testSwiftAddObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredential(create: isParent), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             if isParent {
                 user.waitForDownloadToFinish(realmURL)
@@ -130,7 +196,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// If client B removes objects from a Realm, client A should see those changes.
     func testSwiftDeleteObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredential(create: isParent), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             if isParent {
                 try realm.write {
@@ -153,6 +219,72 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
+    }
+
+    // MARK: Permissions
+
+    func testPermissionChange() {
+        do {
+            let userA = try synchronouslyLogInUser(for: basicCredentials(register: isParent, usernameSuffix: "_A"), server: authURL)
+            let userB = try synchronouslyLogInUser(for: basicCredentials(register: isParent, usernameSuffix: "_B"), server: authURL)
+            _ = try synchronouslyOpenRealm(url: realmURL, user: userA)
+
+            let adminPermissions: [[Bool?]] = [
+                [true, true, true],
+                [false, true, true],
+                [true, false, true],
+                [false, false, true]
+            ]
+            let readWritePermissions: [[Bool?]] = [[true, true, false]]
+            let readOnlyPermissions: [[Bool?]] = [[true, false, false]]
+            let noAccessPermissions: [[Bool?]] = [
+                [false, false, false],
+                [nil, nil, nil]
+            ]
+            let permissions: [[[Bool?]]] = [adminPermissions, readWritePermissions, readOnlyPermissions, noAccessPermissions]
+            let statusMessages = [
+                "administrative access",
+                "read-write access",
+                "read-only access",
+                "no access"
+            ]
+
+            for (accessPermissions, statusMessage) in zip(permissions, statusMessages) {
+                for permissions in accessPermissions {
+                    let permissionChange = SyncPermissionChange(
+                        realmURL: realmURL.absoluteString,
+                        userID: userB.identity!,
+                        mayRead: permissions[0],
+                        mayWrite: permissions[1],
+                        mayManage: permissions[2]
+                    )
+                    try verifyChangePermission(change: permissionChange, statusMessage: statusMessage, owner: userA)
+                }
+            }
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    func verifyChangePermission(change change: SyncPermissionChange, statusMessage: String, owner: SyncUser) throws {
+        let managementRealm = try owner.managementRealm()
+
+        let exp = expectationWithDescription("A new permission will be granted by the server")
+        let token = managementRealm.objects(SyncPermissionChange.self).filter("id = %@", change.id).addNotificationBlock { changes in
+            if case .Update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
+                XCTAssertEqual(statusCode, 0)
+                XCTAssertEqual(change[0].status, SyncManagementObjectStatus.Success)
+                XCTAssertNotNil(change[0].statusMessage?.rangeOfString(statusMessage))
+                exp.fulfill()
+            }
+        }
+
+        try managementRealm.write {
+            managementRealm.add(change)
+        }
+
+        waitForExpectationsWithTimeout(2, handler: nil)
+        token.stop()
     }
 }
 #endif

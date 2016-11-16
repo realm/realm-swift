@@ -22,16 +22,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// A token representing an identity provider's credential.
-typedef NSString* RLMCredentialToken;
-
-/// An options type representing different account actions which can be associated with certain types of credentials.
-typedef NS_OPTIONS(NSUInteger, RLMAuthenticationActions) {
-    /// Create a new Realm Object Server account.
-    RLMAuthenticationActionsCreateAccount            = 1 << 0,
-    /// Use an existing Realm Object Server account.
-    RLMAuthenticationActionsUseExistingAccount       = 1 << 1,
-};
+/// A token representing an identity provider's credentials.
+typedef NSString *RLMSyncCredentialsToken;
 
 /// A type representing the unique identifier of a Realm Object Server identity provider.
 typedef NSString *RLMIdentityProvider RLM_EXTENSIBLE_STRING_ENUM;
@@ -54,60 +46,60 @@ extern RLMIdentityProvider const RLMIdentityProviderGoogle;
 extern RLMIdentityProvider const RLMIdentityProviderICloud;
 
 /**
- An opaque credential representing a specific Realm Object Server user.
+ Opaque credentials representing a specific Realm Object Server user.
  */
-@interface RLMSyncCredential : NSObject
+@interface RLMSyncCredentials : NSObject
 
-/// An opaque credential token containing information that uniquely identifies a Realm Object Server user.
-@property (nonatomic, readonly) RLMCredentialToken token;
+/// An opaque credentials token containing information that uniquely identifies a Realm Object Server user.
+@property (nonatomic, readonly) RLMSyncCredentialsToken token;
 
-/// The name of the identity provider which generated the credential token.
+/// The name of the identity provider which generated the credentials token.
 @property (nonatomic, readonly) RLMIdentityProvider provider;
 
 /// A dictionary containing additional pertinent information. In most cases this is automatically configured.
 @property (nonatomic, readonly) NSDictionary<NSString *, id> *userInfo;
 
 /**
- Construct and return a credential from a Facebook account token.
+ Construct and return credentials from a Facebook account token.
  */
-+ (instancetype)credentialWithFacebookToken:(RLMCredentialToken)token;
++ (instancetype)credentialsWithFacebookToken:(RLMSyncCredentialsToken)token;
 
 /**
- Construct and return a credential from a Google account token.
+ Construct and return credentials from a Google account token.
  */
-+ (instancetype)credentialWithGoogleToken:(RLMCredentialToken)token;
++ (instancetype)credentialsWithGoogleToken:(RLMSyncCredentialsToken)token;
 
 /**
- Construct and return a credential from an iCloud account token.
+ Construct and return credentials from an iCloud account token.
  */
-+ (instancetype)credentialWithICloudToken:(RLMCredentialToken)token;
++ (instancetype)credentialsWithICloudToken:(RLMSyncCredentialsToken)token;
 
 /**
- Construct and return a credential from a Realm Object Server username and password.
+ Construct and return credentials from a Realm Object Server username and password.
  */
-+ (instancetype)credentialWithUsername:(NSString *)username
-                              password:(NSString *)password
-                               actions:(RLMAuthenticationActions)actions;
++ (instancetype)credentialsWithUsername:(NSString *)username
+                               password:(NSString *)password
+                               register:(BOOL)shouldRegister;
 
 /**
- Construct and return a special credential representing a token that can be directly used to open a Realm. The identity
+ Construct and return special credentials representing a token that can be directly used to open a Realm. The identity
  is used to uniquely identify the user across application launches.
  */
-+ (instancetype)credentialWithAccessToken:(RLMServerToken)accessToken identity:(NSString *)identity;
++ (instancetype)credentialsWithAccessToken:(RLMServerToken)accessToken identity:(NSString *)identity;
 
 /**
- Construct and return a credential with a custom token string, identity provider string, and optional user info. In most
+ Construct and return credentials with a custom token string, identity provider string, and optional user info. In most
  cases, the convenience initializers should be used instead.
  */
-- (instancetype)initWithCustomToken:(RLMCredentialToken)token
+- (instancetype)initWithCustomToken:(RLMSyncCredentialsToken)token
                            provider:(RLMIdentityProvider)provider
                            userInfo:(nullable NSDictionary *)userInfo NS_DESIGNATED_INITIALIZER;
 
 /// :nodoc:
-- (instancetype)init __attribute__((unavailable("RLMSyncCredential cannot be created directly")));
+- (instancetype)init __attribute__((unavailable("RLMSyncCredentials cannot be created directly")));
 
 /// :nodoc:
-+ (instancetype)new __attribute__((unavailable("RLMSyncCredential cannot be created directly")));
++ (instancetype)new __attribute__((unavailable("RLMSyncCredentials cannot be created directly")));
 
 NS_ASSUME_NONNULL_END
 

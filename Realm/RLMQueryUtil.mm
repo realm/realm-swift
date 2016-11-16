@@ -19,7 +19,7 @@
 #import "RLMQueryUtil.hpp"
 
 #import "RLMArray.h"
-#import "RLMObjectSchema.h"
+#import "RLMObjectSchema_Private.h"
 #import "RLMObject_Private.hpp"
 #import "RLMPredicateUtil.hpp"
 #import "RLMProperty.h"
@@ -151,7 +151,7 @@ NSString *operatorName(NSPredicateOperatorType operatorType)
 
 Table& get_table(Group& group, RLMObjectSchema *objectSchema)
 {
-    return *ObjectStore::table_for_object_type(group, objectSchema.className.UTF8String);
+    return *ObjectStore::table_for_object_type(group, objectSchema.objectName.UTF8String);
 }
 
 // A reference to a column within a query. Can be resolved to a Columns<T> for use in query expressions.
