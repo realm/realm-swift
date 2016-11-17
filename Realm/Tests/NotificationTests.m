@@ -165,6 +165,7 @@
     [realm commitWriteTransactionWithoutNotifying:@[token] error:nil];
 
     // local realm notifications are called synchronously so no need to wait for anything
+    [token stop];
 }
 
 - (void)testSuppressRealmNotificationForWrongRealm {
@@ -177,6 +178,7 @@
     [realm beginWriteTransaction];
     XCTAssertThrows([realm commitWriteTransactionWithoutNotifying:@[token] error:nil]);
     [realm cancelWriteTransaction];
+    [token stop];
 }
 
 - (void)testSuppressCollectionNotificationForWrongRealm {
