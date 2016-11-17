@@ -60,8 +60,7 @@
     NSMutableArray* activePaths = [[NSMutableArray alloc] init];
     
     for (DrawPath *path in self.paths) {
-        BOOL pathEnded = [path.drawerID isEqualToString:@""];
-        if (pathEnded) {
+        if (path.completed) {
             [self drawPath:path withContext:self.offscreenContext];
         } else {
             [activePaths addObject:path];

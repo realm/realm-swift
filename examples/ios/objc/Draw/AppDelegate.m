@@ -38,7 +38,7 @@
     
     if ([RLMSyncUser allUsers].count > 0) {
         NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", ipAddress]];
-        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:[RLMSyncUser allUsers].firstObject realmURL:syncURL];
+        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:[RLMSyncUser currentUser] realmURL:syncURL];
         RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
         defaultConfig.syncConfiguration = syncConfig;
         [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
@@ -46,18 +46,18 @@
     else {
         // The base server path
         // Set to connect to local or online host
-        NSURL *authURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:9080/~/Draw", ipAddress]];
+        NSURL *authURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:9080", ipAddress]];
         
         // Creating a debug credential since this demo is just using the generated access token
         // produced when running the Realm Object Server via the `start-object-server.command`
-        RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:@"demo@realm.io"
+        RLMSyncCredentials *credential = [RLMSyncCredentials credentialsWithUsername:@"demo@realm.io"
                                                                          password:@"password"
                                                                           register:NO];
         
         // Log the user in (async, the Realm will start syncing once the user is logged in automatically)
-        [RLMSyncUser logInWithCredential:credential
-                           authServerURL:authURL
-                            onCompletion:^(RLMSyncUser *user, NSError *error) {
+        [RLMSyncUser logInWithCredentials:credential
+                            authServerURL:authURL
+                             onCompletion:^(RLMSyncUser *user, NSError *error) {
            if (error) {
                NSLog(@"A login error has occurred! %@", error);
            }

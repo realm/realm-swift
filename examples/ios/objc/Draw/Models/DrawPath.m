@@ -39,6 +39,11 @@
     return path;
 }
 
++ (NSDictionary *)defaultPropertyValues
+{
+    return @{@"pathID": [[NSUUID UUID] UUIDString]};
+}
+
 + (NSArray *)ignoredProperties
 {
     return @[@"path"];

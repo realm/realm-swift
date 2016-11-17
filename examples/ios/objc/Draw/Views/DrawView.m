@@ -27,7 +27,6 @@
 
 @property DrawPath *drawPath;
 @property NSString *pathID;
-@property NSMutableSet *drawnPathIDs;
 @property RLMResults *paths;
 @property RLMNotificationToken *notificationToken;
 @property CanvasView *canvasView;
@@ -64,7 +63,6 @@
         self.swatchesView.swatchColorChangedHandler = ^{
             weakSelf.currentColor = weakSelf.swatchesView.selectedColor;
         };
-        self.drawnPathIDs = [[NSMutableSet alloc] init];
     }
     return self;
 }
@@ -141,10 +139,7 @@
 {
     CGPoint point = [[touches anyObject] locationInView:self.canvasView];
     [self addPoint:point];
-    [[RLMRealm defaultRealm] transactionWithBlock:^{
-        self.drawPath.drawerID = @""; // mark this path as ended
-    }];
-
+    [[RLMRealm defaultRealm] transactionWithBlock:^{ self.drawPath.completed = YES; }];
     self.drawPath = nil;
 }
 
