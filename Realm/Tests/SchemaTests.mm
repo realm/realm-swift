@@ -263,8 +263,7 @@ RLM_ARRAY_TYPE(NotARealClass)
 
 @implementation SchemaTests
 
-+ (void)tearDown
-{
+- (void)tearDown {
     RLMSetTreatFakeObjectAsRLMObject(NO);
     [super tearDown];
 }
