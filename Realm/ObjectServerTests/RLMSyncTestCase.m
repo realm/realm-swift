@@ -83,7 +83,7 @@ static NSURL *syncDirectoryForChildProcess() {
 - (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions {
     [realm beginWriteTransaction];
     for (NSString *desc in descriptions) {
-        [realm addObject:[[SyncObject alloc] initWithValue:@[desc]]];
+        [SyncObject createInRealm:realm withValue:@[desc]];
     }
     [realm commitWriteTransaction];
 }
@@ -102,42 +102,26 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
-    NSError *error = nil;
     const NSTimeInterval timeout = 4;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    RLMSyncBasicErrorReportingBlock basicBlock = ^(NSError *error) {
+    RLMSyncManager.sharedManager.sessionCompletionNotifier = ^(NSError *error) {
         if (error) {
             XCTFail(@"Received an asynchronous error: %@ (process: %@)", error, self.isParent ? @"parent" : @"child");
         }
         dispatch_semaphore_signal(sema);
     };
-    [[RLMSyncManager sharedManager] setSessionCompletionNotifier:basicBlock];
-    RLMRealmConfiguration *c = [[RLMRealmConfiguration defaultConfiguration] copy];
-    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:&error];
+
+    RLMRealm *realm = [self immediatelyOpenRealmForURL:url user:user];
     // Wait for login to succeed or fail.
     XCTAssert(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0,
               @"Timed out while trying to asynchronously open Realm for URL: %@", url);
     return realm;
 }
 
-- (RLMRealm *)managementRealmForUser:(RLMSyncUser *)user {
-    NSError *error = nil;
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
-
-    XCTAssertNotNil(managementRealm);
-    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
-
-    return managementRealm;
-}
-
 - (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
-    NSError *error = nil;
-    RLMRealmConfiguration *c = [[RLMRealmConfiguration defaultConfiguration] copy];
+    RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
     c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:&error];
-    XCTAssertNil(error, @"Experienced an error opening the Realm at %@: %@", url, error);
-    return realm;
+    return [RLMRealm realmWithConfiguration:c error:nil];
 }
 
 - (RLMSyncUser *)logInUserForCredentials:(RLMSyncCredentials *)credentials
