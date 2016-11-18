@@ -100,16 +100,20 @@ public final class Realm {
     /**
      Performs actions contained within the given block inside a write transaction.
 
-     If the block throws an error, the transaction will be canceled, reverting any writes made in the block before the
-     error was thrown.
+     If the block throws an error, the transaction will be canceled and any
+     changes made before the error will be rolled back.
 
-     Write transactions cannot be nested, and trying to execute a write transaction on a Realm which is already
-     participating in a write transaction will throw an error. Calls to `write` from `Realm` instances in other threads
-     will block until the current write transaction completes.
+     Only one write transaction can be open at a time for each Realm file. Write
+     transactions cannot be nested, and trying to begin a write transaction on a
+     Realm which is already in a write transaction will throw an exception.
+     Calls to `write` from `Realm` instances for the same Realm file in other
+     threads or other processes will block until the current write transaction
+     completes or is cancelled.
 
-     Before executing the write transaction, `write` updates the `Realm` instance to the latest Realm version, as if
-     `refresh()` had been called, and generates notifications if applicable. This has no effect if the Realm was already
-     up to date.
+     Before beginning the write transaction, `write` updates the `Realm`
+     instance to the latest Realm version, as if `refresh()` had been called,
+     and generates notifications if applicable. This has no effect if the Realm
+     was already up to date.
 
      - parameter block: The block containing actions to perform.
 
@@ -130,41 +134,66 @@ public final class Realm {
     /**
      Begins a write transaction on the Realm.
 
-     Only one write transaction can be open at a time. Write transactions cannot be nested, and trying to begin a write
-     transaction on a Realm which is already in a write transaction will throw an error. Calls to `beginWrite` from
-     `Realm` instances in other threads will block until the current write transaction completes.
+     Only one write transaction can be open at a time for each Realm file. Write
+     transactions cannot be nested, and trying to begin a write transaction on a
+     Realm which is already in a write transaction will throw an exception.
+     Calls to `beginWrite` from `Realm` instances for the same Realm file in
+     other threads or other processes will block until the current write
+     transaction completes or is cancelled.
 
-     Before beginning the write transaction, `beginWrite` updates the `Realm` instance to the latest Realm version, as
-     if `refresh()` had been called, and generates notifications if applicable. This has no effect if the Realm was
-     already up to date.
+     Before beginning the write transaction, `beginWrite` updates the `Realm`
+     instance to the latest Realm version, as if `refresh()` had been called,
+     and generates notifications if applicable. This has no effect if the Realm
+     was already up to date.
 
-     It is rarely a good idea to have write transactions span multiple cycles of the run loop, but if you do wish to do
-     so you will need to ensure that the Realm in the write transaction is kept alive until the write transaction is
-     committed.
+     It is rarely a good idea to have write transactions span multiple cycles of
+     the run loop, but if you do wish to do so you will need to ensure that the
+     Realm participating in the write transaction is kept alive until the write
+     transaction is committed.
      */
     public func beginWrite() {
         rlmRealm.beginWriteTransaction()
     }
 
     /**
-     Commits all write operations in the current write transaction, and ends the transaction.
+     Commits all write operations in the current write transaction, and ends
+     the transaction.
+
+     After saving the changes and completing the write transaction, all
+     notification blocks registered on this specific `Realm` instance are called
+     synchronously. Notification blocks for `Realm` instances on other threads
+     and blocks registered for any Realm collection (including those on the
+     current thread) are scheduled to be called synchronously.
+
+     You can skip notifiying specific notification blocks about the changes made
+     in this write transaction by passing in their associated notification
+     tokens. This is primarily useful when the write transaction is saving
+     changes already made in the UI and you do not want to have the notification
+     block attempt to re-apply the same changes.
+
+     The tokens passed to this function must be for notifications for this Realm
+     which were added on the same thread as the write transaction is being
+     performed on. Notifications for different threads cannot be skipped using
+     this method.
 
      - warning: This method may only be called during a write transaction.
 
-     - throws: An `NSError` if the transaction could not be written.
+     - throws: An `NSError` if the transaction could not be written due to
+               running out of disk space or other i/o errors.
      */
-    public func commitWrite() throws {
-        try rlmRealm.commitWriteTransaction()
+    public func commitWrite(withoutNotifying tokens: [NotificationToken] = []) throws {
+        try rlmRealm.commitWriteTransactionWithoutNotifying(tokens)
     }
 
     /**
      Reverts all writes made in the current write transaction and ends the transaction.
 
-     This rolls back all objects in the Realm to the state they were in at the beginning of the write transaction, and
-     then ends the transaction.
+     This rolls back all objects in the Realm to the state they were in at the
+     beginning of the write transaction, and then ends the transaction.
 
-     This restores the data for deleted objects, but does not revive invalidated object instances. Any `Object`s which
-     were added to the Realm will be invalidated rather than becoming unmanaged.
+     This restores the data for deleted objects, but does not revive invalidated
+     object instances. Any `Object`s which were added to the Realm will be
+     invalidated rather than becoming unmanaged.
 
      Given the following code:
 
@@ -178,8 +207,13 @@ public final class Realm {
      realm.cancelWrite()
      ```
 
-     Both `oldObject` and `newObject` will return `true` for `isInvalidated`, but re-running the query which provided
-     `oldObject` will once again return the valid object.
+     Both `oldObject` and `newObject` will return `true` for `isInvalidated`,
+     but re-running the query which provided `oldObject` will once again return
+     the valid object.
+
+     KVO observers on any objects which were modified during the transaction
+     will be notified about the change back to their initial values, but no
+     other notifcations are produced by a cancelled write transaction.
 
      - warning: This method may only be called during a write transaction.
      */
@@ -719,21 +753,25 @@ public final class Realm {
     /**
      Performs actions contained within the given block inside a write transaction.
 
-     If the block throws an error, the transaction will be canceled, reverting any writes made in the block before
-     the error was thrown.
+     If the block throws an error, the transaction will be canceled and any
+     changes made before the error will be rolled back.
 
-     Write transactions cannot be nested, and trying to execute a write transaction on a Realm which is already
-     participating in a write transaction will throw an error. Calls to `write` from `Realm` instances in other threads
-     will block until the current write transaction completes.
+     Only one write transaction can be open at a time for each Realm file. Write
+     transactions cannot be nested, and trying to begin a write transaction on a
+     Realm which is already in a write transaction will throw an exception.
+     Calls to `write` from `Realm` instances for the same Realm file in other
+     threads or other processes will block until the current write transaction
+     completes or is cancelled.
 
-     Before executing the write transaction, `write` updates the `Realm` instance to the
-     latest Realm version, as if `refresh()` had been called, and generates notifications
-     if applicable. This has no effect if the Realm was already up to date.
+     Before beginning the write transaction, `write` updates the `Realm`
+     instance to the latest Realm version, as if `refresh()` had been called,
+     and generates notifications if applicable. This has no effect if the Realm
+     was already up to date.
 
      - parameter block: The block containing actions to perform.
 
      - throws: An `NSError` if the transaction could not be completed successfully.
-               If `block` throws, the propagated `ErrorType`.
+               If `block` throws, the function throws the propagated `ErrorType` instead.
      */
     public func write(@noescape block: (() throws -> Void)) throws {
         beginWrite()
@@ -749,35 +787,55 @@ public final class Realm {
     /**
      Begins a write transaction on the Realm.
 
-     Only one write transaction can be open at a time. Write transactions cannot be
-     nested, and trying to begin a write transaction on a Realm which is
-     already in a write transaction will throw an error. Calls to
-     `beginWrite` from `Realm` instances in other threads will block
-     until the current write transaction completes.
+     Only one write transaction can be open at a time for each Realm file. Write
+     transactions cannot be nested, and trying to begin a write transaction on a
+     Realm which is already in a write transaction will throw an exception.
+     Calls to `beginWrite` from `Realm` instances for the same Realm file in
+     other threads or other processes will block until the current write
+     transaction completes or is cancelled.
 
-     Before beginning the write transaction, `beginWrite` updates the
-     `Realm` instance to the latest Realm version, as if `refresh()` had been called, and
-     generates notifications if applicable. This has no effect if the Realm
+     Before beginning the write transaction, `beginWrite` updates the `Realm`
+     instance to the latest Realm version, as if `refresh()` had been called,
+     and generates notifications if applicable. This has no effect if the Realm
      was already up to date.
 
      It is rarely a good idea to have write transactions span multiple cycles of
      the run loop, but if you do wish to do so you will need to ensure that the
-     Realm in the write transaction is kept alive until the write transaction
-     is committed.
+     Realm participating in the write transaction is kept alive until the write
+     transaction is committed.
      */
     public func beginWrite() {
         rlmRealm.beginWriteTransaction()
     }
 
     /**
-     Commits all write operations in the current write transaction, and ends the transaction.
+     Commits all write operations in the current write transaction, and ends
+     the transaction.
+
+     After saving the changes and completing the write transaction, all
+     notification blocks registered on this specific `Realm` instance are called
+     synchronously. Notification blocks for `Realm` instances on other threads
+     and blocks registered for any Realm collection (including those on the
+     current thread) are scheduled to be called synchronously.
+
+     You can skip notifiying specific notification blocks about the changes made
+     in this write transaction by passing in their associated notification
+     tokens. This is primarily useful when the write transaction is saving
+     changes already made in the UI and you do not want to have the notification
+     block attempt to re-apply the same changes.
+
+     The tokens passed to this function must be for notifications for this Realm
+     which were added on the same thread as the write transaction is being
+     performed on. Notifications for different threads cannot be skipped using
+     this method.
 
      - warning: This method may only be called during a write transaction.
 
-     - throws: An `NSError` if the transaction could not be written.
+     - throws: An `NSError` if the transaction could not be written due to
+               running out of disk space or other i/o errors.
      */
-    public func commitWrite() throws {
-        try rlmRealm.commitWriteTransaction()
+    public func commitWrite(withoutNotifying tokens: [NotificationToken] = []) throws {
+        try rlmRealm.commitWriteTransactionWithoutNotifying(tokens)
     }
 
     /**
@@ -789,6 +847,7 @@ public final class Realm {
      This restores the data for deleted objects, but does not revive invalidated
      object instances. Any `Object`s which were added to the Realm will be
      invalidated rather than becoming unmanaged.
+
      Given the following code:
 
      ```swift
@@ -804,6 +863,10 @@ public final class Realm {
      Both `oldObject` and `newObject` will return `true` for `invalidated`,
      but re-running the query which provided `oldObject` will once again return
      the valid object.
+
+     KVO observers on any objects which were modified during the transaction
+     will be notified about the change back to their initial values, but no
+     other notifcations are produced by a cancelled write transaction.
 
      - warning: This method may only be called during a write transaction.
      */

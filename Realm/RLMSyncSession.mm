@@ -42,7 +42,7 @@ using namespace realm;
 
 - (RLMSyncConfiguration *)configuration {
     if (auto session = _session.lock()) {
-        if (session->is_valid()) {
+        if (session->state() != SyncSession::PublicState::Error) {
             return [[RLMSyncConfiguration alloc] initWithRawConfig:session->config()];
         }
     }
@@ -60,7 +60,7 @@ using namespace realm;
 
 - (RLMSyncUser *)parentUser {
     if (auto session = _session.lock()) {
-        if (session->is_valid()) {
+        if (session->state() != SyncSession::PublicState::Error) {
             return [[RLMSyncUser alloc] initWithSyncUser:session->user()];
         }
     }
@@ -69,9 +69,10 @@ using namespace realm;
 
 - (RLMSyncSessionState)state {
     if (auto session = _session.lock()) {
-        if (session->is_inactive()) {
+        if (session->can_be_safely_destroyed()) {
             return RLMSyncSessionStateInactive;
-        } else if (session->is_valid()) {
+        }
+        if (session->state() != SyncSession::PublicState::Error) {
             return RLMSyncSessionStateActive;
         }
     }
@@ -80,11 +81,11 @@ using namespace realm;
 
 - (BOOL)waitForUploadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(void))callback {
     if (auto session = _session.lock()) {
-        if (!session->is_valid()) {
+        if (session->state() == SyncSession::PublicState::Error) {
             return NO;
         }
         queue = queue ?: dispatch_get_main_queue();
-        session->wait_for_upload_completion([=](){
+        session->wait_for_upload_completion([=] {
             dispatch_async(queue, callback);
         });
         return YES;
@@ -94,14 +95,12 @@ using namespace realm;
 
 - (BOOL)waitForDownloadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(void))callback {
     if (auto session = _session.lock()) {
-        if (!session->is_valid()) {
+        if (session->state() == SyncSession::PublicState::Error) {
             return NO;
         }
         queue = queue ?: dispatch_get_main_queue();
-        session->wait_for_download_completion([=](){
-            dispatch_async(queue, ^{
-                callback();
-            });
+        session->wait_for_download_completion([=] {
+            dispatch_async(queue, callback);
         });
         return YES;
     }
