@@ -40,13 +40,11 @@
     self.window.rootViewController = [[UIViewController alloc] init];
     
     // Setup Global Error Handler
-    RLMSyncErrorReportingBlock globalErrorHandler = ^(NSError *error, RLMSyncSession *session) {
+    [RLMSyncManager sharedManager].errorHandler = ^(NSError *error, RLMSyncSession *session) {
         NSLog(@"A global error has occurred! %@", error);
     };
     
-    [RLMSyncManager sharedManager].errorHandler = globalErrorHandler;
-    
-    if ([RLMSyncUser allUsers].count > 0) {
+    if ([RLMSyncUser currentUser]) {
         NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", kIPAddress]];
         RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:[RLMSyncUser currentUser] realmURL:syncURL];
         RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
