@@ -1133,7 +1133,7 @@
     [token stop];
 }
 
-- (void)testThrowingFromDidChangeNotificationCancelsTransaction {
+- (void)testThrowingFromDidChangeNotificationFromBeginWriteCancelsTransaction {
     RLMRealm *realm = RLMRealm.defaultRealm;
     realm.autorefresh = NO;
 
@@ -1149,6 +1149,29 @@
 
     try {
         [realm beginWriteTransaction];
+        XCTFail(@"should have thrown");
+    }
+    catch (int) { }
+    [token stop];
+
+    XCTAssertFalse(realm.inWriteTransaction);
+    XCTAssertNoThrow([realm beginWriteTransaction]);
+    [realm cancelWriteTransaction];
+}
+
+- (void)testThrowingFromDidChangeNotificationAfterLocalCommit {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    realm.autorefresh = NO;
+
+    RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *) {
+        if (note == RLMRealmDidChangeNotification) {
+            throw 0;
+        }
+    }];
+
+    [realm beginWriteTransaction];
+    try {
+        [realm commitWriteTransaction];
         XCTFail(@"should have thrown");
     }
     catch (int) { }

@@ -771,33 +771,41 @@
     }];
 }
 
-- (void)verifyChangePermission:(RLMSyncPermissionChange *)permissionChange statusMessage:(NSString *)message owner:(RLMSyncUser *)owner {
-    RLMRealm *managementRealm = [owner managementRealmWithError:nil];
-
+- (void)waitForPermissionChange:(RLMSyncPermissionChange *)change inRealm:(RLMRealm *)realm
+                validationBlock:(void (^)(RLMSyncPermissionChange *))block {
     XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
+    RLMResults *r = [RLMSyncPermissionChange objectsInRealm:realm where:@"id = %@", change.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                            __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
 
-    RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                 where:@"id = %@", permissionChange.id];
-    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results,
-                                                            RLMCollectionChange * _Nullable change __unused,
-                                                            NSError * _Nullable error __unused) {
         RLMSyncPermissionChange *permissionChange = results[0];
         if (permissionChange.statusCode) {
-            XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertTrue([permissionChange.statusMessage rangeOfString:message].location != NSNotFound);
+            block(permissionChange);
             [expectation fulfill];
         }
     }];
 
     NSError *error = nil;
-    [managementRealm transactionWithBlock:^{
-        [managementRealm addObject:permissionChange];
+    [realm transactionWithBlock:^{
+        [realm addObject:change];
     } error:&error];
     XCTAssertNil(error, @"Error when writing permission change object: %@", error);
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     [token stop];
+}
+
+- (void)verifyChangePermission:(RLMSyncPermissionChange *)permissionChange statusMessage:(NSString *)message owner:(RLMSyncUser *)owner {
+    RLMRealm *managementRealm = [owner managementRealmWithError:nil];
+    [self waitForPermissionChange:permissionChange inRealm:managementRealm validationBlock:^(RLMSyncPermissionChange *change) {
+        XCTAssertEqual(change.status, RLMSyncManagementObjectStatusSuccess);
+        XCTAssertTrue([change.statusMessage rangeOfString:message].location != NSNotFound);
+    }];
 }
 
 /// Changing unowned Realm permission should fail
@@ -824,56 +832,24 @@
 
     {
         RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:realmURL
-                                                                                               userID:userB.identity
+                                                                                                   userID:userB.identity
                                                                                                      read:@YES
                                                                                                     write:@YES
                                                                                                    manage:@NO];
-
-        XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-        RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                     where:@"id = %@", permissionChange.id];
-        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change __unused, NSError * _Nullable error __unused) {
-            RLMSyncPermissionChange *permissionChange = results[0];
-            if (permissionChange.statusCode) {
-                XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusError);
-                [expectation fulfill];
-            }
+        [self waitForPermissionChange:permissionChange inRealm:managementRealm validationBlock:^(RLMSyncPermissionChange *change) {
+            XCTAssertEqual(change.status, RLMSyncManagementObjectStatusError);
         }];
-
-        [managementRealm transactionWithBlock:^{
-            [managementRealm addObject:permissionChange];
-        } error:&error];
-        XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-        [self waitForExpectationsWithTimeout:2.0 handler:nil];
-        [token stop];
     }
 
     {
         RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:realmURL
-                                                                                               userID:@"*"
+                                                                                                   userID:@"*"
                                                                                                      read:@YES
                                                                                                     write:@YES
                                                                                                    manage:@NO];
-
-        XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
-        RLMResults<RLMSyncPermissionChange *> *r = [RLMSyncPermissionChange objectsInRealm:managementRealm
-                                                                                     where:@"id = %@", permissionChange.id];
-        RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults * _Nullable results, RLMCollectionChange * _Nullable change __unused, NSError * _Nullable error __unused) {
-            RLMSyncPermissionChange *permissionChange = results[0];
-            if (permissionChange.statusCode) {
-                XCTAssertEqual(permissionChange.status, RLMSyncManagementObjectStatusError);
-                [expectation fulfill];
-            }
+        [self waitForPermissionChange:permissionChange inRealm:managementRealm validationBlock:^(RLMSyncPermissionChange *change) {
+            XCTAssertEqual(change.status, RLMSyncManagementObjectStatusError);
         }];
-
-        [managementRealm transactionWithBlock:^{
-            [managementRealm addObject:permissionChange];
-        } error:&error];
-        XCTAssertNil(error, @"Error when writing permission change object: %@", error);
-
-        [self waitForExpectationsWithTimeout:2.0 handler:nil];
-        [token stop];
     }
 }
 
