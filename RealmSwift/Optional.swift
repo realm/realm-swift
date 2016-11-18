@@ -32,7 +32,7 @@ extension Double: RealmOptionalType {}
 extension Bool: RealmOptionalType {}
 
 /**
- A `RealmOptional` instance represents a optional value for types that can't be directly declared as `dynamic` in Swift,
+ A `RealmOptional` instance represents an optional value for types that can't be directly declared as `dynamic` in Swift,
  such as `Int`, `Float`, `Double`, and `Bool`.
 
  To change the underlying value stored by a `RealmOptional` instance, mutate the instance's `value` property.
@@ -73,7 +73,7 @@ extension Double: RealmOptionalType {}
 extension Bool: RealmOptionalType {}
 
 /**
- A `RealmOptional` instance represents a optional value for types that can't be directly declared as `dynamic` in Swift,
+ A `RealmOptional` instance represents an optional value for types that can't be directly declared as `dynamic` in Swift,
  such as `Int`, `Float`, `Double`, and `Bool`.
 
  To change the underlying value stored by a `RealmOptional` instance, mutate the instance's `value` property.

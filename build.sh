@@ -297,11 +297,7 @@ download_object_server() {
     mkdir sync
     tar xf $archive_name -C sync
     rm $archive_name
-    echo "\nenterprise:\n  skip_setup: true" >> "sync/object-server/configuration.yml"
-    sed -i '' -e "s/    listen_address: '0\.0\.0\.0'/    listen_address: '::'/" "sync/object-server/configuration.yml"
-    LF=$(printf '\\\012_')
-    LF=${LF%_}
-    sed -i '' -e "s/  sync_hosts:/  sync_hosts:$LF    - 'localhost:9080'/" "sync/object-server/configuration.yml"
+    cp Configuration/object-server-config.yml sync/object-server/configuration.yml
     touch "sync/object-server/do_not_open_browser"
 }
 
