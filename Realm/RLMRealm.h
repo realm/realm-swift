@@ -225,7 +225,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
 /**
  Commits all write operations in the current write transaction, without
- notifying specific callbacks of the changes.
+ notifying specific notification blocks of the changes.
 
  After saving the changes, all notification blocks registered on this specific
  `RLMRealm` instance are invoked synchronously. Notification blocks registered
@@ -347,7 +347,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  Even with this property enabled, you can still call `-refresh` at any time to
  update the Realm before the automatic refresh would occur.
 
- Write transaction will still always advance a Realm to the latest version and
+ Write transactions will still always advance a Realm to the latest version and
  produce local notifications on commit even if autorefresh is disabled.
 
  Disabling `autorefresh` on a Realm without any strong references to it will not

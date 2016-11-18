@@ -71,9 +71,17 @@ void RLMDisableSyncToDisk() {
 }
 
 - (void)suppressNextNotification {
-    auto block = _block;
+    // Temporarily replace the block with one which restores the old block
+    // rather than producing a notification.
+
+    // This briefly creates a retain cycle but it's fine because the block will
+    // be synchronously called shortly after this method is called. Unlike with
+    // collection notifications, this does not have to go through the object
+    // store or do fancy things to handle transaction coalescing because it's
+    // called synchronously by the obj-c code and not by the object store.
+    auto notificationBlock = _block;
     _block = ^(RLMNotification, RLMRealm *) {
-        _block = block;
+        _block = notificationBlock;
     };
 }
 
