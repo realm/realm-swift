@@ -63,6 +63,8 @@
         self.swatchesView.swatchColorChangedHandler = ^{
             weakSelf.currentColor = weakSelf.swatchesView.selectedColor;
         };
+        
+        self.currentColor = [SwatchColor blackSwatchColor];
     }
     return self;
 }
@@ -89,7 +91,7 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSString *colorName = self.currentColor ? self.currentColor.name : @"Black";
+    NSString *colorName = self.currentColor.name;
     
     // Create a draw path object
     self.drawPath = [[DrawPath alloc] init];

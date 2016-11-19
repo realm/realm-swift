@@ -44,9 +44,4 @@
     return @{@"pathID": [[NSUUID UUID] UUIDString]};
 }
 
-+ (NSArray *)ignoredProperties
-{
-    return @[@"path"];
-}
-
 @end

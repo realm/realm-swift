@@ -53,9 +53,8 @@ static CGFloat kSwatchPencilPadding = 1.0f;
 - (void)setupButtons
 {
     self.colors = [SwatchColor allSwatchColors];
-    
-    NSMutableArray *buttons = [NSMutableArray array];
-    
+
+    NSMutableArray *buttons = [NSMutableArray arrayWithCapacity:self.colors.count];    
     NSInteger tag = 0;
     for (SwatchColor *color in self.colors) {
         UIImage *pencilImage = [[UIImage imageNamed:color.name] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];

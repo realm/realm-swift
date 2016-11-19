@@ -22,12 +22,7 @@
 #import "Constants.h"
 
 @interface AppDelegate ()
-
 @property (nonatomic, strong) UIActivityIndicatorView *activityIndicatorView;
-
-- (void)logIn;
-- (void)showActivityIndicator;
-
 @end
 
 @implementation AppDelegate
