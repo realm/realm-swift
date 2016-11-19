@@ -24,8 +24,6 @@
 @property (nonatomic, copy, readonly) NSString *name;
 @property (nonatomic, strong, readonly) UIColor *color;
 
-- (instancetype)initWithName:(NSString *)name color:(UIColor *)color;
-
 + (instancetype)swatchColorForName:(NSString *)name;
 
 + (NSArray *)allSwatchColors;

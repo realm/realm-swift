@@ -18,7 +18,33 @@
 
 #import "SwatchColor.h"
 
+
+
 @implementation SwatchColor
+
++ (NSDictionary *)sharedColors
+{
+    static NSDictionary<NSString *, UIColor*> *swatchColors;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        swatchColors =
+        @{
+          @"Charcoal": [UIColor colorWithRed:28.0f/255.0f green:35.0f/255.0f blue:63.0f/255.0f alpha:1.0f],
+          @"Elephant": [UIColor colorWithRed:154.0f/255.0f green:155.0f/255.0f blue:165.0f/255.0f alpha:1.0f],
+          @"Dove": [UIColor colorWithRed:235.0f/255.0f green:235.0f/255.0f blue:242.0f/255.0f alpha:1.0f],
+          @"Ultramarine": [UIColor colorWithRed:57.0f/255.0f green:71.0f/255.0f blue:127.0f/255.0f alpha:1.0f],
+          @"Indigo": [UIColor colorWithRed:89.0f/255.0f green:86.0f/255.0f blue:158.0f/255.0f alpha:1.0f],
+          @"GrapeJelly": [UIColor colorWithRed:154.0f/255.0f green:80.0f/255.0f blue:165.0f/255.0f alpha:1.0f],
+          @"Mulberry": [UIColor colorWithRed:211.0f/255.0f green:76.0f/255.0f blue:163.0f/255.0f alpha:1.0f],
+          @"Flamingo": [UIColor colorWithRed:242.0f/255.0f green:81.0f/255.0f blue:146.0f/255.0f alpha:1.0f],
+          @"SexySalmon": [UIColor colorWithRed:247.0f/255.0f green:124.0f/255.0f blue:136.0f/255.0f alpha:1.0f],
+          @"Peach": [UIColor colorWithRed:252.0f/255.0f green:159.0f/255.0f blue:149.0f/255.0f alpha:1.0f],
+          @"Melon": [UIColor colorWithRed:252.0f/255.0f green:195.0f/255.0f blue:151.0f/255.0f alpha:1.0f]
+        };
+    });
+    
+    return swatchColors;
+}
 
 - (instancetype)initWithName:(NSString *)name color:(UIColor *)color
 {
@@ -32,41 +58,12 @@
 
 + (instancetype)swatchColorForName:(NSString *)name
 {
-    if ([name isEqualToString:@"Charcoal"]) {
-        return [SwatchColor blackSwatchColor];
+    SwatchColor *swatchColor = [SwatchColor sharedColors][name];
+    if (swatchColor == nil) {
+        return nil;
     }
-    else if ([name isEqualToString:@"Elephant"]) {
-        return [SwatchColor graySwatchColor];
-    }
-    else if ([name isEqualToString:@"Dove"]) {
-        return [SwatchColor redSwatchColor];
-    }
-    else if ([name isEqualToString:@"Ultramarine"]) {
-        return [SwatchColor blueSwatchColor];
-    }
-    else if ([name isEqualToString:@"Indigo"]) {
-        return [SwatchColor greenSwatchColor];
-    }
-    else if ([name isEqualToString:@"GrapeJelly"]) {
-        return [SwatchColor lightGreenSwatchColor];
-    }
-    else if ([name isEqualToString:@"Mulberry"]) {
-        return [SwatchColor lightBlueSwatchColor];
-    }
-    else if ([name isEqualToString:@"Flamingo"]) {
-        return [SwatchColor brownSwatchColor];
-    }
-    else if ([name isEqualToString:@"SexySalmon"]) {
-        return [SwatchColor orangeSwatchColor];
-    }
-    else if ([name isEqualToString:@"Peach"]) {
-        return [SwatchColor yellowSwatchColor];
-    }
-    else if ([name isEqualToString:@"Melon"]) {
-        return [SwatchColor realmSwatchColor];
-    }
-    
-    return nil;
+
+    return [[SwatchColor alloc] initWithName:name color:swatchColor.color];
 }
 
 + (NSArray *)allSwatchColors
