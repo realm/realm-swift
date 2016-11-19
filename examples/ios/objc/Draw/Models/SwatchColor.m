@@ -18,13 +18,6 @@
 
 #import "SwatchColor.h"
 
-@interface SwatchColor ()
-
-@property (nonatomic, copy, readwrite) NSString *name;
-@property (nonatomic, strong, readwrite) UIColor *color;
-
-@end
-
 @implementation SwatchColor
 
 - (instancetype)initWithName:(NSString *)name color:(UIColor *)color
