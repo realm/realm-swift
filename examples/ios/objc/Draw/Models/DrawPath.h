@@ -22,7 +22,6 @@
 
 @interface DrawPath : RLMObject
 
-@property NSString *pathID; // A UUID to uniquely identify this object in Realm
 @property BOOL completed;   // Set to YES once the user stops drawing this particular line
 @property NSString *color;  // The name of the color that this path is drawn in
 @property RLMArray<DrawPoint *><DrawPoint> *points; 

@@ -39,9 +39,4 @@
     return path;
 }
 
-+ (NSDictionary *)defaultPropertyValues
-{
-    return @{@"pathID": [[NSUUID UUID] UUIDString]};
-}
-
 @end
