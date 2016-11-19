@@ -18,8 +18,6 @@
 
 #import "SwatchColor.h"
 
-
-
 @implementation SwatchColor
 
 + (NSDictionary *)sharedColors
@@ -84,67 +82,67 @@
 + (instancetype)blackSwatchColor
 {
     // Charcoal
-    return [[SwatchColor alloc] initWithName:@"Charcoal" color:[UIColor colorWithRed:28.0f/255.0f green:35.0f/255.0f blue:63.0f/255.0f alpha:1.0f]];
+    return [SwatchColor swatchColorForName:@"Charcoal"];
 }
 
 + (instancetype)graySwatchColor
 {
     // Elephant
-    return [[SwatchColor alloc] initWithName:@"Elephant" color:[UIColor colorWithRed:154.0f/255.0f green:155.0f/255.0f blue:165.0f/255.0f alpha:1.0f]];
+    return [SwatchColor swatchColorForName:@"Elephant"];
 }
 
 + (instancetype)redSwatchColor
 {
     // Dove
-    return [[SwatchColor alloc] initWithName:@"Dove" color:[UIColor colorWithRed:235.0f/255.0f green:235.0f/255.0f blue:242.0f/255.0f alpha:1.0f]];
+    return [SwatchColor swatchColorForName:@"Dove"];
 }
 
 + (instancetype)blueSwatchColor
 {
     // Ultramarine
-    return [[SwatchColor alloc] initWithName:@"Ultramarine" color:[UIColor colorWithRed:57.0f/255.0f green:71.0f/255.0f blue:127.0f/255.0f alpha:1.0f]];
+    return [SwatchColor swatchColorForName:@"Ultramarine"];
 }
 
 + (instancetype)greenSwatchColor
 {
     // Indigo
-    return [[SwatchColor alloc] initWithName:@"Indigo" color:[UIColor colorWithRed:89.0f/255.0f green:86.0f/255.0f blue:158.0f/255.0f alpha:1.0f]];
+    return [SwatchColor swatchColorForName:@"Indigo"];
 }
 
 + (instancetype)lightGreenSwatchColor
 {
     // Grape Jelly
-    return [[SwatchColor alloc] initWithName:@"GrapeJelly" color:[UIColor colorWithRed:154.0f/255.0f green:80.0f/255.0f blue:165.0f/255.0f alpha:1.0f]];
+    return [SwatchColor swatchColorForName:@"GrapeJelly"];
 }
 
 + (instancetype)lightBlueSwatchColor
 {
     // Mulberry
-    return [[SwatchColor alloc] initWithName:@"Mulberry" color:[UIColor colorWithRed:211.0f/255.0f green:76.0f/255.0f blue:163.0f/255.0f alpha:1.0f]];
+    return [SwatchColor swatchColorForName:@"Mulberry"];
 }
 
 + (instancetype)brownSwatchColor
 {
     // Flamingo
-    return [[SwatchColor alloc] initWithName:@"Flamingo" color:[UIColor colorWithRed:242.0f/255.0f green:81.0f/255.0f blue:146.0f/255.0f alpha:1.0f]];
+    return [SwatchColor swatchColorForName:@"Flamingo"];
 }
 
 + (instancetype)orangeSwatchColor
 {
     // Sexy Salmon
-    return [[SwatchColor alloc] initWithName:@"SexySalmon" color:[UIColor colorWithRed:247.0f/255.0f green:124.0f/255.0f blue:136.0f/255.0f alpha:1.0f]];
+    return [SwatchColor swatchColorForName:@"SexySalmon"];
 }
 
 + (instancetype)yellowSwatchColor
 {
     // Peach
-    return [[SwatchColor alloc] initWithName:@"Peach" color:[UIColor colorWithRed:252.0f/255.0f green:159.0f/255.0f blue:149.0f/255.0f alpha:1.0f]];
+    return [SwatchColor swatchColorForName:@"Peach"];
 }
 
 + (instancetype)realmSwatchColor
 {
     // Melon
-    return [[SwatchColor alloc] initWithName:@"Melon" color:[UIColor colorWithRed:252.0f/255.0f green:195.0f/255.0f blue:151.0f/255.0f alpha:1.0f]];
+    return [SwatchColor swatchColorForName:@"Melon"];
 }
 
 @end
