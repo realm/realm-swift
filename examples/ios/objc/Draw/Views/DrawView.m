@@ -120,7 +120,7 @@
     [[RLMRealm defaultRealm] transactionWithBlock:^{
         if (self.drawPath.isInvalidated) {
             self.drawPath = [[DrawPath alloc] init];
-            self.drawPath.color = self.currentColor ? self.currentColor.name : @"Black";
+            self.drawPath.color = self.currentColor.name;
             [[RLMRealm defaultRealm] addObject:self.drawPath];
         }
 
