@@ -1373,7 +1373,11 @@ EOF
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
-### API breaking changes
+### Sync Breaking Changes (In Beta)
+
+* None.
+
+### API Breaking Changes
 
 * None.
 
