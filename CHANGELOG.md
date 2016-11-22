@@ -1,7 +1,11 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
-### API breaking changes
+### Sync Breaking Changes (In Beta)
+
+* None.
+
+### API Breaking Changes
 
 * None.
 
@@ -15,6 +19,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 2.1.0 Release notes (2016-11-18)
 =============================================================
+
+### Sync Breaking Changes (In Beta)
+
+* None.
 
 ### API breaking changes
 
@@ -38,7 +46,7 @@ x.x.x Release notes (yyyy-MM-dd)
 2.0.4 Release notes (2016-11-14)
 =============================================================
 
-### API breaking changes
+### Sync Breaking Changes (In Beta)
 
 * Remove `RLMAuthenticationActions` and replace
   `+[RLMSyncCredential credentialWithUsername:password:actions:]` with
@@ -58,6 +66,10 @@ x.x.x Release notes (yyyy-MM-dd)
   struct rather than a named tuple.
 * `+[RLMSyncUser logInWithCredentials:]` now invokes its callback block on a
   background queue.
+
+### API breaking changes
+
+* None.
 
 ### Enhancements
 
