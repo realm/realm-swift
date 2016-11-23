@@ -26,6 +26,12 @@
 
 @implementation CanvasView
 
+- (void)didMoveToSuperview
+{
+    [super didMoveToSuperview];
+    self.backgroundColor = [UIColor whiteColor];
+}
+
 - (void)drawPath:(DrawPath*)path withContext:(CGContextRef)context
 {
     UIColor *swatchColor = [SwatchColor allColors][path.color];
@@ -37,35 +43,18 @@
 
 - (void)drawRect:(CGRect)rect
 {
-    // draw new "inactive" paths to the offscreen image
-    NSMutableArray* activePaths = [[NSMutableArray alloc] init];
-    
     for (DrawPath *path in self.paths) {
-        if (path.completed) {
-            [self drawPath:path withContext:self.offscreenContext];
-        } else {
-            [activePaths addObject:path];
-        }
-    }
-    
-    // copy offscreen image to screen
-    CGContextDrawLayerInRect(self.onscreenContext, self.bounds, self.offscreenLayer);
-    
-    // lastly draw the currently active paths
-    for (DrawPath *path in activePaths) {
-        [self drawPath:path withContext:self.onscreenContext];
+        [self drawPath:path withContext:UIGraphicsGetCurrentContext()];
     }
 }
 
 - (void)clearCanvas
 {
+    CGContextRef context = UIGraphicsGetCurrentContext();
+
     // Clear the onscreen context
-    CGContextSetFillColorWithColor(self.onscreenContext, [UIColor whiteColor].CGColor);
-    CGContextFillRect(self.onscreenContext, self.bounds);
-    
-    // Clear the offscreen context
-    CGContextSetFillColorWithColor(self.offscreenContext, [UIColor whiteColor].CGColor);
-    CGContextFillRect(self.offscreenContext, self.bounds);
+    CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+    CGContextFillRect(context, self.bounds);
     
     [self setNeedsDisplay];
 }
