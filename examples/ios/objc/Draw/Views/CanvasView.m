@@ -22,18 +22,14 @@
 
 @interface CanvasView ()
 
-@property CGContextRef onscreenContext;
-@property CGLayerRef offscreenLayer;
-@property CGContextRef offscreenContext;
-
 @end
 
 @implementation CanvasView
 
 - (void)drawPath:(DrawPath*)path withContext:(CGContextRef)context
 {
-    SwatchColor *swatchColor = [SwatchColor swatchColorForName:path.color];
-    CGContextSetStrokeColorWithColor(context, [swatchColor.color CGColor]);
+    UIColor *swatchColor = [SwatchColor allColors][path.color];
+    CGContextSetStrokeColorWithColor(context, [swatchColor CGColor]);
     CGContextSetLineWidth(context, path.path.lineWidth);
     CGContextAddPath(context, [path.path CGPath]);
     CGContextStrokePath(context);
@@ -41,21 +37,6 @@
 
 - (void)drawRect:(CGRect)rect
 {
-    // create offscreen context just once (must be done here)
-    if (self.offscreenContext == nil) {
-        self.onscreenContext = UIGraphicsGetCurrentContext();
-        
-        float contentScaleFactor = [self contentScaleFactor];
-        CGSize size = CGSizeMake(self.bounds.size.width * contentScaleFactor, self.bounds.size.height * contentScaleFactor);
-        
-        self.offscreenLayer = CGLayerCreateWithContext(self.onscreenContext, size, NULL);
-        self.offscreenContext = CGLayerGetContext(self.offscreenLayer);
-        CGContextScaleCTM(self.offscreenContext, contentScaleFactor, contentScaleFactor);
-        
-        CGContextSetFillColorWithColor(self.offscreenContext, [[UIColor whiteColor] CGColor]);
-        CGContextFillRect(self.offscreenContext, self.bounds);
-    }
-    
     // draw new "inactive" paths to the offscreen image
     NSMutableArray* activePaths = [[NSMutableArray alloc] init];
     

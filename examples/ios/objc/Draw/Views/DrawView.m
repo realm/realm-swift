@@ -31,7 +31,7 @@
 @property RLMNotificationToken *notificationToken;
 @property CanvasView *canvasView;
 @property SwatchesView *swatchesView;
-@property SwatchColor *currentColor;
+@property NSString *currentColorName;
 
 @end
 
@@ -61,10 +61,10 @@
         [self addSubview:self.swatchesView];
         
         self.swatchesView.swatchColorChangedHandler = ^{
-            weakSelf.currentColor = weakSelf.swatchesView.selectedColor;
+            weakSelf.currentColorName = weakSelf.swatchesView.selectedColor;
         };
         
-        self.currentColor = [SwatchColor blackSwatchColor];
+        self.currentColorName = @"Black";
     }
     return self;
 }
@@ -91,7 +91,7 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSString *colorName = self.currentColor.name;
+    NSString *colorName = self.currentColorName;
     
     // Create a draw path object
     self.drawPath = [[DrawPath alloc] init];
@@ -120,7 +120,7 @@
     [[RLMRealm defaultRealm] transactionWithBlock:^{
         if (self.drawPath.isInvalidated) {
             self.drawPath = [[DrawPath alloc] init];
-            self.drawPath.color = self.currentColor.name;
+            self.drawPath.color = [SwatchColor allColors][self.currentColorName] ?: @"Black";
             [[RLMRealm defaultRealm] addObject:self.drawPath];
         }
 

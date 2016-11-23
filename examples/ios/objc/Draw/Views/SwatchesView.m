@@ -28,7 +28,7 @@ static CGFloat kSwatchPencilPadding = 1.0f;
 
 @interface SwatchesView()
 
-@property (nonatomic, strong) NSArray *colors;
+@property (nonatomic, strong) NSDictionary *colors;
 @property (nonatomic, strong) NSArray *colorButtons;
 
 - (void)setupButtons;
@@ -52,12 +52,12 @@ static CGFloat kSwatchPencilPadding = 1.0f;
 
 - (void)setupButtons
 {
-    self.colors = [SwatchColor allSwatchColors];
+    self.colors = [SwatchColor allColors];
 
     NSMutableArray *buttons = [NSMutableArray arrayWithCapacity:self.colors.count];    
     NSInteger tag = 0;
-    for (SwatchColor *color in self.colors) {
-        UIImage *pencilImage = [[UIImage imageNamed:color.name] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+    for (NSString *color in self.colors.allKeys) {
+        UIImage *pencilImage = [[UIImage imageNamed:color] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
         button.tag = tag++;
@@ -111,7 +111,7 @@ static CGFloat kSwatchPencilPadding = 1.0f;
 - (void)buttonTapped:(id)sender
 {
     UIButton *button = (UIButton *)sender;
-    self.selectedColor = self.colors[button.tag];
+    self.selectedColor = self.colors.allKeys[button.tag];
 }
 
 - (void)setSelectedColor:(SwatchColor *)selectedColor

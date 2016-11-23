@@ -21,22 +21,19 @@
 
 @interface SwatchColor : NSObject
 
-@property (nonatomic, copy, readonly) NSString *name;
-@property (nonatomic, strong, readonly) UIColor *color;
-
-+ (instancetype)swatchColorForName:(NSString *)name;
++ (NSDictionary *)allColors;
 
 + (NSArray *)allSwatchColors;
-+ (instancetype)blackSwatchColor;
-+ (instancetype)graySwatchColor;
-+ (instancetype)redSwatchColor;
-+ (instancetype)blueSwatchColor;
-+ (instancetype)greenSwatchColor;
-+ (instancetype)lightGreenSwatchColor;
-+ (instancetype)lightBlueSwatchColor;
-+ (instancetype)brownSwatchColor;
-+ (instancetype)orangeSwatchColor;
-+ (instancetype)yellowSwatchColor;
-+ (instancetype)realmSwatchColor;
++ (UIColor *)blackSwatchColor;
++ (UIColor *)graySwatchColor;
++ (UIColor *)redSwatchColor;
++ (UIColor *)blueSwatchColor;
++ (UIColor *)greenSwatchColor;
++ (UIColor *)lightGreenSwatchColor;
++ (UIColor *)lightBlueSwatchColor;
++ (UIColor *)brownSwatchColor;
++ (UIColor *)orangeSwatchColor;
++ (UIColor *)yellowSwatchColor;
++ (UIColor *)realmSwatchColor;
 
 @end

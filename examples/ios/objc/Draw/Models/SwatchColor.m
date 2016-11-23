@@ -18,11 +18,9 @@
 
 #import "SwatchColor.h"
 
-
-
 @implementation SwatchColor
 
-+ (NSDictionary *)sharedColors
++ (NSDictionary *)allColors
 {
     static NSDictionary<NSString *, UIColor*> *swatchColors;
     static dispatch_once_t onceToken;
@@ -46,26 +44,6 @@
     return swatchColors;
 }
 
-- (instancetype)initWithName:(NSString *)name color:(UIColor *)color
-{
-    if (self = [super init]) {
-        _name = name;
-        _color = color;
-    }
-    
-    return self;
-}
-
-+ (instancetype)swatchColorForName:(NSString *)name
-{
-    SwatchColor *swatchColor = [SwatchColor sharedColors][name];
-    if (swatchColor == nil) {
-        return nil;
-    }
-
-    return [[SwatchColor alloc] initWithName:name color:swatchColor.color];
-}
-
 + (NSArray *)allSwatchColors
 {
     return @[[SwatchColor blackSwatchColor],
@@ -81,70 +59,70 @@
              [SwatchColor realmSwatchColor]];
 }
 
-+ (instancetype)blackSwatchColor
++ (UIColor *)blackSwatchColor
 {
     // Charcoal
-    return [[SwatchColor alloc] initWithName:@"Charcoal" color:[UIColor colorWithRed:28.0f/255.0f green:35.0f/255.0f blue:63.0f/255.0f alpha:1.0f]];
+    return  [SwatchColor allColors][@"Charcoal"];
 }
 
-+ (instancetype)graySwatchColor
++ (UIColor *)graySwatchColor
 {
     // Elephant
-    return [[SwatchColor alloc] initWithName:@"Elephant" color:[UIColor colorWithRed:154.0f/255.0f green:155.0f/255.0f blue:165.0f/255.0f alpha:1.0f]];
+    return [SwatchColor allColors][@"Elephant"];
 }
 
-+ (instancetype)redSwatchColor
++ (UIColor *)redSwatchColor
 {
     // Dove
-    return [[SwatchColor alloc] initWithName:@"Dove" color:[UIColor colorWithRed:235.0f/255.0f green:235.0f/255.0f blue:242.0f/255.0f alpha:1.0f]];
+    return [SwatchColor allColors][@"Dove"];
 }
 
-+ (instancetype)blueSwatchColor
++ (UIColor *)blueSwatchColor
 {
     // Ultramarine
-    return [[SwatchColor alloc] initWithName:@"Ultramarine" color:[UIColor colorWithRed:57.0f/255.0f green:71.0f/255.0f blue:127.0f/255.0f alpha:1.0f]];
+    return [SwatchColor allColors][@"Ultramarine"];
 }
 
-+ (instancetype)greenSwatchColor
++ (UIColor *)greenSwatchColor
 {
     // Indigo
-    return [[SwatchColor alloc] initWithName:@"Indigo" color:[UIColor colorWithRed:89.0f/255.0f green:86.0f/255.0f blue:158.0f/255.0f alpha:1.0f]];
+    return [SwatchColor allColors][@"Indigo"];
 }
 
-+ (instancetype)lightGreenSwatchColor
++ (UIColor *)lightGreenSwatchColor
 {
     // Grape Jelly
-    return [[SwatchColor alloc] initWithName:@"GrapeJelly" color:[UIColor colorWithRed:154.0f/255.0f green:80.0f/255.0f blue:165.0f/255.0f alpha:1.0f]];
+    return [SwatchColor allColors][@"GrapeJelly"];
 }
 
-+ (instancetype)lightBlueSwatchColor
++ (UIColor *)lightBlueSwatchColor
 {
     // Mulberry
-    return [[SwatchColor alloc] initWithName:@"Mulberry" color:[UIColor colorWithRed:211.0f/255.0f green:76.0f/255.0f blue:163.0f/255.0f alpha:1.0f]];
+    return [SwatchColor allColors][@"Mulberry"];
 }
 
-+ (instancetype)brownSwatchColor
++ (UIColor *)brownSwatchColor
 {
     // Flamingo
-    return [[SwatchColor alloc] initWithName:@"Flamingo" color:[UIColor colorWithRed:242.0f/255.0f green:81.0f/255.0f blue:146.0f/255.0f alpha:1.0f]];
+    return [SwatchColor allColors][@"Flamingo"];
 }
 
-+ (instancetype)orangeSwatchColor
++ (UIColor *)orangeSwatchColor
 {
     // Sexy Salmon
-    return [[SwatchColor alloc] initWithName:@"SexySalmon" color:[UIColor colorWithRed:247.0f/255.0f green:124.0f/255.0f blue:136.0f/255.0f alpha:1.0f]];
+    return [SwatchColor allColors][@"SexySalmon"];
 }
 
-+ (instancetype)yellowSwatchColor
++ (UIColor *)yellowSwatchColor
 {
     // Peach
-    return [[SwatchColor alloc] initWithName:@"Peach" color:[UIColor colorWithRed:252.0f/255.0f green:159.0f/255.0f blue:149.0f/255.0f alpha:1.0f]];
+    return [SwatchColor allColors][@"Peach"];
 }
 
-+ (instancetype)realmSwatchColor
++ (UIColor *)realmSwatchColor
 {
     // Melon
-    return [[SwatchColor alloc] initWithName:@"Melon" color:[UIColor colorWithRed:252.0f/255.0f green:195.0f/255.0f blue:151.0f/255.0f alpha:1.0f]];
+    return [SwatchColor allColors][@"Melon"];
 }
 
 @end

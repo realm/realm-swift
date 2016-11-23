@@ -21,7 +21,7 @@
 
 @interface SwatchesView : UIScrollView
 
-@property (nonatomic, strong) SwatchColor *selectedColor;
+@property (nonatomic, strong) NSString *selectedColor;
 @property (nonatomic, copy) void (^swatchColorChangedHandler)(void);
 
 @end
