@@ -18,7 +18,7 @@
 
 import XCTest
 import Realm
-@testable import RealmSwift
+import RealmSwift
 import Foundation
 
 class ObjectiveCSupportTests: TestCase {
@@ -34,59 +34,31 @@ class ObjectiveCSupportTests: TestCase {
             return
         }
 
-        let results = realm.objects(SwiftStringObject.self)
-        XCTAssertEqual(results.rlmResults,
-                       ObjectiveCSupport.convert(object: results),
-                       "RLMResults must stay the same")
+        let results = realm.objects(SwiftObject.self)
+        let rlmResults = ObjectiveCSupport.convert(object:
+            results)
+        XCTAssert(rlmResults.isKind(of: RLMResults.self))
+        XCTAssertEqual(rlmResults.count, 1)
+        XCTAssertEqual(unsafeBitCast(rlmResults.firstObject(), to: SwiftObject.self).intCol, 123)
 
-        let list = List<SwiftStringObject>()
-        XCTAssertEqual(list._rlmArray,
-                       ObjectiveCSupport.convert(object: list),
-                       "RLMArray must stay the same")
+        let list = List<SwiftObject>()
+        list.append(SwiftObject())
+        let rlmArray = ObjectiveCSupport.convert(object: list)
+        XCTAssert(rlmArray.isKind(of: RLMArray.self))
+        XCTAssertEqual(unsafeBitCast(rlmArray.firstObject(), to: SwiftObject.self).floatCol, 1.23)
+        XCTAssertEqual(rlmArray.count, 1)
 
-        let linkingObjects = LinkingObjects(fromType: SwiftStringObject.self, property: "linkCol")
-        XCTAssertEqual(linkingObjects.rlmResults,
-                       ObjectiveCSupport.convert(object: linkingObjects),
-                       "RLMResults of LinkingObjects must stay the same")
-
-        XCTAssertEqual(realm.rlmRealm,
-                       ObjectiveCSupport.convert(object: realm))
-
-        let _ = Realm.Configuration(schemaVersion: 1, migrationBlock: { migration, _ in
-            XCTAssertEqual(migration.rlmMigration,
-                           ObjectiveCSupport.convert(object: migration),
-                           "rlmMigration must stay the same")
-        })
-
-        let objectSchema = realm.schema["SwiftObject"]
-        XCTAssertEqual(objectSchema!.rlmObjectSchema,
-                       ObjectiveCSupport.convert(object: objectSchema!),
-                       "RLMObjectSchema must stay the same")
-
-        let property = objectSchema!.properties[0]
-        XCTAssertEqual(property.rlmProperty,
-                       ObjectiveCSupport.convert(object: property),
-                       "RLMProperty must stay the same")
-
-        XCTAssertEqual(realm.schema.rlmSchema,
-                       ObjectiveCSupport.convert(object: realm.schema),
-                       "RLMSchema must stay the same")
+        let rlmRealm = ObjectiveCSupport.convert(object: realm)
+        XCTAssert(rlmRealm.isKind(of: RLMRealm.self))
+        XCTAssertEqual(rlmRealm.allObjects("SwiftObject").count, 1)
 
         let sortDescriptor: RealmSwift.SortDescriptor = "property"
-        XCTAssertEqual(sortDescriptor.rlmSortDescriptorValue.property,
+        XCTAssertEqual(sortDescriptor.property,
                        ObjectiveCSupport.convert(object: sortDescriptor).property,
                        "SortDescriptor.property must be equal to RLMSortDescriptor.property")
-        XCTAssertEqual(sortDescriptor.rlmSortDescriptorValue.ascending,
+        XCTAssertEqual(sortDescriptor.ascending,
                        ObjectiveCSupport.convert(object: sortDescriptor).ascending,
                        "SortDescriptor.ascending must be equal to RLMSortDescriptor.ascending")
-
-        let credentials = SyncCredentials.usernamePassword(username: "test", password: "1234", register: false)
-        XCTAssertEqual(RLMSyncCredentials(credentials).token,
-                       ObjectiveCSupport.convert(object: credentials).token,
-                       "SyncCredentials.token must be equal to RLMSyncCredentials.token")
-        XCTAssertEqual(RLMSyncCredentials(credentials).provider,
-                       ObjectiveCSupport.convert(object: credentials).provider,
-                       "SyncCredentials.provider must be equal to RLMSyncCredentials.provider")
     }
 
     func testConfigurationSupport() {
@@ -98,37 +70,33 @@ class ObjectiveCSupportTests: TestCase {
             return
         }
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.fileURL,
+        XCTAssertEqual(realm.configuration.fileURL,
                        ObjectiveCSupport.convert(object: realm.configuration).fileURL,
                        "Configuration.fileURL must be equal to RLMConfiguration.fileURL")
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.inMemoryIdentifier,
+        XCTAssertEqual(realm.configuration.inMemoryIdentifier,
                        ObjectiveCSupport.convert(object: realm.configuration).inMemoryIdentifier,
                        "Configuration.inMemoryIdentifier must be equal to RLMConfiguration.inMemoryIdentifier")
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.syncConfiguration,
-                       ObjectiveCSupport.convert(object: realm.configuration).syncConfiguration,
+        XCTAssertEqual(realm.configuration.syncConfiguration?.realmURL,
+                       ObjectiveCSupport.convert(object: realm.configuration).syncConfiguration?.realmURL,
                        "Configuration.syncConfiguration must be equal to RLMConfiguration.syncConfiguration")
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.encryptionKey,
+        XCTAssertEqual(realm.configuration.encryptionKey,
                        ObjectiveCSupport.convert(object: realm.configuration).encryptionKey,
                        "Configuration.encryptionKey must be equal to RLMConfiguration.encryptionKey")
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.readOnly,
+        XCTAssertEqual(realm.configuration.readOnly,
                        ObjectiveCSupport.convert(object: realm.configuration).readOnly,
                        "Configuration.readOnly must be equal to RLMConfiguration.readOnly")
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.schemaVersion,
+        XCTAssertEqual(realm.configuration.schemaVersion,
                        ObjectiveCSupport.convert(object: realm.configuration).schemaVersion,
                        "Configuration.schemaVersion must be equal to RLMConfiguration.schemaVersion")
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.deleteRealmIfMigrationNeeded,
+        XCTAssertEqual(realm.configuration.deleteRealmIfMigrationNeeded,
                        ObjectiveCSupport.convert(object: realm.configuration).deleteRealmIfMigrationNeeded,
                        "Configuration.deleteRealmIfMigrationNeeded must be equal to RLMConfiguration.deleteRealmIfMigrationNeeded")
-
-        XCTAssertEqual(realm.configuration.rlmConfiguration.disableFormatUpgrade,
-                       ObjectiveCSupport.convert(object: realm.configuration).disableFormatUpgrade,
-                       "Configuration.disableFormatUpgrade must be equal to RLMConfiguration.disableFormatUpgrade")
     }
 
     #else
@@ -142,59 +110,30 @@ class ObjectiveCSupportTests: TestCase {
             return
         }
 
-        let results = realm.objects(SwiftStringObject.self)
-        XCTAssertEqual(results.rlmResults,
-                       ObjectiveCSupport.convert(results),
-                       "RLMResults must stay the same")
+        let results = realm.objects(SwiftObject.self)
+        let rlmResults = ObjectiveCSupport.convert(results)
+        XCTAssert(rlmResults.isKindOfClass(RLMResults.self))
+        XCTAssertEqual(rlmResults.count, 1)
+        XCTAssertEqual(unsafeBitCast(rlmResults.firstObject(), SwiftObject.self).intCol, 123)
 
-        let list = List<SwiftStringObject>()
-        XCTAssertEqual(list._rlmArray,
-                       ObjectiveCSupport.convert(list),
-                       "RLMArray must stay the same")
+        let list = List<SwiftObject>()
+        list.append(SwiftObject())
+        let rlmArray = ObjectiveCSupport.convert(list)
+        XCTAssert(rlmArray.isKindOfClass(RLMArray.self))
+        XCTAssertEqual(unsafeBitCast(rlmArray.firstObject(), SwiftObject.self).floatCol, 1.23)
+        XCTAssertEqual(rlmArray.count, 1)
 
-        let linkingObjects = LinkingObjects(fromType: SwiftStringObject.self, property: "linkCol")
-        XCTAssertEqual(linkingObjects.rlmResults,
-                       ObjectiveCSupport.convert(linkingObjects),
-                       "RLMResults of LinkingObjects must stay the same")
-
-        XCTAssertEqual(realm.rlmRealm,
-                       ObjectiveCSupport.convert(realm))
-
-        let _ = Realm.Configuration(schemaVersion: 1, migrationBlock: { migration, _ in
-            XCTAssertEqual(migration.rlmMigration,
-                ObjectiveCSupport.convert(migration),
-                "rlmMigration must stay the same")
-        })
-
-        let objectSchema = realm.schema["SwiftObject"]
-        XCTAssertEqual(objectSchema!.rlmObjectSchema,
-                       ObjectiveCSupport.convert(objectSchema!),
-                       "RLMObjectSchema must stay the same")
-
-        let property = objectSchema!.properties[0]
-        XCTAssertEqual(property.rlmProperty,
-                       ObjectiveCSupport.convert(property),
-                       "RLMProperty must stay the same")
-
-        XCTAssertEqual(realm.schema.rlmSchema,
-                       ObjectiveCSupport.convert(realm.schema),
-                       "RLMSchema must stay the same")
+        let rlmRealm = ObjectiveCSupport.convert(realm)
+        XCTAssert(rlmRealm.isKindOfClass(RLMRealm.self))
+        XCTAssertEqual(rlmRealm.allObjects("SwiftObject").count, 1)
 
         let sortDescriptor: RealmSwift.SortDescriptor = "property"
-        XCTAssertEqual(sortDescriptor.rlmSortDescriptorValue.property,
+        XCTAssertEqual(sortDescriptor.property,
                        ObjectiveCSupport.convert(sortDescriptor).property,
                        "SortDescriptor.property must be equal to RLMSortDescriptor.property")
-        XCTAssertEqual(sortDescriptor.rlmSortDescriptorValue.ascending,
+        XCTAssertEqual(sortDescriptor.ascending,
                        ObjectiveCSupport.convert(sortDescriptor).ascending,
                        "SortDescriptor.ascending must be equal to RLMSortDescriptor.ascending")
-
-        let credentials = SyncCredentials.usernamePassword("test", password: "1234", register: false)
-        XCTAssertEqual(RLMSyncCredentials(credentials).token,
-                       ObjectiveCSupport.convert(credentials).token,
-                       "SyncCredentials.token must be equal to RLMSyncCredentials.token")
-        XCTAssertEqual(RLMSyncCredentials(credentials).provider,
-                       ObjectiveCSupport.convert(credentials).provider,
-                       "SyncCredentials.provider must be equal to RLMSyncCredentials.provider")
     }
 
     func testConfigurationSupport() {
@@ -206,37 +145,33 @@ class ObjectiveCSupportTests: TestCase {
             return
         }
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.fileURL,
+        XCTAssertEqual(realm.configuration.fileURL,
                        ObjectiveCSupport.convert(realm.configuration).fileURL,
                        "Configuration.fileURL must be equal to RLMConfiguration.fileURL")
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.inMemoryIdentifier,
+        XCTAssertEqual(realm.configuration.inMemoryIdentifier,
                        ObjectiveCSupport.convert(realm.configuration).inMemoryIdentifier,
                        "Configuration.inMemoryIdentifier must be equal to RLMConfiguration.inMemoryIdentifier")
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.syncConfiguration,
-                       ObjectiveCSupport.convert(realm.configuration).syncConfiguration,
+        XCTAssertEqual(realm.configuration.syncConfiguration?.realmURL,
+                       ObjectiveCSupport.convert(realm.configuration).syncConfiguration?.realmURL,
                        "Configuration.syncConfiguration must be equal to RLMConfiguration.syncConfiguration")
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.encryptionKey,
+        XCTAssertEqual(realm.configuration.encryptionKey,
                        ObjectiveCSupport.convert(realm.configuration).encryptionKey,
                        "Configuration.encryptionKey must be equal to RLMConfiguration.encryptionKey")
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.readOnly,
+        XCTAssertEqual(realm.configuration.readOnly,
                        ObjectiveCSupport.convert(realm.configuration).readOnly,
                        "Configuration.readOnly must be equal to RLMConfiguration.readOnly")
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.schemaVersion,
+        XCTAssertEqual(realm.configuration.schemaVersion,
                        ObjectiveCSupport.convert(realm.configuration).schemaVersion,
                        "Configuration.schemaVersion must be equal to RLMConfiguration.schemaVersion")
 
-        XCTAssertEqual(realm.configuration.rlmConfiguration.deleteRealmIfMigrationNeeded,
+        XCTAssertEqual(realm.configuration.deleteRealmIfMigrationNeeded,
                        ObjectiveCSupport.convert(realm.configuration).deleteRealmIfMigrationNeeded,
                        "Configuration.deleteRealmIfMigrationNeeded must be equal to RLMConfiguration.deleteRealmIfMigrationNeeded")
-
-        XCTAssertEqual(realm.configuration.rlmConfiguration.disableFormatUpgrade,
-                       ObjectiveCSupport.convert(realm.configuration).disableFormatUpgrade,
-                       "Configuration.disableFormatUpgrade must be equal to RLMConfiguration.disableFormatUpgrade")
     }
 
     #endif
