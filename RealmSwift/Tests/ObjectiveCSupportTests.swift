@@ -16,14 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import XCTest
+import Foundation
 import Realm
 import RealmSwift
-import Foundation
+import XCTest
 
 class ObjectiveCSupportTests: TestCase {
 
-    #if swift(>=3.0)
+#if swift(>=3.0)
 
     func testSupport() {
 
@@ -35,8 +35,7 @@ class ObjectiveCSupportTests: TestCase {
         }
 
         let results = realm.objects(SwiftObject.self)
-        let rlmResults = ObjectiveCSupport.convert(object:
-            results)
+        let rlmResults = ObjectiveCSupport.convert(object: results)
         XCTAssert(rlmResults.isKind(of: RLMResults.self))
         XCTAssertEqual(rlmResults.count, 1)
         XCTAssertEqual(unsafeBitCast(rlmResults.firstObject(), to: SwiftObject.self).intCol, 123)
@@ -99,7 +98,7 @@ class ObjectiveCSupportTests: TestCase {
                        "Configuration.deleteRealmIfMigrationNeeded must be equal to RLMConfiguration.deleteRealmIfMigrationNeeded")
     }
 
-    #else
+#else
 
     func testSupport() {
 
@@ -174,5 +173,5 @@ class ObjectiveCSupportTests: TestCase {
                        "Configuration.deleteRealmIfMigrationNeeded must be equal to RLMConfiguration.deleteRealmIfMigrationNeeded")
     }
 
-    #endif
+#endif
 }

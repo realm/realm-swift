@@ -136,12 +136,12 @@ public final class ObjectiveCSupport {
         return Property(object)
     }
 
-    /// Convert a `Realm` to a `RLMRealmConfiguration`.
+    /// Convert a `Realm.Configuration` to a `RLMRealmConfiguration`.
     public static func convert(object: Realm.Configuration) -> RLMRealmConfiguration {
         return object.rlmConfiguration
     }
 
-    /// Convert a `RLMRealmConfiguration` to a Realm.`Configuration`.
+    /// Convert a `RLMRealmConfiguration` to a `Realm.Configuration`.
     public static func convert(object: RLMRealmConfiguration) -> Realm.Configuration {
         return .fromRLMRealmConfiguration(object)
     }
