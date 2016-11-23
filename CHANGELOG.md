@@ -11,7 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add `RealmSwift.ObjectiveCSupport.convert(object:)` methods to help write
+  code that interoperates between Realm Objective-C and Realm Swift APIs.
 
 ### Bugfixes
 
@@ -78,8 +79,6 @@ x.x.x Release notes (yyyy-MM-dd)
   synchronized Realms using the management Realm obtained via the
   `-[RLMSyncUser managementRealmWithError:]` API and the
   `RLMSyncPermissionChange` class.
-* Add `RealmSwift.ObjectiveCSupport.convert(object:)` methods to help write
-  code that interoperates between Realm Objective-C and Realm Swift APIs.
 
 ### Bugfixes
 
