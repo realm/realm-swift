@@ -32,6 +32,35 @@
 
 #pragma mark - Authentication
 
+/// Log in callback should be dispatched to the main thread
+- (void)testAuthenticationCallbackThread {
+    RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME() register:YES];
+
+    // Successful callback should be dispatched to the main thread
+    XCTestExpectation *successExpectation = [self expectationWithDescription:@"Should log in the user properly"];
+    [RLMSyncUser logInWithCredentials:credentials
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNotNil(user);
+        XCTAssertNil(error);
+        XCTAssertTrue([NSThread isMainThread]);
+        [successExpectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Unsuccessful callback should be dispatched to the main thread
+    XCTestExpectation *failureExpectation = [self expectationWithDescription:@"Should not log in the user"];
+    [RLMSyncUser logInWithCredentials:credentials
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNil(user);
+        XCTAssertNotNil(error);
+        XCTAssertTrue([NSThread isMainThread]);
+        [failureExpectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
 /// Valid username/password credentials should be able to log in a user. Using the same credentials should return the
 /// same user object.
 - (void)testUsernamePasswordAuthentication {
