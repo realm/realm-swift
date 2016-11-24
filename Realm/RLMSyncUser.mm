@@ -312,7 +312,7 @@ using namespace realm;
                     return;
                 }
                 user->_user = sync_user;
-                completion(user, nil);
+                theBlock(user, nil);
             }
         } else {
             // Something else went wrong
