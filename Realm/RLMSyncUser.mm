@@ -261,17 +261,9 @@ using namespace realm;
                authServerURL:(NSURL *)authServerURL
                      timeout:(NSTimeInterval)timeout
              completionBlock:(RLMUserCompletionBlock)completion {
-    // Wrap the completion block.
-    RLMUserCompletionBlock theBlock = ^(RLMSyncUser *user, NSError *error){
-        if (!completion) { return; }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            completion(user, error);
-        });
-    };
-
     // Special credential login should be treated differently.
     if (credentials.provider == RLMIdentityProviderAccessToken) {
-        [self _performLoginForDirectAccessTokenCredentials:credentials user:user completionBlock:theBlock];
+        [self _performLoginForDirectAccessTokenCredentials:credentials user:user completionBlock:completion];
         return;
     }
 
@@ -298,7 +290,7 @@ using namespace realm;
                 error = [NSError errorWithDomain:RLMSyncErrorDomain
                                             code:RLMSyncErrorBadResponse
                                         userInfo:@{kRLMSyncErrorJSONKey: json}];
-                theBlock(nil, error);
+                completion(nil, error);
                 return;
             } else {
                 std::string server_url = authServerURL.absoluteString.UTF8String;
@@ -316,7 +308,7 @@ using namespace realm;
             }
         } else {
             // Something else went wrong
-            theBlock(nil, error);
+            completion(nil, error);
         }
     };
     [RLMNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
