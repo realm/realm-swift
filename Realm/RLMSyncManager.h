@@ -72,7 +72,7 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
  A reverse-DNS string uniquely identifying this application. In most cases this is automatically set by the SDK, and
  does not have to be explicitly configured.
  */
-@property (nonatomic) NSString *appID;
+@property (nonatomic, copy) NSString *appID;
 
 /**
  Whether SSL certificate validation should be disabled. SSL certificate validation is ON by default. Setting this

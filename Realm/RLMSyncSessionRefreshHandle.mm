@@ -102,50 +102,51 @@ using namespace realm;
                 [self.timer invalidate];
                 [[RLMSyncManager sharedManager] _fireError:error];
                 return;
-            } else {
-                // Success
-                if (auto session = _session.lock()) {
-                    if (session->is_valid()) {
-                        session->refresh_access_token([model.accessToken.token UTF8String], none);
-                        [self scheduleRefreshTimer:model.accessToken.tokenData.expires];
-                        return;
-                    }
+            }
+
+            // Success
+            if (auto session = _session.lock()) {
+                if (session->state() != SyncSession::PublicState::Error) {
+                    session->refresh_access_token([model.accessToken.token UTF8String], none);
+                    [self scheduleRefreshTimer:model.accessToken.tokenData.expires];
+                    return;
                 }
-                // The session is dead or in a fatal error state.
+            }
+            // The session is dead or in a fatal error state.
+            [user _unregisterRefreshHandleForURLPath:self.fullURLPath];
+            [self.timer invalidate];
+            return;
+        }
+
+        // Something else went wrong
+        NSError *syncError = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                 code:RLMSyncErrorBadResponse
+                                             userInfo:@{kRLMSyncUnderlyingErrorKey: error}];
+        [[RLMSyncManager sharedManager] _fireError:syncError];
+        NSTimeInterval nextFireDate = 0;
+        // Certain errors should trigger a retry.
+        if (error.domain == NSURLErrorDomain) {
+            switch (error.code) {
+                case NSURLErrorCannotConnectToHost:
+                    // FIXME: 120 seconds is an arbitrarily chosen value, consider rationalizing it.
+                    nextFireDate = [[NSDate dateWithTimeIntervalSinceNow:120] timeIntervalSince1970];
+                    break;
+                case NSURLErrorNotConnectedToInternet:
+                case NSURLErrorNetworkConnectionLost:
+                case NSURLErrorTimedOut:
+                case NSURLErrorDNSLookupFailed:
+                case NSURLErrorCannotFindHost:
+                    // FIXME: 30 seconds is an arbitrarily chosen value, consider rationalizing it.
+                    nextFireDate = [[NSDate dateWithTimeIntervalSinceNow:30] timeIntervalSince1970];
+                    break;
+                default:
+                    break;
+            }
+            if (nextFireDate > 0) {
+                [self scheduleRefreshTimer:nextFireDate];
+            } else {
                 [user _unregisterRefreshHandleForURLPath:self.fullURLPath];
                 [self.timer invalidate];
-            }
-        } else {
-            // Something else went wrong
-            NSError *syncError = [NSError errorWithDomain:RLMSyncErrorDomain
-                                                     code:RLMSyncErrorBadResponse
-                                                 userInfo:@{kRLMSyncUnderlyingErrorKey: error}];
-            [[RLMSyncManager sharedManager] _fireError:syncError];
-            NSTimeInterval nextFireDate = 0;
-            // Certain errors should trigger a retry.
-            if (error.domain == NSURLErrorDomain) {
-                switch (error.code) {
-                    case NSURLErrorCannotConnectToHost:
-                        // FIXME: 120 seconds is an arbitrarily chosen value, consider rationalizing it.
-                        nextFireDate = [[NSDate dateWithTimeIntervalSinceNow:120] timeIntervalSince1970];
-                        break;
-                    case NSURLErrorNotConnectedToInternet:
-                    case NSURLErrorNetworkConnectionLost:
-                    case NSURLErrorTimedOut:
-                    case NSURLErrorDNSLookupFailed:
-                    case NSURLErrorCannotFindHost:
-                        // FIXME: 30 seconds is an arbitrarily chosen value, consider rationalizing it.
-                        nextFireDate = [[NSDate dateWithTimeIntervalSinceNow:30] timeIntervalSince1970];
-                        break;
-                    default:
-                        break;
-                }
-                if (nextFireDate > 0) {
-                    [self scheduleRefreshTimer:nextFireDate];
-                } else {
-                    [user _unregisterRefreshHandleForURLPath:self.fullURLPath];
-                    [self.timer invalidate];
-                }
             }
         }
     };

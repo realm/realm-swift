@@ -8,5 +8,8 @@ auth:
   providers:
     password:
       iterations: 1
+proxy:
+  http:
+    listen_address: '::'
 enterprise:
   skip_setup: true

@@ -73,9 +73,9 @@ static BOOL isValidRealmURL(NSURL *url) {
         return NO;
     }
     RLMSyncConfiguration *that = (RLMSyncConfiguration *)object;
-    return ([self.realmURL isEqual:that.realmURL]
-            && [self.user isEqual:that.user]
-            && self.stopPolicy == that.stopPolicy);
+    return [self.realmURL isEqual:that.realmURL]
+        && [self.user isEqual:that.user]
+        && self.stopPolicy == that.stopPolicy;
 }
 
 - (realm::SyncConfig)rawConfiguration {
@@ -131,11 +131,13 @@ static BOOL isValidRealmURL(NSURL *url) {
             };
         }
 
-        _config = std::make_unique<realm::SyncConfig>([user _syncUser],
-                                                      [[url absoluteString] UTF8String],
-                                                      translateStopPolicy(stopPolicy),
-                                                      std::move(bindHandler),
-                                                      std::move(errorHandler));
+        _config = std::make_unique<SyncConfig>(SyncConfig{
+            [user _syncUser],
+            [[url absoluteString] UTF8String],
+            translateStopPolicy(stopPolicy),
+            std::move(bindHandler),
+            std::move(errorHandler)
+        });
         self.customFileURL = customFileURL;
         return self;
     }

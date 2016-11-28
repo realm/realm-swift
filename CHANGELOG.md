@@ -1,22 +1,54 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
+### Sync Breaking Changes (In Beta)
+
+* None.
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Add `RealmSwift.ObjectiveCSupport.convert(object:)` methods to help write
+  code that interoperates between Realm Objective-C and Realm Swift APIs.
+
+### Bugfixes
+
+* Reset sync metadata Realm in case of decryption error.
+* Fix issue preventing using synchronized Realms in Xcode Playgrounds.
+
+2.1.0 Release notes (2016-11-18)
+=============================================================
+
+### Sync Breaking Changes (In Beta)
+
+* None.
+
 ### API breaking changes
 
 * None.
 
 ### Enhancements
 
-* None.
+* Add the ability to skip calling specific notification blocks when committing
+  a write transaction.
 
 ### Bugfixes
 
-* None.
+* Deliver collection notifications when beginning a write transaction which
+  advances the read version of a Realm (previously only Realm-level
+  notifications were sent).
+* Fix some scenarios which would lead to inconsistent states when using
+  collection notifications.
+* Fix several race conditions in the notification functionality.
+* Don't send Realm change notifications when canceling a write transaction.
 
 2.0.4 Release notes (2016-11-14)
 =============================================================
 
-### API breaking changes
+### Sync Breaking Changes (In Beta)
 
 * Remove `RLMAuthenticationActions` and replace
   `+[RLMSyncCredential credentialWithUsername:password:actions:]` with
@@ -36,6 +68,10 @@ x.x.x Release notes (yyyy-MM-dd)
   struct rather than a named tuple.
 * `+[RLMSyncUser logInWithCredentials:]` now invokes its callback block on a
   background queue.
+
+### API breaking changes
+
+* None.
 
 ### Enhancements
 

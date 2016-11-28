@@ -66,7 +66,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                                 file: StaticString = #file,
                                 line: UInt = #line) throws -> SyncUser {
         let process = isParent ? "parent" : "child"
-        var theUser: SyncUser! = nil
+        var theUser: SyncUser? = nil
         let ex = expectation(description: "Should log in the user properly")
         SyncUser.logIn(with: credentials, server: url) { user, error in
             XCTAssertNotNil(user, file: file, line: line)
@@ -78,11 +78,12 @@ class SwiftSyncTestCase: RLMSyncTestCase {
             ex.fulfill()
         }
         waitForExpectations(timeout: 4, handler: nil)
-        XCTAssertTrue(theUser.state == .active,
+        XCTAssertNotNil(theUser, file: file, line: line)
+        XCTAssertEqual(theUser!.state, .active,
                       "User should have been valid, but wasn't. (process: \(process))",
                       file: file,
                       line: line)
-        return theUser
+        return theUser!
     }
 
     func checkCount<T: Object>(expected: Int,

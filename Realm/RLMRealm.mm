@@ -42,13 +42,19 @@
 #include "shared_realm.hpp"
 
 #include <realm/disable_sync_to_disk.hpp>
+#include <realm/util/scope_exit.hpp>
 #include <realm/version.hpp>
 
 using namespace realm;
 using util::File;
 
+@interface RLMRealmNotificationToken : RLMNotificationToken
+@property (nonatomic, strong) RLMRealm *realm;
+@property (nonatomic, copy) RLMNotificationBlock block;
+@end
+
 @interface RLMRealm ()
-@property (nonatomic, strong) NSHashTable *notificationHandlers;
+@property (nonatomic, strong) NSHashTable<RLMRealmNotificationToken *> *notificationHandlers;
 - (void)sendNotifications:(RLMNotification)notification;
 @end
 
@@ -56,18 +62,27 @@ void RLMDisableSyncToDisk() {
     realm::disable_sync_to_disk();
 }
 
-// Notification Token
-@interface RLMRealmNotificationToken : RLMNotificationToken
-@property (nonatomic, strong) RLMRealm *realm;
-@property (nonatomic, copy) RLMNotificationBlock block;
-@end
-
 @implementation RLMRealmNotificationToken
 - (void)stop {
     [_realm verifyThread];
     [_realm.notificationHandlers removeObject:self];
     _realm = nil;
     _block = nil;
+}
+
+- (void)suppressNextNotification {
+    // Temporarily replace the block with one which restores the old block
+    // rather than producing a notification.
+
+    // This briefly creates a retain cycle but it's fine because the block will
+    // be synchronously called shortly after this method is called. Unlike with
+    // collection notifications, this does not have to go through the object
+    // store or do fancy things to handle transaction coalescing because it's
+    // called synchronously by the obj-c code and not by the object store.
+    auto notificationBlock = _block;
+    _block = ^(RLMNotification, RLMRealm *) {
+        _block = notificationBlock;
+    };
 }
 
 - (void)dealloc {
@@ -102,7 +117,8 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 }
 
 @implementation RLMRealm {
-    NSHashTable *_collectionEnumerators;
+    NSHashTable<RLMFastEnumerator *> *_collectionEnumerators;
+    bool _sendingNotifications;
 }
 
 + (BOOL)isCoreDebug {
@@ -142,10 +158,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 
 - (void)setAutorefresh:(BOOL)autorefresh {
     _realm->set_auto_refresh(autorefresh);
-}
-
-+ (NSString *)writeableTemporaryPathForFile:(NSString *)fileName {
-    return [NSTemporaryDirectory() stringByAppendingPathComponent:fileName];
 }
 
 + (instancetype)defaultRealm {
@@ -382,12 +394,20 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
 - (void)sendNotifications:(RLMNotification)notification {
     NSAssert(!_realm->config().read_only(), @"Read-only realms do not have notifications");
-
+    if (_sendingNotifications) {
+        return;
+    }
     NSUInteger count = _notificationHandlers.count;
     if (count == 0) {
         return;
     }
-    // call this realms notification blocks
+
+    _sendingNotifications = true;
+    auto cleanup = realm::util::make_scope_exit([&]() noexcept {
+        _sendingNotifications = false;
+    });
+
+    // call this realm's notification blocks
     if (count == 1) {
         if (auto block = [_notificationHandlers.anyObject block]) {
             block(notification, self);
@@ -430,6 +450,24 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
     catch (...) {
         RLMRealmTranslateException(outError);
+        return NO;
+    }
+}
+
+- (BOOL)commitWriteTransactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens error:(NSError **)error {
+    for (RLMNotificationToken *token in tokens) {
+        if (token.realm != self) {
+            @throw RLMException(@"Incorrect Realm: only notifications for the Realm being modified can be skipped.");
+        }
+        [token suppressNextNotification];
+    }
+
+    try {
+        _realm->commit_transaction();
+        return YES;
+    }
+    catch (...) {
+        RLMRealmTranslateException(error);
         return NO;
     }
 }
@@ -483,17 +521,17 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 /**
  Replaces all string columns in this Realm with a string enumeration column and compacts the
  database file.
- 
+
  Cannot be called from a write transaction.
 
  Compaction will not occur if other `RLMRealm` instances exist.
- 
+
  While compaction is in progress, attempts by other threads or processes to open the database will
  wait.
- 
+
  Be warned that resource requirements for compaction is proportional to the amount of live data in
  the database.
- 
+
  Compaction works by writing the database contents to a temporary database file and then replacing
  the database with the temporary one. The name of the temporary file is formed by appending
  `.tmp_compaction_space` to the name of the database.
