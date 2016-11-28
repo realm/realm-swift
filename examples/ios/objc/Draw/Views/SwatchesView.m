@@ -114,7 +114,7 @@ static CGFloat kSwatchPencilPadding = 1.0f;
     self.selectedColor = self.colors.allKeys[button.tag];
 }
 
-- (void)setSelectedColor:(SwatchColor *)selectedColor
+- (void)setSelectedColor:(NSString *)selectedColor
 {
     if (selectedColor == _selectedColor) {
         return;
