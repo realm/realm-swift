@@ -17,6 +17,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Reset sync metadata Realm in case of decryption error.
+* Fix issue preventing using synchronized Realms in Xcode Playgrounds.
 
 2.1.0 Release notes (2016-11-18)
 =============================================================
