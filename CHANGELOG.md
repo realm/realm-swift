@@ -27,6 +27,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix a `LogicError: Bad version number` exception when using `RLMResults` with
   no notification blocks and explicitly called `-[RLMRealm refresh]` from that
   thread.
+* Logged-out users are no longer returned from `+[RLMSyncUser currentUser]` or
+  `+[RLMSyncUser allUsers]`.
 
 2.1.0 Release notes (2016-11-18)
 =============================================================
