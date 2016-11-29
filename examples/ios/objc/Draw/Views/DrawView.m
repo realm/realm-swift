@@ -19,8 +19,8 @@
 #import "DrawView.h"
 #import "DrawPath.h"
 #import "SwatchesView.h"
-#import "SwatchColor.h"
 #import "CanvasView.h"
+#import "UIColor+Realm.h"
 #import <Realm/Realm.h>
 
 @interface DrawView ()
@@ -120,7 +120,7 @@
     [[RLMRealm defaultRealm] transactionWithBlock:^{
         if (self.drawPath.isInvalidated) {
             self.drawPath = [[DrawPath alloc] init];
-            self.drawPath.color = [SwatchColor allColors][self.currentColorName] ?: @"Black";
+            self.drawPath.color = self.currentColorName ?: @"Black";
             [[RLMRealm defaultRealm] addObject:self.drawPath];
         }
 

@@ -18,7 +18,7 @@
 
 #import "CanvasView.h"
 #import "DrawPath.h"
-#import "SwatchColor.h"
+#import "UIColor+Realm.h"
 
 @implementation CanvasView
 
@@ -28,7 +28,7 @@
 }
 
 - (void)drawPath:(DrawPath *)path withContext:(CGContextRef)context {
-    UIColor *swatchColor = [SwatchColor allColors][path.color];
+    UIColor *swatchColor = [UIColor realmColors][path.color];
     CGContextSetStrokeColorWithColor(context, [swatchColor CGColor]);
     CGContextSetLineWidth(context, path.path.lineWidth);
     CGContextAddPath(context, [path.path CGPath]);

@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <UIKit/UIKit.h>
-#import "SwatchColor.h"
+#import "UIColor+Realm.h"
 
 @interface SwatchesView : UIScrollView
 

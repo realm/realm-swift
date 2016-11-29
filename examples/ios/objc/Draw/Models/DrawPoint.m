@@ -21,7 +21,7 @@
 @implementation DrawPoint
 
 - (CGPoint)cgPoint {
-    return CGPointMake(point.x, point.y);
+    return CGPointMake(self.x, self.y);
 }
 
 @end
