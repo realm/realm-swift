@@ -192,7 +192,7 @@ static dispatch_once_t s_onceToken;
 
 - (NSArray<RLMSyncUser *> *)_allUsers {
     NSMutableArray<RLMSyncUser *> *buffer = [NSMutableArray array];
-    for (auto user : SyncManager::shared().all_users()) {
+    for (auto user : SyncManager::shared().all_logged_in_users()) {
         [buffer addObject:[[RLMSyncUser alloc] initWithSyncUser:std::move(user)]];
     }
     return buffer;

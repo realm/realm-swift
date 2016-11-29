@@ -72,7 +72,7 @@
     [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
 }
 
-#pragma mark - User Persistence
+#pragma mark - Users
 
 /// `[RLMSyncUser all]` should be updated once a user is logged in.
 - (void)testBasicUserPersistence {
@@ -93,6 +93,18 @@
     NSDictionary *dict2 = @{user.identity: user, user2.identity: user2};
     XCTAssertEqualObjects([RLMSyncUser allUsers], dict2);
     RLMAssertThrowsWithReasonMatching([RLMSyncUser currentUser], @"currentUser cannot be called if more that one valid, logged-in user exists");
+}
+
+/// `[RLMSyncUser currentUser]` should become nil if the user is logged out.
+- (void)testCurrentUserLogout {
+    XCTAssertNil([RLMSyncUser currentUser]);
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
+    XCTAssertNotNil(user);
+    XCTAssertEqualObjects([RLMSyncUser currentUser], user);
+    [user logOut];
+    XCTAssertNil([RLMSyncUser currentUser]);
 }
 
 #pragma mark - Basic Sync
