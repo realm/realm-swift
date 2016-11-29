@@ -20,4 +20,8 @@
 
 @implementation DrawPoint
 
+- (CGPoint)cgPoint {
+    return CGPointMake(point.x, point.y);
+}
+
 @end

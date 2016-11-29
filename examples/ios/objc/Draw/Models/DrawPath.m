@@ -22,17 +22,15 @@
 
 @dynamic path;
 
-- (UIBezierPath *)path
-{
+- (UIBezierPath *)path {
     UIBezierPath *path = [UIBezierPath bezierPath];
     path.lineWidth = 4.0f;
     NSUInteger index = 0;
     for (DrawPoint *point in self.points) {
-        CGPoint cgPoint = CGPointMake(point.x, point.y);
         if (index == 0) {
-            [path moveToPoint:cgPoint];
+            [path moveToPoint:point.cgPoint];
         } else {
-            [path addLineToPoint:cgPoint];
+            [path addLineToPoint:point.cgPoint];
         }
         index++;
     }

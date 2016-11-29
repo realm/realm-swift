@@ -112,7 +112,7 @@
 		F18464551DC1569B00DAB8B9 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		F18464631DC16CDA00DAB8B9 /* DrawPath.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464591DC16CDA00DAB8B9 /* DrawPath.m */; };
 		F18464641DC16CDA00DAB8B9 /* DrawPoint.m in Sources */ = {isa = PBXBuildFile; fileRef = F184645B1DC16CDA00DAB8B9 /* DrawPoint.m */; };
-		F18464651DC16CDA00DAB8B9 /* SwatchColor.m in Sources */ = {isa = PBXBuildFile; fileRef = F184645D1DC16CDA00DAB8B9 /* SwatchColor.m */; };
+		F18464651DC16CDA00DAB8B9 /* UIColor+Realm.m in Sources */ = {isa = PBXBuildFile; fileRef = F184645D1DC16CDA00DAB8B9 /* UIColor+Realm.m */; };
 		F18464661DC16CDA00DAB8B9 /* DrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464601DC16CDA00DAB8B9 /* DrawView.m */; };
 		F18464671DC16CDA00DAB8B9 /* SwatchesView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464621DC16CDA00DAB8B9 /* SwatchesView.m */; };
 		F184646A1DC16D3700DAB8B9 /* CanvasView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464691DC16D3700DAB8B9 /* CanvasView.m */; };
@@ -250,8 +250,8 @@
 		F18464591DC16CDA00DAB8B9 /* DrawPath.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawPath.m; sourceTree = "<group>"; };
 		F184645A1DC16CDA00DAB8B9 /* DrawPoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawPoint.h; sourceTree = "<group>"; };
 		F184645B1DC16CDA00DAB8B9 /* DrawPoint.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawPoint.m; sourceTree = "<group>"; };
-		F184645C1DC16CDA00DAB8B9 /* SwatchColor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchColor.h; sourceTree = "<group>"; };
-		F184645D1DC16CDA00DAB8B9 /* SwatchColor.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SwatchColor.m; sourceTree = "<group>"; };
+		F184645C1DC16CDA00DAB8B9 /* UIColor+Realm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Realm.h"; sourceTree = "<group>"; };
+		F184645D1DC16CDA00DAB8B9 /* UIColor+Realm.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Realm.m"; sourceTree = "<group>"; };
 		F184645F1DC16CDA00DAB8B9 /* DrawView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawView.h; sourceTree = "<group>"; };
 		F18464601DC16CDA00DAB8B9 /* DrawView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawView.m; sourceTree = "<group>"; };
 		F18464611DC16CDA00DAB8B9 /* SwatchesView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwatchesView.h; sourceTree = "<group>"; };
@@ -634,8 +634,8 @@
 				F18464591DC16CDA00DAB8B9 /* DrawPath.m */,
 				F184645A1DC16CDA00DAB8B9 /* DrawPoint.h */,
 				F184645B1DC16CDA00DAB8B9 /* DrawPoint.m */,
-				F184645C1DC16CDA00DAB8B9 /* SwatchColor.h */,
-				F184645D1DC16CDA00DAB8B9 /* SwatchColor.m */,
+				F184645C1DC16CDA00DAB8B9 /* UIColor+Realm.h */,
+				F184645D1DC16CDA00DAB8B9 /* UIColor+Realm.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1186,7 +1186,7 @@
 				F18464631DC16CDA00DAB8B9 /* DrawPath.m in Sources */,
 				F18464661DC16CDA00DAB8B9 /* DrawView.m in Sources */,
 				F18464641DC16CDA00DAB8B9 /* DrawPoint.m in Sources */,
-				F18464651DC16CDA00DAB8B9 /* SwatchColor.m in Sources */,
+				F18464651DC16CDA00DAB8B9 /* UIColor+Realm.m in Sources */,
 				F184646A1DC16D3700DAB8B9 /* CanvasView.m in Sources */,
 				F18464461DC151F000DAB8B9 /* AppDelegate.m in Sources */,
 			);

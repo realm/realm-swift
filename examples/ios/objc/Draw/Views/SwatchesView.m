@@ -52,7 +52,7 @@ static CGFloat kSwatchPencilPadding = 1.0f;
 
 - (void)setupButtons
 {
-    self.colors = [SwatchColor allColors];
+    self.colors = [UIColor realmColors];
 
     NSMutableArray *buttons = [NSMutableArray arrayWithCapacity:self.colors.count];    
     NSInteger tag = 0;

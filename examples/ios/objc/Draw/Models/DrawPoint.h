@@ -24,6 +24,8 @@
 @property double x;
 @property double y;
 
+@property (readonly) CGPoint cgPoint;
+
 @end
 
 RLM_ARRAY_TYPE(DrawPoint)

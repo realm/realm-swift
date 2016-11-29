@@ -16,16 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "SwatchColor.h"
+#import "UIColor+Realm.h"
 
-@implementation SwatchColor
-
-+ (NSDictionary *)allColors
-{
-    static NSDictionary<NSString *, UIColor*> *swatchColors;
+@implementation UIColor (Realm)
++ (NSDictionary<NSString *, UIColor*> *)realmColors {
+    static NSDictionary<NSString *, UIColor*> *realmColors;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        swatchColors =
+        realmColors =
         @{
           @"Charcoal": [UIColor colorWithRed:28.0f/255.0f green:35.0f/255.0f blue:63.0f/255.0f alpha:1.0f],
           @"Elephant": [UIColor colorWithRed:154.0f/255.0f green:155.0f/255.0f blue:165.0f/255.0f alpha:1.0f],
@@ -40,89 +38,6 @@
           @"Melon": [UIColor colorWithRed:252.0f/255.0f green:195.0f/255.0f blue:151.0f/255.0f alpha:1.0f]
         };
     });
-    
-    return swatchColors;
+    return realmColors;
 }
-
-+ (NSArray *)allSwatchColors
-{
-    return @[[SwatchColor blackSwatchColor],
-             [SwatchColor graySwatchColor],
-             [SwatchColor redSwatchColor],
-             [SwatchColor blueSwatchColor],
-             [SwatchColor greenSwatchColor],
-             [SwatchColor lightGreenSwatchColor],
-             [SwatchColor lightBlueSwatchColor],
-             [SwatchColor brownSwatchColor],
-             [SwatchColor orangeSwatchColor],
-             [SwatchColor yellowSwatchColor],
-             [SwatchColor realmSwatchColor]];
-}
-
-+ (UIColor *)blackSwatchColor
-{
-    // Charcoal
-    return  [SwatchColor allColors][@"Charcoal"];
-}
-
-+ (UIColor *)graySwatchColor
-{
-    // Elephant
-    return [SwatchColor allColors][@"Elephant"];
-}
-
-+ (UIColor *)redSwatchColor
-{
-    // Dove
-    return [SwatchColor allColors][@"Dove"];
-}
-
-+ (UIColor *)blueSwatchColor
-{
-    // Ultramarine
-    return [SwatchColor allColors][@"Ultramarine"];
-}
-
-+ (UIColor *)greenSwatchColor
-{
-    // Indigo
-    return [SwatchColor allColors][@"Indigo"];
-}
-
-+ (UIColor *)lightGreenSwatchColor
-{
-    // Grape Jelly
-    return [SwatchColor allColors][@"GrapeJelly"];
-}
-
-+ (UIColor *)lightBlueSwatchColor
-{
-    // Mulberry
-    return [SwatchColor allColors][@"Mulberry"];
-}
-
-+ (UIColor *)brownSwatchColor
-{
-    // Flamingo
-    return [SwatchColor allColors][@"Flamingo"];
-}
-
-+ (UIColor *)orangeSwatchColor
-{
-    // Sexy Salmon
-    return [SwatchColor allColors][@"SexySalmon"];
-}
-
-+ (UIColor *)yellowSwatchColor
-{
-    // Peach
-    return [SwatchColor allColors][@"Peach"];
-}
-
-+ (UIColor *)realmSwatchColor
-{
-    // Melon
-    return [SwatchColor allColors][@"Melon"];
-}
-
 @end

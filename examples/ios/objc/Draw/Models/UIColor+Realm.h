@@ -19,21 +19,6 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 
-@interface SwatchColor : NSObject
-
-+ (NSDictionary *)allColors;
-
-+ (NSArray *)allSwatchColors;
-+ (UIColor *)blackSwatchColor;
-+ (UIColor *)graySwatchColor;
-+ (UIColor *)redSwatchColor;
-+ (UIColor *)blueSwatchColor;
-+ (UIColor *)greenSwatchColor;
-+ (UIColor *)lightGreenSwatchColor;
-+ (UIColor *)lightBlueSwatchColor;
-+ (UIColor *)brownSwatchColor;
-+ (UIColor *)orangeSwatchColor;
-+ (UIColor *)yellowSwatchColor;
-+ (UIColor *)realmSwatchColor;
-
+@interface UIColor (Realm)
++ (NSDictionary<NSString *, UIColor*> *)realmColors;
 @end
