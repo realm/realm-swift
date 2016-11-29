@@ -13,11 +13,19 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Add `RealmSwift.ObjectiveCSupport.convert(object:)` methods to help write
   code that interoperates between Realm Objective-C and Realm Swift APIs.
+* Throw exceptions when opening a Realm with an incorrect configuration, like:
+    * `readOnly` set with a sync configuration.
+    * `readOnly` set with a migration block.
+    * migration block set with a sync configuration.
 
 ### Bugfixes
 
 * Reset sync metadata Realm in case of decryption error.
 * Fix issue preventing using synchronized Realms in Xcode Playgrounds.
+* Fix assertion failure when migrating a model property from object type to
+  `RLMLinkingObjects` type.
+* Fix a `LogicError: Bad version number` exception when using `RLMResults` with
+  no notification blocks.
 
 2.1.0 Release notes (2016-11-18)
 =============================================================
