@@ -25,7 +25,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix assertion failure when migrating a model property from object type to
   `RLMLinkingObjects` type.
 * Fix a `LogicError: Bad version number` exception when using `RLMResults` with
-  no notification blocks.
+  no notification blocks and explicitly called `-[RLMRealm refresh]` from that
+  thread.
 
 2.1.0 Release notes (2016-11-18)
 =============================================================
