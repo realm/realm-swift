@@ -20,20 +20,14 @@
 #import "DrawPath.h"
 #import "SwatchColor.h"
 
-@interface CanvasView ()
-
-@end
-
 @implementation CanvasView
 
-- (void)didMoveToSuperview
-{
+- (void)didMoveToSuperview {
     [super didMoveToSuperview];
     self.backgroundColor = [UIColor whiteColor];
 }
 
-- (void)drawPath:(DrawPath*)path withContext:(CGContextRef)context
-{
+- (void)drawPath:(DrawPath *)path withContext:(CGContextRef)context {
     UIColor *swatchColor = [SwatchColor allColors][path.color];
     CGContextSetStrokeColorWithColor(context, [swatchColor CGColor]);
     CGContextSetLineWidth(context, path.path.lineWidth);
@@ -41,21 +35,17 @@
     CGContextStrokePath(context);
 }
 
-- (void)drawRect:(CGRect)rect
-{
+- (void)drawRect:(CGRect)rect {
+    CGContextRef context = UIGraphicsGetCurrentContext();
     for (DrawPath *path in self.paths) {
-        [self drawPath:path withContext:UIGraphicsGetCurrentContext()];
+        [self drawPath:path withContext:context];
     }
 }
 
-- (void)clearCanvas
-{
+- (void)clearCanvas {
     CGContextRef context = UIGraphicsGetCurrentContext();
-
-    // Clear the onscreen context
     CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
     CGContextFillRect(context, self.bounds);
-    
     [self setNeedsDisplay];
 }
 
