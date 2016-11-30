@@ -116,7 +116,7 @@ static NSString * const kRLMPuzzlePasswordKey = @"RLMPuzzlePasswordKey";
         if (hostName.length > 0) {
             self.hostNameField.text = hostName;
         }
-        if (kLocalIPAddress.length > 0) {
+        else if (kLocalIPAddress.length > 0) {
             self.hostNameField.text = kLocalIPAddress;
         }
     }

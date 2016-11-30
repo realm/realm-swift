@@ -115,8 +115,8 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
     
     NSURL *authURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:9080", self.startView.hostName]];
     
-    RLMSyncCredentials *credential = [RLMSyncCredentials credentialsWithUsername:self.startView.userName password:self.startView.password register:NO];
-    [RLMSyncUser logInWithCredentials:credential authServerURL:authURL onCompletion:^(RLMSyncUser *user, NSError *error) {
+    RLMSyncCredential *credential = [RLMSyncCredential credentialWithUsername:self.startView.userName password:self.startView.password register:NO];
+    [RLMSyncUser logInWithCredential:credential authServerURL:authURL onCompletion:^(RLMSyncUser *user, NSError *error) {
         if (error) {
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"An Error Ocurred" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
             [alertController addAction:[UIAlertAction actionWithTitle:@"Okay" style:UIAlertActionStyleDefault handler:nil]];
