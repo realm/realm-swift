@@ -16,9 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncUtil.h"
+#import <Realm/RLMSyncUtil.h>
 
-#import "RLMSyncCredential.h"
+#import <Realm/RLMSyncCredentials.h>
+#import <Realm/RLMRealmConfiguration.h>
+
+@class RLMSyncUser;
 
 typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
@@ -26,6 +29,10 @@ typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
 typedef NSString* RLMServerPath;
 
 NS_ASSUME_NONNULL_BEGIN
+
+@interface RLMRealmConfiguration (RealmSync)
++ (instancetype)managementConfigurationForUser:(RLMSyncUser *)user;
+@end
 
 extern RLMIdentityProvider const RLMIdentityProviderAccessToken;
 extern RLMIdentityProvider const RLMIdentityProviderRealm;

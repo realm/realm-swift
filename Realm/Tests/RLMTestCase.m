@@ -190,7 +190,7 @@ static BOOL encryptTests() {
         }
     });
 
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [self waitForExpectationsWithTimeout:4.0 handler:nil];
 
     // wait for queue to finish
     dispatch_sync(queue, ^{});

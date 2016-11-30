@@ -39,7 +39,8 @@ In case you don't want to use the precompiled version, you can build Realm yours
 
 Prerequisites:
 
-* Building Realm requires Xcode 7.3.1 or Xcode 8.0.
+* Building Realm requires Xcode 7.3.1 or Xcode 8.x.
+* If cloning from git, submodules are required: `git submodule update --init --recursive`.
 * Building Realm documentation requires [jazzy](https://github.com/realm/jazzy)
 
 Once you have all the necessary prerequisites, building Realm.framework just takes a single command: `sh build.sh build`. You'll need an internet connection the first time you build Realm to download the core binary.

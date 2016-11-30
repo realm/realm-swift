@@ -481,7 +481,7 @@ class RealmCollectionTypeTests: TestCase {
             fatalError("Test precondition failed")
         }
 
-        let theExpectation = expectation(description: "")
+        var theExpectation = expectation(description: "")
         let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
             case .initial(let collection):
@@ -499,7 +499,24 @@ class RealmCollectionTypeTests: TestCase {
         }
         waitForExpectations(timeout: 1, handler: nil)
 
+        // add a second notification and wait for it
+        theExpectation = expectation(description: "")
+        let token2 = collection.addNotificationBlock { (changes: RealmCollectionChange) in
+            theExpectation.fulfill()
+        }
+        waitForExpectations(timeout: 1, handler: nil)
+
+        // make a write and implicitly verify that only the unskipped
+        // notification is called (the first would error on .update)
+        theExpectation = expectation(description: "")
+        let realm = realmWithTestPath()
+        realm.beginWrite()
+        realm.delete(collection)
+        try! realm.commitWrite(withoutNotifying: [token])
+        waitForExpectations(timeout: 1, handler: nil)
+
         token.stop()
+        token2.stop()
     }
 
     func testValueForKeyPath() {
@@ -751,11 +768,11 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
     func testAddNotificationBlockDirect() {
         let collection = collectionBase()
 
-        let theExpectation = expectation(description: "")
+        var theExpectation = expectation(description: "")
         let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
-            case .initial(let list):
-                XCTAssertEqual(list.count, 2)
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
                 break
             case .update:
                 XCTFail("Shouldn't happen")
@@ -764,11 +781,29 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
                 XCTFail("Shouldn't happen")
                 break
             }
+
             theExpectation.fulfill()
         }
         waitForExpectations(timeout: 1, handler: nil)
 
+        // add a second notification and wait for it
+        theExpectation = expectation(description: "")
+        let token2 = collection.addNotificationBlock { (changes: RealmCollectionChange) in
+            theExpectation.fulfill()
+        }
+        waitForExpectations(timeout: 1, handler: nil)
+
+        // make a write and implicitly verify that only the unskipped
+        // notification is called (the first would error on .update)
+        theExpectation = expectation(description: "")
+        let realm = realmWithTestPath()
+        realm.beginWrite()
+        realm.delete(collection)
+        try! realm.commitWrite(withoutNotifying: [token])
+        waitForExpectations(timeout: 1, handler: nil)
+
         token.stop()
+        token2.stop()
     }
 }
 
@@ -1472,7 +1507,7 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testAddNotificationBlock() {
-        let expectation = expectationWithDescription("")
+        var expectation = expectationWithDescription("")
         let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
             case .Initial(let collection):
@@ -1490,7 +1525,24 @@ class RealmCollectionTypeTests: TestCase {
         }
         waitForExpectationsWithTimeout(1, handler: nil)
 
+        // add a second notification and wait for it
+        expectation = expectationWithDescription("")
+        let token2 = collection.addNotificationBlock { (changes: RealmCollectionChange) in
+            expectation.fulfill()
+        }
+        waitForExpectationsWithTimeout(1, handler: nil)
+
+        // make a write and implicitly verify that only the unskipped
+        // notification is called (the first would error on .update)
+        expectation = expectationWithDescription("")
+        let realm = realmWithTestPath()
+        realm.beginWrite()
+        realm.delete(collection)
+        try! realm.commitWrite(withoutNotifying: [token])
+        waitForExpectationsWithTimeout(1, handler: nil)
+
         token.stop()
+        token2.stop()
     }
 
     func testValueForKeyPath() {
@@ -1726,11 +1778,11 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
     func testAddNotificationBlockDirect() {
         let collection = collectionBase()
 
-        let expectation = expectationWithDescription("")
+        var expectation = expectationWithDescription("")
         let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
             switch changes {
-            case .Initial(let list):
-                XCTAssertEqual(list.count, 2)
+            case .Initial(let collection):
+                XCTAssertEqual(collection.count, 2)
                 break
             case .Update:
                 XCTFail("Shouldn't happen")
@@ -1739,11 +1791,29 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
                 XCTFail("Shouldn't happen")
                 break
             }
+
             expectation.fulfill()
         }
         waitForExpectationsWithTimeout(1, handler: nil)
 
+        // add a second notification and wait for it
+        expectation = expectationWithDescription("")
+        let token2 = collection.addNotificationBlock { (changes: RealmCollectionChange) in
+            expectation.fulfill()
+        }
+        waitForExpectationsWithTimeout(1, handler: nil)
+
+        // make a write and implicitly verify that only the unskipped
+        // notification is called (the first would error on .update)
+        expectation = expectationWithDescription("")
+        let realm = realmWithTestPath()
+        realm.beginWrite()
+        realm.delete(collection)
+        try! realm.commitWrite(withoutNotifying: [token])
+        waitForExpectationsWithTimeout(1, handler: nil)
+
         token.stop()
+        token2.stop()
     }
 }
 

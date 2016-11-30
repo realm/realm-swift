@@ -1173,7 +1173,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
 
     // Test #4
     StringObject *stringObject = [[StringObject alloc] init];
-    XCTAssertNoThrow([realm addObject:stringObject], @"Having a nil value for a optional NSObject property should not throw");
+    XCTAssertNoThrow([realm addObject:stringObject], @"Having a nil value for an optional NSObject property should not throw");
 
     [realm commitWriteTransaction];
 }
