@@ -30,15 +30,15 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     application.applicationSupportsShakeToEdit = YES;
-    
+
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UIViewController alloc] init];
-    
+
     // Setup Global Error Handler
     [RLMSyncManager sharedManager].errorHandler = ^(NSError *error, RLMSyncSession *session) {
         NSLog(@"A global error has occurred! %@", error);
     };
-    
+
     if ([RLMSyncUser currentUser]) {
         NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", kIPAddress]];
         RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:[RLMSyncUser currentUser] realmURL:syncURL];
@@ -61,13 +61,13 @@
     // The base server path
     // Set to connect to local or online host
     NSURL *authURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:9080", kIPAddress]];
-    
+
     // Creating a debug credential since this demo is just using the generated access token
     // produced when running the Realm Object Server via the `start-object-server.command`
     RLMSyncCredentials *credential = [RLMSyncCredentials credentialsWithUsername:@"demo@realm.io"
                                                                         password:@"password"
                                                                         register:NO];
-    
+
     // Log the user in (async, the Realm will start syncing once the user is logged in automatically)
     [RLMSyncUser logInWithCredentials:credential
                         authServerURL:authURL

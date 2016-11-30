@@ -25,7 +25,6 @@
 
 @property (nonatomic, strong) RLMResults *paths;
 
-- (void)drawPath:(DrawPath *)path withContext:(CGContextRef)context;
 - (void)clearCanvas;
 
 @end

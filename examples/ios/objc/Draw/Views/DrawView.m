@@ -79,7 +79,7 @@
     CGRect frame = self.canvasView.frame;
     frame.size.width = maxDimension;
     frame.size.height = maxDimension;
-    frame.origin.x = ((boundsSize.width) - maxDimension) * 0.5f;
+    frame.origin.x = (boundsSize.width - maxDimension) * 0.5f;
     self.canvasView.frame = CGRectIntegral(frame);
     
     frame = self.swatchesView.frame;
@@ -91,11 +91,9 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    NSString *colorName = self.currentColorName;
-    
     // Create a draw path object
     self.drawPath = [[DrawPath alloc] init];
-    self.drawPath.color = colorName;
+    self.drawPath.color = self.currentColorName;
     
     // Create a draw point object
     CGPoint point = [[touches anyObject] locationInView:self.canvasView];
