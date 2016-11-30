@@ -403,6 +403,7 @@
 
 - (void)testErrorHandling {
     RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTestExpectation *exp = [self expectationWithDescription:@""];
 
     // Set the max open files to zero so that opening new files will fail
     rlimit oldrl;
@@ -413,7 +414,6 @@
 
     // Will try to open another copy of the file for the pin SG
     __block bool called = false;
-    XCTestExpectation *exp = [self expectationWithDescription:@""];
     auto token = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
         XCTAssertNil(results);
         RLMValidateRealmError(error, RLMErrorFileAccess, @"Too many open files", nil);
@@ -421,14 +421,13 @@
         [exp fulfill];
     }];
 
-    // Block should still be called asynchronously
-    XCTAssertFalse(called);
-
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    XCTAssertTrue(called);
-
     // Restore the old open file limit now so that we can make commits
     setrlimit(RLIMIT_NOFILE, &oldrl);
+
+    // Block should still be called asynchronously
+    XCTAssertFalse(called);
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTAssertTrue(called);
 
     // Neither adding a new async query nor commiting a write transaction should
     // cause it to resend the error
@@ -950,31 +949,29 @@
 }
 
 - (void)testInitialResultDiscardsChanges {
-    // Set up a notification block on the main thread which will let us block
-    // the background thread until async notifications are ready after the commit
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    RLMNotificationToken *outerToken = [self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *) {
-        dispatch_semaphore_signal(sema);
+    auto token = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *changes, NSError *) {
+        XCTAssertEqual(results.count, 1U);
+        XCTAssertNil(changes);
         CFRunLoopStop(CFRunLoopGetCurrent());
     }];
 
+    // Make a write on a background thread, and then wait for the notification
+    // for that write to be delivered to ensure that the notification we get on
+    // the main thread actually would include changes
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     [self dispatchAsync:^{
         CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
-            // Add the notification block, but don't run the local runloop until
-            // the other thread gets the commit notification, to ensure that
-            // the notification block can't be called until it is one that would
-            // have changes
             auto token = [IntObject.allObjects addNotificationBlock:^(RLMResults *results, RLMCollectionChange *changes, NSError *) {
-                XCTAssertEqual(results.count, 1U);
-                XCTAssertNil(changes);
-                CFRunLoopStop(CFRunLoopGetCurrent());
+                if (changes) {
+                    dispatch_semaphore_signal(sema);
+                    CFRunLoopStop(CFRunLoopGetCurrent());
+                }
             }];
 
             [RLMRealm.defaultRealm transactionWithBlock:^{
                 [IntObject createInDefaultRealmWithValue:@[@0]];
             }];
 
-            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
             CFRunLoopRun();
             [token stop];
             CFRunLoopStop(CFRunLoopGetCurrent());
@@ -982,8 +979,9 @@
         CFRunLoopRun();
     }];
 
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
     CFRunLoopRun();
-    [outerToken stop];
+    [token stop];
 }
 
 @end

@@ -22,12 +22,10 @@
  The current state of a sync session object.
  */
 typedef NS_ENUM(NSUInteger, RLMSyncSessionState) {
-    /// The sync session is valid, but has not yet been bound to the Realm Object Server.
-    RLMSyncSessionStateUnbound,
     /// The sync session is bound to the Realm Object Server and communicating with it.
     RLMSyncSessionStateActive,
-    /// The sync session is logged out, but could be rebound to the Realm Object Server.
-    RLMSyncSessionStateLoggedOut,
+    /// The sync session is not currently communicating with the Realm Object Server.
+    RLMSyncSessionStateInactive,
     /// The sync session encountered an error and is invalid; it should be discarded.
     RLMSyncSessionStateInvalid
 };
@@ -49,11 +47,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) RLMSyncSessionState state;
 
 /// The Realm Object Server URL of the remote Realm this session corresponds to.
-@property (nonatomic, readonly) NSURL *realmURL;
+@property (nullable, nonatomic, readonly) NSURL *realmURL;
 
-/// A reference to the user object owning the Realm this session corresponds to. If the session object is invalid, this
-/// property may automatically be set to `nil`.
-@property (nonatomic, weak, nullable, readonly) RLMSyncUser *parentUser;
+/// The user that owns this session.
+- (nullable RLMSyncUser *)parentUser;
 
 /// If the session is valid, return a sync configuration that can be used to open the Realm associated with this
 /// session.

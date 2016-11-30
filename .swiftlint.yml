@@ -15,3 +15,4 @@ disabled_rules:
   - type_body_length
   - line_length
   - vertical_whitespace
+  - syntactic_sugar

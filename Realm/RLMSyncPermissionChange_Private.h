@@ -16,22 +16,23 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMSyncConfiguration.h>
+#import "RLMSyncPermissionChange.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, RLMSyncStopPolicy) {
-    RLMSyncStopPolicyImmediately,
-    RLMSyncStopPolicyLiveIndefinitely,
-    RLMSyncStopPolicyAfterChangesUploaded,
-};
+@interface RLMSyncPermissionChange()
 
-@interface RLMSyncConfiguration ()
+@property (readwrite) NSString *id;
+@property (readwrite) NSDate *createdAt;
+@property (readwrite) NSDate *updatedAt;
+@property (nullable, readwrite) NSNumber<RLMInt> *statusCode;
+@property (nullable, readwrite) NSString *statusMessage;
+@property (readwrite) NSString *realmUrl;
+@property (readwrite) NSString *userId;
 
-@property (nonatomic, readwrite) RLMSyncStopPolicy stopPolicy;
-
-// Internal-only APIs
-@property (nullable, nonatomic) NSURL *customFileURL;
+@property (nullable, readwrite) NSNumber<RLMBool> *mayRead;
+@property (nullable, readwrite) NSNumber<RLMBool> *mayWrite;
+@property (nullable, readwrite) NSNumber<RLMBool> *mayManage;
 
 @end
 

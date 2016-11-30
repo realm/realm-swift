@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSURL *)authServerURL;
 
-+ (RLMSyncCredential *)basicCredentialWithName:(NSString *)name register:(BOOL)shouldRegister;
++ (RLMSyncCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
@@ -49,8 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
 
 /// Synchronously create, log in, and return a user.
-- (RLMSyncUser *)logInUserForCredential:(RLMSyncCredential *)credential
-                                 server:(NSURL *)url;
+- (RLMSyncUser *)logInUserForCredentials:(RLMSyncCredentials *)credentials
+                                  server:(NSURL *)url;
 
 /// Add a number of objects to a Realm.
 - (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions;

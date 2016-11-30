@@ -43,7 +43,7 @@ extension Realm {
          */
         public static var defaultConfiguration: Configuration {
             get {
-                return fromRLMRealmConfiguration(rlmConfiguration: RLMRealmConfiguration.default())
+                return fromRLMRealmConfiguration(RLMRealmConfiguration.default())
             }
             set {
                 RLMRealmConfiguration.setDefault(newValue.rlmConfiguration)
@@ -210,7 +210,7 @@ extension Realm {
             return configuration
         }
 
-        internal static func fromRLMRealmConfiguration(rlmConfiguration: RLMRealmConfiguration) -> Configuration {
+        internal static func fromRLMRealmConfiguration(_ rlmConfiguration: RLMRealmConfiguration) -> Configuration {
             var configuration = Configuration()
             configuration._path = rlmConfiguration.fileURL?.path
             configuration._inMemoryIdentifier = rlmConfiguration.inMemoryIdentifier

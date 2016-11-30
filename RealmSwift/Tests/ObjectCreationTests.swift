@@ -362,7 +362,7 @@ class ObjectCreationTests: TestCase {
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
             "objectCol": SwiftBoolObject(value: [true]),
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
         ]
 
         realmWithTestPath().beginWrite()
@@ -388,7 +388,7 @@ class ObjectCreationTests: TestCase {
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
             "objectCol": SwiftBoolObject(value: [true]),
-            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()],
+            "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
         ]
 
         let realmA = realmWithTestPath()
@@ -439,7 +439,7 @@ class ObjectCreationTests: TestCase {
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
             "objectCol": NSNull(),
-            "arrayCol": NSNull(),
+            "arrayCol": NSNull()
         ]
 
         realmWithTestPath().beginWrite()
