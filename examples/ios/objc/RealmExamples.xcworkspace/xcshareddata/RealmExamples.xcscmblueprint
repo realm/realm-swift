@@ -1,0 +1,30 @@
+{
+  "DVTSourceControlWorkspaceBlueprintPrimaryRemoteRepositoryKey" : "9FB1FDDBA011002795A1FF5BD3CABFA2F79E6A59",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "9FB1FDDBA011002795A1FF5BD3CABFA2F79E6A59" : 9223372036854775807,
+    "8F3C415DA79CDA7D23734F285B95F9F9A3C0CB81" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "2AC1F783-2EB4-4770-9637-97862959857C",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "9FB1FDDBA011002795A1FF5BD3CABFA2F79E6A59" : "realm-cocoa\/",
+    "8F3C415DA79CDA7D23734F285B95F9F9A3C0CB81" : "realm-cocoa\/Realm\/ObjectStore\/"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "RealmExamples",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "examples\/ios\/objc\/RealmExamples.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/realm\/realm-object-store.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "8F3C415DA79CDA7D23734F285B95F9F9A3C0CB81"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/www.github.com\/realm\/realm-cocoa",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "9FB1FDDBA011002795A1FF5BD3CABFA2F79E6A59"
+    }
+  ]
+}
