@@ -2,29 +2,29 @@
 # https://wiki.jenkins-ci.org/display/JENKINS/Yaml+Axis+Plugin
 
 swift_version:
-  - 2.2
-  - 2.3
-  - 3.0
+  # - 2.2
+  # - 2.3
+  # - 3.0
   - 3.0.1
 target:
-  - osx
-  - docs
-  - ios-static
-  - ios-dynamic
-  - ios-swift
-  - osx-swift
-  - watchos
-  - cocoapods
-  - swiftlint
-  - tvos
-  - osx-encryption
-  - osx-object-server
-  # FIXME: Re-enable device tests when they can be made to run reliably
+  # - osx
+  # - docs
+  # - ios-static
+  # - ios-dynamic
+  # - ios-swift
+  # - osx-swift
+  # - watchos
+  # - cocoapods
+  # - swiftlint
+  # - tvos
+  # - osx-encryption
+  # - osx-object-server
+
   # - ios-device-objc
   # - ios-device-swift
-  # - tvos-device
+  - tvos-device
 configuration:
-  - Debug
+  # - Debug
   - Release
 
 # Combinations have to be excluded in a way that's hard to read.
@@ -193,4 +193,17 @@ exclude:
   - swift_version: 3.0
     target: osx-object-server
   - target: osx-object-server
+    configuration: Debug
+
+  ################
+  # tvos-device
+  ################
+  # Just run on 3.0.1 Release
+  - swift_version: 2.2
+    target: tvos-device
+  - swift_version: 2.3
+    target: tvos-device
+  - swift_version: 3.0
+    target: tvos-device
+  - target: tvos-device
     configuration: Debug
