@@ -20,8 +20,8 @@ target:
   # - osx-encryption
   # - osx-object-server
 
-  # - ios-device-objc
-  # - ios-device-swift
+  - ios-device-objc
+  - ios-device-swift
   - tvos-device
 configuration:
   # - Debug
@@ -193,6 +193,32 @@ exclude:
   - swift_version: 3.0
     target: osx-object-server
   - target: osx-object-server
+    configuration: Debug
+
+  ################
+  # ios-device-objc
+  ################
+  # Just run on 3.0.1 Release
+  - swift_version: 2.2
+    target: ios-device-objc
+  - swift_version: 2.3
+    target: ios-device-objc
+  - swift_version: 3.0
+    target: ios-device-objc
+  - target: ios-device-objc
+    configuration: Debug
+
+  ################
+  # ios-device-swift
+  ################
+  # Just run on 3.0.1 Release
+  - swift_version: 2.2
+    target: ios-device-swift
+  - swift_version: 2.3
+    target: ios-device-swift
+  - swift_version: 3.0
+    target: ios-device-swift
+  - target: ios-device-swift
     configuration: Debug
 
   ################
