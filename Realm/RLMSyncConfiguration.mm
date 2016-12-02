@@ -135,14 +135,18 @@ static BOOL isValidRealmURL(NSURL *url) {
             };
         }
 
+        util::Optional<std::string> custom_file_path = none;
+        if (customFileURL) {
+            custom_file_path = util::make_optional<std::string>(customFileURL.path.UTF8String);
+        }
         _config = std::make_unique<SyncConfig>(SyncConfig{
             [user _syncUser],
             [[url absoluteString] UTF8String],
             translateStopPolicy(stopPolicy),
             std::move(bindHandler),
-            std::move(errorHandler)
+            std::move(errorHandler),
+            std::move(custom_file_path)
         });
-        self.customFileURL = customFileURL;
         return self;
     }
     return nil;
