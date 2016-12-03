@@ -69,7 +69,7 @@ using namespace realm;
 
 - (RLMSyncSessionState)state {
     if (auto session = _session.lock()) {
-        if (session->can_be_safely_destroyed()) {
+        if (session->state() == SyncSession::PublicState::Inactive) {
             return RLMSyncSessionStateInactive;
         }
         if (session->state() != SyncSession::PublicState::Error) {
@@ -85,7 +85,7 @@ using namespace realm;
             return NO;
         }
         queue = queue ?: dispatch_get_main_queue();
-        session->wait_for_upload_completion([=] {
+        session->wait_for_upload_completion([=](std::error_code) { // FIXME: report error to user
             dispatch_async(queue, callback);
         });
         return YES;
@@ -99,7 +99,7 @@ using namespace realm;
             return NO;
         }
         queue = queue ?: dispatch_get_main_queue();
-        session->wait_for_download_completion([=] {
+        session->wait_for_download_completion([=](std::error_code) { // FIXME: report error to user
             dispatch_async(queue, callback);
         });
         return YES;

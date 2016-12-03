@@ -105,3 +105,5 @@ Carthage
 
 ## Swift Version
 SwiftVersion.swift
+
+examples/ios/objc/Draw/Constants.h

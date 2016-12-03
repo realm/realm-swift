@@ -1,1 +1,1 @@
-static NSString * const kLocalIPAddress = @"172.20.20.96";
+static NSString * const kIPAddress = @"172.20.20.96";
