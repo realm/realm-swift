@@ -130,10 +130,10 @@ public final class List<T: Object>: ListBase {
     }
 
     /// Returns the first object in the list, or `nil` if the list is empty.
-    public var first: T? { return _rlmArray.firstObject() as! T? }
+    public var first: T? { return unsafeBitCast(_rlmArray.firstObject(), to: Optional<T>.self) }
 
     /// Returns the last object in the list, or `nil` if the list is empty.
-    public var last: T? { return _rlmArray.lastObject() as! T? }
+    public var last: T? { return unsafeBitCast(_rlmArray.lastObject(), to: Optional<T>.self) }
 
     // MARK: KVC
 
@@ -639,7 +639,7 @@ public final class List<T: Object>: ListBase {
     public subscript(index: Int) -> T {
         get {
             throwForNegativeIndex(index)
-            return _rlmArray[UInt(index)] as! T
+            return unsafeBitCast(_rlmArray[UInt(index)], T.self)
         }
         set {
             throwForNegativeIndex(index)
@@ -648,10 +648,10 @@ public final class List<T: Object>: ListBase {
     }
 
     /// Returns the first object in the list, or `nil` if the list is empty.
-    public var first: T? { return _rlmArray.firstObject() as! T? }
+    public var first: T? { return unsafeBitCast(_rlmArray.firstObject(), Optional<T>.self) }
 
     /// Returns the last object in the list, or `nil` if the list is empty.
-    public var last: T? { return _rlmArray.lastObject() as! T? }
+    public var last: T? { return unsafeBitCast(_rlmArray.lastObject(), Optional<T>.self) }
 
     // MARK: KVC
 
