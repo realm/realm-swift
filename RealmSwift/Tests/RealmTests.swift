@@ -537,6 +537,33 @@ class RealmTests: TestCase {
         }
     }
 
+    func testDynamicObjectListProperties() {
+        try! Realm().write {
+            try! Realm().create(SwiftArrayPropertyObject.self, value: ["string", [["array"]], [[2]]])
+        }
+
+        let object = try! Realm().dynamicObjects("SwiftArrayPropertyObject")[0]
+
+        XCTAssertEqual(object["name"] as? String, "string")
+
+        let array = object["array"] as! List<DynamicObject>
+        XCTAssertEqual(array.first!["stringCol"] as? String, "array")
+        XCTAssertEqual(array.last!["stringCol"] as? String, "array")
+
+        for object in array {
+            XCTAssertEqual(object["stringCol"] as? String, "array")
+        }
+
+        let intArray = object["intArray"] as! List<DynamicObject>
+        XCTAssertEqual(intArray[0]["intCol"] as? Int, 2)
+        XCTAssertEqual(intArray.first!["intCol"] as? Int, 2)
+        XCTAssertEqual(intArray.last!["intCol"] as? Int, 2)
+
+        for object in intArray {
+            XCTAssertEqual(object["intCol"] as? Int, 2)
+        }
+    }
+
     func testIntPrimaryKey() {
         func testIntPrimaryKey<O: Object>(for type: O.Type)
             where O: SwiftPrimaryKeyObjectType, O.PrimaryKey: ExpressibleByIntegerLiteral {
@@ -1300,6 +1327,34 @@ class RealmTests: TestCase {
             XCTAssertEqual(object["binaryCol"] as! NSData?, dictionary["binaryCol"] as! NSData?)
             XCTAssertEqual(object["dateCol"] as! NSDate?, dictionary["dateCol"] as! NSDate?)
             XCTAssertEqual(object["objectCol"]?.boolCol, false)
+        }
+    }
+
+    func testDynamicObjectListProperties() {
+        try! Realm().write {
+            try! Realm().create(SwiftArrayPropertyObject.self, value: ["string", [["array"]], [[2]]])
+        }
+
+        let object = try! Realm().dynamicObjects("SwiftArrayPropertyObject")[0]
+
+        XCTAssertEqual(object["name"] as? String, "string")
+
+        let array = object["array"] as! List<DynamicObject>
+        XCTAssertEqual(array[0]["stringCol"] as? String, "array")
+        XCTAssertEqual(array.first!["stringCol"] as? String, "array")
+        XCTAssertEqual(array.last!["stringCol"] as? String, "array")
+
+        for object in array {
+            XCTAssertEqual(object["stringCol"] as? String, "array")
+        }
+
+        let intArray = object["intArray"] as! List<DynamicObject>
+        XCTAssertEqual(intArray[0]["intCol"] as? Int, 2)
+        XCTAssertEqual(intArray.first!["intCol"] as? Int, 2)
+        XCTAssertEqual(intArray.last!["intCol"] as? Int, 2)
+
+        for object in intArray {
+            XCTAssertEqual(object["intCol"] as? Int, 2)
         }
     }
 
