@@ -304,12 +304,10 @@
 
 - (void)testStringUnsupportedOperations
 {
-    XCTAssertThrows([StringObject objectsWhere:@"stringCol LIKE 'abc'"]);
     XCTAssertThrows([StringObject objectsWhere:@"stringCol MATCHES 'abc'"]);
     XCTAssertThrows([StringObject objectsWhere:@"stringCol BETWEEN {'a', 'b'}"]);
     XCTAssertThrows([StringObject objectsWhere:@"stringCol < 'abc'"]);
 
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol LIKE 'abc'"]);
     XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol MATCHES 'abc'"]);
     XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol BETWEEN {'a', 'b'}"]);
     XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol < 'abc'"]);
@@ -898,6 +896,46 @@
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol CONTAINS 'C'");
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol CONTAINS[c] 'c'");
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol CONTAINS[c] 'C'");
+}
+
+- (void)testStringLike
+{
+    RLMRealm *realm = [self realm];
+
+    [realm beginWriteTransaction];
+    StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, so]];
+    [realm commitWriteTransaction];
+
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*a*'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*b*'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*c'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE 'ab*'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*bc'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE 'a*bc'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*abc*'");
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE '*d*'");
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE 'aabc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE 'b*bc'");
+
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE 'a??'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '?b?'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*?c'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE 'ab?'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '?bc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE '?d?'");
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE '?abc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE 'b?bc'");
+
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE '*C*'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE[c] '*c*'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE[c] '*C*'");
+
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol LIKE '*d*'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol LIKE '*c*'");
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol LIKE '*C*'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol LIKE[c] '*c*'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol LIKE[c] '*C*'");
 }
 
 - (void)testStringEquality
