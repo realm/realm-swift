@@ -28,7 +28,7 @@ RLMIdentityProvider const RLMIdentityProviderUsernamePassword       = @"password
 RLMIdentityProvider const RLMIdentityProviderFacebook               = @"facebook";
 RLMIdentityProvider const RLMIdentityProviderTwitter                = @"twitter";
 RLMIdentityProvider const RLMIdentityProviderGoogle                 = @"google";
-RLMIdentityProvider const RLMIdentityProviderICloud                 = @"icloud";
+RLMIdentityProvider const RLMIdentityProviderICloud                 = @"cloudkit";
 
 @interface RLMSyncCredentials ()
 
