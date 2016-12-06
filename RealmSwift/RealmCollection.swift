@@ -34,7 +34,7 @@ public final class RLMIterator<T: Object>: IteratorProtocol {
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public func next() -> T? { // swiftlint:disable:this valid_docs
-        let accessor = generatorBase.next() as! T?
+        let accessor = unsafeBitCast(generatorBase.next() as! Object?, to: Optional<T>.self)
         if let accessor = accessor {
             RLMInitializeSwiftAccessorGenerics(accessor)
         }
@@ -817,7 +817,7 @@ public final class RLMGenerator<T: Object>: GeneratorType {
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public func next() -> T? { // swiftlint:disable:this valid_docs
-        let accessor = generatorBase.next() as! T?
+        let accessor = unsafeBitCast(generatorBase.next() as! Object?, Optional<T>.self)
         if let accessor = accessor {
             RLMInitializeSwiftAccessorGenerics(accessor)
         }
