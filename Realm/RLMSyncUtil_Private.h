@@ -40,6 +40,7 @@ extern RLMIdentityProvider const RLMIdentityProviderRealm;
 extern NSString *const kRLMSyncAppIDKey;
 extern NSString *const kRLMSyncDataKey;
 extern NSString *const kRLMSyncErrorJSONKey;
+extern NSString *const kRLMSyncErrorStatusCodeKey;
 extern NSString *const kRLMSyncIdentityKey;
 extern NSString *const kRLMSyncPasswordKey;
 extern NSString *const kRLMSyncPathKey;
