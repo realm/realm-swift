@@ -171,6 +171,7 @@
 		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
 		227D20DD1CB6009D008F641B /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
+		2288CBCF1DF7B00400E73440 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		3F78C9AB1B431CDF00A0988E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RACTableView/AppDelegate.h; sourceTree = "<group>"; };
 		3F78C9AC1B431CDF00A0988E /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = RACTableView/TableViewController.h; sourceTree = "<group>"; };
 		3F78C9AD1B431CDF00A0988E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RACTableView/Images.xcassets; sourceTree = "<group>"; };
@@ -292,7 +293,6 @@
 		F1BC39091DF2573700C4DCCC /* RLMPuzzleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzleView.m; sourceTree = "<group>"; };
 		F1BC390A1DF2573700C4DCCC /* RLMStartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMStartView.h; sourceTree = "<group>"; };
 		F1BC390B1DF2573700C4DCCC /* RLMStartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMStartView.m; sourceTree = "<group>"; };
-		F1BC39171DF257C400C4DCCC /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
 		F1BC39181DF257F200C4DCCC /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../build/Debug-static/Realm.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -711,7 +711,7 @@
 				F1BC38F91DF2573700C4DCCC /* Controllers */,
 				F1BC38F61DF2573700C4DCCC /* AppDelegate.h */,
 				F1BC38F71DF2573700C4DCCC /* AppDelegate.m */,
-				F1BC39171DF257C400C4DCCC /* Constants.h */,
+				2288CBCF1DF7B00400E73440 /* Constants.h */,
 				F1BC38FC1DF2573700C4DCCC /* Images.xcassets */,
 				F1BC38FD1DF2573700C4DCCC /* main.m */,
 				F1BC39031DF2573700C4DCCC /* Puzzle-Info.plist */,
@@ -2016,6 +2016,7 @@
 				F1BC38F41DF2571600C4DCCC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
