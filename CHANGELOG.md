@@ -1,3 +1,23 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Sync Breaking Changes (In Beta)
+
+* Rename occurences of "iCloud" with "CloudKit" in APIs and comments to match
+  naming in the Realm Object Server.
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix authenticating with CloudKit.
+
 2.1.1 Release notes (2016-12-02)
 =============================================================
 
