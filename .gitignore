@@ -107,3 +107,4 @@ Carthage
 SwiftVersion.swift
 
 examples/ios/objc/Draw/Constants.h
+/examples/ios/objc/Puzzle/RLMConstants.h

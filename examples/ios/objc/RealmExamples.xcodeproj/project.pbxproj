@@ -21,6 +21,7 @@
 		227D20E41CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E51CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E61CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		2288CBD21DF7B2CA00E73440 /* RLMStartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2288CBD11DF7B2CA00E73440 /* RLMStartView.m */; };
 		3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
@@ -125,7 +126,6 @@
 		F1BC39111DF2573700C4DCCC /* RLMPuzzlePiece.m in Sources */ = {isa = PBXBuildFile; fileRef = F1BC39021DF2573700C4DCCC /* RLMPuzzlePiece.m */; };
 		F1BC39131DF2573700C4DCCC /* RLMPuzzlePieceView.m in Sources */ = {isa = PBXBuildFile; fileRef = F1BC39071DF2573700C4DCCC /* RLMPuzzlePieceView.m */; };
 		F1BC39141DF2573700C4DCCC /* RLMPuzzleView.m in Sources */ = {isa = PBXBuildFile; fileRef = F1BC39091DF2573700C4DCCC /* RLMPuzzleView.m */; };
-		F1BC39151DF2573700C4DCCC /* RLMStartView.m in Sources */ = {isa = PBXBuildFile; fileRef = F1BC390B1DF2573700C4DCCC /* RLMStartView.m */; };
 		F1BC39191DF257F300C4DCCC /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1BC39181DF257F200C4DCCC /* Realm.framework */; };
 		F1BC391A1DF257F900C4DCCC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		F1BC391B1DF2580000C4DCCC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
@@ -171,7 +171,8 @@
 		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
 		227D20DD1CB6009D008F641B /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
-		2288CBCF1DF7B00400E73440 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		2288CBD11DF7B2CA00E73440 /* RLMStartView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RLMStartView.m; path = Puzzle/Views/RLMStartView.m; sourceTree = "<group>"; };
+		2288CBD41DF7B44C00E73440 /* RLMConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMConstants.h; sourceTree = "<group>"; };
 		3F78C9AB1B431CDF00A0988E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RACTableView/AppDelegate.h; sourceTree = "<group>"; };
 		3F78C9AC1B431CDF00A0988E /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = RACTableView/TableViewController.h; sourceTree = "<group>"; };
 		3F78C9AD1B431CDF00A0988E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RACTableView/Images.xcassets; sourceTree = "<group>"; };
@@ -527,6 +528,7 @@
 		E8AB719D19BA502500F3EDB4 = {
 			isa = PBXGroup;
 			children = (
+				2288CBD11DF7B2CA00E73440 /* RLMStartView.m */,
 				E8BDBFC71A116FCB00450CFF /* Backlink */,
 				227D20DC1CB6009D008F641B /* Common */,
 				F184641E1DC151CD00DAB8B9 /* Draw */,
@@ -709,9 +711,9 @@
 				F1BC38FE1DF2573700C4DCCC /* Models */,
 				F1BC39051DF2573700C4DCCC /* Views */,
 				F1BC38F91DF2573700C4DCCC /* Controllers */,
+				2288CBD41DF7B44C00E73440 /* RLMConstants.h */,
 				F1BC38F61DF2573700C4DCCC /* AppDelegate.h */,
 				F1BC38F71DF2573700C4DCCC /* AppDelegate.m */,
-				2288CBCF1DF7B00400E73440 /* Constants.h */,
 				F1BC38FC1DF2573700C4DCCC /* Images.xcassets */,
 				F1BC38FD1DF2573700C4DCCC /* main.m */,
 				F1BC39031DF2573700C4DCCC /* Puzzle-Info.plist */,
@@ -1221,7 +1223,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "LOCAL_IP_ADDR=$(ipconfig getifaddr $(netstat -f inet -rant | awk '/default/ { print $6; exit }'))\necho \"static NSString * const kIPAddress = @\\\"${LOCAL_IP_ADDR:-127.0.0.1}\\\";\" > \"$SRCROOT/Puzzle/Constants.h\"";
+			shellScript = "LOCAL_IP_ADDR=$(ipconfig getifaddr $(netstat -f inet -rant | awk '/default/ { print $6; exit }'))\necho \"static NSString * const kIPAddress = @\\\"${LOCAL_IP_ADDR:-127.0.0.1}\\\";\" > \"$SRCROOT/Puzzle/RLMConstants.h\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1346,8 +1348,8 @@
 				F1BC39131DF2573700C4DCCC /* RLMPuzzlePieceView.m in Sources */,
 				F1BC390F1DF2573700C4DCCC /* main.m in Sources */,
 				F1BC39141DF2573700C4DCCC /* RLMPuzzleView.m in Sources */,
+				2288CBD21DF7B2CA00E73440 /* RLMStartView.m in Sources */,
 				F1BC39111DF2573700C4DCCC /* RLMPuzzlePiece.m in Sources */,
-				F1BC39151DF2573700C4DCCC /* RLMStartView.m in Sources */,
 				F1BC390C1DF2573700C4DCCC /* AppDelegate.m in Sources */,
 				F1BC39101DF2573700C4DCCC /* RLMPuzzle.m in Sources */,
 			);

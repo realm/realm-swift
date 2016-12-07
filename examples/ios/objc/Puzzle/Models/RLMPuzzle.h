@@ -21,9 +21,6 @@
 @interface RLMPuzzle : RLMObject
 
 @property NSString *uuid;
-@property NSString *name;
-@property NSString *userID;
-@property NSDate *creationTime;
 @property RLMArray<RLMPuzzlePiece> *pieces;
 
 @end

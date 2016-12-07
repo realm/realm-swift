@@ -39,28 +39,11 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 @property (nonatomic, strong) RLMResults *puzzles;
 @property (nonatomic, strong) NSString *currentPuzzleID;
 
-- (void)setupNotifications;
-- (void)removeNotifications;
-
-- (void)connectToServer;
-- (void)startPuzzle;
-- (void)updatePuzzleState;
-
-- (void)resetGestureRecognized:(UIGestureRecognizer *)gestureRecognizer;
-
 @end
 
 @implementation RLMViewController
 
 #pragma mark - Controller Lifecycle -
-- (instancetype)init
-{
-    if (self = [super init]) {
-       
-    }
-    
-    return self;
-}
 
 - (void)dealloc
 {
@@ -70,7 +53,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    self.view.backgroundColor = [UIColor colorWithWhite:1.0f alpha:1.0f];
+    self.view.backgroundColor = [UIColor whiteColor];
     
     //Scale the frame depending on screen size
     CGRect frame = CGRectZero;
@@ -154,18 +137,13 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
     
     BOOL firstTime = NO;
     if (newPuzzle.pieces.count == 0) {
-        //Create a data point for each puzzle piece
-        NSMutableArray *puzzlePieces = [NSMutableArray array];
-        for (NSInteger i = RLMPuzzlePieceIdentifierA1; i < RLMPuzzlePieceIdentifierNum; i++) {
-            RLMPuzzlePiece *puzzlePiece = [[RLMPuzzlePiece alloc] init];
-            puzzlePiece.identifier = i;
-            [puzzlePieces addObject:puzzlePiece];
-        }
-        
         RLMRealm *defaultRealm = [RLMRealm defaultRealm];
         [defaultRealm transactionWithBlock:^{
-            for (RLMPuzzlePiece *piece in puzzlePieces) {
-                [newPuzzle.pieces addObject:piece];
+            //Create a data point for each puzzle piece
+            for (NSInteger i = RLMPuzzlePieceIdentifierA1; i < RLMPuzzlePieceIdentifierNum; i++) {
+                RLMPuzzlePiece *puzzlePiece = [[RLMPuzzlePiece alloc] init];
+                puzzlePiece.identifier = i;
+                [newPuzzle.pieces addObject:puzzlePiece];
             }
         }];
         
@@ -243,7 +221,6 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 - (void)removeNotifications
 {
     [self.notificationToken stop];
-    self.notificationToken = nil;
 }
 
 @end

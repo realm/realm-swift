@@ -22,10 +22,7 @@
 
 + (NSDictionary *)defaultPropertyValues
 {
-    return @{@"uuid":[NSUUID UUID].UUIDString,
-             @"userID":[NSUUID UUID].UUIDString,
-             @"name":@"My Puzzle",
-             @"creationTime":[NSDate date]};
+    return @{@"uuid":[NSUUID UUID].UUIDString};
 }
 
 + (NSString *)primaryKey

@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMStartView.h"
-#import "Constants.h"
+#import "RLMConstants.h"
 
 static NSString * const kRLMPuzzleHostNameKey = @"RLMPuzzleHostNmeKey";
 static NSString * const kRLMPuzzleUserNameKey = @"RLMPuzzleUserNameKey";
@@ -116,9 +116,9 @@ static NSString * const kRLMPuzzlePasswordKey = @"RLMPuzzlePasswordKey";
         if (hostName.length > 0) {
             self.hostNameField.text = hostName;
         }
-//        else if (kLocalIPAddress.length > 0) {
-//            self.hostNameField.text = kLocalIPAddress;
-//        }
+        else if (kIPAddress.length > 0) {
+            self.hostNameField.text = kIPAddress;
+        }
     }
     
     if (self.userNameField == nil) {
