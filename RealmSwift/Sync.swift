@@ -173,7 +173,7 @@ public struct SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(googleToken: token))
     }
 
-    /// Initialize new credentials using an CloudKit account token.
+    /// Initialize new credentials using a CloudKit account token.
     public static func cloudKit(token: Token) -> SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(cloudKitToken: token))
     }
@@ -399,7 +399,7 @@ public struct SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(googleToken: token))
     }
 
-    /// Initialize new credentials using an CloudKit account token.
+    /// Initialize new credentials using a CloudKit account token.
     public static func cloudKit(token: Token) -> SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(cloudKitToken: token))
     }
