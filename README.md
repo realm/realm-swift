@@ -31,7 +31,7 @@ The API reference is located at [realm.io/docs/swift/latest/api](https://realm.i
 - **Need help with your code?**: Look for previous questions on the  [#realm tag](https://stackoverflow.com/questions/tagged/realm?sort=newest) — or [ask a new question](https://stackoverflow.com/questions/ask?tags=realm). We actively monitor & answer questions on SO!
 - **Have a bug to report?** [Open an issue](https://github.com/realm/realm-cocoa/issues/new). If possible, include the version of Realm, a full log, the Realm file, and a project that shows the issue.
 - **Have a feature request?** [Open an issue](https://github.com/realm/realm-cocoa/issues/new). Tell us what the feature should do, and why you want the feature.
-- Sign up for our [**Community Newsletter**](http://eepurl.com/VEKCn) to get regular tips, learn about other use-cases and get alerted of blogposts and tutorials about Realm.
+- Sign up for our [**Community Newsletter**](https://www2.realm.io/l/210132/2016-12-05/fy9m) to get regular tips, learn about other use-cases and get alerted of blogposts and tutorials about Realm.
 
 ## Building Realm
 
