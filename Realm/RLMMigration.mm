@@ -104,6 +104,34 @@ using namespace realm;
     }
 }
 
+- (void)enumerateObjects:(NSString *)className withPredicate:(NSPredicate *)predicate block:(RLMObjectMigrationBlock)block {
+    // get all objects
+    RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm objects:className withPredicate:predicate] : nil;
+    RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm objects:className withPredicate:predicate] : nil;
+    
+    if (objects && oldObjects) {
+        for (long i = oldObjects.count - 1; i >= 0; i--) {
+            @autoreleasepool {
+                block(oldObjects[i], objects[i]);
+            }
+        }
+    }
+    else if (objects) {
+        for (long i = objects.count - 1; i >= 0; i--) {
+            @autoreleasepool {
+                block(nil, objects[i]);
+            }
+        }
+    }
+    else if (oldObjects) {
+        for (long i = oldObjects.count - 1; i >= 0; i--) {
+            @autoreleasepool {
+                block(oldObjects[i], nil);
+            }
+        }
+    }
+}
+
 - (void)execute:(RLMMigrationBlock)block {
     @autoreleasepool {
         // disable all primary keys for migration and use DynamicObject for all types

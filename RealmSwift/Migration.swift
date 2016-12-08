@@ -109,6 +109,22 @@ public final class Migration {
                   unsafeBitCast(newObject, to: MigrationObject.self))
         }
     }
+    
+    /**
+     Enumerates all the objects of a given type in this Realm, matching a given predicate,
+     providing both the old and new versions of each object.
+     Properties on an object can be accessed using subscripting.
+     
+     - parameter objectClassName: The name of the `Object` class to enumerate.
+     - parameter filter:          The predicate with which to filter the objects.
+     - parameter block:           The block providing both the old and new versions of an object in this Realm.
+     */
+    public func enumerateObjects(ofType typeName: String, withFilter filter: NSPredicate, _ block: MigrationObjectEnumerateBlock) {
+        rlmMigration.enumerateObjects(typeName, with: filter) { oldObject, newObject in
+            block(unsafeBitCast(oldObject, to: MigrationObject.self),
+                  unsafeBitCast(newObject, to: MigrationObject.self))
+        }
+    }
 
     /**
      Creates and returns an `Object` of type `className` in the Realm being migrated.
