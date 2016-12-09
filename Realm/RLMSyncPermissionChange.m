@@ -41,12 +41,12 @@
 + (NSDictionary *)defaultPropertyValues {
     NSDate *now = [NSDate date];
     return @{
-             @"id": [NSUUID UUID].UUIDString,
-             @"createdAt": now,
-             @"updatedAt": now,
-             @"realmUrl": @"*",
-             @"userId": @"*"
-             };
+        @"id": [NSUUID UUID].UUIDString,
+        @"createdAt": now,
+        @"updatedAt": now,
+        @"realmUrl": @"*",
+        @"userId": @"*"
+    };
 }
 
 + (BOOL)shouldIncludeInDefaultSchema {
