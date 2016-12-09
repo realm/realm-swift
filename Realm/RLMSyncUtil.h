@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMConstants.h>
+#import <Realm/RLMProperty.h>
 
 /// A token originating from the Realm Object Server.
 typedef NSString* RLMServerToken;
@@ -60,5 +61,25 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
     /// An error that indicates an internal, unrecoverable error with the underlying synchronization engine.
     RLMSyncErrorClientInternalError     = 6,
 };
+
+/// An enum representing the different states a sync management object can take.
+typedef NS_ENUM(NSUInteger, RLMSyncManagementObjectStatus) {
+    /// The management object has not yet been processed by the object server.
+    RLMSyncManagementObjectStatusNotProcessed,
+    /// The operations encoded in the management object have been successfully
+    /// performed by the object server.
+    RLMSyncManagementObjectStatusSuccess,
+    /**
+     The operations encoded in the management object were not successfully
+     performed by the object server.
+     Refer to the `statusCode` and `statusMessage` properties for more details
+     about the error.
+     */
+    RLMSyncManagementObjectStatusError,
+};
+
+/// Convert sync management object status code (nil, 0 and others) to
+/// RLMSyncManagementObjectStatus enum
+FOUNDATION_EXTERN RLMSyncManagementObjectStatus RLMSyncPermissionStatusCodeToStatus(NSNumber<RLMInt> *statusCode);
 
 NS_ASSUME_NONNULL_END

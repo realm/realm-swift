@@ -23,6 +23,8 @@
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSyncPermissionChange.h"
+#import "RLMSyncPermissionOffer.h"
+#import "RLMSyncPermissionOfferResponse.h"
 
 @implementation RLMRealmConfiguration (RealmSync)
 + (instancetype)managementConfigurationForUser:(RLMSyncUser *)user {
@@ -37,7 +39,7 @@
     RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:managementRealmURL];
     RLMRealmConfiguration *config = [RLMRealmConfiguration new];
     config.syncConfiguration = syncConfig;
-    config.objectClasses = @[RLMSyncPermissionChange.class];
+    config.objectClasses = @[RLMSyncPermissionChange.class, RLMSyncPermissionOffer.class, RLMSyncPermissionOfferResponse.class];
     return config;
 }
 @end
@@ -78,4 +80,14 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy)
     REALM_UNREACHABLE();
 }
 
+}
+
+RLMSyncManagementObjectStatus RLMSyncPermissionStatusCodeToStatus(NSNumber<RLMInt> *statusCode) {
+    if (!statusCode) {
+        return RLMSyncManagementObjectStatusNotProcessed;
+    }
+    if (statusCode.integerValue == 0) {
+        return RLMSyncManagementObjectStatusSuccess;
+    }
+    return RLMSyncManagementObjectStatusError;
 }
