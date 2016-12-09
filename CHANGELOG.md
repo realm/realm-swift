@@ -3,7 +3,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Sync Breaking Changes (In Beta)
 
-* None.
+* Designate `id` properties of the `PermissionChange` to be a primary key.
 
 ### API Breaking Changes
 
@@ -11,7 +11,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add `SyncPermissionOffer` and `SyncPermissionOfferResponse` classes to allow
+  creating and accepting permission change events to synchronized Realms between
+  different users.
 
 ### Bugfixes
 
