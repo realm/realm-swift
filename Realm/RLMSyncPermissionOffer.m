@@ -16,26 +16,30 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncPermissionChange_Private.h"
+#import "RLMSyncPermissionOffer_Private.h"
 
-@implementation RLMSyncPermissionChange
+@implementation RLMSyncPermissionOffer
 
-+ (instancetype)permissionChangeWithRealmURL:(NSString *)realmURL
-                                      userID:(NSString *)userID
-                                        read:(nullable NSNumber<RLMBool> *)mayRead
-                                       write:(nullable NSNumber<RLMBool> *)mayWrite
-                                      manage:(nullable NSNumber<RLMBool> *)mayManage {
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange new];
-    permissionChange.realmUrl = realmURL;
-    permissionChange.userId = userID;
-    permissionChange.mayRead = mayRead;
-    permissionChange.mayWrite = mayWrite;
-    permissionChange.mayManage = mayManage;
-    return permissionChange;
++ (instancetype)permissionOfferWithRealmURL:(NSString *)realmURL
+                                  expiresAt:(nullable NSDate *)expiresAt
+                                       read:(BOOL)mayRead
+                                      write:(BOOL)mayWrite
+                                     manage:(BOOL)mayManage {
+    RLMSyncPermissionOffer *permissionOffer = [RLMSyncPermissionOffer new];
+    permissionOffer.realmUrl = realmURL;
+    permissionOffer.expiresAt = expiresAt;
+    permissionOffer.mayRead = mayRead;
+    permissionOffer.mayWrite = mayWrite;
+    permissionOffer.mayManage = mayManage;
+    return permissionOffer;
 }
 
 + (NSArray<NSString *> *)requiredProperties {
-    return @[@"id", @"createdAt", @"updatedAt", @"realmUrl", @"userId"];
+    return @[@"id", @"createdAt", @"updatedAt", @"realmUrl"];
+}
+
++ (NSArray<NSString *> *)indexedProperties {
+    return @[@"token"];
 }
 
 + (NSDictionary *)defaultPropertyValues {
@@ -44,8 +48,7 @@
              @"id": [NSUUID UUID].UUIDString,
              @"createdAt": now,
              @"updatedAt": now,
-             @"realmUrl": @"*",
-             @"userId": @"*"
+             @"realmUrl": @""
              };
 }
 
@@ -58,7 +61,7 @@
 }
 
 + (NSString *)_realmObjectName {
-    return @"PermissionChange";
+    return @"PermissionOffer";
 }
 
 @end
