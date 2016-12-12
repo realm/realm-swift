@@ -144,7 +144,7 @@ extension Realm.Error: _BridgedStoredNSError {
 /// :nodoc:
 extension Realm.Error.Code: _ErrorCodeProtocol {
     /// :nodoc:
-    public typealias _ErrorType = RLMError
+    public typealias _ErrorType = RLMError // swiftlint:disable:this type_name
 }
 
 // MARK: Equatable
