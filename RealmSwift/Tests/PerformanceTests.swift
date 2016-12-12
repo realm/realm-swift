@@ -478,7 +478,7 @@ class SwiftPerformanceTests: TestCase {
             while object.intCol < stopValue {
                 RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date.distantFuture)
             }
-            queue.sync() {}
+            queue.sync {}
             self.stopMeasuring()
             token.stop()
         }
