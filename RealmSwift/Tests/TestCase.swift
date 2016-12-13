@@ -128,7 +128,7 @@ class TestCase: XCTestCase {
     }
 
     func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
-                        lineNumber: UInt = #line, block: () throws -> ()) {
+                        lineNumber: UInt = #line, block: () throws -> Void) {
         do {
             try block()
         } catch {
@@ -292,7 +292,7 @@ class TestCase: XCTestCase {
     }
 
     func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
-                        lineNumber: UInt = #line, @noescape block: () throws -> ()) {
+                        lineNumber: UInt = #line, @noescape block: () throws -> Void) {
         do {
             try block()
         } catch {

@@ -761,11 +761,11 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> ())
+    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block) }
 
     /// :nodoc:
-    public func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> ())
+    public func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block) }
 }
 
@@ -1532,11 +1532,11 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
+    public func addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block) }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
+    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block) }
 }
 

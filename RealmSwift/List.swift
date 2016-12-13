@@ -444,7 +444,7 @@ public final class List<T: Object>: ListBase {
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<List>) -> ()) -> NotificationToken {
+    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
         return _rlmArray.addNotificationBlock { list, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
@@ -972,7 +972,7 @@ public final class List<T: Object>: ListBase {
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (RealmCollectionChange<List>) -> ()) -> NotificationToken {
+    public func addNotificationBlock(block: (RealmCollectionChange<List>) -> Void) -> NotificationToken {
         return _rlmArray.addNotificationBlock { list, change, error in
             block(RealmCollectionChange.fromObjc(self, change: change, error: error))
         }
