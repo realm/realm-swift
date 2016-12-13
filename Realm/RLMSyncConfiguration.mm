@@ -93,6 +93,10 @@ static BOOL isValidRealmURL(NSURL *url) {
     return translateStopPolicy(_config->stop_policy);
 }
 
+- (void)setStopPolicy:(RLMSyncStopPolicy)stopPolicy {
+    _config->stop_policy = translateStopPolicy(stopPolicy);
+}
+
 - (NSURL *)realmURL {
     NSString *rawStringURL = @(_config->realm_url.c_str());
     return [NSURL URLWithString:rawStringURL];
