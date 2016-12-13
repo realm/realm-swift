@@ -276,7 +276,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return    An `RLMResults` sorted by the specified properties.
  */
-- (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray *)properties;
+- (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties;
 
 /// :nodoc:
 - (RLMObjectType)objectAtIndexedSubscript:(NSUInteger)index;

@@ -374,7 +374,12 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     });
 }
 
-- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties {
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties {
+    if (properties.count == 0) {
+        auto results = translateErrors([&] { return _backingList.filter({}); });
+        return [RLMResults resultsWithObjectInfo:*_objectInfo results:std::move(results)];
+    }
+
     auto order = RLMSortDescriptorFromDescriptors(*_objectInfo->table(), properties);
     auto results = translateErrors([&] { return _backingList.sort(std::move(order)); });
     return [RLMResults resultsWithObjectInfo:*_objectInfo results:std::move(results)];
@@ -389,7 +394,16 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
     auto query = translateErrors([&] { return _backingList.get_query(); });
     query.and_query(RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema, _realm.schema, _realm.group));
+#if REALM_VER_MAJOR >= 2
+    auto indexInTable = query.find();
+    if (indexInTable == realm::not_found) {
+        return NSNotFound;
+    }
+    auto row = query.get_table()->get(indexInTable);
+    return _backingList.find(row);
+#else
     return RLMConvertNotFound(query.find());
+#endif
 }
 
 - (NSArray *)objectsAtIndexes:(__unused NSIndexSet *)indexes {

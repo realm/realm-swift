@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
 // For compatibility with Xcode 7, before extensible string enums were introduced,
 #ifdef NS_EXTENSIBLE_STRING_ENUM
 #define RLM_EXTENSIBLE_STRING_ENUM NS_EXTENSIBLE_STRING_ENUM
@@ -27,7 +29,7 @@
 #define RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(fully_qualified, _) NS_SWIFT_NAME(fully_qualified)
 #endif
 
-#if __has_attribute(ns_error_domain)
+#if __has_attribute(ns_error_domain) && (!defined(__cplusplus) || !__cplusplus || __cplusplus >= 201103L)
 #define RLM_ERROR_ENUM(type, name, domain) \
     _Pragma("clang diagnostic push") \
     _Pragma("clang diagnostic ignored \"-Wignored-attributes\"") \
@@ -198,3 +200,5 @@ extern NSString * const RLMRealmCoreVersionKey;
 
 /** The corresponding key is the Realm invalidated property name. */
 extern NSString * const RLMInvalidatedKey;
+
+NS_ASSUME_NONNULL_END

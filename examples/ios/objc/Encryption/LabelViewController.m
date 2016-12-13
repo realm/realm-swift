@@ -68,7 +68,9 @@
     // Opening with wrong key fails since it decrypts to the wrong thing
     @autoreleasepool {
         uint8_t buffer[64];
-        SecRandomCopyBytes(kSecRandomDefault, 64, buffer);
+        int status = SecRandomCopyBytes(kSecRandomDefault, 64, buffer);
+        NSAssert(status == 0, @"Failed to generate random bytes for key");
+        (void)status;
 
         NSError *error;
         RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
@@ -128,7 +130,8 @@
 
     // No pre-existing key from this application, so generate a new one
     uint8_t buffer[64];
-    SecRandomCopyBytes(kSecRandomDefault, 64, buffer);
+    status = SecRandomCopyBytes(kSecRandomDefault, 64, buffer);
+    NSAssert(status == 0, @"Failed to generate random bytes for key");
     NSData *keyData = [[NSData alloc] initWithBytes:buffer length:sizeof(buffer)];
 
     // Store the key in the keychain

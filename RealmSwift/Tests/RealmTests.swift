@@ -27,6 +27,10 @@ import Foundation
 #if swift(>=3.0)
 
 class RealmTests: TestCase {
+    enum TestError: Error {
+        case intentional
+    }
+
     func testFileURL() {
         XCTAssertEqual(try! Realm(fileURL: testRealmURL()).configuration.fileURL,
                        testRealmURL())
@@ -37,13 +41,13 @@ class RealmTests: TestCase {
             XCTAssertEqual(try! Realm().configuration.readOnly, false)
 
             try! Realm().write {
-                try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [100])
+                try! Realm().create(SwiftIntObject.self, value: [100])
             }
         }
         let config = Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true)
         let readOnlyRealm = try! Realm(configuration: config)
         XCTAssertEqual(true, readOnlyRealm.configuration.readOnly)
-        XCTAssertEqual(1, readOnlyRealm.allObjects(ofType: SwiftIntObject.self).count)
+        XCTAssertEqual(1, readOnlyRealm.objects(SwiftIntObject.self).count)
 
         assertThrows(try! Realm(), "Realm has different readOnly settings")
     }
@@ -58,7 +62,7 @@ class RealmTests: TestCase {
         autoreleasepool {
             let realm = try! Realm(fileURL: testRealmURL())
             try! realm.write {
-                realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["a"])
+                realm.create(SwiftStringObject.self, value: ["a"])
             }
         }
 
@@ -73,7 +77,7 @@ class RealmTests: TestCase {
         assertSucceeds {
             let realm = try Realm(configuration:
                 Realm.Configuration(fileURL: testRealmURL(), readOnly: true))
-            XCTAssertEqual(1, realm.allObjects(ofType: SwiftStringObject.self).count)
+            XCTAssertEqual(1, realm.objects(SwiftStringObject.self).count)
         }
 
         try! fileManager.setAttributes([ FileAttributeKey.immutable: false ], ofItemAtPath: testRealmURL().path)
@@ -129,14 +133,14 @@ class RealmTests: TestCase {
         XCTAssert(realm.isEmpty, "Realm should be empty on creation.")
 
         realm.beginWrite()
-        realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["a"])
+        realm.create(SwiftStringObject.self, value: ["a"])
         XCTAssertFalse(realm.isEmpty, "Realm should not be empty within a write transaction after adding an object.")
         realm.cancelWrite()
 
         XCTAssertTrue(realm.isEmpty, "Realm should be empty after canceling a write transaction that added an object.")
 
         realm.beginWrite()
-        realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["a"])
+        realm.create(SwiftStringObject.self, value: ["a"])
         try! realm.commitWrite()
         XCTAssertFalse(realm.isEmpty,
             "Realm should not be empty after committing a write transaction that added an object.")
@@ -166,23 +170,23 @@ class RealmTests: TestCase {
         autoreleasepool {
             let realm = inMemoryRealm("identifier")
             try! realm.write {
-                realm.createObject(ofType: SwiftIntObject.self, populatedWith: [1])
+                realm.create(SwiftIntObject.self, value: [1])
                 return
             }
         }
         let realm = inMemoryRealm("identifier")
-        XCTAssertEqual(realm.allObjects(ofType: SwiftIntObject.self).count, 0)
+        XCTAssertEqual(realm.objects(SwiftIntObject.self).count, 0)
 
         try! realm.write {
-            realm.createObject(ofType: SwiftIntObject.self, populatedWith: [1])
-            XCTAssertEqual(realm.allObjects(ofType: SwiftIntObject.self).count, 1)
+            realm.create(SwiftIntObject.self, value: [1])
+            XCTAssertEqual(realm.objects(SwiftIntObject.self).count, 1)
 
-            inMemoryRealm("identifier").createObject(ofType: SwiftIntObject.self, populatedWith: [1])
-            XCTAssertEqual(realm.allObjects(ofType: SwiftIntObject.self).count, 2)
+            inMemoryRealm("identifier").create(SwiftIntObject.self, value: [1])
+            XCTAssertEqual(realm.objects(SwiftIntObject.self).count, 2)
         }
 
         let realm2 = inMemoryRealm("identifier2")
-        XCTAssertEqual(realm2.allObjects(ofType: SwiftIntObject.self).count, 0)
+        XCTAssertEqual(realm2.objects(SwiftIntObject.self).count, 0)
     }
 
     func testInitCustomClassList() {
@@ -197,25 +201,25 @@ class RealmTests: TestCase {
         try! Realm().write {
             self.assertThrows(try! Realm().beginWrite())
             self.assertThrows(try! Realm().write { })
-            try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["1"])
-            XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
+            try! Realm().create(SwiftStringObject.self, value: ["1"])
+            XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 1)
         }
-        XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
+        XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 1)
     }
 
     func testDynamicWrite() {
         try! Realm().write {
             self.assertThrows(try! Realm().beginWrite())
             self.assertThrows(try! Realm().write { })
-            try! Realm().createDynamicObject(ofType: "SwiftStringObject", populatedWith: ["1"])
-            XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
+            try! Realm().dynamicCreate("SwiftStringObject", value: ["1"])
+            XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 1)
         }
-        XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
+        XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 1)
     }
 
     func testDynamicWriteSubscripting() {
         try! Realm().beginWrite()
-        let object = try! Realm().createDynamicObject(ofType: "SwiftStringObject", populatedWith: ["1"])
+        let object = try! Realm().dynamicCreate("SwiftStringObject", value: ["1"])
         try! Realm().commitWrite()
 
         XCTAssertNotNil(object, "Dynamic Object Creation Failed")
@@ -229,33 +233,47 @@ class RealmTests: TestCase {
         assertThrows(try! Realm().beginWrite())
         try! Realm().cancelWrite()
         try! Realm().beginWrite()
-        try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["1"])
-        XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
+        try! Realm().create(SwiftStringObject.self, value: ["1"])
+        XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 1)
     }
 
     func testCommitWrite() {
         try! Realm().beginWrite()
-        try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["1"])
+        try! Realm().create(SwiftStringObject.self, value: ["1"])
         try! Realm().commitWrite()
-        XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 1)
+        XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 1)
         try! Realm().beginWrite()
     }
 
     func testCancelWrite() {
         assertThrows(try! Realm().cancelWrite())
         try! Realm().beginWrite()
-        try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["1"])
+        try! Realm().create(SwiftStringObject.self, value: ["1"])
         try! Realm().cancelWrite()
-        XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 0)
+        XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 0)
 
         try! Realm().write {
             self.assertThrows(self.realmWithTestPath().cancelWrite())
-            let object = try! Realm().createObject(ofType: SwiftStringObject.self)
+            let object = try! Realm().create(SwiftStringObject.self)
             try! Realm().cancelWrite()
             XCTAssertTrue(object.isInvalidated)
-            XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 0)
+            XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 0)
         }
-        XCTAssertEqual(try! Realm().allObjects(ofType: SwiftStringObject.self).count, 0)
+        XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 0)
+    }
+
+    func testThrowsWrite() {
+        assertFails(TestError.intentional) {
+            try Realm().write {
+                throw TestError.intentional
+            }
+        }
+        assertFails(TestError.intentional) {
+            try Realm().write {
+                try! Realm().create(SwiftStringObject.self, value: ["1"])
+                throw TestError.intentional
+            }
+        }
     }
 
     func testInWriteTransaction() {
@@ -278,16 +296,16 @@ class RealmTests: TestCase {
     func testAddSingleObject() {
         let realm = try! Realm()
         assertThrows(_ = realm.add(SwiftObject()))
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftObject.self).count)
         var defaultRealmObject: SwiftObject!
         try! realm.write {
             defaultRealmObject = SwiftObject()
             realm.add(defaultRealmObject)
-            XCTAssertEqual(1, realm.allObjects(ofType: SwiftObject.self).count)
+            XCTAssertEqual(1, realm.objects(SwiftObject.self).count)
             realm.add(defaultRealmObject)
-            XCTAssertEqual(1, realm.allObjects(ofType: SwiftObject.self).count)
+            XCTAssertEqual(1, realm.objects(SwiftObject.self).count)
         }
-        XCTAssertEqual(1, realm.allObjects(ofType: SwiftObject.self).count)
+        XCTAssertEqual(1, realm.objects(SwiftObject.self).count)
 
         let testRealm = realmWithTestPath()
         try! testRealm.write {
@@ -297,16 +315,16 @@ class RealmTests: TestCase {
 
     func testAddWithUpdateSingleObject() {
         let realm = try! Realm()
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftPrimaryStringObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftPrimaryStringObject.self).count)
         var defaultRealmObject: SwiftPrimaryStringObject!
         try! realm.write {
             defaultRealmObject = SwiftPrimaryStringObject()
             realm.add(defaultRealmObject, update: true)
-            XCTAssertEqual(1, realm.allObjects(ofType: SwiftPrimaryStringObject.self).count)
+            XCTAssertEqual(1, realm.objects(SwiftPrimaryStringObject.self).count)
             realm.add(SwiftPrimaryStringObject(), update: true)
-            XCTAssertEqual(1, realm.allObjects(ofType: SwiftPrimaryStringObject.self).count)
+            XCTAssertEqual(1, realm.objects(SwiftPrimaryStringObject.self).count)
         }
-        XCTAssertEqual(1, realm.allObjects(ofType: SwiftPrimaryStringObject.self).count)
+        XCTAssertEqual(1, realm.objects(SwiftPrimaryStringObject.self).count)
 
         let testRealm = realmWithTestPath()
         try! testRealm.write {
@@ -317,33 +335,33 @@ class RealmTests: TestCase {
     func testAddMultipleObjects() {
         let realm = try! Realm()
         assertThrows(_ = realm.add([SwiftObject(), SwiftObject()]))
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftObject.self).count)
         try! realm.write {
             let objs = [SwiftObject(), SwiftObject()]
             realm.add(objs)
-            XCTAssertEqual(2, realm.allObjects(ofType: SwiftObject.self).count)
+            XCTAssertEqual(2, realm.objects(SwiftObject.self).count)
         }
-        XCTAssertEqual(2, realm.allObjects(ofType: SwiftObject.self).count)
+        XCTAssertEqual(2, realm.objects(SwiftObject.self).count)
 
         let testRealm = realmWithTestPath()
         try! testRealm.write {
-            self.assertThrows(_ = testRealm.add(realm.allObjects(ofType: SwiftObject.self)))
+            self.assertThrows(_ = testRealm.add(realm.objects(SwiftObject.self)))
         }
     }
 
     func testAddWithUpdateMultipleObjects() {
         let realm = try! Realm()
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftPrimaryStringObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftPrimaryStringObject.self).count)
         try! realm.write {
             let objs = [SwiftPrimaryStringObject(), SwiftPrimaryStringObject()]
             realm.add(objs, update: true)
-            XCTAssertEqual(1, realm.allObjects(ofType: SwiftPrimaryStringObject.self).count)
+            XCTAssertEqual(1, realm.objects(SwiftPrimaryStringObject.self).count)
         }
-        XCTAssertEqual(1, realm.allObjects(ofType: SwiftPrimaryStringObject.self).count)
+        XCTAssertEqual(1, realm.objects(SwiftPrimaryStringObject.self).count)
 
         let testRealm = realmWithTestPath()
         try! testRealm.write {
-            self.assertThrows(_ = testRealm.add(realm.allObjects(ofType: SwiftPrimaryStringObject.self), update: true))
+            self.assertThrows(_ = testRealm.add(realm.objects(SwiftPrimaryStringObject.self), update: true))
         }
     }
 
@@ -351,20 +369,20 @@ class RealmTests: TestCase {
 
     func testDeleteSingleObject() {
         let realm = try! Realm()
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftObject.self).count)
         assertThrows(_ = realm.delete(SwiftObject()))
         var defaultRealmObject: SwiftObject!
         try! realm.write {
             defaultRealmObject = SwiftObject()
             self.assertThrows(_ = realm.delete(defaultRealmObject))
-            XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
+            XCTAssertEqual(0, realm.objects(SwiftObject.self).count)
             realm.add(defaultRealmObject)
-            XCTAssertEqual(1, realm.allObjects(ofType: SwiftObject.self).count)
+            XCTAssertEqual(1, realm.objects(SwiftObject.self).count)
             realm.delete(defaultRealmObject)
-            XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
+            XCTAssertEqual(0, realm.objects(SwiftObject.self).count)
         }
         assertThrows(_ = realm.delete(defaultRealmObject))
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftObject.self).count)
 
         let testRealm = realmWithTestPath()
         assertThrows(_ = testRealm.delete(defaultRealmObject))
@@ -375,16 +393,16 @@ class RealmTests: TestCase {
 
     func testDeleteSequenceOfObjects() {
         let realm = try! Realm()
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftObject.self).count)
         var objs: [SwiftObject]!
         try! realm.write {
             objs = [SwiftObject(), SwiftObject()]
             realm.add(objs)
-            XCTAssertEqual(2, realm.allObjects(ofType: SwiftObject.self).count)
+            XCTAssertEqual(2, realm.objects(SwiftObject.self).count)
             realm.delete(objs)
-            XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
+            XCTAssertEqual(0, realm.objects(SwiftObject.self).count)
         }
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftObject.self).count)
 
         let testRealm = realmWithTestPath()
         assertThrows(_ = testRealm.delete(objs))
@@ -395,74 +413,74 @@ class RealmTests: TestCase {
 
     func testDeleteListOfObjects() {
         let realm = try! Realm()
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftCompanyObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftCompanyObject.self).count)
         try! realm.write {
             let obj = SwiftCompanyObject()
             obj.employees.append(SwiftEmployeeObject())
             realm.add(obj)
-            XCTAssertEqual(1, realm.allObjects(ofType: SwiftEmployeeObject.self).count)
+            XCTAssertEqual(1, realm.objects(SwiftEmployeeObject.self).count)
             realm.delete(obj.employees)
             XCTAssertEqual(0, obj.employees.count)
-            XCTAssertEqual(0, realm.allObjects(ofType: SwiftEmployeeObject.self).count)
+            XCTAssertEqual(0, realm.objects(SwiftEmployeeObject.self).count)
         }
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftEmployeeObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftEmployeeObject.self).count)
     }
 
     func testDeleteResults() {
         let realm = try! Realm(fileURL: testRealmURL())
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftCompanyObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftCompanyObject.self).count)
         try! realm.write {
             realm.add(SwiftIntObject(value: [1]))
             realm.add(SwiftIntObject(value: [1]))
             realm.add(SwiftIntObject(value: [2]))
-            XCTAssertEqual(3, realm.allObjects(ofType: SwiftIntObject.self).count)
-            realm.delete(realm.allObjects(ofType: SwiftIntObject.self).filter(using: "intCol = 1"))
-            XCTAssertEqual(1, realm.allObjects(ofType: SwiftIntObject.self).count)
+            XCTAssertEqual(3, realm.objects(SwiftIntObject.self).count)
+            realm.delete(realm.objects(SwiftIntObject.self).filter("intCol = 1"))
+            XCTAssertEqual(1, realm.objects(SwiftIntObject.self).count)
         }
-        XCTAssertEqual(1, realm.allObjects(ofType: SwiftIntObject.self).count)
+        XCTAssertEqual(1, realm.objects(SwiftIntObject.self).count)
     }
 
     func testDeleteAll() {
         let realm = try! Realm()
         try! realm.write {
             realm.add(SwiftObject())
-            XCTAssertEqual(1, realm.allObjects(ofType: SwiftObject.self).count)
-            realm.deleteAllObjects()
-            XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
+            XCTAssertEqual(1, realm.objects(SwiftObject.self).count)
+            realm.deleteAll()
+            XCTAssertEqual(0, realm.objects(SwiftObject.self).count)
         }
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftObject.self).count)
     }
 
     func testObjects() {
         try! Realm().write {
-            try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [100])
-            try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [200])
-            try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [300])
+            try! Realm().create(SwiftIntObject.self, value: [100])
+            try! Realm().create(SwiftIntObject.self, value: [200])
+            try! Realm().create(SwiftIntObject.self, value: [300])
         }
 
-        XCTAssertEqual(0, try! Realm().allObjects(ofType: SwiftStringObject.self).count)
-        XCTAssertEqual(3, try! Realm().allObjects(ofType: SwiftIntObject.self).count)
-        assertThrows(try! Realm().allObjects(ofType: Object.self))
+        XCTAssertEqual(0, try! Realm().objects(SwiftStringObject.self).count)
+        XCTAssertEqual(3, try! Realm().objects(SwiftIntObject.self).count)
+        assertThrows(try! Realm().objects(Object.self))
     }
 
     func testDynamicObjects() {
         try! Realm().write {
-            try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [100])
-            try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [200])
-            try! Realm().createObject(ofType: SwiftIntObject.self, populatedWith: [300])
+            try! Realm().create(SwiftIntObject.self, value: [100])
+            try! Realm().create(SwiftIntObject.self, value: [200])
+            try! Realm().create(SwiftIntObject.self, value: [300])
         }
 
-        XCTAssertEqual(0, try! Realm().allDynamicObjects(ofType: "SwiftStringObject").count)
-        XCTAssertEqual(3, try! Realm().allDynamicObjects(ofType: "SwiftIntObject").count)
-        assertThrows(try! Realm().allDynamicObjects(ofType: "Object"))
+        XCTAssertEqual(0, try! Realm().dynamicObjects("SwiftStringObject").count)
+        XCTAssertEqual(3, try! Realm().dynamicObjects("SwiftIntObject").count)
+        assertThrows(try! Realm().dynamicObjects("Object"))
     }
 
     func testDynamicObjectProperties() {
         try! Realm().write {
-            try! Realm().createObject(ofType: SwiftObject.self)
+            try! Realm().create(SwiftObject.self)
         }
 
-        let object = try! Realm().allDynamicObjects(ofType: "SwiftObject")[0]
+        let object = try! Realm().dynamicObjects("SwiftObject")[0]
         let dictionary = SwiftObject.defaultValues()
 
         XCTAssertEqual(object["boolCol"] as? NSNumber, dictionary["boolCol"] as! NSNumber?)
@@ -471,16 +489,16 @@ class RealmTests: TestCase {
         XCTAssertEqual(object["doubleCol"] as? NSNumber, dictionary["doubleCol"] as! NSNumber?)
         XCTAssertEqual(object["stringCol"] as! String?, dictionary["stringCol"] as! String?)
         XCTAssertEqual(object["binaryCol"] as! NSData?, dictionary["binaryCol"] as! NSData?)
-        XCTAssertEqual(object["dateCol"] as! NSDate?, dictionary["dateCol"] as! NSDate?)
+        XCTAssertEqual(object["dateCol"] as! Date?, dictionary["dateCol"] as! Date?)
         XCTAssertEqual((object["objectCol"] as? SwiftBoolObject)?.boolCol, false)
     }
 
     func testDynamicObjectOptionalProperties() {
         try! Realm().write {
-            try! Realm().createObject(ofType: SwiftOptionalDefaultValuesObject.self)
+            try! Realm().create(SwiftOptionalDefaultValuesObject.self)
         }
 
-        let object = try! Realm().allDynamicObjects(ofType: "SwiftOptionalDefaultValuesObject")[0]
+        let object = try! Realm().dynamicObjects("SwiftOptionalDefaultValuesObject")[0]
         let dictionary = SwiftOptionalDefaultValuesObject.defaultValues()
 
         XCTAssertEqual(object["optIntCol"] as? NSNumber, dictionary["optIntCol"] as! NSNumber?)
@@ -493,103 +511,154 @@ class RealmTests: TestCase {
         XCTAssertEqual(object["optStringCol"] as! String?, dictionary["optStringCol"] as! String?)
         XCTAssertEqual(object["optNSStringCol"] as! String?, dictionary["optNSStringCol"] as! String?)
         XCTAssertEqual(object["optBinaryCol"] as! NSData?, dictionary["optBinaryCol"] as! NSData?)
-        XCTAssertEqual(object["optDateCol"] as! NSDate?, dictionary["optDateCol"] as! NSDate?)
+        XCTAssertEqual(object["optDateCol"] as! Date?, dictionary["optDateCol"] as! Date?)
         XCTAssertEqual((object["optObjectCol"] as? SwiftBoolObject)?.boolCol, true)
     }
 
-    func testObjectForPrimaryKey() {
-        let intTypes: [Object.Type] = [SwiftPrimaryIntObject.self,
-                                       SwiftPrimaryInt8Object.self,
-                                       SwiftPrimaryInt16Object.self,
-                                       SwiftPrimaryInt32Object.self,
-                                       SwiftPrimaryInt64Object.self]
-        let optionalIntTypes: [Object.Type] = [SwiftPrimaryOptionalIntObject.self,
-                                               SwiftPrimaryOptionalInt8Object.self,
-                                               SwiftPrimaryOptionalInt16Object.self,
-                                               SwiftPrimaryOptionalInt32Object.self,
-                                               SwiftPrimaryOptionalInt64Object.self]
+    func testIterateDynamicObjects() {
+        try! Realm().write {
+            for _ in 1..<3 {
+                try! Realm().create(SwiftObject.self)
+            }
+        }
 
+        let objects = try! Realm().dynamicObjects("SwiftObject")
+        let dictionary = SwiftObject.defaultValues()
+
+        for object in objects {
+            XCTAssertEqual(object["boolCol"] as? NSNumber, dictionary["boolCol"] as! NSNumber?)
+            XCTAssertEqual(object["intCol"] as? NSNumber, dictionary["intCol"] as! NSNumber?)
+            XCTAssertEqual(object["floatCol"] as? NSNumber, dictionary["floatCol"] as! NSNumber?)
+            XCTAssertEqual(object["doubleCol"] as? NSNumber, dictionary["doubleCol"] as! NSNumber?)
+            XCTAssertEqual(object["stringCol"] as! String?, dictionary["stringCol"] as! String?)
+            XCTAssertEqual(object["binaryCol"] as! NSData?, dictionary["binaryCol"] as! NSData?)
+            XCTAssertEqual(object["dateCol"] as! Date?, dictionary["dateCol"] as! Date?)
+            XCTAssertEqual((object["objectCol"] as? SwiftBoolObject)?.boolCol, false)
+        }
+    }
+
+    func testDynamicObjectListProperties() {
+        try! Realm().write {
+            try! Realm().create(SwiftArrayPropertyObject.self, value: ["string", [["array"]], [[2]]])
+        }
+
+        let object = try! Realm().dynamicObjects("SwiftArrayPropertyObject")[0]
+
+        XCTAssertEqual(object["name"] as? String, "string")
+
+        let array = object["array"] as! List<DynamicObject>
+        XCTAssertEqual(array.first!["stringCol"] as? String, "array")
+        XCTAssertEqual(array.last!["stringCol"] as? String, "array")
+
+        for object in array {
+            XCTAssertEqual(object["stringCol"] as? String, "array")
+        }
+
+        let intArray = object["intArray"] as! List<DynamicObject>
+        XCTAssertEqual(intArray[0]["intCol"] as? Int, 2)
+        XCTAssertEqual(intArray.first!["intCol"] as? Int, 2)
+        XCTAssertEqual(intArray.last!["intCol"] as? Int, 2)
+
+        for object in intArray {
+            XCTAssertEqual(object["intCol"] as? Int, 2)
+        }
+    }
+
+    func testIntPrimaryKey() {
+        func testIntPrimaryKey<O: Object>(for type: O.Type)
+            where O: SwiftPrimaryKeyObjectType, O.PrimaryKey: ExpressibleByIntegerLiteral {
+
+                let realm = try! Realm()
+                try! realm.write {
+                    realm.create(type, value: ["a", 1])
+                    realm.create(type, value: ["b", 2])
+                }
+
+                let object = realm.object(ofType: type, forPrimaryKey: 1 as O.PrimaryKey)
+                XCTAssertNotNil(object)
+
+                let missingObject = realm.object(ofType: type, forPrimaryKey: 0 as O.PrimaryKey)
+                XCTAssertNil(missingObject)
+        }
+
+        testIntPrimaryKey(for: SwiftPrimaryIntObject.self)
+        testIntPrimaryKey(for: SwiftPrimaryInt8Object.self)
+        testIntPrimaryKey(for: SwiftPrimaryInt16Object.self)
+        testIntPrimaryKey(for: SwiftPrimaryInt32Object.self)
+        testIntPrimaryKey(for: SwiftPrimaryInt64Object.self)
+    }
+
+    func testOptionalIntPrimaryKey() {
+        func testOptionalIntPrimaryKey<O: Object, Wrapped: RealmOptionalType>(for type: O.Type)
+            where O: SwiftPrimaryKeyObjectType, O.PrimaryKey == RealmOptional<Wrapped>,
+                  Wrapped: ExpressibleByIntegerLiteral {
+                let realm = try! Realm()
+                try! realm.write {
+                    realm.create(type, value: ["a", NSNull()])
+                    realm.create(type, value: ["b", 2])
+                }
+
+                let object1a = realm.object(ofType: type, forPrimaryKey: NSNull())
+                XCTAssertNotNil(object1a)
+
+                let object1b = realm.object(ofType: type, forPrimaryKey: nil as Wrapped?)
+                XCTAssertNotNil(object1b)
+
+                let object2 = realm.object(ofType: type, forPrimaryKey: 2 as Wrapped)
+                XCTAssertNotNil(object2)
+
+                let missingObject = realm.object(ofType: type, forPrimaryKey: 0 as Wrapped)
+                XCTAssertNil(missingObject)
+        }
+
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalIntObject.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt8Object.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt16Object.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt32Object.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt64Object.self)
+    }
+
+    func testStringPrimaryKey() {
         let realm = try! Realm()
         try! realm.write {
-            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["a", 1])
-            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["b", 2])
-
-            realm.createObject(ofType: SwiftPrimaryOptionalStringObject.self, populatedWith: [NSNull(), 1])
-            realm.createObject(ofType: SwiftPrimaryOptionalStringObject.self, populatedWith: ["b", 2])
-
-            func createIntObject(_ objectType: Object.Type) {
-                realm.createObject(ofType: objectType, populatedWith: ["a", 1])
-                realm.createObject(ofType: objectType, populatedWith: ["b", 2])
-            }
-
-            func createOptionalIntObject(_ objectType: Object.Type) {
-                realm.createObject(ofType: objectType, populatedWith: ["a", NSNull()])
-                realm.createObject(ofType: objectType, populatedWith: ["b", 2])
-            }
-
-            for type in intTypes {
-                createIntObject(type)
-            }
-
-            for type in optionalIntTypes {
-                createOptionalIntObject(type)
-            }
+            realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
+            realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
         }
 
-        do {
-            // When this is directly inside the XCTAssertNotNil, it doesn't work
-            let object = realm.object(ofType: SwiftPrimaryStringObject.self, forPrimaryKey: "a")
-            XCTAssertNotNil(object)
+        // When this is directly inside the XCTAssertNotNil, it doesn't work
+        let object = realm.object(ofType: SwiftPrimaryStringObject.self, forPrimaryKey: "a")
+        XCTAssertNotNil(object)
 
-            // When this is directly inside the XCTAssertNil, it fails for some reason
-            let missingObject = realm.object(ofType: SwiftPrimaryStringObject.self, forPrimaryKey: "z")
-            XCTAssertNil(missingObject)
+        // When this is directly inside the XCTAssertNil, it fails for some reason
+        let missingObject = realm.object(ofType: SwiftPrimaryStringObject.self, forPrimaryKey: "z")
+        XCTAssertNil(missingObject)
+    }
+
+    func testOptionalStringPrimaryKey() {
+        let realm = try! Realm()
+        try! realm.write {
+            realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
+            realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
+
+            realm.create(SwiftPrimaryOptionalStringObject.self, value: [NSNull(), 1])
+            realm.create(SwiftPrimaryOptionalStringObject.self, value: ["b", 2])
         }
 
-        do {
-            let object1 = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: NSNull())
-            XCTAssertNotNil(object1)
+        let object1 = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: NSNull())
+        XCTAssertNotNil(object1)
 
-            let object2 = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: "b")
-            XCTAssertNotNil(object2)
+        let object2 = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: "b")
+        XCTAssertNotNil(object2)
 
-            let missingObject = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: "z")
-            XCTAssertNil(missingObject)
-        }
-
-        func assertIntObject(_ objectType: Object.Type) {
-            let object = realm.object(ofType: objectType, forPrimaryKey: 1)
-            XCTAssertNotNil(object)
-
-            let missingObject = realm.object(ofType: objectType, forPrimaryKey: 0)
-            XCTAssertNil(missingObject)
-        }
-
-        func assertOptionalIntObject(_ objectType: Object.Type) {
-            let object1 = realm.object(ofType: objectType, forPrimaryKey: NSNull())
-            XCTAssertNotNil(object1)
-
-            let object2 = realm.object(ofType: objectType, forPrimaryKey: 2)
-            XCTAssertNotNil(object2)
-
-            let missingObject = realm.object(ofType: objectType, forPrimaryKey: 0)
-            XCTAssertNil(missingObject)
-        }
-
-        for type in intTypes {
-            assertIntObject(type)
-        }
-
-        for type in optionalIntTypes {
-            assertOptionalIntObject(type)
-        }
+        let missingObject = realm.object(ofType: SwiftPrimaryOptionalStringObject.self, forPrimaryKey: "z")
+        XCTAssertNil(missingObject)
     }
 
     func testDynamicObjectForPrimaryKey() {
         let realm = try! Realm()
         try! realm.write {
-            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["a", 1])
-            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["b", 2])
+            realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
+            realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
         }
 
         XCTAssertNotNil(realm.dynamicObject(ofType: "SwiftPrimaryStringObject", forPrimaryKey: "a"))
@@ -599,7 +668,7 @@ class RealmTests: TestCase {
     func testDynamicObjectForPrimaryKeySubscripting() {
         let realm = try! Realm()
         try! realm.write {
-            realm.createObject(ofType: SwiftPrimaryStringObject.self, populatedWith: ["a", 1])
+            realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
         }
 
         let object = realm.dynamicObject(ofType: "SwiftPrimaryStringObject", forPrimaryKey: "a")
@@ -636,11 +705,11 @@ class RealmTests: TestCase {
 
     func testAutorefresh() {
         let realm = try! Realm()
-        XCTAssertTrue(realm.shouldAutorefresh, "Autorefresh should default to true")
-        realm.shouldAutorefresh = false
-        XCTAssertFalse(realm.shouldAutorefresh)
-        realm.shouldAutorefresh = true
-        XCTAssertTrue(realm.shouldAutorefresh)
+        XCTAssertTrue(realm.autorefresh, "Autorefresh should default to true")
+        realm.autorefresh = false
+        XCTAssertFalse(realm.autorefresh)
+        realm.autorefresh = true
+        XCTAssertTrue(realm.autorefresh)
 
         // test that autoreresh is applied
         // we have two notifications, one for opening the realm, and a second when performing our transaction
@@ -653,22 +722,21 @@ class RealmTests: TestCase {
         dispatchAsyncAndWait {
             let realm = try! Realm()
             try! realm.write {
-                realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["string"])
+                realm.create(SwiftStringObject.self, value: ["string"])
             }
         }
         waitForExpectations(timeout: 1, handler: nil)
         token.stop()
 
         // get object
-        let results = realm.allObjects(ofType: SwiftStringObject.self
-        )
+        let results = realm.objects(SwiftStringObject.self)
         XCTAssertEqual(results.count, Int(1), "There should be 1 object of type StringObject")
         XCTAssertEqual(results[0].stringCol, "string", "Value of first column should be 'string'")
     }
 
     func testRefresh() {
         let realm = try! Realm()
-        realm.shouldAutorefresh = false
+        realm.autorefresh = false
 
         // test that autoreresh is not applied
         // we have two notifications, one for opening the realm, and a second when performing our transaction
@@ -678,12 +746,12 @@ class RealmTests: TestCase {
             notificationFired.fulfill()
         }
 
-        let results = realm.allObjects(ofType: SwiftStringObject.self)
+        let results = realm.objects(SwiftStringObject.self)
         XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")
 
         dispatchAsyncAndWait {
             try! Realm().write {
-                try! Realm().createObject(ofType: SwiftStringObject.self, populatedWith: ["string"])
+                try! Realm().create(SwiftStringObject.self, value: ["string"])
                 return
             }
         }
@@ -713,7 +781,7 @@ class RealmTests: TestCase {
             realm.add(SwiftObject())
             return
         }
-        XCTAssertEqual(realm.allObjects(ofType: SwiftObject.self).count, 2)
+        XCTAssertEqual(realm.objects(SwiftObject.self).count, 2)
         XCTAssertEqual(object.isInvalidated, true)
     }
 
@@ -724,13 +792,13 @@ class RealmTests: TestCase {
         }
         let fileURL = defaultRealmURL().deletingLastPathComponent().appendingPathComponent("copy.realm")
         do {
-            try realm.writeCopy(toFileURL: fileURL)
+            try realm.writeCopy(toFile: fileURL)
         } catch {
             XCTFail("writeCopyToURL failed")
         }
         autoreleasepool {
             let copy = try! Realm(fileURL: fileURL)
-            XCTAssertEqual(1, copy.allObjects(ofType: SwiftObject.self).count)
+            XCTAssertEqual(1, copy.objects(SwiftObject.self).count)
         }
         try! FileManager.default.removeItem(at: fileURL)
     }
@@ -1517,18 +1585,124 @@ class RealmTests: TestCase {
         XCTAssertEqual(object["optObjectCol"]?.boolCol, true)
     }
 
-    func testObjectForPrimaryKey() {
-        let intTypes: [Object.Type] = [SwiftPrimaryIntObject.self,
-                                       SwiftPrimaryInt8Object.self,
-                                       SwiftPrimaryInt16Object.self,
-                                       SwiftPrimaryInt32Object.self,
-                                       SwiftPrimaryInt64Object.self]
-        let optionalIntTypes: [Object.Type] = [SwiftPrimaryOptionalIntObject.self,
-                                               SwiftPrimaryOptionalInt8Object.self,
-                                               SwiftPrimaryOptionalInt16Object.self,
-                                               SwiftPrimaryOptionalInt32Object.self,
-                                               SwiftPrimaryOptionalInt64Object.self]
+    func testIterateDynamicObjects() {
+        try! Realm().write {
+            for _ in 1..<3 {
+                try! Realm().create(SwiftObject)
+            }
+        }
 
+        let objects = try! Realm().dynamicObjects("SwiftObject")
+        let dictionary = SwiftObject.defaultValues()
+
+        for object in objects {
+            XCTAssertEqual(object["boolCol"] as? NSNumber, dictionary["boolCol"] as! NSNumber?)
+            XCTAssertEqual(object["intCol"] as? NSNumber, dictionary["intCol"] as! NSNumber?)
+            XCTAssertEqual(object["floatCol"] as? NSNumber, dictionary["floatCol"] as! Float?)
+            XCTAssertEqual(object["doubleCol"] as? NSNumber, dictionary["doubleCol"] as! Double?)
+            XCTAssertEqual(object["stringCol"] as! String?, dictionary["stringCol"] as! String?)
+            XCTAssertEqual(object["binaryCol"] as! NSData?, dictionary["binaryCol"] as! NSData?)
+            XCTAssertEqual(object["dateCol"] as! NSDate?, dictionary["dateCol"] as! NSDate?)
+            XCTAssertEqual(object["objectCol"]?.boolCol, false)
+        }
+    }
+
+    func testDynamicObjectListProperties() {
+        try! Realm().write {
+            try! Realm().create(SwiftArrayPropertyObject.self, value: ["string", [["array"]], [[2]]])
+        }
+
+        let object = try! Realm().dynamicObjects("SwiftArrayPropertyObject")[0]
+
+        XCTAssertEqual(object["name"] as? String, "string")
+
+        let array = object["array"] as! List<DynamicObject>
+        XCTAssertEqual(array[0]["stringCol"] as? String, "array")
+        XCTAssertEqual(array.first!["stringCol"] as? String, "array")
+        XCTAssertEqual(array.last!["stringCol"] as? String, "array")
+
+        for object in array {
+            XCTAssertEqual(object["stringCol"] as? String, "array")
+        }
+
+        let intArray = object["intArray"] as! List<DynamicObject>
+        XCTAssertEqual(intArray[0]["intCol"] as? Int, 2)
+        XCTAssertEqual(intArray.first!["intCol"] as? Int, 2)
+        XCTAssertEqual(intArray.last!["intCol"] as? Int, 2)
+
+        for object in intArray {
+            XCTAssertEqual(object["intCol"] as? Int, 2)
+        }
+    }
+
+    func testIntPrimaryKey() {
+        func testIntPrimaryKey<O: Object>(for type: O.Type) {
+
+            let realm = try! Realm()
+            try! realm.write {
+                realm.create(type, value: ["a", 1])
+                realm.create(type, value: ["b", 2])
+            }
+
+            let object = realm.objectForPrimaryKey(type, key: 1)
+            XCTAssertNotNil(object)
+
+            let missingObject = realm.objectForPrimaryKey(type, key: 0)
+            XCTAssertNil(missingObject)
+        }
+
+        testIntPrimaryKey(for: SwiftPrimaryIntObject.self)
+        testIntPrimaryKey(for: SwiftPrimaryInt8Object.self)
+        testIntPrimaryKey(for: SwiftPrimaryInt16Object.self)
+        testIntPrimaryKey(for: SwiftPrimaryInt32Object.self)
+        testIntPrimaryKey(for: SwiftPrimaryInt64Object.self)
+    }
+
+    func testOptionalIntPrimaryKey() {
+        func testOptionalIntPrimaryKey<O: Object>(for type: O.Type) {
+            let realm = try! Realm()
+            try! realm.write {
+                realm.create(type, value: ["a", NSNull()])
+                realm.create(type, value: ["b", 2])
+            }
+
+            let object1a = realm.objectForPrimaryKey(type, key: NSNull())
+            XCTAssertNotNil(object1a)
+
+            let object1b = realm.objectForPrimaryKey(type, key: nil as Int?)
+            XCTAssertNotNil(object1b)
+
+            let object2 = realm.objectForPrimaryKey(type, key: 2)
+            XCTAssertNotNil(object2)
+
+            let missingObject = realm.objectForPrimaryKey(type, key: 0)
+            XCTAssertNil(missingObject)
+        }
+
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalIntObject.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt8Object.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt16Object.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt32Object.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt64Object.self)
+    }
+
+    func testStringPrimaryKey() {
+        let realm = try! Realm()
+        try! realm.write {
+            realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
+            realm.create(SwiftPrimaryStringObject.self, value: ["b", 2])
+        }
+
+        // When this is directly inside the XCTAssertNotNil, it doesn't work
+        let object = realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "a")
+        XCTAssertNotNil(object)
+
+        // When this is directly inside the XCTAssertNil, it fails for some reason
+        let missingObject = realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "z")
+        XCTAssertNil(missingObject)
+    }
+
+    func testOptionalStringPrimaryKey() {
         let realm = try! Realm()
         try! realm.write {
             realm.create(SwiftPrimaryStringObject.self, value: ["a", 1])
@@ -1536,79 +1710,16 @@ class RealmTests: TestCase {
 
             realm.create(SwiftPrimaryOptionalStringObject.self, value: [NSNull(), 1])
             realm.create(SwiftPrimaryOptionalStringObject.self, value: ["b", 2])
-
-            func createIntObject(objectType: Object.Type) {
-                realm.create(objectType, value: ["a", 1])
-                realm.create(objectType, value: ["b", 2])
-            }
-
-            func createOptionalIntObject(objectType: Object.Type) {
-                realm.create(objectType, value: ["a", NSNull()])
-                realm.create(objectType, value: ["b", 2])
-            }
-
-            for type in intTypes {
-                createIntObject(type)
-            }
-
-            for type in optionalIntTypes {
-                createOptionalIntObject(type)
-            }
         }
 
-        do {
-            // When this is directly inside the XCTAssertNotNil, it doesn't work
-            let object = realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "a")
-            XCTAssertNotNil(object)
+        let object1 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: NSNull())
+        XCTAssertNotNil(object1)
 
-            // When this is directly inside the XCTAssertNil, it fails for some reason
-            let missingObject = realm.objectForPrimaryKey(SwiftPrimaryStringObject.self, key: "z")
-            XCTAssertNil(missingObject)
-        }
+        let object2 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: "b")
+        XCTAssertNotNil(object2)
 
-        do {
-            let object1 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: NSNull())
-            XCTAssertNotNil(object1)
-
-            let object2 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: nil)
-            XCTAssertEqual(object1, object2)
-
-            let object3 = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: "b")
-            XCTAssertNotNil(object3)
-
-            let missingObject = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: "z")
-            XCTAssertNil(missingObject)
-        }
-
-        func assertIntObject(objectType: Object.Type) {
-            let object = realm.objectForPrimaryKey(objectType, key: 1)
-            XCTAssertNotNil(object)
-
-            let missingObject = realm.objectForPrimaryKey(objectType, key: 0)
-            XCTAssertNil(missingObject)
-        }
-
-        func assertOptionalIntObject(objectType: Object.Type) {
-            let object1 = realm.objectForPrimaryKey(objectType, key: NSNull())
-            XCTAssertNotNil(object1)
-
-            let object2 = realm.objectForPrimaryKey(objectType, key: nil)
-            XCTAssertEqual(object1, object2)
-
-            let object3 = realm.objectForPrimaryKey(objectType, key: 2)
-            XCTAssertNotNil(object3)
-
-            let missingObject = realm.objectForPrimaryKey(objectType, key: 0)
-            XCTAssertNil(missingObject)
-        }
-
-        for type in intTypes {
-            assertIntObject(type)
-        }
-
-        for type in optionalIntTypes {
-            assertOptionalIntObject(type)
-        }
+        let missingObject = realm.objectForPrimaryKey(SwiftPrimaryOptionalStringObject.self, key: "z")
+        XCTAssertNil(missingObject)
     }
 
     func testDynamicObjectForPrimaryKey() {

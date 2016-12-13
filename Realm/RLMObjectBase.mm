@@ -120,7 +120,7 @@ static id validatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schem
             [self setValue:RLMCoerceToNil(propertyValue) forKeyPath:[properties[i] name]];
         }
     }
-    else {
+    else if (value) {
         // assume our object is an NSDictionary or an object with kvc properties
         NSDictionary *defaultValues = nil;
         for (RLMProperty *prop in properties) {
@@ -134,9 +134,16 @@ static id validatedObjectForProperty(id obj, RLMProperty *prop, RLMSchema *schem
                 obj = defaultValues[prop.name];
             }
 
+            // don't set unspecified properties
+            if (!obj) {
+                continue;
+            }
+
             obj = validatedObjectForProperty(obj, prop, schema);
             [self setValue:RLMCoerceToNil(obj) forKeyPath:prop.name];
         }
+    } else {
+        @throw RLMException(@"Must provide a non-nil value.");
     }
 
     return self;
@@ -287,6 +294,10 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
 
 + (BOOL)shouldIncludeInDefaultSchema {
     return RLMIsObjectSubclass(self);
+}
+
++ (NSString *)_realmObjectName {
+    return nil;
 }
 
 - (id)mutableArrayValueForKey:(NSString *)key {

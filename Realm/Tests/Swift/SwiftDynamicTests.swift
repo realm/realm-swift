@@ -30,9 +30,7 @@ class SwiftDynamicTests: RLMTestCase {
     func testDynamicRealmExists() {
         autoreleasepool {
             // open realm in autoreleasepool to create tables and then dispose
-            let realm = RLMRealm(url
-
-                : RLMTestRealmURL())
+            let realm = RLMRealm(url: RLMTestRealmURL())
             realm.beginWriteTransaction()
             _ = SwiftDynamicObject.create(in: realm, withValue: ["column1", 1])
             _ = SwiftDynamicObject.create(in: realm, withValue: ["column2", 2])
@@ -66,7 +64,7 @@ class SwiftDynamicTests: RLMTestCase {
 
         // verify properties
         let dyrealm = realm(withTestPathAndSchema: nil)
-        let array = dyrealm.allObjects("SwiftDynamicObject")!
+        let array = dyrealm.allObjects("SwiftDynamicObject")
 
         XCTAssertTrue(array[0]["intCol"] as! NSNumber == 1)
         XCTAssertTrue(array[1]["stringCol"] as! String == "column2")
@@ -111,14 +109,14 @@ class SwiftDynamicTests: RLMTestCase {
 
         // verify properties
         let dyrealm = realm(withTestPathAndSchema: nil)
-        let array = dyrealm.allObjects("DynamicObject")!
+        let array = dyrealm.allObjects("DynamicObject")
 
         XCTAssertTrue(array[0]["intCol"] as! NSNumber == 1)
         XCTAssertTrue(array[1]["stringCol"] as! String == "column2")
     }
 
     func testDynamicTypes_objc() {
-        let date = NSDate(timeIntervalSince1970: 100000)
+        let date = Date(timeIntervalSince1970: 100000)
         let data = "a".data(using: String.Encoding.utf8)!
         let obj1: [Any] = [true, 1, 1.1 as Float, 1.11, "string",
             data, date, true, 11, NSNull()]
@@ -141,7 +139,7 @@ class SwiftDynamicTests: RLMTestCase {
 
         // verify properties
         let dyrealm = realm(withTestPathAndSchema: nil)
-        let results = dyrealm.allObjects(AllTypesObject.className())!
+        let results = dyrealm.allObjects(AllTypesObject.className())
         XCTAssertEqual(results.count, UInt(2))
         let robj1 = results[0]
         let robj2 = results[1]

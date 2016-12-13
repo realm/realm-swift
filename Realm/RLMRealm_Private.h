@@ -20,10 +20,12 @@
 
 @class RLMFastEnumerator;
 
+NS_ASSUME_NONNULL_BEGIN
+
 // Disable syncing files to disk. Cannot be re-enabled. Use only for tests.
 FOUNDATION_EXTERN void RLMDisableSyncToDisk();
 
-FOUNDATION_EXTERN NSData *RLMRealmValidatedEncryptionKey(NSData *key);
+FOUNDATION_EXTERN NSData * _Nullable RLMRealmValidatedEncryptionKey(NSData *key);
 
 // Translate an in-flight exception resulting from opening a SharedGroup to
 // an NSError or NSException (if error is nil)
@@ -45,6 +47,6 @@ void RLMRealmTranslateException(NSError **error);
 - (void)verifyThread;
 - (void)verifyNotificationsAreSupported;
 
-+ (NSString *)writeableTemporaryPathForFile:(NSString *)fileName;
-
 @end
+
+NS_ASSUME_NONNULL_END

@@ -1,30 +1,249 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
+### Sync Breaking Changes (In Beta)
+
+* Rename occurences of "iCloud" with "CloudKit" in APIs and comments to match
+  naming in the Realm Object Server.
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Add support for 'LIKE' queries (wildcard matching).
+
+### Bugfixes
+
+* Fix authenticating with CloudKit.
+
+2.1.1 Release notes (2016-12-02)
+=============================================================
+
+### Enhancements
+
+* Add `RealmSwift.ObjectiveCSupport.convert(object:)` methods to help write
+  code that interoperates between Realm Objective-C and Realm Swift APIs.
+* Throw exceptions when opening a Realm with an incorrect configuration, like:
+    * `readOnly` set with a sync configuration.
+    * `readOnly` set with a migration block.
+    * migration block set with a sync configuration.
+* Greatly improve performance of write transactions which make a large number of
+  changes to indexed properties, including the automatic migration when opening
+  files written by Realm 1.x.
+
+### Bugfixes
+
+* Reset sync metadata Realm in case of decryption error.
+* Fix issue preventing using synchronized Realms in Xcode Playgrounds.
+* Fix assertion failure when migrating a model property from object type to
+  `RLMLinkingObjects` type.
+* Fix a `LogicError: Bad version number` exception when using `RLMResults` with
+  no notification blocks and explicitly called `-[RLMRealm refresh]` from that
+  thread.
+* Logged-out users are no longer returned from `+[RLMSyncUser currentUser]` or
+  `+[RLMSyncUser allUsers]`.
+* Fix several issues which could occur when the 1001st object of a given type
+  was created or added to an RLMArray/List, including crashes when rerunning
+  existing queries and possibly data corruption.
+* Fix a potential crash when the application exits due to a race condition in
+  the destruction of global static variables.
+* Fix race conditions when waiting for sync uploads or downloads to complete
+  which could result in crashes or the callback being called too early.
+
+2.1.0 Release notes (2016-11-18)
+=============================================================
+
+### Sync Breaking Changes (In Beta)
+
+* None.
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Add the ability to skip calling specific notification blocks when committing
+  a write transaction.
+
+### Bugfixes
+
+* Deliver collection notifications when beginning a write transaction which
+  advances the read version of a Realm (previously only Realm-level
+  notifications were sent).
+* Fix some scenarios which would lead to inconsistent states when using
+  collection notifications.
+* Fix several race conditions in the notification functionality.
+* Don't send Realm change notifications when canceling a write transaction.
+
+2.0.4 Release notes (2016-11-14)
+=============================================================
+
+### Sync Breaking Changes (In Beta)
+
+* Remove `RLMAuthenticationActions` and replace
+  `+[RLMSyncCredential credentialWithUsername:password:actions:]` with
+  `+[RLMSyncCredential credentialsWithUsername:password:register:]`.
+* Rename `+[RLMSyncUser authenticateWithCredential:]` to
+  `+[RLMSyncUser logInWithCredentials:]`.
+* Rename "credential"-related types and methods to
+  `RLMSyncCredentials`/`SyncCredentials` and consistently refer to credentials
+  in the plural form.
+* Change `+[RLMSyncUser all]` to return a dictionary of identifiers to users and
+  rename to:
+  * `+[RLMSyncUser allUsers]` in Objective-C.
+  * `SyncUser.allUsers()` in Swift 2.
+  * `SyncUser.all` in Swift 3.
+* Rename `SyncManager.sharedManager()` to `SyncManager.shared` in Swift 3.
+* Change `Realm.Configuration.syncConfiguration` to take a `SyncConfiguration`
+  struct rather than a named tuple.
+* `+[RLMSyncUser logInWithCredentials:]` now invokes its callback block on a
+  background queue.
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* Add `+[RLMSyncUser currentUser]`.
+* Add the ability to change read, write and management permissions for
+  synchronized Realms using the management Realm obtained via the
+  `-[RLMSyncUser managementRealmWithError:]` API and the
+  `RLMSyncPermissionChange` class.
+
+### Bugfixes
+
+* None.
+
+2.0.3 Release notes (2016-10-27)
+=============================================================
+
+This release adds binary versions of Swift 3.0.1 frameworks built with Xcode 8.1
+GM seed.
+
+### API breaking changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix a `BadVersion` exception caused by a race condition when delivering
+  collection change notifications.
+* Fix an assertion failure when additional model classes are added and
+  `deleteRealmIfMigrationNeeded` is enabled.
+* Fix a `BadTransactLog` exception when deleting an `RLMResults` in a synced
+  Realm.
+* Fix an assertion failure when a write transaction is in progress at the point
+  of process termination.
+* Fix a crash that could occur when working with a `RLMLinkingObject` property
+  of an unmanaged object.
+
+2.0.2 Release notes (2016-10-05)
+=============================================================
+
+This release is not protocol-compatible with previous version of the Realm
+Mobile Platform.
+
+### API breaking changes
+
+* Rename Realm Swift's `User` to `SyncUser` to make clear that it relates to the
+  Realm Mobile Platform, and to avoid potential conflicts with other `User` types.
+
+### Bugfixes
+
+* Fix Realm headers to be compatible with pre-C++11 dialects of Objective-C++.
+* Fix incorrect merging of RLMArray/List changes when objects with the same
+  primary key are created on multiple devices.
+* Fix bad transaction log errors after deleting objects on a different device.
+* Fix a BadVersion error when a background worker finishes running while older
+  results from that worker are being delivered to a different thread.
+
+2.0.1 Release notes (2016-09-29)
+=============================================================
+
+### Bugfixes
+
+* Fix an assertion failure when opening a Realm file written by a 1.x version
+  of Realm which has an indexed nullable int or bool property.
+
+2.0.0 Release notes (2016-09-27)
+=============================================================
+
+This release introduces support for the Realm Mobile Platform!
+See <https://realm.io/news/introducing-realm-mobile-platform/> for an overview
+of these great new features.
+
+### API breaking changes
+
+* By popular demand, `RealmSwift.Error` has been moved from the top-level
+  namespace into a `Realm` extension and is now `Realm.Error`, so that it no
+  longer conflicts with `Swift.Error`.
+* Files written by Realm 2.0 cannot be read by 1.x or earlier versions. Old
+  files can still be opened.
+
+### Enhancements
+
+* The .log, .log_a and .log_b files no longer exist and the state tracked in
+  them has been moved to the main Realm file. This reduces the number of open
+  files needed by Realm, improves performance of both opening and writing to
+  Realms, and eliminates a small window where committing write transactions
+  would prevent other processes from opening the file.
+
+### Bugfixes
+
+* Fix an assertion failure when sorting by zero properties.
+* Fix a mid-commit crash in one process also crashing all other processes with
+  the same Realm open.
+* Properly initialize new nullable float and double properties added to
+  existing objects to null rather than 0.
+* Fix a stack overflow when objects with indexed string properties had very
+  long common prefixes.
+* Fix a race condition which could lead to crashes when using async queries or
+  collection notifications.
+* Fix a bug which could lead to incorrect state when an object which links to
+  itself is deleted from the Realm.
+
+1.1.0 Release notes (2016-09-16)
+=============================================================
+
+This release brings official support for Xcode 8, Swift 2.3 and Swift 3.0.
+Prebuilt frameworks are now built with Xcode 7.3.1 and Xcode 8.0.
+
 ### API breaking changes
 
 * Deprecate `migrateRealm:` in favor of new `performMigrationForConfiguration:error:` method
-  that follows Cocoa's' NSError conventions.
-* Fix issue where `RLMResults` used `id `instead of its generic type type as the return
+  that follows Cocoa's NSError conventions.
+* Fix issue where `RLMResults` used `id `instead of its generic type as the return
   type of subscript.
-* Fix incorrect truncation of the constant value for queries of the form
-  `column < value` for `float` and `double` columns.
 
 ### Enhancements
 
 * Introduce API for safely handing objects between threads.
 * Improve error message when using NSNumber incorrectly in Swift models.
-* Fix compilation with Swift 2.3 using Xcode 8 beta 2.
 * Further reduce the download size of the prebuilt static libraries.
 * Improve sort performance, especially on non-nullable columns.
+* Allow partial initialization of object by `initWithValue:`, deferring
+  required property checks until object is added to Realm.
 
 ### Bugfixes
 
+* Fix incorrect truncation of the constant value for queries of the form
+  `column < value` for `float` and `double` columns.
 * Fix crash when an aggregate is accessed as an `Int8`, `Int16`, `Int32`, or `Int64`.
 * Fix a race condition that could lead to a crash if an RLMArray or List was
   deallocated on a different thread than it was created on.
 * Fix a crash when the last reference to an observed object is released from
   within the observation.
+* Fix a crash when `initWithValue:` is used to create a nested object for a class
+  with an uninitialized schema.
+* Enforce uniqueness for `RealmOptional` primary keys when using the `value` setter.
 
 1.0.2 Release notes (2016-07-13)
 =============================================================

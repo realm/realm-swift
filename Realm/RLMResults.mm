@@ -139,10 +139,6 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return RLMStringDataToNSString(_results.get_object_type());
 }
 
-- (RLMObjectSchema *)objectSchema {
-    return _info->rlmObjectSchema;
-}
-
 - (RLMClassInfo *)objectInfo {
     return _info;
 }
@@ -150,6 +146,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                   objects:(__unused __unsafe_unretained id [])buffer
                                     count:(NSUInteger)len {
+    if (!_info) {
+        return 0;
+    }
+
     __autoreleasing RLMFastEnumerator *enumerator;
     if (state->state == 0) {
         enumerator = [[RLMFastEnumerator alloc] initWithCollection:self objectSchema:*_info];
@@ -185,22 +185,37 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     query.and_query(RLMPredicateToQuery(predicate, _info->rlmObjectSchema, _realm.schema, _realm.group));
     query.sync_view_if_needed();
 
+#if REALM_VER_MAJOR >= 2
+    size_t indexInTable;
+    if (const auto& sort = _results.get_sort()) {
+        // A sort order is specified so we need to return the first match given that ordering.
+        TableView table_view = query.find_all();
+        table_view.sort(sort);
+        if (!table_view.size()) {
+            return NSNotFound;
+        }
+        indexInTable = table_view.get_source_ndx(0);
+    } else {
+        indexInTable = query.find();
+    }
+    if (indexInTable == realm::not_found) {
+        return NSNotFound;
+    }
+    return RLMConvertNotFound(_results.index_of(indexInTable));
+#else
     TableView table_view;
     if (const auto& sort = _results.get_sort()) {
         // A sort order is specified so we need to return the first match given that ordering.
         table_view = query.find_all();
         table_view.sort(sort);
     } else {
-        // No sort order is specified so we only need to find a single match.
-        // FIXME: We're only looking for a single object so we'd like to be able to use `Query::find`
-        // for this, but as of core v0.97.1 it gives incorrect results if the query is restricted
-        // to a link view (<https://github.com/realm/realm-core/issues/1565>).
         table_view = query.find_all(0, -1, 1);
     }
     if (!table_view.size()) {
         return NSNotFound;
     }
     return _results.index_of(table_view.get_source_ndx(0));
+#endif
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
@@ -265,25 +280,26 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     RLMCollectionSetValueForKey(self, key, value);
 }
 
-- (NSNumber *)_aggregateForKeyPath:(NSString *)keyPath method:(util::Optional<Mixed> (Results::*)(size_t))method methodName:(NSString *)methodName {
+- (NSNumber *)_aggregateForKeyPath:(NSString *)keyPath method:(util::Optional<Mixed> (Results::*)(size_t))method
+                        methodName:(NSString *)methodName returnNilForEmpty:(BOOL)returnNilForEmpty {
     assertKeyPathIsNotNested(keyPath);
-    return [self aggregate:keyPath method:method methodName:methodName];
+    return [self aggregate:keyPath method:method methodName:methodName returnNilForEmpty:returnNilForEmpty];
 }
 
 - (NSNumber *)_minForKeyPath:(NSString *)keyPath {
-    return [self _aggregateForKeyPath:keyPath method:&Results::min methodName:@"@min"];
+    return [self _aggregateForKeyPath:keyPath method:&Results::min methodName:@"@min" returnNilForEmpty:YES];
 }
 
 - (NSNumber *)_maxForKeyPath:(NSString *)keyPath {
-    return [self _aggregateForKeyPath:keyPath method:&Results::max methodName:@"@max"];
+    return [self _aggregateForKeyPath:keyPath method:&Results::max methodName:@"@max" returnNilForEmpty:YES];
 }
 
 - (NSNumber *)_sumForKeyPath:(NSString *)keyPath {
-    return [self _aggregateForKeyPath:keyPath method:&Results::sum methodName:@"@sum"];
+    return [self _aggregateForKeyPath:keyPath method:&Results::sum methodName:@"@sum" returnNilForEmpty:NO];
 }
 
 - (NSNumber *)_avgForKeyPath:(NSString *)keyPath {
-    return [self _aggregateForKeyPath:keyPath method:&Results::average methodName:@"@avg"];
+    return [self _aggregateForKeyPath:keyPath method:&Results::average methodName:@"@avg" returnNilForEmpty:YES];
 }
 
 - (NSArray *)_unionOfObjectsForKeyPath:(NSString *)keyPath {
@@ -344,7 +360,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:property ascending:ascending]]];
 }
 
-- (RLMResults *)sortedResultsUsingDescriptors:(NSArray *)properties {
+- (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties {
+    if (properties.count == 0) {
+        return self;
+    }
     return translateErrors([&] {
         if (_results.get_mode() == Results::Mode::Empty) {
             return self;
@@ -358,7 +377,11 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return [self objectAtIndex:index];
 }
 
-- (id)aggregate:(NSString *)property method:(util::Optional<Mixed> (Results::*)(size_t))method methodName:(NSString *)methodName {
+- (id)aggregate:(NSString *)property method:(util::Optional<Mixed> (Results::*)(size_t))method
+     methodName:(NSString *)methodName returnNilForEmpty:(BOOL)returnNilForEmpty {
+    if (_results.get_mode() == Results::Mode::Empty) {
+        return returnNilForEmpty ? nil : @0;
+    }
     size_t column = _info->tableColumn(property);
     auto value = translateErrors([&] { return (_results.*method)(column); }, methodName);
     if (!value) {
@@ -368,26 +391,26 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (id)minOfProperty:(NSString *)property {
-    return [self aggregate:property method:&Results::min methodName:@"minOfProperty"];
+    return [self aggregate:property method:&Results::min methodName:@"minOfProperty" returnNilForEmpty:YES];
 }
 
 - (id)maxOfProperty:(NSString *)property {
-    return [self aggregate:property method:&Results::max methodName:@"maxOfProperty"];
+    return [self aggregate:property method:&Results::max methodName:@"maxOfProperty" returnNilForEmpty:YES];
 }
 
 - (id)sumOfProperty:(NSString *)property {
-    return [self aggregate:property method:&Results::sum methodName:@"sumOfProperty"];
+    return [self aggregate:property method:&Results::sum methodName:@"sumOfProperty" returnNilForEmpty:NO];
 }
 
 - (id)averageOfProperty:(NSString *)property {
-    return [self aggregate:property method:&Results::average methodName:@"averageOfProperty"];
+    return [self aggregate:property method:&Results::average methodName:@"averageOfProperty" returnNilForEmpty:YES];
 }
 
 - (void)deleteObjectsFromRealm {
     return translateErrors([&] {
         if (_results.get_mode() == Results::Mode::Table) {
             RLMResultsValidateInWriteTransaction(self);
-            RLMClearTable(*self.objectInfo);
+            RLMClearTable(*_info);
         }
         else {
             RLMTrackDeletions(_realm, ^{ _results.clear(); });

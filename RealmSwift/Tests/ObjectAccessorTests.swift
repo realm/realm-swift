@@ -56,11 +56,11 @@ class ObjectAccessorTests: TestCase {
         object.stringCol = utf8TestString
         XCTAssertEqual(object.stringCol, utf8TestString)
 
-        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData
+        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)!
         object.binaryCol = data
         XCTAssertEqual(object.binaryCol, data)
 
-        let date = NSDate(timeIntervalSinceReferenceDate: 2)
+        let date = Date(timeIntervalSinceReferenceDate: 2)
         object.dateCol = date
         XCTAssertEqual(object.dateCol, date)
 
@@ -79,8 +79,8 @@ class ObjectAccessorTests: TestCase {
     func testPersistedAccessors() {
         let realm = try! Realm()
         realm.beginWrite()
-        let object = realm.createObject(ofType: SwiftObject.self)
-        let optionalObject = realm.createObject(ofType: SwiftOptionalObject.self)
+        let object = realm.create(SwiftObject.self)
+        let optionalObject = realm.create(SwiftOptionalObject.self)
         setAndTestAllProperties(object)
         setAndTestAllOptionalProperties(optionalObject)
         try! realm.commitWrite()
@@ -139,7 +139,7 @@ class ObjectAccessorTests: TestCase {
             testObject()
         }
 
-        let obj = realm.allObjects(ofType: SwiftAllIntSizesObject.self).first!
+        let obj = realm.objects(SwiftAllIntSizesObject.self).first!
         XCTAssertEqual(obj.int8, v8)
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
@@ -155,12 +155,12 @@ class ObjectAccessorTests: TestCase {
         let realm = realmWithTestPath()
 
         realm.beginWrite()
-        realm.createObject(ofType: SwiftLongObject.self, populatedWith: [NSNumber(value: longNumber)])
-        realm.createObject(ofType: SwiftLongObject.self, populatedWith: [NSNumber(value: intNumber)])
-        realm.createObject(ofType: SwiftLongObject.self, populatedWith: [NSNumber(value: negativeLongNumber)])
+        realm.create(SwiftLongObject.self, value: [NSNumber(value: longNumber)])
+        realm.create(SwiftLongObject.self, value: [NSNumber(value: intNumber)])
+        realm.create(SwiftLongObject.self, value: [NSNumber(value: negativeLongNumber)])
         try! realm.commitWrite()
 
-        let objects = realm.allObjects(ofType: SwiftLongObject.self)
+        let objects = realm.objects(SwiftLongObject.self)
         XCTAssertEqual(objects.count, Int(3), "3 rows expected")
         XCTAssertEqual(objects[0].longCol, longNumber, "2 ^ 34 expected")
         XCTAssertEqual(objects[1].longCol, intNumber, "2 ^ 31 - 1 expected")
@@ -196,7 +196,7 @@ class ObjectAccessorTests: TestCase {
             realm.add(object2)
         }
 
-        let objects = realm.allObjects(ofType: SwiftObject.self)
+        let objects = realm.objects(SwiftObject.self)
 
         let firstObject = objects.first
         XCTAssertEqual(2, firstObject!.arrayCol.count)
@@ -216,8 +216,8 @@ class ObjectAccessorTests: TestCase {
     func testSettingOptionalPropertyOnDeletedObjectsThrows() {
         let realm = try! Realm()
         try! realm.write {
-            let obj = realm.createObject(ofType: SwiftOptionalObject.self)
-            let copy = realm.allObjects(ofType: SwiftOptionalObject.self).first!
+            let obj = realm.create(SwiftOptionalObject.self)
+            let copy = realm.objects(SwiftOptionalObject.self).first!
             realm.delete(obj)
 
             self.assertThrows(copy.optIntCol.value = 1)
@@ -244,13 +244,13 @@ class ObjectAccessorTests: TestCase {
         object.optStringCol = nil
         XCTAssertNil(object.optStringCol)
 
-        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)! as Data as NSData
+        let data = "b".data(using: String.Encoding.utf8, allowLossyConversion: false)!
         object.optBinaryCol = data
         XCTAssertEqual(object.optBinaryCol!, data)
         object.optBinaryCol = nil
         XCTAssertNil(object.optBinaryCol)
 
-        let date = NSDate(timeIntervalSinceReferenceDate: 2)
+        let date = Date(timeIntervalSinceReferenceDate: 2)
         object.optDateCol = date
         XCTAssertEqual(object.optDateCol!, date)
         object.optDateCol = nil

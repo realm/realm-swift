@@ -53,8 +53,13 @@ class RLMClassInfo;
                                     count:(NSUInteger)len;
 @end
 
+@interface RLMNotificationToken ()
+- (void)suppressNextNotification;
+- (RLMRealm *)realm;
+@end
+
 @interface RLMCancellationToken : RLMNotificationToken
-- (instancetype)initWithToken:(realm::NotificationToken)token;
+- (instancetype)initWithToken:(realm::NotificationToken)token realm:(RLMRealm *)realm;
 @end
 
 @interface RLMCollectionChange ()

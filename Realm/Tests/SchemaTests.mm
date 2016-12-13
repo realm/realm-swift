@@ -263,8 +263,7 @@ RLM_ARRAY_TYPE(NotARealClass)
 
 @implementation SchemaTests
 
-+ (void)tearDown
-{
+- (void)tearDown {
     RLMSetTreatFakeObjectAsRLMObject(NO);
     [super tearDown];
 }
@@ -731,6 +730,24 @@ RLM_ARRAY_TYPE(NotARealClass)
     XCTAssertEqualObjects(@"NumberObject", [[[[NumberObject alloc] init] objectSchema] className]);
     // Verify that child class doesn't use the parent class's schema
     XCTAssertEqualObjects(@"NumberDefaultsObject", [[[[NumberDefaultsObject alloc] init] objectSchema] className]);
+}
+
+- (void)testCreateUnmanagedObjectWithUninitializedSchema {
+    if (self.isParent) {
+        RLMRunChildAndWait();
+        return;
+    }
+    XCTAssertTrue(RLMSchema.partialSharedSchema.objectSchema.count == 0);
+    XCTAssertNoThrow([[IntObject alloc] initWithValue:@[@0]]);
+}
+
+- (void)testCreateUnmanagedObjectWithNestedObjectWithUninitializedSchema {
+    if (self.isParent) {
+        RLMRunChildAndWait();
+        return;
+    }
+    XCTAssertTrue(RLMSchema.partialSharedSchema.objectSchema.count == 0);
+    XCTAssertNoThrow([[IntegerArrayPropertyObject alloc] initWithValue:(@[@0, @[@[@0]]])]);
 }
 
 - (void)testMultipleProcessesTryingToInitializeSchema {

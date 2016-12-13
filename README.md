@@ -1,7 +1,7 @@
 ![Realm](https://github.com/realm/realm-cocoa/raw/master/logo.png)
 
 Realm is a mobile database that runs directly inside phones, tablets or wearables.
-This repository holds the source code for the iOS, OS X, watchOS & tvOS versions of Realm Swift & Realm Objective-C.
+This repository holds the source code for the iOS, macOS, tvOS & watchOS versions of Realm Swift & Realm Objective-C.
 
 ## Features
 
@@ -31,7 +31,7 @@ The API reference is located at [realm.io/docs/swift/latest/api](https://realm.i
 - **Need help with your code?**: Look for previous questions on the  [#realm tag](https://stackoverflow.com/questions/tagged/realm?sort=newest) — or [ask a new question](https://stackoverflow.com/questions/ask?tags=realm). We actively monitor & answer questions on SO!
 - **Have a bug to report?** [Open an issue](https://github.com/realm/realm-cocoa/issues/new). If possible, include the version of Realm, a full log, the Realm file, and a project that shows the issue.
 - **Have a feature request?** [Open an issue](https://github.com/realm/realm-cocoa/issues/new). Tell us what the feature should do, and why you want the feature.
-- Sign up for our [**Community Newsletter**](http://eepurl.com/VEKCn) to get regular tips, learn about other use-cases and get alerted of blogposts and tutorials about Realm.
+- Sign up for our [**Community Newsletter**](https://www2.realm.io/l/210132/2016-12-05/fy9m) to get regular tips, learn about other use-cases and get alerted of blogposts and tutorials about Realm.
 
 ## Building Realm
 
@@ -39,7 +39,8 @@ In case you don't want to use the precompiled version, you can build Realm yours
 
 Prerequisites:
 
-* Building Realm requires Xcode 7.3.
+* Building Realm requires Xcode 7.3.1 or Xcode 8.x.
+* If cloning from git, submodules are required: `git submodule update --init --recursive`.
 * Building Realm documentation requires [jazzy](https://github.com/realm/jazzy)
 
 Once you have all the necessary prerequisites, building Realm.framework just takes a single command: `sh build.sh build`. You'll need an internet connection the first time you build Realm to download the core binary.
@@ -57,7 +58,8 @@ unacceptable behavior to [info@realm.io](mailto:info@realm.io).
 ## License
 
 Realm Objective-C & Realm Swift are published under the Apache 2.0 license.  
-The underlying core is available under the [Realm Core Binary License](https://github.com/realm/realm-cocoa/blob/master/LICENSE#L210-L243) while we [work to open-source it under the Apache 2.0 license](https://realm.io/docs/objc/latest/#faq).
+Realm Core is also published under the Apache 2.0 license and is available
+[here](https://github.com/realm/realm-core).
 
 **This product is not being made available to any person located in Cuba, Iran,
 North Korea, Sudan, Syria or the Crimea region, or to any other person that is

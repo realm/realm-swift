@@ -24,6 +24,8 @@ namespace realm {
     class Schema;
 }
 
+NS_ASSUME_NONNULL_BEGIN
+
 @interface RLMMigration ()
 
 @property (nonatomic, strong) RLMRealm *oldRealm;
@@ -34,3 +36,5 @@ namespace realm {
 - (void)execute:(RLMMigrationBlock)block;
 
 @end
+
+NS_ASSUME_NONNULL_END

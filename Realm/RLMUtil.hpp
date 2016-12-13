@@ -143,7 +143,7 @@ static inline realm::StringData RLMStringDataWithNSString(__unsafe_unretained NS
                                [string lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 }
 
-// Binary convertion utilities
+// Binary conversion utilities
 static inline NSData *RLMBinaryDataToNSData(realm::BinaryData binaryData) {
     return binaryData ? [NSData dataWithBytes:binaryData.data() length:binaryData.size()] : nil;
 }
@@ -156,7 +156,7 @@ static inline realm::BinaryData RLMBinaryDataForNSData(__unsafe_unretained NSDat
     return realm::BinaryData(bytes, data.length);
 }
 
-// Date convertion utilities
+// Date conversion utilities
 // These use the reference date and shift the seconds rather than just getting
 // the time interval since the epoch directly to avoid losing sub-second precision
 static inline NSDate *RLMTimestampToNSDate(realm::Timestamp ts) NS_RETURNS_RETAINED {
@@ -198,3 +198,7 @@ id RLMMixedToObjc(realm::Mixed const& value);
 // For unit testing purposes, allow an Objective-C class named FakeObject to also be used
 // as the base class of managed objects. This allows for testing invalid schemas.
 void RLMSetTreatFakeObjectAsRLMObject(BOOL flag);
+
+// Given a bundle identifier, return the base directory on the disk within which Realm database and support files should
+// be stored.
+NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier);

@@ -95,8 +95,8 @@ class TestCase: XCTestCase {
 
         // Verify that there are no remaining realm files after the test
         let parentDir = (testDir as NSString).deletingLastPathComponent
-        for url in FileManager().enumerator(atPath: parentDir)! {
-            let url = url as! URL
+        for url in FileManager.default.enumerator(atPath: parentDir)! {
+            let url = url as! NSString
             XCTAssertNotEqual(url.pathExtension, "realm", "Lingering realm file at \(parentDir)/\(url)")
             assert(url.pathExtension != "realm")
         }
@@ -123,11 +123,12 @@ class TestCase: XCTestCase {
 
     func assertThrows<T>(_ block: @autoclosure @escaping () -> T, reason regexString: String,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
         RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
     }
 
     func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
-                        lineNumber: UInt = #line, block: () throws -> ()) {
+                        lineNumber: UInt = #line, block: () throws -> Void) {
         do {
             try block()
         } catch {
@@ -136,14 +137,29 @@ class TestCase: XCTestCase {
         }
     }
 
-    func assertFails<T>(_ expectedError: RealmSwift.Error.Code, _ message: String? = nil,
+    func assertFails<T>(_ expectedError: Realm.Error.Code, _ message: String? = nil,
                         fileName: StaticString = #file, lineNumber: UInt = #line,
                         block: () throws -> T) {
         do {
             _ = try block()
             XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",
                 file: fileName, line: lineNumber)
-        } catch let e as RealmSwift.Error where e.code == expectedError {
+        } catch let e as Realm.Error where e.code == expectedError {
+            // Success!
+        } catch {
+            XCTFail("Expected to catch <\(expectedError)>, but instead caught <\(error)>.",
+                file: fileName, line: lineNumber)
+        }
+    }
+
+    func assertFails<T>(_ expectedError: Error, _ message: String? = nil,
+                     fileName: StaticString = #file, lineNumber: UInt = #line,
+                     block: () throws -> T) {
+        do {
+            _ = try block()
+            XCTFail("Expected to catch <\(expectedError)>, but no error was thrown.",
+                file: fileName, line: lineNumber)
+        } catch let e where e._code == expectedError._code {
             // Success!
         } catch {
             XCTFail("Expected to catch <\(expectedError)>, but instead caught <\(error)>.",
@@ -272,11 +288,12 @@ class TestCase: XCTestCase {
 
     func assertThrows<T>(@autoclosure(escaping) block: () -> T, reason regexString: String,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
+        exceptionThrown = true
         RLMAssertThrowsWithReasonMatching(self, { _ = block() } as dispatch_block_t, regexString, message, fileName, lineNumber)
     }
 
     func assertSucceeds(message: String? = nil, fileName: StaticString = #file,
-                        lineNumber: UInt = #line, @noescape block: () throws -> ()) {
+                        lineNumber: UInt = #line, @noescape block: () throws -> Void) {
         do {
             try block()
         } catch {

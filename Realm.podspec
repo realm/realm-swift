@@ -1,16 +1,16 @@
 Pod::Spec.new do |s|
   s.name                    = 'Realm'
   s.version                 = `sh build.sh get-version`
-  s.summary                 = 'Realm is a modern data framework & database for iOS & OS X.'
+  s.summary                 = 'Realm is a modern data framework & database for iOS, macOS, tvOS & watchOS.'
   s.description             = <<-DESC
-                              The Realm database, for Objective-C. (If you want to use Realm from Swift, see the “RealmSwift” pod.)
+                              The Realm Mobile Database, for Objective-C. (If you want to use Realm from Swift, see the “RealmSwift” pod.)
 
-                              Realm is a mobile database: a replacement for Core Data & SQLite. You can use it on iOS & OS X. Realm is not an ORM on top SQLite: instead it uses its own persistence engine, built for simplicity (& speed). Learn more and get help at https://realm.io
+                              The Realm Mobile Database is a fast, easy-to-use replacement for Core Data & SQLite. Use it with the Realm Mobile Platform for realtime, automatic data sync. Works on iOS, macOS, tvOS & watchOS. Learn more and get help at https://realm.io.
                               DESC
   s.homepage                = "https://realm.io"
   s.source                  = { :git => 'https://github.com/realm/realm-cocoa.git', :tag => "v#{s.version}", :submodules => true }
   s.author                  = { 'Realm' => 'help@realm.io' }
-  s.library                 = 'c++'
+  s.library                 = 'c++', 'z'
   s.requires_arc            = true
   s.social_media_url        = 'https://twitter.com/realm'
   s.documentation_url       = "https://realm.io/docs/objc/#{s.version}"
@@ -29,9 +29,17 @@ Pod::Spec.new do |s|
                               'include/**/RLMPlatform.h',
                               'include/**/RLMProperty.h',
                               'include/**/RLMRealm.h',
+                              'include/**/RLMRealmConfiguration+Sync.h',
                               'include/**/RLMRealmConfiguration.h',
                               'include/**/RLMResults.h',
                               'include/**/RLMSchema.h',
+                              'include/**/RLMSyncConfiguration.h',
+                              'include/**/RLMSyncCredentials.h',
+                              'include/**/RLMSyncManager.h',
+                              'include/**/RLMSyncPermissionChange.h',
+                              'include/**/RLMSyncSession.h',
+                              'include/**/RLMSyncUser.h',
+                              'include/**/RLMSyncUtil.h',
                               'include/**/Realm.h',
 
                               # Realm.Dynamic module
@@ -47,12 +55,15 @@ Pod::Spec.new do |s|
 
   source_files              = 'Realm/*.{m,mm}',
                               'Realm/ObjectStore/src/*.cpp',
+                              'Realm/ObjectStore/src/sync/*.cpp',
+                              'Realm/ObjectStore/src/sync/impl/*.cpp',
                               'Realm/ObjectStore/src/impl/*.cpp',
                               'Realm/ObjectStore/src/impl/apple/*.cpp',
-                              'Realm/ObjectStore/src/util/*.cpp'
+                              'Realm/ObjectStore/src/util/*.cpp',
+                              'Realm/ObjectStore/src/util/apple/*.cpp'
 
   s.module_map              = 'Realm/module.modulemap'
-  s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__"
+  s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__ -DREALM_ENABLE_SYNC"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
   s.source_files            = source_files + private_header_files
   s.private_header_files    = private_header_files
