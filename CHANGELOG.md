@@ -12,7 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add support for 'LIKE' queries (wildcard matching).
 
 ### Bugfixes
 

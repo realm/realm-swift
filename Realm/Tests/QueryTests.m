@@ -202,6 +202,7 @@
     XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' CONTAINS string"]);
     XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' BEGINSWITH string"]);
     XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' ENDSWITH string"]);
+    XCTAssertThrows([AllOptionalTypes objectsWhere:@"'' LIKE string"]);
     XCTAssertThrows(([AllOptionalTypes objectsWhere:@"%@ CONTAINS data", [NSData data]]));
 
     // data is missing stuff
@@ -304,12 +305,10 @@
 
 - (void)testStringUnsupportedOperations
 {
-    XCTAssertThrows([StringObject objectsWhere:@"stringCol LIKE 'abc'"]);
     XCTAssertThrows([StringObject objectsWhere:@"stringCol MATCHES 'abc'"]);
     XCTAssertThrows([StringObject objectsWhere:@"stringCol BETWEEN {'a', 'b'}"]);
     XCTAssertThrows([StringObject objectsWhere:@"stringCol < 'abc'"]);
 
-    XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol LIKE 'abc'"]);
     XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol MATCHES 'abc'"]);
     XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol BETWEEN {'a', 'b'}"]);
     XCTAssertThrows([AllTypesObject objectsWhere:@"objectCol.stringCol < 'abc'"]);
@@ -776,6 +775,9 @@
     RLMAssertCount(self.queryObjectClass, 7U, @"string1 ENDSWITH string1");
     RLMAssertCount(self.queryObjectClass, 1U, @"string1 ENDSWITH string2");
     RLMAssertCount(self.queryObjectClass, 2U, @"string2 ENDSWITH string1");
+    RLMAssertCount(self.queryObjectClass, 7U, @"string1 LIKE string1");
+    RLMAssertCount(self.queryObjectClass, 1U, @"string1 LIKE string2");
+    RLMAssertCount(self.queryObjectClass, 1U, @"string2 LIKE string1");
 
     RLMAssertCount(self.queryObjectClass, 7U, @"string1 ==[c] string1");
     RLMAssertCount(self.queryObjectClass, 2U, @"string1 ==[c] string2");
@@ -789,6 +791,9 @@
     RLMAssertCount(self.queryObjectClass, 7U, @"string1 ENDSWITH[c] string1");
     RLMAssertCount(self.queryObjectClass, 2U, @"string1 ENDSWITH[c] string2");
     RLMAssertCount(self.queryObjectClass, 4U, @"string2 ENDSWITH[c] string1");
+    RLMAssertCount(self.queryObjectClass, 7U, @"string1 LIKE[c] string1");
+    RLMAssertCount(self.queryObjectClass, 2U, @"string1 LIKE[c] string2");
+    RLMAssertCount(self.queryObjectClass, 2U, @"string2 LIKE[c] string1");
 
     RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"int1 == float1"],
                                       @"Property type mismatch between int and float");
@@ -802,6 +807,10 @@
                                       @"Property type mismatch between float and string");
     RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"double1 < string1"],
                                       @"Property type mismatch between double and string");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"double1 LIKE string1"],
+                                      @"Property type mismatch between double and string");
+    RLMAssertThrowsWithReasonMatching([self.queryObjectClass objectsWhere:@"string1 LIKE double1"],
+                                      @"Property type mismatch between string and double");
 }
 
 - (void)testBooleanPredicate
@@ -898,6 +907,46 @@
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol CONTAINS 'C'");
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol CONTAINS[c] 'c'");
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol CONTAINS[c] 'C'");
+}
+
+- (void)testStringLike
+{
+    RLMRealm *realm = [self realm];
+
+    [realm beginWriteTransaction];
+    StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
+    [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, so]];
+    [realm commitWriteTransaction];
+
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*a*'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*b*'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*c'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE 'ab*'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*bc'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE 'a*bc'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*abc*'");
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE '*d*'");
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE 'aabc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE 'b*bc'");
+
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE 'a??'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '?b?'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*?c'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE 'ab?'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE '?bc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE '?d?'");
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE '?abc'");
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE 'b?bc'");
+
+    RLMAssertCount(StringObject, 0U, @"stringCol LIKE '*C*'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE[c] '*c*'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE[c] '*C*'");
+
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol LIKE '*d*'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol LIKE '*c*'");
+    RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol LIKE '*C*'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol LIKE[c] '*c*'");
+    RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol LIKE[c] '*C*'");
 }
 
 - (void)testStringEquality
@@ -2000,17 +2049,27 @@
         XCTAssertEqual(2U, nilStrings.count);
         XCTAssertEqualObjects((@[NSNull.null, NSNull.null]), [nilStrings valueForKey:@"stringCol"]);
 
+        RLMResults *nilLikeStrings = [stringObjectClass objectsInRealm:realm where:@"stringCol LIKE NULL"];
+        XCTAssertEqual(2U, nilLikeStrings.count);
+        XCTAssertEqualObjects((@[NSNull.null, NSNull.null]), [nilLikeStrings valueForKey:@"stringCol"]);
+
         RLMResults *nonNilStrings = [stringObjectClass objectsInRealm:realm where:@"stringCol != NULL"];
         XCTAssertEqual(3U, nonNilStrings.count);
         XCTAssertEqualObjects((@[@"a", @"b", @""]), [nonNilStrings valueForKey:@"stringCol"]);
+
+        RLMResults *nonNilLikeStrings = [stringObjectClass objectsInRealm:realm where:@"NOT stringCol LIKE NULL"];
+        XCTAssertEqual(3U, nonNilLikeStrings.count);
+        XCTAssertEqualObjects((@[@"a", @"b", @""]), [nonNilLikeStrings valueForKey:@"stringCol"]);
 
         RLMAssertCount(stringObjectClass, 3U, @"stringCol IN {NULL, 'a'}");
 
         RLMAssertCount(stringObjectClass, 1U, @"stringCol CONTAINS 'a'");
         RLMAssertCount(stringObjectClass, 1U, @"stringCol BEGINSWITH 'a'");
         RLMAssertCount(stringObjectClass, 1U, @"stringCol ENDSWITH 'a'");
+        RLMAssertCount(stringObjectClass, 1U, @"stringCol LIKE 'a'");
 
         RLMAssertCount(stringObjectClass, 0U, @"stringCol CONTAINS 'z'");
+        RLMAssertCount(stringObjectClass, 0U, @"stringCol LIKE 'z'");
 
         RLMAssertCount(stringObjectClass, 1U, @"stringCol = ''");
 
@@ -2028,9 +2087,11 @@
         XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS ''"] valueForKey:@"stringCol"]);
         XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol BEGINSWITH ''"] valueForKey:@"stringCol"]);
         XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol ENDSWITH ''"] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol LIKE '*'"] valueForKey:@"stringCol"]);
         XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS[c] ''"] valueForKey:@"stringCol"]);
         XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol BEGINSWITH[c] ''"] valueForKey:@"stringCol"]);
         XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol ENDSWITH[c] ''"] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol LIKE[c] '*'"] valueForKey:@"stringCol"]);
 
         XCTAssertEqualObjects(@[], ([[stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS %@", @"\0"] valueForKey:@"self"]));
         XCTAssertEqualObjects([[stringObjectClass allObjectsInRealm:realm] valueForKey:@"stringCol"], ([[StringObject objectsInRealm:realm where:@"stringCol CONTAINS NULL"] valueForKey:@"stringCol"]));
@@ -2054,15 +2115,25 @@
         XCTAssertEqual(2U, nilStrings.count);
         XCTAssertEqualObjects((@[NSNull.null, NSNull.null]), [nilStrings valueForKeyPath:@"objectCol.stringCol"]);
 
+        RLMResults *nilLikeStrings = [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol LIKE NULL"];
+        XCTAssertEqual(2U, nilLikeStrings.count);
+        XCTAssertEqualObjects((@[NSNull.null, NSNull.null]), [nilLikeStrings valueForKeyPath:@"objectCol.stringCol"]);
+
         RLMResults *nonNilStrings = [stringLinkClass objectsInRealm:realm where:@"objectCol.stringCol != NULL"];
         XCTAssertEqual(3U, nonNilStrings.count);
         XCTAssertEqualObjects((@[@"a", @"b", @""]), [nonNilStrings valueForKeyPath:@"objectCol.stringCol"]);
+
+        RLMResults *nonNilLikeStrings = [stringLinkClass objectsInRealm:realm where:@"NOT objectCol.stringCol LIKE NULL"];
+        XCTAssertEqual(3U, nonNilLikeStrings.count);
+        XCTAssertEqualObjects((@[@"a", @"b", @""]), [nonNilLikeStrings valueForKeyPath:@"objectCol.stringCol"]);
 
         RLMAssertCount(stringLinkClass, 3U, @"objectCol.stringCol IN {NULL, 'a'}");
 
         RLMAssertCount(stringLinkClass, 1U, @"objectCol.stringCol CONTAINS 'a'");
         RLMAssertCount(stringLinkClass, 1U, @"objectCol.stringCol BEGINSWITH 'a'");
         RLMAssertCount(stringLinkClass, 1U, @"objectCol.stringCol ENDSWITH 'a'");
+        RLMAssertCount(stringLinkClass, 1U, @"objectCol.stringCol LIKE 'a'");
+        RLMAssertCount(stringLinkClass, 0U, @"objectCol.stringCol LIKE 'c'");
 
         RLMAssertCount(stringLinkClass, 0U, @"objectCol.stringCol CONTAINS 'z'");
 
