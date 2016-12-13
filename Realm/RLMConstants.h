@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 #define RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(fully_qualified, _) NS_SWIFT_NAME(fully_qualified)
 #endif
 
-#if __has_attribute(ns_error_domain) && (!__cplusplus || __cplusplus >= 201103L)
+#if __has_attribute(ns_error_domain) && (!defined(__cplusplus) || !__cplusplus || __cplusplus >= 201103L)
 #define RLM_ERROR_ENUM(type, name, domain) \
     _Pragma("clang diagnostic push") \
     _Pragma("clang diagnostic ignored \"-Wignored-attributes\"") \
