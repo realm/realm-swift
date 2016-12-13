@@ -13,6 +13,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Add support for 'LIKE' queries (wildcard matching).
+* Introduce APIs for safely handing objects between threads.
 
 ### Bugfixes
 
@@ -225,7 +226,6 @@ Prebuilt frameworks are now built with Xcode 7.3.1 and Xcode 8.0.
 
 ### Enhancements
 
-* Introduce API for safely handing objects between threads.
 * Improve error message when using NSNumber incorrectly in Swift models.
 * Further reduce the download size of the prebuilt static libraries.
 * Improve sort performance, especially on non-nullable columns.
