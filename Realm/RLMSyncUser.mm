@@ -123,7 +123,8 @@ using namespace realm;
     if (!_user) {
         return nil;
     }
-    return [[RLMSyncSession alloc] initWithSyncSession:_user->session_for_url([[url absoluteString] UTF8String])];
+    auto path = SyncManager::shared().path_for_realm(_user->identity(), [url.absoluteString UTF8String]);
+    return [[RLMSyncSession alloc] initWithSyncSession:_user->session_for_on_disk_path(path)];
 }
 
 - (NSArray<RLMSyncSession *> *)allSessions {
