@@ -378,17 +378,12 @@
 
 @interface QueryTests : RLMTestCase
 - (Class)queryObjectClass;
-- (BOOL)isNull;
 @end
 
 @implementation QueryTests
 
 - (Class)queryObjectClass {
     return [QueryObject class];
-}
-
-- (BOOL)isNull {
-    return NO;
 }
 
 - (RLMResults *)evaluate:(RLMResults *)results {
@@ -814,14 +809,8 @@
     RLMAssertCount(BoolObject, 0U, @"boolCol == TRUE");
     RLMAssertCount(BoolObject, 0U, @"boolCol != TRUE");
 
-    if (self.isNull) {
-        RLMAssertCount(BoolObject, 0U, @"boolCol == NULL");
-        RLMAssertCount(BoolObject, 0U, @"boolCol != NULL");
-    }
-    else {
-        XCTAssertThrows([BoolObject objectsWhere:@"boolCol == NULL"]);
-        XCTAssertThrows([BoolObject objectsWhere:@"boolCol != NULL"]);
-    }
+    XCTAssertThrows([BoolObject objectsWhere:@"boolCol == NULL"]);
+    XCTAssertThrows([BoolObject objectsWhere:@"boolCol != NULL"]);
 
     XCTAssertThrowsSpecificNamed([BoolObject objectsWhere:@"boolCol >= TRUE"],
                                  NSException,
@@ -836,10 +825,6 @@
     [realm beginWriteTransaction];
     StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
     [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, so]];
-    if (self.isNull) {
-        so = [StringObject createInRealm:realm withValue:@[NSNull.null]];
-        [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, so]];
-    }
     [realm commitWriteTransaction];
 
     RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH 'a'");
@@ -866,10 +851,6 @@
     [realm beginWriteTransaction];
     StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
     [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, so]];
-    if (self.isNull) {
-        so = [StringObject createInRealm:realm withValue:@[NSNull.null]];
-        [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, so]];
-    }
     [realm commitWriteTransaction];
 
     RLMAssertCount(StringObject, 1U, @"stringCol ENDSWITH 'c'");
@@ -896,10 +877,6 @@
     [realm beginWriteTransaction];
     StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
     [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, so]];
-    if (self.isNull) {
-        so = [StringObject createInRealm:realm withValue:@[NSNull.null]];
-        [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, so]];
-    }
     [realm commitWriteTransaction];
 
     RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS 'a'");
