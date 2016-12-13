@@ -78,7 +78,7 @@
         XCTAssertEqual(error.domain, RLMSyncErrorDomain);
         XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
         XCTAssertNotNil(error.localizedDescription);
-        
+
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -96,7 +96,7 @@
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, RLMSyncErrorDomain);
-        XCTAssertEqual(error.code, RLMSyncAuthErrorUserDoesNotExist);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
         XCTAssertNotNil(error.localizedDescription);
 
         [expectation fulfill];
@@ -118,7 +118,7 @@
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, RLMSyncErrorDomain);
-        XCTAssertEqual(error.code, RLMSyncAuthErrorUserAlreadyExists);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
         XCTAssertNotNil(error.localizedDescription);
 
         [expectation fulfill];
