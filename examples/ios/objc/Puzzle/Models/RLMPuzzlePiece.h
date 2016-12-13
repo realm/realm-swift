@@ -25,7 +25,6 @@
 @property NSInteger identifier;
 @property double x;
 @property double y;
-@property NSString *userID;
 
 @end
 
