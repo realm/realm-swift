@@ -1143,24 +1143,24 @@ EOM
 
     "package-ios-swift")
         cd tightdb_objc
-        for version in 2.2 2.3 3.0 3.0.1; do
+        for version in 2.2 2.3 3.0 3.0.1 3.0.2; do
             REALM_SWIFT_VERSION="$version" sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION="$version" sh build.sh ios-swift
         done
 
         cd build/ios
-        zip --symlinks -r realm-swift-framework-ios.zip swift-2.2 swift-2.3 swift-3.0 swift-3.0.1
+        zip --symlinks -r realm-swift-framework-ios.zip swift-2.2 swift-2.3 swift-3.0 swift-3.0.1 swift-3.0.2
         ;;
 
     "package-osx-swift")
         cd tightdb_objc
-        for version in 2.2 2.3 3.0 3.0.1; do
+        for version in 2.2 2.3 3.0 3.0.1 3.0.2; do
             REALM_SWIFT_VERSION="$version" sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION="$version" sh build.sh osx-swift
         done
 
         cd build/osx
-        zip --symlinks -r realm-swift-framework-osx.zip swift-2.2 swift-2.3 swift-3.0 swift-3.0.1
+        zip --symlinks -r realm-swift-framework-osx.zip swift-2.2 swift-2.3 swift-3.0 swift-3.0.1 swift-3.0.2
         ;;
 
     "package-watchos")
@@ -1173,13 +1173,13 @@ EOM
 
     "package-watchos-swift")
         cd tightdb_objc
-        for version in 2.2 2.3 3.0 3.0.1; do
+        for version in 2.2 2.3 3.0 3.0.1 3.0.2; do
             REALM_SWIFT_VERSION="$version" sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION="$version" sh build.sh watchos-swift
         done
 
         cd build/watchos
-        zip --symlinks -r realm-swift-framework-watchos.zip swift-2.2 swift-2.3 swift-3.0 swift-3.0.1
+        zip --symlinks -r realm-swift-framework-watchos.zip swift-2.2 swift-2.3 swift-3.0 swift-3.0.1 swift-3.0.2
         ;;
 
     "package-tvos")
@@ -1192,13 +1192,13 @@ EOM
 
     "package-tvos-swift")
         cd tightdb_objc
-        for version in 2.2 2.3 3.0 3.0.1; do
+        for version in 2.2 2.3 3.0 3.0.1 3.0.2; do
             REALM_SWIFT_VERSION="$version" sh build.sh prelaunch-simulator
             REALM_SWIFT_VERSION="$version" sh build.sh tvos-swift
         done
 
         cd build/tvos
-        zip --symlinks -r realm-swift-framework-tvos.zip swift-2.2 swift-2.3 swift-3.0 swift-3.0.1
+        zip --symlinks -r realm-swift-framework-tvos.zip swift-2.2 swift-2.3 swift-3.0 swift-3.0.1 swift-3.0.2
         ;;
 
     "package-release")
