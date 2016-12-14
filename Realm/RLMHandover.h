@@ -23,48 +23,51 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- An object which is bound to a thread-specific RLMRealm instance, and so cannot be passed between threads.
+ An object which is bound to a thread-specific RLMRealm instance, and so cannot be passed between
+ threads without being explicitly exported and imported.
 
  Objects of classes conforming to this protocol can be packaged for transport between threads by calling
  `-[RLMRealm exportThreadHandoverWithObjects:]`. Note that only types defined by Realm can meaningfully conform
  to this protocol, and defining new classes which attempt to conform to it will not make them work with
- `exportThreadHandoverWithObjects`.
+ `-exportThreadHandoverWithObjects:`.
  */
 @protocol RLMThreadConfined <NSObject>
 
 /// The Realm which manages the object, or `nil` if the object is unmanaged.
 @property (nonatomic, readonly, nullable) RLMRealm *realm;
 
-// Runtime-enforced requirement that type also conforms to `RLMThreadConfined_Private`
+// Conformance to the `RLMThreadConfined_Private` protocol will be enforced at runtime.
 @end
 
-/// An object containing the data imported from handover
+/// An object containing the data to be imported from handover.
 @interface RLMThreadImport : NSObject
 
-/// The destination `RLMRealm` that the object was imported into
+/// The destination `RLMRealm` that the object was imported into.
 @property (nonatomic, readonly) RLMRealm *realm;
 
-/// Objects equivalent to those handed over but associated with this thread's `Realm`
+/// Objects equivalent to those handed over but associated with this thread's Realm.
 @property (nonatomic, readonly) NSArray<id<RLMThreadConfined>> *objects;
 
 @end
 
-/// An object intended to be passed between threads containing information about objects being handed over
+/// An object intended to be passed between threads containing information about which objects are
+/// being handed over.
 @interface RLMThreadHandover : NSObject
 
 /**
- Imports the handover package, creating an instance of the `Realm` and objects on the current thread.
+ Imports the handover package, creating an instance of the `RLMRealm` and the contained objects on
+ the current thread.
 
- This method may be not be called more than once on a given handover package. The `Realm` version will
- remain pinned until this method is called or the object is deinitialized.
+ This method may be not be called more than once on a given handover package. The `RLMRealm` version
+ will remain _pinned_ until this method is called or this instance is deinitialized.
 
- @param error If an error occurs, upon return contains an `NSError` object that describes the problem.
+ @param error If an error occurs, this `NSError` object will be populated with information about the problem.
               If you are not interested in possible errors, pass in `NULL`. In the case of an error, the
               handover is invalidated and cannot be imported again.
- 
- @return A `RLMThreadImport` instance with the imported `objects` and their associated `Realm`.
 
- @see RLMThreadHandover
+ @return An `RLMThreadImport` instance with the imported `objects` and their associated `RLMRealm`.
+
+ @see RLMThreadImport
  */
 - (nullable RLMThreadImport *)importOnCurrentThreadWithError:(NSError **)error;
 
