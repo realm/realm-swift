@@ -403,8 +403,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     // MARK: Index Retrieval
 
     override func index(of object: C.Element) -> Int? { return base.index(of: object) }
-    override func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
 
+    override func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
 
     override func index(matching predicateFormat: String, _ args: Any...) -> Int? {
         return base.index(matching: NSPredicate(format: predicateFormat, argumentArray: args))
@@ -419,8 +419,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     override func filter(_ predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
 
     // MARK: Sorting
-    override func sorted(byProperty property: String, ascending: Bool) -> Results<C.Element> {
 
+    override func sorted(byProperty property: String, ascending: Bool) -> Results<C.Element> {
         return base.sorted(byProperty: property, ascending: ascending)
     }
 

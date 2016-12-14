@@ -213,8 +213,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration, ThreadConfin
 
     /**
      Returns a `Results` containing all objects matching the given predicate in the collection.
-     - parameter predicate: The predicate with which to filter the objects.
 
+     - parameter predicate: The predicate with which to filter the objects.
      */
     public func filter(_ predicate: NSPredicate) -> Results<T> {
         return Results<T>(rlmResults.objects(with: predicate))
@@ -281,8 +281,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration, ThreadConfin
      Returns the sum of the values of a given property over all the results.
 
      - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
-     - parameter property: The name of a property whose values should be summed.
 
+     - parameter property: The name of a property whose values should be summed.
      */
     public func sum<U: AddableType>(ofProperty property: String) -> U {
         return dynamicBridgeCast(fromObjectiveC: rlmResults.sum(ofProperty: property))
@@ -807,7 +807,7 @@ public final class Results<T: Object>: ResultsBase, ThreadConfined {
     }
 }
 
-    extension Results: RealmCollectionType {
+extension Results: RealmCollectionType {
     // MARK: Sequence Support
 
     /// Returns an `RLMGenerator` that yields successive elements in the results.

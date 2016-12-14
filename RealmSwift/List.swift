@@ -53,7 +53,7 @@ public class ListBase: RLMListBase {
  Lists can be filtered and sorted with the same predicates as `Results<T>`.
 
  Properties of `List` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
-*/
+ */
 public final class List<T: Object>: ListBase, ThreadConfined {
     // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 

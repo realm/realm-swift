@@ -426,8 +426,8 @@ public final class Realm {
      recommended to use the typed method `objects(type:)`.
 
      Returns all objects for a given class name in the Realm.
-     - parameter typeName: The class name of the objects to be returned.
 
+     - parameter typeName: The class name of the objects to be returned.
      - returns: All objects for the given class name as dynamic objects
 
      :nodoc:
@@ -613,7 +613,7 @@ public final class Realm {
      Used to pass objects between threads in a thread-safe manner.
 
      - warning: Note that the returned `ThreadHandover` must be imported at most once, and that the current version
-               of the Realm will remain pinned until this package is imported or deallocated.
+                of the Realm will remain pinned until this package is imported or deallocated.
 
      - parameter objects: The objects to pass between threads.
      - returns: A package that can be imported on a separate thread.
@@ -680,8 +680,8 @@ extension Realm {
 
     @available(*, unavailable, renamed: "isInWriteTransaction")
     public var inWriteTransaction: Bool { fatalError() }
-    @available(*, unavailable, renamed: "object(ofType:forPrimaryKey:)")
 
+    @available(*, unavailable, renamed: "object(ofType:forPrimaryKey:)")
     public func objectForPrimaryKey<T: Object>(_ type: T.Type, key: AnyObject) -> T? { fatalError() }
 
     @available(*, unavailable, renamed: "dynamicObject(ofType:forPrimaryKey:)")

@@ -132,8 +132,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase, ThreadConfined
 
     /**
      Returns the index of the first object matching the given predicate, or `nil` if no objects match.
-     - parameter predicate: The predicate with which to filter the objects.
 
+     - parameter predicate: The predicate with which to filter the objects.
      */
     public func index(matching predicate: NSPredicate) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: predicate))
@@ -274,8 +274,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase, ThreadConfined
      objects are empty.
 
      - warning: Only a property whose type conforms to the `MinMaxType` protocol can be specified.
-     - parameter property: The name of a property whose minimum value is desired.
 
+     - parameter property: The name of a property whose minimum value is desired.
      */
     public func max<U: MinMaxType>(ofProperty property: String) -> U? {
         return rlmResults.max(ofProperty: property).map(dynamicBridgeCast)
@@ -283,8 +283,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase, ThreadConfined
 
     /**
      Returns the sum of the values of a given property over all the linking objects.
-     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
 
+     - warning: Only a property whose type conforms to the `AddableType` protocol can be specified.
 
      - parameter property: The name of a property whose values should be summed.
      */
