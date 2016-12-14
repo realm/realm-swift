@@ -30,6 +30,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     application.applicationSupportsShakeToEdit = YES;
+    application.idleTimerDisabled = YES;
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UIViewController alloc] init];
