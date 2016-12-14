@@ -20,16 +20,16 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMCollection_Private.hpp"
+#import "RLMHandover_Private.hpp"
+#import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
-#import "RLMObject_Private.hpp"
 #import "RLMObservation.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
-#import "RLMHandover_Private.hpp"
 
 #import "results.hpp"
 
@@ -473,4 +473,3 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 @end
-
