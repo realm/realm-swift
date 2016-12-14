@@ -569,8 +569,9 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
 
  Used to pass objects between threads in a thread-safe manner.
 
- @warning Note that the returned `ThreadHandover` must be imported at most once, and that the current version of the
- Realm will remain pinned until this package is imported or deallocated.
+ @warning Note that the returned `RLMThreadHandover` must be imported at most
+          once, and that the current version of the Realm will not advance
+          until this package is imported or deallocated.
 
  @param objects The objects to pass between threads.
  @return A package that can be imported on a separate thread.
