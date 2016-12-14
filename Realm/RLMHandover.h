@@ -71,6 +71,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable RLMThreadImport *)importOnCurrentThreadWithError:(NSError **)error;
 
+#pragma mark - Unavailable Methods
+
+/**
+ `-[RLMThreadHandover init]` is not available because `RLMThreadHandover` cannot be created directly.
+ `RLMThreadHandover` instances must be obtained by calling `-[RLMRealm exportThreadHandoverWithObjects:]`.
+ */
+- (instancetype)init __attribute__((unavailable("RLMThreadHandover cannot be created directly")));
+
+/**
+ `+[RLMThreadHandover new]` is not available because `RLMThreadHandover` cannot be created directly.
+ `RLMThreadHandover` instances must be obtained by calling `-[RLMRealm exportThreadHandoverWithObjects:]`.
+ */
++ (instancetype)new __attribute__((unavailable("RLMThreadHandover cannot be created directly")));
+
 @end
 
 NS_ASSUME_NONNULL_END
