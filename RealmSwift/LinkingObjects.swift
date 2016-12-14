@@ -76,7 +76,7 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
 public final class LinkingObjects<T: Object>: LinkingObjectsBase, ThreadConfined {
     // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 
-    /// Element type contained in this collection.
+    /// The type of the elements contained within the collection.
     public typealias Element = T
 
     // MARK: Properties

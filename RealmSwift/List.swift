@@ -72,10 +72,6 @@ public final class List<T: Object>: ListBase, ThreadConfined {
 
     // MARK: Initializers
 
-    fileprivate override init!(array: RLMArray<RLMObject>!) {
-        super.init(array: array)
-    }
-
     /// Creates a `List` that holds Realm model objects of type `T`.
     public override init() {
         super.init(array: RLMArray(objectClassName: (T.self as Object.Type).className()))
@@ -553,7 +549,7 @@ extension List: _ThreadConfined {
     }
 
     static func bridge(data: RLMThreadConfined, metadata: Any?) -> List {
-        return List(array: data as! RLMArray)
+        return List(rlmArray: data as! RLMArray)
     }
 }
 
@@ -608,10 +604,6 @@ public final class List<T: Object>: ListBase, ThreadConfined {
     public var invalidated: Bool { return _rlmArray.invalidated }
 
     // MARK: Initializers
-
-    private override init!(array: RLMArray) {
-        super.init(array: array)
-    }
 
     /// Creates a `List` that holds Realm model objects of type `T`.
     public override init() {
@@ -1058,7 +1050,7 @@ extension List: _ThreadConfined {
     }
 
     static func bridge(data: RLMThreadConfined, metadata: Any?) -> List {
-        return List(array: data as! RLMArray)
+        return List(rlmArray: data as! RLMArray)
     }
 }
 

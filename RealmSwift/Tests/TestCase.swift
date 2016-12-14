@@ -106,7 +106,7 @@ class TestCase: XCTestCase {
         RLMRealm.resetRealmState()
     }
 
-    func dispatchAsyncAndWait(block: @escaping () -> ()) {
+    func dispatchAsyncAndWait(block: @escaping () -> Void) {
         queue.async {
             autoreleasepool {
                 block()
@@ -270,7 +270,7 @@ class TestCase: XCTestCase {
     func resetRealmState() {
         RLMRealm.resetRealmState()
     }
-    
+
     func dispatchAsyncAndWait(block: dispatch_block_t) {
         dispatch_async(queue) {
             autoreleasepool {

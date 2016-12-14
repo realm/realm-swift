@@ -818,7 +818,7 @@ class RealmTests: TestCase {
 
     func testHandoverNoObject() {
         let realm = try! Realm()
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftBoolObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftBoolObject.self).count)
         let package = realm.exportThreadHandover(containing: [] as [ThreadConfined])
         dispatchAsyncAndWait {
             let (realm, _) = try! package.importOnCurrentThread()
@@ -826,9 +826,9 @@ class RealmTests: TestCase {
                 realm.add(SwiftBoolObject())
             }
         }
-        XCTAssertEqual(0, realm.allObjects(ofType: SwiftBoolObject.self).count)
+        XCTAssertEqual(0, realm.objects(SwiftBoolObject.self).count)
         realm.refresh()
-        XCTAssertEqual(1, realm.allObjects(ofType: SwiftBoolObject.self).count)
+        XCTAssertEqual(1, realm.objects(SwiftBoolObject.self).count)
     }
 
     func testHandoverSingleObject() {
@@ -903,9 +903,9 @@ class RealmTests: TestCase {
 
     func testHandoverMultipleThreadConfinedTypes() {
         let realm = try! Realm()
-        let results = realm.allObjects(ofType: SwiftStringObject.self)
-            .filter(using: "stringCol != 'C'")
-            .sorted(onProperty: "stringCol", ascending: false)
+        let results = realm.objects(SwiftStringObject.self)
+            .filter("stringCol != 'C'")
+            .sorted(byProperty: "stringCol", ascending: false)
         let string = SwiftStringObject(value: ["hello world"])
         try! realm.write {
             realm.add(string)
@@ -950,7 +950,7 @@ class RealmTests: TestCase {
             XCTAssertEqual("jg", employees[0].name)
 
             try! realm.write {
-                employees.removeAllObjects()
+                employees.removeAll()
                 employees.append(SwiftEmployeeObject(value: ["name" : "jp"]))
                 employees.append(SwiftEmployeeObject(value: ["name" : "az"]))
             }
@@ -968,16 +968,16 @@ class RealmTests: TestCase {
 
     func testHandoverResults() {
         let realm = try! Realm()
-        let results = realm.allObjects(ofType: SwiftStringObject.self)
-            .filter(using: "stringCol != 'C'")
-            .sorted(onProperty: "stringCol", ascending: false)
+        let results = realm.objects(SwiftStringObject.self)
+            .filter("stringCol != 'C'")
+            .sorted(byProperty: "stringCol", ascending: false)
         try! realm.write {
-            realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["A"])
-            realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["B"])
-            realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["C"])
-            realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["D"])
+            realm.create(SwiftStringObject.self, value: ["A"])
+            realm.create(SwiftStringObject.self, value: ["B"])
+            realm.create(SwiftStringObject.self, value: ["C"])
+            realm.create(SwiftStringObject.self, value: ["D"])
         }
-        XCTAssertEqual(4, realm.allObjects(ofType: SwiftStringObject.self).count)
+        XCTAssertEqual(4, realm.objects(SwiftStringObject.self).count)
         XCTAssertEqual(3, results.count)
         XCTAssertEqual("D", results[0].stringCol)
         XCTAssertEqual("B", results[1].stringCol)
@@ -986,7 +986,7 @@ class RealmTests: TestCase {
         dispatchAsyncAndWait {
             let (realm, objects) = try! package.importOnCurrentThread()
             let results = objects[0]
-            XCTAssertEqual(4, realm.allObjects(ofType: SwiftStringObject.self).count)
+            XCTAssertEqual(4, realm.objects(SwiftStringObject.self).count)
             XCTAssertEqual(3, results.count)
             XCTAssertEqual("D", results[0].stringCol)
             XCTAssertEqual("B", results[1].stringCol)
@@ -994,20 +994,20 @@ class RealmTests: TestCase {
             try! realm.write {
                 realm.delete(results[2])
                 realm.delete(results[0])
-                realm.createObject(ofType: SwiftStringObject.self, populatedWith: ["E"])
+                realm.create(SwiftStringObject.self, value: ["E"])
             }
-            XCTAssertEqual(3, realm.allObjects(ofType: SwiftStringObject.self).count)
+            XCTAssertEqual(3, realm.objects(SwiftStringObject.self).count)
             XCTAssertEqual(2, results.count)
             XCTAssertEqual("E", results[0].stringCol)
             XCTAssertEqual("B", results[1].stringCol)
         }
-        XCTAssertEqual(4, realm.allObjects(ofType: SwiftStringObject.self).count)
+        XCTAssertEqual(4, realm.objects(SwiftStringObject.self).count)
         XCTAssertEqual(3, results.count)
         XCTAssertEqual("D", results[0].stringCol)
         XCTAssertEqual("B", results[1].stringCol)
         XCTAssertEqual("A", results[2].stringCol)
         realm.refresh()
-        XCTAssertEqual(3, realm.allObjects(ofType: SwiftStringObject.self).count)
+        XCTAssertEqual(3, realm.objects(SwiftStringObject.self).count)
         XCTAssertEqual(2, results.count)
         XCTAssertEqual("E", results[0].stringCol)
         XCTAssertEqual("B", results[1].stringCol)
@@ -1063,9 +1063,9 @@ class RealmTests: TestCase {
             company.employees.append(SwiftEmployeeObject(value: ["name" : "C"]))
             company.employees.append(SwiftEmployeeObject(value: ["name" : "D"]))
         }
-        let results = AnyRealmCollection(realm.allObjects(ofType: SwiftEmployeeObject.self)
-            .filter(using: "name != 'C'")
-            .sorted(onProperty: "name", ascending: false))
+        let results = AnyRealmCollection(realm.objects(SwiftEmployeeObject.self)
+            .filter("name != 'C'")
+            .sorted(byProperty: "name", ascending: false))
         let list = AnyRealmCollection(company.employees)
         XCTAssertEqual(3, results.count)
         XCTAssertEqual("D", results[0].name)

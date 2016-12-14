@@ -19,7 +19,7 @@
 import Realm
 
 #if swift(>=3.0)
-    
+
 /**
  An object which is bound to a thread-specific Realm instance, and so cannot be passed between threads.
 
@@ -43,7 +43,7 @@ internal protocol _ThreadConfined {
 }
 
 extension ThreadConfined {
-    internal var _private: _ThreadConfined {
+    internal var backing: _ThreadConfined {
         if let object = self as? _ThreadConfined {
             return object
         } else {
@@ -51,7 +51,7 @@ extension ThreadConfined {
         }
     }
 
-    static internal var _private: _ThreadConfined.Type {
+    static internal var backing: _ThreadConfined.Type {
         if let type = self as? _ThreadConfined.Type {
             return type
         } else {
@@ -62,7 +62,7 @@ extension ThreadConfined {
     /// The `Realm` the object is associated with
     // Note: cannot be a protocol requirement since `Realm` is not an Objective-C type.
     public var realm: Realm? {
-        return _private.realm
+        return backing.realm
     }
 }
 
@@ -73,9 +73,9 @@ public class ThreadHandover<T: ThreadConfined> {
     private let package: RLMThreadHandover
 
     internal init(realm: Realm, objects: [T]) {
-        self.metadata = objects.map { $0._private.bridgedMetadata }
+        self.metadata = objects.map { $0.backing.bridgedMetadata }
         self.types = objects.map { type(of: $0) }
-        self.package = realm.rlmRealm.exportThreadHandover(containing: objects.map { $0._private.bridgedData })
+        self.package = realm.rlmRealm.exportThreadHandover(containing: objects.map { $0.backing.bridgedData })
     }
 
     /**
@@ -101,7 +101,7 @@ public class ThreadHandover<T: ThreadConfined> {
         let objects: [T] = zip(types, zip(handoverables, metadata)).map { type, arguments in
             let handoverable = unsafeBitCast(arguments.0, to: RLMThreadConfined.self)
             let metadata = arguments.1
-            return type._private.bridge(data: handoverable, metadata: metadata) as! T
+            return type.backing.bridge(data: handoverable, metadata: metadata) as! T
         }
         return (Realm(handoverImport.realm), objects)
     }
@@ -132,7 +132,7 @@ internal protocol _ThreadConfined {
 }
 
 extension ThreadConfined {
-    internal var _private: _ThreadConfined {
+    internal var backing: _ThreadConfined {
         if let object = self as? _ThreadConfined {
             return object
         } else {
@@ -140,7 +140,7 @@ extension ThreadConfined {
         }
     }
 
-    static internal var _private: _ThreadConfined.Type {
+    static internal var backing: _ThreadConfined.Type {
         if let type = self as? _ThreadConfined.Type {
             return type
         } else {
@@ -151,7 +151,7 @@ extension ThreadConfined {
     // Note: cannot be a protocol requirement since `Realm` is not an Objective-C type.
     /// The `Realm` the object is associated with
     public var realm: Realm? {
-        return _private.realm
+        return backing.realm
     }
 }
 
@@ -162,9 +162,9 @@ public class ThreadHandover<T: ThreadConfined> {
     private let package: RLMThreadHandover
 
     internal init(realm: Realm, objects: [T]) {
-        self.metadata = objects.map { $0._private.bridgedMetadata }
+        self.metadata = objects.map { $0.backing.bridgedMetadata }
         self.types = objects.map { $0.dynamicType }
-        self.package = realm.rlmRealm.exportThreadHandover(containing: objects.map { $0._private.bridgedData })
+        self.package = realm.rlmRealm.exportThreadHandover(containing: objects.map { $0.backing.bridgedData })
     }
 
     /**
@@ -190,7 +190,7 @@ public class ThreadHandover<T: ThreadConfined> {
         let objects: [T] = zip(types, zip(handoverables, metadata)).map { type, arguments in
             let handoverable = unsafeBitCast(arguments.0, RLMThreadConfined.self)
             let metadata = arguments.1
-            return type._private.bridge(handoverable, metadata: metadata) as! T
+            return type.backing.bridge(handoverable, metadata: metadata) as! T
         }
         return (Realm(handoverImport.realm), objects)
     }

@@ -492,15 +492,15 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     // MARK: Handover
 
     override var bridgedData: RLMThreadConfined {
-        return base._private.bridgedData
+        return base.backing.bridgedData
     }
 
     override var bridgedMetadata: Any? {
-        return base._private.bridgedMetadata
+        return base.backing.bridgedMetadata
     }
 
     static override func bridge(data: RLMThreadConfined, metadata: Any?) -> _AnyRealmCollection {
-        let bridgedBase = C._private.bridge(data: data, metadata: metadata)
+        let bridgedBase = C.backing.bridge(data: data, metadata: metadata)
         return _AnyRealmCollection(base: bridgedBase as! C)
     }
 }
@@ -1318,15 +1318,15 @@ private final class _AnyRealmCollection<C: RealmCollectionType>: _AnyRealmCollec
     // MAKR: Handover
 
     override var bridgedData: RLMThreadConfined {
-        return base._private.bridgedData
+        return base.backing.bridgedData
     }
 
     override var bridgedMetadata: Any? {
-        return base._private.bridgedMetadata
+        return base.backing.bridgedMetadata
     }
 
     static override func bridge(data: RLMThreadConfined, metadata: Any?) -> _AnyRealmCollection {
-        let bridgedBase = C._private.bridge(data, metadata: metadata)
+        let bridgedBase = C.backing.bridge(data, metadata: metadata)
         return _AnyRealmCollection(base: bridgedBase as! C)
     }
 }
