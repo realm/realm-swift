@@ -24,12 +24,6 @@
 
 using namespace realm;
 
-@interface RLMThreadImport ()
-
-- (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMThreadConfined>> *)objects;
-
-@end
-
 @implementation RLMThreadImport
 
 - (instancetype)initWithRealm:(RLMRealm *)realm objects:(NSArray<id<RLMThreadConfined>> *)objects {
