@@ -105,7 +105,7 @@ static auto translateErrors(Function&& f, RLMErrorMode mode) {
                 if (object.realm == nil) {
                     @throw RLMException(@"Illegal thread export of unmanaged object, which doesn't require export");
                 } else {
-                    @throw RLMException(@"Object must be exported by same Realm that manages it");
+                    @throw RLMException(@"Object must be exported by the Realm that manages it");
                 }
             }
             handoverables.push_back(object.rlm_handoverData);

@@ -1833,8 +1833,9 @@
     StringObject *stringObject = [[StringObject alloc] init];
     IntObject *intObject = [[IntObject alloc] init];
     NSArray<RLMObject *> *objects = @[stringObject, intObject];
+
     RLMAssertThrowsWithReasonMatching([realm exportThreadHandoverWithObjects:objects],
-                                      @"Can only hand over objects that are mangaged by a Realm");
+                                      @"Illegal thread export of unmanaged object, which doesn't require export");
     [realm transactionWithBlock:^{
         [realm addObject:stringObject];
         [realm addObject:intObject];
@@ -1842,7 +1843,7 @@
 
     RLMRealm *otherRealm = [RLMRealm realmWithConfiguration:configuration error:nil];
     RLMAssertThrowsWithReasonMatching([otherRealm exportThreadHandoverWithObjects:objects],
-                                      @"Can only hand over objects from the Realm they belong");
+                                      @"Object must be exported by the Realm that manages it");
 }
 
 - (void)testHandoverObjects {
