@@ -87,18 +87,19 @@ static auto translateErrors(Function&& f, RLMErrorMode mode) {
         std::vector<realm::AnyThreadConfined> handoverables;
         handoverables.reserve(objects.count);
         for (id<RLMThreadConfined, RLMThreadConfined_Private> object in objects) {
-            if (![object conformsToProtocol: @protocol(RLMThreadConfined_Private)]) {
-                if ([object conformsToProtocol: @protocol(RLMThreadConfined)]) {
+            if (![object conformsToProtocol:@protocol(RLMThreadConfined_Private)]) {
+                if ([object conformsToProtocol:@protocol(RLMThreadConfined)]) {
                     @throw RLMException(@"Illegal custom conformance to `RLMThreadConfined` by `%@`", [object class]);
                 }
                 else {
                     @throw RLMException(@"Unexpected `%@` in array of expected `RLMThreadConfined` objects", [object class]);
                 }
             }
-            if (realm != object.realm) {
+            else if (realm != object.realm) {
                 if (object.realm == nil) {
                     @throw RLMException(@"Illegal thread export of unmanaged object, which doesn't require export");
-                } else {
+                }
+                else {
                     @throw RLMException(@"Object must be exported by the Realm that manages it");
                 }
             }
