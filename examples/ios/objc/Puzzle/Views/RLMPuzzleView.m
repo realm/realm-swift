@@ -27,11 +27,6 @@
 @property (nonatomic, assign) CGPoint gesturePieceOrigin;
 @property (nonatomic, weak)   UIView *draggingView;
 
-- (void)setupPuzzlePieces;
-- (CGPoint)pointForPiece:(RLMPuzzlePieceIdentifier)piece;
-- (void)layoutPiecesInOriginalPlaces;
-- (void)gestureRecognized:(UIPanGestureRecognizer *)gestureRecognizer;
-
 @end
 
 @implementation RLMPuzzleView

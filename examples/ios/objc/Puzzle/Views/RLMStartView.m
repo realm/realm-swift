@@ -40,14 +40,6 @@ static NSString * const kRLMPuzzlePasswordKey = @"RLMPuzzlePasswordKey";
 
 @property (nonatomic, assign) CGFloat keyboardHeight;
 
-- (void)buttonTapped:(id)sender;
-- (UITextField *)newTextField;
-
-+ (UIImage *)cellBackgroundImageBottom:(BOOL)bottom;
-
-- (void)keyboardWillShow:(NSNotification *)notification;
-- (void)keyboardWillHide:(NSNotification *)notification;
-
 @end
 
 @implementation RLMStartView
