@@ -13,5 +13,5 @@
 @end
 
 // This protocol enables typed collections. i.e.:
-// RLMArray<___FILEBASENAMEASIDENTIFIER___>
+// RLMArray<___FILEBASENAMEASIDENTIFIER___ *><___FILEBASENAMEASIDENTIFIER___>
 RLM_ARRAY_TYPE(___FILEBASENAMEASIDENTIFIER___)
