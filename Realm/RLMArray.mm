@@ -23,8 +23,8 @@
 #import "RLMObjectSchema.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMSwiftSupport.h"
-#import "RLMUtil.hpp"
 #import "RLMThreadSafeReference_Private.hpp"
+#import "RLMUtil.hpp"
 
 #import <realm/link_view.hpp>
 
