@@ -407,7 +407,22 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
 #pragma mark - Accessing Objects
 
-// TODO: Document
+/**
+ Returns the same object as the one referenced when the `RLMThreadSafeReference` was first created,
+ but resolved for the current Realm for this thread. Returns `nil` if this object was deleted after
+ the reference was created, or if the operation failed.
+
+ @param reference The thread-safe reference to the thread-confined object to resolve in this Realm.
+
+ @warning Every `RLMThreadSafeReference` object created must be resolved exactly once.
+          An exception will be thrown if a reference is resolved more than once.
+
+ @warning Cannot call within a write transaction.
+
+ @note Will refresh this Realm if the source Realm was at a later version than this one.
+
+ @see `+[RLMThreadSafeReference referenceWithThreadConfined:]`
+ */
 - (nullable id)resolveThreadSafeReference:(RLMThreadSafeReference *)reference
 NS_REFINED_FOR_SWIFT;
 
