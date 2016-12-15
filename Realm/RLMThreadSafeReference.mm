@@ -23,8 +23,8 @@
         return nil;
     }
 
-    REALM_ASSERT_DEBUG([threadConfined conformsToProtocol: @protocol(RLMThreadConfined)]);
-    if (![threadConfined conformsToProtocol: @protocol(RLMThreadConfined_Private)]) {
+    REALM_ASSERT_DEBUG([threadConfined conformsToProtocol:@protocol(RLMThreadConfined)]);
+    if (![threadConfined conformsToProtocol:@protocol(RLMThreadConfined_Private)]) {
         @throw RLMException(@"Illegal custom conformance to `RLMThreadConfined` by `%@`", threadConfined.class);
     }
     if (threadConfined.invalidated) {
