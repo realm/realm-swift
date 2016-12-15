@@ -49,53 +49,85 @@
     }
     else {
         [self showActivityIndicator];
-        [self logIn];
+        [self logInWithAuthURL:[self authURLFromString:kIPAddress] username:@"demo@realm.io" password:@"password" register:NO];
     }
 
     [self.window makeKeyAndVisible];
     return YES;
 }
 
-- (void)logIn
+- (void)logInWithAuthURL:(NSURL *)authURL username:(NSString *)username password:(NSString *)password register:(BOOL)reg
 {
-    // The base server path
-    // Set to connect to local or online host
-    NSURL *authURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:9080", kIPAddress]];
+    RLMSyncCredentials *credential = [RLMSyncCredentials credentialsWithUsername:username
+                                                                        password:password
+                                                                        register:reg];
 
-    // Creating a debug credential since this demo is just using the generated access token
-    // produced when running the Realm Object Server via the `start-object-server.command`
-    RLMSyncCredentials *credential = [RLMSyncCredentials credentialsWithUsername:@"demo@realm.io"
-                                                                        password:@"password"
-                                                                        register:NO];
+    self.activityIndicatorView.hidden = NO;
 
     // Log the user in (async, the Realm will start syncing once the user is logged in automatically)
     [RLMSyncUser logInWithCredentials:credential
                         authServerURL:authURL
                          onCompletion:^(RLMSyncUser *user, NSError *error) {
-                             if (error) {
-                                 self.activityIndicatorView.hidden = YES;
-                                 UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Login Failed" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
-                                 [alertController addAction:[UIAlertAction actionWithTitle:@"Retry" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                                     [self logIn];
-                                     self.activityIndicatorView.hidden = NO;
-                                 }]];
-                                 [self.window.rootViewController presentViewController:alertController animated:YES completion:nil];
-                             }
-                             else { // Logged in setup the default Realm
-                                    // The Realm virtual path on the server.
-                                    // The `~` represents the Realm user ID. Since the user ID is not known until you
-                                    // log in, the ~ is used as short-hand to represent this.
-                                 NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", kIPAddress]];
-                                 RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:syncURL];
-                                 RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
-                                 defaultConfig.syncConfiguration = syncConfig;
-                                 [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
-                                 
-                                 dispatch_async(dispatch_get_main_queue(), ^{
-                                     self.window.rootViewController.view = [DrawView new];
-                                 });
-                             }
-                         }];
+        if (error) {
+            self.activityIndicatorView.hidden = YES;
+            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Login Failed"
+                                                                                     message:error.localizedDescription
+                                                                              preferredStyle:UIAlertControllerStyleAlert];
+
+            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                textField.placeholder = @"Email address";
+                textField.text = username;
+            }];
+
+            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                textField.placeholder = @"Password";
+                textField.text = password;
+                textField.secureTextEntry = YES;
+            }];
+
+            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                textField.placeholder = @"Server address";
+                textField.text = authURL.host;
+            }];
+
+            void (^retryLogIn)(UIAlertAction *) = ^(UIAlertAction *action) {
+                NSString *username = alertController.textFields[0].text;
+                NSString *password = alertController.textFields[1].text;
+                NSURL *authURL = [self authURLFromString:alertController.textFields[2].text];
+                BOOL needRegister = [action.title isEqualToString:@"Register"];
+
+                [self logInWithAuthURL:authURL username:username password:password register:needRegister];
+            };
+
+            [alertController addAction:[UIAlertAction actionWithTitle:@"Register" style:UIAlertActionStyleDefault handler:retryLogIn]];
+            [alertController addAction:[UIAlertAction actionWithTitle:@"Login" style:UIAlertActionStyleDefault handler:retryLogIn]];
+
+            [self.window.rootViewController presentViewController:alertController animated:YES completion:nil];
+        }
+        else { // Logged in setup the default Realm
+            // The Realm virtual path on the server.
+            // The `~` represents the Realm user ID. Since the user ID is not known until you
+            // log in, the ~ is used as short-hand to represent this.
+            NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:%@/~/Draw", authURL.host, authURL.port]];
+            RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:syncURL];
+            RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
+            defaultConfig.syncConfiguration = syncConfig;
+            [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.window.rootViewController.view = [DrawView new];
+            });
+        }
+    }];
+}
+
+- (NSURL *)authURLFromString:(NSString *)string
+{
+    NSURL *url = [NSURL URLWithString:string];
+    return [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@",
+                                 url.scheme ?: @"http",
+                                 url.host ?: kIPAddress,
+                                 url.port ?: @9080]];
 }
 
 - (void)showActivityIndicator
