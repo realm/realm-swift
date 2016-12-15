@@ -229,7 +229,7 @@ class ObjectTests: TestCase {
     }
 
     func testValueForKey() {
-        let test: (SwiftObject) -> () = { object in
+        let test: (SwiftObject) -> Void = { object in
             XCTAssertEqual(object.value(forKey: "boolCol") as! Bool!, false)
             XCTAssertEqual(object.value(forKey: "intCol") as! Int!, 123)
             XCTAssertEqual(object.value(forKey: "floatCol") as! Float!, 1.23 as Float)
@@ -252,7 +252,7 @@ class ObjectTests: TestCase {
         }
     }
 
-    func setAndTestAllTypes(_ setter: (SwiftObject, Any?, String) -> (),
+    func setAndTestAllTypes(_ setter: (SwiftObject, Any?, String) -> Void,
                             getter: (SwiftObject, String) -> (Any?), object: SwiftObject) {
         setter(object, true, "boolCol")
         XCTAssertEqual(getter(object, "boolCol") as! Bool!, true)
@@ -296,7 +296,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
     }
 
-    func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, Any?, String) -> (),
+    func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, Any?, String) -> Void,
                                    getter: (DynamicObject, String) -> (Any?), object: DynamicObject,
                                    boolObject: DynamicObject) {
         setter(object, true, "boolCol")
@@ -340,7 +340,7 @@ class ObjectTests: TestCase {
     }
 
     // Yields a read-write migration `SwiftObject` to the given block
-    private func withMigrationObject(block: @escaping ((MigrationObject, Migration) -> ())) {
+    private func withMigrationObject(block: @escaping ((MigrationObject, Migration) -> Void)) {
         autoreleasepool {
             let realm = self.realmWithTestPath()
             try! realm.write {
@@ -363,7 +363,7 @@ class ObjectTests: TestCase {
     }
 
     func testSetValueForKey() {
-        let setter: (Object, Any?, String) -> () = { object, value, key in
+        let setter: (Object, Any?, String) -> Void = { object, value, key in
             object.setValue(value, forKey: key)
             return
         }
@@ -384,7 +384,7 @@ class ObjectTests: TestCase {
     }
 
     func testSubscript() {
-        let setter: (Object, Any?, String) -> () = { object, value, key in
+        let setter: (Object, Any?, String) -> Void = { object, value, key in
             object[key] = value
             return
         }
@@ -650,7 +650,7 @@ class ObjectTests: TestCase {
     }
 
     func testValueForKey() {
-        let test: (SwiftObject) -> () = { object in
+        let test: (SwiftObject) -> Void = { object in
             XCTAssertEqual(object.valueForKey("boolCol") as! Bool!, false)
             XCTAssertEqual(object.valueForKey("intCol") as! Int!, 123)
             XCTAssertEqual(object.valueForKey("floatCol") as! Float!, 1.23 as Float)
@@ -670,7 +670,7 @@ class ObjectTests: TestCase {
         }
     }
 
-    func setAndTestAllTypes(setter: (SwiftObject, AnyObject?, String) -> (),
+    func setAndTestAllTypes(setter: (SwiftObject, AnyObject?, String) -> Void,
                             getter: (SwiftObject, String) -> (AnyObject?), object: SwiftObject) {
         setter(object, true, "boolCol")
         XCTAssertEqual(getter(object, "boolCol") as! Bool!, true)
@@ -713,7 +713,7 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
     }
 
-    func dynamicSetAndTestAllTypes(setter: (DynamicObject, AnyObject?, String) -> (),
+    func dynamicSetAndTestAllTypes(setter: (DynamicObject, AnyObject?, String) -> Void,
                                    getter: (DynamicObject, String) -> (AnyObject?), object: DynamicObject,
                                    boolObject: DynamicObject) {
         setter(object, true, "boolCol")
@@ -756,7 +756,7 @@ class ObjectTests: TestCase {
     }
 
     // Yields a read-write migration `SwiftObject` to the given block
-    private func withMigrationObject(block: ((MigrationObject, Migration) -> ())) {
+    private func withMigrationObject(block: ((MigrationObject, Migration) -> Void)) {
         autoreleasepool {
             let realm = self.realmWithTestPath()
             try! realm.write {
@@ -779,7 +779,7 @@ class ObjectTests: TestCase {
     }
 
     func testSetValueForKey() {
-        let setter: (Object, AnyObject?, String) -> () = { object, value, key in
+        let setter: (Object, AnyObject?, String) -> Void = { object, value, key in
             object.setValue(value, forKey: key)
             return
         }
@@ -800,7 +800,7 @@ class ObjectTests: TestCase {
     }
 
     func testSubscript() {
-        let setter: (Object, AnyObject?, String) -> () = { object, value, key in
+        let setter: (Object, AnyObject?, String) -> Void = { object, value, key in
             object[key] = value
             return
         }

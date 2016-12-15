@@ -546,6 +546,9 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
         case NSNotEqualToPredicateOperatorType:
             m_query.and_query(column.not_equal(value, caseSensitive));
             break;
+        case NSLikePredicateOperatorType:
+            m_query.and_query(column.like(value, caseSensitive));
+            break;
         default:
             @throw RLMPredicateException(@"Invalid operator type",
                                          @"Operator '%@' not supported for string type", operatorName(operatorType));

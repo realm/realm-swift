@@ -45,20 +45,6 @@
     XCTAssertTrue([firstUser.identity isEqualToString:secondUser.identity]);
     // Authentication server property should be properly set.
     XCTAssertEqualObjects(firstUser.authenticationServer, [RLMSyncTestCase authServerURL]);
-
-    // Trying to "create" a username/password account that already exists should cause an error.
-    XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    [RLMSyncUser logInWithCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME() register:YES]
-                        authServerURL:[RLMObjectServerTests authServerURL]
-                         onCompletion:^(RLMSyncUser *user, NSError *error) {
-        XCTAssertNil(user);
-        XCTAssertNotNil(error);
-        // FIXME: Improve error message
-        XCTAssertEqualObjects(error.localizedDescription,
-                              @"The operation couldn’t be completed. (io.realm.sync error 3.)");
-        [expectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 /// A valid admin token should be able to log in a user.
@@ -70,6 +56,74 @@
     XCTAssertNotNil(credentials);
 
     [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
+}
+
+#pragma mark - Authentication Errors
+
+/// An invalid username/password credential should not be able to log in a user and a corresponding error should be generated.
+- (void)testInvalidPasswordAuthentication {
+    [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:ACCOUNT_NAME() register:YES]
+                          server:[RLMSyncTestCase authServerURL]];
+
+    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithUsername:ACCOUNT_NAME()
+                                                                         password:@"INVALID_PASSWORD"
+                                                                         register:NO];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    [RLMSyncUser logInWithCredentials:credentials
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNil(user);
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
+        XCTAssertNotNil(error.localizedDescription);
+
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+/// A non-existsing user should not be able to log in and a corresponding error should be generated.
+- (void)testNonExistingUsernameAuthentication {
+    RLMSyncCredentials *credentials = [RLMSyncTestCase basicCredentialsWithName:ACCOUNT_NAME()
+                                                                       register:NO];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    [RLMSyncUser logInWithCredentials:credentials
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNil(user);
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
+        XCTAssertNotNil(error.localizedDescription);
+
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+/// Registering a user with existing username should return corresponding error.
+- (void)testExistingUsernameRegistration {
+    RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                            register:YES];
+
+    [self logInUserForCredentials:credentials server:[RLMSyncTestCase authServerURL]];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    [RLMSyncUser logInWithCredentials:credentials
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                        onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNil(user);
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
+        XCTAssertNotNil(error.localizedDescription);
+
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 #pragma mark - Users

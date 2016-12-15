@@ -34,7 +34,7 @@ public final class RLMIterator<T: Object>: IteratorProtocol {
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public func next() -> T? { // swiftlint:disable:this valid_docs
-        let accessor = generatorBase.next() as! T?
+        let accessor = unsafeBitCast(generatorBase.next() as! Object?, to: Optional<T>.self)
         if let accessor = accessor {
             RLMInitializeSwiftAccessorGenerics(accessor)
         }
@@ -761,11 +761,11 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> ())
+    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block) }
 
     /// :nodoc:
-    public func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> ())
+    public func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block) }
 }
 
@@ -817,7 +817,7 @@ public final class RLMGenerator<T: Object>: GeneratorType {
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public func next() -> T? { // swiftlint:disable:this valid_docs
-        let accessor = generatorBase.next() as! T?
+        let accessor = unsafeBitCast(generatorBase.next() as! Object?, Optional<T>.self)
         if let accessor = accessor {
             RLMInitializeSwiftAccessorGenerics(accessor)
         }
@@ -1532,11 +1532,11 @@ public final class AnyRealmCollection<T: Object>: RealmCollectionType {
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
+    public func addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block) }
 
     /// :nodoc:
-    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> ())
+    public func _addNotificationBlock(block: (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._addNotificationBlock(block) }
 }
 

@@ -43,6 +43,8 @@ examples = [
   "examples/tvos/swift-3.0",
   "examples/ios/swift-3.0.1",
   "examples/tvos/swift-3.0.1",
+  "examples/ios/swift-3.0.2",
+  "examples/tvos/swift-3.0.2",
 ]
 
 # Remove reference to Realm.xcodeproj from all example workspaces and realize symlinks.
@@ -63,6 +65,8 @@ framework_directory_for_example = {
   'examples/tvos/swift-2.2' => '../../../tvos/swift-2.2',
   'examples/ios/swift-3.0.1' => '../../../ios/swift-3.0.1',
   'examples/tvos/swift-3.0.1' => '../../../tvos/swift-3.0.1',
+  'examples/ios/swift-3.0.2' => '../../../ios/swift-3.0.2',
+  'examples/tvos/swift-3.0.2' => '../../../tvos/swift-3.0.2',
   'examples/ios/swift-3.0' => '../../../ios/swift-3.0',
   'examples/tvos/swift-3.0' => '../../../tvos/swift-3.0',
 }
@@ -78,7 +82,7 @@ end
 
 # Update Playground imports and instructions
 
-playground_swift_versions = ['2.2', '3.0', '3.0.1']
+playground_swift_versions = ['2.2', '3.0', '3.0.1', '3.0.2']
 playground_swift_versions.each do |swift_version|
   playground_file = "examples/ios/swift-#{swift_version}/GettingStarted.playground/Contents.swift"
   replace_in_file(playground_file, 'choose RealmSwift', 'choose PlaygroundFrameworkWrapper')

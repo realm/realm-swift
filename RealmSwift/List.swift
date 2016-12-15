@@ -130,10 +130,10 @@ public final class List<T: Object>: ListBase {
     }
 
     /// Returns the first object in the list, or `nil` if the list is empty.
-    public var first: T? { return _rlmArray.firstObject() as! T? }
+    public var first: T? { return unsafeBitCast(_rlmArray.firstObject(), to: Optional<T>.self) }
 
     /// Returns the last object in the list, or `nil` if the list is empty.
-    public var last: T? { return _rlmArray.lastObject() as! T? }
+    public var last: T? { return unsafeBitCast(_rlmArray.lastObject(), to: Optional<T>.self) }
 
     // MARK: KVC
 
@@ -444,7 +444,7 @@ public final class List<T: Object>: ListBase {
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<List>) -> ()) -> NotificationToken {
+    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
         return _rlmArray.addNotificationBlock { list, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
@@ -639,7 +639,7 @@ public final class List<T: Object>: ListBase {
     public subscript(index: Int) -> T {
         get {
             throwForNegativeIndex(index)
-            return _rlmArray[UInt(index)] as! T
+            return unsafeBitCast(_rlmArray[UInt(index)], T.self)
         }
         set {
             throwForNegativeIndex(index)
@@ -648,10 +648,10 @@ public final class List<T: Object>: ListBase {
     }
 
     /// Returns the first object in the list, or `nil` if the list is empty.
-    public var first: T? { return _rlmArray.firstObject() as! T? }
+    public var first: T? { return unsafeBitCast(_rlmArray.firstObject(), Optional<T>.self) }
 
     /// Returns the last object in the list, or `nil` if the list is empty.
-    public var last: T? { return _rlmArray.lastObject() as! T? }
+    public var last: T? { return unsafeBitCast(_rlmArray.lastObject(), Optional<T>.self) }
 
     // MARK: KVC
 
@@ -972,7 +972,7 @@ public final class List<T: Object>: ListBase {
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     @warn_unused_result(message="You must hold on to the NotificationToken returned from addNotificationBlock")
-    public func addNotificationBlock(block: (RealmCollectionChange<List>) -> ()) -> NotificationToken {
+    public func addNotificationBlock(block: (RealmCollectionChange<List>) -> Void) -> NotificationToken {
         return _rlmArray.addNotificationBlock { list, change, error in
             block(RealmCollectionChange.fromObjc(self, change: change, error: error))
         }

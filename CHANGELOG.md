@@ -3,11 +3,23 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Sync Breaking Changes (In Beta)
 
-* None.
+* Rename occurences of "iCloud" with "CloudKit" in APIs and comments to match
+  naming in the Realm Object Server.
 
 ### API Breaking Changes
 
 * None.
+
+### Enhancements
+
+* Add support for 'LIKE' queries (wildcard matching).
+
+### Bugfixes
+
+* Fix authenticating with CloudKit.
+
+2.1.1 Release notes (2016-12-02)
+=============================================================
 
 ### Enhancements
 
@@ -17,6 +29,9 @@ x.x.x Release notes (yyyy-MM-dd)
     * `readOnly` set with a sync configuration.
     * `readOnly` set with a migration block.
     * migration block set with a sync configuration.
+* Greatly improve performance of write transactions which make a large number of
+  changes to indexed properties, including the automatic migration when opening
+  files written by Realm 1.x.
 
 ### Bugfixes
 
@@ -29,6 +44,13 @@ x.x.x Release notes (yyyy-MM-dd)
   thread.
 * Logged-out users are no longer returned from `+[RLMSyncUser currentUser]` or
   `+[RLMSyncUser allUsers]`.
+* Fix several issues which could occur when the 1001st object of a given type
+  was created or added to an RLMArray/List, including crashes when rerunning
+  existing queries and possibly data corruption.
+* Fix a potential crash when the application exits due to a race condition in
+  the destruction of global static variables.
+* Fix race conditions when waiting for sync uploads or downloads to complete
+  which could result in crashes or the callback being called too early.
 
 2.1.0 Release notes (2016-11-18)
 =============================================================

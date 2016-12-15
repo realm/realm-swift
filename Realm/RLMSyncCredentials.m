@@ -28,7 +28,7 @@ RLMIdentityProvider const RLMIdentityProviderUsernamePassword       = @"password
 RLMIdentityProvider const RLMIdentityProviderFacebook               = @"facebook";
 RLMIdentityProvider const RLMIdentityProviderTwitter                = @"twitter";
 RLMIdentityProvider const RLMIdentityProviderGoogle                 = @"google";
-RLMIdentityProvider const RLMIdentityProviderICloud                 = @"icloud";
+RLMIdentityProvider const RLMIdentityProviderCloudKit               = @"cloudkit";
 
 @interface RLMSyncCredentials ()
 
@@ -52,8 +52,8 @@ RLMIdentityProvider const RLMIdentityProviderICloud                 = @"icloud";
     return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderGoogle userInfo:nil];
 }
 
-+ (instancetype)credentialsWithICloudToken:(RLMSyncCredentialsToken)token {
-    return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderICloud userInfo:nil];
++ (instancetype)credentialsWithCloudKitToken:(RLMSyncCredentialsToken)token {
+    return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderCloudKit userInfo:nil];
 }
 
 + (instancetype)credentialsWithUsername:(NSString *)username

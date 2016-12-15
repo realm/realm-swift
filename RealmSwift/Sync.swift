@@ -173,9 +173,9 @@ public struct SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(googleToken: token))
     }
 
-    /// Initialize new credentials using an iCloud account token.
-    public static func iCloud(token: Token) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(iCloudToken: token))
+    /// Initialize new credentials using a CloudKit account token.
+    public static func cloudKit(token: Token) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(cloudKitToken: token))
     }
 
     /// Initialize new credentials using a Realm Object Server username and password.
@@ -399,9 +399,9 @@ public struct SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(googleToken: token))
     }
 
-    /// Initialize new credentials using an iCloud account token.
-    public static func iCloud(token: Token) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(ICloudToken: token))
+    /// Initialize new credentials using a CloudKit account token.
+    public static func cloudKit(token: Token) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(cloudKitToken: token))
     }
 
     /// Initialize new credentials using a Realm Object Server username and password.
