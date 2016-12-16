@@ -68,56 +68,58 @@
     [RLMSyncUser logInWithCredentials:credential
                         authServerURL:authURL
                          onCompletion:^(RLMSyncUser *user, NSError *error) {
-        if (error) {
-            self.activityIndicatorView.hidden = YES;
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Login Failed"
-                                                                                     message:error.localizedDescription
-                                                                              preferredStyle:UIAlertControllerStyleAlert];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (error) {
+                self.activityIndicatorView.hidden = YES;
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Login Failed"
+                                                                                         message:error.localizedDescription
+                                                                                  preferredStyle:UIAlertControllerStyleAlert];
 
-            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-                textField.placeholder = @"Email address";
-                textField.text = username;
-            }];
+                [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                    textField.placeholder = @"Email address";
+                    textField.text = username;
+                }];
 
-            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-                textField.placeholder = @"Password";
-                textField.text = password;
-                textField.secureTextEntry = YES;
-            }];
+                [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                    textField.placeholder = @"Password";
+                    textField.text = password;
+                    textField.secureTextEntry = YES;
+                }];
 
-            [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-                textField.placeholder = @"Server address";
-                textField.text = authURL.host;
-            }];
+                [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                    textField.placeholder = @"Server address";
+                    textField.text = authURL.host;
+                }];
 
-            void (^retryLogIn)(UIAlertAction *) = ^(UIAlertAction *action) {
-                NSString *username = alertController.textFields[0].text;
-                NSString *password = alertController.textFields[1].text;
-                NSURL *authURL = [self authURLFromString:alertController.textFields[2].text];
-                BOOL needRegister = [action.title isEqualToString:@"Register"];
+                void (^retryLogIn)(UIAlertAction *) = ^(UIAlertAction *action) {
+                    NSString *username = alertController.textFields[0].text;
+                    NSString *password = alertController.textFields[1].text;
+                    NSURL *authURL = [self authURLFromString:alertController.textFields[2].text];
+                    BOOL needRegister = [action.title isEqualToString:@"Register"];
 
-                [self logInWithAuthURL:authURL username:username password:password register:needRegister];
-            };
+                    [self logInWithAuthURL:authURL username:username password:password register:needRegister];
+                };
 
-            [alertController addAction:[UIAlertAction actionWithTitle:@"Register" style:UIAlertActionStyleDefault handler:retryLogIn]];
-            [alertController addAction:[UIAlertAction actionWithTitle:@"Login" style:UIAlertActionStyleDefault handler:retryLogIn]];
+                [alertController addAction:[UIAlertAction actionWithTitle:@"Register" style:UIAlertActionStyleDefault handler:retryLogIn]];
+                [alertController addAction:[UIAlertAction actionWithTitle:@"Login" style:UIAlertActionStyleDefault handler:retryLogIn]];
 
-            [self.window.rootViewController presentViewController:alertController animated:YES completion:nil];
-        }
-        else { // Logged in setup the default Realm
-            // The Realm virtual path on the server.
-            // The `~` represents the Realm user ID. Since the user ID is not known until you
-            // log in, the ~ is used as short-hand to represent this.
-            NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:%@/~/Draw", authURL.host, authURL.port]];
-            RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:syncURL];
-            RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
-            defaultConfig.syncConfiguration = syncConfig;
-            [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
+                [self.window.rootViewController presentViewController:alertController animated:YES completion:nil];
+            }
+            else { // Logged in setup the default Realm
+                // The Realm virtual path on the server.
+                // The `~` represents the Realm user ID. Since the user ID is not known until you
+                // log in, the ~ is used as short-hand to represent this.
+                NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:%@/~/Draw", authURL.host, authURL.port]];
+                RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:syncURL];
+                RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
+                defaultConfig.syncConfiguration = syncConfig;
+                [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
 
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.window.rootViewController.view = [DrawView new];
-            });
-        }
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    self.window.rootViewController.view = [DrawView new];
+                });
+            }
+        });
     }];
 }
 
