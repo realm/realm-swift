@@ -37,7 +37,6 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 @property (nonatomic, strong) RLMNotificationToken *notificationToken;
 
 @property (nonatomic, strong) RLMResults *puzzles;
-@property (nonatomic, strong) NSString *currentPuzzleID;
 
 @end
 
@@ -133,7 +132,6 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 {
     //Create the over-arching puzzle object
     RLMPuzzle *newPuzzle = [RLMPuzzle objectForPrimaryKey:kRLMPuzzleUUID];
-    self.currentPuzzleID = newPuzzle.uuid;
     
     BOOL firstTime = NO;
     if (newPuzzle.pieces.count == 0) {
@@ -169,7 +167,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 
 - (void)updatePuzzleState
 {
-    RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:self.currentPuzzleID];
+    RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:kRLMPuzzleUUID];
     if (puzzle == nil)
         return;
     
@@ -181,7 +179,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 #pragma mark - Puzzle View Delegate -
 - (void)puzzleView:(RLMPuzzleView *)puzzleView pieceMoved:(RLMPuzzlePieceIdentifier)pieceIdentifier toPoint:(CGPoint)point
 {
-    RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:self.currentPuzzleID];
+    RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:kRLMPuzzleUUID];
     if (puzzle == nil || pieceIdentifier >= puzzle.pieces.count)
         return;
     
