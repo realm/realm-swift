@@ -22,7 +22,7 @@ target:
   - osx-object-server
 
   - ios-device-objc
-  - ios-device-swift
+  # - ios-device-swift
   - tvos-device
 configuration:
   - Debug
