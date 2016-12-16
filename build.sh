@@ -642,7 +642,7 @@ case "$COMMAND" in
         ;;
 
     "test-ios-devices-objc")
-        test_devices iphoneos "Realm iOS static" "$CONFIGURATION"
+        test_devices iphoneos "Realm" "$CONFIGURATION"
         exit $?
         ;;
 
