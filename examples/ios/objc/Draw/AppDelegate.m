@@ -49,7 +49,8 @@
     }
     else {
         [self showActivityIndicator];
-        [self logInWithAuthURL:[self authURLFromString:kIPAddress] username:@"demo@realm.io" password:@"password" register:NO];
+        NSURL *authURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:9080", kIPAddress]];
+        [self logInWithAuthURL:authURL username:@"demo@realm.io" password:@"password" register:NO];
     }
 
     [self.window makeKeyAndVisible];
@@ -87,14 +88,14 @@
                 }];
 
                 [alertController addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-                    textField.placeholder = @"Server address";
-                    textField.text = authURL.host;
+                    textField.placeholder = @"Server URL";
+                    textField.text = authURL.absoluteString;
                 }];
 
                 void (^retryLogIn)(UIAlertAction *) = ^(UIAlertAction *action) {
                     NSString *username = alertController.textFields[0].text;
                     NSString *password = alertController.textFields[1].text;
-                    NSURL *authURL = [self authURLFromString:alertController.textFields[2].text];
+                    NSURL *authURL = [NSURL URLWithString:alertController.textFields[2].text];
                     BOOL needRegister = [action.title isEqualToString:@"Register"];
 
                     [self logInWithAuthURL:authURL username:username password:password register:needRegister];
@@ -121,15 +122,6 @@
             }
         });
     }];
-}
-
-- (NSURL *)authURLFromString:(NSString *)string
-{
-    NSURL *url = [NSURL URLWithString:string];
-    return [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@",
-                                 url.scheme ?: @"http",
-                                 url.host ?: kIPAddress,
-                                 url.port ?: @9080]];
 }
 
 - (void)showActivityIndicator
