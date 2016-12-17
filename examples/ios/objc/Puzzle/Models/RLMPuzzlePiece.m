@@ -20,11 +20,6 @@
 
 @implementation RLMPuzzlePiece
 
-+ (NSDictionary *)defaultPropertyValues
-{
-    return @{@"userID":@""};
-}
-
 + (NSString *)primaryKey
 {
     return @"identifier";
