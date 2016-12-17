@@ -20,7 +20,7 @@
 
 @interface RLMPuzzle : RLMObject
 
-@property NSString *uuid;
+@property NSInteger uuid;
 @property RLMArray<RLMPuzzlePiece> *pieces;
 
 @end

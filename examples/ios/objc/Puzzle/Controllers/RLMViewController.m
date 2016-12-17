@@ -25,8 +25,8 @@
 #import "RLMPuzzleView.h"
 #import "RLMStartView.h"
 
-static NSString *kRLMPuzzleUUID = @"7387fa06-dffa-4891-97e1-9e35c3898658";
-static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
+static NSInteger kRLMPuzzleUUID = 0;
+static CGFloat   kRLMPuzzleCanvasMaxSize = 768.0f;
 
 @interface RLMViewController () <RLMPuzzleViewDelegate, UIAlertViewDelegate>
 
@@ -114,7 +114,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
         [RLMRealmConfiguration setDefaultConfiguration:configuration];
         
         RLMRealm *realm = [RLMRealm defaultRealm];
-        RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:kRLMPuzzleUUID];
+        RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:@(kRLMPuzzleUUID)];
         if (!puzzle) {
             RLMPuzzle *puzzle = [[RLMPuzzle alloc] init];
             puzzle.uuid = kRLMPuzzleUUID;
@@ -131,7 +131,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 - (void)startPuzzle
 {
     //Create the over-arching puzzle object
-    RLMPuzzle *newPuzzle = [RLMPuzzle objectForPrimaryKey:kRLMPuzzleUUID];
+    RLMPuzzle *newPuzzle = [RLMPuzzle objectForPrimaryKey:@(kRLMPuzzleUUID)];
     
     BOOL firstTime = NO;
     if (newPuzzle.pieces.count == 0) {
@@ -167,7 +167,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 
 - (void)updatePuzzleState
 {
-    RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:kRLMPuzzleUUID];
+    RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:@(kRLMPuzzleUUID)];
     if (puzzle == nil)
         return;
     
@@ -179,7 +179,7 @@ static CGFloat kRLMPuzzleCanvasMaxSize = 768.0f;
 #pragma mark - Puzzle View Delegate -
 - (void)puzzleView:(RLMPuzzleView *)puzzleView pieceMoved:(RLMPuzzlePieceIdentifier)pieceIdentifier toPoint:(CGPoint)point
 {
-    RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:kRLMPuzzleUUID];
+    RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:@(kRLMPuzzleUUID)];
     if (puzzle == nil || pieceIdentifier >= puzzle.pieces.count)
         return;
     
