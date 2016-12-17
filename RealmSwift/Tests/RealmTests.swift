@@ -694,7 +694,7 @@ class RealmTests: TestCase {
     func testRemoveNotification() {
         let realm = try! Realm()
         var notificationCalled = false
-        let token = realm.addNotificationBlock { (notification, realm) -> Void in
+        let token = realm.addNotificationBlock { (_, realm) -> Void in
             XCTAssertEqual(realm.configuration.fileURL, self.defaultRealmURL())
             notificationCalled = true
         }

@@ -355,7 +355,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<LinkingObjects>) -> Void) -> NotificationToken {
-        return rlmResults.addNotificationBlock { results, change, error in
+        return rlmResults.addNotificationBlock { _, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
     }

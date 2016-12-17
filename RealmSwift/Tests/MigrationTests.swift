@@ -94,7 +94,7 @@ class MigrationTests: TestCase {
 
         var didRun = false
         let config = Realm.Configuration(fileURL: defaultRealmURL(), schemaVersion: 1,
-                                         migrationBlock: { _, _ in didRun = true })
+                                         migrationBlock: { _ in didRun = true })
         Realm.Configuration.defaultConfiguration = config
 
         try! Realm.performMigration()
@@ -144,7 +144,7 @@ class MigrationTests: TestCase {
             realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftStringObject", properties: [prop])
         }
 
-        migrateAndTestDefaultRealm { migration, oldSchemaVersion in
+        migrateAndTestDefaultRealm { migration, _ in
             XCTAssertEqual(migration.oldSchema.objectSchema.count, 1)
             XCTAssertGreaterThan(migration.newSchema.objectSchema.count, 1)
             XCTAssertEqual(migration.oldSchema.objectSchema[0].properties.count, 1)
@@ -159,12 +159,12 @@ class MigrationTests: TestCase {
             _ = try! Realm()
         }
 
-        migrateAndTestDefaultRealm { migration, oldSchemaVersion in
-            migration.enumerateObjects(ofType: "SwiftStringObject", { oldObj, newObj in
+        migrateAndTestDefaultRealm { migration, _ in
+            migration.enumerateObjects(ofType: "SwiftStringObject", { _ in
                 XCTFail("No objects to enumerate")
             })
 
-            migration.enumerateObjects(ofType: "NoSuchClass", {oldObj, newObj in}) // shouldn't throw
+            migration.enumerateObjects(ofType: "NoSuchClass", { _ in }) // shouldn't throw
         }
 
         autoreleasepool {
@@ -175,7 +175,7 @@ class MigrationTests: TestCase {
             }
         }
 
-        migrateAndTestDefaultRealm(2) { migration, oldSchemaVersion in
+        migrateAndTestDefaultRealm(2) { migration, _ in
             var count = 0
             migration.enumerateObjects(ofType: "SwiftStringObject", { oldObj, newObj in
                 XCTAssertEqual(newObj!.objectSchema.className, "SwiftStringObject")
@@ -195,7 +195,7 @@ class MigrationTests: TestCase {
             }
         }
 
-        migrateAndTestDefaultRealm(3) { migration, oldSchemaVersion in
+        migrateAndTestDefaultRealm(3) { migration, _ in
             migration.enumerateObjects(ofType: "SwiftArrayPropertyObject") { oldObject, newObject in
                 XCTAssertTrue(oldObject! as AnyObject is MigrationObject)
                 XCTAssertTrue(newObject! as AnyObject is MigrationObject)
@@ -223,7 +223,7 @@ class MigrationTests: TestCase {
             }
         }
 
-        migrateAndTestDefaultRealm(4) { migration, oldSchemaVersion in
+        migrateAndTestDefaultRealm(4) { migration, _ in
             migration.enumerateObjects(ofType: "SwiftOptionalObject") { oldObject, newObject in
                 XCTAssertTrue(oldObject! as AnyObject is MigrationObject)
                 XCTAssertTrue(newObject! as AnyObject is MigrationObject)
@@ -260,7 +260,7 @@ class MigrationTests: TestCase {
             _ = try! Realm()
         }
 
-        migrateAndTestDefaultRealm { migration, oldSchemaVersion in
+        migrateAndTestDefaultRealm { migration, _ in
             migration.create("SwiftStringObject", value: ["string"])
             migration.create("SwiftStringObject", value: ["stringCol": "string"])
             migration.create("SwiftStringObject")
@@ -285,9 +285,9 @@ class MigrationTests: TestCase {
             }
         }
 
-        migrateAndTestDefaultRealm { migration, oldSchemaVersion in
+        migrateAndTestDefaultRealm { migration, _ in
             var deleted = false
-            migration.enumerateObjects(ofType: "SwiftStringObject", { oldObj, newObj in
+            migration.enumerateObjects(ofType: "SwiftStringObject", { _, newObj in
                 if deleted == false {
                     migration.delete(newObj!)
                     deleted = true
@@ -362,7 +362,7 @@ class MigrationTests: TestCase {
             }
         }
 
-        migrateAndTestDefaultRealm { migration, oldSchemaVersion in
+        migrateAndTestDefaultRealm { migration, _ in
             var enumerated = false
             migration.enumerateObjects(ofType: "SwiftObject", { oldObj, newObj in
                 XCTAssertEqual((oldObj!["boolCol"] as! Bool), true)
@@ -470,7 +470,7 @@ class MigrationTests: TestCase {
         }
 
         var config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
-        config.migrationBlock = { _, _ in
+        config.migrationBlock = { _ in
             XCTFail("Migration block should not be called")
         }
         config.deleteRealmIfMigrationNeeded = true
@@ -504,7 +504,7 @@ class MigrationTests: TestCase {
             }
         }
 
-        let migrationBlock: MigrationBlock = { _, _ in
+        let migrationBlock: MigrationBlock = { _ in
             XCTFail("Migration block should not be called")
         }
         let config = Realm.Configuration(fileURL: defaultRealmURL(),
@@ -589,7 +589,7 @@ class MigrationTests: TestCase {
 
         var didRun = false
         let config = Realm.Configuration(fileURL: defaultRealmURL(), schemaVersion: 1,
-                                         migrationBlock: { _, _ in didRun = true })
+                                         migrationBlock: { _ in didRun = true })
         Realm.Configuration.defaultConfiguration = config
 
         try! Realm.performMigration()
@@ -964,7 +964,7 @@ class MigrationTests: TestCase {
         }
 
         var config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
-        config.migrationBlock = { _, _ in
+        config.migrationBlock = { _ in
             XCTFail("Migration block should not be called")
         }
         config.deleteRealmIfMigrationNeeded = true
@@ -998,7 +998,7 @@ class MigrationTests: TestCase {
             }
         }
 
-        let migrationBlock: MigrationBlock = { _, _ in
+        let migrationBlock: MigrationBlock = { _ in
             XCTFail("Migration block should not be called")
         }
         let config = Realm.Configuration(fileURL: defaultRealmURL(),
