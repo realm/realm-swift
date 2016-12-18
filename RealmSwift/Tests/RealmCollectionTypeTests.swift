@@ -501,7 +501,7 @@ class RealmCollectionTypeTests: TestCase {
 
         // add a second notification and wait for it
         theExpectation = expectation(description: "")
-        let token2 = collection.addNotificationBlock { (changes: RealmCollectionChange) in
+        let token2 = collection.addNotificationBlock { _ in
             theExpectation.fulfill()
         }
         waitForExpectations(timeout: 1, handler: nil)
@@ -788,7 +788,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
 
         // add a second notification and wait for it
         theExpectation = expectation(description: "")
-        let token2 = collection.addNotificationBlock { (changes: RealmCollectionChange) in
+        let token2 = collection.addNotificationBlock { _ in
             theExpectation.fulfill()
         }
         waitForExpectations(timeout: 1, handler: nil)
@@ -990,12 +990,12 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        assertThrows(collection.addNotificationBlock { (changes: RealmCollectionChange) in })
+        assertThrows(collection.addNotificationBlock { _ in })
     }
 
     override func testAddNotificationBlockDirect() {
         let collection = collectionBase()
-        assertThrows(collection.addNotificationBlock { (changes: RealmCollectionChange) in })
+        assertThrows(collection.addNotificationBlock { _ in })
     }
 }
 

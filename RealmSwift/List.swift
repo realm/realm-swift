@@ -445,7 +445,7 @@ public final class List<T: Object>: ListBase {
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
     public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
-        return _rlmArray.addNotificationBlock { list, change, error in
+        return _rlmArray.addNotificationBlock { _, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
     }
