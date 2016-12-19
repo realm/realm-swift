@@ -17,6 +17,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Fix authenticating with CloudKit.
+* Fix linker warning about "Direct access to global weak symbol".
 
 2.1.1 Release notes (2016-12-02)
 =============================================================
