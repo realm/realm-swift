@@ -1,5 +1,7 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.1.2 Release notes (2016--12-19)
 =============================================================
+
+This release adds binary versions of Swift 3.0.2 frameworks built with Xcode 8.2.
 
 ### Sync Breaking Changes (In Beta)
 
