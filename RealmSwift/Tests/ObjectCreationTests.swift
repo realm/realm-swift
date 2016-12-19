@@ -151,6 +151,11 @@ class ObjectCreationTests: TestCase {
             "object created via generic initializer should equal object created by calling initializer directly")
     }
 
+    func testInitWithObjcName() {
+        // Test that init doesn't crash going into non-swift init logic for renamed Swift classes.
+        _ = SwiftObjcRenamedObject()
+    }
+
     // MARK: Creation tests
 
     func testCreateWithDefaults() {
