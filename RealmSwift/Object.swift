@@ -131,10 +131,10 @@ open class Object: RLMObjectBase {
 
     #if os(OSX)
     /// Helper to return the class name for an Object subclass.
-    public final override var className: String { return "" }
+    public final override var className: String { return objectSchema.className }
     #else
     /// Helper to return the class name for an Object subclass.
-    public final var className: String { return "" }
+    public final var className: String { return objectSchema.className }
     #endif
 
     /**
@@ -487,10 +487,10 @@ public class Object: RLMObjectBase {
 
     #if os(OSX)
     /// A helper property that returns the class name for an `Object` subclass.
-    public final override var className: String { return "" }
+    public final override var className: String { return objectSchema.className }
     #else
     /// A helper property that returns the class name for an `Object` subclass.
-    public final var className: String { return "" }
+    public final var className: String { return objectSchema.className }
     #endif
 
     /**
