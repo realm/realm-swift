@@ -82,7 +82,7 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy)
 
 }
 
-RLMSyncManagementObjectStatus RLMSyncPermissionStatusCodeToStatus(NSNumber<RLMInt> *statusCode) {
+RLMSyncManagementObjectStatus RLMMakeSyncManagementObjectStatus(NSNumber<RLMInt> *statusCode) {
     if (!statusCode) {
         return RLMSyncManagementObjectStatusNotProcessed;
     }

@@ -57,7 +57,7 @@
 }
 
 - (RLMSyncManagementObjectStatus)status {
-    return RLMSyncPermissionStatusCodeToStatus(self.statusCode);
+    return RLMMakeSyncManagementObjectStatus(self.statusCode);
 }
 
 + (NSString *)_realmObjectName {
