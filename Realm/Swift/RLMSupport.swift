@@ -88,6 +88,10 @@ import Realm
                                                       error: NSErrorPointer) -> UInt64 {
             return __schemaVersionAtURL(url, encryptionKey: key, error: error)
         }
+
+        @nonobjc public func resolve<Confined: RLMThreadConfined>(reference: RLMThreadSafeReference) -> Confined? {
+            return __resolveThreadSafeReference(reference) as! Confined?
+        }
     }
 
     extension RLMObject {

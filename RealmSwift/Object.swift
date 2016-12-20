@@ -443,7 +443,7 @@ extension Object: AssistedObjectiveCBridgeable {
  See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
 */
 @objc(RealmSwiftObject)
-public class Object: RLMObjectBase {
+public class Object: RLMObjectBase, ThreadConfined {
     // MARK: Initializers
 
     /**
