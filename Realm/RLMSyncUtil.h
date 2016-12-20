@@ -80,6 +80,6 @@ typedef NS_ENUM(NSUInteger, RLMSyncManagementObjectStatus) {
 
 /// Convert sync management object status code (nil, 0 and others) to
 /// RLMSyncManagementObjectStatus enum
-FOUNDATION_EXTERN RLMSyncManagementObjectStatus RLMSyncPermissionStatusCodeToStatus(NSNumber<RLMInt> *statusCode);
+FOUNDATION_EXTERN RLMSyncManagementObjectStatus RLMMakeSyncManagementObjectStatus(NSNumber<RLMInt> *statusCode);
 
 NS_ASSUME_NONNULL_END
