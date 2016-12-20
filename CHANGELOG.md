@@ -1,3 +1,22 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Sync Breaking Changes (In Beta)
+
+* None.
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
 2.1.2 Release notes (2016--12-19)
 =============================================================
 
