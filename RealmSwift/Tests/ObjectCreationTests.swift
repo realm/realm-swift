@@ -460,7 +460,7 @@ class ObjectCreationTests: TestCase {
         try! Realm().commitWrite()
 
         try! Realm().beginWrite()
-        let object = SwiftObject(value: ["objectCol" : existingObject])
+        let object = SwiftObject(value: ["objectCol": existingObject])
         try! Realm().add(object)
         try! Realm().commitWrite()
 
@@ -587,7 +587,7 @@ class ObjectCreationTests: TestCase {
             case .data:     return ["invalid"]
             case .date:     return ["invalid"]
             case .object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
-            case .array:    return ["invalid", [["a"]], [["boolCol" : "a"]], [[SwiftIntObject()]], [[persistedObject]]]
+            case .array:    return ["invalid", [["a"]], [["boolCol": "a"]], [[SwiftIntObject()]], [[persistedObject]]]
 
             case .any: XCTFail("not supported")
             case .linkingObjects: XCTFail("not supported")

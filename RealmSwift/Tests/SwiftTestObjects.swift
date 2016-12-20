@@ -56,7 +56,7 @@ class SwiftObject: Object {
             "floatCol": 1.23 as Float,
             "doubleCol": 12.3,
             "stringCol": "a",
-            "binaryCol":  "a".data(using: String.Encoding.utf8)!,
+            "binaryCol": "a".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 1),
             "objectCol": [false],
             "arrayCol": []
@@ -106,18 +106,18 @@ class SwiftOptionalDefaultValuesObject: Object {
 
     class func defaultValues() -> [String: Any] {
         return [
-            "optNSStringCol" : "A",
-            "optStringCol" : "B",
-            "optBinaryCol" : "C".data(using: String.Encoding.utf8)!,
-            "optDateCol" : Date(timeIntervalSince1970: 10),
-            "optIntCol" : 1,
-            "optInt8Col" : 1,
-            "optInt16Col" : 1,
-            "optInt32Col" : 1,
-            "optInt64Col" : 1,
-            "optFloatCol" : 2.2 as Float,
-            "optDoubleCol" : 3.3,
-            "optBoolCol" : true
+            "optNSStringCol": "A",
+            "optStringCol": "B",
+            "optBinaryCol": "C".data(using: String.Encoding.utf8)!,
+            "optDateCol": Date(timeIntervalSince1970: 10),
+            "optIntCol": 1,
+            "optInt8Col": 1,
+            "optInt16Col": 1,
+            "optInt32Col": 1,
+            "optInt64Col": 1,
+            "optFloatCol": 2.2 as Float,
+            "optDoubleCol": 3.3,
+            "optBoolCol": true
         ]
     }
 }
