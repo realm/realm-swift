@@ -27,10 +27,13 @@
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncSession *session = [self sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
-    [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                   callback:^{
-                                       dispatch_semaphore_signal(sema);
-                                   }];
+    BOOL couldWait = [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
+                                                    callback:^{
+                                                        dispatch_semaphore_signal(sema);
+                                                    }];
+    if (!couldWait) {
+        return NO;
+    }
     return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
 }
 
@@ -39,10 +42,13 @@
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncSession *session = [self sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
-    [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                     callback:^{
-                                         dispatch_semaphore_signal(sema);
-                                     }];
+    BOOL couldWait = [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
+                                                      callback:^{
+                                                          dispatch_semaphore_signal(sema);
+                                                      }];
+    if (!couldWait) {
+        return NO;
+    }
     return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
 }
 

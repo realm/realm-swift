@@ -97,18 +97,8 @@ static dispatch_once_t s_onceToken;
 
 - (instancetype)initWithCustomRootDirectory:(NSURL *)rootDirectory {
     if (self = [super init]) {
-        // Create the global error handler.
-        auto errorLambda = [=](int error_code, std::string message) {
-            NSError *error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                                 code:RLMSyncErrorClientSessionError
-                                             userInfo:@{@"description": @(message.c_str()),
-                                                        @"error": @(error_code)}];
-            [self _fireError:error];
-        };
-
         // Initialize the sync engine.
         SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
-        SyncManager::shared().set_error_handler(errorLambda);
         bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
         auto mode = should_encrypt ? SyncManager::MetadataMode::Encryption : SyncManager::MetadataMode::NoEncryption;
         rootDirectory = rootDirectory ?: [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
@@ -155,35 +145,40 @@ static dispatch_once_t s_onceToken;
 
 - (void)_fireErrorWithCode:(int)errorCode
                    message:(NSString *)message
+                   isFatal:(BOOL)fatal
                    session:(RLMSyncSession *)session
-                errorClass:(RLMSyncSessionErrorKind)errorClass {
-    NSError *error;
+                errorClass:(RLMSyncSystemErrorKind)errorClass {
+    NSError *error = nil;
 
     switch (errorClass) {
-        case RLMSyncSessionErrorKindUserFatal:
+        case RLMSyncSystemErrorKindUser:
             error = [NSError errorWithDomain:RLMSyncErrorDomain
                                         code:RLMSyncErrorClientUserError
                                     userInfo:@{@"description": message,
                                                @"error": @(errorCode)}];
             break;
-        case RLMSyncSessionErrorKindSessionFatal:
-        case RLMSyncSessionErrorKindAccessDenied:
+        case RLMSyncSystemErrorKindSession:
             error = [NSError errorWithDomain:RLMSyncErrorDomain
                                         code:RLMSyncErrorClientSessionError
                                     userInfo:@{@"description": message,
                                                @"error": @(errorCode)}];
             break;
-        case RLMSyncSessionErrorKindDebug:
+        case RLMSyncSystemErrorKindConnection:
+        case RLMSyncSystemErrorKindClient:
             // Report the error. There's nothing the user can do about it, though.
-            error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                        code:RLMSyncErrorClientInternalError
-                                    userInfo:@{@"description": message,
-                                               @"error": @(errorCode)}];
+            if (fatal) {
+                error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                            code:RLMSyncErrorClientInternalError
+                                        userInfo:@{@"description": message,
+                                                   @"error": @(errorCode),
+                                                   @"kind": @(errorClass)}];
+            }
+            break;
+        case RLMSyncSystemErrorKindUnknown:
             break;
     }
     dispatch_async(dispatch_get_main_queue(), ^{
-        if (!self.errorHandler
-            || (errorClass == RLMSyncSessionErrorKindDebug && self.logLevel >= RLMSyncLogLevelDebug)) {
+        if (!self.errorHandler || !error) {
             return;
         }
         self.errorHandler(error, session);

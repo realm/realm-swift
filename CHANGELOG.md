@@ -3,7 +3,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Sync Breaking Changes (In Beta)
 
-* None.
+* Underlying sync engine upgraded to version BETA-6.3.
+* Sync-related error reporting behavior has been changed. Errors not related
+  to a particular user or session are only reported if they are classed as
+  'fatal' by the underlying sync engine.
 
 ### API Breaking Changes
 
