@@ -57,7 +57,7 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
     /// An error that indicates a problem with a specific user.
     RLMSyncErrorClientUserError         = 5,
 
-    /// An error that indicates an internal error with the underlying synchronization engine. Only for information.
+    /// An error that indicates an internal, unrecoverable error with the underlying synchronization engine.
     RLMSyncErrorClientInternalError     = 6,
 };
 
