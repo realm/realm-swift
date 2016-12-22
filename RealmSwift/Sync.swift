@@ -99,6 +99,18 @@ public typealias SyncManagementObjectStatus = RLMSyncManagementObjectStatus
  */
 public typealias Provider = RLMIdentityProvider
 
+public extension SyncError {
+    /// Given a client reset error, extract and return the recovery file path and the reset closure.
+    public func clientResetInfo() -> (String, () -> Void)? {
+        if code == SyncError.clientResetError,
+            let recoveryPath = userInfo[kRLMSyncPathOfRealmBackupCopyKey] as? String,
+            let block = _nsError.__rlmSync_clientResetBlock() {
+            return (recoveryPath, block)
+        }
+        return nil
+    }
+}
+
 /// A `SyncConfiguration` represents configuration parameters for Realms intended to sync with a Realm Object Server.
 public struct SyncConfiguration {
     /// The `SyncUser` who owns the Realm that this configuration should open.
@@ -477,6 +489,18 @@ fileprivate extension SyncManagementObjectStatus {
  - see: `RLMIdentityProvider`
  */
 public typealias Provider = String // `RLMIdentityProvider` imports as `NSString`
+
+public extension SyncError {
+    /// Given a client reset error, extract and return the recovery file path and the reset closure.
+    public static func clientResetInfoFromError(error: NSError) -> (String, () -> Void)? {
+        if error.code == SyncError.ClientResetError.rawValue,
+            let recoveryPath = error.userInfo[kRLMSyncPathOfRealmBackupCopyKey] as? String,
+            let block = error.__rlmSync_clientResetBlock() {
+            return (recoveryPath, block)
+        }
+        return nil
+    }
+}
 
 /// A `SyncConfiguration` represents configuration parameters for Realms intended to sync with a Realm Object Server.
 public struct SyncConfiguration {

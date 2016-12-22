@@ -147,21 +147,38 @@ static dispatch_once_t s_onceToken;
                    message:(NSString *)message
                    isFatal:(BOOL)fatal
                    session:(RLMSyncSession *)session
+                  userInfo:(NSDictionary *)userInfo
                 errorClass:(RLMSyncSystemErrorKind)errorClass {
     NSError *error = nil;
+    NSMutableDictionary *mutableUserInfo = [userInfo mutableCopy];
+    mutableUserInfo[@"description"] = message;
+    mutableUserInfo[@"error"] = @(errorCode);
+    mutableUserInfo[@"underlying_class"] = @(errorClass);
 
     switch (errorClass) {
+        case RLMSyncSystemErrorKindClientReset: {
+            // Client reset is a special case; the application can respond to it to a greater degree than
+            // it can for most other errors.
+            mutableUserInfo = [@{} mutableCopy];
+            mutableUserInfo[kRLMSyncPathOfRealmBackupCopyKey] = userInfo[@(realm::SyncError::c_recovery_file_path_key)];
+            std::string original_path = [userInfo[@(realm::SyncError::c_original_file_path_key)] UTF8String];
+            mutableUserInfo[kRLMSyncInitiateClientResetBlockKey] = ^{
+                SyncManager::shared().immediately_run_file_actions(original_path);
+            };
+            error = [NSError errorWithDomain:RLMSyncErrorDomain
+                                        code:RLMSyncErrorClientResetError
+                                    userInfo:mutableUserInfo];
+            break;
+        }
         case RLMSyncSystemErrorKindUser:
             error = [NSError errorWithDomain:RLMSyncErrorDomain
                                         code:RLMSyncErrorClientUserError
-                                    userInfo:@{@"description": message,
-                                               @"error": @(errorCode)}];
+                                    userInfo:mutableUserInfo];
             break;
         case RLMSyncSystemErrorKindSession:
             error = [NSError errorWithDomain:RLMSyncErrorDomain
                                         code:RLMSyncErrorClientSessionError
-                                    userInfo:@{@"description": message,
-                                               @"error": @(errorCode)}];
+                                    userInfo:mutableUserInfo];
             break;
         case RLMSyncSystemErrorKindConnection:
         case RLMSyncSystemErrorKindClient:
@@ -169,9 +186,7 @@ static dispatch_once_t s_onceToken;
             if (fatal) {
                 error = [NSError errorWithDomain:RLMSyncErrorDomain
                                             code:RLMSyncErrorClientInternalError
-                                        userInfo:@{@"description": message,
-                                                   @"error": @(errorCode),
-                                                   @"kind": @(errorClass)}];
+                                        userInfo:mutableUserInfo];
             }
             break;
         case RLMSyncSystemErrorKindUnknown:

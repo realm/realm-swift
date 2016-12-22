@@ -20,6 +20,10 @@
 
 #import "RLMSyncSession_Private.hpp"
 
+#import "sync/sync_session.hpp"
+
+using namespace realm;
+
 @implementation RLMSyncUser (ObjectServerTests)
 
 - (BOOL)waitForUploadToFinish:(NSURL *)url {
@@ -50,6 +54,18 @@
         return NO;
     }
     return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
+}
+
+- (void)simulateClientResetErrorForSession:(NSURL *)url {
+    RLMSyncSession *session = [self sessionForURL:url];
+    NSAssert(session, @"Cannot call with invalid URL");
+
+    std::shared_ptr<SyncSession> raw_session = session->_session.lock();
+    std::error_code code = std::error_code{
+        static_cast<int>(realm::sync::ProtocolError::bad_client_file_ident),
+        realm::sync::protocol_error_category()
+    };
+    SyncSession::OnlyForTesting::handle_error(*raw_session, {code, "Not a real error message", false});
 }
 
 @end
