@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2017 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,17 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/Realm.h>
+#import "NSError+RLMSync.h"
 
-NS_ASSUME_NONNULL_BEGIN
+#import "RLMSyncUtil.h"
 
-@interface RLMSyncUser (ObjectServerTests)
+@implementation NSError (RLMSync)
 
-- (BOOL)waitForUploadToFinish:(NSURL *)url;
-- (BOOL)waitForDownloadToFinish:(NSURL *)url;
+- (void(^)(void))rlmSync_clientResetBlock {
+    if (self.domain == RLMSyncErrorDomain && self.code == RLMSyncErrorClientResetError) {
+        return self.userInfo[kRLMSyncInitiateClientResetBlockKey];
+    }
+    return nil;
+}
 
-- (void)simulateClientResetErrorForSession:(NSURL *)url;
+- (NSString *)rlmSync_clientResetBackedUpRealmPath {
+    if (self.domain == RLMSyncErrorDomain && self.code == RLMSyncErrorClientResetError) {
+        return self.userInfo[kRLMSyncPathOfRealmBackupCopyKey];
+    }
+    return nil;
+}
 
 @end
-
-NS_ASSUME_NONNULL_END

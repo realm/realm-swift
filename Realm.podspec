@@ -42,6 +42,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMSyncUser.h',
                               'include/**/RLMSyncUtil.h',
                               'include/**/RLMThreadSafeReference.h',
+                              'include/**/NSError+RLMSync.h',
                               'include/**/Realm.h',
 
                               # Realm.Dynamic module

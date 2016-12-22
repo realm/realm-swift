@@ -87,6 +87,66 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    // MARK: Client reset
+
+    func testClientReset() {
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
+            let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
+
+            var theError: SyncError?
+            let ex = expectation(description: "Waiting for error handler to be called...")
+            SyncManager.shared.errorHandler = { (error, session) in
+                if let error = error as? SyncError {
+                    theError = error
+                } else {
+                    XCTFail("Error \(error) was not a sync error. Something is wrong.")
+                }
+                ex.fulfill()
+            }
+            user.simulateClientResetError(forSession: realmURL)
+            waitForExpectations(timeout: 10, handler: nil)
+            XCTAssertNotNil(theError)
+            XCTAssertTrue(theError!.code == SyncError.Code.clientResetError)
+            let resetInfo = theError!.clientResetInfo()
+            XCTAssertNotNil(resetInfo)
+            XCTAssertTrue(resetInfo!.0.contains("io.realm.object-server-recovered-realms/recovered_realm"))
+            XCTAssertNotNil(realm)
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    func testClientResetManualInitiation() {
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
+            var theError: SyncError?
+
+            try autoreleasepool { _ in
+                let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
+                let ex = expectation(description: "Waiting for error handler to be called...")
+                SyncManager.shared.errorHandler = { (error, session) in
+                    if let error = error as? SyncError {
+                        theError = error
+                    } else {
+                        XCTFail("Error \(error) was not a sync error. Something is wrong.")
+                    }
+                    ex.fulfill()
+                }
+                user.simulateClientResetError(forSession: realmURL)
+                waitForExpectations(timeout: 10, handler: nil)
+                XCTAssertNotNil(theError)
+                XCTAssertNotNil(realm)
+            }
+            let (path, closure) = theError!.clientResetInfo()!
+            XCTAssertFalse(FileManager.default.fileExists(atPath: path))
+            closure()
+            XCTAssertTrue(FileManager.default.fileExists(atPath: path))
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
     // MARK: Permissions
 
     func testPermissionChange() {

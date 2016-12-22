@@ -24,12 +24,6 @@
 
 using namespace realm;
 
-@interface RLMSyncSession () {
-    std::weak_ptr<SyncSession> _session;
-}
-
-@end
-
 @implementation RLMSyncSession
 
 - (instancetype)initWithSyncSession:(std::shared_ptr<SyncSession>)session {

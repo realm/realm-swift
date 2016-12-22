@@ -673,6 +673,65 @@
     }
 }
 
+#pragma mark - Client reset
+
+/// Ensure that a client reset error is propagated up to the binding successfully.
+- (void)testClientReset {
+    NSURL *url = REALM_URL();
+    NSString *sessionName = ACCOUNT_NAME();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:true]
+                                               server:[RLMObjectServerTests authServerURL]];
+    // Open the Realm
+    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:user];
+
+    __block NSError *theError = nil;
+    XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
+    [RLMSyncManager sharedManager].errorHandler = ^void(NSError *error, RLMSyncSession *session) {
+        // Make sure we're actually looking at the right session.
+        XCTAssertTrue([[session.realmURL absoluteString] containsString:sessionName]);
+        theError = error;
+        [ex fulfill];
+    };
+    [user simulateClientResetErrorForSession:url];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+    XCTAssertNotNil(theError);
+    XCTAssertTrue(theError.code == RLMSyncErrorClientResetError);
+    NSString *pathValue = [theError rlmSync_clientResetBackedUpRealmPath];
+    XCTAssertNotNil(pathValue);
+    // Sanity check the recovery path.
+    XCTAssertTrue([pathValue containsString:@"io.realm.object-server-recovered-realms/recovered_realm"]);
+    XCTAssertNotNil([theError rlmSync_clientResetBlock]);
+}
+
+/// Test manually initiating client reset.
+- (void)testClientResetManualInitiation {
+    NSURL *url = REALM_URL();
+    NSString *sessionName = ACCOUNT_NAME();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:true]
+                                               server:[RLMObjectServerTests authServerURL]];
+    __block NSError *theError = nil;
+    @autoreleasepool {
+        __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:user];
+        XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
+        [RLMSyncManager sharedManager].errorHandler = ^void(NSError *error, RLMSyncSession *session) {
+            // Make sure we're actually looking at the right session.
+            XCTAssertTrue([[session.realmURL absoluteString] containsString:sessionName]);
+            theError = error;
+            [ex fulfill];
+        };
+        [user simulateClientResetErrorForSession:url];
+        [self waitForExpectationsWithTimeout:10 handler:nil];
+        XCTAssertNotNil(theError);
+    }
+    // At this point the Realm should be invalidated and client reset should be possible.
+    NSString *pathValue = [theError rlmSync_clientResetBackedUpRealmPath];
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:pathValue]);
+    [theError rlmSync_clientResetBlock]();
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:pathValue]);
+}
+
 #pragma mark - Permissions
 
 /// Grant/revoke access a user's Realm to another user. Another user has no access permission by default.
