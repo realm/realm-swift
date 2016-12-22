@@ -21,6 +21,9 @@
 #import "RLMSyncUtil_Private.h"
 
 typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
+    // Specific
+    RLMSyncSystemErrorKindClientReset,
+    // General
     RLMSyncSystemErrorKindClient,
     RLMSyncSystemErrorKindConnection,
     RLMSyncSystemErrorKindSession,
@@ -45,6 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
                    message:(NSString *)message
                    isFatal:(BOOL)fatal
                    session:(RLMSyncSession *)session
+                  userInfo:(NSDictionary *)userInfo
                 errorClass:(RLMSyncSystemErrorKind)errorClass;
 
 - (NSArray<RLMSyncUser *> *)_allUsers;

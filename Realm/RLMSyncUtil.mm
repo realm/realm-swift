@@ -46,6 +46,9 @@ RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
 
 NSString *const RLMSyncErrorDomain = @"io.realm.sync";
 
+NSString *const kRLMSyncRecoveredRealmLocationPathKey       = @"recovered_realm_location_path";
+NSString *const kRLMSyncImmediatelyRecoverRealmBlockKey     = @"immediately_recover_realm_block";
+
 NSString *const kRLMSyncAppIDKey                = @"app_id";
 NSString *const kRLMSyncDataKey                 = @"data";
 NSString *const kRLMSyncErrorJSONKey            = @"json";
