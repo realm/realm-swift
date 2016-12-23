@@ -41,7 +41,7 @@
         @throw RLMException(@"Cannot construct reference to invalidated object");
     }
     if (!threadConfined.realm) {
-        @throw RLMException(@"Cannot construct reference to unmanaged object,"
+        @throw RLMException(@"Cannot construct reference to unmanaged object, "
                             "which can be passed across threads directly");
     }
 
