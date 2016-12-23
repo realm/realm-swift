@@ -3,7 +3,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Sync Breaking Changes (In Beta)
 
-* None.
+* The `id` property of `RLMSyncPermissionChange`/`SyncPermissionChange` is
+  now declared as primary key
 
 ### API Breaking Changes
 
