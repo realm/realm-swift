@@ -468,6 +468,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		4A6E122A1E0DEBBE004A3B69 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3F1A5E711992EB7400F45F4C;
+			remoteInfo = TestHost;
+		};
 		5D0A40891C62ACE100BBB612 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -1727,6 +1734,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				4A6E122B1E0DEBBE004A3B69 /* PBXTargetDependency */,
 				5D660FDF1BE98C7C0021E04F /* PBXTargetDependency */,
 			);
 			name = "RealmSwift Tests";
@@ -2448,6 +2456,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		4A6E122B1E0DEBBE004A3B69 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
+			targetProxy = 4A6E122A1E0DEBBE004A3B69 /* PBXContainerItemProxy */;
+		};
 		5D0A408A1C62ACE100BBB612 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = C04B4BD71B55C47600FAE58E /* Set Swift Version */;

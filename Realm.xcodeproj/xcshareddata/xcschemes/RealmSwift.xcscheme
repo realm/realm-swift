@@ -3,8 +3,8 @@
    LastUpgradeVersion = "0800"
    version = "1.3">
    <BuildAction
-      parallelizeBuildables = "NO"
-      buildImplicitDependencies = "NO">
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
       <BuildActionEntries>
          <BuildActionEntry
             buildForTesting = "YES"
@@ -17,6 +17,20 @@
                BlueprintIdentifier = "5D660FCB1BE98C560021E04F"
                BuildableName = "RealmSwift.framework"
                BlueprintName = "RealmSwift"
+               ReferencedContainer = "container:Realm.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "5D660FD71BE98C7C0021E04F"
+               BuildableName = "RealmSwift Tests.xctest"
+               BlueprintName = "RealmSwift Tests"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
