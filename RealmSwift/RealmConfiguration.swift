@@ -70,14 +70,14 @@ extension Realm {
          - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
         */
         public init(fileURL: URL? = URL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
-            inMemoryIdentifier: String? = nil,
-            syncConfiguration: SyncConfiguration? = nil,
-            encryptionKey: Data? = nil,
-            readOnly: Bool = false,
-            schemaVersion: UInt64 = 0,
-            migrationBlock: MigrationBlock? = nil,
-            deleteRealmIfMigrationNeeded: Bool = false,
-            objectTypes: [Object.Type]? = nil) {
+                    inMemoryIdentifier: String? = nil,
+                    syncConfiguration: SyncConfiguration? = nil,
+                    encryptionKey: Data? = nil,
+                    readOnly: Bool = false,
+                    schemaVersion: UInt64 = 0,
+                    migrationBlock: MigrationBlock? = nil,
+                    deleteRealmIfMigrationNeeded: Bool = false,
+                    objectTypes: [Object.Type]? = nil) {
                 self.fileURL = fileURL
                 if let inMemoryIdentifier = inMemoryIdentifier {
                     self.inMemoryIdentifier = inMemoryIdentifier

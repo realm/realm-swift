@@ -90,8 +90,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     /// :nodoc:
     public func countByEnumerating(with state: UnsafeMutablePointer<NSFastEnumerationState>,
-                   objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>!,
-                   count len: Int) -> Int {
+                                   objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>!,
+                                   count len: Int) -> Int {
         return Int(rlmResults.countByEnumerating(with: state, objects: buffer, count: UInt(len)))
     }
 

@@ -81,7 +81,7 @@ class KVOTests: TestCase {
     }
 
     func observeChange<T: Equatable>(_ obj: NSObject, _ key: String, _ old: T?, _ new: T?,
-                       fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
+                                     fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         obj.addObserver(self, forKeyPath: key, options: [.old, .new], context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)
