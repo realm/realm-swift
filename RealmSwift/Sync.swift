@@ -371,6 +371,11 @@ public final class SyncPermissionOffer: Object {
     }
 
     /// :nodoc:
+    override public class func primaryKey() -> String? {
+        return "id"
+    }
+
+    /// :nodoc:
     override public class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
@@ -422,6 +427,11 @@ public final class SyncPermissionOfferResponse: Object {
     public convenience init(token: String) {
         self.init()
         self.token = token
+    }
+
+    /// :nodoc:
+    override public class func primaryKey() -> String? {
+        return "id"
     }
 
     /// :nodoc:
@@ -732,6 +742,11 @@ public final class SyncPermissionOffer: Object {
     }
 
     /// :nodoc:
+    override public class func primaryKey() -> String? {
+        return "id"
+    }
+
+    /// :nodoc:
     override public class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
@@ -783,6 +798,11 @@ public final class SyncPermissionOfferResponse: Object {
     public convenience init(token: String) {
         self.init()
         self.token = token
+    }
+
+    /// :nodoc:
+    override public class func primaryKey() -> String? {
+        return "id"
     }
 
     /// :nodoc:
