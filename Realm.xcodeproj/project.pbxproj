@@ -216,6 +216,8 @@
 		3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */; };
 		5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */; };
 		5BC537161DD5B8D70055C524 /* ObjectiveCSupportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */; };
+		5D03FB1F1E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
+		5D03FB201E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
 		5D128F2A1BE984E5001F4FBF /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5D659ED91BE04556006515A0 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		5D1534B81CCFF545008976D7 /* LinkingObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D1534B71CCFF545008976D7 /* LinkingObjects.swift */; };
 		5D274C4D1D6D15D2006FEBB1 /* weak_realm_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5D274C4C1D6D15D2006FEBB1 /* weak_realm_notifier.cpp */; };
@@ -755,6 +757,7 @@
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
 		5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupport.swift; sourceTree = "<group>"; };
 		5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupportTests.swift; sourceTree = "<group>"; };
+		5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PredicateUtilTests.mm; sourceTree = "<group>"; };
 		5D1534B71CCFF545008976D7 /* LinkingObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinkingObjects.swift; sourceTree = "<group>"; };
 		5D274C4C1D6D15D2006FEBB1 /* weak_realm_notifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = weak_realm_notifier.cpp; sourceTree = "<group>"; };
 		5D274C4F1D6D16A8006FEBB1 /* event_loop_signal.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = event_loop_signal.hpp; sourceTree = "<group>"; };
@@ -1292,6 +1295,7 @@
 				021A88301AAFB5BE00EEAC84 /* ObjectSchemaTests.m */,
 				E81A1FBF1955FE0100FDED82 /* ObjectTests.m */,
 				3F04EA2D1992BEE400C2CE2E /* PerformanceTests.m */,
+				5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */,
 				02AFB4611A80343600E11938 /* PropertyTests.m */,
 				E81A1FC01955FE0100FDED82 /* PropertyTypeTest.mm */,
 				E81A1FC11955FE0100FDED82 /* QueryTests.m */,
@@ -2379,6 +2383,7 @@
 				E856D21E195615A900FB2FCF /* RealmTests.mm in Sources */,
 				02AFB4681A80343600E11938 /* ResultsTests.m in Sources */,
 				3FC767071BB9FE7500FE0AFC /* RLMMultiProcessTestCase.m in Sources */,
+				5D03FB201E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */,
 				3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */,
 				E856D21F195615B100FB2FCF /* RLMTestCase.m in Sources */,
 				028481CB19CCFC9C0097A416 /* RLMTestObjects.m in Sources */,
@@ -2402,6 +2407,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5D03FB1F1E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */,
 				E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */,
 				3F7556751BE95A0C0058BC7E /* AsyncTests.mm in Sources */,
 				02E334C31A5F41C7009F8810 /* DynamicTests.m in Sources */,
