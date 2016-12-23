@@ -49,6 +49,10 @@
     };
 }
 
++ (nullable NSString *)primaryKey {
+    return @"id";
+}
+
 + (BOOL)shouldIncludeInDefaultSchema {
     return NO;
 }
