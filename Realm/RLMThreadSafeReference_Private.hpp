@@ -31,14 +31,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, nullable) id rlm_objectiveCMetadata;
 
 // Constructs an new instance of this type
-+ (instancetype)rlm_objectWithThreadSafeReference:(std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
-                                         metadata:(nullable id)metadata
-                                            realm:(RLMRealm *)realm;
++ (nullable instancetype)rlm_objectWithThreadSafeReference:(std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
+                                                  metadata:(nullable id)metadata
+                                                     realm:(RLMRealm *)realm;
 @end
 
 @interface RLMThreadSafeReference ()
 
-- (id<RLMThreadConfined>)resolveReferenceInRealm:(RLMRealm *)realm;
+- (nullable id<RLMThreadConfined>)resolveReferenceInRealm:(RLMRealm *)realm;
 
 @end
 

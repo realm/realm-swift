@@ -520,8 +520,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 - (nullable id)resolveThreadSafeReference:(RLMThreadSafeReference *)reference {
-    id<RLMThreadConfined> threadConfined = [reference resolveReferenceInRealm:self];
-    return threadConfined.invalidated ? nil : threadConfined;
+    return [reference resolveReferenceInRealm:self];
 }
 
 /**

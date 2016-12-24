@@ -476,7 +476,9 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     auto list_reference = static_cast<realm::ThreadSafeReference<realm::List> *>(reference.get());
 
     realm::List list = realm->_realm->resolve_thread_safe_reference(std::move(*list_reference));
-
+    if (!list.is_valid()) {
+        return nil;
+    }
     return [[RLMArrayLinkView alloc] initWithList:std::move(list)
                                             realm:realm
                                        parentInfo:&realm->_info[metadata.parentClassName]

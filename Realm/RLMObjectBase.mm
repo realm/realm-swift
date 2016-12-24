@@ -476,6 +476,9 @@ Class RLMObjectUtilClass(BOOL isSwift) {
     auto object_reference = static_cast<realm::ThreadSafeReference<Object> *>(reference.get());
 
     Object object = realm->_realm->resolve_thread_safe_reference(std::move(*object_reference));
+    if (!object.is_valid()) {
+        return nil;
+    }
     NSString *objectClassName = @(object.get_object_schema().name.c_str());
 
     return RLMCreateObjectAccessor(realm, realm->_info[objectClassName], object.row().get_index());
