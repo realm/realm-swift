@@ -8,22 +8,22 @@ swift_version:
   - 3.0.1
   - 3.0.2
 target:
-#  - osx
-#  - docs
-#  - ios-static
-#  - ios-dynamic
-#  - ios-swift
-#  - osx-swift
-#  - watchos
-#  - cocoapods
-#  - swiftlint
-#  - tvos
-#  - osx-encryption
-#  - osx-object-server
+  - osx
+  - docs
+  - ios-static
+  - ios-dynamic
+  - ios-swift
+  - osx-swift
+  - watchos
+  - cocoapods
+  - swiftlint
+  - tvos
+  - osx-encryption
+  - osx-object-server
 
-#  - ios-device-objc
-  - ios-device-swift # silly change to reboot testing
-#  - tvos-device
+  - ios-device-objc
+  - ios-device-swift
+  - tvos-device
 configuration:
   - Debug
   - Release
