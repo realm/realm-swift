@@ -100,8 +100,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     // MARK: Properties
 
-    /// The Realm which manages this results. Note that this property will never return `nil`.
-    public var realm: Realm? { return Realm(rlmResults.realm) }
+    /// The Realm which manages this results.
+    public var realm: Realm { return Realm(rlmResults.realm) }
 
     /**
      Indicates if the results are no longer valid.
