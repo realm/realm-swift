@@ -15,7 +15,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix queries containing nested `SUBQUERY` expressions.
 
 2.1.2 Release notes (2016--12-19)
 =============================================================
