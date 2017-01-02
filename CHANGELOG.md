@@ -18,6 +18,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Setting `deleteRealmIfMigrationNeeded` now also deletes the Realm if a file
   format migration is required, such as when moving from a file last accessed
   with Realm 0.x to 1.x, or 1.x to 2.x.
+* Fix queries containing nested `SUBQUERY` expressions.
 
 2.1.2 Release notes (2016--12-19)
 =============================================================

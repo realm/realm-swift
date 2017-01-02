@@ -1972,6 +1972,10 @@
     // Linking objects cannot contain null so their members cannot be compared with null.
     XCTAssertThrows([PersonObject objectsWhere:@"ANY parents == NULL"]);
 
+    // People that have a parent under the age of 31 where that parent has a parent over the age of 35 whose name is Michael.
+    RLMResults *r14 = [PersonObject objectsWhere:@"SUBQUERY(parents, $p1, $p1.age < 31 AND SUBQUERY($p1.parents, $p2, $p2.age > 35 AND $p2.name == 'Michael').@count > 0).@count > 0"];
+    XCTAssertEqualObjects(asArray(r14), (@[ hannah ]));
+
 
     // Add a new link and verify that the existing results update as expected.
     __block PersonObject *mackenzie;
@@ -2019,6 +2023,9 @@
 
     // All links are not equal to a detached row accessor so this will match all rows that are linked to.
     XCTAssertEqualObjects(asArray(r13), (@[ hannah, elijah, mark, jason, diane, carol, mackenzie ]));
+
+    // People that have a parent under the age of 31 where that parent has a parent over the age of 35 whose name is Michael.
+    XCTAssertEqualObjects(asArray(r14), (@[ hannah ]));
 }
 
 @end
