@@ -1490,7 +1490,7 @@
     RLMResults *results = [IntObject allObjectsInRealm:realm];
     XCTAssertEqual(0U, results.count);
     XCTAssertEqual(results, [results objectsWhere:@"intCol = 5"]);
-    XCTAssertEqual(results, [results sortedResultsUsingProperty:@"intCol" ascending:YES]);
+    XCTAssertEqual(results, [results sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
     XCTAssertThrows([results objectAtIndex:0]);
     XCTAssertEqual(NSNotFound, [results indexOfObject:self.nonLiteralNil]);
     XCTAssertEqual(NSNotFound, [results indexOfObjectWhere:@"intCol = 5"]);

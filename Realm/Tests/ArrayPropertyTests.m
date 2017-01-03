@@ -271,7 +271,7 @@
 
     XCTAssertThrows([intArray.intArray objectsWhere:@"intCol == 1"], @"Should throw on unmanaged RLMArray");
     XCTAssertThrows(([intArray.intArray objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]), @"Should throw on unmanaged RLMArray");
-    XCTAssertThrows([intArray.intArray sortedResultsUsingProperty:@"intCol" ascending:YES], @"Should throw on unmanaged RLMArray");
+    XCTAssertThrows([intArray.intArray sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"Should throw on unmanaged RLMArray");
 
     XCTAssertEqual(0U, [intArray.intArray indexOfObjectWhere:@"intCol == 1"]);
     XCTAssertEqual(0U, ([intArray.intArray indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol == %i", 1]]));
@@ -780,8 +780,8 @@
     [realm commitWriteTransaction];
 
     bool (^checkOrder)(NSArray *, NSArray *, NSArray *) = ^bool(NSArray *properties, NSArray *ascending, NSArray *dogs) {
-        NSArray *sort = @[[RLMSortDescriptor sortDescriptorWithProperty:properties[0] ascending:[ascending[0] boolValue]],
-                          [RLMSortDescriptor sortDescriptorWithProperty:properties[1] ascending:[ascending[1] boolValue]]];
+        NSArray *sort = @[[RLMSortDescriptor sortDescriptorWithKeyPath:properties[0] ascending:[ascending[0] boolValue]],
+                          [RLMSortDescriptor sortDescriptorWithKeyPath:properties[1] ascending:[ascending[1] boolValue]]];
         RLMResults *actual = [array.dogs sortedResultsUsingDescriptors:sort];
 
         return [actual[0] isEqualToObject:dogs[0]]
@@ -1064,8 +1064,8 @@
         RLMAssertThrowsWithReasonMatching([array indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
         RLMAssertThrowsWithReasonMatching([array objectsWhere:@"intCol = 0"], @"thread");
         RLMAssertThrowsWithReasonMatching([array objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"thread");
-        RLMAssertThrowsWithReasonMatching([array sortedResultsUsingProperty:@"intCol" ascending:YES], @"thread");
-        RLMAssertThrowsWithReasonMatching([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]], @"thread");
+        RLMAssertThrowsWithReasonMatching([array sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"thread");
+        RLMAssertThrowsWithReasonMatching([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]], @"thread");
         RLMAssertThrowsWithReasonMatching(array[0], @"thread");
         RLMAssertThrowsWithReasonMatching(array[0] = io, @"thread");
         RLMAssertThrowsWithReasonMatching([array valueForKey:@"intCol"], @"thread");
@@ -1112,8 +1112,8 @@
     XCTAssertNoThrow([array indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertNoThrow([array objectsWhere:@"intCol = 0"]);
     XCTAssertNoThrow([array objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
-    XCTAssertNoThrow([array sortedResultsUsingProperty:@"intCol" ascending:YES]);
-    XCTAssertNoThrow([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]]);
+    XCTAssertNoThrow([array sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
+    XCTAssertNoThrow([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
     XCTAssertNoThrow(array[0]);
     XCTAssertNoThrow(array[0] = io);
     XCTAssertNoThrow([array valueForKey:@"intCol"]);
@@ -1149,8 +1149,8 @@
     RLMAssertThrowsWithReasonMatching([array indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"invalidated");
     RLMAssertThrowsWithReasonMatching([array objectsWhere:@"intCol = 0"], @"invalidated");
     RLMAssertThrowsWithReasonMatching([array objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([array sortedResultsUsingProperty:@"intCol" ascending:YES], @"invalidated");
-    RLMAssertThrowsWithReasonMatching([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array sortedResultsUsingKeyPath:@"intCol" ascending:YES], @"invalidated");
+    RLMAssertThrowsWithReasonMatching([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]], @"invalidated");
     RLMAssertThrowsWithReasonMatching(array[0], @"invalidated");
     RLMAssertThrowsWithReasonMatching(array[0] = io, @"invalidated");
     RLMAssertThrowsWithReasonMatching([array valueForKey:@"intCol"], @"invalidated");
@@ -1182,8 +1182,8 @@
     XCTAssertNoThrow([array indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertNoThrow([array objectsWhere:@"intCol = 0"]);
     XCTAssertNoThrow([array objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
-    XCTAssertNoThrow([array sortedResultsUsingProperty:@"intCol" ascending:YES]);
-    XCTAssertNoThrow([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]]);
+    XCTAssertNoThrow([array sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
+    XCTAssertNoThrow([array sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
     XCTAssertNoThrow(array[0]);
     XCTAssertNoThrow([array valueForKey:@"intCol"]);
     XCTAssertNoThrow({for (__unused id obj in array);});

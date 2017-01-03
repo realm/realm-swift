@@ -195,6 +195,21 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
     /**
      Returns a `Results` containing the objects in the collection, but sorted.
 
+     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(byKeyPath: "age", ascending: true)`.
+
+     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                floating point, integer, and string types.
+
+     - parameter keyPath:   The key path to sort by.
+     - parameter ascending: The direction to sort in.
+     */
+    func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element>
+
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
      Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
      youngest to oldest based on their `age` property, you might call
      `students.sorted(byProperty: "age", ascending: true)`.
@@ -205,6 +220,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
      - parameter property:  The name of the property to sort by.
      - parameter ascending: The direction to sort in.
      */
+    @available(*, deprecated, renamed: "sorted(byKeyPath:ascending:)")
     func sorted(byProperty property: String, ascending: Bool) -> Results<Element>
 
     /**
@@ -213,7 +229,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
      - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
                 floating point, integer, and string types.
 
-     - see: `sorted(byProperty:ascending:)`
+     - see: `sorted(byKeyPath:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
@@ -363,7 +379,7 @@ private class _AnyRealmCollectionBase<T: Object> {
     func index(matching predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
     func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> { fatalError() }
     func filter(_ predicate: NSPredicate) -> Results<Element> { fatalError() }
-    func sorted(byProperty property: String, ascending: Bool) -> Results<Element> { fatalError() }
+    func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element> { fatalError() }
     func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
@@ -416,8 +432,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     // MARK: Sorting
 
-    override func sorted(byProperty property: String, ascending: Bool) -> Results<C.Element> {
-        return base.sorted(byProperty: property, ascending: ascending)
+    override func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<C.Element> {
+        return base.sorted(byKeyPath: keyPath, ascending: ascending)
     }
 
     override func sorted<S: Sequence>
@@ -575,6 +591,23 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
     /**
      Returns a `Results` containing the objects in the collection, but sorted.
 
+     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
+     youngest to oldest based on their `age` property, you might call
+     `students.sorted(byKeyPath: "age", ascending: true)`.
+
+     - warning:  Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
+                 floating point, integer, and string types.
+
+     - parameter keyPath:  The key path to sort by.
+     - parameter ascending: The direction to sort in.
+     */
+    public func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element> {
+        return base.sorted(byKeyPath: keyPath, ascending: ascending)
+    }
+
+    /**
+     Returns a `Results` containing the objects in the collection, but sorted.
+
      Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
      youngest to oldest based on their `age` property, you might call
      `students.sorted(byProperty: "age", ascending: true)`.
@@ -585,8 +618,9 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
      - parameter property:  The name of the property to sort by.
      - parameter ascending: The direction to sort in.
      */
+    @available(*, deprecated, renamed: "sorted(byKeyPath:ascending:)")
     public func sorted(byProperty property: String, ascending: Bool) -> Results<Element> {
-        return base.sorted(byProperty: property, ascending: ascending)
+        return sorted(byKeyPath: property, ascending: ascending)
     }
 
     /**
@@ -595,7 +629,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
      - warning:  Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
                  floating point, integer, and string types.
 
-     - see: `sorted(byProperty:ascending:)`
+     - see: `sorted(byKeyPath:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
@@ -782,7 +816,7 @@ extension AnyRealmCollection {
     @available(*, unavailable, renamed: "index(matching:_:)")
     public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
 
-    @available(*, unavailable, renamed: "sorted(byProperty:ascending:)")
+    @available(*, unavailable, renamed: "sorted(byKeyPath:ascending:)")
     public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 
     @available(*, unavailable, renamed: "sorted(by:)")
@@ -974,17 +1008,17 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
     /**
      Returns a `Results` containing the objects in the collection, but sorted.
 
-     Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
+     Objects are sorted based on the values of the given key path. For example, to sort a collection of `Student`s from
      youngest to oldest based on their `age` property, you might call
-     `students.sorted(byProperty: "age", ascending: true)`.
+     `students.sorted(byKeyPath: "age", ascending: true)`.
 
      - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
                 floating point, integer, and string types.
 
-     - parameter property:  The name of the property to sort by.
+     - parameter keyPath:   The key path to sort by.
      - parameter ascending: The direction to sort in.
      */
-    func sorted(byProperty: String, ascending: Bool) -> Results<Element>
+    func sorted(byKeyPath: String, ascending: Bool) -> Results<Element>
 
     /**
      Returns a `Results` containing the objects in the collection, but sorted.
@@ -992,7 +1026,7 @@ public protocol RealmCollectionType: CollectionType, CustomStringConvertible {
      - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
                 floating point, integer, and string types.
 
-     - see: `sorted(byProperty:ascending:)`
+     - see: `sorted(byKeyPath:ascending:)`
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */

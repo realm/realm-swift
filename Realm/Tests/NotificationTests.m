@@ -201,7 +201,7 @@
 @implementation SortedNotificationTests
 - (RLMResults *)query {
     return [[IntObject objectsWhere:@"intCol > 0 AND intCol < 5"]
-            sortedResultsUsingProperty:@"intCol" ascending:NO];
+            sortedResultsUsingKeyPath:@"intCol" ascending:NO];
 }
 
 - (void)testMoveMatchingObjectDueToDeletionOfNonMatchingObject {

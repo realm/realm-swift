@@ -124,6 +124,12 @@
 #pragma mark OwnerObject
 
 @implementation OwnerObject
+
+- (BOOL)isEqual:(id)other
+{
+    return [self isEqualToObject:other];
+}
+
 @end
 
 #pragma mark - Specific Use Objects
