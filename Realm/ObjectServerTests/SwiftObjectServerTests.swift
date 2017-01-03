@@ -152,6 +152,101 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 2)
         token.stop()
     }
+
+    func testPermissionOffer() {
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
+            _ = try synchronouslyOpenRealm(url: realmURL, user: user)
+
+            let managementRealm = try user.managementRealm()
+            let permissionOffer = SyncPermissionOffer(realmURL: realmURL.absoluteString, expiresAt: Date(timeIntervalSinceNow: 30 * 24 * 60 * 60), mayRead: true, mayWrite: true, mayManage: false)
+
+            let exp = expectation(description: "A new permission offer will be processed by the server")
+
+            let results = managementRealm.objects(SyncPermissionOffer.self).filter("id = %@", permissionOffer.id)
+            let notificationToken = results.addNotificationBlock { (changes) in
+                if case .update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
+                    XCTAssertEqual(statusCode, 0)
+                    XCTAssertEqual(change[0].status, .success)
+                    exp.fulfill()
+                }
+            }
+
+            try managementRealm.write {
+                managementRealm.add(permissionOffer)
+            }
+
+            waitForExpectations(timeout: 2)
+            notificationToken.stop()
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    func testPermissionOfferResponse() {
+        do {
+            let userA = try synchronouslyLogInUser(for: basicCredentials(register: isParent, usernameSuffix: "_A"), server: authURL)
+            _ = try synchronouslyOpenRealm(url: realmURL, user: userA)
+
+            var managementRealm = try userA.managementRealm()
+            let permissionOffer = SyncPermissionOffer(realmURL: realmURL.absoluteString, expiresAt: Date(timeIntervalSinceNow: 30 * 24 * 60 * 60), mayRead: true, mayWrite: true, mayManage: false)
+
+            var permissionToken: String?
+
+            var exp = expectation(description: "A new permission offer will be processed by the server")
+
+            let permissionOfferNotificationToken = managementRealm
+                .objects(SyncPermissionOffer.self)
+                .filter("id = %@", permissionOffer.id)
+                .addNotificationBlock { (changes) in
+                if case .update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
+                    XCTAssertEqual(statusCode, 0)
+                    XCTAssertEqual(change[0].status, .success)
+
+                    permissionToken = change[0].token
+                    exp.fulfill()
+                }
+            }
+
+            try managementRealm.write {
+                managementRealm.add(permissionOffer)
+            }
+
+            waitForExpectations(timeout: 2)
+            permissionOfferNotificationToken.stop()
+
+            let userB = try synchronouslyLogInUser(for: basicCredentials(register: isParent, usernameSuffix: "_B"), server: authURL)
+            _ = try synchronouslyOpenRealm(url: realmURL, user: userB)
+
+            managementRealm = try userB.managementRealm()
+
+            XCTAssertNotNil(permissionToken)
+            let permissionOfferResponse = SyncPermissionOfferResponse(token: permissionToken!)
+
+            exp = expectation(description: "A new permission offer response will be processed by the server")
+
+            let permissionOfferResponseNotificationToken = managementRealm
+                .objects(SyncPermissionOfferResponse.self)
+                .filter("id = %@", permissionOfferResponse.id)
+                .addNotificationBlock { (changes) in
+                if case .update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
+                    XCTAssertEqual(statusCode, 0)
+                    XCTAssertEqual(change[0].status, .success)
+
+                    exp.fulfill()
+                }
+            }
+
+            try managementRealm.write {
+                managementRealm.add(permissionOfferResponse)
+            }
+
+            waitForExpectations(timeout: 2)
+            permissionOfferResponseNotificationToken.stop()
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
 }
 #else
 class SwiftObjectServerTests: SwiftSyncTestCase {
@@ -252,7 +347,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             for (accessPermissions, statusMessage) in zip(permissions, statusMessages) {
                 for permissions in accessPermissions {
                     let permissionChange = SyncPermissionChange(
-                        realmURL: realmURL.absoluteString,
+                        realmURL: realmURL.absoluteString!,
                         userID: userB.identity!,
                         mayRead: permissions[0],
                         mayWrite: permissions[1],
@@ -285,6 +380,101 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         waitForExpectationsWithTimeout(2, handler: nil)
         token.stop()
+    }
+
+    func testPermissionOffer() {
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
+            _ = try synchronouslyOpenRealm(url: realmURL, user: user)
+
+            let managementRealm = try user.managementRealm()
+            let permissionOffer = SyncPermissionOffer(realmURL: realmURL.absoluteString!, expiresAt: NSDate(timeIntervalSinceNow: 30 * 24 * 60 * 60), mayRead: true, mayWrite: true, mayManage: false)
+
+            let exp = expectationWithDescription("A new permission offer will be processed by the server")
+
+            let results = managementRealm.objects(SyncPermissionOffer.self).filter("id = %@", permissionOffer.id)
+            let notificationToken = results.addNotificationBlock { (changes) in
+                if case .Update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
+                    XCTAssertEqual(statusCode, 0)
+                    XCTAssertEqual(change[0].status, SyncManagementObjectStatus.Success)
+                    exp.fulfill()
+                }
+            }
+
+            try managementRealm.write {
+                managementRealm.add(permissionOffer)
+            }
+
+            waitForExpectationsWithTimeout(2, handler: nil)
+            notificationToken.stop()
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    func testPermissionOfferResponse() {
+        do {
+            let userA = try synchronouslyLogInUser(for: basicCredentials(register: isParent, usernameSuffix: "_A"), server: authURL)
+            _ = try synchronouslyOpenRealm(url: realmURL, user: userA)
+
+            var managementRealm = try userA.managementRealm()
+            let permissionOffer = SyncPermissionOffer(realmURL: realmURL.absoluteString!, expiresAt: NSDate(timeIntervalSinceNow: 30 * 24 * 60 * 60), mayRead: true, mayWrite: true, mayManage: false)
+
+            var permissionToken: String?
+
+            var exp = expectationWithDescription("A new permission offer will be processed by the server")
+
+            let permissionOfferNotificationToken = managementRealm
+                .objects(SyncPermissionOffer.self)
+                .filter("id = %@", permissionOffer.id)
+                .addNotificationBlock { (changes) in
+                    if case .Update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
+                        XCTAssertEqual(statusCode, 0)
+                        XCTAssertEqual(change[0].status, SyncManagementObjectStatus.Success)
+
+                        permissionToken = change[0].token
+                        exp.fulfill()
+                    }
+            }
+
+            try managementRealm.write {
+                managementRealm.add(permissionOffer)
+            }
+
+            waitForExpectationsWithTimeout(2, handler: nil)
+            permissionOfferNotificationToken.stop()
+
+            let userB = try synchronouslyLogInUser(for: basicCredentials(register: isParent, usernameSuffix: "_B"), server: authURL)
+            _ = try synchronouslyOpenRealm(url: realmURL, user: userB)
+
+            managementRealm = try userB.managementRealm()
+
+            XCTAssertNotNil(permissionToken)
+            let permissionOfferResponse = SyncPermissionOfferResponse(token: permissionToken!)
+
+            exp = expectationWithDescription("A new permission offer response will be processed by the server")
+
+            let permissionOfferResponseNotificationToken = managementRealm
+                .objects(SyncPermissionOfferResponse.self)
+                .filter("id = %@", permissionOfferResponse.id)
+                .addNotificationBlock { (changes) in
+                    if case .Update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
+                        XCTAssertEqual(statusCode, 0)
+                        XCTAssertEqual(change[0].status, SyncManagementObjectStatus.Success)
+
+                        exp.fulfill()
+                    }
+            }
+
+            try managementRealm.write {
+                managementRealm.add(permissionOfferResponse)
+            }
+
+            waitForExpectationsWithTimeout(2, handler: nil)
+            permissionOfferResponseNotificationToken.stop()
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
     }
 }
 #endif
