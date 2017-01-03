@@ -11,7 +11,11 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Introduce APIs for safely handing objects between threads. Create a
+  thread-safe reference to a thread-confined object to the
+  `+[RLMThreadSafeReference referenceWithThreadConfined:]`/`ThreadSafeReference(to:)`
+  constructor, which you can then safely pass to another thread to resolve in
+  the new Realm with `-[RLMRealm resolveThreadSafeReference:]`/`Realm.resolve(_:)`.
 
 ### Bugfixes
 
@@ -255,7 +259,6 @@ Prebuilt frameworks are now built with Xcode 7.3.1 and Xcode 8.0.
 * Improve sort performance, especially on non-nullable columns.
 * Allow partial initialization of object by `initWithValue:`, deferring
   required property checks until object is added to Realm.
-* Introduce API for safely handing objects between threads.
 
 ### Bugfixes
 
