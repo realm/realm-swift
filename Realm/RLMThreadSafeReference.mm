@@ -66,7 +66,7 @@
 }
 
 - (BOOL)isInvalidated {
-    return (bool)_reference;
+    return !(bool)_reference;
 }
 
 @end
