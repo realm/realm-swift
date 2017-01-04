@@ -45,7 +45,7 @@ public struct SortDescriptor {
     /**
      Creates a sort descriptor with the given key path and sort order values.
 
-     - parameter keyPath:  The key path which the sort descriptor orders results by.
+     - parameter keyPath:   The key path which the sort descriptor orders results by.
      - parameter ascending: Whether the descriptor sorts in ascending or descending order.
      */
     public init(keyPath: String, ascending: Bool = true) {
@@ -53,6 +53,12 @@ public struct SortDescriptor {
         self.ascending = ascending
     }
 
+    /**
+     Creates a sort descriptor with the given property and sort order values.
+
+     - parameter property:  The property which the sort descriptor orders results by.
+     - parameter ascending: Whether the descriptor sorts in ascending or descending order.
+     */
     @available(*, deprecated, renamed: "init(keyPath:ascending:)")
     public init(property: String, ascending: Bool = true) {
         self.init(keyPath: property, ascending: ascending)
@@ -65,7 +71,8 @@ public struct SortDescriptor {
         return SortDescriptor(keyPath: keyPath, ascending: !ascending)
     }
 
-    @available(*, unavailable, renamed: "keyPath")
+    /// The key path which the sort descriptor orders results by.
+    @available(*, deprecated, renamed: "keyPath")
     public var property: String { return keyPath }
 }
 
@@ -161,6 +168,12 @@ public struct SortDescriptor {
         self.ascending = ascending
     }
 
+    /**
+     Creates a sort descriptor with the given key path and sort order values.
+
+     - parameter property:  The property which the sort descriptor orders results by.
+     - parameter ascending: Whether the descriptor sorts in ascending or descending order.
+     */
     @available(*, deprecated, renamed="init(keyPath:ascending:)")
     public init(property: String, ascending: Bool = true) {
         self.init(keyPath: property, ascending: ascending)
@@ -173,7 +186,8 @@ public struct SortDescriptor {
         return SortDescriptor(keyPath: keyPath, ascending: !ascending)
     }
 
-    @available(*, unavailable, renamed="keyPath")
+    /// The key which the sort descriptor orders results by.
+    @available(*, deprecated, renamed="keyPath")
     public var property: String { return keyPath }
 }
 
