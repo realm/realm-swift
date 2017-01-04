@@ -120,7 +120,9 @@ extension Realm {
      - param reference: The thread-safe reference to the thread-confined object to resolve in this
                         Realm.
 
-     - warning: Every `RLMThreadSafeReference` object created must be resolved exactly once.
+     - warning: A `ThreadSafeReference` object must be resolved at most once.
+                Failing to resolve a `ThreadSafeReference` will result in the source version of the
+                Realm being pinned until the reference is deallocated.
                 An exception will be thrown if a reference is resolved more than once.
 
      - warning: Cannot call within a write transaction.
@@ -141,7 +143,9 @@ extension Realm {
      - param reference: The thread-safe reference to the thread-confined object to resolve in this
                         Realm.
 
-     - warning: Every `RLMThreadSafeReference` object created must be resolved exactly once.
+     - warning: A `ThreadSafeReference` object must be resolved at most once.
+                Failing to resolve a `ThreadSafeReference` will result in the source version of the
+                Realm being pinned until the reference is deallocated.
                 An exception will be thrown if a reference is resolved more than once.
 
      - warning: Cannot call within a write transaction.
