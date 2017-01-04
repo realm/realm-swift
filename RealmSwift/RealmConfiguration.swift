@@ -139,10 +139,10 @@ extension Realm {
             }
         }
 
-        private var _inMemoryIdentifier: String? = nil
+        private var _inMemoryIdentifier: String?
 
         /// A 64-byte key to use to encrypt the data, or `nil` if encryption is not enabled.
-        public var encryptionKey: Data? = nil
+        public var encryptionKey: Data?
 
         /**
          Whether to open the Realm in read-only mode.
@@ -159,7 +159,7 @@ extension Realm {
         public var schemaVersion: UInt64 = 0
 
         /// The block which migrates the Realm to the current version.
-        public var migrationBlock: MigrationBlock? = nil
+        public var migrationBlock: MigrationBlock?
 
         /**
          Whether to recreate the Realm file with the provided schema if a migration is required. This is the case when
@@ -182,7 +182,7 @@ extension Realm {
         }
 
         /// A custom schema to use for the Realm.
-        private var customSchema: RLMSchema? = nil
+        private var customSchema: RLMSchema?
 
         /// If `true`, disables automatic format upgrades when accessing the Realm.
         internal var disableFormatUpgrade: Bool = false
@@ -366,10 +366,10 @@ extension Realm {
             }
         }
 
-        private var _inMemoryIdentifier: String? = nil
+        private var _inMemoryIdentifier: String?
 
         /// A 64-byte key to use to encrypt the data, or `nil` if encryption is not enabled.
-        public var encryptionKey: NSData? = nil
+        public var encryptionKey: NSData?
 
         /// Whether to open the Realm in read-only mode.
         ///
@@ -387,7 +387,7 @@ extension Realm {
         public var schemaVersion: UInt64 = 0
 
         /// The block which migrates the Realm to the current version.
-        public var migrationBlock: MigrationBlock? = nil
+        public var migrationBlock: MigrationBlock?
 
         /**
          Whether to recreate the Realm file with the provided schema if a migration is required.
@@ -410,7 +410,7 @@ extension Realm {
         }
 
         /// A custom schema to use for the Realm.
-        private var customSchema: RLMSchema? = nil
+        private var customSchema: RLMSchema?
 
         /// If `true`, disables automatic format upgrades when accessing the Realm.
         internal var disableFormatUpgrade: Bool = false
