@@ -23,6 +23,31 @@ class SwiftSyncObject: Object {
     dynamic var stringProp: String = ""
 }
 
+class SwiftHugeSyncObject: Object {
+    dynamic var dataProp: NSData?
+
+    required init() {
+        super.init()
+        let size = 1000000
+        let ptr = malloc(size)
+        dataProp = NSData(bytes: ptr, length: size)
+        free(ptr)
+    }
+
+    required init(realm: RLMRealm, schema: RLMObjectSchema) {
+        fatalError("init(realm:schema:) has not been implemented")
+    }
+#if swift(>=3.0)
+    required init(value: Any, schema: RLMSchema) {
+        fatalError("init(value:schema:) has not been implemented")
+    }
+#else
+    required init(value: AnyObject, schema: RLMSchema) {
+        fatalError("init(value:schema:) has not been implemented")
+    }
+#endif
+}
+
 // MARK: Test case
 #if swift(>=3.0)
 class SwiftSyncTestCase: RLMSyncTestCase {

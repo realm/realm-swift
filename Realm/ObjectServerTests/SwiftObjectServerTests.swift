@@ -39,10 +39,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             if isParent {
-                user.waitForDownload(toFinish: realmURL)
+                waitForDownloads(for: user, url: realmURL)
                 checkCount(expected: 0, realm, SwiftSyncObject.self)
                 executeChild()
-                user.waitForDownload(toFinish: realmURL)
+                waitForDownloads(for: user, url: realmURL)
                 checkCount(expected: 3, realm, SwiftSyncObject.self)
             } else {
                 // Add objects
@@ -51,7 +51,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     realm.add(SwiftSyncObject(value: ["child-2"]))
                     realm.add(SwiftSyncObject(value: ["child-3"]))
                 }
-                user.waitForUpload(toFinish: realmURL)
+                waitForUploads(for: user, url: realmURL)
                 checkCount(expected: 3, realm, SwiftSyncObject.self)
             }
         } catch {
@@ -70,16 +70,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     realm.add(SwiftSyncObject(value: ["child-2"]))
                     realm.add(SwiftSyncObject(value: ["child-3"]))
                 }
-                user.waitForUpload(toFinish: realmURL)
+                waitForUploads(for: user, url: realmURL)
                 checkCount(expected: 3, realm, SwiftSyncObject.self)
                 executeChild()
-                user.waitForDownload(toFinish: realmURL)
+                waitForDownloads(for: user, url: realmURL)
                 checkCount(expected: 0, realm, SwiftSyncObject.self)
             } else {
                 try realm.write {
                     realm.deleteAll()
                 }
-                user.waitForUpload(toFinish: realmURL)
+                waitForUploads(for: user, url: realmURL)
                 checkCount(expected:0, realm, SwiftSyncObject.self)
             }
         } catch {
@@ -142,6 +142,77 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertFalse(FileManager.default.fileExists(atPath: path))
             closure()
             XCTAssertTrue(FileManager.default.fileExists(atPath: path))
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    // MARK: Progress notifiers
+
+    func testStreamingDownloadNotifier() {
+        let bigObjectCount = 2
+        do {
+            var callCount = 0
+            var transferred = 0
+            var transferrable = 0
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
+            let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
+            if isParent {
+                let session = user.session(for: realmURL)
+                XCTAssertNotNil(session)
+                let token = session!.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
+                    callCount += 1
+                    XCTAssert(p.transferredBytes >= transferred)
+                    XCTAssert(p.transferrableBytes >= transferrable)
+                    transferred = p.transferredBytes
+                    transferrable = p.transferrableBytes
+                }
+                // Wait for the child process to upload all the data.
+                executeChild()
+                waitForDownloads(for: user, url: realmURL)
+                token!.stop()
+                XCTAssert(callCount > 1)
+                XCTAssert(transferred >= transferrable)
+            } else {
+                try realm.write {
+                    for _ in 0..<bigObjectCount {
+                        realm.add(SwiftHugeSyncObject())
+                    }
+                }
+                waitForUploads(for: user, url: realmURL)
+                checkCount(expected:bigObjectCount, realm, SwiftHugeSyncObject.self)
+            }
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    func testStreamingUploadNotifier() {
+        let bigObjectCount = 2
+        do {
+            var callCount = 0
+            var transferred = 0
+            var transferrable = 0
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
+            let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
+            let session = user.session(for: realmURL)
+            XCTAssertNotNil(session)
+            let token = session!.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
+                callCount += 1
+                XCTAssert(p.transferredBytes >= transferred)
+                XCTAssert(p.transferrableBytes >= transferrable)
+                transferred = p.transferredBytes
+                transferrable = p.transferrableBytes
+            }
+            try realm.write {
+                for _ in 0..<bigObjectCount {
+                    realm.add(SwiftHugeSyncObject())
+                }
+            }
+            waitForUploads(for: user, url: realmURL)
+            token!.stop()
+            XCTAssert(callCount > 1)
+            XCTAssertEqual(transferred, transferrable)
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
@@ -335,10 +406,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             if isParent {
-                user.waitForDownloadToFinish(realmURL)
+                waitForDownloadsForUser(user, url: realmURL)
                 checkCount(expected: 0, realm, SwiftSyncObject.self)
                 executeChild()
-                user.waitForDownloadToFinish(realmURL)
+                waitForDownloadsForUser(user, url: realmURL)
                 checkCount(expected: 3, realm, SwiftSyncObject.self)
             } else {
                 // Add objects
@@ -347,7 +418,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     realm.add(SwiftSyncObject(value: ["child-2"]))
                     realm.add(SwiftSyncObject(value: ["child-3"]))
                 }
-                user.waitForUploadToFinish(realmURL)
+                waitForUploadsForUser(user, url: realmURL)
                 checkCount(expected: 3, realm, SwiftSyncObject.self)
             }
         } catch {
@@ -366,18 +437,89 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     realm.add(SwiftSyncObject(value: ["child-2"]))
                     realm.add(SwiftSyncObject(value: ["child-3"]))
                 }
-                user.waitForUploadToFinish(realmURL)
+                waitForUploadsForUser(user, url: realmURL)
                 checkCount(expected: 3, realm, SwiftSyncObject.self)
                 executeChild()
-                user.waitForDownloadToFinish(realmURL)
+                waitForDownloadsForUser(user, url: realmURL)
                 checkCount(expected: 0, realm, SwiftSyncObject.self)
             } else {
                 try realm.write {
                     realm.deleteAll()
                 }
-                user.waitForUploadToFinish(realmURL)
+                waitForUploadsForUser(user, url: realmURL)
                 checkCount(expected:0, realm, SwiftSyncObject.self)
             }
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    // MARK: Progress notifiers
+
+    func testStreamingDownloadNotifier() {
+        let bigObjectCount = 2
+        do {
+            var callCount = 0
+            var transferred = 0
+            var transferrable = 0
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
+            let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
+            if isParent {
+                let session = user.sessionForURL(realmURL)
+                XCTAssertNotNil(session)
+                let token = session!.addProgressNotificationForDirection(.Download, mode: .ReportIndefinitely) { p in
+                    callCount += 1
+                    XCTAssert(p.transferredBytes >= transferred)
+                    XCTAssert(p.transferrableBytes >= transferrable)
+                    transferred = p.transferredBytes
+                    transferrable = p.transferrableBytes
+                }
+                // Wait for the child process to upload all the data.
+                executeChild()
+                waitForDownloadsForUser(user, url: realmURL)
+                token!.stop()
+                XCTAssert(callCount > 1)
+                XCTAssert(transferred >= transferrable)
+            } else {
+                try realm.write {
+                    for _ in 0..<bigObjectCount {
+                        realm.add(SwiftHugeSyncObject())
+                    }
+                }
+                waitForUploadsForUser(user, url: realmURL)
+                checkCount(expected:bigObjectCount, realm, SwiftHugeSyncObject.self)
+            }
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    func testStreamingUploadNotifier() {
+        let bigObjectCount = 2
+        do {
+            var callCount = 0
+            var transferred = 0
+            var transferrable = 0
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
+            let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
+            let session = user.sessionForURL(realmURL)
+            XCTAssertNotNil(session)
+            let token = session!.addProgressNotificationForDirection(.Upload, mode: .ReportIndefinitely) { p in
+                callCount += 1
+                XCTAssert(p.transferredBytes >= transferred)
+                XCTAssert(p.transferrableBytes >= transferrable)
+                transferred = p.transferredBytes
+                transferrable = p.transferrableBytes
+            }
+            try realm.write {
+                for _ in 0..<bigObjectCount {
+                    realm.add(SwiftHugeSyncObject())
+                }
+            }
+            waitForUploadsForUser(user, url: realmURL)
+            token!.stop()
+            XCTAssert(callCount > 1)
+            XCTAssert(transferred >= transferrable)
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
