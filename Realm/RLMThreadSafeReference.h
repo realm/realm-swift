@@ -51,8 +51,9 @@ NS_ASSUME_NONNULL_BEGIN
  To resolve a thread-safe reference on a target Realm on a different thread, pass to
  `-[RLMRealm resolveThreadSafeReference:]`.
 
- @warning Every `RLMThreadSafeReference` object created must be resolved exactly once.
-          An exception will be thrown if a referenced is resolved more than once.
+ @warning A `RLMThreadSafeReference` object must be resolved at most once.
+          Failing to resolve a `RLMThreadSafeReference` will result in the source version of the
+          Realm being pinned until the reference is deallocated.
 
  @note Prefer short-lived `RLMThreadSafeReference`s as the data for the version of the source Realm
        will be retained until all references have been resolved or deallocated.

@@ -49,8 +49,9 @@ public protocol ThreadConfined {
  To resolve a thread-safe reference on a target Realm on a different thread, pass to
  `Realm.resolve(_:)`.
 
- - warning: Every `ThreadSafeReference` object created must be resolved exactly once.
-            An exception will be thrown if a referenced is resolved more than once.
+ - warning: A `ThreadSafeReference` object must be resolved at most once.
+            Failing to resolve a `ThreadSafeReference` will result in the source version of the
+            Realm being pinned until the reference is deallocated.
 
  - note: Prefer short-lived `ThreadSafeReference`s as the data for the version of the source Realm
          will be retained until all references have been resolved or deallocated.
