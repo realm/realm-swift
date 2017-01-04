@@ -54,7 +54,6 @@ static auto translateErrors(Function&& f) {
     }
 
     translateErrors([&] {
-    //       Should we check the thread ourselves here?
         _reference = [(id<RLMThreadConfined_Private>)threadConfined rlm_newThreadSafeReference];
         _metadata = ((id<RLMThreadConfined_Private>)threadConfined).rlm_objectiveCMetadata;
     });
