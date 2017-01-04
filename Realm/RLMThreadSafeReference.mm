@@ -77,7 +77,7 @@ static auto translateErrors(Function&& f) {
 }
 
 - (BOOL)isInvalidated {
-    return !(bool)_reference;
+    return !_reference;
 }
 
 @end
