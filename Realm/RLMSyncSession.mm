@@ -24,10 +24,38 @@
 
 using namespace realm;
 
+@interface RLMProgressNotificationToken() {
+    uint64_t _token;
+    std::weak_ptr<SyncSession> _session;
+}
+@end
+
+@implementation RLMProgressNotificationToken
+
+- (void)stop {
+    if (auto session = _session.lock()) {
+        session->unregister_progress_notifier(_token);
+    }
+}
+
+- (void)dealloc {
+    [self stop];
+}
+
+- (instancetype)initWithTokenValue:(uint64_t)token session:(std::shared_ptr<SyncSession>)session {
+    if (self = [super init]) {
+        _token = token;
+        _session = session;
+        return self;
+    }
+    return nil;
+}
+
+@end
+
 @interface RLMSyncSession () {
     std::weak_ptr<SyncSession> _session;
 }
-
 @end
 
 @implementation RLMSyncSession
@@ -105,6 +133,31 @@ using namespace realm;
         return YES;
     }
     return NO;
+}
+
+- (RLMProgressNotificationToken *)addProgressNotificationBlock:(RLMProgressNotificationBlock)block
+                                                   isStreaming:(BOOL)streaming {
+    if (auto session = _session.lock()) {
+        if (session->state() == SyncSession::PublicState::Error) {
+            return nil;
+        }
+        uint64_t token = session->register_progress_notifier([block](uint64_t downloaded,
+                                                                     util::Optional<uint64_t> downloadable,
+                                                                     uint64_t uploaded,
+                                                                     util::Optional<uint64_t> uploadable) {
+            NSNumber *downloadableValue = nil;
+            if (downloadable) {
+                downloadableValue = [NSNumber numberWithUnsignedInteger:*downloadable];
+            }
+            NSNumber *uploadableValue = nil;
+            if (uploadable) {
+                uploadableValue = [NSNumber numberWithUnsignedInteger:*uploadable];
+            }
+            block(downloaded, downloadableValue, uploaded, uploadableValue);
+        }, streaming);
+        return [[RLMProgressNotificationToken alloc] initWithTokenValue:token session:std::move(session)];
+    }
+    return nil;
 }
 
 @end
