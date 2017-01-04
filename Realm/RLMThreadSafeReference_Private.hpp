@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMThreadSafeReference.h"
-#include "shared_realm.hpp"
 #include "thread_safe_reference.hpp"
 
 NS_ASSUME_NONNULL_BEGIN

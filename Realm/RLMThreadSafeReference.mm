@@ -17,9 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMThreadSafeReference_Private.hpp"
-#import "RLMRealm_Private.hpp"
 #import "RLMUtil.hpp"
-#import "shared_realm.hpp"
 
 template<typename Function>
 static auto translateErrors(Function&& f) {

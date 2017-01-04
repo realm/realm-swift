@@ -18,9 +18,8 @@
 
 #import <Foundation/Foundation.h>
 #import "RLMConstants.h"
-#import "RLMThreadSafeReference.h"
 
-@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
+@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference;
 
 NS_ASSUME_NONNULL_BEGIN
 
