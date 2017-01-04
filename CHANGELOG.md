@@ -14,6 +14,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Add `SyncPermissionOffer` and `SyncPermissionOfferResponse` classes to allow
   creating and accepting permission change events to synchronized Realms between
   different users.
+* Support monitoring sync transfer progress by registering notification blocks
+  on `SyncSession`. Specify the transfer direction (`.upload`/`.download`) and
+  mode (`.reportIndefinitely`/`.forCurrentlyOutstandingWork`) to monitor.
 
 ### Bugfixes
 
