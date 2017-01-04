@@ -37,6 +37,9 @@
 @implementation RLMArrayHolder
 @end
 
+@interface RLMArray () <RLMThreadConfined_Private>
+@end
+
 @implementation RLMArray {
 @public
     // Backing array when this instance is unmanaged
@@ -418,6 +421,23 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
     return RLMDescriptionWithMaxDepth(@"RLMArray", self, depth);
 }
+
+#pragma mark - Thread Confined Protocol Conformance
+
+- (std::unique_ptr<realm::ThreadSafeReferenceBase>)rlm_newThreadSafeReference {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
+}
+
+- (id)rlm_objectiveCMetadata {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
+}
+
++ (instancetype)rlm_objectWithThreadSafeReference:(__unused std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
+                                         metadata:(__unused id)metadata
+                                            realm:(__unused RLMRealm *)realm {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
+}
+
 @end
 
 @interface RLMSortDescriptor ()
@@ -435,27 +455,6 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (instancetype)reversedSortDescriptor {
     return [self.class sortDescriptorWithProperty:_property ascending:!_ascending];
-}
-
-@end
-
-@interface RLMArray (ThreadConfined) <RLMThreadConfined_Private>
-@end
-
-@implementation RLMArray (ThreadConfined)
-
-- (std::unique_ptr<realm::ThreadSafeReferenceBase>)rlm_newThreadSafeReference {
-    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
-}
-
-- (id)rlm_objectiveCMetadata {
-    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
-}
-
-+ (instancetype)rlm_objectWithThreadSafeReference:(__unused std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
-                                         metadata:(__unused id)metadata
-                                            realm:(__unused RLMRealm *)realm {
-    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
 }
 
 @end

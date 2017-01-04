@@ -35,6 +35,17 @@
 #import <realm/table_view.hpp>
 #import <objc/runtime.h>
 
+@interface RLMArrayLinkViewHandoverMetadata : NSObject
+@property (nonatomic) NSString *parentClassName;
+@property (nonatomic) NSString *key;
+@end
+
+@implementation RLMArrayLinkViewHandoverMetadata
+@end
+
+@interface RLMArrayLinkView () <RLMThreadConfined_Private>
+@end
+
 //
 // RLMArray implementation
 //
@@ -440,22 +451,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 }
 #pragma clang diagnostic pop
 
-@end
-
-@interface RLMArrayLinkViewHandoverMetadata : NSObject
-
-@property (nonatomic) NSString *parentClassName;
-@property (nonatomic) NSString *key;
-
-@end
-
-@implementation RLMArrayLinkViewHandoverMetadata
-@end
-
-@interface RLMArrayLinkView (ThreadConfined) <RLMThreadConfined_Private>
-@end
-
-@implementation RLMArrayLinkView (ThreadConfined)
+#pragma mark - Thread Confined Protocol Conformance
 
 - (std::unique_ptr<realm::ThreadSafeReferenceBase>)rlm_newThreadSafeReference {
     realm::ThreadSafeReference<realm::List> list_reference = _realm->_realm->obtain_thread_safe_reference(_backingList);
@@ -464,7 +460,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 
 - (RLMArrayLinkViewHandoverMetadata *)rlm_objectiveCMetadata {
     RLMArrayLinkViewHandoverMetadata *metadata = [[RLMArrayLinkViewHandoverMetadata alloc] init];
-    metadata.parentClassName = @(_ownerInfo->objectSchema->name.c_str());
+    metadata.parentClassName = _ownerInfo->rlmObjectSchema.className;
     metadata.key = _key;
     return metadata;
 }

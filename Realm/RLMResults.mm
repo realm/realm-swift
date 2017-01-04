@@ -45,6 +45,9 @@ using namespace realm;
 @end
 #pragma clang diagnostic pop
 
+@interface RLMResults () <RLMThreadConfined_Private>
+@end
+
 //
 // RLMResults implementation
 //
@@ -447,15 +450,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return !!_realm;
 }
 
-@end
-
-@implementation RLMLinkingObjects
-@end
-
-@interface RLMResults (ThreadConfined) <RLMThreadConfined_Private>
-@end
-
-@implementation RLMResults (ThreadConfined)
+#pragma mark - Thread Confined Protocol Conformance
 
 - (std::unique_ptr<realm::ThreadSafeReferenceBase>)rlm_newThreadSafeReference {
     return std::make_unique<realm::ThreadSafeReference<Results>>(_realm->_realm->obtain_thread_safe_reference(_results));
@@ -477,4 +472,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
                                      results:std::move(results)];
 }
 
+@end
+
+@implementation RLMLinkingObjects
 @end
