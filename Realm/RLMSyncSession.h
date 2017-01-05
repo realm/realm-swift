@@ -82,8 +82,12 @@ NS_ASSUME_NONNULL_BEGIN
  downloaded and uploaded bytes both exceed their downloadable and uploadable counterparts, the block will be
  automatically unregistered and called no longer.
 
- The token returned by this method can be destroyed if notifications for a given block are no longer desired. If no
- token is returned, the session was not in a state where it could accept progress notifiers.
+ The token returned by this method must be retained as long as progress notifications are desired, and the `-stop`
+ method should be called on it when notifications are no longer needed.
+
+ If no token is returned, the session was not in a state where it could accept progress notifiers, or the notifier was
+ not a streaming notifier, was called immediately, and will not be called again since there is no additional progress
+ to report.
  */
 - (nullable RLMProgressNotificationToken *)addProgressNotificationBlock:(RLMProgressNotificationBlock)block
                                                             isStreaming:(BOOL)streaming NS_REFINED_FOR_SWIFT;

@@ -35,11 +35,18 @@ using namespace realm;
 - (void)stop {
     if (auto session = _session.lock()) {
         session->unregister_progress_notifier(_token);
+        _session = {};
+        _token = 0;
     }
 }
 
 - (void)dealloc {
-    [self stop];
+    if (_token != 0) {
+        NSLog(@"RLMProgressNotificationToken released without unregistering a notification. "
+              @"You must hold on to the RLMProgressNotificationToken and call "
+              @"-[RLMProgressNotificationToken stop] when you no longer wish to receive "
+              @"sync progress update notifications.");
+    }
 }
 
 - (nullable instancetype)initWithTokenValue:(uint64_t)token
