@@ -42,7 +42,11 @@ using namespace realm;
     [self stop];
 }
 
-- (instancetype)initWithTokenValue:(uint64_t)token session:(std::shared_ptr<SyncSession>)session {
+- (nullable instancetype)initWithTokenValue:(uint64_t)token
+                                    session:(std::shared_ptr<SyncSession>)session {
+    if (token == 0) {
+        return nil;
+    }
     if (self = [super init]) {
         _token = token;
         _session = session;
