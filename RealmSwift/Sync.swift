@@ -298,6 +298,11 @@ public final class SyncPermissionChange: Object {
     }
 
     /// :nodoc:
+    override public class func primaryKey() -> String? {
+        return "id"
+    }
+
+    /// :nodoc:
     override public class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
