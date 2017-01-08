@@ -596,10 +596,6 @@
     // sort invalid name
     RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingKeyPath:@"invalidCol" ascending:YES], @"'invalidCol'.* not found .*'AllTypesObject'");
     XCTAssertThrows([arrayOfAll.array sortedResultsUsingKeyPath:@"invalidCol" ascending:NO]);
-
-    // sort on key path
-    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingKeyPath:@"collection.@count" ascending:YES], @"key paths that include collection operators");
-    XCTAssertThrows([arrayOfAll.array sortedResultsUsingKeyPath:@"collection.@count" ascending:NO]);
 }
 
 - (void)testSortByNoColumns {

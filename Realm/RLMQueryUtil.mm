@@ -860,7 +860,7 @@ struct KeyPath {
     bool containsToManyRelationship;
 };
 
-KeyPath key_path_from_string(RLMSchema* schema, RLMObjectSchema *objectSchema, NSString *keyPath)
+KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, NSString *keyPath)
 {
     RLMProperty *property;
     std::vector<RLMProperty *> links;
