@@ -16,37 +16,28 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncPermissionChange_Private.h"
+#import "RLMSyncPermissionOfferResponse_Private.h"
 
-@implementation RLMSyncPermissionChange
+@implementation RLMSyncPermissionOfferResponse
 
-+ (instancetype)permissionChangeWithRealmURL:(NSString *)realmURL
-                                      userID:(NSString *)userID
-                                        read:(nullable NSNumber<RLMBool> *)mayRead
-                                       write:(nullable NSNumber<RLMBool> *)mayWrite
-                                      manage:(nullable NSNumber<RLMBool> *)mayManage {
-    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange new];
-    permissionChange.realmUrl = realmURL;
-    permissionChange.userId = userID;
-    permissionChange.mayRead = mayRead;
-    permissionChange.mayWrite = mayWrite;
-    permissionChange.mayManage = mayManage;
-    return permissionChange;
++ (instancetype)permissionOfferResponseWithToken:(NSString *)token {
+    RLMSyncPermissionOfferResponse *permissionOfferResponse = [RLMSyncPermissionOfferResponse new];
+    permissionOfferResponse.token = token;
+    return permissionOfferResponse;
 }
 
 + (NSArray<NSString *> *)requiredProperties {
-    return @[@"id", @"createdAt", @"updatedAt", @"realmUrl", @"userId"];
+    return @[@"id", @"createdAt", @"updatedAt", @"token"];
 }
 
 + (NSDictionary *)defaultPropertyValues {
     NSDate *now = [NSDate date];
     return @{
-        @"id": [NSUUID UUID].UUIDString,
-        @"createdAt": now,
-        @"updatedAt": now,
-        @"realmUrl": @"*",
-        @"userId": @"*"
-    };
+             @"id": [NSUUID UUID].UUIDString,
+             @"createdAt": now,
+             @"updatedAt": now,
+             @"token": @"",
+             };
 }
 
 + (nullable NSString *)primaryKey {
@@ -62,7 +53,7 @@
 }
 
 + (NSString *)_realmObjectName {
-    return @"PermissionChange";
+    return @"PermissionOfferResponse";
 }
 
 @end

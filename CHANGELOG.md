@@ -3,7 +3,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Sync Breaking Changes (In Beta)
 
-* None.
+* The `id` property of `RLMSyncPermissionChange`/`SyncPermissionChange` is
+  now declared as primary key
 
 ### API Breaking Changes
 
@@ -11,7 +12,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add the `RLMSyncPermissionOffer` class to allow to offer permissions to others for
+  synchronized Realms.
+* Add the `RLMSyncPermissionOfferResponse` class to response permissions by a received token
+  which is genereted by `RLMSyncPermissionOffer`.
 
 ### Bugfixes
 

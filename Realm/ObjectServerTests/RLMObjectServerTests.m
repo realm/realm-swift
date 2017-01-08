@@ -919,4 +919,276 @@
     }
 }
 
+/// Get a token which can be used to offer the permissions as defined
+- (void)testPermissionOffer {
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+    RLMRealm *realm = [self openRealmForURL:url user:user];
+    NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+
+    RLMSyncPermissionOffer *permissionOffer = [RLMSyncPermissionOffer permissionOfferWithRealmURL:realmURL
+                                                                                        expiresAt:[NSDate dateWithTimeIntervalSinceNow:30 * 24 * 60 * 60]
+                                                                                             read:YES
+                                                                                            write:YES
+                                                                                           manage:NO];
+    NSError *error = nil;
+    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission offer will be processed by the server"];
+    RLMResults *r = [RLMSyncPermissionOffer objectsInRealm:managementRealm where:@"id = %@", permissionOffer.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                            __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermissionOffer *permissionOffer = results[0];
+        if (permissionOffer.statusCode) {
+            XCTAssertEqual(permissionOffer.status, RLMSyncManagementObjectStatusSuccess);
+            XCTAssertNotNil(permissionOffer.token);
+
+            [expectation fulfill];
+        }
+    }];
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionOffer];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission offer object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
+/// Get a permission offer token, then permission offer response will be processed
+- (void)testPermissionOfferIsExpired {
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+    RLMRealm *realm = [self openRealmForURL:url user:user];
+    NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+
+    RLMSyncPermissionOffer *permissionOffer = [RLMSyncPermissionOffer permissionOfferWithRealmURL:realmURL
+                                                                                        expiresAt:[NSDate dateWithTimeIntervalSinceNow:-30 * 24 * 60 * 60]
+                                                                                             read:YES
+                                                                                            write:YES
+                                                                                           manage:NO];
+    NSError *error = nil;
+    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission offer will be processed by the server"];
+    RLMResults *r = [RLMSyncPermissionOffer objectsInRealm:managementRealm where:@"id = %@", permissionOffer.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                            __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermissionOffer *permissionOffer = results[0];
+        if (permissionOffer.statusCode) {
+            XCTAssertEqual(permissionOffer.status, RLMSyncManagementObjectStatusError);
+            XCTAssertEqualObjects(permissionOffer.statusMessage, @"The permission offer is expired.");
+            XCTAssertNil(permissionOffer.token);
+
+            [expectation fulfill];
+        }
+    }];
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionOffer];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission offer object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
+/// Failed to process a permission offer response object due to `token` is invalid
+- (void)testPermissionOfferResponse {
+    NSString *userNameA = [ACCOUNT_NAME() stringByAppendingString:@"_A"];
+    RLMSyncUser *userA = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameA
+                                                                                             register:self.isParent]
+                                                server:[RLMObjectServerTests authServerURL]];
+
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"realm://localhost:9080/~/%@", userNameA]];
+    NSError *error = nil;
+    RLMRealm *realm = [self openRealmForURL:url user:userA];
+
+    RLMRealm *managementRealm = [userA managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+
+    RLMSyncPermissionOffer *permissionOffer = [RLMSyncPermissionOffer permissionOfferWithRealmURL:realmURL
+                                                                                        expiresAt:[NSDate dateWithTimeIntervalSinceNow:30 * 24 * 60 * 60]
+                                                                                             read:YES
+                                                                                            write:YES
+                                                                                           manage:NO];
+    __block NSString *permissionToken = nil;
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission offer will be processed by the server"];
+    RLMResults *r = [RLMSyncPermissionOffer objectsInRealm:managementRealm where:@"id = %@", permissionOffer.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                            __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermissionOffer *permissionOffer = results[0];
+        if (permissionOffer.statusCode) {
+            XCTAssertEqual(permissionOffer.status, RLMSyncManagementObjectStatusSuccess);
+            XCTAssertNotNil(permissionOffer.token);
+
+            permissionToken = permissionOffer.token;
+            [expectation fulfill];
+        }
+    }];
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionOffer];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission offer object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+
+    NSString *userNameB = [ACCOUNT_NAME() stringByAppendingString:@"_B"];
+    RLMSyncUser *userB = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameB
+                                                                                             register:self.isParent]
+                                                server:[RLMObjectServerTests authServerURL]];
+
+    managementRealm = [userB managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+
+    RLMSyncPermissionOfferResponse *permissionOfferResponse = [RLMSyncPermissionOfferResponse
+                                                               permissionOfferResponseWithToken:permissionToken];
+
+
+    expectation = [self expectationWithDescription:@"A new permission offer response will be processed by the server"];
+    r = [RLMSyncPermissionOfferResponse objectsInRealm:managementRealm where:@"id = %@", permissionOfferResponse.id];
+    token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                             __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermissionOfferResponse *permissionOfferResponse = results[0];
+        if (permissionOfferResponse.statusCode) {
+            XCTAssertEqual(permissionOfferResponse.status, RLMSyncManagementObjectStatusSuccess);
+            XCTAssertNotNil(permissionOfferResponse.realmUrl);
+
+            [expectation fulfill];
+        }
+    }];
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionOfferResponse];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission offer response object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
+/// Failed to process a permission offer response object due to `token` is invalid
+- (void)testPermissionOfferResponseInvalidToken {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    RLMSyncPermissionOfferResponse *permissionOfferResponse = [RLMSyncPermissionOfferResponse permissionOfferResponseWithToken:@"invalid token"];
+
+    NSError *error = nil;
+    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission offer response will be processed by the server"];
+    RLMResults *r = [RLMSyncPermissionOfferResponse objectsInRealm:managementRealm where:@"id = %@", permissionOfferResponse.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                            __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermissionOffer *permissionOffer = results[0];
+        if (permissionOffer.statusCode) {
+            XCTAssertEqual(permissionOffer.status, RLMSyncManagementObjectStatusError);
+            XCTAssertNil(permissionOffer.realmUrl);
+
+            [expectation fulfill];
+        }
+    }];
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionOfferResponse];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission offer response object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
+/// Failed to process a permission offer response object due to `token` does not exist
+- (void)testPermissionOfferResponseTokenNotExist {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSString *fakeToken = @"00000000000000000000000000000000:00000000-0000-0000-0000-000000000000";
+    RLMSyncPermissionOfferResponse *permissionOfferResponse = [RLMSyncPermissionOfferResponse permissionOfferResponseWithToken:fakeToken];
+
+    NSError *error = nil;
+    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission offer response will be processed by the server"];
+    RLMResults *r = [RLMSyncPermissionOfferResponse objectsInRealm:managementRealm where:@"id = %@", permissionOfferResponse.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                            __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermissionOffer *permissionOffer = results[0];
+        if (permissionOffer.statusCode) {
+            XCTAssertEqual(permissionOffer.status, RLMSyncManagementObjectStatusError);
+            XCTAssertNil(permissionOffer.realmUrl);
+
+            [expectation fulfill];
+        }
+    }];
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionOfferResponse];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission offer response object: %@", error);
+    
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    
+    [token stop];
+}
+
 @end
