@@ -23,7 +23,7 @@ import RealmSwift
 
 class SortDescriptorTests: TestCase {
 
-    let sortDescriptor = SortDescriptor(property: "property")
+    let sortDescriptor = SortDescriptor(keyPath: "property")
 
     func testAscendingDefaultsToTrue() {
         XCTAssertTrue(sortDescriptor.ascending)
@@ -31,13 +31,13 @@ class SortDescriptorTests: TestCase {
 
     func testReversedReturnsReversedDescriptor() {
         let reversed = sortDescriptor.reversed()
-        XCTAssertEqual(reversed.property, sortDescriptor.property, "Property should stay the same when reversed.")
+        XCTAssertEqual(reversed.keyPath, sortDescriptor.keyPath, "Key path should stay the same when reversed.")
         XCTAssertFalse(reversed.ascending)
         XCTAssertTrue(reversed.reversed().ascending)
     }
 
     func testDescription() {
-        XCTAssertEqual(sortDescriptor.description, "SortDescriptor (property: property, direction: ascending)")
+        XCTAssertEqual(sortDescriptor.description, "SortDescriptor(keyPath: property, direction: ascending)")
     }
 
     func testStringLiteralConvertible() {
@@ -51,7 +51,7 @@ class SortDescriptorTests: TestCase {
 
 class SortDescriptorTests: TestCase {
 
-    let sortDescriptor = SortDescriptor(property: "property")
+    let sortDescriptor = SortDescriptor(keyPath: "property")
 
     func testAscendingDefaultsToTrue() {
         XCTAssertTrue(sortDescriptor.ascending)
@@ -59,13 +59,13 @@ class SortDescriptorTests: TestCase {
 
     func testReversedReturnsReversedDescriptor() {
         let reversed = sortDescriptor.reversed()
-        XCTAssertEqual(reversed.property, sortDescriptor.property, "Property should stay the same when reversed.")
+        XCTAssertEqual(reversed.keyPath, sortDescriptor.keyPath, "Property should stay the same when reversed.")
         XCTAssertFalse(reversed.ascending)
         XCTAssertTrue(reversed.reversed().ascending)
     }
 
     func testDescription() {
-        XCTAssertEqual(sortDescriptor.description, "SortDescriptor (property: property, direction: ascending)")
+        XCTAssertEqual(sortDescriptor.description, "SortDescriptor(keyPath: property, direction: ascending)")
     }
 
     func testStringLiteralConvertible() {

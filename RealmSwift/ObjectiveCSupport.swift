@@ -163,7 +163,7 @@ public final class ObjectiveCSupport {
 
     /// Convert a `RLMSortDescriptor` to a `SortDescriptor`.
     public static func convert(object: RLMSortDescriptor) -> SortDescriptor {
-        return SortDescriptor(property: object.property, ascending: object.ascending)
+        return SortDescriptor(keyPath: object.keyPath, ascending: object.ascending)
     }
 
     /// Convert a `SyncCredentials` to a `RLMSyncCredentials`.

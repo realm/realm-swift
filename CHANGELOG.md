@@ -7,11 +7,30 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API Breaking Changes
 
-* None.
+* The following Objective-C APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API                                              | New API                                                     |
+|:------------------------------------------------------------|:------------------------------------------------------------|
+| `-[RLMArray sortedResultsUsingProperty:]`                   | `-[RLMArray sortedResultsUsingKeyPath:]`                    |
+| `-[RLMCollection sortedResultsUsingProperty:]`              | `-[RLMCollection sortedResultsUsingKeyPath:]`               |
+| `-[RLMResults sortedResultsUsingProperty:]`                 | `-[RLMResults sortedResultsUsingKeyPath:]`                  |
+| `+[RLMSortDescriptor sortDescriptorWithProperty:ascending]` | `+[RLMSortDescriptor sortDescriptorWithKeyPath:ascending:]` |
+| `RLMSortDescriptor.property`                                | `RLMSortDescriptor.keyPath`                                 |
+
+* The following Swift APIs have been deprecated in favor of newer or preferred versions:
+
+| Deprecated API                                        | New API                                          |
+|:------------------------------------------------------|:-------------------------------------------------|
+| `LinkingObjects.sorted(byProperty:ascending:)`        | `LinkingObjects.sorted(byKeyPath:ascending:)`    |
+| `List.sorted(byProperty:ascending:)`                  | `List.sorted(byKeyPath:ascending:)`              |
+| `RealmCollection.sorted(byProperty:ascending:)`       | `RealmCollection.sorted(byKeyPath:ascending:)`   |
+| `Results.sorted(byProperty:ascending:)`               | `Results.sorted(byKeyPath:ascending:)`           |
+| `SortDescriptor(property:ascending:)`                 | `SortDescriptor(keyPath:ascending:)`             |
+| `SortDescriptor.property`                             | `SortDescriptor.keyPath`                         |
 
 ### Enhancements
 
-* None.
+* Realm collections can now be sorted by properties over to-one relationships.
 
 ### Bugfixes
 

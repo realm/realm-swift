@@ -130,17 +130,17 @@
 
     // class not derived from RLMObject
     XCTAssertThrows([realm objects:@"NonRealmPersonObject" where:@"age > 25"], @"invalid object type");
-    XCTAssertThrows([[realm objects:@"NonRealmPersonObject" where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"invalid object type");
+    XCTAssertThrows([[realm objects:@"NonRealmPersonObject" where:@"age > 25"] sortedResultsUsingKeyPath:@"age" ascending:YES], @"invalid object type");
 
     // empty string for class name
     XCTAssertThrows([realm objects:@"" where:@"age > 25"], @"missing class name");
-    XCTAssertThrows([[realm objects:@"" where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"missing class name");
+    XCTAssertThrows([[realm objects:@"" where:@"age > 25"] sortedResultsUsingKeyPath:@"age" ascending:YES], @"missing class name");
 
     // nil class name
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnonnull"
     XCTAssertThrows([realm objects:nil where:@"age > 25"], @"nil class name");
-    XCTAssertThrows([[realm objects:nil where:@"age > 25"] sortedResultsUsingProperty:@"age" ascending:YES], @"nil class name");
+    XCTAssertThrows([[realm objects:nil where:@"age > 25"] sortedResultsUsingKeyPath:@"age" ascending:YES], @"nil class name");
 #pragma clang diagnostic pop
 }
 
@@ -407,11 +407,11 @@
     RLMAssertCount(PersonObject, 2U, @"age > 28");
 
     // query on realm with order
-    RLMResults *results = [[PersonObject objectsInRealm:realm where:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *results = [[PersonObject objectsInRealm:realm where:@"age > 28"] sortedResultsUsingKeyPath:@"age" ascending:YES];
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 
     // query on sorted results
-    results = [[[PersonObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"age" ascending:YES] objectsWhere:@"age > 28"];
+    results = [[[PersonObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:@"age" ascending:YES] objectsWhere:@"age > 28"];
     XCTAssertEqualObjects([results[0] name], @"Tim", @"Tim should be first results");
 }
 
@@ -494,7 +494,7 @@
     RLMAssertCount(PersonObject, 1U, @"age == 27");
 
     // with order
-    RLMResults *results = [[PersonObject objectsWhere:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *results = [[PersonObject objectsWhere:@"age > 28"] sortedResultsUsingKeyPath:@"age" ascending:YES];
     PersonObject *tim = results[0];
     XCTAssertEqualObjects(tim.name, @"Tim", @"Tim should be first results");
 }
@@ -513,34 +513,34 @@
     RLMResults *all = [PersonObject allObjects];
     XCTAssertEqual(all.count, 3U, @"Expecting 3 results");
 
-    RLMResults *some = [[PersonObject objectsWhere:@"age > 28"] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *some = [[PersonObject objectsWhere:@"age > 28"] sortedResultsUsingKeyPath:@"age" ascending:YES];
 
     // query/order on array
     RLMAssertCount(all, 1U, @"age == 27");
     RLMAssertCount(all, 0U, @"age == 28");
-    some = [some sortedResultsUsingProperty:@"age" ascending:NO];
+    some = [some sortedResultsUsingKeyPath:@"age" ascending:NO];
     XCTAssertEqualObjects([some[0] name], @"Ari", @"Ari should be first results");
 }
 
 - (void)verifySort:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending expected:(id)val {
-    RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] sortedResultsUsingProperty:column ascending:ascending];
+    RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:column ascending:ascending];
     AllTypesObject *obj = results[0];
     XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
 
     RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
-    results = [ar sortedResultsUsingProperty:column ascending:ascending];
+    results = [ar sortedResultsUsingKeyPath:column ascending:ascending];
     obj = results[0];
     XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
 }
 
 - (void)verifySortWithAccuracy:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending getter:(double(^)(id))getter expected:(double)val accuracy:(double)accuracy {
     // test TableView query
-    RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] sortedResultsUsingProperty:column ascending:ascending];
+    RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:column ascending:ascending];
     XCTAssertEqualWithAccuracy(getter(results[0][column]), val, accuracy, @"Array not sorted as expected");
 
     // test LinkView query
     RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
-    results = [ar sortedResultsUsingProperty:column ascending:ascending];
+    results = [ar sortedResultsUsingKeyPath:column ascending:ascending];
     XCTAssertEqualWithAccuracy(getter(results[0][column]), val, accuracy, @"Array not sorted as expected");
 }
 
@@ -594,12 +594,8 @@
     [self verifySort:realm column:@"stringCol" ascending:NO expected:@"cc"];
 
     // sort invalid name
-    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingProperty:@"invalidCol" ascending:YES], @"'invalidCol'.* 'AllTypesObject'.* not found");
-    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"invalidCol" ascending:NO]);
-
-    // sort on key path
-    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingProperty:@"key.path" ascending:YES], @"key paths is not supported");
-    XCTAssertThrows([arrayOfAll.array sortedResultsUsingProperty:@"key.path" ascending:NO]);
+    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingKeyPath:@"invalidCol" ascending:YES], @"'invalidCol'.* not found .*'AllTypesObject'");
+    XCTAssertThrows([arrayOfAll.array sortedResultsUsingKeyPath:@"invalidCol" ascending:NO]);
 }
 
 - (void)testSortByNoColumns {
@@ -628,8 +624,8 @@
     [realm commitWriteTransaction];
 
     bool (^checkOrder)(NSArray *, NSArray *, NSArray *) = ^bool(NSArray *properties, NSArray *ascending, NSArray *dogs) {
-        NSArray *sort = @[[RLMSortDescriptor sortDescriptorWithProperty:properties[0] ascending:[ascending[0] boolValue]],
-                          [RLMSortDescriptor sortDescriptorWithProperty:properties[1] ascending:[ascending[1] boolValue]]];
+        NSArray *sort = @[[RLMSortDescriptor sortDescriptorWithKeyPath:properties[0] ascending:[ascending[0] boolValue]],
+                          [RLMSortDescriptor sortDescriptorWithKeyPath:properties[1] ascending:[ascending[1] boolValue]]];
         RLMResults *actual = [DogObject.allObjects sortedResultsUsingDescriptors:sort];
         return [actual[0] isEqualToObject:dogs[0]]
             && [actual[1] isEqualToObject:dogs[1]]
@@ -646,6 +642,59 @@
     XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@YES, @NO], @[b1, a1, b2, a2]));
     XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @YES], @[a2, b2, a1, b1]));
     XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @NO], @[b2, a2, b1, a1]));
+}
+
+- (void)testSortByKeyPath {
+    RLMRealm *realm = [self realm];
+
+    [realm beginWriteTransaction];
+    DogObject *lucy = [DogObject createInDefaultRealmWithValue:@[@"Lucy", @7]];
+    DogObject *freyja = [DogObject createInDefaultRealmWithValue:@[@"Freyja", @6]];
+    DogObject *ziggy = [DogObject createInDefaultRealmWithValue:@[@"Ziggy", @9]];
+
+    OwnerObject *mark = [OwnerObject createInDefaultRealmWithValue:@[@"Mark", freyja]];
+    OwnerObject *diane = [OwnerObject createInDefaultRealmWithValue:@[@"Diane", lucy]];
+    OwnerObject *hannah = [OwnerObject createInDefaultRealmWithValue:@[@"Hannah"]];
+    OwnerObject *don = [OwnerObject createInDefaultRealmWithValue:@[@"Don", ziggy]];
+    OwnerObject *diane_sr = [OwnerObject createInDefaultRealmWithValue:@[@"Diane Sr", ziggy]];
+
+    [realm commitWriteTransaction];
+
+    NSArray *(^asArray)(RLMResults *) = ^(RLMResults *results) {
+        return [[self evaluate:results] valueForKeyPath:@"self"];
+    };
+
+    RLMResults *r1 = [OwnerObject.allObjects sortedResultsUsingKeyPath:@"dog.age" ascending:YES];
+    XCTAssertEqualObjects(asArray(r1), (@[ mark, diane, don, diane_sr, hannah ]));
+
+    RLMResults *r2 = [OwnerObject.allObjects sortedResultsUsingKeyPath:@"dog.age" ascending:NO];
+    XCTAssertEqualObjects(asArray(r2), (@[ hannah, don, diane_sr, diane, mark ]));
+
+    RLMResults *r3 = [OwnerObject.allObjects sortedResultsUsingDescriptors:@[
+                         [RLMSortDescriptor sortDescriptorWithKeyPath:@"dog.age" ascending:YES],
+                         [RLMSortDescriptor sortDescriptorWithKeyPath:@"name" ascending:YES]
+    ]];
+    XCTAssertEqualObjects(asArray(r3), (@[ mark, diane, diane_sr, don, hannah ]));
+
+    RLMResults *r4 = [OwnerObject.allObjects sortedResultsUsingDescriptors:@[
+                         [RLMSortDescriptor sortDescriptorWithKeyPath:@"dog.age" ascending:NO],
+                         [RLMSortDescriptor sortDescriptorWithKeyPath:@"name" ascending:YES]
+    ]];
+    XCTAssertEqualObjects(asArray(r4), (@[ hannah, diane_sr, don, diane, mark ]));
+}
+
+- (void)testSortByUnspportedKeyPath {
+    // Array property
+    RLMAssertThrowsWithReasonMatching([DogArrayObject.allObjects sortedResultsUsingKeyPath:@"dogs.age" ascending:YES],
+                                      @"to-many relationship is not supported");
+
+    // Backlinks property
+    RLMAssertThrowsWithReasonMatching([DogObject.allObjects sortedResultsUsingKeyPath:@"owners.name" ascending:YES],
+                                      @"to-many relationship is not supported");
+
+    // Collection operator
+    RLMAssertThrowsWithReasonMatching([DogArrayObject.allObjects sortedResultsUsingKeyPath:@"dogs.@count" ascending:YES],
+                                      @"collection operators is not supported");
 }
 
 - (void)testSortedLinkViewWithDeletion {
@@ -669,7 +718,7 @@
 
     [realm commitWriteTransaction];
 
-    RLMResults *results = [arrayOfAll.array sortedResultsUsingProperty:@"stringCol" ascending:NO];
+    RLMResults *results = [arrayOfAll.array sortedResultsUsingKeyPath:@"stringCol" ascending:NO];
     XCTAssertEqualObjects([results[0] stringCol], @"cc");
 
     // delete cc, add d results should update
@@ -700,8 +749,8 @@
     ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"name", @[], [IntObject allObjects]]];
     [realm commitWriteTransaction];
 
-    RLMResults *asc = [IntObject.allObjects sortedResultsUsingProperty:@"intCol" ascending:YES];
-    RLMResults *desc = [IntObject.allObjects sortedResultsUsingProperty:@"intCol" ascending:NO];
+    RLMResults *asc = [IntObject.allObjects sortedResultsUsingKeyPath:@"intCol" ascending:YES];
+    RLMResults *desc = [IntObject.allObjects sortedResultsUsingKeyPath:@"intCol" ascending:NO];
 
     // sanity check; would work even without sort order being preserved
     XCTAssertEqual(2, [[[asc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
@@ -711,8 +760,8 @@
     XCTAssertEqual(3, [[[[desc objectsWhere:@"intCol >= 2"] objectsWhere:@"intCol < 4"] firstObject] intCol]);
 
     // same thing but on an linkview
-    asc = [array.intArray sortedResultsUsingProperty:@"intCol" ascending:YES];
-    desc = [array.intArray sortedResultsUsingProperty:@"intCol" ascending:NO];
+    asc = [array.intArray sortedResultsUsingKeyPath:@"intCol" ascending:YES];
+    desc = [array.intArray sortedResultsUsingKeyPath:@"intCol" ascending:NO];
 
     XCTAssertEqual(2, [[[asc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
     XCTAssertEqual(4, [[[desc objectsWhere:@"intCol >= 2"] firstObject] intCol]);
@@ -1699,9 +1748,9 @@
 
     CompanyObject *co = CompanyObject.allObjects.firstObject;
     RLMResults *basic = [co.employees objectsWhere:@"age = 40"];
-    RLMResults *sort = [co.employees sortedResultsUsingProperty:@"name" ascending:YES];
-    RLMResults *sortQuery = [[co.employees sortedResultsUsingProperty:@"name" ascending:YES] objectsWhere:@"age = 40"];
-    RLMResults *querySort = [[co.employees objectsWhere:@"age = 40"] sortedResultsUsingProperty:@"name" ascending:YES];
+    RLMResults *sort = [co.employees sortedResultsUsingKeyPath:@"name" ascending:YES];
+    RLMResults *sortQuery = [[co.employees sortedResultsUsingKeyPath:@"name" ascending:YES] objectsWhere:@"age = 40"];
+    RLMResults *querySort = [[co.employees objectsWhere:@"age = 40"] sortedResultsUsingKeyPath:@"name" ascending:YES];
 
     XCTAssertEqual(1U, basic.count);
     XCTAssertEqual(2U, sort.count);
@@ -2080,9 +2129,9 @@
 
         RLMAssertCount(stringObjectClass, 1U, @"stringCol = ''");
 
-        RLMResults *sorted = [[stringObjectClass allObjectsInRealm:realm] sortedResultsUsingProperty:@"stringCol" ascending:YES];
+        RLMResults *sorted = [[stringObjectClass allObjectsInRealm:realm] sortedResultsUsingKeyPath:@"stringCol" ascending:YES];
         XCTAssertEqualObjects((@[NSNull.null, NSNull.null, @"", @"a", @"b"]), [sorted valueForKey:@"stringCol"]);
-        XCTAssertEqualObjects((@[@"b", @"a", @"", NSNull.null, NSNull.null]), [[sorted sortedResultsUsingProperty:@"stringCol" ascending:NO] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects((@[@"b", @"a", @"", NSNull.null, NSNull.null]), [[sorted sortedResultsUsingKeyPath:@"stringCol" ascending:NO] valueForKey:@"stringCol"]);
 
         [realm transactionWithBlock:^{
             [realm deleteObject:[stringObjectClass allObjectsInRealm:realm].firstObject];
@@ -2161,10 +2210,10 @@
         NumberObject *no0 = [NumberObject createInRealm:realm withValue:@[@0, @0.0f, @0.0, @NO]];
         for (RLMProperty *property in [[NumberObject alloc] init].objectSchema.properties) {
             NSString *name = property.name;
-            RLMResults *ascending = [[NumberObject allObjectsInRealm:realm] sortedResultsUsingProperty:name ascending:YES];
+            RLMResults *ascending = [[NumberObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:name ascending:YES];
             XCTAssertEqualObjects([ascending valueForKey:name], ([@[noNull, no0, no1] valueForKey:name]));
 
-            RLMResults *descending = [[NumberObject allObjectsInRealm:realm] sortedResultsUsingProperty:name ascending:NO];
+            RLMResults *descending = [[NumberObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:name ascending:NO];
             XCTAssertEqualObjects([descending valueForKey:name], ([@[no1, no0, noNull] valueForKey:name]));
         }
     }
@@ -2175,10 +2224,10 @@
         DateObject *doZero = [DateObject createInRealm:realm withValue:@[[NSDate dateWithTimeIntervalSince1970:0]]];
         DateObject *doNull = [DateObject createInRealm:realm withValue:@[NSNull.null]];
 
-        RLMResults *ascending = [[DateObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"dateCol" ascending:YES];
+        RLMResults *ascending = [[DateObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:@"dateCol" ascending:YES];
         XCTAssertEqualObjects([ascending valueForKey:@"dateCol"], ([@[doNull, doNegative, doZero, doPositive] valueForKey:@"dateCol"]));
 
-        RLMResults *descending = [[DateObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"dateCol" ascending:NO];
+        RLMResults *descending = [[DateObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:@"dateCol" ascending:NO];
         XCTAssertEqualObjects([descending valueForKey:@"dateCol"], ([@[doPositive, doZero, doNegative, doNull] valueForKey:@"dateCol"]));
     }
 
@@ -2189,10 +2238,10 @@
         StringObject *soNull = [StringObject createInRealm:realm withValue:@[NSNull.null]];
         StringObject *soAB = [StringObject createInRealm:realm withValue:@[@"AB"]];
 
-        RLMResults *ascending = [[StringObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"stringCol" ascending:YES];
+        RLMResults *ascending = [[StringObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:@"stringCol" ascending:YES];
         XCTAssertEqualObjects([ascending valueForKey:@"stringCol"], ([@[soNull, soEmpty, soA, soAB, soB] valueForKey:@"stringCol"]));
 
-        RLMResults *descending = [[StringObject allObjectsInRealm:realm] sortedResultsUsingProperty:@"stringCol" ascending:NO];
+        RLMResults *descending = [[StringObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:@"stringCol" ascending:NO];
         XCTAssertEqualObjects([descending valueForKey:@"stringCol"], ([@[soB, soAB, soA, soEmpty, soNull] valueForKey:@"stringCol"]));
     }
 

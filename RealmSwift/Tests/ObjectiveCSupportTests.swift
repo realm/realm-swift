@@ -52,9 +52,9 @@ class ObjectiveCSupportTests: TestCase {
         XCTAssertEqual(rlmRealm.allObjects("SwiftObject").count, 1)
 
         let sortDescriptor: RealmSwift.SortDescriptor = "property"
-        XCTAssertEqual(sortDescriptor.property,
-                       ObjectiveCSupport.convert(object: sortDescriptor).property,
-                       "SortDescriptor.property must be equal to RLMSortDescriptor.property")
+        XCTAssertEqual(sortDescriptor.keyPath,
+                       ObjectiveCSupport.convert(object: sortDescriptor).keyPath,
+                       "SortDescriptor.keyPath must be equal to RLMSortDescriptor.keyPath")
         XCTAssertEqual(sortDescriptor.ascending,
                        ObjectiveCSupport.convert(object: sortDescriptor).ascending,
                        "SortDescriptor.ascending must be equal to RLMSortDescriptor.ascending")
@@ -127,9 +127,9 @@ class ObjectiveCSupportTests: TestCase {
         XCTAssertEqual(rlmRealm.allObjects("SwiftObject").count, 1)
 
         let sortDescriptor: RealmSwift.SortDescriptor = "property"
-        XCTAssertEqual(sortDescriptor.property,
-                       ObjectiveCSupport.convert(sortDescriptor).property,
-                       "SortDescriptor.property must be equal to RLMSortDescriptor.property")
+        XCTAssertEqual(sortDescriptor.keyPath,
+                       ObjectiveCSupport.convert(sortDescriptor).keyPath,
+                       "SortDescriptor.keyPath must be equal to RLMSortDescriptor.keyPath")
         XCTAssertEqual(sortDescriptor.ascending,
                        ObjectiveCSupport.convert(sortDescriptor).ascending,
                        "SortDescriptor.ascending must be equal to RLMSortDescriptor.ascending")
