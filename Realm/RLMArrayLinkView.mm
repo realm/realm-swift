@@ -65,7 +65,7 @@
     self = [self initWithObjectClassName:property.objectClassName];
     if (self) {
         _realm = realm;
-        REALM_ASSERT_DEBUG(list.get_realm() == realm->_realm);
+        REALM_ASSERT(list.get_realm() == realm->_realm);
         _backingList = std::move(list);
         _objectInfo = &parentInfo->linkTargetType(property.index);
         _ownerInfo = parentInfo;
