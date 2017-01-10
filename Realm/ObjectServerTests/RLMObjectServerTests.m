@@ -1075,6 +1075,7 @@
     XCTAssertNotNil(managementRealm);
     XCTAssertNil(error, @"Error when opening management Realm: %@", error);
 
+    __block NSString *responseRealmUrl = nil;
 
     RLMSyncPermissionOfferResponse *permissionOfferResponse = [RLMSyncPermissionOfferResponse
                                                                permissionOfferResponseWithToken:permissionToken];
@@ -1091,7 +1092,10 @@
         RLMSyncPermissionOfferResponse *permissionOfferResponse = results[0];
         if (permissionOfferResponse.statusCode) {
             XCTAssertEqual(permissionOfferResponse.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertNotNil(permissionOfferResponse.realmUrl);
+            XCTAssertEqualObjects((permissionOfferResponse.realmUrl),
+                                  ([NSString stringWithFormat:@"realm://localhost:9080/%@/%@", userA.identity, userNameA]));
+
+            responseRealmUrl = permissionOfferResponse.realmUrl;
 
             [expectation fulfill];
         }
@@ -1105,6 +1109,8 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     [token stop];
+
+    XCTAssertNotNil([self openRealmForURL:[NSURL URLWithString:responseRealmUrl] user:userB]);
 }
 
 /// Failed to process a permission offer response object due to `token` is invalid

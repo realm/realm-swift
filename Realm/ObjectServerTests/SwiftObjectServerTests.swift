@@ -221,6 +221,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             managementRealm = try userB.managementRealm()
 
             XCTAssertNotNil(permissionToken)
+
+            var responseRealmUrl: String?
             let permissionOfferResponse = SyncPermissionOfferResponse(token: permissionToken!)
 
             exp = expectation(description: "A new permission offer response will be processed by the server")
@@ -232,6 +234,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 if case .update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
                     XCTAssertEqual(statusCode, 0)
                     XCTAssertEqual(change[0].status, .success)
+                    XCTAssertEqual(change[0].realmUrl, String(format: "realm://localhost:9080/%@/testBasicSync", userA.identity!))
+
+                    responseRealmUrl = change[0].realmUrl
 
                     exp.fulfill()
                 }
@@ -243,6 +248,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             waitForExpectations(timeout: 2)
             permissionOfferResponseNotificationToken.stop()
+
+            _ = try synchronouslyOpenRealm(url: URL(string: responseRealmUrl!)!, user: userB)
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
@@ -450,6 +457,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             managementRealm = try userB.managementRealm()
 
             XCTAssertNotNil(permissionToken)
+
+            var responseRealmUrl: String?
             let permissionOfferResponse = SyncPermissionOfferResponse(token: permissionToken!)
 
             exp = expectationWithDescription("A new permission offer response will be processed by the server")
@@ -461,6 +470,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     if case .Update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
                         XCTAssertEqual(statusCode, 0)
                         XCTAssertEqual(change[0].status, SyncManagementObjectStatus.Success)
+                        XCTAssertEqual(change[0].realmUrl, String(format: "realm://localhost:9080/%@/testBasicSync", userA.identity!))
+
+                        responseRealmUrl = change[0].realmUrl
 
                         exp.fulfill()
                     }
@@ -472,6 +484,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             waitForExpectationsWithTimeout(2, handler: nil)
             permissionOfferResponseNotificationToken.stop()
+
+            _ = try synchronouslyOpenRealm(url: NSURL(string: responseRealmUrl!)!, user: userB)
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
