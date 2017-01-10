@@ -52,8 +52,8 @@ static auto translateErrors(Function&& f) {
     }
 
     translateErrors([&] {
-        _reference = [(id<RLMThreadConfined_Private>)threadConfined rlm_newThreadSafeReference];
-        _metadata = ((id<RLMThreadConfined_Private>)threadConfined).rlm_objectiveCMetadata;
+        _reference = [(id<RLMThreadConfined_Private>)threadConfined makeThreadSafeReference];
+        _metadata = ((id<RLMThreadConfined_Private>)threadConfined).objectiveCMetadata;
     });
     _type = threadConfined.class;
 
@@ -69,8 +69,7 @@ static auto translateErrors(Function&& f) {
         @throw RLMException(@"Can only resolve a thread safe reference once.");
     }
     return translateErrors([&] {
-        return [_type rlm_objectWithThreadSafeReference:std::move(_reference)
-                                               metadata:_metadata realm:realm];
+        return [_type objectWithThreadSafeReference:std::move(_reference) metadata:_metadata realm:realm];
     });
 }
 

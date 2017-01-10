@@ -453,21 +453,21 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 
 #pragma mark - Thread Confined Protocol Conformance
 
-- (std::unique_ptr<realm::ThreadSafeReferenceBase>)rlm_newThreadSafeReference {
+- (std::unique_ptr<realm::ThreadSafeReferenceBase>)makeThreadSafeReference {
     realm::ThreadSafeReference<realm::List> list_reference = _realm->_realm->obtain_thread_safe_reference(_backingList);
     return std::make_unique<realm::ThreadSafeReference<realm::List>>(std::move(list_reference));
 }
 
-- (RLMArrayLinkViewHandoverMetadata *)rlm_objectiveCMetadata {
+- (RLMArrayLinkViewHandoverMetadata *)objectiveCMetadata {
     RLMArrayLinkViewHandoverMetadata *metadata = [[RLMArrayLinkViewHandoverMetadata alloc] init];
     metadata.parentClassName = _ownerInfo->rlmObjectSchema.className;
     metadata.key = _key;
     return metadata;
 }
 
-+ (instancetype)rlm_objectWithThreadSafeReference:(std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
-                                         metadata:(RLMArrayLinkViewHandoverMetadata *)metadata
-                                            realm:(RLMRealm *)realm {
++ (instancetype)objectWithThreadSafeReference:(std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
+                                     metadata:(RLMArrayLinkViewHandoverMetadata *)metadata
+                                        realm:(RLMRealm *)realm {
     REALM_ASSERT_DEBUG(dynamic_cast<realm::ThreadSafeReference<realm::List> *>(reference.get()));
     auto list_reference = static_cast<realm::ThreadSafeReference<realm::List> *>(reference.get());
 

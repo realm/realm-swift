@@ -452,17 +452,17 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 #pragma mark - Thread Confined Protocol Conformance
 
-- (std::unique_ptr<realm::ThreadSafeReferenceBase>)rlm_newThreadSafeReference {
+- (std::unique_ptr<realm::ThreadSafeReferenceBase>)makeThreadSafeReference {
     return std::make_unique<realm::ThreadSafeReference<Results>>(_realm->_realm->obtain_thread_safe_reference(_results));
 }
 
-- (id)rlm_objectiveCMetadata {
+- (id)objectiveCMetadata {
     return nil;
 }
 
-+ (instancetype)rlm_objectWithThreadSafeReference:(std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
-                                         metadata:(__unused id)metadata
-                                            realm:(RLMRealm *)realm {
++ (instancetype)objectWithThreadSafeReference:(std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
+                                     metadata:(__unused id)metadata
+                                        realm:(RLMRealm *)realm {
     REALM_ASSERT_DEBUG(dynamic_cast<realm::ThreadSafeReference<Results> *>(reference.get()));
     auto results_reference = static_cast<realm::ThreadSafeReference<Results> *>(reference.get());
 

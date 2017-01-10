@@ -424,17 +424,17 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 #pragma mark - Thread Confined Protocol Conformance
 
-- (std::unique_ptr<realm::ThreadSafeReferenceBase>)rlm_newThreadSafeReference {
+- (std::unique_ptr<realm::ThreadSafeReferenceBase>)makeThreadSafeReference {
     REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
 }
 
-- (id)rlm_objectiveCMetadata {
+- (id)objectiveCMetadata {
     REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
 }
 
-+ (instancetype)rlm_objectWithThreadSafeReference:(__unused std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
-                                         metadata:(__unused id)metadata
-                                            realm:(__unused RLMRealm *)realm {
++ (instancetype)objectWithThreadSafeReference:(__unused std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
+                                     metadata:(__unused id)metadata
+                                        realm:(__unused RLMRealm *)realm {
     REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
 }
 
