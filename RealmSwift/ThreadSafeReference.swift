@@ -19,11 +19,12 @@
 import Realm
 
 /**
- An instance which is bound to a thread-specific `Realm` instance, and so cannot be passed
- between threads without being explicitly exported and imported.
+ Objects of types which conform to `ThreadConfined` can be managed by a Realm, which will make
+ them bound to a thread-specific `Realm` instance. Managed objects must be explicitly exported
+ and imported to be passed between threads.
 
- Instances conforming to this protocol can be converted to a thread-safe reference for transport
- between threads by passing to the `ThreadSafeReference(to:)` constructor.
+ Managed instances of objects conforming to this protocol can be converted to a thread-safe
+ reference for transport between threads by passing to the `ThreadSafeReference(to:)` constructor.
 
  Note that only types defined by Realm can meaningfully conform to this protocol, and defining new
  classes which attempt to conform to it will not make them work with `ThreadSafeReference`.
@@ -31,7 +32,12 @@ import Realm
 public protocol ThreadConfined {
     // Must also conform to `AssistedObjectiveCBridgeable`
 
-    /// The Realm which manages the object, or `nil` if the object is unmanaged.
+    /**
+     The Realm which manages the object, or `nil` if the object is unmanaged.
+
+     Unmanaged objects are not confined to a thread and cannot be passed to methods expecting a
+     `ThreadConfined` object.
+     */
     var realm: Realm? { get }
 #if swift(>=3.0)
     /// Indicates if the object can no longer be accessed because it is now invalid.
@@ -115,7 +121,7 @@ extension Realm {
     /**
      Returns the same object as the one referenced when the `RLMThreadSafeReference` was first
      created, but resolved for the current Realm for this thread. Returns `nil` if this object was
-     deleted after the reference was created, or if the operation failed.
+     deleted after the reference was created.
 
      - param reference: The thread-safe reference to the thread-confined object to resolve in this
                         Realm.
@@ -138,7 +144,7 @@ extension Realm {
     /**
      Returns the same object as the one referenced when the `RLMThreadSafeReference` was first
      created, but resolved for the current Realm for this thread. Returns `nil` if this object was
-     deleted after the reference was created, or if the operation failed.
+     deleted after the reference was created.
 
      - param reference: The thread-safe reference to the thread-confined object to resolve in this
                         Realm.

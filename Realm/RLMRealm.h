@@ -409,7 +409,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 /**
  Returns the same object as the one referenced when the `RLMThreadSafeReference` was first created,
  but resolved for the current Realm for this thread. Returns `nil` if this object was deleted after
- the reference was created, or if the operation failed.
+ the reference was created.
 
  @param reference The thread-safe reference to the thread-confined object to resolve in this Realm.
 

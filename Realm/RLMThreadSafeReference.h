@@ -23,12 +23,13 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- An instance which is bound to a thread-specific `RLMRealm` instance, and so cannot be passed
- between threads without being explicitly exported and imported.
+ Objects of types which conform to `RLMThreadConfined` can be managed by a Realm, which will make
+ them bound to a thread-specific `RLMRealm` instance. Managed objects must be explicitly exported
+ and imported to be passed between threads.
 
- Instances conforming to this protocol can be converted to a thread-safe reference for transport
- between threads by passing to the `+[RLMThreadSafeReference referenceWithThreadConfined:]`
- constructor.
+ Managed instances of objects conforming to this protocol can be converted to a thread-safe
+ reference for transport between threads by passing to the
+ `+[RLMThreadSafeReference referenceWithThreadConfined:]` constructor.
 
  Note that only types defined by Realm can meaningfully conform to this protocol, and defining new
  classes which attempt to conform to it will not make them work with `RLMThreadSafeReference`.
@@ -36,7 +37,12 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol RLMThreadConfined <NSObject>
 // Conformance to the `RLMThreadConfined_Private` protocol will be enforced at runtime.
 
-/// The Realm which manages the object, or `nil` if the object is unmanaged.
+/**
+ The Realm which manages the object, or `nil` if the object is unmanaged.
+
+ Unmanaged objects are not confined to a thread and cannot be passed to methods expecting a
+ `RLMThreadConfined` object.
+ */
 @property (nonatomic, readonly, nullable) RLMRealm *realm;
 
 /// Indicates if the object can no longer be accessed because it is now invalid.
