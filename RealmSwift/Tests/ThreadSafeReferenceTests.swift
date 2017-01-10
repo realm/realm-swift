@@ -129,7 +129,7 @@ class ThreadSafeReferenceTests: TestCase {
         let company = SwiftCompanyObject()
         try! realm.write {
             realm.add(company)
-            company.employees.append(SwiftEmployeeObject(value: ["name" : "jg"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name": "jg"]))
         }
         XCTAssertEqual(1, company.employees.count)
         XCTAssertEqual("jg", company.employees[0].name)
@@ -142,8 +142,8 @@ class ThreadSafeReferenceTests: TestCase {
 
             try! realm.write {
                 employees.removeAll()
-                employees.append(SwiftEmployeeObject(value: ["name" : "jp"]))
-                employees.append(SwiftEmployeeObject(value: ["name" : "az"]))
+                employees.append(SwiftEmployeeObject(value: ["name": "jp"]))
+                employees.append(SwiftEmployeeObject(value: ["name": "az"]))
             }
             XCTAssertEqual(2, employees.count)
             XCTAssertEqual("jp", employees[0].name)
@@ -211,13 +211,13 @@ class ThreadSafeReferenceTests: TestCase {
 
     func testPassThreadSafeReferenceToLinkingObjects() {
         let realm = try! Realm()
-        let dogA = SwiftDogObject(value: ["dogName" : "Cookie", "age" : 10])
-        let unaccessedDogB = SwiftDogObject(value: ["dogName" : "Skipper", "age" : 7])
+        let dogA = SwiftDogObject(value: ["dogName": "Cookie", "age": 10])
+        let unaccessedDogB = SwiftDogObject(value: ["dogName": "Skipper", "age": 7])
         // Ensures that a `LinkingObjects` without cached results can be handed over
 
         try! realm.write {
-            realm.add(SwiftOwnerObject(value: ["name" : "Andrea", "dog" : dogA]))
-            realm.add(SwiftOwnerObject(value: ["name" : "Mike", "dog" : unaccessedDogB]))
+            realm.add(SwiftOwnerObject(value: ["name": "Andrea", "dog": dogA]))
+            realm.add(SwiftOwnerObject(value: ["name": "Mike", "dog": unaccessedDogB]))
         }
         XCTAssertEqual(1, dogA.owners.count)
         XCTAssertEqual("Andrea", dogA.owners[0].name)
@@ -257,10 +257,10 @@ class ThreadSafeReferenceTests: TestCase {
         let company = SwiftCompanyObject()
         try! realm.write {
             realm.add(company)
-            company.employees.append(SwiftEmployeeObject(value: ["name" : "A"]))
-            company.employees.append(SwiftEmployeeObject(value: ["name" : "B"]))
-            company.employees.append(SwiftEmployeeObject(value: ["name" : "C"]))
-            company.employees.append(SwiftEmployeeObject(value: ["name" : "D"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name": "A"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name": "B"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name": "C"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name": "D"]))
         }
         let results = AnyRealmCollection(realm.objects(SwiftEmployeeObject.self)
             .filter("name != 'C'")
@@ -404,7 +404,7 @@ class ThreadSafeReferenceTests: TestCase {
         let company = SwiftCompanyObject()
         try! realm.write {
             realm.add(company)
-            company.employees.append(SwiftEmployeeObject(value: ["name" : "jg"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name": "jg"]))
         }
         XCTAssertEqual(1, company.employees.count)
         XCTAssertEqual("jg", company.employees[0].name)
@@ -417,8 +417,8 @@ class ThreadSafeReferenceTests: TestCase {
 
             try! realm.write {
                 employees.removeAll()
-                employees.append(SwiftEmployeeObject(value: ["name" : "jp"]))
-                employees.append(SwiftEmployeeObject(value: ["name" : "az"]))
+                employees.append(SwiftEmployeeObject(value: ["name": "jp"]))
+                employees.append(SwiftEmployeeObject(value: ["name": "az"]))
             }
             XCTAssertEqual(2, employees.count)
             XCTAssertEqual("jp", employees[0].name)
@@ -486,13 +486,13 @@ class ThreadSafeReferenceTests: TestCase {
 
     func testPassThreadSafeReferenceToLinkingObjects() {
         let realm = try! Realm()
-        let dogA = SwiftDogObject(value: ["dogName" : "Cookie", "age" : 10])
-        let unaccessedDogB = SwiftDogObject(value: ["dogName" : "Skipper", "age" : 7])
+        let dogA = SwiftDogObject(value: ["dogName": "Cookie", "age": 10])
+        let unaccessedDogB = SwiftDogObject(value: ["dogName": "Skipper", "age": 7])
         // Ensures that a `LinkingObjects` without cached results can be handed over
 
         try! realm.write {
-            realm.add(SwiftOwnerObject(value: ["name" : "Andrea", "dog" : dogA]))
-            realm.add(SwiftOwnerObject(value: ["name" : "Mike", "dog" : unaccessedDogB]))
+            realm.add(SwiftOwnerObject(value: ["name": "Andrea", "dog" : dogA]))
+            realm.add(SwiftOwnerObject(value: ["name": "Mike", "dog" : unaccessedDogB]))
         }
         XCTAssertEqual(1, dogA.owners.count)
         XCTAssertEqual("Andrea", dogA.owners[0].name)
@@ -532,10 +532,10 @@ class ThreadSafeReferenceTests: TestCase {
         let company = SwiftCompanyObject()
         try! realm.write {
             realm.add(company)
-            company.employees.append(SwiftEmployeeObject(value: ["name" : "A"]))
-            company.employees.append(SwiftEmployeeObject(value: ["name" : "B"]))
-            company.employees.append(SwiftEmployeeObject(value: ["name" : "C"]))
-            company.employees.append(SwiftEmployeeObject(value: ["name" : "D"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name": "A"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name": "B"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name": "C"]))
+            company.employees.append(SwiftEmployeeObject(value: ["name": "D"]))
         }
         let results = AnyRealmCollection(realm.objects(SwiftEmployeeObject.self)
             .filter("name != 'C'")
