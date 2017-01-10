@@ -60,7 +60,7 @@ class ObjectTests: TestCase {
         XCTAssertNotNil(persisted.realm)
         XCTAssertEqual(realm, persisted.realm!)
 
-        dispatchSyncNewThread {
+        dispatchAsyncAndWait {
             autoreleasepool {
                 XCTAssertNotEqual(try! Realm(), persisted.realm!)
             }
@@ -481,7 +481,7 @@ class ObjectTests: TestCase {
         XCTAssertNotNil(managed.realm)
         XCTAssertEqual(realm, managed.realm!)
 
-        dispatchSyncNewThread {
+        dispatchAsyncAndWait {
             autoreleasepool {
                 XCTAssertNotEqual(try! Realm(), managed.realm!)
             }

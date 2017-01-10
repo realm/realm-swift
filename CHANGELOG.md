@@ -58,6 +58,7 @@ This release adds binary versions of Swift 3.0.2 frameworks built with Xcode 8.2
 ### Enhancements
 
 * Add support for 'LIKE' queries (wildcard matching).
+* Introduce APIs for safely handing objects between threads.
 
 ### Bugfixes
 

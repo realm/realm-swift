@@ -377,6 +377,26 @@ public class ObjectUtil: NSObject {
     }
 }
 
+// MARK: ThreadConfined
+
+private func unsafeBitCastTrampoline<T, U>(_ x: T) -> U {
+    return unsafeBitCast(x, to: U.self)
+}
+
+extension Object: ThreadConfined, _ThreadConfined {
+    var bridgedData: RLMThreadConfined {
+        return unsafeBitCast(self, to: RLMObject.self)
+    }
+
+    var bridgedMetadata: Any? {
+        return nil
+    }
+
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> Self {
+        return unsafeBitCastTrampoline(data)
+    }
+}
+
 #else
 
 /**
@@ -731,6 +751,26 @@ public class ObjectUtil: NSObject {
             d[name] = ["class": results.objectClassName, "property": results.propertyName]
             return d
         }
+    }
+}
+
+// MARK: ThreadConfined
+
+private func unsafeBitCastTrampoline<T, U>(x: T) -> U {
+    return unsafeBitCast(x, U.self)
+}
+
+extension Object: ThreadConfined, _ThreadConfined {
+    var bridgedData: RLMThreadConfined {
+        return unsafeBitCast(self, RLMObject.self)
+    }
+
+    var bridgedMetadata: Any? {
+        return nil
+    }
+
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> Self {
+        return unsafeBitCastTrampoline(data)
     }
 }
 

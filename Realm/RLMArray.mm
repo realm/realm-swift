@@ -24,6 +24,7 @@
 #import "RLMQueryUtil.hpp"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
+#import "RLMHandover_Private.hpp"
 
 #import <realm/link_view.hpp>
 
@@ -443,6 +444,26 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (NSString *)property {
     return _keyPath;
+}
+
+@end
+
+@interface RLMArray (Handover) <RLMThreadConfined_Private>
+@end
+
+@implementation RLMArray (Handover)
+
+- (realm::AnyThreadConfined)rlm_handoverData {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
+}
+
+- (id)rlm_handoverMetadata {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
+}
+
++ (instancetype)rlm_objectWithHandoverData:(__unused realm::AnyThreadConfined&)data
+                                  metadata:(__unused id)metadata inRealm:(__unused RLMRealm *)realm {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
 }
 
 @end

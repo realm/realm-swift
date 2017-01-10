@@ -20,16 +20,15 @@
 
 #import "RLMAnalytics.hpp"
 #import "RLMArray_Private.hpp"
-#import "RLMRealmConfiguration_Private.hpp"
+#import "RLMHandover_Private.hpp"
 #import "RLMMigration_Private.h"
-#import "RLMObjectSchema_Private.hpp"
-#import "RLMProperty_Private.h"
-#import "RLMObjectStore.h"
-#import "RLMObject_Private.h"
 #import "RLMObject_Private.hpp"
+#import "RLMObjectSchema_Private.hpp"
+#import "RLMObjectStore.h"
 #import "RLMObservation.hpp"
-#import "RLMProperty.h"
+#import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
+#import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
 #import "RLMSyncManager_Private.h"
@@ -689,6 +688,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         *error = localError; // Must set outside pool otherwise will free anyway
     }
     return success;
+}
+
+- (RLMThreadHandover *)exportThreadHandoverWithObjects:(NSArray<id<RLMThreadConfined>> *)objects {
+    return [[RLMThreadHandover alloc] initWithRealm:self objects:objects];
 }
 
 - (RLMObject *)createObject:(NSString *)className withValue:(id)value {

@@ -20,9 +20,10 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMCollection_Private.hpp"
+#import "RLMHandover_Private.hpp"
+#import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
-#import "RLMObject_Private.hpp"
 #import "RLMObservation.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
@@ -453,4 +454,26 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 @end
 
 @implementation RLMLinkingObjects
+@end
+
+@interface RLMResults (Handover) <RLMThreadConfined_Private>
+@end
+
+@implementation RLMResults (Handover)
+
+- (realm::AnyThreadConfined)rlm_handoverData {
+    return AnyThreadConfined(_results);
+}
+
+- (id)rlm_handoverMetadata {
+    return nil;
+}
+
++ (instancetype)rlm_objectWithHandoverData:(realm::AnyThreadConfined &)data
+                                  metadata:(__unused id)metadata inRealm:(RLMRealm *)realm {
+    Results results = data.get_results();
+    return [RLMResults resultsWithObjectInfo:realm->_info[RLMStringDataToNSString(results.get_object_type())]
+                                     results:std::move(results)];
+}
+
 @end

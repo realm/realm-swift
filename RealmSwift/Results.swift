@@ -74,9 +74,10 @@ extension Int64: AddableType {}
  Once the results have been evaluated or a notification block has been added, the results are eagerly kept up-to-date,
  with the work done to keep them up-to-date done on a background thread whenever possible.
 
- Results instances cannot be directly instantiated.
+ Results cannot be created directly.
  */
-public final class Results<T: Object>: NSObject, NSFastEnumeration {
+public final class Results<T: Object>: NSObject, NSFastEnumeration, ThreadConfined {
+    // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 
     internal let rlmResults: RLMResults<RLMObject>
 
@@ -380,6 +381,22 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     }
 }
 
+// MARK: ThreadConfined
+
+extension Results: _ThreadConfined {
+    var bridgedData: RLMThreadConfined {
+        return rlmResults
+    }
+
+    var bridgedMetadata: Any? {
+        return nil
+    }
+
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> Results {
+        return Results(data as! RLMResults)
+    }
+}
+
 extension Results: RealmCollection {
     // MARK: Sequence Support
 
@@ -534,7 +551,8 @@ public class ResultsBase: NSObject, NSFastEnumeration {
 
  `Results` cannot be directly instantiated.
 */
-public final class Results<T: Object>: ResultsBase {
+public final class Results<T: Object>: ResultsBase, ThreadConfined {
+    // FIXME: Remove redundant conformance to `ThreadConfined` once bug SR-2146 is fixed.
 
     /// The type of the objects contained in the collection.
     public typealias Element = T
@@ -833,6 +851,22 @@ extension Results: RealmCollectionType {
         return rlmResults.addNotificationBlock { _, change, error in
             block(RealmCollectionChange.fromObjc(anyCollection, change: change, error: error))
         }
+    }
+}
+
+// MARK: ThreadConfined
+
+extension Results: _ThreadConfined {
+    var bridgedData: RLMThreadConfined {
+        return rlmResults
+    }
+
+    var bridgedMetadata: Any? {
+        return nil
+    }
+
+    static func bridge(data: RLMThreadConfined, metadata: Any?) -> Results {
+        return Results(data as! RLMResults)
     }
 }
 
