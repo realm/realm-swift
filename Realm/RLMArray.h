@@ -262,12 +262,23 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns a sorted `RLMResults` from the array.
 
+ @param keyPath     The key path to sort by.
+ @param ascending   The direction to sort in.
+
+ @return    An `RLMResults` sorted by the specified key path.
+ */
+- (RLMResults<RLMObjectType> *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending;
+
+/**
+ Returns a sorted `RLMResults` from the array.
+
  @param property    The property name to sort by.
  @param ascending   The direction to sort in.
 
  @return    An `RLMResults` sorted by the specified property.
  */
-- (RLMResults<RLMObjectType> *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
+- (RLMResults<RLMObjectType> *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
+    __deprecated_msg("Use `-sortedResultsUsingKeyPath:ascending:`");
 
 /**
  Returns a sorted `RLMResults` from the array.

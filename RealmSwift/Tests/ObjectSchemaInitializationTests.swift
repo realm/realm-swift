@@ -240,7 +240,7 @@ class SwiftObjectWithEnum: SwiftFakeObject {
 }
 
 class SwiftObjectWithStruct: SwiftFakeObject {
-    var swiftStruct = SortDescriptor(property: "prop")
+    var swiftStruct = SortDescriptor(keyPath: "prop")
 }
 
 class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {
@@ -517,7 +517,7 @@ class SwiftObjectWithEnum: SwiftFakeObject {
 }
 
 class SwiftObjectWithStruct: SwiftFakeObject {
-    var swiftStruct = SortDescriptor(property: "prop")
+    var swiftStruct = SortDescriptor(keyPath: "prop")
 }
 
 class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {

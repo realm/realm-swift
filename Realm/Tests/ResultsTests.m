@@ -451,7 +451,7 @@
     RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been invalidated");
 
     // reverse order from sort
-    results = [[EmployeeObject objectsWhere:@"hired = YES"] sortedResultsUsingProperty:@"age" ascending:YES];
+    results = [[EmployeeObject objectsWhere:@"hired = YES"] sortedResultsUsingKeyPath:@"age" ascending:YES];
     XCTAssertEqual(1U, [results indexOfObject:po1]);
     XCTAssertEqual(0U, [results indexOfObject:po3]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
@@ -490,7 +490,7 @@
     XCTAssertEqual(2U, ([results indexOfObjectWhere:@"age = %d", 25]));
     XCTAssertEqual((NSUInteger)NSNotFound, ([results indexOfObjectWhere:@"age = %d", 35]));
 
-    results = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
+    results = [[EmployeeObject allObjects] sortedResultsUsingKeyPath:@"age" ascending:YES];
     NSUInteger youngestHired = [results indexOfObjectWhere:@"hired = YES"];
     XCTAssertEqual(0U, youngestHired);
     XCTAssertEqualObjects(@"Jill", [results[youngestHired] name]);
@@ -532,8 +532,8 @@
 
     RLMResults *subarray = nil;
     {
-        __attribute((objc_precise_lifetime)) RLMResults *results = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
-        subarray = [results sortedResultsUsingProperty:@"age" ascending:NO];
+        __attribute((objc_precise_lifetime)) RLMResults *results = [[EmployeeObject allObjects] sortedResultsUsingKeyPath:@"age" ascending:YES];
+        subarray = [results sortedResultsUsingKeyPath:@"age" ascending:NO];
     }
 
     [realm beginWriteTransaction];
@@ -556,8 +556,8 @@
     [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
     [realm commitWriteTransaction];
 
-    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
-    RLMResults *sortedName = [sortedAge sortedResultsUsingProperty:@"name" ascending:NO];
+    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingKeyPath:@"age" ascending:YES];
+    RLMResults *sortedName = [sortedAge sortedResultsUsingKeyPath:@"name" ascending:NO];
 
     XCTAssertEqual(20, [(EmployeeObject *)sortedAge[0] age]);
     XCTAssertEqual(40, [(EmployeeObject *)sortedName[0] age]);
@@ -566,9 +566,9 @@
 - (void)testRerunningSortedQuery {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
-    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingProperty:@"age" ascending:YES];
+    RLMResults *sortedAge = [[EmployeeObject allObjects] sortedResultsUsingKeyPath:@"age" ascending:YES];
     [sortedAge lastObject]; // Force creation of the TableView
-    RLMResults *sortedName = [sortedAge sortedResultsUsingProperty:@"name" ascending:NO];
+    RLMResults *sortedName = [sortedAge sortedResultsUsingKeyPath:@"name" ascending:NO];
     [sortedName lastObject]; // Force creation of the TableView
     RLMResults *filtered = [sortedName objectsWhere:@"age > 20"];
     [filtered lastObject]; // Force creation of the TableView
@@ -825,8 +825,8 @@ static vm_size_t get_resident_size() {
     XCTAssertNoThrow([results indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertNoThrow([results objectsWhere:@"intCol = 0"]);
     XCTAssertNoThrow([results objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
-    XCTAssertNoThrow([results sortedResultsUsingProperty:@"intCol" ascending:YES]);
-    XCTAssertNoThrow([results sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]]);
+    XCTAssertNoThrow([results sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
+    XCTAssertNoThrow([results sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
     XCTAssertNoThrow([results minOfProperty:@"intCol"]);
     XCTAssertNoThrow([results maxOfProperty:@"intCol"]);
     XCTAssertNoThrow([results sumOfProperty:@"intCol"]);
@@ -844,8 +844,8 @@ static vm_size_t get_resident_size() {
         XCTAssertThrows([results indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
         XCTAssertThrows([results objectsWhere:@"intCol = 0"]);
         XCTAssertThrows([results objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
-        XCTAssertThrows([results sortedResultsUsingProperty:@"intCol" ascending:YES]);
-        XCTAssertThrows([results sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]]);
+        XCTAssertThrows([results sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
+        XCTAssertThrows([results sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
         XCTAssertThrows([results minOfProperty:@"intCol"]);
         XCTAssertThrows([results maxOfProperty:@"intCol"]);
         XCTAssertThrows([results sumOfProperty:@"intCol"]);
@@ -871,8 +871,8 @@ static vm_size_t get_resident_size() {
     XCTAssertNoThrow([results indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertNoThrow([results objectsWhere:@"intCol = 0"]);
     XCTAssertNoThrow([results objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
-    XCTAssertNoThrow([results sortedResultsUsingProperty:@"intCol" ascending:YES]);
-    XCTAssertNoThrow([results sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]]);
+    XCTAssertNoThrow([results sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
+    XCTAssertNoThrow([results sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
     XCTAssertNoThrow([results minOfProperty:@"intCol"]);
     XCTAssertNoThrow([results maxOfProperty:@"intCol"]);
     XCTAssertNoThrow([results sumOfProperty:@"intCol"]);
@@ -892,8 +892,8 @@ static vm_size_t get_resident_size() {
     XCTAssertThrows([results indexOfObjectWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
     XCTAssertThrows([results objectsWhere:@"intCol = 0"]);
     XCTAssertThrows([results objectsWithPredicate:[NSPredicate predicateWithFormat:@"intCol = 0"]]);
-    XCTAssertThrows([results sortedResultsUsingProperty:@"intCol" ascending:YES]);
-    XCTAssertThrows([results sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithProperty:@"intCol" ascending:YES]]]);
+    XCTAssertThrows([results sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
+    XCTAssertThrows([results sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:@"intCol" ascending:YES]]]);
     XCTAssertThrows([results minOfProperty:@"intCol"]);
     XCTAssertThrows([results maxOfProperty:@"intCol"]);
     XCTAssertThrows([results sumOfProperty:@"intCol"]);
@@ -911,10 +911,10 @@ static vm_size_t get_resident_size() {
         object = [IntegerArrayPropertyObject createInDefaultRealmWithValue:@[ @0, @[ intObject ] ]];
     }];
 
-    RLMResults *results = [object.array sortedResultsUsingProperty:@"intCol" ascending:YES];
+    RLMResults *results = [object.array sortedResultsUsingKeyPath:@"intCol" ascending:YES];
     [results firstObject];
 
-    RLMResults *unevaluatedResults = [object.array sortedResultsUsingProperty:@"intCol" ascending:YES];
+    RLMResults *unevaluatedResults = [object.array sortedResultsUsingKeyPath:@"intCol" ascending:YES];
 
     [realm transactionWithBlock:^{
         [realm deleteObject:object];

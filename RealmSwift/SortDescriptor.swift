@@ -22,43 +22,58 @@ import Realm
 #if swift(>=3.0)
 
 /**
- A `SortDescriptor` stores a property name and a sort order for use with `sorted(sortDescriptors:)`. It is similar to
+ A `SortDescriptor` stores a key path and a sort order for use with `sorted(sortDescriptors:)`. It is similar to
  `NSSortDescriptor`, but supports only the subset of functionality which can be efficiently run by Realm's query engine.
  */
 public struct SortDescriptor {
 
     // MARK: Properties
 
-    /// The name of the property which the sort descriptor orders results by.
-    public let property: String
+    /// The key path which the sort descriptor orders results by.
+    public let keyPath: String
 
     /// Whether this descriptor sorts in ascending or descending order.
     public let ascending: Bool
 
     /// Converts the receiver to an `RLMSortDescriptor`.
     internal var rlmSortDescriptorValue: RLMSortDescriptor {
-        return RLMSortDescriptor(property: property, ascending: ascending)
+        return RLMSortDescriptor(keyPath: keyPath, ascending: ascending)
     }
 
     // MARK: Initializers
 
     /**
-     Creates a sort descriptor with the given property and sort order values.
+     Creates a sort descriptor with the given key path and sort order values.
 
-     - parameter property:  The name of the property which the sort descriptor orders results by.
+     - parameter keyPath:   The key path which the sort descriptor orders results by.
      - parameter ascending: Whether the descriptor sorts in ascending or descending order.
      */
-    public init(property: String, ascending: Bool = true) {
-        self.property = property
+    public init(keyPath: String, ascending: Bool = true) {
+        self.keyPath = keyPath
         self.ascending = ascending
+    }
+
+    /**
+     Creates a sort descriptor with the given property and sort order values.
+
+     - parameter property:  The property which the sort descriptor orders results by.
+     - parameter ascending: Whether the descriptor sorts in ascending or descending order.
+     */
+    @available(*, deprecated, renamed: "init(keyPath:ascending:)")
+    public init(property: String, ascending: Bool = true) {
+        self.init(keyPath: property, ascending: ascending)
     }
 
     // MARK: Functions
 
     /// Returns a copy of the sort descriptor with the sort order reversed.
     public func reversed() -> SortDescriptor {
-        return SortDescriptor(property: property, ascending: !ascending)
+        return SortDescriptor(keyPath: keyPath, ascending: !ascending)
     }
+
+    /// The key path which the sort descriptor orders results by.
+    @available(*, deprecated, renamed: "keyPath")
+    public var property: String { return keyPath }
 }
 
 // MARK: CustomStringConvertible
@@ -67,7 +82,7 @@ extension SortDescriptor: CustomStringConvertible {
     /// A human-readable description of the sort descriptor.
     public var description: String {
         let direction = ascending ? "ascending" : "descending"
-        return "SortDescriptor (property: \(property), direction: \(direction))"
+        return "SortDescriptor(keyPath: \(keyPath), direction: \(direction))"
     }
 }
 
@@ -78,7 +93,7 @@ extension SortDescriptor: Equatable {}
 /// Returns whether the two sort descriptors are equal.
 public func == (lhs: SortDescriptor, rhs: SortDescriptor) -> Bool {
     // swiftlint:disable:previous valid_docs
-    return lhs.property == rhs.property &&
+    return lhs.keyPath == rhs.keyPath &&
         lhs.ascending == lhs.ascending
 }
 
@@ -95,7 +110,7 @@ extension SortDescriptor: ExpressibleByStringLiteral {
      - parameter unicodeScalarLiteral: Property name literal.
     */
     public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
-        self.init(property: value)
+        self.init(keyPath: value)
     }
 
     /**
@@ -104,7 +119,7 @@ extension SortDescriptor: ExpressibleByStringLiteral {
      - parameter extendedGraphemeClusterLiteral: Property name literal.
      */
     public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
-        self.init(property: value)
+        self.init(keyPath: value)
     }
 
     /**
@@ -113,7 +128,7 @@ extension SortDescriptor: ExpressibleByStringLiteral {
      - parameter stringLiteral: Property name literal.
      */
     public init(stringLiteral value: StringLiteralType) {
-        self.init(property: value)
+        self.init(keyPath: value)
     }
 }
 
@@ -129,36 +144,51 @@ public struct SortDescriptor {
 
     // MARK: Properties
 
-    /// The name of the property which the sort descriptor orders results by.
-    public let property: String
+    /// The key path which the sort descriptor orders results by.
+    public let keyPath: String
 
     /// Whether the descriptor sorts in ascending or descending order.
     public let ascending: Bool
 
     /// Converts the receiver to an `RLMSortDescriptor`
     internal var rlmSortDescriptorValue: RLMSortDescriptor {
-        return RLMSortDescriptor(property: property, ascending: ascending)
+        return RLMSortDescriptor(keyPath: keyPath, ascending: ascending)
     }
 
     // MARK: Initializers
 
     /**
-     Creates a sort descriptor with the given property and sort order values.
+     Creates a sort descriptor with the given key path and sort order values.
 
-    - parameter property:  The name of the property which the sort descriptor orders results by.
+    - parameter keyPath:   The key path which the sort descriptor orders results by.
     - parameter ascending: Whether the descriptor sorts in ascending or descending order.
     */
-    public init(property: String, ascending: Bool = true) {
-        self.property = property
+    public init(keyPath: String, ascending: Bool = true) {
+        self.keyPath = keyPath
         self.ascending = ascending
+    }
+
+    /**
+     Creates a sort descriptor with the given key path and sort order values.
+
+     - parameter property:  The property which the sort descriptor orders results by.
+     - parameter ascending: Whether the descriptor sorts in ascending or descending order.
+     */
+    @available(*, deprecated, renamed="init(keyPath:ascending:)")
+    public init(property: String, ascending: Bool = true) {
+        self.init(keyPath: property, ascending: ascending)
     }
 
     // MARK: Functions
 
     /// Returns a copy of the sort descriptor with the sort order reversed.
     public func reversed() -> SortDescriptor {
-        return SortDescriptor(property: property, ascending: !ascending)
+        return SortDescriptor(keyPath: keyPath, ascending: !ascending)
     }
+
+    /// The key which the sort descriptor orders results by.
+    @available(*, deprecated, renamed="keyPath")
+    public var property: String { return keyPath }
 }
 
 // MARK: CustomStringConvertible
@@ -167,7 +197,7 @@ extension SortDescriptor: CustomStringConvertible {
     /// Returns a human-readable description of the sort descriptor.
     public var description: String {
         let direction = ascending ? "ascending" : "descending"
-        return "SortDescriptor (property: \(property), direction: \(direction))"
+        return "SortDescriptor(keyPath: \(keyPath), direction: \(direction))"
     }
 }
 
@@ -178,7 +208,7 @@ extension SortDescriptor: Equatable {}
 /// Returns whether the two sort descriptors are equal.
 public func == (lhs: SortDescriptor, rhs: SortDescriptor) -> Bool {
     // swiftlint:disable:previous valid_docs
-    return lhs.property == rhs.property &&
+    return lhs.keyPath == rhs.keyPath &&
         lhs.ascending == lhs.ascending
 }
 
@@ -198,7 +228,7 @@ extension SortDescriptor: StringLiteralConvertible {
      - parameter unicodeScalarLiteral: Property name literal.
     */
     public init(unicodeScalarLiteral value: UnicodeScalarLiteralType) {
-        self.init(property: value)
+        self.init(keyPath: value)
     }
 
     /**
@@ -207,7 +237,7 @@ extension SortDescriptor: StringLiteralConvertible {
      - parameter extendedGraphemeClusterLiteral: Property name literal.
     */
     public init(extendedGraphemeClusterLiteral value: ExtendedGraphemeClusterLiteralType) {
-        self.init(property: value)
+        self.init(keyPath: value)
     }
 
     /**
@@ -216,7 +246,7 @@ extension SortDescriptor: StringLiteralConvertible {
      - parameter stringLiteral: Property name literal.
     */
     public init(stringLiteral value: StringLiteralType) {
-        self.init(property: value)
+        self.init(keyPath: value)
     }
 }
 
