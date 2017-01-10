@@ -475,10 +475,11 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
     if (!list.is_valid()) {
         return nil;
     }
+    RLMClassInfo *parentInfo = &realm->_info[metadata.parentClassName];
     return [[RLMArrayLinkView alloc] initWithList:std::move(list)
                                             realm:realm
-                                       parentInfo:&realm->_info[metadata.parentClassName]
-                                         property:realm.schema[metadata.parentClassName][metadata.key]];
+                                       parentInfo:parentInfo
+                                         property:parentInfo->rlmObjectSchema[metadata.key]];
 }
 
 @end
