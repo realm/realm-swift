@@ -182,7 +182,7 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     RLMResults<StringObject *> *allObjects = [StringObject allObjects];
     RLMResults<StringObject *> *results = [[StringObject objectsWhere:@"stringCol != 'C'"]
-                                           sortedResultsUsingProperty:@"stringCol" ascending:NO];
+                                           sortedResultsUsingKeyPath:@"stringCol" ascending:NO];
     RLMThreadSafeReference *resultsRef = [RLMThreadSafeReference referenceWithThreadConfined:results];
     [realm transactionWithBlock:^{
         [StringObject createInDefaultRealmWithValue:@[@"A"]];

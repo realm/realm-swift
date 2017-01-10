@@ -162,7 +162,7 @@ class ThreadSafeReferenceTests: TestCase {
         let allObjects = realm.objects(SwiftStringObject.self)
         let results = allObjects
             .filter("stringCol != 'C'")
-            .sorted(byProperty: "stringCol", ascending: false)
+            .sorted(byKeyPath: "stringCol", ascending: false)
         let resultsRef = ThreadSafeReference(to: results)
         try! realm.write {
             realm.create(SwiftStringObject.self, value: ["A"])
@@ -264,7 +264,7 @@ class ThreadSafeReferenceTests: TestCase {
         }
         let results = AnyRealmCollection(realm.objects(SwiftEmployeeObject.self)
             .filter("name != 'C'")
-            .sorted(byProperty: "name", ascending: false))
+            .sorted(byKeyPath: "name", ascending: false))
         let list = AnyRealmCollection(company.employees)
         XCTAssertEqual(3, results.count)
         XCTAssertEqual("D", results[0].name)
