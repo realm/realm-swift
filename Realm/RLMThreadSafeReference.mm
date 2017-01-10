@@ -30,7 +30,6 @@ static auto translateErrors(Function&& f) {
 }
 
 @implementation RLMThreadSafeReference {
-@private
     std::unique_ptr<realm::ThreadSafeReferenceBase> _reference;
     id _metadata;
     Class _type;
