@@ -412,6 +412,18 @@ extension Results: RealmCollection {
     }
 }
 
+// MARK: AssistedObjectiveCBridgeable
+
+extension Results: AssistedObjectiveCBridgeable {
+    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Results {
+        return Results(objectiveCValue as! RLMResults)
+    }
+
+    var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return (objectiveCValue: rlmResults, metadata: nil)
+    }
+}
+
 // MARK: Unavailable
 
 extension Results {
@@ -804,6 +816,18 @@ public final class Results<T: Object>: ResultsBase {
         return rlmResults.addNotificationBlock { results, change, error in
             block(RealmCollectionChange.fromObjc(self, change: change, error: error))
         }
+    }
+}
+
+// MARK: AssistedObjectiveCBridgeable
+
+extension Results: AssistedObjectiveCBridgeable {
+    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Results {
+        return Results(objectiveCValue as! RLMResults)
+    }
+
+    var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return (objectiveCValue: rlmResults, metadata: nil)
     }
 }
 

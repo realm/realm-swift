@@ -60,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
 // A reference to an object's row that doesn't keep the object accessor alive.
 // Used by some Swift property types, such as LinkingObjects, to avoid retain cycles
 // with their containing object.
-@interface RLMWeakObjectHandle : NSObject
+@interface RLMWeakObjectHandle : NSObject<NSCopying>
 
 - (instancetype)initWithObject:(RLMObjectBase *)object;
 

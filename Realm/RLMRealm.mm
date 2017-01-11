@@ -33,6 +33,7 @@
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
 #import "RLMSyncManager_Private.h"
+#import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
@@ -516,6 +517,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         }
         objectInfo.second.releaseTable();
     }
+}
+
+- (nullable id)resolveThreadSafeReference:(RLMThreadSafeReference *)reference {
+    return [reference resolveReferenceInRealm:self];
 }
 
 /**

@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMThreadSafeReference.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class RLMRealm, RLMResults, RLMObject, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange;
@@ -26,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  A homogenous collection of `RLMObject` instances. Examples of conforming types include `RLMArray`,
  `RLMResults`, and `RLMLinkingObjects`.
  */
-@protocol RLMCollection <NSFastEnumeration>
+@protocol RLMCollection <NSFastEnumeration, RLMThreadConfined>
 
 @required
 

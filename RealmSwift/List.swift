@@ -517,6 +517,19 @@ extension List : RealmCollection, RangeReplaceableCollection {
     }
 }
 
+// MARK: AssistedObjectiveCBridgeable
+
+extension List: AssistedObjectiveCBridgeable {
+    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> List {
+        guard let objectiveCValue = objectiveCValue as? RLMArray<RLMObject> else { preconditionFailure() }
+        return List(rlmArray: objectiveCValue)
+    }
+
+    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return (objectiveCValue: _rlmArray, metadata: nil)
+    }
+}
+
 // MARK: Unavailable
 
 extension List {
@@ -1039,6 +1052,19 @@ extension List: RealmCollectionType, RangeReplaceableCollectionType {
         return _rlmArray.addNotificationBlock { _, change, error in
             block(RealmCollectionChange.fromObjc(anyCollection, change: change, error: error))
         }
+    }
+}
+
+// MARK: AssistedObjectiveCBridgeable
+
+extension List: AssistedObjectiveCBridgeable {
+    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> List {
+        guard let objectiveCValue = objectiveCValue as? RLMArray else { preconditionFailure() }
+        return List(rlmArray: objectiveCValue)
+    }
+
+    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
+        return (objectiveCValue: _rlmArray, metadata: nil)
     }
 }
 

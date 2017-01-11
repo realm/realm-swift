@@ -23,6 +23,7 @@
 #import "RLMObjectSchema.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMSwiftSupport.h"
+#import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import <realm/link_view.hpp>
@@ -34,6 +35,9 @@
 }
 @end
 @implementation RLMArrayHolder
+@end
+
+@interface RLMArray () <RLMThreadConfined_Private>
 @end
 
 @implementation RLMArray {
@@ -422,6 +426,23 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth {
     return RLMDescriptionWithMaxDepth(@"RLMArray", self, depth);
 }
+
+#pragma mark - Thread Confined Protocol Conformance
+
+- (std::unique_ptr<realm::ThreadSafeReferenceBase>)makeThreadSafeReference {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
+}
+
+- (id)objectiveCMetadata {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
+}
+
++ (instancetype)objectWithThreadSafeReference:(__unused std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
+                                     metadata:(__unused id)metadata
+                                        realm:(__unused RLMRealm *)realm {
+    REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
+}
+
 @end
 
 @implementation RLMSortDescriptor

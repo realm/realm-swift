@@ -28,6 +28,10 @@ import Realm
             }
             return version
         }
+
+        @nonobjc public func resolve<Confined: RLMThreadConfined>(reference: RLMThreadSafeReference<Confined>) -> Confined? {
+            return __resolve(reference as! RLMThreadSafeReference<RLMThreadConfined>) as! Confined?
+        }
     }
 
     extension RLMObject {
@@ -83,6 +87,10 @@ import Realm
         @nonobjc public class func schemaVersionAtURL(url: NSURL, encryptionKey key: NSData? = nil,
                                                       error: NSErrorPointer) -> UInt64 {
             return __schemaVersionAtURL(url, encryptionKey: key, error: error)
+        }
+
+        @nonobjc public func resolve<Confined: RLMThreadConfined>(reference: RLMThreadSafeReference) -> Confined? {
+            return __resolveThreadSafeReference(reference) as! Confined?
         }
     }
 
