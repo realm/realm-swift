@@ -30,8 +30,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* Introduce APIs for safely handing objects between threads. Create a
-  thread-safe reference to a thread-confined object to the
+* Introduce APIs for safely passing objects between threads. Create a
+  thread-safe reference to a thread-confined object by passing it to the
   `+[RLMThreadSafeReference referenceWithThreadConfined:]`/`ThreadSafeReference(to:)`
   constructor, which you can then safely pass to another thread to resolve in
   the new Realm with `-[RLMRealm resolveThreadSafeReference:]`/`Realm.resolve(_:)`.
