@@ -616,11 +616,11 @@ public final class Realm {
 
 // MARK: Equatable
 
-extension Realm: Equatable { }
-
-/// Returns whether two `Realm` isntances are equal.
-public func == (lhs: Realm, rhs: Realm) -> Bool { // swiftlint:disable:this valid_docs
-    return lhs.rlmRealm == rhs.rlmRealm
+extension Realm: Equatable {
+    /// Returns whether two `Realm` isntances are equal.
+    public static func == (lhs: Realm, rhs: Realm) -> Bool { // swiftlint:disable:this valid_docs
+        return lhs.rlmRealm == rhs.rlmRealm
+    }
 }
 
 // MARK: Notifications
