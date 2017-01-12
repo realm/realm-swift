@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.2.0 Release notes (2016-01-12)
 =============================================================
 
 ### Sync Breaking Changes (In Beta)
