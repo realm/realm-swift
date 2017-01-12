@@ -90,7 +90,7 @@ public class ThreadSafeReference<Confined: ThreadConfined> {
     /**
      Create a thread-safe reference to the thread-confined object.
 
-     - param threadConfined: The thread-confined object to create a thread-safe reference to.
+     - parameter threadConfined: The thread-confined object to create a thread-safe reference to.
 
      - note: You may continue to use and access the thread-confined object after passing it to this
              constructor.
@@ -119,12 +119,12 @@ public class ThreadSafeReference<Confined: ThreadConfined> {
 extension Realm {
 #if swift(>=3.0)
     /**
-     Returns the same object as the one referenced when the `RLMThreadSafeReference` was first
+     Returns the same object as the one referenced when the `ThreadSafeReference` was first
      created, but resolved for the current Realm for this thread. Returns `nil` if this object was
      deleted after the reference was created.
 
-     - param reference: The thread-safe reference to the thread-confined object to resolve in this
-                        Realm.
+     - parameter reference: The thread-safe reference to the thread-confined object to resolve in
+                            this Realm.
 
      - warning: A `ThreadSafeReference` object must be resolved at most once.
                 Failing to resolve a `ThreadSafeReference` will result in the source version of the
@@ -142,12 +142,12 @@ extension Realm {
     }
 #else
     /**
-     Returns the same object as the one referenced when the `RLMThreadSafeReference` was first
+     Returns the same object as the one referenced when the `ThreadSafeReference` was first
      created, but resolved for the current Realm for this thread. Returns `nil` if this object was
      deleted after the reference was created.
 
-     - param reference: The thread-safe reference to the thread-confined object to resolve in this
-                        Realm.
+     - parameter reference: The thread-safe reference to the thread-confined object to resolve in
+                            this Realm.
 
      - warning: A `ThreadSafeReference` object must be resolved at most once.
                 Failing to resolve a `ThreadSafeReference` will result in the source version of the
