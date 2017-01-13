@@ -60,7 +60,7 @@ static NSString * const kTableName = @"table";
     self.objectsBySection = [NSMutableArray arrayWithCapacity:3];
     for (NSString *section in self.sectionTitles) {
         RLMResults *unsortedObjects = [DemoObject objectsWhere:@"sectionTitle == %@", section];
-        RLMResults *sortedObjects = [unsortedObjects sortedResultsUsingProperty:@"date" ascending:YES];
+        RLMResults *sortedObjects = [unsortedObjects sortedResultsUsingKeyPath:@"date" ascending:YES];
         [self.objectsBySection addObject:sortedObjects];
     }
     [self.tableView reloadData];

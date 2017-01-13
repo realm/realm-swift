@@ -57,7 +57,7 @@ class PlacesViewController: UITableViewController, UITextFieldDelegate {
         if let text = searchField.text, !text.isEmpty {
             results = results?.filter("postalCode beginswith %@", text)
         }
-        results = results?.sorted(byProperty: "postalCode")
+        results = results?.sorted(byKeyPath: "postalCode")
 
         tableView?.reloadData()
     }

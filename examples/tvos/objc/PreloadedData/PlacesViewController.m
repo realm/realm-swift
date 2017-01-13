@@ -63,7 +63,7 @@
     if (self.searchField.text.length > 0) {
         self.results = [self.results objectsWhere:@"postalCode beginswith %@", self.searchField.text];
     }
-    self.results = [self.results sortedResultsUsingProperty:@"postalCode" ascending:YES];
+    self.results = [self.results sortedResultsUsingKeyPath:@"postalCode" ascending:YES];
 
     [self.tableView reloadData];
 }

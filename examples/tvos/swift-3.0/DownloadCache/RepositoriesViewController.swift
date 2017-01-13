@@ -101,7 +101,7 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
         if let text = searchField.text, !text.isEmpty {
             results = results?.filter("name contains[c] %@", text)
         }
-        results = results?.sorted(byProperty: "name", ascending: sortOrderControl!.selectedSegmentIndex == 0)
+        results = results?.sorted(byKeyPath: "name", ascending: sortOrderControl!.selectedSegmentIndex == 0)
 
         collectionView?.reloadData()
     }
