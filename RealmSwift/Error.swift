@@ -28,7 +28,7 @@ extension Realm {
      ```swift
      let realm: Realm?
      do {
-         realm = Realm()
+         realm = try Realm()
      } catch Realm.Error.incompatibleLockFile {
          print("Realm Browser app may be attached to Realm on device?")
      }
