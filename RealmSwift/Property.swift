@@ -63,11 +63,11 @@ public final class Property: CustomStringConvertible {
 
 // MARK: Equatable
 
-extension Property: Equatable {}
-
-/// Returns whether the two properties are equal.
-public func == (lhs: Property, rhs: Property) -> Bool { // swiftlint:disable:this valid_docs
-    return lhs.rlmProperty.isEqual(to: rhs.rlmProperty)
+extension Property: Equatable {
+    /// Returns whether the two properties are equal.
+    public static func == (lhs: Property, rhs: Property) -> Bool { // swiftlint:disable:this valid_docs
+        return lhs.rlmProperty.isEqual(to: rhs.rlmProperty)
+    }
 }
 
 // MARK: Unavailable

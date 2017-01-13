@@ -88,13 +88,13 @@ extension SortDescriptor: CustomStringConvertible {
 
 // MARK: Equatable
 
-extension SortDescriptor: Equatable {}
-
-/// Returns whether the two sort descriptors are equal.
-public func == (lhs: SortDescriptor, rhs: SortDescriptor) -> Bool {
-    // swiftlint:disable:previous valid_docs
-    return lhs.keyPath == rhs.keyPath &&
-        lhs.ascending == lhs.ascending
+extension SortDescriptor: Equatable {
+    /// Returns whether the two sort descriptors are equal.
+    public static func == (lhs: SortDescriptor, rhs: SortDescriptor) -> Bool {
+        // swiftlint:disable:previous valid_docs
+        return lhs.keyPath == rhs.keyPath &&
+            lhs.ascending == lhs.ascending
+    }
 }
 
 // MARK: StringLiteralConvertible
