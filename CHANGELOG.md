@@ -58,6 +58,8 @@ x.x.x Release notes (yyyy-MM-dd)
   constructor, which you can then safely pass to another thread to resolve in
   the new Realm with `-[RLMRealm resolveThreadSafeReference:]`/`Realm.resolve(_:)`.
 * Realm collections can now be sorted by properties over to-one relationships.
+* Optimized `CONTAINS` queries to use Boyer-Moore algorithm
+  (around 10x speedup on large datasets).
 
 ### Bugfixes
 
@@ -67,6 +69,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix queries containing nested `SUBQUERY` expressions.
 * Fix spurious incorrect thread exceptions when a thread id happens to be
   reused while an RLMRealm instance from the old thread still exists.
+* Fixed various bugs in aggregate methods (max, min, avg, sum).
 
 2.1.2 Release notes (2016--12-19)
 =============================================================
