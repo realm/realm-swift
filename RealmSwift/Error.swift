@@ -172,17 +172,6 @@ public func ~= (lhs: Realm.Error, rhs: Error) -> Bool { // swiftlint:disable:thi
 /**
  `Error` is an enum representing all recoverable errors. It is associated with the
  Realm error domain specified in `RLMErrorDomain`.
-
- `Error` is a Swift `ErrorType`:
-
- ```swift
- let realm: Realm?
- do {
-     realm = try Realm()
- } catch RealmSwift.Error.IncompatibleLockFile() {
-     print("Incompatible lock file. The Realm Browser app might be attached to a Realm on the device.")
- }
- ```
 */
 public enum Error: ErrorType {
     // swiftlint:disable variable_name
@@ -272,16 +261,6 @@ extension Error: Equatable {}
 public func == (lhs: ErrorType, rhs: ErrorType) -> Bool { // swiftlint:disable:this valid_docs
     return lhs._code == rhs._code
         && lhs._domain == rhs._domain
-}
-
-// MARK: Pattern Matching
-
-/**
- Pattern matching matching for `Realm.Error`, so that the instances can be used with Swift's
- `do { ... } catch { ... }` syntax.
-*/
-public func ~= (lhs: Error, rhs: ErrorType) -> Bool { // swiftlint:disable:this valid_docs
-    return lhs == rhs
 }
 
 #endif
