@@ -42,8 +42,6 @@ find_xcode_for_swift() {
         if test_xcode_for_swift_version "$path" "$required_version"; then
             export DEVELOPER_DIR=$path
             return 0
-        else
-            echo "nope: $path"
         fi
     done
     
