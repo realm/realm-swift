@@ -32,7 +32,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
     RLMSyncUserStateError,
 };
 
-/// A block type used for APIs which asynchronously vend a `RLMSyncUser`.
+/// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
