@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMConstants.h>
-#import <Realm/RLMProperty.h>
 
 /// A token originating from the Realm Object Server.
 typedef NSString* RLMServerToken;
@@ -77,9 +76,5 @@ typedef NS_ENUM(NSUInteger, RLMSyncManagementObjectStatus) {
      */
     RLMSyncManagementObjectStatusError,
 };
-
-/// Convert sync management object status code (nil, 0 and others) to
-/// RLMSyncManagementObjectStatus enum
-FOUNDATION_EXTERN RLMSyncManagementObjectStatus RLMMakeSyncManagementObjectStatus(NSNumber<RLMInt> *statusCode);
 
 NS_ASSUME_NONNULL_END

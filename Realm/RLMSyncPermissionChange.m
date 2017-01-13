@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncPermissionChange_Private.h"
+#import "RLMSyncUtil_Private.h"
 
 @implementation RLMSyncPermissionChange
 
