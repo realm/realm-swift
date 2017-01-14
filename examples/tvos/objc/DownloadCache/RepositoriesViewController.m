@@ -105,7 +105,7 @@
     if (self.searchField.text.length > 0) {
         self.results = [self.results objectsWhere:@"name contains[c] %@", self.searchField.text];
     }
-    self.results = [self.results sortedResultsUsingProperty:@"name" ascending:self.sortOrderControl.selectedSegmentIndex == 0];
+    self.results = [self.results sortedResultsUsingKeyPath:@"name" ascending:self.sortOrderControl.selectedSegmentIndex == 0];
 
     [self.collectionView reloadData];
 }

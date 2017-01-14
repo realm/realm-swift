@@ -46,7 +46,7 @@ static NSString * const kTableName = @"table";
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.array = [[DemoObject allObjects] sortedResultsUsingProperty:@"date" ascending:YES];
+    self.array = [[DemoObject allObjects] sortedResultsUsingKeyPath:@"date" ascending:YES];
     [self setupUI];
 
     // Set realm notification block
