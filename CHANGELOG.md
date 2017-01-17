@@ -3,7 +3,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Sync Breaking Changes (In Beta)
 
-* Designate `id` properties of the `PermissionChange` to be a primary key.
+* Make `PermissionChange`'s `id` property a primary key.
 
 ### API Breaking Changes
 
