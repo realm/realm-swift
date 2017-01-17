@@ -32,6 +32,8 @@
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import "object.hpp"
+
 using namespace realm;
 
 const NSUInteger RLMDescriptionMaxDepth = 5;
