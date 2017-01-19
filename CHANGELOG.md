@@ -20,7 +20,12 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix a call to `commitWrite(withoutNotifying:)` committing a transaction that
+  would not have triggered a notification incorrectly skipping the next
+  notification.
+* Fix incorrect results and crashes when conflicting object insertions are
+  merged by the synchronization mechanism when there is a collection
+  notification registered for that object type.
 
 2.2.0 Release notes (2017-01-12)
 =============================================================
