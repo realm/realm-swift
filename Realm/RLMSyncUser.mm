@@ -174,6 +174,10 @@ using namespace realm;
     return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration managementConfigurationForUser:self] error:error];
 }
 
+- (RLMRealm *)permissionRealmWithError:(NSError **)error {
+    return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration permissionConfigurationForUser:self] error:error];
+}
+
 #pragma mark - Private API
 
 - (void)_unregisterRefreshHandleForURLPath:(NSString *)path {

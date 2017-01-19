@@ -261,6 +261,52 @@ extension SyncUser {
         config.objectTypes = [SyncPermissionChange.self, SyncPermissionOffer.self, SyncPermissionOfferResponse.self]
         return try Realm(configuration: config)
     }
+
+    /**
+     Returns an instance of the Permission Realm owned by the user.
+
+     This Realm can be used to review access permissions for Realms managed by the user
+     and to Realm which the user was granted access to by other users.
+     */
+    public func permissionRealm() throws -> Realm {
+        var config = Realm.Configuration.fromRLMRealmConfiguration(.permissionConfiguration(for: self))
+        config.objectTypes = [SyncPermission.self]
+        return try Realm(configuration: config)
+    }
+}
+
+/**
+ This model is used to reflect permissions.
+
+ It should be used in conjunction with a `SyncUser`'s Permission Realm.
+ You can only read this Realm. Use the objects in Management Realm to
+ make request for modifications of permissions.
+
+ See https://realm.io/docs/realm-object-server/#permissions for general
+ documentation.
+ */
+public final class SyncPermission: Object {
+    /// The ID of the affected user by the permission.
+    public dynamic var userId = ""
+    /// The path to the realm.
+    public dynamic var path = ""
+
+    /// Whether the affected user is allowed to read from the Realm.
+    public dynamic var mayRead = false
+    /// Whether the affected user is allowed to write to the Realm.
+    public dynamic var mayWrite = false
+    /// Whether the affected user is allowed to manage the access rights for others.
+    public dynamic var mayManage = false
+
+    /// :nodoc:
+    override public class func shouldIncludeInDefaultSchema() -> Bool {
+        return false
+    }
+
+    /// :nodoc:
+    override public class func _realmObjectName() -> String? {
+        return "Permission"
+    }
 }
 
 /**
