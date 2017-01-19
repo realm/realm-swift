@@ -266,7 +266,7 @@ extension SyncUser {
 /**
  This model is used for requesting changes to a Realm's permissions.
 
- It should be used in conjunction with a `SyncUser`'s management Realm.
+ It should be used in conjunction with a `SyncUser`'s Management Realm.
 
  See https://realm.io/docs/realm-object-server/#permissions for general
  documentation.
@@ -307,7 +307,7 @@ public final class SyncPermissionChange: Object {
      Construct a permission change object used to change the access permissions for a user on a Realm.
 
      - parameter realmURL:  The Realm URL whose permissions settings should be changed.
-                            Use `*` to change the permissions of all Realms managed by the management Realm's `SyncUser`.
+                            Use `*` to change the permissions of all Realms managed by the Management Realm's `SyncUser`.
      - parameter userID:    The user or users who should be granted these permission changes.
                             Use `*` to change the permissions for all users.
      - parameter mayRead:   Define read access. Set to `true` or `false` to update this value.
@@ -345,7 +345,7 @@ public final class SyncPermissionChange: Object {
 /**
  This model is used for offering permission changes to other users.
 
- It should be used in conjunction with a `SyncUser`'s management Realm.
+ It should be used in conjunction with a `SyncUser`'s Management Realm.
 
  See https://realm.io/docs/realm-object-server/#permissions for general
  documentation.
@@ -428,7 +428,7 @@ public final class SyncPermissionOffer: Object {
  object represented by the specified token, which was created by another user's
  `SyncPermissionOffer` object.
 
- It should be used in conjunction with a `SyncUser`'s management Realm.
+ It should be used in conjunction with a `SyncUser`'s Management Realm.
 
  See https://realm.io/docs/realm-object-server/#permissions for general
  documentation.

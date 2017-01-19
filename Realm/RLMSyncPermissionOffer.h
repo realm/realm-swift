@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  This model is used for offering permission changes to other users.
 
- It should be used in conjunction with an `RLMSyncUser`'s management Realm.
+ It should be used in conjunction with an `RLMSyncUser`'s Management Realm.
 
  See https://realm.io/docs/realm-object-server/#permissions for general
  documentation.
