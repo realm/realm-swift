@@ -23,8 +23,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMSyncUser;
-
 /**
  This model is used for requesting changes to a Realm's permissions.
 
