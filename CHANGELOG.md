@@ -1,7 +1,7 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.3.0 Release notes (2017-01-19)
 =============================================================
 
-### Sync Breaking Changes (In Beta)
+### Sync Breaking Changes
 
 * Make `PermissionChange`'s `id` property a primary key.
 

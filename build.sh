@@ -1372,10 +1372,6 @@ EOF
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
-### Sync Breaking Changes (In Beta)
-
-* None.
-
 ### API Breaking Changes
 
 * None.
