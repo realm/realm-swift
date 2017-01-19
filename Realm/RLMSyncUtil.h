@@ -98,7 +98,7 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      describes the path of the recovered copy of the Realm. This copy will not actually be
      created until the client reset process is initiated.
 
-     @see: `+[RLMSyncManager clientResetBlockFromError:]`
+     @see: `-[NSError rlmSync_clientResetBlock]`, `-[NSError rlmSync_clientResetBackedUpRealmPath]`
      */
     RLMSyncErrorClientResetError        = 7,
 };
