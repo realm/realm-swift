@@ -161,7 +161,7 @@ using namespace realm;
         bool is_streaming = (mode == RLMSyncProgressReportIndefinitely);
         uint64_t token = session->register_progress_notifier([=](uint64_t transferred, uint64_t transferrable) {
             CFRunLoopPerformBlock(currentRunLoop, kCFRunLoopCommonModes, ^{
-                block(transferred, transferrable);
+                block((NSUInteger)transferred, (NSUInteger)transferrable);
             });
             CFRunLoopWakeUp(currentRunLoop);
         }, notifier_direction, is_streaming);

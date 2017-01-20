@@ -35,6 +35,7 @@ GCC_WARN_UNUSED_VARIABLE = YES;
 SWIFT_OPTIMIZATION_LEVEL = -Owholemodule;
 SWIFT_WHOLE_MODULE_OPTIMIZATION = YES;
 WARNING_CFLAGS = -Wmismatched-tags -Wunused-private-field;
+OTHER_CFLAGS = -fvisibility-inlines-hidden;
 
 OTHER_CPLUSPLUSFLAGS = $(inherited) -isystem core/include;
 HEADER_SEARCH_PATHS = $(inherited) Realm/ObjectStore/src;
