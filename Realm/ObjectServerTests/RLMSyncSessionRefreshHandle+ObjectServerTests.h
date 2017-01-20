@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2017 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,17 +18,8 @@
 
 #import "RLMSyncSessionRefreshHandle.h"
 
-#import <memory>
+@interface RLMSyncSessionRefreshHandle (ObjectServerTests)
 
-namespace realm {
-class SyncSession;
-}
++ (void)calculateFireDateUsingTestLogic:(BOOL)forTest blockOnRefreshCompletion:(void(^)(BOOL))block;
 
-@class RLMSyncUser;
-
-@interface RLMSyncSessionRefreshHandle ()
-
-- (instancetype)initWithPathToRealm:(NSString *)path
-                               user:(RLMSyncUser *)user
-                            session:(std::shared_ptr<realm::SyncSession>)session;
 @end

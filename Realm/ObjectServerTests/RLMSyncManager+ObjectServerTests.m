@@ -19,8 +19,7 @@
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncManager+ObjectServerTests.h"
 #import "RLMSyncTestCase.h"
-
-#import <objc/runtime.h>
+#import "RLMTestUtils.h"
 
 @interface RLMSyncManager ()
 - (NSArray<RLMSyncUser *> *)_allUsers;
@@ -29,23 +28,7 @@
 @implementation RLMSyncManager (ObjectServerTests)
 
 + (void)load {
-    Class class = object_getClass((id)self);
-    SEL originalSelector = @selector(sharedManager);
-    SEL swizzledSelector = @selector(ost_sharedManager);
-    Method originalMethod = class_getClassMethod(class, originalSelector);
-    Method swizzledMethod = class_getClassMethod(class, swizzledSelector);
-
-    if (class_addMethod(class,
-                        originalSelector,
-                        method_getImplementation(swizzledMethod),
-                        method_getTypeEncoding(swizzledMethod))) {
-        class_replaceMethod(class,
-                            swizzledSelector,
-                            method_getImplementation(originalMethod),
-                            method_getTypeEncoding(originalMethod));
-    } else {
-        method_exchangeImplementations(originalMethod, swizzledMethod);
-    }
+    RLMSwapOutClassMethod(self, @selector(sharedManager),  @selector(ost_sharedManager));
 }
 
 + (instancetype)ost_sharedManager {

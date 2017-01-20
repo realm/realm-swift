@@ -130,8 +130,8 @@ static BOOL isValidRealmURL(NSURL *url) {
             @throw RLMException(@"The provided URL (%@) was not a valid Realm URL.", [url absoluteString]);
         }
         auto bindHandler = [=](const std::string& path,
-                              const SyncConfig& config,
-                              const std::shared_ptr<SyncSession>& session) {
+                               const SyncConfig& config,
+                               const std::shared_ptr<SyncSession>& session) {
             [user _bindSessionWithPath:path
                                 config:config
                                session:session
