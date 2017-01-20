@@ -39,12 +39,6 @@ using namespace realm;
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readwrite) NSURL *authenticationServer;
-
-/**
- All 'refresh handles' associated with Realms opened by this user. A refresh handle is
- an object that encapsulates the concept of periodically refreshing the Realm's access
- token before it expires. Tokens are indexed by their paths (e.g. `/~/path/to/realm`).
- */
 @property (nonatomic) NSMutableDictionary<NSString *, RLMSyncSessionRefreshHandle *> *refreshHandles;
 
 @end
@@ -189,9 +183,9 @@ using namespace realm;
                   completion:(RLMSyncBasicErrorReportingBlock)completion
                 isStandalone:(__unused BOOL)standalone {
     NSURL *realmURL = [NSURL URLWithString:@(config.realm_url.c_str())];
-    RLMServerPath pathToRealm = [realmURL path];
+    RLMServerPath unresolvedURL = [realmURL path];
     NSDictionary *json = @{
-                           kRLMSyncPathKey: pathToRealm,
+                           kRLMSyncPathKey: unresolvedURL,
                            kRLMSyncProviderKey: @"realm",
                            kRLMSyncDataKey: @(_user->refresh_token().c_str()),
                            kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
@@ -229,7 +223,7 @@ using namespace realm;
             bool success = session->state() != SyncSession::PublicState::Error;
             if (success) {
                 // Schedule the session for automatic refreshing on a timer.
-                auto handle = [[RLMSyncSessionRefreshHandle alloc] initWithPathToRealm:pathToRealm
+                auto handle = [[RLMSyncSessionRefreshHandle alloc] initWithFullURLPath:resolvedURLString
                                                                                   user:self
                                                                                session:session];
                 [self.refreshHandles[resolvedURLString] invalidate];
