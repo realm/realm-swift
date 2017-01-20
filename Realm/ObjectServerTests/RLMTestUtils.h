@@ -16,19 +16,5 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncSessionRefreshHandle.h"
-
-#import <memory>
-
-namespace realm {
-class SyncSession;
-}
-
-@class RLMSyncUser;
-
-@interface RLMSyncSessionRefreshHandle ()
-
-- (instancetype)initWithPathToRealm:(NSString *)path
-                               user:(RLMSyncUser *)user
-                            session:(std::shared_ptr<realm::SyncSession>)session;
-@end
+void RLMSwapOutClassMethod(id classObject, SEL original, SEL swizzled);
+void RLMSwapOutInstanceMethod(id classObject, SEL original, SEL swizzled);
