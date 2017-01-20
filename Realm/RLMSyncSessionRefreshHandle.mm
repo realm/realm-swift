@@ -33,18 +33,18 @@ using namespace realm;
 }
 
 @property (nonatomic, weak) RLMSyncUser *user;
-@property (nonatomic, strong) NSString *fullURLPath;
+@property (nonatomic, strong) NSString *pathToRealm;
 @property (nonatomic) NSTimer *timer;
 
 @end
 
 @implementation RLMSyncSessionRefreshHandle
 
-- (instancetype)initWithFullURLPath:(NSString *)urlPath
+- (instancetype)initWithPathToRealm:(NSString *)path
                                user:(RLMSyncUser *)user
                             session:(std::shared_ptr<realm::SyncSession>)session {
     if (self = [super init]) {
-        self.fullURLPath = urlPath;
+        self.pathToRealm = path;
         self.user = user;
         _session = session;
         return self;
@@ -53,20 +53,38 @@ using namespace realm;
 }
 
 - (void)invalidate {
-    [self.timer invalidate];
-    self.user = nil;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.timer invalidate];
+        self.user = nil;
+    });
 }
 
 - (void)scheduleRefreshTimer:(NSTimeInterval)fireTime {
-    static const NSInteger refreshBuffer = 10;
-    [self.timer invalidate];
-    self.timer = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSince1970:(fireTime - refreshBuffer)]
-                                          interval:0
-                                            target:self
-                                          selector:@selector(timerFired:)
-                                          userInfo:nil
-                                           repeats:NO];
-    [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
+    constexpr NSInteger REFRESH_BUFFER = 10;
+    // Schedule the timer on the main queue.
+    // It's very likely that this method will be run on a side thread, for example
+    // on the thread that runs `NSURLSession`'s completion blocks. We can't be
+    // guaranteed that there's an existing runloop on those threads, and we don't want
+    // to create and start a new one if one doesn't already exist.
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self.timer invalidate];
+        // The fire time is `REFRESH_BUFFER` seconds before the token expires, but it also
+        // must be at least `REFRESH_BUFFER` seconds in the future from now.
+        NSTimeInterval now = [[NSDate date] timeIntervalSince1970];
+        NSTimeInterval actualTime = fireTime - REFRESH_BUFFER;
+        if (actualTime <= now + REFRESH_BUFFER) {
+            [self.user _unregisterRefreshHandleForURLPath:self.pathToRealm];
+            return;
+        }
+        NSTimer *t = [[NSTimer alloc] initWithFireDate:[NSDate dateWithTimeIntervalSince1970:actualTime]
+                                              interval:0
+                                                target:self
+                                              selector:@selector(timerFired:)
+                                              userInfo:nil
+                                               repeats:NO];
+        [[NSRunLoop currentRunLoop] addTimer:t forMode:NSDefaultRunLoopMode];
+        self.timer = t;
+    });
 }
 
 - (void)timerFired:(__unused NSTimer *)timer {
@@ -76,14 +94,14 @@ using namespace realm;
     }
     RLMServerToken refreshToken = user._refreshToken;
     if (!refreshToken) {
-        [user _unregisterRefreshHandleForURLPath:self.fullURLPath];
+        [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
         [self.timer invalidate];
         return;
     }
 
     NSDictionary *json = @{
                            kRLMSyncProviderKey: @"realm",
-                           kRLMSyncPathKey: self.fullURLPath,
+                           kRLMSyncPathKey: self.pathToRealm,
                            kRLMSyncDataKey: refreshToken,
                            kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
                            };
@@ -98,7 +116,7 @@ using namespace realm;
                 error = [NSError errorWithDomain:RLMSyncErrorDomain
                                             code:RLMSyncErrorBadResponse
                                         userInfo:@{kRLMSyncErrorJSONKey: json}];
-                [user _unregisterRefreshHandleForURLPath:self.fullURLPath];
+                [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
                 [self.timer invalidate];
                 [[RLMSyncManager sharedManager] _fireError:error];
                 return;
@@ -113,7 +131,7 @@ using namespace realm;
                 }
             }
             // The session is dead or in a fatal error state.
-            [user _unregisterRefreshHandleForURLPath:self.fullURLPath];
+            [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
             [self.timer invalidate];
             return;
         }
@@ -145,7 +163,7 @@ using namespace realm;
             if (nextFireDate > 0) {
                 [self scheduleRefreshTimer:nextFireDate];
             } else {
-                [user _unregisterRefreshHandleForURLPath:self.fullURLPath];
+                [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
                 [self.timer invalidate];
             }
         }

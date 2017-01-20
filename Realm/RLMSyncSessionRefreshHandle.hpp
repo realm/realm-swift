@@ -30,7 +30,7 @@ class SyncSession;
 /// Intended for easy removal once the new auth system is in place.
 @interface RLMSyncSessionRefreshHandle : NSObject
 
-- (instancetype)initWithFullURLPath:(NSString *)urlPath
+- (instancetype)initWithPathToRealm:(NSString *)path
                                user:(RLMSyncUser *)user
                             session:(std::shared_ptr<realm::SyncSession>)session;
 
