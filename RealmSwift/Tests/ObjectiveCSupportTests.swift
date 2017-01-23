@@ -23,8 +23,6 @@ import XCTest
 
 class ObjectiveCSupportTests: TestCase {
 
-#if swift(>=3.0)
-
     func testSupport() {
 
         let realm = try! Realm()
@@ -97,81 +95,4 @@ class ObjectiveCSupportTests: TestCase {
                        ObjectiveCSupport.convert(object: realm.configuration).deleteRealmIfMigrationNeeded,
                        "Configuration.deleteRealmIfMigrationNeeded must be equal to RLMConfiguration.deleteRealmIfMigrationNeeded")
     }
-
-#else
-
-    func testSupport() {
-
-        let realm = try! Realm()
-
-        try! realm.write {
-            realm.add(SwiftObject())
-            return
-        }
-
-        let results = realm.objects(SwiftObject.self)
-        let rlmResults = ObjectiveCSupport.convert(results)
-        XCTAssert(rlmResults.isKindOfClass(RLMResults.self))
-        XCTAssertEqual(rlmResults.count, 1)
-        XCTAssertEqual(unsafeBitCast(rlmResults.firstObject(), SwiftObject.self).intCol, 123)
-
-        let list = List<SwiftObject>()
-        list.append(SwiftObject())
-        let rlmArray = ObjectiveCSupport.convert(list)
-        XCTAssert(rlmArray.isKindOfClass(RLMArray.self))
-        XCTAssertEqual(unsafeBitCast(rlmArray.firstObject(), SwiftObject.self).floatCol, 1.23)
-        XCTAssertEqual(rlmArray.count, 1)
-
-        let rlmRealm = ObjectiveCSupport.convert(realm)
-        XCTAssert(rlmRealm.isKindOfClass(RLMRealm.self))
-        XCTAssertEqual(rlmRealm.allObjects("SwiftObject").count, 1)
-
-        let sortDescriptor: RealmSwift.SortDescriptor = "property"
-        XCTAssertEqual(sortDescriptor.keyPath,
-                       ObjectiveCSupport.convert(sortDescriptor).keyPath,
-                       "SortDescriptor.keyPath must be equal to RLMSortDescriptor.keyPath")
-        XCTAssertEqual(sortDescriptor.ascending,
-                       ObjectiveCSupport.convert(sortDescriptor).ascending,
-                       "SortDescriptor.ascending must be equal to RLMSortDescriptor.ascending")
-    }
-
-    func testConfigurationSupport() {
-
-        let realm = try! Realm()
-
-        try! realm.write {
-            realm.add(SwiftObject())
-            return
-        }
-
-        XCTAssertEqual(realm.configuration.fileURL,
-                       ObjectiveCSupport.convert(realm.configuration).fileURL,
-                       "Configuration.fileURL must be equal to RLMConfiguration.fileURL")
-
-        XCTAssertEqual(realm.configuration.inMemoryIdentifier,
-                       ObjectiveCSupport.convert(realm.configuration).inMemoryIdentifier,
-                       "Configuration.inMemoryIdentifier must be equal to RLMConfiguration.inMemoryIdentifier")
-
-        XCTAssertEqual(realm.configuration.syncConfiguration?.realmURL,
-                       ObjectiveCSupport.convert(realm.configuration).syncConfiguration?.realmURL,
-                       "Configuration.syncConfiguration must be equal to RLMConfiguration.syncConfiguration")
-
-        XCTAssertEqual(realm.configuration.encryptionKey,
-                       ObjectiveCSupport.convert(realm.configuration).encryptionKey,
-                       "Configuration.encryptionKey must be equal to RLMConfiguration.encryptionKey")
-
-        XCTAssertEqual(realm.configuration.readOnly,
-                       ObjectiveCSupport.convert(realm.configuration).readOnly,
-                       "Configuration.readOnly must be equal to RLMConfiguration.readOnly")
-
-        XCTAssertEqual(realm.configuration.schemaVersion,
-                       ObjectiveCSupport.convert(realm.configuration).schemaVersion,
-                       "Configuration.schemaVersion must be equal to RLMConfiguration.schemaVersion")
-
-        XCTAssertEqual(realm.configuration.deleteRealmIfMigrationNeeded,
-                       ObjectiveCSupport.convert(realm.configuration).deleteRealmIfMigrationNeeded,
-                       "Configuration.deleteRealmIfMigrationNeeded must be equal to RLMConfiguration.deleteRealmIfMigrationNeeded")
-    }
-
-#endif
 }

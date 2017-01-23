@@ -39,13 +39,9 @@ public protocol ThreadConfined {
      `ThreadConfined` object.
      */
     var realm: Realm? { get }
-#if swift(>=3.0)
+
     /// Indicates if the object can no longer be accessed because it is now invalid.
     var isInvalidated: Bool { get }
-#else
-    /// Indicates if the object can no longer be accessed because it is now invalid.
-    var invalidated: Bool { get }
-#endif
 }
 
 /**
@@ -69,7 +65,6 @@ public class ThreadSafeReference<Confined: ThreadConfined> {
     private let swiftMetadata: Any?
     private let type: ThreadConfined.Type
 
-#if swift(>=3.0)
     /**
      Indicates if the reference can no longer be resolved because an attempt to resolve it has
      already occurred. References can only be resolved once.
@@ -77,15 +72,6 @@ public class ThreadSafeReference<Confined: ThreadConfined> {
     public var isInvalidated: Bool { return objectiveCReference.isInvalidated }
 
     private let objectiveCReference: RLMThreadSafeReference<RLMThreadConfined>
-#else
-    /**
-     Indicates if the reference can no longer be resolved because an attempt to resolve it has
-     already occurred. References can only be resolved once.
-     */
-    public var invalidated: Bool { return objectiveCReference.invalidated }
-
-    private let objectiveCReference: RLMThreadSafeReference
-#endif
 
     /**
      Create a thread-safe reference to the thread-confined object.
@@ -98,26 +84,17 @@ public class ThreadSafeReference<Confined: ThreadConfined> {
     public init(to threadConfined: Confined) {
         let bridged = (threadConfined as! AssistedObjectiveCBridgeable).bridged
         swiftMetadata = bridged.metadata
-#if swift(>=3.0)
         type = type(of: threadConfined)
-#else
-        type = threadConfined.dynamicType
-#endif
         objectiveCReference = RLMThreadSafeReference(threadConfined: bridged.objectiveCValue as! RLMThreadConfined)
     }
 
     internal func resolve(in realm: Realm) -> Confined? {
-#if swift(>=3.0)
         guard let objectiveCValue = realm.rlmRealm.__resolve(objectiveCReference) else { return nil }
-#else
-        guard let objectiveCValue = realm.rlmRealm.__resolveThreadSafeReference(objectiveCReference) else { return nil }
-#endif
         return ((Confined.self as! AssistedObjectiveCBridgeable.Type).bridging(from: objectiveCValue, with: swiftMetadata) as! Confined)
     }
 }
 
 extension Realm {
-#if swift(>=3.0)
     /**
      Returns the same object as the one referenced when the `ThreadSafeReference` was first
      created, but resolved for the current Realm for this thread. Returns `nil` if this object was
@@ -140,28 +117,4 @@ extension Realm {
     public func resolve<Confined: ThreadConfined>(_ reference: ThreadSafeReference<Confined>) -> Confined? {
         return reference.resolve(in: self)
     }
-#else
-    /**
-     Returns the same object as the one referenced when the `ThreadSafeReference` was first
-     created, but resolved for the current Realm for this thread. Returns `nil` if this object was
-     deleted after the reference was created.
-
-     - parameter reference: The thread-safe reference to the thread-confined object to resolve in
-                            this Realm.
-
-     - warning: A `ThreadSafeReference` object must be resolved at most once.
-                Failing to resolve a `ThreadSafeReference` will result in the source version of the
-                Realm being pinned until the reference is deallocated.
-                An exception will be thrown if a reference is resolved more than once.
-
-     - warning: Cannot call within a write transaction.
-
-     - note: Will refresh this Realm if the source Realm was at a later version than this one.
-
-     - see: `ThreadSafeReference(to:)`
-     */
-    public func resolve<Confined: ThreadConfined>(reference: ThreadSafeReference<Confined>) -> Confined? {
-        return reference.resolve(in: self)
-    }
-#endif
 }
