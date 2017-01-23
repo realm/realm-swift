@@ -1,6 +1,9 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
+This release drops support for compiling with Swift 2.x.
+Swift 3.0.0 is now the minimum Swift version supported.
+
 ### API Breaking Changes
 
 * None.

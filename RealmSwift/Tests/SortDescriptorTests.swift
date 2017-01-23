@@ -19,8 +19,6 @@
 import XCTest
 import RealmSwift
 
-#if swift(>=3.0)
-
 class SortDescriptorTests: TestCase {
 
     let sortDescriptor = SortDescriptor(keyPath: "property")
@@ -46,33 +44,3 @@ class SortDescriptorTests: TestCase {
             "SortDescriptor should conform to StringLiteralConvertible")
     }
 }
-
-#else
-
-class SortDescriptorTests: TestCase {
-
-    let sortDescriptor = SortDescriptor(keyPath: "property")
-
-    func testAscendingDefaultsToTrue() {
-        XCTAssertTrue(sortDescriptor.ascending)
-    }
-
-    func testReversedReturnsReversedDescriptor() {
-        let reversed = sortDescriptor.reversed()
-        XCTAssertEqual(reversed.keyPath, sortDescriptor.keyPath, "Property should stay the same when reversed.")
-        XCTAssertFalse(reversed.ascending)
-        XCTAssertTrue(reversed.reversed().ascending)
-    }
-
-    func testDescription() {
-        XCTAssertEqual(sortDescriptor.description, "SortDescriptor(keyPath: property, direction: ascending)")
-    }
-
-    func testStringLiteralConvertible() {
-        let literalSortDescriptor: SortDescriptor = "property"
-        XCTAssertEqual(sortDescriptor, literalSortDescriptor,
-            "SortDescriptor should conform to StringLiteralConvertible")
-    }
-}
-
-#endif
