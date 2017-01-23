@@ -20,6 +20,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// NSError category extension providing methods to get data out of Realm's
+/// "client reset" error.
 @interface NSError (RLMSync)
 
 /**
