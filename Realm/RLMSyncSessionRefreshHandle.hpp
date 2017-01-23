@@ -18,6 +18,8 @@
 
 #import "RLMSyncSessionRefreshHandle.h"
 
+#import "RLMSyncUtil_Private.h"
+
 #import <memory>
 
 namespace realm {
@@ -28,7 +30,13 @@ class SyncSession;
 
 @interface RLMSyncSessionRefreshHandle ()
 
-- (instancetype)initWithPathToRealm:(NSString *)path
-                               user:(RLMSyncUser *)user
-                            session:(std::shared_ptr<realm::SyncSession>)session;
+NS_ASSUME_NONNULL_BEGIN
+
+- (instancetype)initWithRealmURL:(NSURL *)realmURL
+                            user:(RLMSyncUser *)user
+                         session:(std::shared_ptr<realm::SyncSession>)session
+                 completionBlock:(nullable RLMSyncBasicErrorReportingBlock)completionBlock;
+
+NS_ASSUME_NONNULL_END
+
 @end
