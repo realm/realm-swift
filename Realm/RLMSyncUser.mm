@@ -238,10 +238,17 @@ using namespace realm;
             return;
         }
 
-        // Something else went wrong
-        NSError *syncError = [NSError errorWithDomain:RLMSyncErrorDomain
-                                                 code:RLMSyncErrorBadResponse
-                                             userInfo:@{kRLMSyncUnderlyingErrorKey: error}];
+        NSError *syncError;
+        if ([error.domain isEqualToString:RLMSyncErrorDomain]) {
+            // Network client may return sync related error
+            syncError = error;
+        } else {
+            // Something else went wrong
+            syncError = [NSError errorWithDomain:RLMSyncErrorDomain
+                                            code:RLMSyncErrorBadResponse
+                                        userInfo:@{kRLMSyncUnderlyingErrorKey: error}];
+        }
+
         if (completion) {
             completion(syncError);
         }
