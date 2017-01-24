@@ -50,7 +50,10 @@
     testPredicateString(@"A IN B UNION C", 4);
     testPredicateString(@"A IN B INTERSECT C", 4);
     testPredicateString(@"A IN B MINUS C", 4);
-    testPredicateString(@"TERNARY(TRUEPREDICATE, A, B) == 1", 4);
+    if ([NSExpression respondsToSelector:@selector(expressionForConditional:trueExpression:falseExpression:)]) {
+        // Only test conditional predicates on platforms that support them (i.e. iOS 9 and later).
+        testPredicateString(@"TERNARY(TRUEPREDICATE, A, B) == 1", 4);
+    }
     testPredicateString(@"ANYKEY == 1", 2);
     testPredicateString(@"SELF == 1", 2);
 
