@@ -69,6 +69,14 @@ public typealias UserCompletionBlock = RLMUserCompletionBlock
  */
 public typealias SyncError = RLMSyncError
 
+
+/**
+ An error associated with the authentication to the Realm Object Server.
+
+ - see: `RLMSyncAuthError`
+ */
+public typealias SyncAuthError = RLMSyncAuthError
+
 /**
  An enum which can be used to specify the level of logging.
 
