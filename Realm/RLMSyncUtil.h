@@ -35,7 +35,7 @@ extern NSString *const RLMSyncErrorDomain;
 /// An error which is related to authentication to a Realm Object Server.
 typedef RLM_ERROR_ENUM(NSInteger, RLMSyncAuthError, RLMSyncErrorDomain) {
     /// An error that indicates that the provided credentials are invalid.
-    RLMSyncAuthErrorInvalidCredential   = 611,
+    RLMSyncAuthErrorInvalidCredentials   = 611,
 
     /// An error that indicates that the user with provided credentials does not exist.
     RLMSyncAuthErrorUserDoesNotExist    = 612,

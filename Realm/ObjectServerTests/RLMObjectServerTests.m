@@ -75,7 +75,7 @@
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, RLMSyncErrorDomain);
-        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredentials);
         XCTAssertNotNil(error.localizedDescription);
 
         [expectation fulfill];
@@ -95,7 +95,7 @@
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, RLMSyncErrorDomain);
-        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredentials);
         XCTAssertNotNil(error.localizedDescription);
 
         [expectation fulfill];
@@ -117,7 +117,7 @@
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, RLMSyncErrorDomain);
-        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredentials);
         XCTAssertNotNil(error.localizedDescription);
 
         [expectation fulfill];
