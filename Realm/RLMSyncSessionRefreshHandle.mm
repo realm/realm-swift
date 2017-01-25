@@ -107,7 +107,7 @@ using namespace realm;
 /// Handler for network requests whose responses successfully parse into an auth response model.
 - (BOOL)_handleSuccessfulRequest:(RLMAuthResponseModel *)model strongUser:(RLMSyncUser *)user {
     // Success
-    std::shared_ptr<SyncSession> session = _strongSession ?: _session.lock();
+    std::shared_ptr<SyncSession> session = _session.lock();
     if (!session) {
         // The session is dead or in a fatal error state.
         [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
