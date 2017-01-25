@@ -159,7 +159,6 @@ static dispatch_once_t s_onceToken;
         case RLMSyncSystemErrorKindClientReset: {
             // Client reset is a special case; the application can respond to it to a greater degree than
             // it can for most other errors.
-            mutableUserInfo = [@{} mutableCopy];
             mutableUserInfo[kRLMSyncPathOfRealmBackupCopyKey] = userInfo[@(realm::SyncError::c_recovery_file_path_key)];
             std::string original_path = [userInfo[@(realm::SyncError::c_original_file_path_key)] UTF8String];
             mutableUserInfo[kRLMSyncInitiateClientResetBlockKey] = ^{
