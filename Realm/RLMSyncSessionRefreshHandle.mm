@@ -27,12 +27,6 @@
 
 #import "sync/sync_session.hpp"
 
-typedef NS_ENUM(NSUInteger, RLMSyncHandleMode) {
-    RLMSyncHandleModeBind,          // Initial `bind` of a session
-    RLMSyncHandleModeRetryBind,     // Retrying the initial `bind` of a session
-    RLMSyncHandleModeRefresh,       // Preemptive refreshing of a session
-};
-
 using namespace realm;
 
 @interface RLMSyncSessionRefreshHandle () {
@@ -43,7 +37,6 @@ using namespace realm;
 @property (nonatomic, weak) RLMSyncUser *user;
 @property (nonatomic, strong) NSString *pathToRealm;
 @property (nonatomic) NSTimer *timer;
-@property (nonatomic) RLMSyncHandleMode mode;
 
 @property (nonatomic) NSURL *realmURL;
 @property (nonatomic, copy) RLMSyncBasicErrorReportingBlock completionBlock;
@@ -60,11 +53,11 @@ using namespace realm;
         NSString *path = [realmURL path];
         self.pathToRealm = path;
         self.user = user;
-        self.mode = RLMSyncHandleModeBind;
         self.completionBlock = completionBlock;
         self.realmURL = realmURL;
         // For the initial bind, we want to prolong the session's lifetime.
         _strongSession = std::move(session);
+        _session = _strongSession;
         // Immediately fire off the network request.
         [self _timerFired:nil];
         return self;
@@ -73,7 +66,6 @@ using namespace realm;
 }
 
 - (void)dealloc {
-    _strongSession = nullptr;
     [self.timer invalidate];
 }
 
@@ -115,7 +107,7 @@ using namespace realm;
 /// Handler for network requests whose responses successfully parse into an auth response model.
 - (BOOL)_handleSuccessfulRequest:(RLMAuthResponseModel *)model strongUser:(RLMSyncUser *)user {
     // Success
-    std::shared_ptr<SyncSession> session = (self.mode == RLMSyncHandleModeBind ? _strongSession : _session.lock());
+    std::shared_ptr<SyncSession> session = _strongSession ?: _session.lock();
     if (!session) {
         // The session is dead or in a fatal error state.
         [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
@@ -124,38 +116,26 @@ using namespace realm;
     }
     bool success = session->state() != SyncSession::PublicState::Error;
     if (success) {
+        // Calculate the resolved path.
         NSString *resolvedURLString = nil;
-        util::Optional<std::string> resolved_url = none;
-        if (self.mode != RLMSyncHandleModeRefresh) {
-            RLMServerPath resolvedPath = model.accessToken.tokenData.path;
-            // Munge the path back onto the original URL, because the `sync` API expects an entire URL.
-            NSURLComponents *urlBuffer = [NSURLComponents componentsWithURL:self.realmURL
-                                                    resolvingAgainstBaseURL:YES];
-            urlBuffer.path = resolvedPath;
-            resolvedURLString = [[urlBuffer URL] absoluteString];
-            if (resolvedURLString) {
-                resolved_url = {resolvedURLString.UTF8String};
-            } else {
-                @throw RLMException(@"Resolved path returned from the server was invalid (%@).", resolvedPath);
-            }
+        RLMServerPath resolvedPath = model.accessToken.tokenData.path;
+        // Munge the path back onto the original URL, because the `sync` API expects an entire URL.
+        NSURLComponents *urlBuffer = [NSURLComponents componentsWithURL:self.realmURL
+                                                resolvingAgainstBaseURL:YES];
+        urlBuffer.path = resolvedPath;
+        resolvedURLString = [[urlBuffer URL] absoluteString];
+        if (!resolvedURLString) {
+            @throw RLMException(@"Resolved path returned from the server was invalid (%@).", resolvedPath);
         }
-        session->refresh_access_token([model.accessToken.token UTF8String], resolved_url);
+        // Pass the token and resolved path to the underlying sync subsystem.
+        session->refresh_access_token([model.accessToken.token UTF8String], {resolvedURLString.UTF8String});
         success = session->state() != SyncSession::PublicState::Error;
         if (success) {
-            switch (self.mode) {
-                case RLMSyncHandleModeBind:
-                    _session = std::move(_strongSession);
-                    _strongSession = nullptr;
-                    REALM_FALLTHROUGH;
-                case RLMSyncHandleModeRetryBind:
-                    // Any successful request moves the state into RLMSyncHandleModeRefresh.
-                    self.mode = RLMSyncHandleModeRefresh;
-                    REALM_FALLTHROUGH;
-                case RLMSyncHandleModeRefresh:
-                    NSDate *expires = [NSDate dateWithTimeIntervalSince1970:model.accessToken.tokenData.expires];
-                    [self scheduleRefreshTimer:expires];
-                    break;
-            }
+            // Schedule a refresh. If we're successful we must already have `bind()`ed the session
+            // initially, so we can null out the strong pointer.
+            _strongSession = nullptr;
+            NSDate *expires = [NSDate dateWithTimeIntervalSince1970:model.accessToken.tokenData.expires];
+            [self scheduleRefreshTimer:expires];
         } else {
             // The session is dead or in a fatal error state.
             [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
@@ -202,17 +182,10 @@ using namespace realm;
         [self invalidate];
         return NO;
     }
-    switch (self.mode) {
-        case RLMSyncHandleModeBind:
-            // A failed initial bind always results in retry binds.
-            _session = std::move(_strongSession);
-            _strongSession = nullptr;
-            self.mode = RLMSyncHandleModeRetryBind;
-            break;
-        case RLMSyncHandleModeRetryBind:
-        case RLMSyncHandleModeRefresh:
-            break;
-    }
+    // If we tried to initially bind the session and failed, we'll try again. However, each
+    // subsequent attempt will use a weak pointer to avoid prolonging the session's lifetime
+    // unnecessarily.
+    _strongSession = nullptr;
     [self scheduleRefreshTimer:nextTryDate];
     return NO;
 }
