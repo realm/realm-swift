@@ -28,7 +28,8 @@ import Foundation
 public typealias SyncUser = RLMSyncUser
 
 /**
- A singleton which configures and manages the Realm Object Server synchronization-related functionality.
+ A singleton which configures and manages the Realm Object Server synchronization-related
+ functionality.
 
  - see: `RLMSyncManager`
  */
@@ -42,21 +43,24 @@ extension SyncManager {
 }
 
 /**
- A session object which represents communication between the client and server for a specific Realm.
+ A session object which represents communication between the client and server for a specific
+ Realm.
 
  - see: `RLMSyncSession`
  */
 public typealias SyncSession = RLMSyncSession
 
 /**
- A closure type for a closure which can be set on the `SyncManager` to allow errors to be reported to the application.
+ A closure type for a closure which can be set on the `SyncManager` to allow errors to be reported
+ to the application.
 
  - see: `RLMSyncErrorReportingBlock`
  */
 public typealias ErrorReportingBlock = RLMSyncErrorReportingBlock
 
 /**
- A closure type for a closure which is used by certain APIs to asynchronously return a `User` object to the application.
+ A closure type for a closure which is used by certain APIs to asynchronously return a `User`
+ object to the application.
 
  - see: `RLMUserCompletionBlock`
  */
@@ -84,7 +88,8 @@ public typealias SyncLogLevel = RLMSyncLogLevel
 public typealias SyncManagementObjectStatus = RLMSyncManagementObjectStatus
 
 /**
- A data type whose values represent different authentication providers that can be used with the Realm Object Server.
+ A data type whose values represent different authentication providers that can be used with
+ the Realm Object Server.
 
  - see: `RLMIdentityProvider`
  */
@@ -102,7 +107,10 @@ public extension SyncError {
     }
 }
 
-/// A `SyncConfiguration` represents configuration parameters for Realms intended to sync with a Realm Object Server.
+/**
+ A `SyncConfiguration` represents configuration parameters for Realms intended to sync with
+ a Realm Object Server.
+ */
 public struct SyncConfiguration {
     /// The `SyncUser` who owns the Realm that this configuration should open.
     public let user: SyncUser
@@ -115,8 +123,10 @@ public struct SyncConfiguration {
      */
     public let realmURL: URL
 
-    /// A policy that determines what should happen when all references to Realms opened by this configuration
-    /// go out of scope.
+    /**
+     A policy that determines what should happen when all references to Realms opened by this
+     configuration go out of scope.
+     */
     internal let stopPolicy: RLMSyncStopPolicy
 
     internal init(config: RLMSyncConfiguration) {
@@ -152,8 +162,10 @@ public struct SyncCredentials {
     internal var provider: Provider
     internal var userInfo: [String: Any]
 
-    /// Initialize new credentials using a custom token, authentication provider, and user information dictionary. In
-    /// most cases, the convenience initializers should be used instead.
+    /**
+     Initialize new credentials using a custom token, authentication provider, and user information
+     dictionary. In most cases, the convenience initializers should be used instead.
+     */
     public init(customToken token: Token, provider: Provider, userInfo: [String: Any] = [:]) {
         self.token = token
         self.provider = provider
@@ -201,8 +213,10 @@ extension RLMSyncCredentials {
 }
 
 extension SyncUser {
-    /// Given credentials and a server URL, log in a user and asynchronously return a `SyncUser` object which can be used to
-    /// open Realms and Sessions.
+    /**
+     Given credentials and a server URL, log in a user and asynchronously return a `SyncUser`
+     object which can be used to open `Realm`s and retrieve `SyncSession`s.
+     */
     public static func logIn(with credentials: SyncCredentials,
                              server authServerURL: URL,
                              timeout: TimeInterval = 30,
@@ -219,7 +233,8 @@ extension SyncUser {
     }
 
     /**
-     The logged-in user. `nil` if none exists.
+     The logged-in user. `nil` if none exists. Only use this property if your application expects
+     no more than one logged-in user at any given time.
 
      - warning: Throws an Objective-C exception if more than one logged-in user exists.
      */
@@ -270,11 +285,14 @@ public final class SyncPermissionChange: Object {
     /// The identity of a user affected by this permission change.
     public dynamic var userId = "*"
 
-    /// Define read access. Set to `true` or `false` to update this value. Leave unset to preserve the existing setting.
+    /// Define read access. Set to `true` or `false` to update this value. Leave unset
+    /// to preserve the existing setting.
     public let mayRead = RealmOptional<Bool>()
-    /// Define write access. Set to `true` or `false` to update this value. Leave unset to preserve the existing setting.
+    /// Define write access. Set to `true` or `false` to update this value. Leave unset
+    /// to preserve the existing setting.
     public let mayWrite = RealmOptional<Bool>()
-    /// Define management access. Set to `true` or `false` to update this value. Leave unset to preserve the existing setting.
+    /// Define management access. Set to `true` or `false` to update this value. Leave
+    /// unset to preserve the existing setting.
     public let mayManage = RealmOptional<Bool>()
 
     /**
@@ -562,19 +580,21 @@ public extension SyncSession {
 
      Multiple blocks can be registered with the same session at once. Each block
      will be invoked from the runloop of the thread on which it was registered,
-     creating a new runloop if none exists. The progress notification block will
-     always be called once immediately upon registration in order to provide
-     up-to-date registration in order to provide the latest available status
-     information.
+     creating a new runloop if none exists. If the session has already received
+     progress information from the synchronization subsystem, the block will be
+     called immediately. Otherwise, it will be called as soon as progress
+     information becomes available.
 
-     The token returned by this method must be retained as long as progress notifications are desired, and the `stop()`
-     method should be called on it when notifications are no longer needed and before the token is destroyed.
+     The token returned by this method must be retained as long as progress
+     notifications are desired, and the `stop()` method should be called on it
+     when notifications are no longer needed and before the token is destroyed.
 
-     If no token is returned, the notification block will never be called again. There are a number of reasons this might
-     be true. If the session has previously experienced a fatal error it will not accept progress notification blocks.
-     If the block was configured in the `forCurrentlyOutstandingWork` mode but there is no additional
-     progress to report (for example, the number of transferrable bytes and transferred bytes are equal), the block
-     will not be called again.
+     If no token is returned, the notification block will never be called again.
+     There are a number of reasons this might be true. If the session has previously
+     experienced a fatal error it will not accept progress notification blocks. If
+     the block was configured in the `forCurrentlyOutstandingWork` mode but there
+     is no additional progress to report (for example, the number of transferrable bytes
+     and transferred bytes are equal), the block will not be called again.
 
      - parameter direction: The transfer direction (upload or download) to track in this progress notification block.
      - parameter mode:      The desired behavior of this progress notification block.
