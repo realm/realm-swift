@@ -490,7 +490,7 @@ typedef void (^RLMObjectChangeBlock)(bool deleted, NSArray<RLMPropertyChange *> 
 /**
  The name of the property which changed.
  */
-@property (nonatomic, strong) NSString *name;
+@property (nonatomic, readonly, strong) NSString *name;
 
 /**
  The value of the property before the change occurred. This will always be `nil`
@@ -501,13 +501,13 @@ typedef void (^RLMObjectChangeBlock)(bool deleted, NSArray<RLMPropertyChange *> 
  but that object will have its new values and not the values it had before the
  changes. This means that `previousValue` may be a deleted object.
  */
-@property (nonatomic, strong, nullable) id previousValue;
+@property (nonatomic, readonly, strong, nullable) id previousValue;
 
 /**
  The value of the property after the change occurred. This will always be `nil`
  for `RLMArray` properties.
  */
-@property (nonatomic, strong, nullable) id value;
+@property (nonatomic, readonly, strong, nullable) id value;
 @end
 
 #pragma mark - RLMArray Property Declaration

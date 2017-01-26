@@ -31,6 +31,12 @@
 #import "collection_notifications.hpp"
 #import "object.hpp"
 
+@interface RLMPropertyChange ()
+@property (nonatomic, readwrite, strong) NSString *name;
+@property (nonatomic, readwrite, strong, nullable) id previousValue;
+@property (nonatomic, readwrite, strong, nullable) id value;
+@end
+
 // We declare things in RLMObject which are actually implemented in RLMObjectBase
 // for documentation's sake, which leads to -Wunimplemented-method warnings.
 // Other alternatives to this would be to disable -Wunimplemented-method for this
