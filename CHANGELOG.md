@@ -14,7 +14,9 @@ Swift 3.0.0 is now the minimum Swift version supported.
 
 ### Bugfixes
 
-* None.
+* Fix Realm Objective-C compilation errors with Xcode 8.3 beta 1.
+* Fix several error handling issues when renewing expired authentication
+  tokens for synchronized Realms.
 
 2.3.0 Release notes (2017-01-19)
 =============================================================
