@@ -2,7 +2,7 @@ SUPPORTED_PLATFORMS = macosx iphoneos iphonesimulator watchos watchsimulator app
 TARGETED_DEVICE_FAMILY = 1,2,3,4;
 
 INFOPLIST_FILE = Realm/Realm-Info.plist;
-MODULEMAP_FILE = $(SRCROOT)/Realm/module.modulemap;
+MODULEMAP_FILE = $(SRCROOT)/Realm/Realm.modulemap;
 PRODUCT_BUNDLE_IDENTIFIER = io.Realm.${PRODUCT_NAME:rfc1034identifier};
 PRODUCT_NAME = Realm;
 SKIP_INSTALL = YES;
