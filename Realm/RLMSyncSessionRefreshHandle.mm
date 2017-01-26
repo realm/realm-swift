@@ -23,6 +23,7 @@
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMTokenModels.h"
+#import "RLMUtil.hpp"
 
 #import "sync/sync_session.hpp"
 
@@ -30,23 +31,35 @@ using namespace realm;
 
 @interface RLMSyncSessionRefreshHandle () {
     std::weak_ptr<SyncSession> _session;
+    std::shared_ptr<SyncSession> _strongSession;
 }
 
 @property (nonatomic, weak) RLMSyncUser *user;
 @property (nonatomic, strong) NSString *pathToRealm;
 @property (nonatomic) NSTimer *timer;
 
+@property (nonatomic) NSURL *realmURL;
+@property (nonatomic, copy) RLMSyncBasicErrorReportingBlock completionBlock;
+
 @end
 
 @implementation RLMSyncSessionRefreshHandle
 
-- (instancetype)initWithPathToRealm:(NSString *)path
-                               user:(RLMSyncUser *)user
-                            session:(std::shared_ptr<realm::SyncSession>)session {
+- (instancetype)initWithRealmURL:(NSURL *)realmURL
+                            user:(RLMSyncUser *)user
+                         session:(std::shared_ptr<realm::SyncSession>)session
+                 completionBlock:(RLMSyncBasicErrorReportingBlock)completionBlock {
     if (self = [super init]) {
+        NSString *path = [realmURL path];
         self.pathToRealm = path;
         self.user = user;
-        _session = std::move(session);
+        self.completionBlock = completionBlock;
+        self.realmURL = realmURL;
+        // For the initial bind, we want to prolong the session's lifetime.
+        _strongSession = std::move(session);
+        _session = _strongSession;
+        // Immediately fire off the network request.
+        [self _timerFired:nil];
         return self;
     }
     return nil;
@@ -57,6 +70,7 @@ using namespace realm;
 }
 
 - (void)invalidate {
+    _strongSession = nullptr;
     [self.timer invalidate];
 }
 
@@ -83,7 +97,7 @@ using namespace realm;
         self.timer = [[NSTimer alloc] initWithFireDate:fireDate
                                               interval:0
                                                 target:self
-                                              selector:@selector(timerFired:)
+                                              selector:@selector(_timerFired:)
                                               userInfo:nil
                                                repeats:NO];
         [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
@@ -93,29 +107,60 @@ using namespace realm;
 /// Handler for network requests whose responses successfully parse into an auth response model.
 - (BOOL)_handleSuccessfulRequest:(RLMAuthResponseModel *)model strongUser:(RLMSyncUser *)user {
     // Success
-    if (auto session = _session.lock()) {
-        if (session->state() != SyncSession::PublicState::Error) {
-            session->refresh_access_token([model.accessToken.token UTF8String], none);
-            NSDate *expiration = [NSDate dateWithTimeIntervalSince1970:model.accessToken.tokenData.expires];
-            [self scheduleRefreshTimer:expiration];
-            return YES;
+    std::shared_ptr<SyncSession> session = _session.lock();
+    if (!session) {
+        // The session is dead or in a fatal error state.
+        [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
+        [self invalidate];
+        return NO;
+    }
+    bool success = session->state() != SyncSession::PublicState::Error;
+    if (success) {
+        // Calculate the resolved path.
+        NSString *resolvedURLString = nil;
+        RLMServerPath resolvedPath = model.accessToken.tokenData.path;
+        // Munge the path back onto the original URL, because the `sync` API expects an entire URL.
+        NSURLComponents *urlBuffer = [NSURLComponents componentsWithURL:self.realmURL
+                                                resolvingAgainstBaseURL:YES];
+        urlBuffer.path = resolvedPath;
+        resolvedURLString = [[urlBuffer URL] absoluteString];
+        if (!resolvedURLString) {
+            @throw RLMException(@"Resolved path returned from the server was invalid (%@).", resolvedPath);
+        }
+        // Pass the token and resolved path to the underlying sync subsystem.
+        session->refresh_access_token([model.accessToken.token UTF8String], {resolvedURLString.UTF8String});
+        success = session->state() != SyncSession::PublicState::Error;
+        if (success) {
+            // Schedule a refresh. If we're successful we must already have `bind()`ed the session
+            // initially, so we can null out the strong pointer.
+            _strongSession = nullptr;
+            NSDate *expires = [NSDate dateWithTimeIntervalSince1970:model.accessToken.tokenData.expires];
+            [self scheduleRefreshTimer:expires];
+        } else {
+            // The session is dead or in a fatal error state.
+            [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
+            [self invalidate];
         }
     }
-    // The session is dead or in a fatal error state.
-    [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
-    [self.timer invalidate];
-    return NO;
+    if (self.completionBlock) {
+        self.completionBlock(success ? nil : [NSError errorWithDomain:RLMSyncErrorDomain
+                                                                 code:RLMSyncErrorClientSessionError
+                                                             userInfo:nil]);
+    }
+    return success;
 }
 
 /// Handler for network requests that failed before the JSON parsing stage.
 - (BOOL)_handleFailedRequest:(NSError *)error strongUser:(RLMSyncUser *)user {
-    // Something else went wrong
     NSError *syncError = [NSError errorWithDomain:RLMSyncErrorDomain
                                              code:RLMSyncErrorBadResponse
                                          userInfo:@{kRLMSyncUnderlyingErrorKey: error}];
+    if (self.completionBlock) {
+        self.completionBlock(syncError);
+    }
     [[RLMSyncManager sharedManager] _fireError:syncError];
-    NSDate *nextFireDate = nil;
-    // Certain errors should trigger a retry.
+    // Certain errors related to network connectivity should trigger a retry.
+    NSDate *nextTryDate = nil;
     if (error.domain == NSURLErrorDomain) {
         switch (error.code) {
             case NSURLErrorCannotConnectToHost:
@@ -125,21 +170,27 @@ using namespace realm;
             case NSURLErrorDNSLookupFailed:
             case NSURLErrorCannotFindHost:
                 // FIXME: 10 seconds is an arbitrarily chosen value, consider rationalizing it.
-                nextFireDate = [NSDate dateWithTimeIntervalSinceNow:10];
+                nextTryDate = [NSDate dateWithTimeIntervalSinceNow:10];
                 break;
             default:
                 break;
         }
-        if (nextFireDate) {
-            [self scheduleRefreshTimer:nextFireDate];
-        } else {
-            [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
-            [self.timer invalidate];
-        }
     }
+    if (!nextTryDate) {
+        // This error isn't a network failure error. Just invalidate the refresh handle and stop.
+        [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
+        [self invalidate];
+        return NO;
+    }
+    // If we tried to initially bind the session and failed, we'll try again. However, each
+    // subsequent attempt will use a weak pointer to avoid prolonging the session's lifetime
+    // unnecessarily.
+    _strongSession = nullptr;
+    [self scheduleRefreshTimer:nextTryDate];
     return NO;
 }
 
+/// Callback handler for network requests.
 - (BOOL)_onRefreshCompletionWithError:(NSError *)error json:(NSDictionary *)json {
     RLMSyncUser *user = self.user;
     if (!user) {
@@ -158,6 +209,9 @@ using namespace realm;
                                 userInfo:@{kRLMSyncErrorJSONKey: json}];
         [user _unregisterRefreshHandleForURLPath:self.pathToRealm];
         [self.timer invalidate];
+        if (self.completionBlock) {
+            self.completionBlock(error);
+        }
         [[RLMSyncManager sharedManager] _fireError:error];
         return NO;
     } else {
@@ -166,7 +220,7 @@ using namespace realm;
     }
 }
 
-- (void)timerFired:(__unused NSTimer *)timer {
+- (void)_timerFired:(__unused NSTimer *)timer {
     RLMSyncUser *user = self.user;
     if (!user) {
         return;
