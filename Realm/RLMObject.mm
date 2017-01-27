@@ -336,29 +336,35 @@ RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjec
         }
 
         void before(realm::CollectionChangeSet const& c) {
-            oldValues = readValues(c);
+            @autoreleasepool {
+                oldValues = readValues(c);
+            }
         }
 
         void after(realm::CollectionChangeSet const& c) {
-            auto newValues = readValues(c);
-            if (deleted) {
-                block(nil, nil, nil, nil);
+            @autoreleasepool {
+                auto newValues = readValues(c);
+                if (deleted) {
+                    block(nil, nil, nil, nil);
+                }
+                else if (newValues) {
+                    block(propertyNames, oldValues, newValues, nil);
+                }
+                propertyNames = nil;
+                oldValues = nil;
             }
-            else if (newValues) {
-                block(propertyNames, oldValues, newValues, nil);
-            }
-            propertyNames = nil;
-            oldValues = nil;
         }
 
         void error(std::exception_ptr err) {
-            try {
-                rethrow_exception(err);
-            }
-            catch (...) {
-                NSError *error = nil;
-                RLMRealmTranslateException(&error);
-                block(nil, nil, nil, error);
+            @autoreleasepool {
+                try {
+                    rethrow_exception(err);
+                }
+                catch (...) {
+                    NSError *error = nil;
+                    RLMRealmTranslateException(&error);
+                    block(nil, nil, nil, error);
+                }
             }
         }
     } callback{block, obj};
