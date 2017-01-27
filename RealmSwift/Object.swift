@@ -193,6 +193,50 @@ open class Object: RLMObjectBase, ThreadConfined {
         }
     }
 
+    // MARK: Notifications
+
+    /**
+     Observe this object for changes, including those made on other threads and
+     other in other processes.
+
+     After each write transaction which modifies or deletes the observed object,
+     the callback will be called with information about which properties in that
+     object were changed and the old and new values of that object. For write
+     transactions performed on different threads the callback will be invoked
+     when the Realm is (auto)refreshed, while for local write transactions it
+     will be called asynchronously at some point after the transaction is committed.
+
+     Only objects which are managed by a Realm can be observed in this way. You
+     must retain the returned token for as long as you want updates to be sent
+     to the block. To stop receiving updates, call `stop()` on the token.
+
+     It is safe to capture a strong reference to the observed object within the
+     callback block. There is no retain cycle due to that the callback is
+     retained by the returned token and not by the object itself.
+
+     - warning: This method cannot be called during a write transaction, or when
+                the containing Realm is read-only.
+
+     - parameter block: The block to call with information about changes to the object.
+     - returns: A token which must be held for as long as you want updates to be delivered.
+     */
+    public func addNotificationBlock(_ block: @escaping (ObjectChange) -> Void) -> NotificationToken {
+        return RLMObjectAddNotificationBlock(self, { names, oldValues, newValues, error in
+            if let error = error {
+                block(.error(error as NSError))
+                return
+            }
+            guard let names = names, let newValues = newValues else {
+                block(.deleted)
+                return
+            }
+
+            block(.change((0..<newValues.count).map { i in
+                PropertyChange(name: names[i], oldValue: oldValues?[i], newValue: newValues[i])
+            }))
+        })
+    }
+
     // MARK: Dynamic list
 
     /**
@@ -248,7 +292,45 @@ open class Object: RLMObjectBase, ThreadConfined {
     }
 }
 
+/**
+ Information about a specific property which changed in an Object change notification.
+ */
+public struct PropertyChange {
+    /**
+     The name of the property which changed.
+    */
+    public let name: String
 
+    /**
+     Value of the property before the change occurred. This is not supplied if
+     the change happened on the same thread as the notification and for List
+     properties.
+    */
+    public let oldValue: Any?
+
+    /**
+     The value of the property after the change occurred. This is not supplied
+     for List properties and will always be nil.
+    */
+    public let newValue: Any?
+}
+
+public enum ObjectChange {
+    /**
+     If an error occurs, notification blocks are called one time with a `.error`
+     result and an `NSError` containing details about the error. Currently the
+     only errors which can occur are when opening the Realm on a background
+     worker thread to calculate the change set. The callback will never be
+     called again after .error is delivered.
+     */
+    case error(_: NSError)
+    /**
+     One or more of the properties of the object have been changed.
+     */
+    case change(_: [PropertyChange])
+    /// The object has been deleted from the Realm.
+    case deleted
+}
 
 /// Object interface which allows untyped getters and setters for Objects.
 /// :nodoc:

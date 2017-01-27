@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMSyncManager_Private.h>
+#import "RLMSyncManager_Private.h"
 #import "RLMSyncManager+ObjectServerTests.h"
 #import "RLMSyncTestCase.h"
 #import "RLMTestUtils.h"

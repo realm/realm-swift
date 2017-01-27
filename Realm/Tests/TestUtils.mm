@@ -19,8 +19,8 @@
 #import "TestUtils.h"
 
 #import <Realm/Realm.h>
-#import <Realm/RLMRealmUtil.hpp>
 #import <Realm/RLMSchema_Private.h>
+#import "RLMRealmUtil.hpp"
 
 void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self, dispatch_block_t block, NSString *regexString, NSString *message, NSString *fileName, NSUInteger lineNumber) {
     BOOL didThrow = NO;
