@@ -13,6 +13,14 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * None.
 
+2.4.1 Release notes (2017-01-27)
+=============================================================
+
+### Bugfixes
+
+* Fix an issue where authentication tokens were not properly refreshed
+  automatically before expiring.
+
 2.4.0 Release notes (2017-01-26)
 =============================================================
 
