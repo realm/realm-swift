@@ -411,39 +411,45 @@ NS_ASSUME_NONNULL_BEGIN
  A callback block for RLMObject notifications.
 
  If the object is deleted from the managing Realm, the block is called with
- `deleted` set to `true` and the other two arguments are `nil`. The block will
+ `deleted` set to `YES` and the other two arguments are `nil`. The block will
  never be called again after this.
 
  If the object is modified, the block will be called with `deleted` set to
- `false`, a `nil` `error, and an array of `RLMPropertyChange` objects which
+ `NO`, a `nil` `error, and an array of `RLMPropertyChange` objects which
  indicate which properties of the objects were modified.
 
- If an error occurs, `deleted` will be false, `changes` will be `nil`, and
+ If an error occurs, `deleted` will be `NO`, `changes` will be `nil`, and
  `error` will include information about the error. The block will never be
  called again after an error occurs.
  */
-typedef void (^RLMObjectChangeBlock)(bool deleted, NSArray<RLMPropertyChange *> *_Nullable changes, NSError *_Nullable error);
+typedef void (^RLMObjectChangeBlock)(BOOL deleted,
+                                     NSArray<RLMPropertyChange *> *_Nullable changes,
+                                     NSError *_Nullable error);
 
 /**
  Registers a block to be called each time the object changes.
 
  The block will be asynchronously called after each write transaction which
  deletes the object or modifies any of the managed properties of the object,
- including self-assignments that set a property to its existing value. For write
- transactions performed on different threads the block will be called when the
- Realm is (auto)refreshed, while for local write transactions it will be called
- at some point in the future after the write transaction is committed.
+ including self-assignments that set a property to its existing value.
+
+ For write transactions performed on different threads or in differen
+ processes, the block will be called when the managing Realm is
+ (auto)refreshed to a version including the changes, while for local write
+ transactions it will be called at some point in the future after the write
+ transaction is committed.
 
  Notifications are delivered via the standard run loop, and so can't be
- delivered while the run loop is blocked by other activity. When
- notifications can't be delivered instantly, multiple notifications may be
- coalesced into a single notification.
+ delivered while the run loop is blocked by other activity. When notifications
+ can't be delivered instantly, multiple notifications may be coalesced into a
+ single notification.
 
  Unlike with `RLMArray` and `RLMResults`, there is no "initial" callback made
  after you add a new notification block.
 
- You must retain the returned token for as long as you want updates to continue
- to be sent to the block. To stop receiving updates, call `-stop` on the token.
+ Only objects which are managed by a Realm can be observed in this way. You
+ must retain the returned token for as long as you want updates to be sent to
+ the block. To stop receiving updates, call `stop` on the token.
 
  It is safe to capture a strong reference to the observed object within the
  callback block. There is no retain cycle due to that the callback is retained
@@ -483,7 +489,7 @@ typedef void (^RLMObjectChangeBlock)(bool deleted, NSArray<RLMPropertyChange *> 
 @end
 
 /**
- Information about a specific property which changed in an RLMObject change notification.
+ Information about a specific property which changed in an `RLMObject` change notification.
  */
 @interface RLMPropertyChange : NSObject
 
@@ -499,7 +505,8 @@ typedef void (^RLMObjectChangeBlock)(bool deleted, NSArray<RLMPropertyChange *> 
 
  For object properties this will give the object which was previously linked to,
  but that object will have its new values and not the values it had before the
- changes. This means that `previousValue` may be a deleted object.
+ changes. This means that `previousValue` may be a deleted object, and you will
+ need to check `invalidated` before accessing any of its properties.
  */
 @property (nonatomic, readonly, strong, nullable) id previousValue;
 

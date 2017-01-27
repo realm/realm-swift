@@ -196,15 +196,25 @@ open class Object: RLMObjectBase, ThreadConfined {
     // MARK: Notifications
 
     /**
-     Observe this object for changes, including those made on other threads and
-     other in other processes.
+     Registers a block to be called each time the object changes.
 
-     After each write transaction which modifies or deletes the observed object,
-     the callback will be called with information about which properties in that
-     object were changed and the old and new values of that object. For write
-     transactions performed on different threads the callback will be invoked
-     when the Realm is (auto)refreshed, while for local write transactions it
-     will be called asynchronously at some point after the transaction is committed.
+     The block will be asynchronously called after each write transaction which
+     deletes the object or modifies any of the managed properties of the object,
+     including self-assignments that set a property to its existing value.
+
+     For write transactions performed on different threads or in differen
+     processes, the block will be called when the managing Realm is
+     (auto)refreshed to a version including the changes, while for local write
+     transactions it will be called at some point in the future after the write
+     transaction is committed.
+
+     Notifications are delivered via the standard run loop, and so can't be
+     delivered while the run loop is blocked by other activity. When
+     notifications can't be delivered instantly, multiple notifications may be
+     coalesced into a single notification.
+
+     Unlike with List` and `Results`, there is no "initial" callback made after
+     you add a new notification block.
 
      Only objects which are managed by a Realm can be observed in this way. You
      must retain the returned token for as long as you want updates to be sent
@@ -293,7 +303,7 @@ open class Object: RLMObjectBase, ThreadConfined {
 }
 
 /**
- Information about a specific property which changed in an Object change notification.
+ Information about a specific property which changed in an `Object` change notification.
  */
 public struct PropertyChange {
     /**
@@ -305,6 +315,12 @@ public struct PropertyChange {
      Value of the property before the change occurred. This is not supplied if
      the change happened on the same thread as the notification and for List
      properties.
+
+     For object properties this will give the object which was previously
+     linked to, but that boject will have its new values and not the values it
+     had before the changes. This means that `previousValue` may be a deleted
+     object, and you will need to check `isInvalidated` before accessing any
+     of its properties.
     */
     public let oldValue: Any?
 
@@ -315,6 +331,10 @@ public struct PropertyChange {
     public let newValue: Any?
 }
 
+/**
+ Information about the changes made to an object which is passed to `Object's
+ notification blocks.
+ */
 public enum ObjectChange {
     /**
      If an error occurs, notification blocks are called one time with a `.error`
