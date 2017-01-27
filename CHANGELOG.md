@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.4.0 Release notes (2017-01-26)
 =============================================================
 
 This release drops support for compiling with Swift 2.x.
