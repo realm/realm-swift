@@ -51,8 +51,8 @@
     date = [NSDate dateWithTimeIntervalSince1970:(date.timeIntervalSince1970 + 100)];
     NSDate *fireDate = [RLMSyncSessionRefreshHandle fireDateForTokenExpirationDate:date nowDate:nowDate];
     XCTAssertNotNil(fireDate);
-    XCTAssertTrue(fireDate.timeIntervalSinceReferenceDate > nowDate.timeIntervalSinceReferenceDate);
-    XCTAssertTrue(fireDate.timeIntervalSinceReferenceDate < date.timeIntervalSinceReferenceDate);
+    XCTAssertGreaterThan(fireDate.timeIntervalSinceReferenceDate, nowDate.timeIntervalSinceReferenceDate);
+    XCTAssertLessThan(fireDate.timeIntervalSinceReferenceDate, date.timeIntervalSinceReferenceDate);
 }
 
 @end
