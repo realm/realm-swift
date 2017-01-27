@@ -1739,6 +1739,43 @@ public:
     AssertChanged(r2, @2, @3);
 }
 
+- (void)testMoveObservedTableBeforeChange {
+    KVOObject *obj = [self createObject];
+    KVORecorder r(self, obj, @"boolCol");
+    realm::Group &group = self.realm->_realm->read_group();
+    group.move_table(obj->_info->table()->get_index_in_group(), 0);
+    obj.boolCol = YES;
+    AssertChanged(r, @NO, @YES);
+}
+
+- (void)testMoveObservedTableAfterChange {
+    KVOObject *obj = [self createObject];
+    KVORecorder r(self, obj, @"boolCol");
+    obj.boolCol = YES;
+    realm::Group &group = self.realm->_realm->read_group();
+    group.move_table(obj->_info->table()->get_index_in_group(), group.size() - 1);
+    AssertChanged(r, @NO, @YES);
+}
+
+- (void)testShiftObservedTableBeforeChange {
+    KVOObject *obj = [self createObject];
+    KVORecorder r(self, obj, @"boolCol");
+    realm::Group &group = self.realm->_realm->read_group();
+    group.move_table(0, group.size() - 1);
+    obj.boolCol = YES;
+    AssertChanged(r, @NO, @YES);
+}
+
+- (void)testShiftObservedTableAfterChange {
+    KVOObject *obj = [self createObject];
+
+    KVORecorder r(self, obj, @"boolCol");
+    obj.boolCol = YES;
+    realm::Group &group = self.realm->_realm->read_group();
+    group.move_table(group.size() - 1, 0);
+    AssertChanged(r, @NO, @YES);
+}
+
 - (void)testInsertNewColumns {
     KVOObject *obj = [self createObject];
 
@@ -1750,7 +1787,8 @@ public:
     obj.boolCol = YES;
     auto& table = *obj->_info->table();
     table.insert_column(0, realm::type_Binary, "new col");
-    obj->_row.set_int(ndx + 1, 3); // can't use the accessor after a local schema change
+    table.insert_column(ndx, realm::type_Binary, "new col 2");
+    obj->_row.set_int(ndx + 2, 3); // can't use the accessor after a local schema change
 
     AssertChanged(r1, @NO, @YES);
     AssertChanged(r2, @2, @3);
@@ -1794,6 +1832,56 @@ public:
     obj.boolCol = YES;
     obj->_info->table()->insert_column(0, realm::type_Binary, "new col");
     AssertChanged(r, @NO, @YES);
+}
+
+- (void)testSwapRowsIsNotAChange {
+    KVOObject *obj = [self createObject];
+    [self createObject];
+
+    KVORecorder r(self, obj, @"boolCol");
+    obj->_info->table()->swap_rows(0, 1);
+    r.refresh();
+    XCTAssertTrue(r.empty());
+}
+
+- (void)testSwapRowsBeforeChange {
+    KVOObject *obj = [self createObject];
+    [self createObject];
+
+    KVORecorder r(self, obj, @"boolCol");
+    obj->_info->table()->swap_rows(0, 1);
+    obj.boolCol = YES;
+    AssertChanged(r, @NO, @YES);
+}
+
+- (void)testSwapRowsAfterChange {
+    KVOObject *obj = [self createObject];
+    [self createObject];
+
+    KVORecorder r(self, obj, @"boolCol");
+    obj.boolCol = YES;
+    obj->_info->table()->swap_rows(0, 1);
+    AssertChanged(r, @NO, @YES);
+}
+
+- (void)testSwapRowsBeforeArrayChange {
+    KVOObject *obj = [self createObject];
+    [self createObject];
+
+    KVORecorder r(self, obj, @"arrayCol");
+    obj->_info->table()->swap_rows(0, 1);
+    [obj.arrayCol addObject:obj];
+    AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
+}
+
+- (void)testSwapRowsAfterArrayChange {
+    KVOObject *obj = [self createObject];
+    [self createObject];
+
+    KVORecorder r(self, obj, @"arrayCol");
+    [obj.arrayCol addObject:obj];
+    obj->_info->table()->swap_rows(0, 1);
+    AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
 }
 @end
 
