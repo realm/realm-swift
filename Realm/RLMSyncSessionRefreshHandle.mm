@@ -74,11 +74,11 @@ using namespace realm;
     [self.timer invalidate];
 }
 
-+ (NSDate *)fireDateForTokenExpirationDate:(NSDate *)date {
++ (NSDate *)fireDateForTokenExpirationDate:(NSDate *)date nowDate:(NSDate *)nowDate {
     static const NSTimeInterval refreshBuffer = 10;
     NSDate *fireDate = [date dateByAddingTimeInterval:-refreshBuffer];
     // Only fire times in the future are valid.
-    return ([fireDate compare:[NSDate date]] != NSOrderedDescending ? fireDate : nil);
+    return ([fireDate compare:nowDate] == NSOrderedDescending ? fireDate : nil);
 }
 
 - (void)scheduleRefreshTimer:(NSDate *)dateWhenTokenExpires {
@@ -89,7 +89,8 @@ using namespace realm;
     // to create and start a new one if one doesn't already exist.
     dispatch_async(dispatch_get_main_queue(), ^{
         [self.timer invalidate];
-        NSDate *fireDate = [RLMSyncSessionRefreshHandle fireDateForTokenExpirationDate:dateWhenTokenExpires];
+        NSDate *fireDate = [RLMSyncSessionRefreshHandle fireDateForTokenExpirationDate:dateWhenTokenExpires
+                                                                               nowDate:[NSDate date]];
         if (!fireDate) {
             [self.user _unregisterRefreshHandleForURLPath:self.pathToRealm];
             return;
