@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncManager.h"
+#import <Realm/RLMSyncManager.h>
 
 #import "RLMSyncUtil_Private.h"
 
