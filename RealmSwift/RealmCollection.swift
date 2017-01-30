@@ -472,8 +472,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     // MARK: Sequence Support
 
     override subscript(position: Int) -> C.Element {
-        // FIXME: it should be possible to avoid this force-casting
-        return unsafeBitCast(base[position as! C.Index], to: C.Element.self)
+        return base[position as! C.Index] as! C.Element
     }
 
     override func makeIterator() -> RLMIterator<Element> {
