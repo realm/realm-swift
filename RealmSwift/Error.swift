@@ -35,35 +35,7 @@ extension Realm {
      ```
     */
     public struct Error {
-        // swiftlint:disable:next nesting
-        public enum Code: Int {
-            /// - see: `Realm.Error.fail`
-            case fail
-
-            /// - see: `Realm.Error.fileAccess`
-            case fileAccess
-
-            /// - see: `Realm.Error.filePermissionDenied`
-            case filePermissionDenied
-
-            /// - see: `Realm.Error.fileExists`
-            case fileExists
-
-            /// - see: `Realm.Error.fileNotFound`
-            case fileNotFound
-
-            /// - see: `Realm.Error.incompatibleLockFile`
-            case incompatibleLockFile
-
-            /// - see: `Realm.Error.fileFormatUpgradeRequired`
-            case fileFormatUpgradeRequired
-
-            /// - see: `Realm.Error.addressSpaceExhausted`
-            case addressSpaceExhausted
-
-            /// - see: `Realm.Error.schemaMismatch`
-            case schemaMismatch
-        }
+        public typealias Code = RLMError.Code
 
         /// Error thrown by Realm if no other specific error is returned when a realm is opened.
         public static let fail: Code = .fail
@@ -99,27 +71,7 @@ extension Realm {
 
         /// :nodoc:
         public var code: Code {
-            let rlmError = _nsError as! RLMError
-            switch rlmError.code {
-            case .fail:
-                return .fail
-            case .fileAccess:
-                return .fileAccess
-            case .filePermissionDenied:
-                return .filePermissionDenied
-            case .fileExists:
-                return .fileExists
-            case .fileNotFound:
-                return .fileNotFound
-            case .incompatibleLockFile:
-                return .incompatibleLockFile
-            case .fileFormatUpgradeRequired:
-                return .fileFormatUpgradeRequired
-            case .addressSpaceExhausted:
-                return .addressSpaceExhausted
-            case .schemaMismatch:
-                return .schemaMismatch
-            }
+            return (_nsError as! RLMError).code
         }
 
         /// :nodoc:
@@ -137,12 +89,6 @@ extension Realm {
 extension Realm.Error: _BridgedStoredNSError {
     /// :nodoc:
     public static var _nsErrorDomain = RLMErrorDomain // swiftlint:disable:this variable_name
-}
-
-/// :nodoc:
-extension Realm.Error.Code: _ErrorCodeProtocol {
-    /// :nodoc:
-    public typealias _ErrorType = RLMError // swiftlint:disable:this type_name
 }
 
 // MARK: Equatable
