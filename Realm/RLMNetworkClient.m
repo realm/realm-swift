@@ -169,7 +169,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
         NSError *responseError = [self errorFromResponseData:data];
         if (responseError && responseError.userInfo[kRLMSyncErrorStatusCodeKey]) {
             switch (responseError.code) {
-                case RLMSyncAuthErrorInvalidCredentials:
+                case RLMSyncAuthErrorInvalidCredential:
                 case RLMSyncAuthErrorUserDoesNotExist:
                 case RLMSyncAuthErrorUserAlreadyExists:
                     // Authentication error
