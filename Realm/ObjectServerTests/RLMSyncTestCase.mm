@@ -346,6 +346,10 @@ static NSURL *syncDirectoryForChildProcess() {
     }
 }
 
+- (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue {
+    [user _syncUser]->update_refresh_token(tokenValue.UTF8String);
+}
+
 // FIXME: remove this API once the new token system is implemented.
 - (void)primeSyncManagerWithSemaphore:(dispatch_semaphore_t)semaphore {
     if (semaphore == nil) {

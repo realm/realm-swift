@@ -39,6 +39,9 @@ public:
     void unregister_refresh_handle(const std::string& path);
     void invalidate_all_handles();
 
+    RLMUserErrorReportingBlock error_handler() const;
+    void set_error_handler(RLMUserErrorReportingBlock);
+
 private:
     /**
      A map of paths to 'refresh handles'.
@@ -48,8 +51,14 @@ private:
      paths (e.g. `/~/path/to/realm`).
      */
     std::unordered_map<std::string, RLMSyncSessionRefreshHandle *> m_refresh_handles;
-
     std::mutex m_mutex;
+
+    /**
+     An optional callback invoked when the authentication server reports the user as
+     being in an expired state.
+     */
+    RLMUserErrorReportingBlock m_error_handler;
+    mutable std::mutex m_error_handler_mutex;
 };
 
 @interface RLMSyncUser ()
@@ -58,7 +67,6 @@ private:
 - (std::shared_ptr<SyncUser>)_syncUser;
 - (nullable NSString *)_refreshToken;
 + (void)_setUpBindingContextFactory;
-
 @end
 
 using PermissionChangeCallback = std::function<void(std::exception_ptr)>;

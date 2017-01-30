@@ -97,6 +97,18 @@ void CocoaSyncUserContext::invalidate_all_handles()
     m_refresh_handles.clear();
 }
 
+RLMUserErrorReportingBlock CocoaSyncUserContext::error_handler() const
+{
+    std::lock_guard<std::mutex> lock(m_error_handler_mutex);
+    return m_error_handler;
+}
+
+void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
+{
+    std::lock_guard<std::mutex> lock(m_error_handler_mutex);
+    m_error_handler = block;
+}
+
 PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBlock callback) {
     return [callback](std::exception_ptr ptr) {
         if (ptr) {
@@ -206,7 +218,21 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         return;
     }
     _user->log_out();
-    std::static_pointer_cast<CocoaSyncUserContext>(_user->binding_context())->invalidate_all_handles();
+    context_for(_user).invalidate_all_handles();
+}
+
+- (RLMUserErrorReportingBlock)errorHandler {
+    if (!_user) {
+        return nil;
+    }
+    return context_for(_user).error_handler();
+}
+
+- (void)setErrorHandler:(RLMUserErrorReportingBlock)errorHandler {
+    if (!_user) {
+        return;
+    }
+    context_for(_user).set_error_handler([errorHandler copy]);
 }
 
 - (nullable RLMSyncSession *)sessionForURL:(NSURL *)url {

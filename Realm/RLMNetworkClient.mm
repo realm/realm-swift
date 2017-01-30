@@ -256,6 +256,11 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
                 case RLMSyncAuthErrorInvalidCredential:
                 case RLMSyncAuthErrorUserDoesNotExist:
                 case RLMSyncAuthErrorUserAlreadyExists:
+                case RLMSyncAuthErrorAccessDeniedOrInvalidPath:
+                case RLMSyncAuthErrorInvalidAccessToken:
+                case RLMSyncAuthErrorExpiredPermissionOffer:
+                case RLMSyncAuthErrorAmbiguousPermissionOffer:
+                case RLMSyncAuthErrorFileCannotBeShared:
                     *error = make_auth_error(responseModel);
                     break;
                 default:

@@ -462,6 +462,38 @@
     [self waitForExpectationsWithTimeout:10 handler:nil];
 }
 
+- (void)testUserExpirationCallback {
+    NSString *username = NSStringFromSelector(_cmd);
+    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithUsername:username
+                                                                         password:@"a"
+                                                                         register:YES];
+    RLMSyncUser *user = [self logInUserForCredentials:credentials
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"callback should fire"];
+    // Set a callback on the user
+    __weak RLMSyncUser *weakUser = user;
+    __block BOOL invoked = NO;
+    user.errorHandler = ^(RLMSyncUser *u, NSError *error) {
+        XCTAssertEqualObjects(u.identity, weakUser.identity);
+        // Make sure we get the right error.
+        XCTAssertEqualObjects(error.domain, RLMSyncAuthErrorDomain);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
+        invoked = YES;
+        [ex fulfill];
+    };
+
+    // Screw up the token on the user using a debug API
+    [self manuallySetRefreshTokenForUser:user value:@"not_a_real_refresh_token"];
+
+    // Try to log in a Realm; this will cause our errorHandler block defined above to be fired.
+    __attribute__((objc_precise_lifetime)) RLMRealm *r = [self immediatelyOpenRealmForURL:REALM_URL() user:user];
+    if (!invoked) {
+        [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    }
+    XCTAssertTrue(user.state == RLMSyncUserStateLoggedOut);
+}
+
 #pragma mark - Basic Sync
 
 /// It should be possible to successfully open a Realm configured for sync with an access token.

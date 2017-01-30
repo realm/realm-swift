@@ -150,27 +150,42 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
 /// An error which is related to authentication to a Realm Object Server.
 typedef RLM_ERROR_ENUM(NSInteger, RLMSyncAuthError, RLMSyncAuthErrorDomain) {
     /// An error that indicates that the response received from the authentication server was malformed.
-    RLMSyncAuthErrorBadResponse         = 1,
+    RLMSyncAuthErrorBadResponse                     = 1,
 
     /// An error that indicates that the supplied Realm path was invalid, or could not be resolved by the authentication
     /// server.
-    RLMSyncAuthErrorBadRemoteRealmPath  = 2,
+    RLMSyncAuthErrorBadRemoteRealmPath              = 2,
 
     /// An error that indicates that the response received from the authentication server was an HTTP error code. The
     /// `userInfo` dictionary contains the actual error code value.
-    RLMSyncAuthErrorHTTPStatusCodeError = 3,
+    RLMSyncAuthErrorHTTPStatusCodeError             = 3,
 
     /// An error that indicates a problem with the session (a specific Realm opened for sync).
-    RLMSyncAuthErrorClientSessionError  = 4,
+    RLMSyncAuthErrorClientSessionError              = 4,
 
     /// An error that indicates that the provided credentials are invalid.
-    RLMSyncAuthErrorInvalidCredential   = 611,
+    RLMSyncAuthErrorInvalidCredential               = 611,
 
     /// An error that indicates that the user with provided credentials does not exist.
-    RLMSyncAuthErrorUserDoesNotExist    = 612,
+    RLMSyncAuthErrorUserDoesNotExist                = 612,
 
     /// An error that indicates that the user cannot be registered as it exists already.
-    RLMSyncAuthErrorUserAlreadyExists   = 613,
+    RLMSyncAuthErrorUserAlreadyExists               = 613,
+
+    /// An error that indicates the path is invalid or the user doesn't have access to that Realm.
+    RLMSyncAuthErrorAccessDeniedOrInvalidPath       = 614,
+
+    /// An error that indicates the refresh token was invalid.
+    RLMSyncAuthErrorInvalidAccessToken              = 615,
+
+    /// An error that indicates the permission offer is expired.
+    RLMSyncAuthErrorExpiredPermissionOffer          = 701,
+
+    /// An error that indicates the permission offer is ambiguous.
+    RLMSyncAuthErrorAmbiguousPermissionOffer        = 702,
+
+    /// An error that indicates the file at the given path can't be shared.
+    RLMSyncAuthErrorFileCannotBeShared              = 703,
 };
 
 /**
