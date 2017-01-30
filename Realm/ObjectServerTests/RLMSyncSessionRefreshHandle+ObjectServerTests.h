@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2017 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,29 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncManager_Private.h"
-#import "RLMSyncManager+ObjectServerTests.h"
-#import "RLMSyncTestCase.h"
-#import "RLMTestUtils.h"
+#import "RLMSyncSessionRefreshHandle.h"
 
-@interface RLMSyncManager ()
-- (NSArray<RLMSyncUser *> *)_allUsers;
-@end
+@interface RLMSyncSessionRefreshHandle (ObjectServerTests)
 
-@implementation RLMSyncManager (ObjectServerTests)
-
-+ (void)load {
-    RLMSwapOutClassMethod(self, @selector(sharedManager),  @selector(ost_sharedManager));
-}
-
-+ (instancetype)ost_sharedManager {
-    return [RLMSyncTestCase managerForCurrentTest];
-}
-
-- (void)prepareForDestruction {
-    // Log out all the logged-in users.
-    [[self _allUsers] makeObjectsPerformSelector:@selector(logOut)];
-    [RLMSyncManager resetForTesting];
-}
++ (void)calculateFireDateUsingTestLogic:(BOOL)forTest blockOnRefreshCompletion:(void(^)(BOOL))block;
 
 @end

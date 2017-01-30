@@ -81,14 +81,16 @@ public final class RLMIterator<T: Object>: IteratorProtocol {
  */
 public enum RealmCollectionChange<T> {
     /**
-     `.initial` indicates that the initial run of the query has completed (if applicable), and the collection can now be
-     used without performing any blocking work.
+     `.initial` indicates that the initial run of the query has completed (if
+     applicable), and the collection can now be used without performing any
+     blocking work.
      */
     case initial(T)
 
     /**
-     `.update` indicates that a write transaction has been committed which either changed which objects
-     are in the collection, and/or modified one or more of the objects in the collection.
+     `.update` indicates that a write transaction has been committed which
+     either changed which objects are in the collection, and/or modified one
+     or more of the objects in the collection.
 
      All three of the change arrays are always sorted in ascending order.
 
@@ -99,9 +101,11 @@ public enum RealmCollectionChange<T> {
     case update(T, deletions: [Int], insertions: [Int], modifications: [Int])
 
     /**
-     If an error occurs, notification blocks are called one time with a `.error` result and an `NSError` containing
-     details about the error. This can only currently happen if the Realm is opened on a background worker thread to
-     calculate the change set.
+     If an error occurs, notification blocks are called one time with a `.error`
+     result and an `NSError` containing details about the error. This can only
+     currently happen if opening the Realm on a background thread to calcuate
+     the change set fails. The callback will never be called again after it is
+     invoked with a .error value.
      */
     case error(Error)
 

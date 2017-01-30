@@ -75,6 +75,12 @@ FOUNDATION_EXTERN id _Nullable RLMValidatedValueForProperty(id object, NSString 
 // Compare two RLObjectBases
 FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase * _Nullable o1, RLMObjectBase * _Nullable o2);
 
+typedef void (^RLMObjectNotificationCallback)(NSArray<NSString *> *_Nullable propertyNames,
+                                              NSArray *_Nullable oldValues,
+                                              NSArray *_Nullable newValues,
+                                              NSError *_Nullable error);
+FOUNDATION_EXTERN RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjectNotificationCallback block);
+
 // Get ObjectUil class for objc or swift
 FOUNDATION_EXTERN Class RLMObjectUtilClass(BOOL isSwift);
 

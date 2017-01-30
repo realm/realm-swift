@@ -1,9 +1,6 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
-This release drops support for compiling with Swift 2.x.
-Swift 3.0.0 is now the minimum Swift version supported.
-
 ### API Breaking Changes
 
 * None.
@@ -15,6 +12,37 @@ Swift 3.0.0 is now the minimum Swift version supported.
 ### Bugfixes
 
 * None.
+
+2.4.1 Release notes (2017-01-27)
+=============================================================
+
+### Bugfixes
+
+* Fix an issue where authentication tokens were not properly refreshed
+  automatically before expiring.
+
+2.4.0 Release notes (2017-01-26)
+=============================================================
+
+This release drops support for compiling with Swift 2.x.
+Swift 3.0.0 is now the minimum Swift version supported.
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Add change notifications for individual objects with an API similar to that
+  of collection notifications.
+
+### Bugfixes
+
+* Fix Realm Objective-C compilation errors with Xcode 8.3 beta 1.
+* Fix several error handling issues when renewing expired authentication
+  tokens for synchronized Realms.
+* Fix a race condition leading to bad_version exceptions being thrown in
+  Realm's background worker thread.
 
 2.3.0 Release notes (2017-01-19)
 =============================================================

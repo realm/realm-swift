@@ -17,10 +17,12 @@ matrix:
       env: JOB=test-tvos
     - script: ./build.sh verify-osx
       env: JOB=verify-osx
-    - script: ./build.sh test-ios-swift
-      env: JOB=test-ios-swift
-    - script: ./build.sh test-ios-static
-      env: JOB=test-ios-static
+    # These jobs are disabled pending work to fix their configuration when running
+    # on the Travis machines, without also breaking our internal CI system.
+    # - script: ./build.sh test-ios-swift
+    #   env: JOB=test-ios-swift
+    # - script: ./build.sh test-ios-static
+    #   env: JOB=test-ios-static
 
     ############################################################################
     # These jobs pass but are disabled because they occasionally make Travis

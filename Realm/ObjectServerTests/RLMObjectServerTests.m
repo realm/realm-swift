@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncTestCase.h"
+#import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 
 #define ACCOUNT_NAME() NSStringFromSelector(_cmd)
@@ -29,7 +30,7 @@
 
 @implementation RLMObjectServerTests
 
-#pragma mark - Authentication
+#pragma mark - Authentication and Tokens
 
 /// Valid username/password credentials should be able to log in a user. Using the same credentials should return the
 /// same user object.
@@ -56,8 +57,6 @@
 
     [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
 }
-
-#pragma mark - Authentication Errors
 
 /// An invalid username/password credential should not be able to log in a user and a corresponding error should be generated.
 - (void)testInvalidPasswordAuthentication {
@@ -123,6 +122,35 @@
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+/// The pre-emptive token refresh subsystem should function, and properly refresh the token.
+- (void)testPreemptiveTokenRefresh {
+    // Prepare the test.
+    __block NSInteger refreshCount = 0;
+    __block NSInteger errorCount = 0;
+    [RLMSyncManager sharedManager].errorHandler = ^(__unused NSError *error,
+                                                    __unused RLMSyncSession *session) {
+        errorCount++;
+    };
+
+    __block XCTestExpectation *ex;
+    [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:YES
+                                        blockOnRefreshCompletion:^(BOOL success) {
+                                            XCTAssertTrue(success);
+                                            refreshCount++;
+                                            [ex fulfill];
+                                        }];
+    // Open the Realm.
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:true]
+                                               server:[RLMObjectServerTests authServerURL]];
+    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:user];
+    ex = [self expectationWithDescription:@"Timer fired"];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+    XCTAssertTrue(errorCount == 0);
+    XCTAssertTrue(refreshCount > 0);
 }
 
 #pragma mark - Users

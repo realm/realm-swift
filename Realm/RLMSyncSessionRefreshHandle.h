@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2017 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,29 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncManager_Private.h"
-#import "RLMSyncManager+ObjectServerTests.h"
-#import "RLMSyncTestCase.h"
-#import "RLMTestUtils.h"
+#import <Foundation/Foundation.h>
 
-@interface RLMSyncManager ()
-- (NSArray<RLMSyncUser *> *)_allUsers;
-@end
+@class RLMSyncUser;
 
-@implementation RLMSyncManager (ObjectServerTests)
+/// An object that handles refreshing a session's token periodically, as long
+/// as the session remains live and valid.
+@interface RLMSyncSessionRefreshHandle : NSObject
 
-+ (void)load {
-    RLMSwapOutClassMethod(self, @selector(sharedManager),  @selector(ost_sharedManager));
-}
-
-+ (instancetype)ost_sharedManager {
-    return [RLMSyncTestCase managerForCurrentTest];
-}
-
-- (void)prepareForDestruction {
-    // Log out all the logged-in users.
-    [[self _allUsers] makeObjectsPerformSelector:@selector(logOut)];
-    [RLMSyncManager resetForTesting];
-}
+- (void)scheduleRefreshTimer:(NSDate *)dateWhenTokenExpires;
+- (void)invalidate;
 
 @end

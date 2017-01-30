@@ -74,7 +74,8 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgress) {
 @class RLMSyncUser, RLMSyncConfiguration;
 
 /**
- The type of a progress notification block intended for reporting a session's network activity to the user.
+ The type of a progress notification block intended for reporting a session's network
+ activity to the user.
 
  `transferredBytes` refers to the number of bytes that have been uploaded or downloaded.
  `transferrableBytes` refers to the total number of bytes transferred, and pending transfer.
@@ -84,18 +85,21 @@ typedef void(^RLMProgressNotificationBlock)(NSUInteger transferredBytes, NSUInte
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A token object corresponding to a progress notification block on an `RLMSyncSession`. To stop notifications manually,
- call `-stop` on it. Notifications should be stopped before the token goes out of scope or is destroyed.
+ A token object corresponding to a progress notification block on an `RLMSyncSession`.
+
+ To stop notifications manually, call `-stop` on it. Notifications should be stopped before
+ the token goes out of scope or is destroyed.
  */
 @interface RLMProgressNotificationToken : RLMNotificationToken
 @end
 
 /**
- An object encapsulating a Realm Object Server "session". Sessions represent the communication between the client (and a
- local Realm file on disk), and the server (and a remote Realm at a given URL stored on a Realm Object Server).
+ An object encapsulating a Realm Object Server "session". Sessions represent the
+ communication between the client (and a local Realm file on disk), and the server
+ (and a remote Realm at a given URL stored on a Realm Object Server).
 
- Sessions are always created by the SDK and vended out through various APIs. The lifespans of sessions associated with
- Realms are managed automatically.
+ Sessions are always created by the SDK and vended out through various APIs. The lifespans
+ of sessions associated with Realms are managed automatically.
  */
 @interface RLMSyncSession : NSObject
 
@@ -108,8 +112,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// The user that owns this session.
 - (nullable RLMSyncUser *)parentUser;
 
-/// If the session is valid, return a sync configuration that can be used to open the Realm associated with this
-/// session.
+/**
+ If the session is valid, return a sync configuration that can be used to open the Realm
+ associated with this session.
+ */
 - (nullable RLMSyncConfiguration *)configuration;
 
 /**
@@ -117,19 +123,22 @@ NS_ASSUME_NONNULL_BEGIN
 
  Multiple blocks can be registered with the same session at once. Each block
  will be invoked from the runloop of the thread on which it was registered,
- creating a new runloop if none exists. The progress notification block will
- always be called once immediately upon registration in order to provide
- up-to-date registration in order to provide the latest available status
- information.
+ creating a new runloop if none exists. If the session has already received
+ progress information from the synchronization subsystem, the block will be
+ called immediately. Otherwise, it will be called as soon as progress
+ information becomes available.
 
- The token returned by this method must be retained as long as progress notifications are desired, and the `-stop`
- method should be called on it when notifications are no longer needed and before the token is destroyed.
+ The token returned by this method must be retained as long as progress
+ notifications are desired, and the `-stop` method should be called on it
+ when notifications are no longer needed and before the token is destroyed.
 
- If no token is returned, the notification block will never be called again. There are a number of reasons this might
- be true. If the session has previously experienced a fatal error it will not accept progress notification blocks.
- If the block was configured in the `RLMSyncProgressForCurrentlyOutstandingWork` mode but there is no additional
- progress to report (for example, the number of transferrable bytes and transferred bytes are equal), the block
- will not be called again.
+ If no token is returned, the notification block will never be called again.
+ There are a number of reasons this might be true. If the session has previously
+ experienced a fatal error it will not accept progress notification blocks. If
+ the block was configured in the `RLMSyncProgressForCurrentlyOutstandingWork`
+ mode but there is no additional progress to report (for example, the number
+ of transferrable bytes and transferred bytes are equal), the block will not be
+ called again.
 
  @param direction The transfer direction (upload or download) to track in this progress notification block.
  @param mode      The desired behavior of this progress notification block.

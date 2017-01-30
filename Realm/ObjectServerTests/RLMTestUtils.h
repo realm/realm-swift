@@ -16,29 +16,5 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncManager_Private.h"
-#import "RLMSyncManager+ObjectServerTests.h"
-#import "RLMSyncTestCase.h"
-#import "RLMTestUtils.h"
-
-@interface RLMSyncManager ()
-- (NSArray<RLMSyncUser *> *)_allUsers;
-@end
-
-@implementation RLMSyncManager (ObjectServerTests)
-
-+ (void)load {
-    RLMSwapOutClassMethod(self, @selector(sharedManager),  @selector(ost_sharedManager));
-}
-
-+ (instancetype)ost_sharedManager {
-    return [RLMSyncTestCase managerForCurrentTest];
-}
-
-- (void)prepareForDestruction {
-    // Log out all the logged-in users.
-    [[self _allUsers] makeObjectsPerformSelector:@selector(logOut)];
-    [RLMSyncManager resetForTesting];
-}
-
-@end
+void RLMSwapOutClassMethod(id classObject, SEL original, SEL swizzled);
+void RLMSwapOutInstanceMethod(id classObject, SEL original, SEL swizzled);
