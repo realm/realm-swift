@@ -298,54 +298,58 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         return nil;
     }
 
+    RLMSchema *cachedRealmSchema;
     @autoreleasepool {
-        // if we have a cached realm on another thread, copy without a transaction
-        if (RLMRealm *cachedRealm = RLMGetAnyCachedRealmForPath(config.path)) {
-            RLMRealmSetSchemaAndAlign(realm, cachedRealm.schema);
+        // ensure that cachedRealm doesn't end up in this thread's autorelease pool
+        cachedRealmSchema = RLMGetAnyCachedRealmForPath(config.path).schema;
+    }
+
+    // if we have a cached realm on another thread, copy without a transaction
+    if (cachedRealmSchema) {
+        RLMRealmSetSchemaAndAlign(realm, cachedRealmSchema);
+    }
+    else if (dynamic) {
+        RLMRealmSetSchemaAndAlign(realm, [RLMSchema dynamicSchemaFromObjectStoreSchema:realm->_realm->schema()]);
+    }
+    else {
+        // set/align schema or perform migration if needed
+        RLMSchema *schema = configuration.customSchema ?: RLMSchema.sharedSchema;
+
+        Realm::MigrationFunction migrationFunction;
+        auto migrationBlock = configuration.migrationBlock;
+        if (migrationBlock && configuration.schemaVersion > 0) {
+            migrationFunction = [=](SharedRealm old_realm, SharedRealm realm, Schema& mutableSchema) {
+                RLMSchema *oldSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:old_realm->schema()];
+                RLMRealm *oldRealm = [RLMRealm realmWithSharedRealm:old_realm schema:oldSchema];
+
+                // The destination RLMRealm can't just use the schema from the
+                // SharedRealm because it doesn't have information about whether or
+                // not a class was defined in Swift, which effects how new objects
+                // are created
+                RLMRealm *newRealm = [RLMRealm realmWithSharedRealm:realm schema:schema.copy];
+
+                [[[RLMMigration alloc] initWithRealm:newRealm oldRealm:oldRealm schema:mutableSchema] execute:migrationBlock];
+
+                oldRealm->_realm = nullptr;
+                newRealm->_realm = nullptr;
+            };
         }
-        else if (dynamic) {
-            RLMRealmSetSchemaAndAlign(realm, [RLMSchema dynamicSchemaFromObjectStoreSchema:realm->_realm->schema()]);
+
+        try {
+            realm->_realm->update_schema(schema.objectStoreCopy, config.schema_version,
+                                         std::move(migrationFunction));
         }
-        else {
-            // set/align schema or perform migration if needed
-            RLMSchema *schema = configuration.customSchema ?: RLMSchema.sharedSchema;
+        catch (...) {
+            RLMRealmTranslateException(error);
+            return nil;
+        }
 
-            Realm::MigrationFunction migrationFunction;
-            auto migrationBlock = configuration.migrationBlock;
-            if (migrationBlock && configuration.schemaVersion > 0) {
-                migrationFunction = [=](SharedRealm old_realm, SharedRealm realm, Schema& mutableSchema) {
-                    RLMSchema *oldSchema = [RLMSchema dynamicSchemaFromObjectStoreSchema:old_realm->schema()];
-                    RLMRealm *oldRealm = [RLMRealm realmWithSharedRealm:old_realm schema:oldSchema];
+        RLMRealmSetSchemaAndAlign(realm, schema);
+        RLMRealmCreateAccessors(realm.schema);
 
-                    // The destination RLMRealm can't just use the schema from the
-                    // SharedRealm because it doesn't have information about whether or
-                    // not a class was defined in Swift, which effects how new objects
-                    // are created
-                    RLMRealm *newRealm = [RLMRealm realmWithSharedRealm:realm schema:schema.copy];
-
-                    [[[RLMMigration alloc] initWithRealm:newRealm oldRealm:oldRealm schema:mutableSchema] execute:migrationBlock];
-
-                    oldRealm->_realm = nullptr;
-                    newRealm->_realm = nullptr;
-                };
-            }
-
-            try {
-                realm->_realm->update_schema(schema.objectStoreCopy, config.schema_version,
-                                             std::move(migrationFunction));
-            }
-            catch (...) {
-                RLMRealmTranslateException(error);
-                return nil;
-            }
-
-            RLMRealmSetSchemaAndAlign(realm, schema);
-            RLMRealmCreateAccessors(realm.schema);
-
-            if (!readOnly) {
-                // initializing the schema started a read transaction, so end it
-                [realm invalidate];
-            }
+        if (!readOnly) {
+            // initializing the schema started a read transaction, so end it
+            [realm invalidate];
         }
     }
 
