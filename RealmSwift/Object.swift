@@ -263,8 +263,8 @@ open class Object: RLMObjectBase, ThreadConfined {
      :nodoc:
      */
     public func dynamicList(_ propertyName: String) -> List<DynamicObject> {
-        return unsafeBitCast(RLMDynamicGetByName(self, propertyName, true) as! RLMListBase,
-                             to: List<DynamicObject>.self)
+        return noWarnUnsafeBitCast(RLMDynamicGetByName(self, propertyName, true) as! RLMListBase,
+                                   to: List<DynamicObject>.self)
     }
 
     // MARK: Equatable
