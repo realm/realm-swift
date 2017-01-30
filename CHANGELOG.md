@@ -1,17 +1,10 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.4.2 Release notes (2017-01-30)
 =============================================================
-
-### API Breaking Changes
-
-* None.
-
-### Enhancements
-
-* None.
 
 ### Bugfixes
 
-* None.
+* Fix an issue where RLMRealm instances could end up in the autorelease pool
+  for other threads.
 
 2.4.1 Release notes (2017-01-27)
 =============================================================
