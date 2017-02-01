@@ -1013,6 +1013,22 @@
 			name = impl;
 			sourceTree = "<group>";
 		};
+		1A2713FB1E41547E001F6BFC /* Permissions */ = {
+			isa = PBXGroup;
+			children = (
+				14C4B4371DC33481002FDEC8 /* RLMSyncPermissionChange.h */,
+				E8C6EAEF1DD65B8C00EC1A03 /* RLMSyncPermissionChange_Private.h */,
+				14C4B4381DC33481002FDEC8 /* RLMSyncPermissionChange.m */,
+				3F0D873E1E2EEC4C008C92AC /* RLMSyncPermissionOffer.h */,
+				3F0D873D1E2EEC4C008C92AC /* RLMSyncPermissionOffer_Private.h */,
+				3F0D87411E2EEC4C008C92AC /* RLMSyncPermissionOffer.m */,
+				3F0D87401E2EEC4C008C92AC /* RLMSyncPermissionOfferResponse.h */,
+				3F0D873F1E2EEC4C008C92AC /* RLMSyncPermissionOfferResponse_Private.h */,
+				3F0D87421E2EEC4C008C92AC /* RLMSyncPermissionOfferResponse.m */,
+			);
+			name = Permissions;
+			sourceTree = "<group>";
+		};
 		1A7B82361D51254600750296 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -1054,6 +1070,7 @@
 		1AF6EA441D36B1220014EB85 /* Sync */ = {
 			isa = PBXGroup;
 			children = (
+				1A2713FB1E41547E001F6BFC /* Permissions */,
 				1AD3870E1D4A827C00479110 /* Private */,
 				3F73BC931E3A878500FE80B6 /* NSError+RLMSync.h */,
 				3F73BC941E3A878500FE80B6 /* NSError+RLMSync.m */,
@@ -1068,22 +1085,13 @@
 				1AF7EA941D340AF70001A9B5 /* RLMSyncManager.h */,
 				1AF7EA951D340AF70001A9B5 /* RLMSyncManager.mm */,
 				1AF7EA981D340D1F0001A9B5 /* RLMSyncManager_Private.h */,
-				14C4B4371DC33481002FDEC8 /* RLMSyncPermissionChange.h */,
-				14C4B4381DC33481002FDEC8 /* RLMSyncPermissionChange.m */,
-				E8C6EAEF1DD65B8C00EC1A03 /* RLMSyncPermissionChange_Private.h */,
-				3F0D873E1E2EEC4C008C92AC /* RLMSyncPermissionOffer.h */,
-				3F0D87411E2EEC4C008C92AC /* RLMSyncPermissionOffer.m */,
-				3F0D873D1E2EEC4C008C92AC /* RLMSyncPermissionOffer_Private.h */,
-				3F0D87401E2EEC4C008C92AC /* RLMSyncPermissionOfferResponse.h */,
-				3F0D87421E2EEC4C008C92AC /* RLMSyncPermissionOfferResponse.m */,
-				3F0D873F1E2EEC4C008C92AC /* RLMSyncPermissionOfferResponse_Private.h */,
 				1AD3870A1D4A7FBB00479110 /* RLMSyncSession.h */,
 				1AD3870B1D4A7FBB00479110 /* RLMSyncSession.mm */,
 				1ABF256A1D528B9900BAC441 /* RLMSyncSession_Private.hpp */,
 				3F6468381E3A98B1007BD064 /* RLMSyncSessionRefreshHandle.h */,
 				1ABDCDAD1D792FEB003489E3 /* RLMSyncUser.h */,
-				1ABDCDAF1D793008003489E3 /* RLMSyncUser.mm */,
 				1A33C42A1DAEB9C4001E87AA /* RLMSyncUser_Private.hpp */,
+				1ABDCDAF1D793008003489E3 /* RLMSyncUser.mm */,
 				1A4FFC971D35A71000B4B65C /* RLMSyncUtil.h */,
 				1A84132E1D4BCCE600C5326F /* RLMSyncUtil.mm */,
 				1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */,

@@ -26,11 +26,76 @@
 #import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
+#import "RLMSyncPermissionChange.h"
+#import "RLMSyncPermissionOffer.h"
+#import "RLMSyncPermissionOfferResponse.h"
+
 #import "sync/sync_manager.hpp"
 #import "sync/sync_session.hpp"
 #import "sync/sync_user.hpp"
 
 using namespace realm;
+
+namespace {
+
+template<typename OfferObject>
+RLMNotificationToken *addOfferCallbackBlock(OfferObject *object, RLMSyncOfferChangeBlock callback) {
+    __weak OfferObject *weakObject = object;
+    return [object addNotificationBlock:^(BOOL, NSArray<RLMPropertyChange *>*, NSError *error) {
+        OfferObject *thisObject = weakObject;
+        if (!thisObject) {
+            return;
+        }
+        if (error) {
+            callback(RLMSyncManagementObjectStatusError, nil, error);
+            return;
+        }
+        switch(thisObject.status) {
+            case RLMSyncManagementObjectStatusNotProcessed:
+            case RLMSyncManagementObjectStatusSuccess:
+                callback(thisObject.status, thisObject.token, nil);
+                break;
+            case RLMSyncManagementObjectStatusError: {
+                NSError *syncError = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                         code:RLMSyncErrorPermissionsError
+                                                     userInfo:@{@"statusCode": thisObject.statusCode,
+                                                                @"statusMessage": thisObject.statusMessage}];
+                callback(RLMSyncManagementObjectStatusError, nil, syncError);
+                break;
+            }
+        }
+    }];
+}
+
+RLMNotificationToken *addChangeCallbackBlock(RLMSyncPermissionChange *object, RLMSyncPermissionChangeBlock callback) {
+    __weak RLMSyncPermissionChange *weakObject = object;
+    return [object addNotificationBlock:^(BOOL, NSArray<RLMPropertyChange *>*, NSError *error) {
+        RLMSyncPermissionChange *thisObject = weakObject;
+        if (!thisObject) {
+            return;
+        }
+        if (error) {
+            callback(RLMSyncManagementObjectStatusError, error);
+            return;
+        }
+        switch(thisObject.status) {
+            case RLMSyncManagementObjectStatusNotProcessed:
+            case RLMSyncManagementObjectStatusSuccess:
+                callback(thisObject.status, nil);
+                break;
+            case RLMSyncManagementObjectStatusError: {
+                NSError *syncError = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                         code:RLMSyncErrorPermissionsError
+                                                     userInfo:@{@"statusCode": thisObject.statusCode,
+                                                                @"statusMessage": thisObject.statusMessage}];
+                callback(RLMSyncManagementObjectStatusError, syncError);
+                break;
+            }
+        }
+    }];
+}
+
+};
 
 @interface RLMSyncUser () {
     std::shared_ptr<SyncUser> _user;
@@ -281,6 +346,119 @@ using namespace realm;
     }
     user->_user = sync_user;
     completion(user, nil);
+}
+
+#pragma mark - Permissions
+
+- (RLMNotificationToken *)modifyRealmPermissionsForURL:(NSURL *)realmURL
+                                                  user:(RLMSyncUser *)user
+                                           permissions:(RLMSyncRealmPermission)permissions
+                                              callback:(RLMSyncPermissionChangeBlock)callback {
+    NSString *url = [realmURL absoluteString] ?: @"*";
+    NSString *userID = user.identity ?: @"*";
+    BOOL read = (permissions & RLMSyncRealmPermissionRead) != 0;
+    BOOL write = (permissions & RLMSyncRealmPermissionWrite) != 0;
+    BOOL manage = (permissions & RLMSyncRealmPermissionManage) != 0;
+    NSError *error = nil;
+    RLMRealm *management = [self managementRealmWithError:&error];
+    if (error) {
+        if (callback) {
+            callback(RLMSyncManagementObjectStatusError, error);
+        }
+        return nil;
+    }
+    RLMSyncPermissionChange *change = [RLMSyncPermissionChange permissionChangeWithRealmURL:url
+                                                                                     userID:userID
+                                                                                       read:@(read)
+                                                                                      write:@(write)
+                                                                                     manage:@(manage)];
+    [management transactionWithBlock:^{
+        [management addObject:change];
+    } error:&error];
+    if (error) {
+        if (callback) {
+            callback(RLMSyncManagementObjectStatusError, error);
+        }
+        return nil;
+    }
+    if (!callback) {
+        return nil;
+    }
+    return addChangeCallbackBlock(change, callback);
+}
+
+- (NSString *)offerPermissionsForURL:(NSURL *)realmURL
+                          expiration:(NSDate *)date
+                         permissions:(RLMSyncRealmPermission)permissions
+                               token:(RLMNotificationToken **)token
+                            callback:(RLMSyncOfferChangeBlock)callback {
+    BOOL read = (permissions & RLMSyncRealmPermissionRead) != 0;
+    BOOL write = (permissions & RLMSyncRealmPermissionWrite) != 0;
+    BOOL manage = (permissions & RLMSyncRealmPermissionManage) != 0;
+    NSError *error = nil;
+    RLMRealm *management = [self managementRealmWithError:&error];
+    if (!callback || !token) {
+        @throw RLMException(@"The callback and token arguments must be provided.");
+    }
+    if (error) {
+        callback(RLMSyncManagementObjectStatusError, nil, error);
+        return nil;
+    }
+    RLMSyncPermissionOffer *offer = [RLMSyncPermissionOffer permissionOfferWithRealmURL:[realmURL absoluteString]
+                                                                              expiresAt:date
+                                                                                   read:read
+                                                                                  write:write
+                                                                                 manage:manage];
+    [management transactionWithBlock:^{
+        [management addObject:offer];
+    } error:&error];
+    if (error) {
+        callback(RLMSyncManagementObjectStatusError, nil, error);
+        return nil;
+    }
+    *token = addOfferCallbackBlock(offer, callback);
+    return offer.id;
+}
+
+- (RLMNotificationToken *)deleteOffer:(NSString *)offerKey callback:(RLMSyncOfferChangeBlock)callback {
+    #warning TODO: implement me!
+    return nil;
+}
+
+- (RLMNotificationToken *)addCallbackToExistingOffer:(NSString *)offerKey callback:(RLMSyncOfferChangeBlock)callback {
+    NSError *error = nil;
+    RLMRealm *management = [self managementRealmWithError:&error];
+    if (error) {
+        callback(RLMSyncManagementObjectStatusError, nil, error);
+        return nil;
+    }
+    RLMSyncPermissionOffer *offer = [RLMSyncPermissionOffer objectInRealm:management forPrimaryKey:offerKey];
+    if (offer) {
+        return addOfferCallbackBlock(offer, callback);
+    }
+    return nil;
+}
+
+- (RLMNotificationToken *)acceptOffer:(NSString *)token callback:(RLMSyncOfferChangeBlock)callback {
+    NSError *error = nil;
+    RLMRealm *management = [self managementRealmWithError:&error];
+    if (error) {
+        if (callback) {
+            callback(RLMSyncManagementObjectStatusError, nil, error);
+        }
+        return nil;
+    }
+    RLMSyncPermissionOfferResponse *response = [RLMSyncPermissionOfferResponse permissionOfferResponseWithToken:token];
+    [management transactionWithBlock:^{
+        [management addObject:response];
+    } error:&error];
+    if (error) {
+        if (callback) {
+            callback(RLMSyncManagementObjectStatusError, nil, error);
+        }
+        return nil;
+    }
+    return addOfferCallbackBlock(response, callback);
 }
 
 @end
