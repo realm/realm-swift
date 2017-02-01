@@ -9,6 +9,8 @@ get_xcode_version() {
 }
 
 find_xcode_with_version() {
+    local xcodes dev_dir version
+
     # First check if the currently active one is fine
     version="$(get_xcode_version xcodebuild)"
     if [[ "$version" = "$1" ]]; then
@@ -16,8 +18,6 @@ find_xcode_with_version() {
         export REALM_SWIFT_VERSION=$(get_swift_version xcrun swift)
         return 0
     fi
-
-    local xcodes dev_dir version
 
     # Check all installed copies of Xcode for the desired version
     xcodes=()
@@ -40,14 +40,14 @@ find_xcode_with_version() {
 }
 
 find_xcode_for_swift() {
+    local xcodes dev_dir version
+
     # First check if the currently active one is fine
     version="$(get_swift_version xcrun swift || true)"
     if [[ "$version" = "$1" ]]; then
         export DEVELOPER_DIR="$(xcode-select -p)"
         return 0
     fi
-
-    local xcodes dev_dir version
 
     # Check all installed copies of Xcode for the desired Swift version
     xcodes=()
