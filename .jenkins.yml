@@ -3,8 +3,8 @@
 
 xcode_version:
 #  - 8.0
-  - 8.1
-#  - 8.2
+#  - 8.1
+  - 8.2
 target:
 #  - osx
 #  - docs
@@ -23,7 +23,7 @@ target:
   # - ios-device-swift
 #  - tvos-device
 configuration:
-  - Debug
+#  - Debug
   - Release
 
 # Combinations have to be excluded in a way that's hard to read.
