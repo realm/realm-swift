@@ -1133,9 +1133,9 @@ EOM
 
     "package-ios-swift")
         cd tightdb_objc
-        for version in 3.0 3.0.1 3.0.2; do
-            REALM_SWIFT_VERSION="$version" sh build.sh prelaunch-simulator
-            REALM_SWIFT_VERSION="$version" sh build.sh ios-swift
+        for version in 8.0 8.1 8.2; do
+            REALM_XCODE_VERSION="$version" sh build.sh prelaunch-simulator
+            REALM_XCODE_VERSION="$version" sh build.sh ios-swift
         done
 
         cd build/ios
@@ -1144,9 +1144,9 @@ EOM
 
     "package-osx-swift")
         cd tightdb_objc
-        for version in 3.0 3.0.1 3.0.2; do
-            REALM_SWIFT_VERSION="$version" sh build.sh prelaunch-simulator
-            REALM_SWIFT_VERSION="$version" sh build.sh osx-swift
+        for version in 8.0 8.1 8.2; do
+            REALM_XCODE_VERSION="$version" sh build.sh prelaunch-simulator
+            REALM_XCODE_VERSION="$version" sh build.sh osx-swift
         done
 
         cd build/osx
@@ -1163,9 +1163,9 @@ EOM
 
     "package-watchos-swift")
         cd tightdb_objc
-        for version in 3.0 3.0.1 3.0.2; do
-            REALM_SWIFT_VERSION="$version" sh build.sh prelaunch-simulator
-            REALM_SWIFT_VERSION="$version" sh build.sh watchos-swift
+        for version in 8.0 8.1 8.2; do
+            REALM_XCODE_VERSION="$version" sh build.sh prelaunch-simulator
+            REALM_XCODE_VERSION="$version" sh build.sh watchos-swift
         done
 
         cd build/watchos
@@ -1182,9 +1182,9 @@ EOM
 
     "package-tvos-swift")
         cd tightdb_objc
-        for version in 3.0 3.0.1 3.0.2; do
-            REALM_SWIFT_VERSION="$version" sh build.sh prelaunch-simulator
-            REALM_SWIFT_VERSION="$version" sh build.sh tvos-swift
+        for version in 8.0 8.1 8.2; do
+            REALM_XCODE_VERSION="$version" sh build.sh prelaunch-simulator
+            REALM_XCODE_VERSION="$version" sh build.sh tvos-swift
         done
 
         cd build/tvos
