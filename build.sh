@@ -1022,7 +1022,7 @@ EOM
 
     "ci-pr")
         mkdir -p build/reports
-        export REALM_SWIFT_VERSION=$swift_version
+        export REALM_XCODE_VERSION=$xcode_version
         # FIXME: Re-enable once CI can properly unlock the keychain
         export REALM_DISABLE_METADATA_ENCRYPTION=1
 
