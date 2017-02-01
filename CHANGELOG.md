@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix synchronized Realms not downloading remote changes when an access token
+  expires and there are no local changes to upload.
+
 2.4.2 Release notes (2017-01-30)
 =============================================================
 
