@@ -351,11 +351,11 @@ RLMNotificationToken *addChangeCallbackBlock(RLMSyncPermissionChange *object, RL
 #pragma mark - Permissions
 
 - (RLMNotificationToken *)modifyRealmPermissionsForURL:(NSURL *)realmURL
-                                                  user:(RLMSyncUser *)user
+                                          userIdentity:(NSString *)identity
                                            permissions:(RLMSyncRealmPermission)permissions
                                               callback:(RLMSyncPermissionChangeBlock)callback {
     NSString *url = [realmURL absoluteString] ?: @"*";
-    NSString *userID = user.identity ?: @"*";
+    NSString *userID = identity ?: @"*";
     BOOL read = (permissions & RLMSyncRealmPermissionRead) != 0;
     BOOL write = (permissions & RLMSyncRealmPermissionWrite) != 0;
     BOOL manage = (permissions & RLMSyncRealmPermissionManage) != 0;

@@ -151,9 +151,9 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
  @param realmURL        The URL of the synced Realm on the server whose
                         permissions should be modified, or nil.
- @param user            A `RLMSyncUser` representing the user whose
-                        permissions for the Realm at `realmURL` should
-                        be modified, or `nil`.
+ @param identity        The identity of the user whose permissions for
+                        the Realm at `realmURL` should be modified, or
+                        `nil`.
  @param permissions     The new permissions to be set.
  @param callback        An optional block through which the progress of
                         the permission change operation can be reported.
@@ -162,7 +162,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
             Call `-stop` on the token before destroying it.
  */
 - (nullable RLMNotificationToken *)modifyRealmPermissionsForURL:(nullable NSURL *)realmURL
-                                                           user:(nullable RLMSyncUser *)user
+                                                   userIdentity:(nullable NSString *)identity
                                                     permissions:(RLMSyncRealmPermission)permissions
                                                        callback:(nullable RLMSyncPermissionChangeBlock)callback
 NS_REFINED_FOR_SWIFT;
