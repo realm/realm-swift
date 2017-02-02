@@ -925,6 +925,64 @@
 
 #pragma mark - Permissions
 
+/// Permission Realm reflects permissions for Realms
+- (void)testPermission {
+    NSString *userNameA = [ACCOUNT_NAME() stringByAppendingString:@"_A"];
+    RLMSyncUser *userA = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameA
+                                                                                             register:self.isParent]
+                                                server:[RLMObjectServerTests authServerURL]];
+
+    NSString *userNameB = [ACCOUNT_NAME() stringByAppendingString:@"_B"];
+    RLMSyncUser *userB = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameB
+                                                                                             register:self.isParent]
+                                                server:[RLMObjectServerTests authServerURL]];
+
+    NSError *error;
+    RLMRealm *permissionRealm = [userA permissionRealmWithError:&error];
+    XCTAssertNil(error, @"Error when opening permission Realm: %@", error);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission will be granted by the server"];
+    RLMResults *r = [RLMSyncPermission objectsInRealm:permissionRealm where:@"userId = %@", userB.identity];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                            __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermission *permission = results[0];
+        XCTAssertEqualObjects(permission.userId, userB.identity);
+        XCTAssertEqualObjects(permission.path, ([NSString stringWithFormat:@"/%@/%@", userA.identity, @"testPermission"]));
+        XCTAssertEqual(permission.mayRead, YES);
+        XCTAssertEqual(permission.mayWrite, NO);
+        XCTAssertEqual(permission.mayManage, NO);
+
+        [expectation fulfill];
+    }];
+
+    NSURL *url = REALM_URL();
+    RLMRealm *realm = [self openRealmForURL:url user:userA];
+
+    NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+    RLMSyncPermissionChange *permissionChange = [RLMSyncPermissionChange permissionChangeWithRealmURL:realmURL
+                                                                                               userID:userB.identity
+                                                                                                 read:@YES
+                                                                                                write:@NO
+                                                                                               manage:@NO];
+
+    RLMRealm *managementRealm = [userA managementRealmWithError:&error];
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionChange];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission change object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
 /// Grant/revoke access a user's Realm to another user. Another user has no access permission by default.
 - (void)testPermissionChange {
     NSString *userNameA = [ACCOUNT_NAME() stringByAppendingString:@"_A"];
@@ -1040,6 +1098,9 @@
     RLMSyncUser *userA = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameA
                                                                                              register:self.isParent]
                                                 server:[RLMObjectServerTests authServerURL]];
+
+    NSURL *url = REALM_URL();
+    __unused RLMRealm *realm = [self openRealmForURL:url user:userA];
 
     NSString *userNameB = [ACCOUNT_NAME() stringByAppendingString:@"_B"];
     RLMSyncUser *userB = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameB
@@ -1333,8 +1394,8 @@
     expectation = [self expectationWithDescription:@"A new permission offer response will be processed by the server"];
     r = [RLMSyncPermissionOfferResponse objectsInRealm:managementRealm where:@"id = %@", permissionOfferResponse.id];
     token = [r addNotificationBlock:^(RLMResults *results,
-                                                            __unused RLMCollectionChange *change,
-                                                             __unused NSError *error) {
+                                      __unused RLMCollectionChange *change,
+                                      __unused NSError *error) {
         if (results.count == 0) {
             return;
         }
