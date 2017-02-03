@@ -26,6 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType);
 BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType);
+FOUNDATION_EXTERN void RLMValidateSwiftPropertyName(NSString *name);
 
 // private property interface
 @interface RLMProperty () {

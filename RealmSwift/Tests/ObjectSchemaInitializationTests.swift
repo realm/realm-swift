@@ -122,6 +122,8 @@ class ObjectSchemaInitializationTests: TestCase {
                      "Should throw when not ignoring a property of a type we can't persist")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithOptionalStringArray.self),
                      "Should throw when not ignoring a property of a type we can't persist")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithBadPropertyName.self),
+                     "Should throw when not ignoring a property with a name we don't support")
 
         // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
         _ = RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self)
@@ -289,4 +291,8 @@ extension Set: RealmOptionalType { }
 
 class SwiftObjectWithNonRealmOptionalType: SwiftFakeObject {
     let set = RealmOptional<Set<Int>>()
+}
+
+class SwiftObjectWithBadPropertyName: SwiftFakeObject {
+    dynamic var newValue = false
 }
