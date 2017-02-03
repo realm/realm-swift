@@ -33,7 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface RLMSyncPermission : RLMObject
 
-/// The identity of a user affected by this permission change.
+/// The date this object was last modified.
+@property (readonly) NSDate *updatedAt;
+
+/// The identity of a user affected by this permission.
 @property (readonly) NSString *userId;
 
 /// The path to the realm.
