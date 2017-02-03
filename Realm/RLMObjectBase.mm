@@ -189,7 +189,7 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
         if (property.type == RLMPropertyTypeArray && [value conformsToProtocol:@protocol(NSFastEnumeration)]) {
             RLMArray *array = [object_getIvar(self, ivar) _rlmArray];
             [array removeAllObjects];
-            [array addObjects:value];
+            [array addObjects:validatedObjectForProperty(value, property, RLMSchema.partialSharedSchema)];
         }
         else if (property.optional) {
             RLMOptionalBase *optional = object_getIvar(self, ivar);
