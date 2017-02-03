@@ -109,7 +109,7 @@ public final class Migration {
                   unsafeBitCast(newObject, to: MigrationObject.self))
         }
     }
-    
+
     /**
      Enumerates all the objects of a given type in this Realm, matching a given predicate,
      providing both the old and new versions of each object.
