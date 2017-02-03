@@ -250,6 +250,17 @@ class ObjectTests: TestCase {
         }
     }
 
+    func testSettingUnmanagedObjectValuesWithSwiftDictionary() {
+        let json: [String: Any] = ["name": "foo", "array": [["stringCol": "bar"]], "intArray": [["intCol": 50]]]
+        let object = SwiftArrayPropertyObject()
+        json.keys.forEach { key in
+            object.setValue(json[key], forKey: key)
+        }
+        XCTAssertEqual(object.name, "foo")
+        XCTAssertEqual(object.array[0].stringCol, "bar")
+        XCTAssertEqual(object.intArray[0].intCol, 50)
+    }
+
     func setAndTestAllTypes(_ setter: (SwiftObject, Any?, String) -> Void,
                             getter: (SwiftObject, String) -> (Any?), object: SwiftObject) {
         setter(object, true, "boolCol")
