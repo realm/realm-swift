@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add `SyncPermission` class to allow reviewing access permissions for Realms
 
 ### Bugfixes
 
