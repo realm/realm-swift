@@ -35,6 +35,40 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType) {
     return propertyType == RLMPropertyTypeLinkingObjects;
 }
 
+// Swift obeys the ARC naming conventions for method families (except for init)
+// but the end result doesn't really work (using KVC on a method returning a
+// retained value results in a leak, but not returning a retained value results
+// in crashes). Objective-C makes properties with naming fitting the method
+// families a compile error, so we just disallow them in Swift as well.
+// http://clang.llvm.org/docs/AutomaticReferenceCounting.html#arc-method-families
+void RLMValidateSwiftPropertyName(NSString *name) {
+    // To belong to a method family, the property name must begin with the family
+    // name followed by a non-lowercase letter (or nothing), with an optional
+    // leading underscore
+    const char *str = name.UTF8String;
+    if (str[0] == '_')
+        ++str;
+    auto nameSize = strlen(str);
+
+    // Note that "init" is deliberately not in this list because Swift does not
+    // infer family membership for it.
+    for (auto family : {"alloc", "new", "copy", "mutableCopy"}) {
+        auto familySize = strlen(family);
+        if (nameSize < familySize || !std::equal(str, str + familySize, family)) {
+            continue;
+        }
+        if (familySize == nameSize || !islower(str[familySize])) {
+            @throw RLMException(@"Property names beginning with '%s' are not "
+                                 "supported. Swift follows ARC's ownership "
+                                 "rules for methods based on their name, which "
+                                 "results in memory leaks when accessing "
+                                 "properties which return retained values via KVC.",
+                                family);
+        }
+        return;
+    }
+}
+
 static bool rawTypeIsComputedProperty(NSString *rawType) {
     if ([rawType isEqualToString:@"@\"RLMLinkingObjects\""] || [rawType hasPrefix:@"@\"RLMLinkingObjects<"]) {
         return true;
@@ -311,6 +345,8 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     if (!self) {
         return nil;
     }
+
+    RLMValidateSwiftPropertyName(name);
 
     _name = name;
     _indexed = indexed;

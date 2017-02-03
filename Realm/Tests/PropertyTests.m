@@ -117,4 +117,26 @@
     XCTAssertNotEqualObjects(property1, property2);
 }
 
+- (void)testSwiftPropertyNameValidation {
+    RLMAssertThrows(RLMValidateSwiftPropertyName(@"alloc"));
+    RLMAssertThrows(RLMValidateSwiftPropertyName(@"_alloc"));
+    RLMAssertThrows(RLMValidateSwiftPropertyName(@"allocOject"));
+    RLMAssertThrows(RLMValidateSwiftPropertyName(@"_allocOject"));
+    RLMAssertThrows(RLMValidateSwiftPropertyName(@"alloc_object"));
+    RLMAssertThrows(RLMValidateSwiftPropertyName(@"_alloc_object"));
+    RLMAssertThrows(RLMValidateSwiftPropertyName(@"new"));
+    RLMAssertThrows(RLMValidateSwiftPropertyName(@"copy"));
+    RLMAssertThrows(RLMValidateSwiftPropertyName(@"mutableCopy"));
+
+    // Swift doesn't infer family from `init`
+    XCTAssertNoThrow(RLMValidateSwiftPropertyName(@"init"));
+    XCTAssertNoThrow(RLMValidateSwiftPropertyName(@"_init"));
+    XCTAssertNoThrow(RLMValidateSwiftPropertyName(@"initWithValue"));
+
+    // Lowercase letter after family name
+    XCTAssertNoThrow(RLMValidateSwiftPropertyName(@"allocate"));
+
+    XCTAssertNoThrow(RLMValidateSwiftPropertyName(@"__alloc"));
+}
+
 @end
