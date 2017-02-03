@@ -13,6 +13,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix synchronized Realms not downloading remote changes when an access token
   expires and there are no local changes to upload.
+* Fix an issue where values set on a Realm object using `setValue(value:, forKey:)`
+  that were not themselves Realm objects were not properly converted into Realm
+  objects or checked for validity.
 
 2.4.2 Release notes (2017-01-30)
 =============================================================
