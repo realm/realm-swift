@@ -420,7 +420,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
             RLMClearTable(*_info);
         }
         else {
-            RLMTrackDeletions(_realm, ^{ _results.clear(); });
+            RLMTrackDeletions(_realm, [&] { _results.clear(); });
         }
     });
 }
