@@ -467,7 +467,7 @@ public final class List<T: Object>: ListBase {
     }
 }
 
-extension List : RealmCollection, RangeReplaceableCollection {
+extension List: RealmCollection, RangeReplaceableCollection {
     // MARK: Sequence Support
 
     /// Returns a `RLMIterator` that yields successive elements in the `List`.
@@ -477,10 +477,22 @@ extension List : RealmCollection, RangeReplaceableCollection {
 
     // MARK: RangeReplaceableCollection Support
 
+#if swift(>=3.1)
+    // These should not be necessary, but Swift 3.1's compiler fails to infer the `SubSequence`,
+    // and the standard library neglects to provide the default implementation of `subscript`
+    /// :nodoc:
+    public typealias SubSequence = RangeReplaceableRandomAccessSlice<List>
+
+    /// :nodoc:
+    public subscript(slice: Range<Int>) -> SubSequence {
+        return SubSequence(base: self, bounds: slice)
+    }
+#endif
+
     /**
      Replace the given `subRange` of elements with `newElements`.
 
-    - parameter subRange:    The range of elements to be replaced.
+    - parameter subrange:    The range of elements to be replaced.
     - parameter newElements: The new elements to be inserted into the List.
     */
     public func replaceSubrange<C: Collection>(_ subrange: Range<Int>, with newElements: C)
