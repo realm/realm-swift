@@ -16,6 +16,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix an issue where values set on a Realm object using `setValue(value:, forKey:)`
   that were not themselves Realm objects were not properly converted into Realm
   objects or checked for validity.
+* Fix compilation issues with Xcode 8.3 beta 2.
 
 2.4.2 Release notes (2017-01-30)
 =============================================================
