@@ -115,12 +115,16 @@ public enum RealmCollectionChange<T> {
         }
         if let change = change {
             return .update(value,
-                deletions: change.deletions as [Int],
-                insertions: change.insertions as [Int],
-                modifications: change.modifications as [Int])
+                deletions: forceCast(change.deletions, to: [Int].self),
+                insertions: forceCast(change.insertions, to: [Int].self),
+                modifications: forceCast(change.modifications, to: [Int].self))
         }
         return .initial(value)
     }
+}
+
+private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
+    return from as! U
 }
 
 /**
@@ -131,7 +135,6 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
 
     /// The type of the objects contained in the collection.
     associatedtype Element: Object
-
 
     // MARK: Properties
 
