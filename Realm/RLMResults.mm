@@ -414,7 +414,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (void)deleteObjectsFromRealm {
-    return translateErrors([&] {
+    try {
         if (_results.get_mode() == Results::Mode::Table) {
             RLMResultsValidateInWriteTransaction(self);
             RLMClearTable(*_info);
@@ -422,7 +422,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         else {
             RLMTrackDeletions(_realm, ^{ _results.clear(); });
         }
-    });
+    }
+    catch (...) {
+        throwError(nil);
+    }
 }
 
 - (NSString *)description {
