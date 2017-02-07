@@ -299,21 +299,21 @@ class ObjectAccessorTests: TestCase {
         object.optInt64Col.value = nil
         XCTAssertNil(object.optInt64Col.value)
 
-        object.optFloatCol.value = -FLT_MAX
-        XCTAssertEqual(object.optFloatCol.value!, -FLT_MAX)
+        object.optFloatCol.value = -Float.greatestFiniteMagnitude
+        XCTAssertEqual(object.optFloatCol.value!, -Float.greatestFiniteMagnitude)
         object.optFloatCol.value = 0
         XCTAssertEqual(object.optFloatCol.value!, 0)
-        object.optFloatCol.value = FLT_MAX
-        XCTAssertEqual(object.optFloatCol.value!, FLT_MAX)
+        object.optFloatCol.value = Float.greatestFiniteMagnitude
+        XCTAssertEqual(object.optFloatCol.value!, Float.greatestFiniteMagnitude)
         object.optFloatCol.value = nil
         XCTAssertNil(object.optFloatCol.value)
 
-        object.optDoubleCol.value = -DBL_MAX
-        XCTAssertEqual(object.optDoubleCol.value!, -DBL_MAX)
+        object.optDoubleCol.value = -Double.greatestFiniteMagnitude
+        XCTAssertEqual(object.optDoubleCol.value!, -Double.greatestFiniteMagnitude)
         object.optDoubleCol.value = 0
         XCTAssertEqual(object.optDoubleCol.value!, 0)
-        object.optDoubleCol.value = DBL_MAX
-        XCTAssertEqual(object.optDoubleCol.value!, DBL_MAX)
+        object.optDoubleCol.value = Double.greatestFiniteMagnitude
+        XCTAssertEqual(object.optDoubleCol.value!, Double.greatestFiniteMagnitude)
         object.optDoubleCol.value = nil
         XCTAssertNil(object.optDoubleCol.value)
 

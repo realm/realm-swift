@@ -21,6 +21,12 @@ import Realm
 
 // MARK: Internal Helpers
 
+// Swift 3.1 provides fixits for some of our uses of unsafeBitCast
+// to use unsafeDowncast instead, but the bitcast is required.
+internal func noWarnUnsafeBitCast<T, U>(_ x: T, to type: U.Type) -> U {
+    return unsafeBitCast(x, to: type)
+}
+
 internal func notFoundToNil(index: UInt) -> Int? {
     if index == UInt(NSNotFound) {
         return nil
