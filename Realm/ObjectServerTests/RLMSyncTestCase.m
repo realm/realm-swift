@@ -120,7 +120,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
-    return [self openRealmForURL:url user:user immediatelyBlock:^{ /* Do nothing */; }];
+    return [self openRealmForURL:url user:user immediatelyBlock:nil];
 }
 
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user immediatelyBlock:(void(^)(void))block {
@@ -134,7 +134,9 @@ static NSURL *syncDirectoryForChildProcess() {
     };
 
     RLMRealm *realm = [self immediatelyOpenRealmForURL:url user:user];
-    block();
+    if (block) {
+        block();
+    }
     // Wait for login to succeed or fail.
     XCTAssert(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0,
               @"Timed out while trying to asynchronously open Realm for URL: %@", url);

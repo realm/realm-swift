@@ -167,7 +167,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     XCTAssert(p.transferrableBytes >= transferrable)
                     transferred = p.transferredBytes
                     transferrable = p.transferrableBytes
-                    if transferred >= transferrable && !hasBeenFulfilled {
+                    if p.transferredBytes > 0 && p.isTransferComplete && !hasBeenFulfilled {
                         ex.fulfill()
                         hasBeenFulfilled = true
                     }
@@ -210,7 +210,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssert(p.transferrableBytes >= transferrable)
                 transferred = p.transferredBytes
                 transferrable = p.transferrableBytes
-                if transferred >= transferrable && !hasBeenFulfilled {
+                if p.transferredBytes > 0 && p.isTransferComplete && !hasBeenFulfilled {
                     ex.fulfill()
                     hasBeenFulfilled = true
                 }
@@ -223,6 +223,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             waitForExpectations(timeout: 10.0, handler: nil)
             token!.stop()
             XCTAssert(callCount > 1)
+            XCTAssert(transferred >= transferrable)
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }

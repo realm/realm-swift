@@ -812,7 +812,9 @@
                                                                                          transferred = xfr;
                                                                                          transferrable = xfb;
                                                                                          callCount++;
-                                                                                         if (transferred >= transferrable && !hasBeenFulfilled) {
+                                                                                         if (transferrable > 0
+                                                                                             && transferred >= transferrable
+                                                                                             && !hasBeenFulfilled) {
                                                                                              [ex fulfill];
                                                                                              hasBeenFulfilled = YES;
                                                                                          }
@@ -824,7 +826,9 @@
         // The notifier should have been called at least twice: once at the beginning and at least once
         // to report progress.
         XCTAssert(callCount > 1);
-        XCTAssert(transferred >= transferrable);
+        XCTAssert(transferred >= transferrable,
+                  @"Transferred (%@) needs to be greater than or equal to transferrable (%@)",
+                  @(transferred), @(transferrable));
     } else {
         // Write lots of data to the Realm, then wait for it to be uploaded.
         [realm beginWriteTransaction];
@@ -866,7 +870,9 @@
                                                                                      transferred = xfr;
                                                                                      transferrable = xfb;
                                                                                      callCount++;
-                                                                                     if (transferred >= transferrable && !hasBeenFulfilled) {
+                                                                                     if (transferred > 0
+                                                                                         && transferred >= transferrable
+                                                                                         && !hasBeenFulfilled) {
                                                                                          [ex fulfill];
                                                                                          hasBeenFulfilled = YES;
                                                                                      }
@@ -883,7 +889,9 @@
     // The notifier should have been called at least twice: once at the beginning and at least once
     // to report progress.
     XCTAssert(callCount > 1);
-    XCTAssert(transferred >= transferrable);
+    XCTAssert(transferred >= transferrable,
+              @"Transferred (%@) needs to be greater than or equal to transferrable (%@)",
+              @(transferred), @(transferrable));
 }
 
 #pragma mark - Permissions
