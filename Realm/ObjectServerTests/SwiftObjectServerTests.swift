@@ -159,16 +159,22 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             if isParent {
                 let session = user.session(for: realmURL)
                 XCTAssertNotNil(session)
+                let ex = expectation(description: "streaming-downloads-expectation")
+                var hasBeenFulfilled = false
                 let token = session!.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
                     callCount += 1
                     XCTAssert(p.transferredBytes >= transferred)
                     XCTAssert(p.transferrableBytes >= transferrable)
                     transferred = p.transferredBytes
                     transferrable = p.transferrableBytes
+                    if p.transferredBytes > 0 && p.isTransferComplete && !hasBeenFulfilled {
+                        ex.fulfill()
+                        hasBeenFulfilled = true
+                    }
                 }
                 // Wait for the child process to upload all the data.
                 executeChild()
-                waitForDownloads(for: user, url: realmURL)
+                waitForExpectations(timeout: 10.0, handler: nil)
                 token!.stop()
                 XCTAssert(callCount > 1)
                 XCTAssert(transferred >= transferrable)
@@ -196,22 +202,28 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             let session = user.session(for: realmURL)
             XCTAssertNotNil(session)
+            let ex = expectation(description: "streaming-uploads-expectation")
+            var hasBeenFulfilled = false
             let token = session!.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
                 callCount += 1
                 XCTAssert(p.transferredBytes >= transferred)
                 XCTAssert(p.transferrableBytes >= transferrable)
                 transferred = p.transferredBytes
                 transferrable = p.transferrableBytes
+                if p.transferredBytes > 0 && p.isTransferComplete && !hasBeenFulfilled {
+                    ex.fulfill()
+                    hasBeenFulfilled = true
+                }
             }
             try realm.write {
                 for _ in 0..<bigObjectCount {
                     realm.add(SwiftHugeSyncObject())
                 }
             }
-            waitForUploads(for: user, url: realmURL)
+            waitForExpectations(timeout: 10.0, handler: nil)
             token!.stop()
             XCTAssert(callCount > 1)
-            XCTAssertEqual(transferred, transferrable)
+            XCTAssert(transferred >= transferrable)
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }

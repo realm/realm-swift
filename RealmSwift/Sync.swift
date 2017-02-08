@@ -558,8 +558,12 @@ public extension SyncSession {
         public let transferrableBytes: Int
 
         /// The fraction of bytes transferred out of all transferrable bytes. If this value is 1,
-        /// no bytes are waiting to be transferred.
+        /// no bytes are waiting to be transferred (either all bytes have already been transferred,
+        /// or there are no bytes to be transferred in the first place).
         public var fractionTransferred: Double {
+            if transferrableBytes == 0 {
+                return 1
+            }
             let percentage = Double(transferredBytes) / Double(transferrableBytes)
             return percentage > 1 ? 1 : percentage
         }

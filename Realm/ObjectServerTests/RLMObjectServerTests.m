@@ -188,6 +188,30 @@
     XCTAssertNil([RLMSyncUser currentUser]);
 }
 
+/// A sync user should return a session when asked for it based on the path.
+- (void)testUserGetSessionForValidURL {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
+    NSURL *url = REALM_URL();
+    [self openRealmForURL:url user:user immediatelyBlock:^{
+        RLMSyncSession *session = [user sessionForURL:url];
+        XCTAssertNotNil(session);
+    }];
+    // Check session existence after binding.
+    RLMSyncSession *session = [user sessionForURL:url];
+    XCTAssertNotNil(session);
+}
+
+/// A sync user should return nil when asked for a URL that doesn't exist.
+- (void)testUserGetSessionForInvalidURL {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
+    RLMSyncSession *badSession = [user sessionForURL:[NSURL URLWithString:@"realm://localhost:9080/noSuchRealm"]];
+    XCTAssertNil(badSession);
+}
+
 #pragma mark - Basic Sync
 
 /// It should be possible to successfully open a Realm configured for sync with an access token.
@@ -289,7 +313,6 @@
     XCTAssertTrue([user sessionForURL:urlC].state == RLMSyncSessionStateActive, @"Expected active session for URL C");
 }
 
-// FIXME: get these tests working reliably on CI
 /// A client should be able to open multiple Realms and add objects to each of them.
 - (void)testMultipleRealmsAddObjects {
     NSURL *urlA = CUSTOM_REALM_URL(@"a");
@@ -391,7 +414,6 @@
 
 #pragma mark - Session Lifetime
 
-// FIXME: figure out how to get this test to reliably pass.
 /// When a session opened by a Realm goes out of scope, it should stay alive long enough to finish any waiting uploads.
 - (void)testUploadChangesWhenRealmOutOfScope {
     const NSInteger OBJECT_COUNT = 10000;
@@ -774,9 +796,11 @@
     // Open the Realm
     RLMRealm *realm = [self openRealmForURL:url user:user];
     if (self.isParent) {
+        __block BOOL hasBeenFulfilled = NO;
         // Register a notifier.
         RLMSyncSession *session = [user sessionForURL:url];
         XCTAssertNotNil(session);
+        XCTestExpectation *ex = [self expectationWithDescription:@"streaming-download-notifier"];
         RLMProgressNotificationToken *token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionDownload
                                                                                       mode:RLMSyncProgressReportIndefinitely
                                                                                      block:^(NSUInteger xfr, NSUInteger xfb) {
@@ -788,15 +812,23 @@
                                                                                          transferred = xfr;
                                                                                          transferrable = xfb;
                                                                                          callCount++;
+                                                                                         if (transferrable > 0
+                                                                                             && transferred >= transferrable
+                                                                                             && !hasBeenFulfilled) {
+                                                                                             [ex fulfill];
+                                                                                             hasBeenFulfilled = YES;
+                                                                                         }
                                                                                      }];
         // Wait for the child process to upload everything.
         RLMRunChildAndWait();
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForExpectationsWithTimeout:10.0 handler:nil];
         [token stop];
         // The notifier should have been called at least twice: once at the beginning and at least once
         // to report progress.
         XCTAssert(callCount > 1);
-        XCTAssert(transferred >= transferrable);
+        XCTAssert(transferred >= transferrable,
+                  @"Transferred (%@) needs to be greater than or equal to transferrable (%@)",
+                  @(transferred), @(transferrable));
     } else {
         // Write lots of data to the Realm, then wait for it to be uploaded.
         [realm beginWriteTransaction];
@@ -819,12 +851,14 @@
     __block NSInteger callCount = 0;
     __block NSUInteger transferred = 0;
     __block NSUInteger transferrable = 0;
+    __block BOOL hasBeenFulfilled = NO;
     // Open the Realm
     RLMRealm *realm = [self openRealmForURL:url user:user];
 
     // Register a notifier.
     RLMSyncSession *session = [user sessionForURL:url];
     XCTAssertNotNil(session);
+    XCTestExpectation *ex = [self expectationWithDescription:@"streaming-upload-expectation"];
     RLMProgressNotificationToken *token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionUpload
                                                                                   mode:RLMSyncProgressReportIndefinitely
                                                                                  block:^(NSUInteger xfr, NSUInteger xfb) {
@@ -836,6 +870,12 @@
                                                                                      transferred = xfr;
                                                                                      transferrable = xfb;
                                                                                      callCount++;
+                                                                                     if (transferred > 0
+                                                                                         && transferred >= transferrable
+                                                                                         && !hasBeenFulfilled) {
+                                                                                         [ex fulfill];
+                                                                                         hasBeenFulfilled = YES;
+                                                                                     }
                                                                                  }];
     // Upload lots of data
     [realm beginWriteTransaction];
@@ -844,12 +884,14 @@
     }
     [realm commitWriteTransaction];
     // Wait for upload to begin and finish
-    [self waitForUploadsForUser:user url:url];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
     [token stop];
     // The notifier should have been called at least twice: once at the beginning and at least once
     // to report progress.
     XCTAssert(callCount > 1);
-    XCTAssert(transferred >= transferrable);
+    XCTAssert(transferred >= transferrable,
+              @"Transferred (%@) needs to be greater than or equal to transferrable (%@)",
+              @(transferred), @(transferrable));
 }
 
 #pragma mark - Permissions
