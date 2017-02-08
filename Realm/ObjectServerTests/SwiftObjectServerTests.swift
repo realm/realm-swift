@@ -167,7 +167,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     XCTAssert(p.transferrableBytes >= transferrable)
                     transferred = p.transferredBytes
                     transferrable = p.transferrableBytes
-                    if (transferred >= transferrable && !hasBeenFulfilled) {
+                    if transferred >= transferrable && !hasBeenFulfilled {
                         ex.fulfill()
                         hasBeenFulfilled = true
                     }
@@ -210,7 +210,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssert(p.transferrableBytes >= transferrable)
                 transferred = p.transferredBytes
                 transferrable = p.transferrableBytes
-                if (transferred >= transferrable && !hasBeenFulfilled) {
+                if transferred >= transferrable && !hasBeenFulfilled {
                     ex.fulfill()
                     hasBeenFulfilled = true
                 }
