@@ -7,7 +7,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Avoid copying copy-on-write data structures, which can grow the file, when the
+  write does not actually change existing values.
+* Improve performance of deleting all objects in an RLMResults.
+* Reduce the number of files opened per thread-specific Realm on macOS.
 
 ### Bugfixes
 
