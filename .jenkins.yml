@@ -3,25 +3,25 @@
 
 xcode_version:
   - 8.0
-  - 8.1
-  - 8.2
+#  - 8.1
+#  - 8.2
 target:
   - osx
-  - docs
-  - ios-static
-  - ios-dynamic
-  - ios-swift
+#  - docs
+#  - ios-static
+#  - ios-dynamic
+#  - ios-swift
   - osx-swift
-  - watchos
-  - cocoapods
-  - swiftlint
-  - tvos
-  - osx-encryption
-  - osx-object-server
+#  - watchos
+#  - cocoapods
+#  - swiftlint
+#  - tvos
+#  - osx-encryption
+#  - osx-object-server
 
-  - ios-device-objc
+#  - ios-device-objc
   # - ios-device-swift
-  - tvos-device
+#  - tvos-device
 configuration:
   - Debug
   - Release
