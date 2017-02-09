@@ -624,7 +624,7 @@ public final class Realm {
 
 extension Realm: Equatable {
     /// Returns whether two `Realm` isntances are equal.
-    public static func == (lhs: Realm, rhs: Realm) -> Bool { // swiftlint:disable:this valid_docs
+    public static func == (lhs: Realm, rhs: Realm) -> Bool {
         return lhs.rlmRealm == rhs.rlmRealm
     }
 }

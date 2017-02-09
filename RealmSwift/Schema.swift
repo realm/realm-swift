@@ -65,7 +65,7 @@ public final class Schema: CustomStringConvertible {
 
 extension Schema: Equatable {
     /// Returns whether the two schemas are equal.
-    public static func == (lhs: Schema, rhs: Schema) -> Bool { // swiftlint:disable:this valid_docs
+    public static func == (lhs: Schema, rhs: Schema) -> Bool {
         return lhs.rlmSchema.isEqual(to: rhs.rlmSchema)
     }
 }

@@ -76,7 +76,7 @@ public final class ObjectSchema: CustomStringConvertible {
 
 extension ObjectSchema: Equatable {
     /// Returns whether the two object schemas are equal.
-    public static func == (lhs: ObjectSchema, rhs: ObjectSchema) -> Bool { // swiftlint:disable:this valid_docs
+    public static func == (lhs: ObjectSchema, rhs: ObjectSchema) -> Bool {
         return lhs.rlmObjectSchema.isEqual(to: rhs.rlmObjectSchema)
     }
 }

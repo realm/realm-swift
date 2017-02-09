@@ -31,7 +31,7 @@ public final class RLMIterator<T: Object>: IteratorProtocol {
     }
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
-    public func next() -> T? { // swiftlint:disable:this valid_docs
+    public func next() -> T? {
         let accessor = unsafeBitCast(generatorBase.next() as! Object?, to: Optional<T>.self)
         if let accessor = accessor {
             RLMInitializeSwiftAccessorGenerics(accessor)

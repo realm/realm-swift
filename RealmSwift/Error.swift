@@ -96,7 +96,7 @@ extension Realm.Error: _BridgedStoredNSError {
 extension Realm.Error: Equatable {}
 
 /// Returns a Boolean indicating whether the errors are identical.
-public func == (lhs: Error, rhs: Error) -> Bool { // swiftlint:disable:this valid_docs
+public func == (lhs: Error, rhs: Error) -> Bool {
     return lhs._code == rhs._code
         && lhs._domain == rhs._domain
 }
@@ -107,6 +107,6 @@ public func == (lhs: Error, rhs: Error) -> Bool { // swiftlint:disable:this vali
  Pattern matching matching for `Realm.Error`, so that the instances can be used with Swift's
  `do { ... } catch { ... }` syntax.
 */
-public func ~= (lhs: Realm.Error, rhs: Error) -> Bool { // swiftlint:disable:this valid_docs
+public func ~= (lhs: Realm.Error, rhs: Error) -> Bool {
     return lhs == rhs
 }
