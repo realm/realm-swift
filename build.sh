@@ -382,9 +382,8 @@ export CONFIGURATION
 REALM_XCODE_VERSION=${xcode_version:-$REALM_XCODE_VERSION}
 REALM_SWIFT_VERSION=${swift_version:-$REALM_SWIFT_VERSION}
 source "${source_root}/scripts/swift-version.sh"
-echo "test me: $REALM_XCODE_VERSION : $REALM_SWIFT_VERSION"
 set_xcode_and_swift_versions
-echo "test me2: $REALM_XCODE_VERSION : $REALM_SWIFT_VERSION"
+
 ######################################
 # Commands
 ######################################
