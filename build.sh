@@ -495,7 +495,7 @@ case "$COMMAND" in
     # Swift versioning
     ######################################
     "set-swift-version")
-        local version=${2:-$REALM_SWIFT_VERSION}
+        version=${2:-$REALM_SWIFT_VERSION}
 
         SWIFT_VERSION_FILE="RealmSwift/SwiftVersion.swift"
         CONTENTS="let swiftLanguageVersion = \"$version\""
