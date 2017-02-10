@@ -381,7 +381,7 @@ public final class List<T: Object>: ListBase {
      - parameter from:  The index of the object to be moved.
      - parameter to:    index to which the object at `from` should be moved.
      */
-    public func move(from: Int, to: Int) { // swiftlint:disable:this variable_name
+    public func move(from: Int, to: Int) {
         throwForNegativeIndex(from)
         throwForNegativeIndex(to)
         _rlmArray.moveObject(at: UInt(from), to: UInt(to))

@@ -229,12 +229,12 @@ class SwiftObjectWithOptionalStringArray: SwiftFakeObject {
 }
 
 enum SwiftEnum {
-    case Case1
-    case Case2
+    case case1
+    case case2
 }
 
 class SwiftObjectWithEnum: SwiftFakeObject {
-    var swiftEnum = SwiftEnum.Case1
+    var swiftEnum = SwiftEnum.case1
 }
 
 class SwiftObjectWithStruct: SwiftFakeObject {

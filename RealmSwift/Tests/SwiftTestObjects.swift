@@ -198,7 +198,6 @@ class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
 }
 
 class SwiftLinkToPrimaryStringObject: Object {
-    // swiftlint:disable:next variable_name
     dynamic var pk = ""
     dynamic var object: SwiftPrimaryStringObject?
     let objects = List<SwiftPrimaryStringObject>()

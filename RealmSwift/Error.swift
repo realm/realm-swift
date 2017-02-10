@@ -75,7 +75,7 @@ extension Realm {
         }
 
         /// :nodoc:
-        public var _nsError: NSError // swiftlint:disable:this variable_name
+        public var _nsError: NSError
 
         /// :nodoc:
         public init(_nsError error: NSError) {
@@ -88,7 +88,7 @@ extension Realm {
 // Provide bridging from errors with domain RLMErrorDomain to Error.
 extension Realm.Error: _BridgedStoredNSError {
     /// :nodoc:
-    public static var _nsErrorDomain = RLMErrorDomain // swiftlint:disable:this variable_name
+    public static var _nsErrorDomain = RLMErrorDomain
 }
 
 // MARK: Equatable

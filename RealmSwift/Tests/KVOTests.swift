@@ -26,7 +26,6 @@ func nextPrimaryKey() -> Int {
 }
 
 class KVOObject: Object {
-    // swiftlint:disable:next variable_name
     dynamic var pk = nextPrimaryKey() // primary key for equality
     dynamic var ignored: Int = 0
 
