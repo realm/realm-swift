@@ -90,7 +90,7 @@ class RealmTests: TestCase {
 
     func testFilePermissionDenied() {
         autoreleasepool {
-            let _ = try! Realm(fileURL: testRealmURL())
+            _ = try! Realm(fileURL: testRealmURL())
         }
 
         // Make Realm at test path temporarily unreadable

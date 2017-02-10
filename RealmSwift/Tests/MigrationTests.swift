@@ -475,13 +475,13 @@ class MigrationTests: TestCase {
 
         autoreleasepool {
             assertSucceeds {
-                let _ = try Realm(configuration: config)
+                _ = try Realm(configuration: config)
             }
         }
     }
 
     func testDeleteRealmIfMigrationNeeded() {
-        autoreleasepool { let _ = try! Realm(configuration: Realm.Configuration(fileURL: defaultRealmURL())) }
+        autoreleasepool { _ = try! Realm(configuration: Realm.Configuration(fileURL: defaultRealmURL())) }
 
         let objectSchema = RLMObjectSchema(forObjectClass: SwiftEmployeeObject.self)
         objectSchema.properties = Array(objectSchema.properties[0..<1])
@@ -510,7 +510,7 @@ class MigrationTests: TestCase {
                                          deleteRealmIfMigrationNeeded: true)
 
         assertSucceeds {
-            let _ = try Realm(configuration: config)
+            _ = try Realm(configuration: config)
         }
 
         class_replaceMethod(metaClass, #selector(RLMObjectBase.sharedSchema), originalImp, "@@:")
