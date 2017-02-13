@@ -24,6 +24,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * `SyncSession.Progress.fractionTransferred` now returns 1 if there are no
   transferrable bytes.
 * Fix compilation issues with Xcode 8.3 beta 2.
+* Fix incorrect sync progress notification values for Realms originally created
+  using a version of Realm prior to 2.3.0.
 
 2.4.2 Release notes (2017-01-30)
 =============================================================
