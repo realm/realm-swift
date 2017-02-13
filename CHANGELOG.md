@@ -11,6 +11,9 @@ x.x.x Release notes (yyyy-MM-dd)
   write does not actually change existing values.
 * Improve performance of deleting all objects in an RLMResults.
 * Reduce the number of files opened per thread-specific Realm on macOS.
+* Sync progress notifications are now dispatched to a side queue, and a
+  convenience API has been added to allow notifications to be directly dispatched
+  to the main thread instead.
 
 ### Bugfixes
 
@@ -23,6 +26,8 @@ x.x.x Release notes (yyyy-MM-dd)
   non-nil value when passed in an invalid URL.
 * `SyncSession.Progress.fractionTransferred` now returns 1 if there are no
   transferrable bytes.
+* Change the way sync progress notifications are dispatched to fix broken
+  behavior when they aren't registered from the main thread.
 * Fix compilation issues with Xcode 8.3 beta 2.
 * Fix incorrect sync progress notification values for Realms originally created
   using a version of Realm prior to 2.3.0.
