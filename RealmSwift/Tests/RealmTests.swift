@@ -813,4 +813,23 @@ class RealmTests: TestCase {
             XCTAssertFalse(realm == otherThreadRealm)
         }
     }
+
+    func testCatchSpecificErrors() {
+        do {
+            _ = try Realm(configuration: Realm.Configuration(fileURL: URL(fileURLWithPath: "/dev/null/foo")))
+            XCTFail("Error should be thrown")
+        } catch Realm.Error.fileAccess {
+            // Success to catch the error
+        } catch {
+            XCTFail("Failed to brigde RLMError to Realm.Error")
+        }
+        do {
+            _ = try Realm(configuration: Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true))
+            XCTFail("Error should be thrown")
+        } catch Realm.Error.fileNotFound {
+            // Success to catch the error
+        } catch {
+            XCTFail("Failed to brigde RLMError to Realm.Error")
+        }
+    }
 }
