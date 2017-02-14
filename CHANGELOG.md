@@ -11,9 +11,6 @@ x.x.x Release notes (yyyy-MM-dd)
   write does not actually change existing values.
 * Improve performance of deleting all objects in an RLMResults.
 * Reduce the number of files opened per thread-specific Realm on macOS.
-* Sync progress notifications are now dispatched to a side queue, and a
-  convenience API has been added to allow notifications to be directly dispatched
-  to the main thread instead.
 
 ### Bugfixes
 

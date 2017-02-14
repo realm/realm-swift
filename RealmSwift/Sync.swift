@@ -587,8 +587,7 @@ public extension SyncSession {
      will be called as soon as progress information becomes available.
 
      Multiple blocks can be registered with the same session at once. Each block
-     will be invoked either on the main queue (if `dispatchToMainQueue` is true),
-     or on a side queue devoted to progress notifications otherwise.
+     will be invoked on a side queue devoted to progress notifications.
 
      The token returned by this method must be retained as long as progress
      notifications are desired, and the `stop()` method should be called on it
@@ -603,7 +602,6 @@ public extension SyncSession {
 
      - parameter direction: The transfer direction (upload or download) to track in this progress notification block.
      - parameter mode:      The desired behavior of this progress notification block.
-     - parameter dispatchToMainQueue: Whether to dispatch the notifications directly onto the main queue.
      - parameter block:     The block to invoke when notifications are available.
 
      - returns: A token which must be held for as long as you want notifications to be delivered.
@@ -612,13 +610,11 @@ public extension SyncSession {
      */
     public func addProgressNotification(for direction: ProgressDirection,
                                         mode: ProgressMode,
-                                        dispatchToMainQueue: Bool = false,
                                         block: @escaping (Progress) -> Void) -> ProgressNotificationToken? {
         return __addProgressNotification(for: (direction == .upload ? .upload : .download),
                                          mode: (mode == .reportIndefinitely
                                             ? .reportIndefinitely
-                                            : .forCurrentlyOutstandingWork),
-                                         dispatchToMainQueue: dispatchToMainQueue) { transferred, transferrable in
+                                            : .forCurrentlyOutstandingWork)) { transferred, transferrable in
                                                 block(Progress(transferred: transferred, transferrable: transferrable))
         }
     }

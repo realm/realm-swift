@@ -122,8 +122,7 @@ NS_ASSUME_NONNULL_BEGIN
  Register a progress notification block.
 
  Multiple blocks can be registered with the same session at once. Each block
- will be invoked either on the main queue (if `dispatchToMainQueue` is set to
- YES), or on a side queue devoted to progress notifications otherwise.
+ will be invoked on a side queue devoted to progress notifications.
  
  If the session has already received progress information from the
  synchronization subsystem, the block will be called immediately. Otherwise, it
@@ -143,7 +142,6 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param direction The transfer direction (upload or download) to track in this progress notification block.
  @param mode      The desired behavior of this progress notification block.
- @param dispatchToMainQueue  If YES, the notifications will be dispatched directly to the main queue.
  @param block     The block to invoke when notifications are available.
 
  @return A token which must be held for as long as you want notifications to be delivered.
@@ -152,20 +150,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
                                                                           mode:(RLMSyncProgress)mode
-                                                           dispatchToMainQueue:(BOOL)dispatchToMainQueue
                                                                          block:(RLMProgressNotificationBlock)block
 NS_REFINED_FOR_SWIFT;
 
-/**
- Register a progress notification block, and dispatch progress notification blocks
- to the side queue dedicated to handling notification blocks.
-
- @see `-[RLMSyncSession addProgressNotificationForDirection:mode:block:dispatchToMainQueue:]`
- */
-- (nullable RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
-                                                                          mode:(RLMSyncProgress)mode
-                                                                         block:(RLMProgressNotificationBlock)block
-NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 @end
 
 NS_ASSUME_NONNULL_END

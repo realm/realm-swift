@@ -162,18 +162,11 @@ using namespace realm;
 - (RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
                                                                  mode:(RLMSyncProgress)mode
                                                                 block:(RLMProgressNotificationBlock)block {
-    return [self addProgressNotificationForDirection:direction mode:mode dispatchToMainQueue:NO block:block];
-}
-
-- (RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
-                                                                 mode:(RLMSyncProgress)mode
-                                                  dispatchToMainQueue:(BOOL)dispatchToMainQueue
-                                                                block:(RLMProgressNotificationBlock)block {
     if (auto session = _session.lock()) {
         if (session->state() == SyncSession::PublicState::Error) {
             return nil;
         }
-        dispatch_queue_t queue = dispatchToMainQueue ? dispatch_get_main_queue() : RLMSyncSession.notificationsQueue;
+        dispatch_queue_t queue = RLMSyncSession.notificationsQueue;
         auto notifier_direction = (direction == RLMSyncProgressDirectionUpload
                                    ? SyncSession::NotifierType::upload
                                    : SyncSession::NotifierType::download);
