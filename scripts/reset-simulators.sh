@@ -4,6 +4,7 @@ set -o pipefail
 set -e
 
 source "$(dirname "$0")/swift-version.sh"
+set_xcode_and_swift_versions
 
 while pgrep -q Simulator; do
     # Kill all the current simulator processes as they may be from a
