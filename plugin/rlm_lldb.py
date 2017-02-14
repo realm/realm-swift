@@ -91,12 +91,12 @@ def get_ivar_info(obj, ivar):
 def get_ivar(obj, addr, ivar):
     offset, _, size = get_ivar_info(obj, ivar)
     if isinstance(addr, lldb.SBAddress):
-        addr = int(str(addr), 16)
+        addr = addr.GetFileAddress()
     return obj.GetProcess().ReadUnsignedFromMemory(addr + offset, size, lldb.SBError())
 
 object_table_ptr_offset = None
 def is_object_deleted(obj):
-    addr = int(str(obj.GetAddress()), 16)
+    addr = obj.GetAddress().GetFileAddress()
     global object_table_ptr_offset
     if not object_table_ptr_offset:
         row, _, _ = get_ivar_info(obj, 'RLMObject._row')
@@ -212,12 +212,13 @@ def is_results_evaluated(obj):
         results_mode_offset = results_offset + mode_offset
         mode_query_value = next(m for m in mode_type.enum_members if m.name == 'Query').GetValueAsUnsigned()
 
-    addr = int(str(obj.GetAddress()), 16)
+    addr = obj.GetAddress().GetFileAddress()
     mode = obj.GetProcess().ReadUnsignedFromMemory(addr + results_mode_offset, mode_type.size, lldb.SBError())
     return mode != mode_query_value
 
 def results_object_class_name(obj):
-    object_schema = get_ivar(obj, obj.GetAddress(), 'RLMResults._objectSchema')
+    class_info = get_ivar(obj, obj.GetAddress(), 'RLMResults._info')
+    object_schema = get_ivar(obj, class_info, 'RLMClassInfo.rlmObjectSchema')
     return get_object_class_name(obj.GetThread().GetSelectedFrame(), obj, object_schema, 'RLMObjectSchema._className')
 
 def RLMResults_SummaryProvider(obj, _):
