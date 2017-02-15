@@ -408,14 +408,14 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Notifications
 
 /**
- A callback block for RLMObject notifications.
+ A callback block for `RLMObject` notifications.
 
  If the object is deleted from the managing Realm, the block is called with
  `deleted` set to `YES` and the other two arguments are `nil`. The block will
  never be called again after this.
 
  If the object is modified, the block will be called with `deleted` set to
- `NO`, a `nil` `error, and an array of `RLMPropertyChange` objects which
+ `NO`, a `nil` error, and an array of `RLMPropertyChange` objects which
  indicate which properties of the objects were modified.
 
  If an error occurs, `deleted` will be `NO`, `changes` will be `nil`, and
