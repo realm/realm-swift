@@ -37,7 +37,7 @@ class Cell: UITableViewCell {
 class TableViewController: UITableViewController {
 
     let realm = try! Realm()
-    let results = try! Realm().objects(DemoObject.self).sorted(byProperty: "date")
+    let results = try! Realm().objects(DemoObject.self).sorted(byKeyPath: "date")
     var notificationToken: NotificationToken?
 
     override func viewDidLoad() {

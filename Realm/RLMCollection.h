@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMThreadSafeReference.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 @class RLMRealm, RLMResults, RLMObject, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange;
@@ -26,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
  A homogenous collection of `RLMObject` instances. Examples of conforming types include `RLMArray`,
  `RLMResults`, and `RLMLinkingObjects`.
  */
-@protocol RLMCollection <NSFastEnumeration>
+@protocol RLMCollection <NSFastEnumeration, RLMThreadConfined>
 
 @required
 
@@ -132,12 +134,23 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns a sorted `RLMResults` from the collection.
 
+ @param keyPath     The keyPath to sort by.
+ @param ascending   The direction to sort in.
+
+ @return    An `RLMResults` sorted by the specified key path.
+ */
+- (RLMResults *)sortedResultsUsingKeyPath:(NSString *)keyPath ascending:(BOOL)ascending;
+
+/**
+ Returns a sorted `RLMResults` from the collection.
+
  @param property    The property name to sort by.
  @param ascending   The direction to sort in.
 
  @return    An `RLMResults` sorted by the specified property.
  */
-- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending;
+- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
+    __deprecated_msg("Use `-sortedResultsUsingKeyPath:ascending:`");
 
 /**
  Returns a sorted `RLMResults` from the collection.
@@ -248,9 +261,9 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Properties
 
 /**
- The name of the property which the sort descriptor orders results by.
+ The key path which the sort descriptor orders results by.
  */
-@property (nonatomic, readonly) NSString *property;
+@property (nonatomic, readonly) NSString *keyPath;
 
 /**
  Whether the descriptor sorts in ascending or descending order.
@@ -260,14 +273,27 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Methods
 
 /**
- Returns a new sort descriptor for the given property name and sort direction.
+ Returns a new sort descriptor for the given key path and sort direction.
  */
-+ (instancetype)sortDescriptorWithProperty:(NSString *)propertyName ascending:(BOOL)ascending;
++ (instancetype)sortDescriptorWithKeyPath:(NSString *)keyPath ascending:(BOOL)ascending;
 
 /**
  Returns a copy of the receiver with the sort direction reversed.
  */
 - (instancetype)reversedSortDescriptor;
+
+#pragma mark - Deprecated
+
+/**
+ The name of the property which the sort descriptor orders results by.
+ */
+@property (nonatomic, readonly) NSString *property __deprecated_msg("Use `-keyPath`");
+
+/**
+ Returns a new sort descriptor for the given property name and sort direction.
+ */
++ (instancetype)sortDescriptorWithProperty:(NSString *)propertyName ascending:(BOOL)ascending
+    __deprecated_msg("Use `+sortDescriptorWithKeyPath:ascending:`");
 
 @end
 

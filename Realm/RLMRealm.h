@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import "RLMConstants.h"
 
-@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken;
+@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -406,6 +406,26 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
 #pragma mark - Accessing Objects
 
+/**
+ Returns the same object as the one referenced when the `RLMThreadSafeReference` was first created,
+ but resolved for the current Realm for this thread. Returns `nil` if this object was deleted after
+ the reference was created.
+
+ @param reference The thread-safe reference to the thread-confined object to resolve in this Realm.
+
+ @warning A `RLMThreadSafeReference` object must be resolved at most once.
+          Failing to resolve a `RLMThreadSafeReference` will result in the source version of the
+          Realm being pinned until the reference is deallocated.
+          An exception will be thrown if a reference is resolved more than once.
+
+ @warning Cannot call within a write transaction.
+
+ @note Will refresh this Realm if the source Realm was at a later version than this one.
+
+ @see `+[RLMThreadSafeReference referenceWithThreadConfined:]`
+ */
+- (nullable id)resolveThreadSafeReference:(RLMThreadSafeReference *)reference
+NS_REFINED_FOR_SWIFT;
 
 #pragma mark - Adding and Removing Objects from a Realm
 

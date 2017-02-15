@@ -16,15 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncManager.h"
+#import <Realm/RLMSyncManager.h>
 
 #import "RLMSyncUtil_Private.h"
 
-typedef NS_ENUM(NSUInteger, RLMSyncSessionErrorKind) {
-    RLMSyncSessionErrorKindDebug,
-    RLMSyncSessionErrorKindSessionFatal,
-    RLMSyncSessionErrorKindAccessDenied,
-    RLMSyncSessionErrorKindUserFatal,
+typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
+    // Specific
+    RLMSyncSystemErrorKindClientReset,
+    // General
+    RLMSyncSystemErrorKindClient,
+    RLMSyncSystemErrorKindConnection,
+    RLMSyncSystemErrorKindSession,
+    RLMSyncSystemErrorKindUser,
+    RLMSyncSystemErrorKindUnknown,
 };
 
 @class RLMSyncUser, RLMSyncConfiguration;
@@ -42,8 +46,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)_fireErrorWithCode:(int)errorCode
                    message:(NSString *)message
+                   isFatal:(BOOL)fatal
                    session:(RLMSyncSession *)session
-                errorClass:(RLMSyncSessionErrorKind)errorClass;
+                  userInfo:(NSDictionary *)userInfo
+                errorClass:(RLMSyncSystemErrorKind)errorClass;
 
 - (NSArray<RLMSyncUser *> *)_allUsers;
 

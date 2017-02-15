@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncTestCase.h"
-
+#import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 
 #define ACCOUNT_NAME() NSStringFromSelector(_cmd)
@@ -30,7 +30,7 @@
 
 @implementation RLMObjectServerTests
 
-#pragma mark - Authentication
+#pragma mark - Authentication and Tokens
 
 /// Valid username/password credentials should be able to log in a user. Using the same credentials should return the
 /// same user object.
@@ -45,20 +45,6 @@
     XCTAssertTrue([firstUser.identity isEqualToString:secondUser.identity]);
     // Authentication server property should be properly set.
     XCTAssertEqualObjects(firstUser.authenticationServer, [RLMSyncTestCase authServerURL]);
-
-    // Trying to "create" a username/password account that already exists should cause an error.
-    XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    [RLMSyncUser logInWithCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME() register:YES]
-                        authServerURL:[RLMObjectServerTests authServerURL]
-                         onCompletion:^(RLMSyncUser *user, NSError *error) {
-        XCTAssertNil(user);
-        XCTAssertNotNil(error);
-        // FIXME: Improve error message
-        XCTAssertEqualObjects(error.localizedDescription,
-                              @"The operation couldn’t be completed. (io.realm.sync error 3.)");
-        [expectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 /// A valid admin token should be able to log in a user.
@@ -70,6 +56,101 @@
     XCTAssertNotNil(credentials);
 
     [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
+}
+
+/// An invalid username/password credential should not be able to log in a user and a corresponding error should be generated.
+- (void)testInvalidPasswordAuthentication {
+    [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:ACCOUNT_NAME() register:YES]
+                          server:[RLMSyncTestCase authServerURL]];
+
+    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithUsername:ACCOUNT_NAME()
+                                                                         password:@"INVALID_PASSWORD"
+                                                                         register:NO];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    [RLMSyncUser logInWithCredentials:credentials
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNil(user);
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
+        XCTAssertNotNil(error.localizedDescription);
+
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+/// A non-existsing user should not be able to log in and a corresponding error should be generated.
+- (void)testNonExistingUsernameAuthentication {
+    RLMSyncCredentials *credentials = [RLMSyncTestCase basicCredentialsWithName:ACCOUNT_NAME()
+                                                                       register:NO];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    [RLMSyncUser logInWithCredentials:credentials
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNil(user);
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
+        XCTAssertNotNil(error.localizedDescription);
+
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+/// Registering a user with existing username should return corresponding error.
+- (void)testExistingUsernameRegistration {
+    RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                            register:YES];
+
+    [self logInUserForCredentials:credentials server:[RLMSyncTestCase authServerURL]];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    [RLMSyncUser logInWithCredentials:credentials
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                        onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNil(user);
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
+        XCTAssertNotNil(error.localizedDescription);
+
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+/// The pre-emptive token refresh subsystem should function, and properly refresh the token.
+- (void)testPreemptiveTokenRefresh {
+    // Prepare the test.
+    __block NSInteger refreshCount = 0;
+    __block NSInteger errorCount = 0;
+    [RLMSyncManager sharedManager].errorHandler = ^(__unused NSError *error,
+                                                    __unused RLMSyncSession *session) {
+        errorCount++;
+    };
+
+    __block XCTestExpectation *ex;
+    [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:YES
+                                        blockOnRefreshCompletion:^(BOOL success) {
+                                            XCTAssertTrue(success);
+                                            refreshCount++;
+                                            [ex fulfill];
+                                        }];
+    // Open the Realm.
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:true]
+                                               server:[RLMObjectServerTests authServerURL]];
+    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:user];
+    ex = [self expectationWithDescription:@"Timer fired"];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+    XCTAssertTrue(errorCount == 0);
+    XCTAssertTrue(refreshCount > 0);
 }
 
 #pragma mark - Users
@@ -105,6 +186,30 @@
     XCTAssertEqualObjects([RLMSyncUser currentUser], user);
     [user logOut];
     XCTAssertNil([RLMSyncUser currentUser]);
+}
+
+/// A sync user should return a session when asked for it based on the path.
+- (void)testUserGetSessionForValidURL {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
+    NSURL *url = REALM_URL();
+    [self openRealmForURL:url user:user immediatelyBlock:^{
+        RLMSyncSession *session = [user sessionForURL:url];
+        XCTAssertNotNil(session);
+    }];
+    // Check session existence after binding.
+    RLMSyncSession *session = [user sessionForURL:url];
+    XCTAssertNotNil(session);
+}
+
+/// A sync user should return nil when asked for a URL that doesn't exist.
+- (void)testUserGetSessionForInvalidURL {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
+    RLMSyncSession *badSession = [user sessionForURL:[NSURL URLWithString:@"realm://localhost:9080/noSuchRealm"]];
+    XCTAssertNil(badSession);
 }
 
 #pragma mark - Basic Sync
@@ -153,7 +258,7 @@
     } else {
         // Add objects.
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
@@ -168,18 +273,18 @@
     if (self.isParent) {
         // Add objects.
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1", @"parent-2", @"parent-3"]];
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
         RLMRunChildAndWait();
-        WAIT_FOR_DOWNLOAD(user, url);
+        [self waitForDownloadsForUser:user url:url];
         CHECK_COUNT(0, SyncObject, realm);
     } else {
-        WAIT_FOR_DOWNLOAD(user, url);
+        [self waitForDownloadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
         [realm beginWriteTransaction];
         [realm deleteAllObjects];
         [realm commitWriteTransaction];
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(0, SyncObject, realm);
     }
 }
@@ -208,7 +313,6 @@
     XCTAssertTrue([user sessionForURL:urlC].state == RLMSyncSessionStateActive, @"Expected active session for URL C");
 }
 
-// FIXME: get these tests working reliably on CI
 /// A client should be able to open multiple Realms and add objects to each of them.
 - (void)testMultipleRealmsAddObjects {
     NSURL *urlA = CUSTOM_REALM_URL(@"a");
@@ -221,9 +325,9 @@
     RLMRealm *realmB = [self openRealmForURL:urlB user:user];
     RLMRealm *realmC = [self openRealmForURL:urlC user:user];
     if (self.isParent) {
-        WAIT_FOR_DOWNLOAD(user, urlA);
-        WAIT_FOR_DOWNLOAD(user, urlC);
-        WAIT_FOR_DOWNLOAD(user, urlB);
+        [self waitForDownloadsForUser:user url:urlA];
+        [self waitForDownloadsForUser:user url:urlB];
+        [self waitForDownloadsForUser:user url:urlC];
         CHECK_COUNT(0, SyncObject, realmA);
         CHECK_COUNT(0, SyncObject, realmB);
         CHECK_COUNT(0, SyncObject, realmC);
@@ -240,9 +344,9 @@
                        descriptions:@[@"child-B1", @"child-B2"]];
         [self addSyncObjectsToRealm:realmC
                        descriptions:@[@"child-C1", @"child-C2", @"child-C3", @"child-C4", @"child-C5"]];
-        WAIT_FOR_UPLOAD(user, urlA);
-        WAIT_FOR_UPLOAD(user, urlB);
-        WAIT_FOR_UPLOAD(user, urlC);
+        [self waitForUploadsForUser:user url:urlA];
+        [self waitForUploadsForUser:user url:urlB];
+        [self waitForUploadsForUser:user url:urlC];
         CHECK_COUNT(3, SyncObject, realmA);
         CHECK_COUNT(2, SyncObject, realmB);
         CHECK_COUNT(5, SyncObject, realmC);
@@ -261,9 +365,9 @@
     RLMRealm *realmB = [self openRealmForURL:urlB user:user];
     RLMRealm *realmC = [self openRealmForURL:urlC user:user];
     if (self.isParent) {
-        WAIT_FOR_DOWNLOAD(user, urlA);
-        WAIT_FOR_DOWNLOAD(user, urlB);
-        WAIT_FOR_DOWNLOAD(user, urlC);
+        [self waitForDownloadsForUser:user url:urlA];
+        [self waitForDownloadsForUser:user url:urlB];
+        [self waitForDownloadsForUser:user url:urlC];
         // Add objects.
         [self addSyncObjectsToRealm:realmA
                        descriptions:@[@"parent-A1", @"parent-A2", @"parent-A3", @"parent-A4"]];
@@ -271,9 +375,9 @@
                        descriptions:@[@"parent-B1", @"parent-B2", @"parent-B3", @"parent-B4", @"parent-B5"]];
         [self addSyncObjectsToRealm:realmC
                        descriptions:@[@"parent-C1", @"parent-C2"]];
-        WAIT_FOR_UPLOAD(user, urlA);
-        WAIT_FOR_UPLOAD(user, urlB);
-        WAIT_FOR_UPLOAD(user, urlC);
+        [self waitForUploadsForUser:user url:urlA];
+        [self waitForUploadsForUser:user url:urlB];
+        [self waitForUploadsForUser:user url:urlC];
         CHECK_COUNT(4, SyncObject, realmA);
         CHECK_COUNT(5, SyncObject, realmB);
         CHECK_COUNT(2, SyncObject, realmC);
@@ -284,9 +388,9 @@
                        expectedCounts:@[@0, @0, @0]];
     } else {
         // Delete all the objects from the Realms.
-        WAIT_FOR_DOWNLOAD(user, urlA);
-        WAIT_FOR_DOWNLOAD(user, urlB);
-        WAIT_FOR_DOWNLOAD(user, urlC);
+        [self waitForDownloadsForUser:user url:urlA];
+        [self waitForDownloadsForUser:user url:urlB];
+        [self waitForDownloadsForUser:user url:urlC];
         CHECK_COUNT(4, SyncObject, realmA);
         CHECK_COUNT(5, SyncObject, realmB);
         CHECK_COUNT(2, SyncObject, realmC);
@@ -299,9 +403,9 @@
         [realmC beginWriteTransaction];
         [realmC deleteAllObjects];
         [realmC commitWriteTransaction];
-        WAIT_FOR_UPLOAD(user, urlA);
-        WAIT_FOR_UPLOAD(user, urlB);
-        WAIT_FOR_UPLOAD(user, urlC);
+        [self waitForUploadsForUser:user url:urlA];
+        [self waitForUploadsForUser:user url:urlB];
+        [self waitForUploadsForUser:user url:urlC];
         CHECK_COUNT(0, SyncObject, realmA);
         CHECK_COUNT(0, SyncObject, realmB);
         CHECK_COUNT(0, SyncObject, realmC);
@@ -310,7 +414,6 @@
 
 #pragma mark - Session Lifetime
 
-// FIXME: figure out how to get this test to reliably pass.
 /// When a session opened by a Realm goes out of scope, it should stay alive long enough to finish any waiting uploads.
 - (void)testUploadChangesWhenRealmOutOfScope {
     const NSInteger OBJECT_COUNT = 10000;
@@ -340,7 +443,7 @@
     } else {
         RLMRealm *realm = [self openRealmForURL:url user:user];
         // Wait for download to complete.
-        WAIT_FOR_DOWNLOAD(user, url);
+        [self waitForDownloadsForUser:user url:url];
         CHECK_COUNT(OBJECT_COUNT, SyncObject, realm);
     }
 }
@@ -359,7 +462,7 @@
     if (self.isParent) {
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1"]];
         CHECK_COUNT(1, SyncObject, realm);
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         // Log out the user.
         [user logOut];
         // Log the user back in.
@@ -371,11 +474,11 @@
         // FIXME: calling wait_for_upload_complete() before receiving BIND does
         // not actually wait
         sleep(1);
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
         RLMRunChildAndWait();
     } else {
-        WAIT_FOR_DOWNLOAD(user, url);
+        [self waitForDownloadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
@@ -392,7 +495,7 @@
     if (self.isParent) {
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1"]];
         CHECK_COUNT(1, SyncObject, realm);
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         // Log out the user.
         [user logOut];
         // Log the user back in.
@@ -400,16 +503,16 @@
                                                                                    register:NO]
                                       server:[RLMObjectServerTests authServerURL]];
         RLMRunChildAndWait();
-        WAIT_FOR_DOWNLOAD(user, url);
+        [self waitForDownloadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
     } else {
-        WAIT_FOR_DOWNLOAD(user, url);
+        [self waitForDownloadsForUser:user url:url];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2"]];
 
         // FIXME: calling wait_for_upload_complete() before receiving BIND does
         // not actually wait
         sleep(1);
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
@@ -440,13 +543,13 @@
         // Wait for the Realm's session to be bound.
         WAIT_FOR_SEMAPHORE(sema, 30);
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-2", @"parent-3"]];
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
         RLMRunChildAndWait();
     } else {
         RLMRealm *realm = [self openRealmForURL:url user:user];
         XCTAssertNil(error, @"Error when opening Realm: %@", error);
-        WAIT_FOR_DOWNLOAD(user, url);
+        [self waitForDownloadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
@@ -481,7 +584,7 @@
         RLMRealm *realm = [self openRealmForURL:url user:user];
         XCTAssertNil(error, @"Error when opening Realm: %@", error);
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
@@ -505,13 +608,13 @@
         // Open the Realm (for the first time).
         RLMRealm *realm = [self openRealmForURL:url user:user];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2"]];
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(2, SyncObject, realm);
         RLMRunChildAndWait();
     } else {
         RLMRealm *realm = [self openRealmForURL:url user:user];
         // Add objects.
-        WAIT_FOR_DOWNLOAD(user, url);
+        [self waitForDownloadsForUser:user url:url];
         CHECK_COUNT(2, SyncObject, realm);
     }
 }
@@ -536,14 +639,14 @@
         RLMRealm *realm = [self openRealmForURL:url user:user];
         // Run the sub-test.
         RLMRunChildAndWait();
-        WAIT_FOR_DOWNLOAD(user, url);
+        [self waitForDownloadsForUser:user url:url];
         CHECK_COUNT(2, SyncObject, realm);
     } else {
         RLMRealm *realm = [self openRealmForURL:url user:user];
         // Add objects.
-        WAIT_FOR_DOWNLOAD(user, url);
+        [self waitForDownloadsForUser:user url:url];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2"]];
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(2, SyncObject, realm);
     }
 }
@@ -560,7 +663,7 @@
     RLMRealm *realm = [self openRealmForURL:url user:user];
     if (self.isParent) {
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1"]];
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(1, SyncObject, realm);
         // Log out the user.
         [user logOut];
@@ -576,10 +679,10 @@
         // FIXME: calling wait_for_upload_complete() before receiving BIND does
         // not actually wait
         sleep(1);
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         RLMRunChildAndWait();
     } else {
-        WAIT_FOR_DOWNLOAD(user, url);
+        [self waitForDownloadsForUser:user url:url];
         CHECK_COUNT(5, SyncObject, realm);
     }
 }
@@ -596,7 +699,7 @@
     RLMRealm *realm = [self openRealmForURL:url user:user];
     if (self.isParent) {
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1"]];
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         XCTAssert([SyncObject allObjectsInRealm:realm].count == 1, @"Expected 1 item");
         // Log out the user.
         [user logOut];
@@ -611,12 +714,184 @@
         [self waitForDownloadsForUser:user realms:@[realm] realmURLs:@[url] expectedCounts:@[@5]];
     } else {
         // Add objects.
-        WAIT_FOR_DOWNLOAD(user, url);
+        [self waitForDownloadsForUser:user url:url];
         CHECK_COUNT(1, SyncObject, realm);
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3", @"child-4"]];
-        WAIT_FOR_UPLOAD(user, url);
+        [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(5, SyncObject, realm);
     }
+}
+
+#pragma mark - Client reset
+
+/// Ensure that a client reset error is propagated up to the binding successfully.
+- (void)testClientReset {
+    NSURL *url = REALM_URL();
+    NSString *sessionName = ACCOUNT_NAME();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:true]
+                                               server:[RLMObjectServerTests authServerURL]];
+    // Open the Realm
+    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:user];
+
+    __block NSError *theError = nil;
+    XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
+    [RLMSyncManager sharedManager].errorHandler = ^void(NSError *error, RLMSyncSession *session) {
+        // Make sure we're actually looking at the right session.
+        XCTAssertTrue([[session.realmURL absoluteString] containsString:sessionName]);
+        theError = error;
+        [ex fulfill];
+    };
+    [user simulateClientResetErrorForSession:url];
+    [self waitForExpectationsWithTimeout:10 handler:nil];
+    XCTAssertNotNil(theError);
+    XCTAssertTrue(theError.code == RLMSyncErrorClientResetError);
+    NSString *pathValue = [theError rlmSync_clientResetBackedUpRealmPath];
+    XCTAssertNotNil(pathValue);
+    // Sanity check the recovery path.
+    XCTAssertTrue([pathValue containsString:@"io.realm.object-server-recovered-realms/recovered_realm"]);
+    XCTAssertNotNil([theError rlmSync_clientResetBlock]);
+}
+
+/// Test manually initiating client reset.
+- (void)testClientResetManualInitiation {
+    NSURL *url = REALM_URL();
+    NSString *sessionName = ACCOUNT_NAME();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:true]
+                                               server:[RLMObjectServerTests authServerURL]];
+    __block NSError *theError = nil;
+    @autoreleasepool {
+        __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:user];
+        XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
+        [RLMSyncManager sharedManager].errorHandler = ^void(NSError *error, RLMSyncSession *session) {
+            // Make sure we're actually looking at the right session.
+            XCTAssertTrue([[session.realmURL absoluteString] containsString:sessionName]);
+            theError = error;
+            [ex fulfill];
+        };
+        [user simulateClientResetErrorForSession:url];
+        [self waitForExpectationsWithTimeout:10 handler:nil];
+        XCTAssertNotNil(theError);
+    }
+    // At this point the Realm should be invalidated and client reset should be possible.
+    NSString *pathValue = [theError rlmSync_clientResetBackedUpRealmPath];
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:pathValue]);
+    [theError rlmSync_clientResetBlock]();
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:pathValue]);
+}
+
+#pragma mark - Progress Notifications
+
+- (void)testStreamingDownloadNotifier {
+    const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
+    NSURL *url = REALM_URL();
+    // Log in the user.
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+    __block NSInteger callCount = 0;
+    __block NSUInteger transferred = 0;
+    __block NSUInteger transferrable = 0;
+    // Open the Realm
+    RLMRealm *realm = [self openRealmForURL:url user:user];
+    if (self.isParent) {
+        __block BOOL hasBeenFulfilled = NO;
+        // Register a notifier.
+        RLMSyncSession *session = [user sessionForURL:url];
+        XCTAssertNotNil(session);
+        XCTestExpectation *ex = [self expectationWithDescription:@"streaming-download-notifier"];
+        RLMProgressNotificationToken *token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionDownload
+                                                                                      mode:RLMSyncProgressReportIndefinitely
+                                                                                     block:^(NSUInteger xfr, NSUInteger xfb) {
+                                                                                         // Make sure the values are
+                                                                                         // increasing, and update our
+                                                                                         // stored copies.
+                                                                                         XCTAssert(xfr >= transferred);
+                                                                                         XCTAssert(xfb >= transferrable);
+                                                                                         transferred = xfr;
+                                                                                         transferrable = xfb;
+                                                                                         callCount++;
+                                                                                         if (transferrable > 0
+                                                                                             && transferred >= transferrable
+                                                                                             && !hasBeenFulfilled) {
+                                                                                             [ex fulfill];
+                                                                                             hasBeenFulfilled = YES;
+                                                                                         }
+                                                                                     }];
+        // Wait for the child process to upload everything.
+        RLMRunChildAndWait();
+        [self waitForExpectationsWithTimeout:10.0 handler:nil];
+        [token stop];
+        // The notifier should have been called at least twice: once at the beginning and at least once
+        // to report progress.
+        XCTAssert(callCount > 1);
+        XCTAssert(transferred >= transferrable,
+                  @"Transferred (%@) needs to be greater than or equal to transferrable (%@)",
+                  @(transferred), @(transferrable));
+    } else {
+        // Write lots of data to the Realm, then wait for it to be uploaded.
+        [realm beginWriteTransaction];
+        for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
+            [realm addObject:[HugeSyncObject object]];
+        }
+        [realm commitWriteTransaction];
+        [self waitForUploadsForUser:user url:url];
+        CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
+    }
+}
+
+- (void)testStreamingUploadNotifier {
+    const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
+    NSURL *url = REALM_URL();
+    // Log in the user.
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+    __block NSInteger callCount = 0;
+    __block NSUInteger transferred = 0;
+    __block NSUInteger transferrable = 0;
+    __block BOOL hasBeenFulfilled = NO;
+    // Open the Realm
+    RLMRealm *realm = [self openRealmForURL:url user:user];
+
+    // Register a notifier.
+    RLMSyncSession *session = [user sessionForURL:url];
+    XCTAssertNotNil(session);
+    XCTestExpectation *ex = [self expectationWithDescription:@"streaming-upload-expectation"];
+    RLMProgressNotificationToken *token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionUpload
+                                                                                  mode:RLMSyncProgressReportIndefinitely
+                                                                                 block:^(NSUInteger xfr, NSUInteger xfb) {
+                                                                                     // Make sure the values are
+                                                                                     // increasing, and update our
+                                                                                     // stored copies.
+                                                                                     XCTAssert(xfr >= transferred);
+                                                                                     XCTAssert(xfb >= transferrable);
+                                                                                     transferred = xfr;
+                                                                                     transferrable = xfb;
+                                                                                     callCount++;
+                                                                                     if (transferred > 0
+                                                                                         && transferred >= transferrable
+                                                                                         && !hasBeenFulfilled) {
+                                                                                         [ex fulfill];
+                                                                                         hasBeenFulfilled = YES;
+                                                                                     }
+                                                                                 }];
+    // Upload lots of data
+    [realm beginWriteTransaction];
+    for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
+        [realm addObject:[HugeSyncObject object]];
+    }
+    [realm commitWriteTransaction];
+    // Wait for upload to begin and finish
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [token stop];
+    // The notifier should have been called at least twice: once at the beginning and at least once
+    // to report progress.
+    XCTAssert(callCount > 1);
+    XCTAssert(transferred >= transferrable,
+              @"Transferred (%@) needs to be greater than or equal to transferrable (%@)",
+              @(transferred), @(transferrable));
 }
 
 #pragma mark - Permissions
@@ -863,6 +1138,283 @@
             XCTAssertEqual(change.status, RLMSyncManagementObjectStatusError);
         }];
     }
+}
+
+/// Get a token which can be used to offer the permissions as defined
+- (void)testPermissionOffer {
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+    RLMRealm *realm = [self openRealmForURL:url user:user];
+    NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+
+    RLMSyncPermissionOffer *permissionOffer = [RLMSyncPermissionOffer permissionOfferWithRealmURL:realmURL
+                                                                                        expiresAt:[NSDate dateWithTimeIntervalSinceNow:30 * 24 * 60 * 60]
+                                                                                             read:YES
+                                                                                            write:YES
+                                                                                           manage:NO];
+    NSError *error = nil;
+    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission offer will be processed by the server"];
+    RLMResults *r = [RLMSyncPermissionOffer objectsInRealm:managementRealm where:@"id = %@", permissionOffer.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                            __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermissionOffer *permissionOffer = results[0];
+        if (permissionOffer.statusCode) {
+            XCTAssertEqual(permissionOffer.status, RLMSyncManagementObjectStatusSuccess);
+            XCTAssertNotNil(permissionOffer.token);
+
+            [expectation fulfill];
+        }
+    }];
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionOffer];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission offer object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
+/// Failed to process a permission offer object due to the offer expired
+- (void)testPermissionOfferIsExpired {
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+    RLMRealm *realm = [self openRealmForURL:url user:user];
+    NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+
+    RLMSyncPermissionOffer *permissionOffer = [RLMSyncPermissionOffer permissionOfferWithRealmURL:realmURL
+                                                                                        expiresAt:[NSDate dateWithTimeIntervalSinceNow:-30 * 24 * 60 * 60]
+                                                                                             read:YES
+                                                                                            write:YES
+                                                                                           manage:NO];
+    NSError *error = nil;
+    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission offer will be processed by the server"];
+    RLMResults *r = [RLMSyncPermissionOffer objectsInRealm:managementRealm where:@"id = %@", permissionOffer.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                            __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermissionOffer *permissionOffer = results[0];
+        if (permissionOffer.statusCode) {
+            XCTAssertEqual(permissionOffer.status, RLMSyncManagementObjectStatusError);
+            XCTAssertEqualObjects(permissionOffer.statusMessage, @"The permission offer is expired.");
+            XCTAssertNil(permissionOffer.token);
+
+            [expectation fulfill];
+        }
+    }];
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionOffer];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission offer object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
+/// Get a permission offer token, then permission offer response will be processed, then open another user's Realm file
+- (void)testPermissionOfferResponse {
+    NSString *userNameA = [ACCOUNT_NAME() stringByAppendingString:@"_A"];
+    RLMSyncUser *userA = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameA
+                                                                                             register:self.isParent]
+                                                server:[RLMObjectServerTests authServerURL]];
+
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"realm://localhost:9080/~/%@", userNameA]];
+    NSError *error = nil;
+    RLMRealm *realm = [self openRealmForURL:url user:userA];
+
+    RLMRealm *managementRealm = [userA managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+
+    RLMSyncPermissionOffer *permissionOffer = [RLMSyncPermissionOffer permissionOfferWithRealmURL:realmURL
+                                                                                        expiresAt:[NSDate dateWithTimeIntervalSinceNow:30 * 24 * 60 * 60]
+                                                                                             read:YES
+                                                                                            write:YES
+                                                                                           manage:NO];
+    __block NSString *permissionToken = nil;
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission offer will be processed by the server"];
+    RLMResults *r = [RLMSyncPermissionOffer objectsInRealm:managementRealm where:@"id = %@", permissionOffer.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                            __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermissionOffer *permissionOffer = results[0];
+        if (permissionOffer.statusCode) {
+            XCTAssertEqual(permissionOffer.status, RLMSyncManagementObjectStatusSuccess);
+            XCTAssertNotNil(permissionOffer.token);
+
+            permissionToken = permissionOffer.token;
+            [expectation fulfill];
+        }
+    }];
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionOffer];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission offer object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+
+    NSString *userNameB = [ACCOUNT_NAME() stringByAppendingString:@"_B"];
+    RLMSyncUser *userB = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userNameB
+                                                                                             register:self.isParent]
+                                                server:[RLMObjectServerTests authServerURL]];
+
+    managementRealm = [userB managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    __block NSString *responseRealmUrl = nil;
+
+    RLMSyncPermissionOfferResponse *permissionOfferResponse = [RLMSyncPermissionOfferResponse
+                                                               permissionOfferResponseWithToken:permissionToken];
+
+    expectation = [self expectationWithDescription:@"A new permission offer response will be processed by the server"];
+    r = [RLMSyncPermissionOfferResponse objectsInRealm:managementRealm where:@"id = %@", permissionOfferResponse.id];
+    token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                             __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermissionOfferResponse *permissionOfferResponse = results[0];
+        if (permissionOfferResponse.statusCode) {
+            XCTAssertEqual(permissionOfferResponse.status, RLMSyncManagementObjectStatusSuccess);
+            XCTAssertEqualObjects((permissionOfferResponse.realmUrl),
+                                  ([NSString stringWithFormat:@"realm://localhost:9080/%@/%@", userA.identity, userNameA]));
+
+            responseRealmUrl = permissionOfferResponse.realmUrl;
+
+            [expectation fulfill];
+        }
+    }];
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionOfferResponse];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission offer response object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+
+    XCTAssertNotNil([self openRealmForURL:[NSURL URLWithString:responseRealmUrl] user:userB]);
+}
+
+/// Failed to process a permission offer response object due to `token` is invalid
+- (void)testPermissionOfferResponseInvalidToken {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    RLMSyncPermissionOfferResponse *permissionOfferResponse = [RLMSyncPermissionOfferResponse permissionOfferResponseWithToken:@"invalid token"];
+
+    NSError *error = nil;
+    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission offer response will be processed by the server"];
+    RLMResults *r = [RLMSyncPermissionOfferResponse objectsInRealm:managementRealm where:@"id = %@", permissionOfferResponse.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                            __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermissionOffer *permissionOffer = results[0];
+        if (permissionOffer.statusCode) {
+            XCTAssertEqual(permissionOffer.status, RLMSyncManagementObjectStatusError);
+            XCTAssertNil(permissionOffer.realmUrl);
+
+            [expectation fulfill];
+        }
+    }];
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionOfferResponse];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission offer response object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
+}
+
+/// Failed to process a permission offer response object due to `token` does not exist
+- (void)testPermissionOfferResponseTokenNotExist {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSString *fakeToken = @"00000000000000000000000000000000:00000000-0000-0000-0000-000000000000";
+    RLMSyncPermissionOfferResponse *permissionOfferResponse = [RLMSyncPermissionOfferResponse permissionOfferResponseWithToken:fakeToken];
+
+    NSError *error = nil;
+    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+    XCTAssertNotNil(managementRealm);
+    XCTAssertNil(error, @"Error when opening management Realm: %@", error);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"A new permission offer response will be processed by the server"];
+    RLMResults *r = [RLMSyncPermissionOfferResponse objectsInRealm:managementRealm where:@"id = %@", permissionOfferResponse.id];
+    RLMNotificationToken *token = [r addNotificationBlock:^(RLMResults *results,
+                                                            __unused RLMCollectionChange *change,
+                                                            __unused NSError *error) {
+        if (results.count == 0) {
+            return;
+        }
+
+        RLMSyncPermissionOffer *permissionOffer = results[0];
+        if (permissionOffer.statusCode) {
+            XCTAssertEqual(permissionOffer.status, RLMSyncManagementObjectStatusError);
+            XCTAssertNil(permissionOffer.realmUrl);
+
+            [expectation fulfill];
+        }
+    }];
+
+    [managementRealm transactionWithBlock:^{
+        [managementRealm addObject:permissionOfferResponse];
+    } error:&error];
+    XCTAssertNil(error, @"Error when writing permission offer response object: %@", error);
+
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    [token stop];
 }
 
 @end

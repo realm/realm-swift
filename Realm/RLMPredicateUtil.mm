@@ -17,6 +17,8 @@
 
 #import "RLMPredicateUtil.hpp"
 
+#include <realm/util/assert.hpp>
+
 // NSConditionalExpressionType is new in OS X 10.11 and iOS 9.0
 #if defined(__MAC_OS_X_VERSION_MIN_REQUIRED)
 #define CONDITIONAL_EXPRESSION_DECLARED (__MAC_OS_X_VERSION_MIN_REQUIRED >= 101100)
@@ -72,8 +74,12 @@ NSExpression *PredicateExpressionTransformer::visit(NSExpression *expression) co
         case NSMinusSetExpressionType:
             return [NSExpression expressionForMinusSet:visit(expression.leftExpression) with:visit(expression.rightExpression)];
 
-        case NSSubqueryExpressionType:
-            return [NSExpression expressionForSubquery:visit(expression.operand) usingIteratorVariable:expression.variable predicate:visit(expression.predicate)];
+        case NSSubqueryExpressionType: {
+            NSExpression *collection = expression.collection;
+            // NSExpression.collection is declared as id, but appears to always hold an NSExpression for subqueries.
+            REALM_ASSERT([collection isKindOfClass:[NSExpression class]]);
+            return [NSExpression expressionForSubquery:visit(collection) usingIteratorVariable:expression.variable predicate:visit(expression.predicate)];
+        }
 
         case NSAggregateExpressionType: {
             NSMutableArray *subexpressions = [NSMutableArray array];

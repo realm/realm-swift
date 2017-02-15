@@ -42,8 +42,8 @@ extern RLMIdentityProvider const RLMIdentityProviderFacebook;
 /// A Google account as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderGoogle;
 
-/// An iCloud account as an identity provider.
-extern RLMIdentityProvider const RLMIdentityProviderICloud;
+/// A CloudKit account as an identity provider.
+extern RLMIdentityProvider const RLMIdentityProviderCloudKit;
 
 /**
  Opaque credentials representing a specific Realm Object Server user.
@@ -70,9 +70,9 @@ extern RLMIdentityProvider const RLMIdentityProviderICloud;
 + (instancetype)credentialsWithGoogleToken:(RLMSyncCredentialsToken)token;
 
 /**
- Construct and return credentials from an iCloud account token.
+ Construct and return credentials from an CloudKit account token.
  */
-+ (instancetype)credentialsWithICloudToken:(RLMSyncCredentialsToken)token;
++ (instancetype)credentialsWithCloudKitToken:(RLMSyncCredentialsToken)token;
 
 /**
  Construct and return credentials from a Realm Object Server username and password.

@@ -64,7 +64,7 @@
         XCTFail(@"Got an item in empty linking objects");
     }
 
-    XCTAssertEqual(0u, [don.parents sortedResultsUsingProperty:@"age" ascending:YES].count);
+    XCTAssertEqual(0u, [don.parents sortedResultsUsingKeyPath:@"age" ascending:YES].count);
     XCTAssertEqual(0u, [don.parents objectsWhere:@"TRUEPREDICATE"].count);
 
     XCTAssertNil([don.parents minOfProperty:@"age"]);

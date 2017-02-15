@@ -18,8 +18,9 @@
 
 #import <Realm/RLMSyncUtil.h>
 
-#import <Realm/RLMSyncCredentials.h>
+#import <Realm/RLMProperty.h>
 #import <Realm/RLMRealmConfiguration.h>
+#import <Realm/RLMSyncCredentials.h>
 
 @class RLMSyncUser;
 
@@ -40,12 +41,17 @@ extern RLMIdentityProvider const RLMIdentityProviderRealm;
 extern NSString *const kRLMSyncAppIDKey;
 extern NSString *const kRLMSyncDataKey;
 extern NSString *const kRLMSyncErrorJSONKey;
+extern NSString *const kRLMSyncErrorStatusCodeKey;
 extern NSString *const kRLMSyncIdentityKey;
 extern NSString *const kRLMSyncPasswordKey;
 extern NSString *const kRLMSyncPathKey;
 extern NSString *const kRLMSyncProviderKey;
 extern NSString *const kRLMSyncRegisterKey;
 extern NSString *const kRLMSyncUnderlyingErrorKey;
+
+/// Convert sync management object status code (nil, 0 and others) to
+/// RLMSyncManagementObjectStatus enum
+FOUNDATION_EXTERN RLMSyncManagementObjectStatus RLMMakeSyncManagementObjectStatus(NSNumber<RLMInt> * _Nullable statusCode);
 
 #define RLM_SYNC_UNINITIALIZABLE \
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly"))); \

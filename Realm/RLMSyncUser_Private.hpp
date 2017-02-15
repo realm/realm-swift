@@ -34,11 +34,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncUser ()
 
-- (void)_bindSessionWithPath:(const std::string&)path
-                      config:(const SyncConfig&)config
-                     session:(std::shared_ptr<SyncSession>)session
-                  completion:(nullable RLMSyncBasicErrorReportingBlock)completion
-                isStandalone:(BOOL)standalone;
+- (void)_bindSessionWithConfig:(const SyncConfig&)config
+                       session:(std::shared_ptr<SyncSession>)session
+                    completion:(RLMSyncBasicErrorReportingBlock)completion;
 
 - (instancetype)initWithSyncUser:(std::shared_ptr<SyncUser>)user;
 - (std::shared_ptr<SyncUser>)_syncUser;

@@ -204,6 +204,26 @@
         XCTAssertEqualObjects(oldData, newData); \
 } while (0)
 
+- (void)testFileFormatUpgradeRequiredDeleteRealmIfNeeded {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.deleteRealmIfMigrationNeeded = YES;
+
+    NSURL *bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-pre-null" withExtension:@"realm"];
+    [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
+
+    @autoreleasepool {
+        XCTAssertTrue([[RLMRealm realmWithConfiguration:config error:nil] isEmpty]);
+    }
+
+    bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-old-date" withExtension:@"realm"];
+    [NSFileManager.defaultManager removeItemAtURL:config.fileURL error:nil];
+    [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
+
+    @autoreleasepool {
+        XCTAssertTrue([[RLMRealm realmWithConfiguration:config error:nil] isEmpty]);
+    }
+}
+
 - (void)testFileFormatUpgradeRequiredButDisabled {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.disableFormatUpgrade = true;
@@ -1470,7 +1490,7 @@
     RLMResults *results = [IntObject allObjectsInRealm:realm];
     XCTAssertEqual(0U, results.count);
     XCTAssertEqual(results, [results objectsWhere:@"intCol = 5"]);
-    XCTAssertEqual(results, [results sortedResultsUsingProperty:@"intCol" ascending:YES]);
+    XCTAssertEqual(results, [results sortedResultsUsingKeyPath:@"intCol" ascending:YES]);
     XCTAssertThrows([results objectAtIndex:0]);
     XCTAssertEqual(NSNotFound, [results indexOfObject:self.nonLiteralNil]);
     XCTAssertEqual(NSNotFound, [results indexOfObjectWhere:@"intCol = 5"]);

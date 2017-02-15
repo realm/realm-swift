@@ -19,8 +19,9 @@
 #import "TestUtils.h"
 
 #import <Realm/Realm.h>
-#import <Realm/RLMRealmUtil.hpp>
 #import <Realm/RLMSchema_Private.h>
+
+#import "RLMRealmUtil.hpp"
 
 // This ensures the shared schema is initialized outside of of a test case,
 // so if an exception is thrown, it will kill the test process rather than

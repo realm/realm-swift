@@ -27,17 +27,27 @@
 #import "sync/sync_manager.hpp"
 #import "sync/sync_config.hpp"
 
+#import <realm/sync/protocol.hpp>
+
 using namespace realm;
 
 namespace {
-RLMSyncSessionErrorKind errorKindForSessionError(SyncSessionError error) {
-    switch (error) {
-        case SyncSessionError::AccessDenied:    return RLMSyncSessionErrorKindAccessDenied;
-        case SyncSessionError::Debug:           return RLMSyncSessionErrorKindDebug;
-        case SyncSessionError::SessionFatal:    return RLMSyncSessionErrorKindSessionFatal;
-        case SyncSessionError::UserFatal:       return RLMSyncSessionErrorKindUserFatal;
+using ProtocolError = realm::sync::ProtocolError;
+
+RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
+    if (error.is_client_reset_requested()) {
+        return RLMSyncSystemErrorKindClientReset;
+    } else if (error.error_code == ProtocolError::bad_authentication) {
+        return RLMSyncSystemErrorKindUser;
+    } else if (error.is_session_level_protocol_error()) {
+        return RLMSyncSystemErrorKindSession;
+    } else if (error.is_connection_level_protocol_error()) {
+        return RLMSyncSystemErrorKindConnection;
+    } else if (error.is_client_error()) {
+        return RLMSyncSystemErrorKindClient;
+    } else {
+        return RLMSyncSystemErrorKindUnknown;
     }
-    REALM_UNREACHABLE();
 }
 }
 
@@ -61,6 +71,8 @@ static BOOL isValidRealmURL(NSURL *url) {
 @end
 
 @implementation RLMSyncConfiguration
+
+@dynamic stopPolicy;
 
 - (instancetype)initWithRawConfig:(realm::SyncConfig)config {
     if (self = [super init]) {
@@ -91,6 +103,10 @@ static BOOL isValidRealmURL(NSURL *url) {
     return translateStopPolicy(_config->stop_policy);
 }
 
+- (void)setStopPolicy:(RLMSyncStopPolicy)stopPolicy {
+    _config->stop_policy = translateStopPolicy(stopPolicy);
+}
+
 - (NSURL *)realmURL {
     NSString *rawStringURL = @(_config->realm_url.c_str());
     return [NSURL URLWithString:rawStringURL];
@@ -113,25 +129,28 @@ static BOOL isValidRealmURL(NSURL *url) {
         if (!isValidRealmURL(url)) {
             @throw RLMException(@"The provided URL (%@) was not a valid Realm URL.", [url absoluteString]);
         }
-        auto bindHandler = [=](const std::string& path,
-                              const SyncConfig& config,
-                              const std::shared_ptr<SyncSession>& session) {
-            [user _bindSessionWithPath:path
-                                config:config
-                               session:session
-                            completion:[RLMSyncManager sharedManager].sessionCompletionNotifier
-                          isStandalone:NO];
+        auto bindHandler = [=](auto&,
+                               const SyncConfig& config,
+                               const std::shared_ptr<SyncSession>& session) {
+            [user _bindSessionWithConfig:config
+                                 session:session
+                              completion:[RLMSyncManager sharedManager].sessionCompletionNotifier];
         };
         if (!errorHandler) {
             errorHandler = [=](std::shared_ptr<SyncSession> errored_session,
-                               int error_code,
-                               std::string message,
-                               realm::SyncSessionError error_type) {
+                               SyncError error) {
                 RLMSyncSession *session = [[RLMSyncSession alloc] initWithSyncSession:errored_session];
-                [[RLMSyncManager sharedManager] _fireErrorWithCode:error_code
-                                                           message:@(message.c_str())
+                NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithCapacity:error.user_info.size()];
+                for (auto& pair : error.user_info) {
+                    userInfo[@(pair.first.c_str())] = @(pair.second.c_str());
+                }
+                // FIXME: how should the binding respond if the `is_fatal` bool is true?
+                [[RLMSyncManager sharedManager] _fireErrorWithCode:error.error_code.value()
+                                                           message:@(error.message.c_str())
+                                                           isFatal:error.is_fatal
                                                            session:session
-                                                        errorClass:errorKindForSessionError(error_type)];
+                                                          userInfo:userInfo
+                                                        errorClass:errorKindForSyncError(error)];
             };
         }
 

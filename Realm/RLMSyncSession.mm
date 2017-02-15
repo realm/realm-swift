@@ -24,8 +24,47 @@
 
 using namespace realm;
 
-@interface RLMSyncSession () {
+@interface RLMProgressNotificationToken() {
+    uint64_t _token;
     std::weak_ptr<SyncSession> _session;
+}
+@end
+
+@implementation RLMProgressNotificationToken
+
+- (void)suppressNextNotification {
+    // No-op, but implemented in case this token is passed to
+    // `-[RLMRealm commitWriteTransactionWithoutNotifying:]`.
+}
+
+- (void)stop {
+    if (auto session = _session.lock()) {
+        session->unregister_progress_notifier(_token);
+        _session.reset();
+        _token = 0;
+    }
+}
+
+- (void)dealloc {
+    if (_token != 0) {
+        NSLog(@"RLMProgressNotificationToken released without unregistering a notification. "
+              @"You must hold on to the RLMProgressNotificationToken and call "
+              @"-[RLMProgressNotificationToken stop] when you no longer wish to receive "
+              @"progress update notifications.");
+    }
+}
+
+- (nullable instancetype)initWithTokenValue:(uint64_t)token
+                                    session:(std::shared_ptr<SyncSession>)session {
+    if (token == 0) {
+        return nil;
+    }
+    if (self = [super init]) {
+        _token = token;
+        _session = session;
+        return self;
+    }
+    return nil;
 }
 
 @end
@@ -105,6 +144,30 @@ using namespace realm;
         return YES;
     }
     return NO;
+}
+
+- (RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
+                                                                 mode:(RLMSyncProgress)mode
+                                                                block:(RLMProgressNotificationBlock)block {
+    if (auto session = _session.lock()) {
+        if (session->state() == SyncSession::PublicState::Error) {
+            return nil;
+        }
+        // Get the current runloop, or create one if necessary.
+        CFRunLoopRef currentRunLoop = CFRunLoopGetCurrent();
+        auto notifier_direction = (direction == RLMSyncProgressDirectionUpload
+                                   ? SyncSession::NotifierType::upload
+                                   : SyncSession::NotifierType::download);
+        bool is_streaming = (mode == RLMSyncProgressReportIndefinitely);
+        uint64_t token = session->register_progress_notifier([=](uint64_t transferred, uint64_t transferrable) {
+            CFRunLoopPerformBlock(currentRunLoop, kCFRunLoopCommonModes, ^{
+                block((NSUInteger)transferred, (NSUInteger)transferrable);
+            });
+            CFRunLoopWakeUp(currentRunLoop);
+        }, notifier_direction, is_streaming);
+        return [[RLMProgressNotificationToken alloc] initWithTokenValue:token session:std::move(session)];
+    }
+    return nil;
 }
 
 @end

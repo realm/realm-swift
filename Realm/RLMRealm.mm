@@ -33,6 +33,7 @@
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
 #import "RLMSyncManager_Private.h"
+#import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
 
@@ -297,9 +298,15 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         return nil;
     }
 
+    RLMSchema *cachedRealmSchema;
+    @autoreleasepool {
+        // ensure that cachedRealm doesn't end up in this thread's autorelease pool
+        cachedRealmSchema = RLMGetAnyCachedRealmForPath(config.path).schema;
+    }
+
     // if we have a cached realm on another thread, copy without a transaction
-    if (RLMRealm *cachedRealm = RLMGetAnyCachedRealmForPath(config.path)) {
-        RLMRealmSetSchemaAndAlign(realm, cachedRealm.schema);
+    if (cachedRealmSchema) {
+        RLMRealmSetSchemaAndAlign(realm, cachedRealmSchema);
     }
     else if (dynamic) {
         RLMRealmSetSchemaAndAlign(realm, [RLMSchema dynamicSchemaFromObjectStoreSchema:realm->_realm->schema()]);
@@ -352,6 +359,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
     if (!readOnly) {
         realm->_realm->m_binding_context = RLMCreateBindingContext(realm);
+        realm->_realm->m_binding_context->realm = realm->_realm;
     }
 
     return RLMAutorelease(realm);
@@ -516,6 +524,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         }
         objectInfo.second.releaseTable();
     }
+}
+
+- (nullable id)resolveThreadSafeReference:(RLMThreadSafeReference *)reference {
+    return [reference resolveReferenceInRealm:self];
 }
 
 /**

@@ -22,10 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncUser (ObjectServerTests)
 
-// NOTE: Don't use these from Objective-C directly. Use the XCTest macros instead.
-
 - (BOOL)waitForUploadToFinish:(NSURL *)url;
 - (BOOL)waitForDownloadToFinish:(NSURL *)url;
+
+- (void)simulateClientResetErrorForSession:(NSURL *)url;
 
 @end
 

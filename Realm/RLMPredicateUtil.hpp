@@ -16,6 +16,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <functional>
 
-using ExpressionVisitor = NSExpression *(*)(NSExpression *);
+using ExpressionVisitor = std::function<NSExpression *(NSExpression *)>;
 NSPredicate *transformPredicate(NSPredicate *, ExpressionVisitor);

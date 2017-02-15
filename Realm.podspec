@@ -36,9 +36,13 @@ Pod::Spec.new do |s|
                               'include/**/RLMSyncCredentials.h',
                               'include/**/RLMSyncManager.h',
                               'include/**/RLMSyncPermissionChange.h',
+                              'include/**/RLMSyncPermissionOffer.h',
+                              'include/**/RLMSyncPermissionOfferResponse.h',
                               'include/**/RLMSyncSession.h',
                               'include/**/RLMSyncUser.h',
                               'include/**/RLMSyncUtil.h',
+                              'include/**/RLMThreadSafeReference.h',
+                              'include/**/NSError+RLMSync.h',
                               'include/**/Realm.h',
 
                               # Realm.Dynamic module
@@ -61,7 +65,7 @@ Pod::Spec.new do |s|
                               'Realm/ObjectStore/src/util/*.cpp',
                               'Realm/ObjectStore/src/util/apple/*.cpp'
 
-  s.module_map              = 'Realm/module.modulemap'
+  s.module_map              = 'Realm/Realm.modulemap'
   s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__ -DREALM_ENABLE_SYNC"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
   s.source_files            = source_files + private_header_files
