@@ -122,11 +122,11 @@ NS_ASSUME_NONNULL_BEGIN
  Register a progress notification block.
 
  Multiple blocks can be registered with the same session at once. Each block
- will be invoked from the runloop of the thread on which it was registered,
- creating a new runloop if none exists. If the session has already received
- progress information from the synchronization subsystem, the block will be
- called immediately. Otherwise, it will be called as soon as progress
- information becomes available.
+ will be invoked on a side queue devoted to progress notifications.
+ 
+ If the session has already received progress information from the
+ synchronization subsystem, the block will be called immediately. Otherwise, it
+ will be called as soon as progress information becomes available.
 
  The token returned by this method must be retained as long as progress
  notifications are desired, and the `-stop` method should be called on it
@@ -152,6 +152,7 @@ NS_ASSUME_NONNULL_BEGIN
                                                                           mode:(RLMSyncProgress)mode
                                                                          block:(RLMProgressNotificationBlock)block
 NS_REFINED_FOR_SWIFT;
+
 @end
 
 NS_ASSUME_NONNULL_END

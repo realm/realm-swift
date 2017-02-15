@@ -23,6 +23,8 @@ x.x.x Release notes (yyyy-MM-dd)
   non-nil value when passed in an invalid URL.
 * `SyncSession.Progress.fractionTransferred` now returns 1 if there are no
   transferrable bytes.
+* Fix sync progress notifications registered on background threads by always
+  dispatching on a dedicated background queue.
 * Fix compilation issues with Xcode 8.3 beta 2.
 * Fix incorrect sync progress notification values for Realms originally created
   using a version of Realm prior to 2.3.0.
