@@ -53,15 +53,6 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
 /// A block type used to asynchronously report permission changes.
 typedef void(^RLMSyncPermissionChangeBlock)(RLMSyncManagementObjectStatus, NSError * _Nullable);
 
-/**
- A block type used to asynchronously report offer changes.
-
- The first argument is the status of the offer. The second argument, if
- present, is the token associated with the offer. The third argument, if
- present, is an `NSError` describing what went wrong.
- */
-typedef void(^RLMSyncOfferChangeBlock)(RLMSyncManagementObjectStatus, NSString * _Nullable, NSError * _Nullable);
-
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -101,6 +92,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMSyncUserState state;
 
+#pragma mark - Login/logout
+
 /**
  Create, log in, and asynchronously return a new user object, specifying a custom timeout for the network request.
  Credentials identifying the user must be passed in. The user becomes available in the completion block, at which point
@@ -129,6 +122,8 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (void)logOut;
 
+#pragma mark - Sessions
+
 /**
  Retrieve a valid session object belonging to this user for a given URL, or `nil` if no such object exists.
  */
@@ -139,9 +134,11 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (NSArray<RLMSyncSession *> *)allSessions;
 
+#pragma mark - Permissions
+
 /**
- Given the URL of a Realm managed by this user, modify permissions of
- that Realm for a different user.
+ Given a synced Realm managed by this user, set the permissions of a
+ different user with respect to that Realm.
 
  If no URL is passed in, the permission changes will be applied to ALL
  synced Realms managed by this user.
@@ -157,96 +154,14 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  @param permissions     The new permissions to be set.
  @param callback        An optional block through which the progress of
                         the permission change operation can be reported.
- @returns   If `callback` was specified, a notification token. Hold onto
-            the token for as long as callback status updates are desired.
-            Call `-stop` on the token before destroying it.
+                        The callback will be periodically called until
+                        the permissions change has been resolved by the
+                        server.
  */
-- (nullable RLMNotificationToken *)modifyRealmPermissionsForURL:(nullable NSURL *)realmURL
-                                                   userIdentity:(nullable NSString *)identity
-                                                    permissions:(RLMSyncRealmPermission)permissions
-                                                       callback:(nullable RLMSyncPermissionChangeBlock)callback
-NS_REFINED_FOR_SWIFT;
-
-/**
- Create a permission offer.
-
- A permission offer is repesented by a portable string token which can be
- given to another user through any convenient means (such as email). It
- represents offering certain permissions to the recepient, allowing them
- to work with a synced Realm managed by this user.
-
- The token itself is returned asynchronously through the `callback` block.
- It is this token string which can be sent to a different user and then
- passed into `-acceptOffer:callback:` to accept the offer. Do not confuse
- this token with the identifier returned immediately by this method.
-
- @param realmURL        The URL of the synced Realm on the server.
- @param date            The date when the offer should expire. If nil, the
-                        offer will never expire.
- @param permissions     The permissions that the offer should include.
- @param token           A pointer to a notification token object, through
-                        which a notification token should be passed out.
- @param callback        A block through which the status of the permission
-                        offer creation process should be reported.
- @return    An identifier for the newly-created permission offer. This
-            identifier can be passed into any method taking an `offerKey`
-            parameter. Do not confuse this with the permission offer's
-            token, which is passed back asynchronously through the callback
-            once the server has processed the request.
- */
-- (NSString *)offerPermissionsForURL:(NSURL *)realmURL
-                          expiration:(nullable NSDate *)date
-                         permissions:(RLMSyncRealmPermission)permissions
-                               token:(RLMNotificationToken * _Nullable __autoreleasing * _Nonnull)token
-                            callback:(RLMSyncOfferChangeBlock)callback
-NS_REFINED_FOR_SWIFT;
-
-// TODO: does this really need a callback? Won't the object just be deleted immediately?
-/**
- Revoke a permission offer which was previously generated.
-
- @param offerKey        The identifier of the previously-generated permission
-                        offer (not the token).
- @param callback        An optional callback block, to asynchronously report
-                        the progress of the operation.
- @return    If a callback was specified, this will be a Realm notification
-            token. Call `-stop` if you want to deactivate the callback.
- */
-- (nullable RLMNotificationToken *)deleteOffer:(NSString *)offerKey
-                                      callback:(nullable RLMSyncOfferChangeBlock)callback
-NS_REFINED_FOR_SWIFT;
-
-/**
- Given a key representing an existing permission offer, register a callback
- on that offer.
-
- This method is useful if you wish to observe offers across app restarts.
- The offer key can be persisted in whatever way is convenient (for example,
- in a Realm), and then retrieved the next time the app is launched.
-
- @param offerKey        The identifier of the previously-generated permission
-                        offer (not the token).
- @param callback        A callback block, to asynchronously report
-                        the progress of the operation.
- @return    A Realm notification token. Call `-stop` if you want to deactivate
-            the callback.
- */
-- (nullable RLMNotificationToken *)addCallbackToExistingOffer:(NSString *)offerKey
-                                                     callback:(RLMSyncOfferChangeBlock)callback
-NS_REFINED_FOR_SWIFT;
-
-/**
- Given a token representing a permission offer generated by a different user,
- accept that offer.
-
- @param token           The token (not identifier) of a permission offer.
- @param callback        An optional callback block, to asynchronously report
-                        the progress of the operation.
- @return    If a callback was specified, this will be a Realm notification
-            token. Call `-stop` if you want to deactivate the callback.
- */
-- (nullable RLMNotificationToken *)acceptOffer:(NSString *)token
-                                      callback:(nullable RLMSyncOfferChangeBlock)callback
+- (void)setPermissions:(RLMSyncRealmPermission)permissions
+         forRealmAtURL:(nullable NSURL *)realmURL
+               forUser:(nullable NSString *)identity
+              callback:(nullable RLMSyncPermissionChangeBlock)callback
 NS_REFINED_FOR_SWIFT;
 
 /**
@@ -256,6 +171,8 @@ NS_REFINED_FOR_SWIFT;
  This includes granting other users access to Realms.
  */
 - (RLMRealm *)managementRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
+
+#pragma mark - Miscellaneous
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));
