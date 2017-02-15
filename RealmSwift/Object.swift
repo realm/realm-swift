@@ -202,7 +202,7 @@ open class Object: RLMObjectBase, ThreadConfined {
      deletes the object or modifies any of the managed properties of the object,
      including self-assignments that set a property to its existing value.
 
-     For write transactions performed on different threads or in differen
+     For write transactions performed on different threads or in different
      processes, the block will be called when the managing Realm is
      (auto)refreshed to a version including the changes, while for local write
      transactions it will be called at some point in the future after the write
@@ -213,7 +213,7 @@ open class Object: RLMObjectBase, ThreadConfined {
      notifications can't be delivered instantly, multiple notifications may be
      coalesced into a single notification.
 
-     Unlike with List` and `Results`, there is no "initial" callback made after
+     Unlike with `List` and `Results`, there is no "initial" callback made after
      you add a new notification block.
 
      Only objects which are managed by a Realm can be observed in this way. You
