@@ -202,7 +202,7 @@ open class Object: RLMObjectBase, ThreadConfined {
      deletes the object or modifies any of the managed properties of the object,
      including self-assignments that set a property to its existing value.
 
-     For write transactions performed on different threads or in differen
+     For write transactions performed on different threads or in different
      processes, the block will be called when the managing Realm is
      (auto)refreshed to a version including the changes, while for local write
      transactions it will be called at some point in the future after the write
@@ -213,7 +213,7 @@ open class Object: RLMObjectBase, ThreadConfined {
      notifications can't be delivered instantly, multiple notifications may be
      coalesced into a single notification.
 
-     Unlike with List` and `Results`, there is no "initial" callback made after
+     Unlike with `List` and `Results`, there is no "initial" callback made after
      you add a new notification block.
 
      Only objects which are managed by a Realm can be observed in this way. You
@@ -313,11 +313,11 @@ public struct PropertyChange {
 
     /**
      Value of the property before the change occurred. This is not supplied if
-     the change happened on the same thread as the notification and for List
+     the change happened on the same thread as the notification and for `List`
      properties.
 
      For object properties this will give the object which was previously
-     linked to, but that boject will have its new values and not the values it
+     linked to, but that object will have its new values and not the values it
      had before the changes. This means that `previousValue` may be a deleted
      object, and you will need to check `isInvalidated` before accessing any
      of its properties.
@@ -326,13 +326,13 @@ public struct PropertyChange {
 
     /**
      The value of the property after the change occurred. This is not supplied
-     for List properties and will always be nil.
+     for `List` properties and will always be nil.
     */
     public let newValue: Any?
 }
 
 /**
- Information about the changes made to an object which is passed to `Object's
+ Information about the changes made to an object which is passed to `Object`'s
  notification blocks.
  */
 public enum ObjectChange {
@@ -341,7 +341,7 @@ public enum ObjectChange {
      result and an `NSError` containing details about the error. Currently the
      only errors which can occur are when opening the Realm on a background
      worker thread to calculate the change set. The callback will never be
-     called again after .error is delivered.
+     called again after `.error` is delivered.
      */
     case error(_: NSError)
     /**
