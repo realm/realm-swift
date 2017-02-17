@@ -2638,7 +2638,7 @@ struct NullTestData {
 - (RLMRealm *)realm {
     @autoreleasepool {
         NSSet *classNames = [NSSet setWithArray:@[@"AllTypesObject", @"QueryObject", @"PersonObject", @"DogObject",
-                                                  @"EmployeeObject", @"CompanyObject"]];
+                                                  @"EmployeeObject", @"CompanyObject", @"OwnerObject"]];
         RLMSchema *schema = [RLMSchema.sharedSchema copy];
         NSMutableArray *objectSchemas = [schema.objectSchema mutableCopy];
         for (NSUInteger i = 0; i < objectSchemas.count; i++) {
