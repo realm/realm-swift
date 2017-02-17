@@ -31,6 +31,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix LLDB integration to be able to display summaries of `RLMResults` once more.
 * Reject Swift properties with names which cause them to fall in to ARC method
   families rather than crashing when they are accessed.
+* Fix sorting by key path when the declared property order doesn't match the order
+  of properties in the Realm file, which can happen when properties are added in
+  different schema versions.
 
 2.4.2 Release notes (2017-01-30)
 =============================================================
