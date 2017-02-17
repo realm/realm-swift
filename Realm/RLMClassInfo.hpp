@@ -77,7 +77,8 @@ public:
     NSUInteger tableColumn(NSString *propertyName) const;
     NSUInteger tableColumn(RLMProperty *property) const;
 
-    RLMClassInfo &linkTargetType(size_t index);
+    // Get the info for the target of the link at the given property index.
+    RLMClassInfo &linkTargetType(size_t propertyIndex);
 
     void releaseTable() { m_table = nullptr; }
 
