@@ -22,7 +22,7 @@
 #import "RLMObjectSchema_Private.h"
 #import "RLMObject_Private.hpp"
 #import "RLMPredicateUtil.hpp"
-#import "RLMProperty.h"
+#import "RLMProperty_Private.h"
 #import "RLMSchema.h"
 #import "RLMUtil.hpp"
 
@@ -1362,7 +1362,7 @@ std::vector<size_t> RLMValidatedColumnIndicesForSort(RLMClassInfo& classInfo, NS
     auto currentClassInfo = &classInfo;
     for (RLMProperty *link : keyPath.links) {
         auto tableColumn = currentClassInfo->tableColumn(link);
-        currentClassInfo = &currentClassInfo->linkTargetType(tableColumn);
+        currentClassInfo = &currentClassInfo->linkTargetType(link.index);
         columnIndices.push_back(tableColumn);
     }
     columnIndices.push_back(currentClassInfo->tableColumn(keyPath.property));

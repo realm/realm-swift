@@ -154,15 +154,15 @@ static inline RLMObjectBase *RLMGetLinkedObjectForValue(__unsafe_unretained RLMR
 }
 
 // link getter/setter
-static inline RLMObjectBase *RLMGetLink(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex) {
+static inline RLMObjectBase *RLMGetLink(__unsafe_unretained RLMObjectBase *const obj, NSUInteger propertyIndex) {
     RLMVerifyAttached(obj);
-    auto col = obj->_info->objectSchema->persisted_properties[colIndex].table_column;
+    auto colIndex = obj->_info->objectSchema->persisted_properties[propertyIndex].table_column;
 
-    if (obj->_row.is_null_link(col)) {
+    if (obj->_row.is_null_link(colIndex)) {
         return nil;
     }
-    NSUInteger index = obj->_row.get_link(col);
-    return RLMCreateObjectAccessor(obj->_realm, obj->_info->linkTargetType(colIndex), index);
+    NSUInteger index = obj->_row.get_link(colIndex);
+    return RLMCreateObjectAccessor(obj->_realm, obj->_info->linkTargetType(propertyIndex), index);
 }
 
 static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,

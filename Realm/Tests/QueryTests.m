@@ -2637,13 +2637,17 @@ struct NullTestData {
 @implementation QueryWithReversedColumnOrderTests
 - (RLMRealm *)realm {
     @autoreleasepool {
-        NSArray *classNames = @[@"AllTypesObject", @"QueryObject",
-                                @"PersonObject", @"DogObject",
-                                @"EmployeeObject", @"CompanyObject"];
+        NSSet *classNames = [NSSet setWithArray:@[@"AllTypesObject", @"QueryObject", @"PersonObject", @"DogObject",
+                                                  @"EmployeeObject", @"CompanyObject", @"OwnerObject"]];
         RLMSchema *schema = [RLMSchema.sharedSchema copy];
-        for (NSString *className in classNames) {
-            [self reverseProperties:schema[className]];
+        NSMutableArray *objectSchemas = [schema.objectSchema mutableCopy];
+        for (NSUInteger i = 0; i < objectSchemas.count; i++) {
+            RLMObjectSchema *objectSchema = objectSchemas[i];
+            if ([classNames member:objectSchema.className]) {
+                objectSchemas[i] = [self reverseProperties:objectSchema];
+            }
         }
+        schema.objectSchema = objectSchemas;
         RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
         config.customSchema = schema;
         [RLMRealm realmWithConfiguration:config error:nil];
