@@ -72,6 +72,7 @@ using namespace realm;
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer {
     if (self = [super init]) {
         self.authenticationServer = authServer;
+        self.refreshHandles = [NSMutableDictionary dictionary];
         return self;
     }
     return nil;
