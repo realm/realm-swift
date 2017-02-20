@@ -316,11 +316,31 @@ using namespace realm;
          forRealmAtURL:(NSURL *)realmURL
                forUser:(NSString *)identity
               callback:(RLMSyncPermissionChangeBlock)callback {
+    [self changePermissions:permissions forRealmAtURL:realmURL forUser:identity callback:callback additive:NO];
+}
+
+- (void)addPermissions:(RLMSyncRealmPermission)permissions
+         forRealmAtURL:(NSURL *)realmURL
+               forUser:(NSString *)identity
+              callback:(RLMSyncPermissionChangeBlock)callback {
+    [self changePermissions:permissions forRealmAtURL:realmURL forUser:identity callback:callback additive:YES];
+}
+
+- (void)changePermissions:(RLMSyncRealmPermission)permissions
+         forRealmAtURL:(NSURL *)realmURL
+               forUser:(NSString *)identity
+              callback:(RLMSyncPermissionChangeBlock)callback
+              additive:(BOOL)additive {
     NSString *url = [realmURL absoluteString] ?: @"*";
     NSString *userID = identity ?: @"*";
-    BOOL read = (permissions & RLMSyncRealmPermissionRead) != 0;
-    BOOL write = (permissions & RLMSyncRealmPermissionWrite) != 0;
-    BOOL manage = (permissions & RLMSyncRealmPermissionManage) != 0;
+    NSNumber *read = @((permissions & RLMSyncRealmPermissionRead) != 0);
+    NSNumber *write = @((permissions & RLMSyncRealmPermissionWrite) != 0);
+    NSNumber *manage = @((permissions & RLMSyncRealmPermissionManage) != 0);
+    if (additive) {
+        read = [read boolValue] ? @(YES) : nil;
+        write = [write boolValue] ? @(YES) : nil;
+        manage = [manage boolValue] ? @(YES) : nil;
+    }
     NSError *error = nil;
     RLMRealm *management = [self managementRealmWithError:&error];
     if (error) {
@@ -331,9 +351,9 @@ using namespace realm;
     }
     RLMSyncPermissionChange *change = [RLMSyncPermissionChange permissionChangeWithRealmURL:url
                                                                                      userID:userID
-                                                                                       read:@(read)
-                                                                                      write:@(write)
-                                                                                     manage:@(manage)];
+                                                                                       read:read
+                                                                                      write:write
+                                                                                     manage:manage];
     [management transactionWithBlock:^{
         [management addObject:change];
     } error:&error];

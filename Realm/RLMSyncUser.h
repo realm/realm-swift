@@ -165,6 +165,22 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 NS_REFINED_FOR_SWIFT;
 
 /**
+ Given a synced Realm managed by this user, add to the permissions of a
+ different user with respect to that Realm.
+
+ Any permissions present in the bitmask will be added, those absent in
+ the bitmask will be left unchanged (whether originally set or not).
+
+ @see `[RLMSyncUser setPermissions:forRealmAtURL:forUser:callback:]`
+ */
+- (void)addPermissions:(RLMSyncRealmPermission)permissions
+         forRealmAtURL:(NSURL *)realmURL
+               forUser:(NSString *)identity
+              callback:(nullable RLMSyncPermissionChangeBlock)callback
+NS_REFINED_FOR_SWIFT;
+
+
+/**
  Returns an instance of the Management Realm owned by the user.
 
  This Realm can be used to control access permissions for Realms managed by the user.
