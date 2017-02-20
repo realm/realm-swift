@@ -248,8 +248,9 @@ using namespace realm;
                            kRLMSyncAppIDKey: [RLMSyncManager sharedManager].appID,
                            };
 
+    __weak RLMSyncSessionRefreshHandle *weakSelf = self;
     RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
-        [self _onRefreshCompletionWithError:error json:json];
+        [weakSelf _onRefreshCompletionWithError:error json:json];
     };
     [RLMNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
                                      server:user.authenticationServer
