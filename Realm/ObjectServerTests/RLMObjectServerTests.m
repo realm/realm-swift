@@ -19,6 +19,7 @@
 #import "RLMSyncTestCase.h"
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncUser+ObjectServerTests.h"
+#import "RLMSyncUtil_Private.h"
 
 #define ACCOUNT_NAME() NSStringFromSelector(_cmd)
 #define CUSTOM_REALM_URL(realm_identifier) \
@@ -121,6 +122,34 @@
 
         [expectation fulfill];
     }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+/// Errors reported in RLMSyncManager.errorHandler shouldn't contain sync error domain errors as underlying error
+- (void)testSyncErrorHandlerErrorDomain {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
+    XCTAssertNotNil(user);
+
+    NSURL *realmURL = [NSURL URLWithString:@"realm://localhost:9080/THE_PATH_USER_DONT_HAVE_ACCESS_TO/test"];
+
+    RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
+    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:realmURL];
+
+    NSError *error = nil;
+    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:&error];
+    XCTAssertNil(error);
+    XCTAssertTrue(realm.isEmpty);
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    [RLMSyncManager sharedManager].errorHandler = ^(__unused NSError *error,
+                                                    __unused RLMSyncSession *session) {
+        XCTAssertTrue([error.domain isEqualToString:RLMSyncErrorDomain]);
+        XCTAssertFalse([[error.userInfo[kRLMSyncUnderlyingErrorKey] domain] isEqualToString:RLMSyncErrorDomain]);
+        [expectation fulfill];
+    };
+
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
