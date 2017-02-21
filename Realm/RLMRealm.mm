@@ -56,8 +56,11 @@ using util::File;
 
 @interface RLMRealm ()
 @property (nonatomic, strong) NSHashTable<RLMRealmNotificationToken *> *notificationHandlers;
+@property (class, nonatomic, readonly) dispatch_queue_t asyncOpenDispatchQueue;
 - (void)sendNotifications:(RLMNotification)notification;
 @end
+
+static BOOL(^s_customAsyncOpenHandler)(RLMRealm *, dispatch_queue_t, RLMAsynchronouslyOpenRealmCallback) = nil;
 
 void RLMDisableSyncToDisk() {
     realm::disable_sync_to_disk();
@@ -180,6 +183,53 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     configuration.fileURL = fileURL;
     return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
+
++ (dispatch_queue_t)asyncOpenDispatchQueue {
+    static dispatch_queue_t queue;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue", DISPATCH_QUEUE_CONCURRENT);
+    });
+    return queue;
+}
+
++ (void)setCustomAsyncOpenHandler:(BOOL(^)(RLMRealm *, dispatch_queue_t, RLMAsynchronouslyOpenRealmCallback))handler {
+    // TODO: should this be managed using a lock?
+    s_customAsyncOpenHandler = handler;
+}
+
++ (void)openAsynchronouslyWithConfiguration:(RLMRealmConfiguration *)configuration
+                                      queue:(dispatch_queue_t)queue
+                                   callback:(RLMAsynchronouslyOpenRealmCallback)callback {
+    dispatch_async(RLMRealm.asyncOpenDispatchQueue, ^{
+        NSError *error = nil;
+        @autoreleasepool {
+            RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
+            if (realm && !error) {
+                if (s_customAsyncOpenHandler && s_customAsyncOpenHandler(realm, queue, callback)) {
+                    return;
+                }
+                // Default behavior: just dispatch onto the destination queue and open the Realm.
+                dispatch_async(queue, ^{
+                    @autoreleasepool {
+                        NSError *error = nil;
+                        RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
+                        if (error) {
+                            callback(nil, error);
+                        } else {
+                            callback(localRealm, nil);
+                        }
+                    }
+                });
+            } else {
+                dispatch_async(queue, ^{
+                    callback(nil, error);
+                });
+            }
+        }
+    });
+}
+
 // ARC tries to eliminate calls to autorelease when the value is then immediately
 // returned, but this results in significantly different semantics between debug
 // and release builds for RLMRealm, so force it to always autorelease.
