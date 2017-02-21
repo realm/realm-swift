@@ -20,7 +20,7 @@
 
 #import "RLMSyncUtil.h"
 
-@class RLMSyncUser, RLMSyncCredentials, RLMNotificationToken, RLMSyncSession, RLMRealm;
+@class RLMSyncUser, RLMSyncCredentials, RLMSyncSession, RLMRealm;
 
 /**
  The state of the user object.
