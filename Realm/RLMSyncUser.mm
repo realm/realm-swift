@@ -312,25 +312,18 @@ using namespace realm;
     [self.inFlightPermissionNotifications removeObjectForKey:@(key)];
 }
 
-- (void)setPermissions:(RLMSyncRealmPermission)permissions
-         forRealmAtURL:(NSURL *)realmURL
-               forUser:(NSString *)identity
-              callback:(RLMSyncPermissionChangeBlock)callback {
-    [self changePermissions:permissions forRealmAtURL:realmURL forUser:identity callback:callback additive:NO];
-}
-
-- (void)addPermissions:(RLMSyncRealmPermission)permissions
-         forRealmAtURL:(NSURL *)realmURL
-               forUser:(NSString *)identity
-              callback:(RLMSyncPermissionChangeBlock)callback {
-    [self changePermissions:permissions forRealmAtURL:realmURL forUser:identity callback:callback additive:YES];
+- (void)changePermissions:(RLMSyncRealmPermission)permissions
+            forRealmAtURL:(NSURL *)realmURL
+                  forUser:(NSString *)identity
+                 callback:(RLMSyncPermissionChangeBlock)callback {
+    [self changePermissions:permissions forRealmAtURL:realmURL forUser:identity additiveMode:NO callback:callback];
 }
 
 - (void)changePermissions:(RLMSyncRealmPermission)permissions
-         forRealmAtURL:(NSURL *)realmURL
-               forUser:(NSString *)identity
-              callback:(RLMSyncPermissionChangeBlock)callback
-              additive:(BOOL)additive {
+            forRealmAtURL:(NSURL *)realmURL
+                  forUser:(NSString *)identity
+             additiveMode:(BOOL)additive
+                 callback:(RLMSyncPermissionChangeBlock)callback {
     NSString *url = [realmURL absoluteString] ?: @"*";
     NSString *userID = identity ?: @"*";
     NSNumber *read = @((permissions & RLMSyncRealmPermissionRead) != 0);
