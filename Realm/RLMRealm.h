@@ -19,7 +19,9 @@
 #import <Foundation/Foundation.h>
 #import "RLMConstants.h"
 
-@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference;
+@class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference;
+
+typedef void(^RLMAsynchronouslyOpenRealmCallback)(RLMRealm * _Nullable realm, NSError * _Nullable error);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -89,6 +91,26 @@ NS_ASSUME_NONNULL_BEGIN
  @return An `RLMRealm` instance.
  */
 + (instancetype)realmWithURL:(NSURL *)fileURL;
+
+/**
+ Open a Realm asynchronously on a side queue, and then invoke a callback upon either
+ success or failure.
+
+ Opening a Realm asynchronously may be useful if, for example, a time-consuming
+ migration might be necessary. As well, if synchronized Realms are supported and the
+ `waitForServerChanges` flag is set on the sync configuration, the callback block
+ will only be called once the Realm has successfully downloaded a set of changes.
+
+ @param configuration A configuration object to use when creating the Realm.
+ @param queue         The dispatch queue on which the callback should be run.
+ @param callback      A callback block. If the Realm was successfully opened, an
+                      opened Realm will be passed in as an argument.
+                      Otherwise, an `NSError` describing what went wrong will be
+                      passed to the block instead.
+ */
++ (void)openAsynchronouslyWithConfiguration:(RLMRealmConfiguration *)configuration
+                                      queue:(dispatch_queue_t)queue
+                                   callback:(RLMAsynchronouslyOpenRealmCallback)callback;
 
 /**
  The `RLMSchema` used by the Realm.

@@ -47,6 +47,17 @@ void RLMRealmTranslateException(NSError **error);
 - (void)verifyThread;
 - (void)verifyNotificationsAreSupported;
 
+/**
+ Set a custom handler that runs in the context of `openAsynchronouslyWithConfiguration:queue:callback:`
+ once the Realm has been successfully opened on the background queue. This defaults to
+ nil; if so, the Realm is simply re-opened on the destination queue. It should be set at
+ most one time, and is intended as a customization point for the sync subsystem.
+
+ The custom handler should take in a Realm and a dispatch queue; it should return NO
+ only if the default behavior should be executed.
+ */
++ (void)setCustomAsyncOpenHandler:(BOOL(^)(RLMRealm *, dispatch_queue_t, RLMAsynchronouslyOpenRealmCallback))handler;
+
 @end
 
 NS_ASSUME_NONNULL_END
