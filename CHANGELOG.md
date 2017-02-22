@@ -21,7 +21,7 @@
 * Fix an issue where values set on a Realm object using `setValue(value:, forKey:)`
   that were not themselves Realm objects were not properly converted into Realm
   objects or checked for validity.
-* Fix an issue where `-[RLMSyncUser sessionForURL:]` could erronenously return a
+* Fix an issue where `-[RLMSyncUser sessionForURL:]` could erroneously return a
   non-nil value when passed in an invalid URL.
 * `SyncSession.Progress.fractionTransferred` now returns 1 if there are no
   transferrable bytes.
