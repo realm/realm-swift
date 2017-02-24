@@ -719,6 +719,118 @@
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
 }
 
+- (void)testObjectAggregate {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    AggregateArrayObject *obj = [AggregateArrayObject new];
+    XCTAssertEqual(0, [obj.array sumOfProperty:@"intCol"].intValue);
+    XCTAssertNil([obj.array averageOfProperty:@"intCol"]);
+    XCTAssertNil([obj.array minOfProperty:@"intCol"]);
+    XCTAssertNil([obj.array maxOfProperty:@"intCol"]);
+
+    NSDate *dateMinInput = [NSDate date];
+    NSDate *dateMaxInput = [dateMinInput dateByAddingTimeInterval:1000];
+
+    [realm transactionWithBlock:^{
+        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@1, @0.0f, @2.5, @NO, dateMaxInput]];
+        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+        [AggregateObject createInRealm:realm withValue:@[@0, @1.2f, @0.0, @YES, dateMinInput]];
+
+        [obj.array addObjects:[AggregateObject allObjectsInRealm:realm]];
+    }];
+
+    void (^test)() = ^{
+        RLMArray *array = obj.array;
+
+        // SUM
+        XCTAssertEqual([array sumOfProperty:@"intCol"].integerValue, 4);
+        XCTAssertEqualWithAccuracy([array sumOfProperty:@"floatCol"].floatValue, 7.2f, 0.1f);
+        XCTAssertEqualWithAccuracy([array sumOfProperty:@"doubleCol"].doubleValue, 10.0, 0.1f);
+        RLMAssertThrowsWithReasonMatching([array sumOfProperty:@"foo"], @"foo.*AggregateObject");
+        RLMAssertThrowsWithReasonMatching([array sumOfProperty:@"boolCol"], @"sum.*bool");
+        RLMAssertThrowsWithReasonMatching([array sumOfProperty:@"dateCol"], @"sum.*date");
+
+        // Average
+        XCTAssertEqualWithAccuracy([array averageOfProperty:@"intCol"].doubleValue, 0.4, 0.1f);
+        XCTAssertEqualWithAccuracy([array averageOfProperty:@"floatCol"].doubleValue, 0.72, 0.1f);
+        XCTAssertEqualWithAccuracy([array averageOfProperty:@"doubleCol"].doubleValue, 1.0, 0.1f);
+        RLMAssertThrowsWithReasonMatching([array averageOfProperty:@"foo"], @"foo.*AggregateObject");
+        RLMAssertThrowsWithReasonMatching([array averageOfProperty:@"boolCol"], @"average.*bool");
+        RLMAssertThrowsWithReasonMatching([array averageOfProperty:@"dateCol"], @"average.*date");
+
+        // MIN
+        XCTAssertEqual(0, [[array minOfProperty:@"intCol"] intValue]);
+        XCTAssertEqual(0.0f, [[array minOfProperty:@"floatCol"] floatValue]);
+        XCTAssertEqual(0.0, [[array minOfProperty:@"doubleCol"] doubleValue]);
+        XCTAssertEqualObjects(dateMinInput, [array minOfProperty:@"dateCol"]);
+        RLMAssertThrowsWithReasonMatching([array minOfProperty:@"foo"], @"foo.*AggregateObject");
+        RLMAssertThrowsWithReasonMatching([array minOfProperty:@"boolCol"], @"min.*bool");
+
+        // MAX
+        XCTAssertEqual(1, [[array maxOfProperty:@"intCol"] intValue]);
+        XCTAssertEqual(1.2f, [[array maxOfProperty:@"floatCol"] floatValue]);
+        XCTAssertEqual(2.5, [[array maxOfProperty:@"doubleCol"] doubleValue]);
+        XCTAssertEqualObjects(dateMaxInput, [array maxOfProperty:@"dateCol"]);
+        RLMAssertThrowsWithReasonMatching([array maxOfProperty:@"foo"], @"foo.*AggregateObject");
+        RLMAssertThrowsWithReasonMatching([array maxOfProperty:@"boolCol"], @"max.*bool");
+    };
+
+    test();
+    [realm transactionWithBlock:^{ [realm addObject:obj]; }];
+    test();
+}
+
+- (void)testValueForCollectionOperationKeyPath
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    EmployeeObject *c1e1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
+    EmployeeObject *c1e2 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"John", @"age": @30, @"hired": @NO}];
+    EmployeeObject *c1e3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"Jill", @"age": @25, @"hired": @YES}];
+    [CompanyObject createInRealm:realm withValue:@{@"name": @"InspiringNames LLC", @"employees": @[c1e1, c1e2, c1e3]}];
+
+    EmployeeObject *c2e1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"A", @"age": @20, @"hired": @YES}];
+    EmployeeObject *c2e2 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"B", @"age": @30, @"hired": @NO}];
+    EmployeeObject *c2e3 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"C", @"age": @40, @"hired": @YES}];
+    [CompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employees": @[c2e1, c2e2, c2e3]}];
+
+    EmployeeObject *c3e1 = [EmployeeObject createInRealm:realm withValue:@{@"name": @"A", @"age": @21, @"hired": @YES}];
+    [CompanyObject createInRealm:realm withValue:@{@"name": @"ABC AG", @"employees": @[c3e1]}];
+    [realm commitWriteTransaction];
+
+    RLMResults *allCompanies = [CompanyObject allObjects];
+    RLMResults *allEmployees = [EmployeeObject allObjects];
+
+    // count operator
+    XCTAssertEqual([[allCompanies valueForKeyPath:@"@count"] integerValue], 3);
+
+    // numeric operators
+    XCTAssertEqual([[allEmployees valueForKeyPath:@"@min.age"] intValue], 20);
+    XCTAssertEqual([[allEmployees valueForKeyPath:@"@max.age"] intValue], 40);
+    XCTAssertEqual([[allEmployees valueForKeyPath:@"@sum.age"] integerValue], 206);
+    XCTAssertEqualWithAccuracy([[allEmployees valueForKeyPath:@"@avg.age"] doubleValue], 29.43, 0.1f);
+
+    // collection
+    XCTAssertEqualObjects([allCompanies valueForKeyPath:@"@unionOfObjects.name"], (@[@"InspiringNames LLC", @"ABC AG", @"ABC AG"]));
+    XCTAssertEqualObjects([allCompanies valueForKeyPath:@"@distinctUnionOfObjects.name"], (@[@"ABC AG", @"InspiringNames LLC"]));
+    XCTAssertEqualObjects([allCompanies valueForKeyPath:@"employees.@unionOfArrays.name"], (@[@"Joe", @"John", @"Jill", @"A", @"B", @"C", @"A"]));
+    XCTAssertEqualObjects([NSSet setWithArray:[allCompanies valueForKeyPath:@"employees.@distinctUnionOfArrays.name"]], ([NSSet setWithArray:@[@"Joe", @"John", @"Jill", @"A", @"B", @"C"]]));
+
+    // invalid key paths
+    RLMAssertThrowsWithReasonMatching([allCompanies valueForKeyPath:@"@invalid"], @"Unsupported KVC collection operator found in key path '@invalid'");
+    RLMAssertThrowsWithReasonMatching([allCompanies valueForKeyPath:@"@sum"], @"Missing key path for KVC collection operator sum in key path '@sum'");
+    RLMAssertThrowsWithReasonMatching([allCompanies valueForKeyPath:@"@sum."], @"Missing key path for KVC collection operator sum in key path '@sum.'");
+    RLMAssertThrowsWithReasonMatching([allCompanies valueForKeyPath:@"@sum.employees.@sum.age"], @"Nested key paths.*not supported");
+}
+
 - (void)testCrossThreadAccess
 {
     CompanyObject *company = [[CompanyObject alloc] init];

@@ -110,7 +110,7 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
 //
 [[gnu::noinline]]
 [[noreturn]]
-static void throwError() {
+static void throwError(NSString *aggregateMethod) {
     try {
         throw;
     }
@@ -127,15 +127,21 @@ static void throwError() {
         @throw RLMException(@"Index %zu is out of bounds (must be less than %zu)",
                             e.requested, e.valid_count);
     }
+    catch (realm::Results::UnsupportedColumnTypeException const& e) {
+        @throw RLMException(@"%@ is not supported for %@ property '%s'",
+                            aggregateMethod,
+                            RLMTypeToString((RLMPropertyType)e.column_type),
+                            e.column_name.data());
+    }
 }
 
 template<typename Function>
-static auto translateErrors(Function&& f) {
+static auto translateErrors(Function&& f, NSString *aggregateMethod=nil) {
     try {
         return f();
     }
     catch (...) {
-        throwError();
+        throwError(aggregateMethod);
     }
 }
 
@@ -174,7 +180,7 @@ static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar,
         }
         catch (...) {
             info->didChange(ar->_key, kind, indexes);
-            throwError();
+            throwError(nil);
         }
         info->didChange(ar->_key, kind, indexes);
     }
@@ -376,6 +382,33 @@ static void RLMInsertObject(RLMArrayLinkView *ar, RLMObject *object, NSUInteger 
 - (void)setValue:(id)value forKey:(NSString *)key {
     translateErrors([&] { _backingList.verify_in_transaction(); });
     RLMCollectionSetValueForKey(self, key, value);
+}
+
+- (id)aggregate:(NSString *)property
+         method:(realm::util::Optional<realm::Mixed> (realm::List::*)(size_t))method
+     methodName:(NSString *)methodName {
+    size_t column = _objectInfo->tableColumn(property);
+    auto value = translateErrors([&] { return (_backingList.*method)(column); }, methodName);
+    if (!value) {
+        return nil;
+    }
+    return RLMMixedToObjc(*value);
+}
+
+- (id)minOfProperty:(NSString *)property {
+    return [self aggregate:property method:&realm::List::min methodName:@"minOfProperty"];
+}
+
+- (id)maxOfProperty:(NSString *)property {
+    return [self aggregate:property method:&realm::List::max methodName:@"maxOfProperty"];
+}
+
+- (id)sumOfProperty:(NSString *)property {
+    return [self aggregate:property method:&realm::List::sum methodName:@"sumOfProperty"];
+}
+
+- (id)averageOfProperty:(NSString *)property {
+    return [self aggregate:property method:&realm::List::average methodName:@"averageOfProperty"];
 }
 
 - (void)deleteObjectsFromRealm {

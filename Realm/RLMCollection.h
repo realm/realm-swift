@@ -246,6 +246,66 @@ NS_ASSUME_NONNULL_BEGIN
                                                          RLMCollectionChange *__nullable change,
                                                          NSError *__nullable error))block __attribute__((warn_unused_result));
 
+#pragma mark - Aggregating Property Values
+
+/**
+ Returns the minimum (lowest) value of the given property among all the objects
+ in the collection.
+
+     NSNumber *min = [results minOfProperty:@"age"];
+
+ @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
+
+ @param property The property whose minimum value is desired. Only properties of
+                 types `int`, `float`, `double`, and `NSDate` are supported.
+
+ @return The minimum value of the property, or `nil` if the Results are empty.
+ */
+- (nullable id)minOfProperty:(NSString *)property;
+
+/**
+ Returns the maximum (highest) value of the given property among all the objects
+ in the collection.
+
+     NSNumber *max = [results maxOfProperty:@"age"];
+
+ @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
+
+ @param property The property whose maximum value is desired. Only properties of
+                 types `int`, `float`, `double`, and `NSDate` are supported.
+
+ @return The maximum value of the property, or `nil` if the Results are empty.
+ */
+- (nullable id)maxOfProperty:(NSString *)property;
+
+/**
+ Returns the sum of the values of a given property over all the objects in the collection.
+
+     NSNumber *sum = [results sumOfProperty:@"age"];
+
+ @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
+
+ @param property The property whose values should be summed. Only properties of
+                 types `int`, `float`, and `double` are supported.
+
+ @return The sum of the given property.
+ */
+- (NSNumber *)sumOfProperty:(NSString *)property;
+
+/**
+ Returns the average value of a given property over the objects in the collection.
+
+     NSNumber *average = [results averageOfProperty:@"age"];
+
+ @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
+
+ @param property The property whose average value should be calculated. Only
+                 properties of types `int`, `float`, and `double` are supported.
+
+ @return    The average value of the given property, or `nil` if the Results are empty.
+ */
+- (nullable NSNumber *)averageOfProperty:(NSString *)property;
+
 @end
 
 /**
