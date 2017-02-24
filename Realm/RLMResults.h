@@ -264,7 +264,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param property The property whose minimum value is desired. Only properties of types `int`, `float`, `double`, and
                  `NSDate` are supported.
 
- @return The minimum value of the property.
+ @return The minimum value of the property, or `nil` if the Results are empty.
  */
 - (nullable id)minOfProperty:(NSString *)property;
 
@@ -278,7 +278,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param property The property whose maximum value is desired. Only properties of types `int`, `float`, `double`, and 
                  `NSDate` are supported.
 
- @return The maximum value of the property.
+ @return The maximum value of the property, or `nil` if the Results are empty.
  */
 - (nullable id)maxOfProperty:(NSString *)property;
 
@@ -306,8 +306,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param property The property whose average value should be calculated. Only properties of types `int`, `float`, and
                  `double` are supported.
 
- @return    The average value of the given property. This will be of type `double` for both `float` and `double`
-            properties.
+ @return    The average value of the given property, or `nil` if the Results are empty.
  */
 - (nullable NSNumber *)averageOfProperty:(NSString *)property;
 

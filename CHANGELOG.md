@@ -16,6 +16,8 @@ x.x.x Release notes (yyyy-MM-dd)
   synchronized Realms wait for all remote content available at the time the
   operation began to be downloaded and available locally.
 * Speed up case-insensitive queries on indexed string properties.
+* Add RLMResults's collection aggregate methods to RLMArray.
+* Add support for calling the aggregate methods on unmanaged Lists.
 
 ### Bugfixes
 
