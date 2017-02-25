@@ -20,11 +20,11 @@
 
 #import "RLMRealm_Private.h"
 
-#import "RLMRealm+RLMSync.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
+#import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import "sync/sync_config.hpp"
@@ -99,7 +99,7 @@ static dispatch_once_t s_onceToken;
                                               RLMAsynchronouslyOpenRealmCallback callback) {
             if (RLMSyncConfiguration *syncConfig = realm.configuration.syncConfiguration) {
                 if (syncConfig.waitForServerChanges) {
-                    auto session = [realm syncSession];
+                    auto session = sync_session_for_realm(realm);
                     if (!session) {
                         return NO;
                     }
