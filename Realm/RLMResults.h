@@ -22,6 +22,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObject, RLMRealm, RLMNotificationToken;
+typedef NS_ENUM(int32_t, RLMPropertyType);
 
 /**
  `RLMResults` is an auto-updating container type in Realm returned from object
@@ -38,8 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
  enumeration.
 
  `RLMResults` are lazily evaluated the first time they are accessed; they only
- run queries when the result of the query is requested. This means that 
- chaining several temporary `RLMResults` to sort and filter your data does not 
+ run queries when the result of the query is requested. This means that
+ chaining several temporary `RLMResults` to sort and filter your data does not
  perform any extra work processing the intermediate state.
 
  Once the results have been evaluated or a notification block has been added,
@@ -48,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  `RLMResults` cannot be directly instantiated.
  */
-@interface RLMResults<RLMObjectType: RLMObject *> : NSObject<RLMCollection, NSFastEnumeration>
+@interface RLMResults<RLMObjectType> : NSObject<RLMCollection, NSFastEnumeration>
 
 #pragma mark - Properties
 
@@ -58,9 +59,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, assign) NSUInteger count;
 
 /**
- The class name (i.e. type) of the `RLMObject`s contained in the results collection.
+ The type of the objects in the results collection.
  */
-@property (nonatomic, readonly, copy) NSString *objectClassName;
+@property (nonatomic, readonly, assign) RLMPropertyType type;
+
+/**
+ The class name  of the objects contained in the results collection.
+
+ Will be `nil` if `type` is not RLMPropertyTypeObject.
+ */
+@property (nonatomic, readonly, copy, nullable) NSString *objectClassName;
 
 /**
  The Realm which manages this results collection.
@@ -82,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param index   The index to look up.
 
- @return An `RLMObject` of the type contained in the results collection.
+ @return An object of the type contained in the results collection.
  */
 - (RLMObjectType)objectAtIndex:(NSUInteger)index;
 
@@ -91,7 +99,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty results collection.
 
- @return An `RLMObject` of the type contained in the results collection.
+ @return An object of the type contained in the results collection.
  */
 - (nullable RLMObjectType)firstObject;
 
@@ -100,7 +108,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty results collection.
 
- @return An `RLMObject` of the type contained in the results collection.
+ @return An object of the type contained in the results collection.
  */
 - (nullable RLMObjectType)lastObject;
 
@@ -201,7 +209,7 @@ NS_ASSUME_NONNULL_BEGIN
  which rows in the results collection were added, removed or modified. If a
  write transaction did not modify any objects in the results collection,
  the block is not called at all. See the `RLMCollectionChange` documentation for
- information on how the changes are reported and an example of updating a 
+ information on how the changes are reported and an example of updating a
  `UITableView`.
 
  If an error occurs the block will be called with `nil` for the results
@@ -275,8 +283,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
 
- @param property The property whose maximum value is desired. Only properties of types `int`, `float`, `double`, and 
-                 `NSDate` are supported.
+ @param property The property whose maximum value is desired. Only properties of
+                 types `int`, `float`, `double`, and `NSDate` are supported.
 
  @return The maximum value of the property, or `nil` if the Results are empty.
  */
@@ -289,8 +297,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
 
- @param property The property whose values should be summed. Only properties of types `int`, `float`, and `double` are
-                 supported.
+ @param property The property whose values should be summed. Only properties of
+                 types `int`, `float`, and `double` are supported.
 
  @return The sum of the given property.
  */
@@ -303,8 +311,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
 
- @param property The property whose average value should be calculated. Only properties of types `int`, `float`, and
-                 `double` are supported.
+ @param property The property whose average value should be calculated. Only
+                 properties of types `int`, `float`, and `double` are supported.
 
  @return    The average value of the given property, or `nil` if the Results are empty.
  */
@@ -332,7 +340,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  `RLMLinkingObjects` is an auto-updating container type. It represents a collection of objects that link to its
  parent object.
- 
+
  For more information, please see the "Inverse Relationships" section in the
  [documentation](https://realm.io/docs/objc/latest/#relationships).
  */

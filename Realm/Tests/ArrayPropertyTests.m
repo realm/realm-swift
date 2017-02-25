@@ -209,6 +209,8 @@
 
     RLMAssertThrowsWithReasonMatching([company.employees addObject:person], @"invalidated");
     RLMAssertThrowsWithReasonMatching([company.employees insertObject:person atIndex:0], @"invalidated");
+
+    [realm cancelWriteTransaction];
 }
 
 - (void)testAddNil {
@@ -217,9 +219,10 @@
     CompanyObject *company = [CompanyObject createInDefaultRealmWithValue:@[@"company", @[]]];
 
     RLMAssertThrowsWithReasonMatching([company.employees addObject:self.nonLiteralNil], @"nil");
+    [realm cancelWriteTransaction];
 }
 
--(void)testUnmanaged {
+- (void)testUnmanaged {
     RLMRealm *realm = [self realmWithTestPath];
 
     ArrayPropertyObject *array = [[ArrayPropertyObject alloc] init];
@@ -281,6 +284,36 @@
 
     // test unmanaged with literals
     __unused ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithValue:@[@"n", @[], @[[[IntObject alloc] initWithValue:@[@1]]]]];
+}
+
+- (void)testUnmanagedPrimitive {
+    AllPrimitiveArrays *obj = [[AllPrimitiveArrays alloc] init];
+    XCTAssertTrue([obj.intObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.floatObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.doubleObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.boolObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.stringObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.dataObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.dateObj isKindOfClass:[RLMArray class]]);
+
+    [obj.intObj addObject:@1];
+    XCTAssertEqualObjects(obj.intObj[0], @1);
+    XCTAssertThrows([obj.intObj addObject:@""]);
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    obj = [AllPrimitiveArrays createInRealm:realm withValue:@[@[],@[],@[],@[],@[],@[],@[]]];
+
+    XCTAssertTrue([obj.intObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.floatObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.doubleObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.boolObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.stringObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.dataObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.dateObj isKindOfClass:[RLMArray class]]);
+
+    [obj.intObj addObject:@5];
+    XCTAssertEqualObjects(obj.intObj.firstObject, @5);
 }
 
 - (void)testReplaceObjectAtIndexInUnmanagedArray {
@@ -1070,7 +1103,7 @@
     [self dispatchAsyncAndWait:^{
         RLMRealm *realm = self.realmWithTestPath;
         [realm transactionWithBlock:^{
-            RLMArray *array = (RLMArray *)[[ArrayPropertyObject allObjectsInRealm:realm].firstObject array];
+            RLMArray *array = [(ArrayPropertyObject *)[ArrayPropertyObject allObjectsInRealm:realm].firstObject array];
             [array addObject:[[StringObject alloc] init]];
         }];
     }];
@@ -1131,7 +1164,7 @@
         [self dispatchAsyncAndWait:^{
             RLMRealm *realm = self.realmWithTestPath;
             [realm transactionWithBlock:^{
-                RLMArray *array = (RLMArray *)[[ArrayPropertyObject allObjectsInRealm:realm].firstObject array];
+                RLMArray *array = [(ArrayPropertyObject *)[ArrayPropertyObject allObjectsInRealm:realm].firstObject array];
                 [array addObject:[[StringObject alloc] init]];
             }];
         }];
@@ -1289,6 +1322,8 @@
     RLMAssertThrowsWithReasonMatching([array valueForKey:@"intCol"], @"invalidated");
     RLMAssertThrowsWithReasonMatching([array setValue:@1 forKey:@"intCol"], @"invalidated");
     RLMAssertThrowsWithReasonMatching({for (__unused id obj in array);}, @"invalidated");
+
+    [realm cancelWriteTransaction];
 }
 
 - (void)testMutatingMethodsCheckForWriteTransaction {

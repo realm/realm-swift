@@ -160,6 +160,25 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property NSDate *date;
 @end
 
+@interface AllPrimitiveArrays : RLMObject
+@property RLMArray<RLMInt> *intObj;
+@property RLMArray<RLMFloat> *floatObj;
+@property RLMArray<RLMDouble> *doubleObj;
+@property RLMArray<RLMBool> *boolObj;
+@property RLMArray<RLMString> *stringObj;
+@property RLMArray<RLMDate> *dateObj;
+@property RLMArray<RLMData> *dataObj;
+@end
+
+@interface AllOptionalPrimitiveArrays : RLMObject
+@property RLMArray<RLMInt> *intObj;
+@property RLMArray<RLMFloat> *floatObj;
+@property RLMArray<RLMDouble> *doubleObj;
+@property RLMArray<RLMBool> *boolObj;
+@property RLMArray<RLMString> *stringObj;
+@property RLMArray<RLMDate> *dateObj;
+@property RLMArray<RLMData> *dataObj;
+@end
 
 #pragma mark - Real Life Objects
 #pragma mark -

@@ -1,4 +1,4 @@
 [submodule "Realm/ObjectStore"]
 	path = Realm/ObjectStore
 	url = https://github.com/realm/realm-object-store.git
-	branch = master
+	branch = tg/primitive-array

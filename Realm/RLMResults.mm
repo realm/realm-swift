@@ -33,8 +33,8 @@
 #import "RLMUtil.hpp"
 
 #import "results.hpp"
+#import "shared_realm.hpp"
 
-#import <objc/runtime.h>
 #import <objc/message.h>
 #import <realm/table_view.hpp>
 
@@ -228,28 +228,27 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (id)valueForKeyPath:(NSString *)keyPath {
-    if ([keyPath characterAtIndex:0] == '@') {
-        if ([keyPath isEqualToString:@"@count"]) {
-            return @(self.count);
-        }
-        NSRange operatorRange = [keyPath rangeOfString:@"." options:NSLiteralSearch];
-        NSUInteger keyPathLength = keyPath.length;
-        NSUInteger separatorIndex = operatorRange.location != NSNotFound ? operatorRange.location : keyPathLength;
-        NSString *operatorName = [keyPath substringWithRange:NSMakeRange(1, separatorIndex - 1)];
-        SEL opSelector = NSSelectorFromString([NSString stringWithFormat:@"_%@ForKeyPath:", operatorName]);
-        BOOL isValidOperator = [self respondsToSelector:opSelector];
-        if (!isValidOperator) {
-            @throw RLMException(@"Unsupported KVC collection operator found in key path '%@'", keyPath);
-        }
-        else if (separatorIndex >= keyPathLength - 1) {
-            @throw RLMException(@"Missing key path for KVC collection operator %@ in key path '%@'", operatorName, keyPath);
-        }
-        NSString *operatorKeyPath = [keyPath substringFromIndex:separatorIndex + 1];
-        if (isValidOperator) {
-            return ((id(*)(id, SEL, id))objc_msgSend)(self, opSelector, operatorKeyPath);
-        }
+    if ([keyPath characterAtIndex:0] != '@') {
+        return [super valueForKeyPath:keyPath];
     }
-    return [super valueForKeyPath:keyPath];
+    if ([keyPath isEqualToString:@"@count"]) {
+        return @(self.count);
+    }
+
+    NSRange operatorRange = [keyPath rangeOfString:@"." options:NSLiteralSearch];
+    NSUInteger keyPathLength = keyPath.length;
+    NSUInteger separatorIndex = operatorRange.location != NSNotFound ? operatorRange.location : keyPathLength;
+    NSString *operatorName = [keyPath substringWithRange:NSMakeRange(1, separatorIndex - 1)];
+    SEL opSelector = NSSelectorFromString([NSString stringWithFormat:@"_%@ForKeyPath:", operatorName]);
+    if (![self respondsToSelector:opSelector]) {
+        @throw RLMException(@"Unsupported KVC collection operator found in key path '%@'", keyPath);
+    }
+    if (separatorIndex >= keyPathLength - 1) {
+        @throw RLMException(@"Missing key path for KVC collection operator %@ in key path '%@'",
+                            operatorName, keyPath);
+    }
+    NSString *operatorKeyPath = [keyPath substringFromIndex:separatorIndex + 1];
+    return ((id(*)(id, SEL, id))objc_msgSend)(self, opSelector, operatorKeyPath);
 }
 
 - (id)valueForKey:(NSString *)key {
@@ -263,7 +262,8 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     RLMCollectionSetValueForKey(self, key, value);
 }
 
-- (NSNumber *)_aggregateForKeyPath:(NSString *)keyPath method:(util::Optional<Mixed> (Results::*)(size_t))method
+- (NSNumber *)_aggregateForKeyPath:(NSString *)keyPath
+                            method:(util::Optional<Mixed> (Results::*)(size_t))method
                         methodName:(NSString *)methodName returnNilForEmpty:(BOOL)returnNilForEmpty {
     assertKeyPathIsNotNested(keyPath);
     return [self aggregate:keyPath method:method methodName:methodName returnNilForEmpty:returnNilForEmpty];
@@ -298,6 +298,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 - (NSArray *)_unionOfArraysForKeyPath:(NSString *)keyPath {
     assertKeyPathIsNotNested(keyPath);
+    // FIXME: it is now as long as type isn't Object
     if ([keyPath isEqualToString:@"self"]) {
         @throw RLMException(@"self is not a valid key-path for a KVC array collection operator as 'unionOfArrays'.");
     }
@@ -334,6 +335,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         if (_results.get_mode() == Results::Mode::Empty) {
             return self;
         }
+        // FIXME: subtables maybe?
         auto query = RLMPredicateToQuery(predicate, _info->rlmObjectSchema, _realm.schema, _realm.group);
         return [RLMResults resultsWithObjectInfo:*_info results:_results.filter(std::move(query))];
     });
@@ -356,7 +358,8 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
             return self;
         }
 
-        return [RLMResults resultsWithObjectInfo:*_info results:_results.sort(RLMSortDescriptorFromDescriptors(*_info, properties))];
+        return [RLMResults resultsWithObjectInfo:*_info
+                                         results:_results.sort(RLMSortDescriptorFromDescriptors(*_info, properties))];
     });
 }
 
@@ -378,23 +381,28 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (id)minOfProperty:(NSString *)property {
-    return [self aggregate:property method:&Results::min methodName:@"minOfProperty" returnNilForEmpty:YES];
+    return [self aggregate:property method:&Results::min
+                methodName:@"minOfProperty" returnNilForEmpty:YES];
 }
 
 - (id)maxOfProperty:(NSString *)property {
-    return [self aggregate:property method:&Results::max methodName:@"maxOfProperty" returnNilForEmpty:YES];
+    return [self aggregate:property method:&Results::max
+                methodName:@"maxOfProperty" returnNilForEmpty:YES];
 }
 
 - (id)sumOfProperty:(NSString *)property {
-    return [self aggregate:property method:&Results::sum methodName:@"sumOfProperty" returnNilForEmpty:NO];
+    return [self aggregate:property method:&Results::sum
+                methodName:@"sumOfProperty" returnNilForEmpty:NO];
 }
 
 - (id)averageOfProperty:(NSString *)property {
-    return [self aggregate:property method:&Results::average methodName:@"averageOfProperty" returnNilForEmpty:YES];
+    return [self aggregate:property method:&Results::average
+                methodName:@"averageOfProperty" returnNilForEmpty:YES];
 }
 
 - (void)deleteObjectsFromRealm {
     return translateErrors([&] {
+        // FIXME: check type too
         if (_results.get_mode() == Results::Mode::Table) {
             RLMResultsValidateInWriteTransaction(self);
             RLMClearTable(*_info);

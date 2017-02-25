@@ -57,34 +57,32 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     /** Booleans: `BOOL`, `bool`, `Bool` (Swift) */
     RLMPropertyTypeBool   = 1,
     /** Floating-point numbers: `float`, `Float` (Swift) */
-    RLMPropertyTypeFloat  = 9,
+    RLMPropertyTypeFloat  = 5,
     /** Double-precision floating-point numbers: `double`, `Double` (Swift) */
-    RLMPropertyTypeDouble = 10,
+    RLMPropertyTypeDouble = 6,
 
 #pragma mark - Object types
 
     /** Strings: `NSString`, `String` (Swift) */
     RLMPropertyTypeString = 2,
     /** Binary data: `NSData` */
-    RLMPropertyTypeData   = 4,
+    RLMPropertyTypeData   = 3,
     /** 
      Any object: `id`.
      
-     This property type is no longer supported for new models. However, old models with any-typed properties are still
-     supported for migration purposes.
+     This property type is no longer supported for new models. However, old files
+     with any-typed properties are still supported for migration purposes.
      */
-    RLMPropertyTypeAny    = 6,
+    RLMPropertyTypeAny    = 9,
     /** Dates: `NSDate` */
-    RLMPropertyTypeDate   = 8,
+    RLMPropertyTypeDate   = 4,
 
-#pragma mark - Array/Linked object types
+#pragma mark - Linked object types
 
     /** Realm model objects. See [Realm Models](https://realm.io/docs/objc/latest/#models) for more information. */
-    RLMPropertyTypeObject = 12,
-    /** Realm arrays. See [Realm Models](https://realm.io/docs/objc/latest/#models) for more information. */
-    RLMPropertyTypeArray  = 13,
+    RLMPropertyTypeObject = 7,
     /** Realm linking objects. See [Realm Models](https://realm.io/docs/objc/latest/#models) for more information. */
-    RLMPropertyTypeLinkingObjects = 14,
+    RLMPropertyTypeLinkingObjects = 8,
 };
 
 /** An error domain identifying Realm-specific errors. */

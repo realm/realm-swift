@@ -18,15 +18,15 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMThreadSafeReference.h"
+#import <Realm/RLMThreadSafeReference.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMRealm, RLMResults, RLMObject, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange;
+@class RLMRealm, RLMResults, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange;
 
 /**
- A homogenous collection of `RLMObject` instances. Examples of conforming types include `RLMArray`,
- `RLMResults`, and `RLMLinkingObjects`.
+ A homogenous collection of Realm-managed objects. Examples of conforming types
+ include `RLMArray`, `RLMResults`, and `RLMLinkingObjects`.
  */
 @protocol RLMCollection <NSFastEnumeration, RLMThreadConfined>
 
@@ -40,7 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, assign) NSUInteger count;
 
 /**
- The class name (i.e. type) of the `RLMObject`s contained in the collection.
+ The class name (i.e. type) of the objects contained in the collection.
  */
 @property (nonatomic, readonly, copy) NSString *objectClassName;
 
@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param index   The index to look up.
 
- @return An `RLMObject` of the type contained in the collection.
+ @return An object of the type contained in the collection.
  */
 - (id)objectAtIndex:(NSUInteger)index;
 
@@ -65,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty collection.
 
- @return An `RLMObject` of the type contained in the collection.
+ @return An object of the type contained in the collection.
  */
 - (nullable id)firstObject;
 
@@ -74,7 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty collection.
 
- @return An `RLMObject` of the type contained in the collection.
+ @return An object of the type contained in the collection.
  */
 - (nullable id)lastObject;
 
@@ -87,7 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param object  An object (of the same type as returned from the `objectClassName` selector).
  */
-- (NSUInteger)indexOfObject:(RLMObject *)object;
+- (NSUInteger)indexOfObject:(id)object;
 
 /**
  Returns the index of the first object in the collection matching the predicate.

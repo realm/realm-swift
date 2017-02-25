@@ -19,7 +19,6 @@
 import XCTest
 import RealmSwift
 import Realm
-import Realm.Private
 import Realm.Dynamic
 import Foundation
 

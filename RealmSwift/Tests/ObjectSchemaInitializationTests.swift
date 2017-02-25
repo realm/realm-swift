@@ -18,7 +18,6 @@
 
 import XCTest
 import RealmSwift
-import Realm.Private
 import Realm.Dynamic
 import Foundation
 
@@ -97,7 +96,8 @@ class ObjectSchemaInitializationTests: TestCase {
         let arrayCol = objectSchema["arrayCol"]
         XCTAssertNotNil(arrayCol)
         XCTAssertEqual(arrayCol!.name, "arrayCol")
-        XCTAssertEqual(arrayCol!.type, PropertyType.array)
+        XCTAssertEqual(arrayCol!.type, PropertyType.object)
+        XCTAssertTrue(arrayCol!.isArray)
         XCTAssertFalse(arrayCol!.isIndexed)
         XCTAssertFalse(arrayCol!.isOptional)
         XCTAssertEqual(objectCol!.objectClassName!, "SwiftBoolObject")
@@ -105,7 +105,8 @@ class ObjectSchemaInitializationTests: TestCase {
         let dynamicArrayCol = SwiftCompanyObject().objectSchema["employees"]
         XCTAssertNotNil(dynamicArrayCol)
         XCTAssertEqual(dynamicArrayCol!.name, "employees")
-        XCTAssertEqual(dynamicArrayCol!.type, PropertyType.array)
+        XCTAssertEqual(dynamicArrayCol!.type, PropertyType.object)
+        XCTAssertTrue(dynamicArrayCol!.isArray)
         XCTAssertFalse(dynamicArrayCol!.isIndexed)
         XCTAssertFalse(arrayCol!.isOptional)
         XCTAssertEqual(dynamicArrayCol!.objectClassName!, "SwiftEmployeeObject")

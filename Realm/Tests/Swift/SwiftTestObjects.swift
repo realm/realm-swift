@@ -43,20 +43,24 @@ class SwiftObject: RLMObject {
     dynamic var binaryCol = "a".data(using: String.Encoding.utf8)
     dynamic var dateCol = Date(timeIntervalSince1970: 1)
     dynamic var objectCol = SwiftBoolObject()
-    dynamic var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
+    dynamic var arrayCol = RLMArray<SwiftBoolObject>(objectClassName: SwiftBoolObject.className())
 }
 
 class SwiftOptionalObject: RLMObject {
-    // FIXME: Support all optional property types
-//    dynamic var optBoolCol: Bool?
-//    dynamic var optIntCol: Int?
-//    dynamic var optFloatCol: Float?
-//    dynamic var optDoubleCol: Double?
     dynamic var optStringCol: String?
     dynamic var optNSStringCol: NSString?
     dynamic var optBinaryCol: Data?
     dynamic var optDateCol: Date?
     dynamic var optObjectCol: SwiftBoolObject?
+}
+
+class SwiftPrimitiveArrayObject: RLMObject {
+    dynamic var stringCol = RLMArray<NSString>(objectType: .string, optional: false)
+    dynamic var optStringCol = RLMArray<NSObject>(objectType: .string, optional: true)
+    dynamic var dataCol = RLMArray<NSData>(objectType: .data, optional: false)
+    dynamic var optDataCol = RLMArray<NSObject>(objectType: .data, optional: true)
+    dynamic var dateCol = RLMArray<NSDate>(objectType: .date, optional: false)
+    dynamic var optDateCol = RLMArray<NSObject>(objectType: .date, optional: true)
 }
 
 class SwiftDogObject: RLMObject {
@@ -90,13 +94,13 @@ class SwiftEmployeeObject: RLMObject {
 }
 
 class SwiftCompanyObject: RLMObject {
-    dynamic var employees = RLMArray(objectClassName: SwiftEmployeeObject.className())
+    dynamic var employees = RLMArray<SwiftEmployeeObject>(objectClassName: SwiftEmployeeObject.className())
 }
 
 class SwiftArrayPropertyObject: RLMObject {
     dynamic var name = ""
-    dynamic var array = RLMArray(objectClassName: SwiftStringObject.className())
-    dynamic var intArray = RLMArray(objectClassName: SwiftIntObject.className())
+    dynamic var array = RLMArray<SwiftStringObject>(objectClassName: SwiftStringObject.className())
+    dynamic var intArray = RLMArray<SwiftIntObject>(objectClassName: SwiftIntObject.className())
 }
 
 class SwiftDynamicObject: RLMObject {

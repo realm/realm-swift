@@ -19,7 +19,17 @@
 import Realm
 
 /// A protocol describing types that can parameterize a `RealmOptional`.
-public protocol RealmOptionalType {}
+public protocol RealmOptionalType: RealmManaged {
+}
+
+public extension RealmOptionalType {
+    public static func className() -> String {
+        return ""
+    }
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return RLMArray(objectType: .int, optional: false)
+    }
+}
 extension Int: RealmOptionalType {}
 extension Int8: RealmOptionalType {}
 extension Int16: RealmOptionalType {}

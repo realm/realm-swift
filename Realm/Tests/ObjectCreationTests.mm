@@ -575,6 +575,179 @@
     [realm cancelWriteTransaction];
 }
 
+- (void)testCreateRequiredPrimitiveArrays {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    auto now = [NSDate date];
+    auto bytes = [NSData dataWithBytes:"a" length:1];
+    auto req = [AllPrimitiveArrays createInRealm:realm
+                                       withValue:@{@"intObj": @[@1, @2, @3],
+                                                   @"boolObj": @[@YES, @NO],
+                                                   @"floatObj": @[@1.1f, @2.2f],
+                                                   @"doubleObj": @[@3.3, @4.4],
+                                                   @"stringObj": @[@"a", @"b"],
+                                                   @"dateObj": @[now],
+                                                   @"dataObj": @[bytes]}];
+    XCTAssertEqual(3U, req.intObj.count);
+    XCTAssertEqual(2U, req.boolObj.count);
+    XCTAssertEqual(2U, req.floatObj.count);
+    XCTAssertEqual(2U, req.doubleObj.count);
+    XCTAssertEqual(2U, req.stringObj.count);
+    XCTAssertEqual(1U, req.dateObj.count);
+    XCTAssertEqual(1U, req.dataObj.count);
+
+    XCTAssertEqualObjects([req.intObj valueForKey:@"self"], (@[@1, @2, @3]));
+    XCTAssertEqualObjects([req.boolObj valueForKey:@"self"], (@[@YES, @NO]));
+    XCTAssertEqualObjects([req.floatObj valueForKey:@"self"], (@[@1.1f, @2.2f]));
+    XCTAssertEqualObjects([req.doubleObj valueForKey:@"self"], (@[@3.3, @4.4]));
+    XCTAssertEqualObjects([req.stringObj valueForKey:@"self"], (@[@"a", @"b"]));
+    XCTAssertEqualObjects([req.dateObj valueForKey:@"self"], (@[now]));
+    XCTAssertEqualObjects([req.dataObj valueForKey:@"self"], (@[bytes]));
+
+    [realm cancelWriteTransaction];
+}
+
+- (void)testCreateRequiredPrimitiveArraysWithNonNSArrayEnumerable {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    auto now = [NSDate date];
+    auto bytes = [NSData dataWithBytes:"a" length:1];
+    auto req = [AllPrimitiveArrays createInRealm:realm
+                                       withValue:@{@"intObj": @[@1, @2, @3].reverseObjectEnumerator,
+                                                   @"boolObj": @[@YES, @NO].reverseObjectEnumerator,
+                                                   @"floatObj": @[@1.1f, @2.2f].reverseObjectEnumerator,
+                                                   @"doubleObj": @[@3.3, @4.4].reverseObjectEnumerator,
+                                                   @"stringObj": @[@"a", @"b"].reverseObjectEnumerator,
+                                                   @"dateObj": @[now].reverseObjectEnumerator,
+                                                   @"dataObj": @[bytes].reverseObjectEnumerator}];
+    XCTAssertEqual(3U, req.intObj.count);
+    XCTAssertEqual(2U, req.boolObj.count);
+    XCTAssertEqual(2U, req.floatObj.count);
+    XCTAssertEqual(2U, req.doubleObj.count);
+    XCTAssertEqual(2U, req.stringObj.count);
+    XCTAssertEqual(1U, req.dateObj.count);
+    XCTAssertEqual(1U, req.dataObj.count);
+
+    XCTAssertEqualObjects([req.intObj valueForKey:@"self"], (@[@3, @2, @1]));
+    XCTAssertEqualObjects([req.boolObj valueForKey:@"self"], (@[@NO, @YES]));
+    XCTAssertEqualObjects([req.floatObj valueForKey:@"self"], (@[@2.2f, @1.1f]));
+    XCTAssertEqualObjects([req.doubleObj valueForKey:@"self"], (@[@4.4, @3.3]));
+    XCTAssertEqualObjects([req.stringObj valueForKey:@"self"], (@[@"b", @"a"]));
+    XCTAssertEqualObjects([req.dateObj valueForKey:@"self"], (@[now]));
+    XCTAssertEqualObjects([req.dataObj valueForKey:@"self"], (@[bytes]));
+
+    [realm cancelWriteTransaction];
+}
+
+- (void)testCreatePrimitiveArraysWithNSNull {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    auto req = [AllPrimitiveArrays createInRealm:realm
+                                       withValue:@{@"intObj": NSNull.null,
+                                                   @"boolObj": NSNull.null,
+                                                   @"floatObj": NSNull.null,
+                                                   @"doubleObj": NSNull.null,
+                                                   @"stringObj": NSNull.null,
+                                                   @"dateObj": NSNull.null,
+                                                   @"dataObj": NSNull.null}];
+    XCTAssertEqual(0U, req.intObj.count);
+    XCTAssertEqual(0U, req.boolObj.count);
+    XCTAssertEqual(0U, req.floatObj.count);
+    XCTAssertEqual(0U, req.doubleObj.count);
+    XCTAssertEqual(0U, req.stringObj.count);
+    XCTAssertEqual(0U, req.dateObj.count);
+    XCTAssertEqual(0U, req.dataObj.count);
+}
+
+- (void)testCreatePrimitiveArraysWithMissingKeys {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    auto req = [AllPrimitiveArrays createInRealm:realm
+                                       withValue:@{@"intObj": @[@1, @2, @2],
+                                                   @"dataObj": NSNull.null}];
+    XCTAssertEqual(3U, req.intObj.count);
+    XCTAssertEqual(0U, req.boolObj.count);
+    XCTAssertEqual(0U, req.floatObj.count);
+    XCTAssertEqual(0U, req.doubleObj.count);
+    XCTAssertEqual(0U, req.stringObj.count);
+    XCTAssertEqual(0U, req.dateObj.count);
+    XCTAssertEqual(0U, req.dataObj.count);
+}
+
+- (void)testCreateRequiredPrimitiveArraysWithInvalidValues {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    // FIXME: all of these error messages could be a lot better
+    RLMAssertThrowsWithReason([AllPrimitiveArrays createInRealm:realm
+                                       withValue:@{@"intObj": @[NSNull.null]}],
+                             @"Invalid value '<null>' of type 'NSNull' for expected type 'int'");
+    RLMAssertThrowsWithReason([AllPrimitiveArrays createInRealm:realm
+                                       withValue:@{@"intObj": @[@1.1]}],
+                             @"reason");
+    RLMAssertThrowsWithReason([AllPrimitiveArrays createInRealm:realm
+                                       withValue:@{@"intObj": @[@"0"]}],
+                             @"Invalid value '0' of type '__NSCFConstantString' for expected type 'int'");
+    RLMAssertThrowsWithReason([AllPrimitiveArrays createInRealm:realm
+                                       withValue:@{@"intObj": @1}],
+                             @"Array property value (1) is not enumerable");
+
+    [realm cancelWriteTransaction];
+}
+
+- (void)testCreateOptionalPrimitiveArrays {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    auto now = [NSDate date];
+    auto bytes = [NSData dataWithBytes:"a" length:1];
+    auto req = [AllOptionalPrimitiveArrays createInRealm:realm
+                                               withValue:@{@"intObj": @[@1, @2, @3, NSNull.null],
+                                                           @"boolObj": @[@YES, @NO, NSNull.null],
+                                                           @"floatObj": @[@1.1f, @2.2f, NSNull.null],
+                                                           @"doubleObj": @[@3.3, @4.4, NSNull.null],
+                                                           @"stringObj": @[@"a", @"b", NSNull.null],
+                                                           @"dateObj": @[now, NSNull.null],
+                                                           @"dataObj": @[bytes, NSNull.null]}];
+    XCTAssertEqual(4U, req.intObj.count);
+    XCTAssertEqual(3U, req.boolObj.count);
+    XCTAssertEqual(3U, req.floatObj.count);
+    XCTAssertEqual(3U, req.doubleObj.count);
+    XCTAssertEqual(3U, req.stringObj.count);
+    XCTAssertEqual(2U, req.dateObj.count);
+    XCTAssertEqual(2U, req.dataObj.count);
+
+    XCTAssertEqualObjects([req.intObj valueForKey:@"self"], (@[@1, @2, @3, NSNull.null]));
+    XCTAssertEqualObjects([req.boolObj valueForKey:@"self"], (@[@YES, @NO, NSNull.null]));
+    XCTAssertEqualObjects([req.floatObj valueForKey:@"self"], (@[@1.1f, @2.2f, NSNull.null]));
+    XCTAssertEqualObjects([req.doubleObj valueForKey:@"self"], (@[@3.3, @4.4, NSNull.null]));
+    XCTAssertEqualObjects([req.stringObj valueForKey:@"self"], (@[@"a", @"b", NSNull.null]));
+    XCTAssertEqualObjects([req.dateObj valueForKey:@"self"], (@[now, NSNull.null]));
+    XCTAssertEqualObjects([req.dataObj valueForKey:@"self"], (@[bytes, NSNull.null]));
+
+    [realm cancelWriteTransaction];
+}
+
+- (void)testCreateOptionalPrimitiveArraysWithInvalidValues {
+    auto realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+
+    // FIXME: these error messages aren't great
+    RLMAssertThrowsWithReason([AllPrimitiveArrays createInRealm:realm
+                                       withValue:@{@"intObj": @[@1.1]}],
+                             @"reason");
+    RLMAssertThrowsWithReason([AllPrimitiveArrays createInRealm:realm
+                                       withValue:@{@"intObj": @[@"0"]}],
+                             @"Invalid value '0' of type '__NSCFConstantString' for expected type 'int'");
+    RLMAssertThrowsWithReason([AllPrimitiveArrays createInRealm:realm
+                                       withValue:@{@"intObj": @1}],
+                             @"Array property value (1) is not enumerable");
+}
+
 - (void)testCreateUsesDefaultValuesForMissingDictionaryKeys {
     auto realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
@@ -665,7 +838,7 @@
     [realm beginWriteTransaction];
     auto obj1 = [IntObject createInRealm:realm withValue:@[@0]];
     auto obj2 = [IntObject createInRealm:realm withValue:@[@1]];
-    auto obj1alias = [IntObject allObjectsInRealm:realm].firstObject;
+    id obj1alias = [IntObject allObjectsInRealm:realm].firstObject;
 
     [realm deleteObject:obj1];
     RLMAssertThrowsWithReasonMatching([IntObject createInRealm:realm withValue:obj1],
@@ -918,14 +1091,13 @@
     auto obj = [AllOptionalTypesPK createInRealm:realm withValue:nonnull];
     [AllOptionalTypesPK createOrUpdateInRealm:realm withValue:null];
 
-    // FIXME: these should actually all be nil
-    XCTAssertNotNil(obj.intObj);
-    XCTAssertNotNil(obj.floatObj);
-    XCTAssertNotNil(obj.doubleObj);
-    XCTAssertNotNil(obj.boolObj);
-    XCTAssertNotNil(obj.string);
-    XCTAssertNotNil(obj.data);
-    XCTAssertNotNil(obj.date);
+    XCTAssertNil(obj.intObj);
+    XCTAssertNil(obj.floatObj);
+    XCTAssertNil(obj.doubleObj);
+    XCTAssertNil(obj.boolObj);
+    XCTAssertNil(obj.string);
+    XCTAssertNil(obj.data);
+    XCTAssertNil(obj.date);
 
     [AllOptionalTypesPK createOrUpdateInRealm:realm withValue:nonnull];
     [AllOptionalTypesPK createOrUpdateInRealm:realm withValue:@[@0]];

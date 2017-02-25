@@ -64,12 +64,17 @@
                              realm:(__unsafe_unretained RLMRealm *const)realm
                         parentInfo:(RLMClassInfo *)parentInfo
                           property:(__unsafe_unretained RLMProperty *const)property {
-    self = [self initWithObjectClassName:property.objectClassName];
+    if (property.type == RLMPropertyTypeObject)
+        self = [self initWithObjectClassName:property.objectClassName];
+    else
+        self = [self initWithObjectType:property.type optional:property.optional];
     if (self) {
         _realm = realm;
         REALM_ASSERT(list.get_realm() == realm->_realm);
         _backingList = std::move(list);
-        _objectInfo = &parentInfo->linkTargetType(property.index);
+        // FIXME: subtables
+        if (property.type == RLMPropertyTypeObject)
+            _objectInfo = &parentInfo->linkTargetType(property.index);
         _ownerInfo = parentInfo;
         _key = property.name;
     }
@@ -80,8 +85,8 @@
                             property:(__unsafe_unretained RLMProperty *const)property {
     __unsafe_unretained RLMRealm *const realm = parentObject->_realm;
     auto col = parentObject->_info->tableColumn(property);
-    realm::List list(realm->_realm, parentObject->_row.get_linklist(col));
-    return [self initWithList:std::move(list)
+    auto& row = parentObject->_row;
+    return [self initWithList:realm::List(realm->_realm, *row.get_table(), col, row.get_index())
                         realm:realm
                    parentInfo:parentObject->_info
                      property:property];
@@ -100,6 +105,7 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
                                    __unsafe_unretained RLMArray *const array,
                                    __unsafe_unretained id const observed) {
     RLMValidateArrayObservationKey(keyPath, array);
+    // FIXME
     if (!info && array.class == [RLMArrayLinkView class]) {
         RLMArrayLinkView *lv = static_cast<RLMArrayLinkView *>(array);
         info = std::make_unique<RLMObservationInfo>(*lv->_ownerInfo,
@@ -224,6 +230,7 @@ static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyVal
     if (state->state == 0) {
         translateErrors([&] { _backingList.verify_attached(); });
 
+        // FIXME: RLMFastEnumerator doesn't support primitives yet
         enumerator = [[RLMFastEnumerator alloc] initWithCollection:self objectSchema:*_objectInfo];
         state->extra[0] = (long)enumerator;
         state->extra[1] = self.count;
@@ -356,11 +363,28 @@ static void RLMInsertObject(RLMArrayLinkView *ar, id object, NSUInteger index) {
         return @(!_backingList.is_valid());
     }
 
+    if ([key isEqualToString:@"self"]) {
+        NSMutableArray *array = [NSMutableArray arrayWithCapacity:_backingList.size()];
+        RLMAccessorContext context(_realm, *_objectInfo);
+        for (size_t i = 0, count = _backingList.size(); i < count; ++i) {
+            [array addObject:_backingList.get(context, i) ?: NSNull.null];
+        }
+        return array;
+    }
+
     translateErrors([&] { _backingList.verify_attached(); });
     return RLMCollectionValueForKey(self, key);
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
+    if ([key isEqualToString:@"self"]) {
+        RLMAccessorContext context(_realm, *_objectInfo);
+        for (size_t i = 0, count = _backingList.size(); i < count; ++i) {
+            _backingList.set(context, i, value);
+        }
+        return;
+    }
+
     translateErrors([&] { _backingList.verify_in_transaction(); });
     RLMCollectionSetValueForKey(self, key, value);
 }
@@ -418,8 +442,13 @@ static void RLMInsertObject(RLMArrayLinkView *ar, id object, NSUInteger index) {
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
     auto query = translateErrors([&] { return _backingList.get_query(); });
-    query.and_query(RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema,
-                                        _realm.schema, _realm.group));
+    if (_objectInfo) {
+        query.and_query(RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema,
+                                            _realm.schema, _realm.group));
+    }
+    else {
+        // FIXME
+    }
 
     auto indexInTable = query.find();
     if (indexInTable == realm::not_found) {

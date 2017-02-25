@@ -22,9 +22,7 @@ extension RLMRealm {
     @nonobjc public class func schemaVersion(at url: URL, usingEncryptionKey key: Data? = nil) throws -> UInt64 {
         var error: NSError?
         let version = __schemaVersion(at: url, encryptionKey: key, error: &error)
-        guard version != RLMNotVersioned else {
-            throw error!
-        }
+        guard version != RLMNotVersioned else { throw error! }
         return version
     }
 
@@ -36,25 +34,25 @@ extension RLMRealm {
 extension RLMObject {
     // Swift query convenience functions
     public class func objects(where predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
-        return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+        return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args))) as! RLMResults<RLMObject>
     }
 
     public class func objects(in realm: RLMRealm,
                               where predicateFormat: String,
                               _ args: CVarArg...) -> RLMResults<RLMObject> {
-        return objects(in: realm, with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+        return objects(in: realm, with: NSPredicate(format: predicateFormat, arguments: getVaList(args))) as! RLMResults<RLMObject>
     }
 }
 
-public final class RLMIterator: IteratorProtocol {
+public struct RLMIterator<T>: IteratorProtocol {
     private let iteratorBase: NSFastEnumerationIterator
 
     internal init(collection: RLMCollection) {
         iteratorBase = NSFastEnumerationIterator(collection)
     }
 
-    public func next() -> RLMObject? {
-        return iteratorBase.next() as! RLMObject?
+    public func next() -> T? {
+        return iteratorBase.next() as! T?
     }
 }
 
@@ -65,7 +63,7 @@ extension RLMResults: Sequence {}
 
 extension RLMCollection {
     // Support Sequence-style enumeration
-    public func makeIterator() -> RLMIterator {
+    public func makeIterator() -> RLMIterator<RLMObject> {
         return RLMIterator(collection: self)
     }
 }
@@ -76,8 +74,8 @@ extension RLMCollection {
         return indexOfObject(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 
-    public func objects(where predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
-        return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+    public func objects(where predicateFormat: String, _ args: CVarArg...) -> RLMResults<NSObject> {
+        return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args))) as! RLMResults<NSObject>
     }
 }
 

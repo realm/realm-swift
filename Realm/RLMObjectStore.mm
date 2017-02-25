@@ -85,7 +85,7 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
     }
 
     for (RLMProperty *prop in object->_objectSchema.swiftGenericProperties) {
-        if (prop.type == RLMPropertyTypeArray) {
+        if (prop.array) {
             RLMArray *array = [[RLMArrayLinkView alloc] initWithParent:object property:prop];
             [object_getIvar(object, prop.swiftIvar) set_rlmArray:array];
         }
@@ -162,7 +162,6 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
                             (unsigned long long)info.objectSchema->persisted_properties.size());
     }
 
-    // create the object
     RLMAccessorContext c{realm, info, false};
     RLMObjectBase *object = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, realm, &info);
     try {

@@ -53,6 +53,8 @@ void RLMSetErrorOrThrow(NSError *error, NSError **outError);
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
 // throw an exception if the object is not a valid value for the property
 void RLMValidateValueForProperty(id obj, RLMProperty *prop);
+BOOL RLMValidateValue(id value, RLMPropertyType type, bool optional, bool array,
+                      NSString *objectClassName);
 
 // gets default values for the given schema (+defaultPropertyValues)
 // merges with native property defaults if Swift class
@@ -113,7 +115,7 @@ static inline realm::StringData RLMStringDataWithNSString(__unsafe_unretained NS
     static_assert(sizeof(size_t) >= sizeof(NSUInteger),
                   "Need runtime overflow check for NSUInteger to size_t conversion");
     return realm::StringData(string.UTF8String,
-                               [string lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+                             [string lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
 }
 
 // Binary conversion utilities
@@ -140,6 +142,8 @@ static inline NSDate *RLMTimestampToNSDate(realm::Timestamp ts) NS_RETURNS_RETAI
 }
 
 static inline realm::Timestamp RLMTimestampForNSDate(__unsafe_unretained NSDate *const date) {
+    if (!date)
+        return {};
     auto timeInterval = date.timeIntervalSinceReferenceDate;
     if (isnan(timeInterval))
         return {0, 0}; // Arbitrary choice

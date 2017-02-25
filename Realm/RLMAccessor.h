@@ -50,4 +50,7 @@ void RLMReplaceClassNameMethod(Class accessorClass, NSString *className);
 // Replace sharedSchema method for the given class
 void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema * __nullable schema);
 
+#ifdef __cplusplus
+#endif
+
 NS_ASSUME_NONNULL_END

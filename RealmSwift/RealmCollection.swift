@@ -22,8 +22,7 @@ import Realm
 /**
  An iterator for a `RealmCollection` instance.
  */
-public final class RLMIterator<T: Object>: IteratorProtocol {
-    private var i: UInt = 0
+public struct RLMIterator<T: RealmManaged>: IteratorProtocol {
     private let generatorBase: NSFastEnumerationIterator
 
     init(collection: RLMCollection) {
@@ -34,7 +33,7 @@ public final class RLMIterator<T: Object>: IteratorProtocol {
     public func next() -> T? {
         let accessor = unsafeBitCast(generatorBase.next() as! Object?, to: Optional<T>.self)
         if let accessor = accessor {
-            RLMInitializeSwiftAccessorGenerics(accessor)
+            RLMInitializeSwiftAccessorGenerics(unsafeBitCast(accessor, to: RLMObjectBase.self))
         }
         return accessor
     }
@@ -134,7 +133,7 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
     // Must also conform to `AssistedObjectiveCBridgeable`
 
     /// The type of the objects contained in the collection.
-    associatedtype Element: Object
+    associatedtype Element: RealmManaged
 
     // MARK: Properties
 
@@ -373,7 +372,25 @@ public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol,
     func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
-private class _AnyRealmCollectionBase<T: Object>: AssistedObjectiveCBridgeable {
+public extension RealmCollection where Element: MinMaxType {
+    public func min() -> Element? {
+        return min(ofProperty: "self")
+    }
+    public func max() -> Element? {
+        return max(ofProperty: "self")
+    }
+}
+
+public extension RealmCollection where Element: AddableType {
+    public func sum() -> Element {
+        return sum(ofProperty: "self")
+    }
+    public func average() -> Element? {
+        return average(ofProperty: "self")
+    }
+}
+
+private class _AnyRealmCollectionBase<T: RealmManaged>: AssistedObjectiveCBridgeable {
     typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T
     var realm: Realm? { fatalError() }
@@ -525,7 +542,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
  Instances of `RealmCollection` forward operations to an opaque underlying collection having the same `Element` type.
  */
-public final class AnyRealmCollection<T: Object>: RealmCollection {
+public final class AnyRealmCollection<T: RealmManaged>: RealmCollection {
 
     public func index(after i: Int) -> Int { return i + 1 }
     public func index(before i: Int) -> Int { return i - 1 }
@@ -827,7 +844,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
 // MARK: AssistedObjectiveCBridgeable
 
-private struct AnyRealmCollectionBridgingMetadata<T: Object> {
+private struct AnyRealmCollectionBridgingMetadata<T: RealmManaged> {
     var baseMetadata: Any?
     var baseType: _AnyRealmCollectionBase<T>.Type
 }

@@ -24,7 +24,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType);
 BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType);
 FOUNDATION_EXTERN void RLMValidateSwiftPropertyName(NSString *name);
 
@@ -49,8 +48,6 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
             return @"any";
         case RLMPropertyTypeObject:
             return @"object";
-        case RLMPropertyTypeArray:
-            return @"array";
         case RLMPropertyTypeLinkingObjects:
             return @"linking objects";
     }
@@ -76,8 +73,7 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
                                  instance:(RLMObjectBase *)objectInstance;
 
 - (instancetype)initSwiftListPropertyWithName:(NSString *)name
-                                         ivar:(Ivar)ivar
-                              objectClassName:(nullable NSString *)objectClassName;
+                                     instance:(id)object;
 
 - (instancetype)initSwiftOptionalPropertyWithName:(NSString *)name
                                           indexed:(BOOL)indexed

@@ -172,10 +172,14 @@
 		3F1F47821B9612B300CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F1F47831B9656B900CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F222C4E1E26F51300CA0713 /* ThreadSafeReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */; };
+		3F2633C31E9D630000B32D30 /* PrimitiveListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F2633C21E9D630000B32D30 /* PrimitiveListTests.swift */; };
 		3F2E66641CA0BA11004761D5 /* NotificationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F2E66611CA0B9D5004761D5 /* NotificationTests.m */; };
 		3F2E66651CA0BA12004761D5 /* NotificationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F2E66611CA0B9D5004761D5 /* NotificationTests.m */; };
 		3F336E8A1DA2FA14006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A36236A1D83868F00945A54 /* RLMSyncConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		3F336E8B1DA2FA15006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A36236A1D83868F00945A54 /* RLMSyncConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		3F5734F11EA6BF3700C236B3 /* object_accessor_impl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F5734EE1EA6BF3700C236B3 /* object_accessor_impl.hpp */; };
+		3F5734F21EA6BF3700C236B3 /* primitive_list_notifier.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F5734EF1EA6BF3700C236B3 /* primitive_list_notifier.hpp */; };
+		3F5734F31EA6BF3700C236B3 /* primitive_list_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F5734F01EA6BF3700C236B3 /* primitive_list_notifier.cpp */; };
 		3F5B5D301E84230B00953B33 /* binding_callback_thread_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F5B5D2E1E84230B00953B33 /* binding_callback_thread_observer.cpp */; };
 		3F5B5D321E84230E00953B33 /* binding_callback_thread_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F5B5D2E1E84230B00953B33 /* binding_callback_thread_observer.cpp */; };
 		3F643BED1CEA655800F6D0C8 /* mixed-column.realm in Resources */ = {isa = PBXBuildFile; fileRef = 3F643BEB1CEA654D00F6D0C8 /* mixed-column.realm */; };
@@ -185,7 +189,6 @@
 		3F67DB3E1E26D69C0024533D /* RLMThreadSafeReference.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F67DB3B1E26D69C0024533D /* RLMThreadSafeReference.mm */; };
 		3F67DB401E26D6A20024533D /* RLMThreadSafeReference.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F67DB391E26D69C0024533D /* RLMThreadSafeReference.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F67DB411E26D6AD0024533D /* RLMThreadSafeReference.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F67DB3B1E26D69C0024533D /* RLMThreadSafeReference.mm */; };
-		3F73BC861E3A871B00FE80B6 /* ThreadSafeReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC841E3A870F00FE80B6 /* ThreadSafeReferenceTests.swift */; };
 		3F73BC911E3A877300FE80B6 /* RLMSyncSessionRefreshHandle+ObjectServerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC891E3A876600FE80B6 /* RLMSyncSessionRefreshHandle+ObjectServerTests.m */; };
 		3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */; };
 		3F73BC951E3A878500FE80B6 /* NSError+RLMSync.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F73BC931E3A878500FE80B6 /* NSError+RLMSync.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -198,6 +201,23 @@
 		3F7556761BE95A0D0058BC7E /* AsyncTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.mm */; };
 		3F7A3FAE1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7A3FAC1CC6EB7300301A17 /* collection_change_builder.cpp */; };
 		3F7A3FAF1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7A3FAC1CC6EB7300301A17 /* collection_change_builder.cpp */; };
+		3F8824FD1E5E335000586B35 /* MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610011BE98D880021E04F /* MigrationTests.swift */; };
+		3F8824FE1E5E335000586B35 /* ObjectAccessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610021BE98D880021E04F /* ObjectAccessorTests.swift */; };
+		3F8824FF1E5E335000586B35 /* ObjectCreationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610031BE98D880021E04F /* ObjectCreationTests.swift */; };
+		3F8825001E5E335000586B35 /* ObjectiveCSupportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */; };
+		3F8825011E5E335000586B35 /* ObjectSchemaInitializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610041BE98D880021E04F /* ObjectSchemaInitializationTests.swift */; };
+		3F8825021E5E335000586B35 /* ObjectSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610051BE98D880021E04F /* ObjectSchemaTests.swift */; };
+		3F8825031E5E335000586B35 /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610061BE98D880021E04F /* ObjectTests.swift */; };
+		3F8825041E5E335000586B35 /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610071BE98D880021E04F /* PerformanceTests.swift */; };
+		3F8825051E5E335000586B35 /* PropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610081BE98D880021E04F /* PropertyTests.swift */; };
+		3F8825061E5E335000586B35 /* RealmCollectionTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610091BE98D880021E04F /* RealmCollectionTypeTests.swift */; };
+		3F8825071E5E335000586B35 /* RealmConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D66100A1BE98D880021E04F /* RealmConfigurationTests.swift */; };
+		3F8825081E5E335000586B35 /* RealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D66100C1BE98D880021E04F /* RealmTests.swift */; };
+		3F8825091E5E335000586B35 /* SchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D66100D1BE98D880021E04F /* SchemaTests.swift */; };
+		3F88250A1E5E335000586B35 /* SortDescriptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D66100E1BE98D880021E04F /* SortDescriptorTests.swift */; };
+		3F88250B1E5E335000586B35 /* SwiftLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D66100F1BE98D880021E04F /* SwiftLinkTests.swift */; };
+		3F88250C1E5E335000586B35 /* SwiftUnicodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610111BE98D880021E04F /* SwiftUnicodeTests.swift */; };
+		3F88250D1E5E335000586B35 /* ThreadSafeReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC841E3A870F00FE80B6 /* ThreadSafeReferenceTests.swift */; };
 		3F8DCA7519930FCB0008BD7F /* SwiftTestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */; };
 		3F8DCA7619930FCB0008BD7F /* SwiftArrayPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */; };
 		3F8DCA7719930FCB0008BD7F /* SwiftArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */; };
@@ -246,7 +266,6 @@
 		3FEB38401E70AC8800F22712 /* ObjectCreationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FEB383C1E70AC6900F22712 /* ObjectCreationTests.mm */; };
 		3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */; };
 		5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */; };
-		5BC537161DD5B8D70055C524 /* ObjectiveCSupportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */; };
 		5D03FB1F1E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
 		5D03FB201E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
 		5D128F2A1BE984E5001F4FBF /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5D659ED91BE04556006515A0 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -335,24 +354,8 @@
 		5D660FFC1BE98D670021E04F /* Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FEE1BE98D670021E04F /* Schema.swift */; };
 		5D660FFD1BE98D670021E04F /* SortDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FEF1BE98D670021E04F /* SortDescriptor.swift */; };
 		5D660FFE1BE98D670021E04F /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FF01BE98D670021E04F /* Util.swift */; };
-		5D6610151BE98D880021E04F /* KVOTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FFF1BE98D880021E04F /* KVOTests.swift */; };
 		5D6610161BE98D880021E04F /* ListTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610001BE98D880021E04F /* ListTests.swift */; };
-		5D6610171BE98D880021E04F /* MigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610011BE98D880021E04F /* MigrationTests.swift */; };
-		5D6610181BE98D880021E04F /* ObjectAccessorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610021BE98D880021E04F /* ObjectAccessorTests.swift */; };
-		5D6610191BE98D880021E04F /* ObjectCreationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610031BE98D880021E04F /* ObjectCreationTests.swift */; };
-		5D66101A1BE98D880021E04F /* ObjectSchemaInitializationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610041BE98D880021E04F /* ObjectSchemaInitializationTests.swift */; };
-		5D66101B1BE98D880021E04F /* ObjectSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610051BE98D880021E04F /* ObjectSchemaTests.swift */; };
-		5D66101C1BE98D880021E04F /* ObjectTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610061BE98D880021E04F /* ObjectTests.swift */; };
-		5D66101D1BE98D880021E04F /* PerformanceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610071BE98D880021E04F /* PerformanceTests.swift */; };
-		5D66101E1BE98D880021E04F /* PropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610081BE98D880021E04F /* PropertyTests.swift */; };
-		5D66101F1BE98D880021E04F /* RealmCollectionTypeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610091BE98D880021E04F /* RealmCollectionTypeTests.swift */; };
-		5D6610201BE98D880021E04F /* RealmConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D66100A1BE98D880021E04F /* RealmConfigurationTests.swift */; };
-		5D6610211BE98D880021E04F /* RealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D66100C1BE98D880021E04F /* RealmTests.swift */; };
-		5D6610221BE98D880021E04F /* SchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D66100D1BE98D880021E04F /* SchemaTests.swift */; };
-		5D6610231BE98D880021E04F /* SortDescriptorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D66100E1BE98D880021E04F /* SortDescriptorTests.swift */; };
-		5D6610241BE98D880021E04F /* SwiftLinkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D66100F1BE98D880021E04F /* SwiftLinkTests.swift */; };
 		5D6610251BE98D880021E04F /* SwiftTestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610101BE98D880021E04F /* SwiftTestObjects.swift */; };
-		5D6610261BE98D880021E04F /* SwiftUnicodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610111BE98D880021E04F /* SwiftUnicodeTests.swift */; };
 		5D6610271BE98D880021E04F /* TestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610121BE98D880021E04F /* TestCase.swift */; };
 		5D6610281BE98D880021E04F /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D6610141BE98D880021E04F /* TestUtils.mm */; };
 		5D66102A1BE98DD00021E04F /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5D659ED91BE04556006515A0 /* Realm.framework */; };
@@ -734,10 +737,14 @@
 		3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = external_commit_helper.cpp; sourceTree = "<group>"; };
 		3F2118A91B97CBE1005A4CFE /* external_commit_helper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = external_commit_helper.hpp; sourceTree = "<group>"; };
 		3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThreadSafeReference.swift; sourceTree = "<group>"; };
+		3F2633C21E9D630000B32D30 /* PrimitiveListTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PrimitiveListTests.swift; sourceTree = "<group>"; };
 		3F2E66611CA0B9D5004761D5 /* NotificationTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationTests.m; sourceTree = "<group>"; };
 		3F44109E19953F5900223146 /* RLMTestObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMTestObjects.h; sourceTree = "<group>"; };
 		3F452EC519C2279800AFC154 /* RLMSwiftSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMSwiftSupport.m; path = Realm/RLMSwiftSupport.m; sourceTree = SOURCE_ROOT; };
 		3F4E324B1B98C6C700183A69 /* RLMSchema_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSchema_Private.hpp; sourceTree = "<group>"; };
+		3F5734EE1EA6BF3700C236B3 /* object_accessor_impl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = object_accessor_impl.hpp; sourceTree = "<group>"; };
+		3F5734EF1EA6BF3700C236B3 /* primitive_list_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = primitive_list_notifier.hpp; sourceTree = "<group>"; };
+		3F5734F01EA6BF3700C236B3 /* primitive_list_notifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive_list_notifier.cpp; sourceTree = "<group>"; };
 		3F5B5D2E1E84230B00953B33 /* binding_callback_thread_observer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = binding_callback_thread_observer.cpp; sourceTree = "<group>"; };
 		3F5B5D2F1E84230B00953B33 /* binding_callback_thread_observer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = binding_callback_thread_observer.hpp; sourceTree = "<group>"; };
 		3F62BA9E1BA0AB9000A4CEB2 /* binding_context.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = binding_context.hpp; sourceTree = "<group>"; };
@@ -1211,6 +1218,8 @@
 				1ADE09421E89DDB9008AB1D3 /* object_accessor_impl.hpp */,
 				3FAB08861E1EC51F001BC8DA /* object_notifier.cpp */,
 				3FAB08851E1EC51F001BC8DA /* object_notifier.hpp */,
+				3F5734F01EA6BF3700C236B3 /* primitive_list_notifier.cpp */,
+				3F5734EF1EA6BF3700C236B3 /* primitive_list_notifier.hpp */,
 				3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */,
 				3F0543E91C56F71500AA5322 /* realm_coordinator.hpp */,
 				3F9801AE1C90FD2D000A8B07 /* results_notifier.cpp */,
@@ -1306,6 +1315,7 @@
 				5D6610051BE98D880021E04F /* ObjectSchemaTests.swift */,
 				5D6610061BE98D880021E04F /* ObjectTests.swift */,
 				5D6610071BE98D880021E04F /* PerformanceTests.swift */,
+				3F2633C21E9D630000B32D30 /* PrimitiveListTests.swift */,
 				5D6610081BE98D880021E04F /* PropertyTests.swift */,
 				5D6610091BE98D880021E04F /* RealmCollectionTypeTests.swift */,
 				5D66100A1BE98D880021E04F /* RealmConfigurationTests.swift */,
@@ -1613,6 +1623,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F73BC951E3A878500FE80B6 /* NSError+RLMSync.h in Headers */,
+				3F5734F11EA6BF3700C236B3 /* object_accessor_impl.hpp in Headers */,
+				3F5734F21EA6BF3700C236B3 /* primitive_list_notifier.hpp in Headers */,
 				5D659EA51BE04556006515A0 /* Realm.h in Headers */,
 				5D659EA71BE04556006515A0 /* RLMAccessor.h in Headers */,
 				5D659EA91BE04556006515A0 /* RLMArray.h in Headers */,
@@ -2244,6 +2256,7 @@
 				3FAB08881E1EC51F001BC8DA /* object_notifier.cpp in Sources */,
 				5D659E831BE04556006515A0 /* object_schema.cpp in Sources */,
 				5D659E841BE04556006515A0 /* object_store.cpp in Sources */,
+				3F5734F31EA6BF3700C236B3 /* primitive_list_notifier.cpp in Sources */,
 				3F0543EC1C56F71500AA5322 /* realm_coordinator.cpp in Sources */,
 				3F75566B1BE94CCC0058BC7E /* results.cpp in Sources */,
 				3F9801B01C90FD2D000A8B07 /* results_notifier.cpp in Sources */,
@@ -2340,28 +2353,28 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8AE7C261EA436F800CDFF9A /* CompactionTests.swift in Sources */,
-				5D6610151BE98D880021E04F /* KVOTests.swift in Sources */,
 				5D6610161BE98D880021E04F /* ListTests.swift in Sources */,
-				5D6610171BE98D880021E04F /* MigrationTests.swift in Sources */,
-				5D6610181BE98D880021E04F /* ObjectAccessorTests.swift in Sources */,
-				5D6610191BE98D880021E04F /* ObjectCreationTests.swift in Sources */,
-				5BC537161DD5B8D70055C524 /* ObjectiveCSupportTests.swift in Sources */,
-				5D66101A1BE98D880021E04F /* ObjectSchemaInitializationTests.swift in Sources */,
-				5D66101B1BE98D880021E04F /* ObjectSchemaTests.swift in Sources */,
-				5D66101C1BE98D880021E04F /* ObjectTests.swift in Sources */,
-				5D66101D1BE98D880021E04F /* PerformanceTests.swift in Sources */,
-				5D66101E1BE98D880021E04F /* PropertyTests.swift in Sources */,
-				5D66101F1BE98D880021E04F /* RealmCollectionTypeTests.swift in Sources */,
-				5D6610201BE98D880021E04F /* RealmConfigurationTests.swift in Sources */,
-				5D6610211BE98D880021E04F /* RealmTests.swift in Sources */,
-				5D6610221BE98D880021E04F /* SchemaTests.swift in Sources */,
-				5D6610231BE98D880021E04F /* SortDescriptorTests.swift in Sources */,
-				5D6610241BE98D880021E04F /* SwiftLinkTests.swift in Sources */,
+				3F8824FD1E5E335000586B35 /* MigrationTests.swift in Sources */,
+				3F8824FE1E5E335000586B35 /* ObjectAccessorTests.swift in Sources */,
+				3F8824FF1E5E335000586B35 /* ObjectCreationTests.swift in Sources */,
+				3F8825001E5E335000586B35 /* ObjectiveCSupportTests.swift in Sources */,
+				3F8825011E5E335000586B35 /* ObjectSchemaInitializationTests.swift in Sources */,
+				3F8825021E5E335000586B35 /* ObjectSchemaTests.swift in Sources */,
+				3F8825031E5E335000586B35 /* ObjectTests.swift in Sources */,
+				3F8825041E5E335000586B35 /* PerformanceTests.swift in Sources */,
+				3F2633C31E9D630000B32D30 /* PrimitiveListTests.swift in Sources */,
+				3F8825051E5E335000586B35 /* PropertyTests.swift in Sources */,
+				3F8825061E5E335000586B35 /* RealmCollectionTypeTests.swift in Sources */,
+				3F8825071E5E335000586B35 /* RealmConfigurationTests.swift in Sources */,
+				3F8825081E5E335000586B35 /* RealmTests.swift in Sources */,
+				3F8825091E5E335000586B35 /* SchemaTests.swift in Sources */,
+				3F88250A1E5E335000586B35 /* SortDescriptorTests.swift in Sources */,
+				3F88250B1E5E335000586B35 /* SwiftLinkTests.swift in Sources */,
 				5D6610251BE98D880021E04F /* SwiftTestObjects.swift in Sources */,
-				5D6610261BE98D880021E04F /* SwiftUnicodeTests.swift in Sources */,
+				3F88250C1E5E335000586B35 /* SwiftUnicodeTests.swift in Sources */,
 				5D6610271BE98D880021E04F /* TestCase.swift in Sources */,
 				5D6610281BE98D880021E04F /* TestUtils.mm in Sources */,
-				3F73BC861E3A871B00FE80B6 /* ThreadSafeReferenceTests.swift in Sources */,
+				3F88250D1E5E335000586B35 /* ThreadSafeReferenceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

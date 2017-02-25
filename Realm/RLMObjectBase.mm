@@ -83,16 +83,7 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
                                      __unsafe_unretained RLMSchema *const schema) {
     RLMValidateValueForProperty(obj, prop);
 
-    if (obj && prop.type == RLMPropertyTypeObject) {
-        RLMObjectSchema *objSchema = schema[prop.objectClassName];
-        if ([obj isKindOfClass:objSchema.objectClass]) {
-            return obj;
-        }
-        else {
-            return [[objSchema.objectClass alloc] initWithValue:obj schema:schema];
-        }
-    }
-    if (prop.type == RLMPropertyTypeArray) {
+    if (prop.array && [obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
         RLMObjectSchema *objSchema = schema[prop.objectClassName];
         RLMArray *objects = [[RLMArray alloc] initWithObjectClassName:objSchema.className];
         for (id el in obj) {
@@ -104,6 +95,15 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
             }
         }
         return objects;
+    }
+    else if (prop.type == RLMPropertyTypeObject && obj) {
+        RLMObjectSchema *objSchema = schema[prop.objectClassName];
+        if ([obj isKindOfClass:objSchema.objectClass]) {
+            return obj;
+        }
+        else {
+            return [[objSchema.objectClass alloc] initWithValue:obj schema:schema];
+        }
     }
 
     return obj;
@@ -190,7 +190,7 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
     value = RLMCoerceToNil(value);
     RLMProperty *property = _objectSchema[key];
     if (Ivar ivar = property.swiftIvar) {
-        if (property.type == RLMPropertyTypeArray && (!value || [value conformsToProtocol:@protocol(NSFastEnumeration)])) {
+        if (property.array && (!value || [value conformsToProtocol:@protocol(NSFastEnumeration)])) {
             RLMArray *array = [object_getIvar(self, ivar) _rlmArray];
             [array removeAllObjects];
 

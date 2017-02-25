@@ -247,6 +247,12 @@ id makeNumberGetter(NSUInteger index, bool boxed, bool optional) {
 // dynamic getter with column closure
 id managedGetter(RLMProperty *prop, const char *type) {
     NSUInteger index = prop.index;
+    if (prop.array) {
+        return ^id(__unsafe_unretained RLMObjectBase *const obj) {
+            return getArray(obj, index);
+        };
+    }
+
     bool boxed = *type == '@';
     switch (prop.type) {
         case RLMPropertyTypeInt:
@@ -276,10 +282,6 @@ id managedGetter(RLMProperty *prop, const char *type) {
             return makeBoxedGetter<realm::BinaryData>(index);
         case RLMPropertyTypeObject:
             return makeBoxedGetter<realm::RowExpr>(index);
-        case RLMPropertyTypeArray:
-            return ^(__unsafe_unretained RLMObjectBase *const obj) {
-                return getArray(obj, index);
-            };
         case RLMPropertyTypeAny:
             @throw RLMException(@"Cannot create accessor class for schema with Mixed properties");
         case RLMPropertyTypeLinkingObjects:
@@ -319,6 +321,7 @@ id makeSetter(__unsafe_unretained RLMProperty *const prop) {
 // dynamic setter with column closure
 id managedSetter(RLMProperty *prop, const char *type) {
     bool boxed = prop.optional || *type == '@';
+    bool array = prop.array;
     switch (prop.type) {
         case RLMPropertyTypeInt:
             if (boxed) {
@@ -342,10 +345,10 @@ id managedSetter(RLMProperty *prop, const char *type) {
         case RLMPropertyTypeString:         return makeSetter<NSString *>(prop);
         case RLMPropertyTypeDate:           return makeSetter<NSDate *>(prop);
         case RLMPropertyTypeData:           return makeSetter<NSData *>(prop);
-        case RLMPropertyTypeObject:         return makeSetter<RLMObjectBase *>(prop);
-        case RLMPropertyTypeArray:          return makeSetter<id<NSFastEnumeration>>(prop);
         case RLMPropertyTypeAny:            return makeSetter<id>(prop);
         case RLMPropertyTypeLinkingObjects: return nil;
+        case RLMPropertyTypeObject:
+            return array ? makeSetter<id<NSFastEnumeration>>(prop) : makeSetter<RLMObjectBase *>(prop);
     }
 }
 
@@ -370,26 +373,40 @@ void superSet(RLMObjectBase *obj, NSString *propName, id val) {
 // getter/setter for unmanaged object
 id unmanagedGetter(RLMProperty *prop, const char *) {
     // only override getters for RLMArray and linking objects properties
-    if (prop.type == RLMPropertyTypeArray) {
-        NSString *objectClassName = prop.objectClassName;
+    if (prop.array) {
         NSString *propName = prop.name;
-
-        return ^(RLMObjectBase *obj) {
-            id val = superGet(obj, propName);
-            if (!val) {
-                val = [[RLMArray alloc] initWithObjectClassName:objectClassName];
-                superSet(obj, propName, val);
-            }
-            return val;
-        };
+        if (prop.type == RLMPropertyTypeObject) {
+            NSString *objectClassName = prop.objectClassName;
+            return ^(RLMObjectBase *obj) {
+                id val = superGet(obj, propName);
+                if (!val) {
+                    val = [[RLMArray alloc] initWithObjectClassName:objectClassName];
+                    superSet(obj, propName, val);
+                }
+                return val;
+            };
+        }
+        else {
+            auto type = prop.type;
+            auto optional = prop.optional;
+            return ^(RLMObjectBase *obj) {
+                id val = superGet(obj, propName);
+                if (!val) {
+                    val = [[RLMArray alloc] initWithObjectType:type optional:optional];
+                    superSet(obj, propName, val);
+                }
+                return val;
+            };
+        }
     }
     if (prop.type == RLMPropertyTypeLinkingObjects) {
         return ^(RLMObjectBase *) { return [RLMResults emptyDetachedResults]; };
     }
     return nil;
 }
+
 id unmanagedSetter(RLMProperty *prop, const char *) {
-    if (prop.type != RLMPropertyTypeArray) {
+    if (!prop.array) {
         return nil;
     }
 
@@ -552,7 +569,7 @@ id RLMDynamicGetByName(__unsafe_unretained RLMObjectBase *const obj,
         @throw RLMException(@"Invalid property name '%@' for class '%@'.",
                             propName, obj->_objectSchema.className);
     }
-    if (asList && prop.type == RLMPropertyTypeArray && prop.swiftIvar) {
+    if (asList && prop.array && prop.swiftIvar) {
         RLMListBase *list = object_getIvar(obj, prop.swiftIvar);
         if (!list._rlmArray) {
             list._rlmArray = RLMDynamicGet(obj, prop);
@@ -565,7 +582,7 @@ id RLMDynamicGetByName(__unsafe_unretained RLMObjectBase *const obj,
 
 RLMAccessorContext::RLMAccessorContext(RLMAccessorContext& parent, realm::Property const& property)
 : _realm(parent._realm)
-, _info(parent._info.linkTargetType(property))
+, _info(property.type == realm::PropertyType::Object ? parent._info.linkTargetType(property) : parent._info)
 , _promote_existing(parent._promote_existing)
 {
 }
@@ -578,9 +595,8 @@ RLMAccessorContext::RLMAccessorContext(RLMRealm *realm, RLMClassInfo& info, bool
 RLMAccessorContext::RLMAccessorContext(__unsafe_unretained RLMObjectBase *const parent,
                                        const realm::Property *prop)
 : _realm(parent->_realm)
-, _info(prop && (prop->type == realm::PropertyType::Object || prop->type == realm::PropertyType::Array)
-        ? parent->_info->linkTargetType(*prop)
-        : *parent->_info)
+, _info(prop && prop->type == realm::PropertyType::Object ? parent->_info->linkTargetType(*prop)
+                                                          : *parent->_info)
 , _parentObject(parent)
 {
 }
@@ -598,6 +614,12 @@ id RLMAccessorContext::defaultValue(__unsafe_unretained NSString *const key) {
 static void validateValueForProperty(__unsafe_unretained id const obj,
                                      __unsafe_unretained RLMProperty *const prop,
                                      RLMClassInfo const& info) {
+    if (prop.array) {
+        if (obj && obj != NSNull.null && ![obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
+            @throw RLMException(@"Array property value (%@) is not enumerable.", obj);
+        }
+        return;
+    }
     switch (prop.type) {
         case RLMPropertyTypeString:
         case RLMPropertyTypeBool:
@@ -612,11 +634,6 @@ static void validateValueForProperty(__unsafe_unretained id const obj,
             }
             break;
         case RLMPropertyTypeObject:
-            break;
-        case RLMPropertyTypeArray:
-            if (obj && obj != NSNull.null && ![obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
-                @throw RLMException(@"Array property value (%@) is not enumerable.", obj);
-            }
             break;
         case RLMPropertyTypeAny:
         case RLMPropertyTypeLinkingObjects:
@@ -641,7 +658,7 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
 
     // Property value from an instance of this object type
     if ([obj isKindOfClass:_info.rlmObjectSchema.objectClass] && prop.swiftIvar) {
-        if (prop.type == RLMPropertyTypeArray) {
+        if (prop.array) {
             return static_cast<RLMListBase *>(object_getIvar(obj, prop.swiftIvar))._rlmArray;
         }
         else { // optional
@@ -652,18 +669,7 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
     // Property value from some object that's KVC-compatible
     id value = RLMValidatedValueForProperty(obj, [obj respondsToSelector:prop.getterSel] ? prop.getterName : prop.name,
                                             _info.rlmObjectSchema.className);
-    // return value ?: NSNull.null;
-
-    // FIXME: for compatiblity with existing code this does bad things to make
-    // it so that createOrUpdate: does not set existing properties to `nil`
-    // unless using the dictionary/array code path. Remove this in 3.0.
-    if (!value) {
-        validateValueForProperty(NSNull.null, prop, _info);
-        if (prop.isPrimary)
-            return NSNull.null;
-        _nilHack = true;
-    }
-    return value;
+    return value ?: NSNull.null;
 }
 
 id RLMAccessorContext::box(realm::List&& l) {
@@ -844,7 +850,7 @@ RLMOptionalId RLMAccessorContext::value_for_property(__unsafe_unretained id cons
         // this is mainly an issue when the object graph being added has cycles,
         // as it's not obvious that the user has to set the *ivars* to nil to
         // avoid leaking memory
-        if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
+        if (prop.type == RLMPropertyTypeObject) {
             ((void(*)(id, SEL, id))objc_msgSend)(obj, prop.setterSel, nil);
         }
     }
