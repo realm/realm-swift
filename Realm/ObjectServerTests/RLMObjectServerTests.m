@@ -242,6 +242,8 @@
     XCTAssertNil(badSession);
 }
 
+// FIXME: write a 'testUserIsAdminFlagProperlySet' test once we can properly create admin users
+
 #pragma mark - Basic Sync
 
 /// It should be possible to successfully open a Realm configured for sync with an access token.

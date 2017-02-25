@@ -7,11 +7,12 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add an `isAdmin` property to `RLMSyncUser` indicating whether a user is a
+  Realm Object Server administrator.
 
 ### Bugfixes
 
-* None.
+* Fix an issue where the project would fail to compile with clang 4.0.
 
 2.5.0 Release notes (2017-03-28)
 =============================================================
