@@ -287,12 +287,8 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     realm->_dynamic = dynamic;
 
     // protects the realm cache and accessors cache
-    static std::mutex *initLock;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        initLock = new std::mutex();
-    });
-    std::lock_guard<std::mutex> lock(*initLock);
+    static std::mutex& initLock = *new std::mutex();
+    std::lock_guard<std::mutex> lock(initLock);
 
     try {
         realm->_realm = Realm::get_shared_realm(config);
