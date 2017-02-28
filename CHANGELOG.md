@@ -11,7 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix an issue where spurious crashes might occur when the host application is
+  being terminated because static objects that were destroyed were accessed.
 
 2.4.3 Release notes (2017-02-20)
 =============================================================
