@@ -11,7 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix a crash that could occur if new Realm instances were created while the
+  application was exiting.
 
 2.4.3 Release notes (2017-02-20)
 =============================================================

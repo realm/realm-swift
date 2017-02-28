@@ -36,8 +36,8 @@
 #import <unistd.h>
 
 // Global realm state
-static std::mutex s_realmCacheMutex;
-static std::map<std::string, NSMapTable *> s_realmsPerPath;
+static std::mutex& s_realmCacheMutex = *new std::mutex();
+static std::map<std::string, NSMapTable *>& s_realmsPerPath = *new std::map<std::string, NSMapTable *>();
 
 void RLMCacheRealm(std::string const& path, RLMRealm *realm) {
     std::lock_guard<std::mutex> lock(s_realmCacheMutex);
