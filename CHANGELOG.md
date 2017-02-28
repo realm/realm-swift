@@ -11,8 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* Fix an issue where spurious crashes might occur when the host application is
-  being terminated because static objects that were destroyed were accessed.
+* Fix a crash that could occur if new Realm instances were created while the
+  application was exiting.
 
 2.4.3 Release notes (2017-02-20)
 =============================================================
