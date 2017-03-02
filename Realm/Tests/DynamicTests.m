@@ -346,7 +346,7 @@
     XCTAssertTrue([person isEqualToObject:[child[@"parents"] firstObject]]);
 
     RLMAssertThrowsWithReason(person[@"parents"] = @[],
-                              @"Linking objects properties are read-only");
+                              @"Cannot modify read-only property 'PersonObject.parents'");
 
     [realm commitWriteTransaction];
 }

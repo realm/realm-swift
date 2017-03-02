@@ -33,6 +33,7 @@
 #import "RLMUtil.hpp"
 
 #import "object.hpp"
+#import "shared_realm.hpp"
 
 using namespace realm;
 

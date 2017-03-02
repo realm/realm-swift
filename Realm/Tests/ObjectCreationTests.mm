@@ -393,14 +393,14 @@
     auto realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
 
-    RLMAssertThrowsWithReasonMatching(([DogObject createInRealm:realm withValue:@[@"name", @"age"]]),
-                                      @"Invalid value 'age' for property 'age'");
-    RLMAssertThrowsWithReasonMatching(([DogObject createInRealm:realm withValue:@[@"name", NSNull.null]]),
-                                      @"Invalid value '<null>' for property 'age'");
-    RLMAssertThrowsWithReasonMatching(([DogObject createInRealm:realm withValue:@[@"name", @5, @"too many values"]]),
-                                      @"Invalid array input: more values \\(3\\) than properties \\(2\\).");
-    RLMAssertThrowsWithReasonMatching(([PrimaryStringObject createInRealm:realm withValue:@[]]),
-                                      @"Invalid array input: primary key must be present.");
+    RLMAssertThrowsWithReason(([DogObject createInRealm:realm withValue:@[@"name", @"age"]]),
+                              @"Invalid value 'age' for property 'DogObject.age'");
+    RLMAssertThrowsWithReason(([DogObject createInRealm:realm withValue:@[@"name", NSNull.null]]),
+                              @"Invalid value '<null>' for property 'DogObject.age'");
+    RLMAssertThrowsWithReason(([DogObject createInRealm:realm withValue:@[@"name", @5, @"too many values"]]),
+                              @"Invalid array input: more values (3) than properties (2).");
+    RLMAssertThrowsWithReason(([PrimaryStringObject createInRealm:realm withValue:@[]]),
+                              @"Missing value for property 'PrimaryStringObject.stringCol'");
 
     [realm cancelWriteTransaction];
 }
@@ -463,10 +463,10 @@
     auto realm = RLMRealm.defaultRealm;
     [realm beginWriteTransaction];
 
-    RLMAssertThrowsWithReasonMatching(([DogObject createInRealm:realm withValue:@{@"name": @"a", @"age": NSNull.null}]),
-                                      @"Invalid value '<null>' for property 'age'");
+    RLMAssertThrowsWithReason(([DogObject createInRealm:realm withValue:@{@"name": @"a", @"age": NSNull.null}]),
+                              @"Invalid value '<null>' for property 'DogObject.age'");
     RLMAssertThrowsWithReasonMatching(([DogObject createInRealm:realm withValue:@{@"name": @"a", @"age": NSDate.date}]),
-                                      @"Invalid value '20.*' for property 'age'");
+                                      @"Invalid value '20.*' for property 'DogObject.age'");
     [realm cancelWriteTransaction];
 }
 
@@ -522,7 +522,7 @@
 
     // Same property names, but different types
     RLMAssertThrowsWithReasonMatching([BizzaroDog createInRealm:realm withValue:dog],
-                                      @"Invalid value 'Fido' for property 'dogName'");
+                                      @"Invalid value 'Fido' for property 'BizzaroDog.dogName'");
 
     [realm cancelWriteTransaction];
 }
@@ -856,7 +856,11 @@
     auto realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     RLMAssertThrowsWithReason([PrimaryStringObject createOrUpdateInRealm:realm withValue:@{@"stringCol": @"pk"}],
-                              @"Property 'intCol' of object of type 'PrimaryStringObject' cannot be nil.");
+                              @"Missing value for property 'PrimaryStringObject.intCol'");
+    RLMAssertThrowsWithReason(([PrimaryStringObject createOrUpdateInRealm:realm
+                                                                withValue:@{@"stringCol": @"pk",
+                                                                            @"intCol": NSNull.null}]),
+                              @"Invalid value '<null>' for property 'PrimaryStringObject.intCol'");
     [realm cancelWriteTransaction];
 }
 
@@ -1066,7 +1070,7 @@
     auto co = [CompanyObject new];
     [co.employees addObject:eo];
     RLMAssertThrowsWithReason([realm2 addObject:co],
-                              @"Can not add objects from a different Realm");
+                              @"Object is already managed by another Realm. Use create instead to copy it into this Realm.");
     XCTAssertEqual(co.realm, realm2);
 
     [realm cancelWriteTransaction];
@@ -1101,7 +1105,7 @@
     auto realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     RLMAssertThrowsWithReason([realm addObject:[[RequiredPropertiesObject alloc] init]],
-                              @"Nil value specified for required property 'stringCol' in 'RequiredPropertiesObject'");
+                              @"Invalid value '<null>' for property 'RequiredPropertiesObject.stringCol'");
     [realm cancelWriteTransaction];
 }
 
@@ -1186,7 +1190,7 @@
 
     [PrimaryKeyAndRequiredString createInRealm:realm withValue:@[@0, @"value"]];
     RLMAssertThrowsWithReason([realm addOrUpdateObject:[[PrimaryKeyAndRequiredString alloc] init]],
-                              @"Nil value specified for required property");
+                              @"Invalid value '<null>' for property 'PrimaryKeyAndRequiredString.value'");
 
     [realm cancelWriteTransaction];
 }
@@ -1285,7 +1289,7 @@
     auto co = [PrimaryCompanyObject new];
     [co.employees addObject:eo];
     RLMAssertThrowsWithReason([realm2 addOrUpdateObject:co],
-                              @"Can not add objects from a different Realm");
+                              @"Object is already managed by another Realm. Use create instead to copy it into this Realm.");
     XCTAssertEqual(co.realm, realm2);
 
     [realm cancelWriteTransaction];

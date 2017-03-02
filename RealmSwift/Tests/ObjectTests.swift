@@ -222,7 +222,8 @@ class ObjectTests: TestCase {
         assertDifferentPropertyValues(DynamicDefaultObject(), DynamicDefaultObject())
         let realm = try! Realm()
         try! realm.write {
-            assertDifferentPropertyValues(realm.create(DynamicDefaultObject.self), realm.create(DynamicDefaultObject.self))
+            assertDifferentPropertyValues(realm.create(DynamicDefaultObject.self),
+                                          realm.create(DynamicDefaultObject.self))
         }
     }
 

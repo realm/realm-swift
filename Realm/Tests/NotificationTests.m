@@ -934,7 +934,8 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
         XCTAssertEqualObjects(prop.name, _propertyNames[i]);
         XCTAssertNil(prop.previousValue);
         if ([prop.name isEqualToString:@"objectCol"]) {
-            XCTAssertTrue([prop.value isEqualToObject:_values[i]]);
+            XCTAssertTrue([prop.value isEqualToObject:_values[i]],
+                          @"%d: %@ %@", (int)i, prop.value, _values[i]);
         }
         else {
             XCTAssertEqualObjects(prop.value, _values[i]);

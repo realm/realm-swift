@@ -657,7 +657,7 @@
     XCTAssertEqualObjects([company.employees valueForKeyPath:@"@distinctUnionOfObjects.name"], (@[@"Joe"]));
 
     RLMAssertThrowsWithReasonMatching([company.employees valueForKeyPath:@"@sum.dogs.@sum.age"], @"Nested key paths.*not supported");
-    
+
     // unmanaged object
     company = [[CompanyObject alloc] init];
     ages = [NSMutableArray array];
@@ -1011,10 +1011,24 @@
     ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"arrayObject", @[], @[]]];
     NSSet *stringSet = [NSSet setWithArray:@[[[StringObject alloc] initWithValue:@[@"a"]]]];
     [array setValue:stringSet forKey:@"array"];
-    XCTAssertEqualObjects([[array valueForKey:@"array"] valueForKey:@"stringCol"], [[stringSet allObjects] valueForKey:@"stringCol"]);
+    XCTAssertEqualObjects([[array valueForKey:@"array"] valueForKey:@"stringCol"],
+                          [[stringSet allObjects] valueForKey:@"stringCol"]);
     [array setValue:[stringSet allObjects] forKey:@"array"];
-    XCTAssertEqualObjects([[array valueForKey:@"array"] valueForKey:@"stringCol"], [[stringSet allObjects] valueForKey:@"stringCol"]);
+    XCTAssertEqualObjects([[array valueForKey:@"array"] valueForKey:@"stringCol"],
+                          [[stringSet allObjects] valueForKey:@"stringCol"]);
     [realm commitWriteTransaction];
+}
+
+- (void)testAssignIncorrectType {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm
+                                                          withValue:@[@"", @[@[@"a"]], @[@[@0]]]];
+    RLMAssertThrowsWithReason(array.intArray = (id)array.array,
+                              @"Object of type (StringObject) does not match List type");
+    RLMAssertThrowsWithReason(array[@"intArray"] = array[@"array"],
+                              @"Invalid property value");
+    [realm cancelWriteTransaction];
 }
 
 - (void)testNotificationSentInitially {

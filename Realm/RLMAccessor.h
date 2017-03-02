@@ -18,14 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-
-@class RLMObjectSchema, RLMProperty, RLMObjectBase, RLMProperty;
-
-#ifdef __cplusplus
-typedef NSUInteger RLMCreationOptions;
-#else
-typedef NS_OPTIONS(NSUInteger, RLMCreationOptions);
-#endif
+@class RLMObjectSchema, RLMProperty, RLMObjectBase;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -45,7 +38,7 @@ FOUNDATION_EXTERN id __nullable RLMDynamicGet(RLMObjectBase *obj, RLMProperty *p
 FOUNDATION_EXTERN id __nullable RLMDynamicGetByName(RLMObjectBase *obj, NSString *propName, bool asList);
 
 // by property/column
-void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val, RLMCreationOptions options);
+void RLMDynamicSet(RLMObjectBase *obj, RLMProperty *prop, id val);
 
 //
 // Class modification
