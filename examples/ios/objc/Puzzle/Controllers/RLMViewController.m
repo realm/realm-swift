@@ -99,31 +99,33 @@ static CGFloat   kRLMPuzzleCanvasMaxSize = 768.0f;
     
     RLMSyncCredentials *credential = [RLMSyncCredentials credentialsWithUsername:self.startView.userName password:self.startView.password register:NO];
     [RLMSyncUser logInWithCredentials:credential authServerURL:authURL onCompletion:^(RLMSyncUser *user, NSError *error) {
-        if (error) {
-            UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"An Error Ocurred" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
-            [alertController addAction:[UIAlertAction actionWithTitle:@"Okay" style:UIAlertActionStyleDefault handler:nil]];
-            self.startView.loading = NO;
-            [self presentViewController:alertController animated:YES completion:nil];
-            return;
-        }
-        
-        NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Puzzle", self.startView.hostName]];
-        
-        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-        [configuration setSyncConfiguration:[[RLMSyncConfiguration alloc] initWithUser:user realmURL:syncURL]];
-        [RLMRealmConfiguration setDefaultConfiguration:configuration];
-        
-        RLMRealm *realm = [RLMRealm defaultRealm];
-        RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:@(kRLMPuzzleUUID)];
-        if (!puzzle) {
-            RLMPuzzle *puzzle = [[RLMPuzzle alloc] init];
-            puzzle.uuid = kRLMPuzzleUUID;
-            [realm transactionWithBlock:^{
-                [realm addObject:puzzle];
-            }];
-        }
-        
-        [self startPuzzle];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            if (error) {
+                UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"An Error Ocurred" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
+                [alertController addAction:[UIAlertAction actionWithTitle:@"Okay" style:UIAlertActionStyleDefault handler:nil]];
+                self.startView.loading = NO;
+                [self presentViewController:alertController animated:YES completion:nil];
+                return;
+            }
+
+            NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Puzzle", self.startView.hostName]];
+
+            RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+            [configuration setSyncConfiguration:[[RLMSyncConfiguration alloc] initWithUser:user realmURL:syncURL]];
+            [RLMRealmConfiguration setDefaultConfiguration:configuration];
+
+            RLMRealm *realm = [RLMRealm defaultRealm];
+            RLMPuzzle *puzzle = [RLMPuzzle objectForPrimaryKey:@(kRLMPuzzleUUID)];
+            if (!puzzle) {
+                RLMPuzzle *puzzle = [[RLMPuzzle alloc] init];
+                puzzle.uuid = kRLMPuzzleUUID;
+                [realm transactionWithBlock:^{
+                    [realm addObject:puzzle];
+                }];
+            }
+            
+            [self startPuzzle];
+        });
     }];
     
 }
