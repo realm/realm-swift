@@ -18,6 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMSyncUtil.h"
+
 @class RLMSyncUser, RLMSyncCredentials, RLMSyncSession, RLMRealm;
 
 /**
@@ -32,8 +34,24 @@ typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
     RLMSyncUserStateError,
 };
 
+/**
+ Possible values for permissions that can be granted to a given user for working
+ with a given synced Realm.
+ */
+typedef NS_OPTIONS(NSUInteger, RLMSyncRealmPermission) {
+    /// The Realm can be read by a target user.
+    RLMSyncRealmPermissionRead,
+    /// The Realm can be modified by a target user.
+    RLMSyncRealmPermissionWrite,
+    /// The Realm can be managed by a target user.
+    RLMSyncRealmPermissionManage,
+};
+
 /// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
+
+/// A block type used to asynchronously report permission changes.
+typedef void(^RLMSyncPermissionChangeBlock)(RLMSyncManagementObjectStatus, NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -74,6 +92,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMSyncUserState state;
 
+#pragma mark - Login/logout
+
 /**
  Create, log in, and asynchronously return a new user object, specifying a custom timeout for the network request.
  Credentials identifying the user must be passed in. The user becomes available in the completion block, at which point
@@ -102,6 +122,8 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (void)logOut;
 
+#pragma mark - Sessions
+
 /**
  Retrieve a valid session object belonging to this user for a given URL, or `nil` if no such object exists.
  */
@@ -112,13 +134,78 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (NSArray<RLMSyncSession *> *)allSessions;
 
+#pragma mark - Permissions
+
+/**
+ Given a synced Realm managed by this user, change the permissions of a
+ different user with respect to that Realm. Permissions will be granted
+ or denied based on the value of the `permissions` bitmask.
+
+ If no URL is passed in, the permission changes will be applied to ALL
+ synced Realms managed by this user.
+
+ If no user is passed in, the permission changes will be applied with
+ respect to the given synced Realm (or all synced Realms) for ALL users.
+
+ @param realmURL        The URL of the synced Realm on the server whose
+                        permissions should be modified, or nil.
+ @param identity        The identity of the user whose permissions for
+                        the Realm at `realmURL` should be modified, or
+                        `nil`.
+ @param permissions     The new permissions to be set.
+ @param callback        An optional block through which the progress of
+                        the permission change operation can be reported.
+                        The callback will be periodically called until
+                        the permissions change has been resolved by the
+                        server.
+ */
+- (void)changePermissions:(RLMSyncRealmPermission)permissions
+            forRealmAtURL:(nullable NSURL *)realmURL
+                  forUser:(nullable NSString *)identity
+                 callback:(nullable RLMSyncPermissionChangeBlock)callback
+NS_REFINED_FOR_SWIFT;
+
+/**
+ Given a synced Realm managed by this user, change the permissions of a
+ different user with respect to that Realm.
+
+ If no URL is passed in, the permission changes will be applied to ALL
+ synced Realms managed by this user.
+
+ If no user is passed in, the permission changes will be applied with
+ respect to the given synced Realm (or all synced Realms) for ALL users.
+
+ @param realmURL        The URL of the synced Realm on the server whose
+                        permissions should be modified, or nil.
+ @param identity        The identity of the user whose permissions for
+                        the Realm at `realmURL` should be modified, or
+                        `nil`.
+ @param permissions     The new permissions to be set or added.
+ @param additive        If YES, permissions will only be added. If NO,
+                        permissions will be set (added and removed).
+ @param callback        An optional block through which the progress of
+                        the permission change operation can be reported.
+                        The callback will be periodically called until
+                        the permissions change has been resolved by the
+                        server.
+ */
+- (void)changePermissions:(RLMSyncRealmPermission)permissions
+            forRealmAtURL:(nullable NSURL *)realmURL
+                  forUser:(nullable NSString *)identity
+             additiveMode:(BOOL)additive
+                 callback:(nullable RLMSyncPermissionChangeBlock)callback
+NS_REFINED_FOR_SWIFT;
+
+
 /**
  Returns an instance of the Management Realm owned by the user.
- 
+
  This Realm can be used to control access permissions for Realms managed by the user.
  This includes granting other users access to Realms.
  */
 - (RLMRealm *)managementRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
+
+#pragma mark - Miscellaneous
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));

@@ -26,6 +26,10 @@
 #import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
+#import "RLMSyncPermissionChange.h"
+#import "RLMSyncPermissionOffer.h"
+#import "RLMSyncPermissionOfferResponse.h"
+
 #import "sync/sync_manager.hpp"
 #import "sync/sync_session.hpp"
 #import "sync/sync_user.hpp"
@@ -39,6 +43,16 @@ using namespace realm;
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readwrite) NSURL *authenticationServer;
+
+/// Keys used to index into `inFlightPermissionNotifications`.
+@property (nonatomic) NSInteger permissionNotificationKeyCounter;
+
+/**
+ All notification tokens for in-flight permission modification requests. Tokens are
+ deregistered if the user is logged out, or whenever the relevant permission modification
+ completes (successfully or otherwise).
+ */
+@property (nonatomic) NSMutableDictionary<NSNumber *, RLMNotificationToken *> *inFlightPermissionNotifications;
 
 /**
  All 'refresh handles' associated with Realms opened by this user. A refresh handle is
@@ -73,6 +87,8 @@ using namespace realm;
     if (self = [super init]) {
         self.authenticationServer = authServer;
         self.refreshHandles = [NSMutableDictionary dictionary];
+        self.inFlightPermissionNotifications = [NSMutableDictionary dictionary];
+        self.permissionNotificationKeyCounter = 0;
         return self;
     }
     return nil;
@@ -124,6 +140,11 @@ using namespace realm;
         [self.refreshHandles[key] invalidate];
     }
     [self.refreshHandles removeAllObjects];
+    for (id key in self.inFlightPermissionNotifications) {
+        RLMNotificationToken *token = self.inFlightPermissionNotifications[key];
+        [token stop];
+    }
+    [self.inFlightPermissionNotifications removeAllObjects];
 }
 
 - (nullable RLMSyncSession *)sessionForURL:(NSURL *)url {
@@ -281,6 +302,98 @@ using namespace realm;
     }
     user->_user = sync_user;
     completion(user, nil);
+}
+
+#pragma mark - Permissions
+
+- (void)_deregisterPermissionNotificationForKey:(NSInteger)key {
+    RLMNotificationToken *token = self.inFlightPermissionNotifications[@(key)];
+    [token stop];
+    [self.inFlightPermissionNotifications removeObjectForKey:@(key)];
+}
+
+- (void)changePermissions:(RLMSyncRealmPermission)permissions
+            forRealmAtURL:(NSURL *)realmURL
+                  forUser:(NSString *)identity
+                 callback:(RLMSyncPermissionChangeBlock)callback {
+    [self changePermissions:permissions forRealmAtURL:realmURL forUser:identity additiveMode:NO callback:callback];
+}
+
+- (void)changePermissions:(RLMSyncRealmPermission)permissions
+            forRealmAtURL:(NSURL *)realmURL
+                  forUser:(NSString *)identity
+             additiveMode:(BOOL)additive
+                 callback:(RLMSyncPermissionChangeBlock)callback {
+    NSString *url = [realmURL absoluteString] ?: @"*";
+    NSString *userID = identity ?: @"*";
+    NSNumber *read = @((permissions & RLMSyncRealmPermissionRead) != 0);
+    NSNumber *write = @((permissions & RLMSyncRealmPermissionWrite) != 0);
+    NSNumber *manage = @((permissions & RLMSyncRealmPermissionManage) != 0);
+    if (additive) {
+        read = [read boolValue] ? @(YES) : nil;
+        write = [write boolValue] ? @(YES) : nil;
+        manage = [manage boolValue] ? @(YES) : nil;
+    }
+    NSError *error = nil;
+    RLMRealm *management = [self managementRealmWithError:&error];
+    if (error) {
+        if (callback) {
+            callback(RLMSyncManagementObjectStatusError, error);
+        }
+        return;
+    }
+    RLMSyncPermissionChange *change = [RLMSyncPermissionChange permissionChangeWithRealmURL:url
+                                                                                     userID:userID
+                                                                                       read:read
+                                                                                      write:write
+                                                                                     manage:manage];
+    [management transactionWithBlock:^{
+        [management addObject:change];
+    } error:&error];
+    if (error) {
+        if (callback) {
+            callback(RLMSyncManagementObjectStatusError, error);
+        }
+        return;
+    }
+    if (!callback) {
+        return;
+    }
+    NSInteger notificationKey = self.permissionNotificationKeyCounter++;
+    __weak RLMSyncPermissionChange *weakObject = change;
+    __weak RLMSyncUser *weakSelf = self;
+    RLMNotificationToken *token = [change addNotificationBlock:^(BOOL, NSArray<RLMPropertyChange *>*, NSError *error) {
+        RLMSyncPermissionChange *thisObject = weakObject;
+        if (!thisObject) {
+            [weakSelf _deregisterPermissionNotificationForKey:notificationKey];
+            return;
+        }
+        if (error) {
+            callback(RLMSyncManagementObjectStatusError, error);
+            [weakSelf _deregisterPermissionNotificationForKey:notificationKey];
+            return;
+        }
+        switch(thisObject.status) {
+            case RLMSyncManagementObjectStatusNotProcessed:
+                callback(thisObject.status, nil);
+                break;
+            case RLMSyncManagementObjectStatusSuccess:
+                callback(thisObject.status, nil);
+                [weakSelf _deregisterPermissionNotificationForKey:notificationKey];
+                break;
+            case RLMSyncManagementObjectStatusError: {
+                NSError *syncError = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                         code:RLMSyncErrorPermissionsError
+                                                     userInfo:@{@"statusCode": thisObject.statusCode,
+                                                                @"statusMessage": thisObject.statusMessage}];
+                callback(RLMSyncManagementObjectStatusError, syncError);
+                [weakSelf _deregisterPermissionNotificationForKey:notificationKey];
+                break;
+            }
+        }
+    }];
+    // Add the notification token to our dictionary.
+    self.inFlightPermissionNotifications[@(notificationKey)] = token;
 }
 
 @end
