@@ -265,8 +265,8 @@ extension SyncUser {
     /**
      Returns an instance of the Permission Realm owned by the user.
 
-     This Realm can be used to review access permissions for Realms managed by the user
-     and to Realm which the user was granted access to by other users.
+     This read-only Realm contains `SyncPermission` objects reflecting the
+     synchronized Realms and permission details this user has access to.
      */
     public func permissionRealm() throws -> Realm {
         var config = Realm.Configuration.fromRLMRealmConfiguration(.permissionConfiguration(for: self))

@@ -114,7 +114,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 /**
  Returns an instance of the Management Realm owned by the user.
- 
+
  This Realm can be used to control access permissions for Realms managed by the user.
  This includes granting other users access to Realms.
  */
@@ -123,8 +123,8 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 /**
  Returns an instance of the Permission Realm owned by the user.
 
- This Realm can be used to review access permissions for Realms managed by the user
- and to Realm which the user was granted access to by other users.
+ This read-only Realm contains `RLMSyncPermission` objects reflecting the
+ synchronized Realms and permission details this user has access to.
  */
 - (RLMRealm *)permissionRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
 
