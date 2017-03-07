@@ -288,7 +288,7 @@ extension SyncUser {
 public final class SyncPermission: Object {
     /// The date this object was last modified.
     public dynamic var updatedAt = Date()
-    
+
     /// The ID of the affected user by the permission.
     public dynamic var userId = ""
     /// The path to the realm.
