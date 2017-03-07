@@ -59,7 +59,7 @@ public typealias SyncSession = RLMSyncSession
 public typealias ErrorReportingBlock = RLMSyncErrorReportingBlock
 
 /**
- A closure type for a closure which is used by certain APIs to asynchronously return a `User`
+ A closure type for a closure which is used by certain APIs to asynchronously return a `SyncUser`
  object to the application.
 
  - see: `RLMUserCompletionBlock`
