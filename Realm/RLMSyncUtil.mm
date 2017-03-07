@@ -18,6 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
@@ -25,6 +26,8 @@
 #import "RLMSyncPermissionChange.h"
 #import "RLMSyncPermissionOffer.h"
 #import "RLMSyncPermissionOfferResponse.h"
+
+#import "sync/sync_user.hpp"
 
 @implementation RLMRealmConfiguration (RealmSync)
 + (instancetype)managementConfigurationForUser:(RLMSyncUser *)user {
@@ -81,6 +84,21 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy)
         case SyncSessionStopPolicy::AfterChangesUploaded:   return RLMSyncStopPolicyAfterChangesUploaded;
     }
     REALM_UNREACHABLE();
+}
+
+std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm)
+{
+    RLMRealmConfiguration *realmConfig = realm.configuration;
+    if (RLMSyncConfiguration *syncConfig = realmConfig.syncConfiguration) {
+        SyncConfig config = [syncConfig rawConfiguration];
+        std::shared_ptr<SyncUser> user = config.user;
+        if (user && user->state() != SyncUser::State::Error) {
+            NSString *path = [realmConfig.fileURL absoluteString];
+            REALM_ASSERT(path);
+            return user->session_for_on_disk_path([path UTF8String]);
+        }
+    }
+    return nullptr;
 }
 
 }

@@ -32,6 +32,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) RLMSyncUser *user;
 
 /**
+ Determine whether or not this Realm, if opened using an asynchronous API, should wait
+ until at least one complete set of changes have been downloaded from the server before
+ becoming accessible to the user.
+ */
+@property (nonatomic) BOOL waitForServerChanges;
+
+/**
  The URL of the remote Realm upon the Realm Object Server.
  
  @warning The URL cannot end with `.realm`, `.realm.lock` or `.realm.management`.
