@@ -7,7 +7,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* Add `SyncPermission` class to allow reviewing access permissions for Realms
+* Add `(RLM)SyncPermission` class to allow reviewing access permissions for
+  Realms. Requires any edition of the Realm Object Server 1.1.0 or later.
 
 ### Bugfixes
 
