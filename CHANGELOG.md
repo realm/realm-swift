@@ -13,6 +13,17 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix a crash that could occur if new Realm instances were created while the
   application was exiting.
+* Fix a bug that could lead to bad version number errors when delivering
+  change notifications.
+* Fix a potential use-after-free bug when checking validity of results.
+* Fix an issue where a sync session might not close properly if it receives
+  an error while being torn down.
+* Fix some issues where a sync session might not reconnect to the server properly
+  or get into an inconsistent state if revived after invalidation.
+* Fix an issue where notifications might not fire when the children of an
+  observed object are changed.
+* Fix an issue where progress notifications on sync sessions might incorrectly
+  report out-of-date values.
 
 2.4.3 Release notes (2017-02-20)
 =============================================================
