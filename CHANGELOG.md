@@ -24,6 +24,8 @@ x.x.x Release notes (yyyy-MM-dd)
   observed object are changed.
 * Fix an issue where progress notifications on sync sessions might incorrectly
   report out-of-date values.
+* Fix an issue where multiple threads accessing encrypted data could result in
+  corrupted data or crashes.
 
 2.4.3 Release notes (2017-02-20)
 =============================================================
