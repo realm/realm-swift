@@ -732,11 +732,10 @@
     XCTAssertEqualObjects(ca.name, @"b");
     XCTAssertEqual(ca.age, 2);
 
-    // FIXME: doesn't work
-    // Create with KVO-compatible object
-//    auto ca2 = [CustomAccessorsObject createInRealm:realm withValue:ca];
-//    XCTAssertEqualObjects(ca2.name, @"b");
-//    XCTAssertEqual(ca2.age, 2);
+    // Create with KVC-compatible object
+    auto ca2 = [CustomAccessorsObject createInRealm:realm withValue:ca];
+    XCTAssertEqualObjects(ca2.name, @"b");
+    XCTAssertEqual(ca2.age, 2);
 
     [realm cancelWriteTransaction];
 }
