@@ -23,12 +23,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMSyncUser;
-
 /**
  This model is used for requesting changes to a Realm's permissions.
 
- It should be used in conjunction with an `RLMSyncUser`'s management Realm.
+ It should be used in conjunction with an `RLMSyncUser`'s Management Realm.
 
  See https://realm.io/docs/realm-object-server/#permissions for general
  documentation.
@@ -70,7 +68,7 @@ NS_ASSUME_NONNULL_BEGIN
  Construct a permission change object used to change the access permissions for a user on a Realm.
 
  @param realmURL  The Realm URL whose permissions settings should be changed.
-                  Use `*` to change the permissions of all Realms managed by the management Realm's `RLMSyncUser`.
+                  Use `*` to change the permissions of all Realms managed by the Management Realm's `RLMSyncUser`.
  @param userID    The user or users who should be granted these permission changes.
                   Use `*` to change the permissions for all users.
  @param mayRead   Define read access. Set to `YES` or `NO` to update this value.

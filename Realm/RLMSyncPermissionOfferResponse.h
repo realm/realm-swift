@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  object represented by the specified token, which was created by another user's
  `RLMSyncPermissionOffer` object.
 
- It should be used in conjunction with an `RLMSyncUser`'s management Realm.
+ It should be used in conjunction with an `RLMSyncUser`'s Management Realm.
 
  See https://realm.io/docs/realm-object-server/#permissions for general
  documentation.
