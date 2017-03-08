@@ -28,6 +28,35 @@ BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType);
 BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType);
 FOUNDATION_EXTERN void RLMValidateSwiftPropertyName(NSString *name);
 
+// Translate an rlmtype to a string representation
+static inline NSString *RLMTypeToString(RLMPropertyType type) {
+    switch (type) {
+        case RLMPropertyTypeString:
+            return @"string";
+        case RLMPropertyTypeInt:
+            return @"int";
+        case RLMPropertyTypeBool:
+            return @"bool";
+        case RLMPropertyTypeDate:
+            return @"date";
+        case RLMPropertyTypeData:
+            return @"data";
+        case RLMPropertyTypeDouble:
+            return @"double";
+        case RLMPropertyTypeFloat:
+            return @"float";
+        case RLMPropertyTypeAny:
+            return @"any";
+        case RLMPropertyTypeObject:
+            return @"object";
+        case RLMPropertyTypeArray:
+            return @"array";
+        case RLMPropertyTypeLinkingObjects:
+            return @"linking objects";
+    }
+    return @"Unknown";
+}
+
 // private property interface
 @interface RLMProperty () {
 @public

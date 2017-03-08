@@ -1484,6 +1484,7 @@
 
     RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
+    XCTAssertNil([PrimaryIntObject objectInRealm:realm forPrimaryKey:@0]);
 
     // verify that reading a missing table gives an empty array rather than
     // crashing

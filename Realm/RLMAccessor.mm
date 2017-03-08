@@ -587,13 +587,15 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     RLMObjectSchema *schema = obj->_objectSchema;
     RLMProperty *prop = schema[propName];
     if (!prop) {
-        @throw RLMException(@"Invalid property name '%@' for class '%@'.", propName, obj->_objectSchema.className);
+        @throw RLMException(@"Invalid property name '%@' for class '%@'.",
+                            propName, obj->_objectSchema.className);
     }
     if (prop.isPrimary) {
         @throw RLMException(@"Primary key can't be changed to '%@' after an object is inserted.", val);
     }
     if (!RLMIsObjectValidForProperty(val, prop)) {
-        @throw RLMException(@"Invalid property value '%@' for property '%@' of class '%@'", val, propName, obj->_objectSchema.className);
+        @throw RLMException(@"Invalid property value '%@' for property '%@' of class '%@'",
+                            val, propName, obj->_objectSchema.className);
     }
 
     RLMDynamicSet(obj, prop, RLMCoerceToNil(val), RLMCreationOptionsPromoteUnmanaged);
