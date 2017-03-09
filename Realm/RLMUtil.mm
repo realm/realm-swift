@@ -169,6 +169,36 @@ BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
     @throw RLMException(@"Invalid RLMPropertyType specified");
 }
 
+void RLMValidateValueForProperty(__unsafe_unretained id const obj,
+                                 __unsafe_unretained RLMProperty *const prop) {
+    switch (prop.type) {
+        case RLMPropertyTypeString:
+        case RLMPropertyTypeBool:
+        case RLMPropertyTypeDate:
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+        case RLMPropertyTypeData:
+            if (!RLMIsObjectValidForProperty(obj, prop)) {
+                @throw RLMException(@"Invalid value '%@' for property '%@'", obj, prop.name);
+            }
+            break;
+        case RLMPropertyTypeObject:
+            break;
+        case RLMPropertyTypeArray: {
+            if (obj && obj != NSNull.null && ![obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
+                @throw RLMException(@"Array property value (%@) is not enumerable.", obj);
+            }
+            break;
+        }
+        case RLMPropertyTypeAny:
+        case RLMPropertyTypeLinkingObjects:
+            // It should not be possible to have either of these property types
+            // in the persisted properties array
+            REALM_UNREACHABLE();
+    }
+}
+
 NSDictionary *RLMDefaultValuesForObjectSchema(__unsafe_unretained RLMObjectSchema *const objectSchema) {
     if (!objectSchema.isSwiftClass) {
         return [objectSchema.objectClass defaultPropertyValues];

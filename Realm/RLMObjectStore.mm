@@ -102,36 +102,6 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
     }
 }
 
-static void validateValueForProperty(__unsafe_unretained id const obj,
-                                     __unsafe_unretained RLMProperty *const prop) {
-    switch (prop.type) {
-        case RLMPropertyTypeString:
-        case RLMPropertyTypeBool:
-        case RLMPropertyTypeDate:
-        case RLMPropertyTypeInt:
-        case RLMPropertyTypeFloat:
-        case RLMPropertyTypeDouble:
-        case RLMPropertyTypeData:
-            if (!RLMIsObjectValidForProperty(obj, prop)) {
-                @throw RLMException(@"Invalid value '%@' for property '%@'", obj, prop.name);
-            }
-            break;
-        case RLMPropertyTypeObject:
-            break;
-        case RLMPropertyTypeArray: {
-            if (obj != nil && obj != NSNull.null) {
-                if (![obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
-                    @throw RLMException(@"Array property value (%@) is not enumerable.", obj);
-                }
-            }
-            break;
-        }
-        case RLMPropertyTypeAny:
-        case RLMPropertyTypeLinkingObjects:
-            @throw RLMException(@"Invalid value '%@' for property '%@'", obj, prop.name);
-    }
-}
-
 static NSUInteger createRowForObject(RLMClassInfo const& info) {
     try {
         return info.table()->add_empty_row();
@@ -187,7 +157,7 @@ static NSUInteger createRowForObjectWithPrimaryKey(RLMClassInfo const& info, id 
     Row row = info.table()->get(rowIndex);
 
     // set value for primary key
-    validateValueForProperty(primaryValue, primaryProperty);
+    RLMValidateValueForProperty(primaryValue, primaryProperty);
     primaryValue = RLMCoerceToNil(primaryValue);
 
     try {
@@ -372,24 +342,34 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 
     // create row, and populate
     if (NSArray *array = RLMDynamicCast<NSArray>(value)) {
+        NSArray *props = info.rlmObjectSchema.properties;
+        if (array.count > props.count) {
+            @throw RLMException(@"Invalid array input: more values (%llu) than properties (%llu).",
+                                (unsigned long long)array.count, (unsigned long long)props.count);
+        }
+
         // get or create our accessor
         bool foundExisting;
-        NSArray *props = info.rlmObjectSchema.properties;
         auto primaryGetter = [=](__unsafe_unretained RLMProperty *const p) {
-            return array[[props indexOfObject:p]];
+            auto index = [props indexOfObject:p];
+            if (index >= array.count) {
+                @throw RLMException(@"Invalid array input: primary key must be present.");
+            }
+            return array[index];
         };
-        object->_row = (*info.table())[createOrGetRowForObject(info, primaryGetter, createOrUpdate, &foundExisting)];
+        object->_row = (*info.table())[createOrGetRowForObject(info, primaryGetter,
+                                                               createOrUpdate, &foundExisting)];
 
         // populate
-        for (NSUInteger i = 0; i < array.count; i++) {
-            RLMProperty *prop = props[i];
+        NSUInteger i = 0;
+        for (id val in array) {
+            RLMProperty *prop = props[i++];
 
             // skip primary key when updating since it doesn't change
             if (prop.isPrimary)
                 continue;
 
-            id val = array[i];
-            validateValueForProperty(val, prop);
+            RLMValidateValueForProperty(val, prop);
             RLMDynamicSet(object, prop, RLMCoerceToNil(val), creationOptions);
         }
     }
@@ -428,12 +408,12 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
                 continue;
 
             if (id propValue = getValue(prop)) {
-                validateValueForProperty(propValue, prop);
                 // add SetDefault to creationoptions
                 RLMCreationOptions propertyCreationOptions = creationOptions;
                 if (usedDefault) {
                     propertyCreationOptions |= RLMCreationOptionsSetDefault;
                 }
+                RLMValidateValueForProperty(propValue, prop);
                 RLMDynamicSet(object, prop, RLMCoerceToNil(propValue), propertyCreationOptions);
             }
             else if (!foundExisting && !prop.optional) {
