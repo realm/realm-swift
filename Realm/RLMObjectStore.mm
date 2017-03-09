@@ -253,7 +253,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
             return;
         }
         // for differing realms users must explicitly create the object in the second realm
-        @throw RLMException(@"Object is already managed by another Realm");
+        @throw RLMException(@"Object is already managed by another Realm. Use create instead to copy it into this Realm.");
     }
     if (object->_observationInfo && object->_observationInfo->hasObservers()) {
         @throw RLMException(@"Cannot add an object with observers to a Realm");
@@ -297,7 +297,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
         }
 
         if (!value && !prop.optional) {
-            @throw RLMException(@"No value or default value specified for property '%@' in '%@'",
+            @throw RLMException(@"Nil value specified for required property '%@' in '%@'",
                                 prop.name, info.rlmObjectSchema.className);
         }
 
@@ -322,7 +322,8 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     RLMInitializeSwiftAccessorGenerics(object);
 }
 
-RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className, id value, bool createOrUpdate = false) {
+RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
+                                               id value, bool createOrUpdate = false) {
     if (createOrUpdate && RLMIsObjectSubclass([value class])) {
         RLMObjectBase *obj = value;
         if ([obj->_objectSchema.className isEqualToString:className] && obj->_realm == realm) {
@@ -333,6 +334,10 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
 
     // verify writable
     RLMVerifyInWriteTransaction(realm);
+
+    if (!value) {
+        @throw RLMException(@"Must provide a non-nil value.");
+    }
 
     // create the object
     auto& info = realm->_info[className];
