@@ -9,8 +9,6 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Add `(RLM)SyncPermission` class to allow reviewing access permissions for
   Realms. Requires any edition of the Realm Object Server 1.1.0 or later.
-* Further reduce the number of files opened per thread-specific Realm on macOS,
-  iOS and watchOS.
 
 ### Bugfixes
 
@@ -29,9 +27,6 @@ x.x.x Release notes (yyyy-MM-dd)
   report out-of-date values.
 * Fix an issue where multiple threads accessing encrypted data could result in
   corrupted data or crashes.
-* Fix an issue where certain `LIKE` queries could hang.
-* Fix an issue where `-[RLMRealm writeCopyToURL:encryptionKey:error]` could create
-  a corrupt Realm file.
 
 2.4.3 Release notes (2017-02-20)
 =============================================================
