@@ -142,7 +142,12 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 }
 
 - (void)verifyThread {
-    _realm->verify_thread();
+    try {
+        _realm->verify_thread();
+    }
+    catch (std::exception const& e) {
+        @throw RLMException(@"%s", e.what());
+    }
 }
 
 - (BOOL)inWriteTransaction {

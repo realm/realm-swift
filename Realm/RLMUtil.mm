@@ -241,7 +241,7 @@ NSException *RLMException(NSString *fmt, ...) {
 }
 
 NSException *RLMException(std::exception const& exception) {
-    return RLMException(@"%@", @(exception.what()));
+    return RLMException(@"%s", exception.what());
 }
 
 NSError *RLMMakeError(RLMError code, std::exception const& exception) {
