@@ -1060,7 +1060,7 @@ void validate_property_value(const ColumnReference& column,
                              __unsafe_unretained RLMObjectSchema *const objectSchema,
                              __unsafe_unretained NSString *const keyPath) {
     RLMProperty *prop = column.property();
-    if (prop.type == RLMPropertyTypeArray) {
+    if (prop.type == RLMPropertyTypeArray || prop.type == RLMPropertyTypeLinkingObjects) {
         RLMPrecondition([RLMObjectBaseObjectSchema(RLMDynamicCast<RLMObjectBase>(value)).className isEqualToString:prop.objectClassName],
                         @"Invalid value", err, prop.objectClassName, keyPath, objectSchema.className, value);
     }

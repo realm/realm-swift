@@ -136,8 +136,9 @@ BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
             return [obj isKindOfClass:[NSData class]];
         case RLMPropertyTypeAny:
             return NO;
-        case RLMPropertyTypeObject:
-        case RLMPropertyTypeLinkingObjects: {
+        case RLMPropertyTypeLinkingObjects:
+            return YES;
+        case RLMPropertyTypeObject: {
             // only NSNull, nil, or objects which derive from RLMObject and match the given
             // object class are valid
             RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(obj);
