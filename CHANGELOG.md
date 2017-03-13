@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
 2.4.4 Release notes (2017-03-13)
 =============================================================
 
