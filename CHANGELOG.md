@@ -32,6 +32,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix an issue where certain `LIKE` queries could hang.
 * Fix an issue where `-[RLMRealm writeCopyToURL:encryptionKey:error]` could create
   a corrupt Realm file.
+* Fix an issue where incrementing a synced Realm's schema version without actually
+  changing the schema could cause a crash.
 
 2.4.3 Release notes (2017-02-20)
 =============================================================
