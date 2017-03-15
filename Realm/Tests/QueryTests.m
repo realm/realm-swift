@@ -881,7 +881,11 @@
     RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
-    StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
+    StringObject *so = [StringObject createInRealm:realm withValue:@[@"abc"]];
+    [StringObject createInRealm:realm withValue:@[@"üvw"]];
+    [StringObject createInRealm:realm withValue:@[@"ûvw"]];
+    [StringObject createInRealm:realm withValue:@[@"uvw"]];
+    [StringObject createInRealm:realm withValue:@[@"stü"]];
     [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, so]];
     [realm commitWriteTransaction];
 
@@ -895,6 +899,11 @@
     RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH[c] 'a'");
     RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH[c] 'A'");
 
+    RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH 'u'");
+    RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH[c] 'U'");
+    RLMAssertCount(StringObject, 3U, @"stringCol BEGINSWITH[d] 'u'");
+    RLMAssertCount(StringObject, 3U, @"stringCol BEGINSWITH[cd] 'U'");
+
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol BEGINSWITH 'a'");
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol BEGINSWITH 'c'");
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol BEGINSWITH 'A'");
@@ -907,7 +916,11 @@
     RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
-    StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
+    StringObject *so = [StringObject createInRealm:realm withValue:@[@"abc"]];
+    [StringObject createInRealm:realm withValue:@[@"üvw"]];
+    [StringObject createInRealm:realm withValue:@[@"stü"]];
+    [StringObject createInRealm:realm withValue:@[@"stú"]];
+    [StringObject createInRealm:realm withValue:@[@"stu"]];
     [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, so]];
     [realm commitWriteTransaction];
 
@@ -921,6 +934,11 @@
     RLMAssertCount(StringObject, 1U, @"stringCol ENDSWITH[c] 'c'");
     RLMAssertCount(StringObject, 1U, @"stringCol ENDSWITH[c] 'C'");
 
+    RLMAssertCount(StringObject, 1U, @"stringCol ENDSWITH 'u'");
+    RLMAssertCount(StringObject, 1U, @"stringCol ENDSWITH[c] 'U'");
+    RLMAssertCount(StringObject, 3U, @"stringCol ENDSWITH[d] 'u'");
+    RLMAssertCount(StringObject, 3U, @"stringCol ENDSWITH[cd] 'U'");
+
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol ENDSWITH 'c'");
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol ENDSWITH 'a'");
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol ENDSWITH 'C'");
@@ -933,7 +951,10 @@
     RLMRealm *realm = [self realm];
 
     [realm beginWriteTransaction];
-    StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
+    StringObject *so = [StringObject createInRealm:realm withValue:@[@"abc"]];
+    [StringObject createInRealm:realm withValue:@[@"tüv"]];
+    [StringObject createInRealm:realm withValue:@[@"tûv"]];
+    [StringObject createInRealm:realm withValue:@[@"tuv"]];
     [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, so]];
     [realm commitWriteTransaction];
 
@@ -950,6 +971,11 @@
     RLMAssertCount(StringObject, 0U, @"stringCol CONTAINS 'C'");
     RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS[c] 'c'");
     RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS[c] 'C'");
+
+    RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS 'u'");
+    RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS[c] 'U'");
+    RLMAssertCount(StringObject, 3U, @"stringCol CONTAINS[d] 'u'");
+    RLMAssertCount(StringObject, 3U, @"stringCol CONTAINS[cd] 'U'");
 
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol CONTAINS 'd'");
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol CONTAINS 'c'");
@@ -996,6 +1022,9 @@
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol LIKE '*C*'");
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol LIKE[c] '*c*'");
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol LIKE[c] '*C*'");
+
+    RLMAssertThrowsWithReasonMatching([StringObject objectsWhere:@"stringCol LIKE[d] '*'"], @"'LIKE' not supported .* diacritic-insensitive");
+    RLMAssertThrowsWithReasonMatching([StringObject objectsWhere:@"stringCol LIKE[cd] '*'"], @"'LIKE' not supported .* diacritic-insensitive");
 }
 
 - (void)testStringEquality
@@ -1004,17 +1033,30 @@
 
     [realm beginWriteTransaction];
     StringObject *so = [StringObject createInRealm:realm withValue:(@[@"abc"])];
+    [StringObject createInRealm:realm withValue:@[@"tüv"]];
+    [StringObject createInRealm:realm withValue:@[@"tûv"]];
+    [StringObject createInRealm:realm withValue:@[@"tuv"]];
     [AllTypesObject createInRealm:realm withValue:@[@YES, @1, @1.0f, @1.0, @"a", [@"a" dataUsingEncoding:NSUTF8StringEncoding], NSDate.date, @YES, @1LL, so]];
     [realm commitWriteTransaction];
 
     RLMAssertCount(StringObject, 1U, @"stringCol == 'abc'");
-    RLMAssertCount(StringObject, 1U, @"stringCol != 'def'");
+    RLMAssertCount(StringObject, 4U, @"stringCol != 'def'");
     RLMAssertCount(StringObject, 1U, @"stringCol ==[c] 'abc'");
     RLMAssertCount(StringObject, 1U, @"stringCol ==[c] 'ABC'");
 
-    RLMAssertCount(StringObject, 0U, @"stringCol != 'abc'");
+    RLMAssertCount(StringObject, 3U, @"stringCol != 'abc'");
     RLMAssertCount(StringObject, 0U, @"stringCol == 'def'");
     RLMAssertCount(StringObject, 0U, @"stringCol == 'ABC'");
+
+    RLMAssertCount(StringObject, 1U, @"stringCol == 'tuv'");
+    RLMAssertCount(StringObject, 1U, @"stringCol ==[c] 'TUV'");
+    RLMAssertCount(StringObject, 3U, @"stringCol ==[d] 'tuv'");
+    RLMAssertCount(StringObject, 3U, @"stringCol ==[cd] 'TUV'");
+
+    RLMAssertCount(StringObject, 3U, @"stringCol != 'tuv'");
+    RLMAssertCount(StringObject, 3U, @"stringCol !=[c] 'TUV'");
+    RLMAssertCount(StringObject, 1U, @"stringCol !=[d] 'tuv'");
+    RLMAssertCount(StringObject, 1U, @"stringCol !=[cd] 'TUV'");
 
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol == 'abc'");
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol != 'def'");
@@ -2151,8 +2193,16 @@
         XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol ENDSWITH[c] ''"] valueForKey:@"stringCol"]);
         XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol LIKE[c] '*'"] valueForKey:@"stringCol"]);
 
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS[d] ''"] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol BEGINSWITH[d] ''"] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol ENDSWITH[d] ''"] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS[cd] ''"] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol BEGINSWITH[cd] ''"] valueForKey:@"stringCol"]);
+        XCTAssertEqualObjects([nonNilStrings valueForKey:@"stringCol"], [[stringObjectClass objectsInRealm:realm where:@"stringCol ENDSWITH[cd] ''"] valueForKey:@"stringCol"]);
+
         XCTAssertEqualObjects(@[], ([[stringObjectClass objectsInRealm:realm where:@"stringCol CONTAINS %@", @"\0"] valueForKey:@"self"]));
         XCTAssertEqualObjects([[stringObjectClass allObjectsInRealm:realm] valueForKey:@"stringCol"], ([[StringObject objectsInRealm:realm where:@"stringCol CONTAINS NULL"] valueForKey:@"stringCol"]));
+        XCTAssertEqualObjects([[stringObjectClass allObjectsInRealm:realm] valueForKey:@"stringCol"], ([[StringObject objectsInRealm:realm where:@"stringCol CONTAINS[d] NULL"] valueForKey:@"stringCol"]));
     };
     testWithStringClass([StringObject class]);
     testWithStringClass([IndexedStringObject class]);
