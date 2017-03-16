@@ -41,6 +41,14 @@
 
 @end
 
+@interface RealmIntObject : RLMObject
+@property RLMInteger *realmInt;
+@end
+
+@interface RealmNullableIntObject : RLMObject
+@property RLMNullableInteger *realmInt;
+@end
+
 @interface AllIntSizesObject : RLMObject
 // int8_t not supported due to being ambiguous with BOOL
 

@@ -30,6 +30,12 @@
 @implementation IntObject
 @end
 
+@implementation RealmIntObject
+@end
+
+@implementation RealmNullableIntObject
+@end
+
 @implementation AllIntSizesObject
 @end
 
