@@ -554,6 +554,211 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     [realm commitWriteTransaction];
 }
 
+- (void)testRealmIntBasicFunctionality {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    RealmIntObject *obj = [[RealmIntObject alloc] init];
+    obj.realmInt.value = 100;
+    XCTAssertEqual(obj.realmInt.value, 100);
+
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.realmInt.value, 100);
+
+    // Increment the int
+    [realm beginWriteTransaction];
+    [obj.realmInt incrementValueBy:8901];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.realmInt.value, 9001);
+
+    // Set the int
+    [realm beginWriteTransaction];
+    obj.realmInt.value = 123;
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.realmInt.value, 123);
+}
+
+/// Check that calling `RLMInteger` APIs works as expected throughout the object lifecycle.
+- (void)testRealmIntManagementLifecycle {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    RealmIntObject *obj = [[RealmIntObject alloc] init];
+    obj.realmInt.value = 100;
+    XCTAssertEqual(obj.realmInt.value, 100);
+
+    // Before attachment:
+    obj.realmInt.value = 200;
+    XCTAssertEqual(obj.realmInt.value, 200);
+
+    obj.realmInt = [[RLMInteger alloc] initWithValue:300];
+    XCTAssertEqual(obj.realmInt.value, 300);
+
+    // When attached:
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.realmInt.value, 300);
+
+    // When not in a write transaction:
+    XCTAssertThrows(obj.realmInt.value = 400);
+    XCTAssertThrows([obj.realmInt incrementValueBy:123]);
+
+    // When unattached:
+    [realm beginWriteTransaction];
+    [realm deleteAllObjects];
+    [realm commitWriteTransaction];
+
+    XCTAssertThrows(obj.realmInt.value);
+}
+
+/// Check that assigning to a `RLMInteger` property works as expected throughout the object lifecycle.
+- (void)testReassignmentToRealmIntProperty {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    RealmIntObject *obj = [[RealmIntObject alloc] init];
+    // Getting a RLMInteger property that wasn't initialized should work fine.
+    XCTAssertNotNil(obj.realmInt);
+    XCTAssertEqual(obj.realmInt.value, 0);
+
+    // Before attachment:
+    obj.realmInt = [[RLMInteger alloc] initWithValue:101];
+    XCTAssertEqual(obj.realmInt.value, 101);
+
+    // When attached:
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.realmInt.value, 101);
+
+    [realm beginWriteTransaction];
+    obj.realmInt = [[RLMInteger alloc] initWithValue:201];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.realmInt.value, 201);
+
+    // When not in a write transaction:
+    XCTAssertThrows(obj.realmInt = [[RLMInteger alloc] initWithValue:301]);
+
+    // When unattached:
+    [realm beginWriteTransaction];
+    [realm deleteAllObjects];
+    [realm commitWriteTransaction];
+
+    XCTAssertThrows(obj.realmInt = [[RLMInteger alloc] initWithValue:401]);
+}
+
+- (void)testNullableRealmIntBasicFunctionality {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    RealmNullableIntObject *obj = [[RealmNullableIntObject alloc] init];
+    obj.realmInt.value = @100;
+    XCTAssertEqual(obj.realmInt.value.integerValue, 100);
+
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.realmInt.value.integerValue, 100);
+
+    // Increment the int
+    [realm beginWriteTransaction];
+    [obj.realmInt incrementValueBy:8901];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.realmInt.value.integerValue, 9001);
+
+    // Set the int
+    [realm beginWriteTransaction];
+    obj.realmInt.value = @123;
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.realmInt.value.integerValue, 123);
+}
+
+/// Check that calling `RLMInteger` APIs works as expected throughout the object lifecycle.
+- (void)testRealmNullableIntManagementLifecycle {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    RealmNullableIntObject *obj = [[RealmNullableIntObject alloc] init];
+    obj.realmInt.value = @100;
+    XCTAssertEqual(obj.realmInt.value.integerValue, 100);
+
+    // Before attachment:
+    obj.realmInt.value = @200;
+    XCTAssertEqual(obj.realmInt.value.integerValue, 200);
+
+    obj.realmInt.value = nil;
+    XCTAssertNil(obj.realmInt.value);
+
+    obj.realmInt = [[RLMNullableInteger alloc] initWithValue:@300];
+    XCTAssertEqual(obj.realmInt.value.integerValue, 300);
+
+    // When attached:
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.realmInt.value.integerValue, 300);
+
+    [realm beginWriteTransaction];
+    obj.realmInt.value = nil;
+    [realm commitWriteTransaction];
+    XCTAssertNil(obj.realmInt.value);
+
+    // When not in a write transaction:
+    XCTAssertThrows(obj.realmInt.value = @400);
+    XCTAssertThrows([obj.realmInt incrementValueBy:123]);
+
+    // When unattached:
+    [realm beginWriteTransaction];
+    [realm deleteAllObjects];
+    [realm commitWriteTransaction];
+
+    XCTAssertThrows(obj.realmInt.value);
+}
+
+/// Check that assigning to a `RLMInteger` property works as expected throughout the object lifecycle.
+- (void)testReassignmentToRealmNullableIntProperty {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    RealmNullableIntObject *obj = [[RealmNullableIntObject alloc] init];
+    // Getting a RLMInteger property that wasn't initialized should work fine.
+    XCTAssertNotNil(obj.realmInt);
+    XCTAssertNil(obj.realmInt.value);
+
+    // Before attachment:
+    obj.realmInt = nil;
+    XCTAssertNotNil(obj.realmInt);
+    XCTAssertNil(obj.realmInt.value);
+    obj.realmInt = [[RLMNullableInteger alloc] initWithValue:@101];
+    XCTAssertEqual(obj.realmInt.value.integerValue, 101);
+
+    // When attached:
+    [realm beginWriteTransaction];
+    [realm addObject:obj];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.realmInt.value.integerValue, 101);
+
+    [realm beginWriteTransaction];
+    obj.realmInt = nil;
+    [realm commitWriteTransaction];
+    XCTAssertNotNil(obj.realmInt);
+    XCTAssertNil(obj.realmInt.value);
+
+    [realm beginWriteTransaction];
+    obj.realmInt = [[RLMNullableInteger alloc] initWithValue:@201];
+    [realm commitWriteTransaction];
+    XCTAssertEqual(obj.realmInt.value.integerValue, 201);
+
+    // When not in a write transaction:
+    XCTAssertThrows(obj.realmInt = nil);
+    XCTAssertThrows(obj.realmInt = [[RLMNullableInteger alloc] initWithValue:@301]);
+
+    // When unattached:
+    [realm beginWriteTransaction];
+    [realm deleteAllObjects];
+    [realm commitWriteTransaction];
+
+    XCTAssertThrows(obj.realmInt = nil);
+    XCTAssertThrows(obj.realmInt = [[RLMNullableInteger alloc] initWithValue:@401]);
+}
+
 - (void)testAddingObjectNotInSchemaThrows {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.objectClasses = @[StringObject.class];

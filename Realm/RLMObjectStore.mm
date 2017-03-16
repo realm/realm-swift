@@ -20,6 +20,7 @@
 
 #import "RLMAccessor.h"
 #import "RLMArray_Private.hpp"
+#import "RLMInteger.h"
 #import "RLMListBase.h"
 #import "RLMObservation.hpp"
 #import "RLMObject_Private.hpp"
@@ -285,6 +286,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
         // get object from ivar using key value coding
         id value = nil;
         if (prop.swiftIvar) {
+#warning TODO: how does Swift interact with RLMInteger? If we don't use a different type we shouldn't need to do anything.
             if (prop.type == RLMPropertyTypeArray) {
                 value = static_cast<RLMListBase *>(object_getIvar(object, prop.swiftIvar))._rlmArray;
             }
@@ -294,6 +296,9 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
         }
         else if ([object respondsToSelector:prop.getterSel]) {
             value = [object valueForKey:prop.getterName];
+            if (RLMPropertySubtypeIsInteger(prop.subtype)) {
+                value = [(id<RLMIntegerProtocol>)value boxedValue];
+            }
         }
 
         if (!value && !prop.optional) {
@@ -301,12 +306,14 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
                                 prop.name, info.rlmObjectSchema.className);
         }
 
-        // set the ivars for object and array properties to nil as otherwise the
+        // set the ivars for object, array, and Realm integer properties to nil as otherwise the
         // accessors retain objects that are no longer accessible via the properties
         // this is mainly an issue when the object graph being added has cycles,
         // as it's not obvious that the user has to set the *ivars* to nil to
         // avoid leaking memory
-        if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
+        if (prop.type == RLMPropertyTypeObject
+            || prop.type == RLMPropertyTypeArray
+            || RLMPropertySubtypeIsInteger(prop.subtype)) {
             if (!prop.swiftIvar) {
                 ((void(*)(id, SEL, id))objc_msgSend)(object, prop.setterSel, nil);
             }

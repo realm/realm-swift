@@ -47,6 +47,10 @@ BOOL RLMPropertyTypeIsComputed(RLMPropertyType propertyType) {
     return propertyType == RLMPropertyTypeLinkingObjects;
 }
 
+BOOL RLMPropertySubtypeIsInteger(RLMPropertySubtype subtype) {
+    return subtype == RLMPropertySubtypeInteger || subtype == RLMPropertySubtypeNullableInteger;
+}
+
 // Swift obeys the ARC naming conventions for method families (except for init)
 // but the end result doesn't really work (using KVC on a method returning a
 // retained value results in a leak, but not returning a retained value results
@@ -110,6 +114,8 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
         _linkOriginPropertyName = linkOriginPropertyName;
         _indexed = indexed;
         _optional = optional;
+        // Since the dynamic API doesn't support integer property subtypes, we leave this as 'none'.
+        _subtype = RLMPropertySubtypeNone;
         [self updateAccessors];
     }
 
@@ -198,6 +204,16 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
                                 @"RLMArrays can only contain instances of RLMObject subclasses. "
                                 @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
         }
+    }
+    else if (strcmp(code, "@\"RLMInteger\"") == 0) {
+        _type = RLMPropertyTypeInt;
+        _subtype = RLMPropertySubtypeInteger;
+        _optional = false;
+    }
+    else if (strcmp(code, "@\"RLMNullableInteger\"") == 0) {
+        _type = RLMPropertyTypeInt;
+        _subtype = RLMPropertySubtypeNullableInteger;
+        _optional = true;
     }
     else if (strncmp(code, numberPrefix, numberPrefixLen) == 0) {
         // get number type from type string - @"NSNumber<objectClassName>"
@@ -322,6 +338,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
     _name = name;
     _indexed = indexed;
+    _subtype = RLMPropertySubtypeNone;
 
     if (linkPropertyDescriptor) {
         _objectClassName = [linkPropertyDescriptor.objectClass className];
@@ -418,6 +435,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
     _name = name;
     _indexed = indexed;
+    _subtype = RLMPropertySubtypeNone;
 
     if (linkPropertyDescriptor) {
         _objectClassName = [linkPropertyDescriptor.objectClass className];
@@ -460,6 +478,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _type = RLMPropertyTypeArray;
     _objectClassName = objectClassName;
     _swiftIvar = ivar;
+    _subtype = RLMPropertySubtypeNone;
 
     // no obj-c property for generic lists, and thus no getter/setter names
 
@@ -480,6 +499,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _indexed = indexed;
     _swiftIvar = ivar;
     _optional = true;
+    _subtype = RLMPropertySubtypeNone;
 
     // no obj-c property for generic optionals, and thus no getter/setter names
 
@@ -500,6 +520,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     _objectClassName = objectClassName;
     _linkOriginPropertyName = linkOriginPropertyName;
     _swiftIvar = ivar;
+    _subtype = RLMPropertySubtypeNone;
 
     // no obj-c property for generic linking objects properties, and thus no getter/setter names
 
@@ -520,6 +541,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     prop->_swiftIvar = _swiftIvar;
     prop->_optional = _optional;
     prop->_linkOriginPropertyName = _linkOriginPropertyName;
+    prop->_subtype = _subtype;
 
     return prop;
 }
@@ -540,6 +562,10 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 
 - (BOOL)isEqualToProperty:(RLMProperty *)property {
     return _type == property->_type
+        && (_type != RLMPropertyTypeInt
+            || !RLMPropertySubtypeIsInteger(_subtype)
+            || !RLMPropertySubtypeIsInteger(property->_subtype)
+            || _subtype == property->_subtype)
         && _indexed == property->_indexed
         && _isPrimary == property->_isPrimary
         && _optional == property->_optional
@@ -558,7 +584,7 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
     p.type = (realm::PropertyType)_type;
     p.object_type = _objectClassName ? _objectClassName.UTF8String : "";
     p.is_indexed = _indexed;
-    p.is_nullable = _optional;
+    p.is_nullable = _optional || _subtype == RLMPropertySubtypeNullableInteger;
     p.link_origin_property_name = _linkOriginPropertyName ? _linkOriginPropertyName.UTF8String : "";
     return p;
 }

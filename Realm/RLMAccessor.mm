@@ -19,6 +19,7 @@
 #import "RLMAccessor.h"
 
 #import "RLMArray_Private.hpp"
+#import "RLMInteger_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
@@ -284,12 +285,26 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
     @throw RLMException(@"Modifying Mixed properties is not supported");
 }
 
+template<typename Type, typename ViewClass>
+static inline id RLMMakeRealmIntegerGetter(NSUInteger index) {
+    return ^Type(__unsafe_unretained RLMObjectBase *const obj) {
+        RLMVerifyAttached(obj);
+        size_t col = obj->_info->objectSchema->persisted_properties[index].table_column;
+        return [[ViewClass alloc] initWithRow:obj->_row columnIndex:col realm:obj->_realm];
+    };
+}
+
 // dynamic getter with column closure
 static id RLMAccessorGetter(RLMProperty *prop, const char *type) {
     NSUInteger index = prop.index;
     bool boxed = prop.optional || *type == '@';
     switch (prop.type) {
         case RLMPropertyTypeInt:
+            if (prop.subtype == RLMPropertySubtypeInteger) {
+                return RLMMakeRealmIntegerGetter<RLMInteger *, RLMIntegerView>(index);
+            } else if (prop.subtype == RLMPropertySubtypeNullableInteger) {
+                return RLMMakeRealmIntegerGetter<RLMNullableInteger *, RLMNullableIntegerView>(index);
+            }
             if (boxed) {
                 return ^(__unsafe_unretained RLMObjectBase *const obj) {
                     return getBoxed<long long>(obj, index);
@@ -404,11 +419,27 @@ static id makeSetter(__unsafe_unretained RLMProperty *const prop) {
     };
 }
 
+static id makeRealmIntegerSetter(__unsafe_unretained RLMProperty *const prop) {
+    // FIXME: move this into the `makeSetter` method once we support `if constexpr`
+    NSUInteger index = prop.index;
+    NSString *name = prop.name;
+    REALM_ASSERT(!prop.isPrimary);
+    return ^(__unsafe_unretained RLMObjectBase *const obj, id val) {
+        RLMWrapSetter(obj, name, [&] {
+            RLMSetValue(obj, obj->_info->objectSchema->persisted_properties[index].table_column,
+                        static_cast<NSNumber<RLMInt> *>([(id<RLMIntegerProtocol>)val boxedValue]), false);
+        });
+    };
+}
+
 // dynamic setter with column closure
 static id RLMAccessorSetter(RLMProperty *prop, const char *type) {
     bool boxed = prop.optional || *type == '@';
     switch (prop.type) {
         case RLMPropertyTypeInt:
+            if (RLMPropertySubtypeIsInteger(prop.subtype)) {
+                return makeRealmIntegerSetter(prop);
+            }
             if (boxed) {
                 return makeSetter<NSNumber<RLMInt> *>(prop);
             }
@@ -457,11 +488,10 @@ static void RLMSuperSet(RLMObjectBase *obj, NSString *propName, id val) {
 
 // getter/setter for unmanaged object
 static id RLMAccessorUnmanagedGetter(RLMProperty *prop, const char *) {
-    // only override getters for RLMArray and linking objects properties
+    // only override getters for RLMArray, RLM(Nullable)Integer and linking objects properties
+    NSString *propName = prop.name;
     if (prop.type == RLMPropertyTypeArray) {
         NSString *objectClassName = prop.objectClassName;
-        NSString *propName = prop.name;
-
         return ^(RLMObjectBase *obj) {
             id val = RLMSuperGet(obj, propName);
             if (!val) {
@@ -474,6 +504,25 @@ static id RLMAccessorUnmanagedGetter(RLMProperty *prop, const char *) {
     else if (prop.type == RLMPropertyTypeLinkingObjects) {
         return ^(RLMObjectBase *){
             return [RLMResults emptyDetachedResults];
+        };
+    }
+    else if (prop.subtype == RLMPropertySubtypeInteger) {
+        return ^(RLMObjectBase *obj){
+            id val = RLMSuperGet(obj, propName);
+            if (!val) {
+                val = [[RLMInteger alloc] initWithValue:0];
+                RLMSuperSet(obj, propName, val);
+            }
+            return val;
+        };
+    } else if (prop.subtype == RLMPropertySubtypeNullableInteger) {
+        return ^(RLMObjectBase *obj){
+            id val = RLMSuperGet(obj, propName);
+            if (!val) {
+                val = [[RLMNullableInteger alloc] initWithValue:nil];
+                RLMSuperSet(obj, propName, val);
+            }
+            return val;
         };
     }
     return nil;
