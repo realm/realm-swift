@@ -13,7 +13,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix incorrect column type assertions which could occur after schemas were
+  merged by sync.
+* Eliminate an empty write transaction when opening a synced Realm.
 
 2.4.4 Release notes (2017-03-13)
 =============================================================

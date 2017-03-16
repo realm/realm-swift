@@ -28,6 +28,7 @@
 #import "object_schema.hpp"
 #import "object_store.hpp"
 #import "schema.hpp"
+#import "shared_realm.hpp"
 
 #import <realm/table.hpp>
 
@@ -93,9 +94,10 @@ RLMClassInfo& RLMSchemaInfo::operator[](NSString *name) {
     return *&it->second;
 }
 
-RLMSchemaInfo::RLMSchemaInfo(RLMRealm *realm, RLMSchema *rlmSchema, realm::Schema const& schema) {
+RLMSchemaInfo::RLMSchemaInfo(RLMRealm *realm) {
+    RLMSchema *rlmSchema = realm.schema;
+    realm::Schema const& schema = realm->_realm->schema();
     REALM_ASSERT(rlmSchema.objectSchema.count == schema.size());
-    REALM_ASSERT(m_objects.empty());
 
     m_objects.reserve(schema.size());
     for (RLMObjectSchema *rlmObjectSchema in rlmSchema.objectSchema) {
@@ -104,4 +106,20 @@ RLMSchemaInfo::RLMSchemaInfo(RLMRealm *realm, RLMSchema *rlmSchema, realm::Schem
                           std::forward_as_tuple(realm, rlmObjectSchema,
                                                 &*schema.find(rlmObjectSchema.objectName.UTF8String)));
     }
+}
+
+RLMSchemaInfo RLMSchemaInfo::clone(realm::Schema const& source_schema,
+                                   __unsafe_unretained RLMRealm *const target_realm) {
+    RLMSchemaInfo info;
+    info.m_objects.reserve(m_objects.size());
+
+    auto& schema = target_realm->_realm->schema();
+    for (auto& pair : m_objects) {
+        size_t idx = pair.second.objectSchema - &*source_schema.begin();
+        info.m_objects.emplace(std::piecewise_construct,
+                               std::forward_as_tuple(pair.first),
+                               std::forward_as_tuple(target_realm, pair.second.rlmObjectSchema,
+                                                     &*schema.begin() + idx));
+    }
+    return info;
 }

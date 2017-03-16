@@ -397,6 +397,18 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 }
 
+- (void)testInvalidateRefresh {
+    RLMRealm *realm = [self testRealm];
+    [self measureBlock:^{
+        for (int i = 0; i < 50000; ++i) {
+            @autoreleasepool {
+                [realm invalidate];
+                [realm refresh];
+            }
+        }
+    }];
+}
+
 - (void)testCommitWriteTransaction {
     [self measureMetrics:self.class.defaultPerformanceMetrics automaticallyStartMeasuring:NO forBlock:^{
         RLMRealm *realm = self.testRealm;
