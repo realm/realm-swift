@@ -39,7 +39,7 @@
 static std::mutex& s_realmCacheMutex = *new std::mutex();
 static std::map<std::string, NSMapTable *>& s_realmsPerPath = *new std::map<std::string, NSMapTable *>();
 
-void RLMCacheRealm(std::string const& path, RLMRealm *realm) {
+void RLMCacheRealm(std::string const& path, __unsafe_unretained RLMRealm *const realm) {
     std::lock_guard<std::mutex> lock(s_realmCacheMutex);
     NSMapTable *realms = s_realmsPerPath[path];
     if (!realms) {
@@ -138,6 +138,6 @@ private:
 } // anonymous namespace
 
 
-std::unique_ptr<realm::BindingContext> RLMCreateBindingContext(RLMRealm *realm) {
+std::unique_ptr<realm::BindingContext> RLMCreateBindingContext(__unsafe_unretained RLMRealm *const realm) {
     return std::unique_ptr<realm::BindingContext>(new RLMNotificationHelper(realm));
 }

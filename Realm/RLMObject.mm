@@ -110,7 +110,7 @@
     return RLMGetObjects(RLMRealm.defaultRealm, self.className, nil);
 }
 
-+ (RLMResults *)allObjectsInRealm:(RLMRealm *)realm {
++ (RLMResults *)allObjectsInRealm:(__unsafe_unretained RLMRealm *const)realm {
     return RLMGetObjects(realm, self.className, nil);
 }
 
