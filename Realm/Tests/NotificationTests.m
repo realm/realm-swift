@@ -898,6 +898,13 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
     _propertyNames = [_obj.objectSchema.properties valueForKey:@"name"];
 }
 
+- (void)tearDown {
+    _values = nil;
+    _initialValues = nil;
+    _obj = nil;
+    [super tearDown];
+}
+
 - (void)testDeleteObservedObject {
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
     RLMNotificationToken *token = [_obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
