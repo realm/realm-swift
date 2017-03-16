@@ -35,6 +35,7 @@ static NSString *const c_RLMRealmConfigurationProperties[] = {
     @"schemaVersion",
     @"migrationBlock",
     @"deleteRealmIfMigrationNeeded",
+    @"shouldCompactOnLaunch",
     @"dynamic",
     @"customSchema",
 };
@@ -113,6 +114,7 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
     configuration->_cache = _cache;
     configuration->_dynamic = _dynamic;
     configuration->_migrationBlock = _migrationBlock;
+    configuration->_shouldCompactOnLaunch = _shouldCompactOnLaunch;
     configuration->_customSchema = _customSchema;
     return configuration;
 }
@@ -273,6 +275,18 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 
 - (NSString *)pathOnDisk {
     return @(_config.path.c_str());
+}
+
+- (void)setShouldCompactOnLaunch:(RLMShouldCompactOnLaunchBlock)shouldCompactOnLaunch {
+    _shouldCompactOnLaunch = shouldCompactOnLaunch;
+    if (shouldCompactOnLaunch) {
+        _config.should_compact_on_launch_function = [=](size_t totalBytes, size_t usedBytes) {
+            return shouldCompactOnLaunch(totalBytes, usedBytes);
+        };
+    }
+    else {
+        _config.should_compact_on_launch_function = nullptr;
+    }
 }
 
 @end
