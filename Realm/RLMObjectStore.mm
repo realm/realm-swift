@@ -467,7 +467,9 @@ void RLMDeleteAllObjectsFromRealm(RLMRealm *realm) {
     }
 }
 
-RLMResults *RLMGetObjects(RLMRealm *realm, NSString *objectClassName, NSPredicate *predicate) {
+RLMResults *RLMGetObjects(__unsafe_unretained RLMRealm *const realm,
+                          NSString *objectClassName,
+                          NSPredicate *predicate) {
     RLMVerifyRealmRead(realm);
 
     // create view from table and predicate
