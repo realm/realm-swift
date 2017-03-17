@@ -83,7 +83,7 @@ begin
     platform = platform_for_device_type(device_type)
     runtimes_by_platform[platform].each do |runtime|
       output = `xcrun simctl create '#{device_type['name']}' '#{device_type['identifier']}' '#{runtime['identifier']}' 2>&1`
-      next unless $? != 0
+      next if $? == 0
 
       puts "Failed to create device of type #{device_type['identifier']} with runtime #{runtime['identifier']}:"
       output.each_line do |line|
