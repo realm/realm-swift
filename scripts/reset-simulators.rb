@@ -75,6 +75,7 @@ begin
 
   runtimes_by_platform = Hash.new { |hash, key| hash[key] = [] }
   runtimes.each do |runtime|
+    next unless runtime['availability'] == '(available)'
     runtimes_by_platform[platform_for_runtime(runtime)] << runtime
   end
 
