@@ -1166,6 +1166,7 @@ EOM
 
     "package-watchos")
         cd tightdb_objc
+        sh build.sh prelaunch-simulator
         sh build.sh watchos
 
         cd build/watchos
@@ -1188,6 +1189,7 @@ EOM
 
     "package-tvos")
         cd tightdb_objc
+        sh build.sh prelaunch-simulator
         sh build.sh tvos
 
         cd build/tvos
