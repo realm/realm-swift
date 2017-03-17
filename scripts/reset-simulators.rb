@@ -79,12 +79,16 @@ begin
     runtimes_by_platform[platform_for_runtime(runtime)] << runtime
   end
 
-  puts 'Creating fresh simulators...'
+  print 'Creating fresh simulators...'
   device_types.each do |device_type|
     platform = platform_for_device_type(device_type)
     runtimes_by_platform[platform].each do |runtime|
       output = `xcrun simctl create '#{device_type['name']}' '#{device_type['identifier']}' '#{runtime['identifier']}' 2>&1`
       next if $? == 0
+
+      # Error code 161 indicates that the given device is not supported by the runtime, such as the iPad 2 and
+      # iPhone 4s not being supported by the iOS 10 simulator runtime.
+      next if output =~ /(domain=com.apple.CoreSimulator.SimError, code=161)/
 
       puts "Failed to create device of type #{device_type['identifier']} with runtime #{runtime['identifier']}:"
       output.each_line do |line|
@@ -92,7 +96,7 @@ begin
       end
     end
   end
-  puts 'Done!'
+  puts ' done!'
 
 rescue
   system('ps auxwww')
