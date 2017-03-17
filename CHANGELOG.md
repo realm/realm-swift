@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add support for multi-level object equality comparisons against `NULL`.
 
 ### Bugfixes
 

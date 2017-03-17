@@ -680,14 +680,15 @@ void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
 void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
                                        const ColumnReference& column,
                                        realm::null) {
-    RLMPrecondition(!column.has_links(), @"Unsupported operator", @"Multi-level object equality link queries are not supported.");
     RLMPrecondition(operatorType == NSEqualToPredicateOperatorType || operatorType == NSNotEqualToPredicateOperatorType,
                     @"Invalid operator type", @"Only 'Equal' and 'Not Equal' operators supported for object comparison");
-    if (operatorType == NSNotEqualToPredicateOperatorType) {
-        m_query.Not();
-    }
 
-    m_query.and_query(column.resolve<Link>().is_null());
+    if (operatorType == NSEqualToPredicateOperatorType) {
+        m_query.and_query(column.resolve<Link>() == null());
+    }
+    else {
+        m_query.and_query(column.resolve<Link>() != null());
+    }
 }
 
 template<typename T>

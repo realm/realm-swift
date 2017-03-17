@@ -1384,6 +1384,8 @@
     XCTAssertNoThrow(([CircleObject objectsInRealm:realm where:@"next = %@", circle]));
     XCTAssertNoThrow(([CircleObject objectsInRealm:realm where:@"next.next = %@", circle]));
     XCTAssertTrue([circle.next.next.next.next isEqualToObject:[CircleObject objectsInRealm:realm where:@"next = nil"].firstObject]);
+    XCTAssertTrue([circle.next.next.next isEqualToObject:[CircleObject objectsInRealm:realm where:@"next != nil AND next.next = nil"].firstObject]);
+    XCTAssertTrue([circle.next.next isEqualToObject:[CircleObject objectsInRealm:realm where:@"next.next != nil AND next.next.next = nil"].firstObject]);
 }
 
 - (void)testArrayMultiLevelLinkQuery
