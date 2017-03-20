@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+if [ -n "$JENKINS_HOME" ]; then
+  CI_RUN=true
+else
+  CI_RUN=${CI_RUN:-false}
+fi
+
 get_swift_version() {
     "$1" --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p'
 }
@@ -18,7 +24,7 @@ find_xcode_with_version() {
     required_version=$1
     
     # First check if the currently active one is fine, unless we are in a CI run
-    if [ -z "$JENKINS_HOME" ] && [ $(get_xcode_version xcodebuild) = "$required_version" ]; then
+    if [ $CI_RUN == false ] && [ $(get_xcode_version xcodebuild) = "$required_version" ]; then
         DEVELOPER_DIR=$(xcode-select -p)
         return 0
     fi
@@ -73,7 +79,7 @@ find_xcode_for_swift() {
     required_version=$1
     
     # First check if the currently active one is fine, unless we are in a CI run
-    if [ -z "$JENKINS_HOME" ] && test_xcode_for_swift_version "$(xcode-select -p)" "$required_version"; then
+    if [ $CI_RUN == false ] && test_xcode_for_swift_version "$(xcode-select -p)" "$required_version"; then
         DEVELOPER_DIR=$(xcode-select -p)
         return 0
     fi
@@ -103,19 +109,26 @@ find_xcode_for_swift() {
 }
 
 set_xcode_and_swift_versions() {
-    if [ -n "$REALM_XCODE_VERSION" ]; then
-        find_xcode_with_version $REALM_XCODE_VERSION
+    local target_xcode_version=${1:-$REALM_XCODE_VERSION}
+    local target_swift_version=${2:-$REALM_SWIFT_VERSION}
+    if [ -n "$target_xcode_version" ]; then
+        find_xcode_with_version $target_xcode_version
         
-        if [ -n "$REALM_SWIFT_VERSION" ] && ! test_xcode_for_swift_version "$DEVELOPER_DIR" "$REALM_SWIFT_VERSION"; then
-            echo "The version of Xcode specified ($REALM_XCODE_VERSION) does not support the Swift version required: $REALM_SWIFT_VERSION"
+        if [ -n "$target_swift_version" ] && ! test_xcode_for_swift_version "$DEVELOPER_DIR" "$target_swift_version"; then
+            echo "The version of Xcode specified ($REALM_XCODE_VERSION) does not support the Swift version required: $target_swift_version"
             exit 1
         fi
-    elif [ -n "$REALM_SWIFT_VERSION" ]; then
-        find_xcode_for_swift $REALM_SWIFT_VERSION
+    elif [ -n "$target_swift_version" ]; then
+        find_xcode_for_swift $target_swift_version
     elif [ -z "$DEVELOPER_DIR" ]; then
         DEVELOPER_DIR="$(xcode-select -p)"
+        REALM_XCODE_VERSION=
     fi
     export DEVELOPER_DIR
+    
+    if [ -z "$REALM_XCODE_VERSION" ]; then
+        REALM_XCODE_VERSION=$(get_xcode_version "$(xcrun -f xcodebuild)")
+    fi
     export REALM_XCODE_VERSION
     
     if [ -z "$REALM_SWIFT_VERSION" ]; then
