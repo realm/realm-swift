@@ -19,6 +19,7 @@
 #import "RLMUtil.hpp"
 
 #import "RLMArray_Private.hpp"
+#import "RLMInteger.h"
 #import "RLMListBase.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
@@ -101,6 +102,16 @@ static inline bool nsnumber_is_like_double(__unsafe_unretained NSNumber *const o
            data_type == *@encode(unsigned long long);
 }
 
+template<typename RealmIntClass>
+inline BOOL RLMIsObjectValidForRealmIntProperty(__unsafe_unretained id const obj) {
+    if ([obj isKindOfClass:[RealmIntClass class]]) {
+        return YES;
+    } else if (NSNumber *number = RLMDynamicCast<NSNumber>(obj)) {
+        return nsnumber_is_like_integer(number);
+    }
+    return NO;
+}
+
 BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
                                  __unsafe_unretained RLMProperty *const property) {
     if (property.optional && !RLMCoerceToNil(obj)) {
@@ -118,7 +129,11 @@ BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,
         case RLMPropertyTypeDate:
             return [obj isKindOfClass:[NSDate class]];
         case RLMPropertyTypeInt:
-            if (NSNumber *number = RLMDynamicCast<NSNumber>(obj)) {
+            if (property.subtype == RLMPropertySubtypeInteger) {
+                return RLMIsObjectValidForRealmIntProperty<RLMInteger>(obj);
+            } else if (property.subtype == RLMPropertySubtypeNullableInteger) {
+                return RLMIsObjectValidForRealmIntProperty<RLMNullableInteger>(obj);
+            } else if (NSNumber *number = RLMDynamicCast<NSNumber>(obj)) {
                 return nsnumber_is_like_integer(number);
             }
             return NO;
