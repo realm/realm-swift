@@ -146,7 +146,21 @@ struct FalseExpression : realm::Expression {
 // Equal and ContainsSubstring are used by QueryBuilder::add_string_constraint as the comparator
 // for performing diacritic-insensitive comparisons.
 
-template <NSUInteger options>
+bool equal(NSStringCompareOptions options, StringData v1, StringData v2)
+{
+    if (v1.is_null() || v2.is_null()) {
+        return v1.is_null() == v2.is_null();
+    }
+
+    @autoreleasepool {
+        NSString *s1 = [[NSString alloc] initWithBytesNoCopy:(void*)v1.data() length:v1.size() encoding:NSUTF8StringEncoding freeWhenDone:NO];
+        NSString *s2 = [[NSString alloc] initWithBytesNoCopy:(void*)v2.data() length:v2.size() encoding:NSUTF8StringEncoding freeWhenDone:NO];
+
+        return [s1 compare:s2 options:options] == NSOrderedSame;
+    }
+}
+
+template <NSStringCompareOptions options>
 struct Equal {
     using CaseSensitive = Equal<options & ~NSCaseInsensitiveSearch>;
     using CaseInsensitive = Equal<options | NSCaseInsensitiveSearch>;
@@ -156,20 +170,36 @@ struct Equal {
         REALM_ASSERT_DEBUG(v1_null == v1.is_null());
         REALM_ASSERT_DEBUG(v2_null == v2.is_null());
 
-        if (v1_null || v2_null) {
-            return v1_null == v2_null;
-        }
-
-        @autoreleasepool {
-            NSString *s1 = [[NSString alloc] initWithBytesNoCopy:(void*)v1.data() length:v1.size() encoding:NSUTF8StringEncoding freeWhenDone:NO];
-            NSString *s2 = [[NSString alloc] initWithBytesNoCopy:(void*)v2.data() length:v2.size() encoding:NSUTF8StringEncoding freeWhenDone:NO];
-
-            return [s1 compare:s2 options:options] == NSOrderedSame;
-        }
+        return equal(options, v1, v2);
     }
 };
 
-template <NSUInteger options>
+bool contains_substring(NSStringCompareOptions options, StringData v1, StringData v2)
+{
+    if (v2.is_null()) {
+        // Everything contains NULL
+        return true;
+    }
+
+    if (v1.is_null()) {
+        // NULL contains nothing (except NULL, handled above)
+        return false;
+    }
+
+    if (v2.size() == 0) {
+        // Everything (except NULL, handled above) contains the empty string
+        return true;
+    }
+
+    @autoreleasepool {
+        NSString *s1 = [[NSString alloc] initWithBytesNoCopy:(void*)v1.data() length:v1.size() encoding:NSUTF8StringEncoding freeWhenDone:NO];
+        NSString *s2 = [[NSString alloc] initWithBytesNoCopy:(void*)v2.data() length:v2.size() encoding:NSUTF8StringEncoding freeWhenDone:NO];
+
+        return [s1 rangeOfString:s2 options:options].location != NSNotFound;
+    }
+}
+
+template <NSStringCompareOptions options>
 struct ContainsSubstring {
     using CaseSensitive = ContainsSubstring<options & ~NSCaseInsensitiveSearch>;
     using CaseInsensitive = ContainsSubstring<options | NSCaseInsensitiveSearch>;
@@ -179,27 +209,7 @@ struct ContainsSubstring {
         REALM_ASSERT_DEBUG(v1_null == v1.is_null());
         REALM_ASSERT_DEBUG(v2_null == v2.is_null());
 
-        if (v2_null) {
-            // Everything contains NULL
-            return true;
-        }
-
-        if (v1_null) {
-            // NULL contains nothing (except NULL, handled above)
-            return false;
-        }
-
-        if (v2.size() == 0) {
-            // Everything (except NULL, handled above) contains the empty string
-            return true;
-        }
-
-        @autoreleasepool {
-            NSString *s1 = [[NSString alloc] initWithBytesNoCopy:(void*)v1.data() length:v1.size() encoding:NSUTF8StringEncoding freeWhenDone:NO];
-            NSString *s2 = [[NSString alloc] initWithBytesNoCopy:(void*)v2.data() length:v2.size() encoding:NSUTF8StringEncoding freeWhenDone:NO];
-
-            return [s1 rangeOfString:s2 options:options].location != NSNotFound;
-        }
+        return contains_substring(options, v1, v2);
     }
 };
 
