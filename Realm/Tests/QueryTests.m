@@ -904,6 +904,11 @@
     RLMAssertCount(StringObject, 3U, @"stringCol BEGINSWITH[d] 'u'");
     RLMAssertCount(StringObject, 3U, @"stringCol BEGINSWITH[cd] 'U'");
 
+    RLMAssertCount(StringObject, 1U, @"stringCol BEGINSWITH 'ü'");
+    RLMAssertCount(StringObject, 0U, @"stringCol BEGINSWITH[c] 'Ü'");
+    RLMAssertCount(StringObject, 3U, @"stringCol BEGINSWITH[d] 'ü'");
+    RLMAssertCount(StringObject, 3U, @"stringCol BEGINSWITH[cd] 'Ü'");
+
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol BEGINSWITH 'a'");
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol BEGINSWITH 'c'");
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol BEGINSWITH 'A'");
@@ -938,6 +943,11 @@
     RLMAssertCount(StringObject, 1U, @"stringCol ENDSWITH[c] 'U'");
     RLMAssertCount(StringObject, 3U, @"stringCol ENDSWITH[d] 'u'");
     RLMAssertCount(StringObject, 3U, @"stringCol ENDSWITH[cd] 'U'");
+
+    RLMAssertCount(StringObject, 1U, @"stringCol ENDSWITH 'ü'");
+    RLMAssertCount(StringObject, 0U, @"stringCol ENDSWITH[c] 'Ü'");
+    RLMAssertCount(StringObject, 3U, @"stringCol ENDSWITH[d] 'ü'");
+    RLMAssertCount(StringObject, 3U, @"stringCol ENDSWITH[cd] 'Ü'");
 
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol ENDSWITH 'c'");
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol ENDSWITH 'a'");
@@ -976,6 +986,11 @@
     RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS[c] 'U'");
     RLMAssertCount(StringObject, 3U, @"stringCol CONTAINS[d] 'u'");
     RLMAssertCount(StringObject, 3U, @"stringCol CONTAINS[cd] 'U'");
+
+    RLMAssertCount(StringObject, 1U, @"stringCol CONTAINS 'ü'");
+    RLMAssertCount(StringObject, 0U, @"stringCol CONTAINS[c] 'Ü'");
+    RLMAssertCount(StringObject, 3U, @"stringCol CONTAINS[d] 'ü'");
+    RLMAssertCount(StringObject, 3U, @"stringCol CONTAINS[cd] 'Ü'");
 
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol CONTAINS 'd'");
     RLMAssertCount(AllTypesObject, 1U, @"objectCol.stringCol CONTAINS 'c'");
