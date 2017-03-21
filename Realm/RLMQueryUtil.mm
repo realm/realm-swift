@@ -30,6 +30,7 @@
 #import "results.hpp"
 
 #include <realm/query_engine.hpp>
+#include <realm/util/cf_ptr.hpp>
 
 using namespace realm;
 
@@ -85,6 +86,35 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     }
 }
 
+
+// Declare an overload set using lambdas or other function objects.
+// A minimal version of C++ Library Evolution Working Group proposal P0051R2.
+// FIXME: Switch to realm::util::overload once https://github.com/realm/realm-core/pull/2539 is in a core release.
+
+template <typename Fn, typename... Fns>
+struct Overloaded : Fn, Overloaded<Fns...> {
+    template <typename U, typename... Rest>
+    Overloaded(U&& fn, Rest&&... rest) : Fn(std::forward<U>(fn)), Overloaded<Fns...>(std::forward<Rest>(rest)...) { }
+
+    using Fn::operator();
+    using Overloaded<Fns...>::operator();
+};
+
+template <typename Fn>
+struct Overloaded<Fn> : Fn {
+    template <typename U>
+    Overloaded(U&& fn) : Fn(std::forward<U>(fn)) { }
+
+    using Fn::operator();
+};
+
+template <typename... Fns>
+Overloaded<Fns...> overload(Fns&&... f)
+{
+    return Overloaded<Fns...>(std::forward<Fns>(f)...);
+}
+
+
 // FIXME: TrueExpression and FalseExpression should be supported by core in some way
 
 struct TrueExpression : realm::Expression {
@@ -112,6 +142,78 @@ struct FalseExpression : realm::Expression {
         return std::unique_ptr<Expression>(new FalseExpression(*this));
     }
 };
+
+
+// Equal and ContainsSubstring are used by QueryBuilder::add_string_constraint as the comparator
+// for performing diacritic-insensitive comparisons.
+
+bool equal(CFStringCompareFlags options, StringData v1, StringData v2)
+{
+    if (v1.is_null() || v2.is_null()) {
+        return v1.is_null() == v2.is_null();
+    }
+
+    auto s1 = util::adoptCF(CFStringCreateWithBytesNoCopy(kCFAllocatorSystemDefault, (const UInt8*)v1.data(), v1.size(),
+                                                          kCFStringEncodingUTF8, false, kCFAllocatorNull));
+    auto s2 = util::adoptCF(CFStringCreateWithBytesNoCopy(kCFAllocatorSystemDefault, (const UInt8*)v2.data(), v2.size(),
+                                                          kCFStringEncodingUTF8, false, kCFAllocatorNull));
+
+    return CFStringCompare(s1.get(), s2.get(), options) == kCFCompareEqualTo;
+}
+
+template <CFStringCompareFlags options>
+struct Equal {
+    using CaseSensitive = Equal<options & ~kCFCompareCaseInsensitive>;
+    using CaseInsensitive = Equal<options | kCFCompareCaseInsensitive>;
+
+    bool operator()(StringData v1, StringData v2, bool v1_null, bool v2_null) const
+    {
+        REALM_ASSERT_DEBUG(v1_null == v1.is_null());
+        REALM_ASSERT_DEBUG(v2_null == v2.is_null());
+
+        return equal(options, v1, v2);
+    }
+};
+
+bool contains_substring(CFStringCompareFlags options, StringData v1, StringData v2)
+{
+    if (v2.is_null()) {
+        // Everything contains NULL
+        return true;
+    }
+
+    if (v1.is_null()) {
+        // NULL contains nothing (except NULL, handled above)
+        return false;
+    }
+
+    if (v2.size() == 0) {
+        // Everything (except NULL, handled above) contains the empty string
+        return true;
+    }
+
+    auto s1 = util::adoptCF(CFStringCreateWithBytesNoCopy(kCFAllocatorSystemDefault, (const UInt8*)v1.data(), v1.size(),
+                                                          kCFStringEncodingUTF8, false, kCFAllocatorNull));
+    auto s2 = util::adoptCF(CFStringCreateWithBytesNoCopy(kCFAllocatorSystemDefault, (const UInt8*)v2.data(), v2.size(),
+                                                          kCFStringEncodingUTF8, false, kCFAllocatorNull));
+
+    return CFStringFind(s1.get(), s2.get(), options).location != kCFNotFound;
+}
+
+template <CFStringCompareFlags options>
+struct ContainsSubstring {
+    using CaseSensitive = ContainsSubstring<options & ~kCFCompareCaseInsensitive>;
+    using CaseInsensitive = ContainsSubstring<options | kCFCompareCaseInsensitive>;
+
+    bool operator()(StringData v1, StringData v2, bool v1_null, bool v2_null) const
+    {
+        REALM_ASSERT_DEBUG(v1_null == v1.is_null());
+        REALM_ASSERT_DEBUG(v2_null == v2.is_null());
+
+        return contains_substring(options, v1, v2);
+    }
+};
+
 
 NSString *operatorName(NSPredicateOperatorType operatorType)
 {
@@ -526,29 +628,72 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
                                          Columns<String> &&column,
                                          T value) {
     bool caseSensitive = !(predicateOptions & NSCaseInsensitivePredicateOption);
-    bool diacriticInsensitive = (predicateOptions & NSDiacriticInsensitivePredicateOption);
-    RLMPrecondition(!diacriticInsensitive, @"Invalid predicate option",
-                    @"NSDiacriticInsensitivePredicateOption not supported for string type");
+    bool diacriticSensitive = !(predicateOptions & NSDiacriticInsensitivePredicateOption);
+
+    if (diacriticSensitive) {
+        switch (operatorType) {
+            case NSBeginsWithPredicateOperatorType:
+                m_query.and_query(column.begins_with(value, caseSensitive));
+                break;
+            case NSEndsWithPredicateOperatorType:
+                m_query.and_query(column.ends_with(value, caseSensitive));
+                break;
+            case NSContainsPredicateOperatorType:
+                m_query.and_query(column.contains(value, caseSensitive));
+                break;
+            case NSEqualToPredicateOperatorType:
+                m_query.and_query(column.equal(value, caseSensitive));
+                break;
+            case NSNotEqualToPredicateOperatorType:
+                m_query.and_query(column.not_equal(value, caseSensitive));
+                break;
+            case NSLikePredicateOperatorType:
+                m_query.and_query(column.like(value, caseSensitive));
+                break;
+            default:
+                @throw RLMPredicateException(@"Invalid operator type",
+                                             @"Operator '%@' not supported for string type", operatorName(operatorType));
+        }
+        return;
+    }
+
+    auto as_subexpr = overload([](StringData value) { return make_subexpr<ConstantStringValue>(value); },
+                               [](const Columns<String>& c) { return c.clone(); });
+    auto left = as_subexpr(column);
+    auto right = as_subexpr(value);
+
+    auto add_constraint = [&](auto comparator) mutable {
+        using Comparator = decltype(comparator);
+        using CompareCS = Compare<typename Comparator::CaseSensitive, StringData>;
+        using CompareCI = Compare<typename Comparator::CaseInsensitive, StringData>;
+
+        if (caseSensitive) {
+            m_query.and_query(make_expression<CompareCS>(std::move(left), std::move(right)));
+        }
+        else {
+            m_query.and_query(make_expression<CompareCI>(std::move(left), std::move(right)));
+        }
+    };
 
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
-            m_query.and_query(column.begins_with(value, caseSensitive));
+            add_constraint(ContainsSubstring<kCFCompareDiacriticInsensitive | kCFCompareAnchored>{});
             break;
         case NSEndsWithPredicateOperatorType:
-            m_query.and_query(column.ends_with(value, caseSensitive));
+            add_constraint(ContainsSubstring<kCFCompareDiacriticInsensitive | kCFCompareAnchored | kCFCompareBackwards>{});
             break;
         case NSContainsPredicateOperatorType:
-            m_query.and_query(column.contains(value, caseSensitive));
-            break;
-        case NSEqualToPredicateOperatorType:
-            m_query.and_query(column.equal(value, caseSensitive));
+            add_constraint(ContainsSubstring<kCFCompareDiacriticInsensitive>{});
             break;
         case NSNotEqualToPredicateOperatorType:
-            m_query.and_query(column.not_equal(value, caseSensitive));
+            m_query.Not();
+            REALM_FALLTHROUGH;
+        case NSEqualToPredicateOperatorType:
+            add_constraint(Equal<kCFCompareDiacriticInsensitive>{});
             break;
         case NSLikePredicateOperatorType:
-            m_query.and_query(column.like(value, caseSensitive));
-            break;
+            @throw RLMPredicateException(@"Invalid operator type",
+                                         @"Operator 'LIKE' not supported with diacritic-insensitive modifier.");
         default:
             @throw RLMPredicateException(@"Invalid operator type",
                                          @"Operator '%@' not supported for string type", operatorName(operatorType));
