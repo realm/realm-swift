@@ -579,6 +579,18 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     XCTAssertEqual(obj.realmInt.value, 123);
 }
 
+- (void)testCreateRealmIntFromValue {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [RealmIntObject createInRealm:realm withValue:@[@100]];
+    [realm commitWriteTransaction];
+
+    RealmIntObject *object = [[RealmIntObject allObjectsInRealm:realm] firstObject];
+    XCTAssertNotNil(object);
+    XCTAssertEqual(object.realmInt.value, 100);
+}
+
 /// Check that calling `RLMInteger` APIs works as expected throughout the object lifecycle.
 - (void)testRealmIntManagementLifecycle {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -670,6 +682,28 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
     obj.realmInt.value = @123;
     [realm commitWriteTransaction];
     XCTAssertEqual(obj.realmInt.value.integerValue, 123);
+}
+
+- (void)testCreateRealmNullableIntFromValue {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    [realm beginWriteTransaction];
+    [RealmNullableIntObject createInRealm:realm withValue:@[@100]];
+    [realm commitWriteTransaction];
+
+    RealmNullableIntObject *object = [[RealmNullableIntObject allObjectsInRealm:realm] firstObject];
+    XCTAssertNotNil(object);
+    XCTAssertEqual(object.realmInt.value.integerValue, 100);
+
+    // Now try with a null.
+    [realm beginWriteTransaction];
+    [realm deleteAllObjects];
+    [RealmNullableIntObject createInRealm:realm withValue:@[[NSNull null]]];
+    [realm commitWriteTransaction];
+
+    object = [[RealmNullableIntObject allObjectsInRealm:realm] firstObject];
+    XCTAssertNotNil(object);
+    XCTAssertNil(object.realmInt.value);
 }
 
 /// Check that calling `RLMInteger` APIs works as expected throughout the object lifecycle.
