@@ -88,6 +88,7 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
 
 // Declare an overload set using lambdas or other function objects.
 // A minimal version of C++ Library Evolution Working Group proposal P0051R2.
+// FIXME: Switch to realm::util::overload once https://github.com/realm/realm-core/pull/2539 is in a core release.
 
 template <typename Fn, typename... Fns>
 struct Overloaded : Fn, Overloaded<Fns...> {
