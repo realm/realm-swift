@@ -59,6 +59,9 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSNumber<RLMFloat> *optFloatCol;
 @property NSNumber<RLMDouble> *optDoubleCol;
 @property NSNumber<RLMBool> *optBoolCol;
+
+@property RLMInteger *realmInt;
+@property RLMNullableInteger *realmNullableInt;
 @end
 @implementation KVOObject
 + (NSString *)primaryKey {
@@ -1073,6 +1076,8 @@ public:
     obj.binaryCol = NSData.data;
     obj.stringCol = @"";
     obj.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:0];
+    obj.realmInt = [[RLMInteger alloc] initWithValue:10];
+    obj.realmNullableInt = [[RLMNullableInteger alloc] initWithValue:@20];
     return obj;
 }
 
@@ -1150,7 +1155,8 @@ public:
                                                        @NO, @1, @2, @3, @0, @0, @NO, @"",
                                                        NSData.data, [NSDate dateWithTimeIntervalSinceReferenceDate:0],
                                                        NSNull.null, NSNull.null,
-                                                       NSNull.null, NSNull.null, NSNull.null, NSNull.null]];
+                                                       NSNull.null, NSNull.null, NSNull.null, NSNull.null,
+                                                       @10, @20]];
 }
 
 - (id)createLinkObject {

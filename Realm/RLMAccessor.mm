@@ -661,6 +661,14 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     RLMDynamicSet(obj, prop, RLMCoerceToNil(val), RLMCreationOptionsPromoteUnmanaged);
 }
 
+static inline NSNumber<RLMInt> *RLMCoerceToNSNumber(__unsafe_unretained id obj) {
+    if ([obj conformsToProtocol:@protocol(RLMIntegerProtocol)]) {
+        return [obj boxedValue];
+    }
+    REALM_ASSERT_DEBUG(obj == nil || RLMDynamicCast<NSNumber>(obj));
+    return obj;
+}
+
 // Precondition: the property is not a primary key
 void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretained RLMProperty *const prop,
                    __unsafe_unretained id const val, RLMCreationOptions creationOptions) {
@@ -670,7 +678,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unreta
     auto col = obj->_info->tableColumn(prop);
     RLMWrapSetter(obj, prop.name, [&] {
         switch (prop.type) {
-            case RLMPropertyTypeInt:    RLMSetValue(obj, col, (NSNumber<RLMInt> *)val, setDefault); break;
+            case RLMPropertyTypeInt:    RLMSetValue(obj, col, RLMCoerceToNSNumber(val), setDefault); break;
             case RLMPropertyTypeFloat:  RLMSetValue(obj, col, (NSNumber<RLMFloat> *)val, setDefault); break;
             case RLMPropertyTypeDouble: RLMSetValue(obj, col, (NSNumber<RLMDouble> *)val, setDefault); break;
             case RLMPropertyTypeBool:   RLMSetValue(obj, col, (NSNumber<RLMBool> *)val, setDefault); break;
