@@ -30,6 +30,7 @@
 #import "results.hpp"
 
 #include <realm/query_engine.hpp>
+#include <realm/util/cf_ptr.hpp>
 
 using namespace realm;
 
@@ -146,24 +147,24 @@ struct FalseExpression : realm::Expression {
 // Equal and ContainsSubstring are used by QueryBuilder::add_string_constraint as the comparator
 // for performing diacritic-insensitive comparisons.
 
-bool equal(NSStringCompareOptions options, StringData v1, StringData v2)
+bool equal(CFStringCompareFlags options, StringData v1, StringData v2)
 {
     if (v1.is_null() || v2.is_null()) {
         return v1.is_null() == v2.is_null();
     }
 
-    @autoreleasepool {
-        NSString *s1 = [[NSString alloc] initWithBytesNoCopy:(void*)v1.data() length:v1.size() encoding:NSUTF8StringEncoding freeWhenDone:NO];
-        NSString *s2 = [[NSString alloc] initWithBytesNoCopy:(void*)v2.data() length:v2.size() encoding:NSUTF8StringEncoding freeWhenDone:NO];
+    auto s1 = util::adoptCF(CFStringCreateWithBytesNoCopy(kCFAllocatorSystemDefault, (const UInt8*)v1.data(), v1.size(),
+                                                          kCFStringEncodingUTF8, false, kCFAllocatorNull));
+    auto s2 = util::adoptCF(CFStringCreateWithBytesNoCopy(kCFAllocatorSystemDefault, (const UInt8*)v2.data(), v2.size(),
+                                                          kCFStringEncodingUTF8, false, kCFAllocatorNull));
 
-        return [s1 compare:s2 options:options] == NSOrderedSame;
-    }
+    return CFStringCompare(s1.get(), s2.get(), options) == kCFCompareEqualTo;
 }
 
-template <NSStringCompareOptions options>
+template <CFStringCompareFlags options>
 struct Equal {
-    using CaseSensitive = Equal<options & ~NSCaseInsensitiveSearch>;
-    using CaseInsensitive = Equal<options | NSCaseInsensitiveSearch>;
+    using CaseSensitive = Equal<options & ~kCFCompareCaseInsensitive>;
+    using CaseInsensitive = Equal<options | kCFCompareCaseInsensitive>;
 
     bool operator()(StringData v1, StringData v2, bool v1_null, bool v2_null) const
     {
@@ -174,7 +175,7 @@ struct Equal {
     }
 };
 
-bool contains_substring(NSStringCompareOptions options, StringData v1, StringData v2)
+bool contains_substring(CFStringCompareFlags options, StringData v1, StringData v2)
 {
     if (v2.is_null()) {
         // Everything contains NULL
@@ -191,18 +192,18 @@ bool contains_substring(NSStringCompareOptions options, StringData v1, StringDat
         return true;
     }
 
-    @autoreleasepool {
-        NSString *s1 = [[NSString alloc] initWithBytesNoCopy:(void*)v1.data() length:v1.size() encoding:NSUTF8StringEncoding freeWhenDone:NO];
-        NSString *s2 = [[NSString alloc] initWithBytesNoCopy:(void*)v2.data() length:v2.size() encoding:NSUTF8StringEncoding freeWhenDone:NO];
+    auto s1 = util::adoptCF(CFStringCreateWithBytesNoCopy(kCFAllocatorSystemDefault, (const UInt8*)v1.data(), v1.size(),
+                                                          kCFStringEncodingUTF8, false, kCFAllocatorNull));
+    auto s2 = util::adoptCF(CFStringCreateWithBytesNoCopy(kCFAllocatorSystemDefault, (const UInt8*)v2.data(), v2.size(),
+                                                          kCFStringEncodingUTF8, false, kCFAllocatorNull));
 
-        return [s1 rangeOfString:s2 options:options].location != NSNotFound;
-    }
+    return CFStringFind(s1.get(), s2.get(), options).location != kCFNotFound;
 }
 
-template <NSStringCompareOptions options>
+template <CFStringCompareFlags options>
 struct ContainsSubstring {
-    using CaseSensitive = ContainsSubstring<options & ~NSCaseInsensitiveSearch>;
-    using CaseInsensitive = ContainsSubstring<options | NSCaseInsensitiveSearch>;
+    using CaseSensitive = ContainsSubstring<options & ~kCFCompareCaseInsensitive>;
+    using CaseInsensitive = ContainsSubstring<options | kCFCompareCaseInsensitive>;
 
     bool operator()(StringData v1, StringData v2, bool v1_null, bool v2_null) const
     {
@@ -676,19 +677,19 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
 
     switch (operatorType) {
         case NSBeginsWithPredicateOperatorType:
-            add_constraint(ContainsSubstring<NSDiacriticInsensitiveSearch | NSAnchoredSearch>{});
+            add_constraint(ContainsSubstring<kCFCompareDiacriticInsensitive | kCFCompareAnchored>{});
             break;
         case NSEndsWithPredicateOperatorType:
-            add_constraint(ContainsSubstring<NSDiacriticInsensitiveSearch | NSAnchoredSearch | NSBackwardsSearch>{});
+            add_constraint(ContainsSubstring<kCFCompareDiacriticInsensitive | kCFCompareAnchored | kCFCompareBackwards>{});
             break;
         case NSContainsPredicateOperatorType:
-            add_constraint(ContainsSubstring<NSDiacriticInsensitiveSearch>{});
+            add_constraint(ContainsSubstring<kCFCompareDiacriticInsensitive>{});
             break;
         case NSNotEqualToPredicateOperatorType:
             m_query.Not();
             REALM_FALLTHROUGH;
         case NSEqualToPredicateOperatorType:
-            add_constraint(Equal<NSDiacriticInsensitiveSearch>{});
+            add_constraint(Equal<kCFCompareDiacriticInsensitive>{});
             break;
         case NSLikePredicateOperatorType:
             @throw RLMPredicateException(@"Invalid operator type",
