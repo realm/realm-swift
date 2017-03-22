@@ -334,7 +334,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
         }
     }
 
-    if (!value) {
+    if (!value || value == NSNull.null) {
         @throw RLMException(@"Must provide a non-nil value.");
     }
 

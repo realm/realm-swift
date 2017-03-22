@@ -506,6 +506,8 @@
 
     RLMAssertThrowsWithReasonMatching([DogObject createInRealm:realm withValue:self.nonLiteralNil],
                                       @"Must provide a non-nil value");
+    RLMAssertThrowsWithReasonMatching([DogObject createInRealm:realm withValue:NSNull.null],
+                                      @"Must provide a non-nil value");
     RLMAssertThrowsWithReasonMatching([DogObject createInRealm:realm withValue:@""],
                                       @"Invalid value '' to initialize object of type 'DogObject'");
 
