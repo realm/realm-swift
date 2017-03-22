@@ -146,7 +146,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
         _realm->verify_thread();
     }
     catch (std::exception const& e) {
-        @throw RLMException(@"%s", e.what());
+        @throw RLMException(e);
     }
 }
 
