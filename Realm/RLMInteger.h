@@ -70,6 +70,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic) NSInteger value;
 
+/**
+ Create a new instance set to the provided numeric value.
+ */
 - (instancetype)initWithValue:(NSInteger)value;
 
 @end
@@ -94,6 +97,9 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, nullable) NSNumber<RLMInt> *value;
 
+/**
+ Create a new instance set to the provided numeric value.
+ */
 - (instancetype)initWithValue:(nullable NSNumber<RLMInt> *)value;
 
 @end
