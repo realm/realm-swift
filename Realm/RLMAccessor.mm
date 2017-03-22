@@ -643,6 +643,27 @@ Class RLMUnmanagedAccessorClassForObjectClass(Class objectClass, RLMObjectSchema
                                   RLMAccessorUnmanagedGetter, RLMAccessorUnmanagedSetter);
 }
 
+void RLMDynamicIntegerAdd(RLMObjectBase *obj, NSString *propName, NSInteger delta) {
+    RLMObjectSchema *schema = obj->_objectSchema;
+    RLMProperty *prop = schema[propName];
+    if (!prop) {
+        @throw RLMException(@"Invalid property name '%@' for class '%@'.", propName, obj->_objectSchema.className);
+    }
+    if (prop.isPrimary) {
+        @throw RLMException(@"Primary key can't be incremented.");
+    }
+    if (prop.type != RLMPropertyTypeInt) {
+        @throw RLMException(@"Cannot increment a non-integer property.");
+    }
+    RLMVerifyInWriteTransaction(obj);
+    auto col = obj->_info->tableColumn(prop);
+    auto table = obj->_row.get_table();
+    if (table->is_null(col, obj->_row.get_index())) {
+        @throw RLMException(@"Cannot increment a nullable integer property whose value is nil. Set its value first.");
+    }
+    table->add_int(col, obj->_row.get_index(), delta);
+}
+
 void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     RLMObjectSchema *schema = obj->_objectSchema;
     RLMProperty *prop = schema[propName];
