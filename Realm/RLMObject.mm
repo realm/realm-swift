@@ -229,6 +229,10 @@
     RLMDynamicValidatedSet(self, key, value);
 }
 
+- (void)incrementValueOfIntegerProperty:(NSString *)propertyName byValue:(NSInteger)delta {
+    RLMDynamicIntegerAdd(self, propertyName, delta);
+}
+
 @end
 
 @implementation RLMWeakObjectHandle {
