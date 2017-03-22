@@ -21,6 +21,7 @@
 #import "RLMAccessor.h"
 #import "RLMArray.h"
 #import "RLMCollection_Private.hpp"
+#import "RLMInteger.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMProperty.h"
@@ -331,6 +332,9 @@ RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjec
                 id value = [object valueForKey:name];
                 if (!value || [value isKindOfClass:[RLMArray class]]) {
                     [values addObject:NSNull.null];
+                }
+                else if ([value conformsToProtocol:@protocol(RLMIntegerProtocol)]) {
+                    [values addObject:([value boxedValue] ?: NSNull.null)];
                 }
                 else {
                     [values addObject:value];
