@@ -154,6 +154,7 @@
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeFloat),    @"float");
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeObject),   @"object");
     XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeArray),    @"array");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeLinkingObjects), @"linking objects");
 
     XCTAssertEqualObjects(RLMTypeToString((RLMPropertyType)-1),     @"Unknown");
 }
