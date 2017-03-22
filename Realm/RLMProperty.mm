@@ -27,6 +27,18 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+#import <realm/data_type.hpp>
+
+static_assert((int)RLMPropertyTypeInt    == realm::type_Int, "");
+static_assert((int)RLMPropertyTypeBool   == realm::type_Bool, "");
+static_assert((int)RLMPropertyTypeFloat  == realm::type_Float, "");
+static_assert((int)RLMPropertyTypeDouble == realm::type_Double, "");
+static_assert((int)RLMPropertyTypeString == realm::type_String, "");
+static_assert((int)RLMPropertyTypeData   == realm::type_Binary, "");
+static_assert((int)RLMPropertyTypeDate   == realm::type_Timestamp, "");
+static_assert((int)RLMPropertyTypeObject == realm::type_Link, "");
+static_assert((int)RLMPropertyTypeArray  == realm::type_LinkList, "");
+
 BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
     return propertyType != RLMPropertyTypeArray && propertyType != RLMPropertyTypeLinkingObjects;
 }

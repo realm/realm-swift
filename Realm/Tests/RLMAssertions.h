@@ -57,6 +57,20 @@
     exception; \
 })
 
+#define RLMAssertThrowsWithReason(expression, expected, ...) \
+({ \
+    NSException *exception = RLMAssertThrows(expression); \
+    if (exception) { \
+        if ([exception.reason rangeOfString:(expected)].location == NSNotFound) { \
+            _XCTRegisterFailure(self, \
+                                [_XCTFailureDescription(_XCTAssertion_True, 0, @#expression " (EXPR_STRING) contains " #expected) \
+                                 stringByReplacingOccurrencesOfString:@"EXPR_STRING" \
+                                                           withString:exception.reason ?: @"<nil>"]); \
+        } \
+    } \
+    exception; \
+})
+
 #define RLMAssertThrowsWithCodeMatching(expression, expectedCode, ...) \
 ({ \
     NSException *exception = RLMAssertThrows(expression, __VA_ARGS__); \

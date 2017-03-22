@@ -90,17 +90,27 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
     }
 }
 
+static inline void setNull(realm::Table& table, size_t colIndex, size_t rowIndex, bool setDefault) {
+    try {
+        table.set_null(colIndex, rowIndex, setDefault);
+    }
+    catch (std::exception const& e) {
+        @throw RLMException(e);
+    }
+}
+
 // date getter/setter
 static inline NSDate *RLMGetDate(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex) {
     return RLMTimestampToNSDate(get<realm::Timestamp>(obj, colIndex));
 }
-static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, __unsafe_unretained NSDate *const date, bool setDefault) {
+static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
+                               __unsafe_unretained NSDate *const date, bool setDefault) {
     RLMVerifyInWriteTransaction(obj);
     if (date) {
         obj->_row.get_table()->set_timestamp(colIndex, obj->_row.get_index(), RLMTimestampForNSDate(date), setDefault);
     }
     else {
-        obj->_row.set_null(colIndex);
+        setNull(*obj->_row.get_table(), colIndex, obj->_row.get_index(), setDefault);
     }
 }
 
@@ -214,7 +224,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
         obj->_row.get_table()->set_int(colIndex, obj->_row.get_index(), intObject.longLongValue, setDefault);
     }
     else {
-        obj->_row.get_table()->set_null(colIndex, obj->_row.get_index(), setDefault);
+        setNull(*obj->_row.get_table(), colIndex, obj->_row.get_index(), setDefault);
     }
 }
 
@@ -226,7 +236,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
         obj->_row.get_table()->set_float(colIndex, obj->_row.get_index(), floatObject.floatValue, setDefault);
     }
     else {
-        obj->_row.get_table()->set_null(colIndex, obj->_row.get_index(), setDefault);
+        setNull(*obj->_row.get_table(), colIndex, obj->_row.get_index(), setDefault);
     }
 }
 
@@ -238,7 +248,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
         obj->_row.get_table()->set_double(colIndex, obj->_row.get_index(), doubleObject.doubleValue, setDefault);
     }
     else {
-        obj->_row.get_table()->set_null(colIndex, obj->_row.get_index(), setDefault);
+        setNull(*obj->_row.get_table(), colIndex, obj->_row.get_index(), setDefault);
     }
 }
 
@@ -250,7 +260,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
         obj->_row.get_table()->set_bool(colIndex, obj->_row.get_index(), boolObject.boolValue, setDefault);
     }
     else {
-        obj->_row.get_table()->set_null(colIndex, obj->_row.get_index(), setDefault);
+        setNull(*obj->_row.get_table(), colIndex, obj->_row.get_index(), setDefault);
     }
 }
 
@@ -587,13 +597,15 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     RLMObjectSchema *schema = obj->_objectSchema;
     RLMProperty *prop = schema[propName];
     if (!prop) {
-        @throw RLMException(@"Invalid property name '%@' for class '%@'.", propName, obj->_objectSchema.className);
+        @throw RLMException(@"Invalid property name '%@' for class '%@'.",
+                            propName, obj->_objectSchema.className);
     }
     if (prop.isPrimary) {
         @throw RLMException(@"Primary key can't be changed to '%@' after an object is inserted.", val);
     }
     if (!RLMIsObjectValidForProperty(val, prop)) {
-        @throw RLMException(@"Invalid property value '%@' for property '%@' of class '%@'", val, propName, obj->_objectSchema.className);
+        @throw RLMException(@"Invalid property value '%@' for property '%@' of class '%@'",
+                            val, propName, obj->_objectSchema.className);
     }
 
     RLMDynamicSet(obj, prop, RLMCoerceToNil(val), RLMCreationOptionsPromoteUnmanaged);

@@ -18,13 +18,13 @@
 
 #import "RLMTestCase.h"
 
-#import <objc/runtime.h>
 #import "RLMObjectSchema_Private.h"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Dynamic.h"
 
-@interface PropertyTests : RLMTestCase
+#import <objc/runtime.h>
 
+@interface PropertyTests : RLMTestCase
 @end
 
 @implementation PropertyTests
@@ -88,7 +88,12 @@
     { // Test primary key property
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[PrimaryStringObject class]];
         RLMProperty *stringProperty = objectSchema[@"stringCol"];
-        RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol" type:RLMPropertyTypeString objectClassName:nil linkOriginPropertyName:nil indexed:YES optional:YES];
+        RLMProperty *expectedProperty = [[RLMProperty alloc] initWithName:@"stringCol"
+                                                                     type:RLMPropertyTypeString
+                                                          objectClassName:nil
+                                                   linkOriginPropertyName:nil
+                                                                  indexed:YES
+                                                                 optional:NO];
         expectedProperty.isPrimary = YES;
         XCTAssertEqualObjects(stringProperty, expectedProperty);
     }
@@ -137,6 +142,21 @@
     XCTAssertNoThrow(RLMValidateSwiftPropertyName(@"allocate"));
 
     XCTAssertNoThrow(RLMValidateSwiftPropertyName(@"__alloc"));
+}
+
+- (void)testTypeToString {
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeString),   @"string");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeInt),      @"int");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeBool),     @"bool");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeDate),     @"date");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeData),     @"data");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeDouble),   @"double");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeFloat),    @"float");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeObject),   @"object");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeArray),    @"array");
+    XCTAssertEqualObjects(RLMTypeToString(RLMPropertyTypeLinkingObjects), @"linking objects");
+
+    XCTAssertEqualObjects(RLMTypeToString((RLMPropertyType)-1),     @"Unknown");
 }
 
 @end

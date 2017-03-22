@@ -51,6 +51,8 @@ void RLMSetErrorOrThrow(NSError *error, NSError **outError);
 
 // returns if the object can be inserted as the given type
 BOOL RLMIsObjectValidForProperty(id obj, RLMProperty *prop);
+// throw an exception if the object is not a valid value for the property
+void RLMValidateValueForProperty(id obj, RLMProperty *prop);
 
 // gets default values for the given schema (+defaultPropertyValues)
 // merges with native property defaults if Swift class
@@ -91,35 +93,6 @@ static inline T RLMCoerceToNil(__unsafe_unretained T obj) {
         return RLMCoerceToNil(optional.underlyingValue);
     }
     return obj;
-}
-
-// Translate an rlmtype to a string representation
-static inline NSString *RLMTypeToString(RLMPropertyType type) {
-    switch (type) {
-        case RLMPropertyTypeString:
-            return @"string";
-        case RLMPropertyTypeInt:
-            return @"int";
-        case RLMPropertyTypeBool:
-            return @"bool";
-        case RLMPropertyTypeDate:
-            return @"date";
-        case RLMPropertyTypeData:
-            return @"data";
-        case RLMPropertyTypeDouble:
-            return @"double";
-        case RLMPropertyTypeFloat:
-            return @"float";
-        case RLMPropertyTypeAny:
-            return @"any";
-        case RLMPropertyTypeObject:
-            return @"object";
-        case RLMPropertyTypeArray:
-            return @"array";
-        case RLMPropertyTypeLinkingObjects:
-            return @"linking objects";
-    }
-    return @"Unknown";
 }
 
 // String conversion utilities
