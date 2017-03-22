@@ -282,11 +282,13 @@ RLM_ARRAY_TYPE(CycleObject)
     c.longCol = 99;
     c.objectCol = [[StringObject alloc] init];
     c.objectCol.stringCol = @"c";
+    c.realmIntCol = [[RLMInteger alloc] initWithValue:900];
+    c.realmNullableIntCol = [[RLMNullableInteger alloc] initWithValue:@14];
 
     [realm addObject:c];
 
     [AllTypesObject createInRealm:realm withValue:@[@YES, @506, @7.7f, @8.8, @"banach", bin2,
-                                                     timeNow, @YES, @(-20), NSNull.null]];
+                                                     timeNow, @YES, @(-20), NSNull.null, @85, @7]];
     [realm commitWriteTransaction];
 
     AllTypesObject *row1 = [AllTypesObject allObjects][0];
@@ -312,6 +314,11 @@ RLM_ARRAY_TYPE(CycleObject)
     XCTAssertEqual(row2.longCol, -20L,                  @"row2.IntCol");
     XCTAssertTrue([row1.objectCol.stringCol isEqual:@"c"], @"row1.objectCol");
     XCTAssertNil(row2.objectCol,                        @"row2.objectCol");
+    XCTAssertEqual(row1.realmIntCol.value, 900,         @"row1.realmIntCol");
+    XCTAssertEqual(row2.realmIntCol.value, 85,          @"row2.realmIntCol");
+    XCTAssertEqualObjects(row1.realmNullableIntCol.value, @14, @"row1.nullableRealmIntCol");
+    XCTAssertEqualObjects(row2.realmNullableIntCol.value, @7,  @"row2.nullableRealmIntCol");
+
 
     [realm transactionWithBlock:^{
         row1.boolCol = NO;
@@ -995,7 +1002,9 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
                                                @"dateCol"   : timeNow,
                                                @"cBoolCol"  : @NO,
                                                @"longCol"   : @(99),
-                                               @"objectCol": NSNull.null};
+                                               @"objectCol" : NSNull.null,
+                                               @"realmIntCol"           : @50,
+                                               @"realmNullableIntCol"   : NSNull.null};
 
     [realm beginWriteTransaction];
 
@@ -1031,7 +1040,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     const char bin[4] = { 0, 1, 2, 3 };
     NSData *bin1 = [[NSData alloc] initWithBytes:bin length:sizeof bin / 2];
     NSDate *timeNow = [NSDate dateWithTimeIntervalSince1970:1000000];
-    NSArray *const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), to];
+    NSArray *const arrayValidAllTypes = @[@NO, @54, @0.7f, @0.8, @"foo", bin1, timeNow, @NO, @(99), to, @3, NSNull.null];
 
     [realm beginWriteTransaction];
 

@@ -60,6 +60,14 @@ template<typename T> static inline void verifyInWriteTransaction(__unsafe_unreta
     return @(self.value);
 }
 
+- (BOOL)isEqual:(id)object {
+    if ([object conformsToProtocol:@protocol(RLMIntegerProtocol)]) {
+        NSNumber<RLMInt> *thatValue = [object boxedValue];
+        return (thatValue != nil) && [object boxedValue].integerValue == self.value;
+    }
+    return NO;
+}
+
 @end
 
 @implementation RLMNullableInteger
@@ -87,6 +95,15 @@ template<typename T> static inline void verifyInWriteTransaction(__unsafe_unreta
 
 - (NSNumber<RLMInt> *)boxedValue {
     return self.value;
+}
+
+- (BOOL)isEqual:(id)object {
+    NSNumber<RLMInt> *value = self.value;
+    if ([object conformsToProtocol:@protocol(RLMIntegerProtocol)]) {
+        NSNumber<RLMInt> *thatValue = [object boxedValue];
+        return (!value && !thatValue) || [value isEqual:thatValue];
+    }
+    return NO;
 }
 
 @end

@@ -57,6 +57,8 @@
             @"cBoolCol":  [[RLMProperty alloc] initWithName:@"cBoolCol"   type:RLMPropertyTypeBool   objectClassName:nil             linkOriginPropertyName:nil indexed:NO optional:NO],
             @"longCol":   [[RLMProperty alloc] initWithName:@"longCol"    type:RLMPropertyTypeInt    objectClassName:nil             linkOriginPropertyName:nil indexed:NO optional:NO],
             @"objectCol": [[RLMProperty alloc] initWithName:@"objectCol"  type:RLMPropertyTypeObject objectClassName:@"StringObject" linkOriginPropertyName:nil indexed:NO optional:YES],
+            @"realmIntCol": [[RLMProperty alloc] initWithName:@"realmIntCol"  type:RLMPropertyTypeInt objectClassName:nil linkOriginPropertyName:nil indexed:NO optional:NO],
+            @"realmNullableIntCol": [[RLMProperty alloc] initWithName:@"realmNullableIntCol"  type:RLMPropertyTypeInt objectClassName:nil linkOriginPropertyName:nil indexed:NO optional:YES],
         };
         XCTAssertEqual(objectSchema.properties.count, expectedProperties.allKeys.count);
         for (NSString *propertyName in expectedProperties) {
