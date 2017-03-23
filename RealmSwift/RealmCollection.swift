@@ -49,7 +49,7 @@ public final class RLMIterator<T: Object>: IteratorProtocol {
  in a requested section suitable for passing directly to `UITableView`'s batch
  update methods.
 
- The arrays of indices in the `.Update` case follow `UITableView`'s batching
+ The arrays of indices in the `.update` case follow `UITableView`'s batching
  conventions, and can be passed as-is to a table view's batch update functions after being converted to index paths.
  For example, for a simple one-section table view, you can do the following:
 
