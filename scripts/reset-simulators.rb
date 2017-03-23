@@ -27,9 +27,9 @@ def running_devices(devices)
   devices.select { |device| device['state'] != 'Shutdown' }
 end
 
-def shutdown_simulator_devices(all_devices)
+def shutdown_simulator_devices(devices)
   # Shut down any simulators that need it.
-  running_devices(all_devices).each do |device|
+  running_devices(devices).each do |device|
     puts "Shutting down simulator #{device['udid']}"
     system("xcrun simctl shutdown #{device['udid']}") or puts "    Failed to shut down simulator #{device['udid']}"
   end
@@ -48,23 +48,25 @@ begin
 
   wait_for_core_simulator_service
 
-  system('xcrun simctl delete unavailable') or raise 'Failed to delete unavailable simulators'
-
   # Shut down any running simulator devices. This may take multiple attempts if some
   # simulators are currently in the process of booting or being created.
-  all_devices = []
+  all_available_devices = []
   (0..5).each do |shutdown_attempt|
     devices_json = `xcrun simctl list devices -j`
     all_devices = JSON.parse(devices_json)['devices'].flat_map { |_, devices| devices }
-    break if running_devices(all_devices).empty?
 
-    shutdown_simulator_devices all_devices
+    # Exclude devices marked as unavailable as they're from a different version of Xcode.
+    all_available_devices = all_devices.reject { |device| device['availability'] =~ /unavailable/ }
+
+    break if running_devices(all_available_devices).empty?
+
+    shutdown_simulator_devices all_available_devices
     sleep shutdown_attempt if shutdown_attempt > 0
   end
 
   # Delete all simulators.
   print 'Deleting all simulators...'
-  all_devices.each do |device|
+  all_available_devices.each do |device|
     system("xcrun simctl delete #{device['udid']}") or raise "Failed to delete simulator #{device['udid']}"
   end
   puts ' done!'
