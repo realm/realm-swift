@@ -2136,6 +2136,19 @@
     XCTAssertEqualObjects(asArray(r14), (@[ hannah ]));
 }
 
+- (void)testSubqueryPredicateEvaluationWithRLMArray
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DogObject *a = [DogObject createInDefaultRealmWithValue:@[@"a", @1]];
+    DogObject *b = [DogObject createInDefaultRealmWithValue:@[@"b", @2]];
+    DogArrayObject *object = [DogArrayObject createInDefaultRealmWithValue:@[@[a, b]]];
+    [realm commitWriteTransaction];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SUBQUERY(dogs, $dog, $dog.age == 1).@count > 0"];
+    XCTAssertTrue([predicate evaluateWithObject:object]);
+}
+
 @end
 
 @interface NullQueryTests : QueryTests

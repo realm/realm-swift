@@ -46,6 +46,14 @@
     NSMutableArray *_backingArray;
 }
 
++ (void)load
+{
+    SEL isNSArray = NSSelectorFromString([@[@"is", @"NSArray", @"_", @"_"] componentsJoinedByString:@""]);
+    IMP yes = imp_implementationWithBlock(^(__unused id array) { return YES; });
+    Method isConcurrent = class_getInstanceMethod(NSOperation.class, @selector(isConcurrent));
+    class_addMethod(RLMArray.class, isNSArray, yes, method_getTypeEncoding(isConcurrent));
+}
+
 template<typename IndexSetFactory>
 static void changeArray(__unsafe_unretained RLMArray *const ar,
                         NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
