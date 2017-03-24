@@ -2140,12 +2140,11 @@
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
-    DogObject *a = [DogObject createInDefaultRealmWithValue:@[@"a", @1]];
-    DogObject *b = [DogObject createInDefaultRealmWithValue:@[@"b", @2]];
-    DogArrayObject *object = [DogArrayObject createInDefaultRealmWithValue:@[@[a, b]]];
+    DogObject *lucy = [DogObject createInDefaultRealmWithValue:@[@"Lucy", @7]];
+    DogArrayObject *object = [DogArrayObject createInDefaultRealmWithValue:@[@[lucy]]];
     [realm commitWriteTransaction];
     
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SUBQUERY(dogs, $dog, $dog.age == 1).@count > 0"];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SUBQUERY(dogs, $dog, $dog.age == 7).@count == 1"];
     XCTAssertTrue([predicate evaluateWithObject:object]);
 }
 
