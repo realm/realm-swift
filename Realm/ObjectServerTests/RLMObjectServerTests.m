@@ -318,6 +318,29 @@
     }
 }
 
+#pragma mark - Encryption
+
+/// If client B encrypts its synced Realm, client A should be able to access that Realm with a different encryption key.
+- (void)testEncryptedSyncedRealm {
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSData *key = RLMGenerateKey();
+    RLMRealm *realm = [self openRealmForURL:url user:user encryptionKey:key immediatelyBlock:nil];
+    if (self.isParent) {
+        CHECK_COUNT(0, SyncObject, realm);
+        RLMRunChildAndWait();
+        [self waitForDownloadsForUser:user realms:@[realm] realmURLs:@[url] expectedCounts:@[@3]];
+    } else {
+        // Add objects.
+        [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+        [self waitForUploadsForUser:user url:url];
+        CHECK_COUNT(3, SyncObject, realm);
+    }
+}
+
 #pragma mark - Multiple Realm Sync
 
 /// If a client opens multiple Realms, there should be one session object for each Realm that was opened.

@@ -120,10 +120,17 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
-    return [self openRealmForURL:url user:user immediatelyBlock:nil];
+    return [self openRealmForURL:url user:user encryptionKey:nil immediatelyBlock:nil];
 }
 
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user immediatelyBlock:(void(^)(void))block {
+    return [self openRealmForURL:url user:user encryptionKey:nil immediatelyBlock:block];
+}
+
+- (RLMRealm *)openRealmForURL:(NSURL *)url
+                         user:(RLMSyncUser *)user
+                encryptionKey:(NSData *)encryptionKey
+             immediatelyBlock:(void(^)(void))block {
     const NSTimeInterval timeout = 4;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncManager.sharedManager.sessionCompletionNotifier = ^(NSError *error) {
@@ -133,7 +140,7 @@ static NSURL *syncDirectoryForChildProcess() {
         dispatch_semaphore_signal(sema);
     };
 
-    RLMRealm *realm = [self immediatelyOpenRealmForURL:url user:user];
+    RLMRealm *realm = [self immediatelyOpenRealmForURL:url user:user encryptionKey:encryptionKey];
     if (block) {
         block();
     }
@@ -144,8 +151,13 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
+    return [self immediatelyOpenRealmForURL:url user:user encryptionKey:nil];
+}
+
+- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user encryptionKey:(NSData *)encryptionKey {
     RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
     c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    c.encryptionKey = encryptionKey;
     return [RLMRealm realmWithConfiguration:c error:nil];
 }
 

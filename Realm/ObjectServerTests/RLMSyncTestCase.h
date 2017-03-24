@@ -49,10 +49,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
 
 /// Synchronously open a synced Realm. Also run a block right after the Realm is created.
-- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user immediatelyBlock:(nullable void(^)(void))block;
+- (RLMRealm *)openRealmForURL:(NSURL *)url
+                         user:(RLMSyncUser *)user
+             immediatelyBlock:(nullable void(^)(void))block;
+
+/// Synchronously open a synced Realm with encryption key. Also run a block right after the Realm is created.
+- (RLMRealm *)openRealmForURL:(NSURL *)url
+                         user:(RLMSyncUser *)user
+                encryptionKey:(nullable NSData *)encryptionKey
+             immediatelyBlock:(nullable void(^)(void))block;
 
 /// Immediately open a synced Realm.
 - (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
+
+/// Immediately open a synced Realm with encryption key.
+- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url
+                                    user:(RLMSyncUser *)user
+                           encryptionKey:(nullable NSData *)encryptionKey;
 
 /// Synchronously create, log in, and return a user.
 - (RLMSyncUser *)logInUserForCredentials:(RLMSyncCredentials *)credentials
