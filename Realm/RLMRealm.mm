@@ -135,6 +135,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 
     RLMCheckForUpdates();
     RLMSendAnalytics();
+    RLMWorkaroundRadar31252694();
 }
 
 - (instancetype)initPrivate {

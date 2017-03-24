@@ -360,6 +360,14 @@ BOOL RLMIsRunningInPlayground() {
     return [[NSBundle mainBundle].bundleIdentifier hasPrefix:@"com.apple.dt.playground."];
 }
 
+void RLMWorkaroundRadar31252694() {
+    SEL isNSArray = NSSelectorFromString([@[@"is", @"NSArray", @"_", @"_"] componentsJoinedByString:@""]);
+    IMP yes = imp_implementationWithBlock(^(__unused id array) { return YES; });
+    Method isInvalidated = class_getInstanceMethod(RLMArray.class, @selector(isInvalidated));
+    const char *typeEncoding = method_getTypeEncoding(isInvalidated);
+    class_addMethod(RLMArray.class, isNSArray, yes, typeEncoding);
+}
+
 id RLMMixedToObjc(realm::Mixed const& mixed) {
     switch (mixed.get_type()) {
         case realm::type_String:

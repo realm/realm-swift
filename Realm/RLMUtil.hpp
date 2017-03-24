@@ -60,6 +60,7 @@ NSDictionary *RLMDefaultValuesForObjectSchema(RLMObjectSchema *objectSchema);
 
 BOOL RLMIsDebuggerAttached();
 BOOL RLMIsRunningInPlayground();
+void RLMWorkaroundRadar31252694();
 
 // C version of isKindOfClass
 static inline BOOL RLMIsKindOfClass(Class class1, Class class2) {
