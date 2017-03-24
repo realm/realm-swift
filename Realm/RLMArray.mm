@@ -46,12 +46,15 @@
     NSMutableArray *_backingArray;
 }
 
-+ (void)load
++ (void)initialize
 {
-    SEL isNSArray = NSSelectorFromString([@[@"is", @"NSArray", @"_", @"_"] componentsJoinedByString:@""]);
-    IMP yes = imp_implementationWithBlock(^(__unused id array) { return YES; });
-    Method isInvalidated = class_getInstanceMethod(self, @selector(isInvalidated));
-    class_addMethod(RLMArray.class, isNSArray, yes, method_getTypeEncoding(isInvalidated));
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        SEL isNSArray = NSSelectorFromString([@[@"is", @"NSArray", @"_", @"_"] componentsJoinedByString:@""]);
+        IMP yes = imp_implementationWithBlock(^(__unused id array) { return YES; });
+        Method isInvalidated = class_getInstanceMethod(self, @selector(isInvalidated));
+        class_addMethod(RLMArray.class, isNSArray, yes, method_getTypeEncoding(isInvalidated));
+    });
 }
 
 template<typename IndexSetFactory>
