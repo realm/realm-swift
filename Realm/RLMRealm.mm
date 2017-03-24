@@ -41,6 +41,7 @@
 #include "object_store.hpp"
 #include "schema.hpp"
 #include "shared_realm.hpp"
+#include "sync_config.hpp"
 
 #include <realm/disable_sync_to_disk.hpp>
 #include <realm/util/scope_exit.hpp>
@@ -288,6 +289,12 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
     configuration = [configuration copy];
     Realm::Config& config = configuration.config;
+
+    if (configuration.encryptionKey) {
+        std::array<char, 64> sync_encryption_key;
+        std::copy_n(config.encryption_key.begin(), 64, sync_encryption_key.begin());
+        config.sync_config.get()->realm_encryption_key = std::move(sync_encryption_key);
+    }
 
     RLMRealm *realm = [[RLMRealm alloc] initPrivate];
     realm->_dynamic = dynamic;
