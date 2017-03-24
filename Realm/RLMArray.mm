@@ -50,8 +50,8 @@
 {
     SEL isNSArray = NSSelectorFromString([@[@"is", @"NSArray", @"_", @"_"] componentsJoinedByString:@""]);
     IMP yes = imp_implementationWithBlock(^(__unused id array) { return YES; });
-    Method isConcurrent = class_getInstanceMethod(NSOperation.class, @selector(isConcurrent));
-    class_addMethod(RLMArray.class, isNSArray, yes, method_getTypeEncoding(isConcurrent));
+    Method isInvalidated = class_getInstanceMethod(self, @selector(isInvalidated));
+    class_addMethod(RLMArray.class, isNSArray, yes, method_getTypeEncoding(isInvalidated));
 }
 
 template<typename IndexSetFactory>
