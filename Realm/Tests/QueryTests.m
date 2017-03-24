@@ -2148,6 +2148,18 @@
     XCTAssertTrue([predicate evaluateWithObject:object]);
 }
 
+- (void)testSubqueryPredicateEvaluationWithRLMLinkingObjects
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DogObject *lucy = [DogObject createInDefaultRealmWithValue:@[@"Lucy", @7]];
+    [OwnerObject createInDefaultRealmWithValue:@[@"Mark", lucy]];
+    [realm commitWriteTransaction];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SUBQUERY(owners, $owner, $owner.name == 'Mark').@count == 1"];
+    XCTAssertTrue([predicate evaluateWithObject:lucy]);
+}
+
 @end
 
 @interface NullQueryTests : QueryTests

@@ -366,6 +366,7 @@ void RLMWorkaroundRadar31252694() {
     Method isInvalidated = class_getInstanceMethod(RLMArray.class, @selector(isInvalidated));
     const char *typeEncoding = method_getTypeEncoding(isInvalidated);
     class_addMethod(RLMArray.class, isNSArray, yes, typeEncoding);
+    class_addMethod(RLMResults.class, isNSArray, yes, typeEncoding);
 }
 
 id RLMMixedToObjc(realm::Mixed const& mixed) {
