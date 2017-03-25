@@ -2160,6 +2160,17 @@
     XCTAssertTrue([predicate evaluateWithObject:lucy]);
 }
 
+- (void)testSubqueryPredicateEvaluationWithRLMResults
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [DogObject createInDefaultRealmWithValue:@[@"Lucy", @7]];
+    [realm commitWriteTransaction];
+
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SUBQUERY(SELF, $dog, $dog.age == 7).@count == 1"];
+    XCTAssertTrue([predicate evaluateWithObject:[DogObject allObjects]]);
+}
+
 @end
 
 @interface NullQueryTests : QueryTests
