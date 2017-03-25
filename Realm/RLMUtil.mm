@@ -367,6 +367,15 @@ void RLMWorkaroundRadar31252694() {
     const char *typeEncoding = method_getTypeEncoding(isInvalidated);
     class_addMethod(RLMArray.class, isNSArray, yes, typeEncoding);
     class_addMethod(RLMResults.class, isNSArray, yes, typeEncoding);
+    class_addMethod(RLMListBase.class, isNSArray, yes, typeEncoding);
+
+    if (Class swiftLinkingObjects = NSClassFromString(@"RealmSwift.LinkingObjectsBase")) {
+        class_addMethod(swiftLinkingObjects, isNSArray, yes, typeEncoding);
+    }
+
+    if (Class swiftResults = NSClassFromString(@"RealmSwift.ResultsBase")) {
+        class_addMethod(swiftResults, isNSArray, yes, typeEncoding);
+    }
 }
 
 id RLMMixedToObjc(realm::Mixed const& mixed) {

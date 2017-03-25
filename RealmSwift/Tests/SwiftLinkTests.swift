@@ -111,4 +111,23 @@ class SwiftLinkTests: TestCase {
 
         XCTAssertEqual(0, owners.count)
     }
+
+    func testEvaluatingSubqueryPredicate() {
+        let realm = realmWithTestPath()
+
+        let owner = SwiftOwnerObject()
+        owner.name = "Tim"
+        owner.dog = SwiftDogObject()
+        owner.dog!.dogName = "Harvie"
+
+        try! realm.write {
+            realm.add(owner)
+        }
+
+        let p1 = NSPredicate(format: "SUBQUERY(owners, $owner, $owner.name == 'Tim').@count == 1")
+        XCTAssertTrue(p1.evaluate(with: owner.dog))
+
+        let p2 = NSPredicate(format: "SUBQUERY(SELF, $dog, $dog.dogName == 'Harvie').@count == 1")
+        XCTAssertTrue(p2.evaluate(with: realm.objects(SwiftDogObject.self)))
+    }
 }

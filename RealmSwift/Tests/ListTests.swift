@@ -358,6 +358,17 @@ class ListTests: TestCase {
             XCTAssertEqual(0, object.arrayCol.count)
         }
     }
+
+    func testEvaluatingSubqueryPredicate() {
+        guard let array = array, let str1 = str1, let str2 = str2 else {
+            fatalError("Test precondition failure")
+        }
+
+        array.append(objectsIn: [str1, str2])
+
+        let predicate = NSPredicate(format: "SUBQUERY(SELF, $str, $str.stringCol == '1').@count == 1")
+        XCTAssertTrue(predicate.evaluate(with: array))
+    }
 }
 
 class ListStandaloneTests: ListTests {
