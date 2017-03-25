@@ -262,5 +262,8 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     _config.schema_mode = mode;
 }
 
-@end
+- (NSString *)pathOnDisk {
+    return @(_config.path.c_str());
+}
 
+@end
