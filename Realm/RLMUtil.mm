@@ -361,20 +361,23 @@ BOOL RLMIsRunningInPlayground() {
 }
 
 void RLMWorkaroundRadar31252694() {
-    SEL isNSArray = NSSelectorFromString([@[@"is", @"NSArray", @"_", @"_"] componentsJoinedByString:@""]);
-    IMP yes = imp_implementationWithBlock(^(__unused id array) { return YES; });
+    SEL isNSArraySEL = NSSelectorFromString([@[@"is", @"NSArray", @"_", @"_"] componentsJoinedByString:@""]);
+    IMP isNSArrayIMP = imp_implementationWithBlock(^(__unused id array) {
+        NSArray<NSString *> *callStackSymbols = [NSThread callStackSymbols];
+        return callStackSymbols.count > 0 && [callStackSymbols[1] containsString:@"-[NSSubqueryExpression expressionValueWithObject:context:]"];
+    });
     Method isInvalidated = class_getInstanceMethod(RLMArray.class, @selector(isInvalidated));
     const char *typeEncoding = method_getTypeEncoding(isInvalidated);
-    class_addMethod(RLMArray.class, isNSArray, yes, typeEncoding);
-    class_addMethod(RLMResults.class, isNSArray, yes, typeEncoding);
-    class_addMethod(RLMListBase.class, isNSArray, yes, typeEncoding);
+    class_addMethod(RLMArray.class, isNSArraySEL, isNSArrayIMP, typeEncoding);
+    class_addMethod(RLMResults.class, isNSArraySEL, isNSArrayIMP, typeEncoding);
+    class_addMethod(RLMListBase.class, isNSArraySEL, isNSArrayIMP, typeEncoding);
 
     if (Class swiftLinkingObjects = NSClassFromString(@"RealmSwift.LinkingObjectsBase")) {
-        class_addMethod(swiftLinkingObjects, isNSArray, yes, typeEncoding);
+        class_addMethod(swiftLinkingObjects, isNSArraySEL, isNSArrayIMP, typeEncoding);
     }
 
     if (Class swiftResults = NSClassFromString(@"RealmSwift.ResultsBase")) {
-        class_addMethod(swiftResults, isNSArray, yes, typeEncoding);
+        class_addMethod(swiftResults, isNSArraySEL, isNSArrayIMP, typeEncoding);
     }
 }
 
