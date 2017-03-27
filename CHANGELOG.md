@@ -10,6 +10,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Add support for multi-level object equality comparisons against `NULL`.
 * Add support for the `[d]` modifier on string comparison operators to perform
   diacritic-insensitive comparisons.
+* Explicitly mark `[[RLMRealm alloc] init]` as unavailable.
+* Include the name of the problematic class in the error message when an
+  invalid property type is marked as the primary key.
 
 ### Bugfixes
 
