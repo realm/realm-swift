@@ -137,6 +137,11 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     RLMSendAnalytics();
 }
 
+- (instancetype)initPrivate {
+    self = [super init];
+    return self;
+}
+
 - (BOOL)isEmpty {
     return realm::ObjectStore::is_empty(self.group);
 }
@@ -184,7 +189,7 @@ static id RLMAutorelease(__unsafe_unretained id value) {
 }
 
 + (instancetype)realmWithSharedRealm:(SharedRealm)sharedRealm schema:(RLMSchema *)schema {
-    RLMRealm *realm = [RLMRealm new];
+    RLMRealm *realm = [[RLMRealm alloc] initPrivate];
     realm->_realm = sharedRealm;
     realm->_dynamic = YES;
     realm->_schema = schema;
@@ -284,7 +289,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     configuration = [configuration copy];
     Realm::Config& config = configuration.config;
 
-    RLMRealm *realm = [RLMRealm new];
+    RLMRealm *realm = [[RLMRealm alloc] initPrivate];
     realm->_dynamic = dynamic;
 
     // protects the realm cache and accessors cache
