@@ -583,6 +583,24 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
  */
 + (BOOL)performMigrationForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
+#pragma mark - Unavailable Methods
+
+/**
+ RLMRealm instances are cached internally by Realm and cannot be created directly.
+
+ Use `+[RLMRealm defaultRealm]`, `+[RLMRealm realmWithConfiguration:error:]` or
+ `+[RLMRealm realmWithURL]` to obtain a reference to an RLMRealm.
+ */
+- (instancetype)init __attribute__((unavailable("Use +defaultRealm, +realmWithConfiguration: or +realmWithURL:.")));
+
+/**
+ RLMRealm instances are cached internally by Realm and cannot be created directly.
+
+ Use `+[RLMRealm defaultRealm]`, `+[RLMRealm realmWithConfiguration:error:]` or
+ `+[RLMRealm realmWithURL]` to obtain a reference to an RLMRealm.
+ */
++ (instancetype)new __attribute__((unavailable("Use +defaultRealm, +realmWithConfiguration: or +realmWithURL:.")));
+
 @end
 
 /**
