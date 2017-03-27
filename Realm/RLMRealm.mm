@@ -46,7 +46,7 @@
 #include <realm/util/scope_exit.hpp>
 #include <realm/version.hpp>
 
-#include <sync/sync_config.hpp>
+#include "sync/sync_config.hpp"
 
 using namespace realm;
 using util::File;
