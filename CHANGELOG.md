@@ -19,6 +19,8 @@ If using synchronized Realms, the Realm Object Server must be running version
 * Explicitly mark `[[RLMRealm alloc] init]` as unavailable.
 * Don't unnecessarily advance the Realm transaction when resolving a
   `ThreadSafeReference`.
+* Include the name of the problematic class in the error message when an
+  invalid property type is marked as the primary key.
 
 ### Bugfixes
 
