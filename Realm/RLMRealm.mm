@@ -292,9 +292,8 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     Realm::Config& config = configuration.config;
 
     if (configuration.encryptionKey && config.sync_config) {
-        std::array<char, 64> sync_encryption_key;
-        std::copy_n(config.encryption_key.begin(), 64, sync_encryption_key.begin());
-        config.sync_config.get()->realm_encryption_key = std::move(sync_encryption_key);
+        config.sync_config.get()->realm_encryption_key = std::array<char, 64>();
+        std::copy_n(config.encryption_key.begin(), 64, config.sync_config.get()->realm_encryption_key->begin());
     }
 
     RLMRealm *realm = [[RLMRealm alloc] initPrivate];
