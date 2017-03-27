@@ -36,6 +36,8 @@ If using synchronized Realms, the Realm Object Server must be running version
 * Fix an assertion failure when writing to large `RLMArray`/`List` properties.
 * Fix uncaught `BadTransactLog` exceptions when pulling invalid changesets from
   synchronized Realms.
+* Fix an assertion failure when an observed `RLMArray`/`List` is deleted after
+  being modified.
 
 2.4.4 Release notes (2017-03-13)
 =============================================================
