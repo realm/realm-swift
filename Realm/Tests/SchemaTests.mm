@@ -753,6 +753,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     XCTAssertNoThrow([[IntegerArrayPropertyObject alloc] initWithValue:(@[@0, @[@[@0]]])]);
 }
 
+#if !DEBUG
 - (void)testMultipleProcessesTryingToInitializeSchema {
     RLMRealm *syncRealm = [self realmWithTestPath];
 
@@ -808,6 +809,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     [realm cancelWriteTransaction];
     dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
 }
+#endif
 
 - (void)testOpeningFileWithDifferentClassSubsetsInDifferentProcesses {
     if (!self.isParent) {
