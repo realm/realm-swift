@@ -52,8 +52,9 @@
     self.config.sync_config = std::make_shared<realm::SyncConfig>([syncConfiguration rawConfiguration]);
     self.config.schema_mode = realm::SchemaMode::Additive;
     if (!self.config.encryption_key.empty()) {
-        self.config.sync_config.get()->realm_encryption_key = std::array<char, 64>();
-        std::copy_n(self.config.encryption_key.begin(), 64, self.config.sync_config.get()->realm_encryption_key->begin());
+        auto& sync_encryption_key = self.config.sync_config->realm_encryption_key;
+        sync_encryption_key = std::array<char, 64>();
+        std::copy_n(self.config.encryption_key.begin(), 64, sync_encryption_key->begin());
     }
 }
 

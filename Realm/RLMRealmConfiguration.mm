@@ -27,8 +27,6 @@
 #import "shared_realm.hpp"
 #import "sync/sync_config.hpp"
 
-#include <realm/util/optional.hpp>
-
 static NSString *const c_RLMRealmConfigurationProperties[] = {
     @"fileURL",
     @"inMemoryIdentifier",
@@ -180,8 +178,9 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
         auto bytes = static_cast<const char *>(key.bytes);
         _config.encryption_key.assign(bytes, bytes + key.length);
         if (_config.sync_config) {
-            _config.sync_config.get()->realm_encryption_key = std::array<char, 64>();
-            std::copy_n(_config.encryption_key.begin(), 64, _config.sync_config.get()->realm_encryption_key->begin());
+            auto& sync_encryption_key = self.config.sync_config->realm_encryption_key;
+            sync_encryption_key = std::array<char, 64>();
+            std::copy_n(_config.encryption_key.begin(), 64, sync_encryption_key->begin());
         }
     }
     else {
