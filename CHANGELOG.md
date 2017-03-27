@@ -33,6 +33,9 @@ If using synchronized Realms, the Realm Object Server must be running version
 * Fix for reading `{NS}Data` properties incorrectly returning `nil`.
 * Reduce file size growth in cases where Realm versions were pinned while
   starting write transactions.
+* Fix an assertion failure when writing to large `RLMArray`/`List` properties.
+* Fix uncaught `BadTransactLog` exceptions when pulling invalid changesets from
+  synchronized Realms.
 
 2.4.4 Release notes (2017-03-13)
 =============================================================
