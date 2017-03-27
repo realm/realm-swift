@@ -46,8 +46,6 @@
 #include <realm/util/scope_exit.hpp>
 #include <realm/version.hpp>
 
-#include "sync/sync_config.hpp"
-
 using namespace realm;
 using util::File;
 
@@ -290,11 +288,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
     configuration = [configuration copy];
     Realm::Config& config = configuration.config;
-
-    if (configuration.encryptionKey && config.sync_config) {
-        config.sync_config.get()->realm_encryption_key = std::array<char, 64>();
-        std::copy_n(config.encryption_key.begin(), 64, config.sync_config.get()->realm_encryption_key->begin());
-    }
 
     RLMRealm *realm = [[RLMRealm alloc] initPrivate];
     realm->_dynamic = dynamic;
