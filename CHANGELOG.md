@@ -1,8 +1,9 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
-This release requires all processes accessing a Realm file concurrently to be on
-this version or later. This includes iOS extensions and the Realm Browser.
+Files written by Realm this version cannot be read by earlier versions of Realm.
+Old files can still be opened and files open in read-only mode will not be
+modified.
 
 If using synchronized Realms, the Realm Object Server must be running version
 1.3.0 or later.
@@ -17,8 +18,6 @@ If using synchronized Realms, the Realm Object Server must be running version
 * Add support for the `[d]` modifier on string comparison operators to perform
   diacritic-insensitive comparisons.
 * Explicitly mark `[[RLMRealm alloc] init]` as unavailable.
-* Don't unnecessarily advance the Realm transaction when resolving a
-  `ThreadSafeReference`.
 * Include the name of the problematic class in the error message when an
   invalid property type is marked as the primary key.
 
