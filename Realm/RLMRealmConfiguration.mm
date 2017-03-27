@@ -186,7 +186,7 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     else {
         _config.encryption_key.clear();
         if (_config.sync_config)
-            _config.sync_config.get()->realm_encryption_key = realm::util::none;
+            _config.sync_config->realm_encryption_key = realm::util::none;
     }
 }
 
