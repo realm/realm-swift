@@ -1,6 +1,12 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
+This release requires all processes accessing a Realm file concurrently to be on
+this version or later. This includes iOS extensions and the Realm Browser.
+
+If using synchronized Realms, the Realm Object Server must be running version
+1.3.0 or later.
+
 ### API Breaking Changes
 
 * None.
@@ -11,12 +17,20 @@ x.x.x Release notes (yyyy-MM-dd)
 * Add support for the `[d]` modifier on string comparison operators to perform
   diacritic-insensitive comparisons.
 * Explicitly mark `[[RLMRealm alloc] init]` as unavailable.
+* Don't unnecessarily advance the Realm transaction when resolving a
+  `ThreadSafeReference`.
 
 ### Bugfixes
 
 * Fix incorrect column type assertions which could occur after schemas were
   merged by sync.
 * Eliminate an empty write transaction when opening a synced Realm.
+* Support encrypting synchronized Realms by respecting the `encryptionKey` value
+  of the Realm's configuration.
+* Fix crash when setting an `{NS}Data` property close to 16MB.
+* Fix for reading `{NS}Data` properties incorrectly returning `nil`.
+* Reduce file size growth in cases where Realm versions were pinned while
+  starting write transactions.
 
 2.4.4 Release notes (2017-03-13)
 =============================================================
