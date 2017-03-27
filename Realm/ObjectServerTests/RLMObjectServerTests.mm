@@ -17,16 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncTestCase.h"
+#import "RLMTestUtils.h"
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 #import "RLMSyncUtil_Private.h"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMRealmUtil.hpp"
-
-#define ACCOUNT_NAME() NSStringFromSelector(_cmd)
-#define CUSTOM_REALM_URL(realm_identifier) \
-    [NSURL URLWithString:[NSString stringWithFormat:@"realm://localhost:9080/~/%@%@", ACCOUNT_NAME(), realm_identifier]]
-#define REALM_URL() CUSTOM_REALM_URL(@"")
 
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end

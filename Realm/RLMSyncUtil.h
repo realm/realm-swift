@@ -101,6 +101,14 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      @see: `-[NSError rlmSync_clientResetBlock]`, `-[NSError rlmSync_clientResetBackedUpRealmPath]`
      */
     RLMSyncErrorClientResetError        = 7,
+
+#warning TODO: move these errors elsewhere, they don't belong here.
+    /**
+     An error that indicates a permission change operation failed. The `userInfo`
+     dictionary contains the underlying error code and a message (if any).
+     */
+    RLMSyncErrorPermissionChangeError   = 8,
+    RLMSyncErrorPermissionGetError      = 9,
 };
 
 /// An enum representing the different states a sync management object can take.
