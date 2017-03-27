@@ -41,11 +41,12 @@
 #include "object_store.hpp"
 #include "schema.hpp"
 #include "shared_realm.hpp"
-#include "sync_config.hpp"
 
 #include <realm/disable_sync_to_disk.hpp>
 #include <realm/util/scope_exit.hpp>
 #include <realm/version.hpp>
+
+#include <sync/sync_config.hpp>
 
 using namespace realm;
 using util::File;
