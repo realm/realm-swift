@@ -134,11 +134,9 @@ build_combined() {
     local previous_realm_swift_version="$REALM_SWIFT_VERSION"
 
     if [[ "$module_name" == "Realm" ]] && [[ "$IS_RUNNING_PACKAGING" == "1" ]]; then
-      # Work around http://www.openradar.me/31302382 by building Realm Objective-C
-      # with Xcode 8.2 when packaging since 8.3 produces binaries that are ~3x bigger
-      REALM_XCODE_VERSION=8.2
-      REALM_SWIFT_VERSION=
-      set_xcode_and_swift_versions
+      # Work around rdar://31302382 by building Realm Objective-C with Xcode 8.2
+      # when packaging since 8.3 produces binaries that are ~3x bigger
+      force_xcode_82
     fi
 
     local destination=""
@@ -204,6 +202,10 @@ move_to_clean_dir() {
 }
 
 test_ios_static() {
+    local previous_realm_xcode_version="$REALM_XCODE_VERSION"
+    local previous_realm_swift_version="$REALM_SWIFT_VERSION"
+    force_xcode_82
+
     destination="$1"
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' build"
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
@@ -215,6 +217,17 @@ test_ios_static() {
     rm "$path"
 
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test"
+
+    # Reset to state before forcing Xcode 8.2
+    REALM_XCODE_VERSION="$previous_realm_xcode_version"
+    REALM_SWIFT_VERSION="$previous_realm_swift_version"
+    set_xcode_and_swift_versions
+}
+
+force_xcode_82() {
+  REALM_XCODE_VERSION=8.2
+  REALM_SWIFT_VERSION=
+  set_xcode_and_swift_versions
 }
 
 ######################################
