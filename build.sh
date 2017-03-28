@@ -3,7 +3,7 @@
 ##################################################################################
 # Custom build tool for Realm Objective-C binding.
 #
-# (C) Copyright 2011-2015 by realm.io.
+# (C) Copyright 2011-2017 by realm.io.
 ##################################################################################
 
 # Warning: pipefail is not a POSIX compatible option, but on OS X it works just fine.
@@ -14,6 +14,8 @@ set -o pipefail
 set -e
 
 source_root="$(dirname "$0")"
+source "${source_root}/scripts/swift-version.sh"
+source "${source_root}/scripts/reset-simulators.sh"
 
 # You can override the version of the core library
 : ${REALM_CORE_VERSION:=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' ${source_root}/dependencies.list)} # set to "current" to always use the current build
@@ -30,9 +32,12 @@ source_root="$(dirname "$0")"
 
 PATH=/usr/libexec:$PATH
 
-if ! [ -z "${JENKINS_HOME}" ]; then
+if [ -n "${JENKINS_HOME}" ]; then
     XCPRETTY_PARAMS="--no-utf --report junit --output build/reports/junit.xml"
     CODESIGN_PARAMS="CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO"
+    export CI_RUN=true
+else
+    export CI_RUN=${CI_RUN:-false}
 fi
 
 usage() {
@@ -130,18 +135,18 @@ build_combined() {
     local scope_suffix="$5"
     local version_suffix="$6"
     local config="$CONFIGURATION"
-
-    local destination=""
+    
+    IOS_SIM_DEVICE=
     local os_name=""
     if [[ "$os" == "iphoneos" ]]; then
         os_name="ios"
-        destination="iPhone 6"
+        choose_ios_simulator "iPhone 6"
     elif [[ "$os" == "watchos"  ]]; then
         os_name="$os"
-        destination="Apple Watch - 42mm"
+        choose_ios_simulator "Apple Watch - 42mm"
     elif [[ "$os" == "appletvos"  ]]; then
         os_name="tvos"
-        destination="Apple TV 1080p"
+        choose_ios_simulator "Apple TV 1080p"
     fi
 
     # Derive build paths
@@ -154,8 +159,10 @@ build_combined() {
 
     # Build for each platform
     xc "-scheme '$scheme' -configuration $config -sdk $os"
-    xc "-scheme '$scheme' -configuration $config -sdk $simulator -destination 'name=$destination' ONLY_ACTIVE_ARCH=NO"
-
+    setup_ios_simulator
+    trap stop_ios_simulator ERR EXIT INT TERM
+    xc "-scheme '$scheme' -configuration $config -sdk $simulator -destination 'id=$IOS_SIM_DEVICE' ONLY_ACTIVE_ARCH=NO"
+    
     # Combine .swiftmodule
     if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
       cp $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
@@ -171,7 +178,7 @@ build_combined() {
     LIPO_OUTPUT="$out_path/$product_name/$module_name"
     xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
 
-    if [[ "$destination" != "" && "$config" == "Release" ]]; then
+    if [[ -n "$IOS_SIM_DEVICE" && "$config" == "Release" ]]; then
         sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
     fi
 }
@@ -189,17 +196,18 @@ move_to_clean_dir() {
 }
 
 test_ios_static() {
-    destination="$1"
-    xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' build"
-    xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+    setup_ios_simulator "$1" "$2"
+    trap stop_ios_simulator ERR EXIT INT TERM
+    xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'id=$IOS_SIM_DEVICE' build"
+    xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'id=$IOS_SIM_DEVICE' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
 
     # Xcode's depending tracking is lacking and it doesn't realize that the Realm static framework's static library
     # needs to be recreated when the active architectures change. Help Xcode out by removing the static library.
-    settings=$(xcode "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' -showBuildSettings")
+    settings=$(xcode "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'id=$IOS_SIM_DEVICE' -showBuildSettings")
     path=$(echo "$settings" | awk '/CONFIGURATION_BUILD_DIR/ { cbd = $3; } /EXECUTABLE_PATH/ { ep = $3; } END { printf "%s/%s\n", cbd, ep; }')
     rm "$path"
 
-    xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test"
+    xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination 'id=$IOS_SIM_DEVICE' test"
 }
 
 ######################################
@@ -217,7 +225,7 @@ test_devices() {
     done <<< "$serial_numbers_str"
     if [[ ${#serial_numbers[@]} == 0 ]]; then
         echo "At least one iOS/tvOS device must be connected to this computer to run device tests"
-        if [ -z "${JENKINS_HOME}" ]; then
+        if [ $CI_RUN == false ]; then
             # Don't fail if running locally and there's no device
             exit 0
         fi
@@ -381,8 +389,9 @@ export CONFIGURATION
 # Pre-choose Xcode and Swift versions for those operations that do not set them
 REALM_XCODE_VERSION=${xcode_version:-$REALM_XCODE_VERSION}
 REALM_SWIFT_VERSION=${swift_version:-$REALM_SWIFT_VERSION}
-source "${source_root}/scripts/swift-version.sh"
 set_xcode_and_swift_versions
+
+REALM_VERSION_FILE=$(cd "$(dirname "$0")/Realm"; pwd)/Realm-Info.plist
 
 ######################################
 # Commands
@@ -506,10 +515,6 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "prelaunch-simulator")
-        sh ${source_root}/scripts/reset-simulators.sh
-        ;;
-
     ######################################
     # Building
     ######################################
@@ -576,7 +581,7 @@ case "$COMMAND" in
     "osx-swift")
         sh build.sh osx
         xc "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
-        destination="build/osx/swift-$REALM_SWIFT_VERSION"
+        local destination="build/osx/swift-$REALM_SWIFT_VERSION"
         clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
         cp -R build/osx/Realm.framework "$destination"
         exit 0
@@ -616,32 +621,36 @@ case "$COMMAND" in
         ;;
 
     "test-ios-static")
-        test_ios_static "name=iPhone 6"
+        test_ios_static "iPhone 6"
         exit 0
         ;;
 
     "test-ios7-static")
-        test_ios_static "name=iPhone 5S,OS=7.1"
+        test_ios_static "iPhone 5S" "7.1"
         exit 0
         ;;
 
     "test-ios-dynamic")
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        setup_ios_simulator 'iPhone 6'
+        trap stop_ios_simulator ERR EXIT INT TERM
+        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'id=$IOS_SIM_DEVICE' build"
+        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'id=$IOS_SIM_DEVICE' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'id=$IOS_SIM_DEVICE' test"
         exit 0
         ;;
 
     "test-ios-swift")
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        setup_ios_simulator 'iPhone 6'
+        trap stop_ios_simulator ERR EXIT INT TERM
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'id=$IOS_SIM_DEVICE' build"
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'id=$IOS_SIM_DEVICE' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'id=$IOS_SIM_DEVICE' test"
         exit 0
         ;;
 
     "test-ios-devices")
         failed=0
-        trap "failed=1" ERR
+        trap "failed=1; cleanup" ERR
         sh build.sh test-ios-devices-objc
         sh build.sh test-ios-devices-swift
         exit $failed
@@ -658,12 +667,16 @@ case "$COMMAND" in
         ;;
 
     "test-tvos")
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
+        setup_ios_simulator 'Apple TV 1080p'
+        trap stop_ios_simulator ERR EXIT INT TERM
+        xc "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'id=$IOS_SIM_DEVICE' test"
         exit $?
         ;;
 
     "test-tvos-swift")
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
+        setup_ios_simulator 'Apple TV 1080p'
+        trap stop_ios_simulator ERR EXIT INT TERM
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'id=$IOS_SIM_DEVICE' test"
         exit $?
         ;;
 
@@ -859,34 +872,36 @@ case "$COMMAND" in
         ;;
 
     "examples-ios")
-        sh build.sh prelaunch-simulator
         workspace="examples/ios/objc/RealmExamples.xcworkspace"
         pod install --project-directory="$workspace/.." --no-repo-update
-        xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Migration -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Backlink -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme GroupedTableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme RACTableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Encryption -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Draw -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
+        setup_ios_simulator 'iPhone 6'
+        trap stop_ios_simulator ERR EXIT INT TERM
+        xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Migration -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Backlink -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme GroupedTableView -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme RACTableView -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Encryption -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Draw -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
 
-        if [ ! -z "${JENKINS_HOME}" ]; then
-            xc "-workspace $workspace -scheme Extension -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
+        if [ $CI_RUN == true ]; then
+            xc "-workspace $workspace -scheme Extension -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
         fi
 
         exit 0
         ;;
 
     "examples-ios-swift")
-        sh build.sh prelaunch-simulator
         workspace="examples/ios/swift-$REALM_SWIFT_VERSION/RealmExamples.xcworkspace"
-        xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Migration -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Encryption -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Backlink -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme GroupedTableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
+        setup_ios_simulator 'iPhone 6'
+        trap stop_ios_simulator ERR EXIT INT TERM
+        xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Migration -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Encryption -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Backlink -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme GroupedTableView -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
@@ -896,15 +911,19 @@ case "$COMMAND" in
 
     "examples-tvos")
         workspace="examples/tvos/objc/RealmExamples.xcworkspace"
-        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
+        setup_ios_simulator 'Apple TV 1080p'
+        trap stop_ios_simulator ERR EXIT INT TERM
+        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
     "examples-tvos-swift")
         workspace="examples/tvos/swift-$REALM_SWIFT_VERSION/RealmExamples.xcworkspace"
-        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
+        setup_ios_simulator 'Apple TV 1080p'
+        trap stop_ios_simulator ERR EXIT INT TERM
+        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'id=$IOS_SIM_DEVICE' build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
@@ -912,24 +931,19 @@ case "$COMMAND" in
     # Versioning
     ######################################
     "get-version")
-        version_file="Realm/Realm-Info.plist"
-        echo "$(PlistBuddy -c "Print :CFBundleVersion" "$version_file")"
+        /usr/bin/defaults read "$REALM_VERSION_FILE" CFBundleVersion
         exit 0
         ;;
 
     "set-version")
         realm_version="$2"
-        version_files="Realm/Realm-Info.plist"
-
         if [ -z "$realm_version" ]; then
             echo "You must specify a version."
             exit 1
         fi
-        for version_file in $version_files; do
-            PlistBuddy -c "Set :CFBundleVersion $realm_version" "$version_file"
-            PlistBuddy -c "Set :CFBundleShortVersionString $realm_version" "$version_file"
-        done
-        sed -i '' "s/^VERSION=.*/VERSION=$realm_version/" dependencies.list
+        /usr/bin/defaults write "$REALM_VERSION_FILE" CFBundleVersion "$realm_version"
+        /usr/bin/defaults write "$REALM_VERSION_FILE" CFBundleShortVersionString "$realm_version"
+        sed -i '' "s/^VERSION=.*/VERSION=$realm_version/" "$(dirname "$0")/dependencies.list"
         exit 0
         ;;
 
@@ -1040,7 +1054,8 @@ EOM
             export sha=$GITHUB_PR_SOURCE_BRANCH
             export CONFIGURATION=$configuration
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
-            sh build.sh prelaunch-simulator
+            setup_ios_simulator
+            trap stop_ios_simulator ERR EXIT INT TERM
             rm ~/Library/Logs/CoreSimulator/CoreSimulator.log
             # Verify that no Realm files still exist
             ! find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm' | grep -q .
@@ -1114,7 +1129,8 @@ EOM
     "package-ios-static")
         cd tightdb_objc
 
-        sh build.sh prelaunch-simulator
+        setup_ios_simulator
+        trap stop_ios_simulator ERR EXIT INT TERM
         sh build.sh test-ios-static
         sh build.sh ios-static
 
@@ -1125,7 +1141,8 @@ EOM
     "package-ios-dynamic")
         cd tightdb_objc
 
-        sh build.sh prelaunch-simulator
+        setup_ios_simulator
+        trap stop_ios_simulator ERR EXIT INT TERM
         sh build.sh ios-dynamic
         cd build/ios
         zip --symlinks -r realm-dynamic-framework-ios.zip Realm.framework
@@ -1141,11 +1158,12 @@ EOM
 
     "package-ios-swift")
         cd tightdb_objc
+        trap stop_ios_simulator ERR EXIT INT TERM
         for version in 8.0 8.1 8.2; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
-            sh build.sh prelaunch-simulator
+            setup_ios_simulator
             sh build.sh ios-swift
         done
 
@@ -1155,11 +1173,12 @@ EOM
 
     "package-osx-swift")
         cd tightdb_objc
+        trap stop_ios_simulator ERR EXIT INT TERM
         for version in 8.0 8.1 8.2; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
-            sh build.sh prelaunch-simulator
+            setup_ios_simulator
             sh build.sh osx-swift
         done
 
@@ -1178,11 +1197,12 @@ EOM
 
     "package-watchos-swift")
         cd tightdb_objc
+        trap stop_ios_simulator ERR EXIT INT TERM
         for version in 8.0 8.1 8.2; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
-            sh build.sh prelaunch-simulator
+            setup_ios_simulator
             sh build.sh watchos-swift
         done
 
@@ -1201,11 +1221,12 @@ EOM
 
     "package-tvos-swift")
         cd tightdb_objc
+        trap stop_ios_simulator ERR EXIT INT TERM
         for version in 8.0 8.1 8.2; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
-            sh build.sh prelaunch-simulator
+            setup_ios_simulator
             sh build.sh tvos-swift
         done
 
