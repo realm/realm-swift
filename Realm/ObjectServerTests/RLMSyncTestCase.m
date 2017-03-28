@@ -23,6 +23,7 @@
 
 #import "RLMSyncManager+ObjectServerTests.h"
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
+#import "RLMSyncConfiguration_Private.h"
 
 #if !TARGET_OS_MAC
 #error These tests can only be run on a macOS host.
@@ -124,6 +125,18 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user immediatelyBlock:(void(^)(void))block {
+    return [self openRealmForURL:url
+                            user:user
+                   encryptionKey:nil
+                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                immediatelyBlock:block];
+}
+
+- (RLMRealm *)openRealmForURL:(NSURL *)url
+                         user:(RLMSyncUser *)user
+                encryptionKey:(nullable NSData *)encryptionKey
+                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
+             immediatelyBlock:(nullable void(^)(void))block {
     const NSTimeInterval timeout = 4;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncManager.sharedManager.sessionCompletionNotifier = ^(NSError *error) {
@@ -133,7 +146,7 @@ static NSURL *syncDirectoryForChildProcess() {
         dispatch_semaphore_signal(sema);
     };
 
-    RLMRealm *realm = [self immediatelyOpenRealmForURL:url user:user];
+    RLMRealm *realm = [self immediatelyOpenRealmForURL:url user:user encryptionKey:encryptionKey stopPolicy:stopPolicy];
     if (block) {
         block();
     }
@@ -144,8 +157,20 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
+    return [self immediatelyOpenRealmForURL:url
+                                       user:user
+                              encryptionKey:nil
+                                 stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
+}
+
+- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url
+                                    user:(RLMSyncUser *)user
+                           encryptionKey:(NSData *)encryptionKey
+                              stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
     c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    c.syncConfiguration.stopPolicy = stopPolicy;
+    c.encryptionKey = encryptionKey;
     return [RLMRealm realmWithConfiguration:c error:nil];
 }
 

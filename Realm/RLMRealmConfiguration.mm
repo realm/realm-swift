@@ -25,6 +25,7 @@
 
 #import "schema.hpp"
 #import "shared_realm.hpp"
+#import "sync/sync_config.hpp"
 
 static NSString *const c_RLMRealmConfigurationProperties[] = {
     @"fileURL",
@@ -176,9 +177,16 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     if (NSData *key = RLMRealmValidatedEncryptionKey(encryptionKey)) {
         auto bytes = static_cast<const char *>(key.bytes);
         _config.encryption_key.assign(bytes, bytes + key.length);
+        if (_config.sync_config) {
+            auto& sync_encryption_key = self.config.sync_config->realm_encryption_key;
+            sync_encryption_key = std::array<char, 64>();
+            std::copy_n(_config.encryption_key.begin(), 64, sync_encryption_key->begin());
+        }
     }
     else {
         _config.encryption_key.clear();
+        if (_config.sync_config)
+            _config.sync_config->realm_encryption_key = realm::util::none;
     }
 }
 
@@ -262,5 +270,8 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     _config.schema_mode = mode;
 }
 
-@end
+- (NSString *)pathOnDisk {
+    return @(_config.path.c_str());
+}
 
+@end

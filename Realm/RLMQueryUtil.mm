@@ -126,6 +126,7 @@ struct TrueExpression : realm::Expression {
         return realm::not_found;
     }
     void set_base_table(const Table*) override {}
+    void verify_column() const override {}
     const Table* get_base_table() const override { return nullptr; }
     std::unique_ptr<Expression> clone(QueryNodeHandoverPatches*) const override
     {
@@ -136,6 +137,7 @@ struct TrueExpression : realm::Expression {
 struct FalseExpression : realm::Expression {
     size_t find_first(size_t, size_t) const override { return realm::not_found; }
     void set_base_table(const Table*) override {}
+    void verify_column() const override {}
     const Table* get_base_table() const override { return nullptr; }
     std::unique_ptr<Expression> clone(QueryNodeHandoverPatches*) const override
     {

@@ -1,6 +1,13 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
+Files written by Realm this version cannot be read by earlier versions of Realm.
+Old files can still be opened and files open in read-only mode will not be
+modified.
+
+If using synchronized Realms, the Realm Object Server must be running version
+1.3.0 or later.
+
 ### API Breaking Changes
 
 * None.
@@ -19,6 +26,17 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix incorrect column type assertions which could occur after schemas were
   merged by sync.
 * Eliminate an empty write transaction when opening a synced Realm.
+* Support encrypting synchronized Realms by respecting the `encryptionKey` value
+  of the Realm's configuration.
+* Fix crash when setting an `{NS}Data` property close to 16MB.
+* Fix for reading `{NS}Data` properties incorrectly returning `nil`.
+* Reduce file size growth in cases where Realm versions were pinned while
+  starting write transactions.
+* Fix an assertion failure when writing to large `RLMArray`/`List` properties.
+* Fix uncaught `BadTransactLog` exceptions when pulling invalid changesets from
+  synchronized Realms.
+* Fix an assertion failure when an observed `RLMArray`/`List` is deleted after
+  being modified.
 
 2.4.4 Release notes (2017-03-13)
 =============================================================

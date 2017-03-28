@@ -20,6 +20,7 @@
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 #import "RLMSyncUtil_Private.h"
+#import "RLMRealmConfiguration_Private.h"
 
 #define ACCOUNT_NAME() NSStringFromSelector(_cmd)
 #define CUSTOM_REALM_URL(realm_identifier) \
@@ -315,6 +316,67 @@
         [realm commitWriteTransaction];
         [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(0, SyncObject, realm);
+    }
+}
+
+#pragma mark - Encryption
+
+/// If client B encrypts its synced Realm, client A should be able to access that Realm with a different encryption key.
+- (void)testEncryptedSyncedRealm {
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    NSData *key = RLMGenerateKey();
+    RLMRealm *realm = [self openRealmForURL:url user:user encryptionKey:key
+                                 stopPolicy:RLMSyncStopPolicyAfterChangesUploaded immediatelyBlock:nil];
+    if (self.isParent) {
+        CHECK_COUNT(0, SyncObject, realm);
+        RLMRunChildAndWait();
+        [self waitForDownloadsForUser:user realms:@[realm] realmURLs:@[url] expectedCounts:@[@3]];
+    } else {
+        // Add objects.
+        [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+        [self waitForUploadsForUser:user url:url];
+        CHECK_COUNT(3, SyncObject, realm);
+    }
+}
+
+/// If an encrypted synced Realm is re-opened with the wrong key, throw an exception.
+- (void)testEncryptedSyncedRealmWrongKey {
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+
+    if (self.isParent) {
+        NSString *path;
+        @autoreleasepool {
+            RLMRealm *realm = [self openRealmForURL:url user:user encryptionKey:RLMGenerateKey()
+                                         stopPolicy:RLMSyncStopPolicyImmediately immediatelyBlock:nil];
+            path = realm.configuration.pathOnDisk;
+            CHECK_COUNT(0, SyncObject, realm);
+            RLMRunChildAndWait();
+            [self waitForDownloadsForUser:user realms:@[realm] realmURLs:@[url] expectedCounts:@[@3]];
+        }
+        RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
+        c.fileURL = [NSURL fileURLWithPath:path];
+        RLMAssertThrowsWithError([RLMRealm realmWithConfiguration:c error:nil],
+                                 @"Unable to open a realm at path",
+                                 RLMErrorFileAccess,
+                                 @"not a realm file");
+        c.encryptionKey = RLMGenerateKey();
+        RLMAssertThrowsWithError([RLMRealm realmWithConfiguration:c error:nil],
+                                 @"Unable to open a realm at path",
+                                 RLMErrorFileAccess,
+                                 @"Realm file decryption failed");
+    } else {
+        RLMRealm *realm = [self openRealmForURL:url user:user encryptionKey:RLMGenerateKey()
+                                     stopPolicy:RLMSyncStopPolicyImmediately immediatelyBlock:nil];
+        [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+        [self waitForUploadsForUser:user url:url];
+        CHECK_COUNT(3, SyncObject, realm);
     }
 }
 
