@@ -130,6 +130,16 @@ build_combined() {
     local scope_suffix="$5"
     local version_suffix="$6"
     local config="$CONFIGURATION"
+    local previous_realm_xcode_version="$REALM_XCODE_VERSION"
+    local previous_realm_swift_version="$REALM_SWIFT_VERSION"
+
+    if [[ "$module_name" == "Realm" ]] && [[ "$IS_RUNNING_PACKAGING" == "1" ]]; then
+      # Work around http://www.openradar.me/31302382 by building Realm Objective-C
+      # with Xcode 8.2 when packaging since 8.3 produces binaries that are ~3x bigger
+      REALM_XCODE_VERSION=8.2
+      REALM_SWIFT_VERSION=
+      set_xcode_and_swift_versions
+    fi
 
     local destination=""
     local os_name=""
@@ -174,6 +184,11 @@ build_combined() {
     if [[ "$destination" != "" && "$config" == "Release" ]]; then
         sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
     fi
+
+    # Reset to state before applying workaround to rdar://31302382
+    REALM_XCODE_VERSION="$previous_realm_xcode_version"
+    REALM_SWIFT_VERSION="$previous_realm_swift_version"
+    set_xcode_and_swift_versions
 }
 
 clean_retrieve() {
@@ -369,14 +384,18 @@ download_sync() {
 COMMAND="$1"
 
 # Use Debug config if command ends with -debug, otherwise default to Release
+# Set IS_RUNNING_PACKAGING when running packaging steps to help work around rdar://31302382.
 case "$COMMAND" in
     *-debug)
         COMMAND="${COMMAND%-debug}"
         CONFIGURATION="Debug"
         ;;
-    *) CONFIGURATION=${CONFIGURATION:-Release}
+    package-*)
+        IS_RUNNING_PACKAGING=1
+        ;;
 esac
-export CONFIGURATION
+export CONFIGURATION=${CONFIGURATION:-Release}
+export IS_RUNNING_PACKAGING=${IS_RUNNING_PACKAGING:-0}
 
 # Pre-choose Xcode and Swift versions for those operations that do not set them
 REALM_XCODE_VERSION=${xcode_version:-$REALM_XCODE_VERSION}
@@ -1141,7 +1160,7 @@ EOM
 
     "package-ios-swift")
         cd tightdb_objc
-        for version in 8.0 8.1 8.2; do
+        for version in 8.0 8.1 8.2 8.3; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1150,12 +1169,12 @@ EOM
         done
 
         cd build/ios
-        zip --symlinks -r realm-swift-framework-ios.zip swift-3.0 swift-3.0.1 swift-3.0.2
+        zip --symlinks -r realm-swift-framework-ios.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1
         ;;
 
     "package-osx-swift")
         cd tightdb_objc
-        for version in 8.0 8.1 8.2; do
+        for version in 8.0 8.1 8.2 8.3; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1164,7 +1183,7 @@ EOM
         done
 
         cd build/osx
-        zip --symlinks -r realm-swift-framework-osx.zip swift-3.0 swift-3.0.1 swift-3.0.2
+        zip --symlinks -r realm-swift-framework-osx.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1
         ;;
 
     "package-watchos")
@@ -1178,7 +1197,7 @@ EOM
 
     "package-watchos-swift")
         cd tightdb_objc
-        for version in 8.0 8.1 8.2; do
+        for version in 8.0 8.1 8.2 8.3; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1187,7 +1206,7 @@ EOM
         done
 
         cd build/watchos
-        zip --symlinks -r realm-swift-framework-watchos.zip swift-3.0 swift-3.0.1 swift-3.0.2
+        zip --symlinks -r realm-swift-framework-watchos.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1
         ;;
 
     "package-tvos")
@@ -1201,7 +1220,7 @@ EOM
 
     "package-tvos-swift")
         cd tightdb_objc
-        for version in 8.0 8.1 8.2; do
+        for version in 8.0 8.1 8.2 8.3; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1210,7 +1229,7 @@ EOM
         done
 
         cd build/tvos
-        zip --symlinks -r realm-swift-framework-tvos.zip swift-3.0 swift-3.0.1 swift-3.0.2
+        zip --symlinks -r realm-swift-framework-tvos.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1
         ;;
 
     "package-release")

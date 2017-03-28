@@ -8,6 +8,8 @@ modified.
 If using synchronized Realms, the Realm Object Server must be running version
 1.3.0 or later.
 
+Swift binaries are now produced for Swift 3.0, 3.0.1, 3.0.2 and 3.1.
+
 ### API Breaking Changes
 
 * None.
