@@ -414,6 +414,9 @@
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
 		C0CDC0831B38DABB00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
+		C281E9281E8A9CB50015BA4A /* network_reachability_observer.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C281E9251E8A9C930015BA4A /* network_reachability_observer.hpp */; };
+		C281E9291E8A9CC90015BA4A /* network_reachability_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C281E9241E8A9C930015BA4A /* network_reachability_observer.cpp */; };
+		C281E9301E8BC7AC0015BA4A /* network_reachability_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C281E9241E8A9C930015BA4A /* network_reachability_observer.cpp */; };
 		C2841D5E1DDC673400943503 /* RLMSyncErrorResponseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C2841D5B1DDC673300943503 /* RLMSyncErrorResponseModel.m */; };
 		C2841D5F1DDC673400943503 /* RLMSyncErrorResponseModel.m in Sources */ = {isa = PBXBuildFile; fileRef = C2841D5B1DDC673300943503 /* RLMSyncErrorResponseModel.m */; };
 		E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
@@ -837,6 +840,8 @@
 		C0D2DD061B6BDEA1004E8919 /* RLMRealmConfiguration.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMRealmConfiguration.mm; sourceTree = "<group>"; };
 		C0D2DD0F1B6BE0DD004E8919 /* RLMRealmConfiguration_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMRealmConfiguration_Private.h; sourceTree = "<group>"; };
 		C0D6E4101AFBFAF7001F3027 /* RLMAssertions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAssertions.h; sourceTree = "<group>"; };
+		C281E9241E8A9C930015BA4A /* network_reachability_observer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = network_reachability_observer.cpp; sourceTree = "<group>"; };
+		C281E9251E8A9C930015BA4A /* network_reachability_observer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = network_reachability_observer.hpp; sourceTree = "<group>"; };
 		C2841D5A1DDC673300943503 /* RLMSyncErrorResponseModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncErrorResponseModel.h; sourceTree = "<group>"; };
 		C2841D5B1DDC673300943503 /* RLMSyncErrorResponseModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMSyncErrorResponseModel.m; sourceTree = "<group>"; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
@@ -1025,6 +1030,7 @@
 		1A15366B1DB0460F00C0EC93 /* impl */ = {
 			isa = PBXGroup;
 			children = (
+				C281E9231E8A9C930015BA4A /* apple */,
 				1A15366C1DB0464800C0EC93 /* sync_client.hpp */,
 				1A15366D1DB0464800C0EC93 /* sync_file.cpp */,
 				1A15366E1DB0464800C0EC93 /* sync_file.hpp */,
@@ -1282,6 +1288,16 @@
 				5DB591A81D063DF8001D8F93 /* format.hpp */,
 			);
 			path = util;
+			sourceTree = "<group>";
+		};
+		C281E9231E8A9C930015BA4A /* apple */ = {
+			isa = PBXGroup;
+			children = (
+				C281E9241E8A9C930015BA4A /* network_reachability_observer.cpp */,
+				C281E9251E8A9C930015BA4A /* network_reachability_observer.hpp */,
+			);
+			name = apple;
+			path = sync/impl/apple;
 			sourceTree = "<group>";
 		};
 		E81A1FC81955FE0100FDED82 /* Swift */ = {
@@ -1595,6 +1611,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C281E9281E8A9CB50015BA4A /* network_reachability_observer.hpp in Headers */,
 				3F73BC971E3A879700FE80B6 /* NSError+RLMSync.h in Headers */,
 				5DD755A31BE056DE002800DA /* Realm.h in Headers */,
 				5DD755A51BE056DE002800DA /* RLMAccessor.h in Headers */,
@@ -2171,6 +2188,7 @@
 				1AF6EA481D36B1850014EB85 /* RLMAuthResponseModel.m in Sources */,
 				3F9863BB1D36876B00641C98 /* RLMClassInfo.mm in Sources */,
 				3FBEF67B1C63D66100F6935B /* RLMCollection.mm in Sources */,
+				C281E9301E8BC7AC0015BA4A /* network_reachability_observer.cpp in Sources */,
 				5D659E891BE04556006515A0 /* RLMConstants.m in Sources */,
 				5D659E8A1BE04556006515A0 /* RLMListBase.mm in Sources */,
 				5D659E8B1BE04556006515A0 /* RLMMigration.mm in Sources */,
@@ -2305,6 +2323,7 @@
 				1A70030A1D5270CF00FD9EE3 /* RLMAuthResponseModel.m in Sources */,
 				3F9863BC1D36876B00641C98 /* RLMClassInfo.mm in Sources */,
 				3FBEF67C1C63D66400F6935B /* RLMCollection.mm in Sources */,
+				C281E9291E8A9CC90015BA4A /* network_reachability_observer.cpp in Sources */,
 				5DD755871BE056DE002800DA /* RLMConstants.m in Sources */,
 				5DD755881BE056DE002800DA /* RLMListBase.mm in Sources */,
 				5DD755891BE056DE002800DA /* RLMMigration.mm in Sources */,
