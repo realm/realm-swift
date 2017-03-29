@@ -1,12 +1,29 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
+2.5.0 Release notes (2017-03-28)
+=============================================================
+
 Files written by Realm this version cannot be read by earlier versions of Realm.
 Old files can still be opened and files open in read-only mode will not be
 modified.
 
 If using synchronized Realms, the Realm Object Server must be running version
 1.3.0 or later.
+
+Swift binaries are now produced for Swift 3.0, 3.0.1, 3.0.2 and 3.1.
 
 ### API Breaking Changes
 
