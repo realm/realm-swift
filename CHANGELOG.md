@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.5.0 Release notes (2017-03-28)
 =============================================================
 
 Files written by Realm this version cannot be read by earlier versions of Realm.
