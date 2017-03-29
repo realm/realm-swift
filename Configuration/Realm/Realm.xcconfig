@@ -27,11 +27,11 @@ LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks 
 LD_RUNPATH_SEARCH_PATHS[sdk=watch*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 LD_RUNPATH_SEARCH_PATHS[sdk=appletv*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 
-OTHER_LDFLAGS[sdk=macosx*] = -lrealm$(REALM_LIBRARY_SUFFIX);
+OTHER_LDFLAGS[sdk=macosx*] = -lrealm$(REALM_LIBRARY_SUFFIX) -framework SystemConfiguration;
 OTHER_LIBTOOLFLAGS[sdk=macosx*] = -lrealm$(REALM_LIBRARY_SUFFIX);
-OTHER_LDFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
+OTHER_LDFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX) -framework SystemConfiguration;
 OTHER_LIBTOOLFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
 OTHER_LDFLAGS[sdk=watch*] = -lrealm-watchos$(REALM_LIBRARY_SUFFIX);
 OTHER_LIBTOOLFLAGS[sdk=watch*] = -lrealm-watchos$(REALM_LIBRARY_SUFFIX);
-OTHER_LDFLAGS[sdk=appletv*] = -lrealm-tvos$(REALM_LIBRARY_SUFFIX);
+OTHER_LDFLAGS[sdk=appletv*] = -lrealm-tvos$(REALM_LIBRARY_SUFFIX) -framework SystemConfiguration;
 OTHER_LIBTOOLFLAGS[sdk=appletv*] = -lrealm-tvos$(REALM_LIBRARY_SUFFIX);
