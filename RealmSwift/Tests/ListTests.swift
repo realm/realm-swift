@@ -358,6 +358,25 @@ class ListTests: TestCase {
             XCTAssertEqual(0, object.arrayCol.count)
         }
     }
+
+    func testValueForKey() {
+        let realm = try! Realm()
+        try! realm.write {
+            for value in [1, 2] {
+                let object = SwiftArrayPropertyObject()
+                object.intArray.append(SwiftIntObject(value: [value]))
+                realm.add(object)
+            }
+        }
+
+        let objects = realm.objects(SwiftArrayPropertyObject.self)
+
+        let properties = Array(objects.flatMap({ $0.intArray.map({ $0.intCol }) }))
+        let listsOfObjects = objects.value(forKeyPath: "intArray") as! [List<SwiftIntObject>]
+        let kvcPropertiess = Array(listsOfObjects.flatMap({ $0.map({ $0.intCol }) }))
+
+        XCTAssertEqual(properties, kvcPropertiess)
+    }
 }
 
 class ListStandaloneTests: ListTests {

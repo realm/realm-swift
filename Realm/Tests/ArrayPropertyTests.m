@@ -637,6 +637,13 @@
     }
     [realm commitWriteTransaction];
 
+    RLM_GENERIC_ARRAY(EmployeeObject) *employeeObjects = [company valueForKey:@"employees"];
+    NSMutableArray *kvcAgeProperties = [NSMutableArray array];
+    for (EmployeeObject *employee in employeeObjects) {
+        [kvcAgeProperties addObject:@(employee.age)];
+    }
+    XCTAssertEqualObjects(kvcAgeProperties, ages);
+
     XCTAssertEqualObjects([company.employees valueForKey:@"age"], ages);
     XCTAssertTrue([[[company.employees valueForKey:@"self"] firstObject] isEqualToObject:company.employees.firstObject]);
     XCTAssertTrue([[[company.employees valueForKey:@"self"] lastObject] isEqualToObject:company.employees.lastObject]);
