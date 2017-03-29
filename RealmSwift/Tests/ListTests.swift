@@ -373,9 +373,9 @@ class ListTests: TestCase {
 
         let properties = Array(objects.flatMap({ $0.intArray.map({ $0.intCol }) }))
         let listsOfObjects = objects.value(forKeyPath: "intArray") as! [List<SwiftIntObject>]
-        let kvcPropertiess = Array(listsOfObjects.flatMap({ $0.map({ $0.intCol }) }))
+        let kvcProperties = Array(listsOfObjects.flatMap({ $0.map({ $0.intCol }) }))
 
-        XCTAssertEqual(properties, kvcPropertiess)
+        XCTAssertEqual(properties, kvcProperties)
     }
 }
 

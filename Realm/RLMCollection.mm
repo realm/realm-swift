@@ -149,12 +149,9 @@ NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *ke
         return results;
     }
 
-    RLMObject *accessor = RLMCreateManagedAccessor(info->rlmObjectSchema.accessorClass, realm, info);
-    realm::Table *table = info->table();
     for (size_t i = 0; i < count; i++) {
         size_t rowIndex = [collection indexInSource:i];
-        accessor->_row = (*table)[rowIndex];
-        RLMInitializeSwiftAccessorGenerics(accessor);
+        RLMObjectBase *accessor = RLMCreateObjectAccessor(realm, *info, rowIndex);
         [results addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
 
