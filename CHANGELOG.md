@@ -11,7 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fixing CocoaPods installation with static libraries and multiple platforms.
 
 2.5.0 Release notes (2017-03-28)
 =============================================================
