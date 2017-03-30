@@ -1,7 +1,7 @@
 <!---
 
 We LOVE to help with any issues or bugs you have!
-**Questions**: If you have questions about how to use Realm, ask on 
+**Questions**: If you have questions about how to use Realm, ask on
 [StackOverflow](http://stackoverflow.com/questions/ask?tags=realm).
 We monitor the `realm` tag.
 
@@ -20,7 +20,7 @@ Thanks for helping us help you! :-)
 <!--- What did you expect to happen? -->
 
 ## Actual Results
-<!--- What happened instead?  
+<!--- What happened instead?
 e.g. the stack trace of a crash
 -->
 
@@ -39,9 +39,11 @@ Full Xcode projects that we can compile ourselves are ideal!
 ## Version of Realm and Tooling
 <!---
 [In the CONTRIBUTING guidelines](https://git.io/vgxJO), you will find a script,
-which will help determining these versions.
+which will help determining some of these versions.
 -->
-Realm version: ?
+Realm Client version: ?
+
+Realm Object Server version: ?
 
 Xcode version: ?
 
