@@ -7,8 +7,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* Add an `isAdmin` property to `RLMSyncUser` indicating whether a user is a
-  Realm Object Server administrator.
+* Add a `{RLM}SyncUser.isAdmin` property indicating whether a user is a Realm
+  Object Server administrator.
 
 ### Bugfixes
 
