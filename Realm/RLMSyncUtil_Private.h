@@ -75,6 +75,13 @@ if (![data isKindOfClass:[NSString class]]) { data = nil; } \
 self.prop_macro_val = data; \
 } \
 
+#define RLM_SYNC_PARSE_OPTIONAL_BOOL(json_macro_val, key_macro_val, prop_macro_val) \
+{ \
+id data = json_macro_val[key_macro_val]; \
+if (![data isKindOfClass:[NSNumber class]]) { data = @NO; } \
+self.prop_macro_val = [data boolValue]; \
+} \
+
 /// A macro to parse a double out of a JSON dictionary, or return nil.
 #define RLM_SYNC_PARSE_DOUBLE_OR_ABORT(json_macro_val, key_macro_val, prop_macro_val) \
 { \
