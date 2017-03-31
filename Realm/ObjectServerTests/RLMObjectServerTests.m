@@ -47,6 +47,7 @@
     XCTAssertTrue([firstUser.identity isEqualToString:secondUser.identity]);
     // Authentication server property should be properly set.
     XCTAssertEqualObjects(firstUser.authenticationServer, [RLMSyncTestCase authServerURL]);
+    XCTAssertFalse(firstUser.isAdmin);
 }
 
 /// A valid admin token should be able to log in a user.
@@ -57,7 +58,8 @@
     RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken identity:@"test"];
     XCTAssertNotNil(credentials);
 
-    [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
+    XCTAssertTrue(user.isAdmin);
 }
 
 /// An invalid username/password credential should not be able to log in a user and a corresponding error should be generated.

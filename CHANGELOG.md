@@ -12,7 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* Fix an issue where the project would fail to compile with clang 4.0.
+* None.
 
 2.5.0 Release notes (2017-03-28)
 =============================================================
