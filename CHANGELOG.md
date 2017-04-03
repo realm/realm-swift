@@ -13,8 +13,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Fix CocoaPods installation with static libraries and multiple platforms.
-* Fix uncaught "Bad version number" exceptions when refreshing a Realm with no
-  notification registered blocks.
+* Fix uncaught "Bad version number" exceptions on the notification worker thread
+  followed by deadlocks when Realms refresh.
 
 2.5.0 Release notes (2017-03-28)
 =============================================================
