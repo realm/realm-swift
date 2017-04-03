@@ -41,7 +41,7 @@ Full Xcode projects that we can compile ourselves are ideal!
 [In the CONTRIBUTING guidelines](https://git.io/vgxJO), you will find a script,
 which will help determining some of these versions.
 -->
-Realm Client version: ?
+Realm framework version: ?
 
 Realm Object Server version: ?
 
