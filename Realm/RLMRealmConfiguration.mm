@@ -94,6 +94,8 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
         static NSURL *defaultRealmURL = [NSURL fileURLWithPath:RLMRealmPathForFile(c_defaultRealmFileName)];
         self.fileURL = defaultRealmURL;
         self.schemaVersion = 0;
+        self.cache = YES;
+        _config.cache = false;
     }
 
     return self;
@@ -102,6 +104,7 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
 - (instancetype)copyWithZone:(NSZone *)zone {
     RLMRealmConfiguration *configuration = [[[self class] allocWithZone:zone] init];
     configuration->_config = _config;
+    configuration->_cache = _cache;
     configuration->_dynamic = _dynamic;
     configuration->_migrationBlock = _migrationBlock;
     configuration->_customSchema = _customSchema;
@@ -243,15 +246,7 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 
 - (void)setDynamic:(bool)dynamic {
     _dynamic = dynamic;
-    _config.cache = !dynamic;
-}
-
-- (bool)cache {
-    return _config.cache;
-}
-
-- (void)setCache:(bool)cache {
-    _config.cache = cache;
+    self.cache = !dynamic;
 }
 
 - (bool)disableFormatUpgrade {
