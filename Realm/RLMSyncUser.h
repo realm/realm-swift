@@ -70,12 +70,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, readonly) NSURL *authenticationServer;
 
 /**
- Whether the user is a Realm Object Server administrator. Value reflects the
- state at the time of the last successful login of this user.
- */
-@property (nonatomic, readonly) BOOL isAdmin;
-
-/**
  The current state of the user.
  */
 @property (nonatomic, readonly) RLMSyncUserState state;
