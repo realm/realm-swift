@@ -260,13 +260,14 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
     bool dynamic = configuration.dynamic;
+    bool cache = configuration.cache;
     bool readOnly = configuration.readOnly;
 
     {
         Realm::Config& config = configuration.config;
 
         // try to reuse existing realm first
-        if (config.cache || dynamic) {
+        if (cache || dynamic) {
             if (RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path)) {
                 auto const& old_config = realm->_realm->config();
                 if (old_config.read_only() != config.read_only()) {
@@ -363,7 +364,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         }
     }
 
-    if (config.cache) {
+    if (cache) {
         RLMCacheRealm(config.path, realm);
     }
 
