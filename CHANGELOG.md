@@ -1,4 +1,4 @@
-2.5.1 Release notes (2017-04-05)
+x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
 ### API Breaking Changes
@@ -9,6 +9,21 @@
 
 * Add a `{RLM}SyncUser.isAdmin` property indicating whether a user is a Realm
   Object Server administrator.
+
+### Bugfixes
+
+* None.
+
+2.5.1 Release notes (2017-04-05)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
 
 ### Bugfixes
 
