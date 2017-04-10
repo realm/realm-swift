@@ -136,7 +136,7 @@ build_combined() {
 
     if [[ "$module_name" == "Realm" ]] && [[ "$IS_RUNNING_PACKAGING" == "1" ]]; then
       # Work around rdar://31302382 by building Realm Objective-C with Xcode 8.2
-      # when packaging since 8.3 produces binaries that are ~3x bigger
+      # when packaging since 8.3.1 produces binaries that are ~3x bigger
       force_xcode_82
       did_change_xcode_versions=1
     fi
@@ -1188,7 +1188,7 @@ EOM
 
     "package-ios-swift")
         cd tightdb_objc
-        for version in 8.0 8.1 8.2 8.3; do
+        for version in 8.0 8.1 8.2 8.3.1; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1202,7 +1202,7 @@ EOM
 
     "package-osx-swift")
         cd tightdb_objc
-        for version in 8.0 8.1 8.2 8.3; do
+        for version in 8.0 8.1 8.2 8.3.1; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1225,7 +1225,7 @@ EOM
 
     "package-watchos-swift")
         cd tightdb_objc
-        for version in 8.0 8.1 8.2 8.3; do
+        for version in 8.0 8.1 8.2 8.3.1; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1248,7 +1248,7 @@ EOM
 
     "package-tvos-swift")
         cd tightdb_objc
-        for version in 8.0 8.1 8.2 8.3; do
+        for version in 8.0 8.1 8.2 8.3.1; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
