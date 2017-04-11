@@ -265,7 +265,7 @@ using namespace realm;
                 }
                 sync_user->set_is_admin(model.refreshToken.tokenData.isAdmin);
                 user->_user = sync_user;
-                completion(user, nil);
+                theBlock(user, nil);
             }
         } else {
             // Something else went wrong
