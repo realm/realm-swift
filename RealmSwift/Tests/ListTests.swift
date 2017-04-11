@@ -360,22 +360,42 @@ class ListTests: TestCase {
     }
 
     func testValueForKey() {
-        let realm = try! Realm()
-        try! realm.write {
-            for value in [1, 2] {
-                let object = SwiftArrayPropertyObject()
-                object.intArray.append(SwiftIntObject(value: [value]))
-                realm.add(object)
+        do {
+            let realm = try! Realm()
+            try! realm.write {
+                for value in [1, 2] {
+                    let object = SwiftArrayPropertyObject()
+                    object.intArray.append(SwiftIntObject(value: [value]))
+                    realm.add(object)
+                }
             }
+
+            let objects = realm.objects(SwiftArrayPropertyObject.self)
+
+            let properties = Array(objects.flatMap { $0.intArray.map { $0.intCol }})
+            let listsOfObjects = objects.value(forKeyPath: "intArray") as! [List<SwiftIntObject>]
+            let kvcProperties = Array(listsOfObjects.flatMap { $0.map { $0.intCol }})
+
+            XCTAssertEqual(properties, kvcProperties)
         }
+        do {
+            let realm = try! Realm()
+            try! realm.write {
+                for value in [1, 2] {
+                    let object = SwiftOptionalObject()
+                    object.optIntCol.value = value
+                    realm.add(object)
+                }
+            }
 
-        let objects = realm.objects(SwiftArrayPropertyObject.self)
+            let objects = realm.objects(SwiftOptionalObject.self)
 
-        let properties = Array(objects.flatMap({ $0.intArray.map({ $0.intCol }) }))
-        let listsOfObjects = objects.value(forKeyPath: "intArray") as! [List<SwiftIntObject>]
-        let kvcProperties = Array(listsOfObjects.flatMap({ $0.map({ $0.intCol }) }))
+            let properties = Array(objects.flatMap { $0.optIntCol.value })
+            let listsOfObjects = objects.value(forKeyPath: "optIntCol") as! [Int]
+            let kvcProperties = Array(listsOfObjects.flatMap { $0 })
 
-        XCTAssertEqual(properties, kvcProperties)
+            XCTAssertEqual(properties, kvcProperties)
+        }
     }
 }
 
