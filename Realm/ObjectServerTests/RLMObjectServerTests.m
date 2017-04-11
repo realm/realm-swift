@@ -27,6 +27,10 @@
     [NSURL URLWithString:[NSString stringWithFormat:@"realm://localhost:9080/~/%@%@", ACCOUNT_NAME(), realm_identifier]]
 #define REALM_URL() CUSTOM_REALM_URL(@"")
 
+@interface RLMSyncUser ()
+@property (nonatomic, readonly) BOOL isAdmin;
+@end
+
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
 
