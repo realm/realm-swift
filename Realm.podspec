@@ -1,3 +1,18 @@
+def self.realm_source_files(include_headers)
+  extensions = 'm,mm,cpp'
+  extensions += ',h,hpp' if include_headers
+  [
+    "Realm/*.{#{extensions}}",
+    "Realm/ObjectStore/src/*.{#{extensions}}",
+    "Realm/ObjectStore/src/sync/*.{#{extensions}}",
+    "Realm/ObjectStore/src/sync/impl/*.{#{extensions}}",
+    "Realm/ObjectStore/src/impl/*.{#{extensions}}",
+    "Realm/ObjectStore/src/impl/apple/*.{#{extensions}}",
+    "Realm/ObjectStore/src/util/*.{#{extensions}}",
+    "Realm/ObjectStore/src/util/apple/*.{#{extensions}}"
+  ]
+end
+
 Pod::Spec.new do |s|
   # Info
   s.name                    = 'Realm'
@@ -17,82 +32,98 @@ Pod::Spec.new do |s|
 
   # Platforms
   s.ios.deployment_target     = '7.0'
-  s.ios.vendored_library      = 'core/librealmcore-ios.a'
   s.osx.deployment_target     = '10.9'
-  s.osx.vendored_library      = 'core/librealmcore-macosx.a'
   s.tvos.deployment_target    = '9.0'
-  s.tvos.vendored_library     = 'core/librealmcore-tvos.a'
   s.watchos.deployment_target = '2.0'
-  s.watchos.vendored_library  = 'core/librealmcore-watchos.a'
 
   # Compilation
   s.prepare_command         = 'sh build.sh cocoapods-setup'
   s.module_map              = 'Realm/Realm.modulemap'
-  s.library                 = 'c++', 'z'
-  s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__ -DREALM_ENABLE_SYNC"
-  s.pod_target_xcconfig     = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES',
-                                'CLANG_CXX_LANGUAGE_STANDARD' => 'c++14',
-                                'HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include/core"',
-                                'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"' }
+  compiler_flags            = '-D__ASSERTMACROS__',
+                              "-DREALM_COCOA_VERSION='@\"#{s.version}\"'",
+                              '-DREALM_ENABLE_ASSERTIONS',
+                              '-DREALM_ENABLE_ENCRYPTION'
+  xcconfig                  = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES',
+                                'CLANG_CXX_LANGUAGE_STANDARD' => 'c++14' }
+  s.default_subspecs        = 'Sync', 'Headers'
 
   # Files
-  public_header_files       = 'include/**/RLMArray.h',
-                              'include/**/RLMCollection.h',
-                              'include/**/RLMConstants.h',
-                              'include/**/RLMListBase.h',
-                              'include/**/RLMMigration.h',
-                              'include/**/RLMObject.h',
-                              'include/**/RLMObjectBase.h',
-                              'include/**/RLMObjectSchema.h',
-                              'include/**/RLMOptionalBase.h',
-                              'include/**/RLMPlatform.h',
-                              'include/**/RLMProperty.h',
-                              'include/**/RLMRealm.h',
-                              'include/**/RLMRealmConfiguration+Sync.h',
-                              'include/**/RLMRealmConfiguration.h',
-                              'include/**/RLMResults.h',
-                              'include/**/RLMSchema.h',
-                              'include/**/RLMSyncConfiguration.h',
-                              'include/**/RLMSyncCredentials.h',
-                              'include/**/RLMSyncManager.h',
-                              'include/**/RLMSyncPermission.h',
-                              'include/**/RLMSyncPermissionChange.h',
-                              'include/**/RLMSyncPermissionOffer.h',
-                              'include/**/RLMSyncPermissionOfferResponse.h',
-                              'include/**/RLMSyncSession.h',
-                              'include/**/RLMSyncUser.h',
-                              'include/**/RLMSyncUtil.h',
-                              'include/**/RLMThreadSafeReference.h',
-                              'include/**/NSError+RLMSync.h',
-                              'include/**/Realm.h',
+  public_header_files       = 'Realm.h',
+                              'RLMArray.h',
+                              'RLMCollection.h',
+                              'RLMConstants.h',
+                              'RLMListBase.h',
+                              'RLMMigration.h',
+                              'RLMObject.h',
+                              'RLMObjectBase.h',
+                              'RLMObjectSchema.h',
+                              'RLMOptionalBase.h',
+                              'RLMPlatform.h',
+                              'RLMProperty.h',
+                              'RLMRealm.h',
+                              'RLMRealmConfiguration.h',
+                              'RLMResults.h',
+                              'RLMSchema.h',
+                              'RLMThreadSafeReference.h',
+                              '*_Dynamic.h'
+  private_header_files      = '{*_Private,RLMAccessor,RLMObjectStore}.h'
 
-                              # Realm.Dynamic module
-                              'include/**/RLMRealm_Dynamic.h',
-                              'include/**/RLMObjectBase_Dynamic.h'
+  s.subspec 'OSSCore' do |s|
+    # Compilation
+    s.dependency             'RealmCore'
+    s.library              = 'c++'
+    s.header_mappings_dir  = 'Realm'
+    s.compiler_flags       = compiler_flags
+    s.pod_target_xcconfig  = xcconfig.merge('HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/RealmCore/src" "${PODS_ROOT}/Realm/Realm/ObjectStore/src"')
 
-  # Realm.Private module
-  private_header_files      = 'include/**/*_Private.h',
-                              'include/**/RLMAccessor.h',
-                              'include/**/RLMListBase.h',
-                              'include/**/RLMObjectStore.h',
-                              'include/**/RLMOptionalBase.h'
+    # Files
+    s.public_header_files  = public_header_files.map { |file| "Realm/#{file}" }
+    s.private_header_files = "Realm/#{private_header_files}"
+    s.source_files         = realm_source_files(true)
+    s.exclude_files        = 'Realm/ObjectStore/**/sync*',
+                             '**/*RLMSync*',
+                             'Realm/RLMAuthResponseModel.{h,m}',
+                             'Realm/RLMNetworkClient.{h,m}',
+                             'Realm/RLMRealmConfiguration+Sync.{h,mm}',
+                             'Realm/RLMTokenModels.{h,m}'
+  end
 
-  source_files              = 'Realm/*.{m,mm}',
-                              'Realm/ObjectStore/src/*.cpp',
-                              'Realm/ObjectStore/src/sync/*.cpp',
-                              'Realm/ObjectStore/src/sync/impl/*.cpp',
-                              'Realm/ObjectStore/src/impl/*.cpp',
-                              'Realm/ObjectStore/src/impl/apple/*.cpp',
-                              'Realm/ObjectStore/src/util/*.cpp',
-                              'Realm/ObjectStore/src/util/apple/*.cpp'
+  s.subspec 'Sync' do |s|
+    # Compilation
+    s.libraries            = 'c++', 'z'
+    s.header_mappings_dir  = 'include'
+    s.compiler_flags       = compiler_flags + ['-DREALM_ENABLE_SYNC', '-DREALM_HAVE_CONFIG']
+    s.pod_target_xcconfig  = xcconfig.merge('HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include/core"',
+                                            'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"')
 
-  s.source_files            = source_files + private_header_files
-  s.private_header_files    = private_header_files
-  s.header_mappings_dir     = 'include'
-  s.preserve_paths          = %w[build.sh include]
+    # Files
+    sync_header_files      = 'RLMRealmConfiguration+Sync.h',
+                             'RLMSyncConfiguration.h',
+                             'RLMSyncCredentials.h',
+                             'RLMSyncManager.h',
+                             'RLMSyncPermission.h',
+                             'RLMSyncPermissionChange.h',
+                             'RLMSyncPermissionOffer.h',
+                             'RLMSyncPermissionOfferResponse.h',
+                             'RLMSyncSession.h',
+                             'RLMSyncUser.h',
+                             'RLMSyncUtil.h',
+                             'NSError+RLMSync.h'
+    public_header_files    = (public_header_files + sync_header_files).map { |file| "include/**/#{file}" }
+    private_header_files   = "include/**/#{private_header_files}"
+    s.private_header_files = private_header_files
+    s.source_files         = realm_source_files(false) + [private_header_files]
+    s.preserve_paths       = %w[include]
+
+    # Platforms
+    s.ios.vendored_library      = 'core/librealmcore-ios.a'
+    s.osx.vendored_library      = 'core/librealmcore-macosx.a'
+    s.tvos.vendored_library     = 'core/librealmcore-tvos.a'
+    s.watchos.vendored_library  = 'core/librealmcore-watchos.a'
+  end
 
   s.subspec 'Headers' do |s|
-    s.source_files          = public_header_files
-    s.public_header_files   = public_header_files
+    s.source_files        = public_header_files
+    s.public_header_files = public_header_files
   end
 end

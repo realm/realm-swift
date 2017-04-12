@@ -22,12 +22,24 @@ Pod::Spec.new do |s|
   s.watchos.deployment_target = '2.0'
 
   # Compilation
-  s.dependency                  'Realm', "= #{s.version}"
   s.prepare_command           = 'sh build.sh set-swift-version'
-  s.pod_target_xcconfig       = { 'SWIFT_WHOLE_MODULE_OPTIMIZATION' => 'YES',
+  xcconfig                    = { 'SWIFT_WHOLE_MODULE_OPTIMIZATION' => 'YES',
                                   'APPLICATION_EXTENSION_API_ONLY' => 'YES' }
+  s.default_subspecs          = 'Sync'
 
   # Files
-  s.source_files              = 'RealmSwift/*.swift'
   s.preserve_paths            = %w[build.sh]
+
+  s.subspec 'Sync' do |s|
+    s.dependency                'Realm', "= #{s.version}"
+    s.source_files            = 'RealmSwift/*.swift'
+    s.pod_target_xcconfig     = xcconfig.merge({ 'OTHER_SWIFT_FLAGS' => '-DREALM_ENABLE_SYNC' })
+  end
+
+  s.subspec 'OSSCore' do |s|
+    s.dependency                'Realm/OSSCore', "= #{s.version}"
+    s.source_files            = 'RealmSwift/*.swift'
+    s.exclude_files           = 'RealmSwift/Sync.swift'
+    s.pod_target_xcconfig     = xcconfig
+  end
 end
