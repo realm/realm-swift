@@ -17,7 +17,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMRealmConfiguration.h>
+#if REALM_ENABLE_SYNC
 #import <Realm/RLMSyncConfiguration.h>
+#endif
 
 @class RLMSchema, RLMSyncUser;
 
@@ -25,7 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // FIXME: This should really be in sync headers but
 // that can't be added to the module map.
-
+#if REALM_ENABLE_SYNC
 typedef NS_ENUM(NSUInteger, RLMSyncStopPolicy) {
     RLMSyncStopPolicyImmediately,
     RLMSyncStopPolicyLiveIndefinitely,
@@ -43,6 +45,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncStopPolicy) {
 + (instancetype)managementConfigurationForUser:(RLMSyncUser *)user;
 + (instancetype)permissionConfigurationForUser:(RLMSyncUser *)user;
 @end
+#endif
 
 @interface RLMRealmConfiguration ()
 

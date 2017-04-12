@@ -130,6 +130,7 @@ public final class ObjectiveCSupport {
         return SortDescriptor(keyPath: object.keyPath, ascending: object.ascending)
     }
 
+#if REALM_ENABLE_SYNC
     /// Convert a `SyncCredentials` to a `RLMSyncCredentials`.
     public static func convert(object: SyncCredentials) -> RLMSyncCredentials {
         return RLMSyncCredentials(object)
@@ -139,4 +140,5 @@ public final class ObjectiveCSupport {
     public static func convert(object: RLMSyncCredentials) -> SyncCredentials {
         return SyncCredentials(object)
     }
+#endif
 }
