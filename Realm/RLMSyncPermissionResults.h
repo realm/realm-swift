@@ -24,15 +24,6 @@
 @class RLMSyncPermissionValue;
 
 /**
- A token returned when adding a notification block to a permission results object.
-
- Hold on to the token for as long as notifications are desired. Call `-stop` on
- the token to stop notifications. Also call `-stop` before deallocating the token.
- */
-@interface RLMSyncPermissionResultsToken : RLMNotificationToken
-@end
-
-/**
  An object representing the results of a permissions query.
 
  Permissions results objects are thread-confined, and should not be shared across
@@ -56,10 +47,8 @@
  This method returns a token. Hold on to the token for as long as notifications
  are desired. Call `-stop` on the token to stop notifications, and before
  deallocating the token.
-
- @see `RLMSyncPermissionResultsToken`
  */
-- (RLMSyncPermissionResultsToken *)addNotificationBlock:(RLMPermissionStatusBlock)block;
+- (RLMNotificationToken *)addNotificationBlock:(RLMPermissionStatusBlock)block;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncPermissionResults cannot be created directly")));

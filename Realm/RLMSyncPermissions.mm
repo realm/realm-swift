@@ -18,6 +18,8 @@
 
 #import "RLMSyncPermissions_Private.hpp"
 
+#import "RLMUtil.hpp"
+
 using namespace realm;
 using ConditionType = Permission::Condition::Type;
 
@@ -116,13 +118,6 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
     return [[RLMSyncUserIDPermissionValue alloc] initWithRealmPath:path userID:userID accessLevel:accessLevel];
 }
 
-- (instancetype)initWithRealmPath:(NSString *)path
-                              key:(NSString *)key
-                            value:(NSString *)value
-                      accessLevel:(RLMSyncAccessLevel)accessLevel {
-    return [[RLMSyncKeyValuePermissionValue alloc] initWithRealmPath:path key:key value:value accessLevel:accessLevel];
-}
-
 - (instancetype)initPrivate {
     self = [super init];
     return self;
@@ -134,7 +129,7 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
             self = [[RLMSyncUserIDPermissionValue alloc] initPrivate];
             break;
         case ConditionType::KeyValue:
-            self = [[RLMSyncKeyValuePermissionValue alloc] initPrivate];
+            @throw RLMException(@"Key-value permissions are not yet supported in Realm Objective-C or Realm Swift.");
             break;
     }
     _underlying = std::make_unique<Permission>(std::move(permission));
@@ -229,77 +224,6 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
 - (NSString *)description {
     return [NSString stringWithFormat:@"<RLMSyncUserIDPermissionValue> user ID: %@, path: %@, access level: %@",
             self.userID,
-            self.path,
-            descriptionForAccessLevel(self.accessLevel)];
-}
-
-@end
-
-#pragma mark - Key value permission
-
-@interface RLMSyncKeyValuePermissionValue () {
-    NSString *_key;
-    NSString *_value;
-}
-@end
-
-@implementation RLMSyncKeyValuePermissionValue
-
-- (instancetype)initPrivate {
-    self = [super initPrivate];
-    return self;
-}
-
-- (instancetype)initWithRealmPath:(NSString *)path
-                              key:(NSString *)key
-                            value:(NSString *)value
-                      accessLevel:(RLMSyncAccessLevel)accessLevel {
-    if (self = [super initWithAccessLevel:accessLevel path:path]) {
-        _key = key;
-        _value = value;
-    }
-    return self;
-}
-
-- (NSString *)key {
-    if (auto permission = _underlying.get()) {
-        REALM_ASSERT(permission->condition.type == ConditionType::KeyValue);
-        return @(std::get<0>(_underlying->condition.key_value).c_str());
-    }
-    return _key;
-}
-
-- (NSString *)value {
-    if (auto permission = _underlying.get()) {
-        REALM_ASSERT(permission->condition.type == ConditionType::KeyValue);
-        return @(std::get<1>(_underlying->condition.key_value).c_str());
-    }
-    return _value;
-}
-
-- (realm::Permission)rawPermission {
-    if (auto permission = _underlying.get()) {
-        return *permission;
-    }
-    REALM_TERMINATE("Not yet implemented for user-defined permissions");
-    // TODO: implement this
-}
-
-- (BOOL)isEqual:(id)object {
-    if ([object isKindOfClass:[RLMSyncKeyValuePermissionValue class]]) {
-        RLMSyncKeyValuePermissionValue *that = (RLMSyncKeyValuePermissionValue *)object;
-        return (self.accessLevel == that.accessLevel
-                && pathsAreEquivalent(self.path, that.path, self.userID, that.userID)
-                && [self.key isEqualToString:that.key]
-                && [self.value isEqualToString:that.value]);
-    }
-    return NO;
-}
-
-- (NSString *)description {
-    return [NSString stringWithFormat:@"<RLMSyncKeyValuePermissionValue> key: %@, value: %@, path: %@ access level: %@",
-            self.key,
-            self.value,
             self.path,
             descriptionForAccessLevel(self.accessLevel)];
 }

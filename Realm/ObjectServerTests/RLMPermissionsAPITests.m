@@ -104,7 +104,7 @@
     // First, there should be no permissions.
     XCTestExpectation *ex = [self expectationWithDescription:@"No permissions for newly created user."];
     __block RLMSyncPermissionResults *results;
-    [self.userA retrievePermissions:^(RLMSyncPermissionResults *r, NSError *error) {
+    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
         XCTAssertNil(error);
         XCTAssertNotNil(r);
         results = r;
@@ -132,7 +132,7 @@
 
     // Now retrieve the permissions again and make sure the new permission is properly set.
     XCTestExpectation *ex3 = [self expectationWithDescription:@"One permission after setting the permission."];
-    [self.userA retrievePermissions:^(RLMSyncPermissionResults *r, NSError *error) {
+    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
         XCTAssertNil(error);
         XCTAssertNotNil(r);
         results = r;
@@ -171,7 +171,7 @@
 
     // Now retrieve the permissions again and make sure the new permission is properly set.
     XCTestExpectation *ex2 = [self expectationWithDescription:@"One permission after setting the permission."];
-    [self.userA retrievePermissions:^(RLMSyncPermissionResults *r, NSError *error) {
+    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
         XCTAssertNil(error);
         XCTAssertNotNil(r);
         results = r;
@@ -195,7 +195,7 @@
 
     // Make sure the permission deletion is properly reflected.
     XCTestExpectation *ex4 = [self expectationWithDescription:@"No permissions after deleting the permission."];
-    [self.userA retrievePermissions:^(RLMSyncPermissionResults *r, NSError *error) {
+    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
         XCTAssertNil(error);
         XCTAssertNotNil(r);
         results = r;
@@ -211,7 +211,7 @@
     // Get a reference to the permission results.
     XCTestExpectation *ex = [self expectationWithDescription:@"Get permission results."];
     __block RLMSyncPermissionResults *results = nil;
-    [self.userA retrievePermissions:^(RLMSyncPermissionResults *r, NSError *error) {
+    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
         XCTAssertNil(error);
         XCTAssertNotNil(r);
         results = r;
@@ -225,7 +225,7 @@
 
     // Register notifications.
     XCTestExpectation *noteEx = [self expectationWithDescription:@"Notification should fire."];
-    RLMSyncPermissionResultsToken *token = [results addNotificationBlock:^(NSError *error) {
+    RLMNotificationToken *token = [results addNotificationBlock:^(NSError *error) {
         XCTAssertNil(error);
         if (results.count > 0) {
             [noteEx fulfill];
@@ -282,7 +282,7 @@
 
     // Now retrieve the permissions again and make sure the new permission was not set.
     XCTestExpectation *ex3 = [self expectationWithDescription:@"One permission after setting the permission."];
-    [self.userB retrievePermissions:^(RLMSyncPermissionResults *r, NSError *error) {
+    [self.userB retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
         XCTAssertNil(error);
         XCTAssertNotNil(r);
         results = r;

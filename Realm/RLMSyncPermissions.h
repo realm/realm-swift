@@ -65,35 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
                       accessLevel:(RLMSyncAccessLevel)accessLevel;
 
 /**
- Create a new sync permission value, for use with permission APIs.
-
- @param path            The path to the Realm whose permission should be modified (e.g. "/path/to/realm")
- @param key             A key describing a property used to evaluate the set of users to whom the permission applies
- @param value           A filtering criteria on the `key` property determining who the permission applies to
- @param accessLevel     What access level to grant
- */
-- (instancetype)initWithRealmPath:(NSString *)path
-                              key:(NSString *)key
-                            value:(NSString *)value
-                      accessLevel:(RLMSyncAccessLevel)accessLevel;
-
-/**
- A key describing a property used to evaluate the set of users to whom these permissions are granted.
- If the sync permission was configured with a user ID, this field will be nil. If this field is not
- nil, `value` is guaranteed to be populated.
- */
-@property (nullable, nonatomic, readonly) NSString *key;
-
-/**
- A value describing a filtering criteria applied to the values of `key` to determine the set of
- users to whom these permissions are granted. If the sync permission was configured with a user ID,
- this field will be nil. If this field is not nil, `key` is guaranteed to be populated.
- */
-@property (nullable, nonatomic, readonly) NSString *value;
-
-/**
- The user ID of the user to whom these permissions are granted. If the sync permission key was configured
- with a key-value pair, this field will be nil.
+ The user ID of the user to whom these permissions are granted.
  */
 @property (nullable, nonatomic, readonly) NSString *userID;
 

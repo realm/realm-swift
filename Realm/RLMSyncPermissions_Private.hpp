@@ -28,17 +28,9 @@
 
 @end
 
+// `RLMSyncPermissionValue` is subclassed so that future types of
+// permission values can be implemented in the future.
 @interface RLMSyncUserIDPermissionValue : RLMSyncPermissionValue
-
-/// :nodoc:
-- (instancetype)init __attribute__((unavailable("This type cannot be created directly")));
-
-/// :nodoc:
-+ (instancetype)new __attribute__((unavailable("This type cannot be created directly")));
-
-@end
-
-@interface RLMSyncKeyValuePermissionValue : RLMSyncPermissionValue
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly")));

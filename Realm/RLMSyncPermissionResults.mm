@@ -19,46 +19,12 @@
 #import "RLMSyncPermissionResults_Private.hpp"
 
 #import "collection_notifications.hpp"
+#import "RLMCollection_Private.hpp"
 #import "RLMSyncPermissions_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMUtil.hpp"
 
 using namespace realm;
-
-@interface RLMSyncPermissionResultsToken() {
-    std::unique_ptr<NotificationToken> _token;
-}
-@end
-
-@implementation RLMSyncPermissionResultsToken
-
-- (void)suppressNextNotification {
-    @throw RLMException(@"RLMPermissionResultsTokens cannot be passed to "
-                        @"the commitWriteTransactionWithoutNotifying: method");
-}
-
-- (void)stop {
-    _token = nil;
-}
-
-- (void)dealloc {
-    if (_token) {
-        NSLog(@"RLMPermissionResultsToken released without unregistering "
-              @"a notification. You must hold on to the token and call "
-              @"-[RLMPermissionResultsToken stop] when you no longer wish "
-              @"to receive notifications.");
-    }
-}
-
-- (instancetype)initWithToken:(NotificationToken)token {
-    if (self = [super init]) {
-        _token = std::make_unique<NotificationToken>(std::move(token));
-        return self;
-    }
-    return nil;
-}
-
-@end
 
 @interface RLMSyncPermissionResults () {
     std::unique_ptr<PermissionResults> _results;
@@ -72,19 +38,19 @@ using namespace realm;
     return _results->size();
 }
 
-- (RLMSyncPermissionResultsToken *)addNotificationBlock:(RLMPermissionStatusBlock)block {
+- (RLMNotificationToken *)addNotificationBlock:(RLMPermissionStatusBlock)block {
     REALM_ASSERT_DEBUG(_results);
     auto token = _results->async(RLMWrapPermissionStatusCallback(block));
-    return [[RLMSyncPermissionResultsToken alloc] initWithToken:std::move(token)];
+    return [[RLMCancellationToken alloc] initWithToken:std::move(token) realm:nil];
 }
 
 - (RLMSyncPermissionValue *)permissionAtIndex:(NSInteger)index {
     REALM_ASSERT_DEBUG(_results);
-    if (index < 0 || (size_t)index >= _results->size()) {
-        @throw RLMException(@"Index out of bounds; index is %@ but the permission results contains %@ objects.",
-                            @(index), @(_results->size()));
+    try {
+        return [[RLMSyncPermissionValue alloc] initWithPermission:_results->get(index)];
+    } catch (std::exception const& ex) {
+        @throw RLMException(ex);
     }
-    return [[RLMSyncPermissionValue alloc] initWithPermission:_results->get(index)];
 }
 
 - (instancetype)initWithResults:(std::unique_ptr<PermissionResults>)results {

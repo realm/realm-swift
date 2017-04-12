@@ -163,7 +163,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
  The results will be returned through the callback block, or an error if the operation fails.
  */
-- (void)retrievePermissions:(RLMPermissionResultsBlock)callback;
+- (void)retrievePermissionsWithCallback:(RLMPermissionResultsBlock)callback;
 
 /**
  Apply a given permission.

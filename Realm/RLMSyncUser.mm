@@ -40,8 +40,7 @@ using PermissionGetCallback = std::function<void(std::unique_ptr<PermissionResul
 
 namespace {
 
-NSError *RLMTranslateExceptionPtrToError(std::exception_ptr ptr, bool get)
-{
+NSError *translateExceptionPtrToError(std::exception_ptr ptr, bool get) {
     NSError *error = nil;
     try {
         std::rethrow_exception(ptr);
@@ -58,11 +57,10 @@ NSError *RLMTranslateExceptionPtrToError(std::exception_ptr ptr, bool get)
     return error;
 }
 
-PermissionGetCallback RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock callback)
-{
+PermissionGetCallback RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock callback) {
     return [callback](std::unique_ptr<PermissionResults> results, std::exception_ptr ptr) {
         if (ptr) {
-            NSError *error = RLMTranslateExceptionPtrToError(std::move(ptr), true);
+            NSError *error = translateExceptionPtrToError(std::move(ptr), true);
             REALM_ASSERT(error);
             callback(nil, error);
         } else {
@@ -74,13 +72,10 @@ PermissionGetCallback RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock
 
 }
 
-namespace realm {
-
-PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBlock callback)
-{
+PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBlock callback) {
     return [callback](std::exception_ptr ptr) {
         if (ptr) {
-            NSError *error = RLMTranslateExceptionPtrToError(std::move(ptr), false);
+            NSError *error = translateExceptionPtrToError(std::move(ptr), false);
             REALM_ASSERT(error);
             callback(error);
         } else {
@@ -88,8 +83,6 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
             callback(nil);
         }
     };
-}
-
 }
 
 @interface RLMSyncUser () {
@@ -276,7 +269,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 
 #pragma mark - Permissions API
 
-- (void)retrievePermissions:(RLMPermissionResultsBlock)callback {
+- (void)retrievePermissionsWithCallback:(RLMPermissionResultsBlock)callback {
     if (!_user || _user->state() == SyncUser::State::Error) {
         // TODO: improve the error
         callback(nullptr, [NSError errorWithDomain:RLMSyncErrorDomain
