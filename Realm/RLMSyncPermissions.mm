@@ -94,7 +94,7 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
 
 @interface RLMSyncPermissionValue () {
 @protected
-    std::unique_ptr<Permission> _underlying;
+    util::Optional<Permission> _underlying;
     RLMSyncAccessLevel _accessLevel;
     NSString *_path;
 }
@@ -132,23 +132,23 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
             @throw RLMException(@"Key-value permissions are not yet supported in Realm Objective-C or Realm Swift.");
             break;
     }
-    _underlying = std::make_unique<Permission>(std::move(permission));
+    _underlying = util::make_optional<Permission>(std::move(permission));
     return self;
 }
 
 - (NSString *)path {
-    if (auto permission = _underlying.get()) {
-        return @(permission->path.c_str());
+    if (!_underlying) {
+        REALM_ASSERT(_path);
+        return _path;
     }
-    REALM_ASSERT(_path);
-    return _path;
+    return @(_underlying->path.c_str());
 }
 
 - (RLMSyncAccessLevel)accessLevel {
-    if (auto permission = _underlying.get()) {
-        return objCAccessLevelForAccessLevel(permission->access);
+    if (!_underlying) {
+        return _accessLevel;
     }
-    return _accessLevel;
+    return objCAccessLevelForAccessLevel(_underlying->access);
 }
 
 - (realm::Permission)rawPermission {
@@ -193,16 +193,17 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
 }
 
 - (NSString *)userID {
-    if (auto permission = _underlying.get()) {
-        REALM_ASSERT(permission->condition.type == ConditionType::UserId);
-        return @(_underlying->condition.user_id.c_str());
+    if (!_underlying) {
+        return _userID;
     }
-    return _userID;
+    REALM_ASSERT(_underlying->condition.type == ConditionType::UserId);
+    return @(_underlying->condition.user_id.c_str());
+
 }
 
 - (realm::Permission)rawPermission {
-    if (auto permission = _underlying.get()) {
-        return *permission;
+    if (_underlying) {
+        return *_underlying;
     }
     return Permission{
         [_path UTF8String],
