@@ -22,39 +22,47 @@
 
 #import "RLMTestUtils.h"
 
-#define PERMISSIONS_SPIN() [self spinOnMainQueue:1.0]
-
-#define CHECK_PERMISSION_COUNT(ma_results, ma_count) {                      \
-    [self spinOnMainQueue:0.20];                                            \
-    XCTAssertEqual(ma_results.count,ma_count,                               \
-                  @"Did not find expected number of permissions");          \
+#define CHECK_PERMISSION_COUNT(ma_results, ma_count) {                                                  \
+    XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission count"];             \
+    id token = [ma_results addNotificationBlock:^(NSError *err) {                                       \
+        XCTAssertNil(err);                                                                              \
+        if (ma_results.count == ma_count) {                                                             \
+            [ex fulfill];                                                                               \
+        }                                                                                               \
+    }];                                                                                                 \
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                              \
 }
 
-#define CHECK_PERMISSION_PRESENT(ma_results, ma_permission) {               \
-    [self spinOnMainQueue:0.20];                                            \
-    BOOL permissionFound = NO;                                              \
-    for (NSInteger i=0; i<ma_results.count; i++) {                          \
-        if ([[ma_results permissionAtIndex:i] isEqual:ma_permission]) {     \
-            permissionFound = YES;                                          \
-            break;                                                          \
-        }                                                                   \
-    }                                                                       \
-    XCTAssertTrue(permissionFound,                                          \
-                  @"Could not find permission %@ (results: %@)",            \
-                  ma_permission, ma_results);                               \
+#define CHECK_PERMISSION_PRESENT(ma_results, ma_permission) {                                           \
+    XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission presence"];          \
+    id token = [ma_results addNotificationBlock:^(NSError *err) {                                       \
+        XCTAssertNil(err);                                                                              \
+        for (NSInteger i=0; i<ma_results.count; i++) {                                                  \
+            if ([[ma_results permissionAtIndex:i] isEqual:ma_permission]) {                             \
+                [ex fulfill];                                                                           \
+                break;                                                                                  \
+            }                                                                                           \
+        }                                                                                               \
+    }];                                                                                                 \
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                              \
 }
 
-#define CHECK_PERMISSION_ABSENT(ma_results, ma_permission) {                \
-    [self spinOnMainQueue:0.20];                                            \
-    BOOL permissionFound = NO;                                              \
-    for (NSInteger i=0; i<ma_results.count; i++) {                          \
-        if ([[ma_results permissionAtIndex:i] isEqual:ma_permission]) {     \
-            permissionFound = YES;                                          \
-            break;                                                          \
-        }                                                                   \
-    }                                                                       \
-    XCTAssertFalse(permissionFound,                                         \
-                   @"Found unexpected permission %@", ma_permission);       \
+#define CHECK_PERMISSION_ABSENT(ma_results, ma_permission) {                                            \
+    XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission absence"];           \
+    id token = [ma_results addNotificationBlock:^(NSError *err) {                                       \
+        XCTAssertNil(err);                                                                              \
+        BOOL isPresent = NO;                                                                            \
+        for (NSInteger i=0; i<ma_results.count; i++) {                                                  \
+            if ([[ma_results permissionAtIndex:i] isEqual:ma_permission]) {                             \
+                isPresent = YES;                                                                        \
+                break;                                                                                  \
+            }                                                                                           \
+        }                                                                                               \
+        if (!isPresent) {                                                                               \
+            [ex fulfill];                                                                               \
+        }                                                                                               \
+    }];                                                                                                 \
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                              \
 }
 
 @interface RLMPermissionsAPITests : RLMSyncTestCase
@@ -66,15 +74,6 @@
 @end
 
 @implementation RLMPermissionsAPITests
-
-- (void)spinOnMainQueue:(NSTimeInterval)timeInterval {
-    XCTestExpectation *ex = [self expectationWithDescription:@"Waiting..."];
-    double ns = ((double)NSEC_PER_SEC) * timeInterval;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)ns), dispatch_get_main_queue(), ^{
-        [ex fulfill];
-    });
-    [self waitForExpectations:@[ex] timeout:5];
-}
 
 - (void)setUp {
     [super setUp];
@@ -276,9 +275,6 @@
         [ex2 fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
-    // Wait for server to make any change and propagate it back to the client.
-    PERMISSIONS_SPIN();
 
     // Now retrieve the permissions again and make sure the new permission was not set.
     XCTestExpectation *ex3 = [self expectationWithDescription:@"One permission after setting the permission."];
