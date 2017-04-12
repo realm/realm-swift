@@ -18,6 +18,7 @@
 
 #import "RLMSyncUtil_Private.h"
 
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMSyncConfiguration_Private.h"
 
 #import "sync/sync_manager.hpp"

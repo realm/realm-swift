@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMMultiProcessTestCase.h"
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMSyncConfiguration_Private.h"
 
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);

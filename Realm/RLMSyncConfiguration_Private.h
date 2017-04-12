@@ -20,15 +20,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, RLMSyncStopPolicy) {
-    RLMSyncStopPolicyImmediately,
-    RLMSyncStopPolicyLiveIndefinitely,
-    RLMSyncStopPolicyAfterChangesUploaded,
-};
-
 @interface RLMSyncConfiguration ()
-
-@property (nonatomic, readwrite) RLMSyncStopPolicy stopPolicy;
 
 // Internal-only APIs
 @property (nullable, nonatomic) NSURL *customFileURL;
