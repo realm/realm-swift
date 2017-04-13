@@ -29,7 +29,6 @@
 #import "RLMProperty.h"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
-#import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
@@ -200,7 +199,8 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
                                    callback:(RLMAsynchronouslyOpenRealmCallback)callback {
     __block NSError *error = nil;
     RLMRealm *realmStrongRef = nil;
-    if (configuration.syncConfiguration) {
+    bool hasSyncConfig = (configuration.config.sync_config != nullptr);
+    if (hasSyncConfig) {
         realmStrongRef = [RLMRealm uncachedSchemalessRealmWithConfiguration:configuration error:&error];
         if (error) {
             dispatch_async(callbackQueue, ^{
@@ -215,7 +215,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
             RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
             if (realm && !error) {
                 auto session = sync_session_for_realm(realm);
-                if (!configuration.syncConfiguration || !session) {
+                if (!hasSyncConfig || !session) {
                     // Default behavior: just dispatch onto the destination queue and open the Realm.
                     dispatch_async(callbackQueue, ^{
                         @autoreleasepool {
