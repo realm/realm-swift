@@ -20,7 +20,6 @@
 
 #import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
-#import "RLMRealmConfiguration_Private.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncSessionRefreshHandle.hpp"

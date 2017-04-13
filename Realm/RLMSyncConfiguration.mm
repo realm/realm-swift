@@ -72,6 +72,8 @@ static BOOL isValidRealmURL(NSURL *url) {
 
 @implementation RLMSyncConfiguration
 
+@dynamic stopPolicy;
+
 - (instancetype)initWithRawConfig:(realm::SyncConfig)config {
     if (self = [super init]) {
         _config = std::make_unique<realm::SyncConfig>(config);
