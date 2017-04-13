@@ -347,6 +347,16 @@
     // Successful open
     c.readOnly = false;
     ex = [self expectationWithDescription:@"open-async"];
+
+    // Hold exclusive lock on lock file to prevent Realm from being created
+    // if the dispatch_async happens too quickly
+    NSString *lockFilePath = [c.pathOnDisk stringByAppendingString:@".lock"];
+    [[NSFileManager defaultManager] createFileAtPath:lockFilePath contents:[NSData data] attributes:nil];
+    int fd = open(lockFilePath.UTF8String, O_RDWR);
+    XCTAssertNotEqual(-1, fd);
+    int ret = flock(fd, LOCK_SH);
+    XCTAssertEqual(0, ret);
+
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
@@ -355,6 +365,8 @@
         XCTAssertNotNil(realm);
     }];
     XCTAssertFalse(fileExists());
+    flock(fd, LOCK_UN);
+    close(fd);
     assertNoCachedRealm();
     [self waitForExpectationsWithTimeout:1 handler:nil];
     XCTAssertTrue(fileExists());
