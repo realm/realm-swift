@@ -996,6 +996,7 @@ case "$COMMAND" in
     "cocoapods-setup")
         if ! [ -z "${REALM_DISABLE_SYNC}" ]; then
           touch Realm/RLMPlatform.h
+          sed -i.bak '/Sync/d' Realm/Realm.h
           exit 0
         fi
 
