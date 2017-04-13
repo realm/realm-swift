@@ -31,4 +31,3 @@ FOUNDATION_EXTERN void RLMAssertThrowsWithReasonMatching(XCTestCase *self,
                                       NSString *fileName, NSUInteger lineNumber);
 
 FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
-

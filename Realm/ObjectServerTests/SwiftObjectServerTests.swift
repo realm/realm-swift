@@ -185,7 +185,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     }
                 }
                 waitForUploads(for: user, url: realmURL)
-                checkCount(expected:bigObjectCount, realm, SwiftHugeSyncObject.self)
+                checkCount(expected: bigObjectCount, realm, SwiftHugeSyncObject.self)
             }
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")

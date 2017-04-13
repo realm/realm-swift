@@ -743,7 +743,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         _collectionEnumerators = [NSHashTable hashTableWithOptions:NSPointerFunctionsWeakMemory];
     }
     [_collectionEnumerators addObject:enumerator];
-
 }
 
 - (void)unregisterEnumerator:(RLMFastEnumerator *)enumerator {
