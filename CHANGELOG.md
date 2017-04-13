@@ -9,6 +9,12 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Add a `{RLM}SyncUser.isAdmin` property indicating whether a user is a Realm
   Object Server administrator.
+* Add an API to asynchronously open a Realm and deliver it to a block on a
+  given queue. This performs all work needed to get the Realm to
+  a usable state (such as running potentially time-consuming migrations) on a
+  background thread before dispatching to the given queue. In addition,
+  synchronized Realms wait for all remote content available at the time the
+  operation began to be downloaded and available locally.
 
 ### Bugfixes
 
