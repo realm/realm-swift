@@ -326,8 +326,10 @@ download_common() {
     
     if [ "$download_type" == "core" ]; then
         version=$REALM_CORE_VERSION
+        url="https://static.realm.io/downloads/core/realm-core-${version}.tar.xz"
     elif [ "$download_type" == "sync" ]; then
         version=$REALM_SYNC_VERSION
+        url="https://static.realm.io/downloads/sync/realm-sync-cocoa-${version}.tar.xz"
     else
         echo "Unknown dowload_type: $download_type"
         exit 1
@@ -340,11 +342,9 @@ download_common() {
     fi
     temp_dir=$(dirname "$TMPDIR/waste")/core_bin
     mkdir -p "$temp_dir"
-    
     temp_path="${temp_dir}/${download_type}-${version}.tar.xz.tmp"
     tar_path="${temp_dir}/${download_type}-${version}.tar.xz"
-    url="https://static.realm.io/downloads/${download_type}/realm-${download_type}-${version}.tar.xz"
-    
+        
     while [ 0 -lt $tries_left ] && [ ! -f "$tar_path" ]; do
         if ! error=$(curl --fail --silent --show-error --location "$url" --output "$temp_path" 2>&1); then
             tries_left=$[$tries_left-1]
