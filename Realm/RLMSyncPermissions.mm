@@ -212,6 +212,10 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
     };
 }
 
+- (NSUInteger)hash {
+    return [self.userID hash] ^ self.accessLevel;
+}
+
 - (BOOL)isEqual:(id)object {
     if ([object isKindOfClass:[RLMSyncUserIDPermissionValue class]]) {
         RLMSyncUserIDPermissionValue *that = (RLMSyncUserIDPermissionValue *)object;
