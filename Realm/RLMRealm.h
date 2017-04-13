@@ -21,6 +21,11 @@
 
 @class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference;
 
+/**
+ A callback block for opening Realms asynchronously.
+
+ Returns the Realm if the open was successful, or an error otherwise.
+ */
 typedef void(^RLMAsynchronouslyOpenRealmCallback)(RLMRealm * _Nullable realm, NSError * _Nullable error);
 
 NS_ASSUME_NONNULL_BEGIN
