@@ -325,8 +325,8 @@
 
     // Helpers
     auto assertNoCachedRealm = ^{ XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String)); };
-    auto assertFileExists = ^(bool exists){
-        XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil] == exists);
+    auto fileExists = ^BOOL() {
+        return [[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil];
     };
 
     // Unsuccessful open
@@ -338,10 +338,10 @@
         XCTAssertEqual(error.code, RLMErrorFileNotFound);
         XCTAssertNil(realm);
     }];
-    assertFileExists(false);
+    XCTAssertFalse(fileExists());
     assertNoCachedRealm();
     [self waitForExpectationsWithTimeout:1 handler:nil];
-    assertFileExists(false);
+    XCTAssertFalse(fileExists());
     assertNoCachedRealm();
 
     // Successful open
@@ -354,10 +354,10 @@
         XCTAssertNil(error);
         XCTAssertNotNil(realm);
     }];
-    assertFileExists(false);
+    XCTAssertFalse(fileExists());
     assertNoCachedRealm();
     [self waitForExpectationsWithTimeout:1 handler:nil];
-    assertFileExists(true);
+    XCTAssertTrue(fileExists());
     assertNoCachedRealm();
 }
 
