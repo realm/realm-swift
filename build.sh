@@ -322,65 +322,81 @@ download_object_server() {
 }
 
 download_core() {
+    local tries_left=3 core_url error temp_dir temp_path tar_path
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
-    TMP_DIR="$TMPDIR/core_bin"
-    mkdir -p "${TMP_DIR}"
-    CORE_TMP_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.xz.tmp"
-    CORE_TAR="${TMP_DIR}/core-${REALM_CORE_VERSION}.tar.xz"
-    if [ ! -f "${CORE_TAR}" ]; then
-        local CORE_URL="https://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.xz"
-        set +e # temporarily disable immediate exit
-        local ERROR # sweeps the exit code unless declared separately
-        ERROR=$(curl --fail --silent --show-error --location "$CORE_URL" --output "${CORE_TMP_TAR}" 2>&1 >/dev/null)
-        if [[ $? -ne 0 ]]; then
-            echo "Downloading core failed:\n${ERROR}"
-            exit 1
-        fi
-        set -e # re-enable flag
-        mv "${CORE_TMP_TAR}" "${CORE_TAR}"
+    
+    if [ -z "$TMPDIR" ];
+        TMPDIR='/tmp'
     fi
-
+    temp_dir=$(dirname "$TMPDIR/waste")/core_bin
+    mkdir -p "$temp_dir"
+    
+    temp_path="${temp_dir}/core-${REALM_CORE_VERSION}.tar.xz.tmp"
+    tar_path="${temp_dir}/core-${REALM_CORE_VERSION}.tar.xz"
+    core_url="https://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.xz"
+    
+    while [ 0 -lt $tries_left ] && [ ! -f "$tar_path" ]; do
+        if ! error=$(curl --fail --silent --show-error --location "$core_url" --output "$temp_path" 2>&1); then
+            tries_left=$[$tries_left-1]
+        else
+            mv "$temp_path" "$tar_path"
+        fi
+    done
+    
+    if [ ! -f $tar_path ]; then
+        printf "Downloading core failed:\n\t$core_url\n\t$error\n"
+        exit 1
+    fi
+    
     (
-        cd "${TMP_DIR}"
+        cd "$temp_dir"
         rm -rf core
-        tar xf "${CORE_TAR}" --xz
+        tar xf "${tar_path}" --xz
         mv core core-${REALM_CORE_VERSION}
     )
 
     rm -rf core-${REALM_CORE_VERSION} core
-    mv ${TMP_DIR}/core-${REALM_CORE_VERSION} .
+    mv ${temp_dir}/core-${REALM_CORE_VERSION} .
     ln -s core-${REALM_CORE_VERSION} core
 }
 
 download_sync() {
+    local tries_left=3 sync_url error temp_dir temp_path tar_path
     echo "Downloading dependency: sync ${REALM_SYNC_VERSION}"
-    TMP_DIR="$TMPDIR/sync_bin"
-    mkdir -p "${TMP_DIR}"
-    SYNC_TMP_TAR="${TMP_DIR}/sync-${REALM_SYNC_VERSION}.tar.xz.tmp"
-    SYNC_TAR="${TMP_DIR}/sync-${REALM_SYNC_VERSION}.tar.xz"
-    if [ ! -f "${SYNC_TAR}" ]; then
-        local SYNC_URL="https://static.realm.io/downloads/sync/realm-sync-cocoa-${REALM_SYNC_VERSION}.tar.xz"
-        set +e # temporarily disable immediate exit
-        local ERROR # sweeps the exit code unless declared separately
-        ERROR=$(curl --fail --silent --show-error --location "$SYNC_URL" --output "${SYNC_TMP_TAR}" 2>&1 >/dev/null)
-        if [[ $? -ne 0 ]]; then
-            echo "Downloading sync failed:\n${ERROR}"
-            exit 1
+    
+    if [ -z "$TMPDIR" ];
+        TMPDIR='/tmp'
+    fi
+    temp_dir=$(dirname "$TMPDIR/waste")/sync_bin
+    mkdir -p "$temp_dir"
+    
+    temp_path="${temp_dir}/sync-${REALM_SYNC_VERSION}.tar.xz.tmp"
+    tar_path="${temp_dir}/sync-${REALM_SYNC_VERSION}.tar.xz"
+    sync_url="https://static.realm.io/downloads/sync/realm-sync-cocoa-${REALM_SYNC_VERSION}.tar.xz"
+    
+    while [ 0 -lt $tries_left ] && [ ! -f "$tar_path" ]; do
+        if ! error=$(curl --fail --silent --show-error --location "$sync_url" --output "$temp_path" 2>&1); then
+            tries_left=$[$tries_left-1]
+        else
+            mv "$temp_path" "$tar_path"
         fi
-        set -e # re-enable flag
-        mv "${SYNC_TMP_TAR}" "${SYNC_TAR}"
+    done
+    
+    if [ ! -f $tar_path ]; then
+        printf "Downloading sync failed:\n\t$sync_url\n\t$error\n"
+        exit 1
     fi
 
     (
-        cd "${TMP_DIR}"
+        cd "$temp_dir"
         rm -rf sync
-        tar xf "${SYNC_TAR}" --xz
+        tar xf "$tar_path" --xz
         mv core sync-${REALM_SYNC_VERSION}
     )
 
     rm -rf sync-${REALM_SYNC_VERSION} core
-    mv ${TMP_DIR}/sync-${REALM_SYNC_VERSION} .
-    ln -s sync-${REALM_SYNC_VERSION} core
+    mv "${temp_dir}/sync-${REALM_SYNC_VERSION}" .
+    ln -s "sync-${REALM_SYNC_VERSION}" core
 }
 
 ######################################
