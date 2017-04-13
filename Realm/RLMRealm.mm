@@ -59,7 +59,6 @@ using util::File;
 
 @interface RLMRealm ()
 @property (nonatomic, strong) NSHashTable<RLMRealmNotificationToken *> *notificationHandlers;
-@property (class, nonatomic, readonly) dispatch_queue_t asyncOpenDispatchQueue;
 - (void)sendNotifications:(RLMNotification)notification;
 @end
 
@@ -185,11 +184,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 
-+ (dispatch_queue_t)asyncOpenDispatchQueue {
-    static dispatch_queue_t queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue", DISPATCH_QUEUE_CONCURRENT);
-    return queue;
-}
-
 + (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                      callbackQueue:(dispatch_queue_t)callbackQueue
                           callback:(RLMAsynchronouslyOpenRealmCallback)callback {
@@ -205,7 +199,8 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
             return;
         }
     }
-    dispatch_async(self.asyncOpenDispatchQueue, ^{
+    static dispatch_queue_t queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue", DISPATCH_QUEUE_CONCURRENT);
+    dispatch_async(queue, ^{
         (void)realmStrongRef;
         @autoreleasepool {
             RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
