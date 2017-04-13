@@ -105,7 +105,7 @@ std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm)
         SyncConfig config = [syncConfig rawConfiguration];
         std::shared_ptr<SyncUser> user = config.user;
         if (user && user->state() != SyncUser::State::Error) {
-            NSString *path = [realmConfig.fileURL absoluteString];
+            NSString *path = realmConfig.pathOnDisk;
             REALM_ASSERT(path);
             return user->session_for_on_disk_path([path UTF8String]);
         }
