@@ -93,18 +93,18 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)realmWithURL:(NSURL *)fileURL;
 
 /**
- Open a Realm asynchronously on a side queue, and then invoke a callback upon either
- success or failure.
+ Open a Realm asynchronously on a background queue, and then invoke a callback
+ on success or failure.
 
  Opening a Realm asynchronously may be useful if, for example, a time-consuming
- migration might be necessary. As well, if synchronized Realms are supported,
- the callback block will only be called once the Realm has successfully downloaded
- a set of changes.
+ migration might be necessary. If `configuration.syncConfiguration` is set, the
+ callback block will only be called after the Realm has successfully downloaded
+ its remote content available at the time the operation began.
 
- @param configuration A configuration object to use when creating the Realm.
+ @param configuration A configuration object to use when opening the Realm.
  @param queue         The dispatch queue on which the callback should be run.
- @param callback      A callback block. If the Realm was successfully opened, an
-                      opened Realm will be passed in as an argument.
+ @param callback      A callback block. If the Realm was successfully opened,
+                      it will be passed in as an argument.
                       Otherwise, an `NSError` describing what went wrong will be
                       passed to the block instead.
  */
