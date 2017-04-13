@@ -899,21 +899,17 @@
         RLMProgressNotificationToken *token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionDownload
                                                                                       mode:RLMSyncProgressReportIndefinitely
                                                                                      block:^(NSUInteger xfr, NSUInteger xfb) {
-                                                                                         // Make sure the values are
-                                                                                         // increasing, and update our
-                                                                                         // stored copies.
-                                                                                         XCTAssert(xfr >= transferred);
-                                                                                         XCTAssert(xfb >= transferrable);
-                                                                                         transferred = xfr;
-                                                                                         transferrable = xfb;
-                                                                                         callCount++;
-                                                                                         if (transferrable > 0
-                                                                                             && transferred >= transferrable
-                                                                                             && !hasBeenFulfilled) {
-                                                                                             [ex fulfill];
-                                                                                             hasBeenFulfilled = YES;
-                                                                                         }
-                                                                                     }];
+            // Make sure the values are increasing, and update our stored copies.
+            XCTAssert(xfr >= transferred);
+            XCTAssert(xfb >= transferrable);
+            transferred = xfr;
+            transferrable = xfb;
+            callCount++;
+            if (transferrable > 0 && transferred >= transferrable && !hasBeenFulfilled) {
+                [ex fulfill];
+                hasBeenFulfilled = YES;
+            }
+        }];
         // Wait for the child process to upload everything.
         RLMRunChildAndWait();
         [self waitForExpectationsWithTimeout:10.0 handler:nil];
