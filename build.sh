@@ -325,7 +325,7 @@ download_core() {
     local tries_left=3 core_url error temp_dir temp_path tar_path
     echo "Downloading dependency: core ${REALM_CORE_VERSION}"
     
-    if [ -z "$TMPDIR" ];
+    if [ -z "$TMPDIR" ]; then
         TMPDIR='/tmp'
     fi
     temp_dir=$(dirname "$TMPDIR/waste")/core_bin
@@ -364,7 +364,7 @@ download_sync() {
     local tries_left=3 sync_url error temp_dir temp_path tar_path
     echo "Downloading dependency: sync ${REALM_SYNC_VERSION}"
     
-    if [ -z "$TMPDIR" ];
+    if [ -z "$TMPDIR" ]; then
         TMPDIR='/tmp'
     fi
     temp_dir=$(dirname "$TMPDIR/waste")/sync_bin
