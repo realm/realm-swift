@@ -61,17 +61,47 @@ using namespace realm;
     return self;
 }
 
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(id __unsafe_unretained [])buffer
+                                    count:(NSUInteger)len {
+    NSUInteger thisSize = self.count;
+    if (state->state == 0) {
+        state->extra[0] = 0;
+        state->extra[1] = (long)thisSize;
+        state->state = 1;
+    }
+    NSUInteger objectsInBuffer = 0;
+    long idx = state->extra[0];
+    if ((unsigned long)idx == thisSize) {
+        // finished
+        return 0;
+    }
+    state->itemsPtr = buffer;
+    state->mutationsPtr = state->extra + 1;
+    while (true) {
+        if (objectsInBuffer == len) {
+            // Buffer is full.
+            state->extra[0] = idx;
+            return objectsInBuffer;
+        }
+        if ((unsigned long)idx == thisSize) {
+            // finished
+            state->extra[0] = idx;
+            return objectsInBuffer;
+        }
+        // Otherwise, add an object and advance the index pointer.
+        RLMSyncPermissionValue * __autoreleasing thisPermission = [self permissionAtIndex:idx];
+        buffer[objectsInBuffer] = thisPermission;
+        idx++;
+        objectsInBuffer++;
+    }
+}
+
 - (NSString *)description {
-    constexpr int NUMBER_OF_ITEMS = 4;
-    NSMutableString *base = [NSMutableString stringWithFormat:@"<RLMSyncPermissionResults> (%@ items)", @(self.count)];
-    // Stick the first few items in the description.
-    for (NSInteger i=0; i<MIN(self.count, NUMBER_OF_ITEMS); i++) {
-        [base appendFormat:@"\n    [%@]: %@", @(i), [self permissionAtIndex:i]];
-    }
-    if (self.count > NUMBER_OF_ITEMS) {
-        [base appendFormat:@"\n    (%@ additional items...)", @(self.count - NUMBER_OF_ITEMS)];
-    }
-    return base;
+    // FIXME: rather than force-casting to a protocol we don't formally implement,
+    // we should change RLMDescriptionWithMaxDepth to take a less restrictive
+    // collection type.
+    return RLMDescriptionWithMaxDepth(@"RLMSyncPermissionResults", (id<RLMCollection>)self, 1);
 }
 
 @end

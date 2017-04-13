@@ -29,7 +29,7 @@
  Permissions results objects are thread-confined, and should not be shared across
  threads.
  */
-@interface RLMSyncPermissionResults : NSObject
+@interface RLMSyncPermissionResults : NSObject<NSFastEnumeration>
 
 /// The number of results contained within the object.
 @property (nonatomic, readonly) NSInteger count;

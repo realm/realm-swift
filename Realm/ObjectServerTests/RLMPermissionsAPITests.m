@@ -22,47 +22,50 @@
 
 #import "RLMTestUtils.h"
 
-#define CHECK_PERMISSION_COUNT(ma_results, ma_count) {                                                  \
-    XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission count"];             \
-    id token = [ma_results addNotificationBlock:^(NSError *err) {                                       \
-        XCTAssertNil(err);                                                                              \
-        if (ma_results.count == ma_count) {                                                             \
-            [ex fulfill];                                                                               \
-        }                                                                                               \
-    }];                                                                                                 \
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                              \
+#define CHECK_PERMISSION_COUNT(ma_results, ma_count) {                                                                 \
+    XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission count"];                            \
+    __weak typeof(ma_results) weakResults = ma_results;                                                                \
+    __attribute__((objc_precise_lifetime))id token = [ma_results addNotificationBlock:^(NSError *err) {                \
+        XCTAssertNil(err);                                                                                             \
+        if (weakResults.count == ma_count) {                                                                           \
+            [ex fulfill];                                                                                              \
+        }                                                                                                              \
+    }];                                                                                                                \
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                                             \
 }
 
-#define CHECK_PERMISSION_PRESENT(ma_results, ma_permission) {                                           \
-    XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission presence"];          \
-    id token = [ma_results addNotificationBlock:^(NSError *err) {                                       \
-        XCTAssertNil(err);                                                                              \
-        for (NSInteger i=0; i<ma_results.count; i++) {                                                  \
-            if ([[ma_results permissionAtIndex:i] isEqual:ma_permission]) {                             \
-                [ex fulfill];                                                                           \
-                break;                                                                                  \
-            }                                                                                           \
-        }                                                                                               \
-    }];                                                                                                 \
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                              \
+#define CHECK_PERMISSION_PRESENT(ma_results, ma_permission) {                                                          \
+    XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission presence"];                         \
+    __weak typeof(ma_results) weakResults = ma_results;                                                                \
+    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(NSError *err) {               \
+        XCTAssertNil(err);                                                                                             \
+        for (NSInteger i=0; i<weakResults.count; i++) {                                                                \
+            if ([[weakResults permissionAtIndex:i] isEqual:ma_permission]) {                                           \
+                [ex fulfill];                                                                                          \
+                break;                                                                                                 \
+            }                                                                                                          \
+        }                                                                                                              \
+    }];                                                                                                                \
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                                             \
 }
 
-#define CHECK_PERMISSION_ABSENT(ma_results, ma_permission) {                                            \
-    XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission absence"];           \
-    id token = [ma_results addNotificationBlock:^(NSError *err) {                                       \
-        XCTAssertNil(err);                                                                              \
-        BOOL isPresent = NO;                                                                            \
-        for (NSInteger i=0; i<ma_results.count; i++) {                                                  \
-            if ([[ma_results permissionAtIndex:i] isEqual:ma_permission]) {                             \
-                isPresent = YES;                                                                        \
-                break;                                                                                  \
-            }                                                                                           \
-        }                                                                                               \
-        if (!isPresent) {                                                                               \
-            [ex fulfill];                                                                               \
-        }                                                                                               \
-    }];                                                                                                 \
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                              \
+#define CHECK_PERMISSION_ABSENT(ma_results, ma_permission) {                                                           \
+    XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission absence"];                          \
+    __weak typeof(ma_results) weakResults = ma_results;                                                                \
+    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(NSError *err) {               \
+        XCTAssertNil(err);                                                                                             \
+        BOOL isPresent = NO;                                                                                           \
+        for (NSInteger i=0; i<weakResults.count; i++) {                                                                \
+            if ([[weakResults permissionAtIndex:i] isEqual:ma_permission]) {                                           \
+                isPresent = YES;                                                                                       \
+                break;                                                                                                 \
+            }                                                                                                          \
+        }                                                                                                              \
+        if (!isPresent) {                                                                                              \
+            [ex fulfill];                                                                                              \
+        }                                                                                                              \
+    }];                                                                                                                \
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                                             \
 }
 
 @interface RLMPermissionsAPITests : RLMSyncTestCase
