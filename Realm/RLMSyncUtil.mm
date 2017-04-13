@@ -28,6 +28,8 @@
 #import "RLMSyncPermissionOffer.h"
 #import "RLMSyncPermissionOfferResponse.h"
 
+#import "shared_realm.hpp"
+
 #import "sync/sync_user.hpp"
 
 static RLMRealmConfiguration *RLMRealmSpecialPurposeConfiguration(RLMSyncUser *user, NSString *realmName) {
@@ -100,14 +102,11 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy)
 
 std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm)
 {
-    RLMRealmConfiguration *realmConfig = realm.configuration;
-    if (RLMSyncConfiguration *syncConfig = realmConfig.syncConfiguration) {
-        SyncConfig config = [syncConfig rawConfiguration];
-        std::shared_ptr<SyncUser> user = config.user;
+    Realm::Config realmConfig = realm.configuration.config;
+    if (auto config = realmConfig.sync_config) {
+        std::shared_ptr<SyncUser> user = config->user;
         if (user && user->state() != SyncUser::State::Error) {
-            NSString *path = realmConfig.pathOnDisk;
-            REALM_ASSERT(path);
-            return user->session_for_on_disk_path([path UTF8String]);
+            return user->session_for_on_disk_path(realmConfig.path);
         }
     }
     return nullptr;
