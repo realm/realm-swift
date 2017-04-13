@@ -997,6 +997,7 @@ case "$COMMAND" in
         if ! [ -z "${REALM_DISABLE_SYNC}" ]; then
           touch Realm/RLMPlatform.h
           sed -i.bak '/Sync/d' Realm/Realm.h
+          sed -i.bak '/Sync/d' Realm/Realm.modulemap
           exit 0
         fi
 
