@@ -102,14 +102,14 @@ NS_ASSUME_NONNULL_BEGIN
  its remote content available at the time the operation began.
 
  @param configuration A configuration object to use when opening the Realm.
- @param queue         The dispatch queue on which the callback should be run.
+ @param callbackQueue The dispatch queue on which the callback should be run.
  @param callback      A callback block. If the Realm was successfully opened,
                       it will be passed in as an argument.
                       Otherwise, an `NSError` describing what went wrong will be
                       passed to the block instead.
  */
 + (void)openAsynchronouslyWithConfiguration:(RLMRealmConfiguration *)configuration
-                                      queue:(dispatch_queue_t)queue
+                              callbackQueue:(dispatch_queue_t)callbackQueue
                                    callback:(RLMAsynchronouslyOpenRealmCallback)callback;
 
 /**

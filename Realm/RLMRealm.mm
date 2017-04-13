@@ -196,7 +196,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 }
 
 + (void)openAsynchronouslyWithConfiguration:(RLMRealmConfiguration *)configuration
-                                      queue:(dispatch_queue_t)queue
+                              callbackQueue:(dispatch_queue_t)callbackQueue
                                    callback:(RLMAsynchronouslyOpenRealmCallback)callback {
     dispatch_async(self.asyncOpenDispatchQueue, ^{
         NSError *error = nil;
@@ -206,7 +206,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
                 auto session = sync_session_for_realm(realm);
                 if (!configuration.syncConfiguration || !session) {
                     // Default behavior: just dispatch onto the destination queue and open the Realm.
-                    dispatch_async(queue, ^{
+                    dispatch_async(callbackQueue, ^{
                         @autoreleasepool {
                             NSError *error = nil;
                             RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
@@ -216,7 +216,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
                     return;
                 }
                 session->wait_for_download_completion([=](std::error_code error) {
-                    dispatch_async(queue, ^{
+                    dispatch_async(callbackQueue, ^{
                         NSError *err = nil;
                         if (error == std::error_code{}) {
                             // Success
@@ -237,7 +237,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
                     });
                 });
             } else {
-                dispatch_async(queue, ^{
+                dispatch_async(callbackQueue, ^{
                     callback(nil, error);
                 });
             }
