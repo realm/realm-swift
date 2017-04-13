@@ -186,11 +186,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 }
 
 + (dispatch_queue_t)asyncOpenDispatchQueue {
-    static dispatch_queue_t queue;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue", DISPATCH_QUEUE_CONCURRENT);
-    });
+    static dispatch_queue_t queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue", DISPATCH_QUEUE_CONCURRENT);
     return queue;
 }
 
@@ -213,45 +209,45 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
         (void)realmStrongRef;
         @autoreleasepool {
             RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
-            if (realm && !error) {
-                auto session = sync_session_for_realm(realm);
-                if (!hasSyncConfig || !session) {
-                    // Default behavior: just dispatch onto the destination queue and open the Realm.
-                    dispatch_async(callbackQueue, ^{
-                        @autoreleasepool {
-                            NSError *error = nil;
-                            RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
-                            callback(localRealm, error);
-                        }
-                    });
-                    return;
-                }
-                session->wait_for_download_completion([=,session=session](std::error_code error) {
-                    dispatch_async(callbackQueue, ^{
-                        NSError *err = nil;
-                        if (error == std::error_code{}) {
-                            // Success
-                            @autoreleasepool {
-                                // Try opening the Realm on the destination queue.
-                                RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&err];
-                                callback(localRealm, err);
-                            }
-                        } else {
-                            // Failure
-                            // FIXME: we need a less ad-hoc way to turn error codes into NSErrors.
-                            err = [NSError errorWithDomain:RLMSyncErrorDomain
-                                                      code:RLMSyncErrorClientInternalError
-                                                  userInfo:@{@"underlying": @(error.value()),
-                                                             @"message": @(error.message().c_str())}];
-                            callback(nil, err);
-                        }
-                    });
-                });
-            } else {
+            if (!realm || error) {
                 dispatch_async(callbackQueue, ^{
                     callback(nil, error);
                 });
+                return;
             }
+            auto session = sync_session_for_realm(realm);
+            if (!hasSyncConfig || !session) {
+                // Default behavior: just dispatch onto the destination queue and open the Realm.
+                dispatch_async(callbackQueue, ^{
+                    @autoreleasepool {
+                        NSError *error = nil;
+                        RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
+                        callback(localRealm, error);
+                    }
+                });
+                return;
+            }
+            session->wait_for_download_completion([=](std::error_code error) {
+                dispatch_async(callbackQueue, ^{
+                    NSError *err = nil;
+                    if (error == std::error_code{}) {
+                        // Success
+                        @autoreleasepool {
+                            // Try opening the Realm on the destination queue.
+                            RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&err];
+                            callback(localRealm, err);
+                        }
+                    } else {
+                        // Failure
+                        // FIXME: we need a less ad-hoc way to turn error codes into NSErrors.
+                        err = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                  code:RLMSyncErrorClientInternalError
+                                              userInfo:@{@"underlying": @(error.value()),
+                                                         @"message": @(error.message().c_str())}];
+                        callback(nil, err);
+                    }
+                });
+            });
         }
     });
 }

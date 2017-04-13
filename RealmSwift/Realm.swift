@@ -96,13 +96,13 @@ public final class Realm {
     // MARK: Async
 
     /**
-     Open a Realm asynchronously on a background queue, and then invoke a callback
-     on success or failure.
+     Asynchronously open a Realm and deliver it to a block on the given queue.
 
-     Opening a Realm asynchronously may be useful if, for example, a time-consuming
-     migration might be necessary. If `configuration.syncConfiguration` is set, the
-     callback block will only be called after the Realm has successfully downloaded
-     its remote content available at the time the operation began.
+     Opening a Realm asynchronously will perform all work needed to get the Realm to
+     a usable state (such as running potentially time-consuming migrations) on a
+     background thread before dispatching to the given queue. In addition,
+     synchronized Realms wait for all remote content available at the time the
+     operation began to be downloaded and available locally.
 
      - parameter configuration: A configuration object to use when opening the Realm.
      - parameter callbackQueue: The dispatch queue on which the callback should be run.
