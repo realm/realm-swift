@@ -22,6 +22,7 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Dynamic.h"
 #import "RLMSchema_Private.h"
+#import "RLMRealmUtil.hpp"
 
 #import <mach/mach_init.h>
 #import <mach/vm_map.h>
@@ -316,6 +317,49 @@
     }
 }
 #endif
+
+- (void)testOpenAsync {
+    // Locals
+    RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
+    XCTestExpectation *ex = [self expectationWithDescription:@"open-async"];
+
+    // Helpers
+    auto assertNoCachedRealm = ^{ XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String)); };
+    auto assertFileExists = ^(bool exists){
+        XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil] == exists);
+    };
+
+    // Unsuccessful open
+    c.readOnly = true;
+    [RLMRealm openAsynchronouslyWithConfiguration:c
+                                    callbackQueue:dispatch_get_main_queue()
+                                         callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+        [ex fulfill];
+        XCTAssertEqual(error.code, RLMErrorFileNotFound);
+        XCTAssertNil(realm);
+    }];
+    assertFileExists(false);
+    assertNoCachedRealm();
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+    assertFileExists(false);
+    assertNoCachedRealm();
+
+    // Successful open
+    c.readOnly = false;
+    ex = [self expectationWithDescription:@"open-async"];
+    [RLMRealm openAsynchronouslyWithConfiguration:c
+                                    callbackQueue:dispatch_get_main_queue()
+                                         callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+        [ex fulfill];
+        XCTAssertNil(error);
+        XCTAssertNotNil(realm);
+    }];
+    assertFileExists(false);
+    assertNoCachedRealm();
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+    assertFileExists(true);
+    assertNoCachedRealm();
+}
 
 #pragma mark - Adding and Removing Objects
 
