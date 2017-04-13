@@ -97,9 +97,9 @@ NS_ASSUME_NONNULL_BEGIN
  success or failure.
 
  Opening a Realm asynchronously may be useful if, for example, a time-consuming
- migration might be necessary. As well, if synchronized Realms are supported and the
- `waitForServerChanges` flag is set on the sync configuration, the callback block
- will only be called once the Realm has successfully downloaded a set of changes.
+ migration might be necessary. As well, if synchronized Realms are supported,
+ the callback block will only be called once the Realm has successfully downloaded
+ a set of changes.
 
  @param configuration A configuration object to use when creating the Realm.
  @param queue         The dispatch queue on which the callback should be run.
