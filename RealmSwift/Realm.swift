@@ -93,6 +93,33 @@ public final class Realm {
         try self.init(configuration: configuration)
     }
 
+    // MARK: Async
+
+    /**
+     Open a Realm asynchronously on a background queue, and then invoke a callback
+     on success or failure.
+
+     Opening a Realm asynchronously may be useful if, for example, a time-consuming
+     migration might be necessary. If `configuration.syncConfiguration` is set, the
+     callback block will only be called after the Realm has successfully downloaded
+     its remote content available at the time the operation began.
+
+     - parameter configuration: A configuration object to use when opening the Realm.
+     - parameter callbackQueue: The dispatch queue on which the callback should be run.
+     - parameter callback:      A callback block. If the Realm was successfully opened, an
+                                it will be passed in as an argument.
+                                Otherwise, a `Realm.Error` describing what went wrong will be
+                                passed to the block instead.
+     */
+    public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration,
+                                 callbackQueue: DispatchQueue = .main,
+                                 callback: @escaping (Realm?, Realm.Error?) -> Void) {
+        RLMRealm.openAsynchronously(with: configuration.rlmConfiguration,
+                                    callbackQueue: callbackQueue) { rlmRealm, nsError in
+            callback(rlmRealm.flatMap(Realm.init), nsError as! Realm.Error?)
+        }
+    }
+
     // MARK: Transactions
 
     /**
