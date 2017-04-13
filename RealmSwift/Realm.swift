@@ -114,8 +114,7 @@ public final class Realm {
     public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration,
                                  callbackQueue: DispatchQueue = .main,
                                  callback: @escaping (Realm?, Realm.Error?) -> Void) {
-        RLMRealm.openAsynchronously(with: configuration.rlmConfiguration,
-                                    callbackQueue: callbackQueue) { rlmRealm, nsError in
+        RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: callbackQueue) { rlmRealm, nsError in
             callback(rlmRealm.flatMap(Realm.init), nsError as! Realm.Error?)
         }
     }

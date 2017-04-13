@@ -190,9 +190,9 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     return queue;
 }
 
-+ (void)openAsynchronouslyWithConfiguration:(RLMRealmConfiguration *)configuration
-                              callbackQueue:(dispatch_queue_t)callbackQueue
-                                   callback:(RLMAsynchronouslyOpenRealmCallback)callback {
++ (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
+                     callbackQueue:(dispatch_queue_t)callbackQueue
+                          callback:(RLMAsynchronouslyOpenRealmCallback)callback {
     __block NSError *error = nil;
     RLMRealm *realmStrongRef = nil;
     bool hasSyncConfig = (configuration.config.sync_config != nullptr);

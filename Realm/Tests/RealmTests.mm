@@ -331,9 +331,9 @@
 
     // Unsuccessful open
     c.readOnly = true;
-    [RLMRealm openAsynchronouslyWithConfiguration:c
-                                    callbackQueue:dispatch_get_main_queue()
-                                         callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
         [ex fulfill];
         XCTAssertEqual(error.code, RLMErrorFileNotFound);
         XCTAssertNil(realm);
@@ -347,9 +347,9 @@
     // Successful open
     c.readOnly = false;
     ex = [self expectationWithDescription:@"open-async"];
-    [RLMRealm openAsynchronouslyWithConfiguration:c
-                                    callbackQueue:dispatch_get_main_queue()
-                                         callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
         [ex fulfill];
         XCTAssertNil(error);
         XCTAssertNotNil(realm);

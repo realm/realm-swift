@@ -1003,9 +1003,9 @@
         RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
         c.syncConfiguration = syncConfig;
         XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
-        [RLMRealm openAsynchronouslyWithConfiguration:c
-                                        callbackQueue:dispatch_get_main_queue()
-                                             callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+        [RLMRealm asyncOpenWithConfiguration:c
+                               callbackQueue:dispatch_get_main_queue()
+                                    callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
             [ex fulfill];
             XCTAssertNil(error);
             CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
@@ -1057,9 +1057,9 @@
         XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
         RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
         CHECK_COUNT(0, HugeSyncObject, realm);
-        [RLMRealm openAsynchronouslyWithConfiguration:c
-                                        callbackQueue:dispatch_get_main_queue()
-                                             callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+        [RLMRealm asyncOpenWithConfiguration:c
+                               callbackQueue:dispatch_get_main_queue()
+                                    callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
             [ex fulfill];
             XCTAssertNil(error);
             CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
@@ -1106,9 +1106,9 @@
         RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
         c.syncConfiguration = syncConfig;
         XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
-        [RLMRealm openAsynchronouslyWithConfiguration:c
-                                        callbackQueue:dispatch_get_main_queue()
-                                             callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+        [RLMRealm asyncOpenWithConfiguration:c
+                               callbackQueue:dispatch_get_main_queue()
+                                    callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
             [ex fulfill];
             XCTAssertNil(error);
             CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);

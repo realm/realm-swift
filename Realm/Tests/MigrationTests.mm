@@ -666,9 +666,9 @@ RLM_ARRAY_TYPE(MigrationObject);
     c.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
         migrationCalled = true;
     };
-    [RLMRealm openAsynchronouslyWithConfiguration:c
-                                    callbackQueue:dispatch_get_main_queue()
-                                         callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                 callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
         [ex fulfill];
         XCTAssertNil(error);
         XCTAssertNotNil(realm);

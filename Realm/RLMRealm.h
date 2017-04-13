@@ -113,9 +113,9 @@ NS_ASSUME_NONNULL_BEGIN
                       Otherwise, an `NSError` describing what went wrong will be
                       passed to the block instead.
  */
-+ (void)openAsynchronouslyWithConfiguration:(RLMRealmConfiguration *)configuration
-                              callbackQueue:(dispatch_queue_t)callbackQueue
-                                   callback:(RLMAsynchronouslyOpenRealmCallback)callback;
++ (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
+                     callbackQueue:(dispatch_queue_t)callbackQueue
+                          callback:(RLMAsynchronouslyOpenRealmCallback)callback;
 
 /**
  The `RLMSchema` used by the Realm.
