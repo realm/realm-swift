@@ -30,9 +30,11 @@
 #import "RLMObservation.hpp"
 #import "RLMProperty.h"
 #import "RLMQueryUtil.hpp"
+#import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
 #import "RLMSyncManager_Private.h"
+#import "RLMSyncUtil_Private.hpp"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
@@ -45,6 +47,8 @@
 #include <realm/disable_sync_to_disk.hpp>
 #include <realm/util/scope_exit.hpp>
 #include <realm/version.hpp>
+
+#import "sync/sync_session.hpp"
 
 using namespace realm;
 using util::File;
@@ -59,8 +63,6 @@ using util::File;
 @property (class, nonatomic, readonly) dispatch_queue_t asyncOpenDispatchQueue;
 - (void)sendNotifications:(RLMNotification)notification;
 @end
-
-static BOOL(^s_customAsyncOpenHandler)(RLMRealm *, dispatch_queue_t, RLMAsynchronouslyOpenRealmCallback) = nil;
 
 void RLMDisableSyncToDisk() {
     realm::disable_sync_to_disk();
@@ -193,33 +195,46 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     return queue;
 }
 
-+ (void)setCustomAsyncOpenHandler:(BOOL(^)(RLMRealm *, dispatch_queue_t, RLMAsynchronouslyOpenRealmCallback))handler {
-    // TODO: should this be managed using a lock?
-    s_customAsyncOpenHandler = handler;
-}
-
 + (void)openAsynchronouslyWithConfiguration:(RLMRealmConfiguration *)configuration
                                       queue:(dispatch_queue_t)queue
                                    callback:(RLMAsynchronouslyOpenRealmCallback)callback {
-    dispatch_async(RLMRealm.asyncOpenDispatchQueue, ^{
+    dispatch_async(self.asyncOpenDispatchQueue, ^{
         NSError *error = nil;
         @autoreleasepool {
             RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
             if (realm && !error) {
-                if (s_customAsyncOpenHandler && s_customAsyncOpenHandler(realm, queue, callback)) {
+                auto session = sync_session_for_realm(realm);
+                if (!configuration.syncConfiguration || !session) {
+                    // Default behavior: just dispatch onto the destination queue and open the Realm.
+                    dispatch_async(queue, ^{
+                        @autoreleasepool {
+                            NSError *error = nil;
+                            RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
+                            callback(localRealm, error);
+                        }
+                    });
                     return;
                 }
-                // Default behavior: just dispatch onto the destination queue and open the Realm.
-                dispatch_async(queue, ^{
-                    @autoreleasepool {
-                        NSError *error = nil;
-                        RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
-                        if (error) {
-                            callback(nil, error);
+                session->wait_for_download_completion([=](std::error_code error) {
+                    dispatch_async(queue, ^{
+                        NSError *err = nil;
+                        if (error == std::error_code{}) {
+                            // Success
+                            @autoreleasepool {
+                                // Try opening the Realm on the destination queue.
+                                RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&err];
+                                callback(localRealm, err);
+                            }
                         } else {
-                            callback(localRealm, nil);
+                            // Failure
+                            // FIXME: we need a less ad-hoc way to turn error codes into NSErrors.
+                            err = [NSError errorWithDomain:RLMSyncErrorDomain
+                                                      code:RLMSyncErrorClientInternalError
+                                                  userInfo:@{@"underlying": @(error.value()),
+                                                             @"message": @(error.message().c_str())}];
+                            callback(nil, err);
                         }
-                    }
+                    });
                 });
             } else {
                 dispatch_async(queue, ^{
