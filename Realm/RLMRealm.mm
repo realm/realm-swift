@@ -198,8 +198,19 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 + (void)openAsynchronouslyWithConfiguration:(RLMRealmConfiguration *)configuration
                               callbackQueue:(dispatch_queue_t)callbackQueue
                                    callback:(RLMAsynchronouslyOpenRealmCallback)callback {
+    __block NSError *error = nil;
+    RLMRealm *realmStrongRef = nil;
+    if (configuration.syncConfiguration) {
+        realmStrongRef = [RLMRealm uncachedSchemalessRealmWithConfiguration:configuration error:&error];
+        if (error) {
+            dispatch_async(callbackQueue, ^{
+                callback(nil, error);
+            });
+            return;
+        }
+    }
     dispatch_async(self.asyncOpenDispatchQueue, ^{
-        NSError *error = nil;
+        (void)realmStrongRef;
         @autoreleasepool {
             RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
             if (realm && !error) {
@@ -215,7 +226,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
                     });
                     return;
                 }
-                session->wait_for_download_completion([=](std::error_code error) {
+                session->wait_for_download_completion([=,session=session](std::error_code error) {
                     dispatch_async(callbackQueue, ^{
                         NSError *err = nil;
                         if (error == std::error_code{}) {
@@ -439,6 +450,18 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 
     return RLMAutorelease(realm);
+}
+
++ (instancetype)uncachedSchemalessRealmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
+    RLMRealm *realm = [[RLMRealm alloc] initPrivate];
+    try {
+        realm->_realm = Realm::get_shared_realm(configuration.config);
+    }
+    catch (...) {
+        RLMRealmTranslateException(error);
+        return nil;
+    }
+    return realm;
 }
 
 + (void)resetRealmState {
