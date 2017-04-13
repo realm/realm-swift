@@ -321,9 +321,19 @@ download_object_server() {
     touch "sync/object-server/do_not_open_browser"
 }
 
-download_core() {
-    local tries_left=3 core_url error temp_dir temp_path tar_path
-    echo "Downloading dependency: core ${REALM_CORE_VERSION}"
+download_common() {
+    local download_type=$1 tries_left=3 version core_url error temp_dir temp_path tar_path
+    
+    if [ "$download_type" == "core" ]; then
+        version=$REALM_CORE_VERSION
+    elif [ "$download_type" == "sync" ]; then
+        version=$REALM_SYNC_VERSION
+    else
+        echo "Unknown dowload_type: $download_type"
+        exit 1
+    fi
+    
+    echo "Downloading dependency: ${download_type} ${version}"
     
     if [ -z "$TMPDIR" ]; then
         TMPDIR='/tmp'
@@ -331,12 +341,12 @@ download_core() {
     temp_dir=$(dirname "$TMPDIR/waste")/core_bin
     mkdir -p "$temp_dir"
     
-    temp_path="${temp_dir}/core-${REALM_CORE_VERSION}.tar.xz.tmp"
-    tar_path="${temp_dir}/core-${REALM_CORE_VERSION}.tar.xz"
-    core_url="https://static.realm.io/downloads/core/realm-core-${REALM_CORE_VERSION}.tar.xz"
+    temp_path="${temp_dir}/${download_type}-${version}.tar.xz.tmp"
+    tar_path="${temp_dir}/${download_type}-${version}.tar.xz"
+    url="https://static.realm.io/downloads/${download_type}/realm-${download_type}-${version}.tar.xz"
     
     while [ 0 -lt $tries_left ] && [ ! -f "$tar_path" ]; do
-        if ! error=$(curl --fail --silent --show-error --location "$core_url" --output "$temp_path" 2>&1); then
+        if ! error=$(curl --fail --silent --show-error --location "$url" --output "$temp_path" 2>&1); then
             tries_left=$[$tries_left-1]
         else
             mv "$temp_path" "$tar_path"
@@ -344,59 +354,28 @@ download_core() {
     done
     
     if [ ! -f $tar_path ]; then
-        printf "Downloading core failed:\n\t$core_url\n\t$error\n"
+        printf "Downloading ${download_type} failed:\n\t$url\n\t$error\n"
         exit 1
     fi
     
     (
         cd "$temp_dir"
-        rm -rf core
-        tar xf "${tar_path}" --xz
-        mv core core-${REALM_CORE_VERSION}
+        rm -rf $download_type
+        tar xf "$tar_path" --xz
+        mv core "${download_type}-${version}"
     )
 
-    rm -rf core-${REALM_CORE_VERSION} core
-    mv ${temp_dir}/core-${REALM_CORE_VERSION} .
-    ln -s core-${REALM_CORE_VERSION} core
+    rm -rf "${download_type}-${version}" core
+    mv "${temp_dir}/${download_type}-${version}" .
+    ln -s "${download_type}-${version}" core
+}
+
+download_core() {
+    download_common "core"
 }
 
 download_sync() {
-    local tries_left=3 sync_url error temp_dir temp_path tar_path
-    echo "Downloading dependency: sync ${REALM_SYNC_VERSION}"
-    
-    if [ -z "$TMPDIR" ]; then
-        TMPDIR='/tmp'
-    fi
-    temp_dir=$(dirname "$TMPDIR/waste")/sync_bin
-    mkdir -p "$temp_dir"
-    
-    temp_path="${temp_dir}/sync-${REALM_SYNC_VERSION}.tar.xz.tmp"
-    tar_path="${temp_dir}/sync-${REALM_SYNC_VERSION}.tar.xz"
-    sync_url="https://static.realm.io/downloads/sync/realm-sync-cocoa-${REALM_SYNC_VERSION}.tar.xz"
-    
-    while [ 0 -lt $tries_left ] && [ ! -f "$tar_path" ]; do
-        if ! error=$(curl --fail --silent --show-error --location "$sync_url" --output "$temp_path" 2>&1); then
-            tries_left=$[$tries_left-1]
-        else
-            mv "$temp_path" "$tar_path"
-        fi
-    done
-    
-    if [ ! -f $tar_path ]; then
-        printf "Downloading sync failed:\n\t$sync_url\n\t$error\n"
-        exit 1
-    fi
-
-    (
-        cd "$temp_dir"
-        rm -rf sync
-        tar xf "$tar_path" --xz
-        mv core sync-${REALM_SYNC_VERSION}
-    )
-
-    rm -rf sync-${REALM_SYNC_VERSION} core
-    mv "${temp_dir}/sync-${REALM_SYNC_VERSION}" .
-    ln -s "sync-${REALM_SYNC_VERSION}" core
+    download_common "sync"
 }
 
 ######################################
