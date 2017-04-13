@@ -208,7 +208,7 @@ class SwiftLinkToPrimaryStringObject: Object {
 }
 
 class SwiftUTF8Object: Object {
-    // swiftlint:disable:next variable_name
+    // swiftlint:disable:next identifier_name
     dynamic var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 }
 
