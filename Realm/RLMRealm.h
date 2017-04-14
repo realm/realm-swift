@@ -112,6 +112,11 @@ NS_ASSUME_NONNULL_BEGIN
                       it will be passed in as an argument.
                       Otherwise, an `NSError` describing what went wrong will be
                       passed to the block instead.
+
+ @note The returned Realm is confined to the thread on which it was created.
+       Because GCD does not guarantee that queues will always use the same
+       thread, accessing the returned Realm outside the callback block (even if
+       accessed from `callbackQueue`) is unsafe.
  */
 + (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                      callbackQueue:(dispatch_queue_t)callbackQueue

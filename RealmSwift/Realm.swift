@@ -110,6 +110,11 @@ public final class Realm {
                                 it will be passed in as an argument.
                                 Otherwise, a `Realm.Error` describing what went wrong will be
                                 passed to the block instead.
+
+     - note: The returned Realm is confined to the thread on which it was created.
+             Because GCD does not guarantee that queues will always use the same
+             thread, accessing the returned Realm outside the callback block (even if
+             accessed from `callbackQueue`) is unsafe.
      */
     public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration,
                                  callbackQueue: DispatchQueue = .main,
