@@ -410,8 +410,8 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     XCTAssertNotEqual(idx1, NSNotFound);
     XCTAssertNotEqual(idx2, NSNotFound);
     XCTAssertNotEqual(idx3, NSNotFound);
-    XCTAssertTrue(idx1 < idx2);
-    XCTAssertTrue(idx2 < idx3);
+    XCTAssertLessThan(idx1, idx2);
+    XCTAssertLessThan(idx2, idx3);
 }
 
 /// User should not be able to change a permission for a Realm they don't own.

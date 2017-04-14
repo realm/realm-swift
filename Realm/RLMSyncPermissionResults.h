@@ -23,8 +23,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// Properties which a sync permission results collection can be sorted by.
 typedef enum : NSUInteger {
+    /// Sort by the path of the Realm the permission pertains to.
     RLMSyncPermissionResultsSortPropertyPath,
+    /// Sort by the user ID of the user the permission applies to.
     RLMSyncPermissionResultsSortPropertyUserID,
 } RLMSyncPermissionResultsSortProperty;
 
