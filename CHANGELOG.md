@@ -9,10 +9,11 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Add a `{RLM}SyncUser.isAdmin` property indicating whether a user is a Realm
   Object Server administrator.
+* Speed up case-insensitive queries on indexed string properties.
 
 ### Bugfixes
 
-* None.
+* Fix a deadlock when multiple processes open a Realm at the same time.
 
 2.5.1 Release notes (2017-04-05)
 =============================================================
