@@ -53,6 +53,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMSyncAccessLevel accessLevel;
 
+/// Whether the access level allows the user to read from the Realm.
+@property (nonatomic, readonly) BOOL mayRead;
+
+/// Whether the access level allows the user to write to the Realm.
+@property (nonatomic, readonly) BOOL mayWrite;
+
+/// Whether the access level allows the user to administer the Realm.
+@property (nonatomic, readonly) BOOL mayManage;
+
 /**
  Create a new sync permission value, for use with permission APIs.
 

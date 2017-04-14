@@ -155,6 +155,18 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
     REALM_TERMINATE("Subclasses must override this method.");
 }
 
+- (BOOL)mayRead {
+    return self.accessLevel != RLMSyncAccessLevelNone;
+}
+
+- (BOOL)mayWrite {
+    return self.accessLevel == RLMSyncAccessLevelWrite || self.accessLevel == RLMSyncAccessLevelAdmin;
+}
+
+- (BOOL)mayManage {
+    return self.accessLevel == RLMSyncAccessLevelAdmin;
+}
+
 - (NSString *)key {
     return nil;
 }

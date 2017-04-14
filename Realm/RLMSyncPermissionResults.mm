@@ -20,6 +20,9 @@
 
 #import "collection_notifications.hpp"
 #import "RLMCollection_Private.hpp"
+#import "RLMObjectSchema_Private.hpp"
+#import "RLMQueryUtil.hpp"
+#import "RLMSchema_Private.hpp"
 #import "RLMSyncPermissions_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMUtil.hpp"
@@ -44,7 +47,7 @@ using namespace realm;
     return [[RLMCancellationToken alloc] initWithToken:std::move(token) realm:nil];
 }
 
-- (RLMSyncPermissionValue *)permissionAtIndex:(NSInteger)index {
+- (RLMSyncPermissionValue *)objectAtIndex:(NSInteger)index {
     REALM_ASSERT_DEBUG(_results);
     try {
         return [[RLMSyncPermissionValue alloc] initWithPermission:_results->get(index)];
@@ -59,6 +62,56 @@ using namespace realm;
         _results = std::move(results);
     }
     return self;
+}
+
+- (RLMSyncPermissionValue *)firstObject {
+    return self.count == 0 ? nil : [self objectAtIndex:0];
+}
+
+- (RLMSyncPermissionValue *)lastObject {
+    return self.count == 0 ? nil : [self objectAtIndex:(self.count - 1)];
+}
+
+- (NSUInteger)indexOfObject:(RLMSyncPermissionValue *)object {
+    for (int i=0; i<self.count; i++) {
+        if ([[self objectAtIndex:i] isEqual:object]) {
+            return i;
+        }
+    }
+    return NSNotFound;
+}
+
+- (RLMSyncPermissionResults *)objectsWithPredicate:(NSPredicate *)predicate {
+    REALM_ASSERT_DEBUG(_results);
+    auto& results = _results->results();
+    auto query = RLMPredicateToQuery(predicate,
+                                     [RLMObjectSchema objectSchemaForObjectStoreSchema:results.get_object_schema()],
+                                     [RLMSchema dynamicSchemaFromObjectStoreSchema:results.get_realm()->schema()],
+                                     results.get_realm()->read_group());
+    auto filtered_results = std::make_unique<PermissionResults>(_results->filter(std::move(query)));
+    return [[RLMSyncPermissionResults alloc] initWithResults:std::move(filtered_results)];
+}
+
+- (RLMSyncPermissionResults *)sortedResultsUsingProperty:(RLMSyncPermissionResultsSortProperty)property
+                                               ascending:(BOOL)ascending {
+    REALM_ASSERT_DEBUG(_results);
+    auto& results = _results->results();
+    std::string property_name;
+    switch (property) {
+        case RLMSyncPermissionResultsSortPropertyPath:
+            property_name = "path";
+            break;
+        case RLMSyncPermissionResultsSortPropertyUserID:
+            property_name = "user_id";
+            break;
+    }
+    const auto& table = results.get_tableview().get_parent();
+    size_t col_idx = table.get_descriptor()->get_column_index(property_name);
+    REALM_ASSERT(col_idx != size_t(-1));
+    auto sorted_results = std::make_unique<PermissionResults>(_results->sort({
+        table, {{ col_idx }}, { static_cast<bool>(ascending) }
+    }));
+    return [[RLMSyncPermissionResults alloc] initWithResults:std::move(sorted_results)];
 }
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
@@ -90,7 +143,7 @@ using namespace realm;
             return objectsInBuffer;
         }
         // Otherwise, add an object and advance the index pointer.
-        RLMSyncPermissionValue * __autoreleasing thisPermission = [self permissionAtIndex:idx];
+        RLMSyncPermissionValue * __autoreleasing thisPermission = [self objectAtIndex:idx];
         buffer[objectsInBuffer] = thisPermission;
         idx++;
         objectsInBuffer++;

@@ -40,7 +40,7 @@
     __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(NSError *err) {               \
         XCTAssertNil(err);                                                                                             \
         for (NSInteger i=0; i<weakResults.count; i++) {                                                                \
-            if ([[weakResults permissionAtIndex:i] isEqual:ma_permission]) {                                           \
+            if ([[weakResults objectAtIndex:i] isEqual:ma_permission]) {                                               \
                 [ex fulfill];                                                                                          \
                 break;                                                                                                 \
             }                                                                                                          \
@@ -56,7 +56,7 @@
         XCTAssertNil(err);                                                                                             \
         BOOL isPresent = NO;                                                                                           \
         for (NSInteger i=0; i<weakResults.count; i++) {                                                                \
-            if ([[weakResults permissionAtIndex:i] isEqual:ma_permission]) {                                           \
+            if ([[weakResults objectAtIndex:i] isEqual:ma_permission]) {                                               \
                 isPresent = YES;                                                                                       \
                 break;                                                                                                 \
             }                                                                                                          \
@@ -66,6 +66,34 @@
         }                                                                                                              \
     }];                                                                                                                \
     [self waitForExpectationsWithTimeout:2.0 handler:nil];                                                             \
+}
+
+#define GET_PERMISSION(ma_results, ma_permission, ma_destination) {                                                    \
+    XCTestExpectation *ex = [self expectationWithDescription:@"Retrieving permission..."];                             \
+    __block RLMSyncPermissionValue *value = nil;                                                                       \
+    __weak typeof(ma_results) weakResults = ma_results;                                                                \
+    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(NSError *err) {               \
+        XCTAssertNil(err);                                                                                             \
+        for (NSInteger i=0; i<weakResults.count; i++) {                                                                \
+            if ([[weakResults objectAtIndex:i] isEqual:ma_permission]) {                                               \
+                value = [weakResults objectAtIndex:i];                                                                 \
+                [ex fulfill];                                                                                          \
+                break;                                                                                                 \
+            }                                                                                                          \
+        }                                                                                                              \
+    }];                                                                                                                \
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                                             \
+    ma_destination = value;                                                                                            \
+}
+
+static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *original,
+                                                      RLMSyncUser *owner,
+                                                      NSString *realmName) {
+    return [[RLMSyncPermissionValue alloc] initWithRealmPath:[NSString stringWithFormat:@"/%@/%@",
+                                                              owner.identity,
+                                                              realmName]
+                                                      userID:original.userID
+                                                 accessLevel:original.accessLevel];
 }
 
 @interface RLMPermissionsAPITests : RLMSyncTestCase
@@ -142,12 +170,15 @@
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
     // Expected permission: applies to user B, but for user A's Realm.
-    id expectedPermission = [[RLMSyncPermissionValue alloc] initWithRealmPath:[NSString stringWithFormat:@"/%@/%@",
-                                                                               self.userA.identity,
-                                                                               NSStringFromSelector(_cmd)]
-                                                                       userID:self.userB.identity
-                                                                  accessLevel:RLMSyncAccessLevelRead];
-    CHECK_PERMISSION_PRESENT(results, expectedPermission);
+    id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
+    RLMSyncPermissionValue *final = nil;
+    GET_PERMISSION(results, expectedPermission, final);
+    XCTAssertNotNil(final, @"Did not find the permission %@", expectedPermission);
+
+    // Check getting permission by its index.
+    NSUInteger index = [results indexOfObject:expectedPermission];
+    XCTAssertNotEqual(index, NSNotFound);
+    XCTAssertEqualObjects(expectedPermission, [results objectAtIndex:index]);
 }
 
 /// Deleting a permission should work.
@@ -180,11 +211,7 @@
         [ex2 fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    id expectedPermission = [[RLMSyncPermissionValue alloc] initWithRealmPath:[NSString stringWithFormat:@"/%@/%@",
-                                                                               self.userA.identity,
-                                                                               NSStringFromSelector(_cmd)]
-                                                                       userID:self.userB.identity
-                                                                  accessLevel:RLMSyncAccessLevelRead];
+    id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
     CHECK_PERMISSION_PRESENT(results, expectedPermission);
 
     // Delete the permission.
@@ -250,12 +277,141 @@
     // Wait for the notification to be fired.
     [self waitForExpectations:@[noteEx] timeout:2.0];
     [token stop];
-    id expectedPermission = [[RLMSyncPermissionValue alloc] initWithRealmPath:[NSString stringWithFormat:@"/%@/%@",
-                                                                               self.userA.identity,
-                                                                               NSStringFromSelector(_cmd)]
-                                                                       userID:self.userB.identity
-                                                                  accessLevel:RLMSyncAccessLevelRead];
+    id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
     CHECK_PERMISSION_PRESENT(results, expectedPermission);
+}
+
+/// Filtering permissions results should work.
+- (void)testFilteringPermissions {
+    // Get a reference to the permission results.
+    XCTestExpectation *ex = [self expectationWithDescription:@"Get permission results."];
+    __block RLMSyncPermissionResults *results = nil;
+    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(r);
+        results = r;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Open two Realms
+    NSURL *url1 = CUSTOM_REALM_URL(@"r1");
+    NSURL *url2 = CUSTOM_REALM_URL(@"r2");
+    __attribute__((objc_precise_lifetime)) RLMRealm *r1 = [self openRealmForURL:url1 user:self.userA];
+    __attribute__((objc_precise_lifetime)) RLMRealm *r2 = [self openRealmForURL:url2 user:self.userA];
+    NSString *uB = self.userB.identity;
+    NSString *uC = self.userC.identity;
+
+    // Give user B and C read permissions to r1, and user B read permissions for r2.
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting r1 permission for user B should work."];
+    id p1 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url1 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    [self.userA applyPermission:p1 callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTestExpectation *ex3 = [self expectationWithDescription:@"Setting r1 permission for user C should work."];
+    id p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url1 path] userID:uC accessLevel:RLMSyncAccessLevelRead];
+    [self.userA applyPermission:p2 callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex3 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTestExpectation *ex4 = [self expectationWithDescription:@"Setting r2 permission for user B should work."];
+    id p3 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url2 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    [self.userA applyPermission:p3 callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex4 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Wait for all the permissions to show up.
+    id exp1 = makeExpectedPermission(p1, self.userA,
+                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r1"]);
+    id exp2 = makeExpectedPermission(p2, self.userA,
+                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r1"]);
+    id exp3 = makeExpectedPermission(p3, self.userA,
+                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r2"]);
+    CHECK_PERMISSION_PRESENT(results, exp1);
+    CHECK_PERMISSION_PRESENT(results, exp2);
+    CHECK_PERMISSION_PRESENT(results, exp3);
+
+    // Now make a filter.
+    RLMSyncPermissionResults *filtered = [results objectsWithPredicate:[NSPredicate predicateWithFormat:@"userId == %@",
+                                                                        self.userB.identity]];
+    CHECK_PERMISSION_PRESENT(filtered, exp1);
+    CHECK_PERMISSION_ABSENT(filtered, exp2);
+    CHECK_PERMISSION_PRESENT(filtered, exp3);
+}
+
+- (void)testSortingPermissions {
+    // Get a reference to the permission results.
+    XCTestExpectation *ex = [self expectationWithDescription:@"Get permission results."];
+    __block RLMSyncPermissionResults *results = nil;
+    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(r);
+        results = r;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Open three Realms
+    NSURL *url1 = CUSTOM_REALM_URL(@"r1");
+    NSURL *url2 = CUSTOM_REALM_URL(@"r2");
+    NSURL *url3 = CUSTOM_REALM_URL(@"r3");
+    __attribute__((objc_precise_lifetime)) RLMRealm *r1 = [self openRealmForURL:url1 user:self.userA];
+    __attribute__((objc_precise_lifetime)) RLMRealm *r2 = [self openRealmForURL:url2 user:self.userA];
+    __attribute__((objc_precise_lifetime)) RLMRealm *r3 = [self openRealmForURL:url3 user:self.userA];
+    NSString *uB = self.userB.identity;
+
+    // Give user B read permissions for all three Realms.
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting r1 permission for user B should work."];
+    id p1 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url1 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    [self.userA applyPermission:p1 callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTestExpectation *ex3 = [self expectationWithDescription:@"Setting r2 permission for user B should work."];
+    id p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url2 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    [self.userA applyPermission:p2 callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex3 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTestExpectation *ex4 = [self expectationWithDescription:@"Setting r3 permission for user C should work."];
+    id p3 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url3 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    [self.userA applyPermission:p3 callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex4 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Now sort on Realm URL.
+    id exp1 = makeExpectedPermission(p1, self.userA,
+                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r1"]);
+    id exp2 = makeExpectedPermission(p2, self.userA,
+                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r2"]);
+    id exp3 = makeExpectedPermission(p3, self.userA,
+                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r3"]);
+    RLMSyncPermissionResults *sorted = [results sortedResultsUsingProperty:RLMSyncPermissionResultsSortPropertyPath
+                                                                 ascending:YES];
+    RLMSyncPermissionValue *n1 = nil;
+    RLMSyncPermissionValue *n2 = nil;
+    RLMSyncPermissionValue *n3 = nil;
+    GET_PERMISSION(sorted, exp1, n1);
+    GET_PERMISSION(sorted, exp2, n2);
+    GET_PERMISSION(sorted, exp3, n3);
+    NSUInteger idx1 = [sorted indexOfObject:n1];
+    NSUInteger idx2 = [sorted indexOfObject:n2];
+    NSUInteger idx3 = [sorted indexOfObject:n3];
+    // Make sure they are actually in ascending order.
+    XCTAssertNotEqual(idx1, NSNotFound);
+    XCTAssertNotEqual(idx2, NSNotFound);
+    XCTAssertNotEqual(idx3, NSNotFound);
+    XCTAssertTrue(idx1 < idx2);
+    XCTAssertTrue(idx2 < idx3);
 }
 
 /// User should not be able to change a permission for a Realm they don't own.
@@ -289,11 +445,7 @@
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    id expectedPermission = [[RLMSyncPermissionValue alloc] initWithRealmPath:[NSString stringWithFormat:@"/%@/%@",
-                                                                               self.userA.identity,
-                                                                               NSStringFromSelector(_cmd)]
-                                                                       userID:self.userC.identity
-                                                                  accessLevel:RLMSyncAccessLevelRead];
+    id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
     CHECK_PERMISSION_ABSENT(results, expectedPermission);
 }
 
