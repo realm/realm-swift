@@ -340,27 +340,27 @@ download_common() {
     if [ -z "$TMPDIR" ]; then
         TMPDIR='/tmp'
     fi
-    temp_dir=$(dirname "$TMPDIR/waste")/core_bin
+    temp_dir=$(dirname "$TMPDIR/waste")/${download_type}_bin
     mkdir -p "$temp_dir"
-    temp_path="${temp_dir}/${download_type}-${version}.tar.xz.tmp"
     tar_path="${temp_dir}/${download_type}-${version}.tar.xz"
+    temp_path="${tar_path}.tmp"
         
     while [ 0 -lt $tries_left ] && [ ! -f "$tar_path" ]; do
         if ! error=$(curl --fail --silent --show-error --location "$url" --output "$temp_path" 2>&1); then
-            tries_left=$[$tries_left-1]
+            tries_left=$($tries_left-1)
         else
             mv "$temp_path" "$tar_path"
         fi
     done
     
-    if [ ! -f $tar_path ]; then
+    if [ ! -f '$tar_path" ]; then
         printf "Downloading ${download_type} failed:\n\t$url\n\t$error\n"
         exit 1
     fi
     
     (
         cd "$temp_dir"
-        rm -rf $download_type
+        rm -rf "$download_type"
         tar xf "$tar_path" --xz
         mv core "${download_type}-${version}"
     )
