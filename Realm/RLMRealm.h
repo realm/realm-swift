@@ -26,7 +26,7 @@
 
  Returns the Realm if the open was successful, or an error otherwise.
  */
-typedef void(^RLMAsynchronouslyOpenRealmCallback)(RLMRealm * _Nullable realm, NSError * _Nullable error);
+typedef void(^RLMAsyncOpenRealmCallback)(RLMRealm * _Nullable realm, NSError * _Nullable error);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -120,7 +120,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                      callbackQueue:(dispatch_queue_t)callbackQueue
-                          callback:(RLMAsynchronouslyOpenRealmCallback)callback;
+                          callback:(RLMAsyncOpenRealmCallback)callback;
 
 /**
  The `RLMSchema` used by the Realm.
