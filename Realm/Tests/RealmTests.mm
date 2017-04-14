@@ -22,6 +22,7 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Dynamic.h"
 #import "RLMSchema_Private.h"
+#import "RLMRealmUtil.hpp"
 
 #import <mach/mach_init.h>
 #import <mach/vm_map.h>
@@ -316,6 +317,61 @@
     }
 }
 #endif
+
+- (void)testOpenAsync {
+    // Locals
+    RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
+    XCTestExpectation *ex = [self expectationWithDescription:@"open-async"];
+
+    // Helpers
+    auto assertNoCachedRealm = ^{ XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String)); };
+    auto fileExists = ^BOOL() {
+        return [[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil];
+    };
+
+    // Unsuccessful open
+    c.readOnly = true;
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+        XCTAssertEqual(error.code, RLMErrorFileNotFound);
+        XCTAssertNil(realm);
+        [ex fulfill];
+    }];
+    XCTAssertFalse(fileExists());
+    assertNoCachedRealm();
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+    XCTAssertFalse(fileExists());
+    assertNoCachedRealm();
+
+    // Successful open
+    c.readOnly = false;
+    ex = [self expectationWithDescription:@"open-async"];
+
+    // Hold exclusive lock on lock file to prevent Realm from being created
+    // if the dispatch_async happens too quickly
+    NSString *lockFilePath = [c.pathOnDisk stringByAppendingString:@".lock"];
+    [[NSFileManager defaultManager] createFileAtPath:lockFilePath contents:[NSData data] attributes:nil];
+    int fd = open(lockFilePath.UTF8String, O_RDWR);
+    XCTAssertNotEqual(-1, fd);
+    int ret = flock(fd, LOCK_SH);
+    XCTAssertEqual(0, ret);
+
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(realm);
+        [ex fulfill];
+    }];
+    XCTAssertFalse(fileExists());
+    flock(fd, LOCK_UN);
+    close(fd);
+    assertNoCachedRealm();
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+    XCTAssertTrue(fileExists());
+    assertNoCachedRealm();
+}
 
 #pragma mark - Adding and Removing Objects
 

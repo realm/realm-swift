@@ -28,6 +28,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
+#import "RLMRealmUtil.hpp"
 
 #import "object_store.hpp"
 #import "shared_realm.hpp"
@@ -650,6 +651,34 @@ RLM_ARRAY_TYPE(MigrationObject);
     config.schemaVersion = 3;
     @autoreleasepool { XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]); }
     XCTAssertTrue(migrationCalled);
+}
+
+#pragma mark - Async Migration
+
+- (void)testAsyncMigration {
+    RLMRealmConfiguration *c = [RLMRealmConfiguration new];
+    c.schemaVersion = 1;
+    @autoreleasepool { XCTAssertNoThrow([RLMRealm realmWithConfiguration:c error:nil]); }
+    XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
+    XCTestExpectation *ex = [self expectationWithDescription:@"async-migration"];
+    __block bool migrationCalled = false;
+    c.schemaVersion = 2;
+    c.migrationBlock = ^(__unused RLMMigration *migration, __unused uint64_t oldSchemaVersion) {
+        migrationCalled = true;
+    };
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                 callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+        XCTAssertTrue(migrationCalled);
+        XCTAssertNil(error);
+        XCTAssertNotNil(realm);
+        [ex fulfill];
+    }];
+    XCTAssertFalse(migrationCalled);
+    XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+    XCTAssertTrue(migrationCalled);
+    XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
 }
 
 #pragma mark - Migration Correctness

@@ -29,4 +29,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
+
 NS_ASSUME_NONNULL_END

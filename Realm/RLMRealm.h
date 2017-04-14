@@ -19,7 +19,14 @@
 #import <Foundation/Foundation.h>
 #import "RLMConstants.h"
 
-@class RLMRealmConfiguration, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference;
+@class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference;
+
+/**
+ A callback block for opening Realms asynchronously.
+
+ Returns the Realm if the open was successful, or an error otherwise.
+ */
+typedef void(^RLMAsyncOpenRealmCallback)(RLMRealm * _Nullable realm, NSError * _Nullable error);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -89,6 +96,31 @@ NS_ASSUME_NONNULL_BEGIN
  @return An `RLMRealm` instance.
  */
 + (instancetype)realmWithURL:(NSURL *)fileURL;
+
+/**
+ Asynchronously open a Realm and deliver it to a block on the given queue.
+
+ Opening a Realm asynchronously will perform all work needed to get the Realm to
+ a usable state (such as running potentially time-consuming migrations) on a
+ background thread before dispatching to the given queue. In addition,
+ synchronized Realms wait for all remote content available at the time the
+ operation began to be downloaded and available locally.
+
+ @param configuration A configuration object to use when opening the Realm.
+ @param callbackQueue The dispatch queue on which the callback should be run.
+ @param callback      A callback block. If the Realm was successfully opened,
+                      it will be passed in as an argument.
+                      Otherwise, an `NSError` describing what went wrong will be
+                      passed to the block instead.
+
+ @note The returned Realm is confined to the thread on which it was created.
+       Because GCD does not guarantee that queues will always use the same
+       thread, accessing the returned Realm outside the callback block (even if
+       accessed from `callbackQueue`) is unsafe.
+ */
++ (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
+                     callbackQueue:(dispatch_queue_t)callbackQueue
+                          callback:(RLMAsyncOpenRealmCallback)callback;
 
 /**
  The `RLMSchema` used by the Realm.
