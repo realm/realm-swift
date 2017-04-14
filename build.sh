@@ -322,7 +322,7 @@ download_object_server() {
 }
 
 download_common() {
-    local download_type=$1 tries_left=3 version core_url error temp_dir temp_path tar_path
+    local download_type=$1 tries_left=3 version url error temp_dir temp_path tar_path
     
     if [ "$download_type" == "core" ]; then
         version=$REALM_CORE_VERSION
