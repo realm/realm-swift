@@ -334,9 +334,9 @@
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
-        [ex fulfill];
         XCTAssertEqual(error.code, RLMErrorFileNotFound);
         XCTAssertNil(realm);
+        [ex fulfill];
     }];
     XCTAssertFalse(fileExists());
     assertNoCachedRealm();
@@ -360,9 +360,9 @@
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
-        [ex fulfill];
         XCTAssertNil(error);
         XCTAssertNotNil(realm);
+        [ex fulfill];
     }];
     XCTAssertFalse(fileExists());
     flock(fd, LOCK_UN);

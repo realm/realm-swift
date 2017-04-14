@@ -669,9 +669,9 @@ RLM_ARRAY_TYPE(MigrationObject);
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
                                  callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
-        [ex fulfill];
         XCTAssertNil(error);
         XCTAssertNotNil(realm);
+        [ex fulfill];
     }];
     XCTAssertFalse(migrationCalled);
     XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));

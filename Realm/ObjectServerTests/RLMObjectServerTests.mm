@@ -1006,9 +1006,9 @@
         [RLMRealm asyncOpenWithConfiguration:c
                                callbackQueue:dispatch_get_main_queue()
                                     callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
-            [ex fulfill];
             XCTAssertNil(error);
             CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
+            [ex fulfill];
         }];
         NSUInteger (^fileSize)(NSString *) = ^NSUInteger(NSString *path) {
             NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
@@ -1060,9 +1060,9 @@
         [RLMRealm asyncOpenWithConfiguration:c
                                callbackQueue:dispatch_get_main_queue()
                                     callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
-            [ex fulfill];
             XCTAssertNil(error);
             CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
+            [ex fulfill];
         }];
         NSUInteger (^fileSize)(NSString *) = ^NSUInteger(NSString *path) {
             NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
@@ -1109,9 +1109,9 @@
         [RLMRealm asyncOpenWithConfiguration:c
                                callbackQueue:dispatch_get_main_queue()
                                     callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
-            [ex fulfill];
             XCTAssertNil(error);
             CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
+            [ex fulfill];
         }];
         RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
         CHECK_COUNT(0, HugeSyncObject, realm);

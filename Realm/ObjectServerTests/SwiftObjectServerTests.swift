@@ -243,9 +243,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
                 XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
                 Realm.asyncOpen(configuration: config) { realm, error in
-                    ex.fulfill()
                     XCTAssertNil(error)
                     self.checkCount(expected: bigObjectCount, realm!, SwiftHugeSyncObject.self)
+                    ex.fulfill()
                 }
                 func fileSize(path: String) -> Int {
                     if let attr = try? FileManager.default.attributesOfItem(atPath: path) {
