@@ -353,7 +353,7 @@ download_common() {
         fi
     done
     
-    if [ ! -f '$tar_path" ]; then
+    if [ ! -f "$tar_path" ]; then
         printf "Downloading ${download_type} failed:\n\t$url\n\t$error\n"
         exit 1
     fi
