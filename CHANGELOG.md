@@ -15,10 +15,11 @@ x.x.x Release notes (yyyy-MM-dd)
   background thread before dispatching to the given queue. In addition,
   synchronized Realms wait for all remote content available at the time the
   operation began to be downloaded and available locally.
+* Speed up case-insensitive queries on indexed string properties.
 
 ### Bugfixes
 
-* None.
+* Fix a deadlock when multiple processes open a Realm at the same time.
 
 2.5.1 Release notes (2017-04-05)
 =============================================================
