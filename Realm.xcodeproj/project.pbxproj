@@ -444,6 +444,8 @@
 		E8BF67FC1C24D07100E591CD /* SwiftVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BF67FB1C24D07100E591CD /* SwiftVersion.swift */; };
 		E8C6EAF41DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E8C6EAF51DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		E8DA16F81E81210D0055141C /* CompactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8DA16F71E81210D0055141C /* CompactionTests.m */; };
+		E8DA16F91E81210D0055141C /* CompactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8DA16F71E81210D0055141C /* CompactionTests.m */; };
 		E8FD2E381D93345100569F10 /* keychain_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A64CA891D8763B400BC0F9B /* keychain_helper.cpp */; };
 /* End PBXBuildFile section */
 
@@ -906,6 +908,7 @@
 		E8C6EAEF1DD65B8C00EC1A03 /* RLMSyncPermissionChange_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncPermissionChange_Private.h; sourceTree = "<group>"; };
 		E8D89B9D1955FC6D00CF2B9A /* Realm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Realm.h; sourceTree = "<group>"; };
 		E8D89BA31955FC6D00CF2B9A /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8DA16F71E81210D0055141C /* CompactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CompactionTests.m; sourceTree = "<group>"; };
 		E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTestObjects.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -1310,6 +1313,7 @@
 			children = (
 				E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */,
 				3F7556731BE95A050058BC7E /* AsyncTests.mm */,
+				E8DA16F71E81210D0055141C /* CompactionTests.m */,
 				E81A1FBA1955FE0100FDED82 /* DynamicTests.m */,
 				021A882F1AAFB5BE00EEAC84 /* EncryptionTests.mm */,
 				E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */,
@@ -2406,6 +2410,7 @@
 				3F8DCA7719930FCB0008BD7F /* SwiftArrayTests.swift in Sources */,
 				3F8DCA7819930FCB0008BD7F /* SwiftDynamicTests.swift in Sources */,
 				3F8DCA7919930FCB0008BD7F /* SwiftLinkTests.swift in Sources */,
+				E8DA16F91E81210D0055141C /* CompactionTests.m in Sources */,
 				3F8DCA7B19930FCB0008BD7F /* SwiftObjectInterfaceTests.swift in Sources */,
 				3F8DCA7C19930FCB0008BD7F /* SwiftPropertyTypeTest.swift in Sources */,
 				3F8DCA7D19930FCB0008BD7F /* SwiftRealmTests.swift in Sources */,
@@ -2434,6 +2439,7 @@
 				3F2E66641CA0BA11004761D5 /* NotificationTests.m in Sources */,
 				3FEB383F1E70AC8800F22712 /* ObjectCreationTests.mm in Sources */,
 				E81A1FE11955FE0100FDED82 /* ObjectInterfaceTests.m in Sources */,
+				E8DA16F81E81210D0055141C /* CompactionTests.m in Sources */,
 				021A88361AAFB5CD00EEAC84 /* ObjectSchemaTests.m in Sources */,
 				E81A1FE31955FE0100FDED82 /* ObjectTests.m in Sources */,
 				5D03FB1F1E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */,
