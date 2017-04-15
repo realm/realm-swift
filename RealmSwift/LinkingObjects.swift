@@ -28,13 +28,20 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
     fileprivate var cachedRLMResults: RLMResults<RLMObject>?
     @objc fileprivate var object: RLMWeakObjectHandle?
     @objc fileprivate var property: RLMProperty?
+    @objc fileprivate var predicate: NSPredicate?
 
     internal var rlmResults: RLMResults<RLMObject> {
         if cachedRLMResults == nil {
             if let object = self.object, let property = self.property {
-                cachedRLMResults = RLMDynamicGet(object.object, property)! as? RLMResults
+                let results = RLMDynamicGet(object.object, property)! as? RLMResults
+                if let predicate = self.predicate {
+                    self.cachedRLMResults = results?.objects(with: predicate)
+                } else {
+                    self.cachedRLMResults = results
+                }
                 self.object = nil
                 self.property = nil
+                self.predicate = nil
             } else {
                 cachedRLMResults = RLMResults.emptyDetached()
             }
@@ -42,9 +49,10 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
         return cachedRLMResults!
     }
 
-    init(fromClassName objectClassName: String, property propertyName: String) {
+    init(fromClassName objectClassName: String, property propertyName: String, with predicate: NSPredicate? = nil) {
         self.objectClassName = objectClassName
         self.propertyName = propertyName
+        self.predicate = predicate
     }
 
     // MARK: Fast Enumeration
@@ -99,9 +107,9 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter type:         The type of the object owning the property the linking objects should refer to.
      - parameter propertyName: The property name of the property the linking objects should refer to.
      */
-    public init(fromType type: T.Type, property propertyName: String) {
+    public init(fromType type: T.Type, property propertyName: String, with predicate: NSPredicate? = nil) {
         let className = (T.self as Object.Type).className()
-        super.init(fromClassName: className, property: propertyName)
+        super.init(fromClassName: className, property: propertyName, with: predicate)
     }
 
     /// A human-readable description of the objects represented by the linking objects.
