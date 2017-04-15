@@ -64,6 +64,9 @@ Swift binaries are now produced for Swift 3.0, 3.0.1, 3.0.2 and 3.1.
 * Explicitly mark `[[RLMRealm alloc] init]` as unavailable.
 * Include the name of the problematic class in the error message when an
   invalid property type is marked as the primary key.
+* Enable `-[NSPredicate evaluteWithObject:]` to use a `RLMArray`/`List`
+  `RLMResults`/`Results`, or `RLMLinkingObjects`/`LinkingObjects` as the
+  collection of a `SUBQUERY` expression.
 
 ### Bugfixes
 

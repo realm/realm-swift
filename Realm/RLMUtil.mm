@@ -32,6 +32,7 @@
 #import <realm/mixed.hpp>
 #import <realm/table_view.hpp>
 
+#include <dlfcn.h>
 #include <sys/sysctl.h>
 #include <sys/types.h>
 
@@ -358,6 +359,37 @@ BOOL RLMIsDebuggerAttached()
 
 BOOL RLMIsRunningInPlayground() {
     return [[NSBundle mainBundle].bundleIdentifier hasPrefix:@"com.apple.dt.playground."];
+}
+
+void RLMWorkaroundRadar31252694() {
+    static IMP expressionValueWithObjectIMP;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        Class NSSubqueryExpression = NSClassFromString([@[@"N", @"S", @"Subquery", @"Expression"] componentsJoinedByString:@""]);
+        SEL expressionValueWithObjectSEL = NSSelectorFromString([@[@"expression", @"Value", @"With", @"Object", @":", @"context", @":"] componentsJoinedByString:@""]);
+        Method expressionValueWithObject = class_getInstanceMethod(NSSubqueryExpression, expressionValueWithObjectSEL);
+        expressionValueWithObjectIMP = method_getImplementation(expressionValueWithObject);
+    });
+
+    SEL isNSArraySEL = NSSelectorFromString([@[@"is", @"NSArray", @"_", @"_"] componentsJoinedByString:@""]);
+    IMP isNSArrayIMP = imp_implementationWithBlock(^(__unused id array) {
+        Dl_info caller;
+        dladdr(__builtin_return_address(0), &caller);
+        return caller.dli_saddr == expressionValueWithObjectIMP;
+    });
+    Method isInvalidated = class_getInstanceMethod(RLMArray.class, @selector(isInvalidated));
+    const char *typeEncoding = method_getTypeEncoding(isInvalidated);
+    class_addMethod(RLMArray.class, isNSArraySEL, isNSArrayIMP, typeEncoding);
+    class_addMethod(RLMResults.class, isNSArraySEL, isNSArrayIMP, typeEncoding);
+    class_addMethod(RLMListBase.class, isNSArraySEL, isNSArrayIMP, typeEncoding);
+
+    if (Class swiftLinkingObjects = NSClassFromString(@"RealmSwift.LinkingObjectsBase")) {
+        class_addMethod(swiftLinkingObjects, isNSArraySEL, isNSArrayIMP, typeEncoding);
+    }
+
+    if (Class swiftResults = NSClassFromString(@"RealmSwift.ResultsBase")) {
+        class_addMethod(swiftResults, isNSArraySEL, isNSArrayIMP, typeEncoding);
+    }
 }
 
 id RLMMixedToObjc(realm::Mixed const& mixed) {

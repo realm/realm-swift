@@ -55,6 +55,10 @@ extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
 
+/// :nodoc:
+/// Internal class. Do not use directly. Used for reflection.
+public class ResultsBase: NSObject { }
+
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.
 
@@ -75,7 +79,7 @@ extension Int64: AddableType {}
 
  Results instances cannot be directly instantiated.
  */
-public final class Results<T: Object>: NSObject, NSFastEnumeration {
+public final class Results<T: Object>: ResultsBase, NSFastEnumeration {
 
     internal let rlmResults: RLMResults<RLMObject>
 

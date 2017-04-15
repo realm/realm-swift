@@ -2136,6 +2136,41 @@
     XCTAssertEqualObjects(asArray(r14), (@[ hannah ]));
 }
 
+- (void)testSubqueryPredicateEvaluationWithRLMArray
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DogObject *lucy = [DogObject createInDefaultRealmWithValue:@[@"Lucy", @7]];
+    DogArrayObject *object = [DogArrayObject createInDefaultRealmWithValue:@[@[lucy]]];
+    [realm commitWriteTransaction];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SUBQUERY(dogs, $dog, $dog.age == 7).@count == 1"];
+    XCTAssertTrue([predicate evaluateWithObject:object]);
+}
+
+- (void)testSubqueryPredicateEvaluationWithRLMLinkingObjects
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    DogObject *lucy = [DogObject createInDefaultRealmWithValue:@[@"Lucy", @7]];
+    [OwnerObject createInDefaultRealmWithValue:@[@"Mark", lucy]];
+    [realm commitWriteTransaction];
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SUBQUERY(owners, $owner, $owner.name == 'Mark').@count == 1"];
+    XCTAssertTrue([predicate evaluateWithObject:lucy]);
+}
+
+- (void)testSubqueryPredicateEvaluationWithRLMResults
+{
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [DogObject createInDefaultRealmWithValue:@[@"Lucy", @7]];
+    [realm commitWriteTransaction];
+
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"SUBQUERY(SELF, $dog, $dog.age == 7).@count == 1"];
+    XCTAssertTrue([predicate evaluateWithObject:[DogObject allObjects]]);
+}
+
 @end
 
 @interface NullQueryTests : QueryTests
