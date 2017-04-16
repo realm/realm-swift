@@ -29,6 +29,14 @@
 
 #pragma mark - Expected Sizes
 
+// Note: These exact numbers are very sensitive to changes in core's allocator
+// and other internals unrelated to what this is testing, but it's probably useful
+// to know if they ever change, so we have the test fail if these numbers fluctuate.
+NSUInteger expectedTotalBytesBefore = 655360;
+NSUInteger expectedUsedBytesBefore = 70000;
+NSUInteger expectedUsedBytesBeforeMargin = 2248; // allow for +-2KB variation across platforms
+NSUInteger expectedTotalBytesAfter = 75000;
+NSUInteger expectedTotalBytesAfterMargin = 10240; // allow for +-10KB variation across platforms
 NSUInteger count = 1000;
 
 #pragma mark - Helpers
@@ -70,6 +78,100 @@ NSUInteger count = 1000;
 
     unsigned long long fileSizeAfter = [self fileSize:realm.configuration.fileURL];
     XCTAssertGreaterThan(fileSizeBefore, fileSizeAfter);
+}
+
+- (void)testSuccessfulCompactOnLaunch {
+    // Configure the Realm to compact on launch
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = RLMTestRealmURL();
+    configuration.shouldCompactOnLaunch = ^BOOL(NSUInteger totalBytes, NSUInteger usedBytes){
+        // Confirm expected sizes
+        XCTAssertEqual(totalBytes, expectedTotalBytesBefore);
+        XCTAssertEqualWithAccuracy(usedBytes, expectedUsedBytesBefore, expectedUsedBytesBeforeMargin);
+
+        // Compact if the file is over 500KB in size and less than 20% 'used'
+        // In practice, users might want to use values closer to 100MB and 50%
+        NSUInteger fiveHundredKB = 500 * 1024;
+        return (totalBytes > fiveHundredKB) && (usedBytes / totalBytes) < 0.2;
+    };
+
+    // Confirm expected sizes before and after opening the Realm
+    XCTAssertEqual([self fileSize:configuration.fileURL], expectedTotalBytesBefore);
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    XCTAssertEqualWithAccuracy([self fileSize:configuration.fileURL], expectedTotalBytesAfter, expectedTotalBytesAfterMargin);
+
+    // Validate that the file still contains what it should
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], count + 2);
+    XCTAssertEqualObjects(@"A", [[StringObject allObjectsInRealm:realm].firstObject stringCol]);
+    XCTAssertEqualObjects(@"B", [[StringObject allObjectsInRealm:realm].lastObject stringCol]);
+}
+
+- (void)testNoBlockCompactOnLaunch {
+    // Configure the Realm to compact on launch
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = RLMTestRealmURL();
+    // Confirm expected sizes before and after opening the Realm
+    XCTAssertEqual([self fileSize:configuration.fileURL], expectedTotalBytesBefore);
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    XCTAssertEqual([self fileSize:configuration.fileURL], expectedTotalBytesBefore);
+
+    // Validate that the file still contains what it should
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], count + 2);
+    XCTAssertEqualObjects(@"A", [[StringObject allObjectsInRealm:realm].firstObject stringCol]);
+    XCTAssertEqualObjects(@"B", [[StringObject allObjectsInRealm:realm].lastObject stringCol]);
+}
+
+- (void)testCachedRealmCompactOnLaunch {
+    // Test that compact never gets called if there are cached Realms
+    // Access Realm before opening it with a compaction block
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = RLMTestRealmURL();
+    __unused RLMRealm *firstRealm = [RLMRealm realmWithConfiguration:configuration error:nil];
+
+    // Configure the Realm to compact on launch
+    RLMRealmConfiguration *configurationWithCompactBlock = [configuration copy];
+    configurationWithCompactBlock.shouldCompactOnLaunch = ^BOOL(NSUInteger totalBytes, NSUInteger usedBytes){
+        // Confirm expected sizes
+        XCTAssertEqual(totalBytes, expectedTotalBytesBefore);
+        XCTAssertEqualWithAccuracy(usedBytes, expectedUsedBytesBefore, expectedUsedBytesBeforeMargin);
+
+        // Always attempt to compact
+        return YES;
+    };
+
+    // Confirm expected sizes before and after opening the Realm
+    XCTAssertEqual([self fileSize:configuration.fileURL], expectedTotalBytesBefore);
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configurationWithCompactBlock error:nil];
+    XCTAssertEqual([self fileSize:configuration.fileURL], expectedTotalBytesBefore);
+
+    // Validate that the file still contains what it should
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], count + 2);
+    XCTAssertEqualObjects(@"A", [[StringObject allObjectsInRealm:realm].firstObject stringCol]);
+    XCTAssertEqualObjects(@"B", [[StringObject allObjectsInRealm:realm].lastObject stringCol]);
+}
+
+- (void)testReturnNoCompactOnLaunch {
+    // Configure the Realm to compact on launch
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = RLMTestRealmURL();
+    configuration.shouldCompactOnLaunch = ^BOOL(NSUInteger totalBytes, NSUInteger usedBytes){
+        // Confirm expected sizes
+        XCTAssertEqual(totalBytes, expectedTotalBytesBefore);
+        XCTAssertEqualWithAccuracy(usedBytes, expectedUsedBytesBefore, expectedUsedBytesBeforeMargin);
+
+        // Don't compact.
+        return NO;
+    };
+
+    // Confirm expected sizes before and after opening the Realm
+    XCTAssertEqual([self fileSize:configuration.fileURL], expectedTotalBytesBefore);
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
+    XCTAssertEqual([self fileSize:configuration.fileURL], expectedTotalBytesBefore);
+
+    // Validate that the file still contains what it should
+    XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], count + 2);
+    XCTAssertEqualObjects(@"A", [[StringObject allObjectsInRealm:realm].firstObject stringCol]);
+    XCTAssertEqualObjects(@"B", [[StringObject allObjectsInRealm:realm].lastObject stringCol]);
 }
 
 @end

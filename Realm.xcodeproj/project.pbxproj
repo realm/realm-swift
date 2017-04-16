@@ -441,6 +441,7 @@
 		E86E61241D91E4E200DC2419 /* RLMTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FC51955FE0100FDED82 /* RLMTestCase.m */; };
 		E8917598197A1B350068ACC6 /* UnicodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8917597197A1B350068ACC6 /* UnicodeTests.m */; };
 		E8917599197A1B350068ACC6 /* UnicodeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8917597197A1B350068ACC6 /* UnicodeTests.m */; };
+		E8AE7C261EA436F800CDFF9A /* CompactionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8AE7C251EA436F800CDFF9A /* CompactionTests.swift */; };
 		E8BF67FC1C24D07100E591CD /* SwiftVersion.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8BF67FB1C24D07100E591CD /* SwiftVersion.swift */; };
 		E8C6EAF41DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E8C6EAF51DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -904,6 +905,7 @@
 		E8917597197A1B350068ACC6 /* UnicodeTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UnicodeTests.m; sourceTree = "<group>"; };
 		E891759A197A1B600068ACC6 /* SwiftUnicodeTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftUnicodeTests.swift; sourceTree = "<group>"; };
 		E8951F01196C96DE00D6461C /* RLMRealm_Dynamic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMRealm_Dynamic.h; sourceTree = "<group>"; };
+		E8AE7C251EA436F800CDFF9A /* CompactionTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CompactionTests.swift; sourceTree = "<group>"; };
 		E8BF67FB1C24D07100E591CD /* SwiftVersion.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftVersion.swift; sourceTree = "<group>"; };
 		E8C6EAEF1DD65B8C00EC1A03 /* RLMSyncPermissionChange_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncPermissionChange_Private.h; sourceTree = "<group>"; };
 		E8D89B9D1955FC6D00CF2B9A /* Realm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Realm.h; sourceTree = "<group>"; };
@@ -1238,6 +1240,7 @@
 			isa = PBXGroup;
 			children = (
 				5D6610291BE98DAA0021E04F /* Supporting Files */,
+				E8AE7C251EA436F800CDFF9A /* CompactionTests.swift */,
 				5D660FFF1BE98D880021E04F /* KVOTests.swift */,
 				5D6610001BE98D880021E04F /* ListTests.swift */,
 				5D6610011BE98D880021E04F /* MigrationTests.swift */,
@@ -2271,6 +2274,7 @@
 				5D6610211BE98D880021E04F /* RealmTests.swift in Sources */,
 				5D6610221BE98D880021E04F /* SchemaTests.swift in Sources */,
 				5D6610231BE98D880021E04F /* SortDescriptorTests.swift in Sources */,
+				E8AE7C261EA436F800CDFF9A /* CompactionTests.swift in Sources */,
 				5D6610241BE98D880021E04F /* SwiftLinkTests.swift in Sources */,
 				5D6610251BE98D880021E04F /* SwiftTestObjects.swift in Sources */,
 				5D6610261BE98D880021E04F /* SwiftUnicodeTests.swift in Sources */,
