@@ -509,7 +509,11 @@ class ListTests: TestCase {
                 let objects = realm.objects(SwiftOptionalObject.self)
 
                 let properties = Array(objects.flatMap { $0.optInt8Col.value })
+#if swift(>=3.1)
                 let listsOfObjects = objects.value(forKeyPath: "optInt8Col") as! [Int8]
+#else
+                let listsOfObjects = (objects.value(forKeyPath: "optInt8Col") as! [NSNumber]).map { $0.int8Value }
+#endif
                 let kvcProperties = Array(listsOfObjects.flatMap { $0 })
 
                 XCTAssertEqual(properties, kvcProperties)
