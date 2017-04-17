@@ -26,7 +26,7 @@ import RealmSwift
 // to know if they ever change, so we have the test fail if these numbers fluctuate.
 private let expectedTotalBytesBefore = 655360
 private let expectedUsedBytesBefore = 56264
-private let expectedUsedBytesBeforeMargin = 64.0 // allow for +-64B variation across platforms
+private let expectedUsedBytesBeforeMargin = 184.0 // allow for +-184B variation across platforms
 private let expectedTotalBytesAfter = 57344
 private let expectedTotalBytesAfterMargin = 8192.0 // allow for +-8KB variation across platforms
 private var count = 1000
