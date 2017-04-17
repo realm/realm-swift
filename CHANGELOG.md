@@ -24,6 +24,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Fix a deadlock when multiple processes open a Realm at the same time.
+* Fix `value(forKey:)`/`value(forKeyPath:)` returning incorrect values for `List` properties.
 
 2.5.1 Release notes (2017-04-05)
 =============================================================
