@@ -1719,9 +1719,6 @@
 #pragma mark - Validation
 
 - (void)testCompactOnLaunchCannotBeSet {
-    // This test just needs a single process, so skip child.
-    if (!self.isParent) { return; }
-
     RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
                                                                                             register:YES]
                                                server:[RLMObjectServerTests authServerURL]];
