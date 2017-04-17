@@ -193,6 +193,10 @@ class SwiftListOfSwiftObject: Object {
     let array = List<SwiftObject>()
 }
 
+class SwiftListOfSwiftOptionalObject: Object {
+    let array = List<SwiftOptionalObject>()
+}
+
 class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
     let boolArray = List<SwiftBoolObject>()
 }
