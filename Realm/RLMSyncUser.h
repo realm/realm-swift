@@ -38,15 +38,14 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A `RLMSyncUser` instance represents a single Realm Object Server user account
- (or just user).
+ A `RLMSyncUser` instance represents a single Realm Object Server user account.
 
  A user may have one or more credentials associated with it. These credentials
- uniquely identify the user to a third-party auth provider, and are used to sign
+ uniquely identify the user to the authentication provider, and are used to sign
  into a Realm Object Server user account.
 
  Note that user objects are only vended out via SDK APIs, and cannot be directly
- initialized. Users are thread safe.
+ initialized. User objects can be accessed from any thread.
  */
 @interface RLMSyncUser : NSObject
 
@@ -80,8 +79,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The current state of the user.
-
- @see `RLMSyncUserState`
  */
 @property (nonatomic, readonly) RLMSyncUserState state;
 

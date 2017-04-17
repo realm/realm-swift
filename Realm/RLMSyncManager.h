@@ -62,11 +62,11 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 @interface RLMSyncManager : NSObject
 
 /**
- A block which can optionally be used to report sync-related errors to your application.
+ A block which can optionally be set to report sync-related errors to your application.
 
  Errors reported through this mechanism are fatal, with several exceptions. Please consult
  `RLMSyncError` for information about the types of errors that can be reported through
- the block, and for information on handling the error types that are recoverable.
+ the block, and for for suggestions on handling recoverable error codes.
 
  @see `RLMSyncError`
  */
@@ -90,7 +90,7 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
  The logging threshold which newly opened synced Realms will use. Defaults to
  `RLMSyncLogLevelInfo`.
 
- Logging strings are output to ASL.
+ Logging strings are output to Apple System Logger.
 
  @warning This property must be set before any synced Realms are opened. Setting it after
           opening any synced Realm will do nothing.

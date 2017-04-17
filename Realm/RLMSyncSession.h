@@ -98,8 +98,9 @@ NS_ASSUME_NONNULL_BEGIN
  communication between the client (and a local Realm file on disk), and the server
  (and a remote Realm at a given URL stored on a Realm Object Server).
 
- Sessions are always created by the SDK and vended out through various APIs. The lifespans
- of sessions associated with Realms are managed automatically. Sessions are thread safe.
+ Sessions are always created by the SDK and vended out through various APIs. The
+ lifespans of sessions associated with Realms are managed automatically. Session
+ objects can be accessed from any thread.
  */
 @interface RLMSyncSession : NSObject
 
