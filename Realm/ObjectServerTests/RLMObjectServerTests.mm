@@ -1716,4 +1716,18 @@
     [token stop];
 }
 
+#pragma mark - Validation
+
+- (void)testCompactOnLaunchCannotBeSet {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:ACCOUNT_NAME()
+                                                                                            register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:REALM_URL()];
+
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.syncConfiguration = syncConfig;
+    RLMAssertThrowsWithReasonMatching(configuration.shouldCompactOnLaunch = ^BOOL(NSUInteger, NSUInteger){ return NO; },
+                                      @"Cannot set `shouldCompactOnLaunch` when `syncConfiguration` is set.");
+}
+
 @end

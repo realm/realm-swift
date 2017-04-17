@@ -52,6 +52,80 @@
     }
 }
 
+- (void)testCompactOnLaunchSuccessful {
+    if (self.isParent) {
+        @autoreleasepool {
+            [[RLMRealm defaultRealm] transactionWithBlock:^{}];
+        }
+        RLMRunChildAndWait(); // runs the event loop
+    } else {
+        unsigned long long (^fileSize)(NSString *) = ^unsigned long long(NSString *path) {
+            NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+            return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
+        };
+
+        RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+        config.shouldCompactOnLaunch = ^BOOL(__unused NSUInteger totalBytes, __unused NSUInteger usedBytes){
+            return YES;
+        };
+        unsigned long long sizeBefore = fileSize(config.fileURL.path);
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        unsigned long long sizeAfter = fileSize(config.fileURL.path);
+        XCTAssertGreaterThan(sizeBefore, sizeAfter);
+        XCTAssertTrue(realm.isEmpty);
+    }
+}
+
+- (void)testCompactOnLaunchBeginWriteFailed {
+    if (self.isParent) {
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm beginWriteTransaction];
+        RLMRunChildAndWait(); // runs the event loop
+        [realm cancelWriteTransaction];
+    } else {
+        unsigned long long (^fileSize)(NSString *) = ^unsigned long long(NSString *path) {
+            NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+            return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
+        };
+
+        RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+        config.shouldCompactOnLaunch = ^BOOL(__unused NSUInteger totalBytes, __unused NSUInteger usedBytes){
+            return YES;
+        };
+        unsigned long long sizeBefore = fileSize(config.fileURL.path);
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        unsigned long long sizeAfter = fileSize(config.fileURL.path);
+        XCTAssertEqual(sizeBefore, sizeAfter);
+        XCTAssertTrue(realm.isEmpty);
+    }
+}
+
+- (void)testCompactOnLaunchFailSilently {
+    if (self.isParent) {
+        [[RLMRealm defaultRealm] transactionWithBlock:^{}];
+        RLMRunChildAndWait(); // runs the event loop
+    } else {
+        unsigned long long (^fileSize)(NSString *) = ^unsigned long long(NSString *path) {
+            NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+            return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
+        };
+
+        __block BOOL blockCalled = NO;
+
+        RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+        config.shouldCompactOnLaunch = ^BOOL(__unused NSUInteger totalBytes, __unused NSUInteger usedBytes){
+            blockCalled = YES;
+            return YES;
+        };
+        unsigned long long sizeBefore = fileSize(config.fileURL.path);
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        unsigned long long sizeAfter = fileSize(config.fileURL.path);
+        XCTAssertEqual(sizeBefore, sizeAfter);
+        XCTAssertTrue(realm.isEmpty);
+        XCTAssertTrue(blockCalled);
+    }
+}
+
 - (void)testOpenInParentThenAddObjectInChild {
     RLMRealm *realm = [RLMRealm defaultRealm];
     XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);

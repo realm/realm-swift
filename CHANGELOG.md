@@ -15,6 +15,8 @@ x.x.x Release notes (yyyy-MM-dd)
   background thread before dispatching to the given queue. In addition,
   synchronized Realms wait for all remote content available at the time the
   operation began to be downloaded and available locally.
+* Add `shouldCompactOnLaunch` block property when configuring a Realm to
+  determine if it should be compacted before being returned.
 * Speed up case-insensitive queries on indexed string properties.
 * Add RLMResults's collection aggregate methods to RLMArray.
 * Add support for calling the aggregate methods on unmanaged Lists.
