@@ -280,7 +280,6 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 }
 
 - (void)setShouldCompactOnLaunch:(RLMShouldCompactOnLaunchBlock)shouldCompactOnLaunch {
-    _shouldCompactOnLaunch = shouldCompactOnLaunch;
     if (shouldCompactOnLaunch) {
         if (self.readOnly) {
             @throw RLMException(@"Cannot set `shouldCompactOnLaunch` when `readOnly` is set.");
@@ -294,6 +293,7 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     else {
         _config.should_compact_on_launch_function = nullptr;
     }
+    _shouldCompactOnLaunch = shouldCompactOnLaunch;
 }
 
 @end
