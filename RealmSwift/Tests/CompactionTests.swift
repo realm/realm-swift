@@ -21,14 +21,8 @@ import RealmSwift
 
 // MARK: Expected Sizes
 
-// Note: These exact numbers are very sensitive to changes in core's allocator
-// and other internals unrelated to what this is testing, but it's probably useful
-// to know if they ever change, so we have the test fail if these numbers fluctuate.
-private let expectedTotalBytesBefore = 655360
-private let expectedUsedBytesBefore = 56264
-private let expectedUsedBytesBeforeMargin = 184.0 // allow for +-184B variation across platforms
-private let expectedTotalBytesAfter = 57344
-private let expectedTotalBytesAfterMargin = 8192.0 // allow for +-8KB variation across platforms
+private var expectedTotalBytesBefore = 0
+private let expectedUsedBytesBeforeMin = 50000
 private var count = 1000
 
 // MARK: Helpers
@@ -55,6 +49,7 @@ class CompactionTests: TestCase {
                 realm.create(SwiftStringObject.self, value: ["B"])
             }
         }
+        expectedTotalBytesBefore = fileSize(path: testRealmURL().path)
     }
 
     func testSuccessfulCompactOnLaunch() {
@@ -63,8 +58,7 @@ class CompactionTests: TestCase {
                                          shouldCompactOnLaunch: { totalBytes, usedBytes in
             // Confirm expected sizes
             XCTAssertEqual(totalBytes, expectedTotalBytesBefore)
-            XCTAssertEqualWithAccuracy(Double(usedBytes), Double(expectedUsedBytesBefore),
-                                       accuracy: expectedUsedBytesBeforeMargin)
+            XCTAssert((usedBytes < totalBytes) && (usedBytes > expectedUsedBytesBeforeMin))
 
             // Compact if the file is over 500KB in size and less than 20% 'used'
             // In practice, users might want to use values closer to 100MB and 50%
@@ -75,8 +69,7 @@ class CompactionTests: TestCase {
         // Confirm expected sizes before and after opening the Realm
         XCTAssertEqual(fileSize(path: config.fileURL!.path), expectedTotalBytesBefore)
         let realm = try! Realm(configuration: config)
-        XCTAssertEqualWithAccuracy(Double(fileSize(path: config.fileURL!.path)), Double(expectedTotalBytesAfter),
-                                   accuracy: expectedTotalBytesAfterMargin)
+        XCTAssertLessThan(fileSize(path: config.fileURL!.path), expectedTotalBytesBefore)
 
         // Validate that the file still contains what it should
         XCTAssertEqual(realm.objects(SwiftStringObject.self).count, count + 2)
