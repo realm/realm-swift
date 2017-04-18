@@ -29,14 +29,8 @@
 
 #pragma mark - Expected Sizes
 
-// Note: These exact numbers are very sensitive to changes in core's allocator
-// and other internals unrelated to what this is testing, but it's probably useful
-// to know if they ever change, so we have the test fail if these numbers fluctuate.
-NSUInteger expectedTotalBytesBefore = 655360;
-NSUInteger expectedUsedBytesBefore = 70000;
-NSUInteger expectedUsedBytesBeforeMargin = 2248; // allow for +-2KB variation across platforms
-NSUInteger expectedTotalBytesAfter = 75000;
-NSUInteger expectedTotalBytesAfterMargin = 10240; // allow for +-10KB variation across platforms
+NSUInteger expectedTotalBytesBefore = 0;
+NSUInteger expectedUsedBytesBeforeMin = 50000;
 NSUInteger count = 1000;
 
 #pragma mark - Helpers
@@ -60,6 +54,7 @@ NSUInteger count = 1000;
             [StringObject createInRealm:realm withValue:@[@"B"]];
         }];
     }
+    expectedTotalBytesBefore = [self fileSize:RLMTestRealmURL()];
 }
 
 #pragma mark - Tests
@@ -87,7 +82,7 @@ NSUInteger count = 1000;
     configuration.shouldCompactOnLaunch = ^BOOL(NSUInteger totalBytes, NSUInteger usedBytes){
         // Confirm expected sizes
         XCTAssertEqual(totalBytes, expectedTotalBytesBefore);
-        XCTAssertEqualWithAccuracy(usedBytes, expectedUsedBytesBefore, expectedUsedBytesBeforeMargin);
+        XCTAssertTrue((usedBytes < totalBytes) && (usedBytes > expectedUsedBytesBeforeMin));
 
         // Compact if the file is over 500KB in size and less than 20% 'used'
         // In practice, users might want to use values closer to 100MB and 50%
@@ -98,7 +93,7 @@ NSUInteger count = 1000;
     // Confirm expected sizes before and after opening the Realm
     XCTAssertEqual([self fileSize:configuration.fileURL], expectedTotalBytesBefore);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nil];
-    XCTAssertEqualWithAccuracy([self fileSize:configuration.fileURL], expectedTotalBytesAfter, expectedTotalBytesAfterMargin);
+    XCTAssertLessThan([self fileSize:configuration.fileURL], expectedTotalBytesBefore);
 
     // Validate that the file still contains what it should
     XCTAssertEqual([[StringObject allObjectsInRealm:realm] count], count + 2);
@@ -133,7 +128,7 @@ NSUInteger count = 1000;
     configurationWithCompactBlock.shouldCompactOnLaunch = ^BOOL(NSUInteger totalBytes, NSUInteger usedBytes){
         // Confirm expected sizes
         XCTAssertEqual(totalBytes, expectedTotalBytesBefore);
-        XCTAssertEqualWithAccuracy(usedBytes, expectedUsedBytesBefore, expectedUsedBytesBeforeMargin);
+        XCTAssertTrue((usedBytes < totalBytes) && (usedBytes > expectedUsedBytesBeforeMin));
 
         // Always attempt to compact
         return YES;
@@ -157,7 +152,7 @@ NSUInteger count = 1000;
     configuration.shouldCompactOnLaunch = ^BOOL(NSUInteger totalBytes, NSUInteger usedBytes){
         // Confirm expected sizes
         XCTAssertEqual(totalBytes, expectedTotalBytesBefore);
-        XCTAssertEqualWithAccuracy(usedBytes, expectedUsedBytesBefore, expectedUsedBytesBeforeMargin);
+        XCTAssertTrue((usedBytes < totalBytes) && (usedBytes > expectedUsedBytesBeforeMin));
 
         // Don't compact.
         return NO;
