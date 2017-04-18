@@ -108,7 +108,7 @@ public final class Realm {
      - parameter callbackQueue: The dispatch queue on which the callback should be run.
      - parameter callback:      A callback block. If the Realm was successfully opened, an
                                 it will be passed in as an argument.
-                                Otherwise, a `Realm.Error` describing what went wrong will be
+                                Otherwise, a `Swift.Error` describing what went wrong will be
                                 passed to the block instead.
 
      - note: The returned Realm is confined to the thread on which it was created.
@@ -118,9 +118,9 @@ public final class Realm {
      */
     public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration,
                                  callbackQueue: DispatchQueue = .main,
-                                 callback: @escaping (Realm?, Realm.Error?) -> Void) {
-        RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: callbackQueue) { rlmRealm, nsError in
-            callback(rlmRealm.flatMap(Realm.init), nsError as! Realm.Error?)
+                                 callback: @escaping (Realm?, Swift.Error?) -> Void) {
+        RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: callbackQueue) { rlmRealm, error in
+            callback(rlmRealm.flatMap(Realm.init), error)
         }
     }
 
