@@ -11,7 +11,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix an issue where calling `Realm.asyncOpen(...)` with a synchronized Realm
+  configuration would crash in error cases rather than report the error.
+  This is a small source breaking change if you were relying on the error
+  being reported to be a `Realm.Error`.
 
 2.6.0 Release notes (2017-04-18)
 =============================================================
