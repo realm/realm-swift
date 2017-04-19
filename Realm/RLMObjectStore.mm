@@ -296,7 +296,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
         }
         else if ([object respondsToSelector:prop.getterSel]) {
             value = [object valueForKey:prop.getterName];
-            if (RLMPropertySubtypeIsInteger(prop.subtype)) {
+            if ([value conformsToProtocol:@protocol(RLMIntegerProtocol)]) {
                 value = [(id<RLMIntegerProtocol>)value boxedValue];
             }
         }

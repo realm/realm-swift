@@ -286,11 +286,11 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 }
 
 template<typename Type, typename ViewClass>
-static inline id RLMMakeRealmIntegerGetter(NSUInteger index) {
+static inline id RLMMakeRealmIntegerGetter(NSUInteger index, NSString *name) {
     return ^Type(__unsafe_unretained RLMObjectBase *const obj) {
         RLMVerifyAttached(obj);
         size_t col = obj->_info->objectSchema->persisted_properties[index].table_column;
-        return [[ViewClass alloc] initWithRow:obj->_row columnIndex:col realm:obj->_realm];
+        return [[ViewClass alloc] initWithRow:obj->_row columnIndex:col object:obj name:name realm:obj->_realm];
     };
 }
 
@@ -301,9 +301,9 @@ static id RLMAccessorGetter(RLMProperty *prop, const char *type) {
     switch (prop.type) {
         case RLMPropertyTypeInt:
             if (prop.subtype == RLMPropertySubtypeInteger) {
-                return RLMMakeRealmIntegerGetter<RLMInteger *, RLMIntegerView>(index);
+                return RLMMakeRealmIntegerGetter<RLMInteger *, RLMIntegerView>(index, prop.name);
             } else if (prop.subtype == RLMPropertySubtypeNullableInteger) {
-                return RLMMakeRealmIntegerGetter<RLMNullableInteger *, RLMNullableIntegerView>(index);
+                return RLMMakeRealmIntegerGetter<RLMNullableInteger *, RLMNullableIntegerView>(index, prop.name);
             }
             if (boxed) {
                 return ^(__unsafe_unretained RLMObjectBase *const obj) {

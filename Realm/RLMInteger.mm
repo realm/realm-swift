@@ -18,6 +18,8 @@
 
 #import "RLMInteger_Private.hpp"
 
+#import "RLMObject_Private.hpp"
+#import "RLMObservation.hpp"
 #import "RLMProperty.h"
 #import "RLMRealm_Private.h"
 #import "RLMUtil.hpp"
@@ -36,6 +38,26 @@ template<typename T> static inline void verifyInWriteTransaction(__unsafe_unreta
     }
 }
 
+namespace {
+    
+void set_nullable_int(NSNumber<RLMInt> *value, realm::Row& row, size_t colIndex, size_t rowIndex) {
+    if (value) {
+        row.get_table()->set_int(colIndex, rowIndex, value.longLongValue, false);
+    } else {
+        row.get_table()->set_null(colIndex, rowIndex);
+    }
+}
+    
+template <typename TableType>
+void increment_nullable_int(TableType table, size_t colIndex, size_t rowIndex, NSInteger delta) {
+    if (table->is_null(colIndex, rowIndex)) {
+        @throw RLMException(@"Cannot increment a RLMNullableInteger property whose value is nil. Set its value first.");
+    }
+    table->add_int(colIndex, rowIndex, delta);
+}
+    
+}
+
 @implementation RLMInteger
 
 - (instancetype)init {
@@ -52,8 +74,22 @@ template<typename T> static inline void verifyInWriteTransaction(__unsafe_unreta
     return self;
 }
 
+- (void)setValue:(NSInteger)value {
+    realm::Row row;
+    if (_object) {
+        REALM_ASSERT_DEBUG(_name);
+        if (RLMObservationInfo *info = RLMGetObservationInfo(_object->_observationInfo, row.get_index(), *_object->_info)) {
+            info->willChange(_name);
+            _value = value;
+            info->didChange(_name);
+            return;
+        }
+    }
+    _value = value;
+}
+
 - (void)incrementValueBy:(NSInteger)delta {
-    _value += delta;
+    self.value += delta;
 }
 
 - (NSNumber<RLMInt> *)boxedValue {
@@ -86,11 +122,25 @@ template<typename T> static inline void verifyInWriteTransaction(__unsafe_unreta
     return self;
 }
 
+- (void)setValue:(NSNumber<RLMInt> *)value {
+    realm::Row row;
+    if (_object) {
+        REALM_ASSERT_DEBUG(_name);
+        if (RLMObservationInfo *info = RLMGetObservationInfo(_object->_observationInfo, row.get_index(), *_object->_info)) {
+            info->willChange(_name);
+            _value = value;
+            info->didChange(_name);
+            return;
+        }
+    }
+    _value = value;
+}
+
 - (void)incrementValueBy:(NSInteger)delta {
     if (!_value) {
         @throw RLMException(@"Cannot increment a RLMNullableInteger property whose value is nil. Set its value first.");
     }
-    _value = @(_value.integerValue + delta);
+    self.value = @(_value.integerValue + delta);
 }
 
 - (NSNumber<RLMInt> *)boxedValue {
@@ -123,8 +173,10 @@ template<typename T> static inline void verifyInWriteTransaction(__unsafe_unreta
     return nil;
 }
 
-- (instancetype)initWithRow:(realm::Row)row columnIndex:(size_t)colIndex realm:(RLMRealm *)realm {
+- (instancetype)initWithRow:(realm::Row)row columnIndex:(size_t)colIndex object:(RLMObjectBase *)object name:(NSString *)name realm:(RLMRealm *)realm {
     if (self = [super init]) {
+        _name = name;
+        _object = object;
         _row = row;
         _colIndex = colIndex;
         _realm = realm;
@@ -134,7 +186,14 @@ template<typename T> static inline void verifyInWriteTransaction(__unsafe_unreta
 
 - (void)setValue:(NSInteger)value {
     verifyInWriteTransaction(self);
-    _row.get_table()->set_int(_colIndex, _row.get_index(), value, false);
+    size_t rowIndex = _row.get_index();
+    if (RLMObservationInfo *info = RLMGetObservationInfo(_object->_observationInfo, rowIndex, *_object->_info)) {
+        info->willChange(_name);
+        _row.get_table()->set_int(_colIndex, rowIndex, value, false);
+        info->didChange(_name);
+    } else {
+        _row.get_table()->set_int(_colIndex, rowIndex, value, false);
+    }
 }
 
 - (NSInteger)value {
@@ -144,7 +203,14 @@ template<typename T> static inline void verifyInWriteTransaction(__unsafe_unreta
 
 - (void)incrementValueBy:(NSInteger)delta {
     verifyInWriteTransaction(self);
-    _row.get_table()->add_int(_colIndex, _row.get_index(), delta);
+    size_t rowIndex = _row.get_index();
+    if (RLMObservationInfo *info = RLMGetObservationInfo(_object->_observationInfo, rowIndex, *_object->_info)) {
+        info->willChange(_name);
+        _row.get_table()->add_int(_colIndex, rowIndex, delta);
+        info->didChange(_name);
+    } else {
+        _row.get_table()->add_int(_colIndex, rowIndex, delta);
+    }
 }
 
 @end
@@ -164,8 +230,10 @@ template<typename T> static inline void verifyInWriteTransaction(__unsafe_unreta
     return nil;
 }
 
-- (instancetype)initWithRow:(realm::Row)row columnIndex:(size_t)colIndex realm:(RLMRealm *)realm {
+- (instancetype)initWithRow:(realm::Row)row columnIndex:(size_t)colIndex object:(RLMObjectBase *)object name:(NSString *)name realm:(RLMRealm *)realm {
     if (self = [super init]) {
+        _name = name;
+        _object = object;
         _row = row;
         _colIndex = colIndex;
         _realm = realm;
@@ -175,10 +243,13 @@ template<typename T> static inline void verifyInWriteTransaction(__unsafe_unreta
 
 - (void)setValue:(NSNumber<RLMInt> *)value {
     verifyInWriteTransaction(self);
-    if (value) {
-        _row.get_table()->set_int(_colIndex, _row.get_index(), value.longLongValue, false);
+    size_t rowIndex = _row.get_index();
+    if (RLMObservationInfo *info = RLMGetObservationInfo(_object->_observationInfo, rowIndex, *_object->_info)) {
+        info->willChange(_name);
+        set_nullable_int(value, _row, _colIndex, rowIndex);
+        info->didChange(_name);
     } else {
-        _row.get_table()->set_null(_colIndex, _row.get_index());
+        set_nullable_int(value, _row, _colIndex, rowIndex);
     }
 }
 
@@ -194,10 +265,14 @@ template<typename T> static inline void verifyInWriteTransaction(__unsafe_unreta
 - (void)incrementValueBy:(NSInteger)delta {
     verifyInWriteTransaction(self);
     auto table = _row.get_table();
-    if (table->is_null(_colIndex, _row.get_index())) {
-        @throw RLMException(@"Cannot increment a RLMNullableInteger property whose value is nil. Set its value first.");
+    size_t rowIndex = _row.get_index();
+    if (RLMObservationInfo *info = RLMGetObservationInfo(_object->_observationInfo, rowIndex, *_object->_info)) {
+        info->willChange(_name);
+        increment_nullable_int(table, _colIndex, rowIndex, delta);
+        info->didChange(_name);
+    } else {
+        increment_nullable_int(table, _colIndex, rowIndex, delta);
     }
-    table->add_int(_colIndex, _row.get_index(), delta);
 }
 
 @end

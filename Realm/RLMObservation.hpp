@@ -84,7 +84,7 @@ public:
     //
     // prepareForInvalidation() must be called on the head of the linked list
     // (i.e. on the object pointed to directly by the object schema)
-    id valueForKey(NSString *key);
+    id valueForKey(NSString *key, bool condenseRealmInts=true);
 
     void prepareForInvalidation();
 
