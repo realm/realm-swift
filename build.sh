@@ -12,6 +12,7 @@
 #          to be run with zsh.
 set -o pipefail
 set -e
+set -x
 
 source_root="$(dirname "$0")"
 
