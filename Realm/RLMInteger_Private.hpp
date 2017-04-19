@@ -21,7 +21,14 @@
 #import <realm/link_view.hpp>
 #import <realm/row.hpp>
 
-@class RLMRealm;
+@class RLMRealm, RLMObjectBase;
+
+@interface RLMInteger () {
+    @public
+    __weak RLMObjectBase *_object;
+    NSString *_name;
+}
+@end
 
 /**
  Private implementation subclass of RLMInteger representing a Realm integer
@@ -29,8 +36,15 @@
  */
 @interface RLMIntegerView : RLMInteger
 
-- (instancetype)initWithRow:(realm::Row)row columnIndex:(size_t)colIndex realm:(RLMRealm *)realm;
+- (instancetype)initWithRow:(realm::Row)row columnIndex:(size_t)colIndex object:(RLMObjectBase *)object name:(NSString *)name realm:(RLMRealm *)realm;
 
+@end
+
+@interface RLMNullableInteger () {
+    @public
+    __weak RLMObjectBase *_object;
+    NSString *_name;
+}
 @end
 
 /**
@@ -39,6 +53,6 @@
  */
 @interface RLMNullableIntegerView : RLMNullableInteger
 
-- (instancetype)initWithRow:(realm::Row)row columnIndex:(size_t)colIndex realm:(RLMRealm *)realm;
+- (instancetype)initWithRow:(realm::Row)row columnIndex:(size_t)colIndex object:(RLMObjectBase *)object name:(NSString *)name realm:(RLMRealm *)realm;
 
 @end
