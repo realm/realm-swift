@@ -29,19 +29,26 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
     @objc fileprivate var object: RLMWeakObjectHandle?
     @objc fileprivate var property: RLMProperty?
     @objc fileprivate var predicate: NSPredicate?
+    @objc fileprivate var sortDescriptors: [RLMSortDescriptor]?
 
     internal var rlmResults: RLMResults<RLMObject> {
         if cachedRLMResults == nil {
             if let object = self.object, let property = self.property {
-                let results = RLMDynamicGet(object.object, property)! as? RLMResults
+                var results = RLMDynamicGet(object.object, property)! as? RLMResults
+                
                 if let predicate = self.predicate {
-                    self.cachedRLMResults = results?.objects(with: predicate)
-                } else {
-                    self.cachedRLMResults = results
+                    results = results?.objects(with: predicate)
                 }
+                
+                if let sortDescriptors = self.sortDescriptors {
+                    results = results?.sortedResults(using: sortDescriptors)
+                }
+                
+                self.cachedRLMResults = results
+                self.predicate = nil
                 self.object = nil
                 self.property = nil
-                self.predicate = nil
+                self.sortDescriptors = nil
             } else {
                 cachedRLMResults = RLMResults.emptyDetached()
             }
@@ -49,10 +56,11 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
         return cachedRLMResults!
     }
 
-    init(fromClassName objectClassName: String, property propertyName: String, with predicate: NSPredicate? = nil) {
+    init(fromClassName objectClassName: String, property propertyName: String, with predicate: NSPredicate? = nil, using sortDescriptors: [RLMSortDescriptor]? = nil) {
         self.objectClassName = objectClassName
         self.propertyName = propertyName
         self.predicate = predicate
+        self.sortDescriptors = sortDescriptors
     }
 
     // MARK: Fast Enumeration
@@ -107,9 +115,9 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter type:         The type of the object owning the property the linking objects should refer to.
      - parameter propertyName: The property name of the property the linking objects should refer to.
      */
-    public init(fromType type: T.Type, property propertyName: String, with predicate: NSPredicate? = nil) {
+    public init(fromType type: T.Type, property propertyName: String, with predicate: NSPredicate? = nil, using sortDescriptors: [SortDescriptor]? = nil) {
         let className = (T.self as Object.Type).className()
-        super.init(fromClassName: className, property: propertyName, with: predicate)
+        super.init(fromClassName: className, property: propertyName, with: predicate, using: sortDescriptors?.map { $0.rlmSortDescriptorValue })
     }
 
     /// A human-readable description of the objects represented by the linking objects.
