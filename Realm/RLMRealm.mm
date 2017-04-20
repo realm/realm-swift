@@ -201,7 +201,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     }
     static dispatch_queue_t queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue", DISPATCH_QUEUE_CONCURRENT);
     dispatch_async(queue, ^{
-        (void)realmStrongRef;
         @autoreleasepool {
             RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
             if (!realm || error) {
@@ -224,6 +223,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
             }
             session->wait_for_download_completion([=](std::error_code error) {
                 dispatch_async(callbackQueue, ^{
+                    (void)realmStrongRef;
                     NSError *err = nil;
                     if (error == std::error_code{}) {
                         // Success
