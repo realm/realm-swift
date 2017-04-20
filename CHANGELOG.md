@@ -13,6 +13,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix an issue where calling `Realm.asyncOpen(...)` with a synchronized Realm
   configuration would fail with an "Operation canceled" error.
+* Fix initial collection notification sometimes not being delivered for synced
+  Realms.
+* Fix circular links sometimes resulting in objects not being marked as
+  modified in change notifications.
 
 2.6.1 Release notes (2017-04-18)
 =============================================================
