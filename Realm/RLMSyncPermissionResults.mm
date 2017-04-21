@@ -23,7 +23,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMSchema_Private.hpp"
-#import "RLMSyncPermissions_Private.hpp"
+#import "RLMSyncPermissionValue_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMUtil.hpp"
 

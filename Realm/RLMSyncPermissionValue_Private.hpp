@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncPermissions.h"
+#import "RLMSyncPermissionValue.h"
 
 #import "sync/sync_permission.hpp"
 

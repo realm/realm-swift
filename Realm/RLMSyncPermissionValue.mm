@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncPermissions_Private.hpp"
+#import "RLMSyncPermissionValue_Private.hpp"
 
 #import "RLMUtil.hpp"
 

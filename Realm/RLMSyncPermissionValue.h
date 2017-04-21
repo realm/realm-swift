@@ -35,7 +35,6 @@ typedef NS_ENUM(NSUInteger, RLMSyncAccessLevel) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-// TODO: rename the existing `RLMSyncPermission` and make this class the canonical `RLMSyncPermission`.
 /**
  A value representing a permission granted to one or more users with respect to a particular Realm.
 
