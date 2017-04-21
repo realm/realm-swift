@@ -93,7 +93,8 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
 #pragma mark - Permission
 
 @interface RLMSyncPermissionValue () {
-@protected
+@private
+    NSString *_userID;
     util::Optional<Permission> _underlying;
     RLMSyncAccessLevel _accessLevel;
     NSString *_path;
@@ -102,31 +103,26 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
 
 @implementation RLMSyncPermissionValue
 
-// Private
-- (instancetype)initWithAccessLevel:(RLMSyncAccessLevel)accessLevel
-                               path:(NSString *)path {
-    if (self = [super init]) {
-        _accessLevel = accessLevel;
-        _path = path;
-    }
+- (instancetype)initPrivate {
+    self = [super init];
     return self;
 }
 
 - (instancetype)initWithRealmPath:(NSString *)path
                            userID:(NSString *)userID
                       accessLevel:(RLMSyncAccessLevel)accessLevel {
-    return [[RLMSyncUserIDPermissionValue alloc] initWithRealmPath:path userID:userID accessLevel:accessLevel];
-}
-
-- (instancetype)initPrivate {
-    self = [super init];
+    if (self = [super init]) {
+        _accessLevel = accessLevel;
+        _path = path;
+        _userID = userID;
+    }
     return self;
 }
 
 - (instancetype)initWithPermission:(Permission)permission {
     switch (permission.condition.type) {
         case ConditionType::UserId:
-            self = [[RLMSyncUserIDPermissionValue alloc] initPrivate];
+            self = [[RLMSyncPermissionValue alloc] initPrivate];
             break;
         case ConditionType::KeyValue:
             @throw RLMException(@"Key-value permissions are not yet supported in Realm Objective-C or Realm Swift.");
@@ -151,10 +147,6 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
     return objCAccessLevelForAccessLevel(_underlying->access);
 }
 
-- (realm::Permission)rawPermission {
-    REALM_TERMINATE("Subclasses must override this method.");
-}
-
 - (BOOL)mayRead {
     return self.accessLevel != RLMSyncAccessLevelNone;
 }
@@ -167,44 +159,7 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
     return self.accessLevel == RLMSyncAccessLevelAdmin;
 }
 
-- (NSString *)key {
-    return nil;
-}
-
-- (NSString *)value {
-    return nil;
-}
-
-- (NSString *)userID {
-    return nil;
-}
-
-@end
-
-#pragma mark - User ID permission
-
-@interface RLMSyncUserIDPermissionValue () {
-    NSString *_userID;
-}
-@end
-
-@implementation RLMSyncUserIDPermissionValue
-
-- (instancetype)initPrivate {
-    self = [super initPrivate];
-    return self;
-}
-
-- (instancetype)initWithRealmPath:(NSString *)path
-                           userID:(NSString *)userID
-                      accessLevel:(RLMSyncAccessLevel)accessLevel {
-    if (self = [super initWithAccessLevel:accessLevel path:path]) {
-        _userID = userID;
-    }
-    return self;
-}
-
-- (NSString *)userID {
+- (NSString *)userId {
     if (!_underlying) {
         return _userID;
     }
@@ -225,22 +180,22 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
 }
 
 - (NSUInteger)hash {
-    return [self.userID hash] ^ self.accessLevel;
+    return [self.userId hash] ^ self.accessLevel;
 }
 
 - (BOOL)isEqual:(id)object {
-    if ([object isKindOfClass:[RLMSyncUserIDPermissionValue class]]) {
-        RLMSyncUserIDPermissionValue *that = (RLMSyncUserIDPermissionValue *)object;
+    if ([object isKindOfClass:[RLMSyncPermissionValue class]]) {
+        RLMSyncPermissionValue *that = (RLMSyncPermissionValue *)object;
         return (self.accessLevel == that.accessLevel
-                && pathsAreEquivalent(self.path, that.path, self.userID, that.userID)
-                && [self.userID isEqualToString:that.userID]);
+                && pathsAreEquivalent(self.path, that.path, self.userId, that.userId)
+                && [self.userId isEqualToString:that.userId]);
     }
     return NO;
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"<RLMSyncUserIDPermissionValue> user ID: %@, path: %@, access level: %@",
-            self.userID,
+    return [NSString stringWithFormat:@"<RLMSyncPermissionValue> user ID: %@, path: %@, access level: %@",
+            self.userId,
             self.path,
             descriptionForAccessLevel(self.accessLevel)];
 }

@@ -76,7 +76,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The user ID of the user to whom these permissions are granted.
  */
-@property (nullable, nonatomic, readonly) NSString *userID;
+@property (nullable, nonatomic, readonly) NSString *userId;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("Use the designated initializer")));

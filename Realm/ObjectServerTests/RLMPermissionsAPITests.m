@@ -92,7 +92,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     return [[RLMSyncPermissionValue alloc] initWithRealmPath:[NSString stringWithFormat:@"/%@/%@",
                                                               owner.identity,
                                                               realmName]
-                                                      userID:original.userID
+                                                      userID:original.userId
                                                  accessLevel:original.accessLevel];
 }
 

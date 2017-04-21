@@ -35,6 +35,9 @@ typedef enum : NSUInteger {
 
 /**
  An object representing the results of a permissions query.
+ 
+ This collection will automatically update its contents at the start of each runloop
+ iteration, but the objects it vends are immutable and will themselves not change.
 
  Permissions results objects are thread-confined, and should not be shared across
  threads.
