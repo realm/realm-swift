@@ -20,17 +20,6 @@
 
 #import "RLMSyncUtil_Private.h"
 
-typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
-    // Specific
-    RLMSyncSystemErrorKindClientReset,
-    // General
-    RLMSyncSystemErrorKindClient,
-    RLMSyncSystemErrorKindConnection,
-    RLMSyncSystemErrorKindSession,
-    RLMSyncSystemErrorKindUser,
-    RLMSyncSystemErrorKindUnknown,
-};
-
 @class RLMSyncUser, RLMSyncConfiguration;
 
 // All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be

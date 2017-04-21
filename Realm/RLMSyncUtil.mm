@@ -19,6 +19,7 @@
 #import <Foundation/Foundation.h>
 
 #import "RLMSyncConfiguration_Private.hpp"
+#import "RLMSyncErrorResponseModel.h"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
@@ -64,6 +65,8 @@ static RLMRealmConfiguration *RLMRealmSpecialPurposeConfiguration(RLMSyncUser *u
 RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
 
 NSString *const RLMSyncErrorDomain = @"io.realm.sync";
+NSString *const RLMSyncAuthErrorDomain = @"io.realm.sync.auth";
+NSString *const RLMSyncPermissionErrorDomain = @"io.realm.sync.permission";
 
 NSString *const kRLMSyncPathOfRealmBackupCopyKey            = @"recovered_realm_location_path";
 NSString *const kRLMSyncInitiateClientResetBlockKey         = @"initiate_client_reset_block";
@@ -79,7 +82,24 @@ NSString *const kRLMSyncProviderKey             = @"provider";
 NSString *const kRLMSyncRegisterKey             = @"register";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
 
-namespace realm {
+#pragma mark - C++ APIs
+
+namespace {
+
+NSError *make_permission_error(NSString *description, util::Optional<NSInteger> code, bool is_get) {
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
+    if (description) {
+        userInfo[NSLocalizedDescriptionKey] = description;
+    }
+    if (code) {
+        userInfo[kRLMSyncErrorStatusCodeKey] = @(*code);
+    }
+    return [NSError errorWithDomain:RLMSyncPermissionErrorDomain
+                               code:is_get ? RLMSyncPermissionErrorGetFailed : RLMSyncPermissionErrorChangeFailed
+                           userInfo:userInfo];
+}
+
+}
 
 SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy) {
     switch (stopPolicy) {
@@ -90,8 +110,7 @@ SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy) {
     REALM_UNREACHABLE();    // Unrecognized stop policy.
 }
 
-RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy)
-{
+RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy) {
     switch (stop_policy) {
         case SyncSessionStopPolicy::Immediately:            return RLMSyncStopPolicyImmediately;
         case SyncSessionStopPolicy::LiveIndefinitely:       return RLMSyncStopPolicyLiveIndefinitely;
@@ -100,8 +119,7 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy)
     REALM_UNREACHABLE();
 }
 
-std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm)
-{
+std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
     Realm::Config realmConfig = realm.configuration.config;
     if (auto config = realmConfig.sync_config) {
         std::shared_ptr<SyncUser> user = config->user;
@@ -112,7 +130,80 @@ std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm)
     return nullptr;
 }
 
+NSError *make_auth_error_bad_response(NSDictionary *json) {
+    return [NSError errorWithDomain:RLMSyncAuthErrorDomain
+                               code:RLMSyncAuthErrorBadResponse
+                           userInfo:json ? @{kRLMSyncErrorJSONKey: json} : nil];
 }
+
+NSError *make_auth_error_http_status(NSInteger status) {
+    return [NSError errorWithDomain:RLMSyncAuthErrorDomain
+                               code:RLMSyncAuthErrorHTTPStatusCodeError
+                           userInfo:@{kRLMSyncErrorStatusCodeKey: @(status)}];
+}
+
+NSError *make_auth_error_client_issue() {
+    return [NSError errorWithDomain:RLMSyncAuthErrorDomain
+                               code:RLMSyncAuthErrorClientSessionError
+                           userInfo:nil];
+}
+
+NSError *make_auth_error(RLMSyncErrorResponseModel *model) {
+    NSString *description = model.title;
+    return [NSError errorWithDomain:RLMSyncAuthErrorDomain
+                               code:model.code
+                           userInfo:description ? @{NSLocalizedDescriptionKey: description} : nil];
+}
+
+NSError *make_permission_error_get(NSString *description, util::Optional<NSInteger> code) {
+    return make_permission_error(description, std::move(code), true);
+}
+
+NSError *make_permission_error_change(NSString *description, util::Optional<NSInteger> code) {
+    return make_permission_error(description, std::move(code), false);
+}
+
+NSError *make_sync_error(RLMSyncSystemErrorKind kind, NSString *description, NSInteger code, NSDictionary *custom) {
+    NSDictionary *userInfo;
+    if (custom) {
+        NSMutableDictionary *buffer = [custom mutableCopy];
+        buffer[NSLocalizedDescriptionKey] = description;
+        buffer[kRLMSyncErrorStatusCodeKey] = @(code);
+        userInfo = buffer;
+    } else {
+        userInfo = @{NSLocalizedDescriptionKey: description,
+                     kRLMSyncErrorStatusCodeKey: @(code)};
+    }
+    RLMSyncError errorCode;
+    switch (kind) {
+        case RLMSyncSystemErrorKindClientReset: {
+            errorCode = RLMSyncErrorClientResetError;
+            break;
+        }
+        case RLMSyncSystemErrorKindUser:
+            errorCode = RLMSyncErrorClientUserError;
+            break;
+        case RLMSyncSystemErrorKindSession:
+            errorCode = RLMSyncErrorClientSessionError;
+            break;
+        case RLMSyncSystemErrorKindConnection:
+        case RLMSyncSystemErrorKindClient:
+        case RLMSyncSystemErrorKindUnknown:
+            errorCode = RLMSyncErrorClientInternalError;
+            break;
+    }
+    return [NSError errorWithDomain:RLMSyncErrorDomain
+                               code:errorCode
+                           userInfo:userInfo];
+}
+
+NSError *make_sync_error(NSError *wrapped_auth_error) {
+    return [NSError errorWithDomain:RLMSyncErrorDomain
+                               code:RLMSyncErrorUnderlyingAuthError
+                           userInfo:@{kRLMSyncUnderlyingErrorKey: wrapped_auth_error}];
+}
+
+#pragma mark - C APIs
 
 RLMSyncManagementObjectStatus RLMMakeSyncManagementObjectStatus(NSNumber<RLMInt> *statusCode) {
     if (!statusCode) {

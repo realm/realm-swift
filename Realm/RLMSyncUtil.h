@@ -29,34 +29,30 @@ extern NSString *const kRLMSyncPathOfRealmBackupCopyKey;
 /// A user info key for use with `RLMSyncErrorClientResetError`.
 extern NSString *const kRLMSyncInitiateClientResetBlockKey;
 
-/// The error domain string for all SDK errors related to synchronization functionality.
+/**
+ The error domain string for all SDK errors related to errors reported
+ by the synchronization manager error handler, as well as general sync
+ errors that don't fall into any of the other categories.
+ */
 extern NSString *const RLMSyncErrorDomain;
 
-/// An error which is related to authentication to a Realm Object Server.
-typedef RLM_ERROR_ENUM(NSInteger, RLMSyncAuthError, RLMSyncErrorDomain) {
-    /// An error that indicates that the provided credentials are invalid.
-    RLMSyncAuthErrorInvalidCredential   = 611,
+/**
+ The error domain string for all SDK errors related to the authentication
+ endpoint.
+ */
+extern NSString *const RLMSyncAuthErrorDomain;
 
-    /// An error that indicates that the user with provided credentials does not exist.
-    RLMSyncAuthErrorUserDoesNotExist    = 612,
+/**
+ The error domain string for all SDK errors related to the permissions
+ system and APIs.
+ */
+extern NSString *const RLMSyncPermissionErrorDomain;
 
-    /// An error that indicates that the user cannot be registered as it exists already.
-    RLMSyncAuthErrorUserAlreadyExists   = 613,
-};
-
-/// An error which is related to synchronization with a Realm Object Server.
+/**
+ An error related to a problem that might be reported by the synchronization manager
+ error handler, or a callback on a sync-related API that performs asynchronous work.
+ */
 typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
-    /// An error that indicates that the response received from the authentication server was malformed.
-    RLMSyncErrorBadResponse             = 1,
-
-    /// An error that indicates that the supplied Realm path was invalid, or could not be resolved by the authentication
-    /// server.
-    RLMSyncErrorBadRemoteRealmPath      = 2,
-
-    /// An error that indicates that the response received from the authentication server was an HTTP error code. The
-    /// `userInfo` dictionary contains the actual error code value.
-    RLMSyncErrorHTTPStatusCodeError     = 3,
-
     /// An error that indicates a problem with the session (a specific Realm opened for sync).
     RLMSyncErrorClientSessionError      = 4,
 
@@ -102,13 +98,56 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      */
     RLMSyncErrorClientResetError        = 7,
 
-#warning TODO: move these errors elsewhere, they don't belong here.
+    /**
+     An error that indicates an authentication error occurred.
+
+     The `kRLMSyncUnderlyingErrorKey` key in the user info dictionary will contain the
+     underlying error, which is guaranteed to be under the `RLMSyncAuthErrorDomain`
+     error domain.
+     */
+    RLMSyncErrorUnderlyingAuthError     = 8,
+};
+
+/// An error which is related to authentication to a Realm Object Server.
+typedef RLM_ERROR_ENUM(NSInteger, RLMSyncAuthError, RLMSyncAuthErrorDomain) {
+    /// An error that indicates that the response received from the authentication server was malformed.
+    RLMSyncAuthErrorBadResponse         = 1,
+
+    /// An error that indicates that the supplied Realm path was invalid, or could not be resolved by the authentication
+    /// server.
+    RLMSyncAuthErrorBadRemoteRealmPath  = 2,
+
+    /// An error that indicates that the response received from the authentication server was an HTTP error code. The
+    /// `userInfo` dictionary contains the actual error code value.
+    RLMSyncAuthErrorHTTPStatusCodeError = 3,
+
+    /// An error that indicates a problem with the session (a specific Realm opened for sync).
+    RLMSyncAuthErrorClientSessionError  = 4,
+
+    /// An error that indicates that the provided credentials are invalid.
+    RLMSyncAuthErrorInvalidCredential   = 611,
+
+    /// An error that indicates that the user with provided credentials does not exist.
+    RLMSyncAuthErrorUserDoesNotExist    = 612,
+
+    /// An error that indicates that the user cannot be registered as it exists already.
+    RLMSyncAuthErrorUserAlreadyExists   = 613,
+};
+
+/**
+ An error related to the permissions subsystem.
+ */
+typedef RLM_ERROR_ENUM(NSInteger, RLMSyncPermissionError, RLMSyncPermissionErrorDomain) {
     /**
      An error that indicates a permission change operation failed. The `userInfo`
      dictionary contains the underlying error code and a message (if any).
      */
-    RLMSyncErrorPermissionChangeError   = 8,
-    RLMSyncErrorPermissionGetError      = 9,
+    RLMSyncPermissionErrorChangeFailed  = 1,
+
+    /**
+     An error that indicates that attempting to retrieve permissions failed.
+     */
+    RLMSyncPermissionErrorGetFailed     = 2,
 };
 
 /// An enum representing the different states a sync management object can take.

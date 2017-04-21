@@ -74,7 +74,7 @@
                          onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNil(user);
         XCTAssertNotNil(error);
-        XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+        XCTAssertEqual(error.domain, RLMSyncAuthErrorDomain);
         XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
         XCTAssertNotNil(error.localizedDescription);
 
@@ -94,7 +94,7 @@
                          onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNil(user);
         XCTAssertNotNil(error);
-        XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+        XCTAssertEqual(error.domain, RLMSyncAuthErrorDomain);
         XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
         XCTAssertNotNil(error.localizedDescription);
 
@@ -116,7 +116,7 @@
                         onCompletion:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNil(user);
         XCTAssertNotNil(error);
-        XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+        XCTAssertEqual(error.domain, RLMSyncAuthErrorDomain);
         XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
         XCTAssertNotNil(error.localizedDescription);
 
