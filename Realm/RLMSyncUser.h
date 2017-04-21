@@ -103,11 +103,14 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 /**
  Log a user out, destroying their server state, unregistering them from the SDK,
- and removing any synced Realms associated with them from on-disk storage. If
- the user is already logged out or in an error state, this method does nothing.
+ and removing any synced Realms associated with them from on-disk storage on
+ next app launch. If the user is already logged out or in an error state, this
+ method does nothing.
 
- This method should be called whenever the application is committed to not using a user again unless they are recreated.
- Failing to call this method may result in unused files and metadata needlessly taking up space.
+ This method should be called whenever the application is committed to not using
+ a user again unless they are recreated.
+ Failing to call this method may result in unused files and metadata needlessly
+ taking up space.
  */
 - (void)logOut;
 
