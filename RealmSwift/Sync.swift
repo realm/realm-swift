@@ -292,6 +292,40 @@ extension SyncUser {
 }
 
 /**
+ A value which represents a permission granted to a user to interact
+ with a Realm. These values are passed into APIs on `SyncUser`, and
+ returned from `SyncPermissionResults`.
+
+ - see: `RLMSyncPermissionValue`
+ */
+public typealias SyncPermissionValue = RLMSyncPermissionValue
+
+/**
+ A sequence of results that contains the permissions for Realms
+
+ - see: `RLMSyncPermissionResults`
+ */
+public typealias SyncPermissionResults = RLMSyncPermissionResults
+
+extension SyncPermissionResults: Sequence {
+    public struct Iterator: IteratorProtocol {
+        let iteratorBase: NSFastEnumerationIterator
+
+        init(results: SyncPermissionResults) {
+            iteratorBase = NSFastEnumerationIterator(results)
+        }
+
+        public func next() -> SyncPermissionValue? {
+            return iteratorBase.next() as! SyncPermissionValue?
+        }
+    }
+
+    public func makeIterator() -> SyncPermissionResults.Iterator {
+        return Iterator(results: self)
+    }
+}
+
+/**
  This model is used to reflect permissions.
 
  It should be used in conjunction with a `SyncUser`'s Permission Realm.

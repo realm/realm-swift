@@ -80,3 +80,22 @@ extension RLMCollection {
         return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 }
+
+// Sequence conformance for RLMSyncPermissionResults.
+extension RLMSyncPermissionResults: Sequence {
+    public struct Iterator: IteratorProtocol {
+        let iteratorBase: NSFastEnumerationIterator
+
+        init(results: RLMSyncPermissionResults) {
+            iteratorBase = NSFastEnumerationIterator(results)
+        }
+
+        public func next() -> RLMSyncPermissionValue? {
+            return iteratorBase.next() as! RLMSyncPermissionValue?
+        }
+    }
+
+    public func makeIterator() -> RLMSyncPermissionResults.Iterator {
+        return Iterator(results: self)
+    }
+}
