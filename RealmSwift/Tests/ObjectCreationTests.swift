@@ -151,6 +151,12 @@ class ObjectCreationTests: TestCase {
             "object created via generic initializer should equal object created by calling initializer directly")
     }
 
+    func testInitWithObjcName() {
+        // Test that init doesn't crash going into non-swift init logic for renamed Swift classes.
+        _ = SwiftObjcRenamedObject()
+        _ = SwiftObjcArbitrarilyRenamedObject()
+    }
+
     // MARK: Creation tests
 
     func testCreateWithDefaults() {
@@ -446,6 +452,36 @@ class ObjectCreationTests: TestCase {
 
         XCTAssert(object.objectCol == nil) // XCTAssertNil caused a NULL deref inside _swift_getClass
         XCTAssertEqual(object.arrayCol.count, 0)
+    }
+
+    func testCreateWithObjcName() {
+
+        let realm = try! Realm()
+        try! realm.write {
+            let object = realm.create(SwiftObjcRenamedObject.self)
+            object.stringCol = "string"
+        }
+
+        XCTAssertEqual(realm.objects(SwiftObjcRenamedObject.self).count, 1)
+
+        try! realm.write {
+            realm.delete(realm.objects(SwiftObjcRenamedObject.self))
+        }
+    }
+
+    func testCreateWithDifferentObjcName() {
+
+        let realm = try! Realm()
+        try! realm.write {
+            let object = realm.create(SwiftObjcArbitrarilyRenamedObject.self)
+            object.boolCol = true
+        }
+
+        XCTAssertEqual(realm.objects(SwiftObjcArbitrarilyRenamedObject.self).count, 1)
+
+        try! realm.write {
+            realm.delete(realm.objects(SwiftObjcArbitrarilyRenamedObject.self))
+        }
     }
 
     // test null object

@@ -435,3 +435,13 @@ class SwiftObjectiveCTypesObject: Object {
     dynamic var dataCol: NSData?
     dynamic var numCol: NSNumber? = 0
 }
+
+@objc(SwiftObjcRenamedObject)
+class SwiftObjcRenamedObject: Object {
+    dynamic var stringCol = ""
+}
+
+@objc(SwiftObjcRenamedObjectWithTotallyDifferentName)
+class SwiftObjcArbitrarilyRenamedObject: Object {
+    dynamic var boolCol = false
+}
