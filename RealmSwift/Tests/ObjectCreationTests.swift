@@ -452,17 +452,17 @@ class ObjectCreationTests: TestCase {
         XCTAssert(object.objectCol == nil) // XCTAssertNil caused a NULL deref inside _swift_getClass
         XCTAssertEqual(object.arrayCol.count, 0)
     }
-    
+
     func testCreateWithObjcName() {
-        
+
         let realm = try! Realm()
         try! realm.write {
             let object = realm.create(SwiftObjcRenamedObject.self)
             object.stringCol = "string"
         }
-        
+
         XCTAssertEqual(realm.objects(SwiftObjcRenamedObject.self).count, 1)
-        
+
         try! realm.write {
             realm.delete(realm.objects(SwiftObjcRenamedObject.self))
         }
