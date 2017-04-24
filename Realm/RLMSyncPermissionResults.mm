@@ -72,7 +72,7 @@ using namespace realm;
     return self.count == 0 ? nil : [self objectAtIndex:(self.count - 1)];
 }
 
-- (NSUInteger)indexOfObject:(RLMSyncPermissionValue *)object {
+- (NSInteger)indexOfObject:(RLMSyncPermissionValue *)object {
     for (int i=0; i<self.count; i++) {
         if ([[self objectAtIndex:i] isEqual:object]) {
             return i;

@@ -428,7 +428,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                       accessLevel:RLMSyncAccessLevelRead];
 
     // Set the permission.
-    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting a permission should work."];
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting an invalid permission should fail."];
     [self.userB applyPermission:p callback:^(NSError *error) {
         XCTAssertNotNil(error);
         [ex2 fulfill];
@@ -436,7 +436,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     // Now retrieve the permissions again and make sure the new permission was not set.
-    XCTestExpectation *ex3 = [self expectationWithDescription:@"One permission after setting the permission."];
+    XCTestExpectation *ex3 = [self expectationWithDescription:@"Retrieving the results should work."];
     [self.userB retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
         XCTAssertNil(error);
         XCTAssertNotNil(r);

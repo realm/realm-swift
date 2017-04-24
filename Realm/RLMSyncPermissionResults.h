@@ -67,7 +67,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncPermissionResultsSortProperty) {
  Returns the index of the permission in the collection, or `NSNotFound` if the permission
  is not found in the collection.
  */
-- (NSUInteger)indexOfObject:(RLMSyncPermissionValue *)object;
+- (NSInteger)indexOfObject:(RLMSyncPermissionValue *)object;
 
 /**
  Register a notification block upon the results object. The block will be called

@@ -301,6 +301,13 @@ extension SyncUser {
 public typealias SyncPermissionValue = RLMSyncPermissionValue
 
 /**
+ An enumeration describing possible access levels.
+
+ - see: `RLMSyncAccessLevel`
+ */
+public typealias SyncAccessLevel = RLMSyncAccessLevel
+
+/**
  A sequence of results that contains the permissions for Realms
 
  - see: `RLMSyncPermissionResults`
