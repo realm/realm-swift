@@ -440,3 +440,8 @@ class SwiftObjectiveCTypesObject: Object {
 class SwiftObjcRenamedObject: Object {
     dynamic var stringCol = ""
 }
+
+@objc(SwiftObjcRenamedObjectWithTotallyDifferentName)
+class SwiftObjcArbitrarilyRenamedObject: Object {
+    dynamic var boolCol = false
+}

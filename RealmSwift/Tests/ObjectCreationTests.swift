@@ -154,6 +154,7 @@ class ObjectCreationTests: TestCase {
     func testInitWithObjcName() {
         // Test that init doesn't crash going into non-swift init logic for renamed Swift classes.
         _ = SwiftObjcRenamedObject()
+        _ = SwiftObjcArbitrarilyRenamedObject()
     }
 
     // MARK: Creation tests
@@ -465,6 +466,21 @@ class ObjectCreationTests: TestCase {
 
         try! realm.write {
             realm.delete(realm.objects(SwiftObjcRenamedObject.self))
+        }
+    }
+
+    func testCreateWithDifferentObjcName() {
+
+        let realm = try! Realm()
+        try! realm.write {
+            let object = realm.create(SwiftObjcArbitrarilyRenamedObject.self)
+            object.boolCol = true
+        }
+
+        XCTAssertEqual(realm.objects(SwiftObjcArbitrarilyRenamedObject.self).count, 1)
+
+        try! realm.write {
+            realm.delete(realm.objects(SwiftObjcArbitrarilyRenamedObject.self))
         }
     }
 
