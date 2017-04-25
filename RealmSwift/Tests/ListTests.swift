@@ -358,6 +358,195 @@ class ListTests: TestCase {
             XCTAssertEqual(0, object.arrayCol.count)
         }
     }
+
+    func testValueForKey() {
+        do {
+            let realm = try! Realm()
+            try! realm.write {
+                for value in [1, 2] {
+                    let listObject = SwiftListOfSwiftObject()
+                    let object = SwiftObject()
+                    object.intCol = value
+                    object.doubleCol = Double(value)
+                    object.stringCol = String(value)
+                    listObject.array.append(object)
+                    realm.add(listObject)
+                }
+            }
+
+            do {
+                let objects = realm.objects(SwiftListOfSwiftObject.self)
+
+                let properties = Array(objects.flatMap { $0.array.map { $0.intCol }})
+                let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftObject>]
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.map { $0.intCol }})
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+            do {
+                let objects = realm.objects(SwiftListOfSwiftObject.self)
+
+                let properties = Array(objects.flatMap { $0.array.map { $0.doubleCol }})
+                let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftObject>]
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.map { $0.doubleCol }})
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+            do {
+                let objects = realm.objects(SwiftListOfSwiftObject.self)
+
+                let properties = Array(objects.flatMap { $0.array.map { $0.stringCol }})
+                let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftObject>]
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.map { $0.stringCol }})
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+
+            do {
+                let realm = try! Realm()
+                do {
+                    let objects = realm.objects(SwiftObject.self)
+
+                    let properties = Array(objects.flatMap { $0.intCol })
+                    let listsOfObjects = objects.value(forKeyPath: "intCol") as! [Int]
+                    let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+
+                    XCTAssertEqual(properties, kvcProperties)
+                }
+                do {
+                    let objects = realm.objects(SwiftObject.self)
+
+                    let properties = Array(objects.flatMap { $0.doubleCol })
+                    let listsOfObjects = objects.value(forKeyPath: "doubleCol") as! [Double]
+                    let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+
+                    XCTAssertEqual(properties, kvcProperties)
+                }
+                do {
+                    let objects = realm.objects(SwiftObject.self)
+
+                    let properties = Array(objects.flatMap { $0.stringCol })
+                    let listsOfObjects = objects.value(forKeyPath: "stringCol") as! [String]
+                    let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+
+                    XCTAssertEqual(properties, kvcProperties)
+                }
+            }
+        }
+
+        do {
+            let realm = try! Realm()
+            try! realm.write {
+                for value in [1, 2] {
+                    let listObject = SwiftListOfSwiftOptionalObject()
+                    let object = SwiftOptionalObject()
+                    object.optIntCol.value = value
+                    object.optInt8Col.value = Int8(value)
+                    object.optDoubleCol.value = Double(value)
+                    object.optStringCol = String(value)
+                    object.optNSStringCol = NSString(format: "%d", value)
+                    listObject.array.append(object)
+                    realm.add(listObject)
+                }
+            }
+
+            do {
+                let objects = realm.objects(SwiftListOfSwiftOptionalObject.self)
+
+                let properties = Array(objects.flatMap { $0.array.flatMap { $0.optIntCol.value }})
+                let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftOptionalObject>]
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.flatMap { $0.optIntCol.value }})
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+            do {
+                let objects = realm.objects(SwiftListOfSwiftOptionalObject.self)
+
+                let properties = Array(objects.flatMap { $0.array.flatMap { $0.optInt8Col.value }})
+                let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftOptionalObject>]
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.flatMap { $0.optInt8Col.value }})
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+            do {
+                let objects = realm.objects(SwiftListOfSwiftOptionalObject.self)
+
+                let properties = Array(objects.flatMap { $0.array.flatMap { $0.optDoubleCol.value }})
+                let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftOptionalObject>]
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.flatMap { $0.optDoubleCol.value }})
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+            do {
+                let objects = realm.objects(SwiftListOfSwiftOptionalObject.self)
+
+                let properties = Array(objects.flatMap { $0.array.flatMap { $0.optStringCol }})
+                let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftOptionalObject>]
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.flatMap { $0.optStringCol }})
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+            do {
+                let objects = realm.objects(SwiftListOfSwiftOptionalObject.self)
+
+                let properties = Array(objects.flatMap { $0.array.flatMap { $0.optNSStringCol }})
+                let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftOptionalObject>]
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.flatMap { $0.optNSStringCol }})
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+
+            do {
+                let objects = realm.objects(SwiftOptionalObject.self)
+
+                let properties = Array(objects.flatMap { $0.optIntCol.value })
+                let listsOfObjects = objects.value(forKeyPath: "optIntCol") as! [Int]
+                let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+            do {
+                let objects = realm.objects(SwiftOptionalObject.self)
+
+                let properties = Array(objects.flatMap { $0.optInt8Col.value })
+#if swift(>=3.1)
+                let listsOfObjects = objects.value(forKeyPath: "optInt8Col") as! [Int8]
+#else
+                let listsOfObjects = (objects.value(forKeyPath: "optInt8Col") as! [NSNumber]).map { $0.int8Value }
+#endif
+                let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+            do {
+                let objects = realm.objects(SwiftOptionalObject.self)
+
+                let properties = Array(objects.flatMap { $0.optDoubleCol.value })
+                let listsOfObjects = objects.value(forKeyPath: "optDoubleCol") as! [Double]
+                let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+            do {
+                let objects = realm.objects(SwiftOptionalObject.self)
+
+                let properties = Array(objects.flatMap { $0.optStringCol })
+                let listsOfObjects = objects.value(forKeyPath: "optStringCol") as! [String]
+                let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+            do {
+                let objects = realm.objects(SwiftOptionalObject.self)
+
+                let properties = Array(objects.flatMap { $0.optNSStringCol })
+                let listsOfObjects = objects.value(forKeyPath: "optNSStringCol") as! [NSString]
+                let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+
+                XCTAssertEqual(properties, kvcProperties)
+            }
+        }
+    }
 }
 
 class ListStandaloneTests: ListTests {

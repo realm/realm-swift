@@ -38,17 +38,19 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A `RLMSyncUser` instance represents a single Realm Object Server user account (or just user).
+ A `RLMSyncUser` instance represents a single Realm Object Server user account.
 
- A user may have one or more credentials associated with it. These credentials uniquely identify the user to a
- third-party auth provider, and are used to sign into a Realm Object Server user account.
+ A user may have one or more credentials associated with it. These credentials
+ uniquely identify the user to the authentication provider, and are used to sign
+ into a Realm Object Server user account.
 
- Note that users are only vended out via SDK APIs, and only one user instance ever exists for a given user account.
+ Note that user objects are only vended out via SDK APIs, and cannot be directly
+ initialized. User objects can be accessed from any thread.
  */
 @interface RLMSyncUser : NSObject
 
 /**
- A dictionary of all valid, logged-in user identities corresponding to their `RLMSyncUser` objects.
+ A dictionary of all valid, logged-in user identities corresponding to their user objects.
  */
 + (NSDictionary<NSString *, RLMSyncUser *> *)allUsers NS_REFINED_FOR_SWIFT;
 
@@ -68,6 +70,12 @@ NS_ASSUME_NONNULL_BEGIN
  The URL of the authentication server this user will communicate with.
  */
 @property (nullable, nonatomic, readonly) NSURL *authenticationServer;
+
+/**
+ Whether the user is a Realm Object Server administrator. Value reflects the
+ state at the time of the last successful login of this user.
+ */
+@property (nonatomic, readonly) BOOL isAdmin;
 
 /**
  The current state of the user.
@@ -94,11 +102,15 @@ NS_ASSUME_NONNULL_BEGIN
 NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 /**
- Log a user out, destroying their server state, deregistering them from the SDK, and removing any synced Realms
- associated with them from on-disk storage. If the user is already logged out or in an error state, this is a no-op.
+ Log a user out, destroying their server state, unregistering them from the SDK,
+ and removing any synced Realms associated with them from on-disk storage on
+ next app launch. If the user is already logged out or in an error state, this
+ method does nothing.
 
- This method should be called whenever the application is committed to not using a user again unless they are recreated.
- Failing to call this method may result in unused files and metadata needlessly taking up space.
+ This method should be called whenever the application is committed to not using
+ a user again unless they are recreated.
+ Failing to call this method may result in unused files and metadata needlessly
+ taking up space.
  */
 - (void)logOut;
 

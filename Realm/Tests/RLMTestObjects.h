@@ -278,6 +278,11 @@ RLM_ARRAY_TYPE(CircleObject);
 
 @end
 
+RLM_ARRAY_TYPE(AggregateObject)
+@interface AggregateArrayObject : RLMObject
+@property RLMArray<AggregateObject *><AggregateObject> *array;
+@end
+
 #pragma mark PrimaryStringObject
 
 @interface PrimaryStringObject : RLMObject

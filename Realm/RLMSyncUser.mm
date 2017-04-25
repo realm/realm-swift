@@ -178,6 +178,13 @@ using namespace realm;
     return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration permissionConfigurationForUser:self] error:error];
 }
 
+- (BOOL)isAdmin {
+    if (!_user) {
+        return NO;
+    }
+    return _user->is_admin();
+}
+
 #pragma mark - Private API
 
 - (void)_unregisterRefreshHandleForURLPath:(NSString *)path {
@@ -256,6 +263,7 @@ using namespace realm;
                                                     userInfo:nil]);
                     return;
                 }
+                sync_user->set_is_admin(model.refreshToken.tokenData.isAdmin);
                 user->_user = sync_user;
                 completion(user, nil);
             }
@@ -276,7 +284,10 @@ using namespace realm;
                                      completionBlock:(nonnull RLMUserCompletionBlock)completion {
     NSString *identity = credentials.userInfo[kRLMSyncIdentityKey];
     NSAssert(identity != nil, @"Improperly created direct access token credential.");
-    auto sync_user = SyncManager::shared().get_user([identity UTF8String], [credentials.token UTF8String], none, true);
+    auto sync_user = SyncManager::shared().get_user([identity UTF8String],
+                                                    [credentials.token UTF8String],
+                                                    none,
+                                                    SyncUser::TokenType::Admin);
     if (!sync_user) {
         completion(nil, [NSError errorWithDomain:RLMSyncErrorDomain
                                             code:RLMSyncErrorClientSessionError

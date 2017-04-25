@@ -40,6 +40,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable, readonly) NSString *appID;
 @property (nonatomic, nullable, readonly) NSString *path;
 @property (nonatomic, readonly) NSTimeInterval expires;
+@property (nonatomic, readonly) BOOL isAdmin;
 //@property (nonatomic, readonly) NSArray *access;
 
 - (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;

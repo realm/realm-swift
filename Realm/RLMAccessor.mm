@@ -266,6 +266,7 @@ static inline void RLMSetValue(__unsafe_unretained RLMObjectBase *const obj, NSU
 
 static inline RLMLinkingObjects *RLMGetLinkingObjects(__unsafe_unretained RLMObjectBase *const obj,
                                                       __unsafe_unretained RLMProperty *const property) {
+    RLMVerifyAttached(obj);
     auto& objectInfo = obj->_realm->_info[property.objectClassName];
     auto linkingProperty = objectInfo.objectSchema->property_for_name(property.linkOriginPropertyName.UTF8String);
     auto backlinkView = obj->_row.get_table()->get_backlink_view(obj->_row.get_index(), objectInfo.table(), linkingProperty->table_column);

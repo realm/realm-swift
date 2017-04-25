@@ -22,6 +22,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
+#import "RLMProperty_Private.h"
 
 #import "collection_notifications.hpp"
 #import "list.hpp"
@@ -147,6 +148,17 @@ NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *ke
             [results addObject:RLMCreateObjectAccessor(realm, *info, rowIndex) ?: NSNull.null];
         }
         return results;
+    }
+
+    for (RLMProperty *prop in info->rlmObjectSchema.swiftGenericProperties) {
+        if ([prop.name isEqual:key] && !prop.optional) {
+            for (size_t i = 0; i < count; i++) {
+                size_t rowIndex = [collection indexInSource:i];
+                RLMObjectBase *accessor = RLMCreateObjectAccessor(realm, *info, rowIndex);
+                [results addObject:[accessor valueForKey:key] ?: NSNull.null];
+            }
+            return results;
+        }
     }
 
     RLMObject *accessor = RLMCreateManagedAccessor(info->rlmObjectSchema.accessorClass, realm, info);

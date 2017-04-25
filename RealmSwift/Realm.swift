@@ -93,6 +93,37 @@ public final class Realm {
         try self.init(configuration: configuration)
     }
 
+    // MARK: Async
+
+    /**
+     Asynchronously open a Realm and deliver it to a block on the given queue.
+
+     Opening a Realm asynchronously will perform all work needed to get the Realm to
+     a usable state (such as running potentially time-consuming migrations) on a
+     background thread before dispatching to the given queue. In addition,
+     synchronized Realms wait for all remote content available at the time the
+     operation began to be downloaded and available locally.
+
+     - parameter configuration: A configuration object to use when opening the Realm.
+     - parameter callbackQueue: The dispatch queue on which the callback should be run.
+     - parameter callback:      A callback block. If the Realm was successfully opened, an
+                                it will be passed in as an argument.
+                                Otherwise, a `Swift.Error` describing what went wrong will be
+                                passed to the block instead.
+
+     - note: The returned Realm is confined to the thread on which it was created.
+             Because GCD does not guarantee that queues will always use the same
+             thread, accessing the returned Realm outside the callback block (even if
+             accessed from `callbackQueue`) is unsafe.
+     */
+    public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration,
+                                 callbackQueue: DispatchQueue = .main,
+                                 callback: @escaping (Realm?, Swift.Error?) -> Void) {
+        RLMRealm.asyncOpen(with: configuration.rlmConfiguration, callbackQueue: callbackQueue) { rlmRealm, error in
+            callback(rlmRealm.flatMap(Realm.init), error)
+        }
+    }
+
     // MARK: Transactions
 
     /**

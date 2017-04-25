@@ -370,7 +370,7 @@ RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjec
     } callback{block, obj};
 
     realm::Object object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
-    auto token = [[RLMObjectNotificationToken alloc] initWithToken:object.add_notification_block(callback) realm:obj->_realm];
+    auto token = [[RLMObjectNotificationToken alloc] initWithToken:object.add_notification_callback(callback) realm:obj->_realm];
     token->_object = std::move(object);
     return token;
 }

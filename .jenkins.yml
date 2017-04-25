@@ -5,7 +5,7 @@ xcode_version:
   - 8.0
   - 8.1
   - 8.2
-  - 8.3
+  - 8.3.2
 target:
   - osx
   - docs
@@ -33,24 +33,24 @@ configuration:
 # +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 # | Configuration Matrix | osx | docs | ios-static | ios-dynamic | ios-swift | osx-swift | watchos | cocoapods | swiftlint | tvos | osx-encryption | osx-object-server | ios-device-obj | ios-device-swift | tvos-device |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------- | ---------------- | ----------- |
-# | 8.0 | Debug          | X   |      |            |             |           |           |         |           |           |      |                |                   |                |                  |             |
-# | 8.0 | Release        | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                |                  |             |
+# | 8.0   | Debug        | X   |      |            |             |           |           |         |           |           |      |                |                   |                |                  |             |
+# | 8.0   | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                |                  |             |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------- | ---------------- | ----------- |
-# | 8.1 | Debug          | X   |      |            |             |           |           |         |           |           |      |                |                   |                |                  |             |
-# | 8.1 | Release        | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                |                  |             |
+# | 8.1   | Debug        | X   |      |            |             |           |           |         |           |           |      |                |                   |                |                  |             |
+# | 8.1   | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                |                  |             |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------- | ---------------- | ----------- |
-# | 8.2 | Debug          | X   |      | X          |             |           |           |         |           |           |      |                |                   |                |                  |             |
-# | 8.2 | Release        | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                |                  |             |
+# | 8.2   | Debug        | X   |      | X          |             |           |           |         |           |           |      |                |                   |                |                  |             |
+# | 8.2   | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                |                  |             |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------- | ---------------- | ----------- |
-# | 8.3 | Debug          | X   |      |            | X           | X         | X         | X       |           |           | X    |                |                   |                |                  |             |
-# | 8.3 | Release        | X   | X    |            | X           | X         | X         | X       | X         | X         | X    | X              | X                 | X              |                  | X           |
+# | 8.3.2 | Debug        | X   |      |            | X           | X         | X         | X       |           |           | X    |                |                   |                |                  |             |
+# | 8.3.2 | Release      | X   | X    |            | X           | X         | X         | X       | X         | X         | X    | X              | X                 | X              |                  | X           |
 # +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 exclude:
   ################
   # docs
   ################
-  # Just run on 8.3 Release
+  # Just run on 8.3.2 Release
   - xcode_version: 8.0
     target: docs
   - xcode_version: 8.1
@@ -64,14 +64,14 @@ exclude:
   # ios-static
   ################
   # Skip on 8.0/8.1 Debug
-  # Skip 8.3 altogether since it doesn't support the iOS 7 deployment target
+  # Skip 8.3.2 altogether since it doesn't support the iOS 7 deployment target
   - xcode_version: 8.0
     target: ios-static
     configuration: Debug
   - xcode_version: 8.1
     target: ios-static
     configuration: Debug
-  - xcode_version: 8.3
+  - xcode_version: 8.3.2
     target: ios-static
 
   ################
@@ -140,7 +140,7 @@ exclude:
   ################
   # swiftlint
   ################
-  # Just run on 8.3 Release
+  # Just run on 8.3.2 Release
   - xcode_version: 8.0
     target: swiftlint
   - xcode_version: 8.1
@@ -167,7 +167,7 @@ exclude:
   ################
   # osx-encryption
   ################
-  # Just run on 8.3 Release
+  # Just run on 8.3.2 Release
   - xcode_version: 8.0
     target: osx-encryption
   - xcode_version: 8.1
@@ -180,7 +180,7 @@ exclude:
   ################
   # osx-object-server
   ################
-  # Just run on 8.3 Release
+  # Just run on 8.3.2 Release
   - xcode_version: 8.0
     target: osx-object-server
   - xcode_version: 8.1
@@ -193,7 +193,7 @@ exclude:
   ################
   # ios-device-objc
   ################
-  # Just run on 8.3 Release
+  # Just run on 8.3.2 Release
   - xcode_version: 8.0
     target: ios-device-objc
   - xcode_version: 8.1
@@ -206,7 +206,7 @@ exclude:
   ################
   # ios-device-swift
   ################
-  # Just run on 8.3 Release
+  # Just run on 8.3.2 Release
   - xcode_version: 8.0
     target: ios-device-swift
   - xcode_version: 8.1
@@ -219,7 +219,7 @@ exclude:
   ################
   # tvos-device
   ################
-  # Just run on 8.3 Release
+  # Just run on 8.3.2 Release
   - xcode_version: 8.0
     target: tvos-device
   - xcode_version: 8.1

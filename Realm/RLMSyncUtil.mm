@@ -18,6 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
@@ -26,6 +27,10 @@
 #import "RLMSyncPermissionChange.h"
 #import "RLMSyncPermissionOffer.h"
 #import "RLMSyncPermissionOfferResponse.h"
+
+#import "shared_realm.hpp"
+
+#import "sync/sync_user.hpp"
 
 static RLMRealmConfiguration *RLMRealmSpecialPurposeConfiguration(RLMSyncUser *user, NSString *realmName) {
     NSURLComponents *components = [NSURLComponents componentsWithURL:user.authenticationServer resolvingAgainstBaseURL:NO];
@@ -93,6 +98,18 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy)
         case SyncSessionStopPolicy::AfterChangesUploaded:   return RLMSyncStopPolicyAfterChangesUploaded;
     }
     REALM_UNREACHABLE();
+}
+
+std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm)
+{
+    Realm::Config realmConfig = realm.configuration.config;
+    if (auto config = realmConfig.sync_config) {
+        std::shared_ptr<SyncUser> user = config->user;
+        if (user && user->state() != SyncUser::State::Error) {
+            return user->session_for_on_disk_path(realmConfig.path);
+        }
+    }
+    return nullptr;
 }
 
 }

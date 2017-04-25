@@ -21,7 +21,7 @@
 #import "RLMRealm.h"
 
 /**
- The current state of the session represented by an `RLMSyncSession` object.
+ The current state of the session represented by a session object.
  */
 typedef NS_ENUM(NSUInteger, RLMSyncSessionState) {
     /// The sync session is bound to the Realm Object Server and communicating with it.
@@ -53,7 +53,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgressDirection) {
  */
 typedef NS_ENUM(NSUInteger, RLMSyncProgress) {
     /**
-     The block will be called forever, or until it is unregistered by calling
+     The block will be called indefinitely, or until it is unregistered by calling
      `-[RLMProgressNotificationToken stop]`.
 
      Notifications will always report the latest number of transferred bytes, and the
@@ -85,7 +85,7 @@ typedef void(^RLMProgressNotificationBlock)(NSUInteger transferredBytes, NSUInte
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A token object corresponding to a progress notification block on an `RLMSyncSession`.
+ A token object corresponding to a progress notification block on a session object.
 
  To stop notifications manually, call `-stop` on it. Notifications should be stopped before
  the token goes out of scope or is destroyed.
@@ -98,8 +98,9 @@ NS_ASSUME_NONNULL_BEGIN
  communication between the client (and a local Realm file on disk), and the server
  (and a remote Realm at a given URL stored on a Realm Object Server).
 
- Sessions are always created by the SDK and vended out through various APIs. The lifespans
- of sessions associated with Realms are managed automatically.
+ Sessions are always created by the SDK and vended out through various APIs. The
+ lifespans of sessions associated with Realms are managed automatically. Session
+ objects can be accessed from any thread.
  */
 @interface RLMSyncSession : NSObject
 

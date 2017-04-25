@@ -193,6 +193,10 @@ class SwiftListOfSwiftObject: Object {
     let array = List<SwiftObject>()
 }
 
+class SwiftListOfSwiftOptionalObject: Object {
+    let array = List<SwiftOptionalObject>()
+}
+
 class SwiftArrayPropertySubclassObject: SwiftArrayPropertyObject {
     let boolArray = List<SwiftBoolObject>()
 }
@@ -208,7 +212,7 @@ class SwiftLinkToPrimaryStringObject: Object {
 }
 
 class SwiftUTF8Object: Object {
-    // swiftlint:disable:next variable_name
+    // swiftlint:disable:next identifier_name
     dynamic var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 }
 
@@ -430,4 +434,14 @@ class SwiftObjectiveCTypesObject: Object {
     dynamic var dateCol: NSDate?
     dynamic var dataCol: NSData?
     dynamic var numCol: NSNumber? = 0
+}
+
+@objc(SwiftObjcRenamedObject)
+class SwiftObjcRenamedObject: Object {
+    dynamic var stringCol = ""
+}
+
+@objc(SwiftObjcRenamedObjectWithTotallyDifferentName)
+class SwiftObjcArbitrarilyRenamedObject: Object {
+    dynamic var boolCol = false
 }

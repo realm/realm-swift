@@ -185,7 +185,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     }
                 }
                 waitForUploads(for: user, url: realmURL)
-                checkCount(expected:bigObjectCount, realm, SwiftHugeSyncObject.self)
+                checkCount(expected: bigObjectCount, realm, SwiftHugeSyncObject.self)
             }
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -224,6 +224,56 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             token!.stop()
             XCTAssert(callCount > 1)
             XCTAssert(transferred >= transferrable)
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    // MARK: Download Realm
+
+    func testDownloadRealm() {
+        let bigObjectCount = 2
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
+            if isParent {
+                // Wait for the child process to upload everything.
+                executeChild()
+                let ex = expectation(description: "download-realm")
+                let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: realmURL))
+                let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
+                XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
+                Realm.asyncOpen(configuration: config) { realm, error in
+                    XCTAssertNil(error)
+                    self.checkCount(expected: bigObjectCount, realm!, SwiftHugeSyncObject.self)
+                    ex.fulfill()
+                }
+                func fileSize(path: String) -> Int {
+                    if let attr = try? FileManager.default.attributesOfItem(atPath: path) {
+                        return attr[.size] as! Int
+                    }
+                    return 0
+                }
+                let sizeBefore = fileSize(path: pathOnDisk)
+                autoreleasepool {
+                    // We have partial transaction logs but no data
+                    XCTAssertGreaterThan(sizeBefore, 0)
+                    XCTAssert(try! Realm(configuration: config).isEmpty)
+                }
+                XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
+                waitForExpectations(timeout: 10.0, handler: nil)
+                XCTAssertGreaterThan(fileSize(path: pathOnDisk), sizeBefore)
+                XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
+            } else {
+                let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
+                // Write lots of data to the Realm, then wait for it to be uploaded.
+                try realm.write {
+                    for _ in 0..<bigObjectCount {
+                        realm.add(SwiftHugeSyncObject())
+                    }
+                }
+                waitForUploads(for: user, url: realmURL)
+                checkCount(expected: bigObjectCount, realm, SwiftHugeSyncObject.self)
+            }
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }

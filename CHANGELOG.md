@@ -12,7 +12,91 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
+* Support Realm model classes defined in Swift with overridden Objective-C
+  names (e.g. `@objc(Foo) class SwiftFoo: Object {}`).
+
+2.6.2 Release notes (2017-04-21)
+=============================================================
+
+### API Breaking Changes
+
 * None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix an issue where calling `Realm.asyncOpen(...)` with a synchronized Realm
+  configuration would fail with an "Operation canceled" error.
+* Fix initial collection notification sometimes not being delivered for synced
+  Realms.
+* Fix circular links sometimes resulting in objects not being marked as
+  modified in change notifications.
+
+2.6.1 Release notes (2017-04-18)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix an issue where calling `Realm.asyncOpen(...)` with a synchronized Realm
+  configuration would crash in error cases rather than report the error.
+  This is a small source breaking change if you were relying on the error
+  being reported to be a `Realm.Error`.
+
+2.6.0 Release notes (2017-04-18)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Add a `{RLM}SyncUser.isAdmin` property indicating whether a user is a Realm
+  Object Server administrator.
+* Add an API to asynchronously open a Realm and deliver it to a block on a
+  given queue. This performs all work needed to get the Realm to
+  a usable state (such as running potentially time-consuming migrations) on a
+  background thread before dispatching to the given queue. In addition,
+  synchronized Realms wait for all remote content available at the time the
+  operation began to be downloaded and available locally.
+* Add `shouldCompactOnLaunch` block property when configuring a Realm to
+  determine if it should be compacted before being returned.
+* Speed up case-insensitive queries on indexed string properties.
+* Add RLMResults's collection aggregate methods to RLMArray.
+* Add support for calling the aggregate methods on unmanaged Lists.
+
+### Bugfixes
+
+* Fix a deadlock when multiple processes open a Realm at the same time.
+* Fix `value(forKey:)`/`value(forKeyPath:)` returning incorrect values for `List` properties.
+
+2.5.1 Release notes (2017-04-05)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix CocoaPods installation with static libraries and multiple platforms.
+* Fix uncaught "Bad version number" exceptions on the notification worker thread
+  followed by deadlocks when Realms refresh.
 
 2.5.0 Release notes (2017-03-28)
 =============================================================
