@@ -8,7 +8,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * Use reachability API to minimize the reconnection delay if the network
-connection was lost.
+  connection was lost.
 
 ### Bugfixes
 
