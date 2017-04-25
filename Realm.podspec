@@ -61,6 +61,7 @@ Pod::Spec.new do |s|
                               'Realm/ObjectStore/src/*.cpp',
                               'Realm/ObjectStore/src/sync/*.cpp',
                               'Realm/ObjectStore/src/sync/impl/*.cpp',
+                              'Realm/ObjectStore/src/sync/impl/apple/*.cpp',
                               'Realm/ObjectStore/src/impl/*.cpp',
                               'Realm/ObjectStore/src/impl/apple/*.cpp',
                               'Realm/ObjectStore/src/util/*.cpp',
