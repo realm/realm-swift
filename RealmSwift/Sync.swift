@@ -313,6 +313,7 @@ public typealias SyncAccessLevel = RLMSyncAccessLevel
  - see: `RLMSyncPermissionResults`
  */
 public typealias SyncPermissionResults = RLMSyncPermissionResults
+
 #if swift(>=3.1)
 extension SyncPermissionResults: RandomAccessCollection {
     public subscript(index: Int) -> SyncPermissionValue {
