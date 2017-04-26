@@ -46,7 +46,7 @@
             }                                                                                                          \
         }                                                                                                              \
     }];                                                                                                                \
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                                             \
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];                                                            \
 }
 
 /// Check whether a permission disappears or is absent from a results.
@@ -68,7 +68,7 @@
             [ex fulfill];                                                                                              \
         }                                                                                                              \
     }];                                                                                                                \
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                                             \
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];                                                            \
 }
 
 #define GET_PERMISSION(ma_results, ma_permission, ma_destination) {                                                    \
@@ -81,11 +81,11 @@
             if ([[weakResults objectAtIndex:i] isEqual:ma_permission]) {                                               \
                 value = [weakResults objectAtIndex:i];                                                                 \
                 [ex fulfill];                                                                                          \
-                break;                                                                                                 \
+                return;                                                                                                \
             }                                                                                                          \
         }                                                                                                              \
     }];                                                                                                                \
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                                             \
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];                                                            \
     ma_destination = value;                                                                                            \
 }
 
