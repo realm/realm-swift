@@ -314,35 +314,21 @@ public typealias SyncAccessLevel = RLMSyncAccessLevel
  */
 public typealias SyncPermissionResults = RLMSyncPermissionResults
 
-extension SyncPermissionResults {
-    /// Return the first permission value in the results, or `nil` if
-    /// the results are empty.
-    public var first: SyncPermissionValue? {
-        return count > 0 ? object(at: 0) : nil
+extension SyncPermissionResults: RandomAccessCollection {
+    public subscript(index: Int) -> SyncPermissionValue {
+        return object(at: index)
     }
 
-    /// Return the last permission value in the results, or `nil` if
-    /// the results are empty.
-    public var last: SyncPermissionValue? {
-        return count > 0 ? object(at: count - 1) : nil
-    }
-}
-
-extension SyncPermissionResults: Sequence {
-    public struct Iterator: IteratorProtocol {
-        private let iteratorBase: NSFastEnumerationIterator
-
-        fileprivate init(results: SyncPermissionResults) {
-            iteratorBase = NSFastEnumerationIterator(results)
-        }
-
-        public func next() -> SyncPermissionValue? {
-            return iteratorBase.next() as! SyncPermissionValue?
-        }
+    public func index(after i: Int) -> Int {
+        return i + 1
     }
 
-    public func makeIterator() -> SyncPermissionResults.Iterator {
-        return Iterator(results: self)
+    public var startIndex: Int {
+        return 0
+    }
+
+    public var endIndex: Int {
+        return count
     }
 }
 

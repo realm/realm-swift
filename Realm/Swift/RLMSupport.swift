@@ -81,21 +81,21 @@ extension RLMCollection {
     }
 }
 
-// Sequence conformance for RLMSyncPermissionResults.
-extension RLMSyncPermissionResults: Sequence {
-    public struct Iterator: IteratorProtocol {
-        private let iteratorBase: NSFastEnumerationIterator
-
-        fileprivate init(results: RLMSyncPermissionResults) {
-            iteratorBase = NSFastEnumerationIterator(results)
-        }
-
-        public func next() -> RLMSyncPermissionValue? {
-            return iteratorBase.next() as! RLMSyncPermissionValue?
-        }
+// Collection conformance for RLMSyncPermissionResults.
+extension RLMSyncPermissionResults: RandomAccessCollection {
+    public subscript(index: Int) -> RLMSyncPermissionValue {
+        return object(at: index)
     }
 
-    public func makeIterator() -> RLMSyncPermissionResults.Iterator {
-        return Iterator(results: self)
+    public func index(after i: Int) -> Int {
+        return i + 1
+    }
+
+    public var startIndex: Int {
+        return 0
+    }
+
+    public var endIndex: Int {
+        return count
     }
 }
