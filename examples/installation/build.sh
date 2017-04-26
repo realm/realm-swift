@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -o pipefail
+set -e
+
 usage() {
 cat <<EOF
 Usage: sh $0 command [argument]
