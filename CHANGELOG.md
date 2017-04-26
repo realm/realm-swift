@@ -18,6 +18,9 @@ x.x.x Release notes (yyyy-MM-dd)
   exceed 16 MB in size.
 * Add a new API for changing and retrieving permissions. This API can be used
   alongside, or instead of, the existing Realm Object-based permissions system.
+* Add a new API for changing and retrieving permissions for synchronized Realms.
+  This API is intended to replace the existing Realm Object-based permissions
+  system.
 
 ### Bugfixes
 

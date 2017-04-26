@@ -316,9 +316,9 @@ public typealias SyncPermissionResults = RLMSyncPermissionResults
 
 extension SyncPermissionResults: Sequence {
     public struct Iterator: IteratorProtocol {
-        let iteratorBase: NSFastEnumerationIterator
+        private let iteratorBase: NSFastEnumerationIterator
 
-        init(results: SyncPermissionResults) {
+        fileprivate init(results: SyncPermissionResults) {
             iteratorBase = NSFastEnumerationIterator(results)
         }
 

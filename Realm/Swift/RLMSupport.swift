@@ -84,9 +84,9 @@ extension RLMCollection {
 // Sequence conformance for RLMSyncPermissionResults.
 extension RLMSyncPermissionResults: Sequence {
     public struct Iterator: IteratorProtocol {
-        let iteratorBase: NSFastEnumerationIterator
+        private let iteratorBase: NSFastEnumerationIterator
 
-        init(results: RLMSyncPermissionResults) {
+        fileprivate init(results: RLMSyncPermissionResults) {
             iteratorBase = NSFastEnumerationIterator(results)
         }
 

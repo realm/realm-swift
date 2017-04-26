@@ -103,11 +103,6 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
 
 @implementation RLMSyncPermissionValue
 
-- (instancetype)initPrivate {
-    self = [super init];
-    return self;
-}
-
 - (instancetype)initWithRealmPath:(NSString *)path
                            userID:(NSString *)userID
                       accessLevel:(RLMSyncAccessLevel)accessLevel {
@@ -122,11 +117,14 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
 - (instancetype)initWithPermission:(Permission)permission {
     switch (permission.condition.type) {
         case ConditionType::UserId:
-            self = [[RLMSyncPermissionValue alloc] initPrivate];
+            self = [super init];
             break;
         case ConditionType::KeyValue:
             @throw RLMException(@"Key-value permissions are not yet supported in Realm Objective-C or Realm Swift.");
             break;
+    }
+    if (!self) {
+        return nil;
     }
     _underlying = util::make_optional<Permission>(std::move(permission));
     return self;

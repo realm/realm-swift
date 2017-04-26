@@ -34,7 +34,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         userC = try! synchronouslyLogInUser(for: .usernamePassword(username: baseName + "c", password: "a", register: true),
                                             server: SwiftSyncTestCase.authServerURL())
     }
-    
+
     override func tearDown() {
         userA.logOut()
         userB.logOut()
@@ -48,7 +48,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
                                       line: UInt = #line) {
         let ex = expectation(description: "Checking permission count")
         let token = results.addNotificationBlock { (error) in
-            XCTAssertNil(error, "Notification returned error '\(error!)' when running test at \(file):\(line)");
+            XCTAssertNil(error, "Notification returned error '\(error!)' when running test at \(file):\(line)")
             if results.count == expected {
                 ex.fulfill()
             }
@@ -65,16 +65,40 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         var finalValue: SyncPermissionValue?
         let token = results.addNotificationBlock { (error) in
             XCTAssertNil(error, "Notification returned error '\(error!)' when running test at \(file):\(line)")
-            for result in results {
-                if result == permission {
-                    finalValue = result
-                    ex.fulfill()
-                }
+            for result in results where result == permission {
+                finalValue = result
+                ex.fulfill()
+                return
             }
         }
         waitForExpectations(timeout: 2.0, handler: nil)
         token.stop()
         return finalValue
+    }
+
+    /// Ensure the absence of a permission from a results after an elapsed time interval.
+    /// This method is intended to be used to check that a permission never becomes
+    /// present within a results to begin with.
+    private func ensureAbsence(of permission: SyncPermissionValue,
+                               from results: SyncPermissionResults,
+                               after wait: Double = 0.5,
+                               file: StaticString = #file,
+                               line: UInt = #line) {
+        let ex = expectation(description: "Looking for permission")
+        var isPresent = false
+        let token = results.addNotificationBlock { (error) in
+            XCTAssertNil(error, "Notification returned error '\(error!)' when running test at \(file):\(line)")
+            for result in results where result == permission {
+                isPresent = true
+                return
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + wait) {
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: wait + 1.0, handler: nil)
+        token.stop()
+        XCTAssertFalse(isPresent, "Permission '\(permission)' was spuriously present (\(file):\(line))")
     }
 
     private static func makeExpected(from original: SyncPermissionValue,
@@ -131,8 +155,8 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
 
         // Check getting permission by its index.
         let index = results.index(ofObject: expectedPermission)
-        XCTAssertNotEqual(index, NSNotFound);
-        XCTAssertTrue(expectedPermission == results.object(at: index));
+        XCTAssertNotEqual(index, NSNotFound)
+        XCTAssertTrue(expectedPermission == results.object(at: index))
     }
 
     /// Observing permission changes should work.
@@ -211,7 +235,6 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         waitForExpectations(timeout: 2.0, handler: nil)
 
         let expectedPermission = SwiftPermissionsAPITests.makeExpected(from: p, owner: userA, name: uuid)
-        let finalValue = get(permission: expectedPermission, from: results)
-        XCTAssertNil(finalValue);
+        ensureAbsence(of: expectedPermission, from: results)
     }
 }

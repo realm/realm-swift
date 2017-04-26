@@ -49,6 +49,9 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];                                                             \
 }
 
+/// Check whether a permission disappears or is absent from a results.
+/// This macro is intended to be used to check that a permission is
+/// immediately absent, or eventually disappears, from a results.
 #define CHECK_PERMISSION_ABSENT(ma_results, ma_permission) {                                                           \
     XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission absence"];                          \
     __weak typeof(ma_results) weakResults = ma_results;                                                                \

@@ -128,7 +128,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         self.authenticationServer = authServer;
         self.refreshHandles = [NSMutableDictionary dictionary];
         _configMaker = std::make_unique<ConfigMaker>([](std::shared_ptr<SyncUser> user, std::string url) {
-            RLMRealmConfiguration *config = [[RLMRealmConfiguration defaultConfiguration] copy];
+            RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
             NSURL *objCUrl = [NSURL URLWithString:@(url.c_str())];
             RLMSyncUser *objCUser = [[RLMSyncUser alloc] initWithSyncUser:std::move(user)];
             config.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:objCUser realmURL:objCUrl];

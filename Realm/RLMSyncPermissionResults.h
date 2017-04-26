@@ -34,13 +34,16 @@ typedef NS_ENUM(NSUInteger, RLMSyncPermissionResultsSortProperty) {
 @class RLMSyncPermissionValue;
 
 /**
- An object representing the results of a permissions query.
- 
+ A collection object representing the results of a permissions query.
+
  This collection will automatically update its contents at the start of each runloop
  iteration, but the objects it vends are immutable and will themselves not change.
 
- Permissions results objects are thread-confined, and should not be shared across
+ Permission results objects are thread-confined, and should not be shared across
  threads.
+
+ @warning Permission results must only be fetched on threads that have an active
+          run loop. In most cases this will be the main thread.
  */
 @interface RLMSyncPermissionResults : NSObject<NSFastEnumeration>
 

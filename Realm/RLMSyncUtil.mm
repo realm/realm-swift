@@ -169,7 +169,7 @@ NSError *make_sync_error(RLMSyncSystemErrorKind kind, NSString *description, NSI
         NSMutableDictionary *buffer = [custom mutableCopy];
         buffer[NSLocalizedDescriptionKey] = description;
         buffer[kRLMSyncErrorStatusCodeKey] = @(code);
-        userInfo = buffer;
+        userInfo = [buffer copy];
     } else {
         userInfo = @{NSLocalizedDescriptionKey: description,
                      kRLMSyncErrorStatusCodeKey: @(code)};

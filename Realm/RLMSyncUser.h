@@ -162,9 +162,16 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 #pragma mark - Value-based Permissions API
 
 /**
- Asynchronously retrieve all permissions associated with the given user.
+ Asynchronously retrieve all permissions associated with the user calling this method.
 
  The results will be returned through the callback block, or an error if the operation fails.
+ The callback block will be run on the same thread the method was called on.
+
+ @warning This method must be called upon a thread with a currently active run loop. Unless
+          you have manually configured a run loop on a side thread, this will usually be the
+          main thread.
+
+ @see `RLMSyncPermissionResults`
  */
 - (void)retrievePermissionsWithCallback:(RLMPermissionResultsBlock)callback;
 
@@ -172,8 +179,8 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  Apply a given permission.
 
  The operation will take place asynchronously, and the callback will be used to report whether
- the permission change succeeded or failed. The user upon which this method is called must have
- the right to grant the given permission, or else the oepration will fail.
+ the permission change succeeded or failed. The user calling this method must have the right
+ to grant the given permission, or else the operation will fail.
 
  @see `RLMSyncPermissionValue`
  */
@@ -183,16 +190,16 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  Revoke a given permission.
 
  The operation will take place asynchronously, and the callback will be used to report whether
- the permission change succeeded or failed. The user upon which this method is called must have
- the right to grant the given permission, or else the oepration will fail.
+ the permission change succeeded or failed. The user calling this method must have the right
+ to grant the given permission, or else the operation will fail.
 
  @see `RLMSyncPermissionValue`
  */
 - (void)revokePermission:(RLMSyncPermissionValue *)permission callback:(RLMPermissionStatusBlock)callback;
 
-// This set of permissions APIs uses a set of Realms and Realm model objects
-// representing various permission states and actions, as well as standard
-// Realm affordances, to work with permissions. Either this API or the Realm
+// These permission APIs access Realms and Realm model objects representing
+// various permission states and actions, as well as standard Realm
+// affordances, to work with permissions. Either this API or the Realm
 // Object based API can be used to work with permissions.
 #pragma mark - Realm Object-based Permissions API
 

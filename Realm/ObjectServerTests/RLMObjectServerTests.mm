@@ -876,7 +876,7 @@
 - (void)testClientReset {
     NSURL *url = REALM_URL();
     NSString *sessionName = NSStringFromSelector(_cmd);
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:sessionName
                                                                                             register:true]
                                                server:[RLMObjectServerTests authServerURL]];
     // Open the Realm
@@ -905,7 +905,7 @@
 - (void)testClientResetManualInitiation {
     NSURL *url = REALM_URL();
     NSString *sessionName = NSStringFromSelector(_cmd);
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:sessionName
                                                                                             register:true]
                                                server:[RLMObjectServerTests authServerURL]];
     __block NSError *theError = nil;
