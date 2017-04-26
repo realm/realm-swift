@@ -14,6 +14,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Support Realm model classes defined in Swift with overridden Objective-C
   names (e.g. `@objc(Foo) class SwiftFoo: Object {}`).
+* Fix `-[RLMMigration enumerateObjects:block:]` returning incorrect `oldObject`
+  objects when enumerating a class name after previously deleting a `newObject`.
 
 2.6.2 Release notes (2017-04-21)
 =============================================================

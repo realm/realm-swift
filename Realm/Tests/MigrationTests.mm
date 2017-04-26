@@ -1018,6 +1018,109 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqualObjects(@"otherString", [[StringObject allObjectsInRealm:realm].firstObject stringCol]);
 }
 
+- (void)testEnumerateObjectsAfterDeleteObjects {
+    [self createTestRealmWithClasses:@[StringObject.class, IntObject.class, BoolObject.class] block:^(RLMRealm *realm) {
+        [StringObject createInRealm:realm withValue:@[@"1"]];
+        [StringObject createInRealm:realm withValue:@[@"2"]];
+        [StringObject createInRealm:realm withValue:@[@"3"]];
+        [IntObject createInRealm:realm withValue:@[@1]];
+        [IntObject createInRealm:realm withValue:@[@2]];
+        [IntObject createInRealm:realm withValue:@[@3]];
+        [BoolObject createInRealm:realm withValue:@[@YES]];
+        [BoolObject createInRealm:realm withValue:@[@NO]];
+        [BoolObject createInRealm:realm withValue:@[@YES]];
+    }];
+
+    [self migrateTestRealmWithBlock:^(RLMMigration *migration, uint64_t) {
+        __block NSInteger count = 0;
+        [migration enumerateObjects:StringObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(oldObject[@"stringCol"], newObject[@"stringCol"]);
+            if ([oldObject[@"stringCol"] isEqualToString:@"2"]) {
+                [migration deleteObject:newObject];
+            }
+        }];
+        [migration enumerateObjects:StringObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(oldObject[@"stringCol"], newObject[@"stringCol"]);
+            count++;
+        }];
+        XCTAssertEqual(count, 2);
+
+        count = 0;
+        [migration enumerateObjects:IntObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(oldObject[@"intCol"], newObject[@"intCol"]);
+            if ([oldObject[@"intCol"] isEqualToNumber:@1]) {
+                [migration deleteObject:newObject];
+            }
+        }];
+        [migration enumerateObjects:IntObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(oldObject[@"intCol"], newObject[@"intCol"]);
+            count++;
+        }];
+        XCTAssertEqual(count, 2);
+
+        [migration enumerateObjects:BoolObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(oldObject[@"boolCol"], newObject[@"boolCol"]);
+            [migration deleteObject:newObject];
+        }];
+        [migration enumerateObjects:BoolObject.className block:^(__unused RLMObject *oldObject, __unused RLMObject *newObject) {
+            XCTFail(@"This line should not executed since all objects have been deleted.");
+        }];
+    }];
+}
+
+- (void)testEnumerateObjectsAfterDeleteInsertObjects {
+    [self createTestRealmWithClasses:@[StringObject.class, IntObject.class, BoolObject.class] block:^(RLMRealm *realm) {
+        [StringObject createInRealm:realm withValue:@[@"1"]];
+        [StringObject createInRealm:realm withValue:@[@"2"]];
+        [StringObject createInRealm:realm withValue:@[@"3"]];
+        [IntObject createInRealm:realm withValue:@[@1]];
+        [IntObject createInRealm:realm withValue:@[@2]];
+        [IntObject createInRealm:realm withValue:@[@3]];
+        [BoolObject createInRealm:realm withValue:@[@YES]];
+        [BoolObject createInRealm:realm withValue:@[@NO]];
+        [BoolObject createInRealm:realm withValue:@[@YES]];
+    }];
+
+    [self migrateTestRealmWithBlock:^(RLMMigration *migration, uint64_t) {
+        __block NSInteger count = 0;
+        [migration enumerateObjects:StringObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(oldObject[@"stringCol"], newObject[@"stringCol"]);
+            if ([newObject[@"stringCol"] isEqualToString:@"2"]) {
+                [migration deleteObject:newObject];
+                [migration createObject:StringObject.className withValue:@[@"A"]];
+            }
+        }];
+        [migration enumerateObjects:StringObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(oldObject[@"stringCol"], newObject[@"stringCol"]);
+            count++;
+        }];
+        XCTAssertEqual(count, 2);
+
+        count = 0;
+        [migration enumerateObjects:IntObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(oldObject[@"intCol"], newObject[@"intCol"]);
+            if ([newObject[@"intCol"] isEqualToNumber:@1]) {
+                [migration deleteObject:newObject];
+                [migration createObject:IntObject.className withValue:@[@0]];
+            }
+        }];
+        [migration enumerateObjects:IntObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(oldObject[@"intCol"], newObject[@"intCol"]);
+            count++;
+        }];
+        XCTAssertEqual(count, 2);
+
+        [migration enumerateObjects:BoolObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertEqualObjects(oldObject[@"boolCol"], newObject[@"boolCol"]);
+            [migration deleteObject:newObject];
+            [migration createObject:BoolObject.className withValue:@[@NO]];
+        }];
+        [migration enumerateObjects:BoolObject.className block:^(__unused RLMObject *oldObject, __unused RLMObject *newObject) {
+            XCTFail(@"This line should not executed since all objects have been deleted.");
+        }];
+    }];
+}
+
 - (void)testRequiredToNullableAutoMigration {
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:AllOptionalTypes.class];
     [objectSchema.properties setValue:@NO forKey:@"optional"];
