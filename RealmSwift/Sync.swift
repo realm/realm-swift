@@ -314,6 +314,20 @@ public typealias SyncAccessLevel = RLMSyncAccessLevel
  */
 public typealias SyncPermissionResults = RLMSyncPermissionResults
 
+extension SyncPermissionResults {
+    /// Return the first permission value in the results, or `nil` if
+    /// the results are empty.
+    public var first: SyncPermissionValue? {
+        return count > 0 ? object(at: 0) : nil
+    }
+
+    /// Return the last permission value in the results, or `nil` if
+    /// the results are empty.
+    public var last: SyncPermissionValue? {
+        return count > 0 ? object(at: count - 1) : nil
+    }
+}
+
 extension SyncPermissionResults: Sequence {
     public struct Iterator: IteratorProtocol {
         private let iteratorBase: NSFastEnumerationIterator

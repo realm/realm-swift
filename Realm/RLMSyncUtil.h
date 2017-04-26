@@ -53,13 +53,25 @@ extern NSString *const RLMSyncPermissionErrorDomain;
  error handler, or a callback on a sync-related API that performs asynchronous work.
  */
 typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
+    /**
+     An error that indicates that the response received from the
+     authentication server was malformed.
+     
+     @warning This error is deprecated, and has been replaced by
+              `RLMSyncAuthErrorBadResponse`.
+     */
+    RLMSyncErrorBadResponse __deprecated_msg("This error has been replaced by 'RLMSyncAuthErrorBadResponse'") = 1,
+
     /// An error that indicates a problem with the session (a specific Realm opened for sync).
     RLMSyncErrorClientSessionError      = 4,
 
     /// An error that indicates a problem with a specific user.
     RLMSyncErrorClientUserError         = 5,
 
-    /// An error that indicates an internal, unrecoverable error with the underlying synchronization engine.
+    /** 
+     An error that indicates an internal, unrecoverable problem
+     with the underlying synchronization engine.
+     */
     RLMSyncErrorClientInternalError     = 6,
 
     /**
@@ -94,7 +106,7 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      describes the path of the recovered copy of the Realm. This copy will not actually be
      created until the client reset process is initiated.
 
-     @see: `-[NSError rlmSync_clientResetBlock]`, `-[NSError rlmSync_clientResetBackedUpRealmPath]`
+     @see `-[NSError rlmSync_clientResetBlock]`, `-[NSError rlmSync_clientResetBackedUpRealmPath]`
      */
     RLMSyncErrorClientResetError        = 7,
 

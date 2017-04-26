@@ -53,12 +53,12 @@ typedef NS_ENUM(NSUInteger, RLMSyncPermissionResultsSortProperty) {
 /**
  Return the first permission, or nil if the collection is empty.
  */
-- (nullable RLMSyncPermissionValue *)firstObject;
+- (nullable RLMSyncPermissionValue *)firstObject NS_SWIFT_UNAVAILABLE("Use the `first` property.");
 
 /**
  Return the last permission, or nil if the collection is empty.
  */
-- (nullable RLMSyncPermissionValue *)lastObject;
+- (nullable RLMSyncPermissionValue *)lastObject NS_SWIFT_UNAVAILABLE("Use the `last` property.");
 
 /**
  Retrieve the permission value at the given index. Throws an exception if the index

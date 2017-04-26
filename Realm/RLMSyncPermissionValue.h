@@ -19,8 +19,16 @@
 #import <Foundation/Foundation.h>
 
 /**
- Access levels which can be granted to Realm Mobile Platform users for specific synchronized
- Realms, using the permissions APIs.
+ Access levels which can be granted to Realm Mobile Platform users
+ for specific synchronized Realms, using the permissions APIs.
+
+ Note that each permission level implies all the permissions that
+ are present within previous permission levels. Specifically,
+ users with write permissions for a Realm can always read from
+ that Realm, and users with administrative permissions can always
+ read or write from the Realm. It is not possible to, for example,
+ specify that a user can administer and read from a Realm but not
+ write to it.
  */
 typedef NS_ENUM(NSUInteger, RLMSyncAccessLevel) {
     /// No permissions whatsoever.
@@ -29,7 +37,8 @@ typedef NS_ENUM(NSUInteger, RLMSyncAccessLevel) {
     RLMSyncAccessLevelRead,
     /// User can read and write the contents of the Realm.
     RLMSyncAccessLevelWrite,
-    /// User can administer the Realm, including granting permissions to other users.
+    /// User can read, write, and administer the Realm, including
+    /// granting permissions to other users.
     RLMSyncAccessLevelAdmin,
 };
 
