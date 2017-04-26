@@ -67,19 +67,28 @@ public typealias ErrorReportingBlock = RLMSyncErrorReportingBlock
 public typealias UserCompletionBlock = RLMUserCompletionBlock
 
 /**
- An error associated with the SDK's synchronization functionality.
+ An error associated with the SDK's synchronization functionality. All errors reported by
+ an error handler registered on the `SyncManager` will be of this type.
 
  - see: `RLMSyncError`
  */
 public typealias SyncError = RLMSyncError
 
-
 /**
- An error associated with the authentication to the Realm Object Server.
+ An error associated with network requests made to the authentication server. This type of error
+ may be returned in the callback block to `SyncUser.logIn()` upon certain types of failed login
+ attempts (for example, if the request is malformed or if the server is experiencing an issue).
 
  - see: `RLMSyncAuthError`
  */
 public typealias SyncAuthError = RLMSyncAuthError
+
+/**
+ An error associated with retrieving or modifying user permissions to access a synchronized Realm.
+
+ - see: `RLMSyncPermissionError`
+ */
+public typealias SyncPermissionError = RLMSyncPermissionError
 
 /**
  An enum which can be used to specify the level of logging.
@@ -272,6 +281,7 @@ extension SyncUser {
      This Realm can be used to control access permissions for Realms managed by the user.
      This includes granting other users access to Realms.
      */
+    @available(*, deprecated, message: "Only use the management Realm for permission offers and responses.")
     public func managementRealm() throws -> Realm {
         var config = Realm.Configuration.fromRLMRealmConfiguration(.managementConfiguration(for: self))
         config.objectTypes = [SyncPermissionChange.self, SyncPermissionOffer.self, SyncPermissionOfferResponse.self]
@@ -284,6 +294,7 @@ extension SyncUser {
      This read-only Realm contains `SyncPermission` objects reflecting the
      synchronized Realms and permission details this user has access to.
      */
+    @available(*, deprecated, message: "Use SyncUser.retrievePermissions()")
     public func permissionRealm() throws -> Realm {
         var config = Realm.Configuration.fromRLMRealmConfiguration(.permissionConfiguration(for: self))
         config.objectTypes = [SyncPermission.self]
@@ -308,7 +319,9 @@ public typealias SyncPermissionValue = RLMSyncPermissionValue
 public typealias SyncAccessLevel = RLMSyncAccessLevel
 
 /**
- A sequence of results that contains the permissions for Realms
+ A collection of `SyncPermissionValue`s that represent the permissions
+ that have been configured on all the Realms that some user is allowed
+ to administer.
 
  - see: `RLMSyncPermissionResults`
  */
@@ -376,6 +389,7 @@ extension SyncPermissionResults: Sequence {
  See https://realm.io/docs/realm-object-server/#permissions for general
  documentation.
  */
+@available(*, deprecated, message: "Use `SyncPermissionValue`")
 public final class SyncPermission: Object {
     /// The date this object was last modified.
     public dynamic var updatedAt = Date()
@@ -411,6 +425,7 @@ public final class SyncPermission: Object {
  See https://realm.io/docs/realm-object-server/#permissions for general
  documentation.
  */
+@available(*, deprecated, message: "Use `SyncUser.applyPermission()` and `SyncUser.revokePermission()`")
 public final class SyncPermissionChange: Object {
     /// The globally unique ID string of this permission change object.
     public dynamic var id = UUID().uuidString

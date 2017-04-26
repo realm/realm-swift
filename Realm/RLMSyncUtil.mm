@@ -47,7 +47,8 @@ static RLMRealmConfiguration *RLMRealmSpecialPurposeConfiguration(RLMSyncUser *u
     config.syncConfiguration = syncConfig;
     return config;
 }
-
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 @implementation RLMRealmConfiguration (RealmSync)
 + (instancetype)managementConfigurationForUser:(RLMSyncUser *)user {
     RLMRealmConfiguration *config = RLMRealmSpecialPurposeConfiguration(user, @"__management");
@@ -61,6 +62,7 @@ static RLMRealmConfiguration *RLMRealmSpecialPurposeConfiguration(RLMSyncUser *u
     return config;
 }
 @end
+#pragma clang diagnostic pop
 
 RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
 

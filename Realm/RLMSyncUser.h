@@ -157,8 +157,8 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 - (void)changePassword:(NSString *)newPassword completion:(RLMPasswordChangeStatusBlock)completion;
 
 // This set of permissions APIs uses immutable `RLMSyncPermissionValue` objects to
-// get and set permissions, using a simplified API. Either this API or the Realm
-// Object based API can be used to work with permissions.
+// get and set permissions. It is intended to replace the set of APIs which directly
+// access Realms and Realm model objects to work with permissions.
 #pragma mark - Value-based Permissions API
 
 /**
@@ -199,8 +199,9 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 // These permission APIs access Realms and Realm model objects representing
 // various permission states and actions, as well as standard Realm
-// affordances, to work with permissions. Either this API or the Realm
-// Object based API can be used to work with permissions.
+// affordances, to work with permissions. It is being deprecated in favor of
+// the `retrievePermissionsWithCallback:`, `applyPermission:callback:`, and
+// `revokePermission:callback:` APIs.
 #pragma mark - Realm Object-based Permissions API
 
 /**
@@ -209,7 +210,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  This Realm can be used to control access permissions for Realms managed by the user.
  This includes granting other users access to Realms.
  */
-- (RLMRealm *)managementRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
+- (RLMRealm *)managementRealmWithError:(NSError **)error __deprecated_msg("Only use the management Realm for permission offers and responses.") NS_REFINED_FOR_SWIFT;
 
 /**
  Returns an instance of the Permission Realm owned by the user.
@@ -217,7 +218,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  This read-only Realm contains `RLMSyncPermission` objects reflecting the
  synchronized Realms and permission details this user has access to.
  */
-- (RLMRealm *)permissionRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
+- (RLMRealm *)permissionRealmWithError:(NSError **)error __deprecated_msg("Use `-retrievePermissionsWithCallback:`") NS_REFINED_FOR_SWIFT;
 
 #pragma mark - Miscellaneous
 
