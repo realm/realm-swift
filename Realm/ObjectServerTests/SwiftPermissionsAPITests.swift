@@ -126,7 +126,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         // Open a Realm for user A.
         let uuid = UUID().uuidString
         let url = SwiftSyncTestCase.uniqueRealmURL(customName: uuid)
-        let _ = try! synchronouslyOpenRealm(url: url, user: userA)
+        _ = try! synchronouslyOpenRealm(url: url, user: userA)
 
         // Give user B read permissions to that Realm.
         let p = SyncPermissionValue(realmPath: url.path, userID: userB.identity!, accessLevel: .read)
@@ -175,7 +175,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         // Open a Realm for user A.
         let uuid = UUID().uuidString
         let url = SwiftSyncTestCase.uniqueRealmURL(customName: uuid)
-        let _ = try! synchronouslyOpenRealm(url: url, user: userA)
+        _ = try! synchronouslyOpenRealm(url: url, user: userA)
 
         // Register notifications.
         let noteEx = expectation(description: "Notification should fire")
@@ -210,7 +210,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         // Open a Realm for user A.
         let uuid = UUID().uuidString
         let url = SwiftSyncTestCase.uniqueRealmURL(customName: uuid)
-        let _ = try! synchronouslyOpenRealm(url: url, user: userA)
+        _ = try! synchronouslyOpenRealm(url: url, user: userA)
 
         // Try to have user B give user C permissions to that Realm.
         let p = SyncPermissionValue(realmPath: url.path, userID: userC.identity!, accessLevel: .read)
