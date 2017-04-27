@@ -1084,6 +1084,18 @@
     RLMAssertCount(AllTypesObject, 0U, @"objectCol.stringCol == 'ABC'");
 }
 
+- (void)testCaseInsensitiveLongPrimaryKeyString
+{
+    RLMRealm *realm = [self realm];
+
+    [realm beginWriteTransaction];
+    [StringObject createInRealm:realm withValue:@[@"1111111111111111111111111111111"]];
+    [StringObject createInRealm:realm withValue:@[@"1111111111111111111111111111112"]];
+    [realm commitWriteTransaction];
+
+    RLMAssertCount(StringObject, 1U, @"stringCol = [c]%@", "1111111111111111111111111111111");
+}
+
 - (void)testFloatQuery
 {
     RLMRealm *realm = [self realm];
