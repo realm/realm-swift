@@ -189,9 +189,10 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
                           callback:(RLMAsyncOpenRealmCallback)callback {
     bool hasSyncConfig = (configuration.config.sync_config != nullptr);
     __block NSError *error = nil;
-    RLMRealm *realmStrongRef = (hasSyncConfig
-                                ? [RLMRealm uncachedSchemalessRealmWithConfiguration:configuration error:&error]
-                                : [RLMRealm realmWithConfiguration:configuration error:&error]);
+    RLMRealm *realmStrongRef = nil;
+    if (hasSyncConfig) {
+        realmStrongRef = [RLMRealm uncachedSchemalessRealmWithConfiguration:configuration error:&error];
+    }
     if (error) {
         dispatch_async(callbackQueue, ^{
             callback(nil, error);
@@ -202,6 +203,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     dispatch_async(queue, ^{
         @autoreleasepool {
             if (hasSyncConfig) {
+                REALM_ASSERT_DEBUG(realmStrongRef);
                 // Sync behavior: get the raw session, then wait for it to download.
                 if (auto session = sync_session_for_realm(realmStrongRef)) {
                     // Wait for the session to download, then open it.
