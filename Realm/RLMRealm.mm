@@ -187,45 +187,43 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 + (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                      callbackQueue:(dispatch_queue_t)callbackQueue
                           callback:(RLMAsyncOpenRealmCallback)callback {
-    bool hasSyncConfig = (configuration.config.sync_config != nullptr);
-    __block NSError *error = nil;
-    RLMRealm *realmStrongRef = nil;
-    if (hasSyncConfig) {
-        realmStrongRef = [RLMRealm uncachedSchemalessRealmWithConfiguration:configuration error:&error];
-    }
-    if (error) {
-        dispatch_async(callbackQueue, ^{
-            callback(nil, error);
-        });
-        return;
+    RLMRealm *strongReferenceToSyncedRealm = nil;
+    if (configuration.config.sync_config) {
+        NSError *error = nil;
+        strongReferenceToSyncedRealm = [RLMRealm uncachedSchemalessRealmWithConfiguration:configuration error:&error];
+        if (error) {
+            dispatch_async(callbackQueue, ^{
+                callback(nil, error);
+            });
+            return;
+        }
     }
     static dispatch_queue_t queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue", DISPATCH_QUEUE_CONCURRENT);
     dispatch_async(queue, ^{
         @autoreleasepool {
-            if (hasSyncConfig) {
-                REALM_ASSERT_DEBUG(realmStrongRef);
+            if (strongReferenceToSyncedRealm) {
                 // Sync behavior: get the raw session, then wait for it to download.
-                if (auto session = sync_session_for_realm(realmStrongRef)) {
+                if (auto session = sync_session_for_realm(strongReferenceToSyncedRealm)) {
                     // Wait for the session to download, then open it.
-                    session->wait_for_download_completion([=](std::error_code error) {
+                    session->wait_for_download_completion([=](std::error_code error_code) {
                         dispatch_async(callbackQueue, ^{
-                            (void)realmStrongRef;
-                            NSError *err = nil;
-                            if (error == std::error_code{}) {
+                            (void)strongReferenceToSyncedRealm;
+                            NSError *error = nil;
+                            if (error_code == std::error_code{}) {
                                 // Success
                                 @autoreleasepool {
                                     // Try opening the Realm on the destination queue.
-                                    RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&err];
-                                    callback(localRealm, err);
+                                    RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
+                                    callback(localRealm, error);
                                 }
                             } else {
                                 // Failure
                                 callback(nil, [NSError errorWithDomain:RLMSyncErrorDomain
                                                                   code:RLMSyncSystemErrorKindSession
                                                               userInfo:@{kRLMSyncErrorStatusCodeKey:
-                                                                             @(error.value()),
+                                                                             @(error_code.value()),
                                                                          NSLocalizedDescriptionKey:
-                                                                             @(error.message().c_str())
+                                                                             @(error_code.message().c_str())
                                                                          }]);
                             }
                         });
