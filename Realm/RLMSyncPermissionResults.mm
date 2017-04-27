@@ -102,7 +102,7 @@ using namespace realm;
             property_name = "path";
             break;
         case RLMSyncPermissionResultsSortPropertyUserID:
-            property_name = "user_id";
+            property_name = "userId";
             break;
     }
     const auto& table = results.get_tableview().get_parent();

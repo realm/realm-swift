@@ -69,21 +69,21 @@ NSString *descriptionForAccessLevel(RLMSyncAccessLevel level) {
 
 // Returns true if the paths are literally equal, or if one path can be translated
 // into the other path via user-ID substitution.
-BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUserID, NSString *thatUserID)
+BOOL pathsAreEquivalent(NSString *path1, NSString *path2, NSString *userID1, NSString *userID2)
 {
-    if ([thisPath isEqualToString:thatPath]) {
+    if ([path1 isEqualToString:path2]) {
         return YES;
     }
-    NSRange tildeRange = [thisPath rangeOfString:@"~"];
-    if (tildeRange.length > 0) {
+    NSRange tildeRange = [path1 rangeOfString:@"~"];
+    if (tildeRange.location != NSNotFound) {
         // Substitute in the user ID for the `/~/` portion of the path, if applicable.
-        return [[thisPath stringByReplacingCharactersInRange:tildeRange
-                                                  withString:thisUserID] isEqualToString:thatPath];
+        return [[path1 stringByReplacingCharactersInRange:tildeRange
+                                               withString:userID1] isEqualToString:path2];
     }
-    tildeRange = [thatPath rangeOfString:@"~"];
-    if (tildeRange.length > 0) {
-        return [[thatPath stringByReplacingCharactersInRange:tildeRange
-                                                  withString:thatUserID] isEqualToString:thisPath];
+    tildeRange = [path2 rangeOfString:@"~"];
+    if (tildeRange.location != NSNotFound) {
+        return [[path2 stringByReplacingCharactersInRange:tildeRange
+                                               withString:userID2] isEqualToString:path1];
     }
     return NO;
 }
@@ -146,11 +146,11 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
 }
 
 - (BOOL)mayRead {
-    return self.accessLevel != RLMSyncAccessLevelNone;
+    return self.accessLevel > RLMSyncAccessLevelNone;
 }
 
 - (BOOL)mayWrite {
-    return self.accessLevel == RLMSyncAccessLevelWrite || self.accessLevel == RLMSyncAccessLevelAdmin;
+    return self.accessLevel > RLMSyncAccessLevelRead;
 }
 
 - (BOOL)mayManage {
@@ -182,6 +182,9 @@ BOOL pathsAreEquivalent(NSString *thisPath, NSString *thatPath, NSString *thisUs
 }
 
 - (BOOL)isEqual:(id)object {
+    if (self == object) {
+        return YES;
+    }
     if ([object isKindOfClass:[RLMSyncPermissionValue class]]) {
         RLMSyncPermissionValue *that = (RLMSyncPermissionValue *)object;
         return (self.accessLevel == that.accessLevel

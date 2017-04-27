@@ -22,37 +22,43 @@
  Access levels which can be granted to Realm Mobile Platform users
  for specific synchronized Realms, using the permissions APIs.
 
- Note that each permission level implies all the permissions that
- are present within previous permission levels. Specifically,
- users with write permissions for a Realm can always read from
- that Realm, and users with administrative permissions can always
- read or write from the Realm. It is not possible to, for example,
- specify that a user can administer and read from a Realm but not
- write to it.
+ Note that each access level guarantees all allowed actions provided
+ by less permissive access levels. Specifically, users with write
+ access to a Realm can always read from that Realm, and users with
+ administrative access can always read or write from the Realm.
  */
 typedef NS_ENUM(NSUInteger, RLMSyncAccessLevel) {
-    /// No permissions whatsoever.
-    RLMSyncAccessLevelNone,
-    /// User can only read the contents of the Realm.
-    RLMSyncAccessLevelRead,
+    /// No access whatsoever.
+    RLMSyncAccessLevelNone          = 0,
+    /**
+     User can only read the contents of the Realm.
+     
+     @warning Users who have read-only access to a Realm should open the
+              Realm using `+[RLMRealm asyncOpenWithConfiguration:callbackQueue:callback:]`.
+              Attempting to directly open the Realm is an error; in this
+              case the Realm must be deleted and re-opened.
+     */
+    RLMSyncAccessLevelRead          = 1,
     /// User can read and write the contents of the Realm.
-    RLMSyncAccessLevelWrite,
+    RLMSyncAccessLevelWrite         = 2,
     /// User can read, write, and administer the Realm, including
     /// granting permissions to other users.
-    RLMSyncAccessLevelAdmin,
+    RLMSyncAccessLevelAdmin         = 3,
 };
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A value representing a permission granted to one or more users with respect to a particular Realm.
+ A value representing a permission granted to the specified user(s) to access the specified Realm(s).
 
- `RLMSyncPermissionValue` is immutable and thread-safe.
+ `RLMSyncPermissionValue` is immutable and can be accessed from any thread.
  */
 @interface RLMSyncPermissionValue : NSObject
 
 /**
- The path to the Realm to which this permission applies.
+ The Realm Object Server path to the Realm to which this permission applies (e.g. "/path/to/realm").
+
+ Specify "*" if this permission applies to all Realms managed by the server.
  */
 @property (nonatomic, readonly) NSString *path;
 
@@ -73,9 +79,11 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Create a new sync permission value, for use with permission APIs.
 
- @param path            The path to the Realm whose permission should be modified (e.g. "/path/to/realm")
- @param userID          The user ID of the user who should be granted access to the Realm at `path`
- @param accessLevel     What access level to grant
+ @param path        The Realm Object Server path to the Realm whose permission should be modified
+                    (e.g. "/path/to/realm"). Pass "*" to apply to all Realms managed by the server.
+ @param userID      The identity of the user who should be granted access to the Realm at `path`.
+                    Pass "*" to apply to all users managed by the server.
+ @param accessLevel The access level to grant.
  */
 - (instancetype)initWithRealmPath:(NSString *)path
                            userID:(NSString *)userID

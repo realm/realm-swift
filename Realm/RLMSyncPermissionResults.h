@@ -19,25 +19,24 @@
 #import <Foundation/Foundation.h>
 
 #import "RLMSyncUser.h"
-#import "RLMRealm.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /// Properties which a sync permission results collection can be sorted by.
 typedef NS_ENUM(NSUInteger, RLMSyncPermissionResultsSortProperty) {
-    /// Sort by the path of the Realm the permission pertains to.
+    /// Sort by the Realm Object Server path to the Realm to which the permission applies.
     RLMSyncPermissionResultsSortPropertyPath,
-    /// Sort by the user ID of the user the permission applies to.
+    /// Sort by the identity of the user to whom the permission applies.
     RLMSyncPermissionResultsSortPropertyUserID,
 };
 
-@class RLMSyncPermissionValue;
+@class RLMSyncPermissionValue, RLMNotificationToken;
 
 /**
  A collection object representing the results of a permissions query.
 
  This collection will automatically update its contents at the start of each runloop
- iteration, but the objects it vends are immutable and will themselves not change.
+ iteration, but the objects it vends are immutable.
 
  Permission results objects are thread-confined, and should not be shared across
  threads.
@@ -73,8 +72,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncPermissionResultsSortProperty) {
 - (NSInteger)indexOfObject:(RLMSyncPermissionValue *)object;
 
 /**
- Register a notification block upon the results object. The block will be called
- whenever the contents of the results object changes.
+ Register to be notified when the contents of the results object change.
 
  This method returns a token. Hold on to the token for as long as notifications
  are desired. Call `-stop` on the token to stop notifications, and before

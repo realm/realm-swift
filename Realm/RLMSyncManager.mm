@@ -171,9 +171,8 @@ static dispatch_once_t s_onceToken;
     NSDictionary *custom = nil;
     switch (errorClass) {
         case RLMSyncSystemErrorKindClientReset: {
-            // Client reset is a special case; the application
-            // can respond to it to a greater degree than it
-            // can for most other errors.
+            // Users can respond to "client reset" errors to a
+            // greater degree than possible for most other errors.
             std::string original_path = [userInfo[@(realm::SyncError::c_original_file_path_key)] UTF8String];
             custom = @{kRLMSyncPathOfRealmBackupCopyKey: userInfo[@(realm::SyncError::c_recovery_file_path_key)],
                        kRLMSyncInitiateClientResetBlockKey: ^{

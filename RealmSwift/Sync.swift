@@ -68,7 +68,7 @@ public typealias UserCompletionBlock = RLMUserCompletionBlock
 
 /**
  An error associated with the SDK's synchronization functionality. All errors reported by
- an error handler registered on the `SyncManager` will be of this type.
+ an error handler registered on the `SyncManager` are of this type.
 
  - see: `RLMSyncError`
  */
