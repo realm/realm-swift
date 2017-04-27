@@ -166,16 +166,12 @@ NSError *make_permission_error_change(NSString *description, util::Optional<NSIn
 }
 
 NSError *make_sync_error(RLMSyncSystemErrorKind kind, NSString *description, NSInteger code, NSDictionary *custom) {
-    NSDictionary *userInfo;
-    if (custom) {
-        NSMutableDictionary *buffer = [custom mutableCopy];
-        buffer[NSLocalizedDescriptionKey] = description;
+    NSMutableDictionary *buffer = [custom ?: @{} mutableCopy];
+    buffer[NSLocalizedDescriptionKey] = description;
+    if (code != NSNotFound) {
         buffer[kRLMSyncErrorStatusCodeKey] = @(code);
-        userInfo = [buffer copy];
-    } else {
-        userInfo = @{NSLocalizedDescriptionKey: description,
-                     kRLMSyncErrorStatusCodeKey: @(code)};
     }
+
     RLMSyncError errorCode;
     switch (kind) {
         case RLMSyncSystemErrorKindClientReset: {
@@ -196,13 +192,22 @@ NSError *make_sync_error(RLMSyncSystemErrorKind kind, NSString *description, NSI
     }
     return [NSError errorWithDomain:RLMSyncErrorDomain
                                code:errorCode
-                           userInfo:userInfo];
+                           userInfo:[buffer copy]];
 }
 
 NSError *make_sync_error(NSError *wrapped_auth_error) {
     return [NSError errorWithDomain:RLMSyncErrorDomain
                                code:RLMSyncErrorUnderlyingAuthError
                            userInfo:@{kRLMSyncUnderlyingErrorKey: wrapped_auth_error}];
+}
+
+NSError *make_sync_error(std::error_code sync_error, RLMSyncSystemErrorKind kind) {
+    return [NSError errorWithDomain:RLMSyncErrorDomain
+                               code:kind
+                           userInfo:@{
+                                      NSLocalizedDescriptionKey: @(sync_error.message().c_str()),
+                                      kRLMSyncErrorStatusCodeKey: @(sync_error.value())
+                                      }];
 }
 
 #pragma mark - C APIs

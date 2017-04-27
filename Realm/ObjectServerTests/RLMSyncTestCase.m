@@ -39,8 +39,8 @@
 @end
 
 @interface RLMSyncSession ()
-- (BOOL)waitForUploadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(void))callback;
-- (BOOL)waitForDownloadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(void))callback;
+- (BOOL)waitForUploadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback;
+- (BOOL)waitForDownloadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback;
 @end
 
 @implementation SyncObject
@@ -114,7 +114,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSAssert(realms.count == counts.count && realms.count == realmURLs.count,
              @"Test logic error: all array arguments must be the same size.");
     for (NSUInteger i = 0; i < realms.count; i++) {
-        [self waitForDownloadsForUser:user url:realmURLs[i]];
+        [self waitForDownloadsForUser:user url:realmURLs[i] error:nil];
         [realms[i] refresh];
         CHECK_COUNT([counts[i] integerValue], SyncObject, realms[i]);
     }
@@ -196,25 +196,43 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user url:(NSURL *)url {
+    [self waitForDownloadsForUser:user url:url error:nil];
+}
+
+- (void)waitForDownloadsForUser:(RLMSyncUser *)user url:(NSURL *)url error:(NSError **)error {
     RLMSyncSession *session = [user sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
     XCTestExpectation *ex = [self expectationWithDescription:@"Download waiter expectation"];
+    __block NSError *theError = nil;
     [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                     callback:^{
+                                     callback:^(NSError *err){
+                                         theError = err;
                                          [ex fulfill];
                                      }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    if (error) {
+        *error = theError;
+    }
 }
 
 - (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url {
+    [self waitForUploadsForUser:user url:url error:nil];
+}
+
+- (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url error:(NSError **)error {
     RLMSyncSession *session = [user sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
     XCTestExpectation *ex = [self expectationWithDescription:@"Upload waiter expectation"];
+    __block NSError *theError = nil;
     [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                    callback:^{
+                                                    callback:^(NSError *err){
+                                                        theError = err;
                                                         [ex fulfill];
                                                     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    if (error) {
+        *error = theError;
+    }
 }
 
 // FIXME: remove this API once the new token system is implemented.

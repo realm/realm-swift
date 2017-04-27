@@ -40,6 +40,7 @@ NSError *make_auth_error(RLMSyncErrorResponseModel *responseModel);
 NSError *make_permission_error_get(NSString *description, realm::util::Optional<NSInteger> code=none);
 NSError *make_permission_error_change(NSString *description, realm::util::Optional<NSInteger> code=none);
 
+// Set 'code' to NSNotFound to not actually have an error code.
 NSError *make_sync_error(RLMSyncSystemErrorKind kind, NSString *description, NSInteger code, NSDictionary *custom);
 NSError *make_sync_error(NSError *wrapped_auth_error);
-
+NSError *make_sync_error(std::error_code, RLMSyncSystemErrorKind kind=RLMSyncSystemErrorKindSession);
