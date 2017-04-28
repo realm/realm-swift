@@ -210,7 +210,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  This Realm can be used to control access permissions for Realms managed by the user.
  This includes granting other users access to Realms.
  */
-- (RLMRealm *)managementRealmWithError:(NSError **)error __deprecated_msg("Only use the management Realm for permission offers and responses.") NS_REFINED_FOR_SWIFT;
+- (RLMRealm *)managementRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
 
 /**
  Returns an instance of the Permission Realm owned by the user.

@@ -281,10 +281,14 @@ extension SyncUser {
      This Realm can be used to control access permissions for Realms managed by the user.
      This includes granting other users access to Realms.
      */
-    @available(*, deprecated, message: "Only use the management Realm for permission offers and responses.")
     public func managementRealm() throws -> Realm {
         var config = Realm.Configuration.fromRLMRealmConfiguration(.managementConfiguration(for: self))
-        config.objectTypes = [SyncPermissionChange.self, SyncPermissionOffer.self, SyncPermissionOfferResponse.self]
+        guard let permissionChangeClass = NSClassFromString("RealmSwift.SyncPermissionChange") as? Object.Type else {
+            fatalError("Internal error: could not build `SyncPermissionChange` metaclass from string.")
+        }
+        config.objectTypes = [permissionChangeClass,
+                              SyncPermissionOffer.self,
+                              SyncPermissionOfferResponse.self]
         return try Realm(configuration: config)
     }
 

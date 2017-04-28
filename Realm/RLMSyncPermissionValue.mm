@@ -53,41 +53,6 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
     REALM_UNREACHABLE();
 }
 
-NSString *descriptionForAccessLevel(RLMSyncAccessLevel level) {
-    switch (level) {
-        case RLMSyncAccessLevelNone:
-            return @"none";
-        case RLMSyncAccessLevelRead:
-            return @"read";
-        case RLMSyncAccessLevelWrite:
-            return @"write";
-        case RLMSyncAccessLevelAdmin:
-            return @"admin";
-    }
-    REALM_UNREACHABLE();
-}
-
-// Returns true if the paths are literally equal, or if one path can be translated
-// into the other path via user-ID substitution.
-BOOL pathsAreEquivalent(NSString *path1, NSString *path2, NSString *userID1, NSString *userID2)
-{
-    if ([path1 isEqualToString:path2]) {
-        return YES;
-    }
-    NSRange tildeRange = [path1 rangeOfString:@"~"];
-    if (tildeRange.location != NSNotFound) {
-        // Substitute in the user ID for the `/~/` portion of the path, if applicable.
-        return [[path1 stringByReplacingCharactersInRange:tildeRange
-                                               withString:userID1] isEqualToString:path2];
-    }
-    tildeRange = [path2 rangeOfString:@"~"];
-    if (tildeRange.location != NSNotFound) {
-        return [[path2 stringByReplacingCharactersInRange:tildeRange
-                                               withString:userID2] isEqualToString:path1];
-    }
-    return NO;
-}
-
 }
 
 #pragma mark - Permission
@@ -188,7 +153,8 @@ BOOL pathsAreEquivalent(NSString *path1, NSString *path2, NSString *userID1, NSS
     if ([object isKindOfClass:[RLMSyncPermissionValue class]]) {
         RLMSyncPermissionValue *that = (RLMSyncPermissionValue *)object;
         return (self.accessLevel == that.accessLevel
-                && pathsAreEquivalent(self.path, that.path, self.userId, that.userId)
+                && Permission::paths_are_equivalent([self.path UTF8String], [that.path UTF8String],
+                                                    [self.userId UTF8String], [that.userId UTF8String])
                 && [self.userId isEqualToString:that.userId]);
     }
     return NO;
@@ -198,7 +164,7 @@ BOOL pathsAreEquivalent(NSString *path1, NSString *path2, NSString *userID1, NSS
     return [NSString stringWithFormat:@"<RLMSyncPermissionValue> user ID: %@, path: %@, access level: %@",
             self.userId,
             self.path,
-            descriptionForAccessLevel(self.accessLevel)];
+            @(Permission::description_for_access_level(accessLevelForObjcAccessLevel(self.accessLevel)).c_str())];
 }
 
 @end

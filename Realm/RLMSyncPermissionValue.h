@@ -90,7 +90,8 @@ NS_ASSUME_NONNULL_BEGIN
                       accessLevel:(RLMSyncAccessLevel)accessLevel;
 
 /**
- The user ID of the user to whom these permissions are granted.
+ The identity of the user to whom this permission is granted, or "*"
+ if all users are granted this permission.
  */
 @property (nullable, nonatomic, readonly) NSString *userId;
 
