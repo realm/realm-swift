@@ -104,6 +104,9 @@ using namespace realm;
         case RLMSyncPermissionResultsSortPropertyUserID:
             property_name = "userId";
             break;
+        case RLMSyncPermissionResultsSortDateUpdated:
+            property_name = "updatedAt";
+            break;
     }
     const auto& table = results.get_tableview().get_parent();
     size_t col_idx = table.get_descriptor()->get_column_index(property_name);

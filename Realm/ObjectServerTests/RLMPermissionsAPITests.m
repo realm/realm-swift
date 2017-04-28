@@ -566,7 +566,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     CHECK_PERMISSION_PRESENT(filtered, exp3);
 }
 
-- (void)testSortingPermissions {
+- (void)testSortingPermissionsOnPath {
     // Get a reference to the permission results.
     XCTestExpectation *ex = [self expectationWithDescription:@"Get permission results."];
     __block RLMSyncPermissionResults *results = nil;
@@ -602,7 +602,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
         [ex3 fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    XCTestExpectation *ex4 = [self expectationWithDescription:@"Setting r3 permission for user C should work."];
+    XCTestExpectation *ex4 = [self expectationWithDescription:@"Setting r3 permission for user B should work."];
     id p3 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url3 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
     [self.userA applyPermission:p3 callback:^(NSError *error) {
         XCTAssertNil(error);
@@ -617,8 +617,13 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                      [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r2"]);
     id exp3 = makeExpectedPermission(p3, self.userA,
                                      [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r3"]);
-    RLMSyncPermissionResults *sorted = [results sortedResultsUsingProperty:RLMSyncPermissionResultsSortPropertyPath
-                                                                 ascending:YES];
+    RLMSyncPermissionResults *filtered = [results objectsWithPredicate:[NSPredicate predicateWithFormat:@"userId == %@",
+                                                                        uB]];
+    RLMSyncPermissionResults *sorted = [filtered sortedResultsUsingProperty:RLMSyncPermissionResultsSortPropertyPath
+                                                                  ascending:YES];
+    // Wait for changes to propagate
+    CHECK_PERMISSION_COUNT(sorted, 3);
+    
     RLMSyncPermissionValue *n1 = nil;
     RLMSyncPermissionValue *n2 = nil;
     RLMSyncPermissionValue *n3 = nil;
@@ -634,6 +639,74 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     XCTAssertNotEqual(idx3, NSNotFound);
     XCTAssertLessThan(idx1, idx2);
     XCTAssertLessThan(idx2, idx3);
+}
+
+- (void)testSortingPermissionsOnDate {
+    // Get a reference to the permission results.
+    XCTestExpectation *ex = [self expectationWithDescription:@"Get permission results."];
+    __block RLMSyncPermissionResults *results = nil;
+    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(r);
+        results = r;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Open three Realms
+    NSURL *url1 = CUSTOM_REALM_URL(@"-r1");
+    NSURL *url2 = CUSTOM_REALM_URL(@"-r2");
+    NSURL *url3 = CUSTOM_REALM_URL(@"-r3");
+    __attribute__((objc_precise_lifetime)) RLMRealm *r1 = [self openRealmForURL:url1 user:self.userA];
+    __attribute__((objc_precise_lifetime)) RLMRealm *r2 = [self openRealmForURL:url2 user:self.userA];
+    __attribute__((objc_precise_lifetime)) RLMRealm *r3 = [self openRealmForURL:url3 user:self.userA];
+    NSString *uB = self.userB.identity;
+
+    // Give user B read permissions for all three Realms.
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting r3 permission for user B should work."];
+    id p1 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url3 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    [self.userA applyPermission:p1 callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTestExpectation *ex3 = [self expectationWithDescription:@"Setting r1 permission for user B should work."];
+    id p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url1 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    [self.userA applyPermission:p2 callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex3 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTestExpectation *ex4 = [self expectationWithDescription:@"Setting r2 permission for user B should work."];
+    id p3 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url2 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    [self.userA applyPermission:p3 callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex4 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Now sort on date. (Note that we only want the results for the user B permissions.)
+    RLMSyncPermissionResults *filtered = [results objectsWithPredicate:[NSPredicate predicateWithFormat:@"userId == %@",
+                                                                        uB]];
+    RLMSyncPermissionResults *sorted = [filtered sortedResultsUsingProperty:RLMSyncPermissionResultsSortDateUpdated
+                                                                  ascending:YES];
+
+    // Wait for changes to propagate
+    CHECK_PERMISSION_COUNT(sorted, 3);
+    RLMSyncPermissionValue *n1 = [sorted objectAtIndex:0];
+    RLMSyncPermissionValue *n2 = [sorted objectAtIndex:1];
+    RLMSyncPermissionValue *n3 = [sorted objectAtIndex:2];
+
+    NSLog(@"user B ID: %@", uB);
+    NSLog(@"sorted: %@", sorted);
+
+    XCTAssertTrue([n1.path containsString:@"r3"]);
+    XCTAssertTrue([n2.path containsString:@"r1"]);
+    XCTAssertTrue([n3.path containsString:@"r2"]);
+
+    // Make sure they are actually in ascending order.
+    XCTAssertLessThan([n1.updatedAt timeIntervalSinceReferenceDate], [n2.updatedAt timeIntervalSinceReferenceDate]);
+    XCTAssertLessThan([n2.updatedAt timeIntervalSinceReferenceDate], [n3.updatedAt timeIntervalSinceReferenceDate]);
 }
 
 /// User should not be able to change a permission for a Realm they don't own.

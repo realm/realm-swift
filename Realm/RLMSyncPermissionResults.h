@@ -28,6 +28,8 @@ typedef NS_ENUM(NSUInteger, RLMSyncPermissionResultsSortProperty) {
     RLMSyncPermissionResultsSortPropertyPath,
     /// Sort by the identity of the user to whom the permission applies.
     RLMSyncPermissionResultsSortPropertyUserID,
+    /// Sort by the date the permissions were last updated.
+    RLMSyncPermissionResultsSortDateUpdated,
 };
 
 @class RLMSyncPermissionValue, RLMNotificationToken;

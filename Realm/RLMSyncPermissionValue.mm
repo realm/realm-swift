@@ -63,6 +63,7 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
     util::Optional<Permission> _underlying;
     RLMSyncAccessLevel _accessLevel;
     NSString *_path;
+    NSDate *_updatedAt;
 }
 @end
 
@@ -75,6 +76,7 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
         _accessLevel = accessLevel;
         _path = path;
         _userID = userID;
+        _updatedAt = [NSDate date];
     }
     return self;
 }
@@ -128,7 +130,13 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
     }
     REALM_ASSERT(_underlying->condition.type == ConditionType::UserId);
     return @(_underlying->condition.user_id.c_str());
+}
 
+- (NSDate *)updatedAt {
+    if (!_underlying) {
+        return _updatedAt;
+    }
+    return RLMTimestampToNSDate(_underlying->updated_at);
 }
 
 - (realm::Permission)rawPermission {

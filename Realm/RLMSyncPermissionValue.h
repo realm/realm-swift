@@ -52,6 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
  A value representing a permission granted to the specified user(s) to access the specified Realm(s).
 
  `RLMSyncPermissionValue` is immutable and can be accessed from any thread.
+ 
+ See https://realm.io/docs/realm-object-server/#permissions for general documentation.
  */
 @interface RLMSyncPermissionValue : NSObject
 
@@ -94,6 +96,11 @@ NS_ASSUME_NONNULL_BEGIN
  if all users are granted this permission.
  */
 @property (nullable, nonatomic, readonly) NSString *userId;
+
+/**
+ When this permission object was last updated.
+ */
+@property (nonatomic, readonly) NSDate *updatedAt;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("Use the designated initializer")));
