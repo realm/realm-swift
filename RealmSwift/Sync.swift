@@ -137,7 +137,10 @@ public struct SyncConfiguration {
      */
     internal let stopPolicy: RLMSyncStopPolicy
 
-    internal let enableSSLValidation: Bool
+    /**
+     Whether the SSL certificate of the Realm Object Server should be validated.
+     */
+    public let enableSSLValidation: Bool
 
     internal init(config: RLMSyncConfiguration) {
         self.user = config.user
