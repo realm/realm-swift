@@ -156,8 +156,16 @@ public struct SyncConfiguration {
     /**
      Initialize a sync configuration with a user and a Realm URL.
 
+     Additional settings can be optionally specified. Descriptions of these
+     settings follow.
+     
+     `enableSSLValidation` is true by default. It can be disabled for debugging
+     purposes.
+
      - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
                 `.realm`, `.realm.lock` or `.realm.management`.
+     
+     - warning: NEVER disable SSL validation for a system running in production.
      */
     public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true) {
         self.user = user

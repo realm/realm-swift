@@ -3,7 +3,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### API Breaking Changes
 
-* None.
+* The `disableSSLValidation` property has been removed from the sync manager.
+  Since this property is intended only to be used for debugging purposes,
+  we do not consider this a proper breaking change requiring the major version
+  to be incremented.
 
 ### Enhancements
 
@@ -11,6 +14,10 @@ x.x.x Release notes (yyyy-MM-dd)
   connection was lost.
 * Add `-[RLMSyncUser changePassword:completion:]` API to change the current
   user's password if using Realm's 'password' authentication provider.
+* `RLMSyncConfiguration` now has an `enableSSLValidation` property to allow
+  SSL validation to be specified on a per-connection basis.
+* `SyncConfiguration`'s initializer now takes an optional argument to enable
+  or disable SSL validation on a per-connection basis.
 
 ### Bugfixes
 
