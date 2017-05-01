@@ -9,6 +9,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Use reachability API to minimize the reconnection delay if the network
   connection was lost.
+* Add `-[RLMSyncUser changePassword:completion:]` API to change the current
+  user's password if using Realm's 'password' authentication provider.
 
 ### Bugfixes
 

@@ -245,6 +245,62 @@
     XCTAssertNil(badSession);
 }
 
+/// A sync user should be able to successfully change their own password.
+- (void)testUserChangePassword {
+    NSString *firstPassword = @"a";
+    NSString *secondPassword = @"b";
+    // Successfully create user, change its password, log out,
+    // then fail to change password again due to being logged out.
+    {
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:ACCOUNT_NAME() password:firstPassword
+                                                                       register:YES];
+        RLMSyncUser *user = [self logInUserForCredentials:creds
+                                                   server:[RLMObjectServerTests authServerURL]];
+        XCTestExpectation *ex = [self expectationWithDescription:@"change password callback invoked"];
+        [user changePassword:secondPassword completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
+            [ex fulfill];
+        }];
+        [self waitForExpectationsWithTimeout:2.0 handler:nil];
+        [user logOut];
+        ex = [self expectationWithDescription:@"change password callback invoked"];
+        [user changePassword:@"fail" completion:^(NSError * _Nullable error) {
+            XCTAssertNotNil(error);
+            [ex fulfill];
+        }];
+        [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    }
+    // Fail to log in with original password.
+    {
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:ACCOUNT_NAME() password:firstPassword
+                                                                       register:NO];
+
+        XCTestExpectation *ex = [self expectationWithDescription:@"login callback invoked"];
+        [RLMSyncUser logInWithCredentials:creds
+                            authServerURL:[RLMObjectServerTests authServerURL]
+                             onCompletion:^(RLMSyncUser *user, NSError *error) {
+            XCTAssertNil(user);
+            XCTAssertNotNil(error);
+            XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+            XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
+            XCTAssertNotNil(error.localizedDescription);
+
+            [ex fulfill];
+        }];
+        [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    }
+    // Successfully log in with new password.
+    {
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:ACCOUNT_NAME() password:secondPassword
+                                                                       register:NO];
+        RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
+        XCTAssertNotNil(user);
+        XCTAssertEqualObjects(RLMSyncUser.currentUser, user);
+        [user logOut];
+        XCTAssertNil(RLMSyncUser.currentUser);
+    }
+}
+
 // FIXME: write a 'testUserIsAdminFlagProperlySet' test once we can properly create admin users
 
 #pragma mark - Basic Sync
