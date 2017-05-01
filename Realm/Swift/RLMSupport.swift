@@ -101,7 +101,20 @@ extension RLMSyncPermissionResults: RandomAccessCollection {
     }
 }
 #else
-// Sequence conformance for RLMSyncPermissionResults.
+extension RLMSyncPermissionResults {
+    /// Return the first permission value in the results, or `nil` if
+    /// the results are empty.
+    public var first: RLMSyncPermissionValue? {
+        return count > 0 ? object(at: 0) : nil
+    }
+
+    /// Return the last permission value in the results, or `nil` if
+    /// the results are empty.
+    public var last: RLMSyncPermissionValue? {
+        return count > 0 ? object(at: count - 1) : nil
+    }
+}
+
 extension RLMSyncPermissionResults: Sequence {
     public struct Iterator: IteratorProtocol {
         private let iteratorBase: NSFastEnumerationIterator
