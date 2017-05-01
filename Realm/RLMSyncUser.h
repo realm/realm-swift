@@ -35,6 +35,10 @@ typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
 /// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
 
+/// A block type used to report the status of a password change operation.
+/// If the `NSError` argument is nil, the operation succeeded.
+typedef void(^RLMPasswordChangeStatusBlock)(NSError * _Nullable);
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -123,6 +127,22 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  Retrieve all the valid sessions belonging to this user.
  */
 - (NSArray<RLMSyncSession *> *)allSessions;
+
+#pragma mark - Passwords
+
+/**
+ Change this user's password asynchronously.
+
+ @warning Changing a user's password using an authentication server that doesn't
+          use HTTPS is a major security flaw, and should only be done while
+          testing.
+
+ @param newPassword The user's new password.
+ @param completion  Completion block invoked when login has completed or failed.
+                    The callback will be invoked on a background queue provided
+                    by `NSURLSession`.
+ */
+- (void)changePassword:(NSString *)newPassword completion:(RLMPasswordChangeStatusBlock)completion;
 
 /**
  Returns an instance of the Management Realm owned by the user.

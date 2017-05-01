@@ -185,6 +185,26 @@ using namespace realm;
     return _user->is_admin();
 }
 
+#pragma mark - Passwords
+
+- (void)changePassword:(NSString *)newPassword completion:(RLMPasswordChangeStatusBlock)completion {
+    if (self.state != RLMSyncUserStateActive) {
+        completion([NSError errorWithDomain:RLMSyncErrorDomain
+                                       code:RLMSyncErrorClientSessionError
+                                   userInfo:nil]);
+        return;
+    }
+    [RLMNetworkClient sendRequestToEndpoint:RLMServerEndpointChangePassword
+                                 httpMethod:@"PUT"
+                                     server:self.authenticationServer
+                                       JSON:@{@"token": self._refreshToken,
+                                              @"password": newPassword}
+                                    timeout:60
+                                 completion:^(NSError *error, __unused NSDictionary *json) {
+        completion(error);
+    }];
+}
+
 #pragma mark - Private API
 
 - (void)_unregisterRefreshHandleForURLPath:(NSString *)path {
