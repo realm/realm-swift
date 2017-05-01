@@ -11,6 +11,11 @@ x.x.x Release notes (yyyy-MM-dd)
   connection was lost.
 * Add `-[RLMSyncUser changePassword:completion:]` API to change the current
   user's password if using Realm's 'password' authentication provider.
+* `{RLM}SyncConfiguration` now has an `enableSSLValidation` property
+  (and default parameter in the Swift initializer) to allow SSL validation
+  to be specified on a per-server basis.
+* Transactions between a synced Realm and a Realm Object Server can now
+  exceed 16 MB in size.
 
 ### Bugfixes
 

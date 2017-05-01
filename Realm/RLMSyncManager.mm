@@ -81,9 +81,13 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 
 @interface RLMSyncManager ()
 - (instancetype)initWithCustomRootDirectory:(nullable NSURL *)rootDirectory NS_DESIGNATED_INITIALIZER;
+
+@property (nonatomic, nullable, strong) NSNumber *globalSSLValidationDisabled;
 @end
 
 @implementation RLMSyncManager
+
+@synthesize globalSSLValidationDisabled = _globalSSLValidationDisabled;
 
 static RLMSyncManager *s_sharedManager = nil;
 static dispatch_once_t s_onceToken;
@@ -115,6 +119,26 @@ static dispatch_once_t s_onceToken;
     return _appID;
 }
 
+- (NSNumber *)globalSSLValidationDisabled {
+    @synchronized (self) {
+        return _globalSSLValidationDisabled;
+    }
+}
+
+- (void)setGlobalSSLValidationDisabled:(NSNumber *)globalSSLValidationDisabled {
+    @synchronized (self) {
+        _globalSSLValidationDisabled = globalSSLValidationDisabled;
+    }
+}
+
+- (void)setDisableSSLValidation:(BOOL)disableSSLValidation {
+    self.globalSSLValidationDisabled = @(disableSSLValidation);
+}
+
+- (BOOL)disableSSLValidation {
+    return [self.globalSSLValidationDisabled boolValue];
+}
+
 #pragma mark - Passthrough properties
 
 - (RLMSyncLogLevel)logLevel {
@@ -123,14 +147,6 @@ static dispatch_once_t s_onceToken;
 
 - (void)setLogLevel:(RLMSyncLogLevel)logLevel {
     realm::SyncManager::shared().set_log_level(levelForSyncLogLevel(logLevel));
-}
-
-- (BOOL)disableSSLValidation {
-    return realm::SyncManager::shared().client_should_validate_ssl();
-}
-
-- (void)setDisableSSLValidation:(BOOL)disableSSLValidation {
-    realm::SyncManager::shared().set_client_should_validate_ssl(!disableSSLValidation);
 }
 
 #pragma mark - Private API

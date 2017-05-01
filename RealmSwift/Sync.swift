@@ -137,28 +137,44 @@ public struct SyncConfiguration {
      */
     internal let stopPolicy: RLMSyncStopPolicy
 
+    /**
+     Whether the SSL certificate of the Realm Object Server should be validated.
+     */
+    public let enableSSLValidation: Bool
+
     internal init(config: RLMSyncConfiguration) {
         self.user = config.user
         self.realmURL = config.realmURL
         self.stopPolicy = config.stopPolicy
+        self.enableSSLValidation = config.enableSSLValidation
     }
 
     func asConfig() -> RLMSyncConfiguration {
         let config = RLMSyncConfiguration(user: user, realmURL: realmURL)
         config.stopPolicy = stopPolicy
+        config.enableSSLValidation = enableSSLValidation
         return config
     }
 
     /**
      Initialize a sync configuration with a user and a Realm URL.
 
+     Additional settings can be optionally specified. Descriptions of these
+     settings follow.
+     
+     `enableSSLValidation` is true by default. It can be disabled for debugging
+     purposes.
+
      - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
                 `.realm`, `.realm.lock` or `.realm.management`.
+     
+     - warning: NEVER disable SSL validation for a system running in production.
      */
-    public init(user: SyncUser, realmURL: URL) {
+    public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true) {
         self.user = user
         self.realmURL = realmURL
         self.stopPolicy = .afterChangesUploaded
+        self.enableSSLValidation = enableSSLValidation
     }
 }
 
