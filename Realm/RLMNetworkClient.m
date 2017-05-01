@@ -82,8 +82,22 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
                      completion:completionBlock];
 }
 
-// FIXME: should completion argument also pass back the NSURLResponse and/or the raw data?
 + (void)postRequestToEndpoint:(RLMServerEndpoint)endpoint
+                       server:(NSURL *)serverURL
+                         JSON:(NSDictionary *)jsonDictionary
+                      timeout:(NSTimeInterval)timeout
+                   completion:(RLMSyncCompletionBlock)completionBlock {
+    [self sendRequestToEndpoint:endpoint
+                     httpMethod:@"POST"
+                         server:serverURL
+                           JSON:jsonDictionary
+                        timeout:timeout
+                     completion:completionBlock];
+}
+
+// FIXME: should completion argument also pass back the NSURLResponse and/or the raw data?
++ (void)sendRequestToEndpoint:(RLMServerEndpoint)endpoint
+                   httpMethod:(NSString *)httpMethod
                        server:(NSURL *)serverURL
                          JSON:(NSDictionary *)jsonDictionary
                       timeout:(NSTimeInterval)timeout
@@ -103,7 +117,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     // Create the request
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[self urlForServer:serverURL endpoint:endpoint]];
     request.HTTPBody = jsonData;
-    request.HTTPMethod = @"POST";
+    request.HTTPMethod = httpMethod;
     request.timeoutInterval = MAX(timeout, 10);
     [request addValue:@"application/json;charset=utf-8" forHTTPHeaderField:@"Content-Type"];
     [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
