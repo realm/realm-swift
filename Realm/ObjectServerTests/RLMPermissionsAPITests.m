@@ -22,17 +22,19 @@
 
 #import "RLMTestUtils.h"
 
-#define CHECK_PERMISSION_COUNT(ma_results, ma_count) {                                                                 \
+#define CHECK_PERMISSION_COUNT_PREDICATE(ma_results, ma_count, ma_op) {                                                \
     XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission count"];                            \
     __weak typeof(ma_results) weakResults = ma_results;                                                                \
     __attribute__((objc_precise_lifetime))id token = [ma_results addNotificationBlock:^(NSError *err) {                \
         XCTAssertNil(err);                                                                                             \
-        if (weakResults.count == ma_count) {                                                                           \
+        if (weakResults.count ma_op ma_count) {                                                                        \
             [ex fulfill];                                                                                              \
         }                                                                                                              \
     }];                                                                                                                \
     [self waitForExpectationsWithTimeout:2.0 handler:nil];                                                             \
 }
+
+#define CHECK_PERMISSION_COUNT(ma_results, ma_count) CHECK_PERMISSION_COUNT_PREDICATE(ma_results, ma_count, ==)
 
 #define CHECK_PERMISSION_PRESENT(ma_results, ma_permission) {                                                          \
     XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission presence"];                         \
@@ -639,6 +641,61 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     XCTAssertNotEqual(idx3, NSNotFound);
     XCTAssertLessThan(idx1, idx2);
     XCTAssertLessThan(idx2, idx3);
+}
+
+- (void)testSortingPermissionsOnUserId {
+    // Get a reference to the permission results.
+    XCTestExpectation *ex = [self expectationWithDescription:@"Get permission results."];
+    __block RLMSyncPermissionResults *results = nil;
+    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(r);
+        results = r;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Open a Realm
+    NSURL *url = REALM_URL();
+    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:self.userA];
+    NSString *uB = self.userB.identity;
+    NSString *uC = self.userC.identity;
+
+    // Give users B and C read permission for the Realm.
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting r1 permission for user B should work."];
+    id p1 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    [self.userA applyPermission:p1 callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTestExpectation *ex3 = [self expectationWithDescription:@"Setting r1 permission for user C should work."];
+    id p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url path] userID:uC accessLevel:RLMSyncAccessLevelRead];
+    [self.userA applyPermission:p2 callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex3 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Now sort on user ID.
+    RLMSyncPermissionResults *sorted = [results sortedResultsUsingProperty:RLMSyncPermissionResultsSortPropertyUserID
+                                                                 ascending:YES];
+
+    // Wait for changes to propagate, then check them.
+    BOOL seenUserBPermission = NO;
+    BOOL seenUserCPermission = NO;
+    CHECK_PERMISSION_COUNT_PREDICATE(sorted, 3, >=);
+    for (int i=0; i<sorted.count - 1; i++) {
+        NSString *thisID = [sorted objectAtIndex:i].userId;
+        NSString *nextID = [sorted objectAtIndex:i + 1].userId;
+        seenUserBPermission |= ([thisID isEqualToString:uB] || [nextID isEqualToString:uB]);
+        seenUserCPermission |= ([thisID isEqualToString:uC] || [nextID isEqualToString:uC]);
+        // Make sure permissions are in ascending order.
+        NSComparisonResult result = [thisID compare:nextID];
+        XCTAssertTrue(result == NSOrderedAscending || result == NSOrderedSame);
+    }
+    XCTAssertTrue(seenUserBPermission);
+    XCTAssertTrue(seenUserCPermission);
 }
 
 - (void)testSortingPermissionsOnDate {
