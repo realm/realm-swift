@@ -137,15 +137,19 @@ public struct SyncConfiguration {
      */
     internal let stopPolicy: RLMSyncStopPolicy
 
+    internal let enableSSLValidation: Bool
+
     internal init(config: RLMSyncConfiguration) {
         self.user = config.user
         self.realmURL = config.realmURL
         self.stopPolicy = config.stopPolicy
+        self.enableSSLValidation = config.enableSSLValidation
     }
 
     func asConfig() -> RLMSyncConfiguration {
         let config = RLMSyncConfiguration(user: user, realmURL: realmURL)
         config.stopPolicy = stopPolicy
+        config.enableSSLValidation = enableSSLValidation
         return config
     }
 
@@ -155,10 +159,11 @@ public struct SyncConfiguration {
      - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
                 `.realm`, `.realm.lock` or `.realm.management`.
      */
-    public init(user: SyncUser, realmURL: URL) {
+    public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true) {
         self.user = user
         self.realmURL = realmURL
         self.stopPolicy = .afterChangesUploaded
+        self.enableSSLValidation = enableSSLValidation
     }
 }
 

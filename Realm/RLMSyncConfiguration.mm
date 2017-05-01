@@ -91,6 +91,14 @@ static BOOL isValidRealmURL(NSURL *url) {
         && self.stopPolicy == that.stopPolicy;
 }
 
+- (void)setEnableSSLValidation:(BOOL)enableSSLValidation {
+    _config->client_validate_ssl = (bool)enableSSLValidation;
+}
+
+- (BOOL)enableSSLValidation {
+    return (BOOL)_config->client_validate_ssl;
+}
+
 - (realm::SyncConfig)rawConfiguration {
     return *_config;
 }

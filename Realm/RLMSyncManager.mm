@@ -125,14 +125,6 @@ static dispatch_once_t s_onceToken;
     realm::SyncManager::shared().set_log_level(levelForSyncLogLevel(logLevel));
 }
 
-- (BOOL)disableSSLValidation {
-    return realm::SyncManager::shared().client_should_validate_ssl();
-}
-
-- (void)setDisableSSLValidation:(BOOL)disableSSLValidation {
-    realm::SyncManager::shared().set_client_should_validate_ssl(!disableSSLValidation);
-}
-
 #pragma mark - Private API
 
 - (void)_fireError:(NSError *)error {
