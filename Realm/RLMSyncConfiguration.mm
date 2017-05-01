@@ -169,6 +169,9 @@ static BOOL isValidRealmURL(NSURL *url) {
             std::move(bindHandler),
             std::move(errorHandler)
         });
+        if (NSNumber *disabled = [[RLMSyncManager sharedManager] globalSSLValidationDisabled]) {
+            _config->client_validate_ssl = ![disabled boolValue];
+        }
         self.customFileURL = customFileURL;
         return self;
     }
