@@ -65,6 +65,9 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
             pathComponent = @"removeCredentials";
             NSAssert(NO, @"remove credentials endpoint isn't implemented yet, don't use it");
             break;
+        case RLMServerEndpointChangePassword:
+            pathComponent = @"auth/password";
+            break;
     }
     NSAssert(pathComponent != nil, @"Unrecognized value for RLMServerEndpoint enum");
     return [serverURL URLByAppendingPathComponent:pathComponent];
