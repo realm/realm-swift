@@ -88,11 +88,17 @@ NS_ASSUME_NONNULL_BEGIN
 /// called right before a Realm is opened if that Realm's session is the one to be monitored.
 - (void)primeSyncManagerWithSemaphore:(nullable dispatch_semaphore_t)semaphore;
 
-/// Waits for downloads to complete while spinning the runloop. This method uses expectations.
+/// Wait for downloads to complete; drop any error.
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user url:(NSURL *)url;
 
-/// Waits for uploads to complete while spinning the runloop. This method uses expectations.
+/// Wait for uploads to complete; drop any error.
 - (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url;
+
+/// Wait for downloads to complete while spinning the runloop. This method uses expectations.
+- (void)waitForDownloadsForUser:(RLMSyncUser *)user url:(NSURL *)url error:(NSError **)error;
+
+/// Wait for uploads to complete while spinning the runloop. This method uses expectations.
+- (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url error:(NSError **)error;
 
 @end
 

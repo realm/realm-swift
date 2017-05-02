@@ -16,6 +16,9 @@ x.x.x Release notes (yyyy-MM-dd)
   to be specified on a per-server basis.
 * Transactions between a synced Realm and a Realm Object Server can now
   exceed 16 MB in size.
+* Add new APIs for changing and retrieving permissions for synchronized Realms.
+  These APIs are intended to replace the existing Realm Object-based permissions
+  system.
 
 ### Bugfixes
 

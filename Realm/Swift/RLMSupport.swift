@@ -80,3 +80,56 @@ extension RLMCollection {
         return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 }
+
+#if swift(>=3.1)
+// Collection conformance for RLMSyncPermissionResults.
+extension RLMSyncPermissionResults: RandomAccessCollection {
+    public subscript(index: Int) -> RLMSyncPermissionValue {
+        return object(at: index)
+    }
+
+    public func index(after i: Int) -> Int {
+        return i + 1
+    }
+
+    public var startIndex: Int {
+        return 0
+    }
+
+    public var endIndex: Int {
+        return count
+    }
+}
+#else
+extension RLMSyncPermissionResults {
+    /// Return the first permission value in the results, or `nil` if
+    /// the results are empty.
+    public var first: RLMSyncPermissionValue? {
+        return count > 0 ? object(at: 0) : nil
+    }
+
+    /// Return the last permission value in the results, or `nil` if
+    /// the results are empty.
+    public var last: RLMSyncPermissionValue? {
+        return count > 0 ? object(at: count - 1) : nil
+    }
+}
+
+extension RLMSyncPermissionResults: Sequence {
+    public struct Iterator: IteratorProtocol {
+        private let iteratorBase: NSFastEnumerationIterator
+
+        fileprivate init(results: RLMSyncPermissionResults) {
+            iteratorBase = NSFastEnumerationIterator(results)
+        }
+
+        public func next() -> RLMSyncPermissionValue? {
+            return iteratorBase.next() as! RLMSyncPermissionValue?
+        }
+    }
+
+    public func makeIterator() -> RLMSyncPermissionResults.Iterator {
+        return Iterator(results: self)
+    }
+}
+#endif

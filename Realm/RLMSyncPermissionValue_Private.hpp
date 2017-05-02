@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2017 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-void RLMSwapOutClassMethod(id classObject, SEL original, SEL swizzled);
-void RLMSwapOutInstanceMethod(id classObject, SEL original, SEL swizzled);
+#import "RLMSyncPermissionValue.h"
 
-#ifndef CUSTOM_REALM_URL
-#define CUSTOM_REALM_URL(realm_identifier) \
-[NSURL URLWithString:[NSString stringWithFormat:@"realm://localhost:9080/~/%@%@", NSStringFromSelector(_cmd), realm_identifier]]
-#define REALM_URL() CUSTOM_REALM_URL(@"")
-#endif
+#import "sync/sync_permission.hpp"
+
+@interface RLMSyncPermissionValue ()
+
+- (instancetype)initWithPermission:(realm::Permission)permission;
+
+- (realm::Permission)rawPermission;
+
+@end

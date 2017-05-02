@@ -22,6 +22,17 @@
 #import <Realm/RLMRealmConfiguration.h>
 #import <Realm/RLMSyncCredentials.h>
 
+typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
+    // Specific
+    RLMSyncSystemErrorKindClientReset,
+    // General
+    RLMSyncSystemErrorKindClient,
+    RLMSyncSystemErrorKindConnection,
+    RLMSyncSystemErrorKindSession,
+    RLMSyncSystemErrorKindUser,
+    RLMSyncSystemErrorKindUnknown,
+};
+
 @class RLMSyncUser;
 
 typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);

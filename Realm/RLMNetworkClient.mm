@@ -20,7 +20,7 @@
 
 #import "RLMRealmConfiguration.h"
 #import "RLMSyncErrorResponseModel.h"
-#import "RLMSyncUtil_Private.h"
+#import "RLMSyncUtil_Private.hpp"
 
 typedef void(^RLMServerURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
 
@@ -151,9 +151,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
             completionBlock(localError, nil);
         } else if (![json isKindOfClass:[NSDictionary class]]) {
             // JSON response malformed
-            localError = [NSError errorWithDomain:RLMSyncErrorDomain
-                                             code:RLMSyncErrorBadResponse
-                                         userInfo:@{kRLMSyncErrorJSONKey: json}];
+            localError = make_auth_error_bad_response(json);
             completionBlock(localError, nil);
         } else {
             // JSON parsed successfully
@@ -175,7 +173,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 
     if (![response isKindOfClass:[NSHTTPURLResponse class]]) {
         // FIXME: Provide error message
-        *error = [NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadResponse userInfo:nil];
+        *error = make_auth_error_bad_response();
         return NO;
     }
 
@@ -183,28 +181,21 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     BOOL badResponse = (NSLocationInRange(httpResponse.statusCode, RLM_rangeForErrorType(ClientError))
                         || NSLocationInRange(httpResponse.statusCode, RLM_rangeForErrorType(ServerError)));
     if (badResponse) {
-        NSError *responseError = [self errorFromResponseData:data];
-        if (responseError && responseError.userInfo[kRLMSyncErrorStatusCodeKey]) {
-            switch (responseError.code) {
+        if (RLMSyncErrorResponseModel *responseModel = [self responseModelFromData:data]) {
+            switch (responseModel.code) {
                 case RLMSyncAuthErrorInvalidCredential:
                 case RLMSyncAuthErrorUserDoesNotExist:
                 case RLMSyncAuthErrorUserAlreadyExists:
-                    // Authentication error
-                    *error = responseError;
-                break;
-
+                    *error = make_auth_error(responseModel);
+                    break;
                 default:
-                    // HTTP status error with some additional infor from the server
-                    *error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                                 code:RLMSyncErrorHTTPStatusCodeError
-                                             userInfo:responseError.userInfo];
-                break;
+                    // Right now we assume that any codes not described
+                    // above are generic HTTP error codes.
+                    *error = make_auth_error_http_status(responseModel.status);
+                    break;
             }
         } else {
-            // Fallback to HTTP status error without any additional info
-            *error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                         code:RLMSyncErrorHTTPStatusCodeError
-                                     userInfo:@{kRLMSyncErrorStatusCodeKey: @(httpResponse.statusCode)}];
+            *error = make_auth_error_http_status(httpResponse.statusCode);
         }
 
         return NO;
@@ -212,35 +203,24 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 
     if (!data) {
         // FIXME: provide error message
-        *error = [NSError errorWithDomain:RLMSyncErrorDomain code:RLMSyncErrorBadResponse userInfo:nil];
+        *error = make_auth_error_bad_response();
         return NO;
     }
 
     return YES;
 }
 
-+ (NSError *)errorFromResponseData:(NSData *)data {
++ (RLMSyncErrorResponseModel *)responseModelFromData:(NSData *)data {
     if (data.length == 0) {
         return nil;
     }
-
     id json = [NSJSONSerialization JSONObjectWithData:data
                                               options:(NSJSONReadingOptions)0
                                                 error:nil];
     if (!json || ![json isKindOfClass:[NSDictionary class]]) {
         return nil;
     }
-
-    RLMSyncErrorResponseModel *responseModel = [[RLMSyncErrorResponseModel alloc] initWithDictionary:json];
-    if (!responseModel) {
-        return nil;
-    }
-
-    NSMutableDictionary *mutableUserInfo = [NSMutableDictionary dictionaryWithObject:@(responseModel.status) forKey:kRLMSyncErrorStatusCodeKey];
-    [mutableUserInfo setValue:responseModel.title forKey:NSLocalizedDescriptionKey];
-    [mutableUserInfo setValue:responseModel.hint forKey:NSLocalizedRecoverySuggestionErrorKey];
-
-    return [NSError errorWithDomain:RLMSyncErrorDomain code:responseModel.code userInfo:mutableUserInfo];
+    return [[RLMSyncErrorResponseModel alloc] initWithDictionary:json];
 }
 
 @end

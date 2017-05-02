@@ -33,7 +33,7 @@ using namespace realm;
     RLMSyncSession *session = [self sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
     BOOL couldWait = [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                    callback:^{
+                                                    callback:^(NSError *){
                                                         dispatch_semaphore_signal(sema);
                                                     }];
     if (!couldWait) {
@@ -48,7 +48,7 @@ using namespace realm;
     RLMSyncSession *session = [self sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
     BOOL couldWait = [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                      callback:^{
+                                                      callback:^(NSError *){
                                                           dispatch_semaphore_signal(sema);
                                                       }];
     if (!couldWait) {

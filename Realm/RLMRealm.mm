@@ -218,23 +218,19 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
                                 }
                             } else {
                                 // Failure
-                                callback(nil, [NSError errorWithDomain:RLMSyncErrorDomain
-                                                                  code:RLMSyncSystemErrorKindSession
-                                                              userInfo:@{kRLMSyncErrorStatusCodeKey:
-                                                                             @(error_code.value()),
-                                                                         NSLocalizedDescriptionKey:
-                                                                             @(error_code.message().c_str())
-                                                                         }]);
+                                callback(nil, make_sync_error(RLMSyncSystemErrorKindSession,
+                                                              @(error_code.message().c_str()),
+                                                              error_code.value(),
+                                                              nil));
                             }
                         });
                     });
                 } else {
                     dispatch_async(callbackQueue, ^{
-                        callback(nil, [NSError errorWithDomain:RLMSyncErrorDomain
-                                                          code:RLMSyncSystemErrorKindSession
-                                                      userInfo:@{NSLocalizedDescriptionKey:
-                                                                     @"Cannot asynchronously open synced Realm, because the associated session previously experienced a fatal error"
-                                                                 }]);
+                        callback(nil, make_sync_error(RLMSyncSystemErrorKindSession,
+                                                      @"Cannot asynchronously open synced Realm, because the associated session previously experienced a fatal error",
+                                                      NSNotFound,
+                                                      nil));
                     });
                     return;
                 }

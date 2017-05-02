@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMSyncUser, RLMSyncCredentials, RLMSyncSession, RLMRealm;
+@class RLMSyncUser, RLMSyncCredentials, RLMSyncPermissionValue, RLMSyncPermissionResults, RLMSyncSession, RLMRealm;
 
 /**
  The state of the user object.
@@ -38,6 +38,14 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
 /// A block type used to report the status of a password change operation.
 /// If the `NSError` argument is nil, the operation succeeded.
 typedef void(^RLMPasswordChangeStatusBlock)(NSError * _Nullable);
+
+/// A block type used to report the status of a permission apply or revoke operation.
+/// If the `NSError` argument is nil, the operation succeeded.
+typedef void(^RLMPermissionStatusBlock)(NSError * _Nullable);
+
+/// A block type used to asynchronously report results of a permissions get operation.
+/// Exactly one of the two arguments will be populated.
+typedef void(^RLMPermissionResultsBlock)(RLMSyncPermissionResults * _Nullable, NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -86,6 +94,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMSyncUserState state;
 
+#pragma mark - Lifecycle
+
 /**
  Create, log in, and asynchronously return a new user object, specifying a custom timeout for the network request.
  Credentials identifying the user must be passed in. The user becomes available in the completion block, at which point
@@ -118,6 +128,8 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (void)logOut;
 
+#pragma mark - Sessions
+
 /**
  Retrieve a valid session object belonging to this user for a given URL, or `nil` if no such object exists.
  */
@@ -144,6 +156,54 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (void)changePassword:(NSString *)newPassword completion:(RLMPasswordChangeStatusBlock)completion;
 
+// This set of permissions APIs uses immutable `RLMSyncPermissionValue` objects to
+// retrieve and apply permissions. It is intended to replace the set of APIs which
+// directly access Realms and Realm model objects to work with permissions.
+#pragma mark - Value-based Permissions API
+
+/**
+ Asynchronously retrieve all permissions associated with the user calling this method.
+
+ The results will be returned through the callback block, or an error if the operation failed.
+ The callback block will be run on the same thread the method was called on.
+
+ @warning This method must be called from a thread with a currently active run loop. Unless
+          you have manually configured a run loop on a side thread, this will usually be the
+          main thread.
+
+ @see `RLMSyncPermissionResults`
+ */
+- (void)retrievePermissionsWithCallback:(RLMPermissionResultsBlock)callback;
+
+/**
+ Apply a given permission.
+
+ The operation will take place asynchronously, and the callback will be used to report whether
+ the permission change succeeded or failed. The user calling this method must have the right
+ to grant the given permission, or else the operation will fail.
+
+ @see `RLMSyncPermissionValue`
+ */
+- (void)applyPermission:(RLMSyncPermissionValue *)permission callback:(RLMPermissionStatusBlock)callback;
+
+/**
+ Revoke a given permission.
+
+ The operation will take place asynchronously, and the callback will be used to report whether
+ the permission change succeeded or failed. The user calling this method must have the right
+ to grant the given permission, or else the operation will fail.
+
+ @see `RLMSyncPermissionValue`
+ */
+- (void)revokePermission:(RLMSyncPermissionValue *)permission callback:(RLMPermissionStatusBlock)callback;
+
+// These permission APIs access Realms and Realm model objects representing
+// various permission states and actions, as well as standard Realm
+// affordances, to work with permissions. It is being deprecated in favor of
+// the `retrievePermissionsWithCallback:`, `applyPermission:callback:`, and
+// `revokePermission:callback:` APIs.
+#pragma mark - Realm Object-based Permissions API
+
 /**
  Returns an instance of the Management Realm owned by the user.
 
@@ -158,7 +218,9 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  This read-only Realm contains `RLMSyncPermission` objects reflecting the
  synchronized Realms and permission details this user has access to.
  */
-- (RLMRealm *)permissionRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
+- (RLMRealm *)permissionRealmWithError:(NSError **)error __deprecated_msg("Use `-retrievePermissionsWithCallback:`") NS_REFINED_FOR_SWIFT;
+
+#pragma mark - Miscellaneous
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));

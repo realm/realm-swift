@@ -20,9 +20,14 @@
 
 #import "RLMAuthResponseModel.h"
 #import "RLMNetworkClient.h"
+#import "RLMRealmConfiguration+Sync.h"
+#import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.h"
+#import "RLMSyncPermissionResults_Private.hpp"
+#import "RLMSyncPermissionValue_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncSessionRefreshHandle.hpp"
+#import "RLMSyncUtil_Private.hpp"
 #import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
@@ -31,9 +36,58 @@
 #import "sync/sync_user.hpp"
 
 using namespace realm;
+using ConfigMaker = std::function<Realm::Config(std::shared_ptr<SyncUser>, std::string)>;
+using PermissionGetCallback = std::function<void(std::unique_ptr<PermissionResults>, std::exception_ptr)>;
+
+namespace {
+
+NSError *translateExceptionPtrToError(std::exception_ptr ptr, bool get) {
+    NSError *error = nil;
+    try {
+        std::rethrow_exception(ptr);
+    } catch (PermissionChangeException const& ex) {
+        error = (get
+                 ? make_permission_error_get(@(ex.what()), ex.code)
+                 : make_permission_error_change(@(ex.what()), ex.code));
+    }
+    catch (const std::exception &exp) {
+        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), &error);
+    }
+    return error;
+}
+
+PermissionGetCallback RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock callback) {
+    return [callback](std::unique_ptr<PermissionResults> results, std::exception_ptr ptr) {
+        if (ptr) {
+            NSError *error = translateExceptionPtrToError(std::move(ptr), true);
+            REALM_ASSERT(error);
+            callback(nil, error);
+        } else {
+            // Finished successfully
+            callback([[RLMSyncPermissionResults alloc] initWithResults:std::move(results)], nil);
+        }
+    };
+}
+
+}
+
+PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBlock callback) {
+    return [callback](std::exception_ptr ptr) {
+        if (ptr) {
+            NSError *error = translateExceptionPtrToError(std::move(ptr), false);
+            REALM_ASSERT(error);
+            callback(error);
+        } else {
+            // Finished successfully
+            callback(nil);
+        }
+    };
+}
 
 @interface RLMSyncUser () {
     std::shared_ptr<SyncUser> _user;
+    // FIXME: remove this when the object store ConfigMaker goes away
+    std::unique_ptr<ConfigMaker> _configMaker;
 }
 
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer NS_DESIGNATED_INITIALIZER;
@@ -73,6 +127,13 @@ using namespace realm;
     if (self = [super init]) {
         self.authenticationServer = authServer;
         self.refreshHandles = [NSMutableDictionary dictionary];
+        _configMaker = std::make_unique<ConfigMaker>([](std::shared_ptr<SyncUser> user, std::string url) {
+            RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+            NSURL *objCUrl = [NSURL URLWithString:@(url.c_str())];
+            RLMSyncUser *objCUser = [[RLMSyncUser alloc] initWithSyncUser:std::move(user)];
+            config.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:objCUser realmURL:objCUrl];
+            return [config config];
+        });
         return self;
     }
     return nil;
@@ -205,6 +266,38 @@ using namespace realm;
     }];
 }
 
+#pragma mark - Permissions API
+
+- (void)retrievePermissionsWithCallback:(RLMPermissionResultsBlock)callback {
+    if (!_user || _user->state() == SyncUser::State::Error) {
+        callback(nullptr, make_permission_error_get(@"Permissions cannot be retrieved using an invalid user."));
+        return;
+    }
+    Permissions::get_permissions(_user, RLMWrapPermissionResultsCallback(callback), *_configMaker);
+}
+
+- (void)applyPermission:(RLMSyncPermissionValue *)permission callback:(RLMPermissionStatusBlock)callback {
+    if (!_user || _user->state() == SyncUser::State::Error) {
+        callback(make_permission_error_change(@"Permissions cannot be applied using an invalid user."));
+        return;
+    }
+    Permissions::set_permission(_user,
+                                [permission rawPermission],
+                                RLMWrapPermissionStatusCallback(callback),
+                                *_configMaker);
+}
+
+- (void)revokePermission:(RLMSyncPermissionValue *)permission callback:(RLMPermissionStatusBlock)callback {
+    if (!_user || _user->state() == SyncUser::State::Error) {
+        callback(make_permission_error_change(@"Permissions cannot be revoked using an invalid user."));
+        return;
+    }
+    Permissions::delete_permission(_user,
+                                   [permission rawPermission],
+                                   RLMWrapPermissionStatusCallback(callback),
+                                   *_configMaker);
+}
+
 #pragma mark - Private API
 
 - (void)_unregisterRefreshHandleForURLPath:(NSString *)path {
@@ -267,10 +360,7 @@ using namespace realm;
                                                                        requireRefreshToken:YES];
             if (!model) {
                 // Malformed JSON
-                error = [NSError errorWithDomain:RLMSyncErrorDomain
-                                            code:RLMSyncErrorBadResponse
-                                        userInfo:@{kRLMSyncErrorJSONKey: json}];
-                completion(nil, error);
+                completion(nil, make_auth_error_bad_response(json));
                 return;
             } else {
                 std::string server_url = authServerURL.absoluteString.UTF8String;
@@ -278,9 +368,7 @@ using namespace realm;
                                                                 [model.refreshToken.token UTF8String],
                                                                 std::move(server_url));
                 if (!sync_user) {
-                    completion(nil, [NSError errorWithDomain:RLMSyncErrorDomain
-                                                        code:RLMSyncErrorClientSessionError
-                                                    userInfo:nil]);
+                    completion(nil, make_auth_error_client_issue());
                     return;
                 }
                 sync_user->set_is_admin(model.refreshToken.tokenData.isAdmin);
@@ -309,9 +397,7 @@ using namespace realm;
                                                     none,
                                                     SyncUser::TokenType::Admin);
     if (!sync_user) {
-        completion(nil, [NSError errorWithDomain:RLMSyncErrorDomain
-                                            code:RLMSyncErrorClientSessionError
-                                        userInfo:nil]);
+        completion(nil, make_auth_error_client_issue());
         return;
     }
     user->_user = sync_user;
