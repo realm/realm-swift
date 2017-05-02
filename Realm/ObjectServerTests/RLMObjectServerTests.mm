@@ -243,12 +243,13 @@
 
 /// A sync user should be able to successfully change their own password.
 - (void)testUserChangePassword {
+    NSString *userName = NSStringFromSelector(_cmd);
     NSString *firstPassword = @"a";
     NSString *secondPassword = @"b";
     // Successfully create user, change its password, log out,
     // then fail to change password again due to being logged out.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:ACCOUNT_NAME() password:firstPassword
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:firstPassword
                                                                        register:YES];
         RLMSyncUser *user = [self logInUserForCredentials:creds
                                                    server:[RLMObjectServerTests authServerURL]];
@@ -268,7 +269,7 @@
     }
     // Fail to log in with original password.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:ACCOUNT_NAME() password:firstPassword
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:firstPassword
                                                                        register:NO];
 
         XCTestExpectation *ex = [self expectationWithDescription:@"login callback invoked"];
@@ -277,7 +278,7 @@
                              onCompletion:^(RLMSyncUser *user, NSError *error) {
             XCTAssertNil(user);
             XCTAssertNotNil(error);
-            XCTAssertEqual(error.domain, RLMSyncErrorDomain);
+            XCTAssertEqual(error.domain, RLMSyncAuthErrorDomain);
             XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
             XCTAssertNotNil(error.localizedDescription);
 
@@ -287,7 +288,7 @@
     }
     // Successfully log in with new password.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:ACCOUNT_NAME() password:secondPassword
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:secondPassword
                                                                        register:NO];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
         XCTAssertNotNil(user);
