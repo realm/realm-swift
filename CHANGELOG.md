@@ -25,6 +25,8 @@ x.x.x Release notes (yyyy-MM-dd)
   objects when enumerating a class name after previously deleting a `newObject`.
 * Fix an issue where `Realm.asyncOpen(...)` would fail to work when opening a
   synchronized Realm for which the user only had read permissions.
+* Using KVC to set a `List` property to `nil` now clears it to match the
+  behavior of `RLMArray` properties.
 
 2.6.2 Release notes (2017-04-21)
 =============================================================

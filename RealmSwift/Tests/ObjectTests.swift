@@ -309,6 +309,13 @@ class ObjectTests: TestCase {
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 1)
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
+
+        setter(object, nil, "arrayCol")
+        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
+
+        setter(object, [boolObject], "arrayCol")
+        setter(object, NSNull(), "arrayCol")
+        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
     }
 
     func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, Any?, String) -> Void,
@@ -352,6 +359,9 @@ class ObjectTests: TestCase {
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
+
+        setter(object, nil, "arrayCol")
+        XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 0)
     }
 
     // Yields a read-write migration `SwiftObject` to the given block
