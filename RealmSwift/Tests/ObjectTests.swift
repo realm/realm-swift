@@ -312,6 +312,10 @@ class ObjectTests: TestCase {
 
         setter(object, nil, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
+
+        setter(object, [boolObject], "arrayCol")
+        setter(object, NSNull(), "arrayCol")
+        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
     }
 
     func dynamicSetAndTestAllTypes(_ setter: (DynamicObject, Any?, String) -> Void,
