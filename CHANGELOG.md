@@ -27,6 +27,7 @@ x.x.x Release notes (yyyy-MM-dd)
   synchronized Realm for which the user only had read permissions.
 * Using KVC to set a `List` property to `nil` now clears it to match the
   behavior of `RLMArray` properties.
+* Fix crash from `!m_awaiting_pong` assertion failure when using synced Realms.
 
 2.6.2 Release notes (2017-04-21)
 =============================================================
