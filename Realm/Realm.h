@@ -40,3 +40,4 @@
 #import <Realm/RLMSyncUser.h>
 #import <Realm/RLMSyncUtil.h>
 #import <Realm/NSError+RLMSync.h>
+#import <Realm/RLMUnitTestHelper.h>

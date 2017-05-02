@@ -55,6 +55,11 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
+    override func setUp() {
+        super.setUp()
+        testHelper.shouldResetState = false
+    }
+
     override class func tearDown() {
         smallRealm = nil
         mediumRealm = nil
@@ -338,7 +343,7 @@ class SwiftPerformanceTests: TestCase {
 
     func testRealmCreationCached() {
         var realm: Realm!
-        dispatchSyncNewThread {
+        testHelper.dispatchAndWait {
             realm = try! Realm()
         }
 

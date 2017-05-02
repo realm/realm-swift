@@ -71,6 +71,12 @@ static BOOL encryptTests() {
     return encryptAll;
 }
 
+@interface RLMTestCase ()
+
+@property (nonatomic, readwrite) RLMUnitTestHelper *helper;
+
+@end
+
 @implementation RLMTestCase {
     dispatch_queue_t _bgQueue;
 }
@@ -125,29 +131,15 @@ static BOOL encryptTests() {
 }
 
 - (void)invokeTest {
-    @autoreleasepool {
-        [self deleteFiles];
-
-        if (encryptTests()) {
-            RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-            configuration.encryptionKey = RLMGenerateKey();
+    [self.helper invokeTestWithBlock:^{
+        @autoreleasepool {
+            if (encryptTests()) {
+                RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+                configuration.encryptionKey = RLMGenerateKey();
+            }
         }
-    }
-    @autoreleasepool {
         [super invokeTest];
-    }
-    @autoreleasepool {
-        if (_bgQueue) {
-            dispatch_sync(_bgQueue, ^{});
-            _bgQueue = nil;
-        }
-        [self deleteFiles];
-    }
-}
-
-- (RLMRealm *)realmWithTestPath
-{
-    return [RLMRealm realmWithURL:RLMTestRealmURL()];
+    }];
 }
 
 - (RLMRealm *)realmWithTestPathAndSchema:(RLMSchema *)schema {
@@ -193,30 +185,32 @@ static BOOL encryptTests() {
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
 
     // wait for queue to finish
-    dispatch_sync(queue, ^{});
+    [self.helper dispatchAndWait:^{}];
 
     [token stop];
 }
 
 - (void)dispatchAsync:(dispatch_block_t)block {
-    if (!_bgQueue) {
-        _bgQueue = dispatch_queue_create("test background queue", 0);
-    }
-    dispatch_async(_bgQueue, ^{
-        @autoreleasepool {
-            block();
-        }
-    });
+    [self.helper dispatch:block];
 }
 
 - (void)dispatchAsyncAndWait:(dispatch_block_t)block {
-    [self dispatchAsync:block];
-    dispatch_sync(_bgQueue, ^{});
+    [self.helper dispatchAndWait:block];
 }
 
-- (id)nonLiteralNil
-{
+- (id)nonLiteralNil {
     return nil;
+}
+
+- (RLMUnitTestHelper *)helper {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        _helper = [[RLMUnitTestHelper alloc] init];
+        // Note that we set the default configuration before tests begin to run, which allows any tests that need to set
+        // the default configuration during their execution to work properly.
+        [RLMRealmConfiguration setDefaultConfiguration:_helper.onDiskTestRealm.configuration];
+    });
+    return _helper;
 }
 
 @end
