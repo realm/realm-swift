@@ -88,11 +88,9 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         var isPresent = false
         let token = results.addNotificationBlock { (error) in
             XCTAssertNil(error, "Notification returned error '\(error!)' when running test at \(file):\(line)")
-            for result in results where result == permission {
-                isPresent = results.contains(permission)
-                if (isPresent) {
-                    return
-                }
+            isPresent = results.contains(permission)
+            if isPresent {
+                return
             }
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + wait) {
