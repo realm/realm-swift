@@ -31,9 +31,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Using KVC to set a `List` property to `nil` now clears it to match the
   behavior of `RLMArray` properties.
 * Fix crash from `!m_awaiting_pong` assertion failure when using synced Realms.
-* Fix for very computationally expensive case-insensitive searches on indexed
-  string properties containing several characters with identical upper and lower
-  case forms (e.g. numbers).
+* Fix poor performance or hangs when performing case-insensitive queries on
+  indexed string properties that contain many characters that don't differ
+  between upper and lower case (e.g., numbers, punctuation).
 
 2.6.2 Release notes (2017-04-21)
 =============================================================
