@@ -11,6 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
   connection was lost.
 * Add `-[RLMSyncUser changePassword:completion:]` API to change the current
   user's password if using Realm's 'password' authentication provider.
+  Requires any edition of the Realm Object Server 1.4.0 or later.
 * `{RLM}SyncConfiguration` now has an `enableSSLValidation` property
   (and default parameter in the Swift initializer) to allow SSL validation
   to be specified on a per-server basis.
@@ -18,7 +19,7 @@ x.x.x Release notes (yyyy-MM-dd)
   exceed 16 MB in size.
 * Add new APIs for changing and retrieving permissions for synchronized Realms.
   These APIs are intended to replace the existing Realm Object-based permissions
-  system.
+  system. Requires any edition of the Realm Object Server 1.1.0 or later.
 
 ### Bugfixes
 
