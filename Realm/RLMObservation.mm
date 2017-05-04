@@ -182,23 +182,19 @@ void RLMObservationInfo::recordObserver(realm::Row& objectRow, RLMClassInfo *obj
     NSUInteger sep = [keyPath rangeOfString:@"."].location;
     NSString *key = sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
     RLMProperty *prop = objectSchema[key];
-    if (prop) {
-        if (prop.type == RLMPropertyTypeArray) {
-            id value = valueForKey(key);
-            RLMArray *array = [value isKindOfClass:[RLMListBase class]] ? [value _rlmArray] : value;
-            array->_key = key;
-            array->_parentObject = object;
-        }
-        else if (prop.subtype == RLMPropertySubtypeInteger) {
-            auto rlmInt = static_cast<RLMInteger *>(valueForKey(key, false));
-            rlmInt->_object = object;
-            rlmInt->_name = prop.name;
-        }
-        else if (prop.subtype == RLMPropertySubtypeNullableInteger) {
-            auto rlmNullableInt = static_cast<RLMNullableInteger *>(valueForKey(key, false));
-            rlmNullableInt->_object = object;
-            rlmNullableInt->_name = prop.name;
-        }
+    if (prop && prop.type == RLMPropertyTypeArray) {
+        id value = valueForKey(key);
+        RLMArray *array = [value isKindOfClass:[RLMListBase class]] ? [value _rlmArray] : value;
+        array->_key = key;
+        array->_parentObject = object;
+    } else if (prop && prop.subtype == RLMPropertySubtypeInteger) {
+        auto rlmInt = static_cast<RLMInteger *>(valueForKey(key, false));
+        rlmInt->_object = object;
+        rlmInt->_name = prop.name;
+    } else if (prop && prop.subtype == RLMPropertySubtypeNullableInteger) {
+        auto rlmNullableInt = static_cast<RLMNullableInteger *>(valueForKey(key, false));
+        rlmNullableInt->_object = object;
+        rlmNullableInt->_name = prop.name;
     }
     else if (auto swiftIvar = prop.swiftIvar) {
         if (auto optional = RLMDynamicCast<RLMOptionalBase>(object_getIvar(object, swiftIvar))) {
