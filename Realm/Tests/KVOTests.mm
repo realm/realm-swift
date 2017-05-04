@@ -608,6 +608,22 @@ public:
     }
 }
 
+- (void)checkRealmIntegerTypesKVCWithObject:(KVOObject *)obj {
+    {
+        KVORecorder r(self, obj, @"realmIntCol.value");
+        [obj setValue:[[RLMInteger alloc] initWithValue:20] forKey:@"realmIntCol"];
+        AssertChanged(r, @10, @20);
+    }
+
+    {
+        KVORecorder r(self, obj, @"realmNullableIntCol.value");
+        [obj setValue:[[RLMNullableInteger alloc] initWithValue:@21] forKey:@"realmNullableIntCol"];
+        AssertChanged(r, @10, @21);
+        [obj setValue:nil forKey:@"realmNullableIntCol"];
+        AssertChanged(r, @21, NSNull.null);
+    }
+}
+
 - (void)testAllPropertyTypes {
     KVOObject *obj = [self createObject];
 
@@ -846,8 +862,8 @@ public:
         [obj setValue:nil forKey:@"optBoolCol"];
         AssertChanged(r, @YES, NSNull.null);
     }
-    
-#warning TODO: check Realm integer types
+
+    [self checkRealmIntegerTypesKVCWithObject:obj];
 }
 
 - (void)testAllPropertyTypesDynamic {
@@ -970,8 +986,20 @@ public:
         obj[@"optBoolCol"] = nil;
         AssertChanged(r, @YES, NSNull.null);
     }
-    
-#warning TODO: check Realm integer types
+
+    {
+        KVORecorder r(self, obj, @"realmIntCol");
+        obj[@"realmIntCol"] = @30;
+        AssertChanged(r, @10, @30);
+    }
+
+    {
+        KVORecorder r(self, obj, @"realmNullableIntCol");
+        obj[@"realmNullableIntCol"] = @31;
+        AssertChanged(r, @10, @31);
+        obj[@"realmNullableIntCol"] = nil;
+        AssertChanged(r, @31, NSNull.null);
+    }
 }
 
 - (void)testArrayDiffs {
@@ -1143,6 +1171,22 @@ public:
     }
 }
 
+- (void)checkRealmIntegerTypesKVCWithObject:(KVOObject *)obj {
+    {
+        KVORecorder r(self, obj, @"realmIntCol");
+        [obj setValue:@20 forKey:@"realmIntCol"];
+        AssertChanged(r, @10, @20);
+    }
+
+    {
+        KVORecorder r(self, obj, @"realmNullableIntCol");
+        [obj setValue:@21 forKey:@"realmNullableIntCol"];
+        AssertChanged(r, @10, @21);
+        [obj setValue:nil forKey:@"realmNullableIntCol"];
+        AssertChanged(r, @21, NSNull.null);
+    }
+}
+
 - (void)testAllPropertyTypes {
     [super testAllPropertyTypes];
 }
@@ -1236,6 +1280,22 @@ public:
         AssertChanged(r, @101, @102);
         obj.realmNullableIntCol.value = nil;
         AssertChanged(r, @102, NSNull.null);
+    }
+}
+
+- (void)checkRealmIntegerTypesKVCWithObject:(KVOObject *)obj {
+    {
+        KVORecorder r(self, obj, @"realmIntCol");
+        [obj setValue:@20 forKey:@"realmIntCol"];
+        AssertChanged(r, @10, @20);
+    }
+
+    {
+        KVORecorder r(self, obj, @"realmNullableIntCol");
+        [obj setValue:@21 forKey:@"realmNullableIntCol"];
+        AssertChanged(r, @10, @21);
+        [obj setValue:nil forKey:@"realmNullableIntCol"];
+        AssertChanged(r, @21, NSNull.null);
     }
 }
 

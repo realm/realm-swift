@@ -419,6 +419,14 @@ static id makeSetter(__unsafe_unretained RLMProperty *const prop) {
     };
 }
 
+static inline NSNumber<RLMInt> *RLMCoerceToNSNumber(__unsafe_unretained id obj) {
+    if ([obj conformsToProtocol:@protocol(RLMIntegerProtocol)]) {
+        return [obj boxedValue];
+    }
+    REALM_ASSERT_DEBUG(obj == nil || RLMDynamicCast<NSNumber>(obj));
+    return obj;
+}
+
 static id makeRealmIntegerSetter(__unsafe_unretained RLMProperty *const prop) {
     // FIXME: move this into the `makeSetter` method once we support `if constexpr`
     NSUInteger index = prop.index;
@@ -426,8 +434,7 @@ static id makeRealmIntegerSetter(__unsafe_unretained RLMProperty *const prop) {
     REALM_ASSERT(!prop.isPrimary);
     return ^(__unsafe_unretained RLMObjectBase *const obj, id val) {
         RLMWrapSetter(obj, name, [&] {
-            RLMSetValue(obj, obj->_info->objectSchema->persisted_properties[index].table_column,
-                        static_cast<NSNumber<RLMInt> *>([(id<RLMIntegerProtocol>)val boxedValue]), false);
+            RLMSetValue(obj, obj->_info->objectSchema->persisted_properties[index].table_column, RLMCoerceToNSNumber(val), false);
         });
     };
 }
@@ -680,14 +687,6 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     }
 
     RLMDynamicSet(obj, prop, RLMCoerceToNil(val), RLMCreationOptionsPromoteUnmanaged);
-}
-
-static inline NSNumber<RLMInt> *RLMCoerceToNSNumber(__unsafe_unretained id obj) {
-    if ([obj conformsToProtocol:@protocol(RLMIntegerProtocol)]) {
-        return [obj boxedValue];
-    }
-    REALM_ASSERT_DEBUG(obj == nil || RLMDynamicCast<NSNumber>(obj));
-    return obj;
 }
 
 // Precondition: the property is not a primary key
