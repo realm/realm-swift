@@ -137,11 +137,18 @@ NS_ASSUME_NONNULL_BEGIN
  on them.
 
  The `value` argument can be a key-value coding compliant object, an array or dictionary returned from the methods in
- `NSJSONSerialization`, or an array containing one element for each managed property. An exception will be thrown if
- any required properties are not present and those properties were not defined with default values.
+ `NSJSONSerialization`, or an array containing one element for each managed property.
+ 
+ If the object is being created, an exception will be thrown if any required properties are
+ not present and those properties were not defined with default values.
 
- When passing in an array as the `value` argument, all properties must be present, valid and in the same order as the
- properties defined in the model.
+ If the object is being updated and the `value` argument is a dictionary or a key-value
+ coding compliant object, any property on the object that doesn't have a corresponding
+ entry in the `value` argument will remain untouched. Nullable properties on the object can
+ be set to nil by using `NSNull` as the updated value.
+
+ If the `value` argument is an array, all properties must be present, valid and in the same
+ order as the properties defined in the model.
 
  @param value    The value used to populate the object.
 
@@ -156,11 +163,18 @@ NS_ASSUME_NONNULL_BEGIN
  on them.
 
  The `value` argument can be a key-value coding compliant object, an array or dictionary returned from the methods in
- `NSJSONSerialization`, or an array containing one element for each managed property. An exception will be thrown if any
- required properties are not present and those properties were not defined with default values.
+ `NSJSONSerialization`, or an array containing one element for each managed property.
+ 
+ If the object is being created, an exception will be thrown if any required properties are
+ not present and those properties were not defined with default values.
 
- When passing in an array as the `value` argument, all properties must be present, valid and in the same order as the
- properties defined in the model.
+ If the object is being updated and the `value` argument is a dictionary or a key-value
+ coding compliant object, any property on the object that doesn't have a corresponding
+ entry in the `value` argument will remain untouched. Nullable properties on the object can
+ be set to nil by using `NSNull` as the updated value.
+
+ If the `value` argument is an array, all properties must be present, valid and in the same
+ order as the properties defined in the model.
 
  @param realm    The Realm which should manage the newly-created object.
  @param value    The value used to populate the object.

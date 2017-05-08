@@ -315,15 +315,16 @@ public final class Realm {
      one element for each managed property. Do not pass in a `LinkingObjects` instance, either
      by itself or as a member of a collection.
 
-     If the object is being created, an exception will be thrown if any required properties are
-     not present and those properties were not defined with default values.
+     If the object is being created, all required properties that were not defined with default
+     values must be given initial values through the `value` argument. Otherwise, an Objective-C
+     exception will be thrown.
      
      If the object is being updated and the `value` argument is a dictionary or a key-value
      coding compliant object, any property on the object that doesn't have a corresponding
      entry in the `value` argument will remain untouched. Nullable properties on the object can
      be set to nil by using `NSNull` as the updated value.
 
-     If the `value` argument is an `Array`, all properties must be present, valid and in the same
+     If the `value` argument is an array, all properties must be present, valid and in the same
      order as the properties defined in the model.
 
      - warning: This method may only be called during a write transaction.
