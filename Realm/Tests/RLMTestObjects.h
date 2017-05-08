@@ -148,6 +148,19 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property NSDate *date;
 @end
 
+@interface AllOptionalTypesPK : RLMObject
+@property int pk;
+
+@property NSNumber<RLMInt> *intObj;
+@property NSNumber<RLMFloat> *floatObj;
+@property NSNumber<RLMDouble> *doubleObj;
+@property NSNumber<RLMBool> *boolObj;
+@property NSString *string;
+@property NSData *data;
+@property NSDate *date;
+@end
+
+
 #pragma mark - Real Life Objects
 #pragma mark -
 

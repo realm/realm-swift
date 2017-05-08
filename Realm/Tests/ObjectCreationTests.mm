@@ -902,6 +902,68 @@
     [realm2 cancelWriteTransaction];
 }
 
+- (void)testCreateOrUpdateWithNilValues {
+    auto now = [NSDate date];
+    auto bytes = [NSData dataWithBytes:"a" length:1];
+    auto nonnull = [[AllOptionalTypesPK alloc] initWithValue:@[@0, @1, @2.2f, @3.3, @YES, @"a", bytes, now]];
+    auto null = [[AllOptionalTypesPK alloc] initWithValue:@[@0]];
+
+    auto realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    auto obj = [AllOptionalTypesPK createInRealm:realm withValue:nonnull];
+    [AllOptionalTypesPK createOrUpdateInRealm:realm withValue:null];
+
+    // FIXME: these should actually all be nil
+    XCTAssertNotNil(obj.intObj);
+    XCTAssertNotNil(obj.floatObj);
+    XCTAssertNotNil(obj.doubleObj);
+    XCTAssertNotNil(obj.boolObj);
+    XCTAssertNotNil(obj.string);
+    XCTAssertNotNil(obj.data);
+    XCTAssertNotNil(obj.date);
+
+    [AllOptionalTypesPK createOrUpdateInRealm:realm withValue:nonnull];
+    [AllOptionalTypesPK createOrUpdateInRealm:realm withValue:@[@0]];
+
+    // No values specified, so old values should remain
+    XCTAssertNotNil(obj.intObj);
+    XCTAssertNotNil(obj.floatObj);
+    XCTAssertNotNil(obj.doubleObj);
+    XCTAssertNotNil(obj.boolObj);
+    XCTAssertNotNil(obj.string);
+    XCTAssertNotNil(obj.data);
+    XCTAssertNotNil(obj.date);
+
+    [AllOptionalTypesPK createOrUpdateInRealm:realm withValue:@{@"pk": @0}];
+    XCTAssertNotNil(obj.intObj);
+    XCTAssertNotNil(obj.floatObj);
+    XCTAssertNotNil(obj.doubleObj);
+    XCTAssertNotNil(obj.boolObj);
+    XCTAssertNotNil(obj.string);
+    XCTAssertNotNil(obj.data);
+    XCTAssertNotNil(obj.date);
+
+    [AllOptionalTypesPK createOrUpdateInRealm:realm withValue:@{@"pk": @0,
+                                                                @"intObj": NSNull.null,
+                                                                @"floatObj": NSNull.null,
+                                                                @"doubleObj": NSNull.null,
+                                                                @"boolObj": NSNull.null,
+                                                                @"string": NSNull.null,
+                                                                @"data": NSNull.null,
+                                                                @"date": NSNull.null,
+                                                                }];
+    XCTAssertNil(obj.intObj);
+    XCTAssertNil(obj.floatObj);
+    XCTAssertNil(obj.doubleObj);
+    XCTAssertNil(obj.boolObj);
+    XCTAssertNil(obj.string);
+    XCTAssertNil(obj.data);
+    XCTAssertNil(obj.date);
+
+    [realm cancelWriteTransaction];
+}
+
 #pragma mark - Add
 
 - (void)testAddInvalidated {
