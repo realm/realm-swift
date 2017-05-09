@@ -341,7 +341,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
     // User C should be able to write to the Realm.
     NSURL *userCURL = makeTestURL(testName, self.userC);
-    RLMRealm *userCRealm = [self openRealmForURL:userCURL user:self.userC];
+    __unused RLMRealm *userCRealm = [self openRealmForURL:userCURL user:self.userC];
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-6", @"child-7", @"child-8"]];
     [self waitForUploadsForUser:self.userC url:userCURL];
     CHECK_COUNT(8, SyncObject, userBRealm);
