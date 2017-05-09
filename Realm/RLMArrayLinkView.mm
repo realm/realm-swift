@@ -72,10 +72,11 @@
         _realm = realm;
         REALM_ASSERT(list.get_realm() == realm->_realm);
         _backingList = std::move(list);
-        // FIXME: subtables
+        _ownerInfo = parentInfo;
         if (property.type == RLMPropertyTypeObject)
             _objectInfo = &parentInfo->linkTargetType(property.index);
-        _ownerInfo = parentInfo;
+        else
+            _objectInfo = _ownerInfo;
         _key = property.name;
     }
     return self;
@@ -105,7 +106,6 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
                                    __unsafe_unretained RLMArray *const array,
                                    __unsafe_unretained id const observed) {
     RLMValidateArrayObservationKey(keyPath, array);
-    // FIXME
     if (!info && array.class == [RLMArrayLinkView class]) {
         RLMArrayLinkView *lv = static_cast<RLMArrayLinkView *>(array);
         info = std::make_unique<RLMObservationInfo>(*lv->_ownerInfo,
@@ -230,8 +230,10 @@ static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyVal
     if (state->state == 0) {
         translateErrors([&] { _backingList.verify_attached(); });
 
-        // FIXME: RLMFastEnumerator doesn't support primitives yet
-        enumerator = [[RLMFastEnumerator alloc] initWithCollection:self objectSchema:*_objectInfo];
+        enumerator = [[RLMFastEnumerator alloc] initWithList:_backingList
+                                                  collection:self
+                                                       realm:_realm
+                                                   classInfo:*_objectInfo];
         state->extra[0] = (long)enumerator;
         state->extra[1] = self.count;
     }
@@ -344,10 +346,10 @@ static void RLMInsertObject(RLMArrayLinkView *ar, id object, NSUInteger index) {
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath hasPrefix:@"@"]) {
         // Delegate KVC collection operators to RLMResults
-        auto query = translateErrors([&] { return _backingList.get_query(); });
-        RLMResults *results = [RLMResults resultsWithObjectInfo:*_objectInfo
-                                                        results:realm::Results(_realm->_realm, std::move(query))];
-        return [results valueForKeyPath:keyPath];
+        return translateErrors([&] {
+            auto results = [RLMResults resultsWithObjectInfo:*_objectInfo results:_backingList.as_results()];
+            return [results valueForKeyPath:keyPath];
+        });
     }
     return [super valueForKeyPath:keyPath];
 }

@@ -156,7 +156,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
     __autoreleasing RLMFastEnumerator *enumerator;
     if (state->state == 0) {
-        enumerator = [[RLMFastEnumerator alloc] initWithCollection:self objectSchema:*_info];
+        enumerator = [[RLMFastEnumerator alloc] initWithResults:_results
+                                                     collection:self
+                                                          realm:_realm
+                                                      classInfo:*_info];
         state->extra[0] = (long)enumerator;
         state->extra[1] = self.count;
     }

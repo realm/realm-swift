@@ -682,11 +682,11 @@ id RLMAccessorContext::box(realm::List&& l) {
 
 id RLMAccessorContext::box(realm::Object&& o) {
     REALM_ASSERT(currentProperty);
-    return RLMCreateObjectAccessor(_realm, _info.linkTargetType(currentProperty.index), o.row().get_index());
+    return RLMCreateObjectAccessor(_realm, _info.linkTargetType(currentProperty.index), o.row());
 }
 
 id RLMAccessorContext::box(realm::RowExpr r) {
-    return RLMCreateObjectAccessor(_realm, _info, r.get_index());
+    return RLMCreateObjectAccessor(_realm, _info, r);
 }
 
 id RLMAccessorContext::box(realm::Results&& r) {
