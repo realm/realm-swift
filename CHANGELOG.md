@@ -11,7 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Suppress `-Wdocumentation` warnings in Realm C++ headers when using CocoaPods
+  with Xcode 8.3.2.
 
 2.7.0 Release notes (2017-05-03)
 =============================================================
