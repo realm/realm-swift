@@ -578,8 +578,9 @@ RLMAccessorContext::RLMAccessorContext(RLMRealm *realm, RLMClassInfo& info, bool
 RLMAccessorContext::RLMAccessorContext(__unsafe_unretained RLMObjectBase *const parent,
                                        const realm::Property *prop)
 : _realm(parent->_realm)
-, _info(prop && prop->type == realm::PropertyType::Object ? parent->_info->linkTargetType(*prop)
-                                                          : *parent->_info)
+, _info(prop && (prop->type == realm::PropertyType::Object || prop->type == realm::PropertyType::Array)
+        ? parent->_info->linkTargetType(*prop)
+        : *parent->_info)
 , _parentObject(parent)
 {
 }
@@ -841,7 +842,7 @@ RLMOptionalId RLMAccessorContext::value_for_property(__unsafe_unretained id cons
         // this is mainly an issue when the object graph being added has cycles,
         // as it's not obvious that the user has to set the *ivars* to nil to
         // avoid leaking memory
-        if (prop.type == RLMPropertyTypeObject) {
+        if (prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) {
             ((void(*)(id, SEL, id))objc_msgSend)(obj, prop.setterSel, nil);
         }
     }
