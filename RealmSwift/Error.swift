@@ -18,7 +18,6 @@
 
 import Realm
 
-/// :nodoc:
 extension Realm {
     /**
      Struct that describes the error codes within the Realm error domain.
