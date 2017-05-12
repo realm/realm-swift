@@ -19,6 +19,13 @@
 #import "RLMTestCase.h"
 #import "RLMRealm_Dynamic.h"
 
+RLM_ARRAY_TYPE(CircularArrayObject)
+@interface CircularArrayObject : RLMObject
+@property RLM_GENERIC_ARRAY(CircularArrayObject) *array;
+@end
+@implementation CircularArrayObject
+@end
+
 @interface LinkTests : RLMTestCase
 @end
 
@@ -182,6 +189,26 @@
         [realm addObject:obj0];
         obj0.next = nil;
         obj1.next = nil;
+        [realm commitWriteTransaction];
+    }
+
+    XCTAssertNil(weakObj0);
+    XCTAssertNil(weakObj1);
+}
+
+- (void)testAddingCircularReferenceInArrayDoesNotLeakSourceObjects {
+    CircularArrayObject __weak *weakObj0, __weak *weakObj1;
+    @autoreleasepool {
+        CircularArrayObject *obj0 = [[CircularArrayObject alloc] initWithValue:@[@[]]];
+        CircularArrayObject *obj1 = [[CircularArrayObject alloc] initWithValue:@[@[obj0]]];
+        [obj0.array addObject:obj1];
+
+        weakObj0 = obj0;
+        weakObj1 = obj1;
+
+        RLMRealm *realm = [RLMRealm defaultRealm];
+        [realm beginWriteTransaction];
+        [realm addObject:obj0];
         [realm commitWriteTransaction];
     }
 
