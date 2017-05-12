@@ -518,6 +518,31 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(existingObject.intCol, 2)
     }
 
+    func testAddObjectCycle() {
+        weak var weakObj1: SwiftCircleObject? = nil, weakObj2: SwiftCircleObject? = nil
+
+        autoreleasepool {
+            let obj1 = SwiftCircleObject(value: [])
+            let obj2 = SwiftCircleObject(value: [obj1, [obj1]])
+            obj1.obj = obj2
+            obj1.array.append(obj2)
+
+            weakObj1 = obj1
+            weakObj2 = obj2
+
+            let realm = try! Realm()
+            try! realm.write {
+                realm.add(obj1)
+            }
+
+            XCTAssertEqual(obj1.realm, realm)
+            XCTAssertEqual(obj2.realm, realm)
+        }
+
+        XCTAssertNil(weakObj1)
+        XCTAssertNil(weakObj2)
+    }
+
     // MARK: Private utilities
     private func verifySwiftObjectWithArrayLiteral(_ object: SwiftObject, array: [Any], boolObjectValue: Bool,
                                                    boolObjectListValues: [Bool]) {
