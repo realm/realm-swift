@@ -675,6 +675,7 @@ id RLMAccessorContext::box(realm::List&& l) {
 }
 
 id RLMAccessorContext::box(realm::Object&& o) {
+    REALM_ASSERT(currentProperty);
     return RLMCreateObjectAccessor(_realm, _info.linkTargetType(currentProperty.index), o.row().get_index());
 }
 
@@ -683,6 +684,7 @@ id RLMAccessorContext::box(realm::RowExpr r) {
 }
 
 id RLMAccessorContext::box(realm::Results&& r) {
+    REALM_ASSERT(currentProperty);
     return [RLMResults resultsWithObjectInfo:_realm->_info[currentProperty.objectClassName]
                                      results:std::move(r)];
 }
