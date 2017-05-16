@@ -7,7 +7,7 @@ This repository holds the source code for the iOS, macOS, tvOS & watchOS version
 
 * **Mobile-first:** Realm is the first database built from the ground up to run directly inside phones, tablets and wearables.
 * **Simple:** Data is directly [exposed as objects](https://realm.io/docs/objc/latest/#models) and [queryable by code](https://realm.io/docs/objc/latest/#queries), removing the need for ORM's riddled with performance & maintenance issues. Most of our users pick it up intuitively, getting simple apps up & running in minutes.
-* **Modern:** Realm supports relationships, generics, vectorization and even Swift.
+* **Modern:** Realm supports relationships, generics, vectorization and Swift.
 * **Fast:** Realm is faster than even raw SQLite on common operations, while maintaining an extremely rich feature set.
 
 ## Getting Started
