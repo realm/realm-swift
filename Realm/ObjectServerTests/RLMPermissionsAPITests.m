@@ -294,17 +294,21 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     }];
 
     NSString *testName = NSStringFromSelector(_cmd);
+    // Unresolved URL: ~/testManageAccess
+    NSURL *userAURLUnresolved = makeTestURL(testName, nil);
+    // Resolved URL: <User A ID>/testManageAccess
+    NSURL *userAURLResolved = makeTestURL(testName, self.userA);
+
     // Open a Realm for user A.
-    NSURL *userAURL = makeTestURL(testName, nil);
-    RLMRealm *userARealm = [self openRealmForURL:userAURL user:self.userA];
+    RLMRealm *userARealm = [self openRealmForURL:userAURLUnresolved user:self.userA];
 
     // Have user A add some items to the Realm.
     [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-    [self waitForUploadsForUser:self.userA url:userAURL];
+    [self waitForUploadsForUser:self.userA url:userAURLUnresolved];
     CHECK_COUNT(3, SyncObject, userARealm);
 
     // Give user B admin permissions to that Realm.
-    RLMSyncPermissionValue *p = [[RLMSyncPermissionValue alloc] initWithRealmPath:[userAURL path]
+    RLMSyncPermissionValue *p = [[RLMSyncPermissionValue alloc] initWithRealmPath:[userAURLUnresolved path]
                                                                            userID:self.userB.identity
                                                                       accessLevel:RLMSyncAccessLevelAdmin];
     // Set the permission.
@@ -316,20 +320,19 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     // Open the Realm for user B. Since user B has admin privileges, they should be able to open it 'normally'.
-    NSURL *userBURL = makeTestURL(testName, self.userA);
-    RLMRealm *userBRealm = [self openRealmForURL:userBURL user:self.userB];
-    [self waitForDownloadsForUser:self.userB url:userBURL];
+    RLMRealm *userBRealm = [self openRealmForURL:userAURLResolved user:self.userB];
+    [self waitForDownloadsForUser:self.userB url:userAURLResolved];
     CHECK_COUNT(3, SyncObject, userBRealm);
 
     // Add some objects using user B.
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
-    [self waitForUploadsForUser:self.userB url:userBURL];
+    [self waitForUploadsForUser:self.userB url:userAURLResolved];
     CHECK_COUNT(5, SyncObject, userBRealm);
-    [self waitForDownloadsForUser:self.userA url:userAURL];
+    [self waitForDownloadsForUser:self.userA url:userAURLUnresolved];
     CHECK_COUNT(5, SyncObject, userARealm);
 
     // User B should be able to give user C write permissions to user A's Realm.
-    RLMSyncPermissionValue *p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[userBURL path]
+    RLMSyncPermissionValue *p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[userAURLResolved path]
                                                                             userID:self.userC.identity
                                                                        accessLevel:RLMSyncAccessLevelWrite];
     XCTestExpectation *manageEx = [self expectationWithDescription:@"Managing a Realm you can't manage should fail."];
@@ -340,14 +343,15 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     // User C should be able to write to the Realm.
-    NSURL *userCURL = makeTestURL(testName, self.userC);
-    RLMRealm *userCRealm = [self openRealmForURL:userCURL user:self.userC];
-    [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-6", @"child-7", @"child-8"]];
-    [self waitForUploadsForUser:self.userC url:userCURL];
-    CHECK_COUNT(8, SyncObject, userBRealm);
-    [self waitForDownloadsForUser:self.userA url:userAURL];
+    RLMRealm *userCRealm = [self openRealmForURL:userAURLResolved user:self.userC];
+    [self waitForDownloadsForUser:self.userC url:userAURLResolved];
+    CHECK_COUNT(5, SyncObject, userCRealm);
+    [self addSyncObjectsToRealm:userCRealm descriptions:@[@"child-6", @"child-7", @"child-8"]];
+    [self waitForUploadsForUser:self.userC url:userAURLResolved];
+    CHECK_COUNT(8, SyncObject, userCRealm);
+    [self waitForDownloadsForUser:self.userA url:userAURLUnresolved];
     CHECK_COUNT(8, SyncObject, userARealm);
-    [self waitForDownloadsForUser:self.userB url:userBURL];
+    [self waitForDownloadsForUser:self.userB url:userAURLResolved];
     CHECK_COUNT(8, SyncObject, userBRealm);
 }
 
