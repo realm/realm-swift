@@ -166,7 +166,7 @@ using namespace realm;
     [[RLMSyncManager sharedManager] _fireError:make_sync_error(authError)];
     // Certain errors related to network connectivity should trigger a retry.
     NSDate *nextTryDate = nil;
-    if (error.domain == NSURLErrorDomain) {
+    if ([error.domain isEqualToString:NSURLErrorDomain]) {
         switch (error.code) {
             case NSURLErrorCannotConnectToHost:
             case NSURLErrorNotConnectedToInternet:
