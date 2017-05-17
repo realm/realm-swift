@@ -189,7 +189,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     }
 
     return translateErrors([&] {
-        return RLMConvertNotFound(_results.index_of(RLMPredicateToQuery(predicate, _info->rlmObjectSchema, _realm.schema, _realm.group)));
+        return RLMConvertNotFound(_results.index_of(RLMPredicateToQuery(predicate, _info->rlmObjectSchema, _realm)));
     });
 }
 
@@ -339,7 +339,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
             return self;
         }
         // FIXME: subtables maybe?
-        auto query = RLMPredicateToQuery(predicate, _info->rlmObjectSchema, _realm.schema, _realm.group);
+        auto query = RLMPredicateToQuery(predicate, _info->rlmObjectSchema, _realm);
         return [RLMResults resultsWithObjectInfo:*_info results:_results.filter(std::move(query))];
     });
 }

@@ -2137,6 +2137,26 @@
     XCTAssertEqualObjects(asArray(r14), (@[ hannah ]));
 }
 
+- (void)testArraysOfPrimitives {
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+
+    NSDate *date = [NSDate date];
+    NSData *bytes = [NSData dataWithBytes:"a" length:1];
+    [AllPrimitiveArrays createInRealm:realm
+                            withValue:@{@"intObj": @[@1, @2, @3],
+                                        @"boolObj": @[@YES, @NO],
+                                        @"floatObj": @[@1.1f, @2.2f],
+                                        @"doubleObj": @[@3.3, @4.4],
+                                        @"stringObj": @[@"a", @"b"],
+                                        @"dateObj": @[date],
+                                        @"dataObj": @[bytes]}];
+
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"ANY intObj == 2");
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"intObj.@count == 3");
+    RLMAssertCount(AllPrimitiveArrays, 1U, @"intObj.@sum == 6");
+}
+
 @end
 
 @interface NullQueryTests : QueryTests

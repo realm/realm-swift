@@ -217,7 +217,7 @@ RLMResults *RLMGetObjects(__unsafe_unretained RLMRealm *const realm,
     }
 
     if (predicate) {
-        realm::Query query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, realm.schema, realm.group);
+        realm::Query query = RLMPredicateToQuery(predicate, info.rlmObjectSchema, realm);
         return [RLMResults resultsWithObjectInfo:info
                                          results:realm::Results(realm->_realm, std::move(query))];
     }

@@ -33,4 +33,7 @@ namespace realm {
 
 // FIXME - group should not be exposed
 @property (nonatomic, readonly) realm::Group &group;
+
++ (instancetype)realmWithSharedRealm:(std::shared_ptr<realm::Realm>)sharedRealm schema:(RLMSchema *)schema;
+
 @end

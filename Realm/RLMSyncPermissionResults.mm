@@ -22,6 +22,7 @@
 #import "RLMCollection_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMQueryUtil.hpp"
+#import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.hpp"
 #import "RLMSyncPermissionValue_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
@@ -84,10 +85,10 @@ using namespace realm;
 - (RLMSyncPermissionResults *)objectsWithPredicate:(NSPredicate *)predicate {
     REALM_ASSERT_DEBUG(_results);
     auto& results = _results->results();
+    RLMSchema *schema = [RLMSchema dynamicSchemaFromObjectStoreSchema:results.get_realm()->schema()];
     auto query = RLMPredicateToQuery(predicate,
                                      [RLMObjectSchema objectSchemaForObjectStoreSchema:results.get_object_schema()],
-                                     [RLMSchema dynamicSchemaFromObjectStoreSchema:results.get_realm()->schema()],
-                                     results.get_realm()->read_group());
+                                     [RLMRealm realmWithSharedRealm:results.get_realm() schema:schema]);
     auto filtered_results = std::make_unique<PermissionResults>(_results->filter(std::move(query)));
     return [[RLMSyncPermissionResults alloc] initWithResults:std::move(filtered_results)];
 }

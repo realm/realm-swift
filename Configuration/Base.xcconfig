@@ -39,7 +39,7 @@ SWIFT_WHOLE_MODULE_OPTIMIZATION = YES;
 WARNING_CFLAGS = -Wmismatched-tags -Wunused-private-field;
 OTHER_CFLAGS = -fvisibility-inlines-hidden;
 
-OTHER_CPLUSPLUSFLAGS = $(inherited) -isystem core/include;
+OTHER_CPLUSPLUSFLAGS = $(inherited) -isystem core/include -isystem Realm/ObjectStore/external/eggs-variant/include;
 HEADER_SEARCH_PATHS = $(inherited) Realm/ObjectStore/src;
 
 CODE_SIGN_IDENTITY[sdk=iphone*] = iPhone Developer;

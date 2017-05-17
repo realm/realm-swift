@@ -437,7 +437,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, id object, NSUInteger index) {
 }
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
-    auto query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema, _realm.schema, _realm.group);
+    auto query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema, _realm);
     auto results = translateErrors([&] { return _backingList.filter(std::move(query)); });
     return [RLMResults resultsWithObjectInfo:*_objectInfo results:std::move(results)];
 }
@@ -445,8 +445,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, id object, NSUInteger index) {
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
     auto query = translateErrors([&] { return _backingList.get_query(); });
     if (_objectInfo) {
-        query.and_query(RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema,
-                                            _realm.schema, _realm.group));
+        query.and_query(RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema, _realm));
     }
     else {
         // FIXME
