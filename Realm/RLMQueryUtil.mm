@@ -329,6 +329,8 @@ struct Constant : eggs::variant<bool, int64_t, double, StringData, BinaryData, T
     explicit Constant(int64_t value) : Base(value) {}
 };
 
+struct ConstantCollection : std::vector<Constant> { };
+
 struct ColumnPath {
     ColumnPath(std::vector<Property> path) : path(std::move(path))
     {
@@ -369,8 +371,8 @@ private:
 
 // FIXME: Subqueries?
 
-struct Expression : eggs::variant<Constant, ColumnPath, AggregateOperation> {
-    using Base = eggs::variant<Constant, ColumnPath, AggregateOperation>;
+struct Expression : eggs::variant<Constant, ColumnPath, AggregateOperation, ConstantCollection> {
+    using Base = eggs::variant<Constant, ColumnPath, AggregateOperation, ConstantCollection>;
     using Base::Base;
 };
 
@@ -544,6 +546,13 @@ private:
     Expression convert(NSExpression *) const;
     Predicate convert(NSPredicate *) const;
 
+    Expression convertConstant(id constant) const;
+
+    Predicate lower(Predicate) const;
+    Predicate lower(ComparisonPredicate) const;
+    Predicate lower(CompoundPredicate) const;
+    Predicate lower(ConstantPredicate) const;
+
     Query as_query(const Predicate&) const;
     Query as_query(const ComparisonPredicate&) const;
     Query as_query(const CompoundPredicate&) const;
@@ -565,35 +574,59 @@ private:
     RLMObjectSchema *m_objectSchema;
 };
 
+Expression QueryBuilder::convertConstant(id constant) const
+{
+    if (!constant)
+        return Constant{null()};
+
+    if ([constant isKindOfClass:[NSNumber class]]) {
+        CFNumberRef number = (__bridge CFNumberRef)constant;
+        CFNumberType type = CFNumberGetType(number);
+        if (type == kCFNumberFloat32Type || type == kCFNumberFloat64Type
+            || type == kCFNumberFloatType || type == kCFNumberCGFloatType) {
+            return Constant([constant doubleValue]);
+        }
+        return Constant([constant longLongValue]);
+    }
+
+    if ([constant isKindOfClass:[NSString class]])
+        return Constant(RLMStringDataWithNSString(constant));
+
+    if ([constant isKindOfClass:[NSData class]])
+        return Constant(RLMBinaryDataForNSData(constant));
+
+    if ([constant isKindOfClass:[NSDate class]])
+        return Constant(RLMTimestampForNSDate(constant));
+
+    if (auto *object = RLMDynamicCast<RLMObjectBase>(constant)) {
+        // FIXME: We'll also need to validate the object is of the appropriate class at some point.
+        RLMPrecondition(!object->_realm || object->_realm == m_realm,
+                        @"Invalid value origin", @"Object must be from the Realm being queried");
+        return Constant(object->_row);
+    }
+
+    // FIXME: RLMResults / RLMArray could be preserved as live objects if core supported it.
+    if ([constant conformsToProtocol:@protocol(NSFastEnumeration)]) {
+        ConstantCollection constantCollection;
+        constantCollection.reserve([constant count]);
+        for (id object in constant) {
+            auto convertedConstant = convertConstant(object);
+            if (convertedConstant.target<Constant>())
+                constantCollection.push_back(std::move(*convertedConstant.target<Constant>()));
+            else
+                @throw RLMPredicateException(@"Unsupported expression", @"Values of type %@ are not supported within arrays.", [object class]);
+        }
+        return constantCollection;
+    }
+
+    @throw RLMPredicateException(@"Unsupported expression", @"Unsupported constant value in expression: %@", constant);
+}
+
 Expression QueryBuilder::convert(NSExpression *expression) const
 {
     switch (expression.expressionType) {
         case NSConstantValueExpressionType:
-            if (!expression.constantValue) {
-                return Constant{null()};
-            }
-            if ([expression.constantValue isKindOfClass:[NSNumber class]]) {
-                CFNumberRef number = (__bridge CFNumberRef)expression.constantValue;
-                CFNumberType type = CFNumberGetType(number);
-                if (type == kCFNumberFloat32Type || type == kCFNumberFloat64Type
-                    || type == kCFNumberFloatType || type == kCFNumberCGFloatType) {
-                    return Constant([expression.constantValue doubleValue]);
-                }
-                return Constant([expression.constantValue longLongValue]);
-            }
-            if ([expression.constantValue isKindOfClass:[NSString class]]) {
-                return Constant(RLMStringDataWithNSString(expression.constantValue));
-            }
-            if ([expression.constantValue isKindOfClass:[NSDate class]]) {
-                return Constant(RLMTimestampForNSDate(expression.constantValue));
-            }
-            if (auto *object = RLMDynamicCast<RLMObjectBase>(expression.constantValue)) {
-                // FIXME: We'll also need to validate the object is of the appropriate class at some point.
-                RLMPrecondition(!object->_realm || object->_realm == m_realm,
-                                @"Invalid value origin", @"Object must be from the Realm being queried");
-                return Constant(object->_row);
-            }
-            @throw RLMPredicateException(@"Unsupported expression", @"Unsupported expression: %@", expression);
+            return convertConstant(expression.constantValue);
 
         case NSKeyPathExpressionType: {
             auto keyPath = key_path_from_string(m_realm.schema, m_objectSchema, expression.keyPath);
@@ -617,6 +650,19 @@ Expression QueryBuilder::convert(NSExpression *expression) const
 
             return ColumnPath(std::move(path));
         }
+        case NSAggregateExpressionType: {
+            NSArray<NSExpression *> *collection = RLMDynamicCast<NSArray>(expression.collection);
+            ConstantCollection constantCollection;
+            constantCollection.reserve(collection.count);
+            for (NSExpression *subexpression in collection) {
+                if (subexpression.expressionType != NSConstantValueExpressionType)
+                    @throw RLMPredicateException(@"Unsupported expression", @"Expressions of type %zu (%@) are not supported within an aggregate expression", static_cast<size_t>(subexpression.expressionType), subexpression);
+
+                // FIXME: Do we need to handle ConstantCollection's appearing here?
+                constantCollection.push_back(*convert(subexpression).target<Constant>());
+            }
+            return constantCollection;
+        }
         default:
             @throw RLMPredicateException(@"Unsupported expression", @"Unsupported expression: %@ (%zu)", expression, static_cast<size_t>(expression.expressionType));
     }
@@ -624,44 +670,114 @@ Expression QueryBuilder::convert(NSExpression *expression) const
 
 Predicate QueryBuilder::convert(NSPredicate *predicate) const
 {
-    if ([predicate isKindOfClass:[NSComparisonPredicate class]]) {
-        NSComparisonPredicate *comparisonPredicate = (NSComparisonPredicate *)predicate;
+    if (auto *comparisonPredicate = RLMDynamicCast<NSComparisonPredicate>(predicate)) {
         auto left = convert(comparisonPredicate.leftExpression);
         auto right = convert(comparisonPredicate.rightExpression);
         auto operator_ = ::convert(comparisonPredicate.predicateOperatorType);
         auto options = ::convert(comparisonPredicate.options);
-        return ComparisonPredicate{left, right, operator_, options};
+        return lower(ComparisonPredicate{left, right, operator_, options});
     }
-    if ([predicate isKindOfClass:[NSCompoundPredicate class]]) {
-        NSCompoundPredicate *compoundPredicate = (NSCompoundPredicate *)predicate;
-        if (compoundPredicate.subpredicates.count == 0) {
-            switch (compoundPredicate.compoundPredicateType) {
-                case NSAndPredicateType:
-                    // NSCompoundPredicate's documentation states that an AND predicate with no subpredicates evaluates to TRUE.
-                    return ConstantPredicate{true};
-                case NSOrPredicateType:
-                    // NSCompoundPredicate's documentation states that an OR predicate with no subpredicates evaluates to FALSE.
-                    return ConstantPredicate{false};
-                case NSNotPredicateType:
-                    @throw RLMPredicateException(@"FIXME: What should this do?", @"");
-            }
-        }
 
+    if (auto *compoundPredicate = RLMDynamicCast<NSCompoundPredicate>(predicate)) {
         std::vector<std::unique_ptr<Predicate>> subpredicates;
         subpredicates.reserve(compoundPredicate.subpredicates.count);
         for (NSPredicate *subpredicate in compoundPredicate.subpredicates) {
             subpredicates.push_back(std::make_unique<Predicate>(convert(subpredicate)));
         }
+
         auto type = ::convert(compoundPredicate.compoundPredicateType);
         return CompoundPredicate(type, std::move(subpredicates));
     }
-    if ([predicate isEqual:[NSPredicate predicateWithValue:YES]]) {
+
+    if ([predicate isEqual:[NSPredicate predicateWithValue:YES]])
         return ConstantPredicate{true};
-    }
-    if ([predicate isEqual:[NSPredicate predicateWithValue:NO]]) {
+
+    if ([predicate isEqual:[NSPredicate predicateWithValue:NO]])
         return ConstantPredicate{false};
-    }
+
     @throw RLMPredicateException(@"Unsupported predicate", @"Unsupported predicate: %@", predicate);
+}
+
+Predicate QueryBuilder::lower(ComparisonPredicate predicate) const
+{
+    using Operator = ComparisonPredicate::Operator;
+
+    switch (predicate.operator_) {
+        case Operator::Between: {
+            auto* columnPath = predicate.left.target<ColumnPath>();
+            auto* constantCollection = predicate.right.target<ConstantCollection>();
+            if (!columnPath || !constantCollection || constantCollection->size() != 2) {
+                @throw RLMPredicateException(@"Unsupported predicate", @"BETWEEN must compare a key path with an aggregate of two elements.");
+            }
+
+            // FIXME: Convert the to-many case to a subquery.
+            std::vector<std::unique_ptr<Predicate>> subpredicates(2);
+            subpredicates[0] = std::make_unique<Predicate>(ComparisonPredicate{*columnPath, (*constantCollection)[0], Operator::GreaterThanOrEqual, predicate.options});
+            subpredicates[1] = std::make_unique<Predicate>(ComparisonPredicate{*columnPath, (*constantCollection)[1], Operator::LessThanOrEqual, predicate.options});
+
+            return CompoundPredicate(CompoundPredicate::Type::And, std::move(subpredicates));
+        }
+        case Operator::In: {
+            // "key.path IN collection" becomes "key.path = collection[0] OR … OR key.path = collection[SIZE]"
+            if (predicate.left.target<ColumnPath>() && predicate.right.target<ConstantCollection>()) {
+                auto& columnPath = *predicate.left.target<ColumnPath>();
+                auto& constantCollection = *predicate.right.target<ConstantCollection>();
+
+                std::vector<std::unique_ptr<Predicate>> subpredicates;
+                subpredicates.reserve(constantCollection.size());
+                for (auto& constant : constantCollection) {
+                    subpredicates.push_back(std::make_unique<Predicate>(ComparisonPredicate{columnPath, constant, Operator::Equal, predicate.options}));
+                }
+
+                return CompoundPredicate(CompoundPredicate::Type::Or, std::move(subpredicates));
+            }
+
+            // "constant IN key.path" becomes "ANY key.path = constant".
+            if (predicate.left.target<Constant>() && predicate.right.target<ColumnPath>()) {
+                auto& constant = *predicate.left.target<Constant>();
+                auto& columnPath = *predicate.right.target<ColumnPath>();
+
+                return ComparisonPredicate{std::move(columnPath), std::move(constant), Operator::Equal, predicate.options};
+            }
+
+            abort();
+        }
+        default:
+            return predicate;
+    }
+}
+
+Predicate QueryBuilder::lower(CompoundPredicate predicate) const
+{
+    if (predicate.subpredicates.empty()) {
+        switch (predicate.type) {
+            case CompoundPredicate::Type::And:
+                return ConstantPredicate{true};
+            case CompoundPredicate::Type::Or:
+                return ConstantPredicate{false};
+            case CompoundPredicate::Type::Not:
+                @throw RLMPredicateException(@"FIXME: What should this do?", @"???");
+        }
+    }
+
+    std::vector<std::unique_ptr<Predicate>> subpredicates;
+    subpredicates.reserve(predicate.subpredicates.size());
+    for (auto& subpredicate : predicate.subpredicates) {
+        subpredicates.push_back(std::make_unique<Predicate>(lower(std::move(*subpredicate))));
+    }
+    return CompoundPredicate(predicate.type, std::move(subpredicates));
+}
+
+Predicate QueryBuilder::lower(ConstantPredicate predicate) const
+{
+    return predicate;
+}
+
+Predicate QueryBuilder::lower(Predicate predicate) const
+{
+    return apply([&](auto&& predicate) {
+        return lower(std::forward<decltype(predicate)>(predicate));
+    }, std::move(predicate));
 }
 
 Query QueryBuilder::as_query(const Predicate& predicate) const
@@ -716,12 +832,12 @@ auto visit_property_type(F&& function, PropertyType type)
 
 template <typename F>
 struct SubexpressionVisitor {
-    auto operator()(const Constant& value) -> Query
+    Query operator()(const Constant& value)
     {
         return apply(function, value);
     }
 
-    auto operator()(const ColumnPath& column) -> Query
+    Query operator()(const ColumnPath& column)
     {
         return visit_property_type([&](auto type) {
             for (auto it = column.path.begin(); it != std::prev(column.path.end()); ++it) {
@@ -739,7 +855,14 @@ struct SubexpressionVisitor {
         }, column.type());
     }
 
-    auto operator()(const AggregateOperation&) -> Query
+    Query operator()(const ConstantCollection&)
+    {
+        // ConstantCollection's should have been replaced during lowering.
+        abort();
+        __builtin_unreachable();
+    }
+
+    Query operator()(const AggregateOperation&)
     {
         @throw RLMPredicateException(@"Unsupported subexpression type", @"Unsupported subexpression type");
     }
@@ -992,8 +1115,8 @@ auto visit_comparison_operator(F&& function, ComparisonPredicate::Operator opera
         case Operator::Like:
             return function(VisitLike());
 
+        // These operators should have been replaced by lowering.
         case Operator::In:
-            return function(VisitUnsupported());
         case Operator::Between:
             return function(VisitUnsupported());
     }
@@ -1048,7 +1171,7 @@ Query QueryBuilder::as_query(const ConstantPredicate& predicate) const
 void QueryBuilder::apply_predicate(NSPredicate *nspredicate)
 {
     auto predicate = convert(nspredicate);
-    m_query.and_query(as_query(predicate));
+    m_query.and_query(as_query(lower(predicate)));
 }
 
 
