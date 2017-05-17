@@ -321,9 +321,9 @@ KeyPath key_path_from_string(RLMSchema *schema, RLMObjectSchema *objectSchema, N
 
 
 
-struct Constant : eggs::variant<bool, int64_t, double, StringData, BinaryData, Timestamp, null>
+struct Constant : eggs::variant<bool, int64_t, double, StringData, BinaryData, Timestamp, Row, null>
 {
-    using Base = eggs::variant<bool, int64_t, double, StringData, BinaryData, Timestamp, null>;
+    using Base = eggs::variant<bool, int64_t, double, StringData, BinaryData, Timestamp, Row, null>;
     using Base::Base;
 
     explicit Constant(int64_t value) : Base(value) {}
@@ -494,7 +494,7 @@ ComparisonPredicate::Operator convert(NSPredicateOperatorType operatorType)
 
         case NSMatchesPredicateOperatorType:
         case NSCustomSelectorPredicateOperatorType:
-            throw std::runtime_error("Unsupported operator type");
+            @throw RLMPredicateException(@"Unsupported operator type", @"Unsupported operator type");
     }
 }
 
@@ -510,7 +510,7 @@ ComparisonPredicate::Options convert(NSComparisonPredicateOptions options)
 
     if (options & (~NSCaseInsensitivePredicateOption & ~NSDiacriticInsensitivePredicateOption)) {
         NSLog(@"Unsupported predicate option: %zu", options);
-        throw std::runtime_error("Unsupported predicate option");
+        @throw RLMPredicateException(@"Unsupported predicate option", @"Unsupported predicate option");
     }
 
     return result;
@@ -557,7 +557,7 @@ private:
     template <typename F>
     auto subexpression_visitor(F&& function) const
     {
-        return SubexpressionVisitor<F>{table(), std::forward<F>(function)};
+        return SubexpressionVisitor<F>{m_realm.group, table(), std::forward<F>(function)};
     }
 
     Query& m_query;
@@ -569,6 +569,9 @@ Expression QueryBuilder::convert(NSExpression *expression) const
 {
     switch (expression.expressionType) {
         case NSConstantValueExpressionType:
+            if (!expression.constantValue) {
+                return Constant{null()};
+            }
             if ([expression.constantValue isKindOfClass:[NSNumber class]]) {
                 CFNumberRef number = (__bridge CFNumberRef)expression.constantValue;
                 CFNumberType type = CFNumberGetType(number);
@@ -584,7 +587,13 @@ Expression QueryBuilder::convert(NSExpression *expression) const
             if ([expression.constantValue isKindOfClass:[NSDate class]]) {
                 return Constant(RLMTimestampForNSDate(expression.constantValue));
             }
-            throw std::runtime_error("Unsupported expression");
+            if (auto *object = RLMDynamicCast<RLMObjectBase>(expression.constantValue)) {
+                // FIXME: We'll also need to validate the object is of the appropriate class at some point.
+                RLMPrecondition(!object->_realm || object->_realm == m_realm,
+                                @"Invalid value origin", @"Object must be from the Realm being queried");
+                return Constant(object->_row);
+            }
+            @throw RLMPredicateException(@"Unsupported expression", @"Unsupported expression: %@", expression);
 
         case NSKeyPathExpressionType: {
             auto keyPath = key_path_from_string(m_realm.schema, m_objectSchema, expression.keyPath);
@@ -594,9 +603,13 @@ Expression QueryBuilder::convert(NSExpression *expression) const
             auto currentClassInfo = &m_realm->_info[m_objectSchema.className];
             for (RLMProperty *link : keyPath.links) {
                 path.push_back(link.objectStoreCopy);
-                if (link.type != RLMPropertyTypeLinkingObjects)
+                if (link.type != RLMPropertyTypeLinkingObjects) {
                     path.back().table_column = currentClassInfo->tableColumn(link);
-                currentClassInfo = &currentClassInfo->linkTargetType(link.index);
+                    currentClassInfo = &currentClassInfo->linkTargetType(link.index);
+                }
+                else {
+                    currentClassInfo = &m_realm->_info[link.objectClassName];
+                }
             }
 
             path.push_back(keyPath.property.objectStoreCopy);
@@ -605,8 +618,7 @@ Expression QueryBuilder::convert(NSExpression *expression) const
             return ColumnPath(std::move(path));
         }
         default:
-            NSLog(@"Unsupported expression: %@ (%zu)", expression, static_cast<size_t>(expression.expressionType));
-            throw std::runtime_error("Unsupported expression");
+            @throw RLMPredicateException(@"Unsupported expression", @"Unsupported expression: %@ (%zu)", expression, static_cast<size_t>(expression.expressionType));
     }
 }
 
@@ -631,7 +643,7 @@ Predicate QueryBuilder::convert(NSPredicate *predicate) const
                     // NSCompoundPredicate's documentation states that an OR predicate with no subpredicates evaluates to FALSE.
                     return ConstantPredicate{false};
                 case NSNotPredicateType:
-                    throw std::runtime_error("FIXME: What should this do?");
+                    @throw RLMPredicateException(@"FIXME: What should this do?", @"");
             }
         }
 
@@ -649,8 +661,7 @@ Predicate QueryBuilder::convert(NSPredicate *predicate) const
     if ([predicate isEqual:[NSPredicate predicateWithValue:NO]]) {
         return ConstantPredicate{false};
     }
-    NSLog(@"Unsupported predicate: %@", predicate);
-    throw std::runtime_error("Unsupported predicate");
+    @throw RLMPredicateException(@"Unsupported predicate", @"Unsupported predicate: %@", predicate);
 }
 
 Query QueryBuilder::as_query(const Predicate& predicate) const
@@ -663,11 +674,13 @@ Query QueryBuilder::as_query(const Predicate& predicate) const
 template <typename F>
 auto visit_property_type(F&& function, PropertyType type)
 {
-    if (is_array(type)) {
+    if (is_array(type) && type != (PropertyType::Object | PropertyType::Array)) {
         // FIXME: Arrrrrays.
-        throw std::runtime_error("Unsupported property type");
+        @throw RLMPredicateException(@"Unsupported property type", @"Unsupported property type");
         return Query();
     }
+
+    type &= ~PropertyType::Array;
 
     switch (type) {
         case PropertyType::Int:
@@ -685,8 +698,9 @@ auto visit_property_type(F&& function, PropertyType type)
         case PropertyType::Double:
             return function(double{});
         case PropertyType::Object:
+            return function(Link{});
         case PropertyType::LinkingObjects:
-            throw std::runtime_error("Unsupported property type");
+            @throw RLMPredicateException(@"Unsupported property type", @"Unsupported property type");
             return Query();
 
         case PropertyType::Any:
@@ -694,7 +708,7 @@ auto visit_property_type(F&& function, PropertyType type)
         case PropertyType::Nullable:
         case PropertyType::Array:
         case PropertyType::Flags:
-            throw std::runtime_error("Unsupported property type");
+            @throw RLMPredicateException(@"Unsupported property type", @"Unsupported property type");
             return Query();
     }
 }
@@ -712,9 +726,13 @@ struct SubexpressionVisitor {
         return visit_property_type([&](auto type) {
             for (auto it = column.path.begin(); it != std::prev(column.path.end()); ++it) {
                 auto& prop = *it;
-                if (prop.type == PropertyType::LinkingObjects)
-                    throw std::runtime_error("Unsupported column reference");
-                table.link(prop.table_column);
+                if (prop.type == PropertyType::LinkingObjects) {
+                    auto source_table = ObjectStore::table_for_object_type(group, prop.object_type);
+                    table.backlink(*source_table, source_table->get_column_index(prop.link_origin_property_name));
+                }
+                else {
+                    table.link(prop.table_column);
+                }
             }
 
             return function(table.column<decltype(type)>(column.path.back().table_column));
@@ -723,9 +741,10 @@ struct SubexpressionVisitor {
 
     auto operator()(const AggregateOperation&) -> Query
     {
-        throw std::runtime_error("Unsupported subexpression type");
+        @throw RLMPredicateException(@"Unsupported subexpression type", @"Unsupported subexpression type");
     }
 
+    Group& group;
     Table& table;
     F function;
 };
@@ -940,7 +959,8 @@ struct VisitUnsupported {
     template <typename... Args>
     Query operator()(Args&&...) const
     {
-        throw std::runtime_error("Unsupported operator type");
+        // FIXME:
+        @throw RLMPredicateException(@"Unsupported operator type", @"Unsupported operator type");
     }
 };
 
