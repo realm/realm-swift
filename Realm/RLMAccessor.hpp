@@ -26,9 +26,9 @@
 class RLMClassInfo;
 class RLMObservationInfo;
 
-// realm::util::Optional<id> doesn't work due to that explicitly invoking the
-// destructor isn't allowed under ARC, so this covers the subset of Optional
-// that we actually need.
+// realm::util::Optional<id> doesn't work due to that Objective-C types can't
+// be members of unions with ARC, so this covers the subset of Optional that we
+// actually need.
 struct RLMOptionalId {
     id value;
     RLMOptionalId(id value) : value(value) { }
