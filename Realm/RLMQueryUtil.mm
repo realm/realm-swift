@@ -339,8 +339,22 @@ struct ColumnPath {
 
     PropertyType type() const { return path.back().type; }
 
+    bool is_any_object_type() const
+    {
+        return type() == PropertyType::LinkingObjects || (type() & ~PropertyType::Array) == PropertyType::Object;
+    }
+
+    bool has_any_to_many_links() const
+    {
+        return std::any_of(begin(path), end(path),
+                           [](auto& property) { return is_array(property.type) || property.type == PropertyType::LinkingObjects; });
+
+    }
+
     std::vector<Property> path;
 };
+
+struct Expression;
 
 class AggregateOperation {
 public:
@@ -352,29 +366,52 @@ public:
         Average,
     };
 
-    // FIXME: Aggregate operations can be performed on more than just columns (subqueries, for instance).
-    // FIXME: Should this work with a generic Expression instead?
-    AggregateOperation(ColumnPath path, Operator operator_, util::Optional<Property> property)
-    : m_path(std::move(path))
-    , m_operator(operator_)
-    , m_property(std::move(property))
-    {
-        // FIXME: Property can be optional if the end of the key path is a primitive array?
-        REALM_ASSERT_DEBUG(m_operator != Operator::Count ? bool(m_property) : !m_property);
-    }
+    AggregateOperation(Expression, Operator, util::Optional<Property>);
 
-private:
-    ColumnPath m_path;
-    Operator m_operator;
-    util::Optional<Property> m_property;
+    AggregateOperation(const AggregateOperation&);
+    AggregateOperation& operator=(const AggregateOperation&);
+
+    // FIXME: util::Optional appears to preclude marking these as noexcept?
+    AggregateOperation(AggregateOperation&&) = default;
+    AggregateOperation& operator=(AggregateOperation&&) = default;
+
+    std::unique_ptr<Expression> expression;
+    Operator operator_;
+    util::Optional<Property> property;
 };
 
-// FIXME: Subqueries?
+struct Subquery {
+    ColumnPath column;
+    Query query;
+};
 
-struct Expression : eggs::variant<Constant, ColumnPath, AggregateOperation, ConstantCollection> {
-    using Base = eggs::variant<Constant, ColumnPath, AggregateOperation, ConstantCollection>;
+struct Expression : eggs::variant<Constant, ColumnPath, AggregateOperation, ConstantCollection, Subquery> {
+    using Base = eggs::variant<Constant, ColumnPath, AggregateOperation, ConstantCollection, Subquery>;
     using Base::Base;
 };
+
+AggregateOperation::AggregateOperation(Expression expression, Operator operator_, util::Optional<Property> property)
+: expression(std::make_unique<Expression>(std::move(expression)))
+, operator_(operator_)
+, property(std::move(property))
+{
+    // FIXME: Property can be optional if the end of the key path is a primitive array?
+    REALM_ASSERT_DEBUG(this->operator_ != Operator::Count ? bool(this->property) : !this->property);
+}
+
+AggregateOperation::AggregateOperation(const AggregateOperation& other)
+: expression(std::make_unique<Expression>(*other.expression))
+, operator_(other.operator_)
+, property(other.property)
+{
+}
+
+AggregateOperation& AggregateOperation::operator=(const AggregateOperation& other)
+{
+    AggregateOperation copy(other);
+    *this = std::move(copy);
+    return *this;
+}
 
 struct Predicate;
 
@@ -428,8 +465,8 @@ public:
 
     CompoundPredicate(const CompoundPredicate&);
     CompoundPredicate& operator=(const CompoundPredicate&);
-    CompoundPredicate(CompoundPredicate&&) = default;
-    CompoundPredicate& operator=(CompoundPredicate&&) = default;
+    CompoundPredicate(CompoundPredicate&&) noexcept = default;
+    CompoundPredicate& operator=(CompoundPredicate&&) noexcept = default;
 
     std::vector<std::unique_ptr<Predicate>> subpredicates;
     Type type;
@@ -533,7 +570,7 @@ CompoundPredicate::Type convert(NSCompoundPredicateType type)
 }
 
 template<typename F>
-struct SubexpressionVisitor;
+struct ExpressionVisitor;
 
 class QueryBuilder {
 public:
@@ -564,9 +601,9 @@ private:
     }
 
     template <typename F>
-    auto subexpression_visitor(F&& function) const
+    auto expression_visitor(F&& function) const
     {
-        return SubexpressionVisitor<F>{m_realm.group, table(), std::forward<F>(function)};
+        return ExpressionVisitor<F>{m_realm.group, table(), std::forward<F>(function)};
     }
 
     Query& m_query;
@@ -622,9 +659,16 @@ Expression QueryBuilder::convertConstant(id constant) const
     @throw RLMPredicateException(@"Unsupported expression", @"Unsupported constant value in expression: %@", constant);
 }
 
+
 Expression QueryBuilder::convert(NSExpression *expression) const
 {
-    switch (expression.expressionType) {
+    NSExpressionType type = expression.expressionType;
+    if (type == 10) {
+        // Treat the undocumented NSKeyPathSpecifierExpressionType as any other key path.
+        type = NSKeyPathExpressionType;
+    }
+
+    switch (type) {
         case NSConstantValueExpressionType:
             return convertConstant(expression.constantValue);
 
@@ -650,6 +694,7 @@ Expression QueryBuilder::convert(NSExpression *expression) const
 
             return ColumnPath(std::move(path));
         }
+
         case NSAggregateExpressionType: {
             NSArray<NSExpression *> *collection = RLMDynamicCast<NSArray>(expression.collection);
             ConstantCollection constantCollection;
@@ -663,6 +708,39 @@ Expression QueryBuilder::convert(NSExpression *expression) const
             }
             return constantCollection;
         }
+
+        case NSFunctionExpressionType:
+            // Special-case SUBQUERY(…).@count. Other @op operations are handled as part of the key path.
+            if ([expression.function isEqualToString:@"valueForKeyPath:"]
+                && expression.operand.expressionType == NSSubqueryExpressionType
+                && expression.arguments.count == 1
+                && [expression.arguments[0].keyPath isEqualToString:@"@count"]) {
+                return AggregateOperation(convert(expression.operand), AggregateOperation::Operator::Count, util::none);
+            }
+            if ([expression.function isEqualToString:@"valueForKeyPath:"]
+                && expression.operand.expressionType == NSEvaluatedObjectExpressionType
+                && expression.arguments.count == 1) {
+                // Treat [SELF valueForKeyPath:@"key.path"] as key.path.
+                return convert((NSExpression *)expression.arguments[0]);
+            }
+            @throw RLMPredicateException(@"Unsupported expression", @"Unsupported expression: %@ (%zu)", expression, static_cast<size_t>(expression.expressionType));
+
+        case NSSubqueryExpressionType: {
+            auto collection = convert((NSExpression *)expression.collection);
+            auto* collectionColumn = collection.target<ColumnPath>();
+            if (!collectionColumn || !collectionColumn->is_any_object_type() || !collectionColumn->has_any_to_many_links()) {
+                // FIXME: Throw a meaningful exception.
+                abort();
+            }
+
+            // Eliminate references to the iteration variable in the subquery.
+            NSPredicate *subqueryPredicate = [expression.predicate predicateWithSubstitutionVariables:@{ expression.variable : [NSExpression expressionForEvaluatedObject] }];
+
+            RLMObjectSchema *objectSchema = m_realm.schema[@(collectionColumn->path.back().object_type.c_str())];
+            Query subquery = RLMPredicateToQuery(subqueryPredicate, objectSchema, m_realm);
+            return Subquery{std::move(*collection.target<ColumnPath>()), std::move(subquery)};
+        }
+
         default:
             @throw RLMPredicateException(@"Unsupported expression", @"Unsupported expression: %@ (%zu)", expression, static_cast<size_t>(expression.expressionType));
     }
@@ -710,7 +788,21 @@ Predicate QueryBuilder::lower(ComparisonPredicate predicate) const
                 @throw RLMPredicateException(@"Unsupported predicate", @"BETWEEN must compare a key path with an aggregate of two elements.");
             }
 
-            // FIXME: Convert the to-many case to a subquery.
+            if (columnPath->has_any_to_many_links()) {
+                ColumnPath linkColumn({columnPath->path.begin(), std::prev(columnPath->path.end())});
+                REALM_ASSERT(linkColumn.is_any_object_type());
+
+                ColumnPath targetColumn({std::prev(columnPath->path.end()), columnPath->path.end()});
+                ComparisonPredicate between{std::move(targetColumn), std::move(*constantCollection), Operator::Between, predicate.options};
+
+                RLMObjectSchema *linkTargetObjectSchema = m_realm.schema[@(linkColumn.path.back().object_type.c_str())];
+                Query q;
+                // FIXME: QueryBuilder should be split so that NSPredicate -> Predicate is separate from Predicate -> Query.
+                Query subquery = QueryBuilder(q, m_realm, linkTargetObjectSchema).as_query(lower(between));
+                AggregateOperation count(Subquery{linkColumn, std::move(subquery)}, AggregateOperation::Operator::Count, util::none);
+                return ComparisonPredicate{std::move(count), Constant(0), Operator::GreaterThan, ComparisonPredicate::Options::None};
+            }
+
             std::vector<std::unique_ptr<Predicate>> subpredicates(2);
             subpredicates[0] = std::make_unique<Predicate>(ComparisonPredicate{*columnPath, (*constantCollection)[0], Operator::GreaterThanOrEqual, predicate.options});
             subpredicates[1] = std::make_unique<Predicate>(ComparisonPredicate{*columnPath, (*constantCollection)[1], Operator::LessThanOrEqual, predicate.options});
@@ -829,9 +921,62 @@ auto visit_property_type(F&& function, PropertyType type)
     }
 }
 
+template<typename>
+struct SubexpressionVisitor;
+
+template <typename F>
+auto subexpression_visitor(Group& group, Table& table, F&& function)
+{
+    return SubexpressionVisitor<F>{group, table, std::forward<F>(function)};
+}
+
+template <typename Derived>
+struct BaseVisitAggregateOperator {
+    // FIXME: Add an overload for when both arguments are constants and map that to `TrueExpression` / `FalseExpression`?
+
+    template <typename T, typename... Args>
+    using result_of_call_member = decltype(T::call(std::declval<Args>()...));
+
+    template <typename... Args>
+    auto operator()(Args&&... args) const
+    {
+        using call_result_type = detected_t<result_of_call_member, Derived, Args...>;
+        using is_subexpr = std::integral_constant<bool, std::is_base_of<Subexpr, call_result_type>::value>;
+        return call(is_subexpr(), std::forward<Args>(args)...);
+    }
+
+    template <typename... Args>
+    auto call(std::true_type, Args&&... args) const
+    {
+        return Derived::call(std::forward<Args>(args)...);
+    }
+
+    template <typename T, typename... Args>
+    Subexpr call(std::false_type, T&&, Args&&...) const
+    {
+        @throw RLMPredicateException(@"Unsupported target for aggregate operator",
+                                     @"Cannot apply %s operator to %s", static_cast<const Derived&>(*this).name(),
+                                     typeid(T).name());
+    }
+};
+
+struct VisitCount : BaseVisitAggregateOperator<VisitCount> {
+    template <typename T>
+    static auto call(T&& expression) -> decltype(expression.count())
+    {
+        return expression.count();
+    }
+
+    const char *name() const { return "count"; }
+};
 
 template <typename F>
 struct SubexpressionVisitor {
+    SubexpressionVisitor(Group& group, Table& table, F function)
+    : group(group), table(table), function(std::move(function))
+    {
+    }
+
     Query operator()(const Constant& value)
     {
         return apply(function, value);
@@ -840,19 +985,22 @@ struct SubexpressionVisitor {
     Query operator()(const ColumnPath& column)
     {
         return visit_property_type([&](auto type) {
-            for (auto it = column.path.begin(); it != std::prev(column.path.end()); ++it) {
-                auto& prop = *it;
-                if (prop.type == PropertyType::LinkingObjects) {
-                    auto source_table = ObjectStore::table_for_object_type(group, prop.object_type);
-                    table.backlink(*source_table, source_table->get_column_index(prop.link_origin_property_name));
-                }
-                else {
-                    table.link(prop.table_column);
-                }
-            }
-
+            walk_links(column);
             return function(table.column<decltype(type)>(column.path.back().table_column));
         }, column.type());
+    }
+
+    Query operator()(const Subquery& subquery)
+    {
+        walk_links(subquery.column);
+        auto& prop = subquery.column.path.back();
+        if (prop.type == PropertyType::LinkingObjects) {
+            auto source_table = ObjectStore::table_for_object_type(group, prop.object_type);
+            return function(table.column<BackLink>(*source_table, source_table->get_column_index(prop.link_origin_property_name), subquery.query));
+        }
+        else {
+            return function(table.column<LinkList>(prop.table_column, subquery.query));
+        }
     }
 
     Query operator()(const ConstantCollection&)
@@ -864,12 +1012,44 @@ struct SubexpressionVisitor {
 
     Query operator()(const AggregateOperation&)
     {
-        @throw RLMPredicateException(@"Unsupported subexpression type", @"Unsupported subexpression type");
+        // AggregateOperation is only supported at the top level of expressions, provided by ExpressionVisitor below.
+        abort();
     }
 
+protected:
     Group& group;
     Table& table;
     F function;
+
+    void walk_links(const ColumnPath& column)
+    {
+        for (auto it = column.path.begin(); it != std::prev(column.path.end()); ++it) {
+            auto& prop = *it;
+            if (prop.type == PropertyType::LinkingObjects) {
+                auto source_table = ObjectStore::table_for_object_type(group, prop.object_type);
+                table.backlink(*source_table, source_table->get_column_index(prop.link_origin_property_name));
+            }
+            else {
+                table.link(prop.table_column);
+            }
+        }
+    }
+};
+
+template <typename F>
+struct ExpressionVisitor : SubexpressionVisitor<F> {
+    using Base = SubexpressionVisitor<F>;
+
+    using Base::Base;
+    using Base::operator();
+
+    Query operator()(const AggregateOperation& aggregate)
+    {
+        return apply(subexpression_visitor(Base::group, Base::table, [&](auto&& expression) {
+            // FIXME: Visit the appropriate operator.
+            return Base::function(VisitCount()(expression));
+        }), *aggregate.expression);
+    }
 };
 
 
@@ -1127,8 +1307,8 @@ template <typename T> T& unwrap_unique_ptr(T& value) { return value; }
 
 Query QueryBuilder::as_query(const ComparisonPredicate& comparison) const
 {
-    return apply(subexpression_visitor([&](auto&& left) {
-        return apply(subexpression_visitor([&](auto&& right) {
+    return apply(expression_visitor([&](auto&& left) {
+        return apply(expression_visitor([&](auto&& right) {
             return visit_comparison_operator([&](auto op) {
                 using Options = ComparisonPredicate::Options;
 
