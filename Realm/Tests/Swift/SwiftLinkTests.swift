@@ -114,6 +114,7 @@ class SwiftLinkTests: RLMTestCase {
         realm.add(source)
         try! realm.commitWriteTransaction()
 
+        XCTAssertNotNil(target.realm)
         XCTAssertEqual(1, target.backlinks!.count)
         XCTAssertEqual(1234, (target.backlinks!.firstObject() as! SwiftLinkSourceObject).id)
     }

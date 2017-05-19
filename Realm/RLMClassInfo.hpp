@@ -80,6 +80,9 @@ public:
     // Get the info for the target of the link at the given property index.
     RLMClassInfo &linkTargetType(size_t propertyIndex);
 
+    // Get the info for the target of the given property
+    RLMClassInfo &linkTargetType(realm::Property const& property);
+
     void releaseTable() { m_table = nullptr; }
 
 private:

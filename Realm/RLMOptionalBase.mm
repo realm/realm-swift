@@ -49,7 +49,7 @@
         if (_property.isPrimary) {
             @throw RLMException(@"Primary key can't be changed after an object is inserted.");
         }
-        RLMDynamicSet(_object, _property, underlyingValue, RLMCreationOptionsNone);
+        RLMDynamicSet(_object, _property, underlyingValue);
     }
     else {
         NSString *propertyName = _property.name;

@@ -445,3 +445,8 @@ class SwiftObjcRenamedObject: Object {
 class SwiftObjcArbitrarilyRenamedObject: Object {
     dynamic var boolCol = false
 }
+
+class SwiftCircleObject: Object {
+    dynamic var obj: SwiftCircleObject?
+    let array = List<SwiftCircleObject>()
+}

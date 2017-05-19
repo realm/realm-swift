@@ -78,6 +78,11 @@ RLMClassInfo &RLMClassInfo::linkTargetType(size_t propertyIndex) {
     return *m_linkTargets[propertyIndex];
 }
 
+RLMClassInfo &RLMClassInfo::linkTargetType(realm::Property const& property) {
+    REALM_ASSERT(property.type == PropertyType::Object || property.type == PropertyType::Array);
+    return linkTargetType(&property - &objectSchema->persisted_properties[0]);
+}
+
 RLMSchemaInfo::impl::iterator RLMSchemaInfo::begin() noexcept { return m_objects.begin(); }
 RLMSchemaInfo::impl::iterator RLMSchemaInfo::end() noexcept { return m_objects.end(); }
 RLMSchemaInfo::impl::const_iterator RLMSchemaInfo::begin() const noexcept { return m_objects.begin(); }
