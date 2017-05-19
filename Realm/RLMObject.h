@@ -194,10 +194,10 @@ NS_ASSUME_NONNULL_BEGIN
  argument's type is the same as the receiver, and the objects have identical values for
  their managed properties, this method does nothing.
 
- If the object is being updated and the `value` argument is a dictionary or a key-value
- coding compliant object, any property on the object that doesn't have a corresponding
- entry in the `value` argument will remain untouched. Nullable properties on the object can
- be set to nil by using `NSNull` as the updated value.
+ If the object is being updated, all properties defined in its schema will be set by copying from
+ `value` using key-value coding. If the `value` argument does not respond to `valueForKey:` for a
+ given property name (or getter name, if defined), that value will remain untouched.
+ Nullable properties on the object can be set to nil by using `NSNull` as the updated value.
 
  If the `value` argument is an array, all properties must be present, valid and in the same
  order as the properties defined in the model.
@@ -229,10 +229,10 @@ NS_ASSUME_NONNULL_BEGIN
  argument's type is the same as the receiver, and the objects have identical values for
  their managed properties, this method does nothing.
 
- If the object is being updated and the `value` argument is a dictionary or a key-value
- coding compliant object, any property on the object that doesn't have a corresponding
- entry in the `value` argument will remain untouched. Nullable properties on the object can
- be set to nil by using `NSNull` as the updated value.
+ If the object is being updated, all properties defined in its schema will be set by copying from
+ `value` using key-value coding. If the `value` argument does not respond to `valueForKey:` for a
+ given property name (or getter name, if defined), that value will remain untouched.
+ Nullable properties on the object can be set to nil by using `NSNull` as the updated value.
 
  If the `value` argument is an array, all properties must be present, valid and in the same
  order as the properties defined in the model.
