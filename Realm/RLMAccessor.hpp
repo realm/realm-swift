@@ -26,7 +26,7 @@
 class RLMClassInfo;
 class RLMObservationInfo;
 
-// realm::util::Optional<id> doesn't work due to that Objective-C types can't
+// realm::util::Optional<id> doesn't work because Objective-C types can't
 // be members of unions with ARC, so this covers the subset of Optional that we
 // actually need.
 struct RLMOptionalId {
@@ -38,7 +38,7 @@ struct RLMOptionalId {
 
 class RLMAccessorContext {
 public:
-    // Accessor context interfact
+    // Accessor context interface
     RLMAccessorContext(RLMAccessorContext& parent, realm::Property const& property);
 
     id box(realm::List&&);
@@ -106,6 +106,9 @@ private:
     // for every property
     NSDictionary *_defaultValues;
 
+    // A temporary hack to preserve the existing behavior for
+    // https://github.com/realm/realm-cocoa/issues/4926
+    // FIXME: remove in 3.0
     bool _nilHack = false;
 
     RLMObservationInfo *_observationInfo = nullptr;
