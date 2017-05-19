@@ -13,6 +13,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Suppress `-Wdocumentation` warnings in Realm C++ headers when using CocoaPods
   with Xcode 8.3.2.
+* Throw an appropriate error rather than crashing when an RLMArray is assigned
+  to an RLMArray property of a different type.
 
 2.7.0 Release notes (2017-05-03)
 =============================================================
