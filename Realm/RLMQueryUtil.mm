@@ -396,7 +396,7 @@ AggregateOperation::AggregateOperation(Expression expression, Operator operator_
 , property(std::move(property))
 {
     // FIXME: Property can be optional if the end of the key path is a primitive array?
-    REALM_ASSERT_DEBUG(this->operator_ != Operator::Count ? bool(this->property) : !this->property);
+    // REALM_ASSERT_DEBUG(this->operator_ != Operator::Count ? bool(this->property) : !this->property);
 }
 
 AggregateOperation::AggregateOperation(const AggregateOperation& other)
@@ -595,6 +595,9 @@ private:
     Query as_query(const CompoundPredicate&) const;
     Query as_query(const ConstantPredicate&) const;
 
+    ColumnPath column_path_from_key_path(NSString *keyPath) const;
+    AggregateOperation aggregate_operation_from_key_path(NSString *keyPath) const;
+
     Table& table() const
     {
         return *m_realm->_info[m_objectSchema.className].table();
@@ -659,6 +662,91 @@ Expression QueryBuilder::convertConstant(id constant) const
     @throw RLMPredicateException(@"Unsupported expression", @"Unsupported constant value in expression: %@", constant);
 }
 
+bool key_path_contains_collection_operator(NSString *keyPath) {
+    return [keyPath rangeOfString:@"@"].location != NSNotFound;
+}
+
+NSString *get_collection_operation_name_from_key_path(NSString *keyPath, NSString **leadingKeyPath, NSString **trailingKey) {
+    NSRange at  = [keyPath rangeOfString:@"@"];
+    if (at.location == NSNotFound || at.location >= keyPath.length - 1) {
+        @throw RLMPredicateException(@"Invalid key path", @"'%@' is not a valid key path'", keyPath);
+    }
+
+    if (at.location == 0 || [keyPath characterAtIndex:at.location - 1] != '.') {
+        @throw RLMPredicateException(@"Invalid key path", @"'%@' is not a valid key path'", keyPath);
+    }
+
+    NSRange trailingKeyRange = [keyPath rangeOfString:@"." options:0 range:{at.location, keyPath.length - at.location} locale:nil];
+
+    *leadingKeyPath = [keyPath substringToIndex:at.location - 1];
+    if (trailingKeyRange.location == NSNotFound) {
+        *trailingKey = nil;
+        return [keyPath substringFromIndex:at.location];
+    } else {
+        *trailingKey = [keyPath substringFromIndex:trailingKeyRange.location + 1];
+        return [keyPath substringWithRange:{at.location, trailingKeyRange.location - at.location}];
+    }
+}
+
+ColumnPath QueryBuilder::column_path_from_key_path(NSString *keyPathString) const
+{
+    auto keyPath = key_path_from_string(m_realm.schema, m_objectSchema, keyPathString);
+    std::vector<Property> path;
+    path.reserve(keyPath.links.size() + 1);
+
+    auto currentClassInfo = &m_realm->_info[m_objectSchema.className];
+    for (RLMProperty *link : keyPath.links) {
+        path.push_back(link.objectStoreCopy);
+        if (link.type != RLMPropertyTypeLinkingObjects) {
+            path.back().table_column = currentClassInfo->tableColumn(link);
+            currentClassInfo = &currentClassInfo->linkTargetType(link.index);
+        }
+        else {
+            currentClassInfo = &m_realm->_info[link.objectClassName];
+        }
+    }
+
+    path.push_back(keyPath.property.objectStoreCopy);
+    path.back().table_column = currentClassInfo->tableColumn(keyPath.property);
+
+    return ColumnPath(std::move(path));
+}
+
+AggregateOperation QueryBuilder::aggregate_operation_from_key_path(NSString *keyPath) const
+{
+    NSString *leadingKeyPath;
+    NSString *trailingKey;
+    NSString *operatorName = get_collection_operation_name_from_key_path(keyPath, &leadingKeyPath, &trailingKey);
+
+    auto linkColumn = column_path_from_key_path(leadingKeyPath);
+    util::Optional<Property> property;
+    if (trailingKey) {
+        RLMPrecondition([trailingKey rangeOfString:@"."].location == NSNotFound, @"Invalid key path",
+                        @"Right side of collection operator may only have a single level key");
+        NSString *fullKeyPath = [leadingKeyPath stringByAppendingFormat:@".%@", trailingKey];
+        property = column_path_from_key_path(fullKeyPath).path.back();
+    }
+
+    using Operator = AggregateOperation::Operator;
+
+    Operator operator_;
+    if ([operatorName isEqualToString:@"@count"])
+        operator_ = Operator::Count;
+    else if ([operatorName isEqualToString:@"@sum"])
+        operator_ = Operator::Sum;
+    else if ([operatorName isEqualToString:@"@min"])
+        operator_ = Operator::Min;
+    else if ([operatorName isEqualToString:@"@max"])
+        operator_ = Operator::Max;
+    else if ([operatorName isEqualToString:@"@avg"])
+        operator_ = Operator::Average;
+    else {
+        // FIXME: Throw.
+        abort();
+    }
+
+    return AggregateOperation(std::move(linkColumn), operator_, property);
+}
 
 Expression QueryBuilder::convert(NSExpression *expression) const
 {
@@ -673,26 +761,10 @@ Expression QueryBuilder::convert(NSExpression *expression) const
             return convertConstant(expression.constantValue);
 
         case NSKeyPathExpressionType: {
-            auto keyPath = key_path_from_string(m_realm.schema, m_objectSchema, expression.keyPath);
-            std::vector<Property> path;
-            path.reserve(keyPath.links.size() + 1);
+            if (key_path_contains_collection_operator(expression.keyPath))
+                return aggregate_operation_from_key_path(expression.keyPath);
 
-            auto currentClassInfo = &m_realm->_info[m_objectSchema.className];
-            for (RLMProperty *link : keyPath.links) {
-                path.push_back(link.objectStoreCopy);
-                if (link.type != RLMPropertyTypeLinkingObjects) {
-                    path.back().table_column = currentClassInfo->tableColumn(link);
-                    currentClassInfo = &currentClassInfo->linkTargetType(link.index);
-                }
-                else {
-                    currentClassInfo = &m_realm->_info[link.objectClassName];
-                }
-            }
-
-            path.push_back(keyPath.property.objectStoreCopy);
-            path.back().table_column = currentClassInfo->tableColumn(keyPath.property);
-
-            return ColumnPath(std::move(path));
+            return column_path_from_key_path(expression.keyPath);
         }
 
         case NSAggregateExpressionType: {
@@ -879,6 +951,9 @@ Query QueryBuilder::as_query(const Predicate& predicate) const
     }, predicate);
 }
 
+// Core defines BackLink as an alias for Link, but we need to be able to handle them separately.
+struct BackLinkTag { };
+
 template <typename F>
 auto visit_property_type(F&& function, PropertyType type)
 {
@@ -908,8 +983,7 @@ auto visit_property_type(F&& function, PropertyType type)
         case PropertyType::Object:
             return function(Link{});
         case PropertyType::LinkingObjects:
-            @throw RLMPredicateException(@"Unsupported property type", @"Unsupported property type");
-            return Query();
+            return function(BackLinkTag{});
 
         case PropertyType::Any:
         case PropertyType::Indexed:
@@ -970,6 +1044,64 @@ struct VisitCount : BaseVisitAggregateOperator<VisitCount> {
     const char *name() const { return "count"; }
 };
 
+struct VisitSum : BaseVisitAggregateOperator<VisitSum> {
+    template <typename T, typename... Args>
+    static auto call(T&& expression, Args&&... args) -> decltype(expression.sum(std::forward<Args>(args)...))
+    {
+        return expression.sum(std::forward<Args>(args)...);
+    }
+
+    const char *name() const { return "sum"; }
+};
+
+struct VisitMin : BaseVisitAggregateOperator<VisitMin> {
+    template <typename T, typename... Args>
+    static auto call(T&& expression, Args&&... args) -> decltype(expression.min(std::forward<Args>(args)...))
+    {
+        return expression.min(std::forward<Args>(args)...);
+    }
+
+    const char *name() const { return "min"; }
+};
+
+struct VisitMax : BaseVisitAggregateOperator<VisitMax> {
+    template <typename T, typename... Args>
+    static auto call(T&& expression, Args&&... args) -> decltype(expression.max(std::forward<Args>(args)...))
+    {
+        return expression.max(std::forward<Args>(args)...);
+    }
+
+    const char *name() const { return "max"; }
+};
+struct VisitAverage : BaseVisitAggregateOperator<VisitAverage> {
+    template <typename T, typename... Args>
+    static auto call(T&& expression, Args&&... args) -> decltype(expression.average(std::forward<Args>(args)...))
+    {
+        return expression.average(std::forward<Args>(args)...);
+    }
+
+    const char *name() const { return "average"; }
+};
+
+template <typename F>
+auto visit_aggregate_operator(F&& function, AggregateOperation::Operator operator_)
+{
+    using Operator = AggregateOperation::Operator;
+
+    switch (operator_) {
+        case Operator::Count:
+            return function(VisitCount());
+        case Operator::Sum:
+            return function(VisitSum());
+        case Operator::Min:
+            return function(VisitMin());
+        case Operator::Max:
+            return function(VisitMax());
+        case Operator::Average:
+            return function(VisitAverage());
+    }
+}
+
 template <typename F>
 struct SubexpressionVisitor {
     SubexpressionVisitor(Group& group, Table& table, F function)
@@ -984,10 +1116,19 @@ struct SubexpressionVisitor {
 
     Query operator()(const ColumnPath& column)
     {
-        return visit_property_type([&](auto type) {
-            walk_links(column);
-            return function(table.column<decltype(type)>(column.path.back().table_column));
-        }, column.type());
+        auto& prop = column.path.back();
+        auto type_handler = util::overload(
+                                           [&](auto type) {
+                                               walk_links(column);
+                                               return function(table.column<decltype(type)>(prop.table_column));
+                                           },
+                                           [&](BackLinkTag) {
+                                               walk_links(column);
+                                               auto source_table = ObjectStore::table_for_object_type(group, prop.object_type);
+                                               return function(table.column<BackLink>(*source_table, source_table->get_column_index(prop.link_origin_property_name)));
+                                           });
+
+        return visit_property_type(type_handler, column.type());
     }
 
     Query operator()(const Subquery& subquery)
@@ -1036,6 +1177,18 @@ protected:
     }
 };
 
+template <typename T, typename F, typename E, typename=void_t<decltype(std::declval<E>().template column<T>(int{}))>>
+Query aggregate_subproperty(F&& function, E&& expression, const Property& property)
+{
+    return function(expression.template column<T>(property.table_column));
+}
+
+template <typename T, typename... Args>
+Query aggregate_subproperty(Args&&...)
+{
+    abort();
+}
+
 template <typename F>
 struct ExpressionVisitor : SubexpressionVisitor<F> {
     using Base = SubexpressionVisitor<F>;
@@ -1046,8 +1199,21 @@ struct ExpressionVisitor : SubexpressionVisitor<F> {
     Query operator()(const AggregateOperation& aggregate)
     {
         return apply(subexpression_visitor(Base::group, Base::table, [&](auto&& expression) {
-            // FIXME: Visit the appropriate operator.
-            return Base::function(VisitCount()(expression));
+            return visit_aggregate_operator([&](auto op) -> Query {
+                if (aggregate.property) {
+                    return visit_property_type(util::overload(
+                                                              [&](auto type) {
+                                                                  return aggregate_subproperty<decltype(type)>([&](auto&& expression) -> Query {
+                                                                      return Base::function(op(expression));
+                                                                  }, std::forward<decltype(expression)>(expression), *aggregate.property);
+                                                              },
+                                                              [&](BackLinkTag) -> Query {
+                                                                  abort();
+                                                              })
+                                               , aggregate.property->type);
+                }
+                return Base::function(op(expression));
+            }, aggregate.operator_);
         }), *aggregate.expression);
     }
 };
