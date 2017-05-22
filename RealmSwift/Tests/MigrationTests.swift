@@ -43,7 +43,7 @@ private func dynamicRealm(_ fileURL: URL) -> RLMRealm {
 
 class MigrationTests: TestCase {
 
-    // MARK Utility methods
+    // MARK: Utility methods
 
     // create realm at path and test version is 0
     private func createAndTestRealmAtURL(_ fileURL: URL) {
@@ -85,7 +85,7 @@ class MigrationTests: TestCase {
         Realm.Configuration.defaultConfiguration = config
     }
 
-    // MARK Test cases
+    // MARK: Test cases
 
     func testSetDefaultRealmSchemaVersion() {
         createAndTestRealmAtURL(defaultRealmURL())

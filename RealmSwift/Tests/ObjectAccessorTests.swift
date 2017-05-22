@@ -95,7 +95,7 @@ class ObjectAccessorTests: TestCase {
         try! realm.write {
             let obj = SwiftAllIntSizesObject()
 
-            let testObject: (Void) -> Void = {
+            let testObject: () -> Void = {
                 obj.objectSchema.properties.map { $0.name }.forEach { obj[$0] = 0 }
 
                 obj["int8"] = NSNumber(value: v8)
