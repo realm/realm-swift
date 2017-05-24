@@ -74,6 +74,13 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
 - (void)enumerateObjects:(NSString *)className block:(__attribute__((noescape)) RLMObjectMigrationBlock)block;
 
 /**
+ Enumerates all the objects matching the given predicate in the collection.
+ 
+ @param predicate   The predicate with which to filter the objects.
+ */
+- (void)enumerateObjects:(NSString *)className withPredicate:(NSPredicate *)predicate  block:(__attribute__((noescape)) RLMObjectMigrationBlock)block;
+
+/**
  Creates and returns an `RLMObject` instance of type `className` in the Realm being migrated.
  
  The `value` argument is used to populate the object. It can be a key-value coding compliant object, an array or 
