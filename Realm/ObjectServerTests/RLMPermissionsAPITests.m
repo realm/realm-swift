@@ -108,6 +108,8 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
 @interface RLMPermissionsAPITests : RLMSyncTestCase
 
+@property (nonatomic, strong) NSString *currentUsernameBase;
+
 @property (nonatomic, strong) RLMSyncUser *userA;
 @property (nonatomic, strong) RLMSyncUser *userB;
 @property (nonatomic, strong) RLMSyncUser *userC;
@@ -119,20 +121,22 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 - (void)setUp {
     [super setUp];
     NSString *accountNameBase = [[NSUUID UUID] UUIDString];
-    NSString *userNameA = [accountNameBase stringByAppendingString:@"_A"];
+    self.currentUsernameBase = accountNameBase;
+    NSString *userNameA = [accountNameBase stringByAppendingString:@"_A@example.org"];
     self.userA = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:userNameA register:YES]
                                         server:[RLMSyncTestCase authServerURL]];
 
-    NSString *userNameB = [accountNameBase stringByAppendingString:@"_B"];
+    NSString *userNameB = [accountNameBase stringByAppendingString:@"_B@example.org"];
     self.userB = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:userNameB register:YES]
                                         server:[RLMSyncTestCase authServerURL]];
 
-    NSString *userNameC = [accountNameBase stringByAppendingString:@"_C"];
+    NSString *userNameC = [accountNameBase stringByAppendingString:@"_C@example.org"];
     self.userC = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:userNameC register:YES]
                                         server:[RLMSyncTestCase authServerURL]];
 }
 
 - (void)tearDown {
+    self.currentUsernameBase = nil;
     [self.userA logOut];
     [self.userB logOut];
     [self.userC logOut];
@@ -354,6 +358,54 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     CHECK_COUNT(8, SyncObject, userARealm);
     [self waitForDownloadsForUser:self.userB url:userAURLResolved];
     CHECK_COUNT(8, SyncObject, userBRealm);
+}
+
+/// If user A grants user B write access to a Realm via username, user B should be able to write to it.
+- (void)testWriteAccessViaUsername {
+    __block void(^workBlock)(NSError *) = ^(NSError *err) {
+        XCTFail(@"Error handler should not be called unless explicitly expected. Error: %@", err);
+    };
+    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, __unused RLMSyncSession *session) {
+        if (workBlock) {
+            workBlock(error);
+        }
+    }];
+
+    NSString *testName = NSStringFromSelector(_cmd);
+    // Open a Realm for user A.
+    NSURL *userAURL = makeTestURL(testName, nil);
+    RLMRealm *userARealm = [self openRealmForURL:userAURL user:self.userA];
+
+    // Have user A add some items to the Realm.
+    [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+    [self waitForUploadsForUser:self.userA url:userAURL];
+    CHECK_COUNT(3, SyncObject, userARealm);
+
+    // Give user B write permissions to that Realm via user B's username.
+    NSString *userBUsername = [NSString stringWithFormat:@"%@_B@example.org", self.currentUsernameBase];
+    RLMSyncPermissionValue *p = [[RLMSyncPermissionValue alloc] initWithRealmPath:[userAURL path]
+                                                                         username:userBUsername
+                                                                      accessLevel:RLMSyncAccessLevelWrite];
+    // Set the permission.
+    XCTestExpectation *ex = [self expectationWithDescription:@"Setting a permission should work."];
+    [self.userA applyPermission:p callback:^(NSError *err) {
+        XCTAssert(!err);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Open the Realm for user B. Since user B has write privileges, they should be able to open it 'normally'.
+    NSURL *userBURL = makeTestURL(testName, self.userA);
+    RLMRealm *userBRealm = [self openRealmForURL:userBURL user:self.userB];
+    [self waitForDownloadsForUser:self.userB url:userBURL];
+    CHECK_COUNT(3, SyncObject, userBRealm);
+
+    // Add some objects using user B.
+    [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
+    [self waitForUploadsForUser:self.userB url:userBURL];
+    CHECK_COUNT(5, SyncObject, userBRealm);
+    [self waitForUploadsForUser:self.userA url:userAURL];
+    CHECK_COUNT(5, SyncObject, userARealm);
 }
 
 #pragma mark - Permission change API
