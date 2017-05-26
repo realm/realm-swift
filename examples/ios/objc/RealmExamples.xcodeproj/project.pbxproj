@@ -21,6 +21,7 @@
 		227D20E41CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E51CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
 		227D20E61CB6009D008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		2288CBD21DF7B2CA00E73440 /* RLMStartView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2288CBD11DF7B2CA00E73440 /* RLMStartView.m */; };
 		3F78C9BD1B431CF300A0988E /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
 		3F78C9BE1B431CF300A0988E /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
 		3F78C9BF1B431CF300A0988E /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E8F70ED019BA52E8006F60D5 /* libc++.dylib */; };
@@ -117,6 +118,19 @@
 		F18464671DC16CDA00DAB8B9 /* SwatchesView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464621DC16CDA00DAB8B9 /* SwatchesView.m */; };
 		F184646A1DC16D3700DAB8B9 /* CanvasView.m in Sources */ = {isa = PBXBuildFile; fileRef = F18464691DC16D3700DAB8B9 /* CanvasView.m */; };
 		F196C2EF1DD6442400AFB53B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20DD1CB6009D008F641B /* LaunchScreen.xib */; };
+		F1BC390C1DF2573700C4DCCC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F1BC38F71DF2573700C4DCCC /* AppDelegate.m */; };
+		F1BC390D1DF2573700C4DCCC /* RLMViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F1BC38FB1DF2573700C4DCCC /* RLMViewController.m */; };
+		F1BC390E1DF2573700C4DCCC /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F1BC38FC1DF2573700C4DCCC /* Images.xcassets */; };
+		F1BC390F1DF2573700C4DCCC /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F1BC38FD1DF2573700C4DCCC /* main.m */; };
+		F1BC39101DF2573700C4DCCC /* RLMPuzzle.m in Sources */ = {isa = PBXBuildFile; fileRef = F1BC39001DF2573700C4DCCC /* RLMPuzzle.m */; };
+		F1BC39111DF2573700C4DCCC /* RLMPuzzlePiece.m in Sources */ = {isa = PBXBuildFile; fileRef = F1BC39021DF2573700C4DCCC /* RLMPuzzlePiece.m */; };
+		F1BC39131DF2573700C4DCCC /* RLMPuzzlePieceView.m in Sources */ = {isa = PBXBuildFile; fileRef = F1BC39071DF2573700C4DCCC /* RLMPuzzlePieceView.m */; };
+		F1BC39141DF2573700C4DCCC /* RLMPuzzleView.m in Sources */ = {isa = PBXBuildFile; fileRef = F1BC39091DF2573700C4DCCC /* RLMPuzzleView.m */; };
+		F1BC39191DF257F300C4DCCC /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1BC39181DF257F200C4DCCC /* Realm.framework */; };
+		F1BC391A1DF257F900C4DCCC /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */; };
+		F1BC391B1DF2580000C4DCCC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71A919BA502500F3EDB4 /* Foundation.framework */; };
+		F1BC391C1DF2580700C4DCCC /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB71AD19BA502500F3EDB4 /* UIKit.framework */; };
+		F1BC391D1DF2581D00C4DCCC /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = F18464511DC1551200DAB8B9 /* libc++.tbd */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -157,6 +171,8 @@
 		0295B8FE19D102880036D6C3 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0A73D4401B1442B200E1E8EE /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../../README.md; sourceTree = SOURCE_ROOT; };
 		227D20DD1CB6009D008F641B /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
+		2288CBD11DF7B2CA00E73440 /* RLMStartView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RLMStartView.m; path = Puzzle/Views/RLMStartView.m; sourceTree = "<group>"; };
+		2288CBD41DF7B44C00E73440 /* RLMConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMConstants.h; sourceTree = "<group>"; };
 		3F78C9AB1B431CDF00A0988E /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = RACTableView/AppDelegate.h; sourceTree = "<group>"; };
 		3F78C9AC1B431CDF00A0988E /* TableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TableViewController.h; path = RACTableView/TableViewController.h; sourceTree = "<group>"; };
 		3F78C9AD1B431CDF00A0988E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = RACTableView/Images.xcassets; sourceTree = "<group>"; };
@@ -259,6 +275,26 @@
 		F18464681DC16D3700DAB8B9 /* CanvasView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CanvasView.h; sourceTree = "<group>"; };
 		F18464691DC16D3700DAB8B9 /* CanvasView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CanvasView.m; sourceTree = "<group>"; };
 		F18DC0A31DC2AFCB007D2D69 /* Constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Constants.h; sourceTree = "<group>"; };
+		F1BC38DF1DF2571600C4DCCC /* Puzzle.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Puzzle.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1BC38F61DF2573700C4DCCC /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		F1BC38F71DF2573700C4DCCC /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		F1BC38FA1DF2573700C4DCCC /* RLMViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMViewController.h; sourceTree = "<group>"; };
+		F1BC38FB1DF2573700C4DCCC /* RLMViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMViewController.m; sourceTree = "<group>"; };
+		F1BC38FC1DF2573700C4DCCC /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		F1BC38FD1DF2573700C4DCCC /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F1BC38FF1DF2573700C4DCCC /* RLMPuzzle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzle.h; sourceTree = "<group>"; };
+		F1BC39001DF2573700C4DCCC /* RLMPuzzle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzle.m; sourceTree = "<group>"; };
+		F1BC39011DF2573700C4DCCC /* RLMPuzzlePiece.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzlePiece.h; sourceTree = "<group>"; };
+		F1BC39021DF2573700C4DCCC /* RLMPuzzlePiece.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzlePiece.m; sourceTree = "<group>"; };
+		F1BC39031DF2573700C4DCCC /* Puzzle-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Puzzle-Info.plist"; sourceTree = "<group>"; };
+		F1BC39041DF2573700C4DCCC /* Puzzle.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = Puzzle.entitlements; sourceTree = "<group>"; };
+		F1BC39061DF2573700C4DCCC /* RLMPuzzlePieceView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzlePieceView.h; sourceTree = "<group>"; };
+		F1BC39071DF2573700C4DCCC /* RLMPuzzlePieceView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzlePieceView.m; sourceTree = "<group>"; };
+		F1BC39081DF2573700C4DCCC /* RLMPuzzleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMPuzzleView.h; sourceTree = "<group>"; };
+		F1BC39091DF2573700C4DCCC /* RLMPuzzleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMPuzzleView.m; sourceTree = "<group>"; };
+		F1BC390A1DF2573700C4DCCC /* RLMStartView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMStartView.h; sourceTree = "<group>"; };
+		F1BC390B1DF2573700C4DCCC /* RLMStartView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RLMStartView.m; sourceTree = "<group>"; };
+		F1BC39181DF257F200C4DCCC /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../build/Debug-static/Realm.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -395,6 +431,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F1BC38DC1DF2571600C4DCCC /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1BC391D1DF2581D00C4DCCC /* libc++.tbd in Frameworks */,
+				F1BC391C1DF2580700C4DCCC /* UIKit.framework in Frameworks */,
+				F1BC391B1DF2580000C4DCCC /* Foundation.framework in Frameworks */,
+				F1BC391A1DF257F900C4DCCC /* CoreGraphics.framework in Frameworks */,
+				F1BC39191DF257F300C4DCCC /* Realm.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -480,11 +528,13 @@
 		E8AB719D19BA502500F3EDB4 = {
 			isa = PBXGroup;
 			children = (
+				2288CBD11DF7B2CA00E73440 /* RLMStartView.m */,
 				E8BDBFC71A116FCB00450CFF /* Backlink */,
 				227D20DC1CB6009D008F641B /* Common */,
 				F184641E1DC151CD00DAB8B9 /* Draw */,
 				E8F70EBF19BA50AB006F60D5 /* Encryption */,
 				C0DC41CD1A7072670067156A /* Extension */,
+				F1BC38E01DF2571600C4DCCC /* Puzzle */,
 				E8AB71A819BA502500F3EDB4 /* Frameworks */,
 				E879D9DA1A12AA400035E2EB /* GroupedTableView */,
 				E8F70EAE19BA50A3006F60D5 /* Migration */,
@@ -513,6 +563,7 @@
 				E8AB726619BA504500F3EDB4 /* TableView.app */,
 				C0DC42061A7079D00067156A /* TodayExtension.appex */,
 				F184641D1DC151CD00DAB8B9 /* Draw.app */,
+				F1BC38DF1DF2571600C4DCCC /* Puzzle.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -520,6 +571,7 @@
 		E8AB71A819BA502500F3EDB4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F1BC39181DF257F200C4DCCC /* Realm.framework */,
 				F18464511DC1551200DAB8B9 /* libc++.tbd */,
 				E8AB71AB19BA502500F3EDB4 /* CoreGraphics.framework */,
 				E8AB71A919BA502500F3EDB4 /* Foundation.framework */,
@@ -649,6 +701,56 @@
 				F18464621DC16CDA00DAB8B9 /* SwatchesView.m */,
 				F18464681DC16D3700DAB8B9 /* CanvasView.h */,
 				F18464691DC16D3700DAB8B9 /* CanvasView.m */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		F1BC38E01DF2571600C4DCCC /* Puzzle */ = {
+			isa = PBXGroup;
+			children = (
+				F1BC38FE1DF2573700C4DCCC /* Models */,
+				F1BC39051DF2573700C4DCCC /* Views */,
+				F1BC38F91DF2573700C4DCCC /* Controllers */,
+				2288CBD41DF7B44C00E73440 /* RLMConstants.h */,
+				F1BC38F61DF2573700C4DCCC /* AppDelegate.h */,
+				F1BC38F71DF2573700C4DCCC /* AppDelegate.m */,
+				F1BC38FC1DF2573700C4DCCC /* Images.xcassets */,
+				F1BC38FD1DF2573700C4DCCC /* main.m */,
+				F1BC39031DF2573700C4DCCC /* Puzzle-Info.plist */,
+				F1BC39041DF2573700C4DCCC /* Puzzle.entitlements */,
+			);
+			path = Puzzle;
+			sourceTree = "<group>";
+		};
+		F1BC38F91DF2573700C4DCCC /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				F1BC38FA1DF2573700C4DCCC /* RLMViewController.h */,
+				F1BC38FB1DF2573700C4DCCC /* RLMViewController.m */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		F1BC38FE1DF2573700C4DCCC /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F1BC38FF1DF2573700C4DCCC /* RLMPuzzle.h */,
+				F1BC39001DF2573700C4DCCC /* RLMPuzzle.m */,
+				F1BC39011DF2573700C4DCCC /* RLMPuzzlePiece.h */,
+				F1BC39021DF2573700C4DCCC /* RLMPuzzlePiece.m */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		F1BC39051DF2573700C4DCCC /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F1BC39061DF2573700C4DCCC /* RLMPuzzlePieceView.h */,
+				F1BC39071DF2573700C4DCCC /* RLMPuzzlePieceView.m */,
+				F1BC39081DF2573700C4DCCC /* RLMPuzzleView.h */,
+				F1BC39091DF2573700C4DCCC /* RLMPuzzleView.m */,
+				F1BC390A1DF2573700C4DCCC /* RLMStartView.h */,
+				F1BC390B1DF2573700C4DCCC /* RLMStartView.m */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -850,6 +952,24 @@
 			productReference = F184641D1DC151CD00DAB8B9 /* Draw.app */;
 			productType = "com.apple.product-type.application";
 		};
+		F1BC38DE1DF2571600C4DCCC /* Puzzle */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F1BC38F51DF2571600C4DCCC /* Build configuration list for PBXNativeTarget "Puzzle" */;
+			buildPhases = (
+				F1BC39161DF2578000C4DCCC /* Get device IP */,
+				F1BC38DB1DF2571600C4DCCC /* Sources */,
+				F1BC38DC1DF2571600C4DCCC /* Frameworks */,
+				F1BC38DD1DF2571600C4DCCC /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Puzzle;
+			productName = Puzzle;
+			productReference = F1BC38DF1DF2571600C4DCCC /* Puzzle.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -889,6 +1009,11 @@
 							};
 						};
 					};
+					F1BC38DE1DF2571600C4DCCC = {
+						CreatedOnToolsVersion = 8.2;
+						DevelopmentTeam = QX5CR2FTN2;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = E8AB71A119BA502500F3EDB4 /* Build configuration list for PBXProject "RealmExamples" */;
@@ -911,6 +1036,7 @@
 				C0DC42051A7079D00067156A /* TodayExtension */,
 				E879D9C61A12AA120035E2EB /* GroupedTableView */,
 				3F78C9B51B431CF300A0988E /* RACTableView */,
+				F1BC38DE1DF2571600C4DCCC /* Puzzle */,
 				E8AB720919BA503B00F3EDB4 /* Migration */,
 				E8AB729319BA504900F3EDB4 /* REST */,
 				E8AB71DB19BA503500F3EDB4 /* Simple */,
@@ -1015,6 +1141,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		F1BC38DD1DF2571600C4DCCC /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1BC390E1DF2573700C4DCCC /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -1076,6 +1210,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "LOCAL_IP_ADDR=$(ipconfig getifaddr $(netstat -f inet -rant | awk '/default/ { print $6; exit }'))\necho \"static NSString * const kIPAddress = @\\\"${LOCAL_IP_ADDR:-127.0.0.1}\\\";\" > \"$SRCROOT/Draw/Constants.h\"";
+		};
+		F1BC39161DF2578000C4DCCC /* Get device IP */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Get device IP";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "LOCAL_IP_ADDR=$(ipconfig getifaddr $(netstat -f inet -rant | awk '/default/ { print $6; exit }'))\necho \"static NSString * const kIPAddress = @\\\"${LOCAL_IP_ADDR:-127.0.0.1}\\\";\" > \"$SRCROOT/Puzzle/RLMConstants.h\"";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -1189,6 +1337,21 @@
 				F18464651DC16CDA00DAB8B9 /* UIColor+Realm.m in Sources */,
 				F184646A1DC16D3700DAB8B9 /* CanvasView.m in Sources */,
 				F18464461DC151F000DAB8B9 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F1BC38DB1DF2571600C4DCCC /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F1BC390D1DF2573700C4DCCC /* RLMViewController.m in Sources */,
+				F1BC39131DF2573700C4DCCC /* RLMPuzzlePieceView.m in Sources */,
+				F1BC390F1DF2573700C4DCCC /* main.m in Sources */,
+				F1BC39141DF2573700C4DCCC /* RLMPuzzleView.m in Sources */,
+				2288CBD21DF7B2CA00E73440 /* RLMStartView.m in Sources */,
+				F1BC39111DF2573700C4DCCC /* RLMPuzzlePiece.m in Sources */,
+				F1BC390C1DF2573700C4DCCC /* AppDelegate.m in Sources */,
+				F1BC39101DF2573700C4DCCC /* RLMPuzzle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1702,6 +1865,51 @@
 			};
 			name = Release;
 		};
+		F1BC38F31DF2571600C4DCCC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = QX5CR2FTN2;
+				INFOPLIST_FILE = "$(SRCROOT)/Puzzle/Puzzle-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				OTHER_LDFLAGS = (
+					"-lz",
+					"-all_load",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Puzzle;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		F1BC38F41DF2571600C4DCCC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = QX5CR2FTN2;
+				INFOPLIST_FILE = "$(SRCROOT)/Puzzle/Puzzle-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_LDFLAGS = (
+					"-lz",
+					"-all_load",
+					"-ObjC",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Puzzle;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1809,6 +2017,15 @@
 			buildConfigurations = (
 				F18464311DC151CD00DAB8B9 /* Debug */,
 				F18464321DC151CD00DAB8B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F1BC38F51DF2571600C4DCCC /* Build configuration list for PBXNativeTarget "Puzzle" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F1BC38F31DF2571600C4DCCC /* Debug */,
+				F1BC38F41DF2571600C4DCCC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
