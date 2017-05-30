@@ -88,6 +88,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// Synchronously create, log in, and return a user.
 - (RLMSyncUser *)logInUserForCredentials:(RLMSyncCredentials *)credentials
                                   server:(NSURL *)url;
+- (RLMSyncUser *)logInUserForCredentials:(RLMSyncCredentials *)credentials
+                                  server:(NSURL *)url
+                    simulateReconnection:(BOOL)simulateReconnection;
 
 /// Create and log in an admin user.
 - (RLMSyncUser *)createAdminUserForURL:(NSURL *)url username:(NSString *)username;
@@ -122,6 +125,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Manually set the refresh token for a user. Used for testing invalid token conditions.
 - (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue;
+
+/// Simulate no network condition
+- (void)disableNetworking;
+/// Clear poor network simulation
+- (void)enableNetworkingAfter:(NSTimeInterval)secs;
 
 @end
 
