@@ -96,6 +96,10 @@ static NSURL *makeTestURL(NSString *name, RLMSyncUser *owner) {
     return [[NSURL alloc] initWithString:[NSString stringWithFormat:@"realm://localhost:9080/%@/%@", userID, name]];
 }
 
+static NSURL *makeTestGlobalURL(NSString *name) {
+    return [[NSURL alloc] initWithString:[NSString stringWithFormat:@"realm://localhost:9080/%@", name]];
+}
+
 static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *original,
                                                       RLMSyncUser *owner,
                                                       NSString *realmName) {
@@ -406,6 +410,107 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     CHECK_COUNT(5, SyncObject, userBRealm);
     [self waitForUploadsForUser:self.userA url:userAURL];
     CHECK_COUNT(5, SyncObject, userARealm);
+}
+
+/// Setting a permission for all users should work.
+- (void)testWildcardWriteAccess {
+    XCTestExpectation *ex = [self expectationWithDescription:@"No permissions for newly created user."];
+    __block RLMSyncPermissionResults *results;
+    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(r);
+        results = r;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Open a Realm for user A.
+    NSString *testName = NSStringFromSelector(_cmd);
+    NSURL *ownerURL = makeTestURL(testName, nil);
+    NSURL *guestURL = makeTestURL(testName, self.userA);
+    RLMRealm *userARealm = [self openRealmForURL:ownerURL user:self.userA];
+
+    // Give all users write permissions to that Realm.
+    RLMSyncPermissionValue *p = [[RLMSyncPermissionValue alloc] initWithRealmPath:[ownerURL path]
+                                                                           userID:@"*"
+                                                                      accessLevel:RLMSyncAccessLevelWrite];
+
+    // Set the permission.
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting wildcard permission should work."];
+    [self.userA applyPermission:p callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Have user A write a few objects first.
+    [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+    [self waitForUploadsForUser:self.userA url:ownerURL];
+    CHECK_COUNT(3, SyncObject, userARealm);
+
+    // User B should be able to write to the Realm.
+    RLMRealm *userBRealm = [self openRealmForURL:guestURL user:self.userB];
+    [self waitForDownloadsForUser:self.userB url:guestURL];
+    [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
+    [self waitForUploadsForUser:self.userB url:guestURL];
+    CHECK_COUNT(5, SyncObject, userBRealm);
+
+    // User C should be able to write to the Realm.
+    RLMRealm *userCRealm = [self openRealmForURL:guestURL user:self.userC];
+    [self waitForDownloadsForUser:self.userC url:guestURL];
+    [self addSyncObjectsToRealm:userCRealm descriptions:@[@"child-6", @"child-7", @"child-8", @"child-9"]];
+    [self waitForUploadsForUser:self.userC url:guestURL];
+    CHECK_COUNT(9, SyncObject, userCRealm);
+}
+
+/// Setting a permission for all users on a global Realm (no `~`) should work.
+- (void)testWildcardGlobalRealmWriteAccess {
+    XCTestExpectation *ex = [self expectationWithDescription:@"No permissions for newly created user."];
+    __block RLMSyncPermissionResults *results;
+    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(r);
+        results = r;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Open a Realm for user A.
+    NSString *testName = NSStringFromSelector(_cmd);
+    NSURL *globalRealmURL = makeTestGlobalURL(testName);
+    RLMRealm *userARealm = [self openRealmForURL:globalRealmURL user:self.userA];
+
+    // Give all users write permissions to that Realm.
+    RLMSyncPermissionValue *p = [[RLMSyncPermissionValue alloc] initWithRealmPath:[globalRealmURL path]
+                                                                           userID:@"*"
+                                                                      accessLevel:RLMSyncAccessLevelWrite];
+
+    // Set the permission.
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting wildcard permission should work."];
+    [self.userA applyPermission:p callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Have user A write a few objects first.
+    [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+    [self waitForUploadsForUser:self.userA url:globalRealmURL];
+    CHECK_COUNT(3, SyncObject, userARealm);
+
+    // User B should be able to write to the Realm.
+    RLMRealm *userBRealm = [self openRealmForURL:globalRealmURL user:self.userB];
+    [self waitForDownloadsForUser:self.userB url:globalRealmURL];
+    [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
+    [self waitForUploadsForUser:self.userB url:globalRealmURL];
+    CHECK_COUNT(5, SyncObject, userBRealm);
+
+    // User C should be able to write to the Realm.
+    RLMRealm *userCRealm = [self openRealmForURL:globalRealmURL user:self.userC];
+    [self waitForDownloadsForUser:self.userC url:globalRealmURL];
+    [self addSyncObjectsToRealm:userCRealm descriptions:@[@"child-6", @"child-7", @"child-8", @"child-9"]];
+    [self waitForUploadsForUser:self.userC url:globalRealmURL];
+    CHECK_COUNT(9, SyncObject, userCRealm);
 }
 
 #pragma mark - Permission change API
