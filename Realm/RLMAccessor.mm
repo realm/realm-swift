@@ -582,7 +582,7 @@ RLMAccessorContext::RLMAccessorContext(RLMRealm *realm, RLMClassInfo& info, bool
 RLMAccessorContext::RLMAccessorContext(__unsafe_unretained RLMObjectBase *const parent,
                                        const realm::Property *prop)
 : _realm(parent->_realm)
-, _info(prop && (prop->type == realm::PropertyType::Object || prop->type == realm::PropertyType::Array)
+, _info(prop && (prop->type == realm::PropertyType::Object)
         ? parent->_info->linkTargetType(*prop)
         : *parent->_info)
 , _parentObject(parent)

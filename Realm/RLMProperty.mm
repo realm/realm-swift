@@ -27,17 +27,14 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
-#import <realm/data_type.hpp>
-
-static_assert((int)RLMPropertyTypeInt    == realm::type_Int, "");
-static_assert((int)RLMPropertyTypeBool   == realm::type_Bool, "");
-static_assert((int)RLMPropertyTypeFloat  == realm::type_Float, "");
-static_assert((int)RLMPropertyTypeDouble == realm::type_Double, "");
-static_assert((int)RLMPropertyTypeString == realm::type_String, "");
-static_assert((int)RLMPropertyTypeData   == realm::type_Binary, "");
-static_assert((int)RLMPropertyTypeDate   == realm::type_Timestamp, "");
-static_assert((int)RLMPropertyTypeObject == realm::type_Link, "");
-static_assert((int)RLMPropertyTypeArray  == realm::type_LinkList, "");
+static_assert((int)RLMPropertyTypeInt    == (int)realm::PropertyType::Int, "");
+static_assert((int)RLMPropertyTypeBool   == (int)realm::PropertyType::Bool, "");
+static_assert((int)RLMPropertyTypeFloat  == (int)realm::PropertyType::Float, "");
+static_assert((int)RLMPropertyTypeDouble == (int)realm::PropertyType::Double, "");
+static_assert((int)RLMPropertyTypeString == (int)realm::PropertyType::String, "");
+static_assert((int)RLMPropertyTypeData   == (int)realm::PropertyType::Data, "");
+static_assert((int)RLMPropertyTypeDate   == (int)realm::PropertyType::Date, "");
+static_assert((int)RLMPropertyTypeObject == (int)realm::PropertyType::Object, "");
 
 BOOL RLMPropertyTypeIsNullable(RLMPropertyType propertyType) {
     return propertyType != RLMPropertyTypeArray && propertyType != RLMPropertyTypeLinkingObjects;
@@ -88,12 +85,23 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 @implementation RLMProperty
 
 + (instancetype)propertyForObjectStoreProperty:(const realm::Property &)prop {
+    bool optional = false;
+    RLMPropertyType type;
+    if (is_array(prop.type)) {
+        REALM_ASSERT(prop.type == realm::PropertyType::Object);
+        type = RLMPropertyTypeArray;
+    }
+    else {
+        optional = is_nullable(prop.type);
+        type = static_cast<RLMPropertyType>(prop.type & ~realm::PropertyType::Flags);
+    }
+
     return [[RLMProperty alloc] initWithName:@(prop.name.c_str())
-                                        type:(RLMPropertyType)prop.type
+                                        type:type
                              objectClassName:prop.object_type.length() ? @(prop.object_type.c_str()) : nil
                       linkOriginPropertyName:prop.link_origin_property_name.length() ? @(prop.link_origin_property_name.c_str()) : nil
                                      indexed:prop.is_indexed
-                                    optional:prop.is_nullable];
+                                    optional:optional];
 }
 
 - (instancetype)initWithName:(NSString *)name
@@ -555,11 +563,21 @@ static bool rawTypeIsComputedProperty(NSString *rawType) {
 - (realm::Property)objectStoreCopy {
     realm::Property p;
     p.name = _name.UTF8String;
-    p.type = (realm::PropertyType)_type;
     p.object_type = _objectClassName ? _objectClassName.UTF8String : "";
-    p.is_indexed = _indexed;
-    p.is_nullable = _optional;
+    p.is_indexed = (bool)_indexed;
     p.link_origin_property_name = _linkOriginPropertyName ? _linkOriginPropertyName.UTF8String : "";
+    if (_type == RLMPropertyTypeArray) {
+        p.type = realm::PropertyType::Object | realm::PropertyType::Array;
+    }
+    else if (_type == RLMPropertyTypeLinkingObjects) {
+        p.type = realm::PropertyType::LinkingObjects | realm::PropertyType::Array;
+    }
+    else {
+        p.type = static_cast<realm::PropertyType>(_type);
+        if (_optional) {
+            p.type |= realm::PropertyType::Nullable;
+        }
+    }
     return p;
 }
 
