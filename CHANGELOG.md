@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Enable encryption on watchOS.
 
 ### Bugfixes
 
@@ -15,6 +15,8 @@ x.x.x Release notes (yyyy-MM-dd)
   with Xcode 8.3.2.
 * Throw an appropriate error rather than crashing when an RLMArray is assigned
   to an RLMArray property of a different type.
+* Fix crash in large (>4GB) encrypted Realm files.
+* Improve accuracy of sync progress notifications.
 
 2.7.0 Release notes (2017-05-03)
 =============================================================
