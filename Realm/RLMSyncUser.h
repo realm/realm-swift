@@ -156,6 +156,23 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (void)changePassword:(NSString *)newPassword completion:(RLMPasswordChangeStatusBlock)completion;
 
+/**
+ Change an arbitrary user's password asynchronously.
+
+ @note    The current user must be an admin user for this operation to succeed.
+
+ @warning Changing a user's password using an authentication server that doesn't
+          use HTTPS is a major security flaw, and should only be done while
+          testing.
+
+ @param newPassword The user's new password.
+ @param userID      The identity of the user whose password should be changed.
+ @param completion  Completion block invoked when login has completed or failed.
+                    The callback will be invoked on a background queue provided
+                    by `NSURLSession`.
+ */
+- (void)changePassword:(NSString *)newPassword forUserID:(NSString *)userID completion:(RLMPasswordChangeStatusBlock)completion;
+
 // This set of permissions APIs uses immutable `RLMSyncPermissionValue` objects to
 // retrieve and apply permissions. It is intended to replace the set of APIs which
 // directly access Realms and Realm model objects to work with permissions.

@@ -249,6 +249,10 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 #pragma mark - Passwords
 
 - (void)changePassword:(NSString *)newPassword completion:(RLMPasswordChangeStatusBlock)completion {
+    [self changePassword:newPassword forUserID:self.identity completion:completion];
+}
+
+- (void)changePassword:(NSString *)newPassword forUserID:(NSString *)userID completion:(RLMPasswordChangeStatusBlock)completion {
     if (self.state != RLMSyncUserStateActive) {
         completion([NSError errorWithDomain:RLMSyncErrorDomain
                                        code:RLMSyncErrorClientSessionError
@@ -259,6 +263,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                  httpMethod:@"PUT"
                                      server:self.authenticationServer
                                        JSON:@{@"token": self._refreshToken,
+                                              @"userID": userID,
                                               @"password": newPassword}
                                     timeout:60
                                  completion:^(NSError *error, __unused NSDictionary *json) {
