@@ -263,7 +263,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                  httpMethod:@"PUT"
                                      server:self.authenticationServer
                                        JSON:@{@"token": self._refreshToken,
-                                              @"userID": userID,
+                                              @"user_id": userID,
                                               @"password": newPassword}
                                     timeout:60
                                  completion:^(NSError *error, __unused NSDictionary *json) {
