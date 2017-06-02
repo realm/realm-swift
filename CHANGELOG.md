@@ -21,6 +21,9 @@ x.x.x Release notes (yyyy-MM-dd)
   to an RLMArray property of a different type.
 * Fix crash in large (>4GB) encrypted Realm files.
 * Improve accuracy of sync progress notifications.
+* Fix an issue where synchronized Realms did not connect to the remote server
+  in certain situations, such as when an application was offline when the Realms
+  were opened but later regained network connectivity.
 
 2.7.0 Release notes (2017-05-03)
 =============================================================

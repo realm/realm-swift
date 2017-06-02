@@ -758,9 +758,6 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     RLMSyncPermissionValue *n2 = [sorted objectAtIndex:1];
     RLMSyncPermissionValue *n3 = [sorted objectAtIndex:2];
 
-    NSLog(@"user B ID: %@", uB);
-    NSLog(@"sorted: %@", sorted);
-
     XCTAssertTrue([n1.path containsString:@"r3"]);
     XCTAssertTrue([n2.path containsString:@"r1"]);
     XCTAssertTrue([n3.path containsString:@"r2"]);
