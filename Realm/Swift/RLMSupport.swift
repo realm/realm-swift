@@ -28,9 +28,15 @@ extension RLMRealm {
         return version
     }
 
+#if swift(>=4)
+    @nonobjc public func resolve<Confined>(reference: RLMThreadSafeReference<Confined>) -> Confined? {
+        return __resolve(reference as! RLMThreadSafeReference<RLMThreadConfined>) as! Confined?
+    }
+#else
     @nonobjc public func resolve<Confined: RLMThreadConfined>(reference: RLMThreadSafeReference<Confined>) -> Confined? {
         return __resolve(reference as! RLMThreadSafeReference<RLMThreadConfined>) as! Confined?
     }
+#endif
 }
 
 extension RLMObject {
@@ -47,7 +53,7 @@ extension RLMObject {
 }
 
 public final class RLMIterator: IteratorProtocol {
-    private let iteratorBase: NSFastEnumerationIterator
+    private var iteratorBase: NSFastEnumerationIterator
 
     internal init(collection: RLMCollection) {
         iteratorBase = NSFastEnumerationIterator(collection)
