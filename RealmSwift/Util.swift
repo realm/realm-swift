@@ -79,10 +79,19 @@ internal func dynamicBridgeCast<T>(fromSwift x: T) -> Any {
 
 // Used for conversion from Objective-C types to Swift types
 internal protocol CustomObjectiveCBridgeable {
-    /* FIXME: Remove protocol once SR-2393 bridges all integer types to `NSNumber`
-     *        At this point, use `as! [SwiftType]` to cast between. */
     static func bridging(objCValue: Any) -> Self
     var objCValue: Any { get }
+}
+
+// FIXME: needed with swift 3.2
+// Double isn't though?
+extension Float: CustomObjectiveCBridgeable {
+    static func bridging(objCValue: Any) -> Float {
+        return (objCValue as! NSNumber).floatValue
+    }
+    var objCValue: Any {
+        return NSNumber(value: self)
+    }
 }
 
 extension Int8: CustomObjectiveCBridgeable {
