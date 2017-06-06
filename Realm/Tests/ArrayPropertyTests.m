@@ -753,7 +753,7 @@
         [obj.array addObjects:[AggregateObject allObjectsInRealm:realm]];
     }];
 
-    void (^test)() = ^{
+    void (^test)(void) = ^{
         RLMArray *array = obj.array;
 
         // SUM

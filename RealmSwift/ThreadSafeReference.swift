@@ -114,7 +114,7 @@ extension Realm {
 
      - see: `ThreadSafeReference(to:)`
      */
-    public func resolve<Confined: ThreadConfined>(_ reference: ThreadSafeReference<Confined>) -> Confined? {
+    public func resolve<Confined>(_ reference: ThreadSafeReference<Confined>) -> Confined? {
         return reference.resolve(in: self)
     }
 }

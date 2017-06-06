@@ -587,7 +587,7 @@ class RealmTests: TestCase {
     }
 
     func testOptionalIntPrimaryKey() {
-        func testOptionalIntPrimaryKey<O: Object, Wrapped: RealmOptionalType>(for type: O.Type)
+        func testOptionalIntPrimaryKey<O: Object, Wrapped>(for type: O.Type)
             where O: SwiftPrimaryKeyObjectType, O.PrimaryKey == RealmOptional<Wrapped>,
                   Wrapped: ExpressibleByIntegerLiteral {
                 let realm = try! Realm()

@@ -24,7 +24,7 @@ import Realm
  */
 public final class RLMIterator<T: Object>: IteratorProtocol {
     private var i: UInt = 0
-    private let generatorBase: NSFastEnumerationIterator
+    private var generatorBase: NSFastEnumerationIterator
 
     init(collection: RLMCollection) {
         generatorBase = NSFastEnumerationIterator(collection)
@@ -127,14 +127,23 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
     return from as! U
 }
 
+#if swift(>=3.2)
+/// :nodoc:
+public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined where Element: Object {
+}
+#else
+/// :nodoc:
+public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined {
+    /// The type of the objects contained in the collection.
+    associatedtype Element: Object
+}
+#endif
+
 /**
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
 */
-public protocol RealmCollection: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined {
+public protocol RealmCollection: RealmCollectionBase {
     // Must also conform to `AssistedObjectiveCBridgeable`
-
-    /// The type of the objects contained in the collection.
-    associatedtype Element: Object
 
     // MARK: Properties
 
@@ -472,7 +481,11 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     // MARK: Sequence Support
 
     override subscript(position: Int) -> C.Element {
-        return base[position as! C.Index] as! C.Element
+        #if swift(>=3.2)
+            return base[position as! C.Index]
+        #else
+            return base[position as! C.Index] as! C.Element
+        #endif
     }
 
     override func makeIterator() -> RLMIterator<Element> {

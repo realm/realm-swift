@@ -436,7 +436,7 @@ public final class Realm {
 
      :nodoc:
      */
-    public func delete<T: Object>(_ objects: List<T>) {
+    public func delete<T>(_ objects: List<T>) {
         rlmRealm.deleteObjects(objects._rlmArray)
     }
 
@@ -449,7 +449,7 @@ public final class Realm {
 
      :nodoc:
      */
-    public func delete<T: Object>(_ objects: Results<T>) {
+    public func delete<T>(_ objects: Results<T>) {
         rlmRealm.deleteObjects(objects.rlmResults)
     }
 
@@ -471,7 +471,7 @@ public final class Realm {
 
      - returns: A `Results` containing the objects.
      */
-    public func objects<T: Object>(_ type: T.Type) -> Results<T> {
+    public func objects<T>(_ type: T.Type) -> Results<T> {
         return Results<T>(RLMGetObjects(rlmRealm, (type as Object.Type).className(), nil))
     }
 

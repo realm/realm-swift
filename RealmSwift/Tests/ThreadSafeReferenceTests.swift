@@ -21,7 +21,7 @@ import RealmSwift
 
 class ThreadSafeReferenceTests: TestCase {
     /// Resolve a thread-safe reference confirming that you can't resolve it a second time.
-    func assertResolve<T: ThreadConfined>(_ realm: Realm, _ reference: ThreadSafeReference<T>) -> T? {
+    func assertResolve<T>(_ realm: Realm, _ reference: ThreadSafeReference<T>) -> T? {
         XCTAssertFalse(reference.isInvalidated)
         let object = realm.resolve(reference)
         XCTAssert(reference.isInvalidated)
