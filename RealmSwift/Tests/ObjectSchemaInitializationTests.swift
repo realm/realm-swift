@@ -246,7 +246,7 @@ class SwiftObjectWithStruct: SwiftFakeObject {
 class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {
     @objc dynamic var date = Date()
 
-    dynamic override class func primaryKey() -> String? {
+    override class func primaryKey() -> String? {
         return "date"
     }
 }

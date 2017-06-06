@@ -155,7 +155,7 @@ open class Object: RLMObjectBase, ThreadConfined {
 
      - returns: The name of the property designated as the primary key, or `nil` if the model has no primary key.
      */
-    open class func primaryKey() -> String? { return nil }
+    @objc open class func primaryKey() -> String? { return nil }
 
     /**
      Override this method to specify the names of properties to ignore. These properties will not be managed by
@@ -163,7 +163,7 @@ open class Object: RLMObjectBase, ThreadConfined {
 
      - returns: An array of property names to ignore.
      */
-    open class func ignoredProperties() -> [String] { return [] }
+    @objc open class func ignoredProperties() -> [String] { return [] }
 
     /**
      Returns an array of property names for properties which should be indexed.
@@ -172,12 +172,12 @@ open class Object: RLMObjectBase, ThreadConfined {
 
      - returns: An array of property names.
      */
-    open class func indexedProperties() -> [String] { return [] }
+    @objc open class func indexedProperties() -> [String] { return [] }
 
     // MARK: Key-Value Coding & Subscripting
 
     /// Returns or sets the value of the property with the given name.
-    open subscript(key: String) -> Any? {
+    @objc open subscript(key: String) -> Any? {
         get {
             if realm == nil {
                 return value(forKey: key)
