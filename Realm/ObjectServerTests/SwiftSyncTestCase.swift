@@ -20,11 +20,11 @@ import XCTest
 import RealmSwift
 
 class SwiftSyncObject: Object {
-    dynamic var stringProp: String = ""
+    @objc dynamic var stringProp: String = ""
 }
 
 class SwiftHugeSyncObject: Object {
-    dynamic var dataProp: NSData?
+    @objc dynamic var dataProp: NSData?
 
     required init() {
         super.init()

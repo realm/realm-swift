@@ -20,18 +20,18 @@ import XCTest
 import RealmSwift
 
 class CTTAggregateObject: Object {
-    dynamic var intCol = 0
-    dynamic var int8Col = 0
-    dynamic var int16Col = 0
-    dynamic var int32Col = 0
-    dynamic var int64Col = 0
-    dynamic var floatCol = 0 as Float
-    dynamic var doubleCol = 0.0
-    dynamic var boolCol = false
-    dynamic var dateCol = Date()
-    dynamic var trueCol = true
+    @objc dynamic var intCol = 0
+    @objc dynamic var int8Col = 0
+    @objc dynamic var int16Col = 0
+    @objc dynamic var int32Col = 0
+    @objc dynamic var int64Col = 0
+    @objc dynamic var floatCol = 0 as Float
+    @objc dynamic var doubleCol = 0.0
+    @objc dynamic var boolCol = false
+    @objc dynamic var dateCol = Date()
+    @objc dynamic var trueCol = true
     let stringListCol = List<CTTStringObjectWithLink>()
-    dynamic var linkCol: CTTLinkTarget?
+    @objc dynamic var linkCol: CTTLinkTarget?
 }
 
 class CTTAggregateObjectList: Object {
@@ -39,12 +39,12 @@ class CTTAggregateObjectList: Object {
 }
 
 class CTTStringObjectWithLink: Object {
-    dynamic var stringCol = ""
-    dynamic var linkCol: CTTLinkTarget?
+    @objc dynamic var stringCol = ""
+    @objc dynamic var linkCol: CTTLinkTarget?
 }
 
 class CTTLinkTarget: Object {
-    dynamic var id = 0
+    @objc dynamic var id = 0
     let stringObjects = LinkingObjects(fromType: CTTStringObjectWithLink.self, property: "linkCol")
     let aggregateObjects = LinkingObjects(fromType: CTTAggregateObject.self, property: "linkCol")
 }
@@ -140,6 +140,15 @@ class RealmCollectionTypeTests: TestCase {
         super.tearDown()
     }
 
+#if swift(>=4)
+    override class var defaultTestSuite: XCTestSuite {
+        // Don't run tests for the base class
+        if isEqual(RealmCollectionTypeTests.self) {
+            return XCTestSuite(name: "empty")
+        }
+        return super.defaultTestSuite
+    }
+#else
     override class func defaultTestSuite() -> XCTestSuite {
         // Don't run tests for the base class
         if isEqual(RealmCollectionTypeTests.self) {
@@ -147,6 +156,7 @@ class RealmCollectionTypeTests: TestCase {
         }
         return super.defaultTestSuite()
     }
+#endif
 
     func testRealm() {
         guard let collection = collection else {
@@ -550,6 +560,15 @@ class RealmCollectionTypeTests: TestCase {
 // MARK: Results
 
 class ResultsTests: RealmCollectionTypeTests {
+#if swift(>=4)
+    override class var defaultTestSuite: XCTestSuite {
+        // Don't run tests for the base class
+        if isEqual(ResultsTests.self) {
+            return XCTestSuite(name: "empty")
+        }
+        return super.defaultTestSuite
+    }
+#else
     override class func defaultTestSuite() -> XCTestSuite {
         // Don't run tests for the base class
         if isEqual(ResultsTests.self) {
@@ -557,6 +576,7 @@ class ResultsTests: RealmCollectionTypeTests {
         }
         return super.defaultTestSuite()
     }
+#endif
 
     func collectionBaseInWriteTransaction() -> Results<CTTStringObjectWithLink> {
         fatalError("abstract")
@@ -727,6 +747,15 @@ class ResultsFromLinkViewTests: ResultsTests {
 // MARK: List
 
 class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
+#if swift(>=4)
+    override class var defaultTestSuite: XCTestSuite {
+        // Don't run tests for the base class
+        if isEqual(ListRealmCollectionTypeTests.self) {
+            return XCTestSuite(name: "empty")
+        }
+        return super.defaultTestSuite
+    }
+#else
     override class func defaultTestSuite() -> XCTestSuite {
         // Don't run tests for the base class
         if isEqual(ListRealmCollectionTypeTests.self) {
@@ -734,6 +763,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         }
         return super.defaultTestSuite()
     }
+#endif
 
     func collectionBaseInWriteTransaction() -> List<CTTStringObjectWithLink> {
         fatalError("abstract")

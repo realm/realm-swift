@@ -26,28 +26,28 @@ func nextPrimaryKey() -> Int {
 }
 
 class KVOObject: Object {
-    dynamic var pk = nextPrimaryKey() // primary key for equality
-    dynamic var ignored: Int = 0
+    @objc dynamic var pk = nextPrimaryKey() // primary key for equality
+    @objc dynamic var ignored: Int = 0
 
-    dynamic var boolCol: Bool = false
-    dynamic var int8Col: Int8 = 1
-    dynamic var int16Col: Int16 = 2
-    dynamic var int32Col: Int32 = 3
-    dynamic var int64Col: Int64 = 4
-    dynamic var floatCol: Float = 5
-    dynamic var doubleCol: Double = 6
-    dynamic var stringCol: String = ""
-    dynamic var binaryCol: Data = Data()
-    dynamic var dateCol: Date = Date(timeIntervalSince1970: 0)
-    dynamic var objectCol: KVOObject?
+    @objc dynamic var boolCol: Bool = false
+    @objc dynamic var int8Col: Int8 = 1
+    @objc dynamic var int16Col: Int16 = 2
+    @objc dynamic var int32Col: Int32 = 3
+    @objc dynamic var int64Col: Int64 = 4
+    @objc dynamic var floatCol: Float = 5
+    @objc dynamic var doubleCol: Double = 6
+    @objc dynamic var stringCol: String = ""
+    @objc dynamic var binaryCol: Data = Data()
+    @objc dynamic var dateCol: Date = Date(timeIntervalSince1970: 0)
+    @objc dynamic var objectCol: KVOObject?
     let arrayCol = List<KVOObject>()
     let optIntCol = RealmOptional<Int>()
     let optFloatCol = RealmOptional<Float>()
     let optDoubleCol = RealmOptional<Double>()
     let optBoolCol = RealmOptional<Bool>()
-    dynamic var optStringCol: String?
-    dynamic var optBinaryCol: Data?
-    dynamic var optDateCol: Date?
+    @objc dynamic var optStringCol: String?
+    @objc dynamic var optBinaryCol: Data?
+    @objc dynamic var optDateCol: Date?
 
     override class func primaryKey() -> String { return "pk" }
     override class func ignoredProperties() -> [String] { return ["ignored"] }

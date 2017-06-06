@@ -49,7 +49,7 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
 
     // MARK: Fast Enumeration
     public func countByEnumerating(with state: UnsafeMutablePointer<NSFastEnumerationState>,
-                                   objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>!,
+                                   objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>,
                                    count len: Int) -> Int {
         return Int(rlmResults.countByEnumerating(with: state,
                                                  objects: buffer,

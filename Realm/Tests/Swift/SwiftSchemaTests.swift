@@ -21,11 +21,11 @@ import Realm
 import Realm.Private
 
 class InitLinkedToClass: RLMObject {
-    dynamic var value = SwiftIntObject(value: [0])
+    @objc dynamic var value = SwiftIntObject(value: [0])
 }
 
 class IgnoredLinkPropertyObject : RLMObject {
-    dynamic var value = 0
+    @objc dynamic var value = 0
     var obj = SwiftIntObject()
 
     override class func ignoredProperties() -> [String] {
@@ -34,7 +34,7 @@ class IgnoredLinkPropertyObject : RLMObject {
 }
 
 class SwiftRecursingSchemaTestObject : RLMObject {
-    dynamic var propertyWithIllegalDefaultValue: SwiftIntObject? = {
+    @objc dynamic var propertyWithIllegalDefaultValue: SwiftIntObject? = {
         if mayAccessSchema {
             let realm = RLMRealm.default()
             return SwiftIntObject.allObjects().firstObject() as! SwiftIntObject?
@@ -47,7 +47,7 @@ class SwiftRecursingSchemaTestObject : RLMObject {
 }
 
 class InitAppendsToArrayProperty : RLMObject {
-    dynamic var propertyWithIllegalDefaultValue: RLMArray = {
+    @objc dynamic var propertyWithIllegalDefaultValue: RLMArray = {
         if mayAppend {
             let array = RLMArray(objectClassName: SwiftIntObject.className())
             array.add(SwiftIntObject())
