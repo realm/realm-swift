@@ -32,12 +32,10 @@ using namespace realm;
 
 namespace {
 void runBlockForUserContext(const std::weak_ptr<SyncUser>& user,
-                                const std::string& path,
-                                std::function<void(CocoaSyncUserContext&, const std::string&)> block) {
+                            const std::string& path,
+                            std::function<void(CocoaSyncUserContext&, const std::string&)> block) {
     if (auto strong_user = user.lock()) {
-        strong_user->run_block_with_context<CocoaSyncUserContext>([block=std::move(block), path](auto& context) {
-            block(context, path);
-        });
+        block(static_cast<CocoaSyncUserContext&>(*strong_user->binding_context.load()), path);
     }
 }
 }

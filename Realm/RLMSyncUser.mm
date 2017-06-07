@@ -41,6 +41,12 @@ using PermissionGetCallback = std::function<void(std::unique_ptr<PermissionResul
 
 namespace {
 
+struct CocoaSyncUserContextFactory : public realm::SyncUserContextFactory {
+    std::shared_ptr<SyncUserContext> make_context() override {
+        return std::make_shared<CocoaSyncUserContext>();
+    }
+} s_syncContextFactory;
+
 NSError *translateExceptionPtrToError(std::exception_ptr ptr, bool get) {
     NSError *error = nil;
     try {
@@ -70,10 +76,7 @@ PermissionGetCallback RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock
 }
 
 void runBlockForUserContext(const std::shared_ptr<SyncUser>& user, std::function<void(CocoaSyncUserContext&)> block) {
-    user->set_binding_context<CocoaSyncUserContext>();
-    user->run_block_with_context<CocoaSyncUserContext>([block=std::move(block)](auto& context) {
-        block(context);
-    });
+    block(static_cast<CocoaSyncUserContext&>(*user->binding_context.load()));
 }
 
 }
@@ -326,6 +329,10 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 }
 
 #pragma mark - Private API
+
++ (void)_setupBindingContextFactory {
+    SyncUser::set_binding_context_factory(s_syncContextFactory);
+}
 
 - (NSString *)_refreshToken {
     if (!_user) {
