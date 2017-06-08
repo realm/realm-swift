@@ -67,6 +67,15 @@ class ListTests: TestCase {
         super.tearDown()
     }
 
+#if swift(>=4)
+    override class var defaultTestSuite: XCTestSuite {
+        // Don't run tests for the base class
+        if isEqual(ListTests.self) {
+            return XCTestSuite(name: "empty")
+        }
+        return super.defaultTestSuite
+    }
+#else
     override class func defaultTestSuite() -> XCTestSuite {
         // Don't run tests for the base class
         if isEqual(ListTests.self) {
@@ -74,6 +83,7 @@ class ListTests: TestCase {
         }
         return super.defaultTestSuite()
     }
+#endif
 
     func testInvalidated() {
         guard let array = array else {
@@ -527,6 +537,9 @@ class ListTests: TestCase {
 
                 XCTAssertEqual(properties, kvcProperties)
             }
+#if swift(>=4)
+            // this test crashes xcode 9 beta 1's compiler
+#else
             do {
                 let objects = realm.objects(SwiftOptionalObject.self)
 
@@ -536,6 +549,7 @@ class ListTests: TestCase {
 
                 XCTAssertEqual(properties, kvcProperties)
             }
+#endif
             do {
                 let objects = realm.objects(SwiftOptionalObject.self)
 

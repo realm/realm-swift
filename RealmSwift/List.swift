@@ -24,7 +24,7 @@ import Realm.Private
 /// Internal class. Do not use directly.
 public class ListBase: RLMListBase {
     // Printable requires a description property defined in Swift (and not obj-c),
-    // and it has to be defined as @objc override, which can't be done in a
+    // and it has to be defined as override, which can't be done in a
     // generic class.
     /// Returns a human-readable description of the objects contained in the List.
     @objc public override var description: String {
@@ -504,6 +504,10 @@ extension List: RealmCollection, RangeReplaceableCollection {
             insert(x, at: subrange.lowerBound)
         }
     }
+
+    // This should be inferred, but Xcode 8.1 is unable to
+    /// :nodoc:
+    public typealias Indices = DefaultRandomAccessIndices<List>
 
     /// The position of the first element in a non-empty collection.
     /// Identical to endIndex in an empty collection.

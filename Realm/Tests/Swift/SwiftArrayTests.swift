@@ -437,7 +437,7 @@ class SwiftArrayTests: RLMTestCase {
 
         try! realm.commitWriteTransaction()
 
-        let peopleInCompany = company.employees!
+        let peopleInCompany: RLMArray<EmployeeObject> = company.employees!
         XCTAssertEqual(peopleInCompany.count, UInt(3), "No links should have been deleted")
 
         realm.beginWriteTransaction()

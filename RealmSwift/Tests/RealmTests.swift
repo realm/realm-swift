@@ -587,9 +587,8 @@ class RealmTests: TestCase {
     }
 
     func testOptionalIntPrimaryKey() {
-        func testOptionalIntPrimaryKey<O: Object, Wrapped: RealmOptionalType>(for type: O.Type)
-            where O: SwiftPrimaryKeyObjectType, O.PrimaryKey == RealmOptional<Wrapped>,
-                  Wrapped: ExpressibleByIntegerLiteral {
+        func testOptionalIntPrimaryKey<O: Object, Wrapped>(for type: O.Type, _ wrapped: Wrapped.Type)
+            where Wrapped: ExpressibleByIntegerLiteral {
                 let realm = try! Realm()
                 try! realm.write {
                     realm.create(type, value: ["a", NSNull()])
@@ -609,11 +608,11 @@ class RealmTests: TestCase {
                 XCTAssertNil(missingObject)
         }
 
-        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalIntObject.self)
-        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt8Object.self)
-        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt16Object.self)
-        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt32Object.self)
-        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt64Object.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalIntObject.self, Int.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt8Object.self, Int8.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt16Object.self, Int16.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt32Object.self, Int32.self)
+        testOptionalIntPrimaryKey(for: SwiftPrimaryOptionalInt64Object.self, Int64.self)
     }
 
     func testStringPrimaryKey() {

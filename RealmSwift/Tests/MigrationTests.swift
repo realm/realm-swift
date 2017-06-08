@@ -92,7 +92,7 @@ class MigrationTests: TestCase {
 
         var didRun = false
         let config = Realm.Configuration(fileURL: defaultRealmURL(), schemaVersion: 1,
-                                         migrationBlock: { _ in didRun = true })
+                                         migrationBlock: { _, _ in didRun = true })
         Realm.Configuration.defaultConfiguration = config
 
         try! Realm.performMigration()
@@ -158,11 +158,11 @@ class MigrationTests: TestCase {
         }
 
         migrateAndTestDefaultRealm { migration, _ in
-            migration.enumerateObjects(ofType: "SwiftStringObject", { _ in
+            migration.enumerateObjects(ofType: "SwiftStringObject", { _, _ in
                 XCTFail("No objects to enumerate")
             })
 
-            migration.enumerateObjects(ofType: "NoSuchClass", { _ in }) // shouldn't throw
+            migration.enumerateObjects(ofType: "NoSuchClass", { _, _ in }) // shouldn't throw
         }
 
         autoreleasepool {
@@ -577,7 +577,7 @@ class MigrationTests: TestCase {
         }
 
         var config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
-        config.migrationBlock = { _ in
+        config.migrationBlock = { _, _ in
             XCTFail("Migration block should not be called")
         }
         config.deleteRealmIfMigrationNeeded = true
@@ -611,7 +611,7 @@ class MigrationTests: TestCase {
             }
         }
 
-        let migrationBlock: MigrationBlock = { _ in
+        let migrationBlock: MigrationBlock = { _, _ in
             XCTFail("Migration block should not be called")
         }
         let config = Realm.Configuration(fileURL: defaultRealmURL(),
@@ -622,6 +622,6 @@ class MigrationTests: TestCase {
             _ = try Realm(configuration: config)
         }
 
-        class_replaceMethod(metaClass, #selector(RLMObjectBase.sharedSchema), originalImp, "@@:")
+        class_replaceMethod(metaClass, #selector(RLMObjectBase.sharedSchema), originalImp!, "@@:")
     }
 }

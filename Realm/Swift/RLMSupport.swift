@@ -28,7 +28,7 @@ extension RLMRealm {
         return version
     }
 
-#if swift(>=4)
+#if swift(>=3.2)
     @nonobjc public func resolve<Confined>(reference: RLMThreadSafeReference<Confined>) -> Confined? {
         return __resolve(reference as! RLMThreadSafeReference<RLMThreadConfined>) as! Confined?
     }

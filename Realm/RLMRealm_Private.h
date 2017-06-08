@@ -23,7 +23,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 // Disable syncing files to disk. Cannot be re-enabled. Use only for tests.
-FOUNDATION_EXTERN void RLMDisableSyncToDisk();
+FOUNDATION_EXTERN void RLMDisableSyncToDisk(void);
 
 FOUNDATION_EXTERN NSData * _Nullable RLMRealmValidatedEncryptionKey(NSData *key);
 

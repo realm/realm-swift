@@ -63,7 +63,6 @@ public protocol ThreadConfined {
  */
 public class ThreadSafeReference<Confined: ThreadConfined> {
     private let swiftMetadata: Any?
-    private let type: ThreadConfined.Type
 
     /**
      Indicates if the reference can no longer be resolved because an attempt to resolve it has
@@ -84,7 +83,6 @@ public class ThreadSafeReference<Confined: ThreadConfined> {
     public init(to threadConfined: Confined) {
         let bridged = (threadConfined as! AssistedObjectiveCBridgeable).bridged
         swiftMetadata = bridged.metadata
-        type = type(of: threadConfined)
         objectiveCReference = RLMThreadSafeReference(threadConfined: bridged.objectiveCValue as! RLMThreadConfined)
     }
 
@@ -114,7 +112,7 @@ extension Realm {
 
      - see: `ThreadSafeReference(to:)`
      */
-    public func resolve<Confined: ThreadConfined>(_ reference: ThreadSafeReference<Confined>) -> Confined? {
+    public func resolve<Confined>(_ reference: ThreadSafeReference<Confined>) -> Confined? {
         return reference.resolve(in: self)
     }
 }
