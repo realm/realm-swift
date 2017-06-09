@@ -11,7 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix setting a float property to NaN.
 
 2.8.0 Release notes (2017-06-02)
 =============================================================
