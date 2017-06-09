@@ -321,6 +321,15 @@ RLM_ARRAY_TYPE(CycleObject)
     }];
     XCTAssertEqual(row1.boolCol, true);
     XCTAssertEqual(row1.cBoolCol, true);
+
+    AllTypesObject *o = [[AllTypesObject alloc] initWithValue:row1];
+    o.floatCol = NAN;
+    o.doubleCol = NAN;
+    [realm transactionWithBlock:^{
+        [realm addObject:o];
+    }];
+    XCTAssertTrue(isnan(o.floatCol));
+    XCTAssertTrue(isnan(o.doubleCol));
 }
 
 - (void)testObjectSubclass {

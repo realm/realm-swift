@@ -82,8 +82,8 @@ static inline bool nsnumber_is_like_float(__unsafe_unretained NSNumber *const ob
            data_type == *@encode(unsigned int) ||
            data_type == *@encode(unsigned long) ||
            data_type == *@encode(unsigned long long) ||
-           // A double is like float if it fits within float bounds
-           (data_type == *@encode(double) && ABS([obj doubleValue]) <= FLT_MAX);
+           // A double is like float if it fits within float bounds or is NaN.
+           (data_type == *@encode(double) && (ABS([obj doubleValue]) <= FLT_MAX || isnan([obj doubleValue])));
 }
 
 static inline bool nsnumber_is_like_double(__unsafe_unretained NSNumber *const obj)
