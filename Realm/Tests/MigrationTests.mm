@@ -1371,6 +1371,29 @@ RLM_ARRAY_TYPE(MigrationObject);
 #endif
 }
 
+- (void)testModifyPrimaryKeyInMigration {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:PrimaryStringObject.class];
+
+    objectSchema.primaryKeyProperty = objectSchema[@"intCol"];
+    [self createTestRealmWithSchema:@[objectSchema] block:^(RLMRealm *realm) {
+        for (int i = 0; i < 10; ++i) {
+            [PrimaryStringObject createInRealm:realm withValue:@[@(i).stringValue, @(i + 10)]];
+        }
+    }];
+
+    auto realm = [self migrateTestRealmWithBlock:^(RLMMigration *migration, uint64_t) {
+        [migration enumerateObjects:@"PrimaryStringObject" block:^(RLMObject *oldObject, RLMObject *newObject) {
+            newObject[@"stringCol"] = [oldObject[@"intCol"] stringValue];
+        }];
+    }];
+
+    for (int i = 10; i < 20; ++i) {
+        auto obj = [PrimaryStringObject objectInRealm:realm forPrimaryKey:@(i).stringValue];
+        XCTAssertNotNil(obj);
+        XCTAssertEqual(obj.intCol, i);
+    }
+}
+
 #pragma mark - Property Rename
 
 // Successful Property Rename Tests
