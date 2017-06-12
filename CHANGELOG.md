@@ -1,13 +1,7 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.8.1 Release notes (2017-06-12)
 =============================================================
 
-### API Breaking Changes
-
-* None.
-
-### Enhancements
-
-* None.
+Add support for building with Xcode 9 Beta 1.
 
 ### Bugfixes
 
