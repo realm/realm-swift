@@ -12,6 +12,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Fix setting a float property to NaN.
+* Fix a crash when using compact on launch in combination with collection
+  notifications.
 
 2.8.0 Release notes (2017-06-02)
 =============================================================
