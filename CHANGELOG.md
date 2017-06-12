@@ -14,6 +14,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix an issue where synchronized Realms would eventually disconnect from the
   remote server if the user object used to define their sync configuration
   was destroyed.
+* Restore support for changing primary keys in migrations (broken in 2.8.0).
 
 2.8.1 Release notes (2017-06-12)
 =============================================================
