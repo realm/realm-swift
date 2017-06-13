@@ -59,7 +59,7 @@ private:
 - (instancetype)initWithSyncUser:(std::shared_ptr<SyncUser>)user;
 - (std::shared_ptr<SyncUser>)_syncUser;
 - (nullable NSString *)_refreshToken;
-+ (void)_setupBindingContextFactory;
++ (void)_setUpBindingContextFactory;
 
 @end
 

@@ -102,7 +102,7 @@ static dispatch_once_t s_onceToken;
 
 - (instancetype)initWithCustomRootDirectory:(NSURL *)rootDirectory {
     if (self = [super init]) {
-        [RLMSyncUser _setupBindingContextFactory];
+        [RLMSyncUser _setUpBindingContextFactory];
 
         // Initialize the sync engine.
         SyncManager::shared().set_logger_factory(s_syncLoggerFactory);

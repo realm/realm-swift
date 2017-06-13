@@ -35,7 +35,7 @@ void runBlockForUserContext(const std::weak_ptr<SyncUser>& user,
                             const std::string& path,
                             std::function<void(CocoaSyncUserContext&, const std::string&)> block) {
     if (auto strong_user = user.lock()) {
-        block(static_cast<CocoaSyncUserContext&>(*strong_user->binding_context.load()), path);
+        block(static_cast<CocoaSyncUserContext&>(*strong_user->binding_context()), path);
     }
 }
 }

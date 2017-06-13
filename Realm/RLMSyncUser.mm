@@ -41,12 +41,6 @@ using PermissionGetCallback = std::function<void(std::unique_ptr<PermissionResul
 
 namespace {
 
-struct CocoaSyncUserContextFactory : public realm::SyncUserContextFactory {
-    std::shared_ptr<SyncUserContext> make_context() override {
-        return std::make_shared<CocoaSyncUserContext>();
-    }
-} s_syncContextFactory;
-
 NSError *translateExceptionPtrToError(std::exception_ptr ptr, bool get) {
     NSError *error = nil;
     try {
@@ -75,8 +69,9 @@ PermissionGetCallback RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock
     };
 }
 
-void runBlockForUserContext(const std::shared_ptr<SyncUser>& user, std::function<void(CocoaSyncUserContext&)> block) {
-    block(static_cast<CocoaSyncUserContext&>(*user->binding_context.load()));
+std::shared_ptr<CocoaSyncUserContext> contextForUser(const std::shared_ptr<SyncUser>& user)
+{
+    return std::static_pointer_cast<CocoaSyncUserContext>(user->binding_context());
 }
 
 }
@@ -207,9 +202,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         return;
     }
     _user->log_out();
-    runBlockForUserContext(_user, [](auto& context) {
-        context.invalidate_all_handles();
-    });
+    contextForUser(_user)->invalidate_all_handles();
 }
 
 - (nullable RLMSyncSession *)sessionForURL:(NSURL *)url {
@@ -330,8 +323,10 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 
 #pragma mark - Private API
 
-+ (void)_setupBindingContextFactory {
-    SyncUser::set_binding_context_factory(s_syncContextFactory);
++ (void)_setUpBindingContextFactory {
+    SyncUser::set_binding_context_factory([] {
+        return std::make_shared<CocoaSyncUserContext>();
+    });
 }
 
 - (NSString *)_refreshToken {
@@ -352,9 +347,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                                                                            user:self
                                                                                         session:std::move(session)
                                                                                 completionBlock:completion];
-    runBlockForUserContext(_user, [handle=handle, path=[path UTF8String]](auto& context) {
-        context.register_refresh_handle(path, handle);
-    });
+    contextForUser(_user)->register_refresh_handle([path UTF8String], handle);
 }
 
 - (std::shared_ptr<SyncUser>)_syncUser {
