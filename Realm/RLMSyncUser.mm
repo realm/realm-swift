@@ -79,6 +79,7 @@ std::shared_ptr<CocoaSyncUserContext> contextForUser(const std::shared_ptr<SyncU
 void CocoaSyncUserContext::register_refresh_handle(const std::string& path, RLMSyncSessionRefreshHandle *handle)
 {
     REALM_ASSERT(handle);
+    std::lock_guard<std::mutex> lock(m_mutex);
     auto it = m_refresh_handles.find(path);
     if (it != m_refresh_handles.end()) {
         [it->second invalidate];
@@ -89,11 +90,13 @@ void CocoaSyncUserContext::register_refresh_handle(const std::string& path, RLMS
 
 void CocoaSyncUserContext::unregister_refresh_handle(const std::string& path)
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_refresh_handles.erase(path);
 }
 
 void CocoaSyncUserContext::invalidate_all_handles()
 {
+    std::lock_guard<std::mutex> lock(m_mutex);
     for (auto& it : m_refresh_handles) {
         [it.second invalidate];
     }

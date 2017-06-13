@@ -48,6 +48,8 @@ private:
      paths (e.g. `/~/path/to/realm`).
      */
     std::unordered_map<std::string, RLMSyncSessionRefreshHandle *> m_refresh_handles;
+
+    mutable std::mutex m_mutex;
 };
 
 @interface RLMSyncUser ()
