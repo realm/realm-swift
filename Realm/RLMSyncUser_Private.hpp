@@ -49,7 +49,7 @@ private:
      */
     std::unordered_map<std::string, RLMSyncSessionRefreshHandle *> m_refresh_handles;
 
-    mutable std::mutex m_mutex;
+    std::mutex m_mutex;
 };
 
 @interface RLMSyncUser ()
