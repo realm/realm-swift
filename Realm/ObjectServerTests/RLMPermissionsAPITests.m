@@ -31,7 +31,12 @@
             [ex fulfill];                                                                                              \
         }                                                                                                              \
     }];                                                                                                                \
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];                                                             \
+    [self waitForExpectationsWithTimeout:10.0 handler:^(NSError *err) {                                                \
+        if (err) {                                                                                                     \
+            NSLog(@"Checking permission count failed!\nError: %@\nResults: %@\nResults count: %@",                     \
+                  err, weakResults, @([weakResults count]));                                                           \
+        }                                                                                                              \
+    }];                                                                                                                \
 }
 
 #define CHECK_PERMISSION_COUNT(ma_results, ma_count) CHECK_PERMISSION_COUNT_PREDICATE(ma_results, ma_count, ==)
