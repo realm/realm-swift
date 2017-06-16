@@ -11,7 +11,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix an issue where synchronized Realms would eventually disconnect from the
+  remote server if the user object used to define their sync configuration
+  was destroyed.
 
 2.8.1 Release notes (2017-06-12)
 =============================================================

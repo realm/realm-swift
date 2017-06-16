@@ -69,6 +69,38 @@ PermissionGetCallback RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock
     };
 }
 
+std::shared_ptr<CocoaSyncUserContext> contextForUser(const std::shared_ptr<SyncUser>& user)
+{
+    return std::static_pointer_cast<CocoaSyncUserContext>(user->binding_context());
+}
+
+}
+
+void CocoaSyncUserContext::register_refresh_handle(const std::string& path, RLMSyncSessionRefreshHandle *handle)
+{
+    REALM_ASSERT(handle);
+    std::lock_guard<std::mutex> lock(m_mutex);
+    auto it = m_refresh_handles.find(path);
+    if (it != m_refresh_handles.end()) {
+        [it->second invalidate];
+        m_refresh_handles.erase(it);
+    }
+    m_refresh_handles.insert({path, handle});
+}
+
+void CocoaSyncUserContext::unregister_refresh_handle(const std::string& path)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_refresh_handles.erase(path);
+}
+
+void CocoaSyncUserContext::invalidate_all_handles()
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    for (auto& it : m_refresh_handles) {
+        [it.second invalidate];
+    }
+    m_refresh_handles.clear();
 }
 
 PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBlock callback) {
@@ -93,13 +125,6 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer NS_DESIGNATED_INITIALIZER;
 
 @property (nonatomic, readwrite) NSURL *authenticationServer;
-
-/**
- All 'refresh handles' associated with Realms opened by this user. A refresh handle is
- an object that encapsulates the concept of periodically refreshing the Realm's access
- token before it expires. Tokens are indexed by their paths (e.g. `/~/path/to/realm`).
- */
-@property (nonatomic) NSMutableDictionary<NSString *, RLMSyncSessionRefreshHandle *> *refreshHandles;
 
 @end
 
@@ -126,7 +151,6 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 - (instancetype)initWithAuthServer:(nullable NSURL *)authServer {
     if (self = [super init]) {
         self.authenticationServer = authServer;
-        self.refreshHandles = [NSMutableDictionary dictionary];
         _configMaker = std::make_unique<ConfigMaker>([](std::shared_ptr<SyncUser> user, std::string url) {
             RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
             NSURL *objCUrl = [NSURL URLWithString:@(url.c_str())];
@@ -181,10 +205,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         return;
     }
     _user->log_out();
-    for (id key in self.refreshHandles) {
-        [self.refreshHandles[key] invalidate];
-    }
-    [self.refreshHandles removeAllObjects];
+    contextForUser(_user)->invalidate_all_handles();
 }
 
 - (nullable RLMSyncSession *)sessionForURL:(NSURL *)url {
@@ -305,8 +326,10 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 
 #pragma mark - Private API
 
-- (void)_unregisterRefreshHandleForURLPath:(NSString *)path {
-    [self.refreshHandles removeObjectForKey:path];
++ (void)_setUpBindingContextFactory {
+    SyncUser::set_binding_context_factory([] {
+        return std::make_shared<CocoaSyncUserContext>();
+    });
 }
 
 - (NSString *)_refreshToken {
@@ -323,11 +346,11 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     NSURL *realmURL = [NSURL URLWithString:@(config.realm_url.c_str())];
     NSString *path = [realmURL path];
     REALM_ASSERT(realmURL && path);
-    [self.refreshHandles[path] invalidate];
-    self.refreshHandles[path] = [[RLMSyncSessionRefreshHandle alloc] initWithRealmURL:realmURL
-                                                                                 user:self
-                                                                              session:std::move(session)
-                                                                      completionBlock:completion];
+    RLMSyncSessionRefreshHandle *handle = [[RLMSyncSessionRefreshHandle alloc] initWithRealmURL:realmURL
+                                                                                           user:self
+                                                                                        session:std::move(session)
+                                                                                completionBlock:completion];
+    contextForUser(_user)->register_refresh_handle([path UTF8String], handle);
 }
 
 - (std::shared_ptr<SyncUser>)_syncUser {
