@@ -659,7 +659,7 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
     // unless using the dictionary/array code path. Remove this in 3.0.
     if (!value) {
         validateValueForProperty(NSNull.null, prop, _info);
-        if (prop.isPrimary)
+        if (prop.isPrimary || _promote_existing)
             return NSNull.null;
         _nilHack = true;
     }

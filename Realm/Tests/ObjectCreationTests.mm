@@ -1296,4 +1296,28 @@
     [realm2 cancelWriteTransaction];
 }
 
+- (void)testAddOrUpdateWithNilValues {
+    auto now = [NSDate date];
+    auto bytes = [NSData dataWithBytes:"a" length:1];
+    auto nonnull = [[AllOptionalTypesPK alloc] initWithValue:@[@0, @1, @2.2f, @3.3, @YES, @"a", bytes, now]];
+    auto null = [[AllOptionalTypesPK alloc] initWithValue:@[@0]];
+
+    auto realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    auto obj = [AllOptionalTypesPK createInRealm:realm withValue:nonnull];
+    auto nullobj = [[AllOptionalTypesPK alloc] initWithValue:null];
+    [realm addOrUpdateObject:nullobj];
+
+    XCTAssertNil(obj.intObj);
+    XCTAssertNil(obj.floatObj);
+    XCTAssertNil(obj.doubleObj);
+    XCTAssertNil(obj.boolObj);
+    XCTAssertNil(obj.string);
+    XCTAssertNil(obj.data);
+    XCTAssertNil(obj.date);
+
+    [realm cancelWriteTransaction];
+}
+
 @end
