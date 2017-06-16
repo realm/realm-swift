@@ -302,13 +302,14 @@
 /// A sync user should be able to successfully change their own password.
 - (void)testOtherUserChangePassword {
     // Create admin user.
+    NSString *adminUsername = [[NSUUID UUID] UUIDString];
     {
         NSURL *url = [RLMObjectServerTests authServerURL];
-        RLMSyncUser *adminUser = [self makeAdminUser:@"admin" password:@"admin" server:url];
+        RLMSyncUser *adminUser = [self makeAdminUser:adminUsername password:@"admin" server:url];
         [adminUser logOut];
 
-        // Confirm that admin/admin user has admin privileges.
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:@"admin"
+        // Confirm that admin user has admin privileges.
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:adminUsername
                                                                        password:@"admin"
                                                                        register:NO];
         adminUser = [self logInUserForCredentials:creds server:url];
@@ -330,7 +331,9 @@
     }
     // Attempt change password from regular user.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:@"user2" password:@"password"
+        NSString *regularUsername = [[NSUUID UUID] UUIDString];
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:regularUsername
+                                                                       password:@"password"
                                                                        register:YES];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
         XCTestExpectation *ex = [self expectationWithDescription:@"change password callback invoked"];
@@ -343,7 +346,9 @@
     }
     // Change password from admin user.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:@"admin" password:@"admin" register:NO];
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:adminUsername
+                                                                       password:@"admin"
+                                                                       register:NO];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
         XCTestExpectation *ex = [self expectationWithDescription:@"change password callback invoked"];
         [user changePassword:secondPassword forUserID:userID completion:^(NSError * _Nullable error) {
@@ -355,7 +360,8 @@
     }
     // Fail to log in with original password.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:username password:firstPassword
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:username
+                                                                       password:firstPassword
                                                                        register:NO];
 
         XCTestExpectation *ex = [self expectationWithDescription:@"login callback invoked"];
