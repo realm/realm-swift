@@ -465,20 +465,14 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
 /// Setting a permission for all users on a global Realm (no `~`) should work.
 - (void)testWildcardGlobalRealmWriteAccess {
-    XCTestExpectation *ex = [self expectationWithDescription:@"No permissions for newly created user."];
-    __block RLMSyncPermissionResults *results;
-    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(r);
-        results = r;
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    RLMSyncUser *admin = [self makeAdminUser:[[NSUUID UUID] UUIDString]
+                                    password:@"password"
+                                      server:[RLMSyncTestCase authServerURL]];
 
-    // Open a Realm for user A.
+    // Open a Realm for the admin user.
     NSString *testName = NSStringFromSelector(_cmd);
     NSURL *globalRealmURL = makeTestGlobalURL(testName);
-    RLMRealm *userARealm = [self openRealmForURL:globalRealmURL user:self.userA];
+    RLMRealm *adminUserRealm = [self openRealmForURL:globalRealmURL user:admin];
 
     // Give all users write permissions to that Realm.
     RLMSyncPermissionValue *p = [[RLMSyncPermissionValue alloc] initWithRealmPath:[globalRealmURL path]
@@ -487,16 +481,16 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
     // Set the permission.
     XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting wildcard permission should work."];
-    [self.userA applyPermission:p callback:^(NSError *error) {
+    [admin applyPermission:p callback:^(NSError *error) {
         XCTAssertNil(error);
         [ex2 fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    // Have user A write a few objects first.
-    [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-    [self waitForUploadsForUser:self.userA url:globalRealmURL];
-    CHECK_COUNT(3, SyncObject, userARealm);
+    // Have the admin user write a few objects first.
+    [self addSyncObjectsToRealm:adminUserRealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+    [self waitForUploadsForUser:admin url:globalRealmURL];
+    CHECK_COUNT(3, SyncObject, adminUserRealm);
 
     // User B should be able to write to the Realm.
     RLMRealm *userBRealm = [self openRealmForURL:globalRealmURL user:self.userB];

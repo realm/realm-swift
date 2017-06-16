@@ -303,43 +303,15 @@
 - (void)testOtherUserChangePassword {
     // Create admin user.
     {
-        // Admin token user.
-        NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
-        NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
-        XCTAssertNotNil(adminToken);
-        RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken identity:@"test"];
-        XCTAssertNotNil(credentials);
-        RLMSyncUser *adminTokenUser = [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
-
-        // Create admin/admin "normal" user. Won't have admin privileges until further below.
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:@"admin" password:@"admin" register:YES];
-        RLMSyncUser *adminUser = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
-        XCTAssertFalse(adminUser.isAdmin);
+        NSURL *url = [RLMObjectServerTests authServerURL];
+        RLMSyncUser *adminUser = [self makeAdminUser:@"admin" password:@"admin" server:url];
         [adminUser logOut];
 
-        // User should be created very quickly but not necessarily instantly.
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:5.0]];
-
-        // Set newly created admin/admin user as admin.
-        RLMRealmConfiguration *adminRealmConfig = [RLMRealmConfiguration defaultConfiguration];
-        adminRealmConfig.dynamic = true;
-        NSURL *adminRealmURL = [NSURL URLWithString:@"realm://localhost:9080/__admin"];
-        adminRealmConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:adminTokenUser realmURL:adminRealmURL];
-        XCTestExpectation *ex = [self expectationWithDescription:@"async open callback invoked"];
-        [RLMRealm asyncOpenWithConfiguration:adminRealmConfig callbackQueue:dispatch_get_main_queue() callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
-            XCTAssertNotNil(realm);
-            [realm transactionWithBlock:^{
-                [[realm allObjects:@"User"] setValue:@YES forKey:@"isAdmin"];
-            }];
-            XCTAssertNil(error);
-            [ex fulfill];
-        }];
-        [self waitForExpectationsWithTimeout:2.0 handler:nil];
-        [self waitForUploadsForUser:adminTokenUser url:adminRealmURL];
-
         // Confirm that admin/admin user has admin privileges.
-        creds = [RLMSyncCredentials credentialsWithUsername:@"admin" password:@"admin" register:NO];
-        adminUser = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:@"admin"
+                                                                       password:@"admin"
+                                                                       register:NO];
+        adminUser = [self logInUserForCredentials:creds server:url];
         XCTAssertTrue(adminUser.isAdmin);
         [adminUser logOut];
     }

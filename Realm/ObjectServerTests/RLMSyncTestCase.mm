@@ -21,6 +21,7 @@
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
 
+#import "RLMRealm_Dynamic.h"
 #import "RLMSyncManager+ObjectServerTests.h"
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncConfiguration_Private.h"
@@ -207,6 +208,51 @@ static NSURL *syncDirectoryForChildProcess() {
     XCTAssertTrue(theUser.state == RLMSyncUserStateActive,
                   @"User should have been valid, but wasn't. (process: %@)", process);
     return theUser;
+}
+
+- (RLMSyncUser *)makeAdminUser:(NSString *)userName password:(NSString *)password server:(NSURL *)url {
+    // Admin token user (only needs to be set up once ever per test run).
+    // Note: this is shared, persistent state between tests.
+    static RLMSyncUser *adminTokenUser = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
+        NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL
+                                                        encoding:NSUTF8StringEncoding error:nil];
+        RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken
+                                                                                identity:[[NSUUID UUID] UUIDString]];
+        adminTokenUser = [self logInUserForCredentials:credentials server:url];
+    });
+    XCTAssertNotNil(adminTokenUser);
+
+    // Create a new user, which starts off without admin privileges.
+    RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:password register:YES];
+    RLMSyncUser *adminUser = [self logInUserForCredentials:creds server:url];
+    XCTAssertFalse(adminUser.isAdmin);
+
+    // FIXME: is there any way to do this without waiting X seconds?
+    // User should be created very quickly but not necessarily instantly.
+    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:5.0]];
+
+    // Set newly created non-admin user as admin.
+    RLMRealmConfiguration *adminRealmConfig = [RLMRealmConfiguration defaultConfiguration];
+    adminRealmConfig.dynamic = true;
+    NSURL *adminRealmURL = [NSURL URLWithString:@"realm://localhost:9080/__admin"];
+    adminRealmConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:adminTokenUser
+                                                                           realmURL:adminRealmURL];
+    XCTestExpectation *ex = [self expectationWithDescription:@"async open callback invoked"];
+    [RLMRealm asyncOpenWithConfiguration:adminRealmConfig callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *error) {
+                                    XCTAssertNotNil(realm);
+                                    [realm transactionWithBlock:^{
+                                        [[realm allObjects:@"User"] setValue:@YES forKey:@"isAdmin"];
+                                    }];
+                                    XCTAssertNil(error);
+                                    [ex fulfill];
+                                }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [self waitForUploadsForUser:adminTokenUser url:adminRealmURL];
+    return adminUser;
 }
 
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user url:(NSURL *)url {
