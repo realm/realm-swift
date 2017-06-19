@@ -20,6 +20,7 @@
 
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncSession_Private.hpp"
+#import "RLMSyncSessionRefreshHandle.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
@@ -140,9 +141,15 @@ static BOOL isValidRealmURL(NSURL *url) {
         auto bindHandler = [=](auto&,
                                const SyncConfig& config,
                                const std::shared_ptr<SyncSession>& session) {
-            [user _bindSessionWithConfig:config
-                                 session:session
-                              completion:[RLMSyncManager sharedManager].sessionCompletionNotifier];
+            const std::shared_ptr<SyncUser>& user = config.user;
+            NSURL *realmURL = [NSURL URLWithString:@(config.realm_url.c_str())];
+            NSString *path = [realmURL path];
+            REALM_ASSERT(realmURL && path);
+            RLMSyncSessionRefreshHandle *handle = [[RLMSyncSessionRefreshHandle alloc] initWithRealmURL:realmURL
+                                                                                                   user:user
+                                                                                                session:std::move(session)
+                                                                                        completionBlock:[RLMSyncManager sharedManager].sessionCompletionNotifier];
+            std::static_pointer_cast<CocoaSyncUserContext>(user->binding_context())->register_refresh_handle([path UTF8String], handle);
         };
         if (!errorHandler) {
             errorHandler = [=](std::shared_ptr<SyncSession> errored_session,
