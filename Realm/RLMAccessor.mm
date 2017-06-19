@@ -640,18 +640,20 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
     }
 
     // Property value from an instance of this object type
+    id value;
     if ([obj isKindOfClass:_info.rlmObjectSchema.objectClass] && prop.swiftIvar) {
         if (prop.type == RLMPropertyTypeArray) {
             return static_cast<RLMListBase *>(object_getIvar(obj, prop.swiftIvar))._rlmArray;
         }
         else { // optional
-            return static_cast<RLMOptionalBase *>(object_getIvar(obj, prop.swiftIvar)).underlyingValue;
+            value = static_cast<RLMOptionalBase *>(object_getIvar(obj, prop.swiftIvar)).underlyingValue;
         }
     }
-
+    else {
     // Property value from some object that's KVC-compatible
-    id value = RLMValidatedValueForProperty(obj, [obj respondsToSelector:prop.getterSel] ? prop.getterName : prop.name,
-                                            _info.rlmObjectSchema.className);
+        value = RLMValidatedValueForProperty(obj, [obj respondsToSelector:prop.getterSel] ? prop.getterName : prop.name,
+                                             _info.rlmObjectSchema.className);
+    }
     // return value ?: NSNull.null;
 
     // FIXME: for compatiblity with existing code this does bad things to make
