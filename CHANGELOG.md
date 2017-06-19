@@ -11,7 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Properly update RealmOptional properties when adding an object with `add(update: true)`.
 
 2.8.2 Release notes (2017-06-16)
 =============================================================

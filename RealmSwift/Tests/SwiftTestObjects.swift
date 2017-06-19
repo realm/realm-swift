@@ -78,6 +78,12 @@ class SwiftOptionalObject: Object {
     @objc dynamic var optObjectCol: SwiftBoolObject?
 }
 
+class SwiftOptionalPrimaryObject: SwiftOptionalObject {
+    let id = RealmOptional<Int>()
+
+    override class func primaryKey() -> String? { return "id" }
+}
+
 class SwiftImplicitlyUnwrappedOptionalObject: Object {
     @objc dynamic var optNSStringCol: NSString!
     @objc dynamic var optStringCol: String!
