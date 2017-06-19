@@ -6,7 +6,7 @@ xcode_version:
   - 8.1
   - 8.2
   - 8.3.3
-  - 9 beta
+  - 9.0
 target:
   - osx
   - docs
@@ -36,20 +36,20 @@ configuration:
 # +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 # | Configuration Matrix | osx | docs | ios-static | ios-dynamic | ios-swift | osx-swift | watchos | cocoapods | swiftlint | tvos | osx-encryption | osx-object-server | ios-device-objc-ios8 | ios-device-swift-ios8 | ios-device-objc-ios10 | ios-device-swift-ios10 | tvos-device |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
-# | 8.0    | Debug       | X   |      |            |             |           |           |         |           |           |      |                |                   |                      |                       |                       |                        |             |
-# | 8.0    | Release     | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                      |                       |                       |                        |             |
+# | 8.0   | Debug        | X   |      |            |             |           |           |         |           |           |      |                |                   |                      |                       |                       |                        |             |
+# | 8.0   | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                      |                       |                       |                        |             |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
-# | 8.1    | Debug       | X   |      |            |             |           |           |         |           |           |      |                |                   |                      |                       |                       |                        |             |
-# | 8.1    | Release     | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                      |                       |                       |                        |             |
+# | 8.1   | Debug        | X   |      |            |             |           |           |         |           |           |      |                |                   |                      |                       |                       |                        |             |
+# | 8.1   | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                      |                       |                       |                        |             |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
-# | 8.2    | Debug       | X   |      | X          |             |           |           |         |           |           |      |                |                   |                      |                       |                       |                        |             |
-# | 8.2    | Release     | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                      |                       |                       |                        |             |
+# | 8.2   | Debug        | X   |      | X          |             |           |           |         |           |           |      |                |                   |                      |                       |                       |                        |             |
+# | 8.2   | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                      |                       |                       |                        |             |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
 # | 8.3.3 | Debug        | X   |      |            | X           | X         | X         | X       |           |           | X    |                |                   |                      |                       |                       |                        |             |
 # | 8.3.3 | Release      | X   | X    |            | X           | X         | X         | X       | X         | X         | X    | X              | X                 | X                    |                       | X                     |                        | X           |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
-# | 9 beta | Debug       | X   |      | X          |             |           |           |         |           |           |      |                |                   |                      |                       |                       |                        |             |
-# | 9 beta | Release     | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                      |                       |                       |                        |             |
+# | 9.0   | Debug        | X   |      | X          |             |           |           |         |           |           |      |                |                   |                      |                       |                       |                        |             |
+# | 9.0   | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                      |                       |                       |                        |             |
 # +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 exclude:
@@ -63,7 +63,7 @@ exclude:
     target: docs
   - xcode_version: 8.2
     target: docs
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: docs
   - target: docs
     configuration: Debug
@@ -72,7 +72,7 @@ exclude:
   # ios-static
   ################
   # Skip on 8.0/8.1 Debug
-  # Skip 8.3.3/9 beta altogether since it doesn't support the iOS 7 deployment target
+  # Skip 8.3.3/9.0 altogether since it doesn't support the iOS 7 deployment target
   - xcode_version: 8.0
     target: ios-static
     configuration: Debug
@@ -81,13 +81,13 @@ exclude:
     configuration: Debug
   - xcode_version: 8.3.3
     target: ios-static
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: ios-static
 
   ################
   # ios-dynamic
   ################
-  # Skip on 8.0/8.1/8.2/9 beta Debug
+  # Skip on 8.0/8.1/8.2/9.0 Debug
   - xcode_version: 8.0
     target: ios-dynamic
     configuration: Debug
@@ -97,14 +97,14 @@ exclude:
   - xcode_version: 8.2
     target: ios-dynamic
     configuration: Debug
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: ios-dynamic
     configuration: Debug
 
   ################
   # ios-swift
   ################
-  # Skip 8.0/8.1/8.2/9 beta Debug
+  # Skip 8.0/8.1/8.2/9.0 Debug
   - xcode_version: 8.0
     target: ios-swift
     configuration: Debug
@@ -114,14 +114,14 @@ exclude:
   - xcode_version: 8.2
     target: ios-swift
     configuration: Debug
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: ios-swift
     configuration: Debug
 
   ################
   # osx-swift
   ################
-  # Skip 8.0/8.1/8.2/9 beta Debug
+  # Skip 8.0/8.1/8.2/9.0 Debug
   - xcode_version: 8.0
     target: osx-swift
     configuration: Debug
@@ -131,14 +131,14 @@ exclude:
   - xcode_version: 8.2
     target: osx-swift
     configuration: Debug
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: osx-swift
     configuration: Debug
 
   ################
   # watchos
   ################
-  # Skip 8.0/8.1/8.2/9 beta Debug
+  # Skip 8.0/8.1/8.2/9.0 Debug
   - xcode_version: 8.0
     target: watchos
     configuration: Debug
@@ -148,7 +148,7 @@ exclude:
   - xcode_version: 8.2
     target: watchos
     configuration: Debug
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: watchos
     configuration: Debug
 
@@ -169,7 +169,7 @@ exclude:
     target: swiftlint
   - xcode_version: 8.2
     target: swiftlint
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: swiftlint
   - target: swiftlint
     configuration: Debug
@@ -177,7 +177,7 @@ exclude:
   ################
   # tvos
   ################
-  # Skip 8.0/8.1/8.2/9 beta Debug
+  # Skip 8.0/8.1/8.2/9.0 Debug
   - xcode_version: 8.0
     target: tvos
     configuration: Debug
@@ -187,7 +187,7 @@ exclude:
   - xcode_version: 8.2
     target: tvos
     configuration: Debug
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: tvos
     configuration: Debug
 
@@ -201,7 +201,7 @@ exclude:
     target: osx-encryption
   - xcode_version: 8.2
     target: osx-encryption
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: osx-encryption
   - target: osx-encryption
     configuration: Debug
@@ -216,7 +216,7 @@ exclude:
     target: osx-object-server
   - xcode_version: 8.2
     target: osx-object-server
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: osx-object-server
   - target: osx-object-server
     configuration: Debug
@@ -231,7 +231,7 @@ exclude:
     target: ios-device-objc-ios8
   - xcode_version: 8.2
     target: ios-device-objc-ios8
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: ios-device-objc-ios8
   - target: ios-device-objc-ios8
     configuration: Debug
@@ -246,7 +246,7 @@ exclude:
     target: ios-device-swift-ios8
   - xcode_version: 8.2
     target: ios-device-swift-ios8
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: ios-device-swift-ios8
   - target: ios-device-swift-ios8
     configuration: Debug
@@ -261,7 +261,7 @@ exclude:
     target: ios-device-objc-ios10
   - xcode_version: 8.2
     target: ios-device-objc-ios10
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: ios-device-objc-ios10
   - target: ios-device-objc-ios10
     configuration: Debug
@@ -276,7 +276,7 @@ exclude:
     target: ios-device-swift-ios10
   - xcode_version: 8.2
     target: ios-device-swift-ios10
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: ios-device-swift-ios10
   - target: ios-device-swift-ios10
     configuration: Debug
@@ -291,7 +291,7 @@ exclude:
     target: tvos-device
   - xcode_version: 8.2
     target: tvos-device
-  - xcode_version: 9 beta
+  - xcode_version: 9.0
     target: tvos-device
   - target: tvos-device
     configuration: Debug
