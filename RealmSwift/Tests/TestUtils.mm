@@ -73,6 +73,17 @@ void RLMAssertThrowsWithReasonMatching(XCTestCase *self, dispatch_block_t block,
     }
 }
 
+
+void RLMAssertMatches(XCTestCase *self, NSString *(^block)(), NSString *regexString, NSString *message, NSString *fileName, NSUInteger lineNumber) {
+    NSString *result = block();
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regexString options:(NSRegularExpressionOptions)0 error:nil];
+    if ([regex numberOfMatchesInString:result options:(NSMatchingOptions)0 range:NSMakeRange(0, result.length)] == 0) {
+        NSString *msg = [NSString stringWithFormat:@"The given expression '%@' did not match '%@'%@",
+                         result, regexString, message ? [NSString stringWithFormat:@": %@", message] : @""];
+        [self recordFailureWithDescription:msg inFile:fileName atLine:lineNumber expected:NO];
+    }
+}
+
 bool RLMHasCachedRealmForPath(NSString *path) {
     return RLMGetAnyCachedRealmForPath(path.UTF8String);
 }
