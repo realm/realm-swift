@@ -103,7 +103,7 @@ set_xcode_and_swift_versions # exports REALM_SWIFT_VERSION, REALM_XCODE_VERSION,
 
 case "$COMMAND" in
     "test-all")
-        for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage watchos-objc-dynamic test-watchos-objc-cocoapods test-watchos-objc-carthage watchos-swift-dynamic test-watchos-swift-cocoapods test-watchos-swift-carthage; do
+        for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage; do
             ./build.sh test-$target || exit 1
         done
         ;;
