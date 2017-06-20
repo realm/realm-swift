@@ -1,0 +1,475 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		E8FA5D381B3CD3320095EF19 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FA5D371B3CD3320095EF19 /* AppDelegate.swift */; };
+		E8FA5D3A1B3CD3320095EF19 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FA5D391B3CD3320095EF19 /* ViewController.swift */; };
+		E8FA5D3D1B3CD3320095EF19 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8FA5D3B1B3CD3320095EF19 /* Main.storyboard */; };
+		E8FA5D3F1B3CD3320095EF19 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E8FA5D3E1B3CD3320095EF19 /* Images.xcassets */; };
+		E8FA5D421B3CD3320095EF19 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = E8FA5D401B3CD3320095EF19 /* LaunchScreen.xib */; };
+		E8FA5D4E1B3CD3320095EF19 /* CarthageExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8FA5D4D1B3CD3320095EF19 /* CarthageExampleTests.swift */; };
+		E8FA5D591B3CD3A10095EF19 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8FA5D571B3CD3A10095EF19 /* Realm.framework */; };
+		E8FA5D5A1B3CD3A10095EF19 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E8FA5D581B3CD3A10095EF19 /* RealmSwift.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E8FA5D481B3CD3320095EF19 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8FA5D2A1B3CD3320095EF19 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E8FA5D311B3CD3320095EF19;
+			remoteInfo = CarthageExample;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		E8FA5D321B3CD3320095EF19 /* CarthageExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CarthageExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8FA5D361B3CD3320095EF19 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E8FA5D371B3CD3320095EF19 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		E8FA5D391B3CD3320095EF19 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		E8FA5D3C1B3CD3320095EF19 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		E8FA5D3E1B3CD3320095EF19 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		E8FA5D411B3CD3320095EF19 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		E8FA5D471B3CD3320095EF19 /* CarthageExampleTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CarthageExampleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E8FA5D4C1B3CD3320095EF19 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E8FA5D4D1B3CD3320095EF19 /* CarthageExampleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarthageExampleTests.swift; sourceTree = "<group>"; };
+		E8FA5D571B3CD3A10095EF19 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Carthage/Build/iOS/Realm.framework; sourceTree = "<group>"; };
+		E8FA5D581B3CD3A10095EF19 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = Carthage/Build/iOS/RealmSwift.framework; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E8FA5D2F1B3CD3320095EF19 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8FA5D591B3CD3A10095EF19 /* Realm.framework in Frameworks */,
+				E8FA5D5A1B3CD3A10095EF19 /* RealmSwift.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8FA5D441B3CD3320095EF19 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		E8FA5D291B3CD3320095EF19 = {
+			isa = PBXGroup;
+			children = (
+				E8FA5D571B3CD3A10095EF19 /* Realm.framework */,
+				E8FA5D581B3CD3A10095EF19 /* RealmSwift.framework */,
+				E8FA5D341B3CD3320095EF19 /* CarthageExample */,
+				E8FA5D4A1B3CD3320095EF19 /* CarthageExampleTests */,
+				E8FA5D331B3CD3320095EF19 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		E8FA5D331B3CD3320095EF19 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				E8FA5D321B3CD3320095EF19 /* CarthageExample.app */,
+				E8FA5D471B3CD3320095EF19 /* CarthageExampleTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		E8FA5D341B3CD3320095EF19 /* CarthageExample */ = {
+			isa = PBXGroup;
+			children = (
+				E8FA5D371B3CD3320095EF19 /* AppDelegate.swift */,
+				E8FA5D391B3CD3320095EF19 /* ViewController.swift */,
+				E8FA5D3B1B3CD3320095EF19 /* Main.storyboard */,
+				E8FA5D3E1B3CD3320095EF19 /* Images.xcassets */,
+				E8FA5D401B3CD3320095EF19 /* LaunchScreen.xib */,
+				E8FA5D351B3CD3320095EF19 /* Supporting Files */,
+			);
+			path = CarthageExample;
+			sourceTree = "<group>";
+		};
+		E8FA5D351B3CD3320095EF19 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E8FA5D361B3CD3320095EF19 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		E8FA5D4A1B3CD3320095EF19 /* CarthageExampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				E8FA5D4D1B3CD3320095EF19 /* CarthageExampleTests.swift */,
+				E8FA5D4B1B3CD3320095EF19 /* Supporting Files */,
+			);
+			path = CarthageExampleTests;
+			sourceTree = "<group>";
+		};
+		E8FA5D4B1B3CD3320095EF19 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				E8FA5D4C1B3CD3320095EF19 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E8FA5D311B3CD3320095EF19 /* CarthageExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8FA5D511B3CD3320095EF19 /* Build configuration list for PBXNativeTarget "CarthageExample" */;
+			buildPhases = (
+				E8FA5D2E1B3CD3320095EF19 /* Sources */,
+				E8FA5D2F1B3CD3320095EF19 /* Frameworks */,
+				E8FA5D301B3CD3320095EF19 /* Resources */,
+				E8FA5D5B1B3CD3C00095EF19 /* Copy Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CarthageExample;
+			productName = CarthageExample;
+			productReference = E8FA5D321B3CD3320095EF19 /* CarthageExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+		E8FA5D461B3CD3320095EF19 /* CarthageExampleTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E8FA5D541B3CD3320095EF19 /* Build configuration list for PBXNativeTarget "CarthageExampleTests" */;
+			buildPhases = (
+				E8FA5D431B3CD3320095EF19 /* Sources */,
+				E8FA5D441B3CD3320095EF19 /* Frameworks */,
+				E8FA5D451B3CD3320095EF19 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E8FA5D491B3CD3320095EF19 /* PBXTargetDependency */,
+			);
+			name = CarthageExampleTests;
+			productName = CarthageExampleTests;
+			productReference = E8FA5D471B3CD3320095EF19 /* CarthageExampleTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E8FA5D2A1B3CD3320095EF19 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0700;
+				LastUpgradeCheck = 0800;
+				ORGANIZATIONNAME = Realm;
+				TargetAttributes = {
+					E8FA5D311B3CD3320095EF19 = {
+						CreatedOnToolsVersion = 6.3.2;
+						LastSwiftMigration = 0800;
+					};
+					E8FA5D461B3CD3320095EF19 = {
+						CreatedOnToolsVersion = 6.3.2;
+						LastSwiftMigration = 0800;
+						TestTargetID = E8FA5D311B3CD3320095EF19;
+					};
+				};
+			};
+			buildConfigurationList = E8FA5D2D1B3CD3320095EF19 /* Build configuration list for PBXProject "CarthageExample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = E8FA5D291B3CD3320095EF19;
+			productRefGroup = E8FA5D331B3CD3320095EF19 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E8FA5D311B3CD3320095EF19 /* CarthageExample */,
+				E8FA5D461B3CD3320095EF19 /* CarthageExampleTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E8FA5D301B3CD3320095EF19 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8FA5D3D1B3CD3320095EF19 /* Main.storyboard in Resources */,
+				E8FA5D421B3CD3320095EF19 /* LaunchScreen.xib in Resources */,
+				E8FA5D3F1B3CD3320095EF19 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8FA5D451B3CD3320095EF19 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		E8FA5D5B1B3CD3C00095EF19 /* Copy Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/Realm.framework",
+				"$(SRCROOT)/Carthage/Build/iOS/RealmSwift.framework",
+			);
+			name = "Copy Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E8FA5D2E1B3CD3320095EF19 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8FA5D3A1B3CD3320095EF19 /* ViewController.swift in Sources */,
+				E8FA5D381B3CD3320095EF19 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E8FA5D431B3CD3320095EF19 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E8FA5D4E1B3CD3320095EF19 /* CarthageExampleTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E8FA5D491B3CD3320095EF19 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E8FA5D311B3CD3320095EF19 /* CarthageExample */;
+			targetProxy = E8FA5D481B3CD3320095EF19 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		E8FA5D3B1B3CD3320095EF19 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E8FA5D3C1B3CD3320095EF19 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		E8FA5D401B3CD3320095EF19 /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E8FA5D411B3CD3320095EF19 /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		E8FA5D4F1B3CD3320095EF19 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build/iOS";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		E8FA5D501B3CD3320095EF19 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build/iOS";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		E8FA5D521B3CD3320095EF19 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = CarthageExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Debug;
+		};
+		E8FA5D531B3CD3320095EF19 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = CarthageExample/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+			};
+			name = Release;
+		};
+		E8FA5D551B3CD3320095EF19 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = CarthageExampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CarthageExample.app/CarthageExample";
+			};
+			name = Debug;
+		};
+		E8FA5D561B3CD3320095EF19 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = CarthageExampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CarthageExample.app/CarthageExample";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		E8FA5D2D1B3CD3320095EF19 /* Build configuration list for PBXProject "CarthageExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8FA5D4F1B3CD3320095EF19 /* Debug */,
+				E8FA5D501B3CD3320095EF19 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8FA5D511B3CD3320095EF19 /* Build configuration list for PBXNativeTarget "CarthageExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8FA5D521B3CD3320095EF19 /* Debug */,
+				E8FA5D531B3CD3320095EF19 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E8FA5D541B3CD3320095EF19 /* Build configuration list for PBXNativeTarget "CarthageExampleTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E8FA5D551B3CD3320095EF19 /* Debug */,
+				E8FA5D561B3CD3320095EF19 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = E8FA5D2A1B3CD3320095EF19 /* Project object */;
+}
