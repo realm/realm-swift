@@ -1,13 +1,5 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.8.3 Release notes (2017-06-20)
 =============================================================
-
-### API Breaking Changes
-
-* None.
-
-### Enhancements
-
-* None.
 
 ### Bugfixes
 
