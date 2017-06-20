@@ -16,9 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMCollection.h>
-
-#import <Realm/RLMRealm.h>
+#import <Realm/RLMCollection_Private.h>
 
 namespace realm {
     class List;
@@ -72,6 +70,3 @@ RLMNotificationToken *RLMAddNotificationBlock(id objcCollection,
                                               void (^block)(id, RLMCollectionChange *, NSError *),
                                               bool suppressInitialChange=false);
 
-NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *key);
-void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value);
-NSString *RLMDescriptionWithMaxDepth(NSString *name, id<RLMCollection> collection, NSUInteger depth);

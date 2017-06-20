@@ -19,15 +19,18 @@
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTestCase.h>
 
-FOUNDATION_EXTERN void RLMAssertThrowsWithName(XCTestCase *self,
-                                       __attribute__((noescape)) dispatch_block_t block,
-                                       NSString *name, NSString *message,
-                                       NSString *fileName, NSUInteger lineNumber);
+FOUNDATION_EXTERN void RLMAssertThrowsWithName(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block,
+                                               NSString *name, NSString *message, NSString *fileName,
+                                               NSUInteger lineNumber);
 
 
 FOUNDATION_EXTERN void RLMAssertThrowsWithReasonMatching(XCTestCase *self,
-                                      __attribute__((noescape)) dispatch_block_t block,
-                                      NSString *regexString, NSString *message,
-                                      NSString *fileName, NSUInteger lineNumber);
+                                                         __attribute__((noescape)) dispatch_block_t block,
+                                                         NSString *regexString, NSString *message,
+                                                         NSString *fileName, NSUInteger lineNumber);
+
+FOUNDATION_EXTERN void RLMAssertMatches(XCTestCase *self, __attribute__((noescape)) NSString *(^block)(),
+                                        NSString *regexString, NSString *message, NSString *fileName,
+                                        NSUInteger lineNumber);
 
 FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
