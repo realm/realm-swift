@@ -12,6 +12,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Properly update RealmOptional properties when adding an object with `add(update: true)`.
+* Add some missing quotes in error messages.
+* Fix a performance regression when creating objects with primary keys.
 
 2.8.2 Release notes (2017-06-16)
 =============================================================
