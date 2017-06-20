@@ -37,6 +37,8 @@ using ProtocolError = realm::sync::ProtocolError;
 RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     if (error.is_client_reset_requested()) {
         return RLMSyncSystemErrorKindClientReset;
+    } else if (error.error_code == ProtocolError::permission_denied) {
+        return RLMSyncSystemErrorKindPermissionDenied;
     } else if (error.error_code == ProtocolError::bad_authentication) {
         return RLMSyncSystemErrorKindUser;
     } else if (error.is_session_level_protocol_error()) {
