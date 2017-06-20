@@ -40,7 +40,7 @@ COMMAND="$1"
 download_zip_if_needed() {
     LANG="$1"
     DIRECTORY=realm-$LANG-latest
-    if [ ! -f $DIRECTORY.zip ]; then
+    if [ ! -d $DIRECTORY ]; then
         curl -o $DIRECTORY.zip -L https://static.realm.io/downloads/$LANG/latest
         unzip $DIRECTORY.zip
         rm $DIRECTORY.zip
