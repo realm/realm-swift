@@ -116,11 +116,11 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
  This method is useful only in specialized circumstances, for example, in conjunction with
  +[RLMObjectSchema initWithClassName:objectClass:properties:]. If you are simply building an
  app on Realm, it is not recommened to use this method.
- 
+
  Initialize an RLMProperty
- 
+
  @warning This method is useful only in specialized circumstances.
- 
+
  @param name            The property name.
  @param type            The property type.
  @param objectClassName The object type used for Object and Array types.

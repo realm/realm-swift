@@ -32,7 +32,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncAccessLevel) {
     RLMSyncAccessLevelNone          = 0,
     /**
      User can only read the contents of the Realm.
-     
+
      @warning Users who have read-only access to a Realm should open the
               Realm using `+[RLMRealm asyncOpenWithConfiguration:callbackQueue:callback:]`.
               Attempting to directly open the Realm is an error; in this
@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
  A value representing a permission granted to the specified user(s) to access the specified Realm(s).
 
  `RLMSyncPermissionValue` is immutable and can be accessed from any thread.
- 
+
  See https://realm.io/docs/realm-object-server/#permissions for general documentation.
  */
 @interface RLMSyncPermissionValue : NSObject

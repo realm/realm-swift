@@ -786,7 +786,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                   ascending:YES];
     // Wait for changes to propagate
     CHECK_PERMISSION_COUNT(sorted, 3);
-    
+
     RLMSyncPermissionValue *n1 = nil;
     RLMSyncPermissionValue *n2 = nil;
     RLMSyncPermissionValue *n3 = nil;

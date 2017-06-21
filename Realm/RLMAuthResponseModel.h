@@ -20,7 +20,7 @@
 
 /**
  An internal class representing a valid JSON response to an auth request.
- 
+
  ```
  {
      "access_token": { ... } // (optional),

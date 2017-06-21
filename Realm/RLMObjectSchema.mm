@@ -100,10 +100,10 @@ using namespace realm;
     if (hasSwiftName) {
         className = [RLMSwiftSupport demangleClassName:className];
     }
-    
+
     static Class s_swiftObjectClass = NSClassFromString(@"RealmSwiftObject");
     bool isSwift = hasSwiftName || [objectClass isSubclassOfClass:s_swiftObjectClass];
-    
+
     schema.className = className;
     schema.objectClass = objectClass;
     schema.accessorClass = objectClass;
@@ -413,7 +413,7 @@ using namespace realm;
     schema.objectClass = RLMObject.class;
     schema.accessorClass = RLMDynamicObject.class;
     schema.unmanagedClass = RLMObject.class;
-    
+
     return schema;
 }
 

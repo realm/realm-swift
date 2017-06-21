@@ -66,9 +66,9 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     RLMPropertyTypeString = 2,
     /** Binary data: `NSData` */
     RLMPropertyTypeData   = 3,
-    /** 
+    /**
      Any object: `id`.
-     
+
      This property type is no longer supported for new models. However, old models with any-typed properties are still
      supported for migration purposes.
      */
@@ -103,9 +103,9 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMError, RLMErrorDomain) {
     /** Denotes a file I/O error that occurred when trying to open a Realm. */
     RLMErrorFileAccess            = 2,
 
-    /** 
+    /**
      Denotes a file permission error that ocurred when trying to open a Realm.
-     
+
      This error can occur if the user does not have permission to open or create
      the specified file in the specified access mode when opening a Realm.
      */
@@ -116,24 +116,24 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMError, RLMErrorDomain) {
 
     /**
      Denotes an error that occurs if a file could not be found.
-     
+
      This error may occur if a Realm file could not be found on disk when trying to open a
      Realm as read-only, or if the directory part of the specified path was not found when
      trying to write a copy.
      */
     RLMErrorFileNotFound          = 5,
 
-    /** 
+    /**
      Denotes an error that occurs if a file format upgrade is required to open the file,
      but upgrades were explicitly disabled.
      */
     RLMErrorFileFormatUpgradeRequired = 6,
 
-    /** 
+    /**
      Denotes an error that occurs if the database file is currently open in another
      process which cannot share with the current process due to an
      architecture mismatch.
-     
+
      This error may occur if trying to share a Realm file between an i386 (32-bit) iOS
      Simulator and the Realm Browser application. In this case, please use the 64-bit
      version of the iOS Simulator.
