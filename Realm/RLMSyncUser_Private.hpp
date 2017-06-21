@@ -54,10 +54,6 @@ private:
 
 @interface RLMSyncUser ()
 
-- (void)_bindSessionWithConfig:(const SyncConfig&)config
-                       session:(std::shared_ptr<SyncSession>)session
-                    completion:(RLMSyncBasicErrorReportingBlock)completion;
-
 - (instancetype)initWithSyncUser:(std::shared_ptr<SyncUser>)user;
 - (std::shared_ptr<SyncUser>)_syncUser;
 - (nullable NSString *)_refreshToken;

@@ -48,7 +48,6 @@ void unregisterRefreshHandle(const std::weak_ptr<SyncUser>& user, const std::str
 }
 
 @property (nonatomic) NSTimer *timer;
-@property (nonatomic) NSString *identity;
 
 @property (nonatomic) NSURL *realmURL;
 @property (nonatomic) NSURL *authServerURL;
@@ -59,23 +58,22 @@ void unregisterRefreshHandle(const std::weak_ptr<SyncUser>& user, const std::str
 @implementation RLMSyncSessionRefreshHandle
 
 - (instancetype)initWithRealmURL:(NSURL *)realmURL
-                            user:(RLMSyncUser *)user
+                            user:(std::shared_ptr<realm::SyncUser>)user
                          session:(std::shared_ptr<realm::SyncSession>)session
                  completionBlock:(RLMSyncBasicErrorReportingBlock)completionBlock {
     if (self = [super init]) {
         NSString *path = [realmURL path];
         _path = [path UTF8String];
-        self.identity = user.identity;
-        if (!self.identity) {
-            @throw RLMException(@"Refresh handles cannot be created for users without a valid identity.");
+        self.authServerURL = [NSURL URLWithString:@(user->server_url().c_str())];
+        if (!self.authServerURL) {
+            @throw RLMException(@"User object isn't configured with an auth server URL.");
         }
-        self.authServerURL = user.authenticationServer;
         self.completionBlock = completionBlock;
         self.realmURL = realmURL;
         // For the initial bind, we want to prolong the session's lifetime.
         _strongSession = std::move(session);
         _session = _strongSession;
-        _user = [user _syncUser];
+        _user = user;
         // Immediately fire off the network request.
         [self _timerFired:nil];
         return self;
