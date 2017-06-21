@@ -82,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
  Create a new sync permission value, for use with permission APIs.
 
  @param path        The Realm Object Server path to the Realm whose permission should be modified
-                    (e.g. "/path/to/realm"). Pass "*" to apply to all Realms managed by the server.
+                    (e.g. "/path/to/realm"). Pass "*" to apply to all Realms managed by the user.
  @param userID      The identity of the user who should be granted access to the Realm at `path`.
                     Pass "*" to apply to all users managed by the server.
  @param accessLevel The access level to grant.
@@ -95,7 +95,7 @@ NS_ASSUME_NONNULL_BEGIN
  Create a new sync permission value, for use with permission APIs.
 
  @param path        The Realm Object Server path to the Realm whose permission should be modified
-                    (e.g. "/path/to/realm"). Pass "*" to apply to all Realms managed by the server.
+                    (e.g. "/path/to/realm"). Pass "*" to apply to all Realms managed by the user.
  @param username    The username (often an email address) of the user who should be granted access
                     to the Realm at `path`.
  @param accessLevel The access level to grant.
