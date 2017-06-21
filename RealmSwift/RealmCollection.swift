@@ -124,11 +124,66 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
 
 /// A type which can be stored in a Realm List or Results
 public protocol RealmCollectionValue {
-    /**
-     WARNING: This is an internal helper method not intended for public use.
-     :nodoc:
-     */
-    static func className() -> String
+    static func _rlmArray() -> RLMArray<AnyObject>
+}
+
+extension RealmCollectionValue {
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return RLMArray(objectType: .int, optional: false)
+    }
+}
+
+extension Optional: RealmCollectionValue {
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        switch Wrapped.self {
+        case is Int.Type, is Int8.Type, is Int16.Type, is Int32.Type, is Int64.Type:
+            return RLMArray(objectType: .int, optional: true)
+        case is Bool.Type:   return RLMArray(objectType: .bool,  optional: true)
+        case is Float.Type:  return RLMArray(objectType: .float,  optional: true)
+        case is Double.Type: return RLMArray(objectType: .double, optional: true)
+        case is String.Type: return RLMArray(objectType: .string, optional: true)
+        case is Data.Type:   return RLMArray(objectType: .data,   optional: true)
+        case is Date.Type:   return RLMArray(objectType: .date,   optional: true)
+        default: fatalError("Unsupported type for List: \(Wrapped.self)?")
+        }
+    }
+}
+
+extension Int: RealmCollectionValue {}
+extension Int8: RealmCollectionValue {}
+extension Int16: RealmCollectionValue {}
+extension Int32: RealmCollectionValue {}
+extension Int64: RealmCollectionValue {}
+extension Float: RealmCollectionValue {
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return RLMArray(objectType: .float, optional: false)
+    }
+}
+extension Double: RealmCollectionValue {
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return RLMArray(objectType: .double, optional: false)
+    }
+}
+extension Bool: RealmCollectionValue {
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return RLMArray(objectType: .bool, optional: false)
+    }
+}
+
+extension String: RealmCollectionValue {
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return RLMArray(objectType: .string, optional: false)
+    }
+}
+extension Date: RealmCollectionValue {
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return RLMArray(objectType: .date, optional: false)
+    }
+}
+extension Data: RealmCollectionValue {
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return RLMArray(objectType: .data, optional: false)
+    }
 }
 
 #if swift(>=3.2)
@@ -276,7 +331,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter property: The name of a property whose values should be summed.
      */
-    func average<U: AddableType>(ofProperty property: String) -> U?
+    func average(ofProperty property: String) -> Double?
 
 
     // MARK: Key-Value Coding
@@ -370,6 +425,62 @@ public protocol RealmCollection: RealmCollectionBase {
     func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
+public extension RealmCollection where Element: MinMaxType {
+    public func min() -> Element? {
+        return min(ofProperty: "self")
+    }
+    public func max() -> Element? {
+        return max(ofProperty: "self")
+    }
+}
+
+public protocol OptionalProtocol {
+    associatedtype Wrapped
+    func _rlmInferWrappedType() -> Wrapped
+}
+extension Optional: OptionalProtocol {
+    public func _rlmInferWrappedType() -> Wrapped { return self! }
+}
+
+public extension RealmCollection where Element: OptionalProtocol, Element.Wrapped: MinMaxType {
+    public func min() -> Element.Wrapped? {
+        return min(ofProperty: "self")
+    }
+    public func max() -> Element.Wrapped? {
+        return max(ofProperty: "self")
+    }
+}
+
+public extension RealmCollection where Element: AddableType {
+    public func sum() -> Element {
+        return sum(ofProperty: "self")
+    }
+    public func average() -> Double? {
+        return average(ofProperty: "self")
+    }
+}
+
+public extension RealmCollection where Element: OptionalProtocol, Element.Wrapped: AddableType {
+    public func sum() -> Element.Wrapped {
+        return sum(ofProperty: "self")
+    }
+    public func average() -> Double? {
+        return average(ofProperty: "self")
+    }
+}
+
+public extension RealmCollection where Element: Comparable {
+    public func sorted(ascending: Bool = true) -> Results<Element> {
+        return sorted(byKeyPath: "self", ascending: ascending)
+    }
+}
+
+public extension RealmCollection where Element: OptionalProtocol, Element.Wrapped: Comparable {
+    public func sorted(ascending: Bool = true) -> Results<Element> {
+        return sorted(byKeyPath: "self", ascending: ascending)
+    }
+}
+
 private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiveCBridgeable {
     typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T
@@ -389,7 +500,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func min<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
     func max<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
     func sum<U: AddableType>(ofProperty property: String) -> U { fatalError() }
-    func average<U: AddableType>(ofProperty property: String) -> U? { fatalError() }
+    func average(ofProperty property: String) -> Double? { fatalError() }
     subscript(position: Int) -> Element { fatalError() }
     func makeIterator() -> RLMIterator<T> { fatalError() }
     var startIndex: Int { fatalError() }
@@ -461,7 +572,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
         return base.sum(ofProperty: property)
     }
 
-    override func average<U: AddableType>(ofProperty property: String) -> U? {
+    override func average(ofProperty property: String) -> Double? {
         return base.average(ofProperty: property)
     }
 
@@ -687,7 +798,7 @@ public final class AnyRealmCollection<T: RealmCollectionValue>: RealmCollection 
 
      - parameter property: The name of a property whose average value should be calculated.
      */
-    public func average<U: AddableType>(ofProperty property: String) -> U? { return base.average(ofProperty: property) }
+    public func average(ofProperty property: String) -> Double? { return base.average(ofProperty: property) }
 
 
     // MARK: Sequence Support

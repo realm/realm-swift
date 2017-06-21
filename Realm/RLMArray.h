@@ -16,13 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
 #import <Realm/RLMCollection.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMObject, RLMRealm, RLMResults<RLMObjectType>, RLMNotificationToken;
+@class RLMObject, RLMResults<RLMObjectType>;
 
 /**
  `RLMArray` is the container type in Realm used to define to-many relationships.
@@ -67,9 +65,21 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, assign) NSUInteger count;
 
 /**
- The class name (i.e. type) of the objects contained in the array.
+ The type of the objects in the array.
  */
-@property (nonatomic, readonly, copy) NSString *objectClassName;
+@property (nonatomic, readonly, assign) RLMPropertyType type;
+
+/**
+ Indicates whether the objects in the collection can be `nil`.
+ */
+@property (nonatomic, readonly) bool optional;
+
+/**
+ The class name  of the objects contained in the array.
+
+ Will be `nil` if `type` is not RLMPropertyTypeObject.
+ */
+@property (nonatomic, readonly, copy, nullable) NSString *objectClassName;
 
 /**
  The Realm which manages the array. Returns `nil` for unmanaged arrays.

@@ -97,17 +97,26 @@ static inline bool numberIsDouble(__unsafe_unretained NSNumber *const obj) {
            data_type == *@encode(unsigned long long);
 }
 
-BOOL RLMValidateValue(id value, RLMPropertyType type, bool optional, bool array,
-                      NSString *objectClassName) {
+static inline RLMArray *asRLMArray(__unsafe_unretained id const value) {
+    return RLMDynamicCast<RLMArray>(value) ?: RLMDynamicCast<RLMListBase>(value)._rlmArray;
+}
+
+static inline bool checkArrayType(__unsafe_unretained RLMArray *const array,
+                                  RLMPropertyType type, bool optional,
+                                  __unsafe_unretained NSString *const objectClassName) {
+    return array.type == type && array.optional == optional
+        && (type != RLMPropertyTypeObject || [array.objectClassName isEqualToString:objectClassName]);
+}
+
+BOOL RLMValidateValue(__unsafe_unretained id const value,
+                      RLMPropertyType type, bool optional, bool array,
+                      __unsafe_unretained NSString *const objectClassName) {
     if (optional && !RLMCoerceToNil(value)) {
         return YES;
     }
     if (array) {
-        if (RLMArray *array = RLMDynamicCast<RLMArray>(value)) {
-            return [array.objectClassName isEqualToString:objectClassName];
-        }
-        if (RLMListBase *list = RLMDynamicCast<RLMListBase>(value)) {
-            return [list._rlmArray.objectClassName isEqualToString:objectClassName];
+        if (auto rlmArray = asRLMArray(value)) {
+            return checkArrayType(rlmArray, type, optional, objectClassName);
         }
         if ([value conformsToProtocol:@protocol(NSFastEnumeration)]) {
             // check each element for compliance
@@ -165,34 +174,67 @@ BOOL RLMValidateValue(id value, RLMPropertyType type, bool optional, bool array,
     @throw RLMException(@"Invalid RLMPropertyType specified");
 }
 
+void RLMThrowTypeError(__unsafe_unretained id const obj,
+                       __unsafe_unretained RLMObjectSchema *const objectSchema,
+                       __unsafe_unretained RLMProperty *const prop) {
+    @throw RLMException(@"Invalid value '%@' of type '%@' for '%@%s'%s property '%@.%@'.",
+                        obj, [obj class],
+                        prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
+                        prop.array ? " array" : "", objectSchema.className, prop.name);
+}
+
 void RLMValidateValueForProperty(__unsafe_unretained id const obj,
-                                 __unsafe_unretained RLMProperty *const prop) {
+                                 __unsafe_unretained RLMObjectSchema *const objectSchema,
+                                 __unsafe_unretained RLMProperty *const prop,
+                                 bool validateObjects) {
+    // This duplicates a lot of the checks in RLMIsObjectValidForProperty()
+    // for the sake of more specific error messages
     if (prop.array) {
-        if (obj && obj != NSNull.null && ![obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
-            @throw RLMException(@"Array property value (%@) is not enumerable.", obj);
+        // nil is considered equivalent to an empty array for historical reasons
+        // since we don't support null arrays (only arrays containing null),
+        // it's not worth the BC break to change this
+        if (!obj || obj == NSNull.null) {
+            return;
+        }
+        if (![obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
+            @throw RLMException(@"Invalid value (%@) for '%@%s' array property '%@.%@': value is not enumerable.",
+                                obj, prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
+                                objectSchema.className, prop.name);
+        }
+        if (!validateObjects && prop.type == RLMPropertyTypeObject) {
+            return;
+        }
+
+        if (RLMArray *array = asRLMArray(obj)) {
+            if (!checkArrayType(array, prop.type, prop.optional, prop.objectClassName)) {
+                @throw RLMException(@"RLMArray<%@%s> does not match expected type '%@%s' for property '%@.%@'.",
+                                    array.objectClassName ?: RLMTypeToString(array.type), array.optional ? "?" : "",
+                                    prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
+                                    objectSchema.className, prop.name);
+            }
+            return;
+        }
+
+        for (id value in obj) {
+            if (!RLMValidateValue(value, prop.type, prop.optional, false, prop.objectClassName)) {
+                RLMThrowTypeError(value, objectSchema, prop);
+            }
         }
         return;
     }
-    switch (prop.type) {
-        case RLMPropertyTypeString:
-        case RLMPropertyTypeBool:
-        case RLMPropertyTypeDate:
-        case RLMPropertyTypeInt:
-        case RLMPropertyTypeFloat:
-        case RLMPropertyTypeDouble:
-        case RLMPropertyTypeData:
-            if (!RLMIsObjectValidForProperty(obj, prop)) {
-                @throw RLMException(@"Invalid value '%@' for property '%@'", obj, prop.name);
-            }
-            break;
-        case RLMPropertyTypeObject:
-            break;
-        case RLMPropertyTypeAny:
-        case RLMPropertyTypeLinkingObjects:
-            // It should not be possible to have either of these property types
-            // in the persisted properties array
-            REALM_UNREACHABLE();
+
+    // For create() we want to skip the validation logic for objects because
+    // we allow much fuzzier matching (any KVC-compatible object with at least
+    // all the non-defaulted fields), and all the logic for that lives in the
+    // object store rather than here
+    if (prop.type == RLMPropertyTypeObject && !validateObjects) {
+        return;
     }
+    if (RLMIsObjectValidForProperty(obj, prop)) {
+        return;
+    }
+
+    RLMThrowTypeError(obj, objectSchema, prop);
 }
 
 BOOL RLMIsObjectValidForProperty(__unsafe_unretained id const obj,

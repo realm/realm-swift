@@ -68,6 +68,9 @@ import Realm.Private
  */
 @objc(RealmSwiftObject)
 open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return RLMArray(objectClassName: className())
+    }
 
     // MARK: Initializers
 

@@ -664,6 +664,28 @@ RLM_ARRAY_TYPE(NotARealClass)
     XCTAssertFalse([objectSchema[@"binaryCol"] optional]);
 }
 
+- (void)testClassWithRequiredPrimitiveArrayProperties {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:AllPrimitiveArrays.class];
+    XCTAssertFalse(objectSchema[@"intObj"].optional);
+    XCTAssertFalse(objectSchema[@"boolObj"].optional);
+    XCTAssertFalse(objectSchema[@"floatObj"].optional);
+    XCTAssertFalse(objectSchema[@"doubleObj"].optional);
+    XCTAssertFalse(objectSchema[@"stringObj"].optional);
+    XCTAssertFalse(objectSchema[@"dateObj"].optional);
+    XCTAssertFalse(objectSchema[@"dataObj"].optional);
+}
+
+- (void)testClassWithOptionalPrimitiveArrayProperties {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:AllOptionalPrimitiveArrays.class];
+    XCTAssertTrue(objectSchema[@"intObj"].optional);
+    XCTAssertTrue(objectSchema[@"boolObj"].optional);
+    XCTAssertTrue(objectSchema[@"floatObj"].optional);
+    XCTAssertTrue(objectSchema[@"doubleObj"].optional);
+    XCTAssertTrue(objectSchema[@"stringObj"].optional);
+    XCTAssertTrue(objectSchema[@"dateObj"].optional);
+    XCTAssertTrue(objectSchema[@"dataObj"].optional);
+}
+
 - (void)testClassWithRequiredLinkProperty {
     RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:RequiredLinkProperty.class], @"cannot be made required.*'object'");
 }

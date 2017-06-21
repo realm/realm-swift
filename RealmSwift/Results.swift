@@ -45,7 +45,9 @@ extension NSDate: MinMaxType {}
 
  - see: `sum(ofProperty:)`, `average(ofProperty:)`
  */
-public protocol AddableType {}
+public protocol AddableType {
+    init()
+}
 extension NSNumber: AddableType {}
 extension Double: AddableType {}
 extension Float: AddableType {}

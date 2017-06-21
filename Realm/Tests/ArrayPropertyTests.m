@@ -218,7 +218,8 @@
     [realm beginWriteTransaction];
     CompanyObject *company = [CompanyObject createInDefaultRealmWithValue:@[@"company", @[]]];
 
-    RLMAssertThrowsWithReasonMatching([company.employees addObject:self.nonLiteralNil], @"nil");
+    RLMAssertThrowsWithReason([company.employees addObject:self.nonLiteralNil],
+                              @"Invalid nil value for array of 'EmployeeObject'.");
     [realm cancelWriteTransaction];
 }
 
@@ -284,6 +285,36 @@
 
     // test unmanaged with literals
     __unused ArrayPropertyObject *obj = [[ArrayPropertyObject alloc] initWithValue:@[@"n", @[], @[[[IntObject alloc] initWithValue:@[@1]]]]];
+}
+
+- (void)testUnmanagedPrimitive {
+    AllPrimitiveArrays *obj = [[AllPrimitiveArrays alloc] init];
+    XCTAssertTrue([obj.intObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.floatObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.doubleObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.boolObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.stringObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.dataObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.dateObj isKindOfClass:[RLMArray class]]);
+
+    [obj.intObj addObject:@1];
+    XCTAssertEqualObjects(obj.intObj[0], @1);
+    XCTAssertThrows([obj.intObj addObject:@""]);
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    obj = [AllPrimitiveArrays createInRealm:realm withValue:@[@[],@[],@[],@[],@[],@[],@[]]];
+
+    XCTAssertTrue([obj.intObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.floatObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.doubleObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.boolObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.stringObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.dataObj isKindOfClass:[RLMArray class]]);
+    XCTAssertTrue([obj.dateObj isKindOfClass:[RLMArray class]]);
+
+    [obj.intObj addObject:@5];
+    XCTAssertEqualObjects(obj.intObj.firstObject, @5);
 }
 
 - (void)testReplaceObjectAtIndexInUnmanagedArray {
@@ -990,26 +1021,36 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
-    CompanyObject *company = [CompanyObject createInDefaultRealmWithValue:@[@"company", @[]]];
+    RLMArray<EmployeeObject *> *employees = [CompanyObject createInDefaultRealmWithValue:@[@"company"]].employees;
+    RLMArray<NSNumber *> *ints = [AllPrimitiveArrays createInDefaultRealmWithValue:@[]].intObj;
     for (NSInteger i = 0; i < 1012; ++i) {
         EmployeeObject *person = [[EmployeeObject alloc] init];
         person.name = @"Mary";
         person.age = 24;
         person.hired = YES;
-        [company.employees addObject:person];
-        [realm addObject:person];
+        [employees addObject:person];
+        [ints addObject:@(i + 100)];
     }
     [realm commitWriteTransaction];
 
-    NSString *description = [company.employees description];
-
-    XCTAssertTrue([description rangeOfString:@"name"].location != NSNotFound);
-    XCTAssertTrue([description rangeOfString:@"Mary"].location != NSNotFound);
-
-    XCTAssertTrue([description rangeOfString:@"age"].location != NSNotFound);
-    XCTAssertTrue([description rangeOfString:@"24"].location != NSNotFound);
-
-    XCTAssertTrue([description rangeOfString:@"912 objects skipped"].location != NSNotFound);
+    RLMAssertMatches(employees.description,
+                     @"(?s)RLMArray\\<EmployeeObject\\> \\<0x[a-z0-9]+\\> \\(\n"
+                     @"\t\\[0\\] EmployeeObject \\{\n"
+                     @"\t\tname = Mary;\n"
+                     @"\t\tage = 24;\n"
+                     @"\t\thired = 1;\n"
+                     @"\t\\},\n"
+                     @".*\n"
+                     @"\t... 912 objects skipped.\n"
+                     @"\\)");
+    RLMAssertMatches(ints.description,
+                     @"(?s)RLMArray\\<int\\> \\<0x[a-z0-9]+\\> \\(\n"
+                     @"\t\\[0\\] 100,\n"
+                     @"\t\\[1\\] 101,\n"
+                     @"\t\\[2\\] 102,\n"
+                     @".*\n"
+                     @"\t... 912 objects skipped.\n"
+                     @"\\)");
 }
 
 - (void)testUnmanagedAssignment {
@@ -1087,9 +1128,9 @@
     ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm
                                                           withValue:@[@"", @[@[@"a"]], @[@[@0]]]];
     RLMAssertThrowsWithReason(array.intArray = (id)array.array,
-                              @"Object of type (StringObject) does not match List type");
+                              @"RLMArray<StringObject> does not match expected type 'IntObject' for property 'ArrayPropertyObject.intArray'.");
     RLMAssertThrowsWithReason(array[@"intArray"] = array[@"array"],
-                              @"Invalid property value");
+                              @"RLMArray<StringObject> does not match expected type 'IntObject' for property 'ArrayPropertyObject.intArray'.");
     [realm cancelWriteTransaction];
 }
 

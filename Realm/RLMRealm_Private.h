@@ -45,7 +45,7 @@ void RLMRealmTranslateException(NSError **error);
 
 - (void)sendNotifications:(RLMNotification)notification;
 - (void)verifyThread;
-- (void)verifyNotificationsAreSupported;
+- (void)verifyNotificationsAreSupported:(bool)isCollection;
 
 @end
 

@@ -21,7 +21,7 @@
 #import <Realm/RLMObjectSchema.h>
 #import <Realm/RLMProperty.h>
 
-@class RLMResults;
+@class RLMResults<RLMObjectType>;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -42,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @see       `+[RLMObject allObjects]`
  */
-- (RLMResults *)allObjects:(NSString *)className;
+- (RLMResults<RLMObject *> *)allObjects:(NSString *)className;
 
 /**
  Returns all objects matching the given predicate from the Realm.
@@ -58,7 +58,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @see       `+[RLMObject objectsWhere:]`
  */
-- (RLMResults *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
+- (RLMResults<RLMObject *> *)objects:(NSString *)className where:(NSString *)predicateFormat, ...;
 
 /**
  Returns all objects matching the given predicate from the Realm.
@@ -74,7 +74,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @see       `+[RLMObject objectsWhere:]`
  */
-- (RLMResults *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
+- (RLMResults<RLMObject *> *)objects:(NSString *)className withPredicate:(NSPredicate *)predicate;
 
 /**
  Returns the object of the given type with the given primary key from the Realm.

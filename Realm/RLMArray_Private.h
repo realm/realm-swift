@@ -27,4 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
 @end
 
+void RLMArrayValidateMatchingObjectType(RLMArray *array, id value);
+
 NS_ASSUME_NONNULL_END

@@ -135,11 +135,13 @@ RLMArray *getArray(__unsafe_unretained RLMObjectBase *const obj, NSUInteger prop
 void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
               __unsafe_unretained id<NSFastEnumeration> const value) {
     RLMVerifyInWriteTransaction(obj);
+    auto prop = obj->_info->propertyForTableColumn(colIndex);
+    RLMValidateValueForProperty(value, obj->_info->rlmObjectSchema, prop, true);
 
     realm::List list(obj->_realm->_realm, *obj->_row.get_table(), colIndex, obj->_row.get_index());
     RLMClassInfo *info = obj->_info;
     if (list.get_type() == realm::PropertyType::Object) {
-        info = &obj->_info->linkTargetType(obj->_info->propertyForTableColumn(colIndex).index);
+        info = &obj->_info->linkTargetType(prop.index);
     }
     RLMAccessorContext ctx(obj->_realm, *info);
     translateError([&] { list.assign(ctx, value, false); });
@@ -374,11 +376,23 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
     }
     if (prop.array) {
         NSString *propName = prop.name;
-        NSString *objectClassName = prop.objectClassName;
+        if (prop.type == RLMPropertyTypeObject) {
+            NSString *objectClassName = prop.objectClassName;
+            return ^(RLMObjectBase *obj) {
+                id val = superGet(obj, propName);
+                if (!val) {
+                    val = [[RLMArray alloc] initWithObjectClassName:objectClassName];
+                    superSet(obj, propName, val);
+                }
+                return val;
+            };
+        }
+        auto type = prop.type;
+        auto optional = prop.optional;
         return ^(RLMObjectBase *obj) {
             id val = superGet(obj, propName);
             if (!val) {
-                val = [[RLMArray alloc] initWithObjectClassName:objectClassName];
+                val = [[RLMArray alloc] initWithObjectType:type optional:optional];
                 superSet(obj, propName, val);
             }
             return val;
@@ -388,17 +402,24 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
 }
 
 id unmanagedSetter(RLMProperty *prop, const char *) {
+    // Only RLMArray needs special handling for the unmanaged setter
     if (!prop.array) {
         return nil;
     }
 
     NSString *propName = prop.name;
-    NSString *objectClassName = prop.objectClassName;
-    return ^(RLMObjectBase *obj, id<NSFastEnumeration> ar) {
+    return ^(RLMObjectBase *obj, id<NSFastEnumeration> values) {
+        auto prop = obj->_objectSchema[propName];
+        RLMValidateValueForProperty(values, obj->_objectSchema, prop, true);
+
         // make copy when setting (as is the case for all other variants)
-        RLMArray *standaloneAr = [[RLMArray alloc] initWithObjectClassName:objectClassName];
-        [standaloneAr addObjects:ar];
-        superSet(obj, propName, standaloneAr);
+        RLMArray *ar;
+        if (prop.type == RLMPropertyTypeObject)
+            ar = [[RLMArray alloc] initWithObjectClassName:prop.objectClassName];
+        else
+            ar = [[RLMArray alloc] initWithObjectType:prop.type optional:prop.optional];
+        [ar addObjects:values];
+        superSet(obj, propName, ar);
     };
 }
 
@@ -517,11 +538,7 @@ void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
     if (prop.isPrimary) {
         @throw RLMException(@"Primary key can't be changed to '%@' after an object is inserted.", val);
     }
-    if (!RLMIsObjectValidForProperty(val, prop)) {
-        @throw RLMException(@"Invalid property value '%@' for property '%@' of class '%@'",
-                            val, propName, obj->_objectSchema.className);
-    }
-
+    RLMValidateValueForProperty(val, schema, prop, true);
     RLMDynamicSet(obj, prop, RLMCoerceToNil(val));
 }
 
@@ -564,7 +581,7 @@ id RLMDynamicGetByName(__unsafe_unretained RLMObjectBase *const obj,
 
 RLMAccessorContext::RLMAccessorContext(RLMAccessorContext& parent, realm::Property const& property)
 : _realm(parent._realm)
-, _info(parent._info.linkTargetType(property))
+, _info(property.type == realm::PropertyType::Object ? parent._info.linkTargetType(property) : parent._info)
 , _promote_existing(parent._promote_existing)
 {
 }
@@ -589,38 +606,6 @@ id RLMAccessorContext::defaultValue(__unsafe_unretained NSString *const key) {
     }
     return _defaultValues[key];
 }
-
-static void validateValueForProperty(__unsafe_unretained id const obj,
-                                     __unsafe_unretained RLMProperty *const prop,
-                                     RLMClassInfo const& info) {
-    if (prop.array) {
-        if (obj && obj != NSNull.null && ![obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
-            @throw RLMException(@"Array property value (%@) is not enumerable.", obj);
-        }
-        return;
-    }
-    switch (prop.type) {
-        case RLMPropertyTypeString:
-        case RLMPropertyTypeBool:
-        case RLMPropertyTypeDate:
-        case RLMPropertyTypeInt:
-        case RLMPropertyTypeFloat:
-        case RLMPropertyTypeDouble:
-        case RLMPropertyTypeData:
-            if (!RLMIsObjectValidForProperty(obj, prop)) {
-                @throw RLMException(@"Invalid value '%@' for property '%@.%@'",
-                                    obj, info.rlmObjectSchema.className, prop.name);
-            }
-            break;
-        case RLMPropertyTypeObject:
-            break;
-        case RLMPropertyTypeAny:
-        case RLMPropertyTypeLinkingObjects:
-            @throw RLMException(@"Invalid value '%@' for property '%@.%@'",
-                                obj, info.rlmObjectSchema.className, prop.name);
-    }
-}
-
 
 id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t propIndex,
                                      __unsafe_unretained RLMProperty *const prop) {
@@ -675,54 +660,36 @@ id RLMAccessorContext::box(realm::Results&& r) {
                                      results:std::move(r)];
 }
 
-static void checkType(bool cond, __unsafe_unretained id v,
-                      __unsafe_unretained NSString *const expected) {
-    if (__builtin_expect(!cond, 0)) {
-        @throw RLMException(@"Invalid value '%@' of type '%@' for expected type '%@'",
-                            v, [v class], expected);
-    }
-}
-
 template<>
 realm::Timestamp RLMAccessorContext::unbox(__unsafe_unretained id const value, bool, bool) {
     id v = RLMCoerceToNil(value);
-    checkType(!v || [v respondsToSelector:@selector(timeIntervalSinceReferenceDate)], v, @"date");
     return RLMTimestampForNSDate(v);
 }
 
-// Checking for NSNumber here rather than the selectors like the other ones
-// because NSString implements the same selectors and we don't want implicit
-// conversions from string
 template<>
 bool RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
-    checkType([v isKindOfClass:[NSNumber class]], v, @"bool");
     return [v boolValue];
 }
 template<>
 double RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
-    checkType([v isKindOfClass:[NSNumber class]], v, @"double");
     return [v doubleValue];
 }
 template<>
 float RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
-    checkType([v isKindOfClass:[NSNumber class]], v, @"float");
     return [v floatValue];
 }
 template<>
 long long RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
-    checkType([v isKindOfClass:[NSNumber class]], v, @"int");
     return [v longLongValue];
 }
 template<>
 realm::BinaryData RLMAccessorContext::unbox(id v, bool, bool) {
     v = RLMCoerceToNil(v);
-    checkType(!v || [v respondsToSelector:@selector(bytes)], v, @"data");
     return RLMBinaryDataForNSData(v);
 }
 template<>
 realm::StringData RLMAccessorContext::unbox(id v, bool, bool) {
     v = RLMCoerceToNil(v);
-    checkType(!v || [v respondsToSelector:@selector(UTF8String)], v, @"string");
     return RLMStringDataWithNSString(v);
 }
 
@@ -734,31 +701,19 @@ static auto to_optional(__unsafe_unretained id const value, Fn&& fn) {
 
 template<>
 realm::util::Optional<bool> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
-    return to_optional(v, [&](__unsafe_unretained id v) {
-        checkType([v respondsToSelector:@selector(boolValue)], v, @"bool?");
-        return (bool)[v boolValue];
-    });
+    return to_optional(v, [&](__unsafe_unretained id v) { return (bool)[v boolValue]; });
 }
 template<>
 realm::util::Optional<double> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
-    return to_optional(v, [&](__unsafe_unretained id v) {
-        checkType([v respondsToSelector:@selector(doubleValue)], v, @"double?");
-        return [v doubleValue];
-    });
+    return to_optional(v, [&](__unsafe_unretained id v) { return [v doubleValue]; });
 }
 template<>
 realm::util::Optional<float> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
-    return to_optional(v, [&](__unsafe_unretained id v) {
-        checkType([v respondsToSelector:@selector(floatValue)], v, @"float?");
-        return [v floatValue];
-    });
+    return to_optional(v, [&](__unsafe_unretained id v) { return [v floatValue]; });
 }
 template<>
 realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
-    return to_optional(v, [&](__unsafe_unretained id v) {
-        checkType([v respondsToSelector:@selector(longLongValue)], v, @"int?");
-        return [v longLongValue];
-    });
+    return to_optional(v, [&](__unsafe_unretained id v) { return [v longLongValue]; });
 }
 
 template<>
@@ -821,7 +776,7 @@ RLMOptionalId RLMAccessorContext::value_for_property(__unsafe_unretained id cons
     auto prop = _info.rlmObjectSchema.properties[propIndex];
     id value = propertyValue(obj, propIndex, prop);
     if (value) {
-        validateValueForProperty(value, prop, _info);
+        RLMValidateValueForProperty(value, _info.rlmObjectSchema, prop);
     }
 
     if (_promote_existing && [obj isKindOfClass:_info.rlmObjectSchema.objectClass] && !prop.swiftIvar) {

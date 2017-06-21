@@ -134,6 +134,23 @@ class TestCase: XCTestCase {
             }
     }
 
+    func assertEqual<T: Equatable>(_ expected: [T?], _ actual: [T?], file: StaticString = #file, line: UInt = #line) {
+        if expected.count != actual.count {
+            XCTFail("assertEqual failed: (\"\(expected)\") is not equal to (\"\(actual)\")",
+                file: file, line: line)
+            return
+        }
+
+        XCTAssertEqual(expected.count, actual.count, "Collection counts were incorrect", file: file, line: line)
+        for (e, a) in zip(expected, actual) {
+            if e != a {
+                XCTFail("assertEqual failed: (\"\(expected)\") is not equal to (\"\(actual)\")",
+                    file: file, line: line)
+                return
+            }
+        }
+    }
+
     func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true

@@ -23,6 +23,7 @@
 #import <Realm/RLMResults.h>
 
 #import <realm/link_view_fwd.hpp>
+#import <realm/table_ref.hpp>
 
 namespace realm {
     class Results;
@@ -42,9 +43,6 @@ class RLMObservationInfo;
     NSString *_key;
     __weak RLMObjectBase *_parentObject;
 }
-
-@property (nonatomic, readonly) RLMPropertyType type;
-@property (nonatomic, readonly) bool optional;
 @end
 
 @interface RLMManagedArray : RLMArray <RLMFastEnumerable>

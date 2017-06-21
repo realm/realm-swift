@@ -46,19 +46,19 @@ public:
     id box(realm::Object&&);
     id box(realm::RowExpr);
 
-    id box(realm::BinaryData v) { return RLMBinaryDataToNSData(v); }
     id box(bool v) { return @(v); }
     id box(double v) { return @(v); }
     id box(float v) { return @(v); }
     id box(long long v) { return @(v); }
-    id box(realm::StringData v) { return RLMStringDataToNSString(v); }
-    id box(realm::Timestamp v) { return RLMTimestampToNSDate(v); }
+    id box(realm::StringData v) { return RLMStringDataToNSString(v) ?: NSNull.null; }
+    id box(realm::BinaryData v) { return RLMBinaryDataToNSData(v) ?: NSNull.null; }
+    id box(realm::Timestamp v) { return RLMTimestampToNSDate(v) ?: NSNull.null; }
     id box(realm::Mixed v) { return RLMMixedToObjc(v); }
 
-    id box(realm::util::Optional<bool> v) { return v ? @(*v) : nil; }
-    id box(realm::util::Optional<double> v) { return v ? @(*v) : nil; }
-    id box(realm::util::Optional<float> v) { return v ? @(*v) : nil; }
-    id box(realm::util::Optional<int64_t> v) { return v ? @(*v) : nil; }
+    id box(realm::util::Optional<bool> v) { return v ? @(*v) : NSNull.null; }
+    id box(realm::util::Optional<double> v) { return v ? @(*v) : NSNull.null; }
+    id box(realm::util::Optional<float> v) { return v ? @(*v) : NSNull.null; }
+    id box(realm::util::Optional<int64_t> v) { return v ? @(*v) : NSNull.null; }
 
     void will_change(realm::Row const&, realm::Property const&);
     void will_change(realm::Object& obj, realm::Property const& prop) { will_change(obj.row(), prop); }

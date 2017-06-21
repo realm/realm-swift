@@ -96,6 +96,13 @@
 
 @implementation AllOptionalTypes
 @end
+@implementation AllPrimitiveArrays
++ (NSArray *)requiredProperties {
+    return @[@"intObj", @"floatObj", @"doubleObj", @"boolObj", @"stringObj", @"dateObj", @"dataObj"];
+}
+@end
+@implementation AllOptionalPrimitiveArrays
+@end
 
 @implementation AllOptionalTypesPK
 + (NSString *)primaryKey {

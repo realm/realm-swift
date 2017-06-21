@@ -16,13 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 #import <Realm/RLMCollection.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMObject, RLMRealm, RLMNotificationToken;
-typedef NS_ENUM(int32_t, RLMPropertyType);
+@class RLMObject;
 
 /**
  `RLMResults` is an auto-updating container type in Realm returned from object
@@ -62,6 +60,11 @@ typedef NS_ENUM(int32_t, RLMPropertyType);
  The type of the objects in the results collection.
  */
 @property (nonatomic, readonly, assign) RLMPropertyType type;
+
+/**
+ Indicates whether the objects in the collection can be `nil`.
+ */
+@property (nonatomic, readonly) bool optional;
 
 /**
  The class name  of the objects contained in the results collection.

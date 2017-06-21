@@ -394,7 +394,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
         _optional = value.optional;
         _array = true;
         _objectClassName = value.objectClassName;
-        if (![RLMSchema classForString:_objectClassName]) {
+        if (_type == RLMPropertyTypeObject && ![RLMSchema classForString:_objectClassName]) {
             @throw RLMException(@"Property '%@' is of type 'RLMArray<%@>' which is not a supported RLMArray object type. "
                                 @"RLMArrays can only contain instances of RLMObject subclasses. "
                                 @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);

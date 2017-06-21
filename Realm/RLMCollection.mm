@@ -184,17 +184,26 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key,
         return array;
     }
 
+    if (collection.get_type() != realm::PropertyType::Object) {
+        RLMAccessorContext context(realm, info);
+        for (size_t i = 0; i < count; ++i) {
+            [array addObject:[collection.get(context, i) valueForKey:key] ?: NSNull.null];
+        }
+        return array;
+    }
+
     RLMObject *accessor = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, realm, &info);
 
     // List properties need to be handled specially since we need to create a
     // new List each time
     if (info.rlmObjectSchema.isSwiftClass) {
         auto prop = info.rlmObjectSchema[key];
-        if (prop && prop.type == RLMPropertyTypeArray && prop.swiftIvar) {
+        if (prop && prop.array && prop.swiftIvar) {
             // Grab the actual class for the generic List from an instance of it
             // so that we can make instances of the List without creating a new
             // object accessor each time
             Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
+            RLMAccessorContext context(realm, info);
             for (size_t i = 0; i < count; ++i) {
                 RLMListBase *list = [[cls alloc] init];
                 list._rlmArray = [[RLMManagedArray alloc] initWithList:realm::List(realm->_realm, *info.table(),
@@ -244,7 +253,8 @@ NSString *RLMDescriptionWithMaxDepth(NSString *name,
 
     const NSUInteger maxObjects = 100;
     auto str = [NSMutableString stringWithFormat:@"%@<%@> <%p> (\n", name,
-                [collection objectClassName], (void *)collection];
+                [collection objectClassName] ?: RLMTypeToString([collection type]),
+                (void *)collection];
     size_t index = 0, skipped = 0;
     for (id obj in collection) {
         NSString *sub;
