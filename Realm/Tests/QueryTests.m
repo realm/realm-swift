@@ -535,7 +535,8 @@
 
 - (void)verifySortWithAccuracy:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending getter:(double(^)(id))getter expected:(double)val accuracy:(double)accuracy {
     // test TableView query
-    RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:column ascending:ascending];
+    RLMResults<AllTypesObject *> *results = [[AllTypesObject allObjectsInRealm:realm]
+                                             sortedResultsUsingKeyPath:column ascending:ascending];
     XCTAssertEqualWithAccuracy(getter(results[0][column]), val, accuracy, @"Array not sorted as expected");
 
     // test LinkView query
@@ -1779,7 +1780,7 @@
     [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     [realm commitWriteTransaction];
 
-    RLMResults *subarray = nil;
+    RLMResults<EmployeeObject *> *subarray = nil;
     @autoreleasepool {
         __attribute((objc_precise_lifetime)) CompanyObject *co = [CompanyObject allObjects][0];
         subarray = [co.employees objectsWhere:@"age = 40"];

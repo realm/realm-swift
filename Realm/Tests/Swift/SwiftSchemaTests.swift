@@ -82,13 +82,13 @@ class SwiftRecursingSchemaTestObject : RLMObject {
 }
 
 class InitAppendsToArrayProperty : RLMObject {
-    @objc dynamic var propertyWithIllegalDefaultValue: RLMArray = {
+    @objc dynamic var propertyWithIllegalDefaultValue: RLMArray<SwiftIntObject> = {
         if mayAppend {
-            let array = RLMArray(objectClassName: SwiftIntObject.className())
+            let array = RLMArray<SwiftIntObject>(objectClassName: SwiftIntObject.className())
             array.add(SwiftIntObject())
             return array
         } else {
-            return RLMArray(objectClassName: SwiftIntObject.className())
+            return RLMArray<SwiftIntObject>(objectClassName: SwiftIntObject.className())
         }
     }()
 

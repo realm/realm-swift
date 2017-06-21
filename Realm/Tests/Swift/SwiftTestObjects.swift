@@ -43,15 +43,10 @@ class SwiftObject: RLMObject {
     @objc dynamic var binaryCol = "a".data(using: String.Encoding.utf8)
     @objc dynamic var dateCol = Date(timeIntervalSince1970: 1)
     @objc dynamic var objectCol = SwiftBoolObject()
-    @objc dynamic var arrayCol = RLMArray(objectClassName: SwiftBoolObject.className())
+    @objc dynamic var arrayCol = RLMArray<SwiftBoolObject>(objectClassName: SwiftBoolObject.className())
 }
 
 class SwiftOptionalObject: RLMObject {
-    // FIXME: Support all optional property types
-//    @objc dynamic var optBoolCol: Bool?
-//    @objc dynamic var optIntCol: Int?
-//    @objc dynamic var optFloatCol: Float?
-//    @objc dynamic var optDoubleCol: Double?
     @objc dynamic var optStringCol: String?
     @objc dynamic var optNSStringCol: NSString?
     @objc dynamic var optBinaryCol: Data?
@@ -90,13 +85,13 @@ class SwiftEmployeeObject: RLMObject {
 }
 
 class SwiftCompanyObject: RLMObject {
-    @objc dynamic var employees = RLMArray(objectClassName: SwiftEmployeeObject.className())
+    @objc dynamic var employees = RLMArray<SwiftEmployeeObject>(objectClassName: SwiftEmployeeObject.className())
 }
 
 class SwiftArrayPropertyObject: RLMObject {
     @objc dynamic var name = ""
-    @objc dynamic var array = RLMArray(objectClassName: SwiftStringObject.className())
-    @objc dynamic var intArray = RLMArray(objectClassName: SwiftIntObject.className())
+    @objc dynamic var array = RLMArray<SwiftStringObject>(objectClassName: SwiftStringObject.className())
+    @objc dynamic var intArray = RLMArray<SwiftIntObject>(objectClassName: SwiftIntObject.className())
 }
 
 class SwiftDynamicObject: RLMObject {
