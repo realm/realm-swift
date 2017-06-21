@@ -525,12 +525,12 @@
 - (void)verifySort:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending expected:(id)val {
     RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:column ascending:ascending];
     AllTypesObject *obj = results[0];
-    XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
+    XCTAssertEqualObjects(obj[column], val);
 
     RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
     results = [ar sortedResultsUsingKeyPath:column ascending:ascending];
     obj = results[0];
-    XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
+    XCTAssertEqualObjects(obj[column], val);
 }
 
 - (void)verifySortWithAccuracy:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending getter:(double(^)(id))getter expected:(double)val accuracy:(double)accuracy {
