@@ -193,7 +193,6 @@ static dispatch_once_t s_onceToken;
                 calledAlready = YES;
                 std::string original_path = [originalPath UTF8String];
                 if (deleteRealm) {
-                    NSLog(@"Deleting Realm...");
                     SyncManager::shared().immediately_run_file_actions(original_path);
                 } else {
                     SyncManager::shared().perform_metadata_update([&](const auto& manager) {

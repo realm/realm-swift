@@ -46,6 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (RLMSyncCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
 
++ (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm;
+
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
 
