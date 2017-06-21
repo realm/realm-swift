@@ -123,7 +123,10 @@ Add support for building with Xcode 9 Beta 1.
 
 ### Enhancements
 
-* None.
+* Add `-[RLMSyncPermissionValue initWithRealmPath:username:accessLevel:]`
+  API allowing permissions to be applied to a user based on their username
+  (usually, an email address). Requires any edition of the Realm Object
+  Server 1.6.0 or later.
 
 ### Bugfixes
 
