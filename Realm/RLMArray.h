@@ -418,13 +418,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  `-[RLMArray init]` is not available because `RLMArray`s cannot be created directly.
- `RLMArray` properties on `RLMObject`s are lazily created when accessed, or can be obtained by querying a Realm.
+ `RLMArray` properties on `RLMObject`s are lazily created when accessed.
  */
 - (instancetype)init __attribute__((unavailable("RLMArrays cannot be created directly")));
 
 /**
  `+[RLMArray new]` is not available because `RLMArray`s cannot be created directly.
- `RLMArray` properties on `RLMObject`s are lazily created when accessed, or can be obtained by querying a Realm.
+ `RLMArray` properties on `RLMObject`s are lazily created when accessed.
  */
 + (instancetype)new __attribute__((unavailable("RLMArrays cannot be created directly")));
 
