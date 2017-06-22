@@ -72,6 +72,7 @@ NSString *const RLMSyncPermissionErrorDomain = @"io.realm.sync.permission";
 
 NSString *const kRLMSyncPathOfRealmBackupCopyKey            = @"recovered_realm_location_path";
 NSString *const kRLMSyncInitiateClientResetBlockKey         = @"initiate_client_reset_block";
+NSString *const kRLMSyncInitiateDeleteRealmBlockKey         = @"initiate_delete_realm_block";
 
 NSString *const kRLMSyncAppIDKey                = @"app_id";
 NSString *const kRLMSyncDataKey                 = @"data";
@@ -174,10 +175,12 @@ NSError *make_sync_error(RLMSyncSystemErrorKind kind, NSString *description, NSI
 
     RLMSyncError errorCode;
     switch (kind) {
-        case RLMSyncSystemErrorKindClientReset: {
+        case RLMSyncSystemErrorKindClientReset:
             errorCode = RLMSyncErrorClientResetError;
             break;
-        }
+        case RLMSyncSystemErrorKindPermissionDenied:
+            errorCode = RLMSyncErrorPermissionDeniedError;
+            break;
         case RLMSyncSystemErrorKindUser:
             errorCode = RLMSyncErrorClientUserError;
             break;
