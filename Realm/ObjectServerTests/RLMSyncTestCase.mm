@@ -25,6 +25,9 @@
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncConfiguration_Private.h"
 
+#import "sync/sync_manager.hpp"
+#import "sync/sync_session.hpp"
+
 #if !TARGET_OS_MAC
 #error These tests can only be run on a macOS host.
 #endif
@@ -97,6 +100,17 @@ static NSURL *syncDirectoryForChildProcess() {
     return [RLMSyncCredentials credentialsWithUsername:name
                                               password:@"a"
                                               register:shouldRegister];
+}
+
++ (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm {
+    RLMSyncConfiguration *config = [realm.configuration syncConfiguration];
+    auto on_disk_path = realm::SyncManager::shared().path_for_realm([config.user.identity UTF8String],
+                                                                    [config.realmURL.absoluteString UTF8String]);
+    auto ptr = realm::SyncManager::shared().get_existing_session(on_disk_path);
+    if (ptr) {
+        return [NSURL fileURLWithPath:@(ptr->path().c_str())];
+    }
+    return nil;
 }
 
 - (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions {
