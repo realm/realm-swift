@@ -7,11 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* Add a new error code to denote permission denied errors when working with
-  synchronized Realms, as well as an accompanying block that can be called
-  to inform the binding that the offending Realm's files should be kept or
-  deleted immediately. This allows recovering from permission denied errors
-  in a more robust manner.
+* None.
 
 ### Bugfixes
 
