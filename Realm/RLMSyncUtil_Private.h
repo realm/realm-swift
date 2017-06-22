@@ -25,7 +25,6 @@
 typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
     // Specific
     RLMSyncSystemErrorKindClientReset,
-    RLMSyncSystemErrorKindPermissionDenied,
     // General
     RLMSyncSystemErrorKindClient,
     RLMSyncSystemErrorKindConnection,

@@ -32,20 +32,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable void(^)(void))rlmSync_clientResetBlock NS_REFINED_FOR_SWIFT;
 
 /**
- Given a Realm Object Server permission denied error, return the block that
- can be called to manually initiate or cancel the Realm file deletion process,
- or nil if the error isn't a permission denied error.
-
- The block itself takes a single boolean argument. Pass in YES to immediately
- delete the files on disk (after all references to the Realm and objects in
- the Realm have been invalidated). Pass in NO to never delete the Realm files.
- The block can only be called once. If the block isn't called at all, the
- Realm files will be deleted the next time your application is launched and the
- sync subsystem is initialized.
- */
-- (nullable void(^)(BOOL))rlmSync_deleteRealmBlock NS_REFINED_FOR_SWIFT;
-
-/**
  Given a Realm Object Server client reset error, return the path where the
  backup copy of the Realm will be placed once the client reset process is
  complete.
