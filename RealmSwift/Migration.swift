@@ -80,7 +80,7 @@ extension Realm {
  instance provides access to the old and new database schemas, the objects in the Realm, and provides functionality for
  modifying the Realm during the migration.
  */
-public final class Migration {
+public struct Migration {
 
     // MARK: Properties
 
