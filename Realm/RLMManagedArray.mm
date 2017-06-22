@@ -37,21 +37,21 @@
 #import <realm/table_view.hpp>
 #import <objc/runtime.h>
 
-@interface RLMArrayLinkViewHandoverMetadata : NSObject
+@interface RLMManagedArrayHandoverMetadata : NSObject
 @property (nonatomic) NSString *parentClassName;
 @property (nonatomic) NSString *key;
 @end
 
-@implementation RLMArrayLinkViewHandoverMetadata
+@implementation RLMManagedArrayHandoverMetadata
 @end
 
-@interface RLMArrayLinkView () <RLMThreadConfined_Private>
+@interface RLMManagedArray () <RLMThreadConfined_Private>
 @end
 
 //
 // RLMArray implementation
 //
-@implementation RLMArrayLinkView {
+@implementation RLMManagedArray {
 @public
     realm::List _backingList;
     RLMRealm *_realm;
@@ -60,10 +60,10 @@
     std::unique_ptr<RLMObservationInfo> _observationInfo;
 }
 
-- (RLMArrayLinkView *)initWithList:(realm::List)list
-                             realm:(__unsafe_unretained RLMRealm *const)realm
-                        parentInfo:(RLMClassInfo *)parentInfo
-                          property:(__unsafe_unretained RLMProperty *const)property {
+- (RLMManagedArray *)initWithList:(realm::List)list
+                            realm:(__unsafe_unretained RLMRealm *const)realm
+                       parentInfo:(RLMClassInfo *)parentInfo
+                         property:(__unsafe_unretained RLMProperty *const)property {
     self = [self initWithObjectClassName:property.objectClassName];
     if (self) {
         _realm = realm;
@@ -76,8 +76,8 @@
     return self;
 }
 
-- (RLMArrayLinkView *)initWithParent:(__unsafe_unretained RLMObjectBase *const)parentObject
-                            property:(__unsafe_unretained RLMProperty *const)property {
+- (RLMManagedArray *)initWithParent:(__unsafe_unretained RLMObjectBase *const)parentObject
+                           property:(__unsafe_unretained RLMProperty *const)property {
     __unsafe_unretained RLMRealm *const realm = parentObject->_realm;
     auto col = parentObject->_info->tableColumn(property);
     realm::List list(realm->_realm, parentObject->_row.get_linklist(col));
@@ -100,8 +100,8 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
                                    __unsafe_unretained RLMArray *const array,
                                    __unsafe_unretained id const observed) {
     RLMValidateArrayObservationKey(keyPath, array);
-    if (!info && array.class == [RLMArrayLinkView class]) {
-        RLMArrayLinkView *lv = static_cast<RLMArrayLinkView *>(array);
+    if (!info && array.class == [RLMManagedArray class]) {
+        auto lv = static_cast<RLMManagedArray *>(array);
         info = std::make_unique<RLMObservationInfo>(*lv->_ownerInfo,
                                                     lv->_backingList.get_origin_row_index(),
                                                     observed);
@@ -152,7 +152,7 @@ static auto translateErrors(Function&& f, NSString *aggregateMethod=nil) {
 }
 
 template<typename IndexSetFactory>
-static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar,
+static void changeArray(__unsafe_unretained RLMManagedArray *const ar,
                         NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
     translateErrors([&] { ar->_backingList.verify_in_transaction(); });
     RLMObservationInfo *info = RLMGetObservationInfo(ar->_observationInfo.get(),
@@ -175,15 +175,15 @@ static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar,
     }
 }
 
-static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, NSUInteger index, dispatch_block_t f) {
+static void changeArray(__unsafe_unretained RLMManagedArray *const ar, NSKeyValueChange kind, NSUInteger index, dispatch_block_t f) {
     changeArray(ar, kind, f, [=] { return [NSIndexSet indexSetWithIndex:index]; });
 }
 
-static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, NSRange range, dispatch_block_t f) {
+static void changeArray(__unsafe_unretained RLMManagedArray *const ar, NSKeyValueChange kind, NSRange range, dispatch_block_t f) {
     changeArray(ar, kind, f, [=] { return [NSIndexSet indexSetWithIndexesInRange:range]; });
 }
 
-static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyValueChange kind, NSIndexSet *is, dispatch_block_t f) {
+static void changeArray(__unsafe_unretained RLMManagedArray *const ar, NSKeyValueChange kind, NSIndexSet *is, dispatch_block_t f) {
     changeArray(ar, kind, f, [=] { return is; });
 }
 
@@ -244,7 +244,7 @@ static void changeArray(__unsafe_unretained RLMArrayLinkView *const ar, NSKeyVal
     });
 }
 
-static void RLMInsertObject(RLMArrayLinkView *ar, id object, NSUInteger index) {
+static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     if (index == NSUIntegerMax) {
         index = translateErrors([&] { return ar->_backingList.size(); });
     }
@@ -352,7 +352,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, id object, NSUInteger index) {
     // normal array KVC semantics, but observing @things works very oddly (when
     // it's part of a key path, it's triggered automatically when array index
     // changes occur, and can't be sent explicitly, but works normally when it's
-    // the entire key path), and an RLMArrayLinkView *can't* have objects where
+    // the entire key path), and an RLMManagedArray *can't* have objects where
     // invalidated is true, so we're not losing much.
     if ([key isEqualToString:RLMInvalidatedKey]) {
         return @(!_backingList.is_valid());
@@ -468,15 +468,15 @@ static void RLMInsertObject(RLMArrayLinkView *ar, id object, NSUInteger index) {
     return std::make_unique<realm::ThreadSafeReference<realm::List>>(std::move(list_reference));
 }
 
-- (RLMArrayLinkViewHandoverMetadata *)objectiveCMetadata {
-    RLMArrayLinkViewHandoverMetadata *metadata = [[RLMArrayLinkViewHandoverMetadata alloc] init];
+- (RLMManagedArrayHandoverMetadata *)objectiveCMetadata {
+    RLMManagedArrayHandoverMetadata *metadata = [[RLMManagedArrayHandoverMetadata alloc] init];
     metadata.parentClassName = _ownerInfo->rlmObjectSchema.className;
     metadata.key = _key;
     return metadata;
 }
 
 + (instancetype)objectWithThreadSafeReference:(std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
-                                     metadata:(RLMArrayLinkViewHandoverMetadata *)metadata
+                                     metadata:(RLMManagedArrayHandoverMetadata *)metadata
                                         realm:(RLMRealm *)realm {
     REALM_ASSERT_DEBUG(dynamic_cast<realm::ThreadSafeReference<realm::List> *>(reference.get()));
     auto list_reference = static_cast<realm::ThreadSafeReference<realm::List> *>(reference.get());
@@ -486,7 +486,7 @@ static void RLMInsertObject(RLMArrayLinkView *ar, id object, NSUInteger index) {
         return nil;
     }
     RLMClassInfo *parentInfo = &realm->_info[metadata.parentClassName];
-    return [[RLMArrayLinkView alloc] initWithList:std::move(list)
+    return [[RLMManagedArray alloc] initWithList:std::move(list)
                                             realm:realm
                                        parentInfo:parentInfo
                                          property:parentInfo->rlmObjectSchema[metadata.key]];

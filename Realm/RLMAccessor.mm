@@ -129,7 +129,7 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
 RLMArray *getArray(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex) {
     RLMVerifyAttached(obj);
     auto prop = obj->_info->rlmObjectSchema.properties[colIndex];
-    return [[RLMArrayLinkView alloc] initWithParent:obj property:prop];
+    return [[RLMManagedArray alloc] initWithParent:obj property:prop];
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
@@ -675,9 +675,9 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
 id RLMAccessorContext::box(realm::List&& l) {
     REALM_ASSERT(_parentObject);
     REALM_ASSERT(currentProperty);
-    return [[RLMArrayLinkView alloc] initWithList:std::move(l) realm:_realm
-                                       parentInfo:_parentObject->_info
-                                         property:currentProperty];
+    return [[RLMManagedArray alloc] initWithList:std::move(l) realm:_realm
+                                      parentInfo:_parentObject->_info
+                                        property:currentProperty];
 }
 
 id RLMAccessorContext::box(realm::Object&& o) {

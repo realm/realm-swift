@@ -45,12 +45,12 @@ class RLMObservationInfo;
 //
 // LinkView backed RLMArray subclass
 //
-@interface RLMArrayLinkView : RLMArray <RLMFastEnumerable>
+@interface RLMManagedArray : RLMArray <RLMFastEnumerable>
 - (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
-- (RLMArrayLinkView *)initWithList:(realm::List)list
-                             realm:(__unsafe_unretained RLMRealm *const)realm
-                        parentInfo:(RLMClassInfo *)parentInfo
-                          property:(__unsafe_unretained RLMProperty *const)property;
+- (RLMManagedArray *)initWithList:(realm::List)list
+                            realm:(__unsafe_unretained RLMRealm *const)realm
+                       parentInfo:(RLMClassInfo *)parentInfo
+                         property:(__unsafe_unretained RLMProperty *const)property;
 
 - (bool)isBackedByList:(realm::List const&)list;
 

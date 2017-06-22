@@ -65,7 +65,7 @@ NS_RETURNS_RETAINED;
 //
 
 
-// switch List<> properties from being backed by unmanaged RLMArrays to RLMArrayLinkView
+// switch List<> properties from being backed by unmanaged RLMArrays to RLMManagedArray
 void RLMInitializeSwiftAccessorGenerics(RLMObjectBase *object);
 
 #ifdef __cplusplus
