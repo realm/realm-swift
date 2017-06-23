@@ -98,7 +98,7 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      The client reset process can be initiated in one of two ways. The block provided in the
      `userInfo` dictionary under `kRLMSyncInitiateClientResetBlockKey` can be called to
      initiate the reset process. This block can be called any time after the error is
-     received, but should only be called if and when your app closes and invalidates every
+     received, but should only be called after your app closes and invalidates every
      instance of the offending Realm on all threads (note that autorelease pools may make this
      difficult to guarantee).
 
@@ -135,11 +135,11 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      local copy will be deleted the next time the application starts.
      
      The `userInfo` dictionary contains a block under the key
-     `kRLMSyncInitiateDeleteRealmBlockKey`. This block can be called with a single argument:
-     `YES` to immediately delete the Realm file, `NO` to not delete the file at all (either
-     now or upon restart). This block should only be called with `YES` if and when your app
-     closes and invalidates every instance of the offending Realm on all threads (note that
-     autorelease pools may make this difficult to guarantee).
+     `kRLMSyncInitiateDeleteRealmBlockKey`, which can be used to request that the file be
+     deleted immediately instead. This block can be called any time after the error is
+     received to immediately delete the Realm file, but should only be called after your
+     app closes and invalidates every instance of the offending Realm on all threads (note
+     that autorelease pools may make this difficult to guarantee).
 
      @warning It is strongly recommended that, if a Realm has encountered a permission denied
               error, its files be deleted before attempting to re-open it.

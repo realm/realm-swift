@@ -124,7 +124,7 @@ public extension SyncError {
     }
 
     /// Given a permission denied error, extract and return the reset closure.
-    public func deleteRealmUserInfo() -> ((Bool) -> Void)? {
+    public func deleteRealmUserInfo() -> (() -> Void)? {
         return _nsError.__rlmSync_deleteRealmBlock()
     }
 }

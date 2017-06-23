@@ -29,7 +29,7 @@
     return nil;
 }
 
-- (nullable void(^)(BOOL))rlmSync_deleteRealmBlock {
+- (void(^)(void))rlmSync_deleteRealmBlock {
     if (self.domain == RLMSyncErrorDomain && self.code == RLMSyncErrorPermissionDeniedError) {
         return self.userInfo[kRLMSyncInitiateDeleteRealmBlockKey];
     }

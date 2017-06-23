@@ -867,7 +867,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     // Check the error and perform the Realm deletion.
     XCTAssertNotNil(theError);
     XCTAssertNotNil([theError rlmSync_deleteRealmBlock]);
-    [theError rlmSync_deleteRealmBlock](YES);
+    [theError rlmSync_deleteRealmBlock]();
 
     // Ensure the file is no longer on disk.
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[onDiskPath path]]);
