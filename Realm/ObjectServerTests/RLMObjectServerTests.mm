@@ -709,10 +709,6 @@
                                                                                    register:NO]
                                       server:[RLMObjectServerTests authServerURL]];
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-2", @"parent-3"]];
-
-        // FIXME: calling wait_for_upload_complete() before receiving BIND does
-        // not actually wait
-        sleep(1);
         [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
         RLMRunChildAndWait();
@@ -747,10 +743,6 @@
     } else {
         [self waitForDownloadsForUser:user url:url];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2"]];
-
-        // FIXME: calling wait_for_upload_complete() before receiving BIND does
-        // not actually wait
-        sleep(1);
         [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
     }
@@ -914,10 +906,6 @@
         realm = [self immediatelyOpenRealmForURL:url user:user];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3", @"child-4"]];
         CHECK_COUNT(5, SyncObject, realm);
-
-        // FIXME: calling wait_for_upload_complete() before receiving BIND does
-        // not actually wait
-        sleep(1);
         [self waitForUploadsForUser:user url:url];
         RLMRunChildAndWait();
     } else {

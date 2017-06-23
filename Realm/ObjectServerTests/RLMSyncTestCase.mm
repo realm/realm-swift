@@ -22,6 +22,7 @@
 #import <Realm/Realm.h>
 
 #import "RLMRealm_Dynamic.h"
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMSyncManager+ObjectServerTests.h"
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncConfiguration_Private.h"
