@@ -122,6 +122,11 @@ public extension SyncError {
         }
         return nil
     }
+
+    /// Given a permission denied error, extract and return the reset closure.
+    public func deleteRealmUserInfo() -> (() -> Void)? {
+        return _nsError.__rlmSync_deleteRealmBlock()
+    }
 }
 
 /**

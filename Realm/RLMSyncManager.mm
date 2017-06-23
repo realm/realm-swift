@@ -182,6 +182,20 @@ static dispatch_once_t s_onceToken;
                        }};
             break;
         }
+        case RLMSyncSystemErrorKindPermissionDenied: {
+            __block BOOL calledAlready = NO;
+            custom = @{kRLMSyncInitiateDeleteRealmBlockKey: ^ {
+                NSString *originalPath = userInfo[@(realm::SyncError::c_original_file_path_key)];
+                if (calledAlready) {
+                    @throw RLMException(@"The handler block for the Realm at '%@' has already been called once.",
+                                        originalPath);
+                }
+                calledAlready = YES;
+                std::string original_path = [originalPath UTF8String];
+                SyncManager::shared().immediately_run_file_actions(original_path);
+            }};
+            break;
+        }
         case RLMSyncSystemErrorKindUser:
         case RLMSyncSystemErrorKindSession:
             break;
