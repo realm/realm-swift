@@ -82,7 +82,7 @@ NS_ASSUME_NONNULL_BEGIN
  Create a new sync permission value, for use with permission APIs.
 
  @param path        The Realm Object Server path to the Realm whose permission should be modified
-                    (e.g. "/path/to/realm"). Pass "*" to apply to all Realms managed by the server.
+                    (e.g. "/path/to/realm"). Pass "*" to apply to all Realms managed by the user.
  @param userID      The identity of the user who should be granted access to the Realm at `path`.
                     Pass "*" to apply to all users managed by the server.
  @param accessLevel The access level to grant.
@@ -92,10 +92,38 @@ NS_ASSUME_NONNULL_BEGIN
                       accessLevel:(RLMSyncAccessLevel)accessLevel;
 
 /**
+ Create a new sync permission value, for use with permission APIs.
+
+ @param path        The Realm Object Server path to the Realm whose permission should be modified
+                    (e.g. "/path/to/realm"). Pass "*" to apply to all Realms managed by the user.
+ @param username    The username (often an email address) of the user who should be granted access
+                    to the Realm at `path`.
+ @param accessLevel The access level to grant.
+ */
+- (instancetype)initWithRealmPath:(NSString *)path
+                         username:(NSString *)username
+                      accessLevel:(RLMSyncAccessLevel)accessLevel;
+
+/**
  The identity of the user to whom this permission is granted, or "*"
- if all users are granted this permission.
+ if all users are granted this permission. Nil if the permission is
+ defined in terms of a key-value pair.
  */
 @property (nullable, nonatomic, readonly) NSString *userId;
+
+/**
+ If the permission is defined in terms of a key-value pair, the key
+ describing the type of criterion used to determine what users the
+ permission applies to. Otherwise, nil.
+ */
+@property (nullable, nonatomic, readonly) NSString *key;
+
+/**
+ If the permission is defined in terms of a key-value pair, a string
+ describing the criterion value used to determine what users the
+ permission applies to. Otherwise, nil.
+ */
+@property (nullable, nonatomic, readonly) NSString *value;
 
 /**
  When this permission object was last updated.
