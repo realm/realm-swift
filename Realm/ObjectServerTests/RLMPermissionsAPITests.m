@@ -143,12 +143,13 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
 /// If user A grants user B read access to a Realm, user B should be able to read to it.
 - (void)testReadAccess {
-    __block void(^workBlock)(NSError *) = ^(NSError *err) {
-        XCTFail(@"Error handler should not be called unless explicitly expected. Error: %@", err);
-    };
+    __block void(^errorBlock)(NSError *) = nil;
     [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, __unused RLMSyncSession *session) {
-        if (workBlock) {
-            workBlock(error);
+        if (errorBlock) {
+            errorBlock(error);
+            errorBlock = nil;
+        } else {
+            XCTFail(@"Error handler should not be called unless explicitly expected. Error: %@", error);
         }
     }];
 
@@ -195,12 +196,10 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     // Ensure user B can't actually write to the Realm.
     // Run this portion of the test on a background queue, since the error handler is dispatched onto the main queue.
     XCTestExpectation *deniedEx = [self expectationWithDescription:@"Expect a permission denied error."];
-    workBlock = ^(NSError *err) {
+    errorBlock = ^(NSError *err) {
         // Expect an error from the global error handler.
         XCTAssertNotNil(err);
-        XCTAssertEqual(err.code, RLMSyncErrorClientSessionError);
-        // 206 is a permission error. TODO: don't hardcode the literal.
-        XCTAssertEqual([err.userInfo[kRLMSyncErrorStatusCodeKey] integerValue], 206);
+        XCTAssertEqual(err.code, RLMSyncErrorPermissionDeniedError);
         [deniedEx fulfill];
     };
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5", @"child-6"]];
@@ -226,12 +225,13 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
 /// If user A grants user B write access to a Realm, user B should be able to write to it.
 - (void)testWriteAccess {
-    __block void(^workBlock)(NSError *) = ^(NSError *err) {
-        XCTFail(@"Error handler should not be called unless explicitly expected. Error: %@", err);
-    };
+    __block void(^errorBlock)(NSError *) = nil;
     [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, __unused RLMSyncSession *session) {
-        if (workBlock) {
-            workBlock(error);
+        if (errorBlock) {
+            errorBlock(error);
+            errorBlock = nil;
+        } else {
+            XCTFail(@"Error handler should not be called unless explicitly expected. Error: %@", error);
         }
     }];
 
@@ -284,12 +284,13 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
 /// If user A grants user B manage access to a Realm, user B should be able to set a permission for user C.
 - (void)testManageAccess {
-    __block void(^workBlock)(NSError *) = ^(NSError *err) {
-        XCTFail(@"Error handler should not be called unless explicitly expected. Error: %@", err);
-    };
+    __block void(^errorBlock)(NSError *) = nil;
     [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, __unused RLMSyncSession *session) {
-        if (workBlock) {
-            workBlock(error);
+        if (errorBlock) {
+            errorBlock(error);
+            errorBlock = nil;
+        } else {
+            XCTFail(@"Error handler should not be called unless explicitly expected. Error: %@", error);
         }
     }];
 
@@ -802,6 +803,88 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
     id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
     CHECK_PERMISSION_ABSENT(results, expectedPermission);
+}
+
+#pragma mark - Delete Realm upon permission denied
+
+/// A Realm which is opened improperly should report an error allowing the app to recover.
+- (void)testDeleteRealmUponPermissionDenied {
+    __block void(^errorBlock)(NSError *, RLMSyncSession *session) = nil;
+    [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
+        if (errorBlock) {
+            errorBlock(error, session);
+            errorBlock = nil;
+        } else {
+            XCTFail(@"Error handler should not be called unless explicitly expected. Error: %@", error);
+        }
+    }];
+
+    NSString *testName = NSStringFromSelector(_cmd);
+    // Open a Realm for user A.
+    NSURL *userAURL = makeTestURL(testName, nil);
+    RLMRealm *userARealm = [self openRealmForURL:userAURL user:self.userA];
+
+    // Have user A add some items to the Realm.
+    [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+    [self waitForUploadsForUser:self.userA url:userAURL];
+    CHECK_COUNT(3, SyncObject, userARealm);
+
+    // Give user B read permissions to that Realm.
+    RLMSyncPermissionValue *p = [[RLMSyncPermissionValue alloc] initWithRealmPath:[userAURL path]
+                                                                           userID:self.userB.identity
+                                                                      accessLevel:RLMSyncAccessLevelRead];
+    // Set the read permission.
+    XCTestExpectation *ex = [self expectationWithDescription:@"Setting a permission should work."];
+    [self.userA applyPermission:p callback:^(NSError *err) {
+        XCTAssert(!err);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    NSURL *userBURL = makeTestURL(testName, self.userA);
+    RLMRealmConfiguration *userBConfig = [RLMRealmConfiguration defaultConfiguration];
+    userBConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:self.userB realmURL:userBURL];
+    __block NSError *theError = nil;
+
+    // Incorrectly open the Realm for user B.
+    NSURL *onDiskPath;
+    @autoreleasepool {
+        NSString *sessionName = NSStringFromSelector(_cmd);
+        XCTestExpectation *ex2 = [self expectationWithDescription:@"We should get a permission denied error."];
+        errorBlock = ^(NSError *err, RLMSyncSession *session) {
+            // Make sure we're actually looking at the right session.
+            XCTAssertTrue([[session.realmURL absoluteString] containsString:sessionName]);
+            theError = err;
+            [ex2 fulfill];
+        };
+        __attribute__((objc_precise_lifetime)) RLMRealm *bad = [RLMRealm realmWithConfiguration:userBConfig error:nil];
+        [self waitForExpectationsWithTimeout:1000.0 handler:nil];
+        onDiskPath = [RLMSyncTestCase onDiskPathForSyncedRealm:bad];
+    }
+    XCTAssertNotNil(onDiskPath);
+    XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:[onDiskPath path]]);
+
+    // Check the error and perform the Realm deletion.
+    XCTAssertNotNil(theError);
+    XCTAssertNotNil([theError rlmSync_deleteRealmBlock]);
+    [theError rlmSync_deleteRealmBlock](YES);
+
+    // Ensure the file is no longer on disk.
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:[onDiskPath path]]);
+
+    // Correctly open the same Realm for user B.
+    __block RLMRealm *userBRealm = nil;
+    XCTestExpectation *asyncOpenEx = [self expectationWithDescription:@"Should asynchronously open a Realm"];
+    [RLMRealm asyncOpenWithConfiguration:userBConfig
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *err){
+                                    XCTAssertNil(err);
+                                    XCTAssertNotNil(realm);
+                                    userBRealm = realm;
+                                    [asyncOpenEx fulfill];
+                                }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    CHECK_COUNT(3, SyncObject, userBRealm);
 }
 
 @end
