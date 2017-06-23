@@ -29,6 +29,9 @@ extern NSString *const kRLMSyncPathOfRealmBackupCopyKey;
 /// A user info key for use with `RLMSyncErrorClientResetError`.
 extern NSString *const kRLMSyncInitiateClientResetBlockKey;
 
+/// A user info key for use with `RLMSyncErrorPermissionDeniedError`.
+extern NSString *const kRLMSyncInitiateDeleteRealmBlockKey;
+
 /**
  The error domain string for all SDK errors related to errors reported
  by the synchronization manager error handler, as well as general sync
@@ -95,7 +98,7 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      The client reset process can be initiated in one of two ways. The block provided in the
      `userInfo` dictionary under `kRLMSyncInitiateClientResetBlockKey` can be called to
      initiate the reset process. This block can be called any time after the error is
-     received, but should only be called if and when your app closes and invalidates every
+     received, but should only be called after your app closes and invalidates every
      instance of the offending Realm on all threads (note that autorelease pools may make this
      difficult to guarantee).
 
@@ -118,6 +121,30 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      error domain.
      */
     RLMSyncErrorUnderlyingAuthError     = 8,
+
+    /**
+     An error that indicates the user does not have permission to perform an operation
+     upon a synced Realm. For example, a user may receive this error if they attempt to
+     open a Realm they do not have at least read access to, or write to a Realm they only
+     have read access to.
+     
+     This error may also occur if a user incorrectly opens a Realm they have read-only
+     permissions to without using the `asyncOpen()` APIs.
+
+     A Realm that suffers a permission denied error is, by default, flagged so that its
+     local copy will be deleted the next time the application starts.
+     
+     The `userInfo` dictionary contains a block under the key
+     `kRLMSyncInitiateDeleteRealmBlockKey`, which can be used to request that the file be
+     deleted immediately instead. This block can be called any time after the error is
+     received to immediately delete the Realm file, but should only be called after your
+     app closes and invalidates every instance of the offending Realm on all threads (note
+     that autorelease pools may make this difficult to guarantee).
+
+     @warning It is strongly recommended that, if a Realm has encountered a permission denied
+              error, its files be deleted before attempting to re-open it.
+     */
+    RLMSyncErrorPermissionDeniedError   = 9,
 };
 
 /// An error which is related to authentication to a Realm Object Server.
