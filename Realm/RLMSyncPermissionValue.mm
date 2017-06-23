@@ -97,9 +97,6 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
         _key = @"email";
         // FIXME: this should be done on the server, not the client.
         _value = [username lowercaseString];
-        if (!_value) {
-            @throw RLMException(@"A permission value cannot be created without a valid username");
-        }
         _updatedAt = [NSDate date];
     }
     return self;

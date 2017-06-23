@@ -7,11 +7,16 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* Add a new error code to denote permission denied errors when working with
-  synchronized Realms, as well as an accompanying block that can be called
-  to inform the binding that the offending Realm's files should be kept or
-  deleted immediately. This allows recovering from permission denied errors
-  in a more robust manner.
+* Add a new error code to denote 'permission denied' errors when working
+  with synchronized Realms, as well as an accompanying block that can be
+  called to inform the binding that the offending Realm's files should be
+  deleted immediately. This allows recovering from 'permission denied'
+  errors in a more robust manner. See the documentation for
+  `RLMSyncErrorPermissionDeniedError` for more information.
+* Add `-[RLMSyncPermissionValue initWithRealmPath:username:accessLevel:]`
+  API allowing permissions to be applied to a user based on their username
+  (usually, an email address). Requires any edition of the Realm Object
+  Server 1.6.0 or later.
 
 ### Bugfixes
 
@@ -123,10 +128,7 @@ Add support for building with Xcode 9 Beta 1.
 
 ### Enhancements
 
-* Add `-[RLMSyncPermissionValue initWithRealmPath:username:accessLevel:]`
-  API allowing permissions to be applied to a user based on their username
-  (usually, an email address). Requires any edition of the Realm Object
-  Server 1.6.0 or later.
+* None.
 
 ### Bugfixes
 
