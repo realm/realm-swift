@@ -170,7 +170,7 @@ class RealmCollectionTypeTests: TestCase {
             fatalError("Test precondition failed")
         }
         // swiftlint:disable:next line_length
-        XCTAssertEqual(collection.description, "Results<CTTStringObjectWithLink> (\n\t[0] CTTStringObjectWithLink {\n\t\tstringCol = 1;\n\t\tlinkCol = (null);\n\t},\n\t[1] CTTStringObjectWithLink {\n\t\tstringCol = 2;\n\t\tlinkCol = (null);\n\t}\n)")
+        assertMatches(collection.description, "Results<CTTStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
     }
 
     func testCount() {
@@ -794,7 +794,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
             fatalError("Test precondition failed")
         }
         // swiftlint:disable:next line_length
-        XCTAssertEqual(collection.description, "List<CTTStringObjectWithLink> (\n\t[0] CTTStringObjectWithLink {\n\t\tstringCol = 1;\n\t\tlinkCol = (null);\n\t},\n\t[1] CTTStringObjectWithLink {\n\t\tstringCol = 2;\n\t\tlinkCol = (null);\n\t}\n)")
+        assertMatches(collection.description, "List<CTTStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
     }
 
     func testAddNotificationBlockDirect() {
@@ -1045,7 +1045,7 @@ class LinkingObjectsCollectionTypeTests: RealmCollectionTypeTests {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
         // swiftlint:disable:next line_length
-        XCTAssertEqual(collection.description, "LinkingObjects<CTTStringObjectWithLink> (\n\t[0] CTTStringObjectWithLink {\n\t\tstringCol = 1;\n\t\tlinkCol = CTTLinkTarget {\n\t\t\tid = 0;\n\t\t};\n\t},\n\t[1] CTTStringObjectWithLink {\n\t\tstringCol = 2;\n\t\tlinkCol = CTTLinkTarget {\n\t\t\tid = 0;\n\t\t};\n\t}\n)")
+        assertMatches(collection.description, "LinkingObjects<CTTStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 0;\n\t\t\\};\n\t\\},\n\t\\[1\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 0;\n\t\t\\};\n\t\\}\n\\)")
     }
 
     override func testAssignListProperty() {

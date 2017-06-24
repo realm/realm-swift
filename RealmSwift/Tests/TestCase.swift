@@ -170,6 +170,11 @@ class TestCase: XCTestCase {
         XCTAssert(block() == nil, message ?? "", file: fileName, line: lineNumber)
     }
 
+    func assertMatches(_ block: @autoclosure () -> String, _ regexString: String, _ message: String? = nil,
+                       fileName: String = #file, lineNumber: UInt = #line) {
+        RLMAssertMatches(self, block, regexString, message, fileName, lineNumber)
+    }
+
     private func realmFilePrefix() -> String {
         return name!.trimmingCharacters(in: CharacterSet(charactersIn: "-[]"))
     }

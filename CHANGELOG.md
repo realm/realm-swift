@@ -22,7 +22,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* `List.description` now reports the correct types for nested lists.
 
 2.8.3 Release notes (2017-06-20)
 =============================================================

@@ -32,8 +32,7 @@ public class ListBase: RLMListBase {
     }
 
     @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
-        let type = "List<\(_rlmArray.objectClassName)>"
-        return gsub(pattern: "RLMArray <0x[a-z0-9]+>", template: type, string: _rlmArray.description(withMaxDepth: depth)) ?? type
+        return RLMDescriptionWithMaxDepth("List<\(_rlmArray.objectClassName)>", _rlmArray, depth)
     }
 
     /// Returns the number of objects in this List.
