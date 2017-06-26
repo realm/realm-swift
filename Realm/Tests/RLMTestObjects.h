@@ -391,6 +391,11 @@ RLM_ARRAY_TYPE(PrimaryEmployeeObject);
 @property PrimaryEmployeeObject *intern;
 @property LinkToPrimaryEmployeeObject *wrappedIntern;
 @end
+RLM_ARRAY_TYPE(PrimaryCompanyObject);
+
+@interface ArrayOfPrimaryCompanies : RLMObject
+@property RLM_GENERIC_ARRAY(PrimaryCompanyObject) *companies;
+@end
 
 #pragma mark FakeObject
 
