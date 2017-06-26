@@ -262,7 +262,7 @@ static NSURL *syncDirectoryForChildProcess() {
             }];
             [setAdminEx fulfill];
         }];
-        [self waitForExpectations:@[findAdminEx] timeout:20.0];
+        [self waitForExpectations:@[setAdminEx] timeout:20.0];
     }
 
     // Refresh this Realm's token until it becomes an admin user. (We don't have any other
