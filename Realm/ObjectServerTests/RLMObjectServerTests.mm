@@ -302,44 +302,17 @@
 /// A sync user should be able to successfully change their own password.
 - (void)testOtherUserChangePassword {
     // Create admin user.
+    NSString *adminUsername = [[NSUUID UUID] UUIDString];
     {
-        // Admin token user.
-        NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
-        NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
-        XCTAssertNotNil(adminToken);
-        RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken identity:@"test"];
-        XCTAssertNotNil(credentials);
-        RLMSyncUser *adminTokenUser = [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
-
-        // Create admin/admin "normal" user. Won't have admin privileges until further below.
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:@"admin" password:@"admin" register:YES];
-        RLMSyncUser *adminUser = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
-        XCTAssertFalse(adminUser.isAdmin);
+        NSURL *url = [RLMObjectServerTests authServerURL];
+        RLMSyncUser *adminUser = [self makeAdminUser:adminUsername password:@"admin" server:url];
         [adminUser logOut];
 
-        // User should be created very quickly but not necessarily instantly.
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:5.0]];
-
-        // Set newly created admin/admin user as admin.
-        RLMRealmConfiguration *adminRealmConfig = [RLMRealmConfiguration defaultConfiguration];
-        adminRealmConfig.dynamic = true;
-        NSURL *adminRealmURL = [NSURL URLWithString:@"realm://localhost:9080/__admin"];
-        adminRealmConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:adminTokenUser realmURL:adminRealmURL];
-        XCTestExpectation *ex = [self expectationWithDescription:@"async open callback invoked"];
-        [RLMRealm asyncOpenWithConfiguration:adminRealmConfig callbackQueue:dispatch_get_main_queue() callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
-            XCTAssertNotNil(realm);
-            [realm transactionWithBlock:^{
-                [[realm allObjects:@"User"] setValue:@YES forKey:@"isAdmin"];
-            }];
-            XCTAssertNil(error);
-            [ex fulfill];
-        }];
-        [self waitForExpectationsWithTimeout:2.0 handler:nil];
-        [self waitForUploadsForUser:adminTokenUser url:adminRealmURL];
-
-        // Confirm that admin/admin user has admin privileges.
-        creds = [RLMSyncCredentials credentialsWithUsername:@"admin" password:@"admin" register:NO];
-        adminUser = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
+        // Confirm that admin user has admin privileges.
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:adminUsername
+                                                                       password:@"admin"
+                                                                       register:NO];
+        adminUser = [self logInUserForCredentials:creds server:url];
         XCTAssertTrue(adminUser.isAdmin);
         [adminUser logOut];
     }
@@ -358,7 +331,9 @@
     }
     // Attempt change password from regular user.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:@"user2" password:@"password"
+        NSString *regularUsername = [[NSUUID UUID] UUIDString];
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:regularUsername
+                                                                       password:@"password"
                                                                        register:YES];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
         XCTestExpectation *ex = [self expectationWithDescription:@"change password callback invoked"];
@@ -371,7 +346,9 @@
     }
     // Change password from admin user.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:@"admin" password:@"admin" register:NO];
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:adminUsername
+                                                                       password:@"admin"
+                                                                       register:NO];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
         XCTestExpectation *ex = [self expectationWithDescription:@"change password callback invoked"];
         [user changePassword:secondPassword forUserID:userID completion:^(NSError * _Nullable error) {
@@ -383,7 +360,8 @@
     }
     // Fail to log in with original password.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:username password:firstPassword
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:username
+                                                                       password:firstPassword
                                                                        register:NO];
 
         XCTestExpectation *ex = [self expectationWithDescription:@"login callback invoked"];
@@ -731,10 +709,6 @@
                                                                                    register:NO]
                                       server:[RLMObjectServerTests authServerURL]];
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-2", @"parent-3"]];
-
-        // FIXME: calling wait_for_upload_complete() before receiving BIND does
-        // not actually wait
-        sleep(1);
         [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
         RLMRunChildAndWait();
@@ -769,10 +743,6 @@
     } else {
         [self waitForDownloadsForUser:user url:url];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2"]];
-
-        // FIXME: calling wait_for_upload_complete() before receiving BIND does
-        // not actually wait
-        sleep(1);
         [self waitForUploadsForUser:user url:url];
         CHECK_COUNT(3, SyncObject, realm);
     }
@@ -936,10 +906,6 @@
         realm = [self immediatelyOpenRealmForURL:url user:user];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3", @"child-4"]];
         CHECK_COUNT(5, SyncObject, realm);
-
-        // FIXME: calling wait_for_upload_complete() before receiving BIND does
-        // not actually wait
-        sleep(1);
         [self waitForUploadsForUser:user url:url];
         RLMRunChildAndWait();
     } else {
