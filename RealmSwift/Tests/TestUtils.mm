@@ -31,46 +31,56 @@ static void initializeSharedSchema() {
     [RLMSchema sharedSchema];
 }
 
-void RLMAssertThrowsWithName(XCTestCase *self, dispatch_block_t block, NSString *name, NSString *message, NSString *fileName, NSUInteger lineNumber) {
-    BOOL didThrow = NO;
+static void assertThrows(XCTestCase *self, dispatch_block_t block, NSString *message,
+                         NSString *fileName, NSUInteger lineNumber,
+                         NSString *(^condition)(NSException *)) {
     @try {
         block();
-    }
-    @catch (NSException *e) {
-        didThrow = YES;
-        if (![name isEqualToString:e.name]) {
-            NSString *msg = [NSString stringWithFormat:@"The given expression threw an exception named '%@', but expected '%@'",
-                             e.name, name];
-            [self recordFailureWithDescription:msg inFile:fileName atLine:lineNumber expected:NO];
-        }
-    }
-    if (!didThrow) {
         NSString *prefix = @"The given expression failed to throw an exception";
         message = message ? [NSString stringWithFormat:@"%@ (%@)",  prefix, message] : prefix;
         [self recordFailureWithDescription:message inFile:fileName atLine:lineNumber expected:NO];
+    }
+    @catch (NSException *e) {
+        if (NSString *failure = condition(e)) {
+            [self recordFailureWithDescription:failure inFile:fileName atLine:lineNumber expected:NO];
+        }
     }
 }
 
-void RLMAssertThrowsWithReasonMatching(XCTestCase *self, dispatch_block_t block, NSString *regexString, NSString *message, NSString *fileName, NSUInteger lineNumber) {
-    BOOL didThrow = NO;
-    @try {
-        block();
-    }
-    @catch (NSException *e) {
-        didThrow = YES;
-        NSString *reason = e.reason;
-        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regexString options:(NSRegularExpressionOptions)0 error:nil];
-        if ([regex numberOfMatchesInString:reason options:(NSMatchingOptions)0 range:NSMakeRange(0, reason.length)] == 0) {
-            NSString *msg = [NSString stringWithFormat:@"The given expression threw an exception with reason '%@', but expected to match '%@'",
-                             reason, regexString];
-            [self recordFailureWithDescription:msg inFile:fileName atLine:lineNumber expected:NO];
+void RLMAssertThrowsWithName(XCTestCase *self, dispatch_block_t block, NSString *name,
+                             NSString *message, NSString *fileName, NSUInteger lineNumber) {
+    assertThrows(self, block, message, fileName, lineNumber, ^NSString *(NSException *e) {
+        if ([name isEqualToString:e.name]) {
+            return nil;
         }
-    }
-    if (!didThrow) {
-        NSString *prefix = @"The given expression failed to throw an exception";
-        message = message ? [NSString stringWithFormat:@"%@ (%@)",  prefix, message] : prefix;
-        [self recordFailureWithDescription:message inFile:fileName atLine:lineNumber expected:NO];
-    }
+        return [NSString stringWithFormat:@"The given expression threw an exception named '%@', but expected '%@'",
+                             e.name, name];
+    });
+}
+
+void RLMAssertThrowsWithReason(XCTestCase *self, dispatch_block_t block, NSString *expected,
+                               NSString *message, NSString *fileName, NSUInteger lineNumber) {
+    assertThrows(self, block, message, fileName, lineNumber, ^NSString *(NSException *e) {
+        if ([e.reason containsString:expected]) {
+            return nil;
+        }
+        return [NSString stringWithFormat:@"The given expression threw an exception with reason '%@', but expected '%@'",
+                             e.reason, expected];
+    });
+}
+
+void RLMAssertThrowsWithReasonMatching(XCTestCase *self, dispatch_block_t block,
+                                       NSString *regexString, NSString *message,
+                                       NSString *fileName, NSUInteger lineNumber) {
+    auto regex = [NSRegularExpression regularExpressionWithPattern:regexString
+                                                           options:(NSRegularExpressionOptions)0 error:nil];
+    assertThrows(self, block, message, fileName, lineNumber, ^NSString *(NSException *e) {
+        if ([regex numberOfMatchesInString:e.reason options:(NSMatchingOptions)0 range:{0, e.reason.length}] > 0) {
+            return nil;
+        }
+        return [NSString stringWithFormat:@"The given expression threw an exception with reason '%@', but expected to match '%@'",
+                             e.reason, regexString];
+    });
 }
 
 
