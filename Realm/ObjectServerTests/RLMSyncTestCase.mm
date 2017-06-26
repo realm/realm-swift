@@ -21,6 +21,8 @@
 #import <XCTest/XCTest.h>
 #import <Realm/Realm.h>
 
+#import "RLMRealm_Dynamic.h"
+#import "RLMRealmConfiguration_Private.h"
 #import "RLMSyncManager+ObjectServerTests.h"
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncConfiguration_Private.h"
@@ -155,7 +157,8 @@ static NSURL *syncDirectoryForChildProcess() {
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncManager.sharedManager.sessionCompletionNotifier = ^(NSError *error) {
         if (error) {
-            XCTFail(@"Received an asynchronous error: %@ (process: %@)", error, self.isParent ? @"parent" : @"child");
+            XCTFail(@"Received an asynchronous error when trying to open Realm at '%@' for user '%@': %@ (process: %@)",
+                    url, user.identity, error, self.isParent ? @"parent" : @"child");
         }
         dispatch_semaphore_signal(sema);
     };
@@ -209,6 +212,79 @@ static NSURL *syncDirectoryForChildProcess() {
     return theUser;
 }
 
+- (RLMSyncUser *)makeAdminUser:(NSString *)userName password:(NSString *)password server:(NSURL *)url {
+    // Admin token user (only needs to be set up once ever per test run).
+    // Note: this is shared, persistent state between tests.
+    static RLMSyncUser *adminTokenUser = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
+        NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL
+                                                        encoding:NSUTF8StringEncoding error:nil];
+        RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken
+                                                                                identity:[[NSUUID UUID] UUIDString]];
+        adminTokenUser = [self logInUserForCredentials:credentials server:url];
+    });
+    XCTAssertNotNil(adminTokenUser);
+
+    // Create a new user, which starts off without admin privileges.
+    RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:password register:YES];
+    RLMSyncUser *adminUser = [self logInUserForCredentials:creds server:url];
+    XCTAssertFalse(adminUser.isAdmin);
+    NSString *adminUserID = adminUser.identity;
+    XCTAssertNotNil(adminUserID);
+
+    // Find reference in admin Realm to newly-created non-admin user.
+    @autoreleasepool {
+        RLMRealmConfiguration *adminRealmConfig = [RLMRealmConfiguration defaultConfiguration];
+        adminRealmConfig.dynamic = true;
+        NSURL *adminRealmURL = [NSURL URLWithString:@"realm://localhost:9080/__admin"];
+        adminRealmConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:adminTokenUser
+                                                                               realmURL:adminRealmURL];
+
+        XCTestExpectation *setAdminEx = [self expectationWithDescription:@"completed setting admin status on user"];
+        XCTestExpectation *findAdminEx = [self expectationWithDescription:@"found admin status on user"];
+        [RLMRealm asyncOpenWithConfiguration:adminRealmConfig callbackQueue:dispatch_get_main_queue() callback:^(RLMRealm *realm, NSError *error) {
+            XCTAssertNil(error);
+            __attribute__((objc_precise_lifetime)) RLMNotificationToken *token;
+            __block RLMObject *userObject = nil;
+            token = [[realm objects:@"User" where:@"id == %@", adminUserID] addNotificationBlock:^(RLMResults *results, __unused id change, NSError *error) {
+                XCTAssertNil(error);
+                if ([results count] > 0) {
+                    userObject = [results firstObject];
+                    [findAdminEx fulfill];
+                }
+            }];
+            [self waitForExpectations:@[findAdminEx] timeout:10.0];
+            [token stop];
+            [realm transactionWithBlock:^{
+                [userObject setValue:@YES forKey:@"isAdmin"];
+            }];
+            [setAdminEx fulfill];
+        }];
+        [self waitForExpectations:@[setAdminEx] timeout:20.0];
+    }
+
+    // Refresh this Realm's token until it becomes an admin user. (We don't have any other
+    // way to tell when the server has properly processed this change.)
+    BOOL isAdmin = NO;
+    for (NSInteger i=0; i<10; i++) {
+        // Log the user back in
+        RLMSyncCredentials *noRegCreds = [RLMSyncCredentials credentialsWithUsername:userName
+                                                                            password:password
+                                                                            register:NO];
+        RLMSyncUser *testUser = [self logInUserForCredentials:noRegCreds server:url];
+        if (testUser.isAdmin) {
+            isAdmin = YES;
+            break;
+        }
+        // Wait a bit then try again.
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    }
+    XCTAssertTrue(isAdmin);
+    return adminUser;
+}
+
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user url:(NSURL *)url {
     [self waitForDownloadsForUser:user url:url error:nil];
 }
@@ -239,10 +315,10 @@ static NSURL *syncDirectoryForChildProcess() {
     XCTestExpectation *ex = [self expectationWithDescription:@"Upload waiter expectation"];
     __block NSError *theError = nil;
     [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                    callback:^(NSError *err){
-                                                        theError = err;
-                                                        [ex fulfill];
-                                                    }];
+                                   callback:^(NSError *err){
+                                       theError = err;
+                                       [ex fulfill];
+                                   }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
     if (error) {
         *error = theError;

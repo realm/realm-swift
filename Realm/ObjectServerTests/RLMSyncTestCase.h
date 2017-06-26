@@ -77,6 +77,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMSyncUser *)logInUserForCredentials:(RLMSyncCredentials *)credentials
                                   server:(NSURL *)url;
 
+- (RLMSyncUser *)makeAdminUser:(NSString *)userName password:(NSString *)password server:(NSURL *)url;
+
 /// Add a number of objects to a Realm.
 - (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions;
 
