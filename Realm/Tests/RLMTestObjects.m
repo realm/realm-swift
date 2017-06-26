@@ -134,6 +134,9 @@
 }
 @end
 
+@implementation ArrayOfPrimaryCompanies
+@end
+
 #pragma mark LinkToCompanyObject
 
 @implementation LinkToCompanyObject
