@@ -157,7 +157,8 @@ static NSURL *syncDirectoryForChildProcess() {
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncManager.sharedManager.sessionCompletionNotifier = ^(NSError *error) {
         if (error) {
-            XCTFail(@"Received an asynchronous error: %@ (process: %@)", error, self.isParent ? @"parent" : @"child");
+            XCTFail(@"Received an asynchronous error when trying to open Realm at '%@' for user '%@': %@ (process: %@)",
+                    url, user.identity, error, self.isParent ? @"parent" : @"child");
         }
         dispatch_semaphore_signal(sema);
     };
@@ -230,29 +231,57 @@ static NSURL *syncDirectoryForChildProcess() {
     RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:password register:YES];
     RLMSyncUser *adminUser = [self logInUserForCredentials:creds server:url];
     XCTAssertFalse(adminUser.isAdmin);
+    NSString *adminUserID = adminUser.identity;
+    XCTAssertNotNil(adminUserID);
 
-    // FIXME: is there any way to do this without waiting X seconds?
-    // User should be created very quickly but not necessarily instantly.
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:5.0]];
+    // Find reference in admin Realm to newly-created non-admin user.
+    @autoreleasepool {
+        RLMRealmConfiguration *adminRealmConfig = [RLMRealmConfiguration defaultConfiguration];
+        adminRealmConfig.dynamic = true;
+        NSURL *adminRealmURL = [NSURL URLWithString:@"realm://localhost:9080/__admin"];
+        adminRealmConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:adminTokenUser
+                                                                               realmURL:adminRealmURL];
 
-    // Set newly created non-admin user as admin.
-    RLMRealmConfiguration *adminRealmConfig = [RLMRealmConfiguration defaultConfiguration];
-    adminRealmConfig.dynamic = true;
-    NSURL *adminRealmURL = [NSURL URLWithString:@"realm://localhost:9080/__admin"];
-    adminRealmConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:adminTokenUser
-                                                                           realmURL:adminRealmURL];
-    XCTestExpectation *ex = [self expectationWithDescription:@"async open callback invoked"];
-    [RLMRealm asyncOpenWithConfiguration:adminRealmConfig callbackQueue:dispatch_get_main_queue()
-                                callback:^(RLMRealm *realm, NSError *error) {
-                                    XCTAssertNotNil(realm);
-                                    [realm transactionWithBlock:^{
-                                        [[realm allObjects:@"User"] setValue:@YES forKey:@"isAdmin"];
-                                    }];
-                                    XCTAssertNil(error);
-                                    [ex fulfill];
-                                }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [self waitForUploadsForUser:adminTokenUser url:adminRealmURL];
+        XCTestExpectation *setAdminEx = [self expectationWithDescription:@"completed setting admin status on user"];
+        XCTestExpectation *findAdminEx = [self expectationWithDescription:@"found admin status on user"];
+        [RLMRealm asyncOpenWithConfiguration:adminRealmConfig callbackQueue:dispatch_get_main_queue() callback:^(RLMRealm *realm, NSError *error) {
+            XCTAssertNil(error);
+            __attribute__((objc_precise_lifetime)) RLMNotificationToken *token;
+            __block RLMObject *userObject = nil;
+            token = [[realm objects:@"User" where:@"id == %@", adminUserID] addNotificationBlock:^(RLMResults *results, __unused id change, NSError *error) {
+                XCTAssertNil(error);
+                if ([results count] > 0) {
+                    userObject = [results firstObject];
+                    [findAdminEx fulfill];
+                }
+            }];
+            [self waitForExpectations:@[findAdminEx] timeout:10.0];
+            [token stop];
+            [realm transactionWithBlock:^{
+                [userObject setValue:@YES forKey:@"isAdmin"];
+            }];
+            [setAdminEx fulfill];
+        }];
+        [self waitForExpectations:@[findAdminEx] timeout:20.0];
+    }
+
+    // Refresh this Realm's token until it becomes an admin user. (We don't have any other
+    // way to tell when the server has properly processed this change.)
+    BOOL isAdmin = NO;
+    for (NSInteger i=0; i<10; i++) {
+        // Log the user back in
+        RLMSyncCredentials *noRegCreds = [RLMSyncCredentials credentialsWithUsername:userName
+                                                                            password:password
+                                                                            register:NO];
+        RLMSyncUser *testUser = [self logInUserForCredentials:noRegCreds server:url];
+        if (testUser.isAdmin) {
+            isAdmin = YES;
+            break;
+        }
+        // Wait a bit then try again.
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
+    }
+    XCTAssertTrue(isAdmin);
     return adminUser;
 }
 
@@ -286,10 +315,10 @@ static NSURL *syncDirectoryForChildProcess() {
     XCTestExpectation *ex = [self expectationWithDescription:@"Upload waiter expectation"];
     __block NSError *theError = nil;
     [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                    callback:^(NSError *err){
-                                                        theError = err;
-                                                        [ex fulfill];
-                                                    }];
+                                   callback:^(NSError *err){
+                                       theError = err;
+                                       [ex fulfill];
+                                   }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
     if (error) {
         *error = theError;
