@@ -23,9 +23,17 @@ import Foundation
 /**
  An object representing a Realm Object Server user.
 
- - see: `SyncUser`
+ - see: `RLMSyncUser`
  */
 public typealias SyncUser = RLMSyncUser
+
+/**
+ An immutable data object representing information retrieved from the Realm Object
+ Server about a particular user.
+
+ - see: `RLMSyncUserInfo`
+ */
+public typealias SyncUserInfo = RLMSyncUserInfo
 
 /**
  A singleton which configures and manages the Realm Object Server synchronization-related

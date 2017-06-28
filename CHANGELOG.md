@@ -27,6 +27,10 @@ x.x.x Release notes (yyyy-MM-dd)
   users defined using the access token credential type be logged in with an
   authentication server URL specified; this parameter will become mandatory
   in a future version of the SDK.
+* Add `-[RLMSyncUser retrieveInfoForUser:identityProvider:completion:]`
+  API allowing administrator users to retrieve information about a user based
+  on their provider identity (for example, a username). Requires any edition
+  of the Realm Object Server 1.8.2 or later.
 
 ### Bugfixes
 

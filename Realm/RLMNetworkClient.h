@@ -20,42 +20,38 @@
 
 #import "RLMSyncUtil_Private.h"
 
-/**
- An enum describing all possible endpoints on the Realm Object Server.
- */
-typedef NS_ENUM(NSUInteger, RLMServerEndpoint) {
-    RLMServerEndpointAuth,
-    RLMServerEndpointLogout,
-    RLMServerEndpointAddCredentials,
-    RLMServerEndpointRemoveCredentials,
-    RLMServerEndpointChangePassword,
-};
+NS_ASSUME_NONNULL_BEGIN
+
+/// An abstract class representing a server endpoint.
+@interface RLMSyncServerEndpoint : NSObject RLM_SYNC_UNINITIALIZABLE
+@end
+
+/// The authentication endpoint.
+@interface RLMSyncAuthEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
++ (instancetype)endpoint;
+@end
+
+/// The password change endpoint.
+@interface RLMSyncChangePasswordEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
++ (instancetype)endpoint;
+@end
+
+/// The get user info endpoint.
+@interface RLMSyncGetUserInfoEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
++ (instancetype)endpoint;
+@end
 
 /**
  A simple Realm Object Server network client that wraps `NSURLSession`.
  */
 @interface RLMNetworkClient : NSObject
 
-NS_ASSUME_NONNULL_BEGIN
-
-+ (void)postRequestToEndpoint:(RLMServerEndpoint)endpoint
++ (void)sendRequestToEndpoint:(RLMSyncServerEndpoint *)endpoint
                        server:(NSURL *)serverURL
                          JSON:(NSDictionary *)jsonDictionary
                    completion:(RLMSyncCompletionBlock)completionBlock;
 
-+ (void)postRequestToEndpoint:(RLMServerEndpoint)endpoint
-                       server:(NSURL *)serverURL
-                         JSON:(NSDictionary *)jsonDictionary
-                      timeout:(NSTimeInterval)timeout
-                   completion:(RLMSyncCompletionBlock)completionBlock;
-
-/**
- Send some JSON data using the specified HTTP method (e.g. 'POST', 'PUT', etc.) to the authentication server,
- and asynchronously call a completion block with a JSON response and/or error.
- */
-
-+ (void)sendRequestToEndpoint:(RLMServerEndpoint)endpoint
-                   httpMethod:(NSString *)httpMethod
++ (void)sendRequestToEndpoint:(RLMSyncServerEndpoint *)endpoint
                        server:(NSURL *)serverURL
                          JSON:(NSDictionary *)jsonDictionary
                       timeout:(NSTimeInterval)timeout
