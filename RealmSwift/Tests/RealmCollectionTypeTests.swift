@@ -222,8 +222,8 @@ class RealmCollectionTypeTests: TestCase {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        XCTAssertEqual(str1, collection[0])
-        XCTAssertEqual(str2, collection[1])
+        assertEqual(str1, collection[0])
+        assertEqual(str2, collection[1])
 
         assertThrows(collection[200])
         assertThrows(collection[-200])
@@ -233,8 +233,8 @@ class RealmCollectionTypeTests: TestCase {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        XCTAssertEqual(str1, collection.first!)
-        XCTAssertEqual(str2, collection.filter("stringCol = '2'").first!)
+        assertEqual(str1, collection.first!)
+        assertEqual(str2, collection.filter("stringCol = '2'").first!)
         XCTAssertNil(collection.filter("stringCol = '3'").first)
     }
 
@@ -242,8 +242,8 @@ class RealmCollectionTypeTests: TestCase {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        XCTAssertEqual(str2, collection.last!)
-        XCTAssertEqual(str2, collection.filter("stringCol = '2'").last!)
+        assertEqual(str2, collection.last!)
+        assertEqual(str2, collection.filter("stringCol = '2'").last!)
         XCTAssertNil(collection.filter("stringCol = '3'").last)
     }
 
@@ -255,7 +255,7 @@ class RealmCollectionTypeTests: TestCase {
         let actual = collection.value(forKey: "stringCol") as! [String]!
         XCTAssertEqual(expected, actual!)
 
-        XCTAssertEqual(collection.map { $0 }, collection.value(forKey: "self") as! [CTTStringObjectWithLink])
+        assertEqualObjectCollections(collection.map { $0 }, collection.value(forKey: "self") as! [CTTStringObjectWithLink])
     }
 
     func testSetValueForKey() {
@@ -339,8 +339,8 @@ class RealmCollectionTypeTests: TestCase {
         let collection = getAggregateableCollection()
 
         let notActuallySorted = collection.sorted(by: [])
-        XCTAssertEqual(collection[0], notActuallySorted[0])
-        XCTAssertEqual(collection[1], notActuallySorted[1])
+        assertEqual(collection[0], notActuallySorted[0])
+        assertEqual(collection[1], notActuallySorted[1])
 
         var sorted = collection.sorted(by: [SortDescriptor(keyPath: "intCol", ascending: true)])
         XCTAssertEqual(1, sorted[0].intCol)
@@ -689,7 +689,7 @@ class ResultsWithCustomInitializerTest: TestCase {
         let expected = Array(collection.map { $0.stringCol })
         let actual = collection.value(forKey: "stringCol") as! [String]!
         XCTAssertEqual(expected, actual!)
-        XCTAssertEqual(collection.map { $0 }, collection.value(forKey: "self") as! [CTTStringObjectWithLink])
+        assertEqualObjectCollections(collection.map { $0 }, collection.value(forKey: "self") as! [SwiftCustomInitializerObject])
     }
 }
 

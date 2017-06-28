@@ -489,8 +489,8 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
  Returns YES if another Realm object instance points to the same object as the receiver in the Realm managing
  the receiver.
 
- For object types with a primary, key, `isEqual:` is overridden to use this method (along with a corresponding
- implementation for `hash`).
+ For object types with a primary, key, `isEqual:` is overridden to use the same logic as this
+ method (along with a corresponding implementation for `hash`).
 
  @param object  The object to compare the receiver to.
 

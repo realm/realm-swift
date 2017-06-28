@@ -121,9 +121,9 @@ class ListTests: TestCase {
             array.append(str)
         }
         XCTAssertEqual(Int(3), array.count)
-        XCTAssertEqual(str1, array[0])
-        XCTAssertEqual(str2, array[1])
-        XCTAssertEqual(str1, array[2])
+        assertEqual(str1, array[0])
+        assertEqual(str2, array[1])
+        assertEqual(str1, array[2])
     }
 
     func testAppendArray() {
@@ -132,9 +132,9 @@ class ListTests: TestCase {
         }
         array.append(objectsIn: [str1, str2, str1])
         XCTAssertEqual(Int(3), array.count)
-        XCTAssertEqual(str1, array[0])
-        XCTAssertEqual(str2, array[1])
-        XCTAssertEqual(str1, array[2])
+        assertEqual(str1, array[0])
+        assertEqual(str2, array[1])
+        assertEqual(str1, array[2])
     }
 
     func testAppendResults() {
@@ -143,8 +143,8 @@ class ListTests: TestCase {
         }
         array.append(objectsIn: realmWithTestPath().objects(SwiftStringObject.self))
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str1, array[0])
-        XCTAssertEqual(str2, array[1])
+        assertEqual(str1, array[0])
+        assertEqual(str2, array[1])
     }
 
     func testInsert() {
@@ -156,12 +156,12 @@ class ListTests: TestCase {
 
         array.insert(str1, at: 0)
         XCTAssertEqual(Int(1), array.count)
-        XCTAssertEqual(str1, array[0])
+        assertEqual(str1, array[0])
 
         array.insert(str2, at: 0)
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str1, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str1, array[1])
 
         assertThrows(_ = array.insert(str2, at: 200))
         assertThrows(_ = array.insert(str2, at: -200))
@@ -175,8 +175,8 @@ class ListTests: TestCase {
         array.append(objectsIn: [str1, str2, str1])
 
         array.remove(objectAtIndex: 1)
-        XCTAssertEqual(str1, array[0])
-        XCTAssertEqual(str1, array[1])
+        assertEqual(str1, array[0])
+        assertEqual(str1, array[1])
 
         assertThrows(array.remove(objectAtIndex: 200))
         assertThrows(array.remove(objectAtIndex: -200))
@@ -191,7 +191,7 @@ class ListTests: TestCase {
 
         array.removeLast()
         XCTAssertEqual(Int(1), array.count)
-        XCTAssertEqual(str1, array[0])
+        assertEqual(str1, array[0])
 
         array.removeLast()
         XCTAssertEqual(Int(0), array.count)
@@ -223,13 +223,13 @@ class ListTests: TestCase {
 
         array.replace(index: 0, object: str2)
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str1, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str1, array[1])
 
         array.replace(index: 1, object: str2)
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str2, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str2, array[1])
 
         assertThrows(array.replace(index: 200, object: str2))
         assertThrows(array.replace(index: -200, object: str2))
@@ -270,19 +270,19 @@ class ListTests: TestCase {
 
         array.replaceSubrange(0..<1, with: [str2])
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str1, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str1, array[1])
 
         array.replaceSubrange(1..<2, with: [str2])
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str2, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str2, array[1])
 
         array.replaceSubrange(0..<0, with: [str2])
         XCTAssertEqual(Int(3), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str2, array[1])
-        XCTAssertEqual(str2, array[2])
+        assertEqual(str2, array[0])
+        assertEqual(str2, array[1])
+        assertEqual(str2, array[2])
 
         array.replaceSubrange(0..<3, with: [])
         XCTAssertEqual(Int(0), array.count)
@@ -301,13 +301,13 @@ class ListTests: TestCase {
 
         array.swap(index1: 0, 1)
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str1, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str1, array[1])
 
         array.swap(index1: 1, 1)
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str1, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str1, array[1])
 
         assertThrows(array.swap(index1: -1, 0))
         assertThrows(array.swap(index1: 0, -1))

@@ -266,17 +266,22 @@ open class Object: RLMObjectBase, ThreadConfined {
                                    to: List<DynamicObject>.self)
     }
 
-    // MARK: Equatable
-
+    // MARK: Comparison
     /**
-     Returns whether two Realm objects are equal.
+     Returns whether two Realm objects are the same.
 
-     Objects are considered equal if and only if they are both managed by the same Realm and point to the same
-     underlying object in the database.
+     Objects are considered the same if and only if they are both managed by the same
+     Realm and point to the same underlying object in the database.
+     
+     - note: Equality comparison is implemented by `isEqual(_:)`, but objects are only
+             considered equatable using `==` or `isEqual(_:)` if a primary key is
+             defined for the model type. This method can be used to carry out the same
+             underlying comparison regardless of whether the object types are defined
+             with primary keys or not.
 
      - parameter object: The object to compare the receiver to.
      */
-    open override func isEqual(_ object: Any?) -> Bool {
+    public func isSameObject(as object: Any?) -> Bool {
         return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
     }
 
@@ -492,3 +497,15 @@ extension Object: AssistedObjectiveCBridgeable {
         return (objectiveCValue: unsafeCastToRLMObject(), metadata: nil)
     }
 }
+
+// MARK: - Migration assistance
+
+#if os(OSX)
+#else
+extension Object {
+    /// :nodoc:
+    @available(*, unavailable, renamed: "isSameObject(as:)") public func isEqual(to object: Any?) -> Bool {
+        fatalError()
+    }
+}
+#endif

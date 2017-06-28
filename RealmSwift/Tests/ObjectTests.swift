@@ -295,14 +295,14 @@ class ObjectTests: TestCase {
 
         let boolObject = SwiftBoolObject(value: [true])
         setter(object, boolObject, "objectCol")
-        XCTAssertEqual(getter(object, "objectCol") as? SwiftBoolObject, boolObject)
+        assertEqual(getter(object, "objectCol") as? SwiftBoolObject, boolObject)
         XCTAssertEqual((getter(object, "objectCol") as! SwiftBoolObject).boolCol, true)
 
         let list = List<SwiftBoolObject>()
         list.append(boolObject)
         setter(object, list, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 1)
-        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
+        assertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
 
         list.removeAll()
         setter(object, list, "arrayCol")
@@ -310,7 +310,7 @@ class ObjectTests: TestCase {
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 1)
-        XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
+        assertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).first!, boolObject)
 
         setter(object, nil, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<SwiftBoolObject>).count, 0)
@@ -346,12 +346,12 @@ class ObjectTests: TestCase {
         XCTAssertEqual((getter(object, "dateCol") as! Date), Date(timeIntervalSince1970: 333))
 
         setter(object, boolObject, "objectCol")
-        XCTAssertEqual((getter(object, "objectCol") as! DynamicObject), boolObject)
+        assertEqual((getter(object, "objectCol") as! DynamicObject), boolObject)
         XCTAssertEqual(((getter(object, "objectCol") as! DynamicObject)["boolCol"] as! Bool), true)
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
-        XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
+        assertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
 
         let list = getter(object, "arrayCol") as! List<DynamicObject>
         list.removeAll()
@@ -360,7 +360,7 @@ class ObjectTests: TestCase {
 
         setter(object, [boolObject], "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 1)
-        XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
+        assertEqual((getter(object, "arrayCol") as! List<DynamicObject>).first!, boolObject)
 
         setter(object, nil, "arrayCol")
         XCTAssertEqual((getter(object, "arrayCol") as! List<DynamicObject>).count, 0)
@@ -442,8 +442,8 @@ class ObjectTests: TestCase {
         }
         let dynamicArray = arrayObject.dynamicList("array")
         XCTAssertEqual(dynamicArray.count, 2)
-        XCTAssertEqual(dynamicArray[0], str1)
-        XCTAssertEqual(dynamicArray[1], str2)
+        assertEqual(dynamicArray[0], str1)
+        assertEqual(dynamicArray[1], str2)
         XCTAssertEqual(arrayObject.dynamicList("intArray").count, 0)
         assertThrows(arrayObject.dynamicList("noSuchList"))
     }
@@ -595,5 +595,62 @@ class ObjectTests: TestCase {
         }
         waitForExpectations(timeout: 2)
         token.invalidate()
+    }
+
+    func testEqualityForObjectTypeWithPrimaryKey() {
+        let realm = try! Realm()
+        let pk = "123456"
+
+        let testObject = SwiftPrimaryStringObject()
+        testObject.stringCol = pk
+        testObject.intCol = 12345
+
+        let unmanaged = SwiftPrimaryStringObject()
+        unmanaged.stringCol = pk
+        unmanaged.intCol = 12345
+
+        let otherObject = SwiftPrimaryStringObject()
+        otherObject.stringCol = "not" + pk
+        otherObject.intCol = 12345
+
+        try! realm.write {
+            realm.add([testObject, otherObject])
+        }
+
+        // Should not match an object that's not equal.
+        XCTAssertNotEqual(testObject, otherObject)
+
+        // Should not match an object whose fields are equal if it's not the same row in the database.
+        XCTAssertNotEqual(testObject, unmanaged)
+
+        // Should match an object that represents the same row.
+        let retrievedObject = realm.object(ofType: SwiftPrimaryStringObject.self, forPrimaryKey: pk)!
+        XCTAssertEqual(testObject, retrievedObject)
+        XCTAssertEqual(testObject.hash, retrievedObject.hash)
+        XCTAssertTrue(testObject.isSameObject(as: retrievedObject))
+    }
+
+    func testEqualityForObjectTypeWithoutPrimaryKey() {
+        let realm = try! Realm()
+        let pk = "123456"
+        XCTAssertNil(SwiftStringObject.primaryKey())
+
+        let testObject = SwiftStringObject()
+        testObject.stringCol = pk
+
+        let alias = testObject
+
+        try! realm.write {
+            realm.add(testObject)
+        }
+
+        XCTAssertEqual(testObject, alias)
+
+        // Should not match an object even if it represents the same row.
+        let retrievedObject = realm.objects(SwiftStringObject.self).first!
+        XCTAssertNotEqual(testObject, retrievedObject)
+
+        // Should be able to use `isSameObject(as:)` to check if same row in the database.
+        XCTAssertTrue(testObject.isSameObject(as: retrievedObject))
     }
 }

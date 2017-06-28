@@ -51,10 +51,14 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix empty strings, binary data, and null on the right side of `BEGINSWITH`,
   `ENDSWITH` and `CONTAINS` operators in predicates to match Foundation's
   semantics of never matching any strings or data.
+* Swift `Object` comparison and hashing behavior now works the same way as
+  that of `RLMObject` (objects are now only considered equatable if their
+  model class defines a primary key).
 
 ### Enhancements
 
-* None.
+* Add Swift `Object.isSameObject(as:_)` API to perform the same function as
+  the existing Objective-C API `-[RLMObject isEqualToObject:]`.
 
 ### Bugfixes
 
