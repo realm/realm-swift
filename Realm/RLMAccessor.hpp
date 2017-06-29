@@ -106,11 +106,6 @@ private:
     // for every property
     NSDictionary *_defaultValues;
 
-    // A temporary hack to preserve the existing behavior for
-    // https://github.com/realm/realm-cocoa/issues/4926
-    // FIXME: remove in 3.0
-    bool _nilHack = false;
-
     RLMObservationInfo *_observationInfo = nullptr;
     NSString *_kvoPropertyName = nil;
 

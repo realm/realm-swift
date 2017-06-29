@@ -507,6 +507,10 @@ NS_REFINED_FOR_SWIFT;
  As with `addObject:`, the object cannot already be managed by a different
  Realm. Use `-[RLMObject createOrUpdateInRealm:withValue:]` to copy values to
  a different Realm.
+ 
+ If there is a property or KVC value on `object` whose value is nil, and it corresponds
+ to a nullable property on an existing object being updated, that nullable property will
+ be set to nil.
 
  @warning This method may only be called during a write transaction.
 

@@ -918,14 +918,13 @@
     auto obj = [AllOptionalTypesPK createInRealm:realm withValue:nonnull];
     [AllOptionalTypesPK createOrUpdateInRealm:realm withValue:null];
 
-    // FIXME: these should actually all be nil
-    XCTAssertNotNil(obj.intObj);
-    XCTAssertNotNil(obj.floatObj);
-    XCTAssertNotNil(obj.doubleObj);
-    XCTAssertNotNil(obj.boolObj);
-    XCTAssertNotNil(obj.string);
-    XCTAssertNotNil(obj.data);
-    XCTAssertNotNil(obj.date);
+    XCTAssertNil(obj.intObj);
+    XCTAssertNil(obj.floatObj);
+    XCTAssertNil(obj.doubleObj);
+    XCTAssertNil(obj.boolObj);
+    XCTAssertNil(obj.string);
+    XCTAssertNil(obj.data);
+    XCTAssertNil(obj.date);
 
     [AllOptionalTypesPK createOrUpdateInRealm:realm withValue:nonnull];
     [AllOptionalTypesPK createOrUpdateInRealm:realm withValue:@[@0]];

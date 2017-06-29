@@ -25,7 +25,11 @@ Synchronized Realms require a server running Realm Object Server v2.0 or higher.
   `SortDescriptor.property`.
   These APIs have been superseded by equivalent APIs that take
   or return key paths instead of property names.
-  
+* The Objective-C and Swift `create(_:, value: update:)` APIs now
+  correctly nil out nullable properties when updating an existing
+  object when the `value` argument specifies nil or `NSNull` for
+  the property value.
+
 ### Enhancements
 
 * Add a new error code to denote 'permission denied' errors when working

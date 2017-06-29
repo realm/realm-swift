@@ -322,7 +322,9 @@ public final class Realm {
      If the object is being updated, all properties defined in its schema will be set by copying
      from `value` using key-value coding. If the `value` argument does not respond to `value(forKey:)`
      for a given property name (or getter name, if defined), that value will remain untouched.
-     Nullable properties on the object can be set to nil by using `NSNull` as the updated value.
+     Nullable properties on the object can be set to nil by using `NSNull` as the updated value,
+     or (if you are passing in an instance of an `Object` subclass) setting the corresponding
+     property on `value` to nil.
 
      If the `value` argument is an array, all properties must be present, valid and in the same
      order as the properties defined in the model.
