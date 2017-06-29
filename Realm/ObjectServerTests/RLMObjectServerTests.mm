@@ -462,6 +462,78 @@
     [self waitForExpectationsWithTimeout:10 handler:nil];
 }
 
+/// The login queue argument should be respected.
+- (void)testLoginQueueForSuccessfulLogin {
+    // Make global queue
+    dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0);
+
+    RLMSyncCredentials *c1 = [RLMSyncCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
+                                                                password:@"p"
+                                                                register:YES];
+    XCTestExpectation *ex1 = [self expectationWithDescription:@"User logs in successfully on background queue"];
+    [RLMSyncUser logInWithCredentials:c1
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                              timeout:30.0
+                        callbackQueue:queue
+                         onCompletion:^(RLMSyncUser *user, __unused NSError *error) {
+                             XCTAssertNotNil(user);
+                             XCTAssertFalse([NSThread isMainThread]);
+                             [ex1 fulfill];
+                         }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    RLMSyncCredentials *c2 = [RLMSyncCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
+                                                                password:@"p"
+                                                                register:YES];
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"User logs in successfully on main queue"];
+    [RLMSyncUser logInWithCredentials:c2
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                              timeout:30.0
+                        callbackQueue:dispatch_get_main_queue()
+                         onCompletion:^(RLMSyncUser *user, __unused NSError *error) {
+                             XCTAssertNotNil(user);
+                             XCTAssertTrue([NSThread isMainThread]);
+                             [ex2 fulfill];
+                         }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+/// The login queue argument should be respected.
+- (void)testLoginQueueForFailedLogin {
+    // Make global queue
+    dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0);
+
+    RLMSyncCredentials *c1 = [RLMSyncCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
+                                                                password:@"p"
+                                                                register:NO];
+    XCTestExpectation *ex1 = [self expectationWithDescription:@"Error returned on background queue"];
+    [RLMSyncUser logInWithCredentials:c1
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                              timeout:30.0
+                        callbackQueue:queue
+                         onCompletion:^(__unused RLMSyncUser *user, NSError *error) {
+                             XCTAssertNotNil(error);
+                             XCTAssertFalse([NSThread isMainThread]);
+                             [ex1 fulfill];
+                         }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    RLMSyncCredentials *c2 = [RLMSyncCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
+                                                                password:@"p"
+                                                                register:NO];
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"Error returned on main queue"];
+    [RLMSyncUser logInWithCredentials:c2
+                        authServerURL:[RLMObjectServerTests authServerURL]
+                              timeout:30.0
+                        callbackQueue:dispatch_get_main_queue()
+                         onCompletion:^(__unused RLMSyncUser *user, NSError *error) {
+                             XCTAssertNotNil(error);
+                             XCTAssertTrue([NSThread isMainThread]);
+                             [ex2 fulfill];
+                         }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
 #pragma mark - Basic Sync
 
 /// It should be possible to successfully open a Realm configured for sync with an access token.

@@ -38,6 +38,9 @@ x.x.x Release notes (yyyy-MM-dd)
   removed.
 * The class methods `Object.className()`, `Object.objectUtilClass()`, and
   the property `Object.isInvalidated` can no longer be overriden.
+* The callback which runs when a sync user login succeeds or fails
+  now runs on the main queue by default, or can be explicitly specified
+  by a new `callbackQueue` parameter on the `{RLM}SyncUser.logIn(...)` API.
 
 ### Enhancements
 

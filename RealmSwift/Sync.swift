@@ -300,16 +300,28 @@ extension RLMSyncCredentials {
 
 extension SyncUser {
     /**
-     Given credentials and a server URL, log in a user and asynchronously return a `SyncUser`
-     object which can be used to open `Realm`s and retrieve `SyncSession`s.
+     Log in a user and asynchronously retrieve a user object.
+
+     If the log in completes successfully, the completion block will be called, and a
+     `SyncUser` representing the logged-in user will be passed to it. This user object
+     can be used to open `Realm`s and retrieve `SyncSession`s. Otherwise, the
+     completion block will be called with an error.
+
+     - parameter credentials: A `SyncCredentials` object representing the user to log in.
+     - parameter authServerURL: The URL of the authentication server (e.g. "http://realm.example.org:9080").
+     - parameter timeout: How long the network client should wait, in seconds, before timing out.
+     - parameter callbackQueue: The dispatch queue upon which the callback should run. Defaults to the main queue.
+     - parameter completion: A callback block to be invoked once the log in completes.
      */
     public static func logIn(with credentials: SyncCredentials,
                              server authServerURL: URL,
                              timeout: TimeInterval = 30,
+                             callbackQueue queue: DispatchQueue = DispatchQueue.main,
                              onCompletion completion: @escaping UserCompletionBlock) {
         return SyncUser.__logIn(with: RLMSyncCredentials(credentials),
                                 authServerURL: authServerURL,
                                 timeout: timeout,
+                                callbackQueue: queue,
                                 onCompletion: completion)
     }
 

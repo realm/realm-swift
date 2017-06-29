@@ -207,6 +207,7 @@ static NSURL *syncDirectoryForChildProcess() {
     [RLMSyncUser logInWithCredentials:credentials
                         authServerURL:url
                          onCompletion:^(RLMSyncUser *user, NSError *error) {
+                             XCTAssertTrue(NSThread.isMainThread);
                              XCTAssertNil(error,
                                           @"Error when trying to log in a user: %@ (process: %@)",
                                           error, process);
