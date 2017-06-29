@@ -80,7 +80,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncPermissionResultsSortProperty) {
  are desired. Call `-stop` on the token to stop notifications, and before
  deallocating the token.
  */
-- (RLMNotificationToken *)addNotificationBlock:(RLMPermissionStatusBlock)block;
+- (RLMNotificationToken *)addNotificationBlock:(RLMPermissionResultsNotificationBlock)block;
 
 #pragma mark - Queries
 

@@ -63,6 +63,7 @@ private:
 
 using PermissionChangeCallback = std::function<void(std::exception_ptr)>;
 
+NSError *RLMTranslatePermissionExceptionPtrToError(std::exception_ptr ptr, bool get);
 PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBlock callback);
 
 NS_ASSUME_NONNULL_END

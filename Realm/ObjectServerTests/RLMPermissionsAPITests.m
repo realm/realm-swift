@@ -25,7 +25,9 @@
 #define CHECK_PERMISSION_COUNT_PREDICATE(ma_results, ma_count, ma_op) {                                                \
     XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission count"];                            \
     __weak typeof(ma_results) weakResults = ma_results;                                                                \
-    __attribute__((objc_precise_lifetime))id token = [ma_results addNotificationBlock:^(NSError *err) {                \
+    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(__unused id collection,       \
+                                                                                         __unused id changes,          \
+                                                                                         NSError *err) {               \
         XCTAssertNil(err);                                                                                             \
         if (weakResults.count ma_op ma_count) {                                                                        \
             [ex fulfill];                                                                                              \
@@ -44,7 +46,9 @@
 #define CHECK_PERMISSION_PRESENT(ma_results, ma_permission) {                                                          \
     XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission presence"];                         \
     __weak typeof(ma_results) weakResults = ma_results;                                                                \
-    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(NSError *err) {               \
+    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(__unused id collection,       \
+                                                                                         __unused id changes,          \
+                                                                                         NSError *err) {               \
         XCTAssertNil(err);                                                                                             \
         for (NSInteger i=0; i<weakResults.count; i++) {                                                                \
             if ([[weakResults objectAtIndex:i] isEqual:ma_permission]) {                                               \
@@ -62,7 +66,9 @@
 #define CHECK_PERMISSION_ABSENT(ma_results, ma_permission) {                                                           \
     XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission absence"];                          \
     __weak typeof(ma_results) weakResults = ma_results;                                                                \
-    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(NSError *err) {               \
+    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(__unused id collection,       \
+                                                                                         __unused id changes,          \
+                                                                                         NSError *err) {               \
         XCTAssertNil(err);                                                                                             \
         BOOL isPresent = NO;                                                                                           \
         for (NSInteger i=0; i<weakResults.count; i++) {                                                                \
@@ -82,7 +88,9 @@
     XCTestExpectation *ex = [self expectationWithDescription:@"Retrieving permission..."];                             \
     __block RLMSyncPermissionValue *value = nil;                                                                       \
     __weak typeof(ma_results) weakResults = ma_results;                                                                \
-    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(NSError *err) {               \
+    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(__unused id collection,       \
+                                                                                         __unused id changes,          \
+                                                                                         NSError *err) {               \
         XCTAssertNil(err);                                                                                             \
         for (NSInteger i=0; i<weakResults.count; i++) {                                                                \
             if ([[weakResults objectAtIndex:i] isEqual:ma_permission]) {                                               \
@@ -639,7 +647,9 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
     // Register notifications.
     XCTestExpectation *noteEx = [self expectationWithDescription:@"Notification should fire."];
-    RLMNotificationToken *token = [results addNotificationBlock:^(NSError *error) {
+    RLMNotificationToken *token = [results addNotificationBlock:^(__unused id collection,
+                                                                  __unused id changes,
+                                                                  NSError *error) {
         XCTAssertNil(error);
         if (results.count > 0) {
             [noteEx fulfill];

@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMSyncUser, RLMSyncCredentials, RLMSyncPermissionValue, RLMSyncPermissionResults, RLMSyncSession, RLMRealm;
+@class RLMCollectionChange, RLMSyncUser, RLMSyncCredentials, RLMSyncPermissionValue, RLMSyncPermissionResults, RLMSyncSession, RLMRealm;
 
 /**
  The state of the user object.
@@ -42,6 +42,11 @@ typedef void(^RLMPasswordChangeStatusBlock)(NSError * _Nullable);
 /// A block type used to report the status of a permission apply or revoke operation.
 /// If the `NSError` argument is nil, the operation succeeded.
 typedef void(^RLMPermissionStatusBlock)(NSError * _Nullable);
+
+/// A block type used to report changes made to a permission results collection.
+/// This block will always pass back either the `RLMSyncPermissionResults` object
+/// and a `RLMCollectionChange` describing the changes, or an `NSError` otherwise.
+typedef void(^RLMPermissionResultsNotificationBlock)(RLMSyncPermissionResults * _Nullable, RLMCollectionChange * _Nullable, NSError * _Nullable);
 
 /// A block type used to asynchronously report results of a permissions get operation.
 /// Exactly one of the two arguments will be populated.
