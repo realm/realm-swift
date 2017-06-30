@@ -18,6 +18,8 @@
 
 #import <Realm/RLMCollection_Private.h>
 
+#import <vector>
+
 namespace realm {
     class List;
     class Results;
@@ -70,3 +72,4 @@ RLMNotificationToken *RLMAddNotificationBlock(id objcCollection,
                                               void (^block)(id, RLMCollectionChange *, NSError *),
                                               bool suppressInitialChange=false);
 
+std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArray<RLMSortDescriptor *> *properties);

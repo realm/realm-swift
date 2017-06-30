@@ -402,14 +402,10 @@ static void RLMInsertObject(RLMArrayLinkView *ar, id object, NSUInteger index) {
 }
 
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties {
-    if (properties.count == 0) {
-        auto results = translateErrors([&] { return _backingList.filter({}); });
-        return [RLMResults resultsWithObjectInfo:*_objectInfo results:std::move(results)];
-    }
-
-    auto order = RLMSortDescriptorFromDescriptors(*_objectInfo, properties);
-    auto results = translateErrors([&] { return _backingList.sort(std::move(order)); });
-    return [RLMResults resultsWithObjectInfo:*_objectInfo results:std::move(results)];
+    return translateErrors([&] {
+        return [RLMResults resultsWithObjectInfo:*_objectInfo
+                                         results:_backingList.sort(RLMSortDescriptorsToKeypathArray(properties))];
+    });
 }
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {

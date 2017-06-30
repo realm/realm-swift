@@ -101,6 +101,9 @@ static void throwError(NSString *aggregateMethod) {
                             RLMTypeToString((RLMPropertyType)e.column_type),
                             e.column_name.data());
     }
+    catch (std::exception const& e) {
+        @throw RLMException(e);
+    }
 }
 
 template<typename Function>
@@ -355,8 +358,8 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         if (_results.get_mode() == Results::Mode::Empty) {
             return self;
         }
-
-        return [RLMResults resultsWithObjectInfo:*_info results:_results.sort(RLMSortDescriptorFromDescriptors(*_info, properties))];
+        return [RLMResults resultsWithObjectInfo:*_info
+                                         results:_results.sort(RLMSortDescriptorsToKeypathArray(properties))];
     });
 }
 

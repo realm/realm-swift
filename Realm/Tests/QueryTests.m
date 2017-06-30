@@ -594,8 +594,10 @@
     [self verifySort:realm column:@"stringCol" ascending:NO expected:@"cc"];
 
     // sort invalid name
-    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingKeyPath:@"invalidCol" ascending:YES], @"'invalidCol'.* not found .*'AllTypesObject'");
-    XCTAssertThrows([arrayOfAll.array sortedResultsUsingKeyPath:@"invalidCol" ascending:NO]);
+    RLMAssertThrowsWithReason([[AllTypesObject allObjects] sortedResultsUsingKeyPath:@"invalidCol" ascending:YES],
+                              @"Cannot sort on key path 'invalidCol': property 'AllTypesObject.invalidCol' does not exist.");
+    RLMAssertThrowsWithReason([arrayOfAll.array sortedResultsUsingKeyPath:@"invalidCol" ascending:NO],
+                              @"Cannot sort on key path 'invalidCol': property 'AllTypesObject.invalidCol' does not exist.");
 }
 
 - (void)testSortByNoColumns {
@@ -685,16 +687,16 @@
 
 - (void)testSortByUnspportedKeyPath {
     // Array property
-    RLMAssertThrowsWithReasonMatching([DogArrayObject.allObjects sortedResultsUsingKeyPath:@"dogs.age" ascending:YES],
-                                      @"to-many relationship is not supported");
+    RLMAssertThrowsWithReason([DogArrayObject.allObjects sortedResultsUsingKeyPath:@"dogs.age" ascending:YES],
+                              @"Cannot sort on key path 'dogs.age': property 'DogArrayObject.dogs' is of unsupported type 'array'.");
 
     // Backlinks property
-    RLMAssertThrowsWithReasonMatching([DogObject.allObjects sortedResultsUsingKeyPath:@"owners.name" ascending:YES],
-                                      @"to-many relationship is not supported");
+    RLMAssertThrowsWithReason([DogObject.allObjects sortedResultsUsingKeyPath:@"owners.name" ascending:YES],
+                              @"Cannot sort on key path 'owners.name': property 'DogObject.owners' is of unsupported type 'linking objects'.");
 
     // Collection operator
-    RLMAssertThrowsWithReasonMatching([DogArrayObject.allObjects sortedResultsUsingKeyPath:@"dogs.@count" ascending:YES],
-                                      @"collection operators is not supported");
+    RLMAssertThrowsWithReason([DogArrayObject.allObjects sortedResultsUsingKeyPath:@"dogs.@count" ascending:YES],
+                              @"Cannot sort on key path 'dogs.@count': KVC collection operators are not supported.");
 }
 
 - (void)testSortedLinkViewWithDeletion {

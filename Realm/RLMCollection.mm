@@ -229,6 +229,18 @@ NSString *RLMDescriptionWithMaxDepth(NSString *name,
     return str;
 }
 
+std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArray<RLMSortDescriptor *> *properties) {
+    std::vector<std::pair<std::string, bool>> keypaths;
+    keypaths.reserve(properties.count);
+    for (RLMSortDescriptor *desc in properties) {
+        if ([desc.keyPath containsString:@"@"]) {
+            @throw RLMException(@"Cannot sort on key path '%@': KVC collection operators are not supported.", desc.keyPath);
+        }
+        keypaths.push_back({desc.keyPath.UTF8String, desc.ascending});
+    }
+    return keypaths;
+}
+
 @implementation RLMCancellationToken {
     realm::NotificationToken _token;
     __unsafe_unretained RLMRealm *_realm;
