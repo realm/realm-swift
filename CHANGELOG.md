@@ -59,6 +59,18 @@ x.x.x Release notes (yyyy-MM-dd)
   correctly nil out nullable properties when updating an existing
   object when the `value` argument specifies nil or `NSNull` for
   the property value.
+* The way interactive sync errors (client reset and permission denied)
+  are delivered to the user has been changed. Instead of a block which can
+  be invoked to immediately delete the offending Realm file, an opaque
+  token object of type `RLMSyncErrorActionToken` will be returned in the
+  error object's `userInfo` dictionary. This error object can be passed
+  into the new `+[RLMSyncSession immediatelyHandleError:]` API to delete
+  the files.
+* Remove `-[NSError rlmSync_clientResetBlock]` and
+  `-[NSError rlmSync_deleteRealmBlock]` APIs.
+* The return types of the `SyncError.clientResetInfo()` and
+  `SyncError.deleteRealmUserInfo()` APIs have been changed. They now return
+  `RLMSyncErrorActionToken`s or `SyncError.ActionToken`s instead of closures.
 
 ### Enhancements
 

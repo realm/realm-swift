@@ -16,28 +16,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "NSError+RLMSync.h"
+#import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
+/**
+ An opaque token returned as part of certain errors. It can be
+ passed into certain APIs to perform certain actions.
+ 
+ @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
+ */
+@interface RLMSyncErrorActionToken : NSObject
 
-@implementation NSError (RLMSync)
+/// :nodoc:
+- (instancetype)init __attribute__((unavailable("This type cannot be created directly")));
 
-- (RLMSyncErrorActionToken *)rlmSync_errorActionToken {
-    if (self.domain != RLMSyncErrorDomain) {
-        return nil;
-    }
-    if (self.code == RLMSyncErrorClientResetError
-        || self.code == RLMSyncErrorPermissionDeniedError) {
-        return (RLMSyncErrorActionToken *)self.userInfo[kRLMSyncErrorActionTokenKey];
-    }
-    return nil;
-}
-
-- (NSString *)rlmSync_clientResetBackedUpRealmPath {
-    if (self.domain == RLMSyncErrorDomain && self.code == RLMSyncErrorClientResetError) {
-        return self.userInfo[kRLMSyncPathOfRealmBackupCopyKey];
-    }
-    return nil;
-}
+/// :nodoc:
++ (instancetype)new __attribute__((unavailable("This type cannot be created directly")));
 
 @end

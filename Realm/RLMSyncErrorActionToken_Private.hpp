@@ -16,28 +16,17 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "NSError+RLMSync.h"
+#import "RLMSyncErrorActionToken.h"
 
-#import "RLMSyncUtil.h"
+#import <string>
 
-@implementation NSError (RLMSync)
-
-- (RLMSyncErrorActionToken *)rlmSync_errorActionToken {
-    if (self.domain != RLMSyncErrorDomain) {
-        return nil;
-    }
-    if (self.code == RLMSyncErrorClientResetError
-        || self.code == RLMSyncErrorPermissionDeniedError) {
-        return (RLMSyncErrorActionToken *)self.userInfo[kRLMSyncErrorActionTokenKey];
-    }
-    return nil;
+@interface RLMSyncErrorActionToken () {
+@public
+    std::string _originalPath;
 }
 
-- (NSString *)rlmSync_clientResetBackedUpRealmPath {
-    if (self.domain == RLMSyncErrorDomain && self.code == RLMSyncErrorClientResetError) {
-        return self.userInfo[kRLMSyncPathOfRealmBackupCopyKey];
-    }
-    return nil;
-}
+@property (nonatomic) BOOL isValid;
+
+- (instancetype)initWithOriginalPath:(std::string)originalPath;
 
 @end

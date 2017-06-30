@@ -20,23 +20,19 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class RLMSyncErrorActionToken;
+
 /// NSError category extension providing methods to get data out of Realm's
 /// "client reset" error.
 @interface NSError (RLMSync)
 
 /**
- Given a Realm Object Server client reset error, return the block that can
- be called to manually initiate the client reset process, or nil if the
- error isn't a client reset error.
+ Given an appropriate Realm Object Server error, return the token that
+ can be passed into `+[RLMSyncSession immediatelyHandleError:]` to
+ immediately perform error clean-up work, or nil if the error isn't of
+ a type that provides a token.
  */
-- (nullable void(^)(void))rlmSync_clientResetBlock NS_REFINED_FOR_SWIFT;
-
-/**
- Given a Realm Object Server permission denied error, return the block that
- can be called to manually initiate the Realm file deletion process, or nil
- if the error isn't a permission denied error.
- */
-- (nullable void(^)(void))rlmSync_deleteRealmBlock NS_REFINED_FOR_SWIFT;
+- (nullable RLMSyncErrorActionToken *)rlmSync_errorActionToken NS_REFINED_FOR_SWIFT;
 
 /**
  Given a Realm Object Server client reset error, return the path where the

@@ -71,7 +71,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgress) {
     RLMSyncProgressForCurrentlyOutstandingWork,
 };
 
-@class RLMSyncUser, RLMSyncConfiguration;
+@class RLMSyncUser, RLMSyncConfiguration, RLMSyncErrorActionToken;
 
 /**
  The type of a progress notification block intended for reporting a session's network
@@ -153,6 +153,13 @@ NS_ASSUME_NONNULL_BEGIN
                                                                           mode:(RLMSyncProgress)mode
                                                                          block:(RLMProgressNotificationBlock)block
 NS_REFINED_FOR_SWIFT;
+
+/**
+ Given an error action token, immediately handle the corresponding action.
+ 
+ @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
+ */
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token;
 
 @end
 

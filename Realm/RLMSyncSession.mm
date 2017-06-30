@@ -19,6 +19,7 @@
 #import "RLMSyncSession_Private.hpp"
 
 #import "RLMSyncConfiguration_Private.hpp"
+#import "RLMSyncErrorActionToken_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "sync/sync_session.hpp"
@@ -186,6 +187,14 @@ using namespace realm;
         return [[RLMProgressNotificationToken alloc] initWithTokenValue:token session:std::move(session)];
     }
     return nil;
+}
+
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token {
+    if (!token.isValid) {
+        return;
+    }
+    token.isValid = NO;
+    SyncManager::shared().immediately_run_file_actions(std::move(token->_originalPath));
 }
 
 @end
