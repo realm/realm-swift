@@ -65,13 +65,13 @@ typedef NS_ENUM(NSUInteger, RLMSyncPermissionResultsSortProperty) {
  Retrieve the permission value at the given index. Throws an exception if the index
  is out of bounds.
  */
-- (RLMSyncPermissionValue *)objectAtIndex:(NSInteger)index;
+- (RLMSyncPermissionValue *)objectAtIndex:(NSInteger)index NS_REFINED_FOR_SWIFT;
 
 /**
  Returns the index of the permission in the collection, or `NSNotFound` if the permission
  is not found in the collection.
  */
-- (NSInteger)indexOfObject:(RLMSyncPermissionValue *)object;
+- (NSInteger)indexOfObject:(RLMSyncPermissionValue *)object NS_REFINED_FOR_SWIFT;
 
 /**
  Register to be notified when the contents of the results object change.
@@ -90,14 +90,14 @@ typedef NS_ENUM(NSUInteger, RLMSyncPermissionResultsSortProperty) {
  @note Valid properties to filter on are `path` and `userId`, as well as
        the boolean properties `mayRead`, `mayWrite`, and `mayManage`.
  */
-- (RLMSyncPermissionResults *)objectsWithPredicate:(NSPredicate *)predicate;
+- (RLMSyncPermissionResults *)objectsWithPredicate:(NSPredicate *)predicate NS_REFINED_FOR_SWIFT;
 
 /**
  Return a sorted `RLMSyncPermissionResults` from the collection, sorted based on
  the given property.
  */
 - (RLMSyncPermissionResults *)sortedResultsUsingProperty:(RLMSyncPermissionResultsSortProperty)property
-                                               ascending:(BOOL)ascending;
+                                               ascending:(BOOL)ascending NS_REFINED_FOR_SWIFT;
 
 #pragma mark - Misc
 

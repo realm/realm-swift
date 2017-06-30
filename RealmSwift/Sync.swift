@@ -336,12 +336,50 @@ public typealias SyncAccessLevel = RLMSyncAccessLevel
  */
 public typealias SyncPermissionResults = RLMSyncPermissionResults
 
-#if swift(>=3.1)
-extension SyncPermissionResults: RandomAccessCollection {
-    public subscript(index: Int) -> SyncPermissionValue {
-        return object(at: index)
+// Refined APIs for Swift
+extension SyncPermissionResults {
+    /**
+     An enum describing any of the properties that a permission results
+     can be sorted on.
+     */
+    public typealias SortProperty = RLMSyncPermissionResultsSortProperty
+
+    /**
+     Return the permission value at the given position in the collection.
+     */
+    public subscript(position: Int) -> SyncPermissionValue {
+        throwForNegativeIndex(position)
+        return __object(at: position)
     }
 
+    /**
+     Return the index of the given permission value in the collection, or
+     nil if the collection contains no such permission value.
+     */
+    public func index(of object: SyncPermissionValue) -> Int? {
+        let idx = __index(ofObject: object)
+        return (idx == NSNotFound) ? nil : idx
+    }
+
+    /**
+     Return a new `SyncPermissionResults` consisting of the receiver after
+     it has been filtered according to the given predicate.
+     */
+    public func filter(_ predicate: NSPredicate) -> SyncPermissionResults {
+        return __objects(with: predicate)
+    }
+
+    /**
+     Return a new `SyncPermissionResults` consisting of the receiver after
+     it has been sorted according to the given sortable property.
+     */
+    public func sorted(by property: SortProperty, ascending: Bool = true) -> SyncPermissionResults {
+        return __sortedResults(using: property, ascending: ascending)
+    }
+}
+
+#if swift(>=3.1)
+extension SyncPermissionResults: RandomAccessCollection {
     public func index(after i: Int) -> Int {
         return i + 1
     }

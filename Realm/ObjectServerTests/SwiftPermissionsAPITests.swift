@@ -151,9 +151,9 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         XCTAssertNotNil(finalValue, "Did not find the permission \(expectedPermission)")
 
         // Check getting permission by its index.
-        let index = results.index(ofObject: expectedPermission)
-        XCTAssertNotEqual(index, NSNotFound)
-        XCTAssertTrue(expectedPermission == results.object(at: index))
+        let index = results.index(of: expectedPermission)
+        XCTAssertNotNil(index)
+        XCTAssertTrue(expectedPermission == results[index!])
     }
 
     /// Observing permission changes should work.
