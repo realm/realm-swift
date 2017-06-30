@@ -397,13 +397,13 @@ extension SyncPermissionResults {
     /// Return the first permission value in the results, or `nil` if
     /// the results are empty.
     public var first: SyncPermissionValue? {
-        return count > 0 ? object(at: 0) : nil
+        return count > 0 ? self[0] : nil
     }
 
     /// Return the last permission value in the results, or `nil` if
     /// the results are empty.
     public var last: SyncPermissionValue? {
-        return count > 0 ? object(at: count - 1) : nil
+        return count > 0 ? self[count - 1] : nil
     }
 }
 
