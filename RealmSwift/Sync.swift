@@ -291,30 +291,11 @@ extension SyncUser {
     /**
      Returns an instance of the Management Realm owned by the user.
 
-     This Realm can be used to control access permissions for Realms managed by the user.
-     This includes granting other users access to Realms.
+     This Realm can be used to grant other users access to Realms managed by this user.
      */
     public func managementRealm() throws -> Realm {
         var config = Realm.Configuration.fromRLMRealmConfiguration(.managementConfiguration(for: self))
-        guard let permissionChangeClass = NSClassFromString("RealmSwift.SyncPermissionChange") as? Object.Type else {
-            fatalError("Internal error: could not build `SyncPermissionChange` metaclass from string.")
-        }
-        config.objectTypes = [permissionChangeClass,
-                              SyncPermissionOffer.self,
-                              SyncPermissionOfferResponse.self]
-        return try Realm(configuration: config)
-    }
-
-    /**
-     Returns an instance of the Permission Realm owned by the user.
-
-     This read-only Realm contains `SyncPermission` objects reflecting the
-     synchronized Realms and permission details this user has access to.
-     */
-    @available(*, deprecated, message: "Use SyncUser.retrievePermissions()")
-    public func permissionRealm() throws -> Realm {
-        var config = Realm.Configuration.fromRLMRealmConfiguration(.permissionConfiguration(for: self))
-        config.objectTypes = [SyncPermission.self]
+        config.objectTypes = [SyncPermissionOffer.self, SyncPermissionOfferResponse.self]
         return try Realm(configuration: config)
     }
 }
@@ -395,124 +376,6 @@ extension SyncPermissionResults: Sequence {
     }
 }
 #endif
-
-/**
- This model is used to reflect permissions.
-
- It should be used in conjunction with a `SyncUser`'s Permission Realm.
- You can only read this Realm. Use the objects in Management Realm to
- make request for modifications of permissions.
-
- See https://realm.io/docs/realm-object-server/#permissions for general
- documentation.
- */
-@available(*, deprecated, message: "Use `SyncPermissionValue`")
-public final class SyncPermission: Object {
-    /// The date this object was last modified.
-    @objc public dynamic var updatedAt = Date()
-
-    /// The ID of the affected user by the permission.
-    @objc public dynamic var userId = ""
-    /// The path to the realm.
-    @objc public dynamic var path = ""
-
-    /// Whether the affected user is allowed to read from the Realm.
-    @objc public dynamic var mayRead = false
-    /// Whether the affected user is allowed to write to the Realm.
-    @objc public dynamic var mayWrite = false
-    /// Whether the affected user is allowed to manage the access rights for others.
-    @objc public dynamic var mayManage = false
-
-    /// :nodoc:
-    override public class func shouldIncludeInDefaultSchema() -> Bool {
-        return false
-    }
-
-    /// :nodoc:
-    override public class func _realmObjectName() -> String? {
-        return "Permission"
-    }
-}
-
-/**
- This model is used for requesting changes to a Realm's permissions.
-
- It should be used in conjunction with a `SyncUser`'s Management Realm.
-
- See https://realm.io/docs/realm-object-server/#permissions for general
- documentation.
- */
-@available(*, deprecated, message: "Use `SyncUser.applyPermission()` and `SyncUser.revokePermission()`")
-public final class SyncPermissionChange: Object {
-    /// The globally unique ID string of this permission change object.
-    @objc public dynamic var id = UUID().uuidString
-    /// The date this object was initially created.
-    @objc public dynamic var createdAt = Date()
-    /// The date this object was last modified.
-    @objc public dynamic var updatedAt = Date()
-
-    /// The status code of the object that was processed by Realm Object Server.
-    public let statusCode = RealmOptional<Int>()
-    /// An error or informational message, typically written to by the Realm Object Server.
-    @objc public dynamic var statusMessage: String?
-
-    /// Sync management object status.
-    public var status: SyncManagementObjectStatus {
-        return SyncManagementObjectStatus(statusCode: statusCode)
-    }
-    /// The remote URL to the realm.
-    @objc public dynamic var realmUrl = "*"
-    /// The identity of a user affected by this permission change.
-    @objc public dynamic var userId = "*"
-
-    /// Define read access. Set to `true` or `false` to update this value. Leave unset
-    /// to preserve the existing setting.
-    public let mayRead = RealmOptional<Bool>()
-    /// Define write access. Set to `true` or `false` to update this value. Leave unset
-    /// to preserve the existing setting.
-    public let mayWrite = RealmOptional<Bool>()
-    /// Define management access. Set to `true` or `false` to update this value. Leave
-    /// unset to preserve the existing setting.
-    public let mayManage = RealmOptional<Bool>()
-
-    /**
-     Construct a permission change object used to change the access permissions for a user on a Realm.
-
-     - parameter realmURL:  The Realm URL whose permissions settings should be changed.
-                            Use `*` to change the permissions of all Realms managed by the Management Realm's `SyncUser`.
-     - parameter userID:    The user or users who should be granted these permission changes.
-                            Use `*` to change the permissions for all users.
-     - parameter mayRead:   Define read access. Set to `true` or `false` to update this value.
-                            Leave unset to preserve the existing setting.
-     - parameter mayWrite:  Define write access. Set to `true` or `false` to update this value.
-                            Leave unset to preserve the existing setting.
-     - parameter mayManage: Define management access. Set to `true` or `false` to update this value.
-                            Leave unset to preserve the existing setting.
-     */
-    public convenience init(realmURL: String, userID: String, mayRead: Bool?, mayWrite: Bool?, mayManage: Bool?) {
-        self.init()
-        self.realmUrl = realmURL
-        self.userId = userID
-        self.mayRead.value = mayRead
-        self.mayWrite.value = mayWrite
-        self.mayManage.value = mayManage
-    }
-
-    /// :nodoc:
-    override public class func primaryKey() -> String? {
-        return "id"
-    }
-
-    /// :nodoc:
-    override public class func shouldIncludeInDefaultSchema() -> Bool {
-        return false
-    }
-
-    /// :nodoc:
-    override public class func _realmObjectName() -> String? {
-        return "PermissionChange"
-    }
-}
 
 /**
  This model is used for offering permission changes to other users.
