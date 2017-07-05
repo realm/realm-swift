@@ -433,11 +433,6 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
     return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:keyPath ascending:ascending]]];
 }
 
-- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
-{
-    return [self sortedResultsUsingKeyPath:property ascending:ascending];
-}
-
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties
 {
     @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
@@ -505,16 +500,8 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
     return desc;
 }
 
-+ (instancetype)sortDescriptorWithProperty:(NSString *)propertyName ascending:(BOOL)ascending {
-    return [RLMSortDescriptor sortDescriptorWithKeyPath:propertyName ascending:ascending];
-}
-
 - (instancetype)reversedSortDescriptor {
     return [self.class sortDescriptorWithKeyPath:_keyPath ascending:!_ascending];
-}
-
-- (NSString *)property {
-    return _keyPath;
 }
 
 @end

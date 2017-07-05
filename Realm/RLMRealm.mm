@@ -767,13 +767,6 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-+ (nullable NSError *)migrateRealm:(RLMRealmConfiguration *)configuration {
-    // Preserves backwards compatibility
-    NSError *error;
-    [self performMigrationForConfiguration:configuration error:&error];
-    return error;
-}
-
 + (BOOL)performMigrationForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
     if (RLMGetAnyCachedRealmForPath(configuration.config.path)) {
         @throw RLMException(@"Cannot migrate Realms that are already open.");

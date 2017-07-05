@@ -67,13 +67,3 @@ extension Property: Equatable {
         return lhs.rlmProperty.isEqual(to: rhs.rlmProperty)
     }
 }
-
-// MARK: Unavailable
-
-extension Property {
-    @available(*, unavailable, renamed: "isIndexed")
-    public var indexed: Bool { fatalError() }
-
-    @available(*, unavailable, renamed: "isOptional")
-    public var optional: Bool { fatalError() }
-}

@@ -709,21 +709,3 @@ extension Realm {
 
 /// The type of a block to run for notification purposes when the data in a Realm is modified.
 public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
-
-
-// MARK: Unavailable
-
-extension Realm {
-
-    @available(*, unavailable, renamed: "isInWriteTransaction")
-    public var inWriteTransaction: Bool { fatalError() }
-
-    @available(*, unavailable, renamed: "object(ofType:forPrimaryKey:)")
-    public func objectForPrimaryKey<T: Object>(_ type: T.Type, key: AnyObject) -> T? { fatalError() }
-
-    @available(*, unavailable, renamed: "dynamicObject(ofType:forPrimaryKey:)")
-    public func dynamicObjectForPrimaryKey(_ className: String, key: AnyObject) -> DynamicObject? { fatalError() }
-
-    @available(*, unavailable, renamed: "writeCopy(toFile:encryptionKey:)")
-    public func writeCopyToURL(_ fileURL: NSURL, encryptionKey: Data? = nil) throws { fatalError() }
-}

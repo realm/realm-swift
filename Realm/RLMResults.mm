@@ -343,10 +343,6 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return [self sortedResultsUsingDescriptors:@[[RLMSortDescriptor sortDescriptorWithKeyPath:keyPath ascending:ascending]]];
 }
 
-- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending {
-    return [self sortedResultsUsingKeyPath:property ascending:ascending];
-}
-
 - (RLMResults *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties {
     if (properties.count == 0) {
         return self;
