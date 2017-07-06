@@ -222,19 +222,7 @@ static void changeArray(__unsafe_unretained RLMManagedArray *const ar, NSKeyValu
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                   objects:(__unused __unsafe_unretained id [])buffer
                                     count:(NSUInteger)len {
-    __autoreleasing RLMFastEnumerator *enumerator;
-    if (state->state == 0) {
-        translateErrors([&] { _backingList.verify_attached(); });
-
-        enumerator = [[RLMFastEnumerator alloc] initWithCollection:self objectSchema:*_objectInfo];
-        state->extra[0] = (long)enumerator;
-        state->extra[1] = self.count;
-    }
-    else {
-        enumerator = (__bridge id)(void *)state->extra[0];
-    }
-
-    return [enumerator countByEnumeratingWithState:state count:len];
+    return RLMFastEnumerate(state, len, self);
 }
 
 - (id)objectAtIndex:(NSUInteger)index {
@@ -447,6 +435,13 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 
 - (realm::TableView)tableView {
     return translateErrors([&] { return _backingList.get_query(); }).find_all();
+}
+
+- (RLMFastEnumerator *)fastEnumerator {
+    return translateErrors([&] {
+        return [[RLMFastEnumerator alloc] initWithList:_backingList collection:self
+                                                 realm:_realm classInfo:*_objectInfo];
+    });
 }
 
 // The compiler complains about the method's argument type not matching due to

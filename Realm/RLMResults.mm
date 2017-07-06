@@ -156,18 +156,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     if (!_info) {
         return 0;
     }
-
-    __autoreleasing RLMFastEnumerator *enumerator;
-    if (state->state == 0) {
-        enumerator = [[RLMFastEnumerator alloc] initWithCollection:self objectSchema:*_info];
-        state->extra[0] = (long)enumerator;
-        state->extra[1] = self.count;
-    }
-    else {
-        enumerator = (__bridge id)(void *)state->extra[0];
-    }
-
-    return [enumerator countByEnumeratingWithState:state count:len];
+    return RLMFastEnumerate(state, len, self);
 }
 
 - (NSUInteger)indexOfObjectWhere:(NSString *)predicateFormat, ... {
@@ -418,6 +407,13 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 - (realm::TableView)tableView {
     return translateErrors([&] { return _results.get_tableview(); });
+}
+
+- (RLMFastEnumerator *)fastEnumerator {
+    return translateErrors([&] {
+        return [[RLMFastEnumerator alloc] initWithResults:_results collection:self
+                                                    realm:_realm classInfo:*_info];
+    });
 }
 
 // The compiler complains about the method's argument type not matching due to
