@@ -1,6 +1,5 @@
 <!---
 
-We LOVE to help with any issues or bugs you have!
 **Questions**: If you have questions about how to use Realm, ask on
 [StackOverflow](http://stackoverflow.com/questions/ask?tags=realm).
 We monitor the `realm` tag.
@@ -10,7 +9,6 @@ We monitor the `realm` tag.
 **Bugs**: To help you as fast as possible with an issue please describe your issue
 and the steps you have taken to reproduce it in as many details as possible.
 
-Thanks for helping us help you! :-)
 -->
 
 ## Goals
