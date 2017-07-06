@@ -20,8 +20,8 @@ import UIKit
 import RealmSwift
 
 class DemoObject: Object {
-    dynamic var title = ""
-    dynamic var date = NSDate()
+    @objc dynamic var title = ""
+    @objc dynamic var date = NSDate()
 }
 
 class Cell: UITableViewCell {
@@ -106,7 +106,7 @@ class TableViewController: UITableViewController {
 
     // Actions
 
-    func backgroundAdd() {
+    @objc func backgroundAdd() {
         // Import many items in a background thread
         DispatchQueue.global().async {
             // Get new realm and table since we are in a new thread
@@ -120,7 +120,7 @@ class TableViewController: UITableViewController {
         }
     }
 
-    func add() {
+    @objc func add() {
         realm.beginWrite()
         realm.create(DemoObject.self, value: [TableViewController.randomString(), TableViewController.randomDate()])
         try! realm.commitWrite()
