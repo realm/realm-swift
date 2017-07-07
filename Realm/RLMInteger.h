@@ -33,6 +33,10 @@ NS_ASSUME_NONNULL_BEGIN
  migration is required to go change a property of `NSNumber<RLMInt>` or `int`
  type into one of `RLMInteger` type, or vice versa; however, nullability must
  be preserved.
+
+ A `RLMInteger` property normally represents an optional integer; it can be
+ defined to represent a required integer by including the property's name in
+ the array returned by the model object's `requiredProperties` class method.
  */
 @interface RLMInteger : RLMOptionalBase
 
@@ -58,12 +62,12 @@ NS_ASSUME_NONNULL_BEGIN
  cause increment operations from other clients to be lost or ignored,
  depending on how any conflicts are resolved.
  */
-@property (nonatomic, nullable) NSNumber<RLMInt> *value;
+@property (nonatomic, nullable) NSNumber<RLMInt> *value NS_REFINED_FOR_SWIFT;
 
 /**
  Create a new instance set to the provided numeric value.
  */
-- (instancetype)initWithValue:(nullable NSNumber<RLMInt> *)value;
+- (instancetype)initWithValue:(nullable NSNumber<RLMInt> *)value NS_REFINED_FOR_SWIFT;
 
 @end
 

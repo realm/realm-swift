@@ -61,7 +61,11 @@ void increment_int(TableType table, size_t colIndex, size_t rowIndex, NSInteger 
 
 @implementation RLMInteger
 
-// Unmanaged initializer
+// Unmanaged initializers
+- (instancetype)init {
+    return [self initWithValue:@0];
+}
+
 - (instancetype)initWithValue:(NSNumber<RLMInt> *)value {
     if (self = [super init]) {
         self.value = value;
@@ -112,8 +116,8 @@ void increment_int(TableType table, size_t colIndex, size_t rowIndex, NSInteger 
     }
 }
 
-- (int64_t)longLongValue {
-    return [self.value longLongValue];
+- (NSString *)description {
+    return [NSString stringWithFormat:@"RLMInteger (value: %@)", self.value ?: @"nil"];
 }
 
 @end

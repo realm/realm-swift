@@ -22,7 +22,4 @@
 
 - (instancetype)initWithObject:(RLMObjectBase *)obj property:(RLMProperty *)prop;
 
-// Necessary for integer accessors to work correctly with Realm integers.
-- (int64_t)longLongValue;
-
 @end

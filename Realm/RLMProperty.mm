@@ -233,7 +233,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
                             @"RLMArrays can only contain instances of RLMObject subclasses. "
                             @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
     }
-    else if (strcmp(code, "@\"RLMInteger\"") == 0) {
+    else if (strcmp(code, "@\"RLMInteger\"") == 0 || strcmp(code, "@\"RLMSwiftInteger\"") == 0) {
         _type = RLMPropertyTypeInt;
         _subtype = RLMPropertySubtypeInteger;
     }
@@ -437,7 +437,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
                             self.name);
     }
     if (self.subtype == RLMPropertySubtypeInteger) {
-        _swiftIvar = class_getInstanceVariable(objectClass, [[NSString stringWithFormat:@"_%@", self.name] UTF8String]);
+        _swiftIvar = class_getInstanceVariable(objectClass, _name.UTF8String);
     }
 
     if ([rawType isEqualToString:@"c"]) {

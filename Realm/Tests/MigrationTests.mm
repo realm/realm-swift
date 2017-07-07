@@ -51,6 +51,19 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
     }
 }
 
+@interface RLMIntegerMigrationObject : RLMObject
+@property int normalInt;
+@property RLMInteger *realmInt;
+@property NSNumber<RLMInt> *nullableInt;
+@property RLMInteger *nullableRealmInt;
+@end
+
+@implementation RLMIntegerMigrationObject
++ (NSArray *)requiredProperties {
+    return @[@"realmInt"];
+}
+@end
+
 @interface MigrationObject : RLMObject
 @property int intCol;
 @property NSString *stringCol;
@@ -859,6 +872,51 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqualObjects(mig1[@"stringCol"], @"2", @"stringCol should be string after migration.");
 }
 
+/// Realm integers and normal integers should be considered interchangeable.
+- (void)testRealmIntInterchangeabilityWithRegularInt {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:RLMIntegerMigrationObject.class];
+    // Swap around the Realm integers and the normal integers.
+    objectSchema.objectClass = RLMObject.class;
+    RLMProperty *normalInt = objectSchema.properties[0];
+    normalInt.subtype = RLMPropertySubtypeInteger;
+    RLMProperty *realmInt = objectSchema.properties[1];
+    realmInt.subtype = RLMPropertySubtypeNone;
+    RLMProperty *nullableInt = objectSchema.properties[2];
+    nullableInt.subtype = RLMPropertySubtypeInteger;
+    RLMProperty *nullableRealmInt = objectSchema.properties[3];
+    nullableRealmInt.subtype = RLMPropertySubtypeNone;
+
+    // create realm with old schema and populate
+    [self createTestRealmWithSchema:@[objectSchema] block:^(RLMRealm *realm) {
+        [realm createObject:RLMIntegerMigrationObject.className withValue:@[@10, @20, @30, @40]];
+        [realm createObject:RLMIntegerMigrationObject.className withValue:@[@1, @2, NSNull.null, @4]];
+    }];
+
+    // apply migration
+    RLMRealm *realm = [self migrateTestRealmWithBlock:nil];
+
+    // verify migration
+    RLMIntegerMigrationObject *object = [RLMIntegerMigrationObject allObjectsInRealm:realm][1];
+    XCTAssertEqual(object.normalInt, 1);
+    XCTAssertEqual([object.realmInt.value integerValue], 2);
+    XCTAssertNil(object.nullableInt);
+    XCTAssertEqual([object.nullableRealmInt.value integerValue], 4);
+
+    [realm beginWriteTransaction];
+    // Do some Realm Integer-specific stuff.
+    object.normalInt = 100;
+    [object.realmInt incrementValueBy:10];
+    object.nullableInt = @20;
+    object.nullableRealmInt = nil;
+    [realm commitWriteTransaction];
+
+    // Ensure all operations completed successfully.
+    XCTAssertEqual(object.normalInt, 100);
+    XCTAssertEqual([object.realmInt.value integerValue], 12);
+    XCTAssertEqual([object.nullableInt integerValue], 20);
+    XCTAssertNil(object.nullableRealmInt.value);
+}
+
 - (void)testChangeObjectLinkType {
     // create realm with old schema and populate
     [self createTestRealmWithSchema:RLMSchema.sharedSchema.objectSchema block:^(RLMRealm *realm) {
@@ -1457,7 +1515,7 @@ RLM_ARRAY_TYPE(MigrationObject);
     XCTAssertEqualObjects(inputValue[8], @(obj.longCol));
     XCTAssertEqualObjects(inputValue[9], @[obj.objectCol.stringCol]);
     XCTAssertEqualObjects(inputValue[10], obj.realmIntCol.value);
-//    XCTAssertEqualObjects(inputValue[11], obj.realmNullableIntCol.value);
+    XCTAssertEqualObjects(inputValue[11], obj.realmNullableIntCol.value);
 }
 
 - (void)testMultipleMigrationRenameProperty {

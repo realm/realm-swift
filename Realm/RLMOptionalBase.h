@@ -27,11 +27,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)init;
 
-@property (nonatomic, weak) RLMObjectBase *object;
+@property (nonatomic, weak) RLMObjectBase *object NS_SWIFT_UNAVAILABLE("");
 
-@property (nonatomic, unsafe_unretained) RLMProperty *property;
+@property (nonatomic, unsafe_unretained) RLMProperty *property NS_SWIFT_UNAVAILABLE("");
 
-@property (nonatomic, strong, nullable) id underlyingValue;
+@property (nonatomic, strong, nullable) id underlyingValue NS_REFINED_FOR_SWIFT;
 
 @end
 
