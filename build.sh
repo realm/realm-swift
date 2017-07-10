@@ -1082,9 +1082,18 @@ EOM
             export CONFIGURATION=$configuration
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
             sh build.sh prelaunch-simulator
-            rm -f ~/Library/Logs/CoreSimulator/CoreSimulator.log
-            # Verify that no Realm files still exist
-            ! find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm' | grep -q .
+            
+            if [ -d "~/Library/Logs/CoreSimulator" ]; then
+                rm -f "~/Library/Logs/CoreSimulator/CoreSimulator.log"
+            else
+                mkdir -p "~/Library/Logs/CoreSimulator"
+            fi
+            touch "~/Library/Logs/CoreSimulator/CoreSimulator.log"
+            
+            if [ -d "~/Library/Developer/CoreSimulator/Devices/" ]; then
+                # Verify that no Realm files still exist
+                ! find "~/Library/Developer/CoreSimulator/Devices/" -name '*.realm' | grep -q .
+            fi
 
             failed=0
             sh build.sh verify-$target 2>&1 | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || failed=1
@@ -1102,7 +1111,11 @@ EOM
             fi
             if [ "$failed" = "1" ]; then
                 echo "\n\n***\nbuild/build.log\n***\n\n" && cat build/build.log || true
-                echo "\n\n***\nCoreSimulator.log\n***\n\n" && tail -n2000 ~/Library/Logs/CoreSimulator/CoreSimulator.log || true
+                if [ -f "~/Library/Logs/CoreSimulator/CoreSimulator.log" ]; then
+                echo "\n\n***\nCoreSimulator.log\n***\n\n" && tail -n2000 "~/Library/Logs/CoreSimulator/CoreSimulator.log" || true
+            else
+                echo "\n\n*** No CoreSimulator.log\n"
+            fi
                 exit 1
             fi
         fi

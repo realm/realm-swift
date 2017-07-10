@@ -22,7 +22,7 @@ end
 
 begin
   # - Check if the wrong version of the CoreSimulatorService is running, stop it if so
-  if ! /^\d+\s+#{ENV['DEVELOPER_DIR']}\/.+/ =~ `/usr/bin/pgrep -lf com.apple.CoreSimulator.CoreSimulatorService 2>/dev/null`; then    
+  if ENV['JENKINS_HOME'] || ! /^\d+\s+#{ENV['DEVELOPER_DIR']}\/.+/ =~ `/usr/bin/pgrep -lf com.apple.CoreSimulator.CoreSimulatorService 2>/dev/null` ; then    
     # Kill all the current simulator processes as they are from a different Xcode version
     print "Killing running Simulator processes and replacing with one from #{ENV['DEVELOPER_DIR']}..."
     
