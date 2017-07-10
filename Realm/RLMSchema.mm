@@ -19,6 +19,7 @@
 #import "RLMSchema_Private.h"
 
 #import "RLMAccessor.h"
+#import "RLMObjectBase_Private.h"
 #import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
@@ -220,7 +221,9 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
         }
 
         RLMRegisterClassLocalNames(&cls, 1);
-        return RLMRegisterClass(cls);
+        RLMObjectSchema *objectSchema = RLMRegisterClass(cls);
+        [cls initializeLinkedObjectSchemas];
+        return objectSchema;
     }
 }
 

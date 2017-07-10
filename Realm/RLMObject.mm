@@ -66,10 +66,7 @@
 #pragma mark - Convenience Initializers
 
 - (instancetype)initWithValue:(id)value {
-    // ensure this class' objectSchema is loaded in the partialPrivateSharedSchema
-    [self.class initializeLinkedObjectSchemas];
-    RLMSchema *schema = RLMSchema.partialPrivateSharedSchema;
-    return [super initWithValue:value schema:schema];
+    return [super initWithValue:value schema:RLMSchema.partialPrivateSharedSchema];
 }
 
 #pragma mark - Class-based Object Creation
