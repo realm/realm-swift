@@ -215,7 +215,8 @@ class ObjectTests: TestCase {
             XCTAssertNotEqual(obj1.intCol, obj2.intCol)
             XCTAssertNotEqual(obj1.floatCol, obj2.floatCol)
             XCTAssertNotEqual(obj1.doubleCol, obj2.doubleCol)
-            XCTAssertNotEqualWithAccuracy(obj1.dateCol.timeIntervalSinceReferenceDate, obj2.dateCol.timeIntervalSinceReferenceDate, 0.01)
+            XCTAssertNotEqual(obj1.dateCol.timeIntervalSinceReferenceDate, obj2.dateCol.timeIntervalSinceReferenceDate,
+                              accuracy: 0.01)
             XCTAssertNotEqual(obj1.stringCol, obj2.stringCol)
             XCTAssertNotEqual(obj1.binaryCol, obj2.binaryCol)
         }

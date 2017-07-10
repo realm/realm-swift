@@ -414,12 +414,12 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(6, collection.sum(ofProperty: "int32Col") as Int32)
         XCTAssertEqual(6, collection.sum(ofProperty: "int64Col") as NSNumber)
         XCTAssertEqual(6, collection.sum(ofProperty: "int64Col") as Int64)
-        XCTAssertEqualWithAccuracy(5.5, (collection.sum(ofProperty: "floatCol") as NSNumber).floatValue,
+        XCTAssertEqual(5.5, (collection.sum(ofProperty: "floatCol") as NSNumber).floatValue,
                                    accuracy: 0.001)
-        XCTAssertEqualWithAccuracy(5.5, collection.sum(ofProperty: "floatCol") as Float, accuracy: 0.001)
-        XCTAssertEqualWithAccuracy(5.55, (collection.sum(ofProperty: "doubleCol") as NSNumber).doubleValue,
+        XCTAssertEqual(5.5, collection.sum(ofProperty: "floatCol") as Float, accuracy: 0.001)
+        XCTAssertEqual(5.55, (collection.sum(ofProperty: "doubleCol") as NSNumber).doubleValue,
                                    accuracy: 0.001)
-        XCTAssertEqualWithAccuracy(5.55, collection.sum(ofProperty: "doubleCol") as Double, accuracy: 0.001)
+        XCTAssertEqual(5.55, collection.sum(ofProperty: "doubleCol") as Double, accuracy: 0.001)
 
         assertThrows(collection.sum(ofProperty: "noSuchCol") as NSNumber, named: "Invalid property name")
         assertThrows(collection.sum(ofProperty: "noSuchCol") as Float, named: "Invalid property name")
@@ -437,12 +437,12 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(2, collection.average(ofProperty: "int32Col") as Int32!)
         XCTAssertEqual(2, collection.average(ofProperty: "int64Col") as NSNumber!)
         XCTAssertEqual(2, collection.average(ofProperty: "int64Col") as Int64!)
-        XCTAssertEqualWithAccuracy(1.8333, (collection.average(ofProperty: "floatCol") as NSNumber!).floatValue,
+        XCTAssertEqual(1.8333, (collection.average(ofProperty: "floatCol") as NSNumber!).floatValue,
                                    accuracy: 0.001)
-        XCTAssertEqualWithAccuracy(1.8333, collection.average(ofProperty: "floatCol") as Float!, accuracy: 0.001)
-        XCTAssertEqualWithAccuracy(1.85, (collection.average(ofProperty: "doubleCol") as NSNumber!).doubleValue,
+        XCTAssertEqual(1.8333, collection.average(ofProperty: "floatCol") as Float!, accuracy: 0.001)
+        XCTAssertEqual(1.85, (collection.average(ofProperty: "doubleCol") as NSNumber!).doubleValue,
                                    accuracy: 0.001)
-        XCTAssertEqualWithAccuracy(1.85, collection.average(ofProperty: "doubleCol") as Double!, accuracy: 0.001)
+        XCTAssertEqual(1.85, collection.average(ofProperty: "doubleCol") as Double!, accuracy: 0.001)
 
         assertThrows(collection.average(ofProperty: "noSuchCol")! as NSNumber, named: "Invalid property name")
         assertThrows(collection.average(ofProperty: "noSuchCol")! as Float, named: "Invalid property name")
