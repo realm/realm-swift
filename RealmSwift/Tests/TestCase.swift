@@ -200,6 +200,6 @@ func XCTAssertEqual<F: FloatingPoint>(_ expression1: F, _ expression2: F, accura
 }
 func XCTAssertNotEqual<F: FloatingPoint>(_ expression1: F, _ expression2: F, accuracy: F,
                                          file: StaticString = #file, line: UInt = #line) {
-    XCTAssertNotEqualWithAccuracy(expression1, expression2, accuracy: accuracy, file: file, line: line)
+    XCTAssertNotEqualWithAccuracy(expression1, expression2, accuracy, file: file, line: line)
 }
 #endif
