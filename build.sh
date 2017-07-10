@@ -385,7 +385,7 @@ download_sync() {
 COMMAND="$1"
 
 # Use Debug config if command ends with -debug, otherwise default to Release
-# Set IS_RUNNING_PACKAGING when running packaging steps to avoid running iOS static tests with Xcode 8.3.2
+# Set IS_RUNNING_PACKAGING when running packaging steps to avoid running iOS static tests with Xcode 8.3.3
 case "$COMMAND" in
     *-debug)
         COMMAND="${COMMAND%-debug}"
@@ -1171,7 +1171,7 @@ EOM
 
     "package-ios-swift")
         cd tightdb_objc
-        for version in 8.0 8.1 8.2 8.3.2; do
+        for version in 8.0 8.1 8.2 8.3.3; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1185,7 +1185,7 @@ EOM
 
     "package-osx-swift")
         cd tightdb_objc
-        for version in 8.0 8.1 8.2 8.3.2; do
+        for version in 8.0 8.1 8.2 8.3.3; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1208,7 +1208,7 @@ EOM
 
     "package-watchos-swift")
         cd tightdb_objc
-        for version in 8.0 8.1 8.2 8.3.2; do
+        for version in 8.0 8.1 8.2 8.3.3; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1231,7 +1231,7 @@ EOM
 
     "package-tvos-swift")
         cd tightdb_objc
-        for version in 8.0 8.1 8.2 8.3.2; do
+        for version in 8.0 8.1 8.2 8.3.3; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
