@@ -1919,13 +1919,14 @@
 						CreatedOnToolsVersion = 6.0;
 						DevelopmentTeam = QX5CR2FTN2;
 						DevelopmentTeamName = "Realm ApS";
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 					5D0A40841C62ACCC00BBB612 = {
 						CreatedOnToolsVersion = 7.2;
 					};
 					5D659E7D1BE04556006515A0 = {
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 					};
 					5D660FCB1BE98C560021E04F = {
@@ -1945,6 +1946,7 @@
 					};
 					C04B4BD71B55C47600FAE58E = {
 						CreatedOnToolsVersion = 6.4;
+						LastSwiftMigration = 0900;
 					};
 					E83EAC791BED3D880085CCD2 = {
 						CreatedOnToolsVersion = 7.1;
@@ -1959,7 +1961,7 @@
 						CreatedOnToolsVersion = 6.0;
 						DevelopmentTeam = QX5CR2FTN2;
 						DevelopmentTeamName = "Realm ApS";
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 						TestTargetID = E8D89B971955FC6D00CF2B9A;
 					};

@@ -483,7 +483,7 @@ class RealmTests: TestCase {
 
         XCTAssertEqual(object["boolCol"] as? NSNumber, dictionary["boolCol"] as! NSNumber?)
         XCTAssertEqual(object["intCol"] as? NSNumber, dictionary["intCol"] as! NSNumber?)
-        XCTAssertEqualWithAccuracy(object["floatCol"] as! Float, dictionary["floatCol"] as! Float, accuracy: 0.001)
+        XCTAssertEqual(object["floatCol"] as! Float, dictionary["floatCol"] as! Float, accuracy: 0.001)
         XCTAssertEqual(object["doubleCol"] as? NSNumber, dictionary["doubleCol"] as! NSNumber?)
         XCTAssertEqual(object["stringCol"] as! String?, dictionary["stringCol"] as! String?)
         XCTAssertEqual(object["binaryCol"] as! NSData?, dictionary["binaryCol"] as! NSData?)
