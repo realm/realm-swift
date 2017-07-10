@@ -70,6 +70,28 @@ RLM_ARRAY_TYPE(SchemaTestClassSecondChild)
 @implementation SchemaTestClassLink
 @end
 
+@interface NonDefaultObject : RLMObject
+@property int intCol;
+@end
+
+@implementation NonDefaultObject
++ (BOOL)shouldIncludeInDefaultSchema {
+    return NO;
+}
+@end
+
+RLM_ARRAY_TYPE(NonDefaultObject);
+
+@interface NonDefaultArrayObject : RLMObject
+@property RLM_GENERIC_ARRAY(NonDefaultObject) *array;
+@end
+
+@implementation NonDefaultArrayObject
++ (BOOL)shouldIncludeInDefaultSchema {
+    return NO;
+}
+@end
+
 @interface SchemaTestClassWithSingleDuplicatePropertyBase : FakeObject
 @property NSString *string;
 @end
@@ -742,6 +764,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     }
     XCTAssertTrue(RLMSchema.partialSharedSchema.objectSchema.count == 0);
     XCTAssertNoThrow([[IntObject alloc] initWithValue:@[@0]]);
+    XCTAssertNoThrow([[NonDefaultObject alloc] initWithValue:@[@0]]);
 }
 
 - (void)testCreateUnmanagedObjectWithNestedObjectWithUninitializedSchema {
@@ -751,6 +774,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     }
     XCTAssertTrue(RLMSchema.partialSharedSchema.objectSchema.count == 0);
     XCTAssertNoThrow([[IntegerArrayPropertyObject alloc] initWithValue:(@[@0, @[@[@0]]])]);
+    XCTAssertNoThrow([[NonDefaultArrayObject alloc] initWithValue:(@[@[@[@0]]])]);
 }
 
 #if !DEBUG

@@ -44,6 +44,10 @@ NS_ASSUME_NONNULL_BEGIN
 // schema based upon all currently registered object classes
 + (instancetype)partialSharedSchema;
 
+// private schema based upon all currently registered object classes.
+// includes classes that are excluded from the default schema.
++ (instancetype)partialPrivateSharedSchema;
+
 // class for string
 + (nullable Class)classForString:(NSString *)className;
 

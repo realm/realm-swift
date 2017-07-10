@@ -24,6 +24,27 @@ class InitLinkedToClass: RLMObject {
     @objc dynamic var value = SwiftIntObject(value: [0])
 }
 
+class SwiftNonDefaultObject: RLMObject {
+    @objc dynamic var value = 0
+    public override class func shouldIncludeInDefaultSchema() -> Bool {
+        return false
+    }
+}
+
+class SwiftLinkedNonDefaultObject: RLMObject {
+    @objc dynamic var obj: SwiftNonDefaultObject?
+    public override class func shouldIncludeInDefaultSchema() -> Bool {
+        return false
+    }
+}
+
+class SwiftNonDefaultArrayObject: RLMObject {
+    @objc dynamic var array = RLMArray(objectClassName: SwiftNonDefaultObject.className())
+    public override class func shouldIncludeInDefaultSchema() -> Bool {
+        return false
+    }
+}
+
 class IgnoredLinkPropertyObject : RLMObject {
     @objc dynamic var value = 0
     var obj = SwiftIntObject()
@@ -82,26 +103,36 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         }
     }
 
-    func testCreateUnmanagedObjectWhichCreatesAnotherClassDuringSchemaInit() {
+    func testCreateUnmanagedObjectWithUninitializedSchema() {
         if isParent {
             XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
             return
         }
+
+        // Object in default schema
+        _ = SwiftIntObject()
+        // Object not in default schema
+        _ = SwiftNonDefaultObject()
+    }
+
+    func testCreateUnmanagedObjectWithNestedObjectWithUninitializedSchema() {
+        if isParent {
+            XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
+            return
+        }
+
+        // Objects in default schema
 
         // Should not throw (or crash) despite creating an object with an
         // unintialized schema during schema init
         _ = InitLinkedToClass()
-    }
-
-    func testCreateUnmanagedObjectWithLinkPropertyWithoutSharedSchemaInitialized() {
-        if isParent {
-            XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
-            return
-        }
-
-        // This is different from the above test in that it links to an
-        // unintialized type rather than creating one
+        // Again with an object that it links to an unintialized type
+        // rather than creating one
         _ = SwiftCompanyObject()
+
+        // Objects not in default schema
+        _ = SwiftLinkedNonDefaultObject()
+        _ = SwiftNonDefaultArrayObject()
     }
 
     func testCreateUnmanagedObjectWhichCreatesAnotherClassViaInitWithValueDuringSchemaInit() {

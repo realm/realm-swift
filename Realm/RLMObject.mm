@@ -21,6 +21,7 @@
 #import "RLMAccessor.h"
 #import "RLMArray.h"
 #import "RLMCollection_Private.hpp"
+#import "RLMObjectBase_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMProperty.h"
@@ -65,8 +66,9 @@
 #pragma mark - Convenience Initializers
 
 - (instancetype)initWithValue:(id)value {
-    [self.class sharedSchema]; // ensure this class' objectSchema is loaded in the partialSharedSchema
-    RLMSchema *schema = RLMSchema.partialSharedSchema;
+    // ensure this class' objectSchema is loaded in the partialPrivateSharedSchema
+    [self.class initializeLinkedObjectSchemas];
+    RLMSchema *schema = RLMSchema.partialPrivateSharedSchema;
     return [super initWithValue:value schema:schema];
 }
 
