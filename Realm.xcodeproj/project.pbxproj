@@ -466,6 +466,8 @@
 		E8C6EAF51DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E8DA16F81E81210D0055141C /* CompactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8DA16F71E81210D0055141C /* CompactionTests.m */; };
 		E8DA16F91E81210D0055141C /* CompactionTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E8DA16F71E81210D0055141C /* CompactionTests.m */; };
+		E8F992BE1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E8F992BD1F1401C100F634B5 /* RLMObjectBase_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		E8F992BF1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E8F992BD1F1401C100F634B5 /* RLMObjectBase_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E8FD2E381D93345100569F10 /* keychain_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A64CA891D8763B400BC0F9B /* keychain_helper.cpp */; };
 /* End PBXBuildFile section */
 
@@ -951,6 +953,7 @@
 		E8D89BA31955FC6D00CF2B9A /* Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8DA16F71E81210D0055141C /* CompactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CompactionTests.m; sourceTree = "<group>"; };
 		E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTestObjects.swift; sourceTree = "<group>"; };
+		E8F992BD1F1401C100F634B5 /* RLMObjectBase_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectBase_Private.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1523,6 +1526,7 @@
 				023B19571A3BA90D0067FB81 /* RLMObjectBase.h */,
 				023B19581A3BA90D0067FB81 /* RLMObjectBase.mm */,
 				A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */,
+				E8F992BD1F1401C100F634B5 /* RLMObjectBase_Private.h */,
 				E81A1F711955FC9300FDED82 /* RLMObjectSchema.h */,
 				E81A1F721955FC9300FDED82 /* RLMObjectSchema.mm */,
 				29EDB8E91A7712E500458D80 /* RLMObjectSchema_Private.h */,
@@ -1636,6 +1640,7 @@
 				5D1BF1FF1EF987AD00B7DC87 /* RLMCollection_Private.h in Headers */,
 				5D659EBA1BE04556006515A0 /* RLMOptionalBase.h in Headers */,
 				5D659EBC1BE04556006515A0 /* RLMProperty.h in Headers */,
+				E8F992BE1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */,
 				5D659EBD1BE04556006515A0 /* RLMProperty_Private.h in Headers */,
 				5D659EBF1BE04556006515A0 /* RLMRealm.h in Headers */,
 				5D659EC01BE04556006515A0 /* RLMRealm_Dynamic.h in Headers */,
@@ -1707,6 +1712,7 @@
 				5DD755BE1BE056DE002800DA /* RLMRealm_Dynamic.h in Headers */,
 				5DD755BF1BE056DE002800DA /* RLMRealm_Private.h in Headers */,
 				1AFEF8421D52CD8F00495005 /* RLMRealmConfiguration+Sync.h in Headers */,
+				E8F992BF1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */,
 				5DD755C01BE056DE002800DA /* RLMRealmConfiguration.h in Headers */,
 				5DD755C11BE056DE002800DA /* RLMRealmConfiguration_Private.h in Headers */,
 				5DD755C31BE056DE002800DA /* RLMResults.h in Headers */,

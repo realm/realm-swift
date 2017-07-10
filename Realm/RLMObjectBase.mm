@@ -195,7 +195,7 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
             [array removeAllObjects];
 
             if (value) {
-                [array addObjects:validatedObjectForProperty(value, property, RLMSchema.partialSharedSchema)];
+                [array addObjects:validatedObjectForProperty(value, property, RLMSchema.partialPrivateSharedSchema)];
             }
         }
         else if (property.optional) {
@@ -219,6 +219,16 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
 // overridden at runtime per-class for performance
 + (RLMObjectSchema *)sharedSchema {
     return [RLMSchema sharedSchemaForClass:self.class];
+}
+
++ (void)initializeLinkedObjectSchemas {
+    RLMObjectSchema *thisObjectSchema = [self sharedSchema];
+    for (RLMProperty *prop in thisObjectSchema.properties) {
+        if ((prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) &&
+            !RLMSchema.partialPrivateSharedSchema[prop.objectClassName]) {
+            [[RLMSchema classForString:prop.objectClassName] initializeLinkedObjectSchemas];
+        }
+    }
 }
 
 + (Class)objectUtilClass:(BOOL)isSwift {

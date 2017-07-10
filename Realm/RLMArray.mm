@@ -354,7 +354,7 @@ static void RLMValidateArrayBounds(__unsafe_unretained RLMArray *const ar,
         objectSchema = [_backingArray[0] objectSchema];
     }
     else {
-        objectSchema = [RLMSchema.partialSharedSchema schemaForClassName:_objectClassName];
+        objectSchema = [RLMSchema.partialPrivateSharedSchema schemaForClassName:_objectClassName];
     }
 
     RLMProperty *prop = RLMValidatedProperty(objectSchema, propertyName);

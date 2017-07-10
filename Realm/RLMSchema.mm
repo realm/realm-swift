@@ -19,6 +19,7 @@
 #import "RLMSchema_Private.h"
 
 #import "RLMAccessor.h"
+#import "RLMObjectBase_Private.h"
 #import "RLMObject_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMProperty_Private.h"
@@ -43,9 +44,22 @@ const uint64_t RLMNotVersioned = realm::ObjectStore::NotVersioned;
 @property (nonatomic, readwrite) NSMutableDictionary *objectSchemaByName;
 @end
 
+// Private RLMSchema subclass that skips class registration on lookup
+@interface RLMPrivateSchema : RLMSchema
+@end
+@implementation RLMPrivateSchema
+- (RLMObjectSchema *)schemaForClassName:(NSString *)className {
+    return self.objectSchemaByName[className];
+}
+
+- (RLMObjectSchema *)objectForKeyedSubscript:(__unsafe_unretained NSString *const)className {
+    return [self schemaForClassName:className];
+}
+@end
+
 static RLMSchema *s_sharedSchema = [[RLMSchema alloc] init];
 static NSMutableDictionary *s_localNameToClass = [[NSMutableDictionary alloc] init];
-static NSMutableDictionary *s_privateObjectSubclasses = [[NSMutableDictionary alloc] init];
+static RLMSchema *s_privateSharedSchema = [[RLMPrivateSchema alloc] init];
 
 static enum class SharedSchemaState {
     Uninitialized,
@@ -60,7 +74,7 @@ static enum class SharedSchemaState {
 
 // Caller must @synchronize on s_localNameToClass
 static RLMObjectSchema *RLMRegisterClass(Class cls) {
-    if (RLMObjectSchema *schema = s_privateObjectSubclasses[[cls className]]) {
+    if (RLMObjectSchema *schema = s_privateSharedSchema[[cls className]]) {
         return schema;
     }
 
@@ -75,7 +89,7 @@ static RLMObjectSchema *RLMRegisterClass(Class cls) {
     // override sharedSchema class methods for performance
     RLMReplaceSharedSchemaMethod(cls, schema);
 
-    s_privateObjectSubclasses[schema.className] = schema;
+    s_privateSharedSchema.objectSchemaByName[schema.className] = schema;
     if ([cls shouldIncludeInDefaultSchema] && prevState != SharedSchemaState::Initialized) {
         s_sharedSchema.objectSchemaByName[schema.className] = schema;
     }
@@ -207,12 +221,18 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
         }
 
         RLMRegisterClassLocalNames(&cls, 1);
-        return RLMRegisterClass(cls);
+        RLMObjectSchema *objectSchema = RLMRegisterClass(cls);
+        [cls initializeLinkedObjectSchemas];
+        return objectSchema;
     }
 }
 
 + (instancetype)partialSharedSchema {
     return s_sharedSchema;
+}
+
++ (instancetype)partialPrivateSharedSchema {
+    return s_privateSharedSchema;
 }
 
 // schema based on runtime objects
