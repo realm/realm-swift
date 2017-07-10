@@ -20,11 +20,11 @@ import UIKit
 import RealmSwift
 
 class Place: Object {
-    dynamic var postalCode: String?
-    dynamic var placeName: String?
-    dynamic var state: String?
-    dynamic var stateAbbreviation: String?
-    dynamic var county: String?
-    dynamic var latitude = 0.0
-    dynamic var longitude = 0.0
+    @objc dynamic var postalCode: String?
+    @objc dynamic var placeName: String?
+    @objc dynamic var state: String?
+    @objc dynamic var stateAbbreviation: String?
+    @objc dynamic var county: String?
+    @objc dynamic var latitude = 0.0
+    @objc dynamic var longitude = 0.0
 }
