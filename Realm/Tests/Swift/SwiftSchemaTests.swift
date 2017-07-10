@@ -45,6 +45,20 @@ class SwiftNonDefaultArrayObject: RLMObject {
     }
 }
 
+class SwiftMutualLink1Object: RLMObject {
+    @objc dynamic var object: SwiftMutualLink2Object?
+    public override class func shouldIncludeInDefaultSchema() -> Bool {
+        return false
+    }
+}
+
+class SwiftMutualLink2Object: RLMObject {
+    @objc dynamic var object: SwiftMutualLink1Object?
+    public override class func shouldIncludeInDefaultSchema() -> Bool {
+        return false
+    }
+}
+
 class IgnoredLinkPropertyObject : RLMObject {
     @objc dynamic var value = 0
     var obj = SwiftIntObject()
@@ -131,8 +145,9 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         _ = SwiftCompanyObject()
 
         // Objects not in default schema
-        _ = SwiftLinkedNonDefaultObject()
-        _ = SwiftNonDefaultArrayObject()
+        _ = SwiftLinkedNonDefaultObject(value: [[1]])
+        _ = SwiftNonDefaultArrayObject(value: [[[1]]])
+        _ = SwiftMutualLink1Object(value: [[[:]]])
     }
 
     func testCreateUnmanagedObjectWhichCreatesAnotherClassViaInitWithValueDuringSchemaInit() {
