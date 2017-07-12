@@ -312,7 +312,7 @@ kill_object_server() {
 
 download_object_server() {
     local archive_name="realm-object-server-bundled_node_darwin-developer-$REALM_OBJECT_SERVER_VERSION.tar.gz"
-    curl -L -O "https://static.realm.io/downloads/object-server/$archive_name"
+    /usr/bin/curl -L -O "https://static.realm.io/downloads/object-server/$archive_name"
     rm -rf sync
     mkdir sync
     tar xf $archive_name -C sync
@@ -346,7 +346,7 @@ download_common() {
     temp_path="${tar_path}.tmp"
         
     while [ 0 -lt $tries_left ] && [ ! -f "$tar_path" ]; do
-        if ! error=$(curl --fail --silent --show-error --location "$url" --output "$temp_path" 2>&1); then
+        if ! error=$(/usr/bin/curl --fail --silent --show-error --location "$url" --output "$temp_path" 2>&1); then
             tries_left=$[$tries_left-1]
         else
             mv "$temp_path" "$tar_path"
