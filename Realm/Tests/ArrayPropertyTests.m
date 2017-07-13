@@ -1009,18 +1009,69 @@
     XCTAssertTrue([description rangeOfString:@"912 objects skipped"].location != NSNotFound);
 }
 
-- (void)testAssignArrayProperty {
+- (void)testUnmanagedAssignment {
+    IntObject *io1 = [[IntObject alloc] init];
+    IntObject *io2 = [[IntObject alloc] init];
+    IntObject *io3 = [[IntObject alloc] init];
+
+    ArrayPropertyObject *array1 = [[ArrayPropertyObject alloc] init];
+    ArrayPropertyObject *array2 = [[ArrayPropertyObject alloc] init];
+
+    // Assigning NSArray shallow copies
+    array1.intArray = (id)@[io1, io2];
+    XCTAssertEqualObjects([array1.intArray valueForKey:@"self"], (@[io1, io2]));
+
+    [array1 setValue:@[io3, io1] forKey:@"intArray"];
+    XCTAssertEqualObjects([array1.intArray valueForKey:@"self"], (@[io3, io1]));
+
+    array1[@"intArray"] = @[io2, io3];
+    XCTAssertEqualObjects([array1.intArray valueForKey:@"self"], (@[io2, io3]));
+
+    // Assigning RLMArray shallow copies
+    array2.intArray = array1.intArray;
+    XCTAssertEqualObjects([array2.intArray valueForKey:@"self"], (@[io2, io3]));
+
+    [array1.intArray removeAllObjects];
+    XCTAssertEqualObjects([array2.intArray valueForKey:@"self"], (@[io2, io3]));
+
+    // Self-assignment is a no-op
+    array2.intArray = array2.intArray;
+    XCTAssertEqualObjects([array2.intArray valueForKey:@"self"], (@[io2, io3]));
+}
+
+- (void)testManagedAssignment {
     RLMRealm *realm = self.realmWithTestPath;
     [realm beginWriteTransaction];
-    ArrayPropertyObject *array = [ArrayPropertyObject createInRealm:realm withValue:@[@"arrayObject", @[], @[]]];
-    NSSet *stringSet = [NSSet setWithArray:@[[[StringObject alloc] initWithValue:@[@"a"]]]];
-    [array setValue:stringSet forKey:@"array"];
-    XCTAssertEqualObjects([[array valueForKey:@"array"] valueForKey:@"stringCol"],
-                          [[stringSet allObjects] valueForKey:@"stringCol"]);
-    [array setValue:[stringSet allObjects] forKey:@"array"];
-    XCTAssertEqualObjects([[array valueForKey:@"array"] valueForKey:@"stringCol"],
-                          [[stringSet allObjects] valueForKey:@"stringCol"]);
-    [realm commitWriteTransaction];
+
+    IntObject *io1 = [IntObject createInRealm:realm withValue:@[@1]];
+    IntObject *io2 = [IntObject createInRealm:realm withValue:@[@2]];
+    IntObject *io3 = [IntObject createInRealm:realm withValue:@[@3]];
+
+    ArrayPropertyObject *array1 = [ArrayPropertyObject createInRealm:realm withValue:@[@""]];
+    ArrayPropertyObject *array2 = [ArrayPropertyObject createInRealm:realm withValue:@[@""]];
+
+    // Assigning NSArray shallow copies
+    array1.intArray = (id)@[io1, io2];
+    XCTAssertEqualObjects([array1.intArray valueForKey:@"intCol"], (@[@1, @2]));
+
+    [array1 setValue:@[io3, io1] forKey:@"intArray"];
+    XCTAssertEqualObjects([array1.intArray valueForKey:@"intCol"], (@[@3, @1]));
+
+    array1[@"intArray"] = @[io2, io3];
+    XCTAssertEqualObjects([array1.intArray valueForKey:@"intCol"], (@[@2, @3]));
+
+    // Assigning RLMArray shallow copies
+    array2.intArray = array1.intArray;
+    XCTAssertEqualObjects([array2.intArray valueForKey:@"intCol"], (@[@2, @3]));
+
+    [array1.intArray removeAllObjects];
+    XCTAssertEqualObjects([array2.intArray valueForKey:@"intCol"], (@[@2, @3]));
+
+    // Self-assignment is a no-op
+    array2.intArray = array2.intArray;
+    XCTAssertEqualObjects([array2.intArray valueForKey:@"intCol"], (@[@2, @3]));
+
+    [realm cancelWriteTransaction];
 }
 
 - (void)testAssignIncorrectType {

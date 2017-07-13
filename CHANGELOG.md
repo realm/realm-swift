@@ -25,6 +25,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * `List.description` now reports the correct types for nested lists.
 * Fix unmanaged object initialization when a nested property type returned
   `false` from `Object.shouldIncludeInDefaultSchema()`.
+* Don't clear RLMArrays on self-assignment.
 
 2.8.3 Release notes (2017-06-20)
 =============================================================
