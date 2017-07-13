@@ -133,10 +133,14 @@ RLMArray *getArray(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colI
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
-                     __unsafe_unretained id<NSFastEnumeration> const value) {
+              __unsafe_unretained id<NSFastEnumeration> const value) {
     RLMVerifyInWriteTransaction(obj);
 
     realm::List list(obj->_realm->_realm, obj->_row.get_linklist(colIndex));
+    if ([(id)value respondsToSelector:@selector(isBackedByList:)] && [(id)value isBackedByList:list]) {
+        return; // self-assignment is a no-op
+    }
+
     list.remove_all();
     if (!value || (id)value == NSNull.null) {
         return;

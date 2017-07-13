@@ -52,6 +52,8 @@ class RLMObservationInfo;
                         parentInfo:(RLMClassInfo *)parentInfo
                           property:(__unsafe_unretained RLMProperty *const)property;
 
+- (bool)isBackedByList:(realm::List const&)list;
+
 // deletes all objects in the RLMArray from their containing realms
 - (void)deleteObjectsFromRealm;
 @end
