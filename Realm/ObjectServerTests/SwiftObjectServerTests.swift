@@ -20,6 +20,19 @@ import XCTest
 import RealmSwift
 
 class SwiftObjectServerTests: SwiftSyncTestCase {
+
+    func workAroundCoreIssue2724() {
+        // As described in https://github.com/realm/realm-core/issues/2724, with realm-core v3.0.0-rc3 we're
+        // seeing occasional deadlocks in these tests due to core thinking that the history schema needs to
+        // be upgraded when it doesn't. This leads to it taking a write transaction as part of opening a file.
+        // Since this can happen on the notification listener thread while another thread both has an existing
+        // write transaction and is waiting for the notification listener thread to process notifications,
+        // we deadlock.
+        // We work around this by delaying slightly between registering for notifications on a given Realm and
+        // opening a write transaction on the same Realm.
+        RunLoop.current.run(until: Date(timeIntervalSinceNow: 0.1))
+    }
+
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
         let url = URL(string: "realm://localhost:9080/~/testBasicSync")!
@@ -337,6 +350,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
         }
 
+        workAroundCoreIssue2724()
         try managementRealm.write {
             managementRealm.add(change)
         }
@@ -364,6 +378,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
 
+            workAroundCoreIssue2724()
             try managementRealm.write {
                 managementRealm.add(permissionOffer)
             }
@@ -400,6 +415,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
 
+            workAroundCoreIssue2724()
             try managementRealm.write {
                 managementRealm.add(permissionOffer)
             }
@@ -434,6 +450,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
 
+            workAroundCoreIssue2724()
             try managementRealm.write {
                 managementRealm.add(permissionOfferResponse)
             }
