@@ -203,7 +203,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     if (!_user) {
         return nil;
     }
-    auto path = SyncManager::shared().path_for_realm(_user->identity(), [url.absoluteString UTF8String]);
+    auto path = SyncManager::shared().path_for_realm(*_user, [url.absoluteString UTF8String]);
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }
@@ -252,7 +252,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 }
 
 - (NSURL *)authenticationServer {
-    if (!_user) {
+    if (!_user || _user->token_type() == SyncUser::TokenType::Admin) {
         return nil;
     }
     return [NSURL URLWithString:@(_user->server_url().c_str())];
@@ -351,6 +351,9 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         [self _performLoginForDirectAccessTokenCredentials:credentials user:user completionBlock:completion];
         return;
     }
+    if (!authServerURL) {
+        @throw RLMException(@"A user cannot be logged in without specifying an authentication server URL.");
+    }
 
     // Prepare login network request
     NSMutableDictionary *json = [@{
@@ -377,8 +380,8 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
             } else {
                 std::string server_url = authServerURL.absoluteString.UTF8String;
                 auto sync_user = SyncManager::shared().get_user([model.refreshToken.tokenData.identity UTF8String],
-                                                                [model.refreshToken.token UTF8String],
-                                                                std::move(server_url));
+                                                                std::move(server_url),
+                                                                [model.refreshToken.token UTF8String]);
                 if (!sync_user) {
                     completion(nil, make_auth_error_client_issue());
                     return;
@@ -404,10 +407,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                      completionBlock:(nonnull RLMUserCompletionBlock)completion {
     NSString *identity = credentials.userInfo[kRLMSyncIdentityKey];
     NSAssert(identity != nil, @"Improperly created direct access token credential.");
-    auto sync_user = SyncManager::shared().get_user([identity UTF8String],
-                                                    [credentials.token UTF8String],
-                                                    none,
-                                                    SyncUser::TokenType::Admin);
+    auto sync_user = SyncManager::shared().get_admin_token_user([identity UTF8String], [credentials.token UTF8String]);
     if (!sync_user) {
         completion(nil, make_auth_error_client_issue());
         return;

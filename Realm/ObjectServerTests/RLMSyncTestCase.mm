@@ -29,6 +29,7 @@
 
 #import "sync/sync_manager.hpp"
 #import "sync/sync_session.hpp"
+#import "sync/sync_user.hpp"
 
 #if !TARGET_OS_MAC
 #error These tests can only be run on a macOS host.
@@ -46,6 +47,10 @@
 @interface RLMSyncSession ()
 - (BOOL)waitForUploadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback;
 - (BOOL)waitForDownloadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback;
+@end
+
+@interface RLMSyncUser()
+- (std::shared_ptr<realm::SyncUser>)_syncUser;
 @end
 
 @implementation SyncObject
@@ -106,7 +111,10 @@ static NSURL *syncDirectoryForChildProcess() {
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm {
     RLMSyncConfiguration *config = [realm.configuration syncConfiguration];
-    auto on_disk_path = realm::SyncManager::shared().path_for_realm([config.user.identity UTF8String],
+    if (config.user.state == RLMSyncUserStateError) {
+        return nil;
+    }
+    auto on_disk_path = realm::SyncManager::shared().path_for_realm(*[config.user _syncUser],
                                                                     [config.realmURL.absoluteString UTF8String]);
     auto ptr = realm::SyncManager::shared().get_existing_session(on_disk_path);
     if (ptr) {

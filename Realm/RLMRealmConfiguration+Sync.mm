@@ -48,7 +48,7 @@
     if (syncConfiguration.customFileURL) {
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
     } else {
-        self.config.path = SyncManager::shared().path_for_realm([user.identity UTF8String],
+        self.config.path = SyncManager::shared().path_for_realm(*[user _syncUser],
                                                                 [realmURL.absoluteString UTF8String]);
     }
     self.config.in_memory = false;
