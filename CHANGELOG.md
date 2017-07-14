@@ -1,6 +1,8 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
+Synchronized Realms require a server running Realm Object Server v2.0 or higher.
+
 ### API Breaking Changes
 
 * None.
