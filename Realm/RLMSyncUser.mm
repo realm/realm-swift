@@ -379,9 +379,8 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                 return;
             } else {
                 std::string server_url = authServerURL.absoluteString.UTF8String;
-                auto sync_user = SyncManager::shared().get_user([model.refreshToken.tokenData.identity UTF8String],
-                                                                std::move(server_url),
-                                                                [model.refreshToken.token UTF8String]);
+                SyncUserIdentifier identity{[model.refreshToken.tokenData.identity UTF8String], std::move(server_url)};
+                auto sync_user = SyncManager::shared().get_user(identity , [model.refreshToken.token UTF8String]);
                 if (!sync_user) {
                     completion(nil, make_auth_error_client_issue());
                     return;
