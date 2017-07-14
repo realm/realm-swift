@@ -295,7 +295,7 @@ public:
             case RLMPropertyTypeLinkingObjects:
                 return m_schema[property().objectClassName];
             default:
-                REALM_ASSERT(false);
+                REALM_UNREACHABLE();
         }
     }
 
