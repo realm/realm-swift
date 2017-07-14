@@ -59,12 +59,12 @@ public final class RLMIterator<T: Object>: IteratorProtocol {
      case .update(_, let deletions, let insertions, let modifications):
          // Query results have changed, so apply them to the TableView
          self.tableView.beginUpdates()
-         self.tableView.insertRowsAtIndexPaths(insertions.map { NSIndexPath(forRow: $0, inSection: 0) },
-            withRowAnimation: .Automatic)
-         self.tableView.deleteRowsAtIndexPaths(deletions.map { NSIndexPath(forRow: $0, inSection: 0) },
-            withRowAnimation: .Automatic)
-         self.tableView.reloadRowsAtIndexPaths(modifications.map { NSIndexPath(forRow: $0, inSection: 0) },
-            withRowAnimation: .Automatic)
+         self.tableView.insertRows(at: insertions.map { IndexPath(row: $0, section: 0) },
+            with: .automatic)
+         self.tableView.deleteRows(at: deletions.map { IndexPath(row: $0, section: 0) },
+            with: .automatic)
+         self.tableView.reloadRows(at: modifications.map { IndexPath(row: $0, section: 0) },
+            with: .automatic)
          self.tableView.endUpdates()
          break
      case .error(let err):
