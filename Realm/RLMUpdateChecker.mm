@@ -26,7 +26,7 @@
 #endif
 
 void RLMCheckForUpdates() {
-#if TARGET_IPHONE_SIMULATOR
+#if 0
     if (getenv("REALM_DISABLE_UPDATE_CHECKER") || RLMIsRunningInPlayground()) {
         return;
     }
