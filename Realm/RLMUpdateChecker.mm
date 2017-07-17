@@ -26,8 +26,20 @@
 #endif
 
 void RLMCheckForUpdates() {
-#if 0
+#if TARGET_IPHONE_SIMULATOR
     if (getenv("REALM_DISABLE_UPDATE_CHECKER") || RLMIsRunningInPlayground()) {
+        return;
+    }
+
+    NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:@"alpha|beta|rc"
+                                                                           options:(NSRegularExpressionOptions)0
+                                                                             error:nil];
+    NSUInteger numberOfMatches = [regex numberOfMatchesInString:REALM_COCOA_VERSION
+                                                        options:(NSMatchingOptions)0
+                                                          range:NSMakeRange(0, REALM_COCOA_VERSION.length)];
+
+    if (numberOfMatches > 0) {
+        // pre-release version, skip update checking
         return;
     }
 
