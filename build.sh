@@ -1414,7 +1414,7 @@ EOF
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
-### API Breaking Changes
+### Breaking Changes
 
 * None.
 

@@ -1,10 +1,9 @@
 3.0.0-beta Release notes (2017-07-14)
 =============================================================
 
-Synchronized Realms require a server running Realm Object Server v2.0 or higher.
+### Breaking Changes
 
-### API Breaking Changes
-
+* Synchronized Realms require a server running Realm Object Server v2.0 or higher.
 * Remove the following deprecated Objective-C APIs:
   `-[RLMArray sortedResultsUsingProperty:ascending:]`,
   `-[RLMCollection sortedResultsUsingProperty:ascending:]`,
@@ -25,6 +24,10 @@ Synchronized Realms require a server running Realm Object Server v2.0 or higher.
   `SortDescriptor.property`.
   These APIs have been superseded by equivalent APIs that take
   or return key paths instead of property names.
+* The Objective-C and Swift `create(_:, value: update:)` APIs now
+  correctly nil out nullable properties when updating an existing
+  object when the `value` argument specifies nil or `NSNull` for
+  the property value.
 
 ### Enhancements
 
@@ -47,10 +50,6 @@ Synchronized Realms require a server running Realm Object Server v2.0 or higher.
 * Fix unmanaged object initialization when a nested property type returned
   `false` from `Object.shouldIncludeInDefaultSchema()`.
 * Don't clear RLMArrays on self-assignment.
-* The Objective-C and Swift `create(_:, value: update:)` APIs now
-  correctly nil out nullable properties when updating an existing
-  object when the `value` argument specifies nil or `NSNull` for
-  the property value.
 
 2.8.3 Release notes (2017-06-20)
 =============================================================
