@@ -3,6 +3,29 @@
 
 Synchronized Realms require a server running Realm Object Server v2.0 or higher.
 
+### API Breaking Changes
+
+* Remove the following deprecated Objective-C APIs:
+  `-[RLMArray sortedResultsUsingProperty:ascending:]`,
+  `-[RLMCollection sortedResultsUsingProperty:ascending:]`,
+  `-[RLMResults sortedResultsUsingProperty:ascending:]`,
+  `+[RLMSortDescriptor sortDescriptorWithProperty:ascending:]`,
+  `RLMSortDescriptor.property`.
+  These APIs have been superseded by equivalent APIs that take
+  or return key paths instead of property names.
+* Remove the following deprecated Objective-C API:
+  `+[RLMRealm migrateRealm:configuration:]`.
+  Please use `+[RLMRealm performMigrationForConfiguration:error:]` instead.
+* Remove the following deprecated Swift APIs:
+  `AnyRealmCollection.sorted(byProperty:, ascending:)`,
+  `LinkingObjects.sorted(byProperty:, ascending:)`,
+  `List.sorted(byProperty:, ascending:)`,
+  `Results.sorted(byProperty:, ascending:)`,
+  `SortDescriptor.init(property:, ascending:)`,
+  `SortDescriptor.property`.
+  These APIs have been superseded by equivalent APIs that take
+  or return key paths instead of property names.
+  
 ### Enhancements
 
 * Add a new error code to denote 'permission denied' errors when working
