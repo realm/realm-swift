@@ -144,17 +144,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns a sorted `RLMResults` from the collection.
 
- @param property    The property name to sort by.
- @param ascending   The direction to sort in.
-
- @return    An `RLMResults` sorted by the specified property.
- */
-- (RLMResults *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
-    __deprecated_msg("Use `-sortedResultsUsingKeyPath:ascending:`");
-
-/**
- Returns a sorted `RLMResults` from the collection.
-
  @param properties  An array of `RLMSortDescriptor`s to sort by.
 
  @return    An `RLMResults` sorted by the specified properties.
@@ -341,19 +330,6 @@ NS_ASSUME_NONNULL_BEGIN
  Returns a copy of the receiver with the sort direction reversed.
  */
 - (instancetype)reversedSortDescriptor;
-
-#pragma mark - Deprecated
-
-/**
- The name of the property which the sort descriptor orders results by.
- */
-@property (nonatomic, readonly) NSString *property __deprecated_msg("Use `-keyPath`");
-
-/**
- Returns a new sort descriptor for the given property name and sort direction.
- */
-+ (instancetype)sortDescriptorWithProperty:(NSString *)propertyName ascending:(BOOL)ascending
-    __deprecated_msg("Use `+sortDescriptorWithKeyPath:ascending:`");
 
 @end
 

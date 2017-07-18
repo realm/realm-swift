@@ -239,24 +239,6 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     /**
      Returns a `Results` containing the objects represented by the results, but sorted.
 
-     Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
-     youngest to oldest based on their `age` property, you might call
-     `students.sorted(byProperty: "age", ascending: true)`.
-
-     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
-
-     - parameter property:  The name of the property to sort by.
-     - parameter ascending: The direction to sort in.
-     */
-    @available(*, deprecated, renamed: "sorted(byKeyPath:ascending:)")
-    public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T> {
-        return sorted(byKeyPath: property, ascending: ascending)
-    }
-
-    /**
-     Returns a `Results` containing the objects represented by the results, but sorted.
-
      - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
                 floating point, integer, and string types.
 
@@ -425,32 +407,6 @@ extension Results: AssistedObjectiveCBridgeable {
 // MARK: Unavailable
 
 extension Results {
-    @available(*, unavailable, renamed: "isInvalidated")
-    public var invalidated: Bool { fatalError() }
-
-    @available(*, unavailable, renamed: "index(matching:)")
-    public func index(of predicate: NSPredicate) -> Int? { fatalError() }
-
-    @available(*, unavailable, renamed: "index(matching:_:)")
-    public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
-
     @available(*, unavailable, renamed: "sorted(byKeyPath:ascending:)")
-    public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
-
-    @available(*, unavailable, renamed: "sorted(by:)")
-    public func sorted<S: Sequence>(_ sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
-        fatalError()
-    }
-
-    @available(*, unavailable, renamed: "min(ofProperty:)")
-    public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
-
-    @available(*, unavailable, renamed: "max(ofProperty:)")
-    public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
-
-    @available(*, unavailable, renamed: "sum(ofProperty:)")
-    public func sum<U: AddableType>(_ property: String) -> U { fatalError() }
-
-    @available(*, unavailable, renamed: "average(ofProperty:)")
-    public func average<U: AddableType>(_ property: String) -> U? { fatalError() }
+    public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 }

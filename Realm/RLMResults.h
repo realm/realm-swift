@@ -170,17 +170,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns a sorted `RLMResults` from an existing results collection.
 
- @param property    The property name to sort by.
- @param ascending   The direction to sort in.
-
- @return    An `RLMResults` sorted by the specified property.
- */
-- (RLMResults<RLMObjectType> *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
-    __deprecated_msg("Use `-sortedResultsUsingKeyPath:ascending:`");
-
-/**
- Returns a sorted `RLMResults` from an existing results collection.
-
  @param properties  An array of `RLMSortDescriptor`s to sort by.
 
  @return    An `RLMResults` sorted by the specified properties.

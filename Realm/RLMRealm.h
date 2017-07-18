@@ -598,21 +598,6 @@ NS_REFINED_FOR_SWIFT;
 
  @see                 RLMMigration
  */
-+ (nullable NSError *)migrateRealm:(RLMRealmConfiguration *)configuration
-__deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR_SWIFT;
-
-/**
- Performs the given Realm configuration's migration block on a Realm at the given path.
-
- This method is called automatically when opening a Realm for the first time and does
- not need to be called explicitly. You can choose to call this method to control
- exactly when and how migrations are performed.
-
- @param configuration The Realm configuration used to open and migrate the Realm.
- @return              The error that occurred while applying the migration, if any.
-
- @see                 RLMMigration
- */
 + (BOOL)performMigrationForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
 #pragma mark - Unavailable Methods
