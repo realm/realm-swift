@@ -543,20 +543,19 @@ class ObjectCreationTests: TestCase {
 
         XCTAssertNil(object.id.value)
 
-        // FIXME: these should all be nil but that's a breaking change
-        XCTAssertNotNil(object.optIntCol.value)
-        XCTAssertNotNil(object.optInt8Col.value)
-        XCTAssertNotNil(object.optInt16Col.value)
-        XCTAssertNotNil(object.optInt32Col.value)
-        XCTAssertNotNil(object.optInt64Col.value)
-        XCTAssertNotNil(object.optBoolCol.value)
-        XCTAssertNotNil(object.optFloatCol.value)
-        XCTAssertNotNil(object.optDoubleCol.value)
-        XCTAssertNotNil(object.optDateCol)
-        XCTAssertNotNil(object.optStringCol)
-        XCTAssertNotNil(object.optNSStringCol)
-        XCTAssertNotNil(object.optBinaryCol)
-        XCTAssertNotNil(object.optObjectCol)
+        XCTAssertNil(object.optIntCol.value)
+        XCTAssertNil(object.optInt8Col.value)
+        XCTAssertNil(object.optInt16Col.value)
+        XCTAssertNil(object.optInt32Col.value)
+        XCTAssertNil(object.optInt64Col.value)
+        XCTAssertNil(object.optBoolCol.value)
+        XCTAssertNil(object.optFloatCol.value)
+        XCTAssertNil(object.optDoubleCol.value)
+        XCTAssertNil(object.optDateCol)
+        XCTAssertNil(object.optStringCol)
+        XCTAssertNil(object.optNSStringCol)
+        XCTAssertNil(object.optBinaryCol)
+        XCTAssertNil(object.optObjectCol)
 
         realm.cancelWrite()
     }

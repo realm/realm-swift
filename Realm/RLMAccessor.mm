@@ -590,9 +590,6 @@ RLMAccessorContext::RLMAccessorContext(__unsafe_unretained RLMObjectBase *const 
 }
 
 id RLMAccessorContext::defaultValue(__unsafe_unretained NSString *const key) {
-    if (_nilHack) {
-        return nil;
-    }
     if (!_defaultValues) {
         _defaultValues = RLMDefaultValuesForObjectSchema(_info.rlmObjectSchema);
     }
@@ -632,7 +629,6 @@ static void validateValueForProperty(__unsafe_unretained id const obj,
 
 id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t propIndex,
                                      __unsafe_unretained RLMProperty *const prop) {
-    _nilHack = false;
     // Property value from an NSArray
     if ([obj respondsToSelector:@selector(objectAtIndex:)]) {
         return propIndex < [obj count] ? [obj objectAtIndex:propIndex] : nil;
@@ -658,18 +654,7 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
         value = RLMValidatedValueForProperty(obj, [obj respondsToSelector:prop.getterSel] ? prop.getterName : prop.name,
                                              _info.rlmObjectSchema.className);
     }
-    // return value ?: NSNull.null;
-
-    // FIXME: for compatiblity with existing code this does bad things to make
-    // it so that createOrUpdate: does not set existing properties to `nil`
-    // unless using the dictionary/array code path. Remove this in 3.0.
-    if (!value) {
-        validateValueForProperty(NSNull.null, prop, _info);
-        if (prop.isPrimary || _promote_existing)
-            return NSNull.null;
-        _nilHack = true;
-    }
-    return value;
+    return value ?: NSNull.null;
 }
 
 id RLMAccessorContext::box(realm::List&& l) {
