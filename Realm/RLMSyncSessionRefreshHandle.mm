@@ -40,7 +40,7 @@ void unregisterRefreshHandle(const std::weak_ptr<SyncUser>& user, const std::str
 
 }
 
-static const NSTimeInterval RefreshBuffer = 10;
+static const NSTimeInterval RLMRefreshBuffer = 10;
 
 @interface RLMSyncSessionRefreshHandle () {
     std::weak_ptr<SyncUser> _user;
@@ -93,7 +93,7 @@ static const NSTimeInterval RefreshBuffer = 10;
 }
 
 + (NSDate *)fireDateForTokenExpirationDate:(NSDate *)date nowDate:(NSDate *)nowDate {
-    NSDate *fireDate = [date dateByAddingTimeInterval:-RefreshBuffer];
+    NSDate *fireDate = [date dateByAddingTimeInterval:-RLMRefreshBuffer];
     // Only fire times in the future are valid.
     return ([fireDate compare:nowDate] == NSOrderedDescending ? fireDate : nil);
 }
@@ -191,7 +191,7 @@ static const NSTimeInterval RefreshBuffer = 10;
             case NSURLErrorDNSLookupFailed:
             case NSURLErrorCannotFindHost:
                 // FIXME: 10 seconds is an arbitrarily chosen value, consider rationalizing it.
-                nextTryDate = [NSDate dateWithTimeIntervalSinceNow:RefreshBuffer + 10];
+                nextTryDate = [NSDate dateWithTimeIntervalSinceNow:RLMRefreshBuffer + 10];
                 break;
             default:
                 break;
