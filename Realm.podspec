@@ -40,7 +40,6 @@ Pod::Spec.new do |s|
                               'include/**/RLMSyncPermission.h',
                               'include/**/RLMSyncPermissionOffer.h',
                               'include/**/RLMSyncPermissionOfferResponse.h',
-                              'include/**/RLMSyncPermissionResults.h',
                               'include/**/RLMSyncSession.h',
                               'include/**/RLMSyncUser.h',
                               'include/**/RLMSyncUtil.h',

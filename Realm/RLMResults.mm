@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMResults_Private.h"
+#import "RLMResults_Private.hpp"
 
 #import "RLMAccessor.hpp"
 #import "RLMArray_Private.hpp"
@@ -53,7 +53,6 @@ using namespace realm;
 // RLMResults implementation
 //
 @implementation RLMResults {
-    realm::Results _results;
     RLMRealm *_realm;
     RLMClassInfo *_info;
 }
@@ -63,15 +62,20 @@ using namespace realm;
     return self;
 }
 
+- (instancetype)initWithResults:(Results)results {
+    if (self = [super init]) {
+        _results = std::move(results);
+    }
+    return self;
+}
+
 static void assertKeyPathIsNotNested(NSString *keyPath) {
     if ([keyPath rangeOfString:@"."].location != NSNotFound) {
         @throw RLMException(@"Nested key paths are not supported yet for KVC collection operators.");
     }
 }
 
-[[gnu::noinline]]
-[[noreturn]]
-static void throwError(NSString *aggregateMethod) {
+void RLMThrowResultsError(NSString *aggregateMethod) {
     try {
         throw;
     }
@@ -103,16 +107,6 @@ static void throwError(NSString *aggregateMethod) {
     }
     catch (std::exception const& e) {
         @throw RLMException(e);
-    }
-}
-
-template<typename Function>
-static auto translateErrors(Function&& f, NSString *aggregateMethod=nil) {
-    try {
-        return f();
-    }
-    catch (...) {
-        throwError(aggregateMethod);
     }
 }
 

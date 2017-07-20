@@ -18,9 +18,10 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMResults.h"
 #import "RLMSyncCredentials.h"
 
-@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncPermission, RLMSyncPermissionResults, RLMSyncSession, RLMRealm;
+@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncPermission, RLMSyncSession, RLMRealm;
 
 /**
  The state of the user object.
@@ -47,7 +48,7 @@ typedef void(^RLMPermissionStatusBlock)(NSError * _Nullable);
 
 /// A block type used to asynchronously report results of a permissions get operation.
 /// Exactly one of the two arguments will be populated.
-typedef void(^RLMPermissionResultsBlock)(RLMSyncPermissionResults * _Nullable, NSError * _Nullable);
+typedef void(^RLMPermissionResultsBlock)(RLMResults<RLMSyncPermission *> * _Nullable, NSError * _Nullable);
 
 /// A block type used to asynchronously report results of a user info retrieval.
 /// Exactly one of the two arguments will be populated.
@@ -241,10 +242,8 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  @warning This method must be called from a thread with a currently active run loop. Unless
           you have manually configured a run loop on a side thread, this will usually be the
           main thread.
-
- @see `RLMSyncPermissionResults`
  */
-- (void)retrievePermissionsWithCallback:(RLMPermissionResultsBlock)callback;
+- (void)retrievePermissionsWithCallback:(RLMPermissionResultsBlock)callback NS_REFINED_FOR_SWIFT;
 
 /**
  Apply a given permission.
