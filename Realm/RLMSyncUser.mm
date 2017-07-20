@@ -41,25 +41,10 @@ using PermissionGetCallback = std::function<void(std::unique_ptr<PermissionResul
 
 namespace {
 
-NSError *translateExceptionPtrToError(std::exception_ptr ptr, bool get) {
-    NSError *error = nil;
-    try {
-        std::rethrow_exception(ptr);
-    } catch (PermissionChangeException const& ex) {
-        error = (get
-                 ? make_permission_error_get(@(ex.what()), ex.code)
-                 : make_permission_error_change(@(ex.what()), ex.code));
-    }
-    catch (const std::exception &exp) {
-        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), &error);
-    }
-    return error;
-}
-
 PermissionGetCallback RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock callback) {
     return [callback](std::unique_ptr<PermissionResults> results, std::exception_ptr ptr) {
         if (ptr) {
-            NSError *error = translateExceptionPtrToError(std::move(ptr), true);
+            NSError *error = RLMTranslatePermissionExceptionPtrToError(std::move(ptr), true);
             REALM_ASSERT(error);
             callback(nil, error);
         } else {
@@ -98,10 +83,25 @@ void CocoaSyncUserContext::invalidate_all_handles()
     m_refresh_handles.clear();
 }
 
+NSError *RLMTranslatePermissionExceptionPtrToError(std::exception_ptr ptr, bool get) {
+    NSError *error = nil;
+    try {
+        std::rethrow_exception(ptr);
+    } catch (PermissionChangeException const& ex) {
+        error = (get
+                 ? make_permission_error_get(@(ex.what()), ex.code)
+                 : make_permission_error_change(@(ex.what()), ex.code));
+    }
+    catch (const std::exception &exp) {
+        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), &error);
+    }
+    return error;
+}
+
 PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBlock callback) {
     return [callback](std::exception_ptr ptr) {
         if (ptr) {
-            NSError *error = translateExceptionPtrToError(std::move(ptr), false);
+            NSError *error = RLMTranslatePermissionExceptionPtrToError(std::move(ptr), false);
             REALM_ASSERT(error);
             callback(error);
         } else {

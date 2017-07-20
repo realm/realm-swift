@@ -41,10 +41,20 @@ using namespace realm;
     return _results->size();
 }
 
-- (RLMNotificationToken *)addNotificationBlock:(RLMPermissionStatusBlock)block {
+- (RLMNotificationToken *)addNotificationBlock:(RLMPermissionResultsNotificationBlock)block {
     REALM_ASSERT_DEBUG(_results);
-    auto token = _results->async(RLMWrapPermissionStatusCallback(block));
-    return [[RLMCancellationToken alloc] initWithToken:std::move(token) realm:nil];
+    auto cb = [=](realm::CollectionChangeSet const& changes, std::exception_ptr ptr) {
+        if (ptr) {
+            NSError *error = RLMTranslatePermissionExceptionPtrToError(std::move(ptr), true);
+            REALM_ASSERT(error);
+            block(nil, nil, error);
+        } else {
+            // Finished successfully
+            block(self, [[RLMCollectionChange alloc] initWithChanges:changes], nil);
+        }
+    };
+    return [[RLMCancellationToken alloc] initWithToken:_results->add_notification_callback(std::move(cb))
+                                                 realm:nil];
 }
 
 - (RLMSyncPermissionValue *)objectAtIndex:(NSInteger)index {
