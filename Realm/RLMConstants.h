@@ -69,19 +69,17 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     /**
      Any object: `id`.
 
-     This property type is no longer supported for new models. However, old models with any-typed properties are still
-     supported for migration purposes.
+     This property type is no longer supported for new models. However, old files
+     with any-typed properties are still supported for migration purposes.
      */
     RLMPropertyTypeAny    = 9,
     /** Dates: `NSDate` */
     RLMPropertyTypeDate   = 4,
 
-#pragma mark - Array/Linked object types
+#pragma mark - Linked object types
 
     /** Realm model objects. See [Realm Models](https://realm.io/docs/objc/latest/#models) for more information. */
     RLMPropertyTypeObject = 7,
-    /** Realm arrays. See [Realm Models](https://realm.io/docs/objc/latest/#models) for more information. */
-    RLMPropertyTypeArray  = 128,
     /** Realm linking objects. See [Realm Models](https://realm.io/docs/objc/latest/#models) for more information. */
     RLMPropertyTypeLinkingObjects = 8,
 };

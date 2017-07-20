@@ -174,12 +174,12 @@ class ListTests: TestCase {
 
         array.append(objectsIn: [str1, str2, str1])
 
-        array.remove(objectAtIndex: 1)
+        array.remove(at: 1)
         assertEqual(str1, array[0])
         assertEqual(str1, array[1])
 
-        assertThrows(array.remove(objectAtIndex: 200))
-        assertThrows(array.remove(objectAtIndex: -200))
+        assertThrows(array.remove(at: 2))
+        assertThrows(array.remove(at: -2))
     }
 
     func testRemoveLast() {
@@ -299,20 +299,20 @@ class ListTests: TestCase {
 
         array.append(objectsIn: [str1, str2])
 
-        array.swap(index1: 0, 1)
+        array.swap(0, 1)
         XCTAssertEqual(Int(2), array.count)
         assertEqual(str2, array[0])
         assertEqual(str1, array[1])
 
-        array.swap(index1: 1, 1)
+        array.swap(1, 1)
         XCTAssertEqual(Int(2), array.count)
         assertEqual(str2, array[0])
         assertEqual(str1, array[1])
 
-        assertThrows(array.swap(index1: -1, 0))
-        assertThrows(array.swap(index1: 0, -1))
-        assertThrows(array.swap(index1: 1000, 0))
-        assertThrows(array.swap(index1: 0, 1000))
+        assertThrows(array.swap(-1, 0))
+        assertThrows(array.swap(0, -1))
+        assertThrows(array.swap(1000, 0))
+        assertThrows(array.swap(0, 1000))
     }
 
     func testChangesArePersisted() {

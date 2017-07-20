@@ -34,14 +34,14 @@ class ObjectiveCSupportTests: TestCase {
 
         let results = realm.objects(SwiftObject.self)
         let rlmResults = ObjectiveCSupport.convert(object: results)
-        XCTAssert(rlmResults.isKind(of: RLMResults.self))
+        XCTAssert(rlmResults.isKind(of: RLMResults<AnyObject>.self))
         XCTAssertEqual(rlmResults.count, 1)
         XCTAssertEqual(unsafeBitCast(rlmResults.firstObject(), to: SwiftObject.self).intCol, 123)
 
         let list = List<SwiftObject>()
         list.append(SwiftObject())
         let rlmArray = ObjectiveCSupport.convert(object: list)
-        XCTAssert(rlmArray.isKind(of: RLMArray.self))
+        XCTAssert(rlmArray.isKind(of: RLMArray<AnyObject>.self))
         XCTAssertEqual(unsafeBitCast(rlmArray.firstObject(), to: SwiftObject.self).floatCol, 1.23)
         XCTAssertEqual(rlmArray.count, 1)
 

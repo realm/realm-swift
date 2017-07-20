@@ -209,6 +209,8 @@
 
     RLMAssertThrowsWithReasonMatching([company.employees addObject:person], @"invalidated");
     RLMAssertThrowsWithReasonMatching([company.employees insertObject:person atIndex:0], @"invalidated");
+
+    [realm cancelWriteTransaction];
 }
 
 - (void)testAddNil {
@@ -217,9 +219,10 @@
     CompanyObject *company = [CompanyObject createInDefaultRealmWithValue:@[@"company", @[]]];
 
     RLMAssertThrowsWithReasonMatching([company.employees addObject:self.nonLiteralNil], @"nil");
+    [realm cancelWriteTransaction];
 }
 
--(void)testUnmanaged {
+- (void)testUnmanaged {
     RLMRealm *realm = [self realmWithTestPath];
 
     ArrayPropertyObject *array = [[ArrayPropertyObject alloc] init];
@@ -1125,7 +1128,7 @@
     [self dispatchAsyncAndWait:^{
         RLMRealm *realm = self.realmWithTestPath;
         [realm transactionWithBlock:^{
-            RLMArray *array = (RLMArray *)[[ArrayPropertyObject allObjectsInRealm:realm].firstObject array];
+            RLMArray *array = [(ArrayPropertyObject *)[ArrayPropertyObject allObjectsInRealm:realm].firstObject array];
             [array addObject:[[StringObject alloc] init]];
         }];
     }];
@@ -1186,7 +1189,7 @@
         [self dispatchAsyncAndWait:^{
             RLMRealm *realm = self.realmWithTestPath;
             [realm transactionWithBlock:^{
-                RLMArray *array = (RLMArray *)[[ArrayPropertyObject allObjectsInRealm:realm].firstObject array];
+                RLMArray *array = [(ArrayPropertyObject *)[ArrayPropertyObject allObjectsInRealm:realm].firstObject array];
                 [array addObject:[[StringObject alloc] init]];
             }];
         }];
@@ -1344,6 +1347,8 @@
     RLMAssertThrowsWithReasonMatching([array valueForKey:@"intCol"], @"invalidated");
     RLMAssertThrowsWithReasonMatching([array setValue:@1 forKey:@"intCol"], @"invalidated");
     RLMAssertThrowsWithReasonMatching({for (__unused id obj in array);}, @"invalidated");
+
+    [realm cancelWriteTransaction];
 }
 
 - (void)testMutatingMethodsCheckForWriteTransaction {

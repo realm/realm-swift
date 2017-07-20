@@ -268,15 +268,15 @@
 - (void)testInitWithInvalidObject {
     // No overlap in properties
     auto so = [[StringObject alloc] initWithValue:@[@"str"]];
-    RLMAssertThrowsWithReasonMatching([[IntObject alloc] initWithValue:so], @"missing key 'intCol'");
+    RLMAssertThrowsWithReason([[IntObject alloc] initWithValue:so], @"missing key 'intCol'");
 
     // Dog has some but not all of DogExtra's properties
     auto dog = [[DogObject alloc] initWithValue:@[@"Fido", @10]];
-    RLMAssertThrowsWithReasonMatching([[DogExtraObject alloc] initWithValue:dog], @"missing key 'breed'");
+    RLMAssertThrowsWithReason([[DogExtraObject alloc] initWithValue:dog], @"missing key 'breed'");
 
     // Same property names, but different types
-    RLMAssertThrowsWithReasonMatching([[BizzaroDog alloc] initWithValue:dog],
-                                      @"Invalid value 'Fido' for property 'dogName'");
+    RLMAssertThrowsWithReason([[BizzaroDog alloc] initWithValue:dog],
+                              @"Invalid value 'Fido' for property 'dogName'");
 }
 
 - (void)testInitWithCustomAccessors {
@@ -665,7 +665,7 @@
     [realm beginWriteTransaction];
     auto obj1 = [IntObject createInRealm:realm withValue:@[@0]];
     auto obj2 = [IntObject createInRealm:realm withValue:@[@1]];
-    auto obj1alias = [IntObject allObjectsInRealm:realm].firstObject;
+    id obj1alias = [IntObject allObjectsInRealm:realm].firstObject;
 
     [realm deleteObject:obj1];
     RLMAssertThrowsWithReasonMatching([IntObject createInRealm:realm withValue:obj1],

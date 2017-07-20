@@ -67,7 +67,7 @@ import Realm.Private
  See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
  */
 @objc(RealmSwiftObject)
-open class Object: RLMObjectBase, ThreadConfined {
+open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
 
     // MARK: Initializers
 
@@ -363,7 +363,7 @@ public final class DynamicObject: Object {
     public override subscript(key: String) -> Any? {
         get {
             let value = RLMDynamicGetByName(self, key, false)
-            if let array = value as? RLMArray {
+            if let array = value as? RLMArray<AnyObject> {
                 return List<DynamicObject>(rlmArray: array)
             }
             return value

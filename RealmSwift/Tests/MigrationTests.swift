@@ -19,7 +19,6 @@
 import XCTest
 import RealmSwift
 import Realm
-import Realm.Private
 import Realm.Dynamic
 import Foundation
 
@@ -452,7 +451,7 @@ class MigrationTests: TestCase {
             let realm = dynamicRealm(defaultRealmURL())
             XCTAssertEqual(realm.schema.schema(forClassName: "SwiftStringObject")!.properties.count, 1)
             XCTAssertEqual(1, realm.allObjects("SwiftStringObject").count)
-            XCTAssertEqual("a", realm.allObjects("SwiftStringObject").firstObject()?["stringCol"] as? String)
+            XCTAssertEqual("a", (realm.allObjects("SwiftStringObject").firstObject() as! RLMObject?)?["stringCol"] as? String)
         }
     }
 

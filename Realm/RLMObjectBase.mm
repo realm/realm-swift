@@ -78,34 +78,28 @@ static bool maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
     _observationInfo = nullptr;
 }
 
+static id cooerceToObjectType(id obj, Class cls, RLMSchema *schema) {
+    return [obj isKindOfClass:cls] ? obj : [[cls alloc] initWithValue:obj schema:schema];
+}
+
 static id validatedObjectForProperty(__unsafe_unretained id const obj,
                                      __unsafe_unretained RLMProperty *const prop,
                                      __unsafe_unretained RLMSchema *const schema) {
     RLMValidateValueForProperty(obj, prop);
-
-    if (obj && prop.type == RLMPropertyTypeObject) {
-        RLMObjectSchema *objSchema = schema[prop.objectClassName];
-        if ([obj isKindOfClass:objSchema.objectClass]) {
-            return obj;
-        }
-        else {
-            return [[objSchema.objectClass alloc] initWithValue:obj schema:schema];
-        }
+    if (!obj || obj == NSNull.null) {
+        return nil;
     }
-    if (prop.type == RLMPropertyTypeArray) {
-        RLMObjectSchema *objSchema = schema[prop.objectClassName];
-        RLMArray *objects = [[RLMArray alloc] initWithObjectClassName:objSchema.className];
-        for (id el in obj) {
-            if ([el isKindOfClass:objSchema.objectClass]) {
-                [objects addObject:el];
+    if (prop.type == RLMPropertyTypeObject) {
+        Class objectClass = schema[prop.objectClassName].objectClass;
+        if (prop.array) {
+            NSMutableArray *ret = [[NSMutableArray alloc] init];
+            for (id el in obj) {
+                [ret addObject:cooerceToObjectType(el, objectClass, schema)];
             }
-            else {
-                [objects addObject:[[objSchema.objectClass alloc] initWithValue:el schema:schema]];
-            }
+            return ret;
         }
-        return objects;
+        return cooerceToObjectType(obj, objectClass, schema);
     }
-
     return obj;
 }
 
@@ -190,7 +184,7 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
     value = RLMCoerceToNil(value);
     RLMProperty *property = _objectSchema[key];
     if (Ivar ivar = property.swiftIvar) {
-        if (property.type == RLMPropertyTypeArray && (!value || [value conformsToProtocol:@protocol(NSFastEnumeration)])) {
+        if (property.array && (!value || [value conformsToProtocol:@protocol(NSFastEnumeration)])) {
             RLMArray *array = [object_getIvar(self, ivar) _rlmArray];
             [array removeAllObjects];
 
@@ -222,10 +216,8 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
 }
 
 + (void)initializeLinkedObjectSchemas {
-    RLMObjectSchema *thisObjectSchema = [self sharedSchema];
-    for (RLMProperty *prop in thisObjectSchema.properties) {
-        if ((prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) &&
-            !RLMSchema.partialPrivateSharedSchema[prop.objectClassName]) {
+    for (RLMProperty *prop in self.sharedSchema.properties) {
+        if (prop.type == RLMPropertyTypeObject && !RLMSchema.partialPrivateSharedSchema[prop.objectClassName]) {
             [[RLMSchema classForString:prop.objectClassName] initializeLinkedObjectSchemas];
         }
     }

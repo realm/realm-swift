@@ -181,7 +181,7 @@ void RLMObservationInfo::recordObserver(realm::Row& objectRow, RLMClassInfo *obj
     NSUInteger sep = [keyPath rangeOfString:@"."].location;
     NSString *key = sep == NSNotFound ? keyPath : [keyPath substringToIndex:sep];
     RLMProperty *prop = objectSchema[key];
-    if (prop && prop.type == RLMPropertyTypeArray) {
+    if (prop && prop.array) {
         id value = valueForKey(key);
         RLMArray *array = [value isKindOfClass:[RLMListBase class]] ? [value _rlmArray] : value;
         array->_key = key;
@@ -225,7 +225,7 @@ id RLMObservationInfo::valueForKey(NSString *key) {
     // We need to return the same object each time for observing over keypaths
     // to work, so we store a cache of them here. We can't just cache them on
     // the object as that leads to retain cycles.
-    if (lastProp.type == RLMPropertyTypeArray) {
+    if (lastProp.array) {
         RLMArray *value = cachedObjects[key];
         if (!value) {
             value = getSuper();

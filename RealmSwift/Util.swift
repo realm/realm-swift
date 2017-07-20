@@ -51,6 +51,13 @@ internal func gsub(pattern: String, template: String, string: String, error: NSE
                                            withTemplate: template)
 }
 
+internal func cast<U, V>(_ value: U, to: V.Type) -> V {
+    if let v = value as? V {
+        return v
+    }
+    return unsafeBitCast(value, to: to)
+}
+
 extension Object {
     // Must *only* be used to call Realm Objective-C APIs that are exposed on `RLMObject`
     // but actually operate on `RLMObjectBase`. Do not expose cast value to user.

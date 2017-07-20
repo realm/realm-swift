@@ -17,9 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
-import Realm.Private
 import RealmSwift
-import Foundation
+import Realm.Private
 
 class ObjectCreationTests: TestCase {
 
@@ -74,7 +73,7 @@ class ObjectCreationTests: TestCase {
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            for validValue in validValuesForSwiftObjectType(props[propNum].type) {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
                 // update dict with valid value and init
                 var values = baselineValues
                 values[props[propNum].name] = validValue
@@ -86,7 +85,7 @@ class ObjectCreationTests: TestCase {
 
         // test with invalid dictionary literals
         for propNum in 0..<props.count {
-            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type) {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
                 // update dict with invalid value and init
                 var values = baselineValues
                 values[props[propNum].name] = invalidValue
@@ -111,7 +110,7 @@ class ObjectCreationTests: TestCase {
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            for validValue in validValuesForSwiftObjectType(props[propNum].type) {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
                 // update dict with valid value and init
                 var values = baselineValues
                 values[propNum] = validValue
@@ -123,7 +122,7 @@ class ObjectCreationTests: TestCase {
 
         // test with invalid dictionary literals
         for propNum in 0..<props.count {
-            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type) {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
                 // update dict with invalid value and init
                 var values = baselineValues
                 values[propNum] = invalidValue
@@ -226,7 +225,7 @@ class ObjectCreationTests: TestCase {
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            for validValue in validValuesForSwiftObjectType(props[propNum].type) {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
                 // update dict with valid value and init
                 var values = baselineValues
                 values[props[propNum].name] = validValue
@@ -242,7 +241,7 @@ class ObjectCreationTests: TestCase {
 
         // test with invalid dictionary literals
         for propNum in 0..<props.count {
-            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type) {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
                 // update dict with invalid value and init
                 var values = baselineValues
                 values[props[propNum].name] = invalidValue
@@ -273,7 +272,7 @@ class ObjectCreationTests: TestCase {
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
         for propNum in 0..<props.count {
-            for validValue in validValuesForSwiftObjectType(props[propNum].type) {
+            for validValue in validValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
                 // update dict with valid value and init
                 var values = baselineValues
                 values[propNum] = validValue
@@ -289,7 +288,7 @@ class ObjectCreationTests: TestCase {
 
         // test with invalid array literals
         for propNum in 0..<props.count {
-            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type) {
+            for invalidValue in invalidValuesForSwiftObjectType(props[propNum].type, props[propNum].isArray) {
                 // update dict with invalid value and init
                 var values = baselineValues
                 values[propNum] = invalidValue
@@ -798,10 +797,18 @@ class ObjectCreationTests: TestCase {
 
     // return an array of valid values that can be used to initialize each type
     // swiftlint:disable:next cyclomatic_complexity
-    private func validValuesForSwiftObjectType(_ type: PropertyType) -> [Any] {
+    private func validValuesForSwiftObjectType(_ type: PropertyType, _ array: Bool) -> [Any] {
         try! Realm().beginWrite()
         let persistedObject = try! Realm().create(SwiftBoolObject.self, value: [true])
         try! Realm().commitWrite()
+        if array {
+            return [
+                [[true], [false]],
+                [["boolCol": true], ["boolCol": false]],
+                [SwiftBoolObject(value: [true]), SwiftBoolObject(value: [false])],
+                [persistedObject, [false]]
+            ]
+        }
         switch type {
             case .bool:     return [true, NSNumber(value: 0 as Int), NSNumber(value: 1 as Int)]
             case .int:      return [NSNumber(value: 1 as Int)]
@@ -811,12 +818,6 @@ class ObjectCreationTests: TestCase {
             case .data:     return ["b".data(using: String.Encoding.utf8, allowLossyConversion: false)!]
             case .date:     return [Date(timeIntervalSince1970: 2)]
             case .object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
-            case .array:    return [
-                [[true], [false]],
-                [["boolCol": true], ["boolCol": false]],
-                [SwiftBoolObject(value: [true]), SwiftBoolObject(value: [false])],
-                [persistedObject, [false]]
-            ]
             case .any: XCTFail("not supported")
             case .linkingObjects: XCTFail("not supported")
         }
@@ -824,10 +825,13 @@ class ObjectCreationTests: TestCase {
     }
 
     // swiftlint:disable:next cyclomatic_complexity
-    private func invalidValuesForSwiftObjectType(_ type: PropertyType) -> [Any] {
+    private func invalidValuesForSwiftObjectType(_ type: PropertyType, _ array: Bool) -> [Any] {
         try! Realm().beginWrite()
         let persistedObject = try! Realm().create(SwiftIntObject.self)
         try! Realm().commitWrite()
+        if array {
+            return ["invalid", [["a"]], [["boolCol": "a"]], [[SwiftIntObject()]], [[persistedObject]]]
+        }
         switch type {
             case .bool:     return ["invalid", NSNumber(value: 2 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
             case .int:      return ["invalid", NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
@@ -837,8 +841,6 @@ class ObjectCreationTests: TestCase {
             case .data:     return ["invalid"]
             case .date:     return ["invalid"]
             case .object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
-            case .array:    return ["invalid", [["a"]], [["boolCol": "a"]], [[SwiftIntObject()]], [[persistedObject]]]
-
             case .any: XCTFail("not supported")
             case .linkingObjects: XCTFail("not supported")
         }

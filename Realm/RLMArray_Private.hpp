@@ -35,16 +35,18 @@ class RLMObservationInfo;
 @interface RLMArray () {
 @protected
     NSString *_objectClassName;
+    RLMPropertyType _type;
+    bool _optional;
 @public
     // The name of the property which this RLMArray represents
     NSString *_key;
     __weak RLMObjectBase *_parentObject;
 }
+
+@property (nonatomic, readonly) RLMPropertyType type;
+@property (nonatomic, readonly) bool optional;
 @end
 
-//
-// LinkView backed RLMArray subclass
-//
 @interface RLMManagedArray : RLMArray <RLMFastEnumerable>
 - (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 - (RLMManagedArray *)initWithList:(realm::List)list
