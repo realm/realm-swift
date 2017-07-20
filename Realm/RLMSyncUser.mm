@@ -414,7 +414,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         // Retrieve the user based on the auth server URL.
         util::Optional<std::string> identity_string;
         if (identity) {
-            identity_string = util::make_optional<std::string>(identity.UTF8String);
+            identity_string = std::string(identity.UTF8String);
         }
         sync_user = SyncManager::shared().get_admin_token_user([serverURL absoluteString].UTF8String,
                                                                credentials.token.UTF8String,
@@ -422,7 +422,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     } else {
         // Retrieve the user based on the identity.
         if (!identity) {
-            @throw RLMException(@"A direct access credential must specify either/both an identity or a server URL.");
+            @throw RLMException(@"A direct access credential must specify either an identity, a server URL, or both.");
         }
         sync_user = SyncManager::shared().get_admin_token_user_from_identity(identity.UTF8String,
                                                                              none,

@@ -19,6 +19,14 @@ x.x.x Release notes (yyyy-MM-dd)
   Server 1.6.0 or later.
 * Improve performance of creating Swift objects which contain at least one List
   property.
+* It is now possible to create and log in multiple Realm Object Server users
+  with the same identity if they originate from different servers. Note that
+  if the URLs are different aliases for the same authentication server each
+  user will still be treated as separate (e.g. they will have their own copy
+  of each synchronized Realm opened using them). It is highly encouraged that
+  users defined using the access token credential type be logged in with an
+  authentication server URL specified; this parameter will become mandatory
+  in a future version of the SDK.
 
 ### Bugfixes
 
