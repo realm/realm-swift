@@ -203,7 +203,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     if (!_user) {
         return nil;
     }
-    auto path = SyncManager::shared().path_for_realm(_user->identity(), [url.absoluteString UTF8String]);
+    auto path = SyncManager::shared().path_for_realm(*_user, [url.absoluteString UTF8String]);
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }
@@ -252,7 +252,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 }
 
 - (NSURL *)authenticationServer {
-    if (!_user) {
+    if (!_user || _user->token_type() == SyncUser::TokenType::Admin) {
         return nil;
     }
     return [NSURL URLWithString:@(_user->server_url().c_str())];
@@ -348,8 +348,14 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
              completionBlock:(RLMUserCompletionBlock)completion {
     // Special credential login should be treated differently.
     if (credentials.provider == RLMIdentityProviderAccessToken) {
-        [self _performLoginForDirectAccessTokenCredentials:credentials user:user completionBlock:completion];
+        [self _performLoginForDirectAccessTokenCredentials:credentials
+                                                      user:user
+                                             authServerURL:authServerURL
+                                           completionBlock:completion];
         return;
+    }
+    if (!authServerURL) {
+        @throw RLMException(@"A user cannot be logged in without specifying an authentication server URL.");
     }
 
     // Prepare login network request
@@ -376,9 +382,8 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                 return;
             } else {
                 std::string server_url = authServerURL.absoluteString.UTF8String;
-                auto sync_user = SyncManager::shared().get_user([model.refreshToken.tokenData.identity UTF8String],
-                                                                [model.refreshToken.token UTF8String],
-                                                                std::move(server_url));
+                SyncUserIdentifier identity{[model.refreshToken.tokenData.identity UTF8String], std::move(server_url)};
+                auto sync_user = SyncManager::shared().get_user(identity , [model.refreshToken.token UTF8String]);
                 if (!sync_user) {
                     completion(nil, make_auth_error_client_issue());
                     return;
@@ -401,13 +406,28 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 
 + (void)_performLoginForDirectAccessTokenCredentials:(RLMSyncCredentials *)credentials
                                                 user:(RLMSyncUser *)user
+                                       authServerURL:(NSURL *)serverURL
                                      completionBlock:(nonnull RLMUserCompletionBlock)completion {
     NSString *identity = credentials.userInfo[kRLMSyncIdentityKey];
-    NSAssert(identity != nil, @"Improperly created direct access token credential.");
-    auto sync_user = SyncManager::shared().get_user([identity UTF8String],
-                                                    [credentials.token UTF8String],
-                                                    none,
-                                                    SyncUser::TokenType::Admin);
+    std::shared_ptr<SyncUser> sync_user;
+    if (serverURL) {
+        // Retrieve the user based on the auth server URL.
+        util::Optional<std::string> identity_string;
+        if (identity) {
+            identity_string = std::string(identity.UTF8String);
+        }
+        sync_user = SyncManager::shared().get_admin_token_user([serverURL absoluteString].UTF8String,
+                                                               credentials.token.UTF8String,
+                                                               std::move(identity_string));
+    } else {
+        // Retrieve the user based on the identity.
+        if (!identity) {
+            @throw RLMException(@"A direct access credential must specify either an identity, a server URL, or both.");
+        }
+        sync_user = SyncManager::shared().get_admin_token_user_from_identity(identity.UTF8String,
+                                                                             none,
+                                                                             credentials.token.UTF8String);
+    }
     if (!sync_user) {
         completion(nil, make_auth_error_client_issue());
         return;
