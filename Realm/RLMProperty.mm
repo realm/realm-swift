@@ -592,7 +592,22 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@ {\n\ttype = %@;\n\tobjectClassName = %@;\n\tlinkOriginPropertyName = %@;\n\tindexed = %@;\n\tisPrimary = %@;\n\toptional = %@;\n}", self.name, RLMTypeToString(self.type), self.objectClassName, self.linkOriginPropertyName, self.indexed ? @"YES" : @"NO", self.isPrimary ? @"YES" : @"NO", self.optional ? @"YES" : @"NO"];
+    return [NSString stringWithFormat:
+            @"%@ {\n"
+             "\ttype = %@;\n"
+             "\tobjectClassName = %@;\n"
+             "\tlinkOriginPropertyName = %@;\n"
+             "\tindexed = %@;\n"
+             "\tisPrimary = %@;\n"
+             "\tarray = %@;\n"
+             "\toptional = %@;\n"
+             "}",
+            self.name, RLMTypeToString(self.type), self.objectClassName,
+            self.linkOriginPropertyName,
+            self.indexed ? @"YES" : @"NO",
+            self.isPrimary ? @"YES" : @"NO",
+            self.array ? @"YES" : @"NO",
+            self.optional ? @"YES" : @"NO"];
 }
 
 - (realm::Property)objectStoreCopy {

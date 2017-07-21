@@ -39,6 +39,7 @@
                                                 @"\tlinkOriginPropertyName = (null);\n"
                                                 @"\tindexed = NO;\n"
                                                 @"\tisPrimary = NO;\n"
+                                                @"\tarray = NO;\n"
                                                 @"\toptional = YES;\n"
                                                 @"}");
 }
