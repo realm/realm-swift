@@ -14,6 +14,6 @@ When asking questions on Stack Overflow, please keep in mind Stack Overflow's [q
 
 ## GitHub Issues
 
-If you are running into issues with Realm, including questions which are very specific to your particular application or potential bugs, we encourage you to file an issue on our [GitHub issue tracker](https://github.com/realm/realm-cocoa/issues). Please fill out the issue template in its entirety.
+If you are running into issues with Realm, including questions which are very specific to your particular application or potential bugs, we encourage you to file an issue on our [GitHub issue tracker](https://github.com/realm/realm-cocoa/issues). Please check out our [Contribution Guidelines](CONTRIBUTING.md) for information on how to properly file an issue.
 
 We greatly appreciate demonstration projects that we can run for ourselves in order to see issues or potential bugs; we prioritize clearly-written tickets that include reproduction cases. You may attach these to the ticket or send these to help@realm.io; all emails and code sent to that address will be kept confidential.
