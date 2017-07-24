@@ -329,3 +329,17 @@
 + (BOOL)shouldIncludeInDefaultSchema { return NO; }
 + (NSString *)_realmObjectName { return nil; }
 @end
+
+#pragma mark ComputedPropertyNotExplicitlyIgnoredObject
+
+@implementation ComputedPropertyNotExplicitlyIgnoredObject
+
+- (NSURL *)URL {
+    return [NSURL URLWithString:self._URLBacking];
+}
+
+- (void)setURL:(NSURL *)URL {
+    self._URLBacking = URL.absoluteString;
+}
+
+@end

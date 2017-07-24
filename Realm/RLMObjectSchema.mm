@@ -216,7 +216,7 @@ using namespace realm;
 
         if (prop) {
             [propArray addObject:prop];
-         }
+        }
     }
 
     auto existingPropertyIndex = [=](NSString *name) -> NSUInteger {

@@ -626,8 +626,11 @@ RLM_ARRAY_TYPE(NotARealClass)
 
 - (void)testClassWithDuplicateProperties
 {
-    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithSingleDuplicateProperty.class], @"'string' .* multiple times .* 'SchemaTestClassWithSingleDuplicateProperty'");
-    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithMultipleDuplicateProperties.class], @"'SchemaTestClassWithMultipleDuplicateProperties' .* declared multiple times");
+    // If a property is overriden in a child class it should not be picked up more than once.
+    RLMObjectSchema *firstSchema = [RLMObjectSchema schemaForObjectClass:SchemaTestClassWithSingleDuplicateProperty.class];
+    XCTAssertEqual((int)firstSchema.properties.count, 1);
+    RLMObjectSchema *secondSchema = [RLMObjectSchema schemaForObjectClass:SchemaTestClassWithMultipleDuplicateProperties.class];
+    XCTAssertEqual((int)secondSchema.properties.count, 2);
 }
 
 - (void)testClassWithInvalidPrimaryKey {

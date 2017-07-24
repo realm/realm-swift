@@ -27,6 +27,8 @@
   correctly nil out nullable properties when updating an existing
   object when the `value` argument specifies nil or `NSNull` for
   the property value.
+* Computed properties on Realm object types are detected and no
+  longer added to the automatically generated schema.
 
 ### Enhancements
 

@@ -581,6 +581,7 @@ static void testDatesInRange(NSTimeInterval from, NSTimeInterval to, void (^chec
 static void addProperty(Class cls, const char *name, const char *type, size_t size, size_t align, id getter) {
     objc_property_attribute_t objectColAttrs[] = {
         {"T", type},
+        {"V", name},
     };
     class_addIvar(cls, name, size, align, type);
     class_addProperty(cls, name, objectColAttrs, sizeof(objectColAttrs) / sizeof(objc_property_attribute_t));
