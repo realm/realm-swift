@@ -19,7 +19,6 @@
 import XCTest
 import Realm
 
-@objcMembers // workaround for rdar://33514802
 class SwiftLinkTests: RLMTestCase {
 
     // Swift models

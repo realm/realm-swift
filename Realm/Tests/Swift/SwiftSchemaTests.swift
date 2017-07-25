@@ -99,7 +99,6 @@ class InitAppendsToArrayProperty : RLMObject {
     static var mayAppend = false
 }
 
-@objcMembers // workaround for rdar://33514802
 class SwiftSchemaTests: RLMMultiProcessTestCase {
     func testWorksAtAll() {
         if isParent {

@@ -20,6 +20,7 @@
 
 @class NSTask;
 
+__attribute__((swift_objc_members)) // workaround for rdar://33514802
 @interface RLMMultiProcessTestCase : RLMTestCase
 // if true, this is running the main test process
 @property (nonatomic, readonly) bool isParent;

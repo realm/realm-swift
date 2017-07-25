@@ -20,7 +20,6 @@ import XCTest
 import Realm
 import Foundation
 
-@objcMembers // workaround for rdar://33514802
 class SwiftArrayTests: RLMTestCase {
 
     // Swift models
