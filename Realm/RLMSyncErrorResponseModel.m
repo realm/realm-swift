@@ -44,5 +44,5 @@ static const NSString *const kRLMSyncErrorHintKey       = @"hint";
     }
     return nil;
 }
-    
+
 @end

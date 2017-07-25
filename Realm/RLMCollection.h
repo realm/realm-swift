@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMThreadSafeReference.h"
+#import <Realm/RLMThreadSafeReference.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -313,7 +313,7 @@ NS_ASSUME_NONNULL_BEGIN
  `sortedResultsUsingDescriptors:`. It is similar to `NSSortDescriptor`, but supports
  only the subset of functionality which can be efficiently run by Realm's query
  engine.
- 
+
  `RLMSortDescriptor` instances are immutable.
  */
 @interface RLMSortDescriptor : NSObject
@@ -388,11 +388,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The indices in the new version of the collection which were modified.
- 
+
  For `RLMResults`, this means that one or more of the properties of the object at
  that index were modified (or an object linked to by that object was
  modified).
- 
+
  For `RLMArray`, the array itself being modified to contain a
  different object at that index will also be reported as a modification.
  */

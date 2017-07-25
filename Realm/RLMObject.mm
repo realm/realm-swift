@@ -264,6 +264,39 @@
 
 @end
 
+static bool treatFakeObjectAsRLMObject = false;
+void RLMSetTreatFakeObjectAsRLMObject(BOOL flag) {
+    treatFakeObjectAsRLMObject = flag;
+}
+
+BOOL RLMIsObjectOrSubclass(Class klass) {
+    if (RLMIsKindOfClass(klass, RLMObjectBase.class)) {
+        return YES;
+    }
+
+    if (treatFakeObjectAsRLMObject) {
+        static Class FakeObjectClass = NSClassFromString(@"FakeObject");
+        return RLMIsKindOfClass(klass, FakeObjectClass);
+    }
+    return NO;
+}
+
+BOOL RLMIsObjectSubclass(Class klass) {
+    auto isSubclass = [](Class class1, Class class2) {
+        class1 = class_getSuperclass(class1);
+        return RLMIsKindOfClass(class1, class2);
+    };
+    if (isSubclass(class_getSuperclass(klass), RLMObjectBase.class)) {
+        return YES;
+    }
+
+    if (treatFakeObjectAsRLMObject) {
+        static Class FakeObjectClass = NSClassFromString(@"FakeObject");
+        return isSubclass(klass, FakeObjectClass);
+    }
+    return NO;
+}
+
 @interface RLMObjectNotificationToken : RLMCancellationToken
 @end
 @implementation RLMObjectNotificationToken {

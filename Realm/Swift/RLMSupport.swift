@@ -22,9 +22,7 @@ extension RLMRealm {
     @nonobjc public class func schemaVersion(at url: URL, usingEncryptionKey key: Data? = nil) throws -> UInt64 {
         var error: NSError?
         let version = __schemaVersion(at: url, encryptionKey: key, error: &error)
-        guard version != RLMNotVersioned else {
-            throw error!
-        }
+        guard version != RLMNotVersioned else { throw error! }
         return version
     }
 
@@ -52,15 +50,15 @@ extension RLMObject {
     }
 }
 
-public final class RLMIterator: IteratorProtocol {
+public struct RLMIterator<T>: IteratorProtocol {
     private var iteratorBase: NSFastEnumerationIterator
 
     internal init(collection: RLMCollection) {
         iteratorBase = NSFastEnumerationIterator(collection)
     }
 
-    public func next() -> RLMObject? {
-        return iteratorBase.next() as! RLMObject?
+    public func next() -> T? {
+        return iteratorBase.next() as! T?
     }
 }
 
@@ -71,7 +69,7 @@ extension RLMResults: Sequence {}
 
 extension RLMCollection {
     // Support Sequence-style enumeration
-    public func makeIterator() -> RLMIterator {
+    public func makeIterator() -> RLMIterator<RLMObject> {
         return RLMIterator(collection: self)
     }
 }

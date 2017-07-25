@@ -16,37 +16,37 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 #import <Realm/RLMConstants.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 /// :nodoc:
-@protocol RLMInt
-@end
-
+@protocol RLMInt @end
 /// :nodoc:
-@protocol RLMBool
-@end
-
+@protocol RLMBool @end
 /// :nodoc:
-@protocol RLMDouble
-@end
-
+@protocol RLMDouble @end
 /// :nodoc:
-@protocol RLMFloat
-@end
+@protocol RLMFloat @end
+/// :nodoc:
+@protocol RLMString @end
+/// :nodoc:
+@protocol RLMDate @end
+/// :nodoc:
+@protocol RLMData @end
 
 /// :nodoc:
 @interface NSNumber ()<RLMInt, RLMBool, RLMDouble, RLMFloat>
 @end
 
 /**
- `RLMProperty` instances represent properties managed by a Realm in the context of an object schema. Such properties may
- be persisted to a Realm file or computed from other data from the Realm.
- 
- When using Realm, `RLMProperty` instances allow performing migrations and introspecting the database's schema.
- 
+ `RLMProperty` instances represent properties managed by a Realm in the context
+ of an object schema. Such properties may be persisted to a Realm file or
+ computed from other data from the Realm.
+
+ When using Realm, `RLMProperty` instances allow performing migrations and
+ introspecting the database's schema.
+
  These property instances map to columns in the core database.
  */
 @interface RLMProperty : NSObject
@@ -60,14 +60,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The type of the property.
- 
+
  @see `RLMPropertyType`
  */
 @property (nonatomic, readonly) RLMPropertyType type;
 
 /**
  Indicates whether this property is indexed.
- 
+
  @see `RLMObject`
  */
 @property (nonatomic, readonly) BOOL indexed;

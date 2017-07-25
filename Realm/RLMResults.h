@@ -38,8 +38,8 @@ NS_ASSUME_NONNULL_BEGIN
  enumeration.
 
  `RLMResults` are lazily evaluated the first time they are accessed; they only
- run queries when the result of the query is requested. This means that 
- chaining several temporary `RLMResults` to sort and filter your data does not 
+ run queries when the result of the query is requested. This means that
+ chaining several temporary `RLMResults` to sort and filter your data does not
  perform any extra work processing the intermediate state.
 
  Once the results have been evaluated or a notification block has been added,
@@ -201,7 +201,7 @@ NS_ASSUME_NONNULL_BEGIN
  which rows in the results collection were added, removed or modified. If a
  write transaction did not modify any objects in the results collection,
  the block is not called at all. See the `RLMCollectionChange` documentation for
- information on how the changes are reported and an example of updating a 
+ information on how the changes are reported and an example of updating a
  `UITableView`.
 
  If an error occurs the block will be called with `nil` for the results
@@ -275,7 +275,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning You cannot use this method on `RLMObject`, `RLMArray`, and `NSData` properties.
 
- @param property The property whose maximum value is desired. Only properties of types `int`, `float`, `double`, and 
+ @param property The property whose maximum value is desired. Only properties of types `int`, `float`, `double`, and
                  `NSDate` are supported.
 
  @return The maximum value of the property, or `nil` if the Results are empty.
@@ -332,7 +332,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  `RLMLinkingObjects` is an auto-updating container type. It represents a collection of objects that link to its
  parent object.
- 
+
  For more information, please see the "Inverse Relationships" section in the
  [documentation](https://realm.io/docs/objc/latest/#relationships).
  */

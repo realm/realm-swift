@@ -70,12 +70,6 @@ static inline BOOL RLMIsKindOfClass(Class class1, Class class2) {
     return NO;
 }
 
-// Returns whether the class is a descendent of RLMObjectBase
-BOOL RLMIsObjectOrSubclass(Class klass);
-
-// Returns whether the class is an indirect descendant of RLMObjectBase
-BOOL RLMIsObjectSubclass(Class klass);
-
 template<typename T>
 static inline T *RLMDynamicCast(__unsafe_unretained id obj) {
     if ([obj isKindOfClass:[T class]]) {
@@ -167,10 +161,6 @@ static inline NSUInteger RLMConvertNotFound(size_t index) {
 }
 
 id RLMMixedToObjc(realm::Mixed const& value);
-
-// For unit testing purposes, allow an Objective-C class named FakeObject to also be used
-// as the base class of managed objects. This allows for testing invalid schemas.
-void RLMSetTreatFakeObjectAsRLMObject(BOOL flag);
 
 // Given a bundle identifier, return the base directory on the disk within which Realm database and support files should
 // be stored.

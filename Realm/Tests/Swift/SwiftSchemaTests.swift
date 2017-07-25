@@ -81,14 +81,18 @@ class SwiftRecursingSchemaTestObject : RLMObject {
     static var mayAccessSchema = false
 }
 
+class InvalidArrayType: FakeObject {
+    @objc dynamic var array = RLMArray<SwiftIntObject>(objectClassName: "invalid class")
+}
+
 class InitAppendsToArrayProperty : RLMObject {
-    @objc dynamic var propertyWithIllegalDefaultValue: RLMArray = {
+    @objc dynamic var propertyWithIllegalDefaultValue: RLMArray<SwiftIntObject> = {
         if mayAppend {
-            let array = RLMArray(objectClassName: SwiftIntObject.className())
+            let array = RLMArray<SwiftIntObject>(objectClassName: SwiftIntObject.className())
             array.add(SwiftIntObject())
             return array
         } else {
-            return RLMArray(objectClassName: SwiftIntObject.className())
+            return RLMArray<SwiftIntObject>(objectClassName: SwiftIntObject.className())
         }
     }()
 
@@ -198,4 +202,10 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         assertThrowsWithReasonMatching(RLMSchema.shared(), ".*unless the schema is initialized.*")
     }
 
+    func testInvalidObjectTypeForRLMArray() {
+        RLMSetTreatFakeObjectAsRLMObject(true)
+        assertThrowsWithReasonMatching(RLMObjectSchema(forObjectClass: InvalidArrayType.self),
+                                       "RLMArray\\<invalid class\\>")
+        RLMSetTreatFakeObjectAsRLMObject(false)
+    }
 }

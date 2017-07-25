@@ -28,19 +28,19 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     RLMResults *emptyPeople = [EmployeeObject allObjects];
-    
+
     // Enum for zero rows added
     for (EmployeeObject *row in emptyPeople) {
         XCTFail(@"No objects should have been added %@", row);
     }
-    
+
     NSArray *rowsArray = @[@{@"name": @"John", @"age": @20, @"hired": @YES},
                            @{@"name": @"Mary", @"age": @21, @"hired": @NO},
                            @{@"name": @"Lars", @"age": @21, @"hired": @YES},
                            @{@"name": @"Phil", @"age": @43, @"hired": @NO},
                            @{@"name": @"Anni", @"age": @54, @"hired": @YES}];
-    
-    
+
+
     // Add objects
     [realm beginWriteTransaction];
     for (NSArray *rowArray in rowsArray) {
@@ -50,7 +50,7 @@
 
     // Get all objects
     RLMResults *people = [EmployeeObject allObjects];
-    
+
     // Iterate using for...in
     NSUInteger index = 0;
     for (EmployeeObject *row in people) {
@@ -62,10 +62,10 @@
 
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"hired = YES && age BETWEEN {20, 30}"];
     NSArray *filteredArray = [rowsArray filteredArrayUsingPredicate:pred];
-    
+
     // Do a query, and get all matches as RLMResults
     RLMResults *res = [EmployeeObject objectsWithPredicate:pred];
-    
+
     // Iterate over the resulting RLMResults
     index = 0;
     for (EmployeeObject *row in res) {

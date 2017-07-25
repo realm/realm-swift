@@ -124,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Multiple blocks can be registered with the same session at once. Each block
  will be invoked on a side queue devoted to progress notifications.
- 
+
  If the session has already received progress information from the
  synchronization subsystem, the block will be called immediately. Otherwise, it
  will be called as soon as progress information becomes available.

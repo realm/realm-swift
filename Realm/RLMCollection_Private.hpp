@@ -18,6 +18,8 @@
 
 #import <Realm/RLMCollection_Private.h>
 
+#import <vector>
+
 namespace realm {
     class List;
     class Results;
@@ -26,6 +28,7 @@ namespace realm {
     struct NotificationToken;
 }
 class RLMClassInfo;
+@class RLMFastEnumerator;
 
 @protocol RLMFastEnumerable
 @property (nonatomic, readonly) RLMRealm *realm;
@@ -34,14 +37,21 @@ class RLMClassInfo;
 
 - (NSUInteger)indexInSource:(NSUInteger)index;
 - (realm::TableView)tableView;
+- (RLMFastEnumerator *)fastEnumerator;
 @end
 
 // An object which encapulates the shared logic for fast-enumerating RLMArray
 // and RLMResults, and has a buffer to store strong references to the current
 // set of enumerated items
 @interface RLMFastEnumerator : NSObject
-- (instancetype)initWithCollection:(id<RLMFastEnumerable>)collection
-                      objectSchema:(RLMClassInfo&)objectSchema;
+- (instancetype)initWithList:(realm::List&)list
+                  collection:(id)collection
+                       realm:(RLMRealm *)realm
+                   classInfo:(RLMClassInfo&)info;
+- (instancetype)initWithResults:(realm::Results&)results
+                     collection:(id)collection
+                          realm:(RLMRealm *)realm
+                      classInfo:(RLMClassInfo&)info;
 
 // Detach this enumerator from the source collection. Must be called before the
 // source collection is changed.
@@ -50,6 +60,7 @@ class RLMClassInfo;
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
                                     count:(NSUInteger)len;
 @end
+NSUInteger RLMFastEnumerate(NSFastEnumerationState *state, NSUInteger len, id<RLMFastEnumerable> collection);
 
 @interface RLMNotificationToken ()
 - (void)suppressNextNotification;
@@ -70,3 +81,4 @@ RLMNotificationToken *RLMAddNotificationBlock(id objcCollection,
                                               void (^block)(id, RLMCollectionChange *, NSError *),
                                               bool suppressInitialChange=false);
 
+std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArray<RLMSortDescriptor *> *properties);
