@@ -176,7 +176,11 @@ class TestCase: XCTestCase {
     }
 
     private func realmFilePrefix() -> String {
+#if swift(>=3.2)
+        return name.trimmingCharacters(in: CharacterSet(charactersIn: "-[]"))
+#else
         return name!.trimmingCharacters(in: CharacterSet(charactersIn: "-[]"))
+#endif
     }
 
     internal func testRealmURL() -> URL {
