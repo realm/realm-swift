@@ -21,6 +21,7 @@ import Foundation
 import Realm.Private
 import Realm.Dynamic
 
+@objcMembers // workaround for rdar://33514802
 class SwiftDynamicTests: RLMTestCase {
 
     // Swift models

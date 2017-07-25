@@ -27,7 +27,7 @@ class OuterClass {
 }
 
 class SwiftStringObjectSubclass : SwiftStringObject {
-    var stringCol2 = ""
+    @objc dynamic var stringCol2 = ""
 }
 
 class SwiftSelfRefrencingSubclass: SwiftStringObject {
@@ -51,6 +51,7 @@ class SwiftOptionalNumberObject: RLMObject {
     @objc dynamic var boolCol: NSNumber? = true
 }
 
+@objcMembers // workaround for rdar://33514802
 class SwiftObjectInterfaceTests: RLMTestCase {
 
     // Swift models
