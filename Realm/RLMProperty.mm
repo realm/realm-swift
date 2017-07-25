@@ -376,8 +376,10 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
         RLMArray *value = propertyValue;
         _type = RLMPropertyTypeArray;
         _objectClassName = value.objectClassName;
-        if (_objectClassName) {
-            // FIXME: validate
+        if (![RLMSchema classForString:_objectClassName]) {
+            @throw RLMException(@"Property '%@' is of type 'RLMArray<%@>' which is not a supported RLMArray object type. "
+                                @"RLMArrays can only contain instances of RLMObject subclasses. "
+                                @"See https://realm.io/docs/objc/latest/#to-many for more information.", _name, _objectClassName);
         }
     }
     else if ([rawType isEqualToString:@"@\"NSNumber\""]) {
