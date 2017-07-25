@@ -278,7 +278,7 @@ using namespace realm;
             }
 
             // Check to see if this optional property is an underlying storage property for a Swift lazy var.
-            // Managed lazy vars are't allowed.
+            // Managed lazy vars aren't allowed.
             // NOTE: Revisit this once property behaviors are implemented in Swift.
             if (NSString *lazyPropertyBaseName = [self baseNameForLazySwiftProperty:propertyName]) {
                 if ([ignoredProperties containsObject:lazyPropertyBaseName]) {
