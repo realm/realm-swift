@@ -468,6 +468,69 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     CHECK_COUNT(9, SyncObject, userCRealm);
 }
 
+/// It should be possible to grant read-only access to a global Realm.
+- (void)testWildcardGlobalRealmReadAccess {
+    RLMSyncUser *admin = [self makeAdminUser:[[NSUUID UUID] UUIDString]
+                                    password:@"password"
+                                      server:[RLMSyncTestCase authServerURL]];
+
+    // Open a Realm for the admin user.
+    NSString *testName = NSStringFromSelector(_cmd);
+    NSURL *globalRealmURL = makeTestGlobalURL(testName);
+    RLMRealm *adminUserRealm = [self openRealmForURL:globalRealmURL user:admin];
+
+    // Give all users read permissions to that Realm.
+    RLMSyncPermissionValue *p = [[RLMSyncPermissionValue alloc] initWithRealmPath:[globalRealmURL path]
+                                                                           userID:@"*"
+                                                                      accessLevel:RLMSyncAccessLevelRead];
+
+    // Set the permission.
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting wildcard permission should work."];
+    [admin applyPermission:p callback:^(NSError *error) {
+        XCTAssertNil(error);
+        [ex2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Have the admin user write a few objects first.
+    [self addSyncObjectsToRealm:adminUserRealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+    [self waitForUploadsForUser:admin url:globalRealmURL];
+    CHECK_COUNT(3, SyncObject, adminUserRealm);
+
+
+    // User B should be able to read from the Realm.
+    __block RLMRealm *userBRealm = nil;
+    RLMRealmConfiguration *userBConfig = [RLMRealmConfiguration defaultConfiguration];
+    userBConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:self.userB realmURL:globalRealmURL];
+    XCTestExpectation *asyncOpenEx = [self expectationWithDescription:@"Should asynchronously open a Realm"];
+    [RLMRealm asyncOpenWithConfiguration:userBConfig
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *err){
+                                    XCTAssertNil(err);
+                                    XCTAssertNotNil(realm);
+                                    userBRealm = realm;
+                                    [asyncOpenEx fulfill];
+                                }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    CHECK_COUNT(3, SyncObject, userBRealm);
+
+    // User C should be able to read from the Realm.
+    __block RLMRealm *userCRealm = nil;
+    RLMRealmConfiguration *userCConfig = [RLMRealmConfiguration defaultConfiguration];
+    userCConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:self.userC realmURL:globalRealmURL];
+    XCTestExpectation *asyncOpenEx2 = [self expectationWithDescription:@"Should asynchronously open a Realm"];
+    [RLMRealm asyncOpenWithConfiguration:userCConfig
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *err){
+                                    XCTAssertNil(err);
+                                    XCTAssertNotNil(realm);
+                                    userCRealm = realm;
+                                    [asyncOpenEx2 fulfill];
+                                }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    CHECK_COUNT(3, SyncObject, userCRealm);
+}
+
 /// Setting a permission for all users on a global Realm (no `~`) should work.
 - (void)testWildcardGlobalRealmWriteAccess {
     RLMSyncUser *admin = [self makeAdminUser:[[NSUUID UUID] UUIDString]
