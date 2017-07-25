@@ -22,3 +22,16 @@ extension RLMTestCase {
             RLMAssertThrowsWithReasonMatchingSwift(self, { _ = block() }, regexString, message, fileName, lineNumber)
     }
 }
+
+#if !swift(>=3.2)
+func XCTAssertEqual<F: FloatingPoint>(_ expression1: F, _ expression2: F, accuracy: F,
+                                      _ message: @autoclosure () -> String = "",
+                                      file: StaticString = #file, line: UInt = #line) {
+    XCTAssertEqualWithAccuracy(expression1, expression2, accuracy: accuracy, message, file: file, line: line)
+}
+func XCTAssertNotEqual<F: FloatingPoint>(_ expression1: F, _ expression2: F, accuracy: F,
+                                         _ message: @autoclosure () -> String = "",
+                                         file: StaticString = #file, line: UInt = #line) {
+    XCTAssertNotEqualWithAccuracy(expression1, expression2, accuracy, message, file: file, line: line)
+}
+#endif
