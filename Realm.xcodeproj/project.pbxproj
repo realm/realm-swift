@@ -176,6 +176,8 @@
 		3F2E66651CA0BA12004761D5 /* NotificationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F2E66611CA0B9D5004761D5 /* NotificationTests.m */; };
 		3F336E8A1DA2FA14006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A36236A1D83868F00945A54 /* RLMSyncConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		3F336E8B1DA2FA15006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A36236A1D83868F00945A54 /* RLMSyncConfiguration_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		3F4657371F27F2EF00456B07 /* RLMTestCaseUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 297FBEFA1C19F696009D1118 /* RLMTestCaseUtils.swift */; };
+		3F4657381F27F35600456B07 /* TestUtils.mm in Sources */ = {isa = PBXBuildFile; fileRef = 297FBEFE1C19F844009D1118 /* TestUtils.mm */; };
 		3F5B5D301E84230B00953B33 /* binding_callback_thread_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F5B5D2E1E84230B00953B33 /* binding_callback_thread_observer.cpp */; };
 		3F5B5D321E84230E00953B33 /* binding_callback_thread_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F5B5D2E1E84230B00953B33 /* binding_callback_thread_observer.cpp */; };
 		3F643BED1CEA655800F6D0C8 /* mixed-column.realm in Resources */ = {isa = PBXBuildFile; fileRef = 3F643BEB1CEA654D00F6D0C8 /* mixed-column.realm */; };
@@ -1635,12 +1637,12 @@
 				5D659EB21BE04556006515A0 /* RLMObject_Private.h in Headers */,
 				5D659EB31BE04556006515A0 /* RLMObjectBase.h in Headers */,
 				5D659EB41BE04556006515A0 /* RLMObjectBase_Dynamic.h in Headers */,
+				E8F992BE1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */,
 				5D659EB51BE04556006515A0 /* RLMObjectSchema.h in Headers */,
 				5D659EB61BE04556006515A0 /* RLMObjectSchema_Private.h in Headers */,
 				5D659EB81BE04556006515A0 /* RLMObjectStore.h in Headers */,
 				5D659EBA1BE04556006515A0 /* RLMOptionalBase.h in Headers */,
 				5D659EBC1BE04556006515A0 /* RLMProperty.h in Headers */,
-				E8F992BE1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */,
 				5D659EBD1BE04556006515A0 /* RLMProperty_Private.h in Headers */,
 				5D659EBF1BE04556006515A0 /* RLMRealm.h in Headers */,
 				5D659EC01BE04556006515A0 /* RLMRealm_Dynamic.h in Headers */,
@@ -1703,6 +1705,7 @@
 				5DD755B01BE056DE002800DA /* RLMObject_Private.h in Headers */,
 				5DD755B11BE056DE002800DA /* RLMObjectBase.h in Headers */,
 				5DD755B21BE056DE002800DA /* RLMObjectBase_Dynamic.h in Headers */,
+				E8F992BF1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */,
 				5DD755B31BE056DE002800DA /* RLMObjectSchema.h in Headers */,
 				5DD755B41BE056DE002800DA /* RLMObjectSchema_Private.h in Headers */,
 				5DD755B61BE056DE002800DA /* RLMObjectStore.h in Headers */,
@@ -1713,7 +1716,6 @@
 				5DD755BE1BE056DE002800DA /* RLMRealm_Dynamic.h in Headers */,
 				5DD755BF1BE056DE002800DA /* RLMRealm_Private.h in Headers */,
 				1AFEF8421D52CD8F00495005 /* RLMRealmConfiguration+Sync.h in Headers */,
-				E8F992BF1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */,
 				5DD755C01BE056DE002800DA /* RLMRealmConfiguration.h in Headers */,
 				5DD755C11BE056DE002800DA /* RLMRealmConfiguration_Private.h in Headers */,
 				5DD755C31BE056DE002800DA /* RLMResults.h in Headers */,
@@ -2512,6 +2514,7 @@
 				3FC767071BB9FE7500FE0AFC /* RLMMultiProcessTestCase.m in Sources */,
 				3FDE338D19C39A87003B7DBA /* RLMSupport.swift in Sources */,
 				E856D21F195615B100FB2FCF /* RLMTestCase.m in Sources */,
+				3F4657371F27F2EF00456B07 /* RLMTestCaseUtils.swift in Sources */,
 				028481CB19CCFC9C0097A416 /* RLMTestObjects.m in Sources */,
 				0207AB8A195DFA15007EFB12 /* SchemaTests.mm in Sources */,
 				3F8DCA7619930FCB0008BD7F /* SwiftArrayPropertyTests.swift in Sources */,
@@ -2523,6 +2526,7 @@
 				3F8DCA7D19930FCB0008BD7F /* SwiftRealmTests.swift in Sources */,
 				3F8DCA7519930FCB0008BD7F /* SwiftTestObjects.swift in Sources */,
 				3F8DCA7E19930FCB0008BD7F /* SwiftUnicodeTests.swift in Sources */,
+				3F4657381F27F35600456B07 /* TestUtils.mm in Sources */,
 				E856D213195615A900FB2FCF /* TransactionTests.m in Sources */,
 				E8917599197A1B350068ACC6 /* UnicodeTests.m in Sources */,
 				C0CDC0831B38DABB00C5716D /* UtilTests.mm in Sources */,
