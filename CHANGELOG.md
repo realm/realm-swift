@@ -11,7 +11,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* The `shouldCompactOnLaunch` block is no longer invoked if the Realm at that
+  path is already open on other threads.
 
 2.9.0 Release notes (2017-07-26)
 =============================================================
