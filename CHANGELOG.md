@@ -1,9 +1,8 @@
-3.0.0-beta Release notes (2017-07-14)
+x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
 ### Breaking Changes
 
-* Synchronized Realms require a server running Realm Object Server v2.0 or higher.
 * Remove the following deprecated Objective-C APIs:
   `-[RLMArray sortedResultsUsingProperty:ascending:]`,
   `-[RLMCollection sortedResultsUsingProperty:ascending:]`,
@@ -28,6 +27,21 @@
   correctly nil out nullable properties when updating an existing
   object when the `value` argument specifies nil or `NSNull` for
   the property value.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* None.
+
+3.0.0-beta Release notes (2017-07-14)
+=============================================================
+
+### Breaking Changes
+
+* Synchronized Realms require a server running Realm Object Server v2.0 or higher.
 
 ### Enhancements
 
