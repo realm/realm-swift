@@ -81,7 +81,9 @@ NSString *const kRLMSyncErrorStatusCodeKey      = @"statusCode";
 NSString *const kRLMSyncIdentityKey             = @"identity";
 NSString *const kRLMSyncPasswordKey             = @"password";
 NSString *const kRLMSyncPathKey                 = @"path";
+NSString *const kRLMSyncTokenKey                = @"token";
 NSString *const kRLMSyncProviderKey             = @"provider";
+NSString *const kRLMSyncProviderIDKey           = @"provider_id";
 NSString *const kRLMSyncRegisterKey             = @"register";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
 
