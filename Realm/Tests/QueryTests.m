@@ -525,17 +525,18 @@
 - (void)verifySort:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending expected:(id)val {
     RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:column ascending:ascending];
     AllTypesObject *obj = results[0];
-    XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
+    XCTAssertEqualObjects(obj[column], val);
 
     RLMArray *ar = (RLMArray *)[[[ArrayOfAllTypesObject allObjectsInRealm:realm] firstObject] array];
     results = [ar sortedResultsUsingKeyPath:column ascending:ascending];
     obj = results[0];
-    XCTAssertEqualObjects(obj[column], val, @"Array not sorted as expected - %@ != %@", obj[column], val);
+    XCTAssertEqualObjects(obj[column], val);
 }
 
 - (void)verifySortWithAccuracy:(RLMRealm *)realm column:(NSString *)column ascending:(BOOL)ascending getter:(double(^)(id))getter expected:(double)val accuracy:(double)accuracy {
     // test TableView query
-    RLMResults *results = [[AllTypesObject allObjectsInRealm:realm] sortedResultsUsingKeyPath:column ascending:ascending];
+    RLMResults<AllTypesObject *> *results = [[AllTypesObject allObjectsInRealm:realm]
+                                             sortedResultsUsingKeyPath:column ascending:ascending];
     XCTAssertEqualWithAccuracy(getter(results[0][column]), val, accuracy, @"Array not sorted as expected");
 
     // test LinkView query
@@ -594,8 +595,10 @@
     [self verifySort:realm column:@"stringCol" ascending:NO expected:@"cc"];
 
     // sort invalid name
-    RLMAssertThrowsWithReasonMatching([[AllTypesObject allObjects] sortedResultsUsingKeyPath:@"invalidCol" ascending:YES], @"'invalidCol'.* not found .*'AllTypesObject'");
-    XCTAssertThrows([arrayOfAll.array sortedResultsUsingKeyPath:@"invalidCol" ascending:NO]);
+    RLMAssertThrowsWithReason([[AllTypesObject allObjects] sortedResultsUsingKeyPath:@"invalidCol" ascending:YES],
+                              @"Cannot sort on key path 'invalidCol': property 'AllTypesObject.invalidCol' does not exist.");
+    RLMAssertThrowsWithReason([arrayOfAll.array sortedResultsUsingKeyPath:@"invalidCol" ascending:NO],
+                              @"Cannot sort on key path 'invalidCol': property 'AllTypesObject.invalidCol' does not exist.");
 }
 
 - (void)testSortByNoColumns {
@@ -685,16 +688,16 @@
 
 - (void)testSortByUnspportedKeyPath {
     // Array property
-    RLMAssertThrowsWithReasonMatching([DogArrayObject.allObjects sortedResultsUsingKeyPath:@"dogs.age" ascending:YES],
-                                      @"to-many relationship is not supported");
+    RLMAssertThrowsWithReason([DogArrayObject.allObjects sortedResultsUsingKeyPath:@"dogs.age" ascending:YES],
+                              @"Cannot sort on key path 'dogs.age': property 'DogArrayObject.dogs' is of unsupported type 'array'.");
 
     // Backlinks property
-    RLMAssertThrowsWithReasonMatching([DogObject.allObjects sortedResultsUsingKeyPath:@"owners.name" ascending:YES],
-                                      @"to-many relationship is not supported");
+    RLMAssertThrowsWithReason([DogObject.allObjects sortedResultsUsingKeyPath:@"owners.name" ascending:YES],
+                              @"Cannot sort on key path 'owners.name': property 'DogObject.owners' is of unsupported type 'linking objects'.");
 
     // Collection operator
-    RLMAssertThrowsWithReasonMatching([DogArrayObject.allObjects sortedResultsUsingKeyPath:@"dogs.@count" ascending:YES],
-                                      @"collection operators is not supported");
+    RLMAssertThrowsWithReason([DogArrayObject.allObjects sortedResultsUsingKeyPath:@"dogs.@count" ascending:YES],
+                              @"Cannot sort on key path 'dogs.@count': KVC collection operators are not supported.");
 }
 
 - (void)testSortedLinkViewWithDeletion {
@@ -1777,7 +1780,7 @@
     [EmployeeObject createInRealm:realm withValue:@{@"name": @"Joe",  @"age": @40, @"hired": @YES}];
     [realm commitWriteTransaction];
 
-    RLMResults *subarray = nil;
+    RLMResults<EmployeeObject *> *subarray = nil;
     @autoreleasepool {
         __attribute((objc_precise_lifetime)) CompanyObject *co = [CompanyObject allObjects][0];
         subarray = [co.employees objectsWhere:@"age = 40"];

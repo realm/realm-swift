@@ -81,6 +81,16 @@ typedef void (^RLMObjectNotificationCallback)(NSArray<NSString *> *_Nullable pro
                                               NSError *_Nullable error);
 FOUNDATION_EXTERN RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjectNotificationCallback block);
 
+// Returns whether the class is a descendent of RLMObjectBase
+FOUNDATION_EXTERN BOOL RLMIsObjectOrSubclass(Class klass);
+
+// Returns whether the class is an indirect descendant of RLMObjectBase
+FOUNDATION_EXTERN BOOL RLMIsObjectSubclass(Class klass);
+
+// For unit testing purposes, allow an Objective-C class named FakeObject to also be used
+// as the base class of managed objects. This allows for testing invalid schemas.
+FOUNDATION_EXTERN void RLMSetTreatFakeObjectAsRLMObject(BOOL flag);
+
 // Get ObjectUil class for objc or swift
 FOUNDATION_EXTERN Class RLMObjectUtilClass(BOOL isSwift);
 
@@ -94,7 +104,7 @@ FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 + (nullable NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)linkingObjectsPropertiesForClass:(Class)cls;
 
 + (nullable NSArray<NSString *> *)getGenericListPropertyNames:(id)obj;
-+ (nullable NSDictionary<NSString *, NSString *> *)getLinkingObjectsProperties:(id)object;
++ (nullable NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)getLinkingObjectsProperties:(id)object;
 
 + (nullable NSDictionary<NSString *, NSNumber *> *)getOptionalProperties:(id)obj;
 + (nullable NSArray<NSString *> *)requiredPropertiesForClass:(Class)cls;

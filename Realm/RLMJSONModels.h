@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2017 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMTokenDataModel;
 
+#pragma mark - RLMTokenModel
+
 @interface RLMTokenModel : NSObject RLM_SYNC_UNINITIALIZABLE
 
 @property (nonatomic, readonly) NSString *token;
@@ -34,6 +36,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+#pragma mark - RLMTokenDataModel
+
 @interface RLMTokenDataModel : NSObject RLM_SYNC_UNINITIALIZABLE
 
 @property (nonatomic, readonly) NSString *identity;
@@ -42,6 +46,42 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSTimeInterval expires;
 @property (nonatomic, readonly) BOOL isAdmin;
 //@property (nonatomic, readonly) NSArray *access;
+
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;
+
+@end
+
+#pragma mark - RLMAuthResponseModel
+
+/**
+ An internal class representing a valid JSON response to an auth request.
+
+ ```
+ {
+ "access_token": { ... } // (optional),
+ "refresh_token": { ... } // (optional)
+ }
+ ```
+ */
+@interface RLMAuthResponseModel : NSObject RLM_SYNC_UNINITIALIZABLE
+
+@property (nonatomic, readonly, nullable) RLMTokenModel *accessToken;
+@property (nonatomic, readonly, nullable) RLMTokenModel *refreshToken;
+
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary
+                requireAccessToken:(BOOL)requireAccessToken
+               requireRefreshToken:(BOOL)requireRefreshToken;
+
+@end
+
+#pragma mark - RLMUserInfoResponseModel
+
+@interface RLMUserResponseModel : NSObject RLM_SYNC_UNINITIALIZABLE
+
+@property (nonatomic, readonly) NSString *provider;
+@property (nonatomic, readonly) NSString *username;
+@property (nonatomic, readonly) NSString *identity;
+@property (nonatomic, readonly) BOOL isAdmin;
 
 - (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;
 

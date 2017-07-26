@@ -152,19 +152,19 @@ class ObjectTests: TestCase {
 
         try! realm.write {
             realm.add(intObj)
-            assertThrows(intObj.intCol = 2, reason: primaryKeyReason)
-            assertThrows(intObj["intCol"] = 2, reason: primaryKeyReason)
-            assertThrows(intObj.setValue(2, forKey: "intCol"), reason: primaryKeyReason)
+            assertThrows(intObj.intCol = 2, reasonMatching: primaryKeyReason)
+            assertThrows(intObj["intCol"] = 2, reasonMatching: primaryKeyReason)
+            assertThrows(intObj.setValue(2, forKey: "intCol"), reasonMatching: primaryKeyReason)
 
             realm.add(optionalIntObj)
-            assertThrows(optionalIntObj.intCol.value = 2, reason: primaryKeyReason)
-            assertThrows(optionalIntObj["intCol"] = 2, reason: primaryKeyReason)
-            assertThrows(optionalIntObj.setValue(2, forKey: "intCol"), reason: primaryKeyReason)
+            assertThrows(optionalIntObj.intCol.value = 2, reasonMatching: primaryKeyReason)
+            assertThrows(optionalIntObj["intCol"] = 2, reasonMatching: primaryKeyReason)
+            assertThrows(optionalIntObj.setValue(2, forKey: "intCol"), reasonMatching: primaryKeyReason)
 
             realm.add(stringObj)
-            assertThrows(stringObj.stringCol = "c", reason: primaryKeyReason)
-            assertThrows(stringObj["stringCol"] = "c", reason: primaryKeyReason)
-            assertThrows(stringObj.setValue("c", forKey: "stringCol"), reason: primaryKeyReason)
+            assertThrows(stringObj.stringCol = "c", reasonMatching: primaryKeyReason)
+            assertThrows(stringObj["stringCol"] = "c", reasonMatching: primaryKeyReason)
+            assertThrows(stringObj.setValue("c", forKey: "stringCol"), reasonMatching: primaryKeyReason)
         }
     }
 

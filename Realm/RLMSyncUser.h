@@ -18,7 +18,9 @@
 
 #import <Foundation/Foundation.h>
 
-@class RLMSyncUser, RLMSyncCredentials, RLMSyncPermissionValue, RLMSyncPermissionResults, RLMSyncSession, RLMRealm;
+#import "RLMSyncCredentials.h"
+
+@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncPermissionValue, RLMSyncPermissionResults, RLMSyncSession, RLMRealm;
 
 /**
  The state of the user object.
@@ -46,6 +48,10 @@ typedef void(^RLMPermissionStatusBlock)(NSError * _Nullable);
 /// A block type used to asynchronously report results of a permissions get operation.
 /// Exactly one of the two arguments will be populated.
 typedef void(^RLMPermissionResultsBlock)(RLMSyncPermissionResults * _Nullable, NSError * _Nullable);
+
+/// A block type used to asynchronously report results of a user info retrieval.
+/// Exactly one of the two arguments will be populated.
+typedef void(^RLMRetrieveUserBlock)(RLMSyncUserInfo * _Nullable, NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -173,6 +179,23 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (void)changePassword:(NSString *)newPassword forUserID:(NSString *)userID completion:(RLMPasswordChangeStatusBlock)completion;
 
+#pragma mark - Administrator API
+
+/**
+ Given a Realm Object Server authentication provider and a provider identifier for a user
+ (for example, a username), look up and return user information for that user.
+
+ @param providerUserIdentity    The username or identity of the user as issued by the authentication provider.
+                                In most cases this is different from the Realm Object Server-issued identity.
+ @param provider                The authentication provider that manages the user whose information is desired.
+ @param completion              Completion block invoked when request has completed or failed.
+                                The callback will be invoked on a background queue provided
+                                by `NSURLSession`.
+ */
+- (void)retrieveInfoForUser:(NSString *)providerUserIdentity
+           identityProvider:(RLMIdentityProvider)provider
+                 completion:(RLMRetrieveUserBlock)completion;
+
 // This set of permissions APIs uses immutable `RLMSyncPermissionValue` objects to
 // retrieve and apply permissions. It is intended to replace the set of APIs which
 // directly access Realms and Realm model objects to work with permissions.
@@ -245,6 +268,41 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 /// :nodoc:
 + (instancetype)new __attribute__((unavailable("RLMSyncUser cannot be created directly")));
 
-NS_ASSUME_NONNULL_END
+@end
+
+/**
+ A data object representing information about a user that was retrieved from a user lookup call.
+ */
+@interface RLMSyncUserInfo : NSObject
+
+/**
+ The authentication provider which manages the user represented by this user info instance.
+ */
+@property (nonatomic, readonly) RLMIdentityProvider provider;
+
+/**
+ The username or identity issued to this user by the authentication provider.
+ */
+@property (nonatomic, readonly) NSString *providerUserIdentity;
+
+/**
+ The identity issued to this user by the Realm Object Server.
+ */
+@property (nonatomic, readonly) NSString *identity;
+
+/**
+ Whether the user is flagged on the Realm Object Server as an administrator.
+ */
+@property (nonatomic, readonly) BOOL isAdmin;
+
+#pragma mark - Miscellaneous
+
+/// :nodoc:
+- (instancetype)init __attribute__((unavailable("RLMSyncUserInfo cannot be created directly")));
+
+/// :nodoc:
++ (instancetype)new __attribute__((unavailable("RLMSyncUserInfo cannot be created directly")));
 
 @end
+
+NS_ASSUME_NONNULL_END

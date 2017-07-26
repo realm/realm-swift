@@ -89,25 +89,25 @@ class SwiftArrayTests: RLMTestCase {
         XCTAssertEqual(yesArray.sum(ofProperty: "intCol").intValue, 0, "Sum should be 0")
 
         // Test float sum
-        XCTAssertEqualWithAccuracy(noArray.sum(ofProperty: "floatCol").floatValue, Float(0), accuracy: 0.1, "Sum should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.sum(ofProperty: "floatCol").floatValue, Float(7.2), accuracy: 0.1, "Sum should be 7.2")
+        XCTAssertEqual(noArray.sum(ofProperty: "floatCol").floatValue, Float(0), accuracy: 0.1, "Sum should be 0.0")
+        XCTAssertEqual(yesArray.sum(ofProperty: "floatCol").floatValue, Float(7.2), accuracy: 0.1, "Sum should be 7.2")
 
         // Test double sum
-        XCTAssertEqualWithAccuracy(noArray.sum(ofProperty: "doubleCol").doubleValue, Double(10), accuracy: 0.1, "Sum should be 10.0")
-        XCTAssertEqualWithAccuracy(yesArray.sum(ofProperty: "doubleCol").doubleValue, Double(0), accuracy: 0.1, "Sum should be 0.0")
+        XCTAssertEqual(noArray.sum(ofProperty: "doubleCol").doubleValue, Double(10), accuracy: 0.1, "Sum should be 10.0")
+        XCTAssertEqual(yesArray.sum(ofProperty: "doubleCol").doubleValue, Double(0), accuracy: 0.1, "Sum should be 0.0")
 
         // Average ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int average
-        XCTAssertEqualWithAccuracy(noArray.average(ofProperty: "intCol")!.doubleValue, Double(1), accuracy: 0.1, "Average should be 1.0")
-        XCTAssertEqualWithAccuracy(yesArray.average(ofProperty: "intCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqual(noArray.average(ofProperty: "intCol")!.doubleValue, Double(1), accuracy: 0.1, "Average should be 1.0")
+        XCTAssertEqual(yesArray.average(ofProperty: "intCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
 
         // Test float average
-        XCTAssertEqualWithAccuracy(noArray.average(ofProperty: "floatCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.average(ofProperty: "floatCol")!.doubleValue, Double(1.2), accuracy: 0.1, "Average should be 1.2")
+        XCTAssertEqual(noArray.average(ofProperty: "floatCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqual(yesArray.average(ofProperty: "floatCol")!.doubleValue, Double(1.2), accuracy: 0.1, "Average should be 1.2")
 
         // Test double average
-        XCTAssertEqualWithAccuracy(noArray.average(ofProperty: "doubleCol")!.doubleValue, Double(2.5), accuracy: 0.1, "Average should be 2.5")
-        XCTAssertEqualWithAccuracy(yesArray.average(ofProperty: "doubleCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqual(noArray.average(ofProperty: "doubleCol")!.doubleValue, Double(2.5), accuracy: 0.1, "Average should be 2.5")
+        XCTAssertEqual(yesArray.average(ofProperty: "doubleCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
 
         // MIN ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int min
@@ -118,15 +118,15 @@ class SwiftArrayTests: RLMTestCase {
 
         // Test float min
         min = noArray.min(ofProperty: "floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.floatValue, Float(0), accuracy: 0.1, "Minimum should be 0.0f")
+        XCTAssertEqual(min.floatValue, Float(0), accuracy: 0.1, "Minimum should be 0.0f")
         min = yesArray.min(ofProperty: "floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.floatValue, Float(1.2), accuracy: 0.1, "Minimum should be 1.2f")
+        XCTAssertEqual(min.floatValue, Float(1.2), accuracy: 0.1, "Minimum should be 1.2f")
 
         // Test double min
         min = noArray.min(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.doubleValue, Double(2.5), accuracy: 0.1, "Minimum should be 1.5")
+        XCTAssertEqual(min.doubleValue, Double(2.5), accuracy: 0.1, "Minimum should be 1.5")
         min = yesArray.min(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.doubleValue, Double(0), accuracy: 0.1, "Minimum should be 0.0")
+        XCTAssertEqual(min.doubleValue, Double(0), accuracy: 0.1, "Minimum should be 0.0")
 
         // Test date min
         var dateMinOutput = noArray.min(ofProperty: "dateCol") as! Date
@@ -143,15 +143,15 @@ class SwiftArrayTests: RLMTestCase {
 
         // Test float max
         max = noArray.max(ofProperty: "floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.floatValue, Float(0), accuracy: 0.1, "Maximum should be 0.0f")
+        XCTAssertEqual(max.floatValue, Float(0), accuracy: 0.1, "Maximum should be 0.0f")
         max = yesArray.max(ofProperty: "floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.floatValue, Float(1.2), accuracy: 0.1, "Maximum should be 1.2f")
+        XCTAssertEqual(max.floatValue, Float(1.2), accuracy: 0.1, "Maximum should be 1.2f")
 
         // Test double max
         max = noArray.max(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.doubleValue, Double(2.5), accuracy: 0.1, "Maximum should be 3.5")
+        XCTAssertEqual(max.doubleValue, Double(2.5), accuracy: 0.1, "Maximum should be 3.5")
         max = yesArray.max(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.doubleValue, Double(0), accuracy: 0.1, "Maximum should be 0.0")
+        XCTAssertEqual(max.doubleValue, Double(0), accuracy: 0.1, "Maximum should be 0.0")
 
         // Test date max
         var dateMaxOutput = noArray.max(ofProperty: "dateCol") as! Date
@@ -225,13 +225,13 @@ class SwiftArrayTests: RLMTestCase {
 
         XCTAssertEqual(peopleInCompany.count, UInt(2), "link deleted when accessing via links")
 
-        var test = peopleInCompany[0] as! SwiftEmployeeObject
+        var test = peopleInCompany[0]
         XCTAssertEqual(test.age, po1.age, "Should be equal")
         XCTAssertEqual(test.name, po1.name, "Should be equal")
         XCTAssertEqual(test.hired, po1.hired, "Should be equal")
         // XCTAssertEqual(test, po1, "Should be equal") //FIXME, should work. Asana : https://app.asana.com/0/861870036984/13123030433568
 
-        test = peopleInCompany[1] as! SwiftEmployeeObject
+        test = peopleInCompany[1]
         XCTAssertEqual(test.age, po3.age, "Should be equal")
         XCTAssertEqual(test.name, po3.name, "Should be equal")
         XCTAssertEqual(test.hired, po3.hired, "Should be equal")
@@ -316,25 +316,25 @@ class SwiftArrayTests: RLMTestCase {
         XCTAssertEqual(yesArray.sum(ofProperty: "intCol").intValue, 0, "Sum should be 0")
 
         // Test float sum
-        XCTAssertEqualWithAccuracy(noArray.sum(ofProperty: "floatCol").floatValue, Float(0), accuracy: 0.1, "Sum should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.sum(ofProperty: "floatCol").floatValue, Float(7.2), accuracy: 0.1, "Sum should be 7.2")
+        XCTAssertEqual(noArray.sum(ofProperty: "floatCol").floatValue, Float(0), accuracy: 0.1, "Sum should be 0.0")
+        XCTAssertEqual(yesArray.sum(ofProperty: "floatCol").floatValue, Float(7.2), accuracy: 0.1, "Sum should be 7.2")
 
         // Test double sum
-        XCTAssertEqualWithAccuracy(noArray.sum(ofProperty: "doubleCol").doubleValue, Double(10), accuracy: 0.1, "Sum should be 10.0")
-        XCTAssertEqualWithAccuracy(yesArray.sum(ofProperty: "doubleCol").doubleValue, Double(0), accuracy: 0.1, "Sum should be 0.0")
+        XCTAssertEqual(noArray.sum(ofProperty: "doubleCol").doubleValue, Double(10), accuracy: 0.1, "Sum should be 10.0")
+        XCTAssertEqual(yesArray.sum(ofProperty: "doubleCol").doubleValue, Double(0), accuracy: 0.1, "Sum should be 0.0")
 
         // Average ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int average
-        XCTAssertEqualWithAccuracy(noArray.average(ofProperty: "intCol")!.doubleValue, Double(1), accuracy: 0.1, "Average should be 1.0")
-        XCTAssertEqualWithAccuracy(yesArray.average(ofProperty: "intCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqual(noArray.average(ofProperty: "intCol")!.doubleValue, Double(1), accuracy: 0.1, "Average should be 1.0")
+        XCTAssertEqual(yesArray.average(ofProperty: "intCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
 
         // Test float average
-        XCTAssertEqualWithAccuracy(noArray.average(ofProperty: "floatCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
-        XCTAssertEqualWithAccuracy(yesArray.average(ofProperty: "floatCol")!.doubleValue, Double(1.2), accuracy: 0.1, "Average should be 1.2")
+        XCTAssertEqual(noArray.average(ofProperty: "floatCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqual(yesArray.average(ofProperty: "floatCol")!.doubleValue, Double(1.2), accuracy: 0.1, "Average should be 1.2")
 
         // Test double average
-        XCTAssertEqualWithAccuracy(noArray.average(ofProperty: "doubleCol")!.doubleValue, Double(2.5), accuracy: 0.1, "Average should be 2.5")
-        XCTAssertEqualWithAccuracy(yesArray.average(ofProperty: "doubleCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
+        XCTAssertEqual(noArray.average(ofProperty: "doubleCol")!.doubleValue, Double(2.5), accuracy: 0.1, "Average should be 2.5")
+        XCTAssertEqual(yesArray.average(ofProperty: "doubleCol")!.doubleValue, Double(0), accuracy: 0.1, "Average should be 0.0")
 
         // MIN ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int min
@@ -345,15 +345,15 @@ class SwiftArrayTests: RLMTestCase {
 
         // Test float min
         min = noArray.min(ofProperty: "floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.floatValue, Float(0), accuracy: 0.1, "Minimum should be 0.0f")
+        XCTAssertEqual(min.floatValue, Float(0), accuracy: 0.1, "Minimum should be 0.0f")
         min = yesArray.min(ofProperty: "floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.floatValue, Float(1.2), accuracy: 0.1, "Minimum should be 1.2f")
+        XCTAssertEqual(min.floatValue, Float(1.2), accuracy: 0.1, "Minimum should be 1.2f")
 
         // Test double min
         min = noArray.min(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.doubleValue, Double(2.5), accuracy: 0.1, "Minimum should be 1.5")
+        XCTAssertEqual(min.doubleValue, Double(2.5), accuracy: 0.1, "Minimum should be 1.5")
         min = yesArray.min(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(min.doubleValue, Double(0), accuracy: 0.1, "Minimum should be 0.0")
+        XCTAssertEqual(min.doubleValue, Double(0), accuracy: 0.1, "Minimum should be 0.0")
 
         // Test date min
         var dateMinOutput = noArray.min(ofProperty: "dateCol") as! Date
@@ -370,15 +370,15 @@ class SwiftArrayTests: RLMTestCase {
 
         // Test float max
         max = noArray.max(ofProperty: "floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.floatValue, Float(0), accuracy: 0.1, "Maximum should be 0.0f")
+        XCTAssertEqual(max.floatValue, Float(0), accuracy: 0.1, "Maximum should be 0.0f")
         max = yesArray.max(ofProperty: "floatCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.floatValue, Float(1.2), accuracy: 0.1, "Maximum should be 1.2f")
+        XCTAssertEqual(max.floatValue, Float(1.2), accuracy: 0.1, "Maximum should be 1.2f")
 
         // Test double max
         max = noArray.max(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.doubleValue, Double(2.5), accuracy: 0.1, "Maximum should be 3.5")
+        XCTAssertEqual(max.doubleValue, Double(2.5), accuracy: 0.1, "Maximum should be 3.5")
         max = yesArray.max(ofProperty: "doubleCol") as! NSNumber
-        XCTAssertEqualWithAccuracy(max.doubleValue, Double(0), accuracy: 0.1, "Maximum should be 0.0")
+        XCTAssertEqual(max.doubleValue, Double(0), accuracy: 0.1, "Maximum should be 0.0")
 
         // Test date max
         var dateMaxOutput = noArray.max(ofProperty: "dateCol") as! Date

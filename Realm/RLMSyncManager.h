@@ -83,7 +83,7 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 
 /**
  Whether SSL certificate validation should be disabled.
- 
+
  Once this value is set (either way), it will be used as the default value for SSL
  validation when initializing new sync configuration values. A given configuration's
  SSL validation setting can still be overriden from the global default by setting it

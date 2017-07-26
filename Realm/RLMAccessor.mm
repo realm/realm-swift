@@ -129,7 +129,7 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
 RLMArray *getArray(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex) {
     RLMVerifyAttached(obj);
     auto prop = obj->_info->rlmObjectSchema.properties[colIndex];
-    return [[RLMArrayLinkView alloc] initWithParent:obj property:prop];
+    return [[RLMManagedArray alloc] initWithParent:obj property:prop];
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
@@ -582,7 +582,7 @@ RLMAccessorContext::RLMAccessorContext(RLMRealm *realm, RLMClassInfo& info, bool
 RLMAccessorContext::RLMAccessorContext(__unsafe_unretained RLMObjectBase *const parent,
                                        const realm::Property *prop)
 : _realm(parent->_realm)
-, _info(prop && (prop->type == realm::PropertyType::Object || prop->type == realm::PropertyType::Array)
+, _info(prop && (prop->type == realm::PropertyType::Object)
         ? parent->_info->linkTargetType(*prop)
         : *parent->_info)
 , _parentObject(parent)
@@ -660,18 +660,18 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
 id RLMAccessorContext::box(realm::List&& l) {
     REALM_ASSERT(_parentObject);
     REALM_ASSERT(currentProperty);
-    return [[RLMArrayLinkView alloc] initWithList:std::move(l) realm:_realm
-                                       parentInfo:_parentObject->_info
-                                         property:currentProperty];
+    return [[RLMManagedArray alloc] initWithList:std::move(l) realm:_realm
+                                      parentInfo:_parentObject->_info
+                                        property:currentProperty];
 }
 
 id RLMAccessorContext::box(realm::Object&& o) {
     REALM_ASSERT(currentProperty);
-    return RLMCreateObjectAccessor(_realm, _info.linkTargetType(currentProperty.index), o.row().get_index());
+    return RLMCreateObjectAccessor(_realm, _info.linkTargetType(currentProperty.index), o.row());
 }
 
 id RLMAccessorContext::box(realm::RowExpr r) {
-    return RLMCreateObjectAccessor(_realm, _info, r.get_index());
+    return RLMCreateObjectAccessor(_realm, _info, r);
 }
 
 id RLMAccessorContext::box(realm::Results&& r) {

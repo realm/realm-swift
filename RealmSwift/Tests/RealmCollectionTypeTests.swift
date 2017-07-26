@@ -331,7 +331,8 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual("1", sorted[0].stringCol)
         XCTAssertEqual("2", sorted[1].stringCol)
 
-        assertThrows(collection.sorted(byKeyPath: "noSuchCol", ascending: true), named: "Invalid property name")
+        assertThrows(collection.sorted(byKeyPath: "noSuchCol", ascending: true),
+                     reason: "Cannot sort on key path 'noSuchCol': property 'CTTStringObjectWithLink.noSuchCol' does not exist")
     }
 
     func testSortWithDescriptor() {
@@ -353,7 +354,8 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(2, sorted[1].intCol)
         XCTAssertEqual(1.11, sorted[2].doubleCol)
 
-        assertThrows(collection.sorted(by: [SortDescriptor(keyPath: "noSuchCol")]), named: "Invalid property name")
+        assertThrows(collection.sorted(by: [SortDescriptor(keyPath: "noSuchCol")]),
+                     reason: "Cannot sort on key path 'noSuchCol': property 'CTTAggregateObject.noSuchCol' does not exist")
     }
 
     func testMin() {

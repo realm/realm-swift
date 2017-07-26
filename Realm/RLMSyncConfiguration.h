@@ -33,7 +33,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  The URL of the remote Realm upon the Realm Object Server.
- 
+
  @warning The URL cannot end with `.realm`, `.realm.lock` or `.realm.management`.
  */
 @property (nonatomic, readonly) NSURL *realmURL;

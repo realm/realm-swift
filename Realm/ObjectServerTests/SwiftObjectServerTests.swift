@@ -292,6 +292,36 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    // MARK: Administration
+
+    func testRetrieveUserInfo() {
+        let nonAdminUsername = "meela.swift@realm.example.org"
+        let adminUsername = "jyaku.swift@realm.example.org"
+        let password = "p"
+        let server = SwiftObjectServerTests.authServerURL()
+
+        // Create a non-admin user.
+        _ = logInUser(for: .init(username: nonAdminUsername, password: password, register: true),
+                      server: server)
+        // Create an admin user.
+        let adminUser = makeAdminUser(adminUsername, password: password, server: server)
+
+        // Look up information about the non-admin user from the admin user.
+        let ex = expectation(description: "Should be able to look up user information")
+        adminUser.retrieveInfo(forUser: nonAdminUsername, identityProvider: .usernamePassword) { (userInfo, err) in
+            XCTAssertNil(err)
+            XCTAssertNotNil(userInfo)
+            guard let userInfo = userInfo else {
+                return
+            }
+            XCTAssertEqual(userInfo.provider, .usernamePassword)
+            XCTAssertEqual(userInfo.providerUserIdentity, nonAdminUsername)
+            XCTAssertFalse(userInfo.isAdmin)
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 10.0, handler: nil)
+    }
+
     // MARK: Permissions
 
     func testPermissionChange() {

@@ -18,12 +18,11 @@
 
 #import "RLMSyncSessionRefreshHandle.hpp"
 
-#import "RLMAuthResponseModel.h"
+#import "RLMJSONModels.h"
 #import "RLMNetworkClient.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
-#import "RLMTokenModels.h"
 #import "RLMUtil.hpp"
 
 #import "sync/sync_session.hpp"
@@ -39,6 +38,8 @@ void unregisterRefreshHandle(const std::weak_ptr<SyncUser>& user, const std::str
 }
 
 }
+
+static const NSTimeInterval RLMRefreshBuffer = 10;
 
 @interface RLMSyncSessionRefreshHandle () {
     std::weak_ptr<SyncUser> _user;
@@ -91,8 +92,7 @@ void unregisterRefreshHandle(const std::weak_ptr<SyncUser>& user, const std::str
 }
 
 + (NSDate *)fireDateForTokenExpirationDate:(NSDate *)date nowDate:(NSDate *)nowDate {
-    static const NSTimeInterval refreshBuffer = 10;
-    NSDate *fireDate = [date dateByAddingTimeInterval:-refreshBuffer];
+    NSDate *fireDate = [date dateByAddingTimeInterval:-RLMRefreshBuffer];
     // Only fire times in the future are valid.
     return ([fireDate compare:nowDate] == NSOrderedDescending ? fireDate : nil);
 }
@@ -190,7 +190,7 @@ void unregisterRefreshHandle(const std::weak_ptr<SyncUser>& user, const std::str
             case NSURLErrorDNSLookupFailed:
             case NSURLErrorCannotFindHost:
                 // FIXME: 10 seconds is an arbitrarily chosen value, consider rationalizing it.
-                nextTryDate = [NSDate dateWithTimeIntervalSinceNow:10];
+                nextTryDate = [NSDate dateWithTimeIntervalSinceNow:RLMRefreshBuffer + 10];
                 break;
             default:
                 break;
@@ -255,7 +255,7 @@ void unregisterRefreshHandle(const std::weak_ptr<SyncUser>& user, const std::str
     RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         [weakSelf _onRefreshCompletionWithError:error json:json];
     };
-    [RLMNetworkClient postRequestToEndpoint:RLMServerEndpointAuth
+    [RLMNetworkClient sendRequestToEndpoint:[RLMSyncAuthEndpoint endpoint]
                                      server:self.authServerURL
                                        JSON:json
                                  completion:handler];

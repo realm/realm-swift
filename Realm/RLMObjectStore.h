@@ -58,14 +58,14 @@ id _Nullable RLMGetObject(RLMRealm *realm, NSString *objectClassName, id _Nullab
 RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *className,
                                                id _Nullable value, bool createOrUpdate)
 NS_RETURNS_RETAINED;
-    
+
 
 //
 // Accessor Creation
 //
 
 
-// switch List<> properties from being backed by unmanaged RLMArrays to RLMArrayLinkView
+// switch List<> properties from being backed by unmanaged RLMArrays to RLMManagedArray
 void RLMInitializeSwiftAccessorGenerics(RLMObjectBase *object);
 
 #ifdef __cplusplus

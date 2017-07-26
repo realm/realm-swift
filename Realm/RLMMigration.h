@@ -25,11 +25,11 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMObject;
 
 /**
- A block type which provides both the old and new versions of an object in the Realm. Object 
+ A block type which provides both the old and new versions of an object in the Realm. Object
  properties can only be accessed using keyed subscripting.
- 
+
  @see `-[RLMMigration enumerateObjects:block:]`
- 
+
  @param oldObject The object from the original Realm (read-only).
  @param newObject The object from the migrated Realm (read-write).
 */
@@ -37,7 +37,7 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
 
 /**
  `RLMMigration` instances encapsulate information intended to facilitate a schema migration.
- 
+
  A `RLMMigration` instance is passed into a user-defined `RLMMigrationBlock` block when updating
  the version of a Realm. This instance provides access to the old and new database schemas, the
  objects in the Realm, and provides functionality for modifying the Realm during the migration.
@@ -75,8 +75,8 @@ typedef void (^RLMObjectMigrationBlock)(RLMObject * __nullable oldObject, RLMObj
 
 /**
  Creates and returns an `RLMObject` instance of type `className` in the Realm being migrated.
- 
- The `value` argument is used to populate the object. It can be a key-value coding compliant object, an array or 
+
+ The `value` argument is used to populate the object. It can be a key-value coding compliant object, an array or
  dictionary returned from the methods in `NSJSONSerialization`, or an array containing one element for each managed
  property. An exception will be thrown if any required properties are not present and those properties were not defined
  with default values.
