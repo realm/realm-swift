@@ -96,6 +96,18 @@
     ma_destination = value;                                                                                            \
 }
 
+#define APPLY_PERMISSION(ma_permission, ma_user)                                                                       \
+APPLY_PERMISSION_WITH_MESSAGE(ma_permission, ma_user, @"Setting a permission should work")
+
+#define APPLY_PERMISSION_WITH_MESSAGE(ma_permission, ma_user, ma_message) {                                            \
+    XCTestExpectation *ex = [self expectationWithDescription:ma_message];                                              \
+    [ma_user applyPermission:ma_permission callback:^(NSError *err) {                                                  \
+        XCTAssertNil(err, @"Received an error when applying permission: %@", err);                                     \
+        [ex fulfill];                                                                                                  \
+    }];                                                                                                                \
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];                                                            \
+}                                                                                                                      \
+
 static NSURL *makeTestURL(NSString *name, RLMSyncUser *owner) {
     NSString *userID = [owner identity] ?: @"~";
     return [[NSURL alloc] initWithString:[NSString stringWithFormat:@"realm://localhost:9080/%@/%@", userID, name]];
@@ -152,6 +164,27 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     [super tearDown];
 }
 
+#pragma mark - Helper methods
+
+- (RLMSyncPermissionResults *)getPermissionResultsFor:(RLMSyncUser *)user {
+    return [self getPermissionResultsFor:user message:@"Get permission results"];
+}
+
+- (RLMSyncPermissionResults *)getPermissionResultsFor:(RLMSyncUser *)user message:(NSString *)message {
+    // Get a reference to the permission results.
+    XCTestExpectation *ex = [self expectationWithDescription:message];
+    __block RLMSyncPermissionResults *results = nil;
+    [user retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssertNotNil(r);
+        results = r;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    XCTAssertNotNil(results, @"getPermissionResultsFor: failed for user %@. No results.", user.identity);
+    return results;
+}
+
 #pragma mark - Permissions
 
 /// If user A grants user B read access to a Realm, user B should be able to read to it.
@@ -181,12 +214,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                            userID:self.userB.identity
                                                                       accessLevel:RLMSyncAccessLevelRead];
     // Set the read permission.
-    XCTestExpectation *ex = [self expectationWithDescription:@"Setting a permission should work."];
-    [self.userA applyPermission:p callback:^(NSError *err) {
-        XCTAssert(!err);
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION(p, self.userA);
 
     // Open the same Realm for user B.
     NSURL *userBURL = makeTestURL(testName, self.userA);
@@ -204,7 +232,6 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
     CHECK_COUNT(3, SyncObject, userBRealm);
-
 
     // Ensure user B can't actually write to the Realm.
     // Run this portion of the test on a background queue, since the error handler is dispatched onto the main queue.
@@ -263,12 +290,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                            userID:self.userB.identity
                                                                       accessLevel:RLMSyncAccessLevelWrite];
     // Set the permission.
-    XCTestExpectation *ex = [self expectationWithDescription:@"Setting a permission should work."];
-    [self.userA applyPermission:p callback:^(NSError *err) {
-        XCTAssert(!err);
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION(p, self.userA);
 
     // Open the Realm for user B. Since user B has write privileges, they should be able to open it 'normally'.
     NSURL *userBURL = makeTestURL(testName, self.userA);
@@ -326,12 +348,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                            userID:self.userB.identity
                                                                       accessLevel:RLMSyncAccessLevelAdmin];
     // Set the permission.
-    XCTestExpectation *ex = [self expectationWithDescription:@"Setting a permission should work."];
-    [self.userA applyPermission:p callback:^(NSError *err) {
-        XCTAssert(!err);
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION(p, self.userA);
 
     // Open the Realm for user B. Since user B has admin privileges, they should be able to open it 'normally'.
     RLMRealm *userBRealm = [self openRealmForURL:userAURLResolved user:self.userB];
@@ -349,12 +366,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     RLMSyncPermissionValue *p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[userAURLResolved path]
                                                                             userID:self.userC.identity
                                                                        accessLevel:RLMSyncAccessLevelWrite];
-    XCTestExpectation *manageEx = [self expectationWithDescription:@"Managing a Realm you can't manage should fail."];
-    [self.userB applyPermission:p2 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [manageEx fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION_WITH_MESSAGE(p2, self.userB, @"User B should be able to give C write permissions to A's Realm.");
 
     // User C should be able to write to the Realm.
     RLMRealm *userCRealm = [self openRealmForURL:userAURLResolved user:self.userC];
@@ -396,12 +408,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                          username:userBUsername
                                                                       accessLevel:RLMSyncAccessLevelWrite];
     // Set the permission.
-    XCTestExpectation *ex = [self expectationWithDescription:@"Setting a permission should work."];
-    [self.userA applyPermission:p callback:^(NSError *err) {
-        XCTAssert(!err);
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION(p, self.userA);
 
     // Open the Realm for user B. Since user B has write privileges, they should be able to open it 'normally'.
     NSURL *userBURL = makeTestURL(testName, self.userA);
@@ -419,16 +426,6 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
 /// Setting a permission for all users should work.
 - (void)testWildcardWriteAccess {
-    XCTestExpectation *ex = [self expectationWithDescription:@"No permissions for newly created user."];
-    __block RLMSyncPermissionResults *results;
-    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(r);
-        results = r;
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
     // Open a Realm for user A.
     NSString *testName = NSStringFromSelector(_cmd);
     NSURL *ownerURL = makeTestURL(testName, nil);
@@ -441,12 +438,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                       accessLevel:RLMSyncAccessLevelWrite];
 
     // Set the permission.
-    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting wildcard permission should work."];
-    [self.userA applyPermission:p callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION(p, self.userA);
 
     // Have user A write a few objects first.
     [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
@@ -485,18 +477,12 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                       accessLevel:RLMSyncAccessLevelRead];
 
     // Set the permission.
-    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting wildcard permission should work."];
-    [admin applyPermission:p callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION_WITH_MESSAGE(p, admin, @"Setting wildcard permission should work.");
 
     // Have the admin user write a few objects first.
     [self addSyncObjectsToRealm:adminUserRealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
     [self waitForUploadsForUser:admin url:globalRealmURL];
     CHECK_COUNT(3, SyncObject, adminUserRealm);
-
 
     // User B should be able to read from the Realm.
     __block RLMRealm *userBRealm = nil;
@@ -548,12 +534,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                       accessLevel:RLMSyncAccessLevelWrite];
 
     // Set the permission.
-    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting wildcard permission should work."];
-    [admin applyPermission:p callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION(p, admin);
 
     // Have the admin user write a few objects first.
     [self addSyncObjectsToRealm:adminUserRealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
@@ -580,15 +561,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 /// Setting a permission should work, and then that permission should be able to be retrieved.
 - (void)testSettingPermission {
     // First, there should be no permissions.
-    XCTestExpectation *ex = [self expectationWithDescription:@"No permissions for newly created user."];
-    __block RLMSyncPermissionResults *results;
-    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(r);
-        results = r;
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    RLMSyncPermissionResults *results = [self getPermissionResultsFor:self.userA];
     CHECK_PERMISSION_COUNT(results, 0);
 
     // Open a Realm for user A.
@@ -601,22 +574,11 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                       accessLevel:RLMSyncAccessLevelRead];
 
     // Set the permission.
-    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting a permission should work."];
-    [self.userA applyPermission:p callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION(p, self.userA);
 
     // Now retrieve the permissions again and make sure the new permission is properly set.
-    XCTestExpectation *ex3 = [self expectationWithDescription:@"One permission after setting the permission."];
-    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(r);
-        results = r;
-        [ex3 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    results = [self getPermissionResultsFor:self.userA message:@"One permission after setting the permission."];
+
     // Expected permission: applies to user B, but for user A's Realm.
     id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
     RLMSyncPermissionValue *final = nil;
@@ -643,22 +605,10 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                       accessLevel:RLMSyncAccessLevelRead];
 
     // Set the permission.
-    XCTestExpectation *ex = [self expectationWithDescription:@"Setting a permission should work."];
-    [self.userA applyPermission:p callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION(p, self.userA);
 
     // Now retrieve the permissions again and make sure the new permission is properly set.
-    XCTestExpectation *ex2 = [self expectationWithDescription:@"One permission after setting the permission."];
-    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(r);
-        results = r;
-        [ex2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    results = [self getPermissionResultsFor:self.userA message:@"One permission after setting the permission."];
     id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
     CHECK_PERMISSION_PRESENT(results, expectedPermission);
 
@@ -671,14 +621,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     // Make sure the permission deletion is properly reflected.
-    XCTestExpectation *ex4 = [self expectationWithDescription:@"No permissions after deleting the permission."];
-    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(r);
-        results = r;
-        [ex4 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    results = [self getPermissionResultsFor:self.userA message:@"No permissions after deleting the permission."];
     CHECK_PERMISSION_ABSENT(results, expectedPermission);
 }
 
@@ -686,15 +629,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 /// Observing permission changes should work.
 - (void)testObservingPermission {
     // Get a reference to the permission results.
-    XCTestExpectation *ex = [self expectationWithDescription:@"Get permission results."];
-    __block RLMSyncPermissionResults *results = nil;
-    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(r);
-        results = r;
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    RLMSyncPermissionResults *results = [self getPermissionResultsFor:self.userA];
 
     // Open a Realm for user A.
     NSURL *url = REALM_URL();
@@ -715,12 +650,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                       accessLevel:RLMSyncAccessLevelRead];
 
     // Set the permission.
-    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting a permission should work."];
-    [self.userA applyPermission:p callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex2 fulfill];
-    }];
-    [self waitForExpectations:@[ex2] timeout:2.0];
+    APPLY_PERMISSION(p, self.userA);
 
     // Wait for the notification to be fired.
     [self waitForExpectations:@[noteEx] timeout:2.0];
@@ -732,15 +662,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 /// Filtering permissions results should work.
 - (void)testFilteringPermissions {
     // Get a reference to the permission results.
-    XCTestExpectation *ex = [self expectationWithDescription:@"Get permission results."];
-    __block RLMSyncPermissionResults *results = nil;
-    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(r);
-        results = r;
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    RLMSyncPermissionResults *results = [self getPermissionResultsFor:self.userA];
 
     // Open two Realms
     NSURL *url1 = CUSTOM_REALM_URL(@"r1");
@@ -751,27 +673,12 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     NSString *uC = self.userC.identity;
 
     // Give user B and C read permissions to r1, and user B read permissions for r2.
-    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting r1 permission for user B should work."];
     id p1 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url1 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
-    [self.userA applyPermission:p1 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    XCTestExpectation *ex3 = [self expectationWithDescription:@"Setting r1 permission for user C should work."];
+    APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r1 permission for user B should work.");
     id p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url1 path] userID:uC accessLevel:RLMSyncAccessLevelRead];
-    [self.userA applyPermission:p2 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex3 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    XCTestExpectation *ex4 = [self expectationWithDescription:@"Setting r2 permission for user B should work."];
+    APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r1 permission for user C should work.");
     id p3 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url2 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
-    [self.userA applyPermission:p3 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex4 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION_WITH_MESSAGE(p3, self.userA, @"Setting r2 permission for user B should work.");
 
     // Wait for all the permissions to show up.
     id exp1 = makeExpectedPermission(p1, self.userA,
@@ -794,15 +701,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
 - (void)testSortingPermissionsOnPath {
     // Get a reference to the permission results.
-    XCTestExpectation *ex = [self expectationWithDescription:@"Get permission results."];
-    __block RLMSyncPermissionResults *results = nil;
-    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(r);
-        results = r;
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    RLMSyncPermissionResults *results = [self getPermissionResultsFor:self.userA];
 
     // Open three Realms
     NSURL *url1 = CUSTOM_REALM_URL(@"r1");
@@ -814,27 +713,12 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     NSString *uB = self.userB.identity;
 
     // Give user B read permissions for all three Realms.
-    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting r1 permission for user B should work."];
     id p1 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url1 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
-    [self.userA applyPermission:p1 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    XCTestExpectation *ex3 = [self expectationWithDescription:@"Setting r2 permission for user B should work."];
+    APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r1 permission for user B should work.");
     id p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url2 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
-    [self.userA applyPermission:p2 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex3 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    XCTestExpectation *ex4 = [self expectationWithDescription:@"Setting r3 permission for user B should work."];
+    APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r2 permission for user B should work.");
     id p3 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url3 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
-    [self.userA applyPermission:p3 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex4 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION_WITH_MESSAGE(p3, self.userA, @"Setting r3 permission for user B should work.");
 
     // Now sort on Realm URL.
     id exp1 = makeExpectedPermission(p1, self.userA,
@@ -869,15 +753,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
 - (void)testSortingPermissionsOnUserId {
     // Get a reference to the permission results.
-    XCTestExpectation *ex = [self expectationWithDescription:@"Get permission results."];
-    __block RLMSyncPermissionResults *results = nil;
-    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(r);
-        results = r;
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    RLMSyncPermissionResults *results = [self getPermissionResultsFor:self.userA];
 
     // Open a Realm
     NSURL *url = REALM_URL();
@@ -886,20 +762,10 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     NSString *uC = self.userC.identity;
 
     // Give users B and C read permission for the Realm.
-    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting r1 permission for user B should work."];
     id p1 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url path] userID:uB accessLevel:RLMSyncAccessLevelRead];
-    [self.userA applyPermission:p1 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    XCTestExpectation *ex3 = [self expectationWithDescription:@"Setting r1 permission for user C should work."];
+    APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r1 permission for user B should work.");
     id p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url path] userID:uC accessLevel:RLMSyncAccessLevelRead];
-    [self.userA applyPermission:p2 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex3 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r1 permission for user C should work.");
 
     // Now sort on user ID.
     RLMSyncPermissionResults *sorted = [results sortedResultsUsingProperty:RLMSyncPermissionResultsSortPropertyUserID
@@ -924,15 +790,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
 - (void)testSortingPermissionsOnDate {
     // Get a reference to the permission results.
-    XCTestExpectation *ex = [self expectationWithDescription:@"Get permission results."];
-    __block RLMSyncPermissionResults *results = nil;
-    [self.userA retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(r);
-        results = r;
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    RLMSyncPermissionResults *results = [self getPermissionResultsFor:self.userA];
 
     // Open three Realms
     NSURL *url1 = CUSTOM_REALM_URL(@"-r1");
@@ -944,27 +802,12 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     NSString *uB = self.userB.identity;
 
     // Give user B read permissions for all three Realms.
-    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting r3 permission for user B should work."];
     id p1 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url3 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
-    [self.userA applyPermission:p1 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    XCTestExpectation *ex3 = [self expectationWithDescription:@"Setting r1 permission for user B should work."];
+    APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r3 permission for user B should work.");
     id p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url1 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
-    [self.userA applyPermission:p2 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex3 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    XCTestExpectation *ex4 = [self expectationWithDescription:@"Setting r2 permission for user B should work."];
+    APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r1 permission for user B should work.");
     id p3 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[url2 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
-    [self.userA applyPermission:p3 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex4 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION_WITH_MESSAGE(p3, self.userA, @"Setting r2 permission for user B should work.");
 
     // Now sort on date. (Note that we only want the results for the user B permissions.)
     RLMSyncPermissionResults *filtered = [results objectsWithPredicate:[NSPredicate predicateWithFormat:@"userId == %@",
@@ -1011,15 +854,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     // Now retrieve the permissions again and make sure the new permission was not set.
-    XCTestExpectation *ex3 = [self expectationWithDescription:@"Retrieving the results should work."];
-    [self.userB retrievePermissionsWithCallback:^(RLMSyncPermissionResults *r, NSError *error) {
-        XCTAssertNil(error);
-        XCTAssertNotNil(r);
-        results = r;
-        [ex3 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
-
+    results = [self getPermissionResultsFor:self.userB message:@"Retrieving the results should work."];
     id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
     CHECK_PERMISSION_ABSENT(results, expectedPermission);
 }
@@ -1053,12 +888,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
                                                                            userID:self.userB.identity
                                                                       accessLevel:RLMSyncAccessLevelRead];
     // Set the read permission.
-    XCTestExpectation *ex = [self expectationWithDescription:@"Setting a permission should work."];
-    [self.userA applyPermission:p callback:^(NSError *err) {
-        XCTAssert(!err);
-        [ex fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    APPLY_PERMISSION(p, self.userA);
 
     NSURL *userBURL = makeTestURL(testName, self.userA);
     RLMRealmConfiguration *userBConfig = [RLMRealmConfiguration defaultConfiguration];
@@ -1077,7 +907,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
             [ex2 fulfill];
         };
         __attribute__((objc_precise_lifetime)) RLMRealm *bad = [RLMRealm realmWithConfiguration:userBConfig error:nil];
-        [self waitForExpectationsWithTimeout:1000.0 handler:nil];
+        [self waitForExpectationsWithTimeout:10.0 handler:nil];
         onDiskPath = [RLMSyncTestCase onDiskPathForSyncedRealm:bad];
     }
     XCTAssertNotNil(onDiskPath);
