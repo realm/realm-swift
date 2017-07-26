@@ -20,9 +20,9 @@ import UIKit
 import RealmSwift
 
 class Repository: Object {
-    dynamic var identifier = ""
-    dynamic var name: String?
-    dynamic var avatarURL: String?
+    @objc dynamic var identifier = ""
+    @objc dynamic var name: String?
+    @objc dynamic var avatarURL: String?
 
     override static func primaryKey() -> String? {
         return "identifier"
