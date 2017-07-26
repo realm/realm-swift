@@ -907,7 +907,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
             [ex2 fulfill];
         };
         __attribute__((objc_precise_lifetime)) RLMRealm *bad = [RLMRealm realmWithConfiguration:userBConfig error:nil];
-        [self waitForExpectationsWithTimeout:1000.0 handler:nil];
+        [self waitForExpectationsWithTimeout:10.0 handler:nil];
         onDiskPath = [RLMSyncTestCase onDiskPathForSyncedRealm:bad];
     }
     XCTAssertNotNil(onDiskPath);
