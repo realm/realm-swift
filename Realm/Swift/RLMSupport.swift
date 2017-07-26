@@ -57,7 +57,7 @@ public struct RLMIterator<T>: IteratorProtocol {
         iteratorBase = NSFastEnumerationIterator(collection)
     }
 
-    public func next() -> T? {
+    public mutating func next() -> T? {
         return iteratorBase.next() as! T?
     }
 }

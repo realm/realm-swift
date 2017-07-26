@@ -27,7 +27,7 @@ class OuterClass {
 }
 
 class SwiftStringObjectSubclass : SwiftStringObject {
-    var stringCol2 = ""
+    @objc dynamic var stringCol2 = ""
 }
 
 class SwiftSelfRefrencingSubclass: SwiftStringObject {
