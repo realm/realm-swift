@@ -45,7 +45,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Realm no longer throws an "unsupported instruction" exception in some cases
+  when opening a synced Realm asynchronously.
 
 3.0.0-beta Release notes (2017-07-14)
 =============================================================
