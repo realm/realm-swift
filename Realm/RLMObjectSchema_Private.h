@@ -54,15 +54,15 @@ NS_ASSUME_NONNULL_BEGIN
  This method is useful only in specialized circumstances, for example, when accessing objects
  in a Realm produced externally. If you are simply building an app on Realm, it is not recommended
  to use this method as an [RLMObjectSchema](RLMObjectSchema) is generated automatically for every [RLMObject](RLMObject) subclass.
- 
+
  Initialize an RLMObjectSchema with classname, objectClass, and an array of properties
- 
+
  @warning This method is useful only in specialized circumstances.
- 
+
  @param objectClassName     The name of the class used to refer to objects of this type.
  @param objectClass         The Objective-C class used when creating instances of this type.
  @param properties          An array of RLMProperty instances describing the managed properties for this type.
- 
+
  @return    An initialized instance of RLMObjectSchema.
  */
 - (instancetype)initWithClassName:(NSString *)objectClassName objectClass:(Class)objectClass properties:(NSArray *)properties;

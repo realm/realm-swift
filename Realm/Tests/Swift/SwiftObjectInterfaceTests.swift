@@ -27,11 +27,11 @@ class OuterClass {
 }
 
 class SwiftStringObjectSubclass : SwiftStringObject {
-    var stringCol2 = ""
+    @objc dynamic var stringCol2 = ""
 }
 
 class SwiftSelfRefrencingSubclass: SwiftStringObject {
-    @objc dynamic var objects = RLMArray(objectClassName: SwiftSelfRefrencingSubclass.className())
+    @objc dynamic var objects = RLMArray<SwiftSelfRefrencingSubclass>(objectClassName: SwiftSelfRefrencingSubclass.className())
 }
 
 
@@ -86,7 +86,7 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         XCTAssertEqual(firstObj.dateCol, Date(timeIntervalSince1970: 123), "should be epoch + 123")
         XCTAssertEqual(firstObj.objectCol.boolCol, true, "should be true")
         XCTAssertEqual(obj.arrayCol.count, UInt(1), "array count should be 1")
-        XCTAssertEqual((obj.arrayCol.firstObject() as? SwiftBoolObject)!.boolCol, true, "should be true")
+        XCTAssertEqual(obj.arrayCol.firstObject()!.boolCol, true, "should be true")
     }
 
     func testDefaultValueSwiftObject() {

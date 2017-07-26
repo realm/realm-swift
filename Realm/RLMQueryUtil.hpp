@@ -37,6 +37,3 @@ realm::Query RLMPredicateToQuery(NSPredicate *predicate, RLMObjectSchema *object
 
 // return property - throw for invalid column name
 RLMProperty *RLMValidatedProperty(RLMObjectSchema *objectSchema, NSString *columnName);
-
-// validate the array of RLMSortDescriptors and convert it to a realm::SortDescriptor
-realm::SortDescriptor RLMSortDescriptorFromDescriptors(RLMClassInfo& classInfo, NSArray<RLMSortDescriptor *> *descriptors);

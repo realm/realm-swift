@@ -30,7 +30,18 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* It is now possible to create and log in multiple Realm Object Server users
+  with the same identity if they originate from different servers. Note that
+  if the URLs are different aliases for the same authentication server each
+  user will still be treated as separate (e.g. they will have their own copy
+  of each synchronized Realm opened using them). It is highly encouraged that
+  users defined using the access token credential type be logged in with an
+  authentication server URL specified; this parameter will become mandatory
+  in a future version of the SDK.
+* Add `-[RLMSyncUser retrieveInfoForUser:identityProvider:completion:]`
+  API allowing administrator users to retrieve information about a user based
+  on their provider identity (for example, a username). Requires any edition
+  of the Realm Object Server 1.8.2 or later.
 
 ### Bugfixes
 
@@ -57,6 +68,47 @@ x.x.x Release notes (yyyy-MM-dd)
   Server 1.6.0 or later.
 * Improve performance of creating Swift objects which contain at least one List
   property.
+
+### Bugfixes
+
+* `List.description` now reports the correct types for nested lists.
+* Fix unmanaged object initialization when a nested property type returned
+  `false` from `Object.shouldIncludeInDefaultSchema()`.
+* Don't clear RLMArrays on self-assignment.
+
+2.9.0 Release notes (2017-07-26)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Add a new error code to denote 'permission denied' errors when working
+  with synchronized Realms, as well as an accompanying block that can be
+  called to inform the binding that the offending Realm's files should be
+  deleted immediately. This allows recovering from 'permission denied'
+  errors in a more robust manner. See the documentation for
+  `RLMSyncErrorPermissionDeniedError` for more information.
+* Add `-[RLMSyncPermissionValue initWithRealmPath:username:accessLevel:]`
+  API allowing permissions to be applied to a user based on their username
+  (usually, an email address). Requires any edition of the Realm Object
+  Server 1.6.0 or later.
+* Improve performance of creating Swift objects which contain at least one List
+  property.
+* It is now possible to create and log in multiple Realm Object Server users
+  with the same identity if they originate from different servers. Note that
+  if the URLs are different aliases for the same authentication server each
+  user will still be treated as separate (e.g. they will have their own copy
+  of each synchronized Realm opened using them). It is highly encouraged that
+  users defined using the access token credential type be logged in with an
+  authentication server URL specified; this parameter will become mandatory
+  in a future version of the SDK.
+* Add `-[RLMSyncUser retrieveInfoForUser:identityProvider:completion:]`
+  API allowing administrator users to retrieve information about a user based
+  on their provider identity (for example, a username). Requires any edition
+  of the Realm Object Server 1.8.2 or later.
 
 ### Bugfixes
 

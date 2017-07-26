@@ -138,7 +138,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  The `value` argument can be a key-value coding compliant object, an array or dictionary returned from the methods in
  `NSJSONSerialization`, or an array containing one element for each managed property.
- 
+
  An exception will be thrown if any required properties are not present and those properties
  were not defined with default values.
 
@@ -159,7 +159,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  The `value` argument can be a key-value coding compliant object, an array or dictionary returned from the methods in
  `NSJSONSerialization`, or an array containing one element for each managed property.
- 
+
  An exception will be thrown if any required properties are not present and those properties
  were not defined with default values.
 
@@ -189,7 +189,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  If the object is being created, an exception will be thrown if any required properties
  are not present and those properties were not defined with default values.
- 
+
  If the `value` argument is a Realm object already managed by the default Realm, the
  argument's type is the same as the receiver, and the objects have identical values for
  their managed properties, this method does nothing.

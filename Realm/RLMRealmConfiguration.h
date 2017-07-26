@@ -39,10 +39,10 @@ typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger 
  `RLMRealmConfiguration` instances are just plain `NSObject`s. Unlike `RLMRealm`s
  and `RLMObject`s, they can be freely shared between threads as long as you do not
  mutate them.
- 
+
  Creating configuration objects for class subsets (by setting the
  `objectClasses` property) can be expensive. Because of this, you will normally want to
- cache and reuse a single configuration object for each distinct configuration rather than 
+ cache and reuse a single configuration object for each distinct configuration rather than
  creating a new object each time you open a Realm.
  */
 @interface RLMRealmConfiguration : NSObject<NSCopying>

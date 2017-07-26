@@ -1478,47 +1478,6 @@ void QueryBuilder::apply_predicate(NSPredicate *predicate, RLMObjectSchema *obje
                                      @"Only support compound, comparison, and constant predicates");
     }
 }
-
-std::vector<size_t> RLMValidatedColumnIndicesForSort(RLMClassInfo& classInfo, NSString *keyPathString)
-{
-    RLMPrecondition([keyPathString rangeOfString:@"@"].location == NSNotFound, @"Invalid key path for sort",
-                    @"Cannot sort on '%@': sorting on key paths that include collection operators is not supported.",
-                    keyPathString);
-    auto keyPath = key_path_from_string(classInfo.realm.schema, classInfo.rlmObjectSchema, keyPathString);
-
-    RLMPrecondition(!keyPath.containsToManyRelationship, @"Invalid key path for sort",
-                    @"Cannot sort on '%@': sorting on key paths that include a to-many relationship is not supported.",
-                    keyPathString);
-
-    switch (keyPath.property.type) {
-        case RLMPropertyTypeBool:
-        case RLMPropertyTypeDate:
-        case RLMPropertyTypeDouble:
-        case RLMPropertyTypeFloat:
-        case RLMPropertyTypeInt:
-        case RLMPropertyTypeString:
-            break;
-
-        default:
-            @throw RLMPredicateException(@"Invalid sort property type",
-                                         @"Cannot sort on key path '%@' on object of type '%s': sorting is only supported on bool, date, double, float, integer, and string properties, but property is of type %@.",
-                                         keyPathString, classInfo.rlmObjectSchema.className, RLMTypeToString(keyPath.property.type));
-    }
-
-    std::vector<size_t> columnIndices;
-    columnIndices.reserve(keyPath.links.size() + 1);
-
-    auto currentClassInfo = &classInfo;
-    for (RLMProperty *link : keyPath.links) {
-        auto tableColumn = currentClassInfo->tableColumn(link);
-        currentClassInfo = &currentClassInfo->linkTargetType(link.index);
-        columnIndices.push_back(tableColumn);
-    }
-    columnIndices.push_back(currentClassInfo->tableColumn(keyPath.property));
-
-    return columnIndices;
-}
-
 } // namespace
 
 realm::Query RLMPredicateToQuery(NSPredicate *predicate, RLMObjectSchema *objectSchema,
@@ -1540,18 +1499,4 @@ realm::Query RLMPredicateToQuery(NSPredicate *predicate, RLMObjectSchema *object
     RLMPrecondition(validateMessage.empty(), @"Invalid query", @"%.*s",
                     (int)validateMessage.size(), validateMessage.c_str());
     return query;
-}
-
-realm::SortDescriptor RLMSortDescriptorFromDescriptors(RLMClassInfo& classInfo, NSArray<RLMSortDescriptor *> *descriptors) {
-    std::vector<std::vector<size_t>> columnIndices;
-    std::vector<bool> ascending;
-    columnIndices.reserve(descriptors.count);
-    ascending.reserve(descriptors.count);
-
-    for (RLMSortDescriptor *descriptor in descriptors) {
-        columnIndices.push_back(RLMValidatedColumnIndicesForSort(classInfo, descriptor.keyPath));
-        ascending.push_back(descriptor.ascending);
-    }
-
-    return {*classInfo.table(), std::move(columnIndices), std::move(ascending)};
 }
