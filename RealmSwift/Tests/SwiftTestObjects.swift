@@ -444,6 +444,18 @@ class SwiftObjectiveCTypesObject: Object {
 
 class SwiftComputedPropertyNotExplicitlyIgnoredObject: Object {
     dynamic var _urlBacking = ""
+
+    // Dynamic; no ivar
+    dynamic var dynamicURL: URL? {
+        get {
+            return URL(string: _urlBacking)
+        }
+        set {
+            _urlBacking = newValue?.absoluteString ?? ""
+        }
+    }
+
+    // Non-dynamic; no ivar
     var url: URL? {
         get {
             return URL(string: _urlBacking)
