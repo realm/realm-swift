@@ -121,7 +121,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     return [[RLMSyncPermission alloc] initWithRealmPath:[NSString stringWithFormat:@"/%@/%@",
                                                          owner.identity,
                                                          realmName]
-                                                 userID:original.userId
+                                               identity:original.identity
                                             accessLevel:original.accessLevel];
 }
 
@@ -222,7 +222,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Give user B read permissions to that Realm.
     RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[userAURL path]
-                                                                 userID:self.userB.identity
+                                                               identity:self.userB.identity
                                                             accessLevel:RLMSyncAccessLevelRead];
     // Set the read permission.
     APPLY_PERMISSION(p, self.userA);
@@ -263,7 +263,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Administering the Realm should fail.
     RLMSyncPermission *p2 = [[RLMSyncPermission alloc] initWithRealmPath:[userBURL path]
-                                                                  userID:self.userC.identity
+                                                                identity:self.userC.identity
                                                              accessLevel:RLMSyncAccessLevelRead];
     XCTestExpectation *manageEx = [self expectationWithDescription:@"Managing a Realm you can't manage should fail."];
     [self.userB applyPermission:p2 callback:^(NSError *error) {
@@ -297,7 +297,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Give user B write permissions to that Realm.
     RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[userAURL path]
-                                                                 userID:self.userB.identity
+                                                               identity:self.userB.identity
                                                             accessLevel:RLMSyncAccessLevelWrite];
     // Set the permission.
     APPLY_PERMISSION(p, self.userA);
@@ -315,7 +315,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Administering the Realm should fail.
     RLMSyncPermission *p2 = [[RLMSyncPermission alloc] initWithRealmPath:[userBURL path]
-                                                                  userID:self.userC.identity
+                                                                identity:self.userC.identity
                                                              accessLevel:RLMSyncAccessLevelRead];
     XCTestExpectation *manageEx = [self expectationWithDescription:@"Managing a Realm you can't manage should fail."];
     [self.userB applyPermission:p2 callback:^(NSError *error) {
@@ -353,7 +353,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Give user B admin permissions to that Realm.
     RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[userAURLUnresolved path]
-                                                                 userID:self.userB.identity
+                                                               identity:self.userB.identity
                                                             accessLevel:RLMSyncAccessLevelAdmin];
     // Set the permission.
     APPLY_PERMISSION(p, self.userA);
@@ -370,7 +370,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // User B should be able to give user C write permissions to user A's Realm.
     RLMSyncPermission *p2 = [[RLMSyncPermission alloc] initWithRealmPath:[userAURLResolved path]
-                                                                  userID:self.userC.identity
+                                                                identity:self.userC.identity
                                                              accessLevel:RLMSyncAccessLevelWrite];
     APPLY_PERMISSION_WITH_MESSAGE(p2, self.userB, @"User B should be able to give C write permissions to A's Realm.");
 
@@ -435,7 +435,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Give all users write permissions to that Realm.
     RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[ownerURL path]
-                                                                 userID:@"*"
+                                                               identity:@"*"
                                                             accessLevel:RLMSyncAccessLevelWrite];
 
     // Set the permission.
@@ -474,7 +474,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Give all users read permissions to that Realm.
     RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[globalRealmURL path]
-                                                                 userID:@"*"
+                                                               identity:@"*"
                                                             accessLevel:RLMSyncAccessLevelRead];
 
     // Set the permission.
@@ -531,7 +531,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Give all users write permissions to that Realm.
     RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[globalRealmURL path]
-                                                                 userID:@"*"
+                                                               identity:@"*"
                                                             accessLevel:RLMSyncAccessLevelWrite];
 
     // Set the permission.
@@ -571,12 +571,12 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Give user B read permissions to that Realm.
     RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[url path]
-                                                                 userID:self.userB.identity
+                                                               identity:self.userB.identity
                                                             accessLevel:RLMSyncAccessLevelRead];
 
     // Set the permission.
     APPLY_PERMISSION(p, self.userA);
-
+    
     // Now retrieve the permissions again and make sure the new permission is properly set.
     results = [self getPermissionResultsFor:self.userA message:@"One permission after setting the permission."];
 
@@ -602,7 +602,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Give user B read permissions to that Realm.
     RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[url path]
-                                                                 userID:self.userB.identity
+                                                               identity:self.userB.identity
                                                             accessLevel:RLMSyncAccessLevelRead];
 
     // Set the permission.
@@ -647,7 +647,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Give user B read permissions to that Realm.
     RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[url path]
-                                                                 userID:self.userB.identity
+                                                               identity:self.userB.identity
                                                             accessLevel:RLMSyncAccessLevelRead];
 
     // Set the permission.
@@ -674,11 +674,11 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     NSString *uC = self.userC.identity;
 
     // Give user B and C read permissions to r1, and user B read permissions for r2.
-    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r1 permission for user B should work.");
-    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] userID:uC accessLevel:RLMSyncAccessLevelRead];
+    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] identity:uC accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r1 permission for user C should work.");
-    id p3 = [[RLMSyncPermission alloc] initWithRealmPath:[url2 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    id p3 = [[RLMSyncPermission alloc] initWithRealmPath:[url2 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p3, self.userA, @"Setting r2 permission for user B should work.");
 
     // Wait for all the permissions to show up.
@@ -714,11 +714,11 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     NSString *uB = self.userB.identity;
 
     // Give user B read permissions for all three Realms.
-    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r1 permission for user B should work.");
-    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url2 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url2 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r2 permission for user B should work.");
-    id p3 = [[RLMSyncPermission alloc] initWithRealmPath:[url3 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    id p3 = [[RLMSyncPermission alloc] initWithRealmPath:[url3 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p3, self.userA, @"Setting r3 permission for user B should work.");
 
     // Now sort on Realm URL.
@@ -763,9 +763,9 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     NSString *uC = self.userC.identity;
 
     // Give users B and C read permission for the Realm.
-    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url path] identity:uB accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r1 permission for user B should work.");
-    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url path] userID:uC accessLevel:RLMSyncAccessLevelRead];
+    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url path] identity:uC accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r1 permission for user C should work.");
 
     // Now sort on user ID.
@@ -777,8 +777,8 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     BOOL seenUserCPermission = NO;
     CHECK_PERMISSION_COUNT_PREDICATE(sorted, 3, >=);
     for (int i=0; i<sorted.count - 1; i++) {
-        NSString *thisID = [sorted objectAtIndex:i].userId;
-        NSString *nextID = [sorted objectAtIndex:i + 1].userId;
+        NSString *thisID = [sorted objectAtIndex:i].identity;
+        NSString *nextID = [sorted objectAtIndex:i + 1].identity;
         seenUserBPermission |= ([thisID isEqualToString:uB] || [nextID isEqualToString:uB]);
         seenUserCPermission |= ([thisID isEqualToString:uC] || [nextID isEqualToString:uC]);
         // Make sure permissions are in ascending order.
@@ -803,11 +803,11 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     NSString *uB = self.userB.identity;
 
     // Give user B read permissions for all three Realms.
-    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url3 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url3 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r3 permission for user B should work.");
-    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r1 permission for user B should work.");
-    id p3 = [[RLMSyncPermission alloc] initWithRealmPath:[url2 path] userID:uB accessLevel:RLMSyncAccessLevelRead];
+    id p3 = [[RLMSyncPermission alloc] initWithRealmPath:[url2 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p3, self.userA, @"Setting r2 permission for user B should work.");
 
     // Now sort on date. (Note that we only want the results for the user B permissions.)
@@ -841,7 +841,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Try to have user B give user C permissions to that Realm.
     RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[url path]
-                                                                 userID:self.userC.identity
+                                                               identity:self.userC.identity
                                                             accessLevel:RLMSyncAccessLevelRead];
 
     // Set the permission.
@@ -1171,11 +1171,11 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Give user B read permissions to that Realm.
     RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[userAURL path]
-                                                                 userID:self.userB.identity
+                                                               identity:self.userB.identity
                                                             accessLevel:RLMSyncAccessLevelRead];
     // Set the read permission.
     APPLY_PERMISSION(p, self.userA);
-
+    
     NSURL *userBURL = makeTestURL(testName, self.userA);
     RLMRealmConfiguration *userBConfig = [RLMRealmConfiguration defaultConfiguration];
     userBConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:self.userB realmURL:userBURL];

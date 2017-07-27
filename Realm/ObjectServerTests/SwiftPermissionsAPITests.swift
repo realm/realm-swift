@@ -102,7 +102,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
                                      owner: SyncUser,
                                      name: String) -> SyncPermission {
         return SyncPermission(realmPath: "/\(owner.identity!)/\(name)",
-            userID: original.userId!,
+            identity: original.identity!,
             accessLevel: original.accessLevel)
     }
 
@@ -126,7 +126,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         _ = try! synchronouslyOpenRealm(url: url, user: userA)
 
         // Give user B read permissions to that Realm.
-        let p = SyncPermission(realmPath: url.path, userID: userB.identity!, accessLevel: .read)
+        let p = SyncPermission(realmPath: url.path, identity: userB.identity!, accessLevel: .read)
 
         // Set the permission.
         let ex2 = expectation(description: "Setting a permission should work.")
@@ -184,7 +184,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         }
 
         // Give user B read permissions to that Realm.
-        let p = SyncPermission(realmPath: url.path, userID: userB.identity!, accessLevel: .read)
+        let p = SyncPermission(realmPath: url.path, identity: userB.identity!, accessLevel: .read)
 
         // Set the permission.
         let ex2 = expectation(description: "Setting a permission should work.")
@@ -210,7 +210,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         _ = try! synchronouslyOpenRealm(url: url, user: userA)
 
         // Try to have user B give user C permissions to that Realm.
-        let p = SyncPermission(realmPath: url.path, userID: userC.identity!, accessLevel: .read)
+        let p = SyncPermission(realmPath: url.path, identity: userC.identity!, accessLevel: .read)
 
         // Attempt to set the permission.
         let ex2 = expectation(description: "Setting an invalid permission should fail.")

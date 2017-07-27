@@ -59,7 +59,7 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
 
 @interface RLMSyncPermission () {
 @private
-    NSString *_userID;
+    NSString *_identity;
     NSString *_key;
     NSString *_value;
     util::Optional<Permission> _underlying;
@@ -72,13 +72,13 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
 @implementation RLMSyncPermission
 
 - (instancetype)initWithRealmPath:(NSString *)path
-                           userID:(NSString *)userID
+                         identity:(NSString *)identity
                       accessLevel:(RLMSyncAccessLevel)accessLevel {
     if (self = [super init]) {
         _accessLevel = accessLevel;
         _path = path;
-        _userID = userID;
-        if (!_userID) {
+        _identity = identity;
+        if (!identity) {
             @throw RLMException(@"A permission value cannot be created without a valid user ID");
         }
         _updatedAt = [NSDate date];
@@ -92,7 +92,7 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
     if (self = [super init]) {
         _accessLevel = accessLevel;
         _path = path;
-        _userID = nil;
+        _identity = nil;
         // This is correct; we internally call this key 'email' even though it doesn't have to be...
         _key = @"email";
         // FIXME: this should be done on the server, not the client.
@@ -137,9 +137,9 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
     return self.accessLevel == RLMSyncAccessLevelAdmin;
 }
 
-- (NSString *)userId {
+- (NSString *)identity {
     if (!_underlying) {
-        return _userID;
+        return _identity;
     }
     if (_underlying->condition.type == ConditionType::UserId) {
         return @(_underlying->condition.user_id.c_str());
@@ -178,8 +178,8 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
     if (_underlying) {
         return *_underlying;
     }
-    auto condition = (_userID
-                      ? Permission::Condition([_userID UTF8String])
+    auto condition = (_identity
+                      ? Permission::Condition([_identity UTF8String])
                       : Permission::Condition([_key UTF8String], [_value UTF8String]));
     return Permission{
         [_path UTF8String],
@@ -189,7 +189,7 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
 }
 
 - (NSUInteger)hash {
-    return [self.userId hash] ^ self.accessLevel;
+    return [self.identity hash] ^ self.accessLevel;
 }
 
 - (BOOL)isEqual:(id)object {
@@ -200,16 +200,16 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
         RLMSyncPermission *that = (RLMSyncPermission *)object;
         return (self.accessLevel == that.accessLevel
                 && Permission::paths_are_equivalent([self.path UTF8String], [that.path UTF8String],
-                                                    [self.userId UTF8String], [that.userId UTF8String])
-                && [self.userId isEqualToString:that.userId]);
+                                                    [self.identity UTF8String], [that.identity UTF8String])
+                && [self.identity isEqualToString:that.identity]);
     }
     return NO;
 }
 
 - (NSString *)description {
     NSString *typeDescription = nil;
-    if (self.userId) {
-        typeDescription = [NSString stringWithFormat:@"user ID: %@", self.userId];
+    if (self.identity) {
+        typeDescription = [NSString stringWithFormat:@"identity: %@", self.identity];
     } else {
         typeDescription = [NSString stringWithFormat:@"key: %@, value: %@", self.key, self.value];
     }

@@ -83,12 +83,13 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param path        The Realm Object Server path to the Realm whose permission should be modified
                     (e.g. "/path/to/realm"). Pass "*" to apply to all Realms managed by the user.
- @param userID      The identity of the user who should be granted access to the Realm at `path`.
+ @param identity    The Realm Object Server identity of the user who should be granted access to
+                    the Realm at `path`.
                     Pass "*" to apply to all users managed by the server.
  @param accessLevel The access level to grant.
  */
 - (instancetype)initWithRealmPath:(NSString *)path
-                           userID:(NSString *)userID
+                         identity:(NSString *)identity
                       accessLevel:(RLMSyncAccessLevel)accessLevel;
 
 /**
@@ -109,7 +110,7 @@ NS_ASSUME_NONNULL_BEGIN
  if all users are granted this permission. Nil if the permission is
  defined in terms of a key-value pair.
  */
-@property (nullable, nonatomic, readonly) NSString *userId;
+@property (nullable, nonatomic, readonly) NSString *identity;
 
 /**
  If the permission is defined in terms of a key-value pair, the key
@@ -135,6 +136,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// :nodoc:
 + (instancetype)new __attribute__((unavailable("Use the designated initializer")));
+
+#pragma mark - Deprecation
+
+@property (nullable, nonatomic, readonly) NSString *userId __attribute__((unavailable("Renamed to `identity`")));
 
 @end
 
