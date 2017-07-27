@@ -139,6 +139,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Deprecation
 
+/// :nodoc:
 @property (nullable, nonatomic, readonly) NSString *userId __attribute__((unavailable("Renamed to `identity`")));
 
 @end
