@@ -57,12 +57,12 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         token.stop()
     }
 
-    private func get(permission: SyncPermissionValue,
+    private func get(permission: SyncPermission,
                      from results: SyncPermissionResults,
                      file: StaticString = #file,
-                     line: UInt = #line) -> SyncPermissionValue? {
+                     line: UInt = #line) -> SyncPermission? {
         let ex = expectation(description: "Retrieving permission")
-        var finalValue: SyncPermissionValue?
+        var finalValue: SyncPermission?
         let token = results.addNotificationBlock { (error) in
             XCTAssertNil(error, "Notification returned error '\(error!)' when running test at \(file):\(line)")
             for result in results where result == permission {
@@ -79,7 +79,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
     /// Ensure the absence of a permission from a results after an elapsed time interval.
     /// This method is intended to be used to check that a permission never becomes
     /// present within a results to begin with.
-    private func ensureAbsence(of permission: SyncPermissionValue,
+    private func ensureAbsence(of permission: SyncPermission,
                                from results: SyncPermissionResults,
                                after wait: Double = 0.5,
                                file: StaticString = #file,
@@ -98,12 +98,12 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         XCTAssertFalse(isPresent, "Permission '\(permission)' was spuriously present (\(file):\(line))")
     }
 
-    private static func makeExpected(from original: SyncPermissionValue,
+    private static func makeExpected(from original: SyncPermission,
                                      owner: SyncUser,
-                                     name: String) -> SyncPermissionValue {
-        return SyncPermissionValue(realmPath: "/\(owner.identity!)/\(name)",
-                                   userID: original.userId!,
-                                   accessLevel: original.accessLevel)
+                                     name: String) -> SyncPermission {
+        return SyncPermission(realmPath: "/\(owner.identity!)/\(name)",
+            userID: original.userId!,
+            accessLevel: original.accessLevel)
     }
 
     /// Setting a permission should work, and then that permission should be able to be retrieved.
@@ -126,11 +126,11 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         _ = try! synchronouslyOpenRealm(url: url, user: userA)
 
         // Give user B read permissions to that Realm.
-        let p = SyncPermissionValue(realmPath: url.path, userID: userB.identity!, accessLevel: .read)
+        let p = SyncPermission(realmPath: url.path, userID: userB.identity!, accessLevel: .read)
 
         // Set the permission.
         let ex2 = expectation(description: "Setting a permission should work.")
-        userA.applyPermission(p) { (error) in
+        userA.apply(p) { (error) in
             XCTAssertNil(error)
             ex2.fulfill()
         }
@@ -184,11 +184,11 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         }
 
         // Give user B read permissions to that Realm.
-        let p = SyncPermissionValue(realmPath: url.path, userID: userB.identity!, accessLevel: .read)
+        let p = SyncPermission(realmPath: url.path, userID: userB.identity!, accessLevel: .read)
 
         // Set the permission.
         let ex2 = expectation(description: "Setting a permission should work.")
-        userA.applyPermission(p) { (error) in
+        userA.apply(p) { (error) in
             XCTAssertNil(error)
             ex2.fulfill()
         }
@@ -210,11 +210,11 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         _ = try! synchronouslyOpenRealm(url: url, user: userA)
 
         // Try to have user B give user C permissions to that Realm.
-        let p = SyncPermissionValue(realmPath: url.path, userID: userC.identity!, accessLevel: .read)
+        let p = SyncPermission(realmPath: url.path, userID: userC.identity!, accessLevel: .read)
 
         // Attempt to set the permission.
         let ex2 = expectation(description: "Setting an invalid permission should fail.")
-        userB.applyPermission(p) { (error) in
+        userB.apply(p) { (error) in
             XCTAssertNotNil(error)
             ex2.fulfill()
         }

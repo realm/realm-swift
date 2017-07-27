@@ -305,9 +305,9 @@ extension SyncUser {
  with a Realm. These values are passed into APIs on `SyncUser`, and
  returned from `SyncPermissionResults`.
 
- - see: `RLMSyncPermissionValue`
+ - see: `RLMSyncPermission`
  */
-public typealias SyncPermissionValue = RLMSyncPermissionValue
+public typealias SyncPermission = RLMSyncPermission
 
 /**
  An enumeration describing possible access levels.
@@ -317,7 +317,7 @@ public typealias SyncPermissionValue = RLMSyncPermissionValue
 public typealias SyncAccessLevel = RLMSyncAccessLevel
 
 /**
- A collection of `SyncPermissionValue`s that represent the permissions
+ A collection of `SyncPermission`s that represent the permissions
  that have been configured on all the Realms that some user is allowed
  to administer.
 
@@ -327,7 +327,7 @@ public typealias SyncPermissionResults = RLMSyncPermissionResults
 
 #if swift(>=3.1)
 extension SyncPermissionResults: RandomAccessCollection {
-    public subscript(index: Int) -> SyncPermissionValue {
+    public subscript(index: Int) -> SyncPermission {
         return object(at: index)
     }
 
@@ -347,13 +347,13 @@ extension SyncPermissionResults: RandomAccessCollection {
 extension SyncPermissionResults {
     /// Return the first permission value in the results, or `nil` if
     /// the results are empty.
-    public var first: SyncPermissionValue? {
+    public var first: SyncPermission? {
         return count > 0 ? object(at: 0) : nil
     }
 
     /// Return the last permission value in the results, or `nil` if
     /// the results are empty.
-    public var last: SyncPermissionValue? {
+    public var last: SyncPermission? {
         return count > 0 ? object(at: count - 1) : nil
     }
 }
@@ -366,8 +366,8 @@ extension SyncPermissionResults: Sequence {
             iteratorBase = NSFastEnumerationIterator(results)
         }
 
-        public func next() -> SyncPermissionValue? {
-            return iteratorBase.next() as! SyncPermissionValue?
+        public func next() -> SyncPermission? {
+            return iteratorBase.next() as! SyncPermission?
         }
     }
 
@@ -662,3 +662,9 @@ public extension SyncSession {
         }
     }
 }
+
+// MARK: - Migration assistance
+
+/// :nodoc:
+@available(*, unavailable, renamed: "SyncPermission")
+public final class SyncPermissionValue { }

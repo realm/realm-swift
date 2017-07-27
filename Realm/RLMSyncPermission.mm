@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncPermissionValue_Private.hpp"
+#import "RLMSyncPermission_Private.hpp"
 
 #import "RLMUtil.hpp"
 
@@ -57,7 +57,7 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
 
 #pragma mark - Permission
 
-@interface RLMSyncPermissionValue () {
+@interface RLMSyncPermission () {
 @private
     NSString *_userID;
     NSString *_key;
@@ -69,7 +69,7 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
 }
 @end
 
-@implementation RLMSyncPermissionValue
+@implementation RLMSyncPermission
 
 - (instancetype)initWithRealmPath:(NSString *)path
                            userID:(NSString *)userID
@@ -196,8 +196,8 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
     if (self == object) {
         return YES;
     }
-    if ([object isKindOfClass:[RLMSyncPermissionValue class]]) {
-        RLMSyncPermissionValue *that = (RLMSyncPermissionValue *)object;
+    if ([object isKindOfClass:[RLMSyncPermission class]]) {
+        RLMSyncPermission *that = (RLMSyncPermission *)object;
         return (self.accessLevel == that.accessLevel
                 && Permission::paths_are_equivalent([self.path UTF8String], [that.path UTF8String],
                                                     [self.userId UTF8String], [that.userId UTF8String])
@@ -213,7 +213,7 @@ RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) 
     } else {
         typeDescription = [NSString stringWithFormat:@"key: %@, value: %@", self.key, self.value];
     }
-    return [NSString stringWithFormat:@"<RLMSyncPermissionValue> %@, path: %@, access level: %@",
+    return [NSString stringWithFormat:@"<RLMSyncPermission> %@, path: %@, access level: %@",
             typeDescription,
             self.path,
             @(Permission::description_for_access_level(accessLevelForObjcAccessLevel(self.accessLevel)).c_str())];

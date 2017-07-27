@@ -24,7 +24,7 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncPermissionResults_Private.hpp"
-#import "RLMSyncPermissionValue_Private.hpp"
+#import "RLMSyncPermission_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncSessionRefreshHandle.hpp"
 #import "RLMSyncUtil_Private.hpp"
@@ -331,7 +331,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     Permissions::get_permissions(_user, RLMWrapPermissionResultsCallback(callback), *_configMaker);
 }
 
-- (void)applyPermission:(RLMSyncPermissionValue *)permission callback:(RLMPermissionStatusBlock)callback {
+- (void)applyPermission:(RLMSyncPermission *)permission callback:(RLMPermissionStatusBlock)callback {
     if (!_user || _user->state() == SyncUser::State::Error) {
         callback(make_permission_error_change(@"Permissions cannot be applied using an invalid user."));
         return;
@@ -342,7 +342,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                 *_configMaker);
 }
 
-- (void)revokePermission:(RLMSyncPermissionValue *)permission callback:(RLMPermissionStatusBlock)callback {
+- (void)revokePermission:(RLMSyncPermission *)permission callback:(RLMPermissionStatusBlock)callback {
     if (!_user || _user->state() == SyncUser::State::Error) {
         callback(make_permission_error_change(@"Permissions cannot be revoked using an invalid user."));
         return;

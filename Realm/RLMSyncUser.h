@@ -20,7 +20,7 @@
 
 #import "RLMSyncCredentials.h"
 
-@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncPermissionValue, RLMSyncPermissionResults, RLMSyncSession, RLMRealm;
+@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncPermission, RLMSyncPermissionResults, RLMSyncSession, RLMRealm;
 
 /**
  The state of the user object.
@@ -196,7 +196,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
            identityProvider:(RLMIdentityProvider)provider
                  completion:(RLMRetrieveUserBlock)completion;
 
-// This set of permissions APIs uses immutable `RLMSyncPermissionValue` objects to
+// This set of permissions APIs uses immutable `RLMSyncPermission` objects to
 // retrieve and apply permissions. It is intended to replace the set of APIs which
 // directly access Realms and Realm model objects to work with permissions.
 #pragma mark - Value-based Permissions API
@@ -222,9 +222,9 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  the permission change succeeded or failed. The user calling this method must have the right
  to grant the given permission, or else the operation will fail.
 
- @see `RLMSyncPermissionValue`
+ @see `RLMSyncPermission`
  */
-- (void)applyPermission:(RLMSyncPermissionValue *)permission callback:(RLMPermissionStatusBlock)callback;
+- (void)applyPermission:(RLMSyncPermission *)permission callback:(RLMPermissionStatusBlock)callback;
 
 /**
  Revoke a given permission.
@@ -233,9 +233,9 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  the permission change succeeded or failed. The user calling this method must have the right
  to grant the given permission, or else the operation will fail.
 
- @see `RLMSyncPermissionValue`
+ @see `RLMSyncPermission`
  */
-- (void)revokePermission:(RLMSyncPermissionValue *)permission callback:(RLMPermissionStatusBlock)callback;
+- (void)revokePermission:(RLMSyncPermission *)permission callback:(RLMPermissionStatusBlock)callback;
 
 /**
  Returns an instance of the Management Realm owned by the user.

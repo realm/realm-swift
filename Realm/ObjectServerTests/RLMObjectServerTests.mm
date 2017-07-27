@@ -30,19 +30,6 @@
 
 @implementation RLMObjectServerTests
 
-- (void)workAroundCoreIssue2724
-{
-    // As described in https://github.com/realm/realm-core/issues/2724, with realm-core v3.0.0-rc3 we're
-    // seeing occasional deadlocks in these tests due to core thinking that the history schema needs to
-    // be upgraded when it doesn't. This leads to it taking a write transaction as part of opening a file.
-    // Since this can happen on the notification listener thread while another thread both has an existing
-    // write transaction and is waiting for the notification listener thread to process notifications,
-    // we deadlock.
-    // We work around this by delaying slightly between registering for notifications on a given Realm and
-    // opening a write transaction on the same Realm.
-    [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-}
-
 #pragma mark - Authentication and Tokens
 
 /// Valid username/password credentials should be able to log in a user. Using the same credentials should return the
