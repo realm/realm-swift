@@ -22,28 +22,28 @@ import RealmSwift
 // Old data models
 /* V0
 class Person: Object {
-    dynamic var firstName = ""
-    dynamic var lastName = ""
-    dynamic var age = 0
+    @objc dynamic var firstName = ""
+    @objc dynamic var lastName = ""
+    @objc dynamic var age = 0
 }
 */
 
 /* V1
 class Person: Object {
-    dynamic var fullName = ""        // combine firstName and lastName into single field
-    dynamic var age = 0
+    @objc dynamic var fullName = ""        // combine firstName and lastName into single field
+    @objc dynamic var age = 0
 }
 */
 
 /* V2 */
 class Pet: Object {
-    dynamic var name = ""
-    dynamic var type = ""
+    @objc dynamic var name = ""
+    @objc dynamic var type = ""
 }
 
 class Person: Object {
-    dynamic var fullName = ""
-    dynamic var age = 0
+    @objc dynamic var fullName = ""
+    @objc dynamic var age = 0
     let pets = List<Pet>() // Add pets field
 }
 
