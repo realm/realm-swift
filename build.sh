@@ -1114,8 +1114,8 @@ EOM
         ;;
 
     "package-test-examples")
-        if ! VERSION=$(echo realm-objc-*.zip | grep -o '\d*\.\d*\.\d*-[a-z]*'); then
-            VERSION=$(echo realm-objc-*.zip | grep -o '\d*\.\d*\.\d*')
+        if ! VERSION=$(echo realm-objc-*.zip | egrep -o '\d*\.\d*\.\d*-[a-z]*(\.\d*)?'); then
+            VERSION=$(echo realm-objc-*.zip | egrep -o '\d*\.\d*\.\d*')
         fi
         OBJC="realm-objc-${VERSION}"
         SWIFT="realm-swift-${VERSION}"
