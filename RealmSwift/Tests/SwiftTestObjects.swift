@@ -442,7 +442,8 @@ class SwiftObjectiveCTypesObject: Object {
     @objc dynamic var numCol: NSNumber? = 0
 }
 
-class SwiftComputedPropertyNotExplicitlyIgnoredObject: Object {
+class SwiftComputedPropertyNotIgnoredObject: Object {
+    // swiftlint:disable:next identifier_name
     dynamic var _urlBacking = ""
 
     // Dynamic; no ivar

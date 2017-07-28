@@ -206,7 +206,7 @@ class ObjectSchemaInitializationTests: TestCase {
     }
 
     func testNotExplicitlyIgnoredComputedProperties() {
-        let schema = SwiftComputedPropertyNotExplicitlyIgnoredObject().objectSchema
+        let schema = SwiftComputedPropertyNotIgnoredObject().objectSchema
         // The two computed properties should not appear on the schema.
         XCTAssertEqual(schema.properties.count, 1)
         XCTAssertNotNil(schema["_urlBacking"])
