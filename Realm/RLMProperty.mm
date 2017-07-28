@@ -74,7 +74,7 @@ void RLMValidateSwiftPropertyName(NSString *name) {
     }
 }
 
-static bool rawTypeIsComputedProperty(NSString *rawType) {
+static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
     return [rawType isEqualToString:@"@\"RLMLinkingObjects\""] || [rawType hasPrefix:@"@\"RLMLinkingObjects<"];
 }
 
@@ -296,10 +296,14 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     return YES;
 }
 
-- (void)parseObjcProperty:(objc_property_t)property readOnly:(bool *)readOnly rawType:(NSString **)rawType {
+- (void)parseObjcProperty:(objc_property_t)property
+                 readOnly:(bool *)readOnly
+                 computed:(bool *)computed
+                  rawType:(NSString **)rawType {
     unsigned int count;
     objc_property_attribute_t *attrs = property_copyAttributeList(property, &count);
 
+    *computed = true;
     for (size_t i = 0; i < count; ++i) {
         switch (*attrs[i].name) {
             case 'T':
@@ -319,6 +323,9 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
                 break;
             case 'S':
                 _setterName = @(attrs[i].value);
+                break;
+            case 'V': // backing ivar name
+                *computed = false;
                 break;
             default:
                 break;
@@ -349,8 +356,17 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
 
     NSString *rawType;
     bool readOnly = false;
-    [self parseObjcProperty:property readOnly:&readOnly rawType:&rawType];
-    if (readOnly) {
+    bool isComputed = false;
+    [self parseObjcProperty:property readOnly:&readOnly computed:&isComputed rawType:&rawType];
+    if (!readOnly && isComputed) {
+        // Check for lazy property.
+        NSString *backingPropertyName = [NSString stringWithFormat:@"%@.storage", name];
+        if (class_getInstanceVariable([obj class], backingPropertyName.UTF8String)) {
+            isComputed = false;
+        }
+    }
+
+    if (readOnly || isComputed) {
         return nil;
     }
 
@@ -445,9 +461,10 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
 
     NSString *rawType;
     bool isReadOnly = false;
-    [self parseObjcProperty:property readOnly:&isReadOnly rawType:&rawType];
-    bool isComputedProperty = rawTypeIsComputedProperty(rawType);
-    if (isReadOnly && !isComputedProperty) {
+    bool isComputed = false;
+    [self parseObjcProperty:property readOnly:&isReadOnly computed:&isComputed rawType:&rawType];
+    bool shouldBeTreatedAsComputedProperty = rawTypeShouldBeTreatedAsComputedProperty(rawType);
+    if ((isReadOnly || isComputed) && !shouldBeTreatedAsComputedProperty) {
         return nil;
     }
 
@@ -456,7 +473,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
                              "Add to ignoredPropertyNames: method to ignore.", self.name);
     }
 
-    if (!isReadOnly && isComputedProperty) {
+    if (!isReadOnly && shouldBeTreatedAsComputedProperty) {
         @throw RLMException(@"Property '%@' must be declared as readonly as %@ properties cannot be written to.",
                             self.name, RLMTypeToString(_type));
     }

@@ -442,6 +442,31 @@ class SwiftObjectiveCTypesObject: Object {
     @objc dynamic var numCol: NSNumber? = 0
 }
 
+class SwiftComputedPropertyNotIgnoredObject: Object {
+    // swiftlint:disable:next identifier_name
+    dynamic var _urlBacking = ""
+
+    // Dynamic; no ivar
+    dynamic var dynamicURL: URL? {
+        get {
+            return URL(string: _urlBacking)
+        }
+        set {
+            _urlBacking = newValue?.absoluteString ?? ""
+        }
+    }
+
+    // Non-dynamic; no ivar
+    var url: URL? {
+        get {
+            return URL(string: _urlBacking)
+        }
+        set {
+            _urlBacking = newValue?.absoluteString ?? ""
+        }
+    }
+}
+
 @objc(SwiftObjcRenamedObject)
 class SwiftObjcRenamedObject: Object {
     @objc dynamic var stringCol = ""

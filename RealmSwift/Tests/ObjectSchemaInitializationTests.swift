@@ -204,6 +204,13 @@ class ObjectSchemaInitializationTests: TestCase {
     func testNonRealmOptionalTypesDeclaredAsRealmOptional() {
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonRealmOptionalType.self))
     }
+
+    func testNotExplicitlyIgnoredComputedProperties() {
+        let schema = SwiftComputedPropertyNotIgnoredObject().objectSchema
+        // The two computed properties should not appear on the schema.
+        XCTAssertEqual(schema.properties.count, 1)
+        XCTAssertNotNil(schema["_urlBacking"])
+    }
 }
 
 class SwiftFakeObject: NSObject {

@@ -397,6 +397,13 @@ RLM_ARRAY_TYPE(PrimaryCompanyObject);
 @property RLM_GENERIC_ARRAY(PrimaryCompanyObject) *companies;
 @end
 
+#pragma mark ComputedPropertyNotExplicitlyIgnoredObject
+
+@interface ComputedPropertyNotExplicitlyIgnoredObject : RLMObject
+@property NSString *_URLBacking;
+@property NSURL *URL;
+@end
+
 #pragma mark FakeObject
 
 @interface FakeObject : NSObject
