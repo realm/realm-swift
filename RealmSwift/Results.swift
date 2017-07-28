@@ -249,6 +249,12 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
         return Results<T>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
+    
+    // MARK: Distinction
+    
+    public func distinct(byProperty property: String) -> Results<T> {
+        return Results<T>(rlmResults.distinctResults(usingProperty: property))
+    }
 
     // MARK: Aggregate Operations
 
