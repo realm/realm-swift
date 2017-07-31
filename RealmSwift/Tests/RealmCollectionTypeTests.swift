@@ -490,13 +490,13 @@ class RealmCollectionTypeTests: TestCase {
         _ = collection.filter("ANY stringListCol == %@", CTTStringObjectWithLink())
     }
 
-    func testAddNotificationBlock() {
+    func testObserve() {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
 
         var theExpectation = expectation(description: "")
-        let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
+        let token = collection.observe { (changes: RealmCollectionChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 2)
@@ -515,7 +515,7 @@ class RealmCollectionTypeTests: TestCase {
 
         // add a second notification and wait for it
         theExpectation = expectation(description: "")
-        let token2 = collection.addNotificationBlock { _ in
+        let token2 = collection.observe { _ in
             theExpectation.fulfill()
         }
         waitForExpectations(timeout: 1, handler: nil)
@@ -616,7 +616,7 @@ class ResultsTests: RealmCollectionTypeTests {
 
         var theExpectation = expectation(description: "")
         var calls = 0
-        let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
+        let token = collection.observe { (changes: RealmCollectionChange) in
             switch changes {
             case .initial(let results):
                 XCTAssertEqual(results.count, calls + 2)
@@ -647,7 +647,7 @@ class ResultsTests: RealmCollectionTypeTests {
 
         var theExpectation = expectation(description: "")
         var calls = 0
-        let token = collection.addNotificationBlock { (change: RealmCollectionChange) in
+        let token = collection.observe { (change: RealmCollectionChange) in
             switch change {
             case .initial(let results):
                 XCTAssertEqual(calls, 0)
@@ -799,11 +799,11 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         assertMatches(collection.description, "List<CTTStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
     }
 
-    func testAddNotificationBlockDirect() {
+    func testObserveDirect() {
         let collection = collectionBase()
 
         var theExpectation = expectation(description: "")
-        let token = collection.addNotificationBlock { (changes: RealmCollectionChange) in
+        let token = collection.observe { (changes: RealmCollectionChange) in
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 2)
@@ -822,7 +822,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
 
         // add a second notification and wait for it
         theExpectation = expectation(description: "")
-        let token2 = collection.addNotificationBlock { _ in
+        let token2 = collection.observe { _ in
             theExpectation.fulfill()
         }
         waitForExpectations(timeout: 1, handler: nil)
@@ -936,16 +936,16 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(collection.filter("ANY stringListCol == %@", CTTStringObjectWithLink()))
     }
 
-    override func testAddNotificationBlock() {
+    override func testObserve() {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        assertThrows(collection.addNotificationBlock { _ in })
+        assertThrows(collection.observe { _ in })
     }
 
-    override func testAddNotificationBlockDirect() {
+    override func testObserveDirect() {
         let collection = collectionBase()
-        assertThrows(collection.addNotificationBlock { _ in })
+        assertThrows(collection.observe { _ in })
     }
 }
 

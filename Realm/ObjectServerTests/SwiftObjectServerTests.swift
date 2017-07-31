@@ -335,7 +335,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let exp = expectation(description: "A new permission offer will be processed by the server")
 
             let results = managementRealm.objects(SyncPermissionOffer.self).filter("id = %@", permissionOffer.id)
-            let notificationToken = results.addNotificationBlock { (changes) in
+            let notificationToken = results.observe { (changes) in
                 if case .update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
                     XCTAssertEqual(statusCode, 0)
                     XCTAssertEqual(change[0].status, .success)
@@ -370,7 +370,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let permissionOfferNotificationToken = managementRealm
                 .objects(SyncPermissionOffer.self)
                 .filter("id = %@", permissionOffer.id)
-                .addNotificationBlock { (changes) in
+                .observe { (changes) in
                 if case .update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
                     XCTAssertEqual(statusCode, 0)
                     XCTAssertEqual(change[0].status, .success)
@@ -403,7 +403,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let permissionOfferResponseNotificationToken = managementRealm
                 .objects(SyncPermissionOfferResponse.self)
                 .filter("id = %@", permissionOfferResponse.id)
-                .addNotificationBlock { (changes) in
+                .observe { (changes) in
                 if case .update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
                     XCTAssertEqual(statusCode, 0)
                     XCTAssertEqual(change[0].status, .success)

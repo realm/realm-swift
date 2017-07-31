@@ -675,10 +675,10 @@ class RealmTests: TestCase {
         XCTAssertEqual(stringVal, "a", "Object Subscripting Failed!")
     }
 
-    func testAddNotificationBlock() {
+    func testObserve() {
         let realm = try! Realm()
         var notificationCalled = false
-        let token = realm.addNotificationBlock { _, realm in
+        let token = realm.observe { _, realm in
             XCTAssertEqual(realm.configuration.fileURL, self.defaultRealmURL())
             notificationCalled = true
         }
@@ -691,7 +691,7 @@ class RealmTests: TestCase {
     func testRemoveNotification() {
         let realm = try! Realm()
         var notificationCalled = false
-        let token = realm.addNotificationBlock { (_, realm) -> Void in
+        let token = realm.observe { (_, realm) -> Void in
             XCTAssertEqual(realm.configuration.fileURL, self.defaultRealmURL())
             notificationCalled = true
         }
@@ -711,7 +711,7 @@ class RealmTests: TestCase {
         // test that autoreresh is applied
         // we have two notifications, one for opening the realm, and a second when performing our transaction
         let notificationFired = expectation(description: "notification fired")
-        let token = realm.addNotificationBlock { _, realm in
+        let token = realm.observe { _, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
             notificationFired.fulfill()
         }
@@ -738,7 +738,7 @@ class RealmTests: TestCase {
         // test that autoreresh is not applied
         // we have two notifications, one for opening the realm, and a second when performing our transaction
         let notificationFired = expectation(description: "notification fired")
-        let token = realm.addNotificationBlock { _, realm in
+        let token = realm.observe { _, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
             notificationFired.fulfill()
         }

@@ -229,7 +229,7 @@ open class Object: RLMObjectBase, ThreadConfined {
      - parameter block: The block to call with information about changes to the object.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(_ block: @escaping (ObjectChange) -> Void) -> NotificationToken {
+    public func observe(_ block: @escaping (ObjectChange) -> Void) -> NotificationToken {
         return RLMObjectAddNotificationBlock(self, { names, oldValues, newValues, error in
             if let error = error {
                 block(.error(error as NSError))

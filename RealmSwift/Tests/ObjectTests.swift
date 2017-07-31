@@ -474,7 +474,7 @@ class ObjectTests: TestCase {
         try! realm.commitWrite()
 
         let exp = expectation(description: "")
-        let token = object.addNotificationBlock { change in
+        let token = object.observe { change in
             if case .deleted = change {
             } else {
                 XCTFail("expected .deleted, got \(change)")
@@ -513,7 +513,7 @@ class ObjectTests: TestCase {
         let object = realm.create(SwiftIntObject.self, value: [1])
         try! realm.commitWrite()
 
-        let token = object.addNotificationBlock(expectChange("intCol", Int?.none, 2))
+        let token = object.observe(expectChange("intCol", Int?.none, 2))
         try! realm.write {
             object.intCol = 2
         }
@@ -528,7 +528,7 @@ class ObjectTests: TestCase {
         let object = realm.create(SwiftIntObject.self, value: [1])
         try! realm.commitWrite()
 
-        let token = object.addNotificationBlock(expectChange("intCol", 1, 2))
+        let token = object.observe(expectChange("intCol", 1, 2))
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {
@@ -546,7 +546,7 @@ class ObjectTests: TestCase {
         let object = realm.create(SwiftRecursiveObject.self, value: [[]])
         try! realm.commitWrite()
 
-        let token = object.addNotificationBlock(expectChange("objects", Int?.none, Int?.none))
+        let token = object.observe(expectChange("objects", Int?.none, Int?.none))
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {
@@ -566,7 +566,7 @@ class ObjectTests: TestCase {
             realm.add(object)
         }
 
-        var token = object.addNotificationBlock(expectChange("optIntCol", 1, 2))
+        var token = object.observe(expectChange("optIntCol", 1, 2))
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {
@@ -576,7 +576,7 @@ class ObjectTests: TestCase {
         waitForExpectations(timeout: 2)
         token.stop()
 
-        token = object.addNotificationBlock(expectChange("optIntCol", 2, Int?.none))
+        token = object.observe(expectChange("optIntCol", 2, Int?.none))
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {
@@ -586,7 +586,7 @@ class ObjectTests: TestCase {
         waitForExpectations(timeout: 2)
         token.stop()
 
-        token = object.addNotificationBlock(expectChange("optIntCol", Int?.none, 3))
+        token = object.observe(expectChange("optIntCol", Int?.none, 3))
         dispatchSyncNewThread {
             let realm = try! Realm()
             try! realm.write {

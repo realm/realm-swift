@@ -34,7 +34,7 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
         super.viewDidLoad()
 
         let realm = try! Realm()
-        token = realm.addNotificationBlock { [weak self] notification, realm in
+        token = realm.observe { [weak self] notification, realm in
             self?.reloadData()
         }
 

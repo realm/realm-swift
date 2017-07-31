@@ -47,7 +47,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
                                       file: StaticString = #file,
                                       line: UInt = #line) {
         let ex = expectation(description: "Checking permission count")
-        let token = results.addNotificationBlock { (error) in
+        let token = results.observe { (error) in
             XCTAssertNil(error, "Notification returned error '\(error!)' when running test at \(file):\(line)")
             if results.count == expected {
                 ex.fulfill()
@@ -63,7 +63,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
                      line: UInt = #line) -> SyncPermission? {
         let ex = expectation(description: "Retrieving permission")
         var finalValue: SyncPermission?
-        let token = results.addNotificationBlock { (error) in
+        let token = results.observe { (error) in
             XCTAssertNil(error, "Notification returned error '\(error!)' when running test at \(file):\(line)")
             for result in results where result == permission {
                 finalValue = result
@@ -86,7 +86,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
                                line: UInt = #line) {
         let ex = expectation(description: "Looking for permission")
         var isPresent = false
-        let token = results.addNotificationBlock { (error) in
+        let token = results.observe { (error) in
             XCTAssertNil(error, "Notification returned error '\(error!)' when running test at \(file):\(line)")
             isPresent = results.contains(permission)
         }
@@ -176,7 +176,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
 
         // Register notifications.
         let noteEx = expectation(description: "Notification should fire")
-        let token = results.addNotificationBlock { (error) in
+        let token = results.observe { (error) in
             XCTAssertNil(error)
             if results.count > 0 {
                 noteEx.fulfill()

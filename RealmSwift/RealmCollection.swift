@@ -50,7 +50,7 @@ public final class RLMIterator<T: Object>: IteratorProtocol {
  For example, for a simple one-section table view, you can do the following:
 
  ```swift
- self.notificationToken = results.addNotificationBlock { changes in
+ self.notificationToken = results.observe { changes in
      switch changes {
      case .initial:
          // Results are now populated and can be accessed without blocking the UI
@@ -327,7 +327,7 @@ public protocol RealmCollection: RealmCollectionBase {
      ```swift
      let results = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
-     let token = dogs.addNotificationBlock { changes in
+     let token = dogs.observe { changes in
      switch changes {
          case .initial(let dogs):
              // Will print "dogs.count: 1"
@@ -356,10 +356,10 @@ public protocol RealmCollection: RealmCollectionBase {
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    func addNotificationBlock(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
+    func observe(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
     /// :nodoc:
-    func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
+    func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
 private class _AnyRealmCollectionBase<T: Object>: AssistedObjectiveCBridgeable {
@@ -389,7 +389,7 @@ private class _AnyRealmCollectionBase<T: Object>: AssistedObjectiveCBridgeable {
     func value(forKey key: String) -> Any? { fatalError() }
     func value(forKeyPath keyPath: String) -> Any? { fatalError() }
     func setValue(_ value: Any?, forKey key: String) { fatalError() }
-    func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
+    func _observe(_ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
     class func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self { fatalError() }
     var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
@@ -498,8 +498,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     // MARK: Notifications
 
     /// :nodoc:
-    override func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
-        -> NotificationToken { return base._addNotificationBlock(block) }
+    override func _observe(_ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
+        -> NotificationToken { return base._observe(block) }
 
     // MARK: AssistedObjectiveCBridgeable
 
@@ -763,7 +763,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
      ```swift
      let results = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
-     let token = dogs.addNotificationBlock { changes in
+     let token = dogs.observe { changes in
          switch changes {
          case .initial(let dogs):
              // Will print "dogs.count: 1"
@@ -792,12 +792,12 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
-        -> NotificationToken { return base._addNotificationBlock(block) }
+    public func observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
+        -> NotificationToken { return base._observe(block) }
 
     /// :nodoc:
-    public func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
-        -> NotificationToken { return base._addNotificationBlock(block) }
+    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
+        -> NotificationToken { return base._observe(block) }
 }
 
 // MARK: AssistedObjectiveCBridgeable

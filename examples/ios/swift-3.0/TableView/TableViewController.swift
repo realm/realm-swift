@@ -46,7 +46,7 @@ class TableViewController: UITableViewController {
         setupUI()
 
         // Set results notification block
-        self.notificationToken = results.addNotificationBlock { (changes: RealmCollectionChange) in
+        self.notificationToken = results.observe { (changes: RealmCollectionChange) in
             switch changes {
             case .initial:
                 // Results are now populated and can be accessed without blocking the UI

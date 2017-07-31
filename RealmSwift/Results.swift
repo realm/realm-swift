@@ -324,7 +324,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      ```swift
      let results = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
-     let token = dogs.addNotificationBlock { changes in
+     let token = dogs.observe { changes in
          switch changes {
          case .initial(let dogs):
              // Will print "dogs.count: 1"
@@ -353,7 +353,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<Results>) -> Void) -> NotificationToken {
+    public func observe(_ block: @escaping (RealmCollectionChange<Results>) -> Void) -> NotificationToken {
         return rlmResults.addNotificationBlock { _, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
@@ -383,7 +383,7 @@ extension Results: RealmCollection {
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
-    public func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
         NotificationToken {
         let anyCollection = AnyRealmCollection(self)
         return rlmResults.addNotificationBlock { _, change, error in
