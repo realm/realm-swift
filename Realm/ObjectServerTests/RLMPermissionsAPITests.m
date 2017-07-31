@@ -248,8 +248,7 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     // TODO: if we can get the session itself we can check to see if it's been errored out (as expected).
 
     // Perhaps obviously, there should be no new objects.
-    [self waitForDownloadsForUser:self.userA url:userAURL];
-    CHECK_COUNT(3, SyncObject, userARealm);
+    CHECK_COUNT_PENDING_DOWNLOAD(3, SyncObject, userARealm);
 
     // Administering the Realm should fail.
     RLMSyncPermissionValue *p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[userBURL path]
@@ -295,15 +294,13 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     // Open the Realm for user B. Since user B has write privileges, they should be able to open it 'normally'.
     NSURL *userBURL = makeTestURL(testName, self.userA);
     RLMRealm *userBRealm = [self openRealmForURL:userBURL user:self.userB];
-    [self waitForDownloadsForUser:self.userB url:userBURL];
-    CHECK_COUNT(3, SyncObject, userBRealm);
+    CHECK_COUNT_PENDING_DOWNLOAD(3, SyncObject, userBRealm);
 
     // Add some objects using user B.
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
     [self waitForUploadsForUser:self.userB url:userBURL];
     CHECK_COUNT(5, SyncObject, userBRealm);
-    [self waitForUploadsForUser:self.userA url:userAURL];
-    CHECK_COUNT(5, SyncObject, userARealm);
+    CHECK_COUNT_PENDING_DOWNLOAD(5, SyncObject, userARealm);
 
     // Administering the Realm should fail.
     RLMSyncPermissionValue *p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[userBURL path]
@@ -352,15 +349,13 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
     // Open the Realm for user B. Since user B has admin privileges, they should be able to open it 'normally'.
     RLMRealm *userBRealm = [self openRealmForURL:userAURLResolved user:self.userB];
-    [self waitForDownloadsForUser:self.userB url:userAURLResolved];
-    CHECK_COUNT(3, SyncObject, userBRealm);
+    CHECK_COUNT_PENDING_DOWNLOAD(3, SyncObject, userBRealm);
 
     // Add some objects using user B.
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
     [self waitForUploadsForUser:self.userB url:userAURLResolved];
     CHECK_COUNT(5, SyncObject, userBRealm);
-    [self waitForDownloadsForUser:self.userA url:userAURLUnresolved];
-    CHECK_COUNT(5, SyncObject, userARealm);
+    CHECK_COUNT_PENDING_DOWNLOAD(5, SyncObject, userARealm);
 
     // User B should be able to give user C write permissions to user A's Realm.
     RLMSyncPermissionValue *p2 = [[RLMSyncPermissionValue alloc] initWithRealmPath:[userAURLResolved path]
@@ -370,15 +365,12 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
     // User C should be able to write to the Realm.
     RLMRealm *userCRealm = [self openRealmForURL:userAURLResolved user:self.userC];
-    [self waitForDownloadsForUser:self.userC url:userAURLResolved];
-    CHECK_COUNT(5, SyncObject, userCRealm);
+    CHECK_COUNT_PENDING_DOWNLOAD(5, SyncObject, userCRealm);
     [self addSyncObjectsToRealm:userCRealm descriptions:@[@"child-6", @"child-7", @"child-8"]];
     [self waitForUploadsForUser:self.userC url:userAURLResolved];
     CHECK_COUNT(8, SyncObject, userCRealm);
-    [self waitForDownloadsForUser:self.userA url:userAURLUnresolved];
-    CHECK_COUNT(8, SyncObject, userARealm);
-    [self waitForDownloadsForUser:self.userB url:userAURLResolved];
-    CHECK_COUNT(8, SyncObject, userBRealm);
+    CHECK_COUNT_PENDING_DOWNLOAD(8, SyncObject, userARealm);
+    CHECK_COUNT_PENDING_DOWNLOAD(8, SyncObject, userBRealm);
 }
 
 /// If user A grants user B write access to a Realm via username, user B should be able to write to it.
@@ -413,15 +405,13 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
     // Open the Realm for user B. Since user B has write privileges, they should be able to open it 'normally'.
     NSURL *userBURL = makeTestURL(testName, self.userA);
     RLMRealm *userBRealm = [self openRealmForURL:userBURL user:self.userB];
-    [self waitForDownloadsForUser:self.userB url:userBURL];
-    CHECK_COUNT(3, SyncObject, userBRealm);
+    CHECK_COUNT_PENDING_DOWNLOAD(3, SyncObject, userBRealm);
 
     // Add some objects using user B.
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
     [self waitForUploadsForUser:self.userB url:userBURL];
     CHECK_COUNT(5, SyncObject, userBRealm);
-    [self waitForUploadsForUser:self.userA url:userAURL];
-    CHECK_COUNT(5, SyncObject, userARealm);
+    CHECK_COUNT_PENDING_DOWNLOAD(5, SyncObject, userARealm);
 }
 
 /// Setting a permission for all users should work.
@@ -447,14 +437,14 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
     // User B should be able to write to the Realm.
     RLMRealm *userBRealm = [self openRealmForURL:guestURL user:self.userB];
-    [self waitForDownloadsForUser:self.userB url:guestURL];
+    CHECK_COUNT_PENDING_DOWNLOAD(3, SyncObject, userBRealm);
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
     [self waitForUploadsForUser:self.userB url:guestURL];
     CHECK_COUNT(5, SyncObject, userBRealm);
 
     // User C should be able to write to the Realm.
     RLMRealm *userCRealm = [self openRealmForURL:guestURL user:self.userC];
-    [self waitForDownloadsForUser:self.userC url:guestURL];
+    CHECK_COUNT_PENDING_DOWNLOAD(5, SyncObject, userCRealm);
     [self addSyncObjectsToRealm:userCRealm descriptions:@[@"child-6", @"child-7", @"child-8", @"child-9"]];
     [self waitForUploadsForUser:self.userC url:guestURL];
     CHECK_COUNT(9, SyncObject, userCRealm);
@@ -543,14 +533,14 @@ static RLMSyncPermissionValue *makeExpectedPermission(RLMSyncPermissionValue *or
 
     // User B should be able to write to the Realm.
     RLMRealm *userBRealm = [self openRealmForURL:globalRealmURL user:self.userB];
-    [self waitForDownloadsForUser:self.userB url:globalRealmURL];
+    CHECK_COUNT_PENDING_DOWNLOAD(3, SyncObject, userBRealm);
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
     [self waitForUploadsForUser:self.userB url:globalRealmURL];
     CHECK_COUNT(5, SyncObject, userBRealm);
 
     // User C should be able to write to the Realm.
     RLMRealm *userCRealm = [self openRealmForURL:globalRealmURL user:self.userC];
-    [self waitForDownloadsForUser:self.userC url:globalRealmURL];
+    CHECK_COUNT_PENDING_DOWNLOAD(5, SyncObject, userCRealm);
     [self addSyncObjectsToRealm:userCRealm descriptions:@[@"child-6", @"child-7", @"child-8", @"child-9"]];
     [self waitForUploadsForUser:self.userC url:globalRealmURL];
     CHECK_COUNT(9, SyncObject, userCRealm);

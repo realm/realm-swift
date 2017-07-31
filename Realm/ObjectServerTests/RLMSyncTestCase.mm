@@ -138,7 +138,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSAssert(realms.count == counts.count && realms.count == realmURLs.count,
              @"Test logic error: all array arguments must be the same size.");
     for (NSUInteger i = 0; i < realms.count; i++) {
-        [self waitForDownloadsForUser:user url:realmURLs[i] error:nil];
+        [self waitForDownloadsForUser:user url:realmURLs[i] expectation:nil error:nil];
         [realms[i] refresh];
         CHECK_COUNT([counts[i] integerValue], SyncObject, realms[i]);
     }
@@ -294,20 +294,27 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user url:(NSURL *)url {
-    [self waitForDownloadsForUser:user url:url error:nil];
+    [self waitForDownloadsForUser:user url:url expectation:nil error:nil];
 }
 
-- (void)waitForDownloadsForUser:(RLMSyncUser *)user url:(NSURL *)url error:(NSError **)error {
+- (void)waitForDownloadsForUser:(RLMSyncUser *)user
+                            url:(NSURL *)url
+                    expectation:(XCTestExpectation *)expectation
+                          error:(NSError **)error {
     RLMSyncSession *session = [user sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
-    XCTestExpectation *ex = [self expectationWithDescription:@"Download waiter expectation"];
+    XCTestExpectation *ex = expectation ?: [self expectationWithDescription:@"Download waiter expectation"];
     __block NSError *theError = nil;
-    [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                     callback:^(NSError *err){
-                                         theError = err;
-                                         [ex fulfill];
-                                     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    BOOL queued = [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
+                                                   callback:^(NSError *err){
+                                                       theError = err;
+                                                       [ex fulfill];
+                                                   }];
+    if (!queued) {
+        XCTFail(@"Download waiter did not queue; session was invalid or errored out.");
+        return;
+    }
+    [self waitForExpectations:@[ex] timeout:20.0];
     if (error) {
         *error = theError;
     }
@@ -322,12 +329,16 @@ static NSURL *syncDirectoryForChildProcess() {
     NSAssert(session, @"Cannot call with invalid URL");
     XCTestExpectation *ex = [self expectationWithDescription:@"Upload waiter expectation"];
     __block NSError *theError = nil;
-    [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                   callback:^(NSError *err){
-                                       theError = err;
-                                       [ex fulfill];
-                                   }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    BOOL queued = [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
+                                                 callback:^(NSError *err){
+                                                     theError = err;
+                                                     [ex fulfill];
+                                                 }];
+    if (!queued) {
+        XCTFail(@"Upload waiter did not queue; session was invalid or errored out.");
+        return;
+    }
+    [self waitForExpectations:@[ex] timeout:20.0];
     if (error) {
         *error = theError;
     }
