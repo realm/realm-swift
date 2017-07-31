@@ -338,6 +338,8 @@ static NSURL *syncDirectoryForChildProcess() {
         XCTFail(@"Upload waiter did not queue; session was invalid or errored out.");
         return;
     }
+    // FIXME: If tests involving `HugeSyncObject` are more reliable after July 2017, file an issue against sync
+    // regarding performance of ROS.
     [self waitForExpectations:@[ex] timeout:20.0];
     if (error) {
         *error = theError;

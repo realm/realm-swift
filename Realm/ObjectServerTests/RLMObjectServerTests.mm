@@ -1280,7 +1280,7 @@
         NSUInteger sizeBefore = fileSize(c.pathOnDisk);
         XCTAssertGreaterThan(sizeBefore, 0U);
         XCTAssertNotNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
-        [self waitForExpectationsWithTimeout:15.0 handler:nil];
+        [self waitForExpectationsWithTimeout:10.0 handler:nil];
         XCTAssertGreaterThan(fileSize(c.pathOnDisk), sizeBefore);
         XCTAssertNotNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
         CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
