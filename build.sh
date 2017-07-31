@@ -228,14 +228,10 @@ force_xcode_82() {
 ######################################
 
 test_devices() {
-    serial_numbers_str=$(system_profiler SPUSBDataType | grep "Serial Number: ")
     serial_numbers=()
-    while read -r line; do
-        number=${line:15} # Serial number starts at position 15
-        if [[ ${#number} == 40 ]]; then
-            serial_numbers+=("$number")
-        fi
-    done <<< "$serial_numbers_str"
+    /usr/sbin/system_profiler SPUSBDataType | /usr/bin/awk '/^ +Serial Number: / { match($0, /^ +Serial Number: /); print substr($0, RLENGTH + 1) }' | while read -r number; do
+        serial_numbers+=("$number")
+    done
     if [[ ${#serial_numbers[@]} == 0 ]]; then
         echo "At least one iOS/tvOS device must be connected to this computer to run device tests"
         if [ -z "${JENKINS_HOME}" ]; then
