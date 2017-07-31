@@ -490,12 +490,12 @@ NS_REFINED_FOR_SWIFT;
 
  @warning This method may only be called during a write transaction.
 
- @param array   An enumerable object such as `NSArray` or `RLMResults` which contains objects to be added to
-                the Realm.
+ @param objects   An enumerable collection such as `NSArray`, `RLMArray`, or `RLMResults`,
+                  containing Realm objects to be added to the Realm.
 
  @see   `addObject:`
  */
-- (void)addObjects:(id<NSFastEnumeration>)array;
+- (void)addObjects:(id<NSFastEnumeration>)objects;
 
 /**
  Adds or updates an existing object into the Realm.
@@ -525,11 +525,12 @@ NS_REFINED_FOR_SWIFT;
 
  @warning This method may only be called during a write transaction.
 
- @param array  An `NSArray`, `RLMArray`, or `RLMResults` of `RLMObject`s (or subclasses) to be added to the Realm.
+ @param objects  An enumerable collection such as `NSArray`, `RLMArray`, or `RLMResults`,
+                 containing Realm objects to be added to or updated within the Realm.
 
  @see   `addOrUpdateObject:`
  */
-- (void)addOrUpdateObjectsFromArray:(id)array;
+- (void)addOrUpdateObjects:(id<NSFastEnumeration>)objects;
 
 /**
  Deletes an object from the Realm. Once the object is deleted it is considered invalidated.
@@ -547,11 +548,12 @@ NS_REFINED_FOR_SWIFT;
 
  @warning This method may only be called during a write transaction.
 
- @param array  An `RLMArray`, `NSArray`, or `RLMResults` of `RLMObject`s (or subclasses) to be deleted.
+ @param objects  An enumerable collection such as `NSArray`, `RLMArray`, or `RLMResults`,
+                 containing objects to be deleted from the Realm.
 
  @see `deleteObject:`
  */
-- (void)deleteObjects:(id)array;
+- (void)deleteObjects:(id<NSFastEnumeration>)objects;
 
 /**
  Deletes all objects from the Realm.
@@ -622,7 +624,12 @@ NS_REFINED_FOR_SWIFT;
  */
 + (instancetype)new __attribute__((unavailable("Use +defaultRealm, +realmWithConfiguration: or +realmWithURL:.")));
 
+/// :nodoc:
+- (void)addOrUpdateObjectsFromArray:(id)array __attribute__((unavailable("Renamed to -addOrUpdateObjects:.")));
+
 @end
+
+// MARK: - RLMNotificationToken
 
 /**
  A token which is returned from methods which subscribe to changes to a Realm.

@@ -673,8 +673,8 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     RLMAddObjectToRealm(object, self, false);
 }
 
-- (void)addObjects:(id<NSFastEnumeration>)array {
-    for (RLMObject *obj in array) {
+- (void)addObjects:(id<NSFastEnumeration>)objects {
+    for (RLMObject *obj in objects) {
         if (![obj isKindOfClass:[RLMObject class]]) {
             @throw RLMException(@"Cannot insert objects of type %@ with addObjects:. Only RLMObjects are supported.",
                                 NSStringFromClass(obj.class));
@@ -692,8 +692,13 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     RLMAddObjectToRealm(object, self, true);
 }
 
-- (void)addOrUpdateObjectsFromArray:(id)array {
-    for (RLMObject *obj in array) {
+- (void)addOrUpdateObjects:(id<NSFastEnumeration>)objects {
+    for (RLMObject *obj in objects) {
+        if (![obj isKindOfClass:[RLMObject class]]) {
+            @throw RLMException(@"Cannot add or update objects of type %@ with addOrUpdateObjects:. Only RLMObjects are"
+                                " supported.",
+                                NSStringFromClass(obj.class));
+        }
         [self addOrUpdateObject:obj];
     }
 }
@@ -702,22 +707,21 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     RLMDeleteObjectFromRealm(object, self);
 }
 
-- (void)deleteObjects:(id)array {
-    if ([array respondsToSelector:@selector(realm)] && [array respondsToSelector:@selector(deleteObjectsFromRealm)]) {
-        if (self != (RLMRealm *)[array realm]) {
+- (void)deleteObjects:(id<NSFastEnumeration>)objects {
+    NSObject *collection = (NSObject *)objects;
+    if ([collection respondsToSelector:@selector(realm)]
+        && [collection respondsToSelector:@selector(deleteObjectsFromRealm)]) {
+        if (self != (RLMRealm *)[collection performSelector:@selector(realm)]) {
             @throw RLMException(@"Can only delete objects from the Realm they belong to.");
         }
-        [array deleteObjectsFromRealm];
+        [collection performSelector:@selector(deleteObjectsFromRealm)];
     }
-    else if ([array conformsToProtocol:@protocol(NSFastEnumeration)]) {
-        for (id obj in array) {
-            if ([obj isKindOfClass:RLMObjectBase.class]) {
-                RLMDeleteObjectFromRealm(obj, self);
-            }
+    for (RLMObject *obj in objects) {
+        if (![obj isKindOfClass:[RLMObject class]]) {
+            @throw RLMException(@"Cannot delete objects of type %@ with deleteObjects:. Only RLMObjects are supported.",
+                                NSStringFromClass(obj.class));
         }
-    }
-    else {
-        @throw RLMException(@"Invalid array type - container must be an RLMArray, RLMArray, or NSArray of RLMObjects");
+        RLMDeleteObjectFromRealm(obj, self);
     }
 }
 
