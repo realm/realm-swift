@@ -425,6 +425,16 @@ public class ObjectUtil: NSObject {
         } as NSArray
     }
 
+    // Return the indices of generic properties in the object.
+    @objc private class func getGenericListPropertyIndices(_ object: Any) -> NSArray {
+        let children = Mirror(reflecting: object).children
+        let indices = Array(0..<Int(children.count))
+        let mask = children.map { (prop: Mirror.Child) -> Bool in
+            return type(of: prop.value) is RLMListBase.Type
+        }
+        return zip(indices, mask).filter { $0.1 }.map { $0.0 } as NSArray
+    }
+
     // swiftlint:disable:next cyclomatic_complexity
     @objc private class func getOptionalProperties(_ object: Any) -> [String: Any] {
         let children = Mirror(reflecting: object).children
@@ -466,19 +476,18 @@ public class ObjectUtil: NSObject {
         return []
     }
 
-    // Get information about each of the linking objects properties.
-    @objc private class func getLinkingObjectsProperties(_ object: Any) -> [String: [String: String]] {
-        let properties = Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
-            return prop.value as? LinkingObjectsBase != nil
-        }.flatMap { (prop: Mirror.Child) in
-            (prop.label!, prop.value as! LinkingObjectsBase)
+    @objc private class func getLinkingObjectsProperties(_ object: Any) -> [RLMLinkingObjectsPropertyMetadata] {
+        let children = Mirror(reflecting: object).children
+        var props: [RLMLinkingObjectsPropertyMetadata] = []
+        for (idx, prop) in children.enumerated() {
+            if let value = prop.value as? LinkingObjectsBase {
+                props.append(RLMLinkingObjectsPropertyMetadata(propertyName: prop.label!,
+                                                               className: value.objectClassName,
+                                                               linkedPropertyName: value.propertyName,
+                                                               index: idx))
+            }
         }
-        return properties.reduce([:]) { (dictionary, property) in
-            var d = dictionary
-            let (name, results) = property
-            d[name] = ["class": results.objectClassName, "property": results.propertyName]
-            return d
-        }
+        return props
     }
 }
 

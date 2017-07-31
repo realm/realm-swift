@@ -696,6 +696,26 @@ class ObjectCreationTests: TestCase {
         realm.cancelWrite()
     }
 
+    /// If a Swift class declares generic properties before non-generic ones, the properties
+    /// should be registered in order and creation from an array of values should work.
+    func testProperOrderingOfProperties() {
+        let sc = "stringCol"
+        let v: [Any] = [1, [[sc: "hello"], [sc: "world"]], 2, [[sc: "goodbye"], [sc: "cruel"], [sc: "world"]], 3]
+        let object = SwiftGenericPropsNotLastObject(value: v)
+        XCTAssertEqual(object.firstNumber, 1)
+        XCTAssertEqual(object.secondNumber, 2)
+        XCTAssertEqual(object.thirdNumber, 3)
+        XCTAssertTrue(object.firstArray.count == 2)
+        XCTAssertEqual(object.firstArray[0].stringCol, "hello")
+        XCTAssertEqual(object.firstArray[1].stringCol, "world")
+        XCTAssertTrue(object.secondArray.count == 3)
+        XCTAssertEqual(object.secondArray[0].stringCol, "goodbye")
+        XCTAssertEqual(object.secondArray[1].stringCol, "cruel")
+        XCTAssertEqual(object.secondArray[2].stringCol, "world")
+        XCTAssertTrue(object.firstLinking.count == 0)
+        XCTAssertTrue(object.secondLinking.count == 0)
+    }
+
     // MARK: Private utilities
     private func verifySwiftObjectWithArrayLiteral(_ object: SwiftObject, array: [Any], boolObjectValue: Bool,
                                                    boolObjectListValues: [Bool]) {

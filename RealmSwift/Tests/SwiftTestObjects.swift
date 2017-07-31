@@ -481,3 +481,19 @@ class SwiftCircleObject: Object {
     @objc dynamic var obj: SwiftCircleObject?
     let array = List<SwiftCircleObject>()
 }
+
+class SwiftGenericPropsNotLastObject: Object {
+    @objc dynamic var firstNumber = 0
+    let firstArray = List<SwiftStringObject>()
+    @objc dynamic var secondNumber = 0
+    let secondArray = List<SwiftStringObject>()
+    let firstLinking = LinkingObjects(fromType: SwiftGenericPropsNotLastHelper.self, property: "first")
+    let secondLinking = LinkingObjects(fromType: SwiftGenericPropsNotLastHelper.self, property: "second")
+    @objc dynamic var thirdNumber = 0
+}
+
+// Only exists to allow linking object properties on `SwiftGenericPropsNotLastObject`.
+class SwiftGenericPropsNotLastHelper: Object {
+    @objc dynamic var first: SwiftGenericPropsNotLastObject?
+    @objc dynamic var second: SwiftGenericPropsNotLastObject?
+}

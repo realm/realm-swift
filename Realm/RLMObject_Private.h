@@ -96,18 +96,35 @@ FOUNDATION_EXTERN Class RLMObjectUtilClass(BOOL isSwift);
 
 FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 
-@class RLMProperty, RLMArray;
+@class RLMProperty, RLMArray, RLMLinkingObjectsPropertyMetadata;
 @interface RLMObjectUtil : NSObject
 
 + (nullable NSArray<NSString *> *)ignoredPropertiesForClass:(Class)cls;
 + (nullable NSArray<NSString *> *)indexedPropertiesForClass:(Class)cls;
 + (nullable NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)linkingObjectsPropertiesForClass:(Class)cls;
 
+// Precondition: these must be returned in ascending order.
 + (nullable NSArray<NSString *> *)getGenericListPropertyNames:(id)obj;
-+ (nullable NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)getLinkingObjectsProperties:(id)object;
++ (nullable NSArray<NSNumber *> *)getGenericListPropertyIndices:(id)obj;
+// Precondition: these must be returned in ascending order.
++ (nullable NSArray<RLMLinkingObjectsPropertyMetadata *> *)getLinkingObjectsProperties:(id)object;
 
 + (nullable NSDictionary<NSString *, NSNumber *> *)getOptionalProperties:(id)obj;
 + (nullable NSArray<NSString *> *)requiredPropertiesForClass:(Class)cls;
+
+@end
+
+@interface RLMLinkingObjectsPropertyMetadata : NSObject
+
+@property (nonatomic, strong) NSString *propertyName;
+@property (nonatomic, strong) NSString *className;
+@property (nonatomic, strong) NSString *linkedPropertyName;
+@property (nonatomic) NSInteger index;
+
++ (instancetype)linkingObjectsPropertyMetadataWithPropertyName:(NSString *)propertyName
+                                                     className:(NSString *)className
+                                            linkedPropertyName:(NSString *)linkedPropertyName
+                                                         index:(NSInteger)index;
 
 @end
 

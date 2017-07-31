@@ -56,6 +56,10 @@ x.x.x Release notes (yyyy-MM-dd)
   model class defines a primary key).
 * Fix the way the hash property works on `Object` when the object model has
   no primary key.
+* Fix an issue where if a Swift model class defined non-generic managed
+  properties after generic Realm properties (like `List<T>`), the schema
+  would be constructed incorrectly. Fixes an issue where creating such
+  models from an array could fail.
 
 ### Enhancements
 

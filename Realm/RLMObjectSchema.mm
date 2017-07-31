@@ -224,13 +224,13 @@ using namespace realm;
             return [obj.name isEqualToString:name];
         }];
     };
-    auto addProperty = [=](RLMProperty *prop) {
+    auto addProperty = [=](RLMProperty *prop, NSInteger index) {
         NSUInteger existing = existingPropertyIndex(prop.name);
         if (existing != NSNotFound) {
             propArray[existing] = prop;
         }
         else {
-            [propArray addObject:prop];
+            [propArray insertObject:prop atIndex:index];
         }
     };
 
@@ -238,19 +238,29 @@ using namespace realm;
         // List<> properties don't show up as objective-C properties due to
         // being generic, so use Swift reflection to get a list of them, and
         // then access their ivars directly
-        for (NSString *propName in [objectUtil getGenericListPropertyNames:swiftObjectInstance]) {
-            addProperty([[RLMProperty alloc] initSwiftListPropertyWithName:propName instance:swiftObjectInstance]);
+        NSArray<NSString *> *listPropNames = [objectUtil getGenericListPropertyNames:swiftObjectInstance] ?: @[];
+        NSArray<NSNumber *> *listPropIndices = [objectUtil getGenericListPropertyIndices:swiftObjectInstance] ?: @[];
+        if ([listPropNames count] != [listPropIndices count]) {
+            @throw RLMException(@"List property name count and index count did not match up. This may be due to "
+                                "misuse of Realm property types.");
+        }
+        for (NSUInteger i = 0; i < listPropNames.count; i++) {
+            addProperty([[RLMProperty alloc] initSwiftListPropertyWithName:listPropNames[i]
+                                                                  instance:swiftObjectInstance],
+                        [listPropIndices[i] integerValue]);
         }
 
         // Ditto for LinkingObjects<> properties.
-        [[objectUtil getLinkingObjectsProperties:swiftObjectInstance]
-         enumerateKeysAndObjectsUsingBlock:^(NSString *propName, NSDictionary *info, BOOL *) {
-             Ivar ivar = class_getInstanceVariable(objectClass, propName.UTF8String);
-             addProperty([[RLMProperty alloc] initSwiftLinkingObjectsPropertyWithName:propName
-                                                                                 ivar:ivar
-                                                                      objectClassName:info[@"class"]
-                                                               linkOriginPropertyName:info[@"property"]]);
-         }];
+        NSArray<RLMLinkingObjectsPropertyMetadata *> *linkProps = [objectUtil
+                                                                   getLinkingObjectsProperties:swiftObjectInstance];
+        for (RLMLinkingObjectsPropertyMetadata *metadata in linkProps) {
+            Ivar ivar = class_getInstanceVariable(objectClass, metadata.propertyName.UTF8String);
+            addProperty([[RLMProperty alloc] initSwiftLinkingObjectsPropertyWithName:metadata.propertyName
+                                                                                ivar:ivar
+                                                                     objectClassName:metadata.className
+                                                              linkOriginPropertyName:metadata.linkedPropertyName],
+                        metadata.index);
+        }
     }
 
     if (auto optionalProperties = [objectUtil getOptionalProperties:swiftObjectInstance]) {
