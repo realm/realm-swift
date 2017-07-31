@@ -675,7 +675,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
 - (void)addObjects:(id<NSFastEnumeration>)objects {
     for (RLMObject *obj in objects) {
-        if (![obj isKindOfClass:[RLMObject class]]) {
+        if (![obj isKindOfClass:RLMObjectBase.class]) {
             @throw RLMException(@"Cannot insert objects of type %@ with addObjects:. Only RLMObjects are supported.",
                                 NSStringFromClass(obj.class));
         }
@@ -694,7 +694,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
 - (void)addOrUpdateObjects:(id<NSFastEnumeration>)objects {
     for (RLMObject *obj in objects) {
-        if (![obj isKindOfClass:[RLMObject class]]) {
+        if (![obj isKindOfClass:RLMObjectBase.class]) {
             @throw RLMException(@"Cannot add or update objects of type %@ with addOrUpdateObjects:. Only RLMObjects are"
                                 " supported.",
                                 NSStringFromClass(obj.class));
@@ -708,16 +708,16 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 - (void)deleteObjects:(id<NSFastEnumeration>)objects {
-    NSObject *collection = (NSObject *)objects;
-    if ([collection respondsToSelector:@selector(realm)]
-        && [collection respondsToSelector:@selector(deleteObjectsFromRealm)]) {
-        if (self != (RLMRealm *)[collection performSelector:@selector(realm)]) {
+    id idObjects = objects;
+    if ([idObjects respondsToSelector:@selector(realm)]
+        && [idObjects respondsToSelector:@selector(deleteObjectsFromRealm)]) {
+        if (self != (RLMRealm *)[idObjects realm]) {
             @throw RLMException(@"Can only delete objects from the Realm they belong to.");
         }
-        [collection performSelector:@selector(deleteObjectsFromRealm)];
+        [idObjects deleteObjectsFromRealm];
     }
     for (RLMObject *obj in objects) {
-        if (![obj isKindOfClass:[RLMObject class]]) {
+        if (![obj isKindOfClass:RLMObjectBase.class]) {
             @throw RLMException(@"Cannot delete objects of type %@ with deleteObjects:. Only RLMObjects are supported.",
                                 NSStringFromClass(obj.class));
         }
