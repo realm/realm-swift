@@ -44,6 +44,12 @@ x.x.x Release notes (yyyy-MM-dd)
   the property value.
 * Computed properties on Realm object types are detected and no
   longer added to the automatically generated schema.
+* `-[RLMRealm addOrUpdateObjectsInArray:]` has been renamed to
+  `-[RLMRealm addOrUpdateObjects:]` for consistency with similar methods
+  that add or delete objects.
+* `-[RLMRealm addOrUpdateObjects:]` and `-[RLMRealm deleteObjects:]` now
+  require their argument to conform to `NSFastEnumeration`, to match similar
+  APIs that also take collections.
 
 ### Enhancements
 
