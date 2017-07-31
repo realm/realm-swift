@@ -1254,6 +1254,7 @@
         // Wait for the child process to upload everything.
         RLMRunChildAndWait();
         XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
+        XCTestExpectation *ex2 = [self expectationWithDescription:@"wait for downloads after asyncOpen"];
         RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
         RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
         c.syncConfiguration = syncConfig;
@@ -1264,7 +1265,9 @@
                                callbackQueue:dispatch_get_main_queue()
                                     callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
             XCTAssertNil(error);
-            CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
+            // The big objects might take some time for the server to process,
+            // so we may need to ask it a few times before it's ready.
+            CHECK_COUNT_PENDING_DOWNLOAD_CUSTOM_EXPECTATION(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm, ex2);
             [ex fulfill];
         }];
         NSUInteger (^fileSize)(NSString *) = ^NSUInteger(NSString *path) {
