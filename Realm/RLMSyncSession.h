@@ -71,7 +71,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgress) {
     RLMSyncProgressForCurrentlyOutstandingWork,
 };
 
-@class RLMSyncUser, RLMSyncConfiguration;
+@class RLMSyncUser, RLMSyncConfiguration, RLMSyncErrorActionToken;
 
 /**
  The type of a progress notification block intended for reporting a session's network
@@ -153,6 +153,33 @@ NS_ASSUME_NONNULL_BEGIN
                                                                           mode:(RLMSyncProgress)mode
                                                                          block:(RLMProgressNotificationBlock)block
 NS_REFINED_FOR_SWIFT;
+
+/**
+ Given an error action token, immediately handle the corresponding action.
+ 
+ @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
+ */
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token;
+
+@end
+
+// MARK: - Error action token
+
+#pragma mark - Error action token
+
+/**
+ An opaque token returned as part of certain errors. It can be
+ passed into certain APIs to perform certain actions.
+
+ @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
+ */
+@interface RLMSyncErrorActionToken : NSObject
+
+/// :nodoc:
+- (instancetype)init __attribute__((unavailable("This type cannot be created directly")));
+
+/// :nodoc:
++ (instancetype)new __attribute__((unavailable("This type cannot be created directly")));
 
 @end
 

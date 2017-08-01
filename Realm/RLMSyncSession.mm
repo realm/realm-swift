@@ -25,6 +25,13 @@
 
 using namespace realm;
 
+@interface RLMSyncErrorActionToken () {
+@public
+    std::string _originalPath;
+    BOOL _isValid;
+}
+@end
+
 @interface RLMProgressNotificationToken() {
     uint64_t _token;
     std::weak_ptr<SyncSession> _session;
@@ -184,6 +191,29 @@ using namespace realm;
             });
         }, notifier_direction, is_streaming);
         return [[RLMProgressNotificationToken alloc] initWithTokenValue:token session:std::move(session)];
+    }
+    return nil;
+}
+
++ (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token {
+    if (!token->_isValid) {
+        return;
+    }
+    token->_isValid = NO;
+    SyncManager::shared().immediately_run_file_actions(std::move(token->_originalPath));
+}
+
+@end
+
+// MARK: - Error action token
+
+@implementation RLMSyncErrorActionToken
+
+- (instancetype)initWithOriginalPath:(std::string)originalPath {
+    if (self = [super init]) {
+        _isValid = YES;
+        _originalPath = std::move(originalPath);
+        return self;
     }
     return nil;
 }

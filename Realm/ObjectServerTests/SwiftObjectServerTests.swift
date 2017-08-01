@@ -150,9 +150,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertNotNil(theError)
                 XCTAssertNotNil(realm)
             }
-            let (path, closure) = theError!.clientResetInfo()!
+            let (path, errorToken) = theError!.clientResetInfo()!
             XCTAssertFalse(FileManager.default.fileExists(atPath: path))
-            closure()
+            SyncSession.immediatelyHandleError(errorToken)
             XCTAssertTrue(FileManager.default.fileExists(atPath: path))
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")

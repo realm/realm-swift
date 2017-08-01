@@ -26,11 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// A user info key for use with `RLMSyncErrorClientResetError`.
 extern NSString *const kRLMSyncPathOfRealmBackupCopyKey;
 
-/// A user info key for use with `RLMSyncErrorClientResetError`.
-extern NSString *const kRLMSyncInitiateClientResetBlockKey;
-
-/// A user info key for use with `RLMSyncErrorPermissionDeniedError`.
-extern NSString *const kRLMSyncInitiateDeleteRealmBlockKey;
+/// A user info key for use with certain error types.
+extern NSString *const kRLMSyncErrorActionTokenKey;
 
 /**
  The error domain string for all SDK errors related to errors reported
@@ -87,21 +84,24 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      re-downloaded Realm will initially contain only the data present at the time the Realm
      was backed up on the server.
 
-     The client reset process can be initiated in one of two ways. The block provided in the
-     `userInfo` dictionary under `kRLMSyncInitiateClientResetBlockKey` can be called to
-     initiate the reset process. This block can be called any time after the error is
-     received, but should only be called after your app closes and invalidates every
+     The client reset process can be initiated in one of two ways.
+     
+     The `userInfo` dictionary contains an opaque token object under the key
+     `kRLMSyncErrorActionTokenKey`. This token can be passed into
+     `+[RLMSyncSession immediatelyHandleError:]` in order to immediately perform the client
+     reset process. This should only be done after your app closes and invalidates every
      instance of the offending Realm on all threads (note that autorelease pools may make this
      difficult to guarantee).
 
-     If the block is not called, the client reset process will be automatically carried out
-     the next time the app is launched and the `RLMSyncManager` singleton is accessed.
+     If `+[RLMSyncSession immediatelyHandleError:]` is not called, the client reset process
+     will be automatically carried out the next time the app is launched and the
+     `RLMSyncManager` singleton is accessed.
 
      The value for the `kRLMSyncPathOfRealmBackupCopyKey` key in the `userInfo` dictionary
      describes the path of the recovered copy of the Realm. This copy will not actually be
      created until the client reset process is initiated.
 
-     @see `-[NSError rlmSync_clientResetBlock]`, `-[NSError rlmSync_clientResetBackedUpRealmPath]`
+     @see `-[NSError rlmSync_errorActionToken]`, `-[NSError rlmSync_clientResetBackedUpRealmPath]`
      */
     RLMSyncErrorClientResetError        = 7,
 
@@ -126,15 +126,17 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      A Realm that suffers a permission denied error is, by default, flagged so that its
      local copy will be deleted the next time the application starts.
      
-     The `userInfo` dictionary contains a block under the key
-     `kRLMSyncInitiateDeleteRealmBlockKey`, which can be used to request that the file be
-     deleted immediately instead. This block can be called any time after the error is
-     received to immediately delete the Realm file, but should only be called after your
-     app closes and invalidates every instance of the offending Realm on all threads (note
-     that autorelease pools may make this difficult to guarantee).
+     The `userInfo` dictionary contains an opaque token object under the key
+     `kRLMSyncErrorActionTokenKey`. This token can be passed into
+     `+[RLMSyncSession immediatelyHandleError:]` in order to immediately delete the local
+     copy. This should only be done after your app closes and invalidates every instance
+     of the offending Realm on all threads (note that autorelease pools may make this
+     difficult to guarantee).
 
      @warning It is strongly recommended that, if a Realm has encountered a permission denied
               error, its files be deleted before attempting to re-open it.
+     
+     @see `-[NSError rlmSync_errorActionToken]`
      */
     RLMSyncErrorPermissionDeniedError   = 9,
 };
