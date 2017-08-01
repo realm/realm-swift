@@ -529,8 +529,8 @@ class RealmCollectionTypeTests: TestCase {
         try! realm.commitWrite(withoutNotifying: [token])
         waitForExpectations(timeout: 1, handler: nil)
 
-        token.stop()
-        token2.stop()
+        token.invalidate()
+        token2.invalidate()
     }
 
     func testValueForKeyPath() {
@@ -639,7 +639,7 @@ class ResultsTests: RealmCollectionTypeTests {
         addObjectToResults()
         waitForExpectations(timeout: 1, handler: nil)
 
-        token.stop()
+        token.invalidate()
     }
 
     func testNotificationBlockChangeIndices() {
@@ -674,7 +674,7 @@ class ResultsTests: RealmCollectionTypeTests {
         addObjectToResults()
         waitForExpectations(timeout: 1, handler: nil)
 
-        token.stop()
+        token.invalidate()
     }
 }
 
@@ -836,8 +836,8 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         try! realm.commitWrite(withoutNotifying: [token])
         waitForExpectations(timeout: 1, handler: nil)
 
-        token.stop()
-        token2.stop()
+        token.invalidate()
+        token2.invalidate()
     }
 }
 

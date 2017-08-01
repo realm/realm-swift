@@ -1189,7 +1189,7 @@
         // Wait for the child process to upload everything.
         RLMRunChildAndWait();
         [self waitForExpectationsWithTimeout:10.0 handler:nil];
-        [token stop];
+        [token invalidate];
         // The notifier should have been called at least twice: once at the beginning and at least once
         // to report progress.
         XCTAssert(callCount > 1);
@@ -1252,7 +1252,7 @@
     [realm commitWriteTransaction];
     // Wait for upload to begin and finish
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
-    [token stop];
+    [token invalidate];
     // The notifier should have been called at least twice: once at the beginning and at least once
     // to report progress.
     XCTAssert(callCount > 1);

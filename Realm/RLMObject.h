@@ -469,7 +469,7 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
 
  Only objects which are managed by a Realm can be observed in this way. You
  must retain the returned token for as long as you want updates to be sent to
- the block. To stop receiving updates, call `stop` on the token.
+ the block. To stop receiving updates, call `-invalidate` on the token.
 
  It is safe to capture a strong reference to the observed object within the
  callback block. There is no retain cycle due to that the callback is retained

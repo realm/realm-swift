@@ -50,7 +50,7 @@ class InterfaceController: WKInterfaceController {
     }
 
     override func didDeactivate() {
-        token.stop()
+        token.invalidate()
         super.didDeactivate()
     }
 }

@@ -552,7 +552,7 @@ public final class Realm {
      delivered instantly, multiple notifications may be coalesced.
 
      You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
-     updates, call `stop()` on the token.
+     updates, call `invalidate()` on the token.
 
      - parameter block: A block which is called to process Realm notifications. It receives the following parameters:
                         `notification`: the incoming notification; `realm`: the Realm for which the notification

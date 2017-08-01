@@ -33,7 +33,7 @@
 @implementation RepositoriesViewController
 
 - (void)dealloc {
-    [self.token stop];
+    [self.token invalidate];
 }
 
 - (void)viewDidLoad {

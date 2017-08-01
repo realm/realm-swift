@@ -851,7 +851,7 @@ RLM_ARRAY_TYPE(NotARealClass)
         }
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
-    [token stop];
+    [token invalidate];
 
     // Release the write transaction and let them run
     [realm cancelWriteTransaction];

@@ -27,7 +27,7 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
     var token: NotificationToken?
 
     deinit {
-        token?.stop()
+        token?.invalidate()
     }
 
     override func viewDidLoad() {

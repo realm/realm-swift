@@ -77,7 +77,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncPermissionResultsSortProperty) {
  Register to be notified when the contents of the results object change.
 
  This method returns a token. Hold on to the token for as long as notifications
- are desired. Call `-stop` on the token to stop notifications, and before
+ are desired. Call `-invalidate` on the token to stop notifications, and before
  deallocating the token.
  */
 - (RLMNotificationToken *)addNotificationBlock:(RLMPermissionStatusBlock)block;

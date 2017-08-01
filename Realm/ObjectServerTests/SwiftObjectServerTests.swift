@@ -188,7 +188,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 // Wait for the child process to upload all the data.
                 executeChild()
                 waitForExpectations(timeout: 10.0, handler: nil)
-                token!.stop()
+                token!.invalidate()
                 XCTAssert(callCount > 1)
                 XCTAssert(transferred >= transferrable)
             } else {
@@ -234,7 +234,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
             waitForExpectations(timeout: 10.0, handler: nil)
-            token!.stop()
+            token!.invalidate()
             XCTAssert(callCount > 1)
             XCTAssert(transferred >= transferrable)
         } catch {
@@ -349,7 +349,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
 
             waitForExpectations(timeout: 2)
-            notificationToken.stop()
+            notificationToken.invalidate()
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
@@ -386,7 +386,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
 
             waitForExpectations(timeout: 2)
-            permissionOfferNotificationToken.stop()
+            permissionOfferNotificationToken.invalidate()
 
             let userB = try synchronouslyLogInUser(for: basicCredentials(register: isParent, usernameSuffix: "_B"), server: authURL)
             _ = try synchronouslyOpenRealm(url: realmURL, user: userB)
@@ -421,7 +421,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
 
             waitForExpectations(timeout: 2)
-            permissionOfferResponseNotificationToken.stop()
+            permissionOfferResponseNotificationToken.invalidate()
 
             _ = try synchronouslyOpenRealm(url: URL(string: responseRealmUrl!)!, user: userB)
         } catch {

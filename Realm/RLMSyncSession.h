@@ -54,7 +54,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgressDirection) {
 typedef NS_ENUM(NSUInteger, RLMSyncProgress) {
     /**
      The block will be called indefinitely, or until it is unregistered by calling
-     `-[RLMProgressNotificationToken stop]`.
+     `-[RLMProgressNotificationToken invalidate]`.
 
      Notifications will always report the latest number of transferred bytes, and the
      most up-to-date number of total transferrable bytes.
@@ -87,7 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  A token object corresponding to a progress notification block on a session object.
 
- To stop notifications manually, call `-stop` on it. Notifications should be stopped before
+ To stop notifications manually, call `-invalidate` on it. Notifications should be stopped before
  the token goes out of scope or is destroyed.
  */
 @interface RLMProgressNotificationToken : RLMNotificationToken
@@ -130,7 +130,7 @@ NS_ASSUME_NONNULL_BEGIN
  will be called as soon as progress information becomes available.
 
  The token returned by this method must be retained as long as progress
- notifications are desired, and the `-stop` method should be called on it
+ notifications are desired, and the `-invalidate` method should be called on it
  when notifications are no longer needed and before the token is destroyed.
 
  If no token is returned, the notification block will never be called again.

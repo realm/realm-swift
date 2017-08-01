@@ -54,7 +54,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
             }
         }
         waitForExpectations(timeout: 2.0, handler: nil)
-        token.stop()
+        token.invalidate()
     }
 
     private func get(permission: SyncPermission,
@@ -72,7 +72,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
             }
         }
         waitForExpectations(timeout: 2.0, handler: nil)
-        token.stop()
+        token.invalidate()
         return finalValue
     }
 
@@ -94,7 +94,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
             ex.fulfill()
         }
         waitForExpectations(timeout: wait + 1.0, handler: nil)
-        token.stop()
+        token.invalidate()
         XCTAssertFalse(isPresent, "Permission '\(permission)' was spuriously present (\(file):\(line))")
     }
 
@@ -196,7 +196,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
 
         // Wait for the notification to be fired.
         wait(for: [noteEx], timeout: 2.0)
-        token.stop()
+        token.invalidate()
         let expectedPermission = SwiftPermissionsAPITests.makeExpected(from: p, owner: userA, name: uuid)
         let finalValue = get(permission: expectedPermission, from: results)
         XCTAssertNotNil(finalValue, "Did not find the permission \(expectedPermission)")

@@ -637,12 +637,12 @@ NS_REFINED_FOR_SWIFT;
  Change subscriptions in Realm return an `RLMNotificationToken` instance,
  which can be used to unsubscribe from the changes. You must store a strong
  reference to the token for as long as you want to continue to receive notifications.
- When you wish to stop, call the `-stop` method. Notifications are also stopped if
+ When you wish to stop, call the `-invalidate` method. Notifications are also stopped if
  the token is deallocated.
  */
 @interface RLMNotificationToken : NSObject
 /// Stops notifications for the change subscription that returned this token.
-- (void)stop;
+- (void)invalidate;
 @end
 
 NS_ASSUME_NONNULL_END

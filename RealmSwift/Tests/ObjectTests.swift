@@ -487,7 +487,7 @@ class ObjectTests: TestCase {
         try! realm.commitWrite()
 
         waitForExpectations(timeout: 2)
-        token.stop()
+        token.invalidate()
     }
 
     func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?) -> ((ObjectChange) -> Void) {
@@ -519,7 +519,7 @@ class ObjectTests: TestCase {
         }
 
         waitForExpectations(timeout: 2)
-        token.stop()
+        token.invalidate()
     }
 
     func testModifyObservedObjectRemotely() {
@@ -537,7 +537,7 @@ class ObjectTests: TestCase {
         }
 
         waitForExpectations(timeout: 2)
-        token.stop()
+        token.invalidate()
     }
 
     func testListPropertyNotifications() {
@@ -556,7 +556,7 @@ class ObjectTests: TestCase {
         }
 
         waitForExpectations(timeout: 2)
-        token.stop()
+        token.invalidate()
     }
 
     func testOptionalPropertyNotifications() {
@@ -574,7 +574,7 @@ class ObjectTests: TestCase {
             }
         }
         waitForExpectations(timeout: 2)
-        token.stop()
+        token.invalidate()
 
         token = object.observe(expectChange("optIntCol", 2, Int?.none))
         dispatchSyncNewThread {
@@ -584,7 +584,7 @@ class ObjectTests: TestCase {
             }
         }
         waitForExpectations(timeout: 2)
-        token.stop()
+        token.invalidate()
 
         token = object.observe(expectChange("optIntCol", Int?.none, 3))
         dispatchSyncNewThread {
@@ -594,6 +594,6 @@ class ObjectTests: TestCase {
             }
         }
         waitForExpectations(timeout: 2)
-        token.stop()
+        token.invalidate()
     }
 }

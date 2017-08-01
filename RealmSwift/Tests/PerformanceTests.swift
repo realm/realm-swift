@@ -426,7 +426,7 @@ class SwiftPerformanceTests: TestCase {
                 try! realm.write { object.intCol += 1 }
             }
             self.stopMeasuring()
-            token.stop()
+            token.invalidate()
         }
     }
 
@@ -454,7 +454,7 @@ class SwiftPerformanceTests: TestCase {
                         semaphore.signal()
                     }
                     CFRunLoopRun()
-                    token.stop()
+                    token.invalidate()
                 }
             }
 
@@ -495,7 +495,7 @@ class SwiftPerformanceTests: TestCase {
                         semaphore.signal()
                     }
                     CFRunLoopRun()
-                    token.stop()
+                    token.invalidate()
                 }
             }
 
@@ -514,7 +514,7 @@ class SwiftPerformanceTests: TestCase {
             }
             queue.sync {}
             self.stopMeasuring()
-            token.stop()
+            token.invalidate()
         }
     }
 

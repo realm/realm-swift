@@ -346,7 +346,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      ```
 
      You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
-     updates, call `stop()` on the token.
+     updates, call `invalidate()` on the token.
 
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
 

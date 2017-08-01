@@ -45,7 +45,7 @@ using namespace realm;
     // `-[RLMRealm commitWriteTransactionWithoutNotifying:]`.
 }
 
-- (void)stop {
+- (void)invalidate {
     if (auto session = _session.lock()) {
         session->unregister_progress_notifier(_token);
         _session.reset();
@@ -57,7 +57,7 @@ using namespace realm;
     if (_token != 0) {
         NSLog(@"RLMProgressNotificationToken released without unregistering a notification. "
               @"You must hold on to the RLMProgressNotificationToken and call "
-              @"-[RLMProgressNotificationToken stop] when you no longer wish to receive "
+              @"-[RLMProgressNotificationToken invalidate] when you no longer wish to receive "
               @"progress update notifications.");
     }
 }
