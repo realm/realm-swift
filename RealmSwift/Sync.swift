@@ -95,7 +95,7 @@ extension SyncError {
      Given a client reset error, extract and return the recovery file path
      and the action token.
 
-     The action token can be passed into `SyncUser.immediatelyHandleError(_:)`
+     The action token can be passed into `SyncSession.immediatelyHandleError(_:)`
      to immediately delete the local copy of the Realm which experienced the
      client reset error. The local copy of the Realm must be deleted before
      your application attempts to open the Realm again.
@@ -103,7 +103,7 @@ extension SyncError {
      The recovery file path is the path to which the current copy of the Realm
      on disk will be saved once the client reset occurs.
 
-     - warning: Do not call `SyncUser.immediatelyHandleError(_:)` until you are
+     - warning: Do not call `SyncSession.immediatelyHandleError(_:)` until you are
                 sure that all references to the Realm and managed objects belonging
                 to the Realm have been nil'ed out, and that all autorelease pools
                 containing these references have been drained.
@@ -122,12 +122,12 @@ extension SyncError {
     /**
      Given a permission denied error, extract and return the action token.
 
-     This action token can be passed into `SyncUser.immediatelyHandleError(_:)`
+     This action token can be passed into `SyncSession.immediatelyHandleError(_:)`
      to immediately delete the local copy of the Realm which experienced the
      permission denied error. The local copy of the Realm must be deleted before
      your application attempts to open the Realm again.
 
-     - warning: Do not call `SyncUser.immediatelyHandleError(_:)` until you are
+     - warning: Do not call `SyncSession.immediatelyHandleError(_:)` until you are
                 sure that all references to the Realm and managed objects belonging
                 to the Realm have been nil'ed out, and that all autorelease pools
                 containing these references have been drained.
