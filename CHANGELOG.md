@@ -42,8 +42,8 @@ x.x.x Release notes (yyyy-MM-dd)
   now runs on the main queue by default, or can be explicitly specified
   by a new `callbackQueue` parameter on the `{RLM}SyncUser.logIn(...)` API.
 * Rename `{RLM}NotificationToken.stop()` to `invalidate()` and
-  `RealmCollection.addNotificationBlock(_:)` to `observe(_:)` to mirror the new
-  KVO Swift APIs.
+  `{RealmCollection,SyncPermissionResults}.addNotificationBlock(_:)` to
+  `observe(_:)` to mirror Foundation's new KVO APIs.
 
 ### Enhancements
 

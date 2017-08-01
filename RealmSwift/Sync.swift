@@ -377,6 +377,17 @@ public typealias SyncAccessLevel = RLMSyncAccessLevel
  */
 public typealias SyncPermissionResults = RLMSyncPermissionResults
 
+extension SyncPermissionResults {
+    public func observe(_ block: @escaping RLMPermissionStatusBlock) -> RLMNotificationToken {
+        return __addNotificationBlock(block)
+    }
+
+    @available(*, unavailable, renamed: "observe(_:)")
+    @nonobjc public func addNotificationBlock(_ block: @escaping RLMPermissionStatusBlock) -> RLMNotificationToken {
+        fatalError()
+    }
+}
+
 #if swift(>=3.1)
 extension SyncPermissionResults: RandomAccessCollection {
     public subscript(index: Int) -> SyncPermission {

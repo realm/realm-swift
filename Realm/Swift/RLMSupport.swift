@@ -85,6 +85,12 @@ extension RLMCollection {
     }
 }
 
+extension RLMSyncPermissionResults {
+    @nonobjc open func addNotificationBlock(_ block: @escaping RLMPermissionStatusBlock) -> RLMNotificationToken {
+        return __addNotificationBlock(block)
+    }
+}
+
 #if swift(>=3.1)
 // Collection conformance for RLMSyncPermissionResults.
 extension RLMSyncPermissionResults: RandomAccessCollection {
