@@ -19,12 +19,20 @@
 #import "RLMSyncSession_Private.hpp"
 
 #import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncErrorActionToken_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "sync/sync_session.hpp"
 
 using namespace realm;
+
+@interface RLMSyncErrorActionToken () {
+@public
+    std::string _originalPath;
+}
+
+@property (nonatomic) BOOL isValid;
+
+@end
 
 @interface RLMProgressNotificationToken() {
     uint64_t _token;
@@ -195,6 +203,21 @@ using namespace realm;
     }
     token.isValid = NO;
     SyncManager::shared().immediately_run_file_actions(std::move(token->_originalPath));
+}
+
+@end
+
+// MARK: - Error action token
+
+@implementation RLMSyncErrorActionToken
+
+- (instancetype)initWithOriginalPath:(std::string)originalPath {
+    if (self = [super init]) {
+        self.isValid = YES;
+        _originalPath = std::move(originalPath);
+        return self;
+    }
+    return nil;
 }
 
 @end

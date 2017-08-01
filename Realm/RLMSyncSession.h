@@ -20,6 +20,8 @@
 
 #import "RLMRealm.h"
 
+@class RLMSyncErrorActionToken;
+
 /**
  The current state of the session represented by a session object.
  */
@@ -160,6 +162,26 @@ NS_REFINED_FOR_SWIFT;
  @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
  */
 + (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token;
+
+@end
+
+// MARK: - Error action token
+
+#pragma mark - Error action token
+
+/**
+ An opaque token returned as part of certain errors. It can be
+ passed into certain APIs to perform certain actions.
+
+ @see `RLMSyncErrorClientResetError`, `RLMSyncErrorPermissionDeniedError`
+ */
+@interface RLMSyncErrorActionToken : NSObject
+
+/// :nodoc:
+- (instancetype)init __attribute__((unavailable("This type cannot be created directly")));
+
+/// :nodoc:
++ (instancetype)new __attribute__((unavailable("This type cannot be created directly")));
 
 @end
 
