@@ -1175,7 +1175,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
                                                             accessLevel:RLMSyncAccessLevelRead];
     // Set the read permission.
     APPLY_PERMISSION(p, self.userA);
-    
+
     NSURL *userBURL = makeTestURL(testName, self.userA);
     RLMRealmConfiguration *userBConfig = [RLMRealmConfiguration defaultConfiguration];
     userBConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:self.userB realmURL:userBURL];

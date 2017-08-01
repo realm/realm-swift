@@ -137,10 +137,16 @@ NS_ASSUME_NONNULL_BEGIN
 /// :nodoc:
 + (instancetype)new __attribute__((unavailable("Use the designated initializer")));
 
-#pragma mark - Deprecation
+// MARK: - Migration assistance
 
 /// :nodoc:
 @property (nullable, nonatomic, readonly) NSString *userId __attribute__((unavailable("Renamed to `identity`")));
+
+/// :nodoc:
+- (instancetype)initWithRealmPath:(NSString *)path
+                           userID:(NSString *)identity
+                      accessLevel:(RLMSyncAccessLevel)accessLevel
+__attribute__((unavailable("Renamed to `-initWithRealmPath:identity:accessLevel:`")));
 
 @end
 
