@@ -13,6 +13,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * The `shouldCompactOnLaunch` block is no longer invoked if the Realm at that
   path is already open on other threads.
+* Fix an assertion failure in collection notifications when changes are made to
+  the schema via sync while the notification block is active.
 
 2.9.0 Release notes (2017-07-26)
 =============================================================
