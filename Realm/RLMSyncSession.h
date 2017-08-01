@@ -20,8 +20,6 @@
 
 #import "RLMRealm.h"
 
-@class RLMSyncErrorActionToken;
-
 /**
  The current state of the session represented by a session object.
  */

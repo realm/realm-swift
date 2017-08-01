@@ -28,10 +28,8 @@ using namespace realm;
 @interface RLMSyncErrorActionToken () {
 @public
     std::string _originalPath;
+    BOOL _isValid;
 }
-
-@property (nonatomic) BOOL isValid;
-
 @end
 
 @interface RLMProgressNotificationToken() {
@@ -198,10 +196,10 @@ using namespace realm;
 }
 
 + (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token {
-    if (!token.isValid) {
+    if (!token->_isValid) {
         return;
     }
-    token.isValid = NO;
+    token->_isValid = NO;
     SyncManager::shared().immediately_run_file_actions(std::move(token->_originalPath));
 }
 
@@ -213,7 +211,7 @@ using namespace realm;
 
 - (instancetype)initWithOriginalPath:(std::string)originalPath {
     if (self = [super init]) {
-        self.isValid = YES;
+        _isValid = YES;
         _originalPath = std::move(originalPath);
         return self;
     }
