@@ -699,9 +699,18 @@ class ObjectCreationTests: TestCase {
     /// If a Swift class declares generic properties before non-generic ones, the properties
     /// should be registered in order and creation from an array of values should work.
     func testProperOrderingOfProperties() {
-        let sc = "stringCol"
-        let v: [Any] = [1, [[sc: "hello"], [sc: "world"]], 2, [[sc: "goodbye"], [sc: "cruel"], [sc: "world"]], 3]
-        let object = SwiftGenericPropsNotLastObject(value: v)
+        let v: [Any] = [
+            // Superclass's columns
+            [["intCol": 42], ["intCol": 9001]],
+            100,
+            200,
+            // Class's columns
+            1,
+            [["stringCol": "hello"], ["stringCol": "world"]],
+            2,
+            [["stringCol": "goodbye"], ["stringCol": "cruel"], ["stringCol": "world"]],
+            3]
+        let object = SwiftGenericPropsOrderingObject(value: v)
         XCTAssertEqual(object.firstNumber, 1)
         XCTAssertEqual(object.secondNumber, 2)
         XCTAssertEqual(object.thirdNumber, 3)
@@ -712,6 +721,11 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.secondArray[0].stringCol, "goodbye")
         XCTAssertEqual(object.secondArray[1].stringCol, "cruel")
         XCTAssertEqual(object.secondArray[2].stringCol, "world")
+        XCTAssertTrue(object.parentFirstList.count == 2)
+        XCTAssertEqual(object.parentFirstList[0].intCol, 42)
+        XCTAssertEqual(object.parentFirstList[1].intCol, 9001)
+        XCTAssertEqual(object.parentFirstNumber, 100)
+        XCTAssertEqual(object.parentSecondNumber, 200)
         XCTAssertTrue(object.firstLinking.count == 0)
         XCTAssertTrue(object.secondLinking.count == 0)
     }

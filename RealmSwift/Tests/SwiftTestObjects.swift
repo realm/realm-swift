@@ -482,18 +482,30 @@ class SwiftCircleObject: Object {
     let array = List<SwiftCircleObject>()
 }
 
-class SwiftGenericPropsNotLastObject: Object {
+class SwiftGenericPropsOrderingParent: Object {
+    let parentFirstList = List<SwiftIntObject>()
+    @objc dynamic var parentFirstNumber = 0
+    func parentFunction() -> Int { return parentFirstNumber + 1 }
+    @objc dynamic var parentSecondNumber = 1
+    var parentComputedProp: String { return "hello world" }
+}
+
+class SwiftGenericPropsOrderingObject: SwiftGenericPropsOrderingParent {
+
+    func myFunction() -> Int { return firstNumber + secondNumber + thirdNumber }
     @objc dynamic var firstNumber = 0
+    class func myClassFunction(x: Int, y: Int) -> Int { return x + y }
     let firstArray = List<SwiftStringObject>()
     @objc dynamic var secondNumber = 0
+    var computedProp: String { return "\(firstNumber), \(secondNumber), and \(thirdNumber)" }
     let secondArray = List<SwiftStringObject>()
-    let firstLinking = LinkingObjects(fromType: SwiftGenericPropsNotLastHelper.self, property: "first")
-    let secondLinking = LinkingObjects(fromType: SwiftGenericPropsNotLastHelper.self, property: "second")
+    let firstLinking = LinkingObjects(fromType: SwiftGenericPropsOrderingHelper.self, property: "first")
+    let secondLinking = LinkingObjects(fromType: SwiftGenericPropsOrderingHelper.self, property: "second")
     @objc dynamic var thirdNumber = 0
 }
 
 // Only exists to allow linking object properties on `SwiftGenericPropsNotLastObject`.
-class SwiftGenericPropsNotLastHelper: Object {
-    @objc dynamic var first: SwiftGenericPropsNotLastObject?
-    @objc dynamic var second: SwiftGenericPropsNotLastObject?
+class SwiftGenericPropsOrderingHelper: Object {
+    @objc dynamic var first: SwiftGenericPropsOrderingObject?
+    @objc dynamic var second: SwiftGenericPropsOrderingObject?
 }
