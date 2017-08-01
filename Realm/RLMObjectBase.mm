@@ -485,11 +485,7 @@ Class RLMObjectUtilClass(BOOL isSwift) {
     return nil;
 }
 
-+ (NSArray *)getGenericListPropertyNames:(__unused id)obj {
-    return nil;
-}
-
-+ (NSArray *)getGenericListPropertyIndices:(__unused id)obj {
++ (NSArray *)getListProperties:(__unused id)obj {
     return nil;
 }
 
@@ -503,6 +499,17 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 
 + (NSArray *)requiredPropertiesForClass:(Class)cls {
     return [cls requiredProperties];
+}
+
+@end
+
+@implementation RLMListPropertyMetadata
+
++ (instancetype)listPropertyMetadataWithPropertyName:(NSString *)propertyName index:(NSInteger)index {
+    RLMListPropertyMetadata *md = [RLMListPropertyMetadata new];
+    md.propertyName = propertyName;
+    md.index = index;
+    return md;
 }
 
 @end

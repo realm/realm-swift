@@ -491,14 +491,19 @@ class SwiftGenericPropsOrderingParent: Object {
 }
 
 class SwiftGenericPropsOrderingObject: SwiftGenericPropsOrderingParent {
-
     func myFunction() -> Int { return firstNumber + secondNumber + thirdNumber }
+    var firstIgnored = 1
     @objc dynamic var firstNumber = 0
     class func myClassFunction(x: Int, y: Int) -> Int { return x + y }
+    var secondIgnored = 10
     let firstArray = List<SwiftStringObject>()
     @objc dynamic var secondNumber = 0
     var computedProp: String { return "\(firstNumber), \(secondNumber), and \(thirdNumber)" }
     let secondArray = List<SwiftStringObject>()
+    override class func ignoredProperties() -> [String] {
+        return ["firstIgnored", "secondIgnored", "thirdIgnored"]
+    }
+    var thirdIgnored = 100
     let firstLinking = LinkingObjects(fromType: SwiftGenericPropsOrderingHelper.self, property: "first")
     let secondLinking = LinkingObjects(fromType: SwiftGenericPropsOrderingHelper.self, property: "second")
     @objc dynamic var thirdNumber = 0

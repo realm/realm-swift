@@ -238,16 +238,12 @@ using namespace realm;
         // List<> properties don't show up as objective-C properties due to
         // being generic, so use Swift reflection to get a list of them, and
         // then access their ivars directly
-        NSArray<NSString *> *listPropNames = [objectUtil getGenericListPropertyNames:swiftObjectInstance] ?: @[];
-        NSArray<NSNumber *> *listPropIndices = [objectUtil getGenericListPropertyIndices:swiftObjectInstance] ?: @[];
-        if ([listPropNames count] != [listPropIndices count]) {
-            @throw RLMException(@"List property name count and index count did not match up. This may be due to "
-                                "misuse of Realm property types.");
-        }
-        for (NSUInteger i = 0; i < listPropNames.count; i++) {
-            addProperty([[RLMProperty alloc] initSwiftListPropertyWithName:listPropNames[i]
+        NSArray<RLMListPropertyMetadata *> *listProps = [objectUtil getListProperties:swiftObjectInstance];
+        for (RLMListPropertyMetadata *metadata in listProps) {
+            addProperty([[RLMProperty alloc] initSwiftListPropertyWithName:metadata.propertyName
                                                                   instance:swiftObjectInstance],
-                        [listPropIndices[i] integerValue]);
+                        metadata.index);
+
         }
 
         // Ditto for LinkingObjects<> properties.

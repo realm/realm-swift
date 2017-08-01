@@ -416,23 +416,43 @@ public class ObjectUtil: NSObject {
         return nil
     }
 
-    // Get the names of all properties in the object which are of type List<>.
-    @objc private class func getGenericListPropertyNames(_ object: Any) -> NSArray {
-        return Mirror(reflecting: object).children.filter { (prop: Mirror.Child) in
-            return type(of: prop.value) is RLMListBase.Type
-        }.flatMap { (prop: Mirror.Child) in
-            return prop.label
-        } as NSArray
+    // Reflect an object, and remove all the ignored stored properties from the
+    // children collection.
+    private static func getNonIgnoredMirrorChildren(for object: Any) -> [Mirror.Child] {
+        guard let realmObject = object as? Object else {
+            return Array(Mirror(reflecting: object).children)
+        }
+        let ignoredPropNames: Set<String> = Set(type(of: realmObject).ignoredProperties())
+        // No HKT in Swift, unfortunately
+        return Mirror(reflecting: realmObject).children.filter { (prop: Mirror.Child) -> Bool in
+            guard let label = prop.label else {
+                return false
+            }
+            return !ignoredPropNames.contains(label)
+        }
     }
 
-    // Return the indices of generic properties in the object.
-    @objc private class func getGenericListPropertyIndices(_ object: Any) -> NSArray {
-        let children = Mirror(reflecting: object).children
-        let indices = Array(0..<Int(children.count))
-        let mask = children.map { (prop: Mirror.Child) -> Bool in
-            return type(of: prop.value) is RLMListBase.Type
+    @objc private class func getListProperties(_ object: Any) -> [RLMListPropertyMetadata] {
+        var props: [RLMListPropertyMetadata] = []
+        for (idx, prop) in getNonIgnoredMirrorChildren(for: object).enumerated() {
+            if let value = prop.value as? RLMListBase {
+                props.append(RLMListPropertyMetadata(propertyName: prop.label!, index: idx))
+            }
         }
-        return zip(indices, mask).filter { $0.1 }.map { $0.0 } as NSArray
+        return props
+    }
+
+    @objc private class func getLinkingObjectsProperties(_ object: Any) -> [RLMLinkingObjectsPropertyMetadata] {
+        var props: [RLMLinkingObjectsPropertyMetadata] = []
+        for (idx, prop) in getNonIgnoredMirrorChildren(for: object).enumerated() {
+            if let value = prop.value as? LinkingObjectsBase {
+                props.append(RLMLinkingObjectsPropertyMetadata(propertyName: prop.label!,
+                                                               className: value.objectClassName,
+                                                               linkedPropertyName: value.propertyName,
+                                                               index: idx))
+            }
+        }
+        return props
     }
 
     // swiftlint:disable:next cyclomatic_complexity
@@ -474,20 +494,6 @@ public class ObjectUtil: NSObject {
 
     @objc private class func requiredPropertiesForClass(_: Any) -> [String] {
         return []
-    }
-
-    @objc private class func getLinkingObjectsProperties(_ object: Any) -> [RLMLinkingObjectsPropertyMetadata] {
-        let children = Mirror(reflecting: object).children
-        var props: [RLMLinkingObjectsPropertyMetadata] = []
-        for (idx, prop) in children.enumerated() {
-            if let value = prop.value as? LinkingObjectsBase {
-                props.append(RLMLinkingObjectsPropertyMetadata(propertyName: prop.label!,
-                                                               className: value.objectClassName,
-                                                               linkedPropertyName: value.propertyName,
-                                                               index: idx))
-            }
-        }
-        return props
     }
 }
 
