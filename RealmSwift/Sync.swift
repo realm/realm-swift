@@ -378,6 +378,13 @@ public typealias SyncAccessLevel = RLMSyncAccessLevel
 public typealias SyncPermissionResults = RLMSyncPermissionResults
 
 extension SyncPermissionResults {
+    /**
+     Register to be notified when the contents of the results object change.
+
+     This method returns a token. Hold on to the token for as long as notifications
+     are desired. Call `invalidate()` on the token to stop notifications, and before
+     deallocating the token.
+     */
     public func observe(_ block: @escaping RLMPermissionStatusBlock) -> RLMNotificationToken {
         return __addNotificationBlock(block)
     }
