@@ -643,6 +643,9 @@ NS_REFINED_FOR_SWIFT;
 @interface RLMNotificationToken : NSObject
 /// Stops notifications for the change subscription that returned this token.
 - (void)invalidate;
+
+/// Stops notifications for the change subscription that returned this token.
+- (void)stop __attribute__((unavailable("Renamed to -invalidate.")));;
 @end
 
 NS_ASSUME_NONNULL_END

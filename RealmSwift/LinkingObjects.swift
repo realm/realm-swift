@@ -436,10 +436,3 @@ internal enum LinkingObjectsBridgingMetadata {
         }
     }
 }
-
-// MARK: Unavailable
-
-extension LinkingObjects {
-    @available(*, unavailable, renamed: "sorted(byKeyPath:ascending:)")
-    public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T> { fatalError() }
-}

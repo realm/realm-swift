@@ -403,10 +403,3 @@ extension Results: AssistedObjectiveCBridgeable {
         return (objectiveCValue: rlmResults, metadata: nil)
     }
 }
-
-// MARK: Unavailable
-
-extension Results {
-    @available(*, unavailable, renamed: "sorted(byKeyPath:ascending:)")
-    public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T> { fatalError() }
-}

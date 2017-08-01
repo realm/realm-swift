@@ -823,7 +823,12 @@ extension AnyRealmCollection: AssistedObjectiveCBridgeable {
 
 // MARK: Unavailable
 
-extension AnyRealmCollection {
+extension RealmCollection {
     @available(*, unavailable, renamed: "sorted(byKeyPath:ascending:)")
     func sorted(byProperty property: String, ascending: Bool) -> Results<Element> { fatalError() }
+
+    @available(*, unavailable, renamed: "observe(_:)")
+    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken {
+        fatalError()
+    }
 }
