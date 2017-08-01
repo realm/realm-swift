@@ -11,6 +11,16 @@ x.x.x Release notes (yyyy-MM-dd)
 * `-[RLMRealm addOrUpdateObjects:]` and `-[RLMRealm deleteObjects:]` now
   require their argument to conform to `NSFastEnumeration`, to match similar
   APIs that also take collections.
+* Remove deprecated `{RLM}SyncPermission` and `{RLM}SyncPermissionChange`
+  classes.
+* `{RLM}SyncPermissionValue` has been renamed to just `{RLM}SyncPermission`.
+  Its `userId` property has been renamed `identity`, and its
+  `-initWithRealmPath:userID:accessLevel:` initializer has been renamed
+  `-initWithRealmPath:identity:accessLevel:`.
+* Remove deprecated `-[RLMSyncUser permissionRealmWithError:]` and
+  `SyncUser.permissionRealm()` APIs. Use the new permissions system.
+* Remove deprecated error `RLMSyncErrorBadResponse`. Use
+  `RLMSyncAuthErrorBadResponse` instead.
 
 ### Enhancements
 

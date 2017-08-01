@@ -88,7 +88,7 @@ extension RLMCollection {
 #if swift(>=3.1)
 // Collection conformance for RLMSyncPermissionResults.
 extension RLMSyncPermissionResults: RandomAccessCollection {
-    public subscript(index: Int) -> RLMSyncPermissionValue {
+    public subscript(index: Int) -> RLMSyncPermission {
         return object(at: index)
     }
 
@@ -108,13 +108,13 @@ extension RLMSyncPermissionResults: RandomAccessCollection {
 extension RLMSyncPermissionResults {
     /// Return the first permission value in the results, or `nil` if
     /// the results are empty.
-    public var first: RLMSyncPermissionValue? {
+    public var first: RLMSyncPermission? {
         return count > 0 ? object(at: 0) : nil
     }
 
     /// Return the last permission value in the results, or `nil` if
     /// the results are empty.
-    public var last: RLMSyncPermissionValue? {
+    public var last: RLMSyncPermission? {
         return count > 0 ? object(at: count - 1) : nil
     }
 }
@@ -127,8 +127,8 @@ extension RLMSyncPermissionResults: Sequence {
             iteratorBase = NSFastEnumerationIterator(results)
         }
 
-        public func next() -> RLMSyncPermissionValue? {
-            return iteratorBase.next() as! RLMSyncPermissionValue?
+        public func next() -> RLMSyncPermission? {
+            return iteratorBase.next() as! RLMSyncPermission?
         }
     }
 

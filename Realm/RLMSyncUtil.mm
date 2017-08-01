@@ -24,8 +24,6 @@
 #import "RLMSyncUser_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
-#import "RLMSyncPermission.h"
-#import "RLMSyncPermissionChange.h"
 #import "RLMSyncPermissionOffer.h"
 #import "RLMSyncPermissionOfferResponse.h"
 
@@ -47,22 +45,14 @@ static RLMRealmConfiguration *RLMRealmSpecialPurposeConfiguration(RLMSyncUser *u
     config.syncConfiguration = syncConfig;
     return config;
 }
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
 @implementation RLMRealmConfiguration (RealmSync)
 + (instancetype)managementConfigurationForUser:(RLMSyncUser *)user {
     RLMRealmConfiguration *config = RLMRealmSpecialPurposeConfiguration(user, @"__management");
-    config.objectClasses = @[RLMSyncPermissionChange.class, RLMSyncPermissionOffer.class, RLMSyncPermissionOfferResponse.class];
-    return config;
-}
-
-+ (instancetype)permissionConfigurationForUser:(RLMSyncUser *)user {
-    RLMRealmConfiguration *config = RLMRealmSpecialPurposeConfiguration(user, @"__permission");
-    config.objectClasses = @[RLMSyncPermission.class];
+    config.objectClasses = @[RLMSyncPermissionOffer.class, RLMSyncPermissionOfferResponse.class];
     return config;
 }
 @end
-#pragma clang diagnostic pop
 
 RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
 

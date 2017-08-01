@@ -56,14 +56,6 @@ extern NSString *const RLMSyncPermissionErrorDomain;
  error handler, or a callback on a sync-related API that performs asynchronous work.
  */
 typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
-    /**
-     An error that indicates that the response received from the
-     authentication server was malformed.
-
-     @warning This error is deprecated, and has been replaced by
-              `RLMSyncAuthErrorBadResponse`.
-     */
-    RLMSyncErrorBadResponse __deprecated_msg("This error has been replaced by 'RLMSyncAuthErrorBadResponse'") = 1,
 
     /// An error that indicates a problem with the session (a specific Realm opened for sync).
     RLMSyncErrorClientSessionError      = 4,

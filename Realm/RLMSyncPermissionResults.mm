@@ -23,7 +23,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMQueryUtil.hpp"
 #import "RLMSchema_Private.hpp"
-#import "RLMSyncPermissionValue_Private.hpp"
+#import "RLMSyncPermission_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMUtil.hpp"
 
@@ -47,10 +47,10 @@ using namespace realm;
     return [[RLMCancellationToken alloc] initWithToken:std::move(token) realm:nil];
 }
 
-- (RLMSyncPermissionValue *)objectAtIndex:(NSInteger)index {
+- (RLMSyncPermission *)objectAtIndex:(NSInteger)index {
     REALM_ASSERT_DEBUG(_results);
     try {
-        return [[RLMSyncPermissionValue alloc] initWithPermission:_results->get(index)];
+        return [[RLMSyncPermission alloc] initWithPermission:_results->get(index)];
     } catch (std::exception const& ex) {
         @throw RLMException(ex);
     }
@@ -64,15 +64,15 @@ using namespace realm;
     return self;
 }
 
-- (RLMSyncPermissionValue *)firstObject {
+- (RLMSyncPermission *)firstObject {
     return self.count == 0 ? nil : [self objectAtIndex:0];
 }
 
-- (RLMSyncPermissionValue *)lastObject {
+- (RLMSyncPermission *)lastObject {
     return self.count == 0 ? nil : [self objectAtIndex:(self.count - 1)];
 }
 
-- (NSInteger)indexOfObject:(RLMSyncPermissionValue *)object {
+- (NSInteger)indexOfObject:(RLMSyncPermission *)object {
     for (int i=0; i<self.count; i++) {
         if ([[self objectAtIndex:i] isEqual:object]) {
             return i;
@@ -146,7 +146,7 @@ using namespace realm;
             return objectsInBuffer;
         }
         // Otherwise, add an object and advance the index pointer.
-        RLMSyncPermissionValue * __autoreleasing thisPermission = [self objectAtIndex:idx];
+        RLMSyncPermission * __autoreleasing thisPermission = [self objectAtIndex:idx];
         buffer[objectsInBuffer] = thisPermission;
         idx++;
         objectsInBuffer++;

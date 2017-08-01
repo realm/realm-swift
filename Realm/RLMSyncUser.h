@@ -20,7 +20,7 @@
 
 #import "RLMSyncCredentials.h"
 
-@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncPermissionValue, RLMSyncPermissionResults, RLMSyncSession, RLMRealm;
+@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncPermission, RLMSyncPermissionResults, RLMSyncSession, RLMRealm;
 
 /**
  The state of the user object.
@@ -196,7 +196,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
            identityProvider:(RLMIdentityProvider)provider
                  completion:(RLMRetrieveUserBlock)completion;
 
-// This set of permissions APIs uses immutable `RLMSyncPermissionValue` objects to
+// This set of permissions APIs uses immutable `RLMSyncPermission` objects to
 // retrieve and apply permissions. It is intended to replace the set of APIs which
 // directly access Realms and Realm model objects to work with permissions.
 #pragma mark - Value-based Permissions API
@@ -222,9 +222,9 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  the permission change succeeded or failed. The user calling this method must have the right
  to grant the given permission, or else the operation will fail.
 
- @see `RLMSyncPermissionValue`
+ @see `RLMSyncPermission`
  */
-- (void)applyPermission:(RLMSyncPermissionValue *)permission callback:(RLMPermissionStatusBlock)callback;
+- (void)applyPermission:(RLMSyncPermission *)permission callback:(RLMPermissionStatusBlock)callback;
 
 /**
  Revoke a given permission.
@@ -233,32 +233,18 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  the permission change succeeded or failed. The user calling this method must have the right
  to grant the given permission, or else the operation will fail.
 
- @see `RLMSyncPermissionValue`
+ @see `RLMSyncPermission`
  */
-- (void)revokePermission:(RLMSyncPermissionValue *)permission callback:(RLMPermissionStatusBlock)callback;
-
-// These permission APIs access Realms and Realm model objects representing
-// various permission states and actions, as well as standard Realm
-// affordances, to work with permissions. It is being deprecated in favor of
-// the `retrievePermissionsWithCallback:`, `applyPermission:callback:`, and
-// `revokePermission:callback:` APIs.
-#pragma mark - Realm Object-based Permissions API
+- (void)revokePermission:(RLMSyncPermission *)permission callback:(RLMPermissionStatusBlock)callback;
 
 /**
  Returns an instance of the Management Realm owned by the user.
 
- This Realm can be used to control access permissions for Realms managed by the user.
- This includes granting other users access to Realms.
+ This Realm can be used to grant other users access to Realms managed by the current user.
+ 
+ @see `RLMSyncPermissionOffer`, `RLMSyncPermissionOfferResponse`
  */
 - (RLMRealm *)managementRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
-
-/**
- Returns an instance of the Permission Realm owned by the user.
-
- This read-only Realm contains `RLMSyncPermission` objects reflecting the
- synchronized Realms and permission details this user has access to.
- */
-- (RLMRealm *)permissionRealmWithError:(NSError **)error __deprecated_msg("Use `-retrievePermissionsWithCallback:`") NS_REFINED_FOR_SWIFT;
 
 #pragma mark - Miscellaneous
 
