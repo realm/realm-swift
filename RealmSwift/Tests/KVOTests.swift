@@ -77,17 +77,57 @@ class KVOTests: TestCase {
         changeDictionary = change
     }
 
-    func observeChange<T: Equatable>(_ obj: NSObject, _ key: String, _ old: T?, _ new: T?,
+    func observeChange<T: Equatable>(_ obj: KVOObject, _ key: String, _ old: T?, _ new: T?,
                                      fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
-        obj.addObserver(self, forKeyPath: key, options: [.old, .new], context: nil)
+        let kvoOptions: NSKeyValueObservingOptions = [.old, .new]
+#if swift(>=3.2)
+        func observe<Value>(_ keyPath: KeyPath<KVOObject, Value>) -> NSKeyValueObservation {
+            return obj.observe(keyPath, options: kvoOptions) { _, change in
+                self.changeDictionary = [
+                    .oldKey: change.oldValue as? T as Any,
+                    .newKey: change.newValue as? T as Any
+                ]
+            }
+        }
+        let observation: NSKeyValueObservation?
+        switch key {
+        case "boolCol":      observation = observe(\.boolCol)
+        case "int8Col":      observation = observe(\.int8Col)
+        case "int16Col":     observation = observe(\.int16Col)
+        case "int32Col":     observation = observe(\.int32Col)
+        case "int64Col":     observation = observe(\.int64Col)
+        case "floatCol":     observation = observe(\.floatCol)
+        case "doubleCol":    observation = observe(\.doubleCol)
+        case "stringCol":    observation = observe(\.stringCol)
+        case "binaryCol":    observation = observe(\.binaryCol)
+        case "dateCol":      observation = observe(\.dateCol)
+        case "objectCol":    observation = observe(\.objectCol)
+        case "optStringCol": observation = observe(\.optStringCol)
+        case "optBinaryCol": observation = observe(\.optBinaryCol)
+        case "optDateCol":   observation = observe(\.optDateCol)
+        case "invalidated":  observation = observe(\.invalidated)
+        default:
+            // some properties don't support Swift Smart KeyPaths, fall back to legacy KVO API
+            observation = nil
+            obj.addObserver(self, forKeyPath: key, options: kvoOptions, context: nil)
+        }
+        block()
+        if let observation = observation {
+            observation.invalidate()
+        } else {
+            obj.removeObserver(self, forKeyPath: key)
+        }
+#else
+        obj.addObserver(self, forKeyPath: key, options: kvoOptions, context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)
+#endif
 
         XCTAssert(changeDictionary != nil, "Did not get a notification", file: fileName, line: lineNumber)
         guard changeDictionary != nil else { return }
 
-        let actualOld = changeDictionary![NSKeyValueChangeKey.oldKey]! as? T
-        let actualNew = changeDictionary![NSKeyValueChangeKey.newKey]! as? T
+        let actualOld = changeDictionary![.oldKey]! as? T
+        let actualNew = changeDictionary![.newKey]! as? T
 
         XCTAssert(old == actualOld,
                   "Old value: expected \(String(describing: old)), got \(String(describing: actualOld))",
@@ -125,12 +165,12 @@ class KVOTests: TestCase {
     func testAllPropertyTypesStandalone() {
         let obj = KVOObject()
         observeChange(obj, "boolCol", false, true) { obj.boolCol = true }
-        observeChange(obj, "int8Col", 1, 10) { obj.int8Col = 10 }
-        observeChange(obj, "int16Col", 2, 10) { obj.int16Col = 10 }
-        observeChange(obj, "int32Col", 3, 10) { obj.int32Col = 10 }
-        observeChange(obj, "int64Col", 4, 10) { obj.int64Col = 10 }
-        observeChange(obj, "floatCol", 5, 10) { obj.floatCol = 10 }
-        observeChange(obj, "doubleCol", 6, 10) { obj.doubleCol = 10 }
+        observeChange(obj, "int8Col", 1 as Int8, 10) { obj.int8Col = 10 }
+        observeChange(obj, "int16Col", 2 as Int16, 10) { obj.int16Col = 10 }
+        observeChange(obj, "int32Col", 3 as Int32, 10) { obj.int32Col = 10 }
+        observeChange(obj, "int64Col", 4 as Int64, 10) { obj.int64Col = 10 }
+        observeChange(obj, "floatCol", 5 as Float, 10) { obj.floatCol = 10 }
+        observeChange(obj, "doubleCol", 6 as Double, 10) { obj.doubleCol = 10 }
         observeChange(obj, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obj, "objectCol", nil, obj) { obj.objectCol = obj }
 
@@ -169,12 +209,12 @@ class KVOTests: TestCase {
         realm.add(obj)
 
         observeChange(obj, "boolCol", false, true) { obj.boolCol = true }
-        observeChange(obj, "int8Col", 1, 10) { obj.int8Col = 10 }
-        observeChange(obj, "int16Col", 2, 10) { obj.int16Col = 10 }
-        observeChange(obj, "int32Col", 3, 10) { obj.int32Col = 10 }
-        observeChange(obj, "int64Col", 4, 10) { obj.int64Col = 10 }
-        observeChange(obj, "floatCol", 5, 10) { obj.floatCol = 10 }
-        observeChange(obj, "doubleCol", 6, 10) { obj.doubleCol = 10 }
+        observeChange(obj, "int8Col", 1 as Int8, 10) { obj.int8Col = 10 }
+        observeChange(obj, "int16Col", 2 as Int16, 10) { obj.int16Col = 10 }
+        observeChange(obj, "int32Col", 3 as Int32, 10) { obj.int32Col = 10 }
+        observeChange(obj, "int64Col", 4 as Int64, 10) { obj.int64Col = 10 }
+        observeChange(obj, "floatCol", 5 as Float, 10) { obj.floatCol = 10 }
+        observeChange(obj, "doubleCol", 6 as Double, 10) { obj.doubleCol = 10 }
         observeChange(obj, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obj, "objectCol", nil, obj) { obj.objectCol = obj }
 
@@ -224,12 +264,12 @@ class KVOTests: TestCase {
         let obs = realm.object(ofType: KVOObject.self, forPrimaryKey: obj.pk)!
 
         observeChange(obs, "boolCol", false, true) { obj.boolCol = true }
-        observeChange(obs, "int8Col", 1, 10) { obj.int8Col = 10 }
-        observeChange(obs, "int16Col", 2, 10) { obj.int16Col = 10 }
-        observeChange(obs, "int32Col", 3, 10) { obj.int32Col = 10 }
-        observeChange(obs, "int64Col", 4, 10) { obj.int64Col = 10 }
-        observeChange(obs, "floatCol", 5, 10) { obj.floatCol = 10 }
-        observeChange(obs, "doubleCol", 6, 10) { obj.doubleCol = 10 }
+        observeChange(obs, "int8Col", 1 as Int8, 10) { obj.int8Col = 10 }
+        observeChange(obs, "int16Col", 2 as Int16, 10) { obj.int16Col = 10 }
+        observeChange(obs, "int32Col", 3 as Int32, 10) { obj.int32Col = 10 }
+        observeChange(obs, "int64Col", 4 as Int64, 10) { obj.int64Col = 10 }
+        observeChange(obs, "floatCol", 5 as Float, 10) { obj.floatCol = 10 }
+        observeChange(obs, "doubleCol", 6 as Double, 10) { obj.doubleCol = 10 }
         observeChange(obs, "stringCol", "", "abc") { obj.stringCol = "abc" }
         observeChange(obs, "objectCol", nil, obj) { obj.objectCol = obj }
 
