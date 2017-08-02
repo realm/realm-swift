@@ -723,6 +723,8 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.secondArray[0].stringCol, "goodbye")
         XCTAssertEqual(object.secondArray[1].stringCol, "cruel")
         XCTAssertEqual(object.secondArray[2].stringCol, "world")
+        XCTAssertEqual(object.firstOptionalNumber.value, nil)
+        XCTAssertEqual(object.secondOptionalNumber.value, 300)
         XCTAssertTrue(object.parentFirstList.count == 2)
         XCTAssertEqual(object.parentFirstList[0].intCol, 42)
         XCTAssertEqual(object.parentFirstList[1].intCol, 9001)
