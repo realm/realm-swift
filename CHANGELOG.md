@@ -11,7 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Sorting Realm collection types no longer throws an exception on iOS 7.
 
 2.9.1 Release notes (2017-08-01)
 =============================================================
