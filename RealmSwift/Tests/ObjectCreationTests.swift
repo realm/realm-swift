@@ -709,7 +709,9 @@ class ObjectCreationTests: TestCase {
             [["stringCol": "hello"], ["stringCol": "world"]],
             2,
             [["stringCol": "goodbye"], ["stringCol": "cruel"], ["stringCol": "world"]],
-            3]
+            NSNull(),
+            3,
+            300]
         let object = SwiftGenericPropsOrderingObject(value: v)
         XCTAssertEqual(object.firstNumber, 1)
         XCTAssertEqual(object.secondNumber, 2)

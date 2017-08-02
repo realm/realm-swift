@@ -416,8 +416,19 @@ public class ObjectUtil: NSObject {
         return nil
     }
 
-    // Reflect an object, and remove all the ignored stored properties from the
-    // children collection.
+    // If the property is a storage property for a lazy Swift property, return
+    // the base property name (e.g. `foo.storage` becomes `foo`). Otherwise, nil.
+    private static func baseName(forLazySwiftProperty name: String) -> String? {
+        let storageSuffix = ".storage"
+        if let storageRange = name.range(of: storageSuffix, options: [.anchored, .backwards]) {
+            var baseName = name
+            baseName.removeSubrange(storageRange)
+            return baseName
+        }
+        return nil
+    }
+
+    // Reflect an object, returning only children representing managed Realm properties.
     private static func getNonIgnoredMirrorChildren(for object: Any) -> [Mirror.Child] {
         guard let realmObject = object as? Object else {
             return Array(Mirror(reflecting: object).children)
@@ -428,68 +439,78 @@ public class ObjectUtil: NSObject {
             guard let label = prop.label else {
                 return false
             }
-            return !ignoredPropNames.contains(label)
-        }
-    }
-
-    @objc private class func getListProperties(_ object: Any) -> [RLMListPropertyMetadata] {
-        var props: [RLMListPropertyMetadata] = []
-        for (idx, prop) in getNonIgnoredMirrorChildren(for: object).enumerated() {
-            if let value = prop.value as? RLMListBase {
-                props.append(RLMListPropertyMetadata(propertyName: prop.label!, index: idx))
+            if ignoredPropNames.contains(label) {
+                // Ignored property.
+                return false
             }
+            if let lazyBaseName = baseName(forLazySwiftProperty: label) {
+                if ignoredPropNames.contains(lazyBaseName) {
+                    // Ignored lazy property.
+                    return false
+                }
+                // Managed lazy property; not currently supported.
+                // FIXME: revisit this once Swift gets property behaviors/property macros.
+                throwRealmException("Lazy managed property '\(lazyBaseName)' is not allowed on a Realm Swift object"
+                    + " class. Either add the property to the ignored properties list or make it non-lazy.")
+            }
+            return true
         }
-        return props
     }
 
-    @objc private class func getLinkingObjectsProperties(_ object: Any) -> [RLMLinkingObjectsPropertyMetadata] {
-        var props: [RLMLinkingObjectsPropertyMetadata] = []
+    // Build optional property metadata for a given property.
+    private static func buildMetadata(for child: Mirror.Child, at index: Int) -> RLMGenericPropertyMetadata? {
+        guard let name = child.label else {
+            return nil
+        }
+        let mirror = Mirror(reflecting: child.value)
+        let type = mirror.subjectType
+        let code: PropertyType
+        if type is Optional<String>.Type || type is Optional<NSString>.Type {
+            code = .string
+        } else if type is Optional<Date>.Type {
+            code = .date
+        } else if type is Optional<Data>.Type {
+            code = .data
+        } else if type is Optional<Object>.Type {
+            code = .object
+        } else if type is RealmOptional<Int>.Type ||
+            type is RealmOptional<Int8>.Type ||
+            type is RealmOptional<Int16>.Type ||
+            type is RealmOptional<Int32>.Type ||
+            type is RealmOptional<Int64>.Type {
+            code = .int
+        } else if type is RealmOptional<Float>.Type {
+            code = .float
+        } else if type is RealmOptional<Double>.Type {
+            code = .double
+        } else if type is RealmOptional<Bool>.Type {
+            code = .bool
+        } else if child.value as? RLMOptionalBase != nil {
+            throwRealmException("'\(type)' is not a valid RealmOptional type.")
+            code = .int // ignored
+        } else if mirror.displayStyle == .optional || type is ExpressibleByNilLiteral.Type {
+            return RLMGenericPropertyMetadata(forNilLiteralOptionalProperty: name, index: index)
+        } else {
+            return nil
+        }
+        return RLMGenericPropertyMetadata(forOptionalProperty: name, type: Int(code.rawValue), index: index)
+    }
+
+    @objc private class func getSwiftGenericProperties(_ object: Any) -> [RLMGenericPropertyMetadata] {
+        var props: [RLMGenericPropertyMetadata] = []
         for (idx, prop) in getNonIgnoredMirrorChildren(for: object).enumerated() {
             if let value = prop.value as? LinkingObjectsBase {
-                props.append(RLMLinkingObjectsPropertyMetadata(propertyName: prop.label!,
-                                                               className: value.objectClassName,
-                                                               linkedPropertyName: value.propertyName,
-                                                               index: idx))
+                props.append(.init(forLinkingObjectsProperty: prop.label!,
+                                   className: value.objectClassName,
+                                   linkedPropertyName: value.propertyName,
+                                   index: idx))
+            } else if prop.value is RLMListBase {
+                props.append(.init(forListProperty: prop.label!, index: idx))
+            } else if let optional = buildMetadata(for: prop, at: idx) {
+                props.append(optional)
             }
         }
         return props
-    }
-
-    // swiftlint:disable:next cyclomatic_complexity
-    @objc private class func getOptionalProperties(_ object: Any) -> [String: Any] {
-        let children = Mirror(reflecting: object).children
-        return children.reduce([:]) { (properties: [String: Any], prop: Mirror.Child) in
-            guard let name = prop.label else { return properties }
-            let mirror = Mirror(reflecting: prop.value)
-            let type = mirror.subjectType
-            var properties = properties
-            if type is Optional<String>.Type || type is Optional<NSString>.Type {
-                properties[name] = NSNumber(value: PropertyType.string.rawValue)
-            } else if type is Optional<Date>.Type {
-                properties[name] = NSNumber(value: PropertyType.date.rawValue)
-            } else if type is Optional<Data>.Type {
-                properties[name] = NSNumber(value: PropertyType.data.rawValue)
-            } else if type is Optional<Object>.Type {
-                properties[name] = NSNumber(value: PropertyType.object.rawValue)
-            } else if type is RealmOptional<Int>.Type ||
-                      type is RealmOptional<Int8>.Type ||
-                      type is RealmOptional<Int16>.Type ||
-                      type is RealmOptional<Int32>.Type ||
-                      type is RealmOptional<Int64>.Type {
-                properties[name] = NSNumber(value: PropertyType.int.rawValue)
-            } else if type is RealmOptional<Float>.Type {
-                properties[name] = NSNumber(value: PropertyType.float.rawValue)
-            } else if type is RealmOptional<Double>.Type {
-                properties[name] = NSNumber(value: PropertyType.double.rawValue)
-            } else if type is RealmOptional<Bool>.Type {
-                properties[name] = NSNumber(value: PropertyType.bool.rawValue)
-            } else if prop.value as? RLMOptionalBase != nil {
-                throwRealmException("'\(type)' is not a valid RealmOptional type.")
-            } else if mirror.displayStyle == .optional || type is ExpressibleByNilLiteral.Type {
-                properties[name] = NSNull()
-            }
-            return properties
-        }
     }
 
     @objc private class func requiredPropertiesForClass(_: Any) -> [String] {
