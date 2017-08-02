@@ -90,7 +90,10 @@ NSExpression *PredicateExpressionTransformer::visit(NSExpression *expression) co
         }
 
         case NSConditionalExpressionType:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
             return [NSExpression expressionForConditional:visit(expression.predicate) trueExpression:visit(expression.trueExpression) falseExpression:visit(expression.falseExpression)];
+#pragma clang diagnostic pop
 
         default:
             // The remaining expression types do not contain nested expressions or predicates.
