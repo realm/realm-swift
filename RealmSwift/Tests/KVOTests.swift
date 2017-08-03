@@ -165,10 +165,17 @@ class KVOTests: TestCase {
     func testAllPropertyTypesStandalone() {
         let obj = KVOObject()
         observeChange(obj, "boolCol", false, true) { obj.boolCol = true }
+#if swift(>=3.2)
         observeChange(obj, "int8Col", 1 as Int8, 10) { obj.int8Col = 10 }
         observeChange(obj, "int16Col", 2 as Int16, 10) { obj.int16Col = 10 }
         observeChange(obj, "int32Col", 3 as Int32, 10) { obj.int32Col = 10 }
         observeChange(obj, "int64Col", 4 as Int64, 10) { obj.int64Col = 10 }
+#else
+        observeChange(obj, "int8Col", 1, 10) { obj.int8Col = 10 }
+        observeChange(obj, "int16Col", 2, 10) { obj.int16Col = 10 }
+        observeChange(obj, "int32Col", 3, 10) { obj.int32Col = 10 }
+        observeChange(obj, "int64Col", 4, 10) { obj.int64Col = 10 }
+#endif
         observeChange(obj, "floatCol", 5 as Float, 10) { obj.floatCol = 10 }
         observeChange(obj, "doubleCol", 6 as Double, 10) { obj.doubleCol = 10 }
         observeChange(obj, "stringCol", "", "abc") { obj.stringCol = "abc" }
@@ -209,10 +216,17 @@ class KVOTests: TestCase {
         realm.add(obj)
 
         observeChange(obj, "boolCol", false, true) { obj.boolCol = true }
+#if swift(>=3.2)
         observeChange(obj, "int8Col", 1 as Int8, 10) { obj.int8Col = 10 }
         observeChange(obj, "int16Col", 2 as Int16, 10) { obj.int16Col = 10 }
         observeChange(obj, "int32Col", 3 as Int32, 10) { obj.int32Col = 10 }
         observeChange(obj, "int64Col", 4 as Int64, 10) { obj.int64Col = 10 }
+#else
+        observeChange(obj, "int8Col", 1, 10) { obj.int8Col = 10 }
+        observeChange(obj, "int16Col", 2, 10) { obj.int16Col = 10 }
+        observeChange(obj, "int32Col", 3, 10) { obj.int32Col = 10 }
+        observeChange(obj, "int64Col", 4, 10) { obj.int64Col = 10 }
+#endif
         observeChange(obj, "floatCol", 5 as Float, 10) { obj.floatCol = 10 }
         observeChange(obj, "doubleCol", 6 as Double, 10) { obj.doubleCol = 10 }
         observeChange(obj, "stringCol", "", "abc") { obj.stringCol = "abc" }
@@ -264,10 +278,17 @@ class KVOTests: TestCase {
         let obs = realm.object(ofType: KVOObject.self, forPrimaryKey: obj.pk)!
 
         observeChange(obs, "boolCol", false, true) { obj.boolCol = true }
+#if swift(>=3.2)
         observeChange(obs, "int8Col", 1 as Int8, 10) { obj.int8Col = 10 }
         observeChange(obs, "int16Col", 2 as Int16, 10) { obj.int16Col = 10 }
         observeChange(obs, "int32Col", 3 as Int32, 10) { obj.int32Col = 10 }
         observeChange(obs, "int64Col", 4 as Int64, 10) { obj.int64Col = 10 }
+#else
+        observeChange(obs, "int8Col", 1, 10) { obj.int8Col = 10 }
+        observeChange(obs, "int16Col", 2, 10) { obj.int16Col = 10 }
+        observeChange(obs, "int32Col", 3, 10) { obj.int32Col = 10 }
+        observeChange(obs, "int64Col", 4, 10) { obj.int64Col = 10 }
+#endif
         observeChange(obs, "floatCol", 5 as Float, 10) { obj.floatCol = 10 }
         observeChange(obs, "doubleCol", 6 as Double, 10) { obj.doubleCol = 10 }
         observeChange(obs, "stringCol", "", "abc") { obj.stringCol = "abc" }
