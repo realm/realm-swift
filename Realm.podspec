@@ -81,7 +81,7 @@ Pod::Spec.new do |s|
                                 'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"' }
   s.preserve_paths          = %w(build.sh include)
 
-  s.ios.deployment_target   = '7.0'
+  s.ios.deployment_target   = '8.0'
   s.ios.vendored_library    = 'core/librealmcore-ios.a'
 
   s.osx.deployment_target   = '10.9'

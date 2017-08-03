@@ -3,6 +3,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Breaking Changes
 
+* iOS 7 is no longer supported.
 * Computed properties on Realm object types are detected and no
   longer added to the automatically generated schema.
 * `-[RLMRealm addOrUpdateObjectsInArray:]` has been renamed to
