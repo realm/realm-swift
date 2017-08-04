@@ -34,6 +34,10 @@ x.x.x Release notes (yyyy-MM-dd)
 * The return types of the `SyncError.clientResetInfo()` and
   `SyncError.deleteRealmUserInfo()` APIs have been changed. They now return
   `RLMSyncErrorActionToken`s or `SyncError.ActionToken`s instead of closures.
+* The (erroneously added) instance property `Object.className` has been
+  removed.
+* The class methods `Object.className()`, `Object.objectUtilClass()`, and
+  the property `Object.isInvalidated` can no longer be overriden.
 
 ### Enhancements
 
