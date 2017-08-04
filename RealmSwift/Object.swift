@@ -121,24 +121,24 @@ open class Object: RLMObjectBase, ThreadConfined {
     ///
     /// An object can no longer be accessed if the object has been deleted from the Realm that manages it, or if
     /// `invalidate()` is called on that Realm.
-    open override var isInvalidated: Bool { return super.isInvalidated }
+    public override final var isInvalidated: Bool { return super.isInvalidated }
 
     /// A human-readable description of the object.
     open override var description: String { return super.description }
 
-    #if os(OSX)
-    /// Helper to return the class name for an Object subclass.
-    public final override var className: String { return "" }
-    #else
-    /// Helper to return the class name for an Object subclass.
-    public final var className: String { return "" }
-    #endif
+    /**
+     WARNING: This is an internal helper method not intended for public use.
+     :nodoc:
+     */
+    public override final class func className() -> String {
+        return super.className()
+    }
 
     /**
-    WARNING: This is an internal helper method not intended for public use.
-    :nodoc:
-    */
-    open override class func objectUtilClass(_ isSwift: Bool) -> AnyClass {
+     WARNING: This is an internal helper method not intended for public use.
+     :nodoc:
+     */
+    public override final class func objectUtilClass(_ isSwift: Bool) -> AnyClass {
         return ObjectUtil.self
     }
 
