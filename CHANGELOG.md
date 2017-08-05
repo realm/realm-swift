@@ -126,6 +126,24 @@ x.x.x Release notes (yyyy-MM-dd)
   `false` from `Object.shouldIncludeInDefaultSchema()`.
 * Don't clear RLMArrays on self-assignment.
 
+2.9.1 Release notes (2017-08-01)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* The `shouldCompactOnLaunch` block is no longer invoked if the Realm at that
+  path is already open on other threads.
+* Fix an assertion failure in collection notifications when changes are made to
+  the schema via sync while the notification block is active.
+
 2.9.0 Release notes (2017-07-26)
 =============================================================
 
