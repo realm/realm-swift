@@ -85,6 +85,62 @@ extension RLMCollection {
     }
 }
 
+// MARK: - Sync-related
+
+extension RLMSyncManager {
+    public static var shared: RLMSyncManager {
+        return __shared()
+    }
+}
+
+extension RLMSyncUser {
+    public static var current: RLMSyncUser? {
+        return __current()
+    }
+
+    public static var all: [String: RLMSyncUser] {
+        return __allUsers()
+    }
+
+    @nonobjc public var errorHandler: RLMUserErrorReportingBlock? {
+        get {
+            return __errorHandler
+        }
+        set {
+            __errorHandler = newValue
+        }
+    }
+
+    public static func logIn(with credentials: RLMSyncCredentials,
+                             server authServerURL: URL,
+                             timeout: TimeInterval = 30,
+                             onCompletion completion: @escaping RLMUserCompletionBlock) {
+        return __logIn(with: credentials,
+                       authServerURL: authServerURL,
+                       timeout: timeout,
+                       onCompletion: completion)
+    }
+
+    public func managementRealm() throws -> RLMRealm {
+        var error: NSError?
+        let realm = __managementRealmWithError(&error)
+        if let error = error {
+            throw error
+        }
+        return realm
+    }
+}
+
+extension RLMSyncSession {
+    public func addProgressNotification(for direction: RLMSyncProgressDirection,
+                                        mode: RLMSyncProgress,
+                                        block: @escaping RLMProgressNotificationBlock) -> RLMProgressNotificationToken? {
+        return __addProgressNotification(for: direction,
+                                         mode: mode,
+                                         block: block)
+    }
+}
+
 #if swift(>=3.1)
 // Collection conformance for RLMSyncPermissionResults.
 extension RLMSyncPermissionResults: RandomAccessCollection {
