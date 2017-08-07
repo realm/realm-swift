@@ -20,6 +20,9 @@ import XCTest
 import RealmSwift
 
 class SwiftObjectServerTests: SwiftSyncTestCase {
+
+    // MARK: - Basic tests
+
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
         let url = URL(string: "realm://localhost:9080/~/testBasicSync")!
@@ -86,7 +89,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    // MARK: Client reset
+    // MARK: - Client reset
 
     func testClientReset() {
         do {
@@ -146,7 +149,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    // MARK: Progress notifiers
+    // MARK: - Progress notifiers
 
     func testStreamingDownloadNotifier() {
         let bigObjectCount = 2
@@ -229,7 +232,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    // MARK: Download Realm
+    // MARK: - Download Realm
 
     func testDownloadRealm() {
         let bigObjectCount = 2
@@ -279,7 +282,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    // MARK: Administration
+    // MARK: - Administration
 
     func testRetrieveUserInfo() {
         let nonAdminUsername = "meela.swift@realm.example.org"
@@ -309,7 +312,63 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 10.0, handler: nil)
     }
 
-    // MARK: Permissions
+    // MARK: - Authentication
+
+    func testInvalidCredentials() {
+        do {
+            let username = "testInvalidCredentialsUsername"
+            let credentials = SyncCredentials.usernamePassword(username: username,
+                                                               password: "THIS_IS_A_PASSWORD",
+                                                               register: true)
+            _ = try synchronouslyLogInUser(for: credentials, server: authURL)
+            // Now log in the same user, but with a bad password.
+            let ex = expectation(description: "wait for user login")
+            let credentials2 = SyncCredentials.usernamePassword(username: username, password: "NOT_A_VALID_PASSWORD")
+            SyncUser.logIn(with: credentials2, server: authURL) { user, error in
+                XCTAssertNil(user)
+                XCTAssertTrue(error is SyncAuthError)
+                let castError = error as! SyncAuthError
+                XCTAssertEqual(castError.code, SyncAuthError.invalidCredential)
+                ex.fulfill()
+            }
+            waitForExpectations(timeout: 2.0, handler: nil)
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    // MARK: - User-specific functionality
+
+    func testUserExpirationCallback() {
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials(), server: authURL)
+
+            // Set a callback on the user
+            let ex = expectation(description: "Error callback should fire upon receiving an error")
+            var invoked = false
+            user.errorHandler = { (u, error) in
+                XCTAssertEqual(u.identity, user.identity)
+                XCTAssertEqual(error.code, .invalidCredential)
+                invoked = true
+                ex.fulfill()
+            }
+
+            // Screw up the token on the user.
+            manuallySetRefreshToken(for: user, value: "not-a-real-token")
+
+            // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
+            _ = try immediatelyOpenRealm(url: realmURL, user: user)
+            if !invoked {
+                waitForExpectations(timeout: 10.0, handler: nil)
+            }
+            XCTAssertEqual(user.state, .loggedOut)
+
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
+
+    // MARK: - Permissions
 
     func testPermissionChange() {
         do {

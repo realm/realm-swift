@@ -289,6 +289,32 @@ extension SyncUser {
     }
 
     /**
+     An optional error handler which can be set to notify the host application when
+     the user encounters an error.
+     
+     - note: Check for `.invalidAccessToken` to see if the user has been remotely logged
+             out because its refresh token expired, or because the third party authentication
+             service providing the user's identity has logged the user out.
+
+     - warning: Regardless of whether an error handler is defined, certain user errors
+                will automatically cause the user to enter the logged out state.
+     */
+    @nonobjc public var errorHandler: ((SyncUser, SyncAuthError) -> Void)? {
+        get {
+            return __errorHandler
+        }
+        set {
+            if let newValue = newValue {
+                __errorHandler = { (user, error) in
+                    newValue(user, error as! SyncAuthError)
+                }
+            } else {
+                __errorHandler = nil
+            }
+        }
+    }
+
+    /**
      Returns an instance of the Management Realm owned by the user.
 
      This Realm can be used to control access permissions for Realms managed by the user.

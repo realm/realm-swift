@@ -23,14 +23,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncErrorResponseModel : NSObject RLM_SYNC_UNINITIALIZABLE
 
-@property (nonatomic, readonly, assign) NSInteger status;
-@property (nonatomic, readonly, assign) NSInteger code;
-@property (nonatomic, readonly, copy) NSString *title;
-@property (nonatomic, readonly, copy) NSString *hint;
+@property (nonatomic, readonly) NSInteger status;
+@property (nonatomic, readonly) NSInteger code;
+@property (nullable, nonatomic, readonly, copy) NSString *title;
+@property (nullable, nonatomic, readonly, copy) NSString *hint;
 
 - (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;
 
 @end
-
 
 NS_ASSUME_NONNULL_END

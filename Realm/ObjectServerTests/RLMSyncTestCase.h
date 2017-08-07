@@ -107,6 +107,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// Wait for uploads to complete while spinning the runloop. This method uses expectations.
 - (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url error:(NSError **)error;
 
+/// Manually set the refresh token for a user. Used for testing invalid token conditions.
+- (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue;
+
 @end
 
 NS_ASSUME_NONNULL_END

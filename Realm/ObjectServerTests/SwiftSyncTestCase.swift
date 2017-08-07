@@ -61,7 +61,10 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
 
-    func basicCredentials(register: Bool, usernameSuffix: String = "", file: StaticString = #file, line: UInt = #line) -> SyncCredentials {
+    func basicCredentials(register: Bool = true,
+                          usernameSuffix: String = "",
+                          file: StaticString = #file,
+                          line: UInt = #line) -> SyncCredentials {
         return .usernamePassword(username: "\(file)\(line)\(usernameSuffix)", password: "a", register: register)
     }
 
