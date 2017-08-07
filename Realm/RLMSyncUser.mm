@@ -36,7 +36,7 @@
 
 using namespace realm;
 using ConfigMaker = std::function<Realm::Config(std::shared_ptr<SyncUser>, std::string)>;
-using PermissionGetCallback = std::function<void(std::unique_ptr<PermissionResults>, std::exception_ptr)>;
+using PermissionGetCallback = std::function<void(Results, std::exception_ptr)>;
 
 namespace {
 
@@ -56,7 +56,7 @@ NSError *translateExceptionPtrToError(std::exception_ptr ptr, bool get) {
 }
 
 PermissionGetCallback RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock callback) {
-    return [callback](std::unique_ptr<PermissionResults> results, std::exception_ptr ptr) {
+    return [callback](Results results, std::exception_ptr ptr) {
         if (ptr) {
             NSError *error = translateExceptionPtrToError(std::move(ptr), true);
             REALM_ASSERT(error);
