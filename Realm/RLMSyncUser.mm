@@ -186,18 +186,21 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     [self logInWithCredentials:credential
                  authServerURL:authServerURL
                        timeout:30
+                 callbackQueue:dispatch_get_main_queue()
                   onCompletion:completion];
 }
 
 + (void)logInWithCredentials:(RLMSyncCredentials *)credential
                authServerURL:(NSURL *)authServerURL
                      timeout:(NSTimeInterval)timeout
+               callbackQueue:(dispatch_queue_t)callbackQueue
                 onCompletion:(RLMUserCompletionBlock)completion {
     RLMSyncUser *user = [[RLMSyncUser alloc] initPrivate];
     [RLMSyncUser _performLogInForUser:user
                           credentials:credential
                         authServerURL:authServerURL
                               timeout:timeout
+                        callbackQueue:callbackQueue
                       completionBlock:completion];
 }
 
@@ -376,6 +379,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                  credentials:(RLMSyncCredentials *)credentials
                authServerURL:(NSURL *)authServerURL
                      timeout:(NSTimeInterval)timeout
+               callbackQueue:(dispatch_queue_t)callbackQueue
              completionBlock:(RLMUserCompletionBlock)completion {
     // Special credential login should be treated differently.
     if (credentials.provider == RLMIdentityProviderAccessToken) {
@@ -409,30 +413,44 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                                                        requireRefreshToken:YES];
             if (!model) {
                 // Malformed JSON
-                completion(nil, make_auth_error_bad_response(json));
+                NSError *badResponseError = make_auth_error_bad_response(json);
+                dispatch_async(callbackQueue, ^{
+                    completion(nil, badResponseError);
+                });
                 return;
             } else {
                 std::string server_url = authServerURL.absoluteString.UTF8String;
                 SyncUserIdentifier identity{[model.refreshToken.tokenData.identity UTF8String], std::move(server_url)};
                 auto sync_user = SyncManager::shared().get_user(identity , [model.refreshToken.token UTF8String]);
                 if (!sync_user) {
-                    completion(nil, make_auth_error_client_issue());
+                    NSError *authError = make_auth_error_client_issue();
+                    dispatch_async(callbackQueue, ^{
+                        completion(nil, authError);
+                    });
                     return;
                 }
                 sync_user->set_is_admin(model.refreshToken.tokenData.isAdmin);
                 user->_user = sync_user;
-                completion(user, nil);
+                dispatch_async(callbackQueue, ^{
+                    completion(user, nil);
+                });
             }
         } else {
             // Something else went wrong
-            completion(nil, error);
+            dispatch_async(callbackQueue, ^{
+                completion(nil, error);
+            });
         }
     };
     [RLMNetworkClient sendRequestToEndpoint:[RLMSyncAuthEndpoint endpoint]
                                      server:authServerURL
                                        JSON:json
                                     timeout:timeout
-                                 completion:handler];
+                                 completion:^(NSError *error, NSDictionary *dictionary) {
+                                     dispatch_async(callbackQueue, ^{
+                                         handler(error, dictionary);
+                                     });
+                                 }];
 }
 
 + (void)_performLoginForDirectAccessTokenCredentials:(RLMSyncCredentials *)credentials
