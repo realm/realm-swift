@@ -82,18 +82,6 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 @property (nonatomic, copy) NSString *appID;
 
 /**
- Whether SSL certificate validation should be disabled.
-
- Once this value is set (either way), it will be used as the default value for SSL
- validation when initializing new sync configuration values. A given configuration's
- SSL validation setting can still be overriden from the global default by setting it
- explicitly.
-
- @warning NEVER disable certificate validation for clients and servers in production.
- */
-@property (nonatomic) BOOL disableSSLValidation __deprecated_msg("Set `enableSSLValidation` on individual configurations instead.");
-
-/**
  The logging threshold which newly opened synced Realms will use. Defaults to
  `RLMSyncLogLevelInfo`.
 

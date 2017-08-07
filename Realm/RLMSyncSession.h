@@ -51,7 +51,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgressDirection) {
  Progress notification blocks can be registered on sessions if your app wishes to be informed
  how many bytes have been uploaded or downloaded, for example to show progress indicator UIs.
  */
-typedef NS_ENUM(NSUInteger, RLMSyncProgress) {
+typedef NS_ENUM(NSUInteger, RLMSyncProgressMode) {
     /**
      The block will be called indefinitely, or until it is unregistered by calling
      `-[RLMProgressNotificationToken invalidate]`.
@@ -59,7 +59,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgress) {
      Notifications will always report the latest number of transferred bytes, and the
      most up-to-date number of total transferrable bytes.
      */
-    RLMSyncProgressReportIndefinitely,
+    RLMSyncProgressModeReportIndefinitely,
     /**
      The block will, upon registration, store the total number of bytes
      to be transferred. When invoked, it will always report the most up-to-date number
@@ -68,7 +68,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgress) {
      When the number of transferred bytes reaches or exceeds the
      number of transferrable bytes, the block will be unregistered.
      */
-    RLMSyncProgressForCurrentlyOutstandingWork,
+    RLMSyncProgressModeForCurrentlyOutstandingWork,
 };
 
 @class RLMSyncUser, RLMSyncConfiguration, RLMSyncErrorActionToken;
@@ -150,7 +150,7 @@ NS_ASSUME_NONNULL_BEGIN
  @see `RLMSyncProgressDirection`, `RLMSyncProgress`, `RLMProgressNotificationBlock`, `RLMProgressNotificationToken`
  */
 - (nullable RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
-                                                                          mode:(RLMSyncProgress)mode
+                                                                          mode:(RLMSyncProgressMode)mode
                                                                          block:(RLMProgressNotificationBlock)block
 NS_REFINED_FOR_SWIFT;
 

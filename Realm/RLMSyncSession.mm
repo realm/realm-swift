@@ -174,7 +174,7 @@ using namespace realm;
 }
 
 - (RLMProgressNotificationToken *)addProgressNotificationForDirection:(RLMSyncProgressDirection)direction
-                                                                 mode:(RLMSyncProgress)mode
+                                                                 mode:(RLMSyncProgressMode)mode
                                                                 block:(RLMProgressNotificationBlock)block {
     if (auto session = _session.lock()) {
         if (session->state() == SyncSession::PublicState::Error) {
@@ -184,7 +184,7 @@ using namespace realm;
         auto notifier_direction = (direction == RLMSyncProgressDirectionUpload
                                    ? SyncSession::NotifierType::upload
                                    : SyncSession::NotifierType::download);
-        bool is_streaming = (mode == RLMSyncProgressReportIndefinitely);
+        bool is_streaming = (mode == RLMSyncProgressModeReportIndefinitely);
         uint64_t token = session->register_progress_notifier([=](uint64_t transferred, uint64_t transferrable) {
             dispatch_async(queue, ^{
                 block((NSUInteger)transferred, (NSUInteger)transferrable);
