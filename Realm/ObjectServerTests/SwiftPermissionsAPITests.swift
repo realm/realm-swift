@@ -47,14 +47,14 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
                                       file: StaticString = #file,
                                       line: UInt = #line) {
         let ex = expectation(description: "Checking permission count")
-        let token = results.addNotificationBlock { (error) in
+        let token = results.observe { (error) in
             XCTAssertNil(error, "Notification returned error '\(error!)' when running test at \(file):\(line)")
             if results.count == expected {
                 ex.fulfill()
             }
         }
         waitForExpectations(timeout: 2.0, handler: nil)
-        token.stop()
+        token.invalidate()
     }
 
     private func get(permission: SyncPermission,
@@ -63,7 +63,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
                      line: UInt = #line) -> SyncPermission? {
         let ex = expectation(description: "Retrieving permission")
         var finalValue: SyncPermission?
-        let token = results.addNotificationBlock { (error) in
+        let token = results.observe { (error) in
             XCTAssertNil(error, "Notification returned error '\(error!)' when running test at \(file):\(line)")
             for result in results where result == permission {
                 finalValue = result
@@ -72,7 +72,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
             }
         }
         waitForExpectations(timeout: 2.0, handler: nil)
-        token.stop()
+        token.invalidate()
         return finalValue
     }
 
@@ -86,7 +86,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
                                line: UInt = #line) {
         let ex = expectation(description: "Looking for permission")
         var isPresent = false
-        let token = results.addNotificationBlock { (error) in
+        let token = results.observe { (error) in
             XCTAssertNil(error, "Notification returned error '\(error!)' when running test at \(file):\(line)")
             isPresent = results.contains(permission)
         }
@@ -94,7 +94,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
             ex.fulfill()
         }
         waitForExpectations(timeout: wait + 1.0, handler: nil)
-        token.stop()
+        token.invalidate()
         XCTAssertFalse(isPresent, "Permission '\(permission)' was spuriously present (\(file):\(line))")
     }
 
@@ -176,7 +176,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
 
         // Register notifications.
         let noteEx = expectation(description: "Notification should fire")
-        let token = results.addNotificationBlock { (error) in
+        let token = results.observe { (error) in
             XCTAssertNil(error)
             if results.count > 0 {
                 noteEx.fulfill()
@@ -196,7 +196,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
 
         // Wait for the notification to be fired.
         wait(for: [noteEx], timeout: 2.0)
-        token.stop()
+        token.invalidate()
         let expectedPermission = SwiftPermissionsAPITests.makeExpected(from: p, owner: userA, name: uuid)
         let finalValue = get(permission: expectedPermission, from: results)
         XCTAssertNotNil(finalValue, "Did not find the permission \(expectedPermission)")

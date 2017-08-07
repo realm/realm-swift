@@ -377,6 +377,24 @@ public typealias SyncAccessLevel = RLMSyncAccessLevel
  */
 public typealias SyncPermissionResults = RLMSyncPermissionResults
 
+extension SyncPermissionResults {
+    /**
+     Register to be notified when the contents of the results object change.
+
+     This method returns a token. Hold on to the token for as long as notifications
+     are desired. Call `invalidate()` on the token to stop notifications, and before
+     deallocating the token.
+     */
+    public func observe(_ block: @escaping RLMPermissionStatusBlock) -> RLMNotificationToken {
+        return __addNotificationBlock(block)
+    }
+
+    @available(*, unavailable, renamed: "observe(_:)")
+    @nonobjc public func addNotificationBlock(_ block: @escaping RLMPermissionStatusBlock) -> RLMNotificationToken {
+        fatalError()
+    }
+}
+
 #if swift(>=3.1)
 extension SyncPermissionResults: RandomAccessCollection {
     public subscript(index: Int) -> SyncPermission {
@@ -608,7 +626,7 @@ public extension SyncSession {
     public enum ProgressMode {
         /**
          The block will be called forever, or until it is unregistered by calling
-         `ProgressNotificationToken.stop()`.
+         `ProgressNotificationToken.invalidate()`.
 
          Notifications will always report the latest number of transferred bytes, and the
          most up-to-date number of total transferrable bytes.
@@ -628,8 +646,8 @@ public extension SyncSession {
     /**
      A token corresponding to a progress notification block.
 
-     Call `stop()` on the token to stop notifications. If the notification block has already
-     been automatically stopped, calling `stop()` does nothing. `stop()` should be called
+     Call `invalidate()` on the token to stop notifications. If the notification block has already
+     been automatically stopped, calling `invalidate()` does nothing. `invalidate()` should be called
      before the token is destroyed.
      */
     public typealias ProgressNotificationToken = RLMProgressNotificationToken
@@ -685,7 +703,7 @@ public extension SyncSession {
      will be invoked on a side queue devoted to progress notifications.
 
      The token returned by this method must be retained as long as progress
-     notifications are desired, and the `stop()` method should be called on it
+     notifications are desired, and the `invalidate()` method should be called on it
      when notifications are no longer needed and before the token is destroyed.
 
      If no token is returned, the notification block will never be called again.

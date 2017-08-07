@@ -655,7 +655,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Wait for the notification to be fired.
     [self waitForExpectations:@[noteEx] timeout:2.0];
-    [token stop];
+    [token invalidate];
     id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
     CHECK_PERMISSION_PRESENT(results, expectedPermission);
 }
@@ -907,7 +907,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    [token stop];
+    [token invalidate];
 }
 
 /// Failed to process a permission offer object due to the offer expired
@@ -956,7 +956,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    [token stop];
+    [token invalidate];
 }
 
 /// Get a permission offer token, then permission offer response will be processed, then open another user's Realm file
@@ -1010,7 +1010,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    [token stop];
+    [token invalidate];
 
     NSString *userNameB = [NSStringFromSelector(_cmd) stringByAppendingString:@"_B"];
     RLMSyncUser *userB = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:userNameB
@@ -1055,7 +1055,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    [token stop];
+    [token invalidate];
 
     XCTAssertNotNil([self openRealmForURL:[NSURL URLWithString:responseRealmUrl] user:userB]);
 }
@@ -1099,7 +1099,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    [token stop];
+    [token invalidate];
 }
 
 /// Failed to process a permission offer response object due to `token` does not exist
@@ -1142,7 +1142,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
     
-    [token stop];
+    [token invalidate];
 }
 
 #pragma mark - Delete Realm upon permission denied

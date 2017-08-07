@@ -265,7 +265,7 @@ static NSURL *syncDirectoryForChildProcess() {
                 }
             }];
             [self waitForExpectations:@[findAdminEx] timeout:10.0];
-            [token stop];
+            [token invalidate];
             [realm transactionWithBlock:^{
                 [userObject setValue:@YES forKey:@"isAdmin"];
             }];

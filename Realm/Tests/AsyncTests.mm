@@ -54,7 +54,7 @@
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testNewResultsAreDeliveredAfterLocalCommit {
@@ -73,7 +73,7 @@
     expectation = [self expectationWithDescription:@""];
     [self createObject:2];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testNewResultsAreDeliveredAfterBackgroundCommit {
@@ -92,7 +92,7 @@
     expectation = [self expectationWithDescription:@""];
     [self dispatchAsyncAndWait:^{ [self createObject:2]; }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testResultsPerserveQuery {
@@ -111,7 +111,7 @@
         [self createObject:-11];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testResultsPerserveSort {
@@ -136,7 +136,7 @@
     expected = 2;
     [self dispatchAsyncAndWait:^{ [self createObject:2]; }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testQueryingDeliveredQueryResults {
@@ -155,7 +155,7 @@
     expectation = [self expectationWithDescription:@""];
     [self dispatchAsyncAndWait:^{ [self createObject:2]; }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testQueryingDeliveredTableResults {
@@ -174,7 +174,7 @@
     expectation = [self expectationWithDescription:@""];
     [self dispatchAsyncAndWait:^{ [self createObject:2]; }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testQueryingDeliveredSortedResults {
@@ -193,7 +193,7 @@
     expectation = [self expectationWithDescription:@""];
     [self dispatchAsyncAndWait:^{ [self createObject:2]; }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testSortingDeliveredResults {
@@ -212,7 +212,7 @@
     expectation = [self expectationWithDescription:@""];
     [self dispatchAsyncAndWait:^{ [self createObject:2]; }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testQueryingLinkList {
@@ -251,7 +251,7 @@
         [self waitForExpectationsWithTimeout:2.0 handler:nil];
     }
 
-    [token stop];
+    [token invalidate];
 }
 
 - (RLMNotificationToken *)subscribeAndWaitForInitial:(id<RLMCollection>)query block:(void (^)(id))block {
@@ -292,7 +292,7 @@
     [realm refresh];
     XCTAssertTrue(called);
 
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testModifyingUnrelatedTableDoesNotTriggerResend {
@@ -309,7 +309,7 @@
             [StringObject createInDefaultRealmWithValue:@[@""]];
         }];
     }];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testStaleResultsAreDiscardedWhenThreadIsBlocked {
@@ -331,7 +331,7 @@
                 token = [RLMRealm.defaultRealm addNotificationBlock:^(RLMNotification notification, RLMRealm *realm) {
                     CFRunLoopStop(CFRunLoopGetCurrent());
                     dispatch_semaphore_signal(sema);
-                    [token stop];
+                    [token invalidate];
                     token = nil;
                 }];
                 dispatch_semaphore_signal(sema);
@@ -357,7 +357,7 @@
 
     // Only now let the main thread pick up the notifications
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 }
 
@@ -397,8 +397,8 @@
     XCTAssertEqual(2, firstBlockCalls);
     XCTAssertEqual(2, secondBlockCalls);
 
-    [token stop];
-    [token2 stop];
+    [token invalidate];
+    [token2 invalidate];
 }
 
 - (void)testErrorHandling {
@@ -443,8 +443,8 @@
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    [token stop];
-    [token2 stop];
+    [token invalidate];
+    [token2 invalidate];
 }
 
 - (void)testRLMResultsInstanceIsReused {
@@ -464,7 +464,7 @@
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
     XCTAssertNotNil(prev);
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testCancellationTokenKeepsSubscriptionAlive {
@@ -511,7 +511,7 @@
         XCTAssertThrows([RLMRealm realmWithConfiguration:config error:nil]);
     }
 
-    [token stop];
+    [token invalidate];
     XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
 }
 
@@ -521,17 +521,17 @@
         RLMResults *results = IntObject.allObjects;
         [[self subscribeAndWaitForInitial:results block:^(RLMResults *r) {
             XCTFail(@"results delivered after removal");
-        }] stop];
+        }] invalidate];
 
         // Readd same results at same version
         [[self subscribeAndWaitForInitial:results block:^(RLMResults *r) {
             XCTFail(@"results delivered after removal");
-        }] stop];
+        }] invalidate];
 
         // Add different results at same version
         [[self subscribeAndWaitForInitial:IntObject.allObjects block:^(RLMResults *r) {
             XCTFail(@"results delivered after removal");
-        }] stop];
+        }] invalidate];
 
         [self waitForNotification:RLMRealmDidChangeNotification realm:RLMRealm.defaultRealm block:^{
             [RLMRealm.defaultRealm transactionWithBlock:^{ }];
@@ -540,19 +540,19 @@
         // Readd at later version
         [[self subscribeAndWaitForInitial:results block:^(RLMResults *r) {
             XCTFail(@"results delivered after removal");
-        }] stop];
+        }] invalidate];
 
         // Add different results at later version
         [[self subscribeAndWaitForInitial:[IntObject allObjectsInRealm:realm] block:^(RLMResults *r) {
             XCTFail(@"results delivered after removal");
-        }] stop];
+        }] invalidate];
     }
 
     // Add different results after all of the previous async queries have been
     // removed entirely
     [[self subscribeAndWaitForInitial:[IntObject allObjectsInRealm:realm] block:^(RLMResults *r) {
         XCTFail(@"results delivered after removal");
-    }] stop];
+    }] invalidate];
 }
 
 - (void)testMultipleSourceVersionsForAsyncQueries {
@@ -588,7 +588,7 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     for (int i = 0; i < 10; ++i) {
-        [tokens[i] stop];
+        [tokens[i] invalidate];
     }
 }
 
@@ -624,7 +624,7 @@
         // remove all but the last two so that the version pin is for a version
         // that doesn't have a notifier anymore
         for (int i = 0; i < 7; ++i) {
-            [tokens[i] stop];
+            [tokens[i] invalidate];
         }
     }
 
@@ -638,7 +638,7 @@
     }
 
     for (int i = 7; i < 10; ++i) {
-        [tokens[i] stop];
+        [tokens[i] invalidate];
     }
 }
 
@@ -665,7 +665,7 @@
     XCTAssertEqual(calls1, 1);
     XCTAssertEqual(calls2, 1);
 
-    [token1 stop];
+    [token1 invalidate];
 
     [self waitForNotification:RLMRealmDidChangeNotification realm:results.realm block:^{
         [self createObject:0];
@@ -674,7 +674,7 @@
     XCTAssertEqual(calls1, 1);
     XCTAssertEqual(calls2, 2);
 
-    [token2 stop];
+    [token2 invalidate];
 
     [self waitForNotification:RLMRealmDidChangeNotification realm:results.realm block:^{
         [self createObject:0];
@@ -690,11 +690,11 @@
     __block int calls = 0;
     __block RLMNotificationToken *token1, *token2;
     token1 = [self subscribeAndWaitForInitial:results block:^(RLMResults *results) {
-        [token1 stop];
+        [token1 invalidate];
         ++calls;
     }];
     token2 = [self subscribeAndWaitForInitial:results block:^(RLMResults *results) {
-        [token2 stop];
+        [token2 invalidate];
         ++calls;
     }];
 
@@ -733,8 +733,8 @@
     }];
     XCTAssertEqual(calls, 4);
 
-    [token1 stop];
-    [token2 stop];
+    [token1 invalidate];
+    [token2 invalidate];
 }
 
 - (void)testAddingNewQueryWithinNotificationBlock {
@@ -769,8 +769,8 @@
     CFRunLoopRun();
     XCTAssertEqual(calls, 4);
 
-    [token1 stop];
-    [token2 stop];
+    [token1 invalidate];
+    [token2 invalidate];
 }
 
 - (void)testAddingNewQueryWithinRealmNotificationBlock {
@@ -789,11 +789,11 @@
 
     // Wait for the notification
     CFRunLoopRun();
-    [realmToken stop];
+    [realmToken invalidate];
 
     // Wait for the initial async query results created within the notification
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [queryToken stop];
+    [queryToken invalidate];
 }
 
 - (void)testBlockedThreadWithNotificationsDoesNotPreventDeliveryOnOtherThreads {
@@ -812,7 +812,7 @@
             }];
         });
         CFRunLoopRun();
-        [token stop];
+        [token invalidate];
     }];
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 
@@ -827,7 +827,7 @@
     }];
     XCTAssertEqual(calls, 1);
 
-    [token stop];
+    [token invalidate];
     dispatch_semaphore_signal(sema2);
 }
 
@@ -853,7 +853,7 @@
         XCTFail(@"should not be called");
     }];
     [self dispatchAsyncAndWait:^{
-        [token stop];
+        [token invalidate];
     }];
 }
 
@@ -870,7 +870,7 @@
                 first = false;
                 dispatch_semaphore_signal(sema1);
                 dispatch_semaphore_wait(sema2, DISPATCH_TIME_FOREVER);
-                [token2 stop];
+                [token2 invalidate];
                 CFRunLoopStop(CFRunLoopGetCurrent());
             }];
         });
@@ -884,7 +884,7 @@
             first = false;
             dispatch_semaphore_signal(sema2);
             dispatch_semaphore_wait(sema1, DISPATCH_TIME_FOREVER);
-            [token1 stop];
+            [token1 invalidate];
             CFRunLoopStop(CFRunLoopGetCurrent());
         }];
     });
@@ -944,8 +944,8 @@
         }];
     }];
 
-    [token1 stop];
-    [token2 stop];
+    [token1 invalidate];
+    [token2 invalidate];
 }
 
 - (void)testInitialResultDiscardsChanges {
@@ -973,7 +973,7 @@
             }];
 
             CFRunLoopRun();
-            [token stop];
+            [token invalidate];
             CFRunLoopStop(CFRunLoopGetCurrent());
         });
         CFRunLoopRun();
@@ -981,7 +981,7 @@
 
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
     CFRunLoopRun();
-    [token stop];
+    [token invalidate];
 }
 
 @end

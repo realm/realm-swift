@@ -322,7 +322,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      ```swift
      let results = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
-     let token = dogs.addNotificationBlock { changes in
+     let token = dogs.observe { changes in
          switch changes {
          case .initial(let dogs):
              // Will print "dogs.count: 1"
@@ -344,14 +344,14 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      ```
 
      You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
-     updates, call `stop()` on the token.
+     updates, call `invalidate()` on the token.
 
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
 
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<LinkingObjects>) -> Void) -> NotificationToken {
+    public func observe(_ block: @escaping (RealmCollectionChange<LinkingObjects>) -> Void) -> NotificationToken {
         return rlmResults.addNotificationBlock { _, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
@@ -386,7 +386,7 @@ extension LinkingObjects : RealmCollection {
     }
 
     /// :nodoc:
-    public func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
         NotificationToken {
             let anyCollection = AnyRealmCollection(self)
             return rlmResults.addNotificationBlock { _, change, error in
@@ -435,11 +435,4 @@ internal enum LinkingObjectsBridgingMetadata {
         case .cached(let propertyName): return propertyName
         }
     }
-}
-
-// MARK: Unavailable
-
-extension LinkingObjects {
-    @available(*, unavailable, renamed: "sorted(byKeyPath:ascending:)")
-    public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 }

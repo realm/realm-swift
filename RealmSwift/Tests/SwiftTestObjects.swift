@@ -444,10 +444,10 @@ class SwiftObjectiveCTypesObject: Object {
 
 class SwiftComputedPropertyNotIgnoredObject: Object {
     // swiftlint:disable:next identifier_name
-    dynamic var _urlBacking = ""
+    @objc dynamic var _urlBacking = ""
 
     // Dynamic; no ivar
-    dynamic var dynamicURL: URL? {
+    @objc dynamic var dynamicURL: URL? {
         get {
             return URL(string: _urlBacking)
         }

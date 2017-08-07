@@ -212,7 +212,7 @@
         XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
     }
 
-    [token stop];
+    [token invalidate];
 }
 
 // FIXME: Re-enable this test when it can be made to pass reliably.
@@ -272,7 +272,7 @@
         }
     }
 
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testManyWriters {
@@ -304,7 +304,7 @@
             CFRunLoopStop(CFRunLoopGetCurrent());
         }];
         CFRunLoopRun();
-        [token stop];
+        [token invalidate];
     };
 
     IntObject *obj = [IntObject allObjects].firstObject;

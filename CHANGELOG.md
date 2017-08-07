@@ -41,6 +41,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * The callback which runs when a sync user login succeeds or fails
   now runs on the main queue by default, or can be explicitly specified
   by a new `callbackQueue` parameter on the `{RLM}SyncUser.logIn(...)` API.
+* Rename `{RLM}NotificationToken.stop()` to `invalidate()` and
+  `{RealmCollection,SyncPermissionResults}.addNotificationBlock(_:)` to
+  `observe(_:)` to mirror Foundation's new KVO APIs.
 
 ### Enhancements
 

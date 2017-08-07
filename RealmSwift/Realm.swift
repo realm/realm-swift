@@ -552,7 +552,7 @@ public final class Realm {
      delivered instantly, multiple notifications may be coalesced.
 
      You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
-     updates, call `stop()` on the token.
+     updates, call `invalidate()` on the token.
 
      - parameter block: A block which is called to process Realm notifications. It receives the following parameters:
                         `notification`: the incoming notification; `realm`: the Realm for which the notification
@@ -560,7 +560,7 @@ public final class Realm {
 
      - returns: A token which must be held for as long as you wish to continue receiving change notifications.
      */
-    public func addNotificationBlock(_ block: @escaping NotificationBlock) -> NotificationToken {
+    public func observe(_ block: @escaping NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
             switch rlmNotification {
             case RLMNotification.DidChange:

@@ -876,7 +876,7 @@
     [realm beginWriteTransaction];
     [realm commitWriteTransaction];
 
-    [token stop];
+    [token invalidate];
     XCTAssertTrue(notificationFired);
 }
 
@@ -909,7 +909,7 @@
     XCTAssertTrue(notificationFired);
 
     [realm cancelWriteTransaction];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testBeginWriteTransactionFromWithinRefreshRequiredNotification {
@@ -934,7 +934,7 @@
     }];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testBeginWriteTransactionFromWithinRealmChangedNotification {
@@ -971,7 +971,7 @@
     createObject();
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 
     // Test with the triggering transaction on the same thread
     __block bool first = true;
@@ -1018,7 +1018,7 @@
         XCTAssertEqual(2U, results.count);
         [realm cancelWriteTransaction];
         [expectation fulfill];
-        [token stop];
+        [token invalidate];
     };
     token = [StringObject.allObjects addNotificationBlock:block];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
@@ -1321,7 +1321,7 @@
     [realm beginWriteTransaction];
     XCTAssertTrue(called);
     [realm cancelWriteTransaction];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testThrowingFromDidChangeNotificationFromBeginWriteCancelsTransaction {
@@ -1343,7 +1343,7 @@
         XCTFail(@"should have thrown");
     }
     catch (int) { }
-    [token stop];
+    [token invalidate];
 
     XCTAssertFalse(realm.inWriteTransaction);
     XCTAssertNoThrow([realm beginWriteTransaction]);
@@ -1366,7 +1366,7 @@
         XCTFail(@"should have thrown");
     }
     catch (int) { }
-    [token stop];
+    [token invalidate];
 
     XCTAssertFalse(realm.inWriteTransaction);
     XCTAssertNoThrow([realm beginWriteTransaction]);
@@ -1388,7 +1388,7 @@
         [RLMRealm.defaultRealm transactionWithBlock:^{ }];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testNotificationBlockMustNotBeNil {
@@ -1447,7 +1447,7 @@
                 XCTAssertEqual(note, RLMRealmDidChangeNotification);
                 XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
                 fulfilled = true;
-                [token stop];
+                [token invalidate];
             }];
 
             // notify main thread that we're ready for it to commit
@@ -1483,7 +1483,7 @@
         CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
             RLMNotificationToken *token;
             XCTAssertNoThrow(token = [realm addNotificationBlock:^(NSString *, RLMRealm *) { }]);
-            [token stop];
+            [token invalidate];
             CFRunLoopStop(CFRunLoopGetCurrent());
         });
 

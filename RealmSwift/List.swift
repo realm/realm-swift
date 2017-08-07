@@ -412,7 +412,7 @@ public final class List<T: Object>: ListBase {
      ```swift
      let results = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
-     let token = dogs.addNotificationBlock { changes in
+     let token = dogs.observe { changes in
          switch changes {
          case .initial(let dogs):
              // Will print "dogs.count: 1"
@@ -434,14 +434,14 @@ public final class List<T: Object>: ListBase {
      ```
 
      You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
-     updates, call `stop()` on the token.
+     updates, call `invalidate()` on the token.
 
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
 
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
+    public func observe(_ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
         return _rlmArray.addNotificationBlock { _, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
@@ -503,7 +503,7 @@ extension List: RealmCollection, RangeReplaceableCollection {
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
-    public func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
         NotificationToken {
         let anyCollection = AnyRealmCollection(self)
         return _rlmArray.addNotificationBlock { _, change, error in
@@ -523,11 +523,4 @@ extension List: AssistedObjectiveCBridgeable {
     internal var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (objectiveCValue: _rlmArray, metadata: nil)
     }
-}
-
-// MARK: Unavailable
-
-extension List {
-    @available(*, unavailable, renamed: "sorted(byKeyPath:ascending:)")
-    public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T> { fatalError() }
 }

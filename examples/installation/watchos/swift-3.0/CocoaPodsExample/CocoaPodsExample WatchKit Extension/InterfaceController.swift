@@ -44,13 +44,13 @@ class InterfaceController: WKInterfaceController {
 
     override func willActivate() {
         super.willActivate()
-        token = counter.realm!.addNotificationBlock { [unowned self] _, _ in
+        token = counter.realm!.observe { [unowned self] _, _ in
             self.button.setTitle("\(self.counter.count)")
         }
     }
 
     override func didDeactivate() {
-        token.stop()
+        token.invalidate()
         super.didDeactivate()
     }
 }

@@ -297,7 +297,7 @@ std::vector<std::pair<std::string, bool>> RLMSortDescriptorsToKeypathArray(NSArr
     _token.suppress_next();
 }
 
-- (void)stop {
+- (void)invalidate {
     _token = {};
 }
 
