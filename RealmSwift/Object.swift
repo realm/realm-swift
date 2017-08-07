@@ -273,11 +273,12 @@ open class Object: RLMObjectBase, ThreadConfined {
      Objects are considered the same if and only if they are both managed by the same
      Realm and point to the same underlying object in the database.
      
-     - note: Equality comparison is implemented by `isEqual(_:)`, but objects are only
-             considered equatable using `==` or `isEqual(_:)` if a primary key is
-             defined for the model type. This method can be used to carry out the same
-             underlying comparison regardless of whether the object types are defined
-             with primary keys or not.
+     - note: Equality comparison is implemented by `isEqual(_:)`. If the object type
+             is defined with a primary key, `isEqual(_:)` behaves identically to this
+             method. If the object type is not defined with a primary key,
+             `isEqual(_:)` uses the `NSObject` behavior of comparing object identity.
+             This method can be used to compare two objects for database equality
+             whether or not their object type defines a primary key.
 
      - parameter object: The object to compare the receiver to.
      */

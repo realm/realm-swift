@@ -54,6 +54,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Swift `Object` comparison and hashing behavior now works the same way as
   that of `RLMObject` (objects are now only considered equatable if their
   model class defines a primary key).
+* Fix the way the hash property works on `Object` when the object model has
+  no primary key.
 
 ### Enhancements
 
