@@ -18,10 +18,10 @@
 
 #import "RLMSyncPermissionResults.h"
 
-#import "sync/sync_permission.hpp"
+#import "results.hpp"
 
 @interface RLMSyncPermissionResults ()
 
-- (instancetype)initWithResults:(std::unique_ptr<realm::PermissionResults>)results;
+- (instancetype)initWithResults:(realm::Results)results;
 
 @end
