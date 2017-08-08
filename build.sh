@@ -197,7 +197,12 @@ test_ios_static() {
 
     destination="$1"
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' build"
-    xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+    if [[ `echo $REALM_XCODE_VERSION | awk '{tmp=match($0, /^[[:digit:]]+/); print substr($0, RSTART, RLENGTH)}'` -lt 9 ]]; then
+        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+    else
+        # in Xcode 9 iOS 11 is the standard, and it does not support 32-bit iOS configurations
+        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test"
+    fi
 
     # Xcode's depending tracking is lacking and it doesn't realize that the Realm static framework's static library
     # needs to be recreated when the active architectures change. Help Xcode out by removing the static library.
@@ -644,14 +649,20 @@ case "$COMMAND" in
 
     "test-ios-dynamic")
         xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        if [[ `echo $REALM_XCODE_VERSION | awk '{tmp=match($0, /^[[:digit:]]+/); print substr($0, RSTART, RLENGTH)}'` -lt 9 ]]; then
+            # in Xcode 9 iOS 11 is the standard, and it does not support 32-bit iOS configurations
+            xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        fi
         xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
     "test-ios-swift")
         xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        if [[ `echo $REALM_XCODE_VERSION | awk '{tmp=match($0, /^[[:digit:]]+/); print substr($0, RSTART, RLENGTH)}'` -lt 9 ]]; then
+            # in Xcode 9 iOS 11 is the standard, and it does not support 32-bit iOS configurations
+            xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        fi
         xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
