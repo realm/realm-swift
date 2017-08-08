@@ -66,7 +66,7 @@ begin
     raise 'xcrun failed!' unless $?.success?
     all_available_devices = JSON.parse(devices_json)['devices'].flat_map { |_, devices| devices }
 
-    # Include only avalible devices, others belong to other versions of the simulator
+    # Include only available devices, others belong to other versions of the simulator
     all_available_devices = all_available_devices.select { |device| device['availability'] == '(available)' }
     
     # Get the list of non-shutdown devices
@@ -82,8 +82,8 @@ begin
     sleep shutdown_attempt if shutdown_attempt > 0
   end
 
-  # Delete all avalible simulators
-  print 'Deleting all avalible simulators...'
+  # Delete all available simulators
+  print 'Deleting all available simulators...'
   all_available_devices.each do |device|
     system("xcrun simctl delete #{device['udid']}") or raise "Failed to delete simulator #{device['udid']}"
   end
