@@ -44,6 +44,10 @@ x.x.x Release notes (yyyy-MM-dd)
 * Rename `{RLM}NotificationToken.stop()` to `invalidate()` and
   `{RealmCollection,SyncPermissionResults}.addNotificationBlock(_:)` to
   `observe(_:)` to mirror Foundation's new KVO APIs.
+* The `RLMSyncProgress` enum has been renamed `RLMSyncProgressMode`.
+* Remove deprecated `{RLM}SyncManager.disableSSLValidation` property. Disable
+  SSL validation on a per-Realm basis by setting the `enableSSLValidation`
+  property on `{RLM}SyncConfiguration` instead.
 
 ### Enhancements
 

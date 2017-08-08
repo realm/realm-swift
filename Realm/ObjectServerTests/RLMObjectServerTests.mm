@@ -1173,7 +1173,7 @@
         XCTAssertNotNil(session);
         XCTestExpectation *ex = [self expectationWithDescription:@"streaming-download-notifier"];
         RLMProgressNotificationToken *token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionDownload
-                                                                                      mode:RLMSyncProgressReportIndefinitely
+                                                                                      mode:RLMSyncProgressModeReportIndefinitely
                                                                                      block:^(NSUInteger xfr, NSUInteger xfb) {
             // Make sure the values are increasing, and update our stored copies.
             XCTAssert(xfr >= transferred);
@@ -1227,7 +1227,7 @@
     XCTAssertNotNil(session);
     XCTestExpectation *ex = [self expectationWithDescription:@"streaming-upload-expectation"];
     RLMProgressNotificationToken *token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionUpload
-                                                                                  mode:RLMSyncProgressReportIndefinitely
+                                                                                  mode:RLMSyncProgressModeReportIndefinitely
                                                                                  block:^(NSUInteger xfr, NSUInteger xfb) {
                                                                                      // Make sure the values are
                                                                                      // increasing, and update our
