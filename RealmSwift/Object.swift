@@ -282,8 +282,8 @@ open class Object: RLMObjectBase, ThreadConfined {
 
      - parameter object: The object to compare the receiver to.
      */
-    public func isSameObject(as object: Any?) -> Bool {
-        return RLMObjectBaseAreEqual(self as RLMObjectBase?, object as? RLMObjectBase)
+    public func isSameObject(as object: Object?) -> Bool {
+        return RLMObjectBaseAreEqual(self, object)
     }
 
     // MARK: Private functions

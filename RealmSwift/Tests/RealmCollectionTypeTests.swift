@@ -678,7 +678,7 @@ class ResultsTests: RealmCollectionTypeTests {
     }
 }
 
-class ResultsWithCustomInitializerTest: TestCase {
+class ResultsWithCustomInitializerTests: TestCase {
     func testValueForKey() {
         let realm = realmWithTestPath()
         try! realm.write {
