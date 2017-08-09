@@ -20,8 +20,8 @@ import UIKit
 import RealmSwift
 
 class DemoObject: Object {
-    @objc dynamic var title = ""
-    @objc dynamic var date = NSDate()
+    dynamic var title = ""
+    dynamic var date = NSDate()
 }
 
 class Cell: UITableViewCell {

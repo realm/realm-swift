@@ -23,7 +23,7 @@ import UIKit
 
 // Model definition
 class EncryptionObject: Object {
-    @objc dynamic var stringProp = ""
+    dynamic var stringProp = ""
 }
 
 class ViewController: UIViewController {

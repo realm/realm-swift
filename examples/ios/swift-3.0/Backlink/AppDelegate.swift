@@ -21,14 +21,14 @@ import RealmSwift
 
 
 class Dog: Object {
-    @objc dynamic var name = ""
-    @objc dynamic var age = 0
+    dynamic var name = ""
+    dynamic var age = 0
     // Define "owners" as the inverse relationship to Person.dogs
     let owners = LinkingObjects(fromType: Person.self, property: "dogs")
 }
 
 class Person: Object {
-    @objc dynamic var name = ""
+    dynamic var name = ""
     let dogs = List<Dog>()
 }
 
