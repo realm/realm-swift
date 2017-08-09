@@ -21,46 +21,46 @@ import Realm
 import Realm.Private
 
 class InitLinkedToClass: RLMObject {
-    @objc dynamic var value = SwiftIntObject(value: [0])
+    dynamic var value = SwiftIntObject(value: [0])
 }
 
 class SwiftNonDefaultObject: RLMObject {
-    @objc dynamic var value = 0
+    dynamic var value = 0
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
 }
 
 class SwiftLinkedNonDefaultObject: RLMObject {
-    @objc dynamic var obj: SwiftNonDefaultObject?
+    dynamic var obj: SwiftNonDefaultObject?
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
 }
 
 class SwiftNonDefaultArrayObject: RLMObject {
-    @objc dynamic var array = RLMArray(objectClassName: SwiftNonDefaultObject.className())
+    dynamic var array = RLMArray(objectClassName: SwiftNonDefaultObject.className())
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
 }
 
 class SwiftMutualLink1Object: RLMObject {
-    @objc dynamic var object: SwiftMutualLink2Object?
+    dynamic var object: SwiftMutualLink2Object?
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
 }
 
 class SwiftMutualLink2Object: RLMObject {
-    @objc dynamic var object: SwiftMutualLink1Object?
+    dynamic var object: SwiftMutualLink1Object?
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
 }
 
 class IgnoredLinkPropertyObject : RLMObject {
-    @objc dynamic var value = 0
+    dynamic var value = 0
     var obj = SwiftIntObject()
 
     override class func ignoredProperties() -> [String] {
@@ -69,7 +69,7 @@ class IgnoredLinkPropertyObject : RLMObject {
 }
 
 class SwiftRecursingSchemaTestObject : RLMObject {
-    @objc dynamic var propertyWithIllegalDefaultValue: SwiftIntObject? = {
+    dynamic var propertyWithIllegalDefaultValue: SwiftIntObject? = {
         if mayAccessSchema {
             let realm = RLMRealm.default()
             return SwiftIntObject.allObjects().firstObject() as! SwiftIntObject?
@@ -82,11 +82,11 @@ class SwiftRecursingSchemaTestObject : RLMObject {
 }
 
 class InvalidArrayType: FakeObject {
-    @objc dynamic var array = RLMArray<SwiftIntObject>(objectClassName: "invalid class")
+    dynamic var array = RLMArray<SwiftIntObject>(objectClassName: "invalid class")
 }
 
 class InitAppendsToArrayProperty : RLMObject {
-    @objc dynamic var propertyWithIllegalDefaultValue: RLMArray<SwiftIntObject> = {
+    dynamic var propertyWithIllegalDefaultValue: RLMArray<SwiftIntObject> = {
         if mayAppend {
             let array = RLMArray<SwiftIntObject>(objectClassName: SwiftIntObject.className())
             array.add(SwiftIntObject())

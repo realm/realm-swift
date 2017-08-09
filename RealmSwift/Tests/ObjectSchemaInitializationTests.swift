@@ -206,7 +206,13 @@ class ObjectSchemaInitializationTests: TestCase {
     }
 }
 
-class SwiftFakeObject: NSObject {
+#if swift(>=3.2)
+@objcMembers class SwiftFakeObject: NSObject {}
+#else
+class SwiftFakeObject: NSObject {}
+#endif
+
+extension SwiftFakeObject {
     @objc class func objectUtilClass(_ isSwift: Bool) -> AnyClass { return ObjectUtil.self }
     @objc class func primaryKey() -> String? { return nil }
     @objc class func ignoredProperties() -> [String] { return [] }
@@ -215,19 +221,19 @@ class SwiftFakeObject: NSObject {
 }
 
 class SwiftObjectWithNSURL: SwiftFakeObject {
-    @objc dynamic var url = NSURL(string: "http://realm.io")!
+    dynamic var url = NSURL(string: "http://realm.io")!
 }
 
 class SwiftObjectWithAnyObject: SwiftFakeObject {
-    @objc dynamic var anyObject: AnyObject = NSObject()
+    dynamic var anyObject: AnyObject = NSObject()
 }
 
 class SwiftObjectWithStringArray: SwiftFakeObject {
-    @objc dynamic var stringArray = [String]()
+    dynamic var stringArray = [String]()
 }
 
 class SwiftObjectWithOptionalStringArray: SwiftFakeObject {
-    @objc dynamic var stringArray: [String]?
+    dynamic var stringArray: [String]?
 }
 
 enum SwiftEnum {
@@ -244,7 +250,7 @@ class SwiftObjectWithStruct: SwiftFakeObject {
 }
 
 class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {
-    @objc dynamic var date = Date()
+    dynamic var date = Date()
 
     override class func primaryKey() -> String? {
         return "date"
@@ -252,25 +258,25 @@ class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {
 }
 
 class SwiftObjectWithNSNumber: SwiftFakeObject {
-    @objc dynamic var number = NSNumber()
+    dynamic var number = NSNumber()
 }
 
 class SwiftObjectWithOptionalNSNumber: SwiftFakeObject {
-    @objc dynamic var number: NSNumber? = NSNumber()
+    dynamic var number: NSNumber? = NSNumber()
 }
 
 class SwiftFakeObjectSubclass: SwiftFakeObject {
-    @objc dynamic var dateCol = Date()
+    dynamic var dateCol = Date()
 }
 
 class SwiftObjectWithUnindexibleProperties: SwiftFakeObject {
-    @objc dynamic var boolCol = false
-    @objc dynamic var intCol = 123
-    @objc dynamic var floatCol = 1.23 as Float
-    @objc dynamic var doubleCol = 12.3
-    @objc dynamic var binaryCol = "a".data(using: String.Encoding.utf8)!
-    @objc dynamic var dateCol = Date(timeIntervalSince1970: 1)
-    @objc dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
+    dynamic var boolCol = false
+    dynamic var intCol = 123
+    dynamic var floatCol = 1.23 as Float
+    dynamic var doubleCol = 12.3
+    dynamic var binaryCol = "a".data(using: String.Encoding.utf8)!
+    dynamic var dateCol = Date(timeIntervalSince1970: 1)
+    dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
     let arrayCol = List<SwiftBoolObject>()
 
     dynamic override class func indexedProperties() -> [String] {
@@ -280,11 +286,11 @@ class SwiftObjectWithUnindexibleProperties: SwiftFakeObject {
 
 // swiftlint:disable:next type_name
 class SwiftObjectWithNonNullableOptionalProperties: SwiftFakeObject {
-    @objc dynamic var optDateCol: Date?
+    dynamic var optDateCol: Date?
 }
 
 class SwiftObjectWithNonOptionalLinkProperty: SwiftFakeObject {
-    @objc dynamic var objectCol = SwiftBoolObject()
+    dynamic var objectCol = SwiftBoolObject()
 }
 
 extension Set: RealmOptionalType { }
@@ -294,5 +300,5 @@ class SwiftObjectWithNonRealmOptionalType: SwiftFakeObject {
 }
 
 class SwiftObjectWithBadPropertyName: SwiftFakeObject {
-    @objc dynamic var newValue = false
+    dynamic var newValue = false
 }

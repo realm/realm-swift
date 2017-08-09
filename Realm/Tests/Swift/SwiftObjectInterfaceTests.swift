@@ -27,17 +27,17 @@ class OuterClass {
 }
 
 class SwiftStringObjectSubclass : SwiftStringObject {
-    @objc dynamic var stringCol2 = ""
+    dynamic var stringCol2 = ""
 }
 
 class SwiftSelfRefrencingSubclass: SwiftStringObject {
-    @objc dynamic var objects = RLMArray<SwiftSelfRefrencingSubclass>(objectClassName: SwiftSelfRefrencingSubclass.className())
+    dynamic var objects = RLMArray<SwiftSelfRefrencingSubclass>(objectClassName: SwiftSelfRefrencingSubclass.className())
 }
 
 
 class SwiftDefaultObject: RLMObject {
-    @objc dynamic var intCol = 1
-    @objc dynamic var boolCol = true
+    dynamic var intCol = 1
+    dynamic var boolCol = true
 
     override class func defaultPropertyValues() -> [AnyHashable : Any]? {
         return ["intCol": 2]
@@ -45,10 +45,10 @@ class SwiftDefaultObject: RLMObject {
 }
 
 class SwiftOptionalNumberObject: RLMObject {
-    @objc dynamic var intCol: NSNumber? = 1
-    @objc dynamic var floatCol: NSNumber? = 2.2 as Float as NSNumber
-    @objc dynamic var doubleCol: NSNumber? = 3.3
-    @objc dynamic var boolCol: NSNumber? = true
+    dynamic var intCol: NSNumber? = 1
+    dynamic var floatCol: NSNumber? = 2.2 as Float as NSNumber
+    dynamic var doubleCol: NSNumber? = 3.3
+    dynamic var boolCol: NSNumber? = true
 }
 
 class SwiftObjectInterfaceTests: RLMTestCase {

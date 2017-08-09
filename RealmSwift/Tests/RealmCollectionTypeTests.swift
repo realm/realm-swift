@@ -20,18 +20,18 @@ import XCTest
 import RealmSwift
 
 class CTTAggregateObject: Object {
-    @objc dynamic var intCol = 0
-    @objc dynamic var int8Col = 0
-    @objc dynamic var int16Col = 0
-    @objc dynamic var int32Col = 0
-    @objc dynamic var int64Col = 0
-    @objc dynamic var floatCol = 0 as Float
-    @objc dynamic var doubleCol = 0.0
-    @objc dynamic var boolCol = false
-    @objc dynamic var dateCol = Date()
-    @objc dynamic var trueCol = true
+    dynamic var intCol = 0
+    dynamic var int8Col = 0
+    dynamic var int16Col = 0
+    dynamic var int32Col = 0
+    dynamic var int64Col = 0
+    dynamic var floatCol = 0 as Float
+    dynamic var doubleCol = 0.0
+    dynamic var boolCol = false
+    dynamic var dateCol = Date()
+    dynamic var trueCol = true
     let stringListCol = List<CTTStringObjectWithLink>()
-    @objc dynamic var linkCol: CTTLinkTarget?
+    dynamic var linkCol: CTTLinkTarget?
 }
 
 class CTTAggregateObjectList: Object {
@@ -39,12 +39,12 @@ class CTTAggregateObjectList: Object {
 }
 
 class CTTStringObjectWithLink: Object {
-    @objc dynamic var stringCol = ""
-    @objc dynamic var linkCol: CTTLinkTarget?
+    dynamic var stringCol = ""
+    dynamic var linkCol: CTTLinkTarget?
 }
 
 class CTTLinkTarget: Object {
-    @objc dynamic var id = 0
+    dynamic var id = 0
     let stringObjects = LinkingObjects(fromType: CTTStringObjectWithLink.self, property: "linkCol")
     let aggregateObjects = LinkingObjects(fromType: CTTAggregateObject.self, property: "linkCol")
 }
