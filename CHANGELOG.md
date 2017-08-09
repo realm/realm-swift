@@ -48,6 +48,9 @@ x.x.x Release notes (yyyy-MM-dd)
 * Remove deprecated `{RLM}SyncManager.disableSSLValidation` property. Disable
   SSL validation on a per-Realm basis by setting the `enableSSLValidation`
   property on `{RLM}SyncConfiguration` instead.
+* Fix empty strings, binary data, and null on the right side of `BEGINSWITH`,
+  `ENDSWITH` and `CONTAINS` operators in predicates to match Foundation's
+  semantics of never matching any strings or data.
 
 ### Enhancements
 
