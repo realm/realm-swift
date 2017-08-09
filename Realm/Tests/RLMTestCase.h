@@ -33,7 +33,6 @@ NSData *RLMGenerateKey(void);
 }
 #endif
 
-__attribute__((swift_objc_members)) // workaround for rdar://33514802
 @interface RLMTestCase : XCTestCase
 
 - (RLMRealm *)realmWithTestPath;
