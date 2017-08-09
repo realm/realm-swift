@@ -39,6 +39,11 @@ NS_ASSUME_NONNULL_BEGIN
 #define RLM_ERROR_ENUM(type, name, domain) NS_ENUM(type, name)
 #endif
 
+#if __has_attribute(swift_objc_members)
+#define REALM_SWIFT_OBJC_MEMBERS __attribute__((swift_objc_members))
+#else
+#define REALM_SWIFT_OBJC_MEMBERS
+#endif
 
 #pragma mark - Enums
 
