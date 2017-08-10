@@ -485,11 +485,7 @@ Class RLMObjectUtilClass(BOOL isSwift) {
     return nil;
 }
 
-+ (NSArray *)getGenericListPropertyNames:(__unused id)obj {
-    return nil;
-}
-
-+ (NSDictionary *)getLinkingObjectsProperties:(__unused id)obj {
++ (NSArray *)getSwiftGenericProperties:(__unused id)obj {
     return nil;
 }
 
@@ -499,6 +495,48 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 
 + (NSArray *)requiredPropertiesForClass:(Class)cls {
     return [cls requiredProperties];
+}
+
+@end
+
+@implementation RLMGenericPropertyMetadata
+
++ (instancetype)metadataForListProperty:(NSString *)propertyName index:(NSInteger)index {
+    RLMGenericPropertyMetadata *md = [RLMGenericPropertyMetadata new];
+    md.propertyName = propertyName;
+    md.index = index;
+    md.kind = RLMGenericPropertyKindList;
+    return md;
+}
+
++ (instancetype)metadataForLinkingObjectsProperty:(NSString *)propertyName
+                                        className:(NSString *)className
+                               linkedPropertyName:(NSString *)linkedPropertyName
+                                            index:(NSInteger)index {
+    RLMGenericPropertyMetadata *md = [RLMGenericPropertyMetadata new];
+    md.propertyName = propertyName;
+    md.className = className;
+    md.linkedPropertyName = linkedPropertyName;
+    md.index = index;
+    md.kind = RLMGenericPropertyKindLinkingObjects;
+    return md;
+}
+
++ (instancetype)metadataForOptionalProperty:(NSString *)propertyName type:(NSInteger)type index:(NSInteger)index {
+    RLMGenericPropertyMetadata *md = [RLMGenericPropertyMetadata new];
+    md.propertyName = propertyName;
+    md.propertyType = type;
+    md.index = index;
+    md.kind = RLMGenericPropertyKindOptional;
+    return md;
+}
+
++ (instancetype)metadataForNilLiteralOptionalProperty:(NSString *)propertyName index:(NSInteger)index {
+    RLMGenericPropertyMetadata *md = [RLMGenericPropertyMetadata new];
+    md.propertyName = propertyName;
+    md.index = index;
+    md.kind = RLMGenericPropertyKindNilLiteralOptional;
+    return md;
 }
 
 @end

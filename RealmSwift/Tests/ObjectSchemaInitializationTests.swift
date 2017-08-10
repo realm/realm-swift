@@ -124,6 +124,10 @@ class ObjectSchemaInitializationTests: TestCase {
                      "Should throw when not ignoring a property of a type we can't persist")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithBadPropertyName.self),
                      "Should throw when not ignoring a property with a name we don't support")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithManagedLazyProperty.self),
+                     "Should throw when not ignoring a lazy property")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDynamicManagedLazyProperty.self),
+                     "Should throw when not ignoring a lazy property")
 
         // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
         _ = RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self)
@@ -302,4 +306,13 @@ class SwiftObjectWithNonRealmOptionalType: SwiftFakeObject {
 
 class SwiftObjectWithBadPropertyName: SwiftFakeObject {
     @objc dynamic var newValue = false
+}
+
+class SwiftObjectWithManagedLazyProperty: SwiftFakeObject {
+    lazy var foobar: String = "foo"
+}
+
+// swiftlint:disable:next type_name
+class SwiftObjectWithDynamicManagedLazyProperty: SwiftFakeObject {
+    @objc dynamic lazy var foobar: String = "foo"
 }

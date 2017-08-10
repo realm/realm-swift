@@ -96,18 +96,48 @@ FOUNDATION_EXTERN Class RLMObjectUtilClass(BOOL isSwift);
 
 FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 
-@class RLMProperty, RLMArray;
+@class RLMProperty, RLMArray, RLMGenericPropertyMetadata;
 @interface RLMObjectUtil : NSObject
 
 + (nullable NSArray<NSString *> *)ignoredPropertiesForClass:(Class)cls;
 + (nullable NSArray<NSString *> *)indexedPropertiesForClass:(Class)cls;
 + (nullable NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)linkingObjectsPropertiesForClass:(Class)cls;
 
-+ (nullable NSArray<NSString *> *)getGenericListPropertyNames:(id)obj;
-+ (nullable NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)getLinkingObjectsProperties:(id)object;
+// Precondition: these must be returned in ascending order.
++ (nullable NSArray<RLMGenericPropertyMetadata *> *)getSwiftGenericProperties:(id)obj;
 
 + (nullable NSDictionary<NSString *, NSNumber *> *)getOptionalProperties:(id)obj;
 + (nullable NSArray<NSString *> *)requiredPropertiesForClass:(Class)cls;
+
+@end
+
+typedef NS_ENUM(NSUInteger, RLMGenericPropertyKind) {
+    RLMGenericPropertyKindList,
+    RLMGenericPropertyKindLinkingObjects,
+    RLMGenericPropertyKindOptional,
+    RLMGenericPropertyKindNilLiteralOptional,   // For Swift optional properties that reflect as nil
+};
+
+// Metadata that describes a Swift generic property.
+@interface RLMGenericPropertyMetadata : NSObject
+
+@property (nonatomic, strong) NSString *propertyName;
+@property (nullable, nonatomic, strong) NSString *className;
+@property (nullable, nonatomic, strong) NSString *linkedPropertyName;
+@property (nonatomic) NSInteger index;
+@property (nonatomic) NSInteger propertyType;
+@property (nonatomic) RLMGenericPropertyKind kind;
+
++ (instancetype)metadataForListProperty:(NSString *)propertyName index:(NSInteger)index;
+
++ (instancetype)metadataForLinkingObjectsProperty:(NSString *)propertyName
+                                        className:(NSString *)className
+                               linkedPropertyName:(NSString *)linkedPropertyName
+                                            index:(NSInteger)index;
+
++ (instancetype)metadataForOptionalProperty:(NSString *)propertyName type:(NSInteger)type index:(NSInteger)index;
+
++ (instancetype)metadataForNilLiteralOptionalProperty:(NSString *)propertyName index:(NSInteger)index;
 
 @end
 

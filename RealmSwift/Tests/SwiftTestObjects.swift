@@ -481,3 +481,45 @@ class SwiftCircleObject: Object {
     @objc dynamic var obj: SwiftCircleObject?
     let array = List<SwiftCircleObject>()
 }
+
+// Exists to serve as a superclass to `SwiftGenericPropsOrderingObject`
+class SwiftGenericPropsOrderingParent: Object {
+    let parentFirstList = List<SwiftIntObject>()
+    @objc dynamic var parentFirstNumber = 0
+    func parentFunction() -> Int { return parentFirstNumber + 1 }
+    @objc dynamic var parentSecondNumber = 1
+    var parentComputedProp: String { return "hello world" }
+}
+
+// Used to verify that Swift properties (generic and otherwise) are detected properly and
+// added to the schema in the correct order.
+class SwiftGenericPropsOrderingObject: SwiftGenericPropsOrderingParent {
+    func myFunction() -> Int { return firstNumber + secondNumber + thirdNumber }
+    @objc dynamic var dynamicComputed: Int { return 999 }
+    var firstIgnored = 999
+    @objc dynamic var dynamicIgnored = 999
+    @objc dynamic var firstNumber = 0                   // Managed property
+    class func myClassFunction(x: Int, y: Int) -> Int { return x + y }
+    var secondIgnored = 999
+    lazy var lazyIgnored = 999
+    let firstArray = List<SwiftStringObject>()          // Managed property
+    @objc dynamic var secondNumber = 0                  // Managed property
+    var computedProp: String { return "\(firstNumber), \(secondNumber), and \(thirdNumber)" }
+    let secondArray = List<SwiftStringObject>()         // Managed property
+    override class func ignoredProperties() -> [String] {
+        return ["firstIgnored", "dynamicIgnored", "secondIgnored", "thirdIgnored", "lazyIgnored", "dynamicLazyIgnored"]
+    }
+    let firstOptionalNumber = RealmOptional<Int>()      // Managed property
+    var thirdIgnored = 999
+    @objc dynamic lazy var dynamicLazyIgnored = 999
+    let firstLinking = LinkingObjects(fromType: SwiftGenericPropsOrderingHelper.self, property: "first")
+    let secondLinking = LinkingObjects(fromType: SwiftGenericPropsOrderingHelper.self, property: "second")
+    @objc dynamic var thirdNumber = 0                   // Managed property
+    let secondOptionalNumber = RealmOptional<Int>()     // Managed property
+}
+
+// Only exists to allow linking object properties on `SwiftGenericPropsNotLastObject`.
+class SwiftGenericPropsOrderingHelper: Object {
+    @objc dynamic var first: SwiftGenericPropsOrderingObject?
+    @objc dynamic var second: SwiftGenericPropsOrderingObject?
+}
