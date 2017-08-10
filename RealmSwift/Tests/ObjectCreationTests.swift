@@ -576,7 +576,7 @@ class ObjectCreationTests: TestCase {
 
         XCTAssertNotNil(object.realm)
 
-        XCTAssertEqual(object.objectCol, existingObject)
+        assertEqual(object.objectCol, existingObject)
     }
 
     func testAddAndUpdateWithExisingNestedObjects() {

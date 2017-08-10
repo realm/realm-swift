@@ -113,6 +113,28 @@ class TestCase: XCTestCase {
         queue.sync { }
     }
 
+    /// Check whether two test objects are equal (refer to the same row in the same Realm), even if their models
+    /// don't define a primary key.
+    func assertEqual<O: Object>(_ o1: O?, _ o2: O?, fileName: StaticString = #file, lineNumber: UInt = #line) {
+        if o1 == nil && o2 == nil {
+            return
+        }
+        if let o1 = o1, let o2 = o2, o1.isSameObject(as: o2) {
+            return
+        }
+        XCTFail("Objects expected to be equal, but weren't. First: \(String(describing: o1)), "
+            + "second: \(String(describing: o2))", file: fileName, line: lineNumber)
+    }
+
+    /// Check whether two collections containing Realm objects are equal.
+    func assertEqual<C: Collection>(_ c1: C, _ c2: C, fileName: StaticString = #file, lineNumber: UInt = #line)
+        where C.Iterator.Element: Object {
+            XCTAssertEqual(c1.count, c2.count, "Collection counts were incorrect", file: fileName, line: lineNumber)
+            for (o1, o2) in zip(c1, c2) {
+                assertEqual(o1, o2, fileName: fileName, lineNumber: lineNumber)
+            }
+    }
+
     func assertThrows<T>(_ block: @autoclosure @escaping() -> T, named: String? = RLMExceptionName,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
