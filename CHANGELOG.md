@@ -60,6 +60,9 @@ x.x.x Release notes (yyyy-MM-dd)
   properties after generic Realm properties (like `List<T>`), the schema
   would be constructed incorrectly. Fixes an issue where creating such
   models from an array could fail.
+* `Realm.Configuration` is now constructed using a `Realm.Kind` enum case,
+  rather than a separate file URL, in-memory identifier, or sync configuration
+  value.
 
 ### Enhancements
 

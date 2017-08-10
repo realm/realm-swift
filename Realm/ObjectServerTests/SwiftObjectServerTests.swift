@@ -240,7 +240,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 // Wait for the child process to upload everything.
                 executeChild()
                 let ex = expectation(description: "download-realm")
-                let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: realmURL))
+                let config = Realm.Configuration(kind: .synced(SyncConfiguration(user: user, realmURL: realmURL)))
                 let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
                 XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
                 Realm.asyncOpen(configuration: config) { realm, error in

@@ -24,7 +24,7 @@ import RealmSwift
 import XCTest
 
 func inMemoryRealm(_ inMememoryIdentifier: String) -> Realm {
-    return try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: inMememoryIdentifier))
+    return try! Realm(configuration: Realm.Configuration(kind: .inMemory(inMememoryIdentifier)))
 }
 
 class TestCase: XCTestCase {
@@ -36,7 +36,7 @@ class TestCase: XCTestCase {
     @discardableResult
     func realmWithTestPath(configuration: Realm.Configuration = Realm.Configuration()) -> Realm {
         var configuration = configuration
-        configuration.fileURL = testRealmURL()
+        configuration.kind = .file(testRealmURL())
         return try! Realm(configuration: configuration)
     }
 
@@ -72,7 +72,7 @@ class TestCase: XCTestCase {
         try! FileManager.default.createDirectory(at: URL(fileURLWithPath: testDir, isDirectory: true),
                                                      withIntermediateDirectories: true, attributes: nil)
 
-        let config = Realm.Configuration(fileURL: defaultRealmURL())
+        let config = Realm.Configuration(kind: .file(defaultRealmURL()))
         Realm.Configuration.defaultConfiguration = config
 
         exceptionThrown = false

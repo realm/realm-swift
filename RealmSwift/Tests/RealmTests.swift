@@ -30,8 +30,11 @@ class RealmTests: TestCase {
     }
 
     func testFileURL() {
-        XCTAssertEqual(try! Realm(fileURL: testRealmURL()).configuration.fileURL,
-                       testRealmURL())
+        var fileURL: URL!
+        if case let .file(url) = try! Realm(fileURL: testRealmURL()).configuration.kind {
+            fileURL = url
+        }
+        XCTAssertEqual(fileURL, testRealmURL())
     }
 
     func testReadOnly() {
@@ -42,7 +45,7 @@ class RealmTests: TestCase {
                 try! Realm().create(SwiftIntObject.self, value: [100])
             }
         }
-        let config = Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true)
+        let config = Realm.Configuration(kind: .file(defaultRealmURL()), readOnly: true)
         let readOnlyRealm = try! Realm(configuration: config)
         XCTAssertEqual(true, readOnlyRealm.configuration.readOnly)
         XCTAssertEqual(1, readOnlyRealm.objects(SwiftIntObject.self).count)
@@ -52,7 +55,7 @@ class RealmTests: TestCase {
 
     func testOpeningInvalidPathThrows() {
         assertFails(.fileAccess) {
-            try Realm(configuration: Realm.Configuration(fileURL: URL(fileURLWithPath: "/dev/null/foo")))
+            try Realm(configuration: Realm.Configuration(kind: .file(URL(fileURLWithPath: "/dev/null/foo"))))
         }
     }
 
@@ -74,7 +77,7 @@ class RealmTests: TestCase {
 
         assertSucceeds {
             let realm = try Realm(configuration:
-                Realm.Configuration(fileURL: testRealmURL(), readOnly: true))
+                Realm.Configuration(kind: .file(testRealmURL()), readOnly: true))
             XCTAssertEqual(1, realm.objects(SwiftStringObject.self).count)
         }
 
@@ -84,7 +87,7 @@ class RealmTests: TestCase {
     func testReadOnlyRealmMustExist() {
         assertFails(.fileNotFound) {
             try Realm(configuration:
-                Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true))
+                Realm.Configuration(kind: .file(defaultRealmURL()), readOnly: true))
         }
     }
 
@@ -145,8 +148,11 @@ class RealmTests: TestCase {
     }
 
     func testInit() {
-        XCTAssertEqual(try! Realm(fileURL: testRealmURL()).configuration.fileURL,
-                       testRealmURL())
+        var fileURL: URL!
+        if case let .file(url) = try! Realm(fileURL: testRealmURL()).configuration.kind {
+            fileURL = url
+        }
+        XCTAssertEqual(fileURL, testRealmURL())
     }
 
     func testInitFailable() {
@@ -188,7 +194,7 @@ class RealmTests: TestCase {
     }
 
     func testInitCustomClassList() {
-        let configuration = Realm.Configuration(fileURL: Realm.Configuration.defaultConfiguration.fileURL,
+        let configuration = Realm.Configuration(kind: Realm.Configuration.defaultConfiguration.kind,
             objectTypes: [SwiftStringObject.self])
         XCTAssert(configuration.objectTypes! is [SwiftStringObject.Type])
         let realm = try! Realm(configuration: configuration)
@@ -679,7 +685,11 @@ class RealmTests: TestCase {
         let realm = try! Realm()
         var notificationCalled = false
         let token = realm.observe { _, realm in
-            XCTAssertEqual(realm.configuration.fileURL, self.defaultRealmURL())
+            var fileURL: URL!
+            if case let .file(url) = realm.configuration.kind {
+                fileURL = url
+            }
+            XCTAssertEqual(fileURL, self.defaultRealmURL())
             notificationCalled = true
         }
         XCTAssertFalse(notificationCalled)
@@ -692,7 +702,11 @@ class RealmTests: TestCase {
         let realm = try! Realm()
         var notificationCalled = false
         let token = realm.observe { (_, realm) -> Void in
-            XCTAssertEqual(realm.configuration.fileURL, self.defaultRealmURL())
+            var fileURL: URL!
+            if case let .file(url) = realm.configuration.kind {
+                fileURL = url
+            }
+            XCTAssertEqual(fileURL, self.defaultRealmURL())
             notificationCalled = true
         }
         token.invalidate()
@@ -815,7 +829,7 @@ class RealmTests: TestCase {
 
     func testCatchSpecificErrors() {
         do {
-            _ = try Realm(configuration: Realm.Configuration(fileURL: URL(fileURLWithPath: "/dev/null/foo")))
+            _ = try Realm(configuration: Realm.Configuration(kind: .file(URL(fileURLWithPath: "/dev/null/foo"))))
             XCTFail("Error should be thrown")
         } catch Realm.Error.fileAccess {
             // Success to catch the error
@@ -823,7 +837,7 @@ class RealmTests: TestCase {
             XCTFail("Failed to brigde RLMError to Realm.Error")
         }
         do {
-            _ = try Realm(configuration: Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true))
+            _ = try Realm(configuration: Realm.Configuration(kind: .file(defaultRealmURL()), readOnly: true))
             XCTFail("Error should be thrown")
         } catch Realm.Error.fileNotFound {
             // Success to catch the error

@@ -40,7 +40,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
 
         do {
-            try FileManager.default.removeItem(at: Realm.Configuration.defaultConfiguration.fileURL!)
+            if case let .file(url) = Realm.Configuration.defaultConfiguration.kind {
+                try FileManager.default.removeItem(at: url)
+            }
         } catch {}
 
         // Create a standalone object

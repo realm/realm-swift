@@ -162,7 +162,7 @@ class RealmCollectionTypeTests: TestCase {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        XCTAssertEqual(collection.realm!.configuration.fileURL, realmWithTestPath().configuration.fileURL)
+        XCTAssertEqual(collection.realm!.configuration.kind, realmWithTestPath().configuration.kind)
     }
 
     func testDescription() {

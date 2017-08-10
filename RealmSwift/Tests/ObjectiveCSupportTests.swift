@@ -67,15 +67,27 @@ class ObjectiveCSupportTests: TestCase {
             return
         }
 
-        XCTAssertEqual(realm.configuration.fileURL,
+        var fileURL: URL!
+        if case let .file(url) = realm.configuration.kind {
+            fileURL = url
+        }
+        XCTAssertEqual(fileURL,
                        ObjectiveCSupport.convert(object: realm.configuration).fileURL,
                        "Configuration.fileURL must be equal to RLMConfiguration.fileURL")
 
-        XCTAssertEqual(realm.configuration.inMemoryIdentifier,
+        var inMemoryIdentifier: String!
+        if case let .inMemory(identifier) = realm.configuration.kind {
+            inMemoryIdentifier = identifier
+        }
+        XCTAssertEqual(inMemoryIdentifier,
                        ObjectiveCSupport.convert(object: realm.configuration).inMemoryIdentifier,
                        "Configuration.inMemoryIdentifier must be equal to RLMConfiguration.inMemoryIdentifier")
 
-        XCTAssertEqual(realm.configuration.syncConfiguration?.realmURL,
+        var syncConfiguration: SyncConfiguration!
+        if case let .synced(config) = realm.configuration.kind {
+            syncConfiguration = config
+        }
+        XCTAssertEqual(syncConfiguration?.realmURL,
                        ObjectiveCSupport.convert(object: realm.configuration).syncConfiguration?.realmURL,
                        "Configuration.syncConfiguration must be equal to RLMConfiguration.syncConfiguration")
 
