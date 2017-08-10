@@ -106,12 +106,21 @@ NS_ASSUME_NONNULL_BEGIN
  synchronized Realms wait for all remote content available at the time the
  operation began to be downloaded and available locally.
 
- @param configuration A configuration object to use when opening the Realm.
- @param callbackQueue The dispatch queue on which the callback should be run.
- @param callback      A callback block. If the Realm was successfully opened,
-                      it will be passed in as an argument.
-                      Otherwise, an `NSError` describing what went wrong will be
-                      passed to the block instead.
+ @param configuration   A configuration object to use when opening the Realm.
+ @param waitForDownload If the configuration describes a synchronized Realm, whether
+                        to immediately return the Realm or to only return the Realm in
+                        the callback once the connection with the Realm Object Server
+                        has been established, and all pending changes downloaded. If
+                        the configuration describes a non-synced Realm, this argument
+                        is ignored. Set this to NO if you are trying to open a synced
+                        Realm for which the user has read-only permissions and you do
+                        not want the callback to be blocked on whether the Realm Object
+                        server is reachable over the network or not.
+ @param callbackQueue   The dispatch queue on which the callback should be run.
+ @param callback        A callback block. If the Realm was successfully opened,
+                        it will be passed in as an argument.
+                        Otherwise, an `NSError` describing what went wrong will be
+                        passed to the block instead.
 
  @note The returned Realm is confined to the thread on which it was created.
        Because GCD does not guarantee that queues will always use the same
@@ -119,8 +128,23 @@ NS_ASSUME_NONNULL_BEGIN
        accessed from `callbackQueue`) is unsafe.
  */
 + (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
+           waitForDownloadIfSynced:(BOOL)waitForDownload
                      callbackQueue:(dispatch_queue_t)callbackQueue
                           callback:(RLMAsyncOpenRealmCallback)callback;
+
+/**
+ Asynchronously open a Realm and deliver it to a block on the given queue.
+
+ If the Realm is a synced Realm, the callback will only be invoked if an
+ error occurs, or once the connection with the Realm Object Server has been
+ made and all pending changes downloaded.
+
+ @see `+[RLMRealm asyncOpenWithConfiguration:waitForDownloadIfSynced:callbackQueue:callback:]`
+ */
++ (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
+                     callbackQueue:(dispatch_queue_t)callbackQueue
+                          callback:(RLMAsyncOpenRealmCallback)callback;
+
 
 /**
  The `RLMSchema` used by the Realm.
