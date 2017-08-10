@@ -32,6 +32,11 @@ static const NSString *const kRLMSyncRefreshTokenKey    = @"refresh_token";
 
 static const NSString *const kRLMSyncUserKey            = @"user";
 
+static const NSString *const kRLMSyncErrorStatusKey     = @"status";
+static const NSString *const kRLMSyncErrorCodeKey       = @"code";
+static const NSString *const kRLMSyncErrorTitleKey      = @"title";
+static const NSString *const kRLMSyncErrorHintKey       = @"hint";
+
 #pragma mark - RLMTokenDataModel
 
 @interface RLMTokenDataModel ()
@@ -172,6 +177,32 @@ static const NSString *const kRLMSyncUserKey            = @"user";
 
 - (BOOL)isAdmin {
     return self.submodel.isAdmin;
+}
+
+@end
+
+#pragma mark - RLMSyncErrorResponseModel
+
+@interface RLMSyncErrorResponseModel ()
+
+@property (nonatomic, readwrite) NSInteger status;
+@property (nonatomic, readwrite) NSInteger code;
+@property (nonatomic, readwrite) NSString *title;
+@property (nonatomic, readwrite) NSString *hint;
+
+@end
+
+@implementation RLMSyncErrorResponseModel
+
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary {
+    if (self = [super init]) {
+        RLM_SYNC_PARSE_DOUBLE_OR_ABORT(jsonDictionary, kRLMSyncErrorStatusKey, status);
+        RLM_SYNC_PARSE_DOUBLE_OR_ABORT(jsonDictionary, kRLMSyncErrorCodeKey, code);
+        RLM_SYNC_PARSE_OPTIONAL_STRING(jsonDictionary, kRLMSyncErrorTitleKey, title);
+        RLM_SYNC_PARSE_OPTIONAL_STRING(jsonDictionary, kRLMSyncErrorHintKey, hint);
+        return self;
+    }
+    return nil;
 }
 
 @end

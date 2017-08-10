@@ -18,8 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMJSONModels.h"
 #import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncErrorResponseModel.h"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
