@@ -182,6 +182,16 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 + (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                      callbackQueue:(dispatch_queue_t)callbackQueue
                           callback:(RLMAsyncOpenRealmCallback)callback {
+    [self asyncOpenWithConfiguration:configuration
+             waitForDownloadIfSynced:YES
+                       callbackQueue:callbackQueue
+                            callback:callback];
+}
+
++ (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
+           waitForDownloadIfSynced:(BOOL)waitForDownload
+                     callbackQueue:(dispatch_queue_t)callbackQueue
+                          callback:(RLMAsyncOpenRealmCallback)callback {
     RLMRealm *strongReferenceToSyncedRealm = nil;
     if (configuration.config.sync_config) {
         NSError *error = nil;
@@ -199,6 +209,19 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
             if (strongReferenceToSyncedRealm) {
                 // Sync behavior: get the raw session, then wait for it to download.
                 if (auto session = sync_session_for_realm(strongReferenceToSyncedRealm)) {
+                    if (!waitForDownload) {
+                        // Immediately open the session.
+                        dispatch_async(callbackQueue, ^{
+                            @autoreleasepool {
+                                (void)strongReferenceToSyncedRealm;
+                                // Try opening the Realm on the destination queue.
+                                NSError *error = nil;
+                                RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
+                                callback(localRealm, error);
+                            }
+                        });
+                        return;
+                    }
                     // Wait for the session to download, then open it.
                     session->wait_for_download_completion([=](std::error_code error_code) {
                         dispatch_async(callbackQueue, ^{

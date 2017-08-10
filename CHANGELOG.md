@@ -11,6 +11,9 @@ x.x.x Release notes (yyyy-MM-dd)
   a Realm Object Server.
 * An error handler can now be registered on `{RLM}SyncUser`s in order to
   report authentication-related errors that affect the user.
+* Add a variant API to asynchronously open a synced Realm for which the user
+  has read-only permissions and immediately return its contents before the
+  latest updates have been 
 
 ### Bugfixes
 
