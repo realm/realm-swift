@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ##################################################################################
 # Custom build tool for Realm Objective-C binding.
@@ -411,7 +411,7 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        find . -type d -name build -exec rm -r "{}" +\;
+        find . -type d -name build -exec rm -r "{}" +
         exit 0
         ;;
 
@@ -967,7 +967,7 @@ case "$COMMAND" in
         archs="$(lipo -info "$BINARY" | rev | cut -d ':' -f1 | rev)"
 
         archs_array=( $archs )
-        if [[ ${#archs_array[@]} < 2 ]]; then
+        if [[ ${#archs_array[@]} -lt 2 ]]; then
             exit 1 # Early exit if not a fat binary
         fi
 
@@ -1413,7 +1413,7 @@ EOF
         ;;
 
     "add-empty-changelog")
-        empty_section=$(cat <<EOS
+        read -r -d '' empty_section << EOS
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
@@ -1428,7 +1428,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * None.
-EOS)
+EOS
         changelog=$(cat CHANGELOG.md)
         echo "$empty_section" > CHANGELOG.md
         echo >> CHANGELOG.md
