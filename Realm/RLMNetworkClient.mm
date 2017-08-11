@@ -19,7 +19,7 @@
 #import "RLMNetworkClient.h"
 
 #import "RLMRealmConfiguration.h"
-#import "RLMSyncErrorResponseModel.h"
+#import "RLMJSONModels.h"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 

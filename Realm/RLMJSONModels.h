@@ -87,4 +87,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+#pragma mark - RLMSyncErrorResponseModel
+
+@interface RLMSyncErrorResponseModel : NSObject RLM_SYNC_UNINITIALIZABLE
+
+@property (nonatomic, readonly) NSInteger status;
+@property (nonatomic, readonly) NSInteger code;
+@property (nullable, nonatomic, readonly, copy) NSString *title;
+@property (nullable, nonatomic, readonly, copy) NSString *hint;
+
+- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;
+
+@end
+
 NS_ASSUME_NONNULL_END
