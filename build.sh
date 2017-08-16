@@ -13,8 +13,6 @@
 set -o pipefail
 set -e
 
-source ./scripts/bandwidth_throttling.sh
-
 source_root="$(dirname "$0")"
 
 # You can override the version of the core library
