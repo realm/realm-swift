@@ -22,7 +22,7 @@
 
 @class RLMSyncConfiguration;
 
-/// :nodoc:
+/// Realm configuration options related to Sync.
 @interface RLMRealmConfiguration (Sync)
 
 NS_ASSUME_NONNULL_BEGIN
