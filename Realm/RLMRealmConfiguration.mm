@@ -202,7 +202,8 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 }
 
 - (BOOL)readOnly {
-    return _config.read_only();
+    // FIXME: rename this immutable for Realm 3
+    return _config.immutable();
 }
 
 - (void)setReadOnly:(BOOL)readOnly {
@@ -212,7 +213,7 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
         } else if (self.shouldCompactOnLaunch) {
             @throw RLMException(@"Cannot set `readOnly` when `shouldCompactOnLaunch` is set.");
         }
-        _config.schema_mode = realm::SchemaMode::ReadOnly;
+        _config.schema_mode = realm::SchemaMode::Immutable;
     }
     else if (self.readOnly) {
         _config.schema_mode = realm::SchemaMode::Automatic;

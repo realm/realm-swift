@@ -334,7 +334,8 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         if (cache || dynamic) {
             if (RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path)) {
                 auto const& old_config = realm->_realm->config();
-                if (old_config.read_only() != config.read_only()) {
+                if (old_config.immutable() != config.immutable()
+                    || old_config.read_only_alternative() != config.read_only_alternative()) {
                     @throw RLMException(@"Realm at path '%s' already opened with different read permissions", config.path.c_str());
                 }
                 if (old_config.in_memory != config.in_memory) {
@@ -460,8 +461,8 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 
 - (void)verifyNotificationsAreSupported {
     [self verifyThread];
-    if (_realm->config().read_only()) {
-        @throw RLMException(@"Read-only Realms do not change and do not have change notifications");
+    if (_realm->config().immutable()) {
+        @throw RLMException(@"Immutable Realms do not change and do not have change notifications");
     }
     if (!_realm->can_deliver_notifications()) {
         @throw RLMException(@"Can only add notification blocks from within runloops.");
@@ -488,7 +489,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 - (void)sendNotifications:(RLMNotification)notification {
-    NSAssert(!_realm->config().read_only(), @"Read-only realms do not have notifications");
+    NSAssert(!_realm->config().immutable(), @"Immutable realms do not have notifications");
     if (_sendingNotifications) {
         return;
     }
