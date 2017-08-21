@@ -20,9 +20,8 @@ x.x.x Release notes (yyyy-MM-dd)
   example, users who are authenticated using third-party credentials will find
   themselves logged out of the Realm Object Server if the third-party identity
   service indicates that their credential is no longer valid.
-* Search depth when reporting changes to observation blocks has been
-  decreased. This should resolve certain issues where certain Realms appear to
-  hang when observation blocks are set on their contents.
+* Fix high CPU usage and hangs when processing collection notifications in
+  highly-connected object graphs.
 
 2.9.1 Release notes (2017-08-01)
 =============================================================
