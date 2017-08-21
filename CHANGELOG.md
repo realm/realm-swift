@@ -20,8 +20,8 @@ x.x.x Release notes (yyyy-MM-dd)
   example, users who are authenticated using third-party credentials will find
   themselves logged out of the Realm Object Server if the third-party identity
   service indicates that their credential is no longer valid.
-* Fix high CPU usage and hangs when processing collection notifications in
-  highly-connected object graphs.
+* Address high CPU usage and hangs in certain cases when processing collection
+  notifications in highly-connected object graphs.
 
 2.9.1 Release notes (2017-08-01)
 =============================================================
