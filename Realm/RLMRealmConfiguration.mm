@@ -202,7 +202,6 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 }
 
 - (BOOL)readOnly {
-    // FIXME: rename this immutable for Realm 3
     return _config.immutable();
 }
 

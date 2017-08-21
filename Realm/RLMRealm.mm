@@ -462,7 +462,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 - (void)verifyNotificationsAreSupported {
     [self verifyThread];
     if (_realm->config().immutable()) {
-        @throw RLMException(@"Immutable Realms do not change and do not have change notifications");
+        @throw RLMException(@"Read-only Realms do not change and do not have change notifications");
     }
     if (!_realm->can_deliver_notifications()) {
         @throw RLMException(@"Can only add notification blocks from within runloops.");
@@ -489,7 +489,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 }
 
 - (void)sendNotifications:(RLMNotification)notification {
-    NSAssert(!_realm->config().immutable(), @"Immutable realms do not have notifications");
+    NSAssert(!_realm->config().immutable(), @"Read-only realms do not have notifications");
     if (_sendingNotifications) {
         return;
     }
