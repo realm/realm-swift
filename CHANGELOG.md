@@ -126,6 +126,7 @@ x.x.x Release notes (yyyy-MM-dd)
   the property value.
 * Rename `List.remove(objectAtIndex:)` to `List.remove(at:)` to match the name
   used by 'RangeReplaceableCollection'.
+* Rename `List.swap()` to `List.swapAt()` to match the name used by 'Array'.
 * Loosen `RLMArray` and `RLMResults`'s generic constraint from `RLMObject` to
   `NSObject`. This may result in having to add some casts to disambiguate
   types.

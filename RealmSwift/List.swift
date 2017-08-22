@@ -380,7 +380,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
      - parameter index1: The index of the object which should replace the object at index `index2`.
      - parameter index2: The index of the object which should replace the object at index `index1`.
      */
-    public func swap(_ index1: Int, _ index2: Int) {
+    public func swapAt(_ index1: Int, _ index2: Int) {
         throwForNegativeIndex(index1, parameterName: "index1")
         throwForNegativeIndex(index2, parameterName: "index2")
         _rlmArray.exchangeObject(at: UInt(index1), withObjectAt: UInt(index2))
