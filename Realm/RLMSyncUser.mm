@@ -36,7 +36,6 @@
 
 using namespace realm;
 using ConfigMaker = std::function<Realm::Config(std::shared_ptr<SyncUser>, std::string)>;
-using PermissionGetCallback = std::function<void(std::unique_ptr<PermissionResults>, std::exception_ptr)>;
 
 namespace {
 
@@ -55,8 +54,8 @@ NSError *translateExceptionPtrToError(std::exception_ptr ptr, bool get) {
     return error;
 }
 
-PermissionGetCallback RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock callback) {
-    return [callback](std::unique_ptr<PermissionResults> results, std::exception_ptr ptr) {
+Permissions::PermissionResultsCallback RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock callback) {
+    return [callback](Results results, std::exception_ptr ptr) {
         if (ptr) {
             NSError *error = translateExceptionPtrToError(std::move(ptr), true);
             REALM_ASSERT(error);
@@ -95,6 +94,18 @@ void CocoaSyncUserContext::invalidate_all_handles()
         [it.second invalidate];
     }
     m_refresh_handles.clear();
+}
+
+RLMUserErrorReportingBlock CocoaSyncUserContext::error_handler() const
+{
+    std::lock_guard<std::mutex> lock(m_error_handler_mutex);
+    return m_error_handler;
+}
+
+void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
+{
+    std::lock_guard<std::mutex> lock(m_error_handler_mutex);
+    m_error_handler = block;
 }
 
 PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBlock callback) {
@@ -209,7 +220,21 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         return;
     }
     _user->log_out();
-    std::static_pointer_cast<CocoaSyncUserContext>(_user->binding_context())->invalidate_all_handles();
+    context_for(_user).invalidate_all_handles();
+}
+
+- (RLMUserErrorReportingBlock)errorHandler {
+    if (!_user) {
+        return nil;
+    }
+    return context_for(_user).error_handler();
+}
+
+- (void)setErrorHandler:(RLMUserErrorReportingBlock)errorHandler {
+    if (!_user) {
+        return;
+    }
+    context_for(_user).set_error_handler([errorHandler copy]);
 }
 
 - (nullable RLMSyncSession *)sessionForURL:(NSURL *)url {

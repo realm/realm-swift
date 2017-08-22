@@ -24,11 +24,16 @@
 #import "realm/util/optional.hpp"
 
 @class RLMSyncErrorResponseModel;
+class CocoaSyncUserContext;
 
 realm::SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy);
 RLMSyncStopPolicy translateStopPolicy(realm::SyncSessionStopPolicy stop_policy);
 
 std::shared_ptr<realm::SyncSession> sync_session_for_realm(RLMRealm *realm);
+
+#pragma mark - Get user context
+
+CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user);
 
 #pragma mark - Error construction
 

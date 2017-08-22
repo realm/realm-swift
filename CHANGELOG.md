@@ -65,10 +65,20 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Add Swift `Object.isSameObject(as:_)` API to perform the same function as
   the existing Objective-C API `-[RLMObject isEqualToObject:]`.
+* Expose additional authentication-related errors that might be reported by
+  a Realm Object Server.
+* An error handler can now be registered on `{RLM}SyncUser`s in order to
+  report authentication-related errors that affect the user.
 
 ### Bugfixes
 
-* None.
+* Sync users are now automatically logged out upon receiving certain types
+  of errors that indicate they are no longer logged into the server. For
+  example, users who are authenticated using third-party credentials will find
+  themselves logged out of the Realm Object Server if the third-party identity
+  service indicates that their credential is no longer valid.
+* Address high CPU usage and hangs in certain cases when processing collection
+  notifications in highly-connected object graphs.
 
 3.0.0-beta.2 Release notes (2017-07-26)
 =============================================================
@@ -148,6 +158,31 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fix unmanaged object initialization when a nested property type returned
   `false` from `Object.shouldIncludeInDefaultSchema()`.
 * Don't clear RLMArrays on self-assignment.
+
+2.10.0 Release notes (2017-08-21)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Expose additional authentication-related errors that might be reported by
+  a Realm Object Server.
+* An error handler can now be registered on `{RLM}SyncUser`s in order to
+  report authentication-related errors that affect the user.
+
+### Bugfixes
+
+* Sorting Realm collection types no longer throws an exception on iOS 7.
+* Sync users are now automatically logged out upon receiving certain types
+  of errors that indicate they are no longer logged into the server. For
+  example, users who are authenticated using third-party credentials will find
+  themselves logged out of the Realm Object Server if the third-party identity
+  service indicates that their credential is no longer valid.
+* Address high CPU usage and hangs in certain cases when processing collection
+  notifications in highly-connected object graphs.
 
 2.9.1 Release notes (2017-08-01)
 =============================================================

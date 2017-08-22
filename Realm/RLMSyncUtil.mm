@@ -18,8 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMJSONModels.h"
 #import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncErrorResponseModel.h"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
@@ -124,6 +124,11 @@ std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
     return nullptr;
 }
 
+CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user)
+{
+    return *std::static_pointer_cast<CocoaSyncUserContext>(user->binding_context());
+}
+
 NSError *make_auth_error_bad_response(NSDictionary *json) {
     return [NSError errorWithDomain:RLMSyncAuthErrorDomain
                                code:RLMSyncAuthErrorBadResponse
@@ -143,10 +148,14 @@ NSError *make_auth_error_client_issue() {
 }
 
 NSError *make_auth_error(RLMSyncErrorResponseModel *model) {
-    NSString *description = model.title;
-    return [NSError errorWithDomain:RLMSyncAuthErrorDomain
-                               code:model.code
-                           userInfo:description ? @{NSLocalizedDescriptionKey: description} : nil];
+    NSMutableDictionary<NSString *, NSString *> *userInfo = [NSMutableDictionary dictionaryWithCapacity:2];
+    if (NSString *description = model.title) {
+        [userInfo setObject:description forKey:NSLocalizedDescriptionKey];
+    }
+    if (NSString *hint = model.hint) {
+        [userInfo setObject:hint forKey:NSLocalizedRecoverySuggestionErrorKey];
+    }
+    return [NSError errorWithDomain:RLMSyncAuthErrorDomain code:model.code userInfo:userInfo];
 }
 
 NSError *make_permission_error_get(NSString *description, util::Optional<NSInteger> code) {

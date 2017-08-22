@@ -66,10 +66,12 @@ typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger 
 
 #pragma mark - Properties
 
-/// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`.
+/// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier` and `syncConfiguration`;
+/// setting any one of the three properties will automatically nil out the other two.
 @property (nonatomic, copy, nullable) NSURL *fileURL;
 
-/// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL`.
+/// A string used to identify a particular in-memory Realm. Mutually exclusive with `fileURL` and `syncConfiguration`;
+/// setting any one of the three properties will automatically nil out the other two.
 @property (nonatomic, copy, nullable) NSString *inMemoryIdentifier;
 
 /// A 64-byte key to use to encrypt the data, or `nil` if encryption is not enabled.

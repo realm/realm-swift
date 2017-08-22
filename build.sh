@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ##################################################################################
 # Custom build tool for Realm Objective-C binding.
@@ -320,20 +320,20 @@ download_object_server() {
 
 download_common() {
     local download_type=$1 tries_left=3 version url error temp_dir temp_path tar_path
-    
+
     if [ "$download_type" == "core" ]; then
         version=$REALM_CORE_VERSION
         url="https://static.realm.io/downloads/core/realm-core-${version}.tar.xz"
     elif [ "$download_type" == "sync" ]; then
         version=$REALM_SYNC_VERSION
-        url="https://static.realm.io/downloads/sync/realm-sync-cocoa-${version}.tar.xz"
+        url="https://static.realm.io/downloads/sync/realm-sync-cocoa-${version}.tar.gz"
     else
         echo "Unknown dowload_type: $download_type"
         exit 1
     fi
-    
+
     echo "Downloading dependency: ${download_type} ${version}"
-    
+
     if [ -z "$TMPDIR" ]; then
         TMPDIR='/tmp'
     fi
@@ -341,7 +341,7 @@ download_common() {
     mkdir -p "$temp_dir"
     tar_path="${temp_dir}/${download_type}-${version}.tar.xz"
     temp_path="${tar_path}.tmp"
-        
+
     while [ 0 -lt $tries_left ] && [ ! -f "$tar_path" ]; do
         if ! error=$(/usr/bin/curl --fail --silent --show-error --location "$url" --output "$temp_path" 2>&1); then
             tries_left=$[$tries_left-1]
@@ -349,12 +349,12 @@ download_common() {
             mv "$temp_path" "$tar_path"
         fi
     done
-    
+
     if [ ! -f "$tar_path" ]; then
         printf "Downloading ${download_type} failed:\n\t$url\n\t$error\n"
         exit 1
     fi
-    
+
     (
         cd "$temp_dir"
         rm -rf "$download_type"
@@ -411,7 +411,7 @@ case "$COMMAND" in
     # Clean
     ######################################
     "clean")
-        find . -type d -name build -exec rm -r "{}" +\;
+        find . -type d -name build -exec rm -r "{}" +
         exit 0
         ;;
 
@@ -956,7 +956,7 @@ case "$COMMAND" in
         archs="$(lipo -info "$BINARY" | rev | cut -d ':' -f1 | rev)"
 
         archs_array=( $archs )
-        if [[ ${#archs_array[@]} < 2 ]]; then
+        if [[ ${#archs_array[@]} -lt 2 ]]; then
             exit 1 # Early exit if not a fat binary
         fi
 
@@ -1402,7 +1402,7 @@ EOF
         ;;
 
     "add-empty-changelog")
-        empty_section=$(cat <<EOS
+        read -r -d '' empty_section << EOS
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
@@ -1417,7 +1417,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * None.
-EOS)
+EOS
         changelog=$(cat CHANGELOG.md)
         echo "$empty_section" > CHANGELOG.md
         echo >> CHANGELOG.md

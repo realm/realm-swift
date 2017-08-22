@@ -151,7 +151,7 @@ static BOOL isValidRealmURL(NSURL *url) {
                                                                                                    user:user
                                                                                                 session:std::move(session)
                                                                                         completionBlock:[RLMSyncManager sharedManager].sessionCompletionNotifier];
-            std::static_pointer_cast<CocoaSyncUserContext>(user->binding_context())->register_refresh_handle([path UTF8String], handle);
+            context_for(user).register_refresh_handle([path UTF8String], handle);
         };
         if (!errorHandler) {
             errorHandler = [=](std::shared_ptr<SyncSession> errored_session,
