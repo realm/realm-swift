@@ -377,15 +377,6 @@ RLMNotificationToken *RLMAddNotificationBlock(id objcCollection,
                                               Collection& collection,
                                               void (^block)(id, RLMCollectionChange *, NSError *),
                                               bool suppressInitialChange) {
-    struct IsValid {
-        static bool call(realm::List const& list) {
-            return list.is_valid();
-        }
-        static bool call(realm::Results const&) {
-            return true;
-        }
-    };
-
     auto skip = suppressInitialChange ? std::make_shared<bool>(true) : nullptr;
     auto cb = [=, &collection](realm::CollectionChangeSet const& changes,
                                std::exception_ptr err) {
@@ -399,10 +390,6 @@ RLMNotificationToken *RLMAddNotificationBlock(id objcCollection,
                 block(nil, nil, error);
                 return;
             }
-        }
-
-        if (!IsValid::call(collection)) {
-            return;
         }
 
         if (skip && *skip) {
