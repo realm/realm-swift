@@ -78,7 +78,7 @@ static bool maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
     _observationInfo = nullptr;
 }
 
-static id cooerceToObjectType(id obj, Class cls, RLMSchema *schema) {
+static id coerceToObjectType(id obj, Class cls, RLMSchema *schema) {
     return [obj isKindOfClass:cls] ? obj : [[cls alloc] initWithValue:obj schema:schema];
 }
 
@@ -94,11 +94,11 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
         if (prop.array) {
             NSMutableArray *ret = [[NSMutableArray alloc] init];
             for (id el in obj) {
-                [ret addObject:cooerceToObjectType(el, objectClass, schema)];
+                [ret addObject:coerceToObjectType(el, objectClass, schema)];
             }
             return ret;
         }
-        return cooerceToObjectType(obj, objectClass, schema);
+        return coerceToObjectType(obj, objectClass, schema);
     }
     return obj;
 }
