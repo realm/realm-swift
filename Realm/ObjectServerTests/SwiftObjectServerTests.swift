@@ -387,7 +387,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
 
-            workAroundCoreIssue2724()
             try managementRealm.write {
                 managementRealm.add(permissionOffer)
             }
@@ -424,7 +423,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
 
-            workAroundCoreIssue2724()
             try managementRealm.write {
                 managementRealm.add(permissionOffer)
             }
@@ -459,7 +457,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
             }
 
-            workAroundCoreIssue2724()
             try managementRealm.write {
                 managementRealm.add(permissionOfferResponse)
             }
