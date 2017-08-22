@@ -114,6 +114,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// Wait for uploads to complete; drop any error.
 - (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url;
 
+/// Wait for uploads to complete
+- (void)waitForUploadsForUser:(RLMSyncUser *)user
+                          url:(NSURL *)url
+                      timeout:(NSTimeInterval)timeout
+                        error:(NSError **)error;
+
 /// Wait for downloads to complete while spinning the runloop. This method uses expectations.
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
                             url:(NSURL *)url

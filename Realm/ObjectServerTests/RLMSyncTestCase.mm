@@ -266,7 +266,11 @@ static NSURL *syncDirectoryForChildProcess() {
                              theUser = user;
                              [expectation fulfill];
                          }];
-    [self waitForExpectationsWithTimeout:30 handler:nil];
+    if (simulateReconnection) {
+        [self waitForExpectationsWithTimeout:30.0 handler:nil];
+    } else {
+        [self waitForExpectationsWithTimeout:4.0 handler:nil];
+    }
     XCTAssertTrue(theUser.state == RLMSyncUserStateActive,
                   @"User should have been valid, but wasn't. (process: %@)", process);
     return theUser;
@@ -323,7 +327,7 @@ static NSURL *syncDirectoryForChildProcess() {
         XCTFail(@"Download waiter did not queue; session was invalid or errored out.");
         return;
     }
-    [self waitForExpectations:@[ex] timeout:60.0];
+    [self waitForExpectations:@[ex] timeout:20.0];
     if (error) {
         *error = theError;
     }
@@ -334,6 +338,10 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url error:(NSError **)error {
+    [self waitForUploadsForUser:user url:url timeout:20.0 error:error];
+}
+
+- (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url timeout:(NSTimeInterval)timeout error:(NSError **)error {
     RLMSyncSession *session = [user sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
     XCTestExpectation *ex = [self expectationWithDescription:@"Upload waiter expectation"];
@@ -349,7 +357,7 @@ static NSURL *syncDirectoryForChildProcess() {
     }
     // FIXME: If tests involving `HugeSyncObject` are more reliable after July 2017, file an issue against sync
     // regarding performance of ROS.
-    [self waitForExpectations:@[ex] timeout:60.0];
+    [self waitForExpectations:@[ex] timeout:timeout];
     if (error) {
         *error = theError;
     }
