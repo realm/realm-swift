@@ -30,7 +30,7 @@ public struct RLMIterator<T: RealmCollectionValue>: IteratorProtocol {
     }
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
-    public func next() -> T? {
+    public mutating func next() -> T? {
         return unsafeBitCast(generatorBase.next() as! Object?, to: Optional<T>.self)
     }
 }
@@ -129,7 +129,7 @@ public protocol RealmCollectionValue {
 
 #if swift(>=3.2)
 /// :nodoc:
-public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined where Element: Object {
+public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined where Element: RealmCollectionValue {
 }
 #else
 /// :nodoc:
