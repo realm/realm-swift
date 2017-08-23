@@ -70,9 +70,11 @@ extension Realm {
                                             returned to the user. It is passed the total file size (data + free space)
                                             and the total bytes used by data in the file.
 
-                                            Return `true ` to indicate that an attempt to compact the file should be made.
+                                            Return `true` to indicate that an attempt to compact the file should be made.
                                             The compaction will be skipped if another process is accessing it.
          - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
+         - parameter openSyncedRealmOffline: Defaults to `false`. Set to `true` if `fileURL` points to the Realm file
+                                             for a synchronized Realm, and you want to open that Realm offline.
         */
         public init(fileURL: URL? = URL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
                     inMemoryIdentifier: String? = nil,
@@ -83,21 +85,23 @@ extension Realm {
                     migrationBlock: MigrationBlock? = nil,
                     deleteRealmIfMigrationNeeded: Bool = false,
                     shouldCompactOnLaunch: ((Int, Int) -> Bool)? = nil,
-                    objectTypes: [Object.Type]? = nil) {
-                self.fileURL = fileURL
-                if let inMemoryIdentifier = inMemoryIdentifier {
-                    self.inMemoryIdentifier = inMemoryIdentifier
-                }
-                if let syncConfiguration = syncConfiguration {
-                    self.syncConfiguration = syncConfiguration
-                }
-                self.encryptionKey = encryptionKey
-                self.readOnly = readOnly
-                self.schemaVersion = schemaVersion
-                self.migrationBlock = migrationBlock
-                self.deleteRealmIfMigrationNeeded = deleteRealmIfMigrationNeeded
-                self.shouldCompactOnLaunch = shouldCompactOnLaunch
-                self.objectTypes = objectTypes
+                    objectTypes: [Object.Type]? = nil,
+                    openSyncedRealmOffline: Bool = false) {
+            self.fileURL = fileURL
+            if let inMemoryIdentifier = inMemoryIdentifier {
+                self.inMemoryIdentifier = inMemoryIdentifier
+            }
+            if let syncConfiguration = syncConfiguration {
+                self.syncConfiguration = syncConfiguration
+            }
+            self.encryptionKey = encryptionKey
+            self.readOnly = readOnly
+            self.schemaVersion = schemaVersion
+            self.migrationBlock = migrationBlock
+            self.deleteRealmIfMigrationNeeded = deleteRealmIfMigrationNeeded
+            self.shouldCompactOnLaunch = shouldCompactOnLaunch
+            self.objectTypes = objectTypes
+            self.openSyncedRealmOffline = openSyncedRealmOffline
         }
 
         // MARK: Configuration Properties
@@ -161,6 +165,14 @@ extension Realm {
          another process will result in crashes.
          */
         public var readOnly: Bool = false
+
+        /**
+         Whether to open a synchronized Realm file as a non-synchronized Realm.
+
+         `fileURL` must be set. Use this to open backup copies of a Realm that are created
+         after a client reset occurs.
+         */
+        public var openSyncedRealmOffline: Bool = false
 
         /// The current schema version.
         public var schemaVersion: UInt64 = 0
@@ -230,6 +242,7 @@ extension Realm {
             }
             configuration.customSchema = self.customSchema
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
+            configuration.openSyncedRealmOffline = self.openSyncedRealmOffline
             return configuration
         }
 
@@ -254,6 +267,7 @@ extension Realm {
             configuration.shouldCompactOnLaunch = rlmConfiguration.shouldCompactOnLaunch.map(ObjectiveCSupport.convert)
             configuration.customSchema = rlmConfiguration.customSchema
             configuration.disableFormatUpgrade = rlmConfiguration.disableFormatUpgrade
+            configuration.openSyncedRealmOffline = rlmConfiguration.openSyncedRealmOffline
             return configuration
         }
     }
