@@ -53,7 +53,12 @@
             }                                                                                                          \
         }                                                                                                              \
     }];                                                                                                                \
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];                                                            \
+    [self waitForExpectationsWithTimeout:10.0 handler:^(NSError *err) {                                                \
+        if (err) {                                                                                                     \
+            NSLog(@"Checking permission presence failed with error: %@\nLooking for %@\nResults: %@.",                 \
+                  err, ma_permission, ma_results);                                                                     \
+        }                                                                                                              \
+    }];                                                                                                                \
 }
 
 /// Check whether a permission disappears or is absent from a results.
@@ -75,7 +80,12 @@
             [ex fulfill];                                                                                              \
         }                                                                                                              \
     }];                                                                                                                \
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];                                                            \
+    [self waitForExpectationsWithTimeout:10.0 handler:^(NSError *err) {                                                \
+        if (err) {                                                                                                     \
+            NSLog(@"Checking permission absence failed with error: %@\nLooking for %@\nResults: %@.",                  \
+                  err, ma_permission, ma_results);                                                                     \
+        }                                                                                                              \
+    }];                                                                                                                \
 }
 
 #define GET_PERMISSION(ma_results, ma_permission, ma_destination) {                                                    \
@@ -92,7 +102,12 @@
             }                                                                                                          \
         }                                                                                                              \
     }];                                                                                                                \
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];                                                            \
+    [self waitForExpectationsWithTimeout:10.0 handler:^(NSError *err) {                                                \
+        if (err) {                                                                                                     \
+            NSLog(@"Getting permission failed with error: %@\nLooking for %@\nResults: %@.",                           \
+                  err, ma_permission, ma_results);                                                                     \
+        }                                                                                                              \
+    }];                                                                                                                \
     ma_destination = value;                                                                                            \
 }
 
