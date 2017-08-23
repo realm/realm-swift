@@ -1094,6 +1094,11 @@
     __block NSError *theError = nil;
     @autoreleasepool {
         __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:user];
+
+        // Add a few objects to the Realm.
+        [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3", @"child-4"]];
+        CHECK_COUNT(4, SyncObject, realm);
+
         XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
         [RLMSyncManager sharedManager].errorHandler = ^void(NSError *error, RLMSyncSession *session) {
             // Make sure we're actually looking at the right session.
@@ -1110,6 +1115,15 @@
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:pathValue]);
     [theError rlmSync_clientResetBlock]();
     XCTAssertTrue([[NSFileManager defaultManager] fileExistsAtPath:pathValue]);
+
+    // Make sure the Realm can actually be opened.
+    theError = nil;
+    RLMRealmConfiguration *recoveryConfig = [RLMRealmConfiguration defaultConfiguration];
+    recoveryConfig.fileURL = [NSURL fileURLWithPath:pathValue];
+    recoveryConfig.openSyncedRealmOffline = YES;
+    RLMRealm *recoveryRealm = [RLMRealm realmWithConfiguration:recoveryConfig error:&theError];
+    XCTAssertNil(theError);
+    CHECK_COUNT(4, SyncObject, recoveryRealm);
 }
 
 #pragma mark - Progress Notifications

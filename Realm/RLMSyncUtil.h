@@ -93,7 +93,9 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncError, RLMSyncErrorDomain) {
      Data written to the Realm after the local copy of the Realm diverged from the backup
      remote copy will be present in the local recovery copy of the Realm file. The
      re-downloaded Realm will initially contain only the data present at the time the Realm
-     was backed up on the server.
+     was backed up on the server. This file can be opened as a standard non-synchronized
+     Realm by creating a Realm configuration, specifying the `fileURL`, and setting the
+     property `openSyncedRealmOffline` to YES.
 
      The client reset process can be initiated in one of two ways. The block provided in the
      `userInfo` dictionary under `kRLMSyncInitiateClientResetBlockKey` can be called to
