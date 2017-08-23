@@ -919,7 +919,7 @@ case "$COMMAND" in
     ######################################
     "get-version")
         version_file="Realm/Realm-Info.plist"
-        echo "$(PlistBuddy -c "Print :CFBundleVersion" "$version_file")"
+        echo "$(PlistBuddy -c "Print :CFBundleShortVersionString" "$version_file")"
         exit 0
         ;;
 
