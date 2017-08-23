@@ -30,7 +30,7 @@ def release_notes(version)
   end
   current_version_index += 2
   previous_version_lines = changelog[(current_version_index+1)...-1]
-  previous_version_index = current_version_index + (previous_version_lines.find_index { |line| line =~ /^\d+\.\d+\.\d+\s+/ } || changelog.count)
+  previous_version_index = current_version_index + (previous_version_lines.find_index { |line| line =~ /^\d+\.\d+\.\d+(-(alpha|beta|rc)(\.\d+)?)?\s+/ } || changelog.count)
 
   relevant = changelog[current_version_index..previous_version_index]
 
