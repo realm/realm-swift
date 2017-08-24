@@ -11,6 +11,9 @@ x.x.x Release notes (yyyy-MM-dd)
   types.
 * Remove `RLMPropertyTypeArray` in favor of a separate bool `array` property on
   `RLMProperty`/`Property`.
+* Realm Swift APIs that filter or look up the index of an object based on a
+  format string now properly handle optional arguments in their variadic argument
+  list.
 
 ### Enhancements
 

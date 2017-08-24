@@ -143,7 +143,7 @@ public final class Results<T: RealmCollectionValue>: NSObject, NSFastEnumeration
      */
     public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: NSPredicate(format: predicateFormat,
-                                                                               argumentArray: args)))
+                                                                               argumentArray: unwrap(arguments: args))))
     }
 
     // MARK: Object Retrieval
@@ -205,7 +205,8 @@ public final class Results<T: RealmCollectionValue>: NSObject, NSFastEnumeration
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
     public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> {
-        return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
+        return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat,
+                                                               argumentArray: unwrap(arguments: args))))
     }
 
     /**

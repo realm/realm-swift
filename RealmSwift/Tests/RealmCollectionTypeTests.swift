@@ -30,7 +30,7 @@ class CTTAggregateObject: Object {
     @objc dynamic var boolCol = false
     @objc dynamic var dateCol = Date()
     @objc dynamic var trueCol = true
-    let stringListCol = List<CTTStringObjectWithLink>()
+    let stringListCol = List<CTTNullableStringObjectWithLink>()
     @objc dynamic var linkCol: CTTLinkTarget?
 }
 
@@ -38,27 +38,27 @@ class CTTAggregateObjectList: Object {
     let list = List<CTTAggregateObject>()
 }
 
-class CTTStringObjectWithLink: Object {
-    @objc dynamic var stringCol = ""
+class CTTNullableStringObjectWithLink: Object {
+    @objc dynamic var stringCol: String? = ""
     @objc dynamic var linkCol: CTTLinkTarget?
 }
 
 class CTTLinkTarget: Object {
     @objc dynamic var id = 0
-    let stringObjects = LinkingObjects(fromType: CTTStringObjectWithLink.self, property: "linkCol")
+    let stringObjects = LinkingObjects(fromType: CTTNullableStringObjectWithLink.self, property: "linkCol")
     let aggregateObjects = LinkingObjects(fromType: CTTAggregateObject.self, property: "linkCol")
 }
 
 class CTTStringList: Object {
-    let array = List<CTTStringObjectWithLink>()
+    let array = List<CTTNullableStringObjectWithLink>()
 }
 
 class RealmCollectionTypeTests: TestCase {
-    var str1: CTTStringObjectWithLink?
-    var str2: CTTStringObjectWithLink?
-    var collection: AnyRealmCollection<CTTStringObjectWithLink>?
+    var str1: CTTNullableStringObjectWithLink?
+    var str2: CTTNullableStringObjectWithLink?
+    var collection: AnyRealmCollection<CTTNullableStringObjectWithLink>?
 
-    func getCollection() -> AnyRealmCollection<CTTStringObjectWithLink> {
+    func getCollection() -> AnyRealmCollection<CTTNullableStringObjectWithLink> {
         fatalError("Abstract method. Try running tests using Control-U.")
     }
 
@@ -115,11 +115,11 @@ class RealmCollectionTypeTests: TestCase {
     override func setUp() {
         super.setUp()
 
-        let str1 = CTTStringObjectWithLink()
+        let str1 = CTTNullableStringObjectWithLink()
         str1.stringCol = "1"
         self.str1 = str1
 
-        let str2 = CTTStringObjectWithLink()
+        let str2 = CTTNullableStringObjectWithLink()
         str2.stringCol = "2"
         self.str2 = str2
 
@@ -170,7 +170,7 @@ class RealmCollectionTypeTests: TestCase {
             fatalError("Test precondition failed")
         }
         // swiftlint:disable:next line_length
-        assertMatches(collection.description, "Results<CTTStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
+        assertMatches(collection.description, "Results<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
     }
 
     func testCount() {
@@ -253,9 +253,9 @@ class RealmCollectionTypeTests: TestCase {
         }
         let expected = Array(collection.map { $0.stringCol })
         let actual = collection.value(forKey: "stringCol") as! [String]!
-        XCTAssertEqual(expected, actual!)
+        XCTAssertEqual(expected as! [String], actual!)
 
-        assertEqual(collection.map { $0 }, collection.value(forKey: "self") as! [CTTStringObjectWithLink])
+        assertEqual(collection.map { $0 }, collection.value(forKey: "self") as! [CTTNullableStringObjectWithLink])
     }
 
     func testSetValueForKey() {
@@ -267,7 +267,7 @@ class RealmCollectionTypeTests: TestCase {
         }
         let expected = Array((0..<collection.count).map { _ in "hi there!" })
         let actual = Array(collection.map { $0.stringCol })
-        XCTAssertEqual(expected, actual)
+        XCTAssertEqual(expected, actual as! [String])
     }
 
     func testFilterFormat() {
@@ -278,6 +278,18 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual(1, collection.filter("stringCol = %@", "1").count)
         XCTAssertEqual(1, collection.filter("stringCol = %@", "2").count)
         XCTAssertEqual(0, collection.filter("stringCol = %@", "3").count)
+    }
+
+    func testFilterWithAnyVarags() {
+        guard let collection = collection else {
+            fatalError("Test precondition failed")
+        }
+        let firstCriterion: String? = "1"
+        let secondCriterion: String = "2"
+        let thirdCriterion: String? = nil
+        let result = collection.filter("stringCol = %@ OR stringCol = %@ OR stringCol = %@",
+                                       firstCriterion as Any, secondCriterion as Any, thirdCriterion as Any)
+        XCTAssertEqual(2, result.count)
     }
 
     func testFilterList() {
@@ -332,7 +344,7 @@ class RealmCollectionTypeTests: TestCase {
         XCTAssertEqual("2", sorted[1].stringCol)
 
         assertThrows(collection.sorted(byKeyPath: "noSuchCol", ascending: true),
-                     reason: "Cannot sort on key path 'noSuchCol': property 'CTTStringObjectWithLink.noSuchCol' does not exist")
+                     reason: "Cannot sort on key path 'noSuchCol': property 'CTTNullableStringObjectWithLink.noSuchCol' does not exist")
     }
 
     func testSortWithDescriptor() {
@@ -457,7 +469,7 @@ class RealmCollectionTypeTests: TestCase {
 
         var str = ""
         for obj in collection {
-            str += obj.stringCol
+            str += obj.stringCol!
         }
 
         XCTAssertEqual(str, "12")
@@ -487,7 +499,7 @@ class RealmCollectionTypeTests: TestCase {
         let collection = getAggregateableCollection()
 
         // Should not throw a type error.
-        _ = collection.filter("ANY stringListCol == %@", CTTStringObjectWithLink())
+        _ = collection.filter("ANY stringListCol == %@", CTTNullableStringObjectWithLink())
     }
 
     func testObserve() {
@@ -580,19 +592,19 @@ class ResultsTests: RealmCollectionTypeTests {
     }
 #endif
 
-    func collectionBaseInWriteTransaction() -> Results<CTTStringObjectWithLink> {
+    func collectionBaseInWriteTransaction() -> Results<CTTNullableStringObjectWithLink> {
         fatalError("abstract")
     }
 
-    final func collectionBase() -> Results<CTTStringObjectWithLink> {
-        var result: Results<CTTStringObjectWithLink>?
+    final func collectionBase() -> Results<CTTNullableStringObjectWithLink> {
+        var result: Results<CTTNullableStringObjectWithLink>?
         try! realmWithTestPath().write {
             result = collectionBaseInWriteTransaction()
         }
         return result!
     }
 
-    override func getCollection() -> AnyRealmCollection<CTTStringObjectWithLink> {
+    override func getCollection() -> AnyRealmCollection<CTTNullableStringObjectWithLink> {
         return AnyRealmCollection(collectionBase())
     }
 
@@ -607,7 +619,7 @@ class ResultsTests: RealmCollectionTypeTests {
     func addObjectToResults() {
         let realm = realmWithTestPath()
         try! realm.write {
-            realm.create(CTTStringObjectWithLink.self, value: ["a"])
+            realm.create(CTTNullableStringObjectWithLink.self, value: ["a"])
         }
     }
 
@@ -695,8 +707,8 @@ class ResultsWithCustomInitializerTests: TestCase {
 
 class ResultsFromTableTests: ResultsTests {
 
-    override func collectionBaseInWriteTransaction() -> Results<CTTStringObjectWithLink> {
-        return realmWithTestPath().objects(CTTStringObjectWithLink.self)
+    override func collectionBaseInWriteTransaction() -> Results<CTTNullableStringObjectWithLink> {
+        return realmWithTestPath().objects(CTTNullableStringObjectWithLink.self)
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
@@ -707,8 +719,8 @@ class ResultsFromTableTests: ResultsTests {
 
 class ResultsFromTableViewTests: ResultsTests {
 
-    override func collectionBaseInWriteTransaction() -> Results<CTTStringObjectWithLink> {
-        return realmWithTestPath().objects(CTTStringObjectWithLink.self).filter("stringCol != ''")
+    override func collectionBaseInWriteTransaction() -> Results<CTTNullableStringObjectWithLink> {
+        return realmWithTestPath().objects(CTTNullableStringObjectWithLink.self).filter("stringCol != ''")
     }
 
     override func getAggregateableCollection() -> AnyRealmCollection<CTTAggregateObject> {
@@ -719,7 +731,7 @@ class ResultsFromTableViewTests: ResultsTests {
 
 class ResultsFromLinkViewTests: ResultsTests {
 
-    override func collectionBaseInWriteTransaction() -> Results<CTTStringObjectWithLink> {
+    override func collectionBaseInWriteTransaction() -> Results<CTTNullableStringObjectWithLink> {
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failed")
         }
@@ -741,7 +753,7 @@ class ResultsFromLinkViewTests: ResultsTests {
         let realm = realmWithTestPath()
         try! realm.write {
             let array = realm.objects(CTTStringList.self).last!
-            array.array.append(realm.create(CTTStringObjectWithLink.self, value: ["a"]))
+            array.array.append(realm.create(CTTNullableStringObjectWithLink.self, value: ["a"]))
         }
     }
 }
@@ -767,19 +779,19 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
     }
 #endif
 
-    func collectionBaseInWriteTransaction() -> List<CTTStringObjectWithLink> {
+    func collectionBaseInWriteTransaction() -> List<CTTNullableStringObjectWithLink> {
         fatalError("abstract")
     }
 
-    final func collectionBase() -> List<CTTStringObjectWithLink> {
-        var collection: List<CTTStringObjectWithLink>?
+    final func collectionBase() -> List<CTTNullableStringObjectWithLink> {
+        var collection: List<CTTNullableStringObjectWithLink>?
         try! realmWithTestPath().write {
             collection = collectionBaseInWriteTransaction()
         }
         return collection!
     }
 
-    override func getCollection() -> AnyRealmCollection<CTTStringObjectWithLink> {
+    override func getCollection() -> AnyRealmCollection<CTTNullableStringObjectWithLink> {
         return AnyRealmCollection(collectionBase())
     }
 
@@ -796,7 +808,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
             fatalError("Test precondition failed")
         }
         // swiftlint:disable:next line_length
-        assertMatches(collection.description, "List<CTTStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
+        assertMatches(collection.description, "List<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
     }
 
     func testObserveDirect() {
@@ -842,7 +854,7 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
 }
 
 class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func collectionBaseInWriteTransaction() -> List<CTTStringObjectWithLink> {
+    override func collectionBaseInWriteTransaction() -> List<CTTNullableStringObjectWithLink> {
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failed")
         }
@@ -929,11 +941,15 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(collection.filter(pred2))
     }
 
+    override func testFilterWithAnyVarags() {
+        // Functionality not supported for standalone lists; don't test.
+    }
+
     override func testArrayAggregateWithSwiftObjectDoesntThrow() {
         guard let collection = collection else {
             fatalError("Test precondition failed")
         }
-        assertThrows(collection.filter("ANY stringListCol == %@", CTTStringObjectWithLink()))
+        assertThrows(collection.filter("ANY stringListCol == %@", CTTNullableStringObjectWithLink()))
     }
 
     override func testObserve() {
@@ -950,7 +966,7 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 }
 
 class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func collectionBaseInWriteTransaction() -> List<CTTStringObjectWithLink> {
+    override func collectionBaseInWriteTransaction() -> List<CTTNullableStringObjectWithLink> {
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
@@ -970,7 +986,7 @@ class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 }
 
 class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func collectionBaseInWriteTransaction() -> List<CTTStringObjectWithLink> {
+    override func collectionBaseInWriteTransaction() -> List<CTTNullableStringObjectWithLink> {
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
@@ -989,7 +1005,7 @@ class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 }
 
 class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
-    override func collectionBaseInWriteTransaction() -> List<CTTStringObjectWithLink> {
+    override func collectionBaseInWriteTransaction() -> List<CTTNullableStringObjectWithLink> {
         guard let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
@@ -1010,23 +1026,23 @@ class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 }
 
 class LinkingObjectsCollectionTypeTests: RealmCollectionTypeTests {
-    func collectionBaseInWriteTransaction() -> LinkingObjects<CTTStringObjectWithLink> {
+    func collectionBaseInWriteTransaction() -> LinkingObjects<CTTNullableStringObjectWithLink> {
         let target = realmWithTestPath().create(CTTLinkTarget.self, value: [0])
-        for object in realmWithTestPath().objects(CTTStringObjectWithLink.self) {
+        for object in realmWithTestPath().objects(CTTNullableStringObjectWithLink.self) {
             object.linkCol = target
         }
         return target.stringObjects
     }
 
-    final func collectionBase() -> LinkingObjects<CTTStringObjectWithLink> {
-        var result: LinkingObjects<CTTStringObjectWithLink>?
+    final func collectionBase() -> LinkingObjects<CTTNullableStringObjectWithLink> {
+        var result: LinkingObjects<CTTNullableStringObjectWithLink>?
         try! realmWithTestPath().write {
             result = collectionBaseInWriteTransaction()
         }
         return result!
     }
 
-    override func getCollection() -> AnyRealmCollection<CTTStringObjectWithLink> {
+    override func getCollection() -> AnyRealmCollection<CTTNullableStringObjectWithLink> {
         return AnyRealmCollection(collectionBase())
     }
 
@@ -1047,7 +1063,7 @@ class LinkingObjectsCollectionTypeTests: RealmCollectionTypeTests {
             fatalError("Test precondition failure - a property was unexpectedly nil")
         }
         // swiftlint:disable:next line_length
-        assertMatches(collection.description, "LinkingObjects<CTTStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 0;\n\t\t\\};\n\t\\},\n\t\\[1\\] CTTStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 0;\n\t\t\\};\n\t\\}\n\\)")
+        assertMatches(collection.description, "LinkingObjects<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 0;\n\t\t\\};\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 0;\n\t\t\\};\n\t\\}\n\\)")
     }
 
     override func testAssignListProperty() {

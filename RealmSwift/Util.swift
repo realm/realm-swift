@@ -27,6 +27,15 @@ internal func noWarnUnsafeBitCast<T, U>(_ x: T, to type: U.Type) -> U {
     return unsafeBitCast(x, to: type)
 }
 
+internal func unwrap(arguments: [Any]) -> [Any] {
+    return arguments.map { arg in
+        if let someArg = arg as Any? {
+            return someArg
+        }
+        return NSNull()
+    }
+}
+
 internal func notFoundToNil(index: UInt) -> Int? {
     if index == UInt(NSNotFound) {
         return nil
