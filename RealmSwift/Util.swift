@@ -27,14 +27,41 @@ internal func noWarnUnsafeBitCast<T, U>(_ x: T, to type: U.Type) -> U {
     return unsafeBitCast(x, to: type)
 }
 
-internal func unwrap(arguments: [Any]) -> [Any] {
-    return arguments.map { arg in
+/// Given a list of `Any`-typed varargs, unwrap any optionals and
+/// replace them with the underlying value or NSNull.
+internal func unwrapOptionals(in varargs: [Any]) -> [Any] {
+    return varargs.map { arg in
+#if swift(>=3.1)
         if let someArg = arg as Any? {
             return someArg
         }
         return NSNull()
+#else
+        if let optionalArg = arg as? RealmAnyOptionalUnboxingWorkaround {
+            return optionalArg.rlm_unwrappedValue()
+        } else {
+            return arg
+        }
+#endif
     }
 }
+
+// FIXME: Kill this when we drop Xcode 8.0 support.
+#if swift(>=3.1)
+#else
+private protocol RealmAnyOptionalUnboxingWorkaround {
+    func rlm_unwrappedValue() -> Any
+}
+
+extension Optional: RealmAnyOptionalUnboxingWorkaround {
+    func rlm_unwrappedValue() -> Any {
+        switch self {
+        case .none: return NSNull()
+        case let .some(underlying): return underlying
+        }
+    }
+}
+#endif
 
 internal func notFoundToNil(index: UInt) -> Int? {
     if index == UInt(NSNotFound) {

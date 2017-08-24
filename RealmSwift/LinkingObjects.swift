@@ -136,7 +136,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      */
     public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: NSPredicate(format: predicateFormat,
-                                                                               argumentArray: unwrap(arguments: args))))
+                                                                               argumentArray: unwrapOptionals(in: args))))
     }
 
     // MARK: Object Retrieval
@@ -201,7 +201,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      */
     public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> {
         return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat,
-                                                               argumentArray: unwrap(arguments: args))))
+                                                               argumentArray: unwrapOptionals(in: args))))
     }
 
     /**

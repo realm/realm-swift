@@ -424,13 +424,13 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     override func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
 
     override func index(matching predicateFormat: String, _ args: Any...) -> Int? {
-        return base.index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrap(arguments: args)))
+        return base.index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
     }
 
     // MARK: Filtering
 
     override func filter(_ predicateFormat: String, _ args: Any...) -> Results<C.Element> {
-        return base.filter(NSPredicate(format: predicateFormat, argumentArray: unwrap(arguments: args)))
+        return base.filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
     }
 
     override func filter(_ predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
@@ -585,7 +585,7 @@ public final class AnyRealmCollection<T: RealmCollectionValue>: RealmCollection 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
     public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
-        return base.index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrap(arguments: args)))
+        return base.index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
     }
 
     // MARK: Filtering
@@ -596,7 +596,7 @@ public final class AnyRealmCollection<T: RealmCollectionValue>: RealmCollection 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
     public func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
-        return base.filter(NSPredicate(format: predicateFormat, argumentArray: unwrap(arguments: args)))
+        return base.filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
     }
 
     /**
