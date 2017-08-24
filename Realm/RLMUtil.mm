@@ -324,12 +324,6 @@ NSError *RLMMakeError(std::system_error const& exception) {
                                       @"Category": category}];
 }
 
-NSError *RLMMakeError(NSException *exception) {
-    return [NSError errorWithDomain:RLMErrorDomain
-                               code:0
-                           userInfo:@{NSLocalizedDescriptionKey: exception.reason}];
-}
-
 void RLMSetErrorOrThrow(NSError *error, NSError **outError) {
     if (outError) {
         *outError = error;

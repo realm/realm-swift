@@ -134,9 +134,6 @@
 
 - (id)objectAtIndex:(NSUInteger)index {
     validateArrayBounds(self, index);
-    if (!_backingArray) {
-        _backingArray = [NSMutableArray new];
-    }
     return [_backingArray objectAtIndex:index];
 }
 

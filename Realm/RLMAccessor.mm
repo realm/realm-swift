@@ -206,10 +206,6 @@ RLMLinkingObjects *getLinkingObjects(__unsafe_unretained RLMObjectBase *const ob
 }
 
 // any getter/setter
-void setValue(__unsafe_unretained RLMObjectBase *const, NSUInteger, __unsafe_unretained id) {
-    @throw RLMException(@"Modifying Mixed properties is not supported");
-}
-
 template<typename Type, typename StorageType=Type>
 id makeGetter(NSUInteger index) {
     return ^(__unsafe_unretained RLMObjectBase *const obj) {
@@ -344,7 +340,7 @@ id managedSetter(RLMProperty *prop, const char *type) {
         case RLMPropertyTypeString:         return makeSetter<NSString *>(prop);
         case RLMPropertyTypeDate:           return makeSetter<NSDate *>(prop);
         case RLMPropertyTypeData:           return makeSetter<NSData *>(prop);
-        case RLMPropertyTypeAny:            return makeSetter<id>(prop);
+        case RLMPropertyTypeAny:            return nil;
         case RLMPropertyTypeLinkingObjects: return nil;
         case RLMPropertyTypeObject:         return makeSetter<RLMObjectBase *>(prop);
     }

@@ -45,7 +45,6 @@ NSError *RLMMakeError(RLMError code, std::exception const& exception);
 NSError *RLMMakeError(RLMError code, const realm::util::File::AccessError&);
 NSError *RLMMakeError(RLMError code, const realm::RealmFileException&);
 NSError *RLMMakeError(std::system_error const& exception);
-NSError *RLMMakeError(NSException *exception);
 
 void RLMSetErrorOrThrow(NSError *error, NSError **outError);
 
