@@ -124,6 +124,10 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
 
 /// A type which can be stored in a Realm List or Results
 public protocol RealmCollectionValue {
+    /**
+     WARNING: This is an internal helper method not intended for public use.
+     :nodoc:
+     */
     static func className() -> String
 }
 
