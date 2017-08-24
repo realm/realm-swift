@@ -25,11 +25,11 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
     internal let objectClassName: String
     internal let propertyName: String
 
-    fileprivate var cachedRLMResults: RLMResults<RLMObject>?
+    fileprivate var cachedRLMResults: RLMResults<AnyObject>?
     @objc fileprivate var object: RLMWeakObjectHandle?
     @objc fileprivate var property: RLMProperty?
 
-    internal var rlmResults: RLMResults<RLMObject> {
+    internal var rlmResults: RLMResults<AnyObject> {
         if cachedRLMResults == nil {
             if let object = self.object, let property = self.property {
                 cachedRLMResults = RLMDynamicGet(object.object, property)! as? RLMResults
@@ -106,7 +106,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
     /// A human-readable description of the objects represented by the linking objects.
     public override var description: String {
-        return RLMDescriptionWithMaxDepth("LinkingObjects<\(rlmResults.objectClassName)>", rlmResults, RLMDescriptionMaxDepth)
+        return RLMDescriptionWithMaxDepth("LinkingObjects<\(rlmResults.objectClassName!)>", rlmResults, RLMDescriptionMaxDepth)
     }
 
     // MARK: Index Retrieval
@@ -406,7 +406,7 @@ extension LinkingObjects: AssistedObjectiveCBridgeable {
         case (let object as RLMObjectBase, .uncached(let property)):
             swiftValue.object = RLMWeakObjectHandle(object: object)
             swiftValue.property = property
-        case (let results as RLMResults<RLMObject>, .cached):
+        case (let results as RLMResults<AnyObject>, .cached):
             swiftValue.cachedRLMResults = results
         default:
             preconditionFailure()

@@ -48,8 +48,92 @@ class ObjectSchemaTests: TestCase {
 
     func testDescription() {
         let objectSchema = swiftObjectSchema
-        // swiftlint:disable:next line_length
-        XCTAssertEqual(objectSchema.description, "SwiftObject {\n\tboolCol {\n\t\ttype = bool;\n\t\tobjectClassName = (null);\n\t\tlinkOriginPropertyName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t\toptional = NO;\n\t}\n\tintCol {\n\t\ttype = int;\n\t\tobjectClassName = (null);\n\t\tlinkOriginPropertyName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t\toptional = NO;\n\t}\n\tfloatCol {\n\t\ttype = float;\n\t\tobjectClassName = (null);\n\t\tlinkOriginPropertyName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t\toptional = NO;\n\t}\n\tdoubleCol {\n\t\ttype = double;\n\t\tobjectClassName = (null);\n\t\tlinkOriginPropertyName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t\toptional = NO;\n\t}\n\tstringCol {\n\t\ttype = string;\n\t\tobjectClassName = (null);\n\t\tlinkOriginPropertyName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t\toptional = NO;\n\t}\n\tbinaryCol {\n\t\ttype = data;\n\t\tobjectClassName = (null);\n\t\tlinkOriginPropertyName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t\toptional = NO;\n\t}\n\tdateCol {\n\t\ttype = date;\n\t\tobjectClassName = (null);\n\t\tlinkOriginPropertyName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t\toptional = NO;\n\t}\n\tobjectCol {\n\t\ttype = object;\n\t\tobjectClassName = SwiftBoolObject;\n\t\tlinkOriginPropertyName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t\toptional = YES;\n\t}\n\tarrayCol {\n\t\ttype = array;\n\t\tobjectClassName = SwiftBoolObject;\n\t\tlinkOriginPropertyName = (null);\n\t\tindexed = NO;\n\t\tisPrimary = NO;\n\t\toptional = NO;\n\t}\n}")
+        let expected =
+            "SwiftObject {\n" +
+            "    boolCol {\n" +
+            "        type = bool;\n" +
+            "        objectClassName = (null);\n" +
+            "        linkOriginPropertyName = (null);\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    intCol {\n" +
+            "        type = int;\n" +
+            "        objectClassName = (null);\n" +
+            "        linkOriginPropertyName = (null);\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    floatCol {\n" +
+            "        type = float;\n" +
+            "        objectClassName = (null);\n" +
+            "        linkOriginPropertyName = (null);\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    doubleCol {\n" +
+            "        type = double;\n" +
+            "        objectClassName = (null);\n" +
+            "        linkOriginPropertyName = (null);\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    stringCol {\n" +
+            "        type = string;\n" +
+            "        objectClassName = (null);\n" +
+            "        linkOriginPropertyName = (null);\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    binaryCol {\n" +
+            "        type = data;\n" +
+            "        objectClassName = (null);\n" +
+            "        linkOriginPropertyName = (null);\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    dateCol {\n" +
+            "        type = date;\n" +
+            "        objectClassName = (null);\n" +
+            "        linkOriginPropertyName = (null);\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    objectCol {\n" +
+            "        type = object;\n" +
+            "        objectClassName = SwiftBoolObject;\n" +
+            "        linkOriginPropertyName = (null);\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = YES;\n" +
+            "    }\n" +
+            "    arrayCol {\n" +
+            "        type = object;\n" +
+            "        objectClassName = SwiftBoolObject;\n" +
+            "        linkOriginPropertyName = (null);\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = YES;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "}"
+
+        XCTAssertEqual(objectSchema.description, expected.replacingOccurrences(of: "    ", with: "\t"))
     }
 
     func testSubscript() {

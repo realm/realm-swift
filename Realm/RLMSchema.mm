@@ -197,7 +197,7 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
     // Verify that all of the targets of links are included in the class list
     [schema->_objectSchemaByName enumerateKeysAndObjectsUsingBlock:^(id, RLMObjectSchema *objectSchema, BOOL *) {
         for (RLMProperty *prop in objectSchema.properties) {
-            if (prop.type != RLMPropertyTypeObject && prop.type != RLMPropertyTypeArray) {
+            if (prop.type != RLMPropertyTypeObject) {
                 continue;
             }
             if (!schema->_objectSchemaByName[prop.objectClassName]) {

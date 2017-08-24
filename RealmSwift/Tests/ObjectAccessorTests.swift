@@ -202,7 +202,7 @@ class ObjectAccessorTests: TestCase {
         let lastObject = objects.last
         XCTAssertEqual(2, lastObject!.arrayCol.count)
 
-        let iterator = objects.makeIterator()
+        var iterator = objects.makeIterator()
         let next = iterator.next()!
         XCTAssertEqual(next.arrayCol.count, 2)
 

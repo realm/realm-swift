@@ -75,13 +75,13 @@ extension Int64: AddableType {}
 
  Results instances cannot be directly instantiated.
  */
-public final class Results<T: Object>: NSObject, NSFastEnumeration {
+public final class Results<T: RealmCollectionValue>: NSObject, NSFastEnumeration {
 
-    internal let rlmResults: RLMResults<RLMObject>
+    internal let rlmResults: RLMResults<AnyObject>
 
     /// A human-readable description of the objects represented by the results.
     public override var description: String {
-        return RLMDescriptionWithMaxDepth("Results<\(rlmResults.objectClassName)>", rlmResults, RLMDescriptionMaxDepth)
+        return RLMDescriptionWithMaxDepth("Results<\(rlmResults.objectClassName!)>", rlmResults, RLMDescriptionMaxDepth)
     }
 
     // MARK: Fast Enumeration
@@ -114,7 +114,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     // MARK: Initializers
 
-    internal init(_ rlmResults: RLMResults<RLMObject>) {
+    internal init(_ rlmResults: RLMResults<AnyObject>) {
         self.rlmResults = rlmResults
     }
 
@@ -124,7 +124,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      Returns the index of the given object in the results, or `nil` if the object is not present.
      */
     public func index(of object: T) -> Int? {
-        return notFoundToNil(index: rlmResults.index(of: object.unsafeCastToRLMObject()))
+        return notFoundToNil(index: rlmResults.index(of: object as AnyObject))
     }
 
     /**
@@ -155,7 +155,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      */
     public subscript(position: Int) -> T {
         throwForNegativeIndex(position)
-        return unsafeBitCast(rlmResults.object(at: UInt(position)), to: T.self)
+        return cast(rlmResults.object(at: UInt(position)), to: T.self)
     }
 
     /// Returns the first object in the results, or `nil` if the results are empty.

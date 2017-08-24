@@ -22,8 +22,7 @@ import Realm
 /**
  An iterator for a `RealmCollection` instance.
  */
-public final class RLMIterator<T: Object>: IteratorProtocol {
-    private var i: UInt = 0
+public struct RLMIterator<T: RealmCollectionValue>: IteratorProtocol {
     private var generatorBase: NSFastEnumerationIterator
 
     init(collection: RLMCollection) {
@@ -31,7 +30,7 @@ public final class RLMIterator<T: Object>: IteratorProtocol {
     }
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
-    public func next() -> T? {
+    public mutating func next() -> T? {
         return unsafeBitCast(generatorBase.next() as! Object?, to: Optional<T>.self)
     }
 }
@@ -123,15 +122,24 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
     return from as! U
 }
 
+/// A type which can be stored in a Realm List or Results
+public protocol RealmCollectionValue {
+    /**
+     WARNING: This is an internal helper method not intended for public use.
+     :nodoc:
+     */
+    static func className() -> String
+}
+
 #if swift(>=3.2)
 /// :nodoc:
-public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined where Element: Object {
+public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined where Element: RealmCollectionValue {
 }
 #else
 /// :nodoc:
 public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined {
     /// The type of the objects contained in the collection.
-    associatedtype Element: Object
+    associatedtype Element: RealmCollectionValue
 }
 #endif
 
@@ -362,7 +370,7 @@ public protocol RealmCollection: RealmCollectionBase {
     func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
-private class _AnyRealmCollectionBase<T: Object>: AssistedObjectiveCBridgeable {
+private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiveCBridgeable {
     typealias Wrapper = AnyRealmCollection<Element>
     typealias Element = T
     var realm: Realm? { fatalError() }
@@ -518,7 +526,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
  Instances of `RealmCollection` forward operations to an opaque underlying collection having the same `Element` type.
  */
-public final class AnyRealmCollection<T: Object>: RealmCollection {
+public final class AnyRealmCollection<T: RealmCollectionValue>: RealmCollection {
 
     public func index(after i: Int) -> Int { return i + 1 }
     public func index(before i: Int) -> Int { return i - 1 }
@@ -802,7 +810,7 @@ public final class AnyRealmCollection<T: Object>: RealmCollection {
 
 // MARK: AssistedObjectiveCBridgeable
 
-private struct AnyRealmCollectionBridgingMetadata<T: Object> {
+private struct AnyRealmCollectionBridgingMetadata<T: RealmCollectionValue> {
     var baseMetadata: Any?
     var baseType: _AnyRealmCollectionBase<T>.Type
 }

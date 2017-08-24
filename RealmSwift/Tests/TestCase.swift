@@ -18,7 +18,6 @@
 
 import Foundation
 import Realm
-import Realm.Private
 import Realm.Dynamic
 import RealmSwift
 import XCTest
@@ -135,7 +134,7 @@ class TestCase: XCTestCase {
             }
     }
 
-    func assertThrows<T>(_ block: @autoclosure @escaping() -> T, named: String? = RLMExceptionName,
+    func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithName(self, { _ = block() }, named, message, fileName, lineNumber)

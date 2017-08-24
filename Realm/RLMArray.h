@@ -22,7 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMObject, RLMRealm, RLMResults<RLMObjectType: RLMObject *>, RLMNotificationToken;
+@class RLMObject, RLMRealm, RLMResults<RLMObjectType>, RLMNotificationToken;
 
 /**
  `RLMArray` is the container type in Realm used to define to-many relationships.
@@ -57,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
  object. Instead, you can call the mutation methods on the `RLMArray` directly.
  */
 
-@interface RLMArray<RLMObjectType: RLMObject *> : NSObject<RLMCollection, NSFastEnumeration>
+@interface RLMArray<RLMObjectType> : NSObject<RLMCollection, NSFastEnumeration>
 
 #pragma mark - Properties
 
@@ -67,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, assign) NSUInteger count;
 
 /**
- The class name (i.e. type) of the `RLMObject`s contained in the array.
+ The class name (i.e. type) of the objects contained in the array.
  */
 @property (nonatomic, readonly, copy) NSString *objectClassName;
 
@@ -88,7 +88,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param index   The index to look up.
 
- @return An `RLMObject` of the type contained in the array.
+ @return An object of the type contained in the array.
  */
 - (RLMObjectType)objectAtIndex:(NSUInteger)index;
 
@@ -97,7 +97,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty array.
 
- @return An `RLMObject` of the type contained in the array.
+ @return An object of the type contained in the array.
  */
 - (nullable RLMObjectType)firstObject;
 
@@ -106,7 +106,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty array.
 
- @return An `RLMObject` of the type contained in the array.
+ @return An object of the type contained in the array.
  */
 - (nullable RLMObjectType)lastObject;
 
@@ -119,7 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning This method may only be called during a write transaction.
 
- @param object  An `RLMObject` of the type contained in the array.
+ @param object  An object of the type contained in the array.
  */
 - (void)addObject:(RLMObjectType)object;
 
@@ -140,7 +140,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning This method may only be called during a write transaction.
 
- @param anObject  An `RLMObject` of the type contained in the array.
+ @param anObject  An object of the type contained in the array.
  @param index   The index at which to insert the object.
  */
 - (void)insertObject:(RLMObjectType)anObject atIndex:(NSUInteger)index;
@@ -158,6 +158,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Removes the last object in the array.
+
+ This is a no-op if the array is already empty.
 
  @warning This method may only be called during a write transaction.
 */

@@ -63,6 +63,7 @@
                                                     @"\t\tlinkOriginPropertyName = (null);\n"
                                                     @"\t\tindexed = YES;\n"
                                                     @"\t\tisPrimary = YES;\n"
+                                                    @"\t\tarray = NO;\n"
                                                     @"\t\toptional = NO;\n"
                                                     @"\t}\n"
                                                     @"\tintCol {\n"
@@ -71,6 +72,7 @@
                                                     @"\t\tlinkOriginPropertyName = (null);\n"
                                                     @"\t\tindexed = NO;\n"
                                                     @"\t\tisPrimary = NO;\n"
+                                                    @"\t\tarray = NO;\n"
                                                     @"\t\toptional = NO;\n"
                                                     @"\t}\n"
                                                     @"}");
