@@ -81,7 +81,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     /// A human-readable description of the objects represented by the results.
     public override var description: String {
-        return RLMDescriptionWithMaxDepth("Results<\(rlmResults.objectClassName)>", rlmResults, RLMDescriptionMaxDepth)
+        return RLMDescriptionWithMaxDepth("Results", rlmResults, RLMDescriptionMaxDepth)
     }
 
     // MARK: Fast Enumeration
