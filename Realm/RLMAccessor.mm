@@ -136,23 +136,13 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
               __unsafe_unretained id<NSFastEnumeration> const value) {
     RLMVerifyInWriteTransaction(obj);
 
-    realm::List list(obj->_realm->_realm, obj->_row.get_linklist(colIndex));
-    if ([(id)value respondsToSelector:@selector(isBackedByList:)] && [(id)value isBackedByList:list]) {
-        return; // self-assignment is a no-op
+    realm::List list(obj->_realm->_realm, *obj->_row.get_table(), colIndex, obj->_row.get_index());
+    RLMClassInfo *info = obj->_info;
+    if (list.get_type() == realm::PropertyType::Object) {
+        info = &obj->_info->linkTargetType(obj->_info->propertyForTableColumn(colIndex).index);
     }
-
-    list.remove_all();
-    if (!value || (id)value == NSNull.null) {
-        return;
-    }
-
-    RLMAccessorContext ctx(obj->_realm,
-                           obj->_info->linkTargetType(obj->_info->propertyForTableColumn(colIndex).index));
-    translateError([&] {
-        for (id element in value) {
-            list.add(ctx, element);
-        }
-    });
+    RLMAccessorContext ctx(obj->_realm, *info);
+    translateError([&] { list.assign(ctx, value, false); });
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
@@ -862,4 +852,8 @@ RLMOptionalId RLMAccessorContext::default_value_for_property(realm::ObjectSchema
                                                              std::string const& prop)
 {
     return RLMOptionalId{defaultValue(@(prop.c_str()))};
+}
+
+bool RLMAccessorContext::is_same_list(realm::List const& list, __unsafe_unretained id const v) const noexcept {
+    return [v respondsToSelector:@selector(isBackedByList:)] && [v isBackedByList:list];
 }
