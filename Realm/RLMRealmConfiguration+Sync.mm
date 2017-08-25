@@ -69,4 +69,12 @@
     return [[RLMSyncConfiguration alloc] initWithRawConfig:sync_config];
 }
 
+- (BOOL)openSyncedRealmOffline {
+    return self.config.force_sync_history;
+}
+
+- (void)setOpenSyncedRealmOffline:(BOOL)openSyncedRealmOffline {
+    self.config.force_sync_history = openSyncedRealmOffline;
+}
+
 @end

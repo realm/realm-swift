@@ -38,6 +38,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nullable, nonatomic) RLMSyncConfiguration *syncConfiguration;
 
+/**
+ Set this to YES to open a synced Realm file as a normal, unsynchronized Realm.
+ `fileURL` must be set. Use this to open backup copies of a Realm that are created
+ after a client reset occurs.
+
+ @see `RLMSyncErrorClientResetError`
+ */
+@property (nonatomic) BOOL openSyncedRealmOffline;
+
 NS_ASSUME_NONNULL_END
 
 @end
