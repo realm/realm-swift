@@ -103,7 +103,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
     */
     public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
-        return index(matching: NSPredicate(format: predicateFormat, argumentArray: args))
+        return index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
     }
 
     // MARK: Object Retrieval
@@ -172,7 +172,8 @@ public final class List<T: RealmCollectionValue>: ListBase {
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
     */
     public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> {
-        return Results<T>(_rlmArray.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
+        return Results<T>(_rlmArray.objects(with: NSPredicate(format: predicateFormat,
+                                                              argumentArray: unwrapOptionals(in: args))))
     }
 
     /**

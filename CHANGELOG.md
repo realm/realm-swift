@@ -18,7 +18,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Realm Swift APIs that filter or look up the index of an object based on a
+  format string now properly handle optional arguments in their variadic argument
+  list.
 
 3.0.0-beta.3 Release notes (2017-08-23)
 =============================================================
