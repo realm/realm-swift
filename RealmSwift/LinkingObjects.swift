@@ -106,7 +106,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
     /// A human-readable description of the objects represented by the linking objects.
     public override var description: String {
-        return RLMDescriptionWithMaxDepth("LinkingObjects<\(rlmResults.objectClassName!)>", rlmResults, RLMDescriptionMaxDepth)
+        return RLMDescriptionWithMaxDepth("LinkingObjects", rlmResults, RLMDescriptionMaxDepth)
     }
 
     // MARK: Index Retrieval

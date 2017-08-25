@@ -167,46 +167,57 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state, NSUInteger len, id<RL
     return [enumerator countByEnumeratingWithState:state count:len];
 }
 
-NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *key) {
-    size_t count = collection.count;
+template<typename Collection>
+NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key,
+                                  RLMRealm *realm, RLMClassInfo& info) {
+    size_t count = collection.size();
     if (count == 0) {
         return @[];
     }
 
-    RLMRealm *realm = collection.realm;
-    RLMClassInfo *info = collection.objectInfo;
-
-    NSMutableArray *results = [NSMutableArray arrayWithCapacity:count];
+    NSMutableArray *array = [NSMutableArray arrayWithCapacity:count];
     if ([key isEqualToString:@"self"]) {
-        for (size_t i = 0; i < count; i++) {
-            size_t rowIndex = [collection indexInSource:i];
-            [results addObject:RLMCreateObjectAccessor(realm, *info, rowIndex) ?: NSNull.null];
+        RLMAccessorContext context(realm, info);
+        for (size_t i = 0; i < count; ++i) {
+            [array addObject:collection.get(context, i) ?: NSNull.null];
         }
-        return results;
+        return array;
     }
 
-    for (RLMProperty *prop in info->rlmObjectSchema.swiftGenericProperties) {
-        if ([prop.name isEqual:key] && !prop.optional) {
-            for (size_t i = 0; i < count; i++) {
-                size_t rowIndex = [collection indexInSource:i];
-                RLMObjectBase *accessor = RLMCreateObjectAccessor(realm, *info, rowIndex);
-                [results addObject:[accessor valueForKey:key] ?: NSNull.null];
+    RLMObject *accessor = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, realm, &info);
+
+    // List properties need to be handled specially since we need to create a
+    // new List each time
+    if (info.rlmObjectSchema.isSwiftClass) {
+        auto prop = info.rlmObjectSchema[key];
+        if (prop && prop.type == RLMPropertyTypeArray && prop.swiftIvar) {
+            // Grab the actual class for the generic List from an instance of it
+            // so that we can make instances of the List without creating a new
+            // object accessor each time
+            Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
+            for (size_t i = 0; i < count; ++i) {
+                RLMListBase *list = [[cls alloc] init];
+                list._rlmArray = [[RLMManagedArray alloc] initWithList:realm::List(realm->_realm, *info.table(),
+                                                                                   info.tableColumn(prop),
+                                                                                   collection.get(i).get_index())
+                                                                 realm:realm parentInfo:&info
+                                                              property:prop];
+                [array addObject:list];
             }
-            return results;
+            return array;
         }
     }
 
-    RLMObject *accessor = RLMCreateManagedAccessor(info->rlmObjectSchema.accessorClass, realm, info);
-    realm::Table *table = info->table();
     for (size_t i = 0; i < count; i++) {
-        size_t rowIndex = [collection indexInSource:i];
-        accessor->_row = (*table)[rowIndex];
+        accessor->_row = collection.get(i);
         RLMInitializeSwiftAccessorGenerics(accessor);
-        [results addObject:[accessor valueForKey:key] ?: NSNull.null];
+        [array addObject:[accessor valueForKey:key] ?: NSNull.null];
     }
-
-    return results;
+    return array;
 }
+
+template NSArray *RLMCollectionValueForKey(realm::Results&, NSString *, RLMRealm *, RLMClassInfo&);
+template NSArray *RLMCollectionValueForKey(realm::List&, NSString *, RLMRealm *, RLMClassInfo&);
 
 void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value) {
     realm::TableView tv = [collection tableView];
@@ -232,7 +243,8 @@ NSString *RLMDescriptionWithMaxDepth(NSString *name,
     }
 
     const NSUInteger maxObjects = 100;
-    auto str = [NSMutableString stringWithFormat:@"%@ <%p> (\n", name, (void *)collection];
+    auto str = [NSMutableString stringWithFormat:@"%@<%@> <%p> (\n", name,
+                [collection objectClassName], (void *)collection];
     size_t index = 0, skipped = 0;
     for (id obj in collection) {
         NSString *sub;

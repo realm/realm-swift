@@ -183,6 +183,22 @@ x.x.x Release notes (yyyy-MM-dd)
   `false` from `Object.shouldIncludeInDefaultSchema()`.
 * Don't clear RLMArrays on self-assignment.
 
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix more cases where assigning an RLMArray property to itself would clear the
+  RLMArray.
+
 2.10.0 Release notes (2017-08-21)
 =============================================================
 
