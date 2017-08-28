@@ -77,16 +77,16 @@ typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger 
 /// A 64-byte key to use to encrypt the data, or `nil` if encryption is not enabled.
 @property (nonatomic, copy, nullable) NSData *encryptionKey;
 
-/// Whether to open the Realm in read-only mode.
+/// Whether to open the Realm in immutable mode.
 ///
 /// This is required to be able to open Realm files which are not writeable or
 /// are in a directory which is not writeable. This should only be used on files
 /// which will not be modified by anyone while they are open, and not just to
 /// get a read-only view of a file which may be written to by another thread or
-/// process. Opening in read-only mode requires disabling Realm's reader/writer
+/// process. Opening in immutable mode requires disabling Realm's reader/writer
 /// coordination, so committing a write transaction from another process will
 /// result in crashes.
-@property (nonatomic) BOOL readOnly;
+@property (nonatomic) BOOL immutable;
 
 /// The current schema version.
 @property (nonatomic) uint64_t schemaVersion;

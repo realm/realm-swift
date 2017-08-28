@@ -39,7 +39,7 @@ NSData *RLMGenerateKey(void);
 - (RLMRealm *)realmWithTestPathAndSchema:(nullable RLMSchema *)schema;
 
 - (RLMRealm *)inMemoryRealmWithIdentifier:(NSString *)identifier;
-- (RLMRealm *)readOnlyRealmWithURL:(NSURL *)fileURL error:(NSError **)error;
+- (RLMRealm *)immutableRealmWithURL:(NSURL *)fileURL error:(NSError **)error;
 
 - (void)deleteFiles;
 - (void)deleteRealmFileAtURL:(NSURL *)fileURL;

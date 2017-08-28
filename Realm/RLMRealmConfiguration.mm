@@ -201,20 +201,20 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     }
 }
 
-- (BOOL)readOnly {
+- (BOOL)immutable {
     return _config.immutable();
 }
 
-- (void)setReadOnly:(BOOL)readOnly {
-    if (readOnly) {
+- (void)setImmutable:(BOOL)immutable {
+    if (immutable) {
         if (self.deleteRealmIfMigrationNeeded) {
-            @throw RLMException(@"Cannot set `readOnly` when `deleteRealmIfMigrationNeeded` is set.");
+            @throw RLMException(@"Cannot set `immutable` when `deleteRealmIfMigrationNeeded` is set.");
         } else if (self.shouldCompactOnLaunch) {
-            @throw RLMException(@"Cannot set `readOnly` when `shouldCompactOnLaunch` is set.");
+            @throw RLMException(@"Cannot set `immutable` when `shouldCompactOnLaunch` is set.");
         }
         _config.schema_mode = realm::SchemaMode::Immutable;
     }
-    else if (self.readOnly) {
+    else if (self.immutable) {
         _config.schema_mode = realm::SchemaMode::Automatic;
     }
 }
@@ -236,8 +236,8 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 
 - (void)setDeleteRealmIfMigrationNeeded:(BOOL)deleteRealmIfMigrationNeeded {
     if (deleteRealmIfMigrationNeeded) {
-        if (self.readOnly) {
-            @throw RLMException(@"Cannot set `deleteRealmIfMigrationNeeded` when `readOnly` is set.");
+        if (self.immutable) {
+            @throw RLMException(@"Cannot set `deleteRealmIfMigrationNeeded` when `immutable` is set.");
         }
         _config.schema_mode = realm::SchemaMode::ResetFile;
     }
@@ -281,8 +281,8 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 
 - (void)setShouldCompactOnLaunch:(RLMShouldCompactOnLaunchBlock)shouldCompactOnLaunch {
     if (shouldCompactOnLaunch) {
-        if (self.readOnly) {
-            @throw RLMException(@"Cannot set `shouldCompactOnLaunch` when `readOnly` is set.");
+        if (self.immutable) {
+            @throw RLMException(@"Cannot set `shouldCompactOnLaunch` when `immutable` is set.");
         } else if (_config.sync_config) {
             @throw RLMException(@"Cannot set `shouldCompactOnLaunch` when `syncConfiguration` is set.");
         }

@@ -240,18 +240,18 @@ NSUInteger count = 1000;
 
 - (void)testCompactOnLaunchValidation {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.readOnly = YES;
+    configuration.immutable = YES;
 
     BOOL (^compactBlock)(NSUInteger, NSUInteger) = ^BOOL(__unused NSUInteger totalBytes, __unused NSUInteger usedBytes){
         return NO;
     };
     RLMAssertThrowsWithReasonMatching(configuration.shouldCompactOnLaunch = compactBlock,
-                                      @"Cannot set `shouldCompactOnLaunch` when `readOnly` is set.");
+                                      @"Cannot set `shouldCompactOnLaunch` when `immutable` is set.");
 
-    configuration.readOnly = NO;
+    configuration.immutable = NO;
     configuration.shouldCompactOnLaunch = compactBlock;
-    RLMAssertThrowsWithReasonMatching(configuration.readOnly = YES,
-                                      @"Cannot set `readOnly` when `shouldCompactOnLaunch` is set.");
+    RLMAssertThrowsWithReasonMatching(configuration.immutable = YES,
+                                      @"Cannot set `immutable` when `shouldCompactOnLaunch` is set.");
 }
 
 @end

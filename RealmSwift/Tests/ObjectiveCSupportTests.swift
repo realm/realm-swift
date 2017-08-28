@@ -83,9 +83,9 @@ class ObjectiveCSupportTests: TestCase {
                        ObjectiveCSupport.convert(object: realm.configuration).encryptionKey,
                        "Configuration.encryptionKey must be equal to RLMConfiguration.encryptionKey")
 
-        XCTAssertEqual(realm.configuration.readOnly,
-                       ObjectiveCSupport.convert(object: realm.configuration).readOnly,
-                       "Configuration.readOnly must be equal to RLMConfiguration.readOnly")
+        XCTAssertEqual(realm.configuration.immutable,
+                       ObjectiveCSupport.convert(object: realm.configuration).immutable,
+                       "Configuration.immutable must be equal to RLMConfiguration.immutable")
 
         XCTAssertEqual(realm.configuration.schemaVersion,
                        ObjectiveCSupport.convert(object: realm.configuration).schemaVersion,

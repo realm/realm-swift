@@ -15,6 +15,8 @@ x.x.x Release notes (yyyy-MM-dd)
   using a `RLMResults`. This results collection supports all normal collection
   operations except for setting values using KVO (since `RLMSyncPermission`s are
   immutable) and the property aggregation operations.
+* Rename `RLMRealmConfiguration.readOnly` (and its Swift equivalent) to
+  `immutable`.
 
 ### Enhancements
 
