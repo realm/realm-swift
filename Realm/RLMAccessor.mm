@@ -26,7 +26,7 @@
 #import "RLMObservation.hpp"
 #import "RLMProperty_Private.h"
 #import "RLMRealm_Private.hpp"
-#import "RLMResults_Private.h"
+#import "RLMResults_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
 #import "results.hpp"

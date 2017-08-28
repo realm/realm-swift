@@ -49,6 +49,21 @@ typedef NS_ENUM(NSUInteger, RLMSyncAccessLevel) {
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ A property on which a `RLMResults<RLMSyncPermission *>` can be queried or filtered.
+
+ @warning If building `NSPredicate`s using format strings including these string
+          constants, use %K instead of %@ as the substitution parameter.
+ */
+typedef NSString * RLMSyncPermissionSortProperty NS_STRING_ENUM;
+
+/// Sort by the Realm Object Server path to the Realm to which the permission applies.
+extern RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyPath;
+/// Sort by the identity of the user to whom the permission applies.
+extern RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUserID;
+/// Sort by the date the permissions were last updated.
+extern RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated;
+
+/**
  A value representing a permission granted to the specified user(s) to access the specified Realm(s).
 
  `RLMSyncPermission` is immutable and can be accessed from any thread.

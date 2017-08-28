@@ -11,6 +11,10 @@ x.x.x Release notes (yyyy-MM-dd)
   types.
 * Remove `RLMPropertyTypeArray` in favor of a separate bool `array` property on
   `RLMProperty`/`Property`.
+* Remove `RLMSyncPermissionResults`. `RLMSyncPermission`s are now vended out
+  using a `RLMResults`. This results collection supports all normal collection
+  operations except for setting values using KVO (since `RLMSyncPermission`s are
+  immutable) and the property aggregation operations.
 
 ### Enhancements
 

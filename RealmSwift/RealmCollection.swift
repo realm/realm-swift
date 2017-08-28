@@ -31,7 +31,11 @@ public struct RLMIterator<T: RealmCollectionValue>: IteratorProtocol {
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> T? {
-        return unsafeBitCast(generatorBase.next() as! Object?, to: Optional<T>.self)
+        let next = generatorBase.next()
+        if let next = next as? Object? {
+            return unsafeBitCast(next, to: Optional<T>.self)
+        }
+        return next as! T?
     }
 }
 

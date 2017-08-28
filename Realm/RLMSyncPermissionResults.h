@@ -18,95 +18,10 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUser.h"
+#import "RLMResults.h"
 
-NS_ASSUME_NONNULL_BEGIN
+@class RLMSyncPermission;
 
-/// Properties which a sync permission results collection can be sorted by.
-typedef NS_ENUM(NSUInteger, RLMSyncPermissionResultsSortProperty) {
-    /// Sort by the Realm Object Server path to the Realm to which the permission applies.
-    RLMSyncPermissionResultsSortPropertyPath,
-    /// Sort by the identity of the user to whom the permission applies.
-    RLMSyncPermissionResultsSortPropertyUserID,
-    /// Sort by the date the permissions were last updated.
-    RLMSyncPermissionResultsSortDateUpdated,
-};
-
-@class RLMSyncPermission, RLMNotificationToken;
-
-/**
- A collection object representing the results of a permissions query.
-
- This collection will automatically update its contents at the start of each runloop
- iteration, but the objects it vends are immutable.
-
- Permission results objects are thread-confined, and should not be shared across
- threads.
-
- @warning Permission results must only be fetched on threads that have an active
-          run loop. In most cases this will be the main thread.
- */
-@interface RLMSyncPermissionResults : NSObject<NSFastEnumeration>
-
-/// The number of results contained within the object.
-@property (nonatomic, readonly) NSInteger count;
-
-/**
- Return the first permission, or nil if the collection is empty.
- */
-- (nullable RLMSyncPermission *)firstObject NS_SWIFT_UNAVAILABLE("Use the `first` property.");
-
-/**
- Return the last permission, or nil if the collection is empty.
- */
-- (nullable RLMSyncPermission *)lastObject NS_SWIFT_UNAVAILABLE("Use the `last` property.");
-
-/**
- Retrieve the permission value at the given index. Throws an exception if the index
- is out of bounds.
- */
-- (RLMSyncPermission *)objectAtIndex:(NSInteger)index;
-
-/**
- Returns the index of the permission in the collection, or `NSNotFound` if the permission
- is not found in the collection.
- */
-- (NSInteger)indexOfObject:(RLMSyncPermission *)object;
-
-/**
- Register to be notified when the contents of the results object change.
-
- This method returns a token. Hold on to the token for as long as notifications
- are desired. Call `-invalidate` on the token to stop notifications, and before
- deallocating the token.
- */
-- (RLMNotificationToken *)addNotificationBlock:(RLMPermissionStatusBlock)block NS_REFINED_FOR_SWIFT;
-
-#pragma mark - Queries
-
-/**
- Return all permissions matching the given predicate in the collection.
-
- @note Valid properties to filter on are `path` and `userId`, as well as
-       the boolean properties `mayRead`, `mayWrite`, and `mayManage`.
- */
-- (RLMSyncPermissionResults *)objectsWithPredicate:(NSPredicate *)predicate;
-
-/**
- Return a sorted `RLMSyncPermissionResults` from the collection, sorted based on
- the given property.
- */
-- (RLMSyncPermissionResults *)sortedResultsUsingProperty:(RLMSyncPermissionResultsSortProperty)property
-                                               ascending:(BOOL)ascending;
-
-#pragma mark - Misc
-
-/// :nodoc:
-- (instancetype)init __attribute__((unavailable("RLMSyncPermissionResults cannot be created directly")));
-
-/// :nodoc:
-+ (instancetype)new __attribute__((unavailable("RLMSyncPermissionResults cannot be created directly")));
-
+// A private subclass of `RLMResults`.
+@interface RLMSyncPermissionResults : RLMResults<RLMSyncPermission *>
 @end
-
-NS_ASSUME_NONNULL_END
