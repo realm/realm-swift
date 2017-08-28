@@ -66,6 +66,10 @@ void RLMDisableSyncToDisk() {
     realm::disable_sync_to_disk();
 }
 
+static void RLMAddSkipBackupAttributeToItemAtPath(std::string const& path) {
+    [[NSURL fileURLWithPath:@(path.c_str())] setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:nil];
+}
+
 @implementation RLMRealmNotificationToken
 - (void)stop {
     [_realm verifyThread];
@@ -436,6 +440,10 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     if (!readOnly) {
         realm->_realm->m_binding_context = RLMCreateBindingContext(realm);
         realm->_realm->m_binding_context->realm = realm->_realm;
+
+        RLMAddSkipBackupAttributeToItemAtPath(config.path + ".management");
+        RLMAddSkipBackupAttributeToItemAtPath(config.path + ".lock");
+        RLMAddSkipBackupAttributeToItemAtPath(config.path + ".note");
     }
 
     return RLMAutorelease(realm);

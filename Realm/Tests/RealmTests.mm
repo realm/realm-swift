@@ -1871,4 +1871,18 @@
     [self waitForExpectationsWithTimeout:1 handler:nil];
 }
 
+- (void)testAuxiliaryFilesAreExcludedFromBackup {
+    @autoreleasepool { [RLMRealm defaultRealm]; }
+
+    NSURL *fileURL = RLMRealmConfiguration.defaultConfiguration.fileURL;
+    for (NSString *pathExtension in @[@"management", @"lock", @"note"]) {
+        NSNumber *attribute = nil;
+        NSError *error = nil;
+        BOOL success = [[fileURL URLByAppendingPathExtension:pathExtension] getResourceValue:&attribute forKey:NSURLIsExcludedFromBackupKey error:&error];
+        XCTAssertTrue(success);
+        XCTAssertNil(error);
+        XCTAssertTrue(attribute.boolValue);
+    }
+}
+
 @end
