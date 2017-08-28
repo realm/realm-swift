@@ -91,7 +91,7 @@ RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated    = @"
 }
 
 - (RLMSyncPermission *)objectAtIndex:(NSUInteger)index {
-    return translateErrors([&] {
+    return translateRLMResultsErrors([&] {
         Object permission(_results.get_realm(), _results.get_object_schema(), _results.get(index));
         return [[RLMSyncPermission alloc] initWithPermission:Permission(permission)];
     });
@@ -112,7 +112,7 @@ RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated    = @"
     }
     // Canonicalize the path.
     NSString *path = object.path;
-    if ([path containsString:@"~"]) {
+    if ([path rangeOfString:@"~"].location != NSNotFound) {
         path = [path stringByReplacingOccurrencesOfString:@"~" withString:object.identity];
     }
     // Build the predicate. (Don't match the actual permission flags; path and identity identify a permission.)
@@ -123,7 +123,7 @@ RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated    = @"
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
-    return translateErrors([&] {
+    return translateRLMResultsErrors([&] {
         auto& group = _results.get_realm()->read_group();
         auto query = RLMPredicateToQuery(predicate, self.objectSchema, self.schema, group);
         return RLMConvertNotFound(_results.index_of(std::move(query)));
@@ -131,7 +131,7 @@ RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated    = @"
 }
 
 - (RLMResults<RLMSyncPermission *> *)objectsWithPredicate:(NSPredicate *)predicate {
-    return translateErrors([&] {
+    return translateRLMResultsErrors([&] {
         auto query = RLMPredicateToQuery(predicate, self.objectSchema, self.schema, _results.get_realm()->read_group());
         return [[RLMSyncPermissionResults alloc] initWithResults:_results.filter(std::move(query))];
     });
@@ -147,7 +147,7 @@ RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated    = @"
                                 @" `RLMSyncPermissionSortProperty`.");
         }
     }
-    return translateErrors([&] {
+    return translateRLMResultsErrors([&] {
         auto sorted = _results.sort(RLMSortDescriptorsToKeypathArray(properties));
         return [[RLMSyncPermissionResults alloc] initWithResults:std::move(sorted)];
     });

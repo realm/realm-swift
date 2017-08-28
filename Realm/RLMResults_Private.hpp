@@ -40,7 +40,7 @@ void RLMThrowResultsError(NSString * _Nullable aggregateMethod);
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnullability-completeness"
 template<typename Function>
-static auto translateErrors(Function&& f, NSString *aggregateMethod=nil) {
+static auto translateRLMResultsErrors(Function&& f, NSString *aggregateMethod=nil) {
     try {
         return f();
     }
