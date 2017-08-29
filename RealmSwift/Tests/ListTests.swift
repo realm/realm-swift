@@ -643,3 +643,101 @@ class ListRetrievedTests: ListTests {
         return array
     }
 }
+
+class ListRangeReplaceableCollectionMethodsTests: XCTestCase {
+    private func compare(array: [Int], with list: List<SwiftIntObject>) {
+        guard array.count == list.count else {
+            XCTFail("Array and list have different sizes (\(array.count) and \(list.count), respectively).")
+            return
+        }
+        for i in 0..<array.count {
+            XCTAssertEqual(array[i], list[i].intCol,
+                           "Mistmatched array value (\(array[i])) and list value (\(list[i].intCol)) at index \(i)")
+        }
+    }
+
+    private func makeArray(from list: List<SwiftIntObject>) -> [Int] {
+        return list.map { $0.intCol }
+    }
+
+    private func makeSwiftIntObjects(from array: [Int]) -> [SwiftIntObject] {
+        return array.map { SwiftIntObject(value: [$0]) }
+    }
+
+    private func createListObject(_ values: [Int] = [0, 1, 2, 3, 4, 5, 6]) -> SwiftArrayPropertyObject {
+        let object = SwiftArrayPropertyObject()
+        XCTAssertNil(object.realm)
+        object.intArray.append(objectsIn: makeSwiftIntObjects(from: values))
+        return object
+    }
+
+    private var array: [Int]!
+    private var list: List<SwiftIntObject>!
+
+    override func setUp() {
+        super.setUp()
+        list = createListObject().intArray
+        array = makeArray(from: list)
+    }
+
+    func testSubscript() {
+        list[1..<4] = createListObject([10, 11, 12]).intArray[0..<2]
+        array[1..<4] = [10, 11]
+        compare(array: array, with: list)
+    }
+
+    func testRemoveFirst() {
+        list.removeFirst()
+        array.removeFirst()
+        compare(array: array, with: list)
+    }
+
+    func testRemoveFirstFew() {
+        list.removeFirst(3)
+        array.removeFirst(3)
+        compare(array: array, with: list)
+    }
+
+    func testRemoveLastFew() {
+        list.removeLast(3)
+        array.removeLast(3)
+        compare(array: array, with: list)
+    }
+
+    func testInsert() {
+        let newElements = [10, 11, 12, 13]
+        list.insert(contentsOf: makeSwiftIntObjects(from: newElements), at: 2)
+        array.insert(contentsOf: newElements, at: 2)
+        compare(array: array, with: list)
+    }
+
+    func testRemoveClosedSubrange() {
+        let subrange: ClosedRange<Int> = 1...3
+        list.removeSubrange(subrange)
+        array.removeSubrange(subrange)
+        compare(array: array, with: list)
+    }
+
+    func testRemoveOpenSubrange() {
+        let subrange: Range<Int> = 1..<3
+        list.removeSubrange(subrange)
+        array.removeSubrange(subrange)
+        compare(array: array, with: list)
+    }
+
+    func testReplaceClosedSubrange() {
+        let subrange: ClosedRange<Int> = 2...5
+        let newElements = [10, 11, 12, 13, 14, 15, 16]
+        list.replaceSubrange(subrange, with: makeSwiftIntObjects(from: newElements))
+        array.replaceSubrange(subrange, with: newElements)
+        compare(array: array, with: list)
+    }
+
+    func testReplaceOpenSubrange() {
+        let subrange: Range<Int> = 2..<5
+        let newElements = [10, 11, 12, 13, 14, 15, 16]
+        list.replaceSubrange(subrange, with: makeSwiftIntObjects(from: newElements))
+        array.replaceSubrange(subrange, with: newElements)
+        compare(array: array, with: list)
+    }
+}
