@@ -489,7 +489,7 @@ extension List: RealmCollection, RangeReplaceableCollection {
                 insert(x, at: subrange.lowerBound)
             }
     }
-    
+
     // This should be inferred, but Xcode 8.1 is unable to
     /// :nodoc:
     public typealias Indices = DefaultRandomAccessIndices<List>
