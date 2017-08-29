@@ -58,8 +58,8 @@ extension Int64: AddableType {}
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.
 
- `Results` can be queried with the same predicates as `List<T>`, and you can chain queries to further filter query
- results.
+ `Results` can be queried with the same predicates as `List<Element>`, and you can
+ chain queries to further filter query results.
 
  `Results` always reflect the current state of the Realm on the current thread, including during write transactions on
  the current thread. The one exception to this is when using `for...in` enumeration, which will always enumerate over
@@ -75,7 +75,7 @@ extension Int64: AddableType {}
 
  Results instances cannot be directly instantiated.
  */
-public final class Results<T: RealmCollectionValue>: NSObject, NSFastEnumeration {
+public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnumeration {
 
     internal let rlmResults: RLMResults<AnyObject>
 
@@ -94,7 +94,7 @@ public final class Results<T: RealmCollectionValue>: NSObject, NSFastEnumeration
     }
 
     /// The type of the objects described by the results.
-    public typealias Element = T
+    public typealias ElementType = Element
 
     // MARK: Properties
 
@@ -123,7 +123,7 @@ public final class Results<T: RealmCollectionValue>: NSObject, NSFastEnumeration
     /**
      Returns the index of the given object in the results, or `nil` if the object is not present.
      */
-    public func index(of object: T) -> Int? {
+    public func index(of object: Element) -> Int? {
         return notFoundToNil(index: rlmResults.index(of: object as AnyObject))
     }
 
@@ -153,16 +153,16 @@ public final class Results<T: RealmCollectionValue>: NSObject, NSFastEnumeration
 
      - parameter index: The index.
      */
-    public subscript(position: Int) -> T {
+    public subscript(position: Int) -> Element {
         throwForNegativeIndex(position)
-        return cast(rlmResults.object(at: UInt(position)), to: T.self)
+        return cast(rlmResults.object(at: UInt(position)), to: Element.self)
     }
 
     /// Returns the first object in the results, or `nil` if the results are empty.
-    public var first: T? { return unsafeBitCast(rlmResults.firstObject(), to: Optional<T>.self) }
+    public var first: Element? { return unsafeBitCast(rlmResults.firstObject(), to: Optional<Element>.self) }
 
     /// Returns the last object in the results, or `nil` if the results are empty.
-    public var last: T? { return unsafeBitCast(rlmResults.lastObject(), to: Optional<T>.self) }
+    public var last: Element? { return unsafeBitCast(rlmResults.lastObject(), to: Optional<Element>.self) }
 
     // MARK: KVC
 
@@ -204,9 +204,9 @@ public final class Results<T: RealmCollectionValue>: NSObject, NSFastEnumeration
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
-    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> {
-        return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat,
-                                                               argumentArray: unwrapOptionals(in: args))))
+    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
+        return Results<Element>(rlmResults.objects(with: NSPredicate(format: predicateFormat,
+                                                                     argumentArray: unwrapOptionals(in: args))))
     }
 
     /**
@@ -214,8 +214,8 @@ public final class Results<T: RealmCollectionValue>: NSObject, NSFastEnumeration
 
      - parameter predicate: The predicate with which to filter the objects.
      */
-    public func filter(_ predicate: NSPredicate) -> Results<T> {
-        return Results<T>(rlmResults.objects(with: predicate))
+    public func filter(_ predicate: NSPredicate) -> Results<Element> {
+        return Results<Element>(rlmResults.objects(with: predicate))
     }
 
     // MARK: Sorting
@@ -233,7 +233,7 @@ public final class Results<T: RealmCollectionValue>: NSObject, NSFastEnumeration
      - parameter keyPath:   The key path to sort by.
      - parameter ascending: The direction to sort in.
      */
-    public func sorted(byKeyPath keyPath: String, ascending: Bool = true) -> Results<T> {
+    public func sorted(byKeyPath keyPath: String, ascending: Bool = true) -> Results<Element> {
         return sorted(by: [SortDescriptor(keyPath: keyPath, ascending: ascending)])
     }
 
@@ -247,8 +247,9 @@ public final class Results<T: RealmCollectionValue>: NSObject, NSFastEnumeration
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
-    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
-        return Results<T>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
+    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element>
+        where S.Iterator.Element == SortDescriptor {
+            return Results<Element>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Aggregate Operations
@@ -365,7 +366,7 @@ extension Results: RealmCollection {
     // MARK: Sequence Support
 
     /// Returns a `RLMIterator` that yields successive elements in the results.
-    public func makeIterator() -> RLMIterator<T> {
+    public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: rlmResults)
     }
 
@@ -384,7 +385,7 @@ extension Results: RealmCollection {
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
-    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) ->
         NotificationToken {
         let anyCollection = AnyRealmCollection(self)
         return rlmResults.addNotificationBlock { _, change, error in

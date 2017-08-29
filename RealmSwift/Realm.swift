@@ -438,7 +438,7 @@ public final class Realm {
 
      :nodoc:
      */
-    public func delete<T: Object>(_ objects: List<T>) {
+    public func delete<Element: Object>(_ objects: List<Element>) {
         rlmRealm.deleteObjects(objects._rlmArray)
     }
 
@@ -451,7 +451,7 @@ public final class Realm {
 
      :nodoc:
      */
-    public func delete<T: Object>(_ objects: Results<T>) {
+    public func delete<Element: Object>(_ objects: Results<Element>) {
         rlmRealm.deleteObjects(objects.rlmResults)
     }
 
@@ -473,8 +473,8 @@ public final class Realm {
 
      - returns: A `Results` containing the objects.
      */
-    public func objects<T: Object>(_ type: T.Type) -> Results<T> {
-        return Results<T>(RLMGetObjects(rlmRealm, type.className(), nil))
+    public func objects<Element: Object>(_ type: Element.Type) -> Results<Element> {
+        return Results(RLMGetObjects(rlmRealm, type.className(), nil))
     }
 
     /**
@@ -505,10 +505,10 @@ public final class Realm {
 
      - returns: An object of type `type`, or `nil` if no instance with the given primary key exists.
      */
-    public func object<T: Object, K>(ofType type: T.Type, forPrimaryKey key: K) -> T? {
+    public func object<Element: Object, KeyType>(ofType type: Element.Type, forPrimaryKey key: KeyType) -> Element? {
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(),
                                           dynamicBridgeCast(fromSwift: key)) as! RLMObjectBase?,
-                             to: Optional<T>.self)
+                             to: Optional<Element>.self)
     }
 
     /**

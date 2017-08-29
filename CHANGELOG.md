@@ -15,6 +15,11 @@ x.x.x Release notes (yyyy-MM-dd)
   using a `RLMResults`. This results collection supports all normal collection
   operations except for setting values using KVO (since `RLMSyncPermission`s are
   immutable) and the property aggregation operations.
+* `RealmCollection`'s associated type `Element` has been renamed `ElementType`.
+* Realm Swift collection types (`List`, `Results`, `AnyRealmCollection`, and
+  `LinkingObjects` have had their generic type parameter changed from `T` to
+  `Element`).
+* `RealmOptional`'s generic type parameter has been changed from `T` to `Value`.
 
 ### Enhancements
 
