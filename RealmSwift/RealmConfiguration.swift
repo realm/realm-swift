@@ -60,7 +60,7 @@ extension Realm {
          - parameter inMemoryIdentifier: A string used to identify a particular in-memory Realm.
          - parameter syncConfiguration:  For Realms intended to sync with the Realm Object Server, a sync configuration.
          - parameter encryptionKey:      An optional 64-byte key to use to encrypt the data.
-         - parameter readOnly:           Whether the Realm is read-only (must be true for read-only files).
+         - parameter immutable:          Whether the Realm is immutable (must be true for read-only files).
          - parameter schemaVersion:      The current schema version.
          - parameter migrationBlock:     The block which migrates the Realm to the current version.
          - parameter deleteRealmIfMigrationNeeded: If `true`, recreate the Realm file with the provided
@@ -78,7 +78,7 @@ extension Realm {
                     inMemoryIdentifier: String? = nil,
                     syncConfiguration: SyncConfiguration? = nil,
                     encryptionKey: Data? = nil,
-                    readOnly: Bool = false,
+                    immutable: Bool = false,
                     schemaVersion: UInt64 = 0,
                     migrationBlock: MigrationBlock? = nil,
                     deleteRealmIfMigrationNeeded: Bool = false,
@@ -92,7 +92,7 @@ extension Realm {
                     self.syncConfiguration = syncConfiguration
                 }
                 self.encryptionKey = encryptionKey
-                self.readOnly = readOnly
+                self.immutable = immutable
                 self.schemaVersion = schemaVersion
                 self.migrationBlock = migrationBlock
                 self.deleteRealmIfMigrationNeeded = deleteRealmIfMigrationNeeded
@@ -152,15 +152,15 @@ extension Realm {
         public var encryptionKey: Data?
 
         /**
-         Whether to open the Realm in read-only mode.
+         Whether to open the Realm in immutable mode.
 
          This is required to be able to open Realm files which are not writeable or are in a directory which is not
          writeable. This should only be used on files which will not be modified by anyone while they are open, and not
          just to get a read-only view of a file which may be written to by another thread or process. Opening in
-         read-only mode requires disabling Realm's reader/writer coordination, so committing a write transaction from
+         immutable mode requires disabling Realm's reader/writer coordination, so committing a write transaction from
          another process will result in crashes.
          */
-        public var readOnly: Bool = false
+        public var immutable: Bool = false
 
         /// The current schema version.
         public var schemaVersion: UInt64 = 0
@@ -219,7 +219,7 @@ extension Realm {
                 fatalError("A Realm Configuration must specify a path or an in-memory identifier.")
             }
             configuration.encryptionKey = self.encryptionKey
-            configuration.readOnly = self.readOnly
+            configuration.immutable = self.immutable
             configuration.schemaVersion = self.schemaVersion
             configuration.migrationBlock = self.migrationBlock.map { accessorMigrationBlock($0) }
             configuration.deleteRealmIfMigrationNeeded = self.deleteRealmIfMigrationNeeded
@@ -243,7 +243,7 @@ extension Realm {
                 configuration._syncConfiguration = nil
             }
             configuration.encryptionKey = rlmConfiguration.encryptionKey
-            configuration.readOnly = rlmConfiguration.readOnly
+            configuration.immutable = rlmConfiguration.immutable
             configuration.schemaVersion = rlmConfiguration.schemaVersion
             configuration.migrationBlock = rlmConfiguration.migrationBlock.map { rlmMigration in
                 return { migration, schemaVersion in
@@ -267,5 +267,15 @@ extension Realm.Configuration: CustomStringConvertible {
         return gsub(pattern: "\\ARLMRealmConfiguration",
                     template: "Realm.Configuration",
                     string: rlmConfiguration.description) ?? ""
+    }
+}
+
+// MARK: Migration assistance
+
+/// :nodoc:
+extension Realm.Configuration {
+    @available(*, unavailable, renamed: "immutable") public var readOnly: Bool {
+        get { fatalError() }
+        set { fatalError() }
     }
 }

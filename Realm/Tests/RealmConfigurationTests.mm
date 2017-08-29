@@ -81,13 +81,13 @@
 
 - (void)testCannotSetMutuallyExclusiveProperties {
     RLMRealmConfiguration *configuration = [[RLMRealmConfiguration alloc] init];
-    XCTAssertNoThrow(configuration.readOnly = YES);
+    XCTAssertNoThrow(configuration.immutable = YES);
     XCTAssertNoThrow(configuration.deleteRealmIfMigrationNeeded = NO);
     XCTAssertThrows(configuration.deleteRealmIfMigrationNeeded = YES);
-    XCTAssertNoThrow(configuration.readOnly = NO);
+    XCTAssertNoThrow(configuration.immutable = NO);
     XCTAssertNoThrow(configuration.deleteRealmIfMigrationNeeded = YES);
-    XCTAssertNoThrow(configuration.readOnly = NO);
-    XCTAssertThrows(configuration.readOnly = YES);
+    XCTAssertNoThrow(configuration.immutable = NO);
+    XCTAssertThrows(configuration.immutable = YES);
 }
 
 #pragma mark - Default Configuration
@@ -97,7 +97,7 @@
     XCTAssertEqualObjects(defaultConfiguration.fileURL, RLMDefaultRealmURL());
     XCTAssertNil(defaultConfiguration.inMemoryIdentifier);
     XCTAssertNil(defaultConfiguration.encryptionKey);
-    XCTAssertFalse(defaultConfiguration.readOnly);
+    XCTAssertFalse(defaultConfiguration.immutable);
     XCTAssertEqual(defaultConfiguration.schemaVersion, 0U);
     XCTAssertNil(defaultConfiguration.migrationBlock);
 

@@ -553,15 +553,15 @@ RLM_ARRAY_TYPE(MigrationObject);
 
 #pragma mark - Allowed schema mismatches
 
-- (void)testMismatchedIndexAllowedForReadOnly {
+- (void)testMismatchedIndexAllowedForImmutable {
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:StringObject.class];
     [objectSchema.properties[0] setIndexed:YES];
 
     [self createTestRealmWithSchema:@[objectSchema] block:^(RLMRealm *) { }];
 
-    // should be able to open readonly with mismatched index schema
+    // should be able to open immutable with mismatched index schema
     RLMRealmConfiguration *config = [self config];
-    config.readOnly = true;
+    config.immutable = true;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     auto& info = realm->_info[@"StringObject"];
     XCTAssertTrue(info.table()->has_search_index(info.tableColumn(objectSchema.properties[0].name)));

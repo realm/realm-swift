@@ -325,7 +325,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
     bool dynamic = configuration.dynamic;
     bool cache = configuration.cache;
-    bool readOnly = configuration.readOnly;
+    bool immutable = configuration.immutable;
 
     {
         Realm::Config& config = configuration.config;
@@ -423,7 +423,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         realm->_info = RLMSchemaInfo(realm);
         RLMRealmCreateAccessors(realm.schema);
 
-        if (!readOnly) {
+        if (!immutable) {
             // initializing the schema started a read transaction, so end it
             [realm invalidate];
         }
@@ -433,7 +433,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         RLMCacheRealm(config.path, realm);
     }
 
-    if (!readOnly) {
+    if (!immutable) {
         realm->_realm->m_binding_context = RLMCreateBindingContext(realm);
         realm->_realm->m_binding_context->realm = realm->_realm;
     }

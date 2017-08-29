@@ -86,7 +86,7 @@
     [RLMRealmConfiguration setDefaultConfiguration:originalDefaultConfiguration];
 }
 
-- (void)testReadOnlyFile {
+- (void)testImmutableFile {
     @autoreleasepool {
         RLMRealm *realm = self.realmWithTestPath;
         [realm beginWriteTransaction];
@@ -100,13 +100,13 @@
     RLMAssertThrowsWithCodeMatching([self realmWithTestPath], RLMErrorFileAccess);
 
     RLMRealm *realm;
-    XCTAssertNoThrow(realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil]);
+    XCTAssertNoThrow(realm = [self immutableRealmWithURL:RLMTestRealmURL() error:nil]);
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
 
     [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:RLMTestRealmURL().path error:nil];
 }
 
-- (void)testReadOnlyFileInImmutableDirectory {
+- (void)testImmutableFileInImmutableDirectory {
     @autoreleasepool {
         RLMRealm *realm = self.realmWithTestPath;
         [realm beginWriteTransaction];
@@ -123,37 +123,37 @@
     [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES} ofItemAtPath:parentDirectoryOfTestRealmURL.path error:nil];
 
     RLMRealm *realm;
-    // Read-only Realm should be opened even in immutable directory
-    XCTAssertNoThrow(realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil]);
+    // Immutable Realm should be opened even in immutable directory
+    XCTAssertNoThrow(realm = [self immutableRealmWithURL:RLMTestRealmURL() error:nil]);
 
-    [self dispatchAsyncAndWait:^{ XCTAssertNoThrow([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil]); }];
+    [self dispatchAsyncAndWait:^{ XCTAssertNoThrow([self immutableRealmWithURL:RLMTestRealmURL() error:nil]); }];
 
     [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:parentDirectoryOfTestRealmURL.path error:nil];
 }
 
-- (void)testReadOnlyRealmMustExist {
-   RLMAssertThrowsWithCodeMatching([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil], RLMErrorFileNotFound);
+- (void)testImmutableRealmMustExist {
+   RLMAssertThrowsWithCodeMatching([self immutableRealmWithURL:RLMTestRealmURL() error:nil], RLMErrorFileNotFound);
 }
 
-- (void)testCannotHaveReadOnlyAndReadWriteRealmsAtSamePathAtSameTime {
+- (void)testCannotHaveImmutableAndReadWriteRealmsAtSamePathAtSameTime {
     NSString *exceptionReason = @"Realm at path '.*' already opened with different read permissions";
     @autoreleasepool {
         XCTAssertNoThrow([self realmWithTestPath]);
-        RLMAssertThrowsWithReasonMatching([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil], exceptionReason);
+        RLMAssertThrowsWithReasonMatching([self immutableRealmWithURL:RLMTestRealmURL() error:nil], exceptionReason);
     }
 
     @autoreleasepool {
-        XCTAssertNoThrow([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil]);
+        XCTAssertNoThrow([self immutableRealmWithURL:RLMTestRealmURL() error:nil]);
         RLMAssertThrowsWithReasonMatching([self realmWithTestPath], exceptionReason);
     }
 
     [self dispatchAsyncAndWait:^{
-        XCTAssertNoThrow([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil]);
+        XCTAssertNoThrow([self immutableRealmWithURL:RLMTestRealmURL() error:nil]);
         RLMAssertThrowsWithReasonMatching([self realmWithTestPath], exceptionReason);
     }];
 }
 
-- (void)testCanOpenReadOnlyOnMulitpleThreadsAtOnce {
+- (void)testCanOpenImmutableOnMulitpleThreadsAtOnce {
     @autoreleasepool {
         RLMRealm *realm = self.realmWithTestPath;
         [realm beginWriteTransaction];
@@ -161,11 +161,11 @@
         [realm commitWriteTransaction];
     }
 
-    RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
+    RLMRealm *realm = [self immutableRealmWithURL:RLMTestRealmURL() error:nil];
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
 
     [self dispatchAsyncAndWait:^{
-        RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
+        RLMRealm *realm = [self immutableRealmWithURL:RLMTestRealmURL() error:nil];
         XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
     }];
 
@@ -244,9 +244,9 @@
     AssertFileUnmodified(bundledRealmURL, config.fileURL);
 }
 
-- (void)testFileFormatUpgradeRequiredButReadOnly {
+- (void)testFileFormatUpgradeRequiredButImmutable {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.readOnly = true;
+    config.immutable = true;
 
     NSURL *bundledRealmURL = [[NSBundle bundleForClass:[RealmTests class]] URLForResource:@"fileformat-pre-null" withExtension:@"realm"];
     [NSFileManager.defaultManager copyItemAtURL:bundledRealmURL toURL:config.fileURL error:nil];
@@ -329,7 +329,7 @@
     };
 
     // Unsuccessful open
-    c.readOnly = true;
+    c.immutable = true;
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
@@ -344,7 +344,7 @@
     assertNoCachedRealm();
 
     // Successful open
-    c.readOnly = false;
+    c.immutable = false;
     ex = [self expectationWithDescription:@"open-async"];
 
     // Hold exclusive lock on lock file to prevent Realm from being created
@@ -1028,11 +1028,11 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-- (void)testReadOnlyRealmIsImmutable
+- (void)testImmutableRealmIsImmutable
 {
     @autoreleasepool { [self realmWithTestPath]; }
 
-    RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
+    RLMRealm *realm = [self immutableRealmWithURL:RLMTestRealmURL() error:nil];
     XCTAssertThrows([realm beginWriteTransaction]);
     XCTAssertThrows([realm refresh]);
 }
@@ -1247,13 +1247,13 @@
     XCTAssertThrows([array count]);
 }
 
-- (void)testInvalidateOnReadOnlyRealmIsError
+- (void)testInvalidateOnImmutableRealmIsError
 {
     @autoreleasepool {
         // Create the file
         [self realmWithTestPath];
     }
-    RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
+    RLMRealm *realm = [self immutableRealmWithURL:RLMTestRealmURL() error:nil];
     XCTAssertThrows([realm invalidate]);
 }
 
@@ -1519,9 +1519,9 @@
     XCTAssertEqual(0U, [StringObject allObjectsInRealm:inMemoryRealm].count);
 }
 
-#pragma mark - Read-only Realms
+#pragma mark - Immutable Realms
 
-- (void)testReadOnlyRealmWithMissingTables
+- (void)testImmutableRealmWithMissingTables
 {
     // create a realm with only a StringObject table
     @autoreleasepool {
@@ -1537,7 +1537,7 @@
         [realm commitWriteTransaction];
     }
 
-    RLMRealm *realm = [self readOnlyRealmWithURL:RLMTestRealmURL() error:nil];
+    RLMRealm *realm = [self immutableRealmWithURL:RLMTestRealmURL() error:nil];
     XCTAssertEqual(1U, [StringObject allObjectsInRealm:realm].count);
     XCTAssertNil([PrimaryIntObject objectInRealm:realm forPrimaryKey:@0]);
 
@@ -1562,7 +1562,7 @@
     }
 }
 
-- (void)testReadOnlyRealmWithMissingColumns
+- (void)testImmutableRealmWithMissingColumns
 {
     // create a realm with only a zero-column StringObject table
     @autoreleasepool {
@@ -1575,7 +1575,7 @@
         [self realmWithTestPathAndSchema:schema];
     }
 
-    XCTAssertThrows([self readOnlyRealmWithURL:RLMTestRealmURL() error:nil],
+    XCTAssertThrows([self immutableRealmWithURL:RLMTestRealmURL() error:nil],
                     @"should reject table missing column");
 }
 #pragma mark - Write Copy to Path

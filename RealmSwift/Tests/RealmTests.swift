@@ -34,17 +34,17 @@ class RealmTests: TestCase {
                        testRealmURL())
     }
 
-    func testReadOnly() {
+    func testImmutable() {
         autoreleasepool {
-            XCTAssertEqual(try! Realm().configuration.readOnly, false)
+            XCTAssertEqual(try! Realm().configuration.immutable, false)
 
             try! Realm().write {
                 try! Realm().create(SwiftIntObject.self, value: [100])
             }
         }
-        let config = Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true)
+        let config = Realm.Configuration(fileURL: defaultRealmURL(), immutable: true)
         let readOnlyRealm = try! Realm(configuration: config)
-        XCTAssertEqual(true, readOnlyRealm.configuration.readOnly)
+        XCTAssertEqual(true, readOnlyRealm.configuration.immutable)
         XCTAssertEqual(1, readOnlyRealm.objects(SwiftIntObject.self).count)
 
         assertThrows(try! Realm(), "Realm has different readOnly settings")
@@ -74,7 +74,7 @@ class RealmTests: TestCase {
 
         assertSucceeds {
             let realm = try Realm(configuration:
-                Realm.Configuration(fileURL: testRealmURL(), readOnly: true))
+                Realm.Configuration(fileURL: testRealmURL(), immutable: true))
             XCTAssertEqual(1, realm.objects(SwiftStringObject.self).count)
         }
 
@@ -84,7 +84,7 @@ class RealmTests: TestCase {
     func testReadOnlyRealmMustExist() {
         assertFails(.fileNotFound) {
             try Realm(configuration:
-                Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true))
+                Realm.Configuration(fileURL: defaultRealmURL(), immutable: true))
         }
     }
 
@@ -823,7 +823,7 @@ class RealmTests: TestCase {
             XCTFail("Failed to brigde RLMError to Realm.Error")
         }
         do {
-            _ = try Realm(configuration: Realm.Configuration(fileURL: defaultRealmURL(), readOnly: true))
+            _ = try Realm(configuration: Realm.Configuration(fileURL: defaultRealmURL(), immutable: true))
             XCTFail("Error should be thrown")
         } catch Realm.Error.fileNotFound {
             // Success to catch the error

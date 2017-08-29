@@ -166,10 +166,10 @@ static BOOL encryptTests() {
     return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 
-- (RLMRealm *)readOnlyRealmWithURL:(NSURL *)fileURL error:(NSError **)error {
+- (RLMRealm *)immutableRealmWithURL:(NSURL *)fileURL error:(NSError **)error {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = fileURL;
-    configuration.readOnly = true;
+    configuration.immutable = true;
     return [RLMRealm realmWithConfiguration:configuration error:error];
 }
 

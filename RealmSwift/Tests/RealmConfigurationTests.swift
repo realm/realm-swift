@@ -27,7 +27,7 @@ class RealmConfigurationTests: TestCase {
         XCTAssertEqual(defaultConfiguration.fileURL, try! Realm().configuration.fileURL)
         XCTAssertNil(defaultConfiguration.inMemoryIdentifier)
         XCTAssertNil(defaultConfiguration.encryptionKey)
-        XCTAssertFalse(defaultConfiguration.readOnly)
+        XCTAssertFalse(defaultConfiguration.immutable)
         XCTAssertEqual(defaultConfiguration.schemaVersion, 0)
         XCTAssert(defaultConfiguration.migrationBlock == nil)
     }
@@ -42,9 +42,9 @@ class RealmConfigurationTests: TestCase {
 
     func testCannotSetMutuallyExclusiveProperties() {
         var configuration = Realm.Configuration()
-        configuration.readOnly = true
+        configuration.immutable = true
         configuration.deleteRealmIfMigrationNeeded = true
         assertThrows(try! Realm(configuration: configuration),
-                     reason: "Cannot set `deleteRealmIfMigrationNeeded` when `readOnly` is set.")
+                     reason: "Cannot set `deleteRealmIfMigrationNeeded` when `immutable` is set.")
     }
 }

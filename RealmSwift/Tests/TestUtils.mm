@@ -61,7 +61,7 @@ void RLMAssertThrowsWithName(XCTestCase *self, dispatch_block_t block, NSString 
 void RLMAssertThrowsWithReason(XCTestCase *self, dispatch_block_t block, NSString *expected,
                                NSString *message, NSString *fileName, NSUInteger lineNumber) {
     assertThrows(self, block, message, fileName, lineNumber, ^NSString *(NSException *e) {
-        if ([e.reason containsString:expected]) {
+        if ([e.reason rangeOfString:expected].location != NSNotFound) {
             return nil;
         }
         return [NSString stringWithFormat:@"The given expression threw an exception with reason '%@', but expected '%@'",

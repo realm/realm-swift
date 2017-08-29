@@ -32,7 +32,7 @@
     [super viewDidLoad];
 
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.readOnly = YES;
+    config.immutable = YES;
     config.fileURL = [[NSBundle mainBundle] URLForResource:@"Places" withExtension:@"realm"];
     [RLMRealmConfiguration setDefaultConfiguration:config];
 

@@ -506,7 +506,7 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.readOnly = true;
+    config.immutable = true;
     @autoreleasepool {
         XCTAssertThrows([RLMRealm realmWithConfiguration:config error:nil]);
     }
@@ -891,11 +891,11 @@
     CFRunLoopRun();
 }
 
-- (void)testAsyncNotSupportedForReadOnlyRealms {
+- (void)testAsyncNotSupportedForImmutableRealms {
     @autoreleasepool { [RLMRealm defaultRealm]; }
 
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.readOnly = true;
+    config.immutable = true;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
 
     XCTAssertThrows([[IntObject allObjectsInRealm:realm] addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
