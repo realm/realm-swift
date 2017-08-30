@@ -644,6 +644,7 @@ class ListRetrievedTests: ListTests {
     }
 }
 
+#if swift(>=4.0)
 class ListRangeReplaceableCollectionMethodsTests: XCTestCase {
     private func compare(array: [Int], with list: List<SwiftIntObject>) {
         guard array.count == list.count else {
@@ -741,3 +742,4 @@ class ListRangeReplaceableCollectionMethodsTests: XCTestCase {
         compare(array: array, with: list)
     }
 }
+#endif
