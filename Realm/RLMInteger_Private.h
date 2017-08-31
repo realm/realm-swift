@@ -18,8 +18,8 @@
 
 #import "RLMInteger.h"
 
+@class RLMObjectBase, RLMProperty;
+
 @interface RLMInteger ()
-
 - (instancetype)initWithObject:(RLMObjectBase *)obj property:(RLMProperty *)prop;
-
 @end

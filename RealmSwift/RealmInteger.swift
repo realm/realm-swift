@@ -22,12 +22,18 @@ import Realm
 /**
  A `RealmInteger` represents an integer property on an `Object` subclass
  that supports advanced Realm-specific functionality.
+
+ `RealmInteger` properties should be declared as `@objc dynamic`.
  
  You may either work with the APIs of a `RealmInteger` instance, or you may
- directly assign to a `RealmInteger` property on a model object.
+ directly assign to a `RealmInteger` property on a model object. If a
+ `RealmInteger` is directly assigned to, it takes on the integer value of
+ the other `RealmInteger` instance at the time the assignment takes place.
 
  A property of `RealmInteger` type represents a required Realm integer. To
  make the integer optional, define it as a `RealmInteger?`.
+
+ - see: `RLMInteger`
  */
 @objc(RLMSwiftInteger)
 public final class RealmInteger: RLMInteger {
@@ -49,7 +55,8 @@ public final class RealmInteger: RLMInteger {
     }
 
     /**
-     Create a new instance set to the provided numeric value.
+     Create a new instance set to the provided numeric value (or 0 if none
+     is provided).
      */
     public init(value: Int? = 0) {
         if let value = value {
@@ -60,6 +67,7 @@ public final class RealmInteger: RLMInteger {
     }
 }
 
+/// :nodoc:
 extension RealmInteger : ExpressibleByIntegerLiteral {
     public convenience init(integerLiteral value: Int) {
         self.init(value: value)

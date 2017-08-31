@@ -37,6 +37,11 @@ NS_ASSUME_NONNULL_BEGIN
  A `RLMInteger` property normally represents an optional integer; it can be
  defined to represent a required integer by including the property's name in
  the array returned by the model object's `requiredProperties` class method.
+
+ You may either work with the APIs of a `RLMInteger` instance, or you may
+ directly assign to a `RLMInteger` property on a model object. If a
+ `RLMInteger` is directly assigned to, it takes on the integer value of
+ the other `RLMInteger` instance at the time the assignment takes place.
  */
 @interface RLMInteger : RLMOptionalBase
 
@@ -50,6 +55,9 @@ NS_ASSUME_NONNULL_BEGIN
  even if other clients are incrementing the value and pushing their changes
  to a Realm Object Server, as long as the value is not also being set using
  the `value` property.
+
+ @warning If the object the integer belongs to is managed, this method must
+          only be called within a write transaction.
 
  @warning If the value of the integer is nil, an exception will be thrown.
  */
