@@ -407,6 +407,7 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
     if (prop.type == RLMPropertyTypeLinkingObjects) {
         return ^(RLMObjectBase *) { return [RLMResults emptyDetachedResults]; };
     }
+    NSString *propName = prop.name;
     if (prop.subtype == RLMPropertySubtypeInteger) {
         return ^(RLMObjectBase *obj){
             id val = superGet(obj, propName);
@@ -418,7 +419,6 @@ id unmanagedGetter(RLMProperty *prop, const char *) {
         };
     }
     if (prop.array) {
-        NSString *propName = prop.name;
         if (prop.type == RLMPropertyTypeObject) {
             NSString *objectClassName = prop.objectClassName;
             return ^(RLMObjectBase *obj) {
@@ -823,7 +823,7 @@ realm::RowExpr RLMAccessorContext::unbox(__unsafe_unretained id const v, bool cr
 
 bool RLMAccessorContext::is_null(id v) {
     if ([v isKindOfClass:[RLMInteger class]]) {
-        return ![v value];
+        return ![(RLMInteger *)v value];
     }
     return v == NSNull.null;
 }

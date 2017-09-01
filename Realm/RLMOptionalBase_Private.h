@@ -16,12 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMOptionalBase.h"
+#import <Realm/RLMOptionalBase.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObjectBase, RLMProperty;
 
+/// :nodoc:
 @interface RLMOptionalBase ()
 - (instancetype)init;
 @property (nonatomic, weak) RLMObjectBase *object NS_SWIFT_UNAVAILABLE("");

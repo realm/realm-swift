@@ -54,6 +54,9 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSDate              *dateCol;
 @property KVOObject           *objectCol;
 
+@property RLMInteger *realmIntCol;
+@property RLMInteger *realmNullableIntCol;
+
 @property RLMArray<RLMBool>   *boolArray;
 @property RLMArray<RLMInt>    *intArray;
 @property RLMArray<RLMFloat>  *floatArray;
@@ -67,9 +70,6 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSNumber<RLMFloat> *optFloatCol;
 @property NSNumber<RLMDouble> *optDoubleCol;
 @property NSNumber<RLMBool> *optBoolCol;
-
-@property RLMInteger *realmIntCol;
-@property RLMInteger *realmNullableIntCol;
 
 @end
 @implementation KVOObject
@@ -1349,8 +1349,7 @@ public:
     return [KVOObject createInRealm:_realm withValue:@[@(++pk),
                                                        @NO, @1, @2, @3, @0, @0, @NO, @"",
                                                        NSData.data, [NSDate dateWithTimeIntervalSinceReferenceDate:0],
-                                                       NSNull.null, NSNull.null,
-                                                       NSNull.null, NSNull.null, NSNull.null, NSNull.null,
+                                                       [NSNull null],
                                                        @10, @10]];
 }
 

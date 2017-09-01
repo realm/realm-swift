@@ -492,6 +492,8 @@ public class ObjectUtil: NSObject {
             code = .bool
         } else if type is Optional<RealmInteger>.Type {
             code = .int
+        } else if type is RealmInteger.Type {
+            return nil
         } else if child.value is RLMOptionalBase {
             throwRealmException("'\(type)' is not a valid RealmOptional type.")
             code = .int // ignored

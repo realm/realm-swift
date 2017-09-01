@@ -145,13 +145,8 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
         case RLMPropertyTypeDate:
             return [value isKindOfClass:[NSDate class]];
         case RLMPropertyTypeInt:
-            if (property.subtype == RLMPropertySubtypeInteger) {
-                if ([value isKindOfClass:[RLMInteger class]]) {
-                    return YES;
-                } else if (NSNumber *number = RLMDynamicCast<NSNumber>(value)) {
-                    return numberIsInteger(number);
-                }
-                return NO;
+            if ([value isKindOfClass:[RLMInteger class]]) {
+                return YES;
             }
             if (NSNumber *number = RLMDynamicCast<NSNumber>(value)) {
                 return numberIsInteger(number);

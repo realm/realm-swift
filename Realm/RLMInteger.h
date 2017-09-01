@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMOptionalBase.h"
+#import <Realm/RLMOptionalBase.h>
 
 @protocol RLMInt;
 
