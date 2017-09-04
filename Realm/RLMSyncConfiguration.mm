@@ -68,6 +68,7 @@ static BOOL isValidRealmURL(NSURL *url) {
 
 - (instancetype)initWithUser:(RLMSyncUser *)user
                     realmURL:(NSURL *)url
+                     partial:(BOOL)partial
                customFileURL:(nullable NSURL *)customFileURL
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
                 errorHandler:(std::function<realm::SyncSessionErrorHandler>)errorHandler;
@@ -126,6 +127,16 @@ static BOOL isValidRealmURL(NSURL *url) {
 - (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url {
     return [self initWithUser:user
                      realmURL:url
+                      partial:NO
+                customFileURL:nil
+                   stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                 errorHandler:nullptr];
+}
+
+- (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url partial:(BOOL)partial {
+    return [self initWithUser:user
+                     realmURL:url
+                      partial:partial
                 customFileURL:nil
                    stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
                  errorHandler:nullptr];
@@ -133,6 +144,7 @@ static BOOL isValidRealmURL(NSURL *url) {
 
 - (instancetype)initWithUser:(RLMSyncUser *)user
                     realmURL:(NSURL *)url
+                     partial:(BOOL)partial
                customFileURL:(nullable NSURL *)customFileURL
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
                 errorHandler:(std::function<realm::SyncSessionErrorHandler>)errorHandler {
@@ -147,6 +159,12 @@ static BOOL isValidRealmURL(NSURL *url) {
             NSURL *realmURL = [NSURL URLWithString:@(config.realm_url.c_str())];
             NSString *path = [realmURL path];
             REALM_ASSERT(realmURL && path);
+            
+            // Setup partial sync
+            if (partial) {
+                path = [NSString stringWithFormat:@"%@/__partial/%s", path, user->identity().c_str()];
+            }
+            
             RLMSyncSessionRefreshHandle *handle = [[RLMSyncSessionRefreshHandle alloc] initWithRealmURL:realmURL
                                                                                                    user:user
                                                                                                 session:std::move(session)

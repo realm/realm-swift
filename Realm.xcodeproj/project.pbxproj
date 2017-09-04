@@ -455,6 +455,10 @@
 		E8F992BE1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E8F992BD1F1401C100F634B5 /* RLMObjectBase_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E8F992BF1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E8F992BD1F1401C100F634B5 /* RLMObjectBase_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		E8FD2E381D93345100569F10 /* keychain_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A64CA891D8763B400BC0F9B /* keychain_helper.cpp */; };
+		F98AC6A51F576F6500E811A5 /* RLMResults+RLMResults_Sync.h in Headers */ = {isa = PBXBuildFile; fileRef = F98AC6A31F576F6500E811A5 /* RLMResults+RLMResults_Sync.h */; };
+		F98AC6A61F576F6500E811A5 /* RLMResults+RLMResults_Sync.h in Headers */ = {isa = PBXBuildFile; fileRef = F98AC6A31F576F6500E811A5 /* RLMResults+RLMResults_Sync.h */; };
+		F98AC6A71F576F6500E811A5 /* RLMResults+RLMResults_Sync.m in Sources */ = {isa = PBXBuildFile; fileRef = F98AC6A41F576F6500E811A5 /* RLMResults+RLMResults_Sync.m */; };
+		F98AC6A81F576F6500E811A5 /* RLMResults+RLMResults_Sync.m in Sources */ = {isa = PBXBuildFile; fileRef = F98AC6A41F576F6500E811A5 /* RLMResults+RLMResults_Sync.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -930,6 +934,8 @@
 		E8DA16F71E81210D0055141C /* CompactionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CompactionTests.m; sourceTree = "<group>"; };
 		E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftTestObjects.swift; sourceTree = "<group>"; };
 		E8F992BD1F1401C100F634B5 /* RLMObjectBase_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMObjectBase_Private.h; sourceTree = "<group>"; };
+		F98AC6A31F576F6500E811A5 /* RLMResults+RLMResults_Sync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RLMResults+RLMResults_Sync.h"; sourceTree = "<group>"; };
+		F98AC6A41F576F6500E811A5 /* RLMResults+RLMResults_Sync.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "RLMResults+RLMResults_Sync.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1142,6 +1148,8 @@
 				1A84132E1D4BCCE600C5326F /* RLMSyncUtil.mm */,
 				1A1C6E241D3FFCF70077B6E7 /* RLMSyncUtil_Private.h */,
 				1A0512731D87413000806AEC /* RLMSyncUtil_Private.hpp */,
+				F98AC6A31F576F6500E811A5 /* RLMResults+RLMResults_Sync.h */,
+				F98AC6A41F576F6500E811A5 /* RLMResults+RLMResults_Sync.m */,
 			);
 			name = Sync;
 			sourceTree = "<group>";
@@ -1591,6 +1599,7 @@
 				5D659EA71BE04556006515A0 /* RLMAccessor.h in Headers */,
 				5D659EA91BE04556006515A0 /* RLMArray.h in Headers */,
 				5D659EAA1BE04556006515A0 /* RLMArray_Private.h in Headers */,
+				F98AC6A51F576F6500E811A5 /* RLMResults+RLMResults_Sync.h in Headers */,
 				5D659EAB1BE04556006515A0 /* RLMCollection.h in Headers */,
 				5D1BF1FF1EF987AD00B7DC87 /* RLMCollection_Private.h in Headers */,
 				5D659EAC1BE04556006515A0 /* RLMConstants.h in Headers */,
@@ -1695,6 +1704,7 @@
 				1ADE093F1E897EF0008AB1D3 /* RLMSyncPermission.h in Headers */,
 				1A7003111D5270FF00FD9EE3 /* RLMSyncSession.h in Headers */,
 				1ABDCDB11D793012003489E3 /* RLMSyncUser.h in Headers */,
+				F98AC6A61F576F6500E811A5 /* RLMResults+RLMResults_Sync.h in Headers */,
 				1A7DE70B1D3847670029F0AE /* RLMSyncUtil.h in Headers */,
 				E8C6EAF41DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */,
 				3F67DB401E26D6A20024533D /* RLMThreadSafeReference.h in Headers */,
@@ -2264,6 +2274,7 @@
 				5D659E9D1BE04556006515A0 /* shared_realm.cpp in Sources */,
 				1A1536721DB0464800C0EC93 /* sync_file.cpp in Sources */,
 				1A1536581DB045B500C0EC93 /* sync_manager.cpp in Sources */,
+				F98AC6A71F576F6500E811A5 /* RLMResults+RLMResults_Sync.m in Sources */,
 				1A1536741DB0464800C0EC93 /* sync_metadata.cpp in Sources */,
 				1ADE09371E897BCA008AB1D3 /* sync_permission.cpp in Sources */,
 				1A15365C1DB045B500C0EC93 /* sync_session.cpp in Sources */,
@@ -2401,6 +2412,7 @@
 				5DD7559B1BE056DE002800DA /* shared_realm.cpp in Sources */,
 				1A1536761DB0464F00C0EC93 /* sync_file.cpp in Sources */,
 				1A1536631DB045CB00C0EC93 /* sync_manager.cpp in Sources */,
+				F98AC6A81F576F6500E811A5 /* RLMResults+RLMResults_Sync.m in Sources */,
 				1A1536771DB0465400C0EC93 /* sync_metadata.cpp in Sources */,
 				1ADE09391E897BEF008AB1D3 /* sync_permission.cpp in Sources */,
 				1A1536671DB045D200C0EC93 /* sync_session.cpp in Sources */,

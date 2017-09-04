@@ -48,6 +48,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL enableSSLValidation;
 
 /**
+ Whether to open the Realm in partial synchronization mode.
+ 
+ In this mode, the Realm will only synchronize a subset of data from the server.
+ 
+ On first open, the Realm will contain no data. Instead, data will synchronize
+ from the server after registration of a query.
+ 
+ To register a query see RLMResults
+ */
+@property (nonatomic, readonly) BOOL partial;
+
+/**
  Create a sync configuration instance.
 
  @param user    A `RLMSyncUser` that owns the Realm at the given URL.
@@ -57,6 +69,19 @@ NS_ASSUME_NONNULL_BEGIN
                 the user identity by the Realm Object Server.
  */
 - (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url;
+
+/**
+ Create a sync configuration instance.
+ 
+ @param user    A `RLMSyncUser` that owns the Realm at the given URL.
+ @param url     The unresolved absolute URL to the Realm on the Realm Object Server, e.g.
+                `realm://example.org/~/path/to/realm`. "Unresolved" means the path should
+                contain the wildcard marker `~`, which will automatically be filled in with
+                the user identity by the Realm Object Server.
+ @param partial Whether to open the Realm in partial synchronization mode
+ */
+
+- (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url partial:(BOOL)partial;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly")));

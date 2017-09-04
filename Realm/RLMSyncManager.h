@@ -20,7 +20,7 @@
 
 #import "RLMSyncUtil.h"
 
-@class RLMSyncSession;
+@class RLMSyncSession, RLMResults;
 
 /// An enum representing different levels of sync-related logging that can be configured.
 typedef NS_ENUM(NSUInteger, RLMSyncLogLevel) {
@@ -92,8 +92,27 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
  */
 @property (nonatomic) RLMSyncLogLevel logLevel;
 
+/**
+ Retrieve a list of all registered remote queries.
+ 
+ Only works with partial synced Realms
+ 
+ Returns a list of ResultSet objects, where only the `query` and `status` are public
+*/
+@property (nonatomic, readonly) RLMResults<ResultSet> *remoteQueries;
+
 /// The sole instance of the singleton.
 + (instancetype)sharedManager NS_REFINED_FOR_SWIFT;
+
+/**
+ Deletes all the `ResultSet` objects to unregister the remote queries
+ 
+ Must be done in a write transaction
+ 
+ 
+ // `unregister()` method is available on an individual `ResultSets` to remove a single one.
+ */
+- (void)unregisterAllRemoteQueries;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncManager cannot be created directly")));
