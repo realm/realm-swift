@@ -1874,8 +1874,13 @@
 - (void)testAuxiliaryFilesAreExcludedFromBackup {
     @autoreleasepool { [RLMRealm defaultRealm]; }
 
+#if TARGET_OS_TV
+    NSArray *auxiliaryFileExtensions = @[@"management", @"lock"]; // tvOS does not support named pipes
+#else
+    NSArray *auxiliaryFileExtensions = @[@"management", @"lock", @"note"];
+#endif
     NSURL *fileURL = RLMRealmConfiguration.defaultConfiguration.fileURL;
-    for (NSString *pathExtension in @[@"management", @"lock", @"note"]) {
+    for (NSString *pathExtension in auxiliaryFileExtensions) {
         NSNumber *attribute = nil;
         NSError *error = nil;
         BOOL success = [[fileURL URLByAppendingPathExtension:pathExtension] getResourceValue:&attribute forKey:NSURLIsExcludedFromBackupKey error:&error];
@@ -1883,6 +1888,38 @@
         XCTAssertNil(error);
         XCTAssertTrue(attribute.boolValue);
     }
+}
+
+- (void)testAuxiliaryFilesAreExcludedFromBackupPerformance {
+    [self measureBlock:^{
+        @autoreleasepool {
+            RLMRealm *realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+            realm = [RLMRealm defaultRealm];
+        }
+        @autoreleasepool { [RLMRealm defaultRealm]; }
+    }];
+
+//    NSURL *fileURL = RLMRealmConfiguration.defaultConfiguration.fileURL;
+//    for (NSString *pathExtension in @[@"management", @"lock", @"note"]) {
+//        NSNumber *attribute = nil;
+//        NSError *error = nil;
+//        BOOL success = [[fileURL URLByAppendingPathExtension:pathExtension] getResourceValue:&attribute forKey:NSURLIsExcludedFromBackupKey error:&error];
+//        XCTAssertTrue(success);
+//        XCTAssertNil(error);
+//        XCTAssertTrue(attribute.boolValue);
+//    }
 }
 
 @end
