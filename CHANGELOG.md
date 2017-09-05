@@ -13,6 +13,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix more cases where assigning an RLMArray property to itself would clear the
   RLMArray.
+* None.
 
 2.10.0 Release notes (2017-08-21)
 =============================================================
