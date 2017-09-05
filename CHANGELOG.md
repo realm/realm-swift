@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Auxiliary files are excluded from backup by default.
 
 ### Bugfixes
 
