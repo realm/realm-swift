@@ -224,7 +224,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func min<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
         return _rlmArray.min(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -236,7 +236,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
 
      - parameter property: The name of a property whose maximum value is desired.
      */
-    public func max<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
         return _rlmArray.max(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -247,7 +247,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
 
      - parameter property: The name of a property whose values should be summed.
      */
-    public func sum<U: AddableType>(ofProperty property: String) -> U {
+    public func sum<T: AddableType>(ofProperty property: String) -> T {
         return dynamicBridgeCast(fromObjectiveC: _rlmArray.sum(ofProperty: property))
     }
 
@@ -258,7 +258,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
 
      - parameter property: The name of a property whose average value should be calculated.
      */
-    public func average<U: AddableType>(ofProperty property: String) -> U? {
+    public func average<T: AddableType>(ofProperty property: String) -> T? {
         return _rlmArray.average(ofProperty: property).map(dynamicBridgeCast)
     }
 

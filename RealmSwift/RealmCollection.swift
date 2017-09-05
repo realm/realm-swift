@@ -252,7 +252,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    func min<U: MinMaxType>(ofProperty property: String) -> U?
+    func min<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
      Returns the maximum (highest) value of the given property among all the objects in the collection, or `nil` if the
@@ -262,7 +262,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    func max<U: MinMaxType>(ofProperty property: String) -> U?
+    func max<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
     Returns the sum of the given property for objects in the collection, or `nil` if the collection is empty.
@@ -271,7 +271,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
     - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
     */
-    func sum<U: AddableType>(ofProperty property: String) -> U
+    func sum<T: AddableType>(ofProperty property: String) -> T
 
     /**
      Returns the sum of the values of a given property over all the objects in the collection.
@@ -280,7 +280,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter property: The name of a property whose values should be summed.
      */
-    func average<U: AddableType>(ofProperty property: String) -> U?
+    func average<T: AddableType>(ofProperty property: String) -> T?
 
 
     // MARK: Key-Value Coding
@@ -390,10 +390,10 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
-    func min<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
-    func max<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
-    func sum<U: AddableType>(ofProperty property: String) -> U { fatalError() }
-    func average<U: AddableType>(ofProperty property: String) -> U? { fatalError() }
+    func min<T: MinMaxType>(ofProperty property: String) -> T? { fatalError() }
+    func max<T: MinMaxType>(ofProperty property: String) -> T? { fatalError() }
+    func sum<T: AddableType>(ofProperty property: String) -> T { fatalError() }
+    func average<T: AddableType>(ofProperty property: String) -> T? { fatalError() }
     subscript(position: Int) -> Element { fatalError() }
     func makeIterator() -> RLMIterator<T> { fatalError() }
     var startIndex: Int { fatalError() }
@@ -453,19 +453,19 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     // MARK: Aggregate Operations
 
-    override func min<U: MinMaxType>(ofProperty property: String) -> U? {
+    override func min<T: MinMaxType>(ofProperty property: String) -> T? {
         return base.min(ofProperty: property)
     }
 
-    override func max<U: MinMaxType>(ofProperty property: String) -> U? {
+    override func max<T: MinMaxType>(ofProperty property: String) -> T? {
         return base.max(ofProperty: property)
     }
 
-    override func sum<U: AddableType>(ofProperty property: String) -> U {
+    override func sum<T: AddableType>(ofProperty property: String) -> T {
         return base.sum(ofProperty: property)
     }
 
-    override func average<U: AddableType>(ofProperty property: String) -> U? {
+    override func average<T: AddableType>(ofProperty property: String) -> T? {
         return base.average(ofProperty: property)
     }
 
@@ -660,7 +660,7 @@ public final class AnyRealmCollection<Element: RealmCollectionValue>: RealmColle
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func min<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
         return base.min(ofProperty: property)
     }
 
@@ -672,7 +672,7 @@ public final class AnyRealmCollection<Element: RealmCollectionValue>: RealmColle
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func max<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
         return base.max(ofProperty: property)
     }
 
@@ -683,7 +683,7 @@ public final class AnyRealmCollection<Element: RealmCollectionValue>: RealmColle
 
      - parameter property: The name of a property whose values should be summed.
      */
-    public func sum<U: AddableType>(ofProperty property: String) -> U { return base.sum(ofProperty: property) }
+    public func sum<T: AddableType>(ofProperty property: String) -> T { return base.sum(ofProperty: property) }
 
     /**
      Returns the average value of a given property over all the objects in the collection, or `nil` if the collection is
@@ -693,7 +693,7 @@ public final class AnyRealmCollection<Element: RealmCollectionValue>: RealmColle
 
      - parameter property: The name of a property whose average value should be calculated.
      */
-    public func average<U: AddableType>(ofProperty property: String) -> U? { return base.average(ofProperty: property) }
+    public func average<T: AddableType>(ofProperty property: String) -> T? { return base.average(ofProperty: property) }
 
 
     // MARK: Sequence Support

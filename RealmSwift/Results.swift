@@ -261,7 +261,7 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func min<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
         return rlmResults.min(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -272,7 +272,7 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func max<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
         return rlmResults.max(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -283,7 +283,7 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
 
      - parameter property: The name of a property whose values should be summed.
      */
-    public func sum<U: AddableType>(ofProperty property: String) -> U {
+    public func sum<T: AddableType>(ofProperty property: String) -> T {
         return dynamicBridgeCast(fromObjectiveC: rlmResults.sum(ofProperty: property))
     }
 
@@ -294,7 +294,7 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
 
      - parameter property: The name of a property whose average value should be calculated.
      */
-    public func average<U: AddableType>(ofProperty property: String) -> U? {
+    public func average<T: AddableType>(ofProperty property: String) -> T? {
         return rlmResults.average(ofProperty: property).map(dynamicBridgeCast)
     }
 
