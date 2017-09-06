@@ -47,14 +47,11 @@ public class ListBase: RLMListBase {
  Unlike Swift's native collections, `List`s are reference types, and are only immutable if the Realm that manages them
  is opened as read-only.
 
- Lists can be filtered and sorted with the same predicates as `Results<T>`.
+ Lists can be filtered and sorted with the same predicates as `Results<Element>`.
 
  Properties of `List` type defined on `Object` subclasses must be declared as `let` and cannot be `dynamic`.
  */
-public final class List<T: RealmCollectionValue>: ListBase {
-
-    /// The type of the elements contained within the collection.
-    public typealias Element = T
+public final class List<Element: RealmCollectionValue>: ListBase {
 
     // MARK: Properties
 
@@ -68,9 +65,9 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
     // MARK: Initializers
 
-    /// Creates a `List` that holds Realm model objects of type `T`.
+    /// Creates a `List` that holds Realm model objects of type `Element`.
     public override init() {
-        super.init(array: RLMArray(objectClassName: T.className()))
+        super.init(array: RLMArray(objectClassName: Element.className()))
     }
 
     internal init(rlmArray: RLMArray<AnyObject>) {
@@ -84,7 +81,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - parameter object: An object to find.
      */
-    public func index(of object: T) -> Int? {
+    public func index(of object: Element) -> Int? {
         return notFoundToNil(index: _rlmArray.index(of: object as AnyObject))
     }
 
@@ -115,10 +112,10 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - parameter index: The index of the object to retrieve or replace.
      */
-    public subscript(position: Int) -> T {
+    public subscript(position: Int) -> Element {
         get {
             throwForNegativeIndex(position)
-            return cast(_rlmArray.object(at: UInt(position)), to: T.self)
+            return cast(_rlmArray.object(at: UInt(position)), to: Element.self)
         }
         set {
             throwForNegativeIndex(position)
@@ -127,10 +124,10 @@ public final class List<T: RealmCollectionValue>: ListBase {
     }
 
     /// Returns the first object in the list, or `nil` if the list is empty.
-    public var first: T? { return cast(_rlmArray.firstObject(), to: Optional<T>.self) }
+    public var first: Element? { return cast(_rlmArray.firstObject(), to: Optional<Element>.self) }
 
     /// Returns the last object in the list, or `nil` if the list is empty.
-    public var last: T? { return cast(_rlmArray.lastObject(), to: Optional<T>.self) }
+    public var last: Element? { return cast(_rlmArray.lastObject(), to: Optional<Element>.self) }
 
     // MARK: KVC
 
@@ -171,8 +168,8 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
     */
-    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> {
-        return Results<T>(_rlmArray.objects(with: NSPredicate(format: predicateFormat,
+    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
+        return Results<Element>(_rlmArray.objects(with: NSPredicate(format: predicateFormat,
                                                               argumentArray: unwrapOptionals(in: args))))
     }
 
@@ -181,8 +178,8 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - parameter predicate: The predicate with which to filter the objects.
      */
-    public func filter(_ predicate: NSPredicate) -> Results<T> {
-        return Results<T>(_rlmArray.objects(with: predicate))
+    public func filter(_ predicate: NSPredicate) -> Results<Element> {
+        return Results<Element>(_rlmArray.objects(with: predicate))
     }
 
     // MARK: Sorting
@@ -200,7 +197,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
      - parameter keyPath:  The key path to sort by.
      - parameter ascending: The direction to sort in.
      */
-    public func sorted(byKeyPath keyPath: String, ascending: Bool = true) -> Results<T> {
+    public func sorted(byKeyPath keyPath: String, ascending: Bool = true) -> Results<Element> {
         return sorted(by: [SortDescriptor(keyPath: keyPath, ascending: ascending)])
     }
 
@@ -212,8 +209,9 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - see: `sorted(byKeyPath:ascending:)`
     */
-    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
-        return Results<T>(_rlmArray.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
+    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element>
+        where S.Iterator.Element == SortDescriptor {
+            return Results<Element>(_rlmArray.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Aggregate Operations
@@ -226,7 +224,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func min<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
         return _rlmArray.min(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -238,7 +236,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - parameter property: The name of a property whose maximum value is desired.
      */
-    public func max<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
         return _rlmArray.max(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -249,7 +247,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - parameter property: The name of a property whose values should be summed.
      */
-    public func sum<U: AddableType>(ofProperty property: String) -> U {
+    public func sum<T: AddableType>(ofProperty property: String) -> T {
         return dynamicBridgeCast(fromObjectiveC: _rlmArray.sum(ofProperty: property))
     }
 
@@ -260,7 +258,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - parameter property: The name of a property whose average value should be calculated.
      */
-    public func average<U: AddableType>(ofProperty property: String) -> U? {
+    public func average<T: AddableType>(ofProperty property: String) -> T? {
         return _rlmArray.average(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -276,7 +274,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - parameter object: An object.
      */
-    public func append(_ object: T) {
+    public func append(_ object: Element) {
         _rlmArray.add(object as AnyObject)
     }
 
@@ -285,7 +283,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
 
      - warning: This method may only be called during a write transaction.
     */
-    public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == T {
+    public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element {
         for obj in objects {
             _rlmArray.add(obj as AnyObject)
         }
@@ -301,7 +299,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
      - parameter object: An object.
      - parameter index:  The index at which to insert the object.
      */
-    public func insert(_ object: T, at index: Int) {
+    public func insert(_ object: Element, at index: Int) {
         throwForNegativeIndex(index)
         _rlmArray.insert(object as AnyObject, at: UInt(index))
     }
@@ -350,7 +348,7 @@ public final class List<T: RealmCollectionValue>: ListBase {
      - parameter index:  The index of the object to be replaced.
      - parameter object: An object.
      */
-    public func replace(index: Int, object: T) {
+    public func replace(index: Int, object: Element) {
         throwForNegativeIndex(index)
         _rlmArray.replaceObject(at: UInt(index), with: object as AnyObject)
     }
@@ -452,10 +450,13 @@ public final class List<T: RealmCollectionValue>: ListBase {
 }
 
 extension List: RealmCollection, RangeReplaceableCollection {
+    /// The type of the objects stored within the list.
+    public typealias ElementType = Element
+
     // MARK: Sequence Support
 
     /// Returns a `RLMIterator` that yields successive elements in the `List`.
-    public func makeIterator() -> RLMIterator<T> {
+    public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: _rlmArray)
     }
 
@@ -476,17 +477,17 @@ extension List: RealmCollection, RangeReplaceableCollection {
     /**
      Replace the given `subRange` of elements with `newElements`.
 
-    - parameter subrange:    The range of elements to be replaced.
-    - parameter newElements: The new elements to be inserted into the List.
-    */
+     - parameter subrange:    The range of elements to be replaced.
+     - parameter newElements: The new elements to be inserted into the List.
+     */
     public func replaceSubrange<C: Collection>(_ subrange: Range<Int>, with newElements: C)
-        where C.Iterator.Element == T {
-        for _ in subrange.lowerBound..<subrange.upperBound {
-            remove(at: subrange.lowerBound)
-        }
-        for x in newElements.reversed() {
-            insert(x, at: subrange.lowerBound)
-        }
+        where C.Iterator.Element == Element {
+            for _ in subrange.lowerBound..<subrange.upperBound {
+                remove(at: subrange.lowerBound)
+            }
+            for x in newElements.reversed() {
+                insert(x, at: subrange.lowerBound)
+            }
     }
 
     // This should be inferred, but Xcode 8.1 is unable to
@@ -506,7 +507,7 @@ extension List: RealmCollection, RangeReplaceableCollection {
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
-    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) ->
         NotificationToken {
         let anyCollection = AnyRealmCollection(self)
         return _rlmArray.addNotificationBlock { _, change, error in

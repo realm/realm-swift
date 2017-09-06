@@ -61,7 +61,7 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
  `LinkingObjects` is an auto-updating container type. It represents zero or more objects that are linked to its owning
  model object through a property relationship.
 
- `LinkingObjects` can be queried with the same predicates as `List<T>` and `Results<T>`.
+ `LinkingObjects` can be queried with the same predicates as `List<Element>` and `Results<Element>`.
 
  `LinkingObjects` always reflects the current state of the Realm on the current thread, including during write
  transactions on the current thread. The one exception to this is when using `for...in` enumeration, which will always
@@ -71,9 +71,9 @@ public class LinkingObjectsBase: NSObject, NSFastEnumeration {
  `LinkingObjects` can only be used as a property on `Object` models. Properties of this type must be declared as `let`
  and cannot be `dynamic`.
  */
-public final class LinkingObjects<T: Object>: LinkingObjectsBase {
+public final class LinkingObjects<Element: Object>: LinkingObjectsBase {
     /// The type of the objects represented by the linking objects.
-    public typealias Element = T
+    public typealias ElementType = Element
 
     // MARK: Properties
 
@@ -99,8 +99,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter type:         The type of the object owning the property the linking objects should refer to.
      - parameter propertyName: The property name of the property the linking objects should refer to.
      */
-    public init(fromType type: T.Type, property propertyName: String) {
-        let className = (T.self as Object.Type).className()
+    public init(fromType type: Element.Type, property propertyName: String) {
+        let className = (Element.self as Object.Type).className()
         super.init(fromClassName: className, property: propertyName)
     }
 
@@ -116,7 +116,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter object: The object whose index is being queried.
      */
-    public func index(of object: T) -> Int? {
+    public func index(of object: Element) -> Int? {
         return notFoundToNil(index: rlmResults.index(of: object.unsafeCastToRLMObject()))
     }
 
@@ -146,18 +146,18 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter index: The index.
      */
-    public subscript(index: Int) -> T {
+    public subscript(index: Int) -> Element {
         get {
             throwForNegativeIndex(index)
-            return unsafeBitCast(rlmResults[UInt(index)], to: T.self)
+            return unsafeBitCast(rlmResults[UInt(index)], to: Element.self)
         }
     }
 
     /// Returns the first object in the linking objects, or `nil` if the linking objects are empty.
-    public var first: T? { return unsafeBitCast(rlmResults.firstObject(), to: Optional<T>.self) }
+    public var first: Element? { return unsafeBitCast(rlmResults.firstObject(), to: Optional<Element>.self) }
 
     /// Returns the last object in the linking objects, or `nil` if the linking objects are empty.
-    public var last: T? { return unsafeBitCast(rlmResults.lastObject(), to: Optional<T>.self) }
+    public var last: Element? { return unsafeBitCast(rlmResults.lastObject(), to: Optional<Element>.self) }
 
     // MARK: KVC
 
@@ -199,9 +199,9 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
-    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> {
-        return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat,
-                                                               argumentArray: unwrapOptionals(in: args))))
+    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
+        return Results(rlmResults.objects(with: NSPredicate(format: predicateFormat,
+                                                            argumentArray: unwrapOptionals(in: args))))
     }
 
     /**
@@ -209,8 +209,8 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter predicate: The predicate with which to filter the objects.
      */
-    public func filter(_ predicate: NSPredicate) -> Results<T> {
-        return Results<T>(rlmResults.objects(with: predicate))
+    public func filter(_ predicate: NSPredicate) -> Results<Element> {
+        return Results(rlmResults.objects(with: predicate))
     }
 
     // MARK: Sorting
@@ -228,7 +228,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
      - parameter keyPath:  The key path to sort by.
      - parameter ascending: The direction to sort in.
      */
-    public func sorted(byKeyPath keyPath: String, ascending: Bool = true) -> Results<T> {
+    public func sorted(byKeyPath keyPath: String, ascending: Bool = true) -> Results<Element> {
         return sorted(by: [SortDescriptor(keyPath: keyPath, ascending: ascending)])
     }
 
@@ -242,8 +242,9 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
-    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
-        return Results<T>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
+    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element>
+        where S.Iterator.Element == SortDescriptor {
+            return Results(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Aggregate Operations
@@ -256,7 +257,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func min<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
         return rlmResults.min(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -268,7 +269,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func max<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
         return rlmResults.max(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -279,7 +280,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter property: The name of a property whose values should be summed.
      */
-    public func sum<U: AddableType>(ofProperty property: String) -> U {
+    public func sum<T: AddableType>(ofProperty property: String) -> T {
         return dynamicBridgeCast(fromObjectiveC: rlmResults.sum(ofProperty: property))
     }
 
@@ -291,7 +292,7 @@ public final class LinkingObjects<T: Object>: LinkingObjectsBase {
 
      - parameter property: The name of a property whose average value should be calculated.
      */
-    public func average<U: AddableType>(ofProperty property: String) -> U? {
+    public func average<T: AddableType>(ofProperty property: String) -> T? {
         return rlmResults.average(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -363,7 +364,7 @@ extension LinkingObjects : RealmCollection {
     // MARK: Sequence Support
 
     /// Returns an iterator that yields successive elements in the linking objects.
-    public func makeIterator() -> RLMIterator<T> {
+    public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: rlmResults)
     }
 
@@ -387,7 +388,7 @@ extension LinkingObjects : RealmCollection {
     }
 
     /// :nodoc:
-    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) ->
         NotificationToken {
             let anyCollection = AnyRealmCollection(self)
             return rlmResults.addNotificationBlock { _, change, error in
@@ -402,7 +403,7 @@ extension LinkingObjects: AssistedObjectiveCBridgeable {
     internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> LinkingObjects {
         guard let metadata = metadata as? LinkingObjectsBridgingMetadata else { preconditionFailure() }
 
-        let swiftValue = LinkingObjects(fromType: T.self, property: metadata.propertyName)
+        let swiftValue = LinkingObjects(fromType: Element.self, property: metadata.propertyName)
         switch (objectiveCValue, metadata) {
         case (let object as RLMObjectBase, .uncached(let property)):
             swiftValue.object = RLMWeakObjectHandle(object: object)

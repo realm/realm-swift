@@ -737,14 +737,15 @@ extension SortDescriptor {
 }
 
 #if swift(>=3.1)
-extension Results where T == SyncPermission {
+extension Results where Element == SyncPermission {
     /**
      Return a `Results<SyncPermissionValue>` containing the objects represented
      by the results, but sorted on the specified property.
 
      - see: `sorted(byKeyPath:, ascending:)`
      */
-    public func sorted(bySortProperty sortProperty: SyncPermissionSortProperty, ascending: Bool = true) -> Results<T> {
+    public func sorted(bySortProperty sortProperty: SyncPermissionSortProperty,
+                       ascending: Bool = true) -> Results<Element> {
         return sorted(by: [SortDescriptor(sortProperty: sortProperty, ascending: ascending)])
     }
 }
