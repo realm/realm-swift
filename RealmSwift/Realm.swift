@@ -89,7 +89,7 @@ public final class Realm {
      */
     public convenience init(fileURL: URL) throws {
         var configuration = Configuration.defaultConfiguration
-        configuration.fileURL = fileURL
+        configuration.kind = .file(fileURL)
         try self.init(configuration: configuration)
     }
 

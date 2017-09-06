@@ -62,7 +62,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
 
         // copy over old data files for migration
-        let defaultURL = Realm.Configuration.defaultConfiguration.fileURL!
+        var defaultURL: URL!
+        if case let .file(url) = Realm.Configuration.defaultConfiguration.kind {
+            defaultURL = url
+        }
         let defaultParentURL = defaultURL.deletingLastPathComponent()
 
         if let v0URL = bundleURL("default-v0") {
@@ -112,8 +115,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let realmv1URL = defaultParentURL.appendingPathComponent("default-v1.realm")
             let realmv2URL = defaultParentURL.appendingPathComponent("default-v2.realm")
 
-            let realmv1Configuration = Realm.Configuration(fileURL: realmv1URL, schemaVersion: 2, migrationBlock: migrationBlock)
-            let realmv2Configuration = Realm.Configuration(fileURL: realmv2URL, schemaVersion: 3, migrationBlock: migrationBlock)
+            let realmv1Configuration = Realm.Configuration(kind: .file(realmv1URL), schemaVersion: 2, migrationBlock: migrationBlock)
+            let realmv2Configuration = Realm.Configuration(kind: .file(realmv2URL), schemaVersion: 3, migrationBlock: migrationBlock)
 
             do {
                 try FileManager.default.removeItem(at: realmv1URL)

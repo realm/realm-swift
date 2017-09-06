@@ -24,8 +24,7 @@ class RealmConfigurationTests: TestCase {
     func testDefaultConfiguration() {
         let defaultConfiguration = Realm.Configuration.defaultConfiguration
 
-        XCTAssertEqual(defaultConfiguration.fileURL, try! Realm().configuration.fileURL)
-        XCTAssertNil(defaultConfiguration.inMemoryIdentifier)
+        XCTAssertEqual(defaultConfiguration.kind, try! Realm().configuration.kind)
         XCTAssertNil(defaultConfiguration.encryptionKey)
         XCTAssertFalse(defaultConfiguration.readOnly)
         XCTAssertEqual(defaultConfiguration.schemaVersion, 0)
@@ -33,11 +32,17 @@ class RealmConfigurationTests: TestCase {
     }
 
     func testSetDefaultConfiguration() {
-        let fileURL = Realm.Configuration.defaultConfiguration.fileURL
-        let configuration = Realm.Configuration(fileURL: URL(fileURLWithPath: "/dev/null"))
+        let kind = Realm.Configuration.defaultConfiguration.kind
+        let configuration = Realm.Configuration(kind: .file(URL(fileURLWithPath: "/dev/null")))
         Realm.Configuration.defaultConfiguration = configuration
-        XCTAssertEqual(Realm.Configuration.defaultConfiguration.fileURL, URL(fileURLWithPath: "/dev/null"))
-        Realm.Configuration.defaultConfiguration.fileURL = fileURL
+        var newURL: URL?
+        if case let .file(url) = Realm.Configuration.defaultConfiguration.kind {
+            newURL = url
+        } else {
+            XCTFail("Setting the default configuration's kind should work properly.")
+        }
+        XCTAssertEqual(newURL, URL(fileURLWithPath: "/dev/null"))
+        Realm.Configuration.defaultConfiguration.kind = kind
     }
 
     func testCannotSetMutuallyExclusiveProperties() {
@@ -46,5 +51,35 @@ class RealmConfigurationTests: TestCase {
         configuration.deleteRealmIfMigrationNeeded = true
         assertThrows(try! Realm(configuration: configuration),
                      reason: "Cannot set `deleteRealmIfMigrationNeeded` when `readOnly` is set.")
+    }
+
+    func testConfigurationCreationWithPath() {
+        let fileURL = URL(fileURLWithPath: "/tmp/1234")
+        let configuration1 = Realm.Configuration(kind: .file(fileURL))
+        if case let .file(url) = configuration1.kind {
+            XCTAssertEqual(url, fileURL)
+        } else {
+            XCTFail("A configuration was created with kind 'file', but the kind was stored incorrectly")
+        }
+        // Check equality
+        let configuration2 = Realm.Configuration(kind: .file(fileURL))
+        XCTAssertEqual(configuration1.kind, configuration2.kind)
+        let badConfig = Realm.Configuration(kind: .file(URL(fileURLWithPath: "/tmp/5678")))
+        XCTAssertNotEqual(configuration1.kind, badConfig.kind)
+    }
+
+    func testConfigurationCreationWithIdentifier() {
+        let expectedIdentifier = "123456"
+        let configuration1 = Realm.Configuration(kind: .inMemory(expectedIdentifier))
+        if case let .inMemory(identifier) = configuration1.kind {
+            XCTAssertEqual(identifier, expectedIdentifier)
+        } else {
+            XCTFail("A configuration was created with kind 'inMemory', but the kind was stored incorrectly")
+        }
+        // Check equality
+        let configuration2 = Realm.Configuration(kind: .inMemory(expectedIdentifier))
+        XCTAssertEqual(configuration1.kind, configuration2.kind)
+        let badConfig = Realm.Configuration(kind: .inMemory("7890"))
+        XCTAssertNotEqual(configuration1.kind, badConfig.kind)
     }
 }

@@ -57,7 +57,7 @@ class MigrationTests: TestCase {
     private func migrateAndTestRealm(_ fileURL: URL, shouldRun: Bool = true, schemaVersion: UInt64 = 1,
                                      autoMigration: Bool = false, block: MigrationBlock? = nil) {
         var didRun = false
-        let config = Realm.Configuration(fileURL: fileURL, schemaVersion: schemaVersion,
+        let config = Realm.Configuration(kind: .file(fileURL), schemaVersion: schemaVersion,
             migrationBlock: { migration, oldSchemaVersion in
                 if let block = block {
                     block(migration, oldSchemaVersion)
@@ -79,7 +79,7 @@ class MigrationTests: TestCase {
 
     private func migrateAndTestDefaultRealm(_ schemaVersion: UInt64 = 1, block: @escaping MigrationBlock) {
         migrateAndTestRealm(defaultRealmURL(), schemaVersion: schemaVersion, block: block)
-        let config = Realm.Configuration(fileURL: defaultRealmURL(),
+        let config = Realm.Configuration(kind: .file(defaultRealmURL()),
                                          schemaVersion: schemaVersion)
         Realm.Configuration.defaultConfiguration = config
     }
@@ -90,7 +90,7 @@ class MigrationTests: TestCase {
         createAndTestRealmAtURL(defaultRealmURL())
 
         var didRun = false
-        let config = Realm.Configuration(fileURL: defaultRealmURL(), schemaVersion: 1,
+        let config = Realm.Configuration(kind: .file(defaultRealmURL()), schemaVersion: 1,
                                          migrationBlock: { _, _ in didRun = true })
         Realm.Configuration.defaultConfiguration = config
 
@@ -560,7 +560,7 @@ class MigrationTests: TestCase {
             realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftEmployeeObject", properties: [prop])
         }
 
-        let config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
+        let config = Realm.Configuration(kind: .file(defaultRealmURL()), objectTypes: [SwiftEmployeeObject.self])
         autoreleasepool {
             assertFails(.schemaMismatch) {
                 try Realm(configuration: config)
@@ -575,7 +575,7 @@ class MigrationTests: TestCase {
             realmWithSingleClassProperties(defaultRealmURL(), className: "SwiftEmployeeObject", properties: [prop])
         }
 
-        var config = Realm.Configuration(fileURL: defaultRealmURL(), objectTypes: [SwiftEmployeeObject.self])
+        var config = Realm.Configuration(kind: .file(defaultRealmURL()), objectTypes: [SwiftEmployeeObject.self])
         config.migrationBlock = { _, _ in
             XCTFail("Migration block should not be called")
         }
@@ -589,7 +589,7 @@ class MigrationTests: TestCase {
     }
 
     func testDeleteRealmIfMigrationNeeded() {
-        autoreleasepool { _ = try! Realm(configuration: Realm.Configuration(fileURL: defaultRealmURL())) }
+        autoreleasepool { _ = try! Realm(configuration: Realm.Configuration(kind: .file(defaultRealmURL()))) }
 
         let objectSchema = RLMObjectSchema(forObjectClass: SwiftEmployeeObject.self)
         objectSchema.properties = Array(objectSchema.properties[0..<1])
@@ -613,7 +613,7 @@ class MigrationTests: TestCase {
         let migrationBlock: MigrationBlock = { _, _ in
             XCTFail("Migration block should not be called")
         }
-        let config = Realm.Configuration(fileURL: defaultRealmURL(),
+        let config = Realm.Configuration(kind: .file(defaultRealmURL()),
                                          migrationBlock: migrationBlock,
                                          deleteRealmIfMigrationNeeded: true)
 

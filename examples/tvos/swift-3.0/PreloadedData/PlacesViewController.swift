@@ -28,7 +28,7 @@ class PlacesViewController: UITableViewController, UITextFieldDelegate {
         super.viewDidLoad()
 
         let seedFileURL = Bundle.main.url(forResource: "Places", withExtension: "realm")
-        let config = Realm.Configuration(fileURL: seedFileURL, readOnly: true)
+        let config = Realm.Configuration(kind: .file(seedFileURL!), readOnly: true)
         Realm.Configuration.defaultConfiguration = config
 
         reloadData()
