@@ -422,6 +422,229 @@ extension Results: AssistedObjectiveCBridgeable {
     }
 }
 
+#if swift(>=4)
+// MARK: Typesafe Queries
+public protocol RealmPropertyType {
+    var _object: AnyObject { get }
+}
+
+public protocol RealmEquatablePropertyType: RealmPropertyType {}
+public protocol RealmComparablePropertyType: RealmEquatablePropertyType {}
+
+extension Results {
+    public func filter<P: Predicate>(_ expression: @autoclosure () -> P) -> Results<T> where P.ObjectType == T {
+        return filter(expression().predicate)
+    }
+
+    public func sorted<RealmObject: Object, RealmProperty: RealmPropertyType>(byKeyPath keyPath: KeyPath<RealmObject, RealmProperty>, ascending: Bool = true) -> Results<T> {
+        return sorted(by: [SortDescriptor(keyPath: keyPath._kvcKeyPathString!, ascending: ascending)])
+    }
+
+    public func sorted<RealmObject: Object, RealmProperty: RealmPropertyType>(byKeyPath keyPath: KeyPath<RealmObject, RealmProperty?>, ascending: Bool = true) -> Results<T> {
+        return sorted(by: [SortDescriptor(keyPath: keyPath._kvcKeyPathString!, ascending: ascending)])
+    }
+}
+
+extension Bool: RealmEquatablePropertyType {
+    public var _object: AnyObject { return NSNumber(value: self) }
+}
+extension Int: RealmComparablePropertyType {
+    public var _object: AnyObject { return NSNumber(value: self) }
+}
+extension Int8: RealmComparablePropertyType {
+    public var _object: AnyObject { return NSNumber(value: self) }
+}
+extension Int16: RealmComparablePropertyType {
+    public var _object: AnyObject { return NSNumber(value: self) }
+}
+extension Int32: RealmComparablePropertyType {
+    public var _object: AnyObject { return NSNumber(value: self) }
+}
+extension Int64: RealmComparablePropertyType {
+    public var _object: AnyObject { return NSNumber(value: self) }
+}
+extension Float: RealmComparablePropertyType {
+    public var _object: AnyObject { return NSNumber(value: self) }
+}
+extension Double: RealmComparablePropertyType {
+    public var _object: AnyObject { return NSNumber(value: self) }
+}
+extension Date: RealmComparablePropertyType {
+    public var _object: AnyObject { return self as NSDate }
+}
+extension NSDate: RealmComparablePropertyType {
+    public var _object: AnyObject { return self }
+}
+
+extension String: RealmEquatablePropertyType {
+    public var _object: AnyObject { return self as NSString }
+}
+extension NSString: RealmEquatablePropertyType {
+    public var _object: AnyObject { return self as NSString }
+}
+extension Data: RealmEquatablePropertyType {
+    public var _object: AnyObject { return self as NSData }
+}
+extension NSData: RealmEquatablePropertyType {
+    public var _object: AnyObject { return self }
+}
+
+public protocol Predicate {
+    associatedtype ObjectType
+    var predicate: NSPredicate { get }
+}
+
+public struct BasicPredicate<RealmObject>: Predicate {
+    public typealias ObjectType = RealmObject
+
+    let format: String
+    let arguments: [AnyObject]
+
+    public var predicate: NSPredicate {
+        return NSPredicate(format: format, argumentArray: arguments)
+    }
+}
+
+public struct AndPredicate<RealmObject>: Predicate {
+    public typealias ObjectType = RealmObject
+
+    let left: BasicPredicate<RealmObject>
+    let right: BasicPredicate<RealmObject>
+
+    public var predicate: NSPredicate {
+        return NSCompoundPredicate(type: .and, subpredicates: [left.predicate, right.predicate])
+    }
+}
+
+public struct OrPredicate<RealmObject>: Predicate {
+    public typealias ObjectType = RealmObject
+
+    let left: BasicPredicate<RealmObject>
+    let right: BasicPredicate<RealmObject>
+
+    public var predicate: NSPredicate {
+        return NSCompoundPredicate(type: .or, subpredicates: [left.predicate, right.predicate])
+    }
+}
+
+public struct NotPredicate<RealmObject>: Predicate {
+    public typealias ObjectType = RealmObject
+
+    let original: BasicPredicate<RealmObject>
+
+    public var predicate: NSPredicate {
+        return NSCompoundPredicate(notPredicateWithSubpredicate: original.predicate)
+    }
+}
+
+// MARK: Logical Operators
+public func && <RealmObject: Object>(lhs: BasicPredicate<RealmObject>, rhs: BasicPredicate<RealmObject>) -> AndPredicate<RealmObject> {
+    return AndPredicate(left: lhs, right: rhs)
+}
+
+public func || <RealmObject: Object>(lhs: BasicPredicate<RealmObject>, rhs: BasicPredicate<RealmObject>) -> OrPredicate<RealmObject> {
+    return OrPredicate(left: lhs, right: rhs)
+}
+
+public prefix func ! <RealmObject: Object>(predicate: BasicPredicate<RealmObject>) -> NotPredicate<RealmObject> {
+    return NotPredicate(original: predicate)
+}
+
+// MARK: RealmEquatablePropertyType
+
+public func == <RealmObject: Object, RealmProperty: RealmEquatablePropertyType>(lhs: KeyPath<RealmObject, RealmProperty>, rhs: RealmProperty) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K == %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs._object])
+}
+
+public func != <RealmObject: Object, RealmProperty: RealmEquatablePropertyType>(lhs: KeyPath<RealmObject, RealmProperty>, rhs: RealmProperty) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K != %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs._object])
+}
+
+// MARK: Optional<RealmEquatablePropertyType>
+public func == <RealmObject: Object, RealmProperty: RealmEquatablePropertyType>(lhs: KeyPath<RealmObject, RealmProperty?>, rhs: RealmProperty?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K == %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs?._object ?? NSNull()])
+}
+
+public func != <RealmObject: Object, RealmProperty: RealmEquatablePropertyType>(lhs: KeyPath<RealmObject, RealmProperty?>, rhs: RealmProperty?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K != %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs?._object ?? NSNull()])
+}
+
+// `_kvcKeyPathString` returns `nil` if non-objc property
+/*
+// MARK: RealmOptional<RealmEquatablePropertyType>
+public func == <RealmObject: Object, RealmProperty: RealmEquatablePropertyType>(lhs: KeyPath<RealmObject, RealmOptional<RealmProperty>>, rhs: RealmProperty?) -> BasicPredicate<RealmObject> {
+    dump(lhs)
+//    print(lhs._kvcKeyPathString)
+    return BasicPredicate<RealmObject>(format: "%K == %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs?._object ?? NSNull()])
+}
+
+public func != <RealmObject: Object, RealmProperty: RealmEquatablePropertyType>(lhs: KeyPath<RealmObject, RealmOptional<RealmProperty>>, rhs: RealmProperty?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K != %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs?._object ?? NSNull()])
+}
+*/
+
+// MARK: RealmComparablePropertyType
+public func < <RealmObject: Object, RealmProperty: RealmComparablePropertyType>(lhs: KeyPath<RealmObject, RealmProperty>, rhs: RealmProperty) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K < %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs._object])
+}
+
+public func > <RealmObject: Object, RealmProperty: RealmComparablePropertyType>(lhs: KeyPath<RealmObject, RealmProperty>, rhs: RealmProperty) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K > %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs._object])
+}
+
+public func <= <RealmObject: Object, RealmProperty: RealmComparablePropertyType>(lhs: KeyPath<RealmObject, RealmProperty>, rhs: RealmProperty) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K <= %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs._object])
+}
+
+public func >= <RealmObject: Object, RealmProperty: RealmComparablePropertyType>(lhs: KeyPath<RealmObject, RealmProperty>, rhs: RealmProperty) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K >= %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs._object])
+}
+
+// MARK: Optional<RealmComparablePropertyType>
+public func < <RealmObject: Object, RealmProperty: RealmComparablePropertyType>(lhs: KeyPath<RealmObject, RealmProperty?>, rhs: RealmProperty?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K < %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs?._object ?? NSNull()])
+}
+
+public func > <RealmObject: Object, RealmProperty: RealmComparablePropertyType>(lhs: KeyPath<RealmObject, RealmProperty?>, rhs: RealmProperty?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K > %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs?._object ?? NSNull()])
+}
+public func <= <RealmObject: Object, RealmProperty: RealmComparablePropertyType>(lhs: KeyPath<RealmObject, RealmProperty?>, rhs: RealmProperty?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K <= %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs?._object ?? NSNull()])
+}
+
+public func >= <RealmObject: Object, RealmProperty: RealmComparablePropertyType>(lhs: KeyPath<RealmObject, RealmProperty?>, rhs: RealmProperty?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K >= %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs?._object ?? NSNull()])
+}
+
+// `_kvcKeyPathString` returns `nil` if non-objc property
+/*
+// MARK: RealmOptional<RealmComparablePropertyType>
+public func < <RealmObject: Object, RealmProperty: RealmComparablePropertyType>(lhs: KeyPath<RealmObject, RealmOptional<RealmProperty>>, rhs: RealmProperty?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K < %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs?._object ?? NSNull()])
+}
+
+public func > <RealmObject: Object, RealmProperty: RealmComparablePropertyType>(lhs: KeyPath<RealmObject, RealmOptional<RealmProperty>>, rhs: RealmProperty?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K > %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs?._object ?? NSNull()])
+}
+public func <= <RealmObject: Object, RealmProperty: RealmComparablePropertyType>(lhs: KeyPath<RealmObject, RealmOptional<RealmProperty>>, rhs: RealmProperty?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K <= %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs?._object ?? NSNull()])
+}
+
+public func >= <RealmObject: Object, RealmProperty: RealmComparablePropertyType>(lhs: KeyPath<RealmObject, RealmOptional<RealmProperty>>, rhs: RealmProperty?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K >= %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs?._object ?? NSNull()])
+}
+*/
+
+// MARK: Object
+public func == <RealmObject: Object, RelationObject: Object>(lhs: KeyPath<RealmObject, RelationObject?>, rhs: RelationObject?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K == %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs ?? NSNull()])
+}
+
+public func != <RealmObject: Object, RelationObject: Object>(lhs: KeyPath<RealmObject, RelationObject?>, rhs: RelationObject?) -> BasicPredicate<RealmObject> {
+    return BasicPredicate<RealmObject>(format: "%K != %@", arguments: [lhs._kvcKeyPathString! as NSString, rhs ?? NSNull()])
+}
+#endif
+
 // MARK: Unavailable
 
 extension Results {
