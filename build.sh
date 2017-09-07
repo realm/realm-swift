@@ -326,7 +326,7 @@ download_common() {
         url="https://static.realm.io/downloads/core/realm-core-${version}.tar.xz"
     elif [ "$download_type" == "sync" ]; then
         version=$REALM_SYNC_VERSION
-        url="https://static.realm.io/downloads/sync/realm-sync-cocoa-${version}.tar.gz"
+        url="https://static.realm.io/downloads/sync/realm-sync-cocoa-${version}.tar.xz"
     else
         echo "Unknown dowload_type: $download_type"
         exit 1
