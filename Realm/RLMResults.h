@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Indicates whether the objects in the collection can be `nil`.
  */
-@property (nonatomic, readonly) bool optional;
+@property (nonatomic, readwrite, getter = isOptional) BOOL optional;
 
 /**
  The class name  of the objects contained in the results collection.

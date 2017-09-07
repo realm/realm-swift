@@ -147,7 +147,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     return static_cast<RLMPropertyType>(_results.get_type() & ~realm::PropertyType::Nullable);
 }
 
-- (bool)optional {
+- (BOOL)isOptional {
     return is_nullable(_results.get_type());
 }
 
