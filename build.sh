@@ -94,6 +94,10 @@ EOF
 # Xcode Helpers
 ######################################
 
+xcode_version_major() {
+    echo "${REALM_XCODE_VERSION%%.*}"
+}
+
 xcode() {
     mkdir -p build/DerivedData
     CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@"
@@ -192,12 +196,14 @@ test_ios_static() {
     local previous_realm_xcode_version="$REALM_XCODE_VERSION"
     local previous_realm_swift_version="$REALM_SWIFT_VERSION"
     if [[ "$IS_RUNNING_PACKAGING" == "1" ]]; then
-      force_xcode_82
+        force_xcode_82
     fi
 
     destination="$1"
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' build"
-    xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+    if (( $(xcode_version_major) < 9 )); then
+        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+    fi
 
     # Xcode's depending tracking is lacking and it doesn't realize that the Realm static framework's static library
     # needs to be recreated when the active architectures change. Help Xcode out by removing the static library.
@@ -208,11 +214,11 @@ test_ios_static() {
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test"
 
     if [[ "$IS_RUNNING_PACKAGING" == "1" ]]; then
-      # Reset to state before forcing Xcode 8.2
-      REALM_XCODE_VERSION="$previous_realm_xcode_version"
-      REALM_SWIFT_VERSION="$previous_realm_swift_version"
-      set_xcode_and_swift_versions
-      sh build.sh prelaunch-simulator
+        # Reset to state before forcing Xcode 8.2
+        REALM_XCODE_VERSION="$previous_realm_xcode_version"
+        REALM_SWIFT_VERSION="$previous_realm_swift_version"
+        set_xcode_and_swift_versions
+        sh build.sh prelaunch-simulator
     fi
 }
 
@@ -644,14 +650,18 @@ case "$COMMAND" in
 
     "test-ios-dynamic")
         xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        if (( $(xcode_version_major) < 9 )); then
+            xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        fi
         xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
     "test-ios-swift")
         xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        if (( $(xcode_version_major) < 9 )); then
+            xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        fi
         xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
