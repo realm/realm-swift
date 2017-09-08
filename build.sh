@@ -145,7 +145,11 @@ build_combined() {
         destination="Apple Watch - 42mm"
     elif [[ "$os" == "appletvos"  ]]; then
         os_name="tvos"
-        destination="Apple TV 1080p"
+        if (( $(xcode_version_major) >= 9 )); then
+            destination="Apple TV"
+        else
+            destination="Apple TV 1080p"
+        fi
     fi
 
     # Derive build paths
@@ -685,12 +689,22 @@ case "$COMMAND" in
         ;;
 
     "test-tvos")
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
+        if (( $(xcode_version_major) >= 9 )); then
+            destination="Apple TV"
+        else
+            destination="Apple TV 1080p"
+        fi
+        xc "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination' test"
         exit $?
         ;;
 
     "test-tvos-swift")
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
+        if (( $(xcode_version_major) >= 9 )); then
+            destination="Apple TV"
+        else
+            destination="Apple TV 1080p"
+        fi
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination' test"
         exit $?
         ;;
 
@@ -923,15 +937,27 @@ case "$COMMAND" in
 
     "examples-tvos")
         workspace="examples/tvos/objc/RealmExamples.xcworkspace"
-        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
+        if (( $(xcode_version_major) >= 9 )); then
+            destination="Apple TV"
+        else
+            destination="Apple TV 1080p"
+        fi
+
+        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
     "examples-tvos-swift")
         workspace="examples/tvos/swift/RealmExamples.xcworkspace"
-        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
+        if (( $(xcode_version_major) >= 9 )); then
+            destination="Apple TV"
+        else
+            destination="Apple TV 1080p"
+        fi
+
+        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
