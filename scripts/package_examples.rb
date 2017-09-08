@@ -54,6 +54,7 @@ base_examples.each do |example|
     swift_versions.each do |swift_version|
       FileUtils.cp_r example, "#{example}-#{swift_version}"
     end
+    FileUtils.rm_r example
   end
 end
 
