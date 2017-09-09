@@ -6,6 +6,7 @@ xcode_version:
   - 8.1
   - 8.2
   - 8.3.3
+  - 9.0
 target:
   - osx
   - docs
@@ -46,6 +47,9 @@ configuration:
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
 # | 8.3.3 | Debug        | X   |      |            | X           | X         | X         | X       |           |           | X    |                |                   |                      |                       |                       |                        |             |
 # | 8.3.3 | Release      | X   | X    |            | X           | X         | X         | X       | X         | X         | X    | X              | X                 | X                    |                       | X                     |                        | X           |
+# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
+# | 9.0   | Debug        | X   |      |            | X           | X         | X         | X       |           |           | X    |                |                   |                      |                       |                       |                        |             |
+# | 9.0   | Release      | X   |      |            | X           | X         | X         | X       | X         | X         | X    | X              | X                 | X                    |                       | X                     |                        | X           |
 # +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 exclude:
@@ -59,6 +63,8 @@ exclude:
     target: docs
   - xcode_version: 8.2
     target: docs
+  - xcode_version: 9.0
+    target: docs
   - target: docs
     configuration: Debug
 
@@ -66,7 +72,7 @@ exclude:
   # ios-static
   ################
   # Skip on 8.0/8.1 Debug
-  # Skip 8.3.3 altogether since it doesn't support the iOS 7 deployment target
+  # Skip 8.3.3/9.0 altogether since it doesn't support the iOS 7 deployment target
   - xcode_version: 8.0
     target: ios-static
     configuration: Debug
@@ -74,6 +80,8 @@ exclude:
     target: ios-static
     configuration: Debug
   - xcode_version: 8.3.3
+    target: ios-static
+  - xcode_version: 9.0
     target: ios-static
 
   ################
@@ -142,7 +150,7 @@ exclude:
   ################
   # swiftlint
   ################
-  # Just run on 8.3.3 Release
+  # Just run on 8.3.3/9.0 Release
   - xcode_version: 8.0
     target: swiftlint
   - xcode_version: 8.1
@@ -169,7 +177,7 @@ exclude:
   ################
   # osx-encryption
   ################
-  # Just run on 8.3.3 Release
+  # Just run on 8.3.3/9.0 Release
   - xcode_version: 8.0
     target: osx-encryption
   - xcode_version: 8.1
@@ -182,7 +190,7 @@ exclude:
   ################
   # osx-object-server
   ################
-  # Just run on 8.3.3 Release
+  # Just run on 8.3.3/9.0 Release
   - xcode_version: 8.0
     target: osx-object-server
   - xcode_version: 8.1
@@ -195,7 +203,7 @@ exclude:
   ################
   # ios-device-objc-ios8
   ################
-  # Just run on 8.3.3 Release
+  # Just run on 8.3.3/9.0 Release
   - xcode_version: 8.0
     target: ios-device-objc-ios8
   - xcode_version: 8.1
@@ -208,7 +216,7 @@ exclude:
   ################
   # ios-device-swift-ios8
   ################
-  # Just run on 8.3.3 Release
+  # Just run on 8.3.3/9.0 Release
   - xcode_version: 8.0
     target: ios-device-swift-ios8
   - xcode_version: 8.1
@@ -221,7 +229,7 @@ exclude:
   ################
   # ios-device-objc-ios10
   ################
-  # Just run on 8.3.3 Release
+  # Just run on 8.3.3/9.0 Release
   - xcode_version: 8.0
     target: ios-device-objc-ios10
   - xcode_version: 8.1
@@ -234,7 +242,7 @@ exclude:
   ################
   # ios-device-swift-ios10
   ################
-  # Just run on 8.3.3 Release
+  # Just run on 8.3.3/9.0 Release
   - xcode_version: 8.0
     target: ios-device-swift-ios10
   - xcode_version: 8.1
@@ -247,7 +255,7 @@ exclude:
   ################
   # tvos-device
   ################
-  # Just run on 8.3.3 Release
+  # Just run on 8.3.3/9.0 Release
   - xcode_version: 8.0
     target: tvos-device
   - xcode_version: 8.1
