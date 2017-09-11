@@ -138,6 +138,7 @@ public protocol RealmCollectionValue {
 #if swift(>=3.2)
 /// :nodoc:
 public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined where Element: RealmCollectionValue {
+    associatedtype ElementType: RealmCollectionValue
 }
 #else
 /// :nodoc:
@@ -372,6 +373,12 @@ public protocol RealmCollection: RealmCollectionBase {
 
     /// :nodoc:
     func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<ElementType>>) -> Void) -> NotificationToken
+
+#if swift(>=3.2)
+    // Work around Swift type inference deficiencies.
+    /// :nodoc:
+    subscript(_ index: Int) -> ElementType { get }
+#endif
 }
 
 private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiveCBridgeable {
@@ -474,7 +481,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     override subscript(position: Int) -> C.ElementType {
         #if swift(>=3.2)
-            return base[position as! C.Index]
+            return base[position]
         #else
             return base[position as! C.Index] as! C.ElementType
         #endif

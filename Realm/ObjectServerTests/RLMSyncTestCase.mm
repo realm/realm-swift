@@ -367,10 +367,10 @@ static NSURL *syncDirectoryForChildProcess() {
 
 + (void)setUp {
     [super setUp];
-    NSString *syncDirectory = [[[self rootRealmCocoaURL] URLByAppendingPathComponent:@"sync"] path];
-    BOOL isDirectory = NO;
-    if (![[NSFileManager defaultManager] fileExistsAtPath:syncDirectory isDirectory:&isDirectory] || !isDirectory) {
-        NSLog(@"sync/ directory doesn't exist. You need to run 'build.sh download-object-server' prior to running these tests");
+    NSURL *target = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"test-ros-instance/ros/bin/ros"];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[target path]]) {
+        NSLog(@"The Realm Object Server isn't installed. You need to run 'build.sh download-object-server'"
+              @" prior to running these tests.");
         abort();
     }
 }
@@ -379,27 +379,45 @@ static NSURL *syncDirectoryForChildProcess() {
     if (!self.isParent || s_task) {
         return;
     }
+    NSPipe *pipe = [NSPipe pipe];
+    NSMutableString *stringBuffer = [[NSMutableString alloc] init];
+    __block BOOL inUseError = NO;
     [RLMSyncTestCase runResetObjectServer:YES];
     NSTask *task = [[NSTask alloc] init];
-    task.currentDirectoryPath = [[RLMSyncTestCase rootRealmCocoaURL] path];
+    NSString *currentDirPath = [[[RLMSyncTestCase rootRealmCocoaURL]
+                                 URLByAppendingPathComponent:@"test-ros-instance/"] path];
+    task.currentDirectoryPath = currentDirPath;
     task.launchPath = @"/bin/sh";
-    task.arguments = @[@"build.sh", @"start-object-server"];
+    task.arguments = @[@"-c", @"/usr/local/bin/node ./ros/bin/ros start"];
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    task.standardOutput = [NSPipe pipe];
-    [[task.standardOutput fileHandleForReading] setReadabilityHandler:^(NSFileHandle *file) {
+    task.standardOutput = pipe;
+    task.standardError = pipe;
+    [[task.standardError fileHandleForReading] setReadabilityHandler:^(NSFileHandle *file) {
         NSData *data = [file availableData];
-        NSString *output = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if ([output containsString:@"Received: IDENT"]) {
+        NSString *fragment = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        [stringBuffer appendString:fragment];
+        if ([stringBuffer rangeOfString:@"Sending: IDENT"].location != NSNotFound) {
             dispatch_semaphore_signal(sema);
+        } else if ([stringBuffer rangeOfString:@"Error: listen EADDRINUSE"].location != NSNotFound) {
+            inUseError = YES;
+            dispatch_semaphore_signal(sema);
+        } else if ([fragment characterAtIndex:[fragment length] - 1] == '\n') {
+            // Reached EOL, reset the string buffer.
+            [stringBuffer setString:@""];
         }
     }];
     s_task = task;
     [task launch];
     const NSTimeInterval timeout = 60;
     BOOL wait_result = dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
-    if (!wait_result) {
+    if (!wait_result || inUseError) {
         s_task = nil;
-        XCTFail(@"Server did not start up within the allotted timeout interval.");
+        if (inUseError) {
+            XCTFail(@"Server tried to start up, but the port was already in use (probably already running).");
+        } else {
+            XCTFail(@"Server did not start up within the allotted timeout interval.");
+        }
+        abort();
     }
 }
 
@@ -408,7 +426,6 @@ static NSURL *syncDirectoryForChildProcess() {
     task.currentDirectoryPath = [[RLMSyncTestCase rootRealmCocoaURL] path];
     task.launchPath = @"/bin/sh";
     task.arguments = @[@"build.sh", initial ? @"reset-object-server" : @"reset-object-server-between-tests"];
-    task.standardOutput = [NSPipe pipe];
     [task launch];
     [task waitUntilExit];
 }
