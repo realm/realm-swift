@@ -41,7 +41,7 @@ base_examples = [
   "examples/tvos/swift",
 ]
 
-swift_versions = %w(3.0 3.0.1 3.0.2 3.1)
+swift_versions = %w(3.0 3.0.1 3.0.2 3.1 3.2 4.0)
 
 # Remove reference to Realm.xcodeproj from all example workspaces.
 base_examples.each do |example|
