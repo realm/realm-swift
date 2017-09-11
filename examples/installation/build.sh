@@ -53,6 +53,9 @@ xctest() {
     LANG="$2"
     NAME="$3"
     DIRECTORY="$PLATFORM/$LANG/$NAME"
+    if [[ ! -d "$DIRECTORY" ]]; then
+        DIRECTORY="${DIRECTORY/swift/swift-$REALM_SWIFT_VERSION}"
+    fi
     PROJECT="$DIRECTORY/$NAME.xcodeproj"
     WORKSPACE="$DIRECTORY/$NAME.xcworkspace"
     if [[ $PLATFORM == ios ]]; then
