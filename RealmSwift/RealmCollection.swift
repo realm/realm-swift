@@ -136,6 +136,9 @@ public protocol RealmCollectionValue {
 }
 
 #if swift(>=3.2)
+// FIXME: When we drop support for Swift 3.1, change ElementType to Element
+// throughout the project (this is a non-breaking change). We use ElementType
+// only because of limitations in Swift 3.1's compiler.
 /// :nodoc:
 public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined where Element: RealmCollectionValue {
     typealias ElementType = Element
