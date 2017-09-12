@@ -138,6 +138,7 @@ public protocol RealmCollectionValue {
 #if swift(>=3.2)
 /// :nodoc:
 public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined where Element: RealmCollectionValue {
+    typealias ElementType = Element
 }
 #else
 /// :nodoc:
