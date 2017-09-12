@@ -54,5 +54,6 @@ def notifyBuild(String buildStatus = 'STARTED', String channel) {
     colorCode = '#FF0000'
   }
 
-  slackSend(channel: channel, color: colorCode, message: summary)
+  // FIXME: Enable this once things are mostly working.
+  // slackSend(channel: channel, color: colorCode, message: summary)
 }
