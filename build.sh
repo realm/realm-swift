@@ -1155,7 +1155,6 @@ EOM
     ######################################
 
     "package-examples")
-        cd tightdb_objc
         ./scripts/package_examples.rb
         zip --symlinks -r realm-examples.zip examples -x "examples/installation/*"
         ;;
@@ -1189,8 +1188,6 @@ EOM
         ;;
 
     "package-ios-static")
-        cd tightdb_objc
-
         sh build.sh prelaunch-simulator
         sh build.sh test-ios-static
         sh build.sh ios-static
@@ -1200,8 +1197,6 @@ EOM
         ;;
 
     "package-ios-dynamic")
-        cd tightdb_objc
-
         sh build.sh prelaunch-simulator
         sh build.sh ios-dynamic
         cd build/ios
@@ -1209,7 +1204,6 @@ EOM
         ;;
 
     "package-osx")
-        cd tightdb_objc
         sh build.sh test-osx
 
         cd build/DerivedData/Realm/Build/Products/Release
@@ -1217,7 +1211,6 @@ EOM
         ;;
 
     "package-ios-swift")
-        cd tightdb_objc
         for version in 8.0 8.1 8.2 8.3.3 9.0; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
@@ -1232,7 +1225,6 @@ EOM
         ;;
 
     "package-osx-swift")
-        cd tightdb_objc
         for version in 8.0 8.1 8.2 8.3.3 9.0; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
@@ -1247,7 +1239,6 @@ EOM
         ;;
 
     "package-watchos")
-        cd tightdb_objc
         sh build.sh prelaunch-simulator
         sh build.sh watchos
 
@@ -1256,7 +1247,6 @@ EOM
         ;;
 
     "package-watchos-swift")
-        cd tightdb_objc
         for version in 8.0 8.1 8.2 8.3.3 9.0; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
@@ -1271,7 +1261,6 @@ EOM
         ;;
 
     "package-tvos")
-        cd tightdb_objc
         sh build.sh prelaunch-simulator
         sh build.sh tvos
 
@@ -1280,7 +1269,6 @@ EOM
         ;;
 
     "package-tvos-swift")
-        cd tightdb_objc
         for version in 8.0 8.1 8.2 8.3.3 9.0; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
@@ -1298,9 +1286,7 @@ EOM
         LANG="$2"
         TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
 
-        cd tightdb_objc
         VERSION=$(sh build.sh get-version)
-        cd ..
 
         FOLDER=${TEMPDIR}/realm-${LANG}-${VERSION}
 
@@ -1358,7 +1344,7 @@ EOM
         fi
 
         (
-            cd ${WORKSPACE}/tightdb_objc
+            cd ${WORKSPACE}
             cp -R plugin ${FOLDER}
             cp LICENSE ${FOLDER}/LICENSE.txt
             if [[ "${LANG}" == "objc" ]]; then
@@ -1412,44 +1398,45 @@ EOF
         WORKSPACE="$(cd "$WORKSPACE" && pwd)"
         export WORKSPACE
         cd $WORKSPACE
-        git clone --recursive $REALM_SOURCE tightdb_objc
+        git clone --recursive $REALM_SOURCE realm-cocoa
+        cd realm-cocoa
 
         echo 'Packaging iOS'
-        sh tightdb_objc/build.sh package-ios-static
-        cp tightdb_objc/build/ios-static/realm-framework-ios.zip .
-        sh tightdb_objc/build.sh package-ios-dynamic
-        cp tightdb_objc/build/ios/realm-dynamic-framework-ios.zip .
-        sh tightdb_objc/build.sh package-ios-swift
-        cp tightdb_objc/build/ios/realm-swift-framework-ios.zip .
+        sh build.sh package-ios-static
+        cp build/ios-static/realm-framework-ios.zip ..
+        sh build.sh package-ios-dynamic
+        cp build/ios/realm-dynamic-framework-ios.zip ..
+        sh build.sh package-ios-swift
+        cp build/ios/realm-swift-framework-ios.zip ..
 
         echo 'Packaging OS X'
-        sh tightdb_objc/build.sh package-osx
-        cp tightdb_objc/build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip .
-        sh tightdb_objc/build.sh package-osx-swift
-        cp tightdb_objc/build/osx/realm-swift-framework-osx.zip .
+        sh build.sh package-osx
+        cp build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip ..
+        sh build.sh package-osx-swift
+        cp build/osx/realm-swift-framework-osx.zip ..
 
         echo 'Packaging watchOS'
-        sh tightdb_objc/build.sh package-watchos
-        cp tightdb_objc/build/watchos/realm-framework-watchos.zip .
-        sh tightdb_objc/build.sh package-watchos-swift
-        cp tightdb_objc/build/watchos/realm-swift-framework-watchos.zip .
+        sh build.sh package-watchos
+        cp build/watchos/realm-framework-watchos.zip ..
+        sh build.sh package-watchos-swift
+        cp build/watchos/realm-swift-framework-watchos.zip ..
 
         echo 'Packaging tvOS'
-        sh tightdb_objc/build.sh package-tvos
-        cp tightdb_objc/build/tvos/realm-framework-tvos.zip .
-        sh tightdb_objc/build.sh package-tvos-swift
-        cp tightdb_objc/build/tvos/realm-swift-framework-tvos.zip .
+        sh build.sh package-tvos
+        cp build/tvos/realm-framework-tvos.zip ..
+        sh build.sh package-tvos-swift
+        cp build/tvos/realm-swift-framework-tvos.zip ..
 
         echo 'Packaging examples'
-        sh tightdb_objc/build.sh package-examples
-        cp tightdb_objc/realm-examples.zip .
+        sh build.sh package-examples
+        cp realm-examples.zip ..
 
         echo 'Building final release packages'
-        sh tightdb_objc/build.sh package-release objc
-        sh tightdb_objc/build.sh package-release swift
+        sh build.sh package-release objc
+        sh build.sh package-release swift
 
         echo 'Testing packaged examples'
-        sh tightdb_objc/build.sh package-test-examples
+        sh build.sh package-test-examples
         ;;
 
     "github-release")
