@@ -52,7 +52,9 @@ def doBuild() {
           unstash 'source'
           sh 'XCMODE=xcpretty ./build.sh package-osx'
           // FIXME: Why is this file at a different location than for the other variants?
-          stash includes: 'build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip', name: 'osx-objc'
+          dir('build/DerivedData/Realm/Build/Products/Release') {
+            stash includes: 'realm-framework-osx.zip', name: 'osx-objc'
+          }
         }
       },
       "iOS Obj-C": {
@@ -60,7 +62,9 @@ def doBuild() {
           deleteDir()
           unstash 'source'
           sh 'XCMODE=xcpretty ./build.sh package-ios-dynamic'
-          stash includes: 'build/ios/realm-framework-ios.zip', name: 'ios-objc'
+          dir('build/ios') {
+            stash includes: 'realm-framework-ios.zip', name: 'ios-objc'
+          }
         }
       },
       "watchOS Obj-C": {
@@ -68,7 +72,9 @@ def doBuild() {
           deleteDir()
           unstash 'source'
           sh 'XCMODE=xcpretty ./build.sh package-watchos'
-          stash includes: 'build/watchos/realm-framework-watchos.zip', name: 'watchos-objc'
+          dir('build/watchos') {
+            stash includes: 'realm-framework-watchos.zip', name: 'watchos-objc'
+          }
         }
       },
       "tvOS Obj-C": {
@@ -76,7 +82,9 @@ def doBuild() {
           deleteDir()
           unstash 'source'
           sh 'XCMODE=xcpretty ./build.sh package-tvos'
-          stash includes: 'build/tvos/realm-framework-tvos.zip', name: 'tvos-objc'
+          dir('build/tvos') {
+            stash includes: 'realm-framework-tvos.zip', name: 'tvos-objc'
+          }
         }
       },
       "iOS Obj-C static": {
@@ -84,7 +92,9 @@ def doBuild() {
           deleteDir()
           unstash 'source'
           sh 'XCMODE=xcpretty ./build.sh package-ios-static'
-          stash includes: 'build/ios-static/realm-framework-ios-static.zip', name: 'ios-objc-static'
+          dir('build/ios-static') {
+            stash includes: 'realm-framework-ios-static.zip', name: 'ios-objc-static'
+          }
         }
       },
     ]
@@ -99,8 +109,10 @@ def doBuild() {
             deleteDir()
             unstash 'source'
             sh "XCMODE=xcpretty ./build.sh package-${platform}-swift-${swiftVersion}"
-            stash includes: "build/${platform}/realm-swift-framework-${platform}-swift-${swiftVersion}.zip",
-                  name: "${platform}-swift-${swiftVersion}"
+            dir("build/${platform}") {
+              stash includes: "realm-swift-framework-${platform}-swift-${swiftVersion}.zip",
+                    name: "${platform}-swift-${swiftVersion}"
+            }
           }
         }
       }
