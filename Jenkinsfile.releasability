@@ -18,19 +18,38 @@ def doBuild() {
 
   stage('build') {
     parallel (
-      "docs": { build job: 'cocoa_docs' },
-      "examples": { build job: 'objc_examples' },
+      "docs": {
+        node('osx') {
+          unstash 'source'
+          sh '''
+          ./scripts/reset-simulators.sh
+          ./build.sh docs
+          cd docs
+          zip -r objc-docs.zip objc_output
+          zip -r swift-docs.zip swift_output
+          '''
+          stash includes: 'docs/*-docs.zip', name: 'docs'
+        }
+      },
 
-      "macOS Obj-C": { build job: 'objc_osx' },
-      "iOS Obj-C": { build job: 'objc_ios' },
-      "watchOS Obj-C": { build job: 'objc_watchos' },
-      "tvOS Obj-C": { build job: 'objc_tvos' },
-      "iOS Obj-C dynamic": { build job: 'cocoa_ios_dynamic' },
+      "examples": {
+        node('osx') {
+          unstash 'source'
+          sh 'XCMODE=xcpretty ./build.sh package-examples'
+          stash includes: 'realm-examples.zip', name: 'examples'
+        }
+      },
 
-      "macOS Swift": { build job: 'Package OS X Swift' },
-      "iOS Swift": { build job: 'Package iOS Swift' },
-      "watchOS Swift": { build job: 'Package watchOS Swift' },
-      "tvOS Swift": { build job: 'Package tvOS Swift' }
+      // "macOS Obj-C": { build job: 'objc_osx' },
+      // "iOS Obj-C": { build job: 'objc_ios' },
+      // "watchOS Obj-C": { build job: 'objc_watchos' },
+      // "tvOS Obj-C": { build job: 'objc_tvos' },
+      // "iOS Obj-C dynamic": { build job: 'cocoa_ios_dynamic' },
+
+      // "macOS Swift": { build job: 'Package OS X Swift' },
+      // "iOS Swift": { build job: 'Package iOS Swift' },
+      // "watchOS Swift": { build job: 'Package watchOS Swift' },
+      // "tvOS Swift": { build job: 'Package tvOS Swift' }
     )
   }
 
