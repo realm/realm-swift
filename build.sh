@@ -1282,6 +1282,27 @@ EOM
         zip --symlinks -r realm-swift-framework-tvos.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1 swift-3.2 swift-4.0
         ;;
 
+    package-*-swift-3.2)
+        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
+        mkdir -p build/$PLATFORM
+        cd build/$PLATFORM
+        ln -s swift-4.0 swift-3.2
+        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.2.zip swift-3.2
+        ;;
+
+    package-*-swift-*)
+        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
+        REALM_SWIFT_VERSION=$(echo $COMMAND | cut -d - -f 4)
+        REALM_XCODE_VERSION=
+
+        set_xcode_and_swift_versions
+        sh build.sh prelaunch-simulator
+        sh build.sh $PLATFORM-swift
+
+        cd build/$PLATFORM
+        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-$REALM_SWIFT_VERSION.zip swift-$REALM_SWIFT_VERSION
+        ;;
+
     "package-release")
         LANG="$2"
         TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
