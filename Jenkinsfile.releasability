@@ -1,5 +1,23 @@
-try {
-    build job: 'objc_prepare_workspace', parameters: [string(name: 'sha', value: sha)]
+def doBuild() {
+  stage('prepare') {
+    //  build job: 'objc_prepare_workspace', parameters: [string(name: 'sha', value: sha)]
+    node('docker') {
+      checkout(
+        [
+          $class           : 'GitSCM',
+          branches         : scm.branches,
+          gitTool          : 'native git',
+          extensions       : scm.extensions + [[$class: 'CleanCheckout'],
+                                               [$class: 'SubmoduleOption', parentCredentials: true]],
+          userRemoteConfigs: scm.userRemoteConfigs,
+        ]
+      )
+
+      stash includes: '**', name: 'source'
+    }
+  }
+
+  stage('build') {
     parallel (
       objcOsx: { build job: 'objc_osx' },
       cocoaDocs: { build job: 'cocoa_docs' },
@@ -13,22 +31,33 @@ try {
       packageWatchosSwift: { build job: 'Package watchOS Swift' },
       packageTvosSwift: { build job: 'Package tvOS Swift' }
     )
+  }
+
+  stage('package') {
     parallel (
       objc: { build job: 'cocoa_release_package' },
       swift: { build job: 'swift_release_package' }
     )
+  }
+
+  stage('test') {
     parallel (
       objcTestExamples: { build job: 'objc_test_examples', parameters: [string(name: 'sha', value: sha)] },
       cocoaInstallationExamples: { build job: 'Cocoa Installation Examples', parameters: [string(name: 'sha', value: sha)] }
-    )  
-} catch (e) {
-    // If there was an exception thrown, the build failed
-    currentBuild.result = "FAILED"
-    throw e
-  } finally {
-    // Success or failure, always send notifications
-    notifyBuild(currentBuild.result, '#cocoa-team')
+    )
   }
+}
+
+try {
+  doBuild()
+} catch (e) {
+  // If there was an exception thrown, the build failed
+  currentBuild.result = "FAILED"
+  throw e
+} finally {
+  // Success or failure, always send notifications
+  notifyBuild(currentBuild.result, '#cocoa-team')
+}
 
 def notifyBuild(String buildStatus = 'STARTED', String channel) {
   // build status of null means successful
