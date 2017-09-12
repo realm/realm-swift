@@ -1345,22 +1345,30 @@ EOM
         else
             (
                 cd ${FOLDER}/osx
-                unzip ${WORKSPACE}/realm-swift-framework-osx.zip
+                for f in ${WORKSPACE}/realm-swift-framework-osx-swift-*.zip; do
+                    unzip "$f"
+                done
             )
 
             (
                 cd ${FOLDER}/ios
-                unzip ${WORKSPACE}/realm-swift-framework-ios.zip
+                for f in ${WORKSPACE}/realm-swift-framework-ios-swift-*.zip; do
+                    unzip "$f"
+                done
             )
 
             (
                 cd ${FOLDER}/watchos
-                unzip ${WORKSPACE}/realm-swift-framework-watchos.zip
+                for f in ${WORKSPACE}/realm-swift-framework-watchos-swift-*.zip; do
+                    unzip "$f"
+                done
             )
 
             (
                 cd ${FOLDER}/tvos
-                unzip ${WORKSPACE}/realm-swift-framework-tvos.zip
+                for f in ${WORKSPACE}/realm-swift-framework-tvos-swift-*.zip; do
+                    unzip "$f"
+                done
             )
         fi
 
