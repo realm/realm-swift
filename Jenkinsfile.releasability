@@ -24,6 +24,7 @@ def doBuild() {
     def parallelBuilds = [
       "docs": {
         node('osx') {
+          deleteDir()
           unstash 'source'
           sh '''
           ./scripts/reset-simulators.sh
@@ -38,6 +39,7 @@ def doBuild() {
 
       "examples": {
         node('osx') {
+          deleteDir()
           unstash 'source'
           sh 'XCMODE=xcpretty ./build.sh package-examples'
           stash includes: 'realm-examples.zip', name: 'examples'
@@ -46,6 +48,7 @@ def doBuild() {
 
       "macOS Obj-C": {
         node('osx') {
+          deleteDir()
           unstash 'source'
           sh 'XCMODE=xcpretty ./build.sh package-osx'
           // FIXME: Why is this file at a different location than for the other variants?
@@ -54,6 +57,7 @@ def doBuild() {
       },
       "iOS Obj-C": {
         node('osx') {
+          deleteDir()
           unstash 'source'
           sh 'XCMODE=xcpretty ./build.sh package-ios-dynamic'
           stash includes: 'build/ios/realm-framework-ios.zip', name: 'ios-objc'
@@ -61,6 +65,7 @@ def doBuild() {
       },
       "watchOS Obj-C": {
         node('osx') {
+          deleteDir()
           unstash 'source'
           sh 'XCMODE=xcpretty ./build.sh package-watchos'
           stash includes: 'build/watchos/realm-framework-watchos.zip', name: 'watchos-objc'
@@ -68,6 +73,7 @@ def doBuild() {
       },
       "tvOS Obj-C": {
         node('osx') {
+          deleteDir()
           unstash 'source'
           sh 'XCMODE=xcpretty ./build.sh package-tvos'
           stash includes: 'build/tvos/realm-framework-tvos.zip', name: 'tvos-objc'
@@ -75,6 +81,7 @@ def doBuild() {
       },
       "iOS Obj-C static": {
         node('osx') {
+          deleteDir()
           unstash 'source'
           sh 'XCMODE=xcpretty ./build.sh package-ios-static'
           stash includes: 'build/ios-static/realm-framework-ios-static.zip', name: 'ios-objc-static'
@@ -89,6 +96,7 @@ def doBuild() {
         def swiftVersion = v
         parallelBuilds["${platformName} Swift ${swiftVersion}"] = {
           node('osx') {
+            deleteDir()
             unstash 'source'
             sh "XCMODE=xcpretty ./build.sh package-${platform}-swift-${swiftVersion}"
             stash includes: "build/${platform}/realm-swift-framework-${platform}-swift-${swiftVersion}.zip",
@@ -105,6 +113,8 @@ def doBuild() {
     parallel (
       "Obj-C": {
         node('osx') {
+          deleteDir()
+
           for (def platform in platforms) {
             unstash "${platform}-objc"
           }
@@ -120,6 +130,8 @@ def doBuild() {
       },
       "Swift": {
         node('osx') {
+          deleteDir()
+
           for (def platform in platforms) {
             for (def swiftVersion in swiftVersions) {
               unstash "${platform}-swift-${swiftVersion}"
@@ -142,6 +154,8 @@ def doBuild() {
     parallel (
       "Test Examples": {
         node('osx') {
+          deleteDir()
+
           // FIXME: Split Obj-C and Swift.
           unstash 'objc-packaged'
           unstash 'swift-packaged'
