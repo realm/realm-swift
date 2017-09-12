@@ -1193,14 +1193,14 @@ EOM
         sh build.sh ios-static
 
         cd build/ios-static
-        zip --symlinks -r realm-framework-ios.zip Realm.framework
+        zip --symlinks -r realm-framework-ios-static.zip Realm.framework
         ;;
 
     "package-ios-dynamic")
         sh build.sh prelaunch-simulator
         sh build.sh ios-dynamic
         cd build/ios
-        zip --symlinks -r realm-dynamic-framework-ios.zip Realm.framework
+        zip --symlinks -r realm-framework-ios.zip Realm.framework
         ;;
 
     "package-osx")
@@ -1304,12 +1304,12 @@ EOM
 
             (
                 cd ${FOLDER}/ios/static
-                unzip ${WORKSPACE}/realm-framework-ios.zip
+                unzip ${WORKSPACE}/realm-framework-ios-static.zip
             )
 
             (
                 cd ${FOLDER}/ios/dynamic
-                unzip ${WORKSPACE}/realm-dynamic-framework-ios.zip
+                unzip ${WORKSPACE}/realm-framework-ios.zip
             )
 
             (
@@ -1403,9 +1403,9 @@ EOF
 
         echo 'Packaging iOS'
         sh build.sh package-ios-static
-        cp build/ios-static/realm-framework-ios.zip ..
+        cp build/ios-static/realm-framework-ios-static.zip ..
         sh build.sh package-ios-dynamic
-        cp build/ios/realm-dynamic-framework-ios.zip ..
+        cp build/ios/realm-framework-ios.zip ..
         sh build.sh package-ios-swift
         cp build/ios/realm-swift-framework-ios.zip ..
 

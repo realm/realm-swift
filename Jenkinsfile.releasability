@@ -40,11 +40,42 @@ def doBuild() {
         }
       },
 
-      // "macOS Obj-C": { build job: 'objc_osx' },
-      // "iOS Obj-C": { build job: 'objc_ios' },
-      // "watchOS Obj-C": { build job: 'objc_watchos' },
-      // "tvOS Obj-C": { build job: 'objc_tvos' },
-      // "iOS Obj-C dynamic": { build job: 'cocoa_ios_dynamic' },
+      "macOS Obj-C": {
+        node('osx') {
+          unstash 'source'
+          sh 'XCMODE=xcpretty ./build.sh package-osx'
+          // FIXME: Why is this file at a different location than for the other variants?
+          stash includes: 'build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip', name: 'macos-objc'
+        }
+      },
+      "iOS Obj-C": {
+        node('osx') {
+          unstash 'source'
+          sh 'XCMODE=xcpretty ./build.sh package-ios-dynamic'
+          stash includes: 'build/ios/realm-framework-ios.zip', name: 'ios-objc'
+        }
+      },
+      "watchOS Obj-C": {
+        node('osx') {
+          unstash 'source'
+          sh 'XCMODE=xcpretty ./build.sh package-watchos'
+          stash includes: 'build/watchos/realm-framework-watchos.zip', name: 'watchos-objc'
+        }
+      },
+      "tvOS Obj-C": {
+        node('osx') {
+          unstash 'source'
+          sh 'XCMODE=xcpretty ./build.sh package-tvos'
+          stash includes: 'build/tvos/realm-framework-tvos.zip', name: 'tvos-objc'
+        }
+      },
+      "iOS Obj-C static": {
+        node('osx') {
+          unstash 'source'
+          sh 'XCMODE=xcpretty ./build.sh package-ios-static'
+          stash includes: 'build/ios-static/realm-framework-ios-static.zip', name: 'ios-objc-static'
+        }
+      },
 
       // "macOS Swift": { build job: 'Package OS X Swift' },
       // "iOS Swift": { build job: 'Package iOS Swift' },
