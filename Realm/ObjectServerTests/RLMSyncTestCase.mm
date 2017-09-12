@@ -387,8 +387,8 @@ static NSURL *syncDirectoryForChildProcess() {
     NSString *currentDirPath = [[[RLMSyncTestCase rootRealmCocoaURL]
                                  URLByAppendingPathComponent:@"test-ros-instance/"] path];
     task.currentDirectoryPath = currentDirPath;
-    task.launchPath = @"/bin/sh";
-    task.arguments = @[@"-c", @"/usr/local/bin/node ./ros/bin/ros start"];
+    task.launchPath = @"/usr/local/bin/node";
+    task.arguments = @[@"./ros/bin/ros", @"start"];
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     task.standardOutput = pipe;
     task.standardError = pipe;
@@ -425,7 +425,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSTask *task = [[NSTask alloc] init];
     task.currentDirectoryPath = [[RLMSyncTestCase rootRealmCocoaURL] path];
     task.launchPath = @"/bin/sh";
-    task.arguments = @[@"build.sh", initial ? @"reset-object-server" : @"reset-object-server-between-tests"];
+    task.arguments = @[@"build.sh", initial ? @"reset-object-server" : @"reset-ros-client-state"];
     [task launch];
     [task waitUntilExit];
 }

@@ -311,8 +311,7 @@ kill_object_server() {
 
 download_object_server() {
     rm -rf ./test-ros-instance
-    mkdir ./test-ros-instance
-    mkdir ./test-ros-instance/ros
+    mkdir -p ./test-ros-instance/ros
     npm install --prefix ./test-ros-instance/ros -g realm-object-server@${REALM_OBJECT_SERVER_VERSION} -S
 }
 
@@ -421,8 +420,13 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "reset-object-server-between-tests")
-        # Leave the server files alone to avoid 'bad_server_ident' errors
+    "reset-ros-server-state")
+        rm -rf "./test-ros-instance/data"
+        rm -rf "./test-ros-instance/realm-object-server"
+        exit 0
+        ;;
+
+    "reset-ros-client-state")
         rm -rf "~/Library/Application Support/xctest"
         rm -rf "~/Library/Application Support/io.realm.TestHost"
         rm -rf "~/Library/Application Support/xctest-child"
@@ -433,7 +437,8 @@ case "$COMMAND" in
         kill_object_server
         # Add a short delay, so file system doesn't complain about files in use
         sleep 1
-        sh build.sh reset-object-server-between-tests
+        sh build.sh reset-ros-server-state
+        sh build.sh reset-ros-client-state
         exit 0
         ;;
 
