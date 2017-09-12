@@ -1,6 +1,5 @@
 def doBuild() {
   stage('prepare') {
-    //  build job: 'objc_prepare_workspace', parameters: [string(name: 'sha', value: sha)]
     node('docker') {
       checkout(
         [
@@ -19,17 +18,19 @@ def doBuild() {
 
   stage('build') {
     parallel (
-      objcOsx: { build job: 'objc_osx' },
-      cocoaDocs: { build job: 'cocoa_docs' },
-      objcIos: { build job: 'objc_ios' },
-      objcWatchos: { build job: 'objc_watchos' },
-      objcTvos: { build job: 'objc_tvos' },
-      cocoaIosDyn: { build job: 'cocoa_ios_dynamic' },
-      objcExamples: { build job: 'objc_examples' },
-      packageIosSwift: { build job: 'Package iOS Swift' },
-      packageOsxSwift: { build job: 'Package OS X Swift' },
-      packageWatchosSwift: { build job: 'Package watchOS Swift' },
-      packageTvosSwift: { build job: 'Package tvOS Swift' }
+      "docs": { build job: 'cocoa_docs' },
+      "examples": { build job: 'objc_examples' },
+
+      "macOS Obj-C": { build job: 'objc_osx' },
+      "iOS Obj-C": { build job: 'objc_ios' },
+      "watchOS Obj-C": { build job: 'objc_watchos' },
+      "tvOS Obj-C": { build job: 'objc_tvos' },
+      "iOS Obj-C dynamic": { build job: 'cocoa_ios_dynamic' },
+
+      "macOS Swift": { build job: 'Package OS X Swift' },
+      "iOS Swift": { build job: 'Package iOS Swift' },
+      "watchOS Swift": { build job: 'Package watchOS Swift' },
+      "tvOS Swift": { build job: 'Package tvOS Swift' }
     )
   }
 
