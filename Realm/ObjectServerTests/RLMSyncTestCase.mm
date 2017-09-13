@@ -227,9 +227,13 @@ static NSURL *syncDirectoryForChildProcess() {
     static RLMSyncUser *adminTokenUser = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
-        NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL
-                                                        encoding:NSUTF8StringEncoding error:nil];
+        NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"test-ros-instance/data/keys/admin.json"];
+        NSData *rawData = [NSData dataWithContentsOfURL:adminTokenFileURL];
+        NSDictionary *adminJSON = [NSJSONSerialization JSONObjectWithData:rawData options:0 error:nil];
+        NSString *adminToken = [adminJSON objectForKey:@"ADMIN_TOKEN"];
+        if (![adminToken isKindOfClass:[NSString class]]) {
+            XCTFail(@"Could not parse out admin token...");
+        }
         RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken
                                                                                 identity:[[NSUUID UUID] UUIDString]];
         adminTokenUser = [self logInUserForCredentials:credentials server:url];

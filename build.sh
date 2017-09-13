@@ -312,7 +312,8 @@ kill_object_server() {
 download_object_server() {
     rm -rf ./test-ros-instance
     mkdir -p ./test-ros-instance/ros
-    npm install --prefix ./test-ros-instance/ros -g realm-object-server@${REALM_OBJECT_SERVER_VERSION} -S
+    chmod 777 ./test-ros-instance
+    npm install --prefix ./test-ros-instance/ros -g realm-object-server@${REALM_OBJECT_SERVER_VERSION}
 }
 
 download_common() {
@@ -439,6 +440,8 @@ case "$COMMAND" in
         sleep 1
         sh build.sh reset-ros-server-state
         sh build.sh reset-ros-client-state
+        # Add another delay to ensure files are actually gone from file system
+        sleep 1
         exit 0
         ;;
 

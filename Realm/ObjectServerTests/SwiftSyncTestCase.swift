@@ -65,7 +65,8 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                           usernameSuffix: String = "",
                           file: StaticString = #file,
                           line: UInt = #line) -> SyncCredentials {
-        return .usernamePassword(username: "\(file)\(line)\(usernameSuffix)", password: "a", register: register)
+        let filename = URL(fileURLWithPath: String(describing: file)).deletingPathExtension().lastPathComponent
+        return .usernamePassword(username: "\(filename)\(line)\(usernameSuffix)", password: "a", register: register)
     }
 
     func synchronouslyOpenRealm(url: URL, user: SyncUser, file: StaticString = #file, line: UInt = #line) throws -> Realm {
@@ -94,7 +95,8 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                                 file: StaticString = #file,
                                 line: UInt = #line) throws -> SyncUser {
         let process = isParent ? "parent" : "child"
-        var theUser: SyncUser? = nil
+        var theUser: SyncUser?
+        var theError: Error?
         let ex = expectation(description: "Should log in the user properly")
         SyncUser.logIn(with: credentials, server: url) { user, error in
             XCTAssertNotNil(user, file: file, line: line)
@@ -103,14 +105,15 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                          file: file,
                          line: line)
             theUser = user
+            theError = error
             ex.fulfill()
         }
         waitForExpectations(timeout: 4, handler: nil)
         XCTAssertNotNil(theUser, file: file, line: line)
-        XCTAssertEqual(theUser!.state, .active,
-                      "User should have been valid, but wasn't. (process: \(process))",
-                      file: file,
-                      line: line)
+        XCTAssertEqual(theUser?.state, .active,
+                       "User should have been valid, but wasn't. (process: \(process), error: \(theError))",
+                       file: file,
+                       line: line)
         return theUser!
     }
 
