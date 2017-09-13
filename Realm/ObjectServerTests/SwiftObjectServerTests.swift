@@ -282,17 +282,17 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Administration
 
+    // FIXME: the endpoint exists, but it doesn't do what we want it to anymore. Tracked in: https://github.com/realm/ros/issues/271
     func disabled_testRetrieveUserInfo() {
         let nonAdminUsername = "meela.swift@realm.example.org"
-        let adminUsername = "jyaku.swift@realm.example.org"
         let password = "p"
         let server = SwiftObjectServerTests.authServerURL()
 
         // Create a non-admin user.
         _ = logInUser(for: .init(username: nonAdminUsername, password: password, register: true),
                       server: server)
-        // Create an admin user.
-        let adminUser = makeAdminUser(adminUsername, password: password, server: server)
+        // Get the default admin user.
+        let adminUser = getSharedPersistentAdminUser(for: server)
 
         // Look up information about the non-admin user from the admin user.
         let ex = expectation(description: "Should be able to look up user information")

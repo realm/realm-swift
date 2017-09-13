@@ -458,9 +458,10 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
 /// It should be possible to grant read-only access to a global Realm.
 - (void)disabled_testWildcardGlobalRealmReadAccess {
-    RLMSyncUser *admin = [self makeAdminUser:[[NSUUID UUID] UUIDString]
-                                    password:@"password"
-                                      server:[RLMSyncTestCase authServerURL]];
+    RLMSyncUser *admin = nil;
+//    [self makeAdminUser:[[NSUUID UUID] UUIDString]
+//                                    password:@"password"
+//                                      server:[RLMSyncTestCase authServerURL]];
 
     // Open a Realm for the admin user.
     NSString *testName = NSStringFromSelector(_cmd);
@@ -515,9 +516,10 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
 /// Setting a permission for all users on a global Realm (no `~`) should work.
 - (void)disabled_testWildcardGlobalRealmWriteAccess {
-    RLMSyncUser *admin = [self makeAdminUser:[[NSUUID UUID] UUIDString]
-                                    password:@"password"
-                                      server:[RLMSyncTestCase authServerURL]];
+    RLMSyncUser *admin = nil;
+//    [self makeAdminUser:[[NSUUID UUID] UUIDString]
+//                                    password:@"password"
+//                                      server:[RLMSyncTestCase authServerURL]];
 
     // Open a Realm for the admin user.
     NSString *testName = NSStringFromSelector(_cmd);
@@ -860,9 +862,9 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     RLMSyncPermission *n2 = [sorted objectAtIndex:1];
     RLMSyncPermission *n3 = [sorted objectAtIndex:2];
 
-    XCTAssertTrue([n1.path containsString:@"r3"]);
-    XCTAssertTrue([n2.path containsString:@"r1"]);
-    XCTAssertTrue([n3.path containsString:@"r2"]);
+    XCTAssertTrue([n1.path rangeOfString:@"r3"].location != NSNotFound);
+    XCTAssertTrue([n2.path rangeOfString:@"r1"].location != NSNotFound);
+    XCTAssertTrue([n3.path rangeOfString:@"r2"].location != NSNotFound);
 
     // Make sure they are actually in ascending order.
     XCTAssertLessThan([n1.updatedAt timeIntervalSinceReferenceDate], [n2.updatedAt timeIntervalSinceReferenceDate]);
@@ -1260,7 +1262,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
         XCTestExpectation *ex2 = [self expectationWithDescription:@"We should get a permission denied error."];
         errorBlock = ^(NSError *err, RLMSyncSession *session) {
             // Make sure we're actually looking at the right session.
-            XCTAssertTrue([[session.realmURL absoluteString] containsString:sessionName]);
+            XCTAssertTrue([[session.realmURL absoluteString] rangeOfString:sessionName].location != NSNotFound);
             theError = err;
             [ex2 fulfill];
         };

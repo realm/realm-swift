@@ -221,80 +221,13 @@ static NSURL *syncDirectoryForChildProcess() {
     return theUser;
 }
 
-- (RLMSyncUser *)makeAdminUser:(NSString *)userName password:(NSString *)password server:(NSURL *)url {
-    // Admin token user (only needs to be set up once ever per test run).
-    // Note: this is shared, persistent state between tests.
-    static RLMSyncUser *adminTokenUser = nil;
+- (RLMSyncUser *)getSharedPersistentAdminUserForURL:(NSURL *)url {
+    static RLMSyncUser *adminUser = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"test-ros-instance/data/keys/admin.json"];
-        NSData *rawData = [NSData dataWithContentsOfURL:adminTokenFileURL];
-        NSDictionary *adminJSON = [NSJSONSerialization JSONObjectWithData:rawData options:0 error:nil];
-        NSString *adminToken = [adminJSON objectForKey:@"ADMIN_TOKEN"];
-        if (![adminToken isKindOfClass:[NSString class]]) {
-            XCTFail(@"Could not parse out admin token...");
-        }
-        RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken
-                                                                                identity:[[NSUUID UUID] UUIDString]];
-        adminTokenUser = [self logInUserForCredentials:credentials server:url];
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:@"realm-admin" password:@"" register:NO];
+        adminUser = [self logInUserForCredentials:creds server:url];
     });
-    XCTAssertNotNil(adminTokenUser);
-
-    // Create a new user, which starts off without admin privileges.
-    RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:password register:YES];
-    RLMSyncUser *adminUser = [self logInUserForCredentials:creds server:url];
-    XCTAssertFalse(adminUser.isAdmin);
-    NSString *adminUserID = adminUser.identity;
-    XCTAssertNotNil(adminUserID);
-
-    // Find reference in admin Realm to newly-created non-admin user.
-    @autoreleasepool {
-        RLMRealmConfiguration *adminRealmConfig = [RLMRealmConfiguration defaultConfiguration];
-        adminRealmConfig.dynamic = true;
-        NSURL *adminRealmURL = [NSURL URLWithString:@"realm://localhost:9080/__admin"];
-        adminRealmConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:adminTokenUser
-                                                                               realmURL:adminRealmURL];
-
-        XCTestExpectation *setAdminEx = [self expectationWithDescription:@"completed setting admin status on user"];
-        XCTestExpectation *findAdminEx = [self expectationWithDescription:@"found admin status on user"];
-        [RLMRealm asyncOpenWithConfiguration:adminRealmConfig callbackQueue:dispatch_get_main_queue() callback:^(RLMRealm *realm, NSError *error) {
-            XCTAssertNil(error);
-            __attribute__((objc_precise_lifetime)) RLMNotificationToken *token;
-            __block RLMObject *userObject = nil;
-            token = [[realm objects:@"User" where:@"id == %@", adminUserID] addNotificationBlock:^(RLMResults *results, __unused id change, NSError *error) {
-                XCTAssertNil(error);
-                if ([results count] > 0) {
-                    userObject = [results firstObject];
-                    [findAdminEx fulfill];
-                }
-            }];
-            [self waitForExpectations:@[findAdminEx] timeout:10.0];
-            [token invalidate];
-            [realm transactionWithBlock:^{
-                [userObject setValue:@YES forKey:@"isAdmin"];
-            }];
-            [setAdminEx fulfill];
-        }];
-        [self waitForExpectations:@[setAdminEx] timeout:20.0];
-    }
-
-    // Refresh this Realm's token until it becomes an admin user. (We don't have any other
-    // way to tell when the server has properly processed this change.)
-    BOOL isAdmin = NO;
-    for (NSInteger i=0; i<10; i++) {
-        // Log the user back in
-        RLMSyncCredentials *noRegCreds = [RLMSyncCredentials credentialsWithUsername:userName
-                                                                            password:password
-                                                                            register:NO];
-        RLMSyncUser *testUser = [self logInUserForCredentials:noRegCreds server:url];
-        if (testUser.isAdmin) {
-            isAdmin = YES;
-            break;
-        }
-        // Wait a bit then try again.
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-    }
-    XCTAssertTrue(isAdmin);
     return adminUser;
 }
 
@@ -400,7 +333,7 @@ static NSURL *syncDirectoryForChildProcess() {
         NSData *data = [file availableData];
         NSString *fragment = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         [stringBuffer appendString:fragment];
-        if ([stringBuffer rangeOfString:@"Sending: IDENT"].location != NSNotFound) {
+        if ([stringBuffer rangeOfString:@"Realm Object Server has started and is listening"].location != NSNotFound) {
             dispatch_semaphore_signal(sema);
         } else if ([stringBuffer rangeOfString:@"Error: listen EADDRINUSE"].location != NSNotFound) {
             inUseError = YES;

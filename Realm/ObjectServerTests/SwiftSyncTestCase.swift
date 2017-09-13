@@ -111,7 +111,8 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         waitForExpectations(timeout: 4, handler: nil)
         XCTAssertNotNil(theUser, file: file, line: line)
         XCTAssertEqual(theUser?.state, .active,
-                       "User should have been valid, but wasn't. (process: \(process), error: \(theError))",
+                       "User should have been valid, but wasn't. (process: \(process), error: "
+                        + "\(theError != nil ? String(describing: theError!) : "n/a"))",
                        file: file,
                        line: line)
         return theUser!

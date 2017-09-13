@@ -204,10 +204,10 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
             XCTAssertNil(error)
             ex2.fulfill()
         }
-        waitForExpectations(timeout: 2000.0, handler: nil)
+        waitForExpectations(timeout: 2.0, handler: nil)
 
         // Wait for the notification to be fired.
-        wait(for: [noteEx], timeout: 2000.0)
+        wait(for: [noteEx], timeout: 2.0)
         token.invalidate()
         let expectedPermission = SwiftPermissionsAPITests.makeExpected(from: p, owner: userA, name: uuid)
         let finalValue = get(permission: expectedPermission, from: results)
