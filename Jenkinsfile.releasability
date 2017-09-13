@@ -2,9 +2,38 @@ swiftVersions = ['3.0', '3.0.1', '3.0.2', '3.1', '3.2', '4.0']
 platforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS']
 
+def installationTest(platform, test, language) {
+  return {
+    node('osx') {
+      deleteDir()
+      unstash 'source'
+
+      if (test == "dynamic" || test == "static") {
+        unstash "${language}-packaged"
+      }
+
+      sh """
+      archive=\$(echo \$PWD/realm-${language}-*.zip)
+      cd examples/installation
+
+      if [[ -f \$archive ]]; then
+        mv \$archive .
+        unzip realm-${language}-*zip
+        find . -name 'realm-${language}-*' -print0 | xargs -J% mv % realm-${language}-latest
+      fi
+
+      ./build.sh test-${platform}-${language}-${test}
+      """
+    }
+  }
+}
+
+
 def doBuild() {
   stage('prepare') {
     node('docker') {
+      deleteDir()
+
       checkout(
         [
           $class           : 'GitSCM',
@@ -163,7 +192,7 @@ def doBuild() {
   }
 
   stage('test') {
-    parallel (
+    def parallelBuilds = [
       "Test Examples": {
         node('osx') {
           deleteDir()
@@ -184,13 +213,44 @@ def doBuild() {
           XCMODE=xcpretty sh build.sh package-test-examples
           """
         }
-      },
-
-      "Installation Examples": {
-        // FIXME: Implement this.
-        // build job: 'Cocoa Installation Examples', parameters: [string(name: 'sha', value: sha)]
       }
-    )
+    ]
+
+    // objc / osx / dynamic
+    // objc / osx / cocoapods
+    // objc / osx / carthage
+    //
+    // objc / ios / dynamic
+    // objc / ios / cocoapods
+    // objc / ios / carthage
+
+    for (def platform in ["osx", "ios"]) {
+      def platformName = platformNames[platform]
+      for (def test in ["dynamic", "cocoapods", "carthage"]) {
+        parallelBuilds["${platformName} Obj-C ${test}"] = installationTest(platform, test, 'objc')
+      }
+    }
+
+    // objc / ios / static
+    // objc / ios / cocoapods-dynamic
+
+    parallelBuilds["iOS Obj-C static"] = installationTest('ios', 'static', 'objc')
+    parallelBuilds["iOS Obj-C CocoaPods dynamic"] = installationTest('ios', 'cocoapods-dynamic', 'objc')
+
+    // swift / osx / cocoapods
+    // swift / osx / carthage
+    //
+    // swift / ios / cocoapods
+    // swift / ios / carthage
+
+    for (def platform in ["osx", "ios"]) {
+      def platformName = platformNames[platform]
+      for (def test in ["cocoapods", "carthage"]) {
+        parallelBuilds["${platformName} Swift ${test}"] = installationTest(platform, test, 'swift')
+      }
+    }
+
+    parallel parallelBuilds
   }
 }
 
