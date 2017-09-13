@@ -193,7 +193,7 @@ def doBuild() {
 
   stage('test') {
     def parallelBuilds = [
-      "Test Examples": {
+      'Test Examples': {
         node('osx') {
           deleteDir()
 
@@ -213,40 +213,41 @@ def doBuild() {
           XCMODE=xcpretty sh build.sh package-test-examples
           """
         }
+      },
+
+      'Test iOS static': {
+        node('osx') {
+          deleteDir()
+          unstash 'source'
+
+          sh 'XCMODE=xcpretty IS_RUNNING_PACKAGING=1 sh build.sh test-ios-static'
+        }
+      },
+
+      'Test macOS': {
+        node('osx') {
+          deleteDir()
+          unstash 'source'
+
+          sh 'XCMODE=xcpretty sh build.sh test-osx'
+        }
       }
     ]
-
-    // objc / osx / dynamic
-    // objc / osx / cocoapods
-    // objc / osx / carthage
-    //
-    // objc / ios / dynamic
-    // objc / ios / cocoapods
-    // objc / ios / carthage
 
     for (def platform in ["osx", "ios"]) {
       def platformName = platformNames[platform]
       for (def test in ["dynamic", "cocoapods", "carthage"]) {
-        parallelBuilds["${platformName} Obj-C ${test}"] = installationTest(platform, test, 'objc')
+        parallelBuilds["Installation - ${platformName} Obj-C ${test}"] = installationTest(platform, test, 'objc')
       }
     }
 
-    // objc / ios / static
-    // objc / ios / cocoapods-dynamic
-
-    parallelBuilds["iOS Obj-C static"] = installationTest('ios', 'static', 'objc')
-    parallelBuilds["iOS Obj-C CocoaPods dynamic"] = installationTest('ios', 'cocoapods-dynamic', 'objc')
-
-    // swift / osx / cocoapods
-    // swift / osx / carthage
-    //
-    // swift / ios / cocoapods
-    // swift / ios / carthage
+    parallelBuilds["Installation - iOS Obj-C static"] = installationTest('ios', 'static', 'objc')
+    parallelBuilds["Installation - iOS Obj-C CocoaPods dynamic"] = installationTest('ios', 'cocoapods-dynamic', 'objc')
 
     for (def platform in ["osx", "ios"]) {
       def platformName = platformNames[platform]
       for (def test in ["cocoapods", "carthage"]) {
-        parallelBuilds["${platformName} Swift ${test}"] = installationTest(platform, test, 'swift')
+        parallelBuilds["Installation - ${platformName} Swift ${test}"] = installationTest(platform, test, 'swift')
       }
     }
 

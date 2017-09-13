@@ -1189,7 +1189,6 @@ EOM
 
     "package-ios-static")
         sh build.sh prelaunch-simulator
-        sh build.sh test-ios-static
         sh build.sh ios-static
 
         cd build/ios-static
@@ -1204,7 +1203,7 @@ EOM
         ;;
 
     "package-osx")
-        sh build.sh test-osx
+        sh build.sh osx
 
         cd build/DerivedData/Realm/Build/Products/Release
         zip --symlinks -r realm-framework-osx.zip Realm.framework
