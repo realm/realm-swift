@@ -28,6 +28,19 @@ def installationTest(platform, test, language) {
   }
 }
 
+def buildObjC(platform, outputDirectory=null) {
+  return {
+    node('osx') {
+      deleteDir()
+      unstash 'source'
+      sh "XCMODE=xcpretty ./build.sh package-${platform}"
+      dir(outputDirectory ?: "build/${platform}") {
+        stash includes: "realm-framework-${platform}.zip", name: "${platform}-objc"
+      }
+    }
+  }
+}
+
 
 def doBuild() {
   stage('prepare') {
@@ -51,7 +64,7 @@ def doBuild() {
 
   stage('build') {
     def parallelBuilds = [
-      "docs": {
+      'Docs': {
         node('osx') {
           deleteDir()
           unstash 'source'
@@ -66,7 +79,7 @@ def doBuild() {
         }
       },
 
-      "examples": {
+      'Examples': {
         node('osx') {
           deleteDir()
           unstash 'source'
@@ -75,57 +88,11 @@ def doBuild() {
         }
       },
 
-      "macOS Obj-C": {
-        node('osx') {
-          deleteDir()
-          unstash 'source'
-          sh 'XCMODE=xcpretty ./build.sh package-osx'
-          // FIXME: Why is this file at a different location than for the other variants?
-          dir('build/DerivedData/Realm/Build/Products/Release') {
-            stash includes: 'realm-framework-osx.zip', name: 'osx-objc'
-          }
-        }
-      },
-      "iOS Obj-C": {
-        node('osx') {
-          deleteDir()
-          unstash 'source'
-          sh 'XCMODE=xcpretty ./build.sh package-ios-dynamic'
-          dir('build/ios') {
-            stash includes: 'realm-framework-ios.zip', name: 'ios-objc'
-          }
-        }
-      },
-      "watchOS Obj-C": {
-        node('osx') {
-          deleteDir()
-          unstash 'source'
-          sh 'XCMODE=xcpretty ./build.sh package-watchos'
-          dir('build/watchos') {
-            stash includes: 'realm-framework-watchos.zip', name: 'watchos-objc'
-          }
-        }
-      },
-      "tvOS Obj-C": {
-        node('osx') {
-          deleteDir()
-          unstash 'source'
-          sh 'XCMODE=xcpretty ./build.sh package-tvos'
-          dir('build/tvos') {
-            stash includes: 'realm-framework-tvos.zip', name: 'tvos-objc'
-          }
-        }
-      },
-      "iOS Obj-C static": {
-        node('osx') {
-          deleteDir()
-          unstash 'source'
-          sh 'XCMODE=xcpretty ./build.sh package-ios-static'
-          dir('build/ios-static') {
-            stash includes: 'realm-framework-ios-static.zip', name: 'ios-objc-static'
-          }
-        }
-      },
+      'macOS Obj-C': buildObjC('osx', 'build/DerivedData/Realm/Build/Products/Release'),
+      'iOS Obj-C': buildObjC('ios'),
+      'watchOS Obj-C': buildObjC('watchos'),
+      'tvOS Obj-C': buildObjC('tvos'),
+      'iOS Obj-C static': buildObjC('ios-static'),
     ]
 
     for (def p in platforms) {
@@ -160,7 +127,7 @@ def doBuild() {
             unstash "${platform}-objc"
           }
 
-          unstash 'ios-objc-static'
+          unstash 'ios-static-objc'
           unstash 'examples'
           unstash 'source'
 
