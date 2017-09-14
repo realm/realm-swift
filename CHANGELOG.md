@@ -1,11 +1,7 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.10.1 Release notes (2017-09-14)
 =============================================================
 
 Swift binaries are now produced for Swift 3.0, 3.0.1, 3.0.2, 3.1, 3.2 and 4.0.
-
-### API Breaking Changes
-
-* None.
 
 ### Enhancements
 
