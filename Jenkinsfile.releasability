@@ -75,7 +75,9 @@ def doBuild() {
           zip -r objc-docs.zip objc_output
           zip -r swift-docs.zip swift_output
           '''
-          stash includes: 'docs/*-docs.zip', name: 'docs'
+          dir('docs') {
+            archiveArtifacts artifacts: '*-docs.zip'
+          }
         }
       },
 
