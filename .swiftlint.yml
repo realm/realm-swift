@@ -24,3 +24,4 @@ disabled_rules:
   - line_length
   - vertical_whitespace
   - syntactic_sugar
+  - block_based_kvo
