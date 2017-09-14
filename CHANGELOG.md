@@ -1,6 +1,8 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
+Swift binaries are now produced for Swift 3.0, 3.0.1, 3.0.2, 3.1, 3.2 and 4.0.
+
 ### API Breaking Changes
 
 * None.
@@ -13,7 +15,6 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix more cases where assigning an RLMArray property to itself would clear the
   RLMArray.
-* None.
 
 2.10.0 Release notes (2017-08-21)
 =============================================================
