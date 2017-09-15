@@ -122,7 +122,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
             var theError: SyncError?
 
-            try autoreleasepool { _ in
+            try autoreleasepool {
                 let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
                 let ex = expectation(description: "Waiting for error handler to be called...")
                 SyncManager.shared.errorHandler = { (error, session) in

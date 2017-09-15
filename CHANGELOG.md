@@ -192,6 +192,20 @@ x.x.x Release notes (yyyy-MM-dd)
   `false` from `Object.shouldIncludeInDefaultSchema()`.
 * Don't clear RLMArrays on self-assignment.
 
+2.10.1 Release notes (2017-09-14)
+=============================================================
+
+Swift binaries are now produced for Swift 3.0, 3.0.1, 3.0.2, 3.1, 3.2 and 4.0.
+
+### Enhancements
+
+* Auxiliary files are excluded from backup by default.
+
+### Bugfixes
+
+* Fix more cases where assigning an RLMArray property to itself would clear the
+  RLMArray.
+
 2.10.0 Release notes (2017-08-21)
 =============================================================
 

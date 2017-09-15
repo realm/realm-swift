@@ -81,7 +81,7 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
 
     /// A human-readable description of the objects represented by the results.
     public override var description: String {
-        return RLMDescriptionWithMaxDepth("Results<\(rlmResults.objectClassName!)>", rlmResults, RLMDescriptionMaxDepth)
+        return RLMDescriptionWithMaxDepth("Results", rlmResults, RLMDescriptionMaxDepth)
     }
 
     // MARK: Fast Enumeration

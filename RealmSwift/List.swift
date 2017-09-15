@@ -32,7 +32,7 @@ public class ListBase: RLMListBase {
     }
 
     @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
-        return RLMDescriptionWithMaxDepth("List<\(_rlmArray.objectClassName)>", _rlmArray, depth)
+        return RLMDescriptionWithMaxDepth("List", _rlmArray, depth)
     }
 
     /// Returns the number of objects in this List.

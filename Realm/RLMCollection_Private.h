@@ -22,6 +22,5 @@
 
 @protocol RLMFastEnumerable;
 
-NSArray *RLMCollectionValueForKey(id<RLMFastEnumerable> collection, NSString *key);
 void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value);
 FOUNDATION_EXTERN NSString *RLMDescriptionWithMaxDepth(NSString *name, id<RLMCollection> collection, NSUInteger depth);
