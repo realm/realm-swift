@@ -326,6 +326,36 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
+REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfiguration *originalConfiguration, NSError **error) {
+    try {
+        throw;
+    }
+    catch (RealmFileException const& ex) {
+        switch (ex.kind()) {
+            case RealmFileException::Kind::IncompatibleSyncedRealm: {
+                RLMRealmConfiguration *configuration = [originalConfiguration copy];
+                configuration.fileURL = [NSURL fileURLWithPath:@(ex.path().data())];
+                configuration.readOnly = YES;
+
+                NSError *intermediateError = RLMMakeError(RLMErrorIncompatibleSyncedFile, ex);
+                NSMutableDictionary *userInfo = [intermediateError.userInfo mutableCopy];
+                userInfo[RLMBackupRealmConfigurationErrorKey] = configuration;
+                NSError *finalError = [NSError errorWithDomain:intermediateError.domain code:intermediateError.code
+                                                      userInfo:userInfo];
+                RLMSetErrorOrThrow(finalError, error);
+                break;
+            }
+            default:
+                RLMRealmTranslateException(error);
+                break;
+        }
+    }
+    catch (...) {
+        RLMRealmTranslateException(error);
+    }
+}
+
+
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
     bool dynamic = configuration.dynamic;
     bool cache = configuration.cache;
@@ -370,7 +400,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         realm->_realm = Realm::get_shared_realm(config);
     }
     catch (...) {
-        RLMRealmTranslateException(error);
+        translateSharedGroupOpenException(configuration, error);
         return nil;
     }
 
@@ -455,7 +485,7 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
         realm->_realm = Realm::get_shared_realm(configuration.config);
     }
     catch (...) {
-        RLMRealmTranslateException(error);
+        translateSharedGroupOpenException(configuration, error);
         return nil;
     }
     return realm;
