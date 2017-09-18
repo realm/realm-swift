@@ -116,6 +116,7 @@ set_xcode_and_swift_versions() {
         DEVELOPER_DIR="$(xcode-select -p)"
     fi
     export DEVELOPER_DIR
+    REALM_XCODE_VERSION=$(get_xcode_version "$DEVELOPER_DIR/usr/bin/xcodebuild")
     export REALM_XCODE_VERSION
     
     if [ -z "$REALM_SWIFT_VERSION" ]; then

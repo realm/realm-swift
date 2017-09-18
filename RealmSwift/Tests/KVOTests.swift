@@ -99,6 +99,7 @@ class KVOTests: TestCase {
         changeDictionary = change
     }
 
+    // swiftlint:disable:next cyclomatic_complexity
     func observeChange<T: Equatable>(_ obj: KVOObject, _ key: String, _ old: T?, _ new: T?,
                                      fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         let kvoOptions: NSKeyValueObservingOptions = [.old, .new]

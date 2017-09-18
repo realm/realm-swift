@@ -42,9 +42,9 @@ extension Bool: RealmOptionalType {}
 
  To change the underlying value stored by a `RealmOptional` instance, mutate the instance's `value` property.
  */
-public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
+public final class RealmOptional<Value: RealmOptionalType>: RLMOptionalBase {
     /// The value the optional represents.
-    public var value: T? {
+    public var value: Value? {
         get {
             return underlyingValue.map(dynamicBridgeCast)
         }
@@ -58,7 +58,7 @@ public final class RealmOptional<T: RealmOptionalType>: RLMOptionalBase {
 
      - parameter value: The value to store in the optional, or `nil` if not specified.
      */
-    public init(_ value: T? = nil) {
+    public init(_ value: Value? = nil) {
         super.init()
         self.value = value
     }

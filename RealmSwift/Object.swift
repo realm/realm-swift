@@ -44,9 +44,9 @@ import Realm.Private
  - `Bool`
  - `Date`, `NSDate`
  - `Data`, `NSData`
- - `RealmOptional<T>` for optional numeric properties
+ - `RealmOptional<Value>` for optional numeric properties
  - `Object` subclasses, to model many-to-one relationships
- - `List<T>`, to model many-to-many relationships
+ - `List<Element>`, to model many-to-many relationships
 
  `String`, `NSString`, `Date`, `NSDate`, `Data`, `NSData` and `Object` subclass properties can be declared as optional.
  `Int`, `Int8`, `Int16`, `Int32`, `Int64`, `Float`, `Double`, `Bool`, and `List` properties cannot. To store an optional

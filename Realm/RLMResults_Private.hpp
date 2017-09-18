@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2014 Realm Inc.
+// Copyright 2017 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,22 +16,36 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Cocoa
+#import "RLMResults_Private.h"
 
-class ViewController: NSViewController {
+#import "results.hpp"
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+NS_ASSUME_NONNULL_BEGIN
 
-        // Do any additional setup after loading the view.
-    }
-
-    override var representedObject: Any? {
-        didSet {
-        // Update the view, if already loaded.
-        }
-    }
-
-
+@interface RLMResults () {
+@protected
+    realm::Results _results;
 }
+- (instancetype)initWithResults:(realm::Results)results;
+@end
 
+NS_ASSUME_NONNULL_END
+
+// Utility functions
+
+[[gnu::noinline]]
+[[noreturn]]
+void RLMThrowResultsError(NSString * _Nullable aggregateMethod);
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnullability-completeness"
+template<typename Function>
+static auto translateRLMResultsErrors(Function&& f, NSString *aggregateMethod=nil) {
+    try {
+        return f();
+    }
+    catch (...) {
+        RLMThrowResultsError(aggregateMethod);
+    }
+}
+#pragma clang diagnostic pop

@@ -22,7 +22,7 @@ import Realm
 /**
  An iterator for a `RealmCollection` instance.
  */
-public struct RLMIterator<T: RealmCollectionValue>: IteratorProtocol {
+public struct RLMIterator<Element: RealmCollectionValue>: IteratorProtocol {
     private var generatorBase: NSFastEnumerationIterator
 
     init(collection: RLMCollection) {
@@ -30,8 +30,12 @@ public struct RLMIterator<T: RealmCollectionValue>: IteratorProtocol {
     }
 
     /// Advance to the next element and return it, or `nil` if no next element exists.
-    public mutating func next() -> T? {
-        return unsafeBitCast(generatorBase.next() as! Object?, to: Optional<T>.self)
+    public mutating func next() -> Element? {
+        let next = generatorBase.next()
+        if let next = next as? Object? {
+            return unsafeBitCast(next, to: Optional<Element>.self)
+        }
+        return next as! Element?
     }
 }
 
@@ -74,13 +78,13 @@ public struct RLMIterator<T: RealmCollectionValue>: IteratorProtocol {
  }
  ```
  */
-public enum RealmCollectionChange<T> {
+public enum RealmCollectionChange<CollectionType> {
     /**
      `.initial` indicates that the initial run of the query has completed (if
      applicable), and the collection can now be used without performing any
      blocking work.
      */
-    case initial(T)
+    case initial(CollectionType)
 
     /**
      `.update` indicates that a write transaction has been committed which
@@ -93,7 +97,7 @@ public enum RealmCollectionChange<T> {
      - parameter insertions:    The indices in the new collection which were added in this version.
      - parameter modifications: The indices of the objects in the new collection which were modified in this version.
      */
-    case update(T, deletions: [Int], insertions: [Int], modifications: [Int])
+    case update(CollectionType, deletions: [Int], insertions: [Int], modifications: [Int])
 
     /**
      If an error occurs, notification blocks are called one time with a `.error`
@@ -104,7 +108,7 @@ public enum RealmCollectionChange<T> {
      */
     case error(Error)
 
-    static func fromObjc(value: T, change: RLMCollectionChange?, error: Error?) -> RealmCollectionChange {
+    static func fromObjc(value: CollectionType, change: RLMCollectionChange?, error: Error?) -> RealmCollectionChange {
         if let error = error {
             return .error(error)
         }
@@ -187,14 +191,18 @@ extension Data: RealmCollectionValue {
 }
 
 #if swift(>=3.2)
+// FIXME: When we drop support for Swift 3.1, change ElementType to Element
+// throughout the project (this is a non-breaking change). We use ElementType
+// only because of limitations in Swift 3.1's compiler.
 /// :nodoc:
 public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined where Element: RealmCollectionValue {
+    typealias ElementType = Element
 }
 #else
 /// :nodoc:
 public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined {
     /// The type of the objects contained in the collection.
-    associatedtype Element: RealmCollectionValue
+    associatedtype ElementType: RealmCollectionValue
 }
 #endif
 
@@ -230,7 +238,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter object: An object.
      */
-    func index(of object: Element) -> Int?
+    func index(of object: ElementType) -> Int?
 
     /**
      Returns the index of the first object matching the predicate, or `nil` if no objects match.
@@ -254,14 +262,14 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
-    func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element>
+    func filter(_ predicateFormat: String, _ args: Any...) -> Results<ElementType>
 
     /**
      Returns a `Results` containing all objects matching the given predicate in the collection.
 
      - parameter predicate: The predicate to use to filter the objects.
      */
-    func filter(_ predicate: NSPredicate) -> Results<Element>
+    func filter(_ predicate: NSPredicate) -> Results<ElementType>
 
 
     // MARK: Sorting
@@ -279,7 +287,7 @@ public protocol RealmCollection: RealmCollectionBase {
      - parameter keyPath:   The key path to sort by.
      - parameter ascending: The direction to sort in.
      */
-    func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element>
+    func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<ElementType>
 
     /**
      Returns a `Results` containing the objects in the collection, but sorted.
@@ -291,7 +299,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
-    func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor
+    func sorted<S: Sequence>(by sortDescriptors: S) -> Results<ElementType> where S.Iterator.Element == SortDescriptor
 
     // MARK: Aggregate Operations
 
@@ -303,7 +311,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    func min<U: MinMaxType>(ofProperty property: String) -> U?
+    func min<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
      Returns the maximum (highest) value of the given property among all the objects in the collection, or `nil` if the
@@ -313,7 +321,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    func max<U: MinMaxType>(ofProperty property: String) -> U?
+    func max<T: MinMaxType>(ofProperty property: String) -> T?
 
     /**
     Returns the sum of the given property for objects in the collection, or `nil` if the collection is empty.
@@ -322,7 +330,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
     - parameter property: The name of a property conforming to `AddableType` to calculate sum on.
     */
-    func sum<U: AddableType>(ofProperty property: String) -> U
+    func sum<T: AddableType>(ofProperty property: String) -> T
 
     /**
      Returns the sum of the values of a given property over all the objects in the collection.
@@ -422,7 +430,7 @@ public protocol RealmCollection: RealmCollectionBase {
     func observe(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
     /// :nodoc:
-    func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
+    func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<ElementType>>) -> Void) -> NotificationToken
 }
 
 public extension RealmCollection where Element: MinMaxType {
@@ -497,9 +505,9 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
         fatalError()
     }
-    func min<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
-    func max<U: MinMaxType>(ofProperty property: String) -> U? { fatalError() }
-    func sum<U: AddableType>(ofProperty property: String) -> U { fatalError() }
+    func min<T: MinMaxType>(ofProperty property: String) -> T? { fatalError() }
+    func max<T: MinMaxType>(ofProperty property: String) -> T? { fatalError() }
+    func sum<T: AddableType>(ofProperty property: String) -> T { fatalError() }
     func average(ofProperty property: String) -> Double? { fatalError() }
     subscript(position: Int) -> Element { fatalError() }
     func makeIterator() -> RLMIterator<T> { fatalError() }
@@ -514,7 +522,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
 }
 
-private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.Element> {
+private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.ElementType> {
     let base: C
     init(base: C) {
         self.base = base
@@ -530,7 +538,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     // MARK: Index Retrieval
 
-    override func index(of object: C.Element) -> Int? { return base.index(of: object) }
+    override func index(of object: C.ElementType) -> Int? { return base.index(of: object) }
 
     override func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
 
@@ -540,35 +548,35 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     // MARK: Filtering
 
-    override func filter(_ predicateFormat: String, _ args: Any...) -> Results<C.Element> {
+    override func filter(_ predicateFormat: String, _ args: Any...) -> Results<C.ElementType> {
         return base.filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
     }
 
-    override func filter(_ predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
+    override func filter(_ predicate: NSPredicate) -> Results<C.ElementType> { return base.filter(predicate) }
 
     // MARK: Sorting
 
-    override func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<C.Element> {
+    override func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<C.ElementType> {
         return base.sorted(byKeyPath: keyPath, ascending: ascending)
     }
 
     override func sorted<S: Sequence>
-        (by sortDescriptors: S) -> Results<C.Element> where S.Iterator.Element == SortDescriptor {
+        (by sortDescriptors: S) -> Results<C.ElementType> where S.Iterator.Element == SortDescriptor {
         return base.sorted(by: sortDescriptors)
     }
 
 
     // MARK: Aggregate Operations
 
-    override func min<U: MinMaxType>(ofProperty property: String) -> U? {
+    override func min<T: MinMaxType>(ofProperty property: String) -> T? {
         return base.min(ofProperty: property)
     }
 
-    override func max<U: MinMaxType>(ofProperty property: String) -> U? {
+    override func max<T: MinMaxType>(ofProperty property: String) -> T? {
         return base.max(ofProperty: property)
     }
 
-    override func sum<U: AddableType>(ofProperty property: String) -> U {
+    override func sum<T: AddableType>(ofProperty property: String) -> T {
         return base.sum(ofProperty: property)
     }
 
@@ -579,11 +587,11 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     // MARK: Sequence Support
 
-    override subscript(position: Int) -> C.Element {
+    override subscript(position: Int) -> C.ElementType {
         #if swift(>=3.2)
             return base[position as! C.Index]
         #else
-            return base[position as! C.Index] as! C.Element
+            return base[position as! C.Index] as! C.ElementType
         #endif
     }
 
@@ -637,21 +645,23 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
  Instances of `RealmCollection` forward operations to an opaque underlying collection having the same `Element` type.
  */
-public final class AnyRealmCollection<T: RealmCollectionValue>: RealmCollection {
+public final class AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection {
+
+    /// The type of the objects contained within the collection.
+    public typealias ElementType = Element
 
     public func index(after i: Int) -> Int { return i + 1 }
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// The type of the objects contained in the collection.
-    public typealias Element = T
-    fileprivate let base: _AnyRealmCollectionBase<T>
+    fileprivate let base: _AnyRealmCollectionBase<Element>
 
-    fileprivate init(base: _AnyRealmCollectionBase<T>) {
+    fileprivate init(base: _AnyRealmCollectionBase<Element>) {
         self.base = base
     }
 
     /// Creates an `AnyRealmCollection` wrapping `base`.
-    public init<C: RealmCollection>(_ base: C) where C.Element == T {
+    public init<C: RealmCollection>(_ base: C) where C.ElementType == Element {
         self.base = _AnyRealmCollection(base: base)
     }
 
@@ -765,7 +775,7 @@ public final class AnyRealmCollection<T: RealmCollectionValue>: RealmCollection 
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func min<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
         return base.min(ofProperty: property)
     }
 
@@ -777,7 +787,7 @@ public final class AnyRealmCollection<T: RealmCollectionValue>: RealmCollection 
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func max<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
         return base.max(ofProperty: property)
     }
 
@@ -788,7 +798,7 @@ public final class AnyRealmCollection<T: RealmCollectionValue>: RealmCollection 
 
      - parameter property: The name of a property whose values should be summed.
      */
-    public func sum<U: AddableType>(ofProperty property: String) -> U { return base.sum(ofProperty: property) }
+    public func sum<T: AddableType>(ofProperty property: String) -> T { return base.sum(ofProperty: property) }
 
     /**
      Returns the average value of a given property over all the objects in the collection, or `nil` if the collection is
@@ -808,10 +818,10 @@ public final class AnyRealmCollection<T: RealmCollectionValue>: RealmCollection 
 
      - parameter index: The index.
      */
-    public subscript(position: Int) -> T { return base[position] }
+    public subscript(position: Int) -> Element { return base[position] }
 
     /// Returns a `RLMIterator` that yields successive elements in the collection.
-    public func makeIterator() -> RLMIterator<T> { return base.makeIterator() }
+    public func makeIterator() -> RLMIterator<Element> { return base.makeIterator() }
 
 
     // MARK: Collection Support
@@ -928,7 +938,7 @@ private struct AnyRealmCollectionBridgingMetadata<T: RealmCollectionValue> {
 
 extension AnyRealmCollection: AssistedObjectiveCBridgeable {
     static func bridging(from objectiveCValue: Any, with metadata: Any?) -> AnyRealmCollection {
-        guard let metadata = metadata as? AnyRealmCollectionBridgingMetadata<T> else { preconditionFailure() }
+        guard let metadata = metadata as? AnyRealmCollectionBridgingMetadata<Element> else { preconditionFailure() }
         return AnyRealmCollection(base: metadata.baseType.bridging(from: objectiveCValue, with: metadata.baseMetadata))
     }
 
@@ -944,7 +954,7 @@ extension AnyRealmCollection: AssistedObjectiveCBridgeable {
 
 extension RealmCollection {
     @available(*, unavailable, renamed: "sorted(byKeyPath:ascending:)")
-    func sorted(byProperty property: String, ascending: Bool) -> Results<Element> { fatalError() }
+    func sorted(byProperty property: String, ascending: Bool) -> Results<ElementType> { fatalError() }
 
     @available(*, unavailable, renamed: "observe(_:)")
     public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken {

@@ -131,13 +131,14 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 }
 
 - (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
-    NSString *provider = json[kRLMSyncProviderKey];
+    // FIXME: Figure out what ROS wants to do with this API, then make the appropriate changes.
+//    NSString *provider = json[kRLMSyncProviderKey];
     NSString *providerID = json[kRLMSyncProviderIDKey];
-    NSAssert([provider isKindOfClass:[NSString class]] && [providerID isKindOfClass:[NSString class]],
+    NSAssert(/*[provider isKindOfClass:[NSString class]] && */[providerID isKindOfClass:[NSString class]],
              @"malformed request; this indicates a logic error in the binding.");
     NSCharacterSet *allowed = [NSCharacterSet URLQueryAllowedCharacterSet];
-    NSString *pathComponent = [NSString stringWithFormat:@"api/providers/%@/accounts/%@",
-                               [provider stringByAddingPercentEncodingWithAllowedCharacters:allowed],
+    NSString *pathComponent = [NSString stringWithFormat:@"auth/users/%@",  //@"api/providers/%@/accounts/%@",
+                               //[provider stringByAddingPercentEncodingWithAllowedCharacters:allowed],
                                [providerID stringByAddingPercentEncodingWithAllowedCharacters:allowed]];
     return [authServerURL URLByAppendingPathComponent:pathComponent];
 }

@@ -11,6 +11,15 @@ x.x.x Release notes (yyyy-MM-dd)
   types.
 * Remove `RLMPropertyTypeArray` in favor of a separate bool `array` property on
   `RLMProperty`/`Property`.
+* Remove `RLMSyncPermissionResults`. `RLMSyncPermission`s are now vended out
+  using a `RLMResults`. This results collection supports all normal collection
+  operations except for setting values using KVO (since `RLMSyncPermission`s are
+  immutable) and the property aggregation operations.
+* `RealmCollection`'s associated type `Element` has been renamed `ElementType`.
+* Realm Swift collection types (`List`, `Results`, `AnyRealmCollection`, and
+  `LinkingObjects` have had their generic type parameter changed from `T` to
+  `Element`).
+* `RealmOptional`'s generic type parameter has been changed from `T` to `Value`.
 
 ### Enhancements
 
@@ -193,6 +202,14 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Enhancements
 
 * None.
+2.10.1 Release notes (2017-09-14)
+=============================================================
+
+Swift binaries are now produced for Swift 3.0, 3.0.1, 3.0.2, 3.1, 3.2 and 4.0.
+
+### Enhancements
+
+* Auxiliary files are excluded from backup by default.
 
 ### Bugfixes
 

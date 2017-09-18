@@ -1,0 +1,263 @@
+swiftVersions = ['3.0', '3.0.1', '3.0.2', '3.1', '3.2', '4.0']
+platforms = ['osx', 'ios', 'watchos', 'tvos']
+platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS']
+
+def installationTest(platform, test, language) {
+  return {
+    node('osx') {
+      deleteDir()
+      unstash 'source'
+
+      if (test == "dynamic" || test == "static") {
+        unstash "${language}-packaged"
+      }
+
+      sh """
+      archive=\$(echo \$PWD/realm-${language}-*.zip)
+      cd examples/installation
+
+      if [[ -f \$archive ]]; then
+        mv \$archive .
+        unzip realm-${language}-*zip
+        find . -name 'realm-${language}-*' -print0 | xargs -J% mv % realm-${language}-latest
+      fi
+
+      ./build.sh test-${platform}-${language}-${test}
+      """
+    }
+  }
+}
+
+def buildObjC(platform, outputDirectory=null) {
+  return {
+    node('osx') {
+      deleteDir()
+      unstash 'source'
+      sh "XCMODE=xcpretty ./build.sh package-${platform}"
+      dir(outputDirectory ?: "build/${platform}") {
+        stash includes: "realm-framework-${platform}.zip", name: "${platform}-objc"
+      }
+    }
+  }
+}
+
+
+def doBuild() {
+  stage('prepare') {
+    node('docker') {
+      deleteDir()
+
+      checkout(
+        [
+          $class           : 'GitSCM',
+          branches         : scm.branches,
+          gitTool          : 'native git',
+          extensions       : scm.extensions + [[$class: 'CleanCheckout'],
+                                               [$class: 'SubmoduleOption', parentCredentials: true]],
+          userRemoteConfigs: scm.userRemoteConfigs,
+        ]
+      )
+
+      stash includes: '**', name: 'source'
+    }
+  }
+
+  stage('build') {
+    def parallelBuilds = [
+      'Docs': {
+        node('osx') {
+          deleteDir()
+          unstash 'source'
+          sh '''
+          ./scripts/reset-simulators.sh
+          ./build.sh docs
+          cd docs
+          zip -r objc-docs.zip objc_output
+          zip -r swift-docs.zip swift_output
+          '''
+          dir('docs') {
+            archiveArtifacts artifacts: '*-docs.zip'
+          }
+        }
+      },
+
+      'Examples': {
+        node('osx') {
+          deleteDir()
+          unstash 'source'
+          sh 'XCMODE=xcpretty ./build.sh package-examples'
+          stash includes: 'realm-examples.zip', name: 'examples'
+        }
+      },
+
+      'macOS Obj-C': buildObjC('osx', 'build/DerivedData/Realm/Build/Products/Release'),
+      'iOS Obj-C': buildObjC('ios'),
+      'watchOS Obj-C': buildObjC('watchos'),
+      'tvOS Obj-C': buildObjC('tvos'),
+      'iOS Obj-C static': buildObjC('ios-static'),
+    ]
+
+    for (def p in platforms) {
+      def platform = p
+      def platformName = platformNames[platform]
+      for (def v in swiftVersions) {
+        def swiftVersion = v
+        parallelBuilds["${platformName} Swift ${swiftVersion}"] = {
+          node('osx') {
+            deleteDir()
+            unstash 'source'
+            sh "XCMODE=xcpretty ./build.sh package-${platform}-swift-${swiftVersion}"
+            dir("build/${platform}") {
+              stash includes: "realm-swift-framework-${platform}-swift-${swiftVersion}.zip",
+                    name: "${platform}-swift-${swiftVersion}"
+            }
+          }
+        }
+      }
+    }
+
+    parallel parallelBuilds
+  }
+
+  stage('package') {
+    parallel (
+      "Obj-C": {
+        node('osx') {
+          deleteDir()
+
+          for (def platform in platforms) {
+            unstash "${platform}-objc"
+          }
+
+          unstash 'ios-static-objc'
+          unstash 'examples'
+          unstash 'source'
+
+          sh './build.sh package-release objc'
+          stash include: 'realm-objc-*.zip', name: 'objc-packaged'
+          archiveArtifacts artifacts: 'realm-objc-*.zip'
+        }
+      },
+      "Swift": {
+        node('osx') {
+          deleteDir()
+
+          for (def platform in platforms) {
+            for (def swiftVersion in swiftVersions) {
+              unstash "${platform}-swift-${swiftVersion}"
+            }
+          }
+
+          unstash 'examples'
+          unstash 'source'
+
+          sh './build.sh package-release swift'
+          sh 'rm realm-swift-framework-*.zip'
+          stash include: 'realm-swift-*.zip', name: 'swift-packaged'
+          archiveArtifacts artifacts: 'realm-swift-*.zip'
+        }
+      }
+    )
+  }
+
+  stage('test') {
+    def parallelBuilds = [
+      'Test Examples': {
+        node('osx') {
+          deleteDir()
+
+          // FIXME: Split Obj-C and Swift.
+          unstash 'objc-packaged'
+          unstash 'swift-packaged'
+
+          def sha = params.sha
+          sh """
+          curl -O https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/build.sh
+          mkdir -p scripts
+          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/swift-version.sh -o scripts/swift-version.sh
+          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/reset-simulators.sh -o scripts/reset-simulators.sh
+          curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/reset-simulators.rb -o scripts/reset-simulators.rb
+          chmod +x scripts/reset-simulators.rb
+
+          XCMODE=xcpretty sh build.sh package-test-examples
+          """
+        }
+      },
+
+      'Test iOS static': {
+        node('osx') {
+          deleteDir()
+          unstash 'source'
+
+          sh 'XCMODE=xcpretty IS_RUNNING_PACKAGING=1 sh build.sh test-ios-static'
+        }
+      },
+
+      'Test macOS': {
+        node('osx') {
+          deleteDir()
+          unstash 'source'
+
+          sh 'XCMODE=xcpretty sh build.sh test-osx'
+        }
+      }
+    ]
+
+    for (def platform in ["osx", "ios"]) {
+      def platformName = platformNames[platform]
+      for (def test in ["dynamic", "cocoapods", "carthage"]) {
+        parallelBuilds["Installation - ${platformName} Obj-C ${test}"] = installationTest(platform, test, 'objc')
+      }
+    }
+
+    parallelBuilds["Installation - iOS Obj-C static"] = installationTest('ios', 'static', 'objc')
+    parallelBuilds["Installation - iOS Obj-C CocoaPods dynamic"] = installationTest('ios', 'cocoapods-dynamic', 'objc')
+
+    for (def platform in ["osx", "ios"]) {
+      def platformName = platformNames[platform]
+      for (def test in ["cocoapods", "carthage"]) {
+        parallelBuilds["Installation - ${platformName} Swift ${test}"] = installationTest(platform, test, 'swift')
+      }
+    }
+
+    parallel parallelBuilds
+  }
+}
+
+try {
+  doBuild()
+} catch (e) {
+  // If there was an exception thrown, the build failed
+  currentBuild.result = "FAILED"
+  throw e
+} finally {
+  // Success or failure, always send notifications
+  notifyBuild(currentBuild.result, '#cocoa-team')
+}
+
+def notifyBuild(String buildStatus = 'STARTED', String channel) {
+  // build status of null means successful
+  buildStatus =  buildStatus ?: 'SUCCESSFUL'
+
+  // Default values
+  def colorName = 'RED'
+  def colorCode = '#FF0000'
+  def subject = "${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
+  def summary = "${subject} (${env.BUILD_URL})"
+  def details = """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
+    <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>"""
+
+  // Override default values based on build status
+  if (buildStatus == 'STARTED') {
+    color = 'YELLOW'
+    colorCode = '#FFFF00'
+  } else if (buildStatus == 'SUCCESSFUL') {
+    color = 'GREEN'
+    colorCode = '#00FF00'
+  } else {
+    color = 'RED'
+    colorCode = '#FF0000'
+  }
+
+  slackSend(channel: channel, color: colorCode, message: summary)
+}

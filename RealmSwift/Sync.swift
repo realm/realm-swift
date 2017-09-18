@@ -366,6 +366,20 @@ extension SyncUser {
     }
 
     /**
+     Retrieve permissions for a user.
+     */
+    public func retrievePermissions(callback: @escaping (SyncPermissionResults?, SyncPermissionError?) -> Void) {
+        self.__retrievePermissions { (results, error) in
+            guard let results = results else {
+                callback(nil, error as! SyncPermissionError?)
+                return
+            }
+            let upcasted: RLMResults<SyncPermission> = results
+            callback(Results(upcasted as! RLMResults<AnyObject>), nil)
+        }
+    }
+
+    /**
      Returns an instance of the Management Realm owned by the user.
 
      This Realm can be used to grant other users access to Realms managed by this user.
@@ -392,85 +406,6 @@ public typealias SyncPermission = RLMSyncPermission
  - see: `RLMSyncAccessLevel`
  */
 public typealias SyncAccessLevel = RLMSyncAccessLevel
-
-/**
- A collection of `SyncPermission`s that represent the permissions
- that have been configured on all the Realms that some user is allowed
- to administer.
-
- - see: `RLMSyncPermissionResults`
- */
-public typealias SyncPermissionResults = RLMSyncPermissionResults
-
-extension SyncPermissionResults {
-    /**
-     Register to be notified when the contents of the results object change.
-
-     This method returns a token. Hold on to the token for as long as notifications
-     are desired. Call `invalidate()` on the token to stop notifications, and before
-     deallocating the token.
-     */
-    public func observe(_ block: @escaping RLMPermissionStatusBlock) -> RLMNotificationToken {
-        return __addNotificationBlock(block)
-    }
-
-    @available(*, unavailable, renamed: "observe(_:)")
-    @nonobjc public func addNotificationBlock(_ block: @escaping RLMPermissionStatusBlock) -> RLMNotificationToken {
-        fatalError()
-    }
-}
-
-#if swift(>=3.1)
-extension SyncPermissionResults: RandomAccessCollection {
-    public subscript(index: Int) -> SyncPermission {
-        return object(at: index)
-    }
-
-    public func index(after i: Int) -> Int {
-        return i + 1
-    }
-
-    public var startIndex: Int {
-        return 0
-    }
-
-    public var endIndex: Int {
-        return count
-    }
-}
-#else
-extension SyncPermissionResults {
-    /// Return the first permission value in the results, or `nil` if
-    /// the results are empty.
-    public var first: SyncPermission? {
-        return count > 0 ? object(at: 0) : nil
-    }
-
-    /// Return the last permission value in the results, or `nil` if
-    /// the results are empty.
-    public var last: SyncPermission? {
-        return count > 0 ? object(at: count - 1) : nil
-    }
-}
-
-extension SyncPermissionResults: Sequence {
-    public struct Iterator: IteratorProtocol {
-        private let iteratorBase: NSFastEnumerationIterator
-
-        fileprivate init(results: SyncPermissionResults) {
-            iteratorBase = NSFastEnumerationIterator(results)
-        }
-
-        public func next() -> SyncPermission? {
-            return iteratorBase.next() as! SyncPermission?
-        }
-    }
-
-    public func makeIterator() -> SyncPermissionResults.Iterator {
-        return Iterator(results: self)
-    }
-}
-#endif
 
 /**
  This model is used for offering permission changes to other users.
@@ -757,6 +692,64 @@ public extension SyncSession {
         }
     }
 }
+
+// MARK: - Permissions and permission results
+
+extension SyncPermission : RealmCollectionValue {
+    #if os(OSX)
+    /// :nodoc:
+    open override static func className() -> String {
+        return NSStringFromClass(SyncPermission.self)
+    }
+    #else
+    /// :nodoc:
+    open static func className() -> String {
+        return NSStringFromClass(SyncPermission.self)
+    }
+    #endif
+}
+
+/**
+ A `Results` collection containing sync permission results.
+ */
+public typealias SyncPermissionResults = Results<SyncPermission>
+
+/**
+ A property upon which a `SyncPermissionResults` can be sorted or queried.
+ The raw value string can be used to construct predicates and queries
+ manually.
+
+ - warning: If building `NSPredicate`s using format strings including these
+            raw values, use `%K` instead of `%@` as the substitution
+            parameter.
+
+ - see: `RLMSyncPermissionSortProperty`
+ */
+public typealias SyncPermissionSortProperty = RLMSyncPermissionSortProperty
+
+extension SortDescriptor {
+    /**
+     Construct a sort descriptor using a `SyncPermissionSortProperty`.
+     */
+    public init(sortProperty: SyncPermissionSortProperty, ascending: Bool = true) {
+        self.init(keyPath: sortProperty.rawValue, ascending: ascending)
+    }
+}
+
+#if swift(>=3.1)
+extension Results where Element == SyncPermission {
+    /**
+     Return a `Results<SyncPermissionValue>` containing the objects represented
+     by the results, but sorted on the specified property.
+
+     - see: `sorted(byKeyPath:, ascending:)`
+     */
+    public func sorted(bySortProperty sortProperty: SyncPermissionSortProperty,
+                       ascending: Bool = true) -> Results<Element> {
+        return sorted(by: [SortDescriptor(sortProperty: sortProperty, ascending: ascending)])
+    }
+}
+#endif
 
 // MARK: - Migration assistance
 
