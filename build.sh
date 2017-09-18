@@ -313,7 +313,8 @@ download_object_server() {
     rm -rf ./test-ros-instance
     mkdir -p ./test-ros-instance/ros
     chmod 777 ./test-ros-instance
-    npm install --prefix ./test-ros-instance/ros -g realm-object-server@${REALM_OBJECT_SERVER_VERSION}
+    /usr/local/bin/node /usr/local/bin/npm install --scripts-prepend-node-path=auto --prefix ./test-ros-instance/ros \
+        -g realm-object-server@${REALM_OBJECT_SERVER_VERSION}
 }
 
 download_common() {
