@@ -136,9 +136,12 @@ public protocol RealmCollectionValue {
 }
 
 #if swift(>=3.2)
+// FIXME: When we drop support for Swift 3.1, change ElementType to Element
+// throughout the project (this is a non-breaking change). We use ElementType
+// only because of limitations in Swift 3.1's compiler.
 /// :nodoc:
 public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined where Element: RealmCollectionValue {
-    associatedtype ElementType: RealmCollectionValue
+    typealias ElementType = Element
 }
 #else
 /// :nodoc:
@@ -373,12 +376,6 @@ public protocol RealmCollection: RealmCollectionBase {
 
     /// :nodoc:
     func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<ElementType>>) -> Void) -> NotificationToken
-
-#if swift(>=3.2)
-    // Work around Swift type inference deficiencies.
-    /// :nodoc:
-    subscript(_ index: Int) -> ElementType { get }
-#endif
 }
 
 private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiveCBridgeable {
@@ -481,7 +478,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     override subscript(position: Int) -> C.ElementType {
         #if swift(>=3.2)
-            return base[position]
+            return base[position as! C.Index]
         #else
             return base[position as! C.Index] as! C.ElementType
         #endif
