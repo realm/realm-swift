@@ -76,7 +76,7 @@
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, RLMSyncAuthErrorDomain);
-        // FIXME ROS 2 changed the error
+        // FIXME ROS 2.0: ROS 2.0 changed the error
 //        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
         XCTAssertNotNil(error.localizedDescription);
 
@@ -257,7 +257,7 @@
                                                    server:[RLMObjectServerTests authServerURL]];
         XCTestExpectation *ex = [self expectationWithDescription:@"change password callback invoked"];
         [user changePassword:secondPassword completion:^(NSError * _Nullable error) {
-            // FIXME: this endpoint is broken. Tracked in https://github.com/realm/ros/issues/273
+            // FIXME ROS 2.0: this endpoint is broken. Tracked in https://github.com/realm/ros/issues/273
             XCTAssertNil(error);
             [ex fulfill];
         }];
@@ -302,7 +302,7 @@
 }
 
 /// A sync user should be able to successfully change their own password.
-// FIXME: re-enable this. Issue tracked in https://github.com/realm/ros/issues/273
+// FIXME ROS 2.0: Issue tracked in https://github.com/realm/ros/issues/273
 - (void)disabled_testOtherUserChangePassword {
     // Create admin user.
     NSURL *url = [RLMObjectServerTests authServerURL];
@@ -536,7 +536,7 @@
         XCTAssertEqualObjects(u.identity, weakUser.identity);
         // Make sure we get the right error.
         XCTAssertEqualObjects(error.domain, RLMSyncAuthErrorDomain);
-        // FIXME: ROS 2 changed the error
+        // FIXME ROS 2.0: ROS 2.0 changed the error
 //        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
         invoked = YES;
         [ex fulfill];

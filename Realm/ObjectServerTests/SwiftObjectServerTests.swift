@@ -282,7 +282,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Administration
 
-    // FIXME: the endpoint exists, but it doesn't do what we want it to anymore. Tracked in: https://github.com/realm/ros/issues/271
+    // FIXME ROS 2.0: the endpoint exists, but it doesn't do what we want it to anymore.
+    // Tracked in: https://github.com/realm/ros/issues/271
     func disabled_testRetrieveUserInfo() {
         let nonAdminUsername = "meela.swift@realm.example.org"
         let password = "p"
@@ -326,8 +327,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertNil(user)
                 XCTAssertTrue(error is SyncAuthError)
                 let castError = error as! SyncAuthError
-                // FIXME: We don't return a 611 error anymore
-//                XCTAssertEqual(castError.code, SyncAuthError.invalidCredential)
+                // FIXME ROS 2.0: We don't return a 611 error anymore
+                // XCTAssertEqual(castError.code, SyncAuthError.invalidCredential)
                 ex.fulfill()
             }
             waitForExpectations(timeout: 2.0, handler: nil)
@@ -347,8 +348,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             var invoked = false
             user.errorHandler = { (u, error) in
                 XCTAssertEqual(u.identity, user.identity)
-                // FIXME: ROS 2 changed this error
-//                XCTAssertEqual(error.code, .invalidCredential)
+                // FIXME ROS 2.0: ROS 2.0 changed this error
+                // XCTAssertEqual(error.code, .invalidCredential)
                 invoked = true
                 ex.fulfill()
             }
