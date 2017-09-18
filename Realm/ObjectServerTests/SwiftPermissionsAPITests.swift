@@ -116,7 +116,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
     }
 
     /// Setting a permission should work, and then that permission should be able to be retrieved.
-    func testSettingPermissions() {
+    func disabled_testSettingPermissions() {
         // First, there should be no permissions.
         let ex = expectation(description: "No permissions for newly created user.")
         var results: SyncPermissionResults!
@@ -166,7 +166,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
     }
 
     /// Observing permission changes should work.
-    func testObservingPermissions() {
+    func disabled_testObservingPermissions() {
         // Get a reference to the permission results.
         let ex = expectation(description: "Retrieve permission results.")
         var results: SyncPermissionResults!
@@ -215,7 +215,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
     }
 
     /// User should not be able to change a permission for a Realm they don't own.
-    func testSettingUnownedRealmPermission() {
+    func disabled_testSettingUnownedRealmPermission() {
         // Open a Realm for user A.
         let uuid = UUID().uuidString
         let url = SwiftSyncTestCase.uniqueRealmURL(customName: uuid)

@@ -221,76 +221,13 @@ static NSURL *syncDirectoryForChildProcess() {
     return theUser;
 }
 
-- (RLMSyncUser *)makeAdminUser:(NSString *)userName password:(NSString *)password server:(NSURL *)url {
-    // Admin token user (only needs to be set up once ever per test run).
-    // Note: this is shared, persistent state between tests.
-    static RLMSyncUser *adminTokenUser = nil;
+- (RLMSyncUser *)getSharedPersistentAdminUserForURL:(NSURL *)url {
+    static RLMSyncUser *adminUser = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
-        NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL
-                                                        encoding:NSUTF8StringEncoding error:nil];
-        RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken
-                                                                                identity:[[NSUUID UUID] UUIDString]];
-        adminTokenUser = [self logInUserForCredentials:credentials server:url];
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:@"realm-admin" password:@"" register:NO];
+        adminUser = [self logInUserForCredentials:creds server:url];
     });
-    XCTAssertNotNil(adminTokenUser);
-
-    // Create a new user, which starts off without admin privileges.
-    RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:password register:YES];
-    RLMSyncUser *adminUser = [self logInUserForCredentials:creds server:url];
-    XCTAssertFalse(adminUser.isAdmin);
-    NSString *adminUserID = adminUser.identity;
-    XCTAssertNotNil(adminUserID);
-
-    // Find reference in admin Realm to newly-created non-admin user.
-    @autoreleasepool {
-        RLMRealmConfiguration *adminRealmConfig = [RLMRealmConfiguration defaultConfiguration];
-        adminRealmConfig.dynamic = true;
-        NSURL *adminRealmURL = [NSURL URLWithString:@"realm://localhost:9080/__admin"];
-        adminRealmConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:adminTokenUser
-                                                                               realmURL:adminRealmURL];
-
-        XCTestExpectation *setAdminEx = [self expectationWithDescription:@"completed setting admin status on user"];
-        XCTestExpectation *findAdminEx = [self expectationWithDescription:@"found admin status on user"];
-        [RLMRealm asyncOpenWithConfiguration:adminRealmConfig callbackQueue:dispatch_get_main_queue() callback:^(RLMRealm *realm, NSError *error) {
-            XCTAssertNil(error);
-            __attribute__((objc_precise_lifetime)) RLMNotificationToken *token;
-            __block RLMObject *userObject = nil;
-            token = [[realm objects:@"User" where:@"id == %@", adminUserID] addNotificationBlock:^(RLMResults *results, __unused id change, NSError *error) {
-                XCTAssertNil(error);
-                if ([results count] > 0) {
-                    userObject = [results firstObject];
-                    [findAdminEx fulfill];
-                }
-            }];
-            [self waitForExpectations:@[findAdminEx] timeout:10.0];
-            [token invalidate];
-            [realm transactionWithBlock:^{
-                [userObject setValue:@YES forKey:@"isAdmin"];
-            }];
-            [setAdminEx fulfill];
-        }];
-        [self waitForExpectations:@[setAdminEx] timeout:20.0];
-    }
-
-    // Refresh this Realm's token until it becomes an admin user. (We don't have any other
-    // way to tell when the server has properly processed this change.)
-    BOOL isAdmin = NO;
-    for (NSInteger i=0; i<10; i++) {
-        // Log the user back in
-        RLMSyncCredentials *noRegCreds = [RLMSyncCredentials credentialsWithUsername:userName
-                                                                            password:password
-                                                                            register:NO];
-        RLMSyncUser *testUser = [self logInUserForCredentials:noRegCreds server:url];
-        if (testUser.isAdmin) {
-            isAdmin = YES;
-            break;
-        }
-        // Wait a bit then try again.
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
-    }
-    XCTAssertTrue(isAdmin);
     return adminUser;
 }
 
@@ -367,10 +304,10 @@ static NSURL *syncDirectoryForChildProcess() {
 
 + (void)setUp {
     [super setUp];
-    NSString *syncDirectory = [[[self rootRealmCocoaURL] URLByAppendingPathComponent:@"sync"] path];
-    BOOL isDirectory = NO;
-    if (![[NSFileManager defaultManager] fileExistsAtPath:syncDirectory isDirectory:&isDirectory] || !isDirectory) {
-        NSLog(@"sync/ directory doesn't exist. You need to run 'build.sh download-object-server' prior to running these tests");
+    NSURL *target = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"test-ros-instance/ros/bin/ros"];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[target path]]) {
+        NSLog(@"The Realm Object Server isn't installed. You need to run 'build.sh download-object-server'"
+              @" prior to running these tests.");
         abort();
     }
 }
@@ -379,27 +316,45 @@ static NSURL *syncDirectoryForChildProcess() {
     if (!self.isParent || s_task) {
         return;
     }
+    NSPipe *pipe = [NSPipe pipe];
+    NSMutableString *stringBuffer = [[NSMutableString alloc] init];
+    __block BOOL inUseError = NO;
     [RLMSyncTestCase runResetObjectServer:YES];
     NSTask *task = [[NSTask alloc] init];
-    task.currentDirectoryPath = [[RLMSyncTestCase rootRealmCocoaURL] path];
-    task.launchPath = @"/bin/sh";
-    task.arguments = @[@"build.sh", @"start-object-server"];
+    NSString *currentDirPath = [[[RLMSyncTestCase rootRealmCocoaURL]
+                                 URLByAppendingPathComponent:@"test-ros-instance/"] path];
+    task.currentDirectoryPath = currentDirPath;
+    task.launchPath = @"/usr/local/bin/node";
+    task.arguments = @[@"./ros/bin/ros", @"start"];
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    task.standardOutput = [NSPipe pipe];
-    [[task.standardOutput fileHandleForReading] setReadabilityHandler:^(NSFileHandle *file) {
+    task.standardOutput = pipe;
+    task.standardError = pipe;
+    [[task.standardError fileHandleForReading] setReadabilityHandler:^(NSFileHandle *file) {
         NSData *data = [file availableData];
-        NSString *output = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        if ([output containsString:@"Received: IDENT"]) {
+        NSString *fragment = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        [stringBuffer appendString:fragment];
+        if ([stringBuffer rangeOfString:@"Realm Object Server has started and is listening"].location != NSNotFound) {
             dispatch_semaphore_signal(sema);
+        } else if ([stringBuffer rangeOfString:@"Error: listen EADDRINUSE"].location != NSNotFound) {
+            inUseError = YES;
+            dispatch_semaphore_signal(sema);
+        } else if ([fragment characterAtIndex:[fragment length] - 1] == '\n') {
+            // Reached EOL, reset the string buffer.
+            [stringBuffer setString:@""];
         }
     }];
     s_task = task;
     [task launch];
     const NSTimeInterval timeout = 60;
     BOOL wait_result = dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
-    if (!wait_result) {
+    if (!wait_result || inUseError) {
         s_task = nil;
-        XCTFail(@"Server did not start up within the allotted timeout interval.");
+        if (inUseError) {
+            XCTFail(@"Server tried to start up, but the port was already in use (probably already running).");
+        } else {
+            XCTFail(@"Server did not start up within the allotted timeout interval.");
+        }
+        abort();
     }
 }
 
@@ -407,8 +362,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSTask *task = [[NSTask alloc] init];
     task.currentDirectoryPath = [[RLMSyncTestCase rootRealmCocoaURL] path];
     task.launchPath = @"/bin/sh";
-    task.arguments = @[@"build.sh", initial ? @"reset-object-server" : @"reset-object-server-between-tests"];
-    task.standardOutput = [NSPipe pipe];
+    task.arguments = @[@"build.sh", initial ? @"reset-object-server" : @"reset-ros-client-state"];
     [task launch];
     [task waitUntilExit];
 }

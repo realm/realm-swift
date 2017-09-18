@@ -42,6 +42,7 @@ Usage: sh $0 command [argument]
 command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
+  download-object-server:  downloads and installs the Realm Object Server
   download-sync:        downloads sync library (binary version, core+sync)
   build:                builds all iOS  and OS X frameworks
   ios-static:           builds fat iOS static framework
@@ -68,6 +69,7 @@ command:
   test-osx:             tests OS X framework
   test-osx-swift:       tests RealmSwift OS X framework
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device in both Debug and Release configurations, swiftlint
+  verify-osx-object-server:  downloads the Realm Object Server and runs the Objective-C and Swift integration tests
   docs:                 builds docs in docs/output
   examples:             builds all examples
   examples-ios:         builds all static iOS examples
@@ -302,20 +304,17 @@ fi
 ######################################
 
 kill_object_server() {
-    (pgrep -f realm-object-server || true) | while read pid; do
-        kill $pid 2>/dev/null
-    done
+# Based on build.sh conventions we always run ROS from a path ending in 'ros/bin/ros'.
+    pid=$(ps ax | grep "ros/bin/ros start$" | sed -e 's/^[[:space:]]*//' | awk '{ print $1 }')
+    kill $pid 2>/dev/null
 }
 
 download_object_server() {
-    local archive_name="realm-object-server-bundled_node_darwin-developer-$REALM_OBJECT_SERVER_VERSION.tar.gz"
-    /usr/bin/curl -L -O "https://static.realm.io/downloads/object-server/$archive_name"
-    rm -rf sync
-    mkdir sync
-    tar xf $archive_name -C sync
-    rm $archive_name
-    cp Configuration/object-server-config.yml sync/object-server/configuration.yml
-    touch "sync/object-server/do_not_open_browser"
+    rm -rf ./test-ros-instance
+    mkdir -p ./test-ros-instance/ros
+    chmod 777 ./test-ros-instance
+    /usr/local/bin/node /usr/local/bin/npm install --scripts-prepend-node-path=auto --prefix ./test-ros-instance/ros \
+        -g realm-object-server@${REALM_OBJECT_SERVER_VERSION}
 }
 
 download_common() {
@@ -326,7 +325,7 @@ download_common() {
         url="https://static.realm.io/downloads/core/realm-core-${version}.tar.xz"
     elif [ "$download_type" == "sync" ]; then
         version=$REALM_SYNC_VERSION
-        url="https://static.realm.io/downloads/sync/realm-sync-cocoa-${version}.tar.gz"
+        url="https://static.realm.io/downloads/sync/realm-sync-cocoa-${version}.tar.xz"
     else
         echo "Unknown dowload_type: $download_type"
         exit 1
@@ -423,14 +422,13 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "start-object-server")
-        kill_object_server
-        ./sync/start-object-server.command
+    "reset-ros-server-state")
+        rm -rf "./test-ros-instance/data"
+        rm -rf "./test-ros-instance/realm-object-server"
         exit 0
         ;;
 
-    "reset-object-server-between-tests")
-        # Leave the server files alone to avoid 'bad_server_ident' errors
+    "reset-ros-client-state")
         rm -rf "~/Library/Application Support/xctest"
         rm -rf "~/Library/Application Support/io.realm.TestHost"
         rm -rf "~/Library/Application Support/xctest-child"
@@ -441,16 +439,10 @@ case "$COMMAND" in
         kill_object_server
         # Add a short delay, so file system doesn't complain about files in use
         sleep 1
-        package="${source_root}/sync"
-        for file in "$package"/realm-object-server-*; do
-            if [ -d "$file" ]; then
-                package="$file"
-                break
-            fi
-        done
-        rm -rf "$package/object-server/root_dir/"
-        rm -rf "$package/object-server/temp_dir/"
-        sh build.sh reset-object-server-between-tests
+        sh build.sh reset-ros-server-state
+        sh build.sh reset-ros-client-state
+        # Add another delay to ensure files are actually gone from file system
+        sleep 1
         exit 0
         ;;
 
