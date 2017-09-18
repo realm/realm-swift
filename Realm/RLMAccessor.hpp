@@ -68,6 +68,8 @@ public:
     RLMOptionalId default_value_for_property(realm::ObjectSchema const&,
                                              std::string const& prop);
 
+    bool is_same_list(realm::List const& list, id v) const noexcept;
+
     template<typename Func>
     void enumerate_list(__unsafe_unretained const id v, Func&& func) {
         for (id value in v) {

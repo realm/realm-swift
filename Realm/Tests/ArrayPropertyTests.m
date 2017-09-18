@@ -1040,6 +1040,8 @@
     // Self-assignment is a no-op
     array2.intArray = array2.intArray;
     XCTAssertEqualObjects([array2.intArray valueForKey:@"self"], (@[io2, io3]));
+    array2[@"intArray"] = array2[@"intArray"];
+    XCTAssertEqualObjects([array2[@"intArray"] valueForKey:@"self"], (@[io2, io3]));
 }
 
 - (void)testManagedAssignment {
@@ -1073,6 +1075,8 @@
     // Self-assignment is a no-op
     array2.intArray = array2.intArray;
     XCTAssertEqualObjects([array2.intArray valueForKey:@"intCol"], (@[@2, @3]));
+    array2[@"intArray"] = array2[@"intArray"];
+    XCTAssertEqualObjects([array2[@"intArray"] valueForKey:@"intCol"], (@[@2, @3]));
 
     [realm cancelWriteTransaction];
 }

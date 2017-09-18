@@ -96,6 +96,10 @@ EOF
 # Xcode Helpers
 ######################################
 
+xcode_version_major() {
+    echo "${REALM_XCODE_VERSION%%.*}"
+}
+
 xcode() {
     mkdir -p build/DerivedData
     CMD="xcodebuild -IDECustomDerivedDataLocation=build/DerivedData $@"
@@ -143,7 +147,11 @@ build_combined() {
         destination="Apple Watch - 42mm"
     elif [[ "$os" == "appletvos"  ]]; then
         os_name="tvos"
-        destination="Apple TV 1080p"
+        if (( $(xcode_version_major) >= 9 )); then
+            destination="Apple TV"
+        else
+            destination="Apple TV 1080p"
+        fi
     fi
 
     # Derive build paths
@@ -194,12 +202,14 @@ test_ios_static() {
     local previous_realm_xcode_version="$REALM_XCODE_VERSION"
     local previous_realm_swift_version="$REALM_SWIFT_VERSION"
     if [[ "$IS_RUNNING_PACKAGING" == "1" ]]; then
-      force_xcode_82
+        force_xcode_82
     fi
 
     destination="$1"
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' build"
-    xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+    if (( $(xcode_version_major) < 9 )); then
+        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+    fi
 
     # Xcode's depending tracking is lacking and it doesn't realize that the Realm static framework's static library
     # needs to be recreated when the active architectures change. Help Xcode out by removing the static library.
@@ -210,11 +220,11 @@ test_ios_static() {
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test"
 
     if [[ "$IS_RUNNING_PACKAGING" == "1" ]]; then
-      # Reset to state before forcing Xcode 8.2
-      REALM_XCODE_VERSION="$previous_realm_xcode_version"
-      REALM_SWIFT_VERSION="$previous_realm_swift_version"
-      set_xcode_and_swift_versions
-      sh build.sh prelaunch-simulator
+        # Reset to state before forcing Xcode 8.2
+        REALM_XCODE_VERSION="$previous_realm_xcode_version"
+        REALM_SWIFT_VERSION="$previous_realm_swift_version"
+        set_xcode_and_swift_versions
+        sh build.sh prelaunch-simulator
     fi
 }
 
@@ -631,14 +641,18 @@ case "$COMMAND" in
 
     "test-ios-dynamic")
         xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        if (( $(xcode_version_major) < 9 )); then
+            xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        fi
         xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
     "test-ios-swift")
         xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        if (( $(xcode_version_major) < 9 )); then
+            xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
+        fi
         xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
@@ -662,12 +676,22 @@ case "$COMMAND" in
         ;;
 
     "test-tvos")
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
+        if (( $(xcode_version_major) >= 9 )); then
+            destination="Apple TV"
+        else
+            destination="Apple TV 1080p"
+        fi
+        xc "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination' test"
         exit $?
         ;;
 
     "test-tvos-swift")
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=Apple TV 1080p' test"
+        if (( $(xcode_version_major) >= 9 )); then
+            destination="Apple TV"
+        else
+            destination="Apple TV 1080p"
+        fi
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination' test"
         exit $?
         ;;
 
@@ -878,7 +902,11 @@ case "$COMMAND" in
 
     "examples-ios-swift")
         sh build.sh prelaunch-simulator
-        workspace="examples/ios/swift-$REALM_SWIFT_VERSION/RealmExamples.xcworkspace"
+        workspace="examples/ios/swift/RealmExamples.xcworkspace"
+        if [[ ! -d "$workspace" ]]; then
+            workspace="${workspace/swift/swift-$REALM_SWIFT_VERSION}"
+        fi
+
         xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme Migration -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
@@ -894,15 +922,31 @@ case "$COMMAND" in
 
     "examples-tvos")
         workspace="examples/tvos/objc/RealmExamples.xcworkspace"
-        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
+        if (( $(xcode_version_major) >= 9 )); then
+            destination="Apple TV"
+        else
+            destination="Apple TV 1080p"
+        fi
+
+        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
     "examples-tvos-swift")
-        workspace="examples/tvos/swift-$REALM_SWIFT_VERSION/RealmExamples.xcworkspace"
-        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=Apple TV 1080p' build ${CODESIGN_PARAMS}"
+        workspace="examples/tvos/swift/RealmExamples.xcworkspace"
+        if [[ ! -d "$workspace" ]]; then
+            workspace="${workspace/swift/swift-$REALM_SWIFT_VERSION}"
+        fi
+
+        if (( $(xcode_version_major) >= 9 )); then
+            destination="Apple TV"
+        else
+            destination="Apple TV 1080p"
+        fi
+
+        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
@@ -1095,7 +1139,6 @@ EOM
     ######################################
 
     "package-examples")
-        cd tightdb_objc
         ./scripts/package_examples.rb
         zip --symlinks -r realm-examples.zip examples -x "examples/installation/*"
         ;;
@@ -1129,36 +1172,29 @@ EOM
         ;;
 
     "package-ios-static")
-        cd tightdb_objc
-
         sh build.sh prelaunch-simulator
-        sh build.sh test-ios-static
         sh build.sh ios-static
 
         cd build/ios-static
-        zip --symlinks -r realm-framework-ios.zip Realm.framework
+        zip --symlinks -r realm-framework-ios-static.zip Realm.framework
         ;;
 
-    "package-ios-dynamic")
-        cd tightdb_objc
-
+    "package-ios")
         sh build.sh prelaunch-simulator
         sh build.sh ios-dynamic
         cd build/ios
-        zip --symlinks -r realm-dynamic-framework-ios.zip Realm.framework
+        zip --symlinks -r realm-framework-ios.zip Realm.framework
         ;;
 
     "package-osx")
-        cd tightdb_objc
-        sh build.sh test-osx
+        sh build.sh osx
 
         cd build/DerivedData/Realm/Build/Products/Release
         zip --symlinks -r realm-framework-osx.zip Realm.framework
         ;;
 
     "package-ios-swift")
-        cd tightdb_objc
-        for version in 8.0 8.1 8.2 8.3.3; do
+        for version in 8.0 8.1 8.2 8.3.3 9.0; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1167,12 +1203,12 @@ EOM
         done
 
         cd build/ios
-        zip --symlinks -r realm-swift-framework-ios.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1
+        ln -s swift-4.0 swift-3.2
+        zip --symlinks -r realm-swift-framework-ios.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1 swift-3.2 swift-4.0
         ;;
 
     "package-osx-swift")
-        cd tightdb_objc
-        for version in 8.0 8.1 8.2 8.3.3; do
+        for version in 8.0 8.1 8.2 8.3.3 9.0; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1181,11 +1217,11 @@ EOM
         done
 
         cd build/osx
-        zip --symlinks -r realm-swift-framework-osx.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1
+        ln -s swift-4.0 swift-3.2
+        zip --symlinks -r realm-swift-framework-osx.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1 swift-3.2 swift-4.0
         ;;
 
     "package-watchos")
-        cd tightdb_objc
         sh build.sh prelaunch-simulator
         sh build.sh watchos
 
@@ -1194,8 +1230,7 @@ EOM
         ;;
 
     "package-watchos-swift")
-        cd tightdb_objc
-        for version in 8.0 8.1 8.2 8.3.3; do
+        for version in 8.0 8.1 8.2 8.3.3 9.0; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1204,11 +1239,11 @@ EOM
         done
 
         cd build/watchos
-        zip --symlinks -r realm-swift-framework-watchos.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1
+        ln -s swift-4.0 swift-3.2
+        zip --symlinks -r realm-swift-framework-watchos.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1 swift-3.2 swift-4.0
         ;;
 
     "package-tvos")
-        cd tightdb_objc
         sh build.sh prelaunch-simulator
         sh build.sh tvos
 
@@ -1217,8 +1252,7 @@ EOM
         ;;
 
     "package-tvos-swift")
-        cd tightdb_objc
-        for version in 8.0 8.1 8.2 8.3.3; do
+        for version in 8.0 8.1 8.2 8.3.3 9.0; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1227,16 +1261,36 @@ EOM
         done
 
         cd build/tvos
-        zip --symlinks -r realm-swift-framework-tvos.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1
+        ln -s swift-4.0 swift-3.2
+        zip --symlinks -r realm-swift-framework-tvos.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1 swift-3.2 swift-4.0
+        ;;
+
+    package-*-swift-3.2)
+        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
+        mkdir -p build/$PLATFORM
+        cd build/$PLATFORM
+        ln -s swift-4.0 swift-3.2
+        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.2.zip swift-3.2
+        ;;
+
+    package-*-swift-*)
+        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
+        REALM_SWIFT_VERSION=$(echo $COMMAND | cut -d - -f 4)
+        REALM_XCODE_VERSION=
+
+        set_xcode_and_swift_versions
+        sh build.sh prelaunch-simulator
+        sh build.sh $PLATFORM-swift
+
+        cd build/$PLATFORM
+        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-$REALM_SWIFT_VERSION.zip swift-$REALM_SWIFT_VERSION
         ;;
 
     "package-release")
         LANG="$2"
         TEMPDIR=$(mktemp -d $TMPDIR/realm-release-package-${LANG}.XXXX)
 
-        cd tightdb_objc
         VERSION=$(sh build.sh get-version)
-        cd ..
 
         FOLDER=${TEMPDIR}/realm-${LANG}-${VERSION}
 
@@ -1254,12 +1308,12 @@ EOM
 
             (
                 cd ${FOLDER}/ios/static
-                unzip ${WORKSPACE}/realm-framework-ios.zip
+                unzip ${WORKSPACE}/realm-framework-ios-static.zip
             )
 
             (
                 cd ${FOLDER}/ios/dynamic
-                unzip ${WORKSPACE}/realm-dynamic-framework-ios.zip
+                unzip ${WORKSPACE}/realm-framework-ios.zip
             )
 
             (
@@ -1274,27 +1328,35 @@ EOM
         else
             (
                 cd ${FOLDER}/osx
-                unzip ${WORKSPACE}/realm-swift-framework-osx.zip
+                for f in ${WORKSPACE}/realm-swift-framework-osx-swift-*.zip; do
+                    unzip "$f"
+                done
             )
 
             (
                 cd ${FOLDER}/ios
-                unzip ${WORKSPACE}/realm-swift-framework-ios.zip
+                for f in ${WORKSPACE}/realm-swift-framework-ios-swift-*.zip; do
+                    unzip "$f"
+                done
             )
 
             (
                 cd ${FOLDER}/watchos
-                unzip ${WORKSPACE}/realm-swift-framework-watchos.zip
+                for f in ${WORKSPACE}/realm-swift-framework-watchos-swift-*.zip; do
+                    unzip "$f"
+                done
             )
 
             (
                 cd ${FOLDER}/tvos
-                unzip ${WORKSPACE}/realm-swift-framework-tvos.zip
+                for f in ${WORKSPACE}/realm-swift-framework-tvos-swift-*.zip; do
+                    unzip "$f"
+                done
             )
         fi
 
         (
-            cd ${WORKSPACE}/tightdb_objc
+            cd ${WORKSPACE}
             cp -R plugin ${FOLDER}
             cp LICENSE ${FOLDER}/LICENSE.txt
             if [[ "${LANG}" == "objc" ]]; then
@@ -1348,44 +1410,45 @@ EOF
         WORKSPACE="$(cd "$WORKSPACE" && pwd)"
         export WORKSPACE
         cd $WORKSPACE
-        git clone --recursive $REALM_SOURCE tightdb_objc
+        git clone --recursive $REALM_SOURCE realm-cocoa
+        cd realm-cocoa
 
         echo 'Packaging iOS'
-        sh tightdb_objc/build.sh package-ios-static
-        cp tightdb_objc/build/ios-static/realm-framework-ios.zip .
-        sh tightdb_objc/build.sh package-ios-dynamic
-        cp tightdb_objc/build/ios/realm-dynamic-framework-ios.zip .
-        sh tightdb_objc/build.sh package-ios-swift
-        cp tightdb_objc/build/ios/realm-swift-framework-ios.zip .
+        sh build.sh package-ios-static
+        cp build/ios-static/realm-framework-ios-static.zip ..
+        sh build.sh package-ios
+        cp build/ios/realm-framework-ios.zip ..
+        sh build.sh package-ios-swift
+        cp build/ios/realm-swift-framework-ios.zip ..
 
         echo 'Packaging OS X'
-        sh tightdb_objc/build.sh package-osx
-        cp tightdb_objc/build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip .
-        sh tightdb_objc/build.sh package-osx-swift
-        cp tightdb_objc/build/osx/realm-swift-framework-osx.zip .
+        sh build.sh package-osx
+        cp build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip ..
+        sh build.sh package-osx-swift
+        cp build/osx/realm-swift-framework-osx.zip ..
 
         echo 'Packaging watchOS'
-        sh tightdb_objc/build.sh package-watchos
-        cp tightdb_objc/build/watchos/realm-framework-watchos.zip .
-        sh tightdb_objc/build.sh package-watchos-swift
-        cp tightdb_objc/build/watchos/realm-swift-framework-watchos.zip .
+        sh build.sh package-watchos
+        cp build/watchos/realm-framework-watchos.zip ..
+        sh build.sh package-watchos-swift
+        cp build/watchos/realm-swift-framework-watchos.zip ..
 
         echo 'Packaging tvOS'
-        sh tightdb_objc/build.sh package-tvos
-        cp tightdb_objc/build/tvos/realm-framework-tvos.zip .
-        sh tightdb_objc/build.sh package-tvos-swift
-        cp tightdb_objc/build/tvos/realm-swift-framework-tvos.zip .
+        sh build.sh package-tvos
+        cp build/tvos/realm-framework-tvos.zip ..
+        sh build.sh package-tvos-swift
+        cp build/tvos/realm-swift-framework-tvos.zip ..
 
         echo 'Packaging examples'
-        sh tightdb_objc/build.sh package-examples
-        cp tightdb_objc/realm-examples.zip .
+        sh build.sh package-examples
+        cp realm-examples.zip ..
 
         echo 'Building final release packages'
-        sh tightdb_objc/build.sh package-release objc
-        sh tightdb_objc/build.sh package-release swift
+        sh build.sh package-release objc
+        sh build.sh package-release swift
 
         echo 'Testing packaged examples'
-        sh tightdb_objc/build.sh package-test-examples
+        sh build.sh package-test-examples
         ;;
 
     "github-release")

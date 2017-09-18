@@ -88,9 +88,9 @@ begin
       output = `xcrun simctl create '#{device_type['name']}' '#{device_type['identifier']}' '#{runtime['identifier']}' 2>&1`
       next if $? == 0
 
-      # Error code 161 indicates that the given device is not supported by the runtime, such as the iPad 2 and
+      # Error code 161 and 162 indicate that the given device is not supported by the runtime, such as the iPad 2 and
       # iPhone 4s not being supported by the iOS 10 simulator runtime.
-      next if output =~ /(domain=com.apple.CoreSimulator.SimError, code=161)/
+      next if output =~ /(domain=com.apple.CoreSimulator.SimError, code=16[12])/
 
       puts "Failed to create device of type #{device_type['identifier']} with runtime #{runtime['identifier']}:"
       output.each_line do |line|

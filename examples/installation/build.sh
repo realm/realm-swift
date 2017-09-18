@@ -53,6 +53,9 @@ xctest() {
     LANG="$2"
     NAME="$3"
     DIRECTORY="$PLATFORM/$LANG/$NAME"
+    if [[ ! -d "$DIRECTORY" ]]; then
+        DIRECTORY="${DIRECTORY/swift/swift-$REALM_SWIFT_VERSION}"
+    fi
     PROJECT="$DIRECTORY/$NAME.xcodeproj"
     WORKSPACE="$DIRECTORY/$NAME.xcworkspace"
     if [[ $PLATFORM == ios ]]; then
@@ -129,15 +132,15 @@ case "$COMMAND" in
         ;;
 
     "test-ios-swift-dynamic")
-        xctest ios swift-$REALM_SWIFT_VERSION DynamicExample
+        xctest ios swift DynamicExample
         ;;
 
     "test-ios-swift-cocoapods")
-        xctest ios swift-$REALM_SWIFT_VERSION CocoaPodsExample
+        xctest ios swift CocoaPodsExample
         ;;
 
     "test-ios-swift-carthage")
-        xctest ios swift-$REALM_SWIFT_VERSION CarthageExample
+        xctest ios swift CarthageExample
         ;;
 
     "test-osx-objc-dynamic")
@@ -153,15 +156,15 @@ case "$COMMAND" in
         ;;
 
     "test-osx-swift-dynamic")
-        xctest osx swift-$REALM_SWIFT_VERSION DynamicExample
+        xctest osx swift DynamicExample
         ;;
 
     "test-osx-swift-cocoapods")
-        xctest osx swift-$REALM_SWIFT_VERSION CocoaPodsExample
+        xctest osx swift CocoaPodsExample
         ;;
 
     "test-osx-swift-carthage")
-        xctest osx swift-$REALM_SWIFT_VERSION CarthageExample
+        xctest osx swift CarthageExample
         ;;
 
     "test-watchos-objc-dynamic")
@@ -177,15 +180,15 @@ case "$COMMAND" in
         ;;
 
     "test-watchos-swift-dynamic")
-        xctest watchos swift-$REALM_SWIFT_VERSION DynamicExample
+        xctest watchos swift DynamicExample
         ;;
 
     "test-watchos-swift-cocoapods")
-        xctest watchos swift-$REALM_SWIFT_VERSION CocoaPodsExample
+        xctest watchos swift CocoaPodsExample
         ;;
 
     "test-watchos-swift-carthage")
-        xctest watchos swift-$REALM_SWIFT_VERSION CarthageExample
+        xctest watchos swift CarthageExample
         ;;
 
     *)

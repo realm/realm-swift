@@ -80,8 +80,8 @@
                            property:(__unsafe_unretained RLMProperty *const)property {
     __unsafe_unretained RLMRealm *const realm = parentObject->_realm;
     auto col = parentObject->_info->tableColumn(property);
-    realm::List list(realm->_realm, parentObject->_row.get_linklist(col));
-    return [self initWithList:std::move(list)
+    auto& row = parentObject->_row;
+    return [self initWithList:realm::List(realm->_realm, *row.get_table(), col, row.get_index())
                         realm:realm
                    parentInfo:parentObject->_info
                      property:property];
@@ -131,9 +131,9 @@ static void throwError(NSString *aggregateMethod) {
                             e.requested, e.valid_count);
     }
     catch (realm::Results::UnsupportedColumnTypeException const& e) {
-        @throw RLMException(@"%@ is not supported for %@ property '%s'",
+        @throw RLMException(@"%@ is not supported for %s property '%s'",
                             aggregateMethod,
-                            RLMTypeToString((RLMPropertyType)e.column_type),
+                            string_for_property_type(e.property_type),
                             e.column_name.data());
     }
     catch (std::logic_error const& e) {
@@ -327,10 +327,10 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 - (id)valueForKeyPath:(NSString *)keyPath {
     if ([keyPath hasPrefix:@"@"]) {
         // Delegate KVC collection operators to RLMResults
-        auto query = translateErrors([&] { return _backingList.get_query(); });
-        RLMResults *results = [RLMResults resultsWithObjectInfo:*_objectInfo
-                                                        results:realm::Results(_realm->_realm, std::move(query))];
-        return [results valueForKeyPath:keyPath];
+        return translateErrors([&] {
+            auto results = [RLMResults resultsWithObjectInfo:*_objectInfo results:_backingList.as_results()];
+            return [results valueForKeyPath:keyPath];
+        });
     }
     return [super valueForKeyPath:keyPath];
 }
@@ -342,12 +342,14 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     // changes occur, and can't be sent explicitly, but works normally when it's
     // the entire key path), and an RLMManagedArray *can't* have objects where
     // invalidated is true, so we're not losing much.
-    if ([key isEqualToString:RLMInvalidatedKey]) {
-        return @(!_backingList.is_valid());
-    }
+    return translateErrors([&]() -> id {
+        if ([key isEqualToString:RLMInvalidatedKey]) {
+            return @(!_backingList.is_valid());
+        }
 
-    translateErrors([&] { _backingList.verify_attached(); });
-    return RLMCollectionValueForKey(self, key);
+        _backingList.verify_attached();
+        return RLMCollectionValueForKey(_backingList, key, _realm, *_objectInfo);
+    });
 }
 
 - (void)setValue:(id)value forKey:(NSString *)key {
@@ -355,31 +357,27 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     RLMCollectionSetValueForKey(self, key, value);
 }
 
-- (id)aggregate:(NSString *)property
-         method:(realm::util::Optional<realm::Mixed> (realm::List::*)(size_t))method
-     methodName:(NSString *)methodName {
-    size_t column = _objectInfo->tableColumn(property);
-    auto value = translateErrors([&] { return (_backingList.*method)(column); }, methodName);
-    if (!value) {
-        return nil;
-    }
-    return RLMMixedToObjc(*value);
-}
-
 - (id)minOfProperty:(NSString *)property {
-    return [self aggregate:property method:&realm::List::min methodName:@"minOfProperty"];
+    size_t column = _objectInfo->tableColumn(property);
+    auto value = translateErrors([&] { return _backingList.min(column); }, @"minOfProperty");
+    return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)maxOfProperty:(NSString *)property {
-    return [self aggregate:property method:&realm::List::max methodName:@"maxOfProperty"];
+    size_t column = _objectInfo->tableColumn(property);
+    auto value = translateErrors([&] { return _backingList.max(column); }, @"maxOfProperty");
+    return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)sumOfProperty:(NSString *)property {
-    return [self aggregate:property method:&realm::List::sum methodName:@"sumOfProperty"];
+    size_t column = _objectInfo->tableColumn(property);
+    return RLMMixedToObjc(translateErrors([&] { return _backingList.sum(column); }, @"sumOfProperty"));
 }
 
 - (id)averageOfProperty:(NSString *)property {
-    return [self aggregate:property method:&realm::List::average methodName:@"averageOfProperty"];
+    size_t column = _objectInfo->tableColumn(property);
+    auto value = translateErrors([&] { return _backingList.average(column); }, @"averageOfProperty");
+    return value ? @(*value) : nil;
 }
 
 - (void)deleteObjectsFromRealm {
@@ -427,10 +425,6 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
             context:(void *)context {
     RLMEnsureArrayObservationInfo(_observationInfo, keyPath, self, self);
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
-}
-
-- (NSUInteger)indexInSource:(NSUInteger)index {
-    return _backingList.get_unchecked(index);
 }
 
 - (realm::TableView)tableView {
