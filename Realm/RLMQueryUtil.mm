@@ -32,6 +32,7 @@
 #include <realm/query_engine.hpp>
 #include <realm/query_expression.hpp>
 #include <realm/util/cf_ptr.hpp>
+#include <realm/util/overload.hpp>
 
 using namespace realm;
 
@@ -87,66 +88,6 @@ BOOL RLMPropertyTypeIsNumeric(RLMPropertyType propertyType) {
     }
 }
 
-
-// Declare an overload set using lambdas or other function objects.
-// A minimal version of C++ Library Evolution Working Group proposal P0051R2.
-// FIXME: Switch to realm::util::overload once https://github.com/realm/realm-core/pull/2539 is in a core release.
-
-template <typename Fn, typename... Fns>
-struct Overloaded : Fn, Overloaded<Fns...> {
-    template <typename U, typename... Rest>
-    Overloaded(U&& fn, Rest&&... rest) : Fn(std::forward<U>(fn)), Overloaded<Fns...>(std::forward<Rest>(rest)...) { }
-
-    using Fn::operator();
-    using Overloaded<Fns...>::operator();
-};
-
-template <typename Fn>
-struct Overloaded<Fn> : Fn {
-    template <typename U>
-    Overloaded(U&& fn) : Fn(std::forward<U>(fn)) { }
-
-    using Fn::operator();
-};
-
-template <typename... Fns>
-Overloaded<Fns...> overload(Fns&&... f)
-{
-    return Overloaded<Fns...>(std::forward<Fns>(f)...);
-}
-
-
-// FIXME: TrueExpression and FalseExpression should be supported by core in some way
-
-struct TrueExpression : realm::Expression {
-    size_t find_first(size_t start, size_t end) const override
-    {
-        if (start != end)
-            return start;
-
-        return realm::not_found;
-    }
-    void set_base_table(const Table*) override {}
-    void verify_column() const override {}
-    const Table* get_base_table() const override { return nullptr; }
-    std::unique_ptr<Expression> clone(QueryNodeHandoverPatches*) const override
-    {
-        return std::unique_ptr<Expression>(new TrueExpression(*this));
-    }
-};
-
-struct FalseExpression : realm::Expression {
-    size_t find_first(size_t, size_t) const override { return realm::not_found; }
-    void set_base_table(const Table*) override {}
-    void verify_column() const override {}
-    const Table* get_base_table() const override { return nullptr; }
-    std::unique_ptr<Expression> clone(QueryNodeHandoverPatches*) const override
-    {
-        return std::unique_ptr<Expression>(new FalseExpression(*this));
-    }
-};
-
-
 // Equal and ContainsSubstring are used by QueryBuilder::add_string_constraint as the comparator
 // for performing diacritic-insensitive comparisons.
 
@@ -176,6 +117,9 @@ struct Equal {
 
         return equal(options, v1, v2);
     }
+
+    // FIXME: Consider the options.
+    static const char* description() { return "equal"; }
 };
 
 bool contains_substring(CFStringCompareFlags options, StringData v1, StringData v2)
@@ -215,6 +159,9 @@ struct ContainsSubstring {
 
         return contains_substring(options, v1, v2);
     }
+
+    // FIXME: Consider the options.
+    static const char* description() { return "contains"; }
 };
 
 
@@ -687,8 +634,8 @@ void QueryBuilder::add_string_constraint(NSPredicateOperatorType operatorType,
         return;
     }
 
-    auto as_subexpr = overload([](StringData value) { return make_subexpr<ConstantStringValue>(value); },
-                               [](const Columns<String>& c) { return c.clone(); });
+    auto as_subexpr = util::overload([](StringData value) { return make_subexpr<ConstantStringValue>(value); },
+                                     [](const Columns<String>& c) { return c.clone(); });
     auto left = as_subexpr(column);
     auto right = as_subexpr(value);
 
