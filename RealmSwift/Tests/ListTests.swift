@@ -643,7 +643,8 @@ class ListRetrievedTests: ListTests {
     }
 }
 
-class ListRangeReplaceableCollectionMethodsTests: XCTestCase {
+/// Ensure the range replaceable collection methods behave correctly when emulated for Swift 4 and later.
+class ListRRCMethodsTests: XCTestCase {
     private func compare(array: [Int], with list: List<SwiftIntObject>) {
         guard array.count == list.count else {
             XCTFail("Array and list have different sizes (\(array.count) and \(list.count), respectively).")
