@@ -192,16 +192,6 @@ x.x.x Release notes (yyyy-MM-dd)
   `false` from `Object.shouldIncludeInDefaultSchema()`.
 * Don't clear RLMArrays on self-assignment.
 
-x.x.x Release notes (yyyy-MM-dd)
-=============================================================
-
-### API Breaking Changes
-
-* None.
-
-### Enhancements
-
-* None.
 2.10.1 Release notes (2017-09-14)
 =============================================================
 
