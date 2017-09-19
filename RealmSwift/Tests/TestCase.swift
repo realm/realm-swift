@@ -142,12 +142,10 @@ class TestCase: XCTestCase {
         }
 
         XCTAssertEqual(expected.count, actual.count, "Collection counts were incorrect", file: file, line: line)
-        for (e, a) in zip(expected, actual) {
-            if e != a {
-                XCTFail("assertEqual failed: (\"\(expected)\") is not equal to (\"\(actual)\")",
-                    file: file, line: line)
-                return
-            }
+        for (e, a) in zip(expected, actual) where e != a {
+            XCTFail("assertEqual failed: (\"\(expected)\") is not equal to (\"\(actual)\")",
+                file: file, line: line)
+            return
         }
     }
 

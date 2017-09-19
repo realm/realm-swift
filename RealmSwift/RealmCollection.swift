@@ -128,26 +128,29 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
 
 /// A type which can be stored in a Realm List or Results
 public protocol RealmCollectionValue {
+    // swiftlint:disable:next identifier_name
     static func _rlmArray() -> RLMArray<AnyObject>
 }
 
 extension RealmCollectionValue {
+    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .int, optional: false)
     }
 }
 
 extension Optional: RealmCollectionValue {
+    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         switch Wrapped.self {
         case is Int.Type, is Int8.Type, is Int16.Type, is Int32.Type, is Int64.Type:
             return RLMArray(objectType: .int, optional: true)
-        case is Bool.Type:   return RLMArray(objectType: .bool,  optional: true)
-        case is Float.Type:  return RLMArray(objectType: .float,  optional: true)
+        case is Bool.Type:   return RLMArray(objectType: .bool, optional: true)
+        case is Float.Type:  return RLMArray(objectType: .float, optional: true)
         case is Double.Type: return RLMArray(objectType: .double, optional: true)
         case is String.Type: return RLMArray(objectType: .string, optional: true)
-        case is Data.Type:   return RLMArray(objectType: .data,   optional: true)
-        case is Date.Type:   return RLMArray(objectType: .date,   optional: true)
+        case is Data.Type:   return RLMArray(objectType: .data, optional: true)
+        case is Date.Type:   return RLMArray(objectType: .date, optional: true)
         default: fatalError("Unsupported type for List: \(Wrapped.self)?")
         }
     }
@@ -159,32 +162,38 @@ extension Int16: RealmCollectionValue {}
 extension Int32: RealmCollectionValue {}
 extension Int64: RealmCollectionValue {}
 extension Float: RealmCollectionValue {
+    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .float, optional: false)
     }
 }
 extension Double: RealmCollectionValue {
+    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .double, optional: false)
     }
 }
 extension Bool: RealmCollectionValue {
+    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .bool, optional: false)
     }
 }
 
 extension String: RealmCollectionValue {
+    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .string, optional: false)
     }
 }
 extension Date: RealmCollectionValue {
+    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .date, optional: false)
     }
 }
 extension Data: RealmCollectionValue {
+    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .data, optional: false)
     }
@@ -435,9 +444,11 @@ public protocol RealmCollection: RealmCollectionBase {
 
 public protocol OptionalProtocol {
     associatedtype Wrapped
+    // swiftlint:disable:next identifier_name
     func _rlmInferWrappedType() -> Wrapped
 }
 extension Optional: OptionalProtocol {
+    // swiftlint:disable:next identifier_name
     public func _rlmInferWrappedType() -> Wrapped { return self! }
 }
 
