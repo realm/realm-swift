@@ -3764,6 +3764,16 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                 if (bIsNull) {
                     return -1;
                 }
+
+                if ([a isKindOfClass:[NSData class]]) {
+                    if ([a length] != [b length])
+                        return [a length] < [b length] ? -1 : 1;
+                    int result = memcmp([a bytes], [b bytes], [a length]);
+                    if (!result)
+                        return 0;
+                    return result < 0 ? -1 : 1;
+                }
+
                 return [a compare:b];
             }];
 }
