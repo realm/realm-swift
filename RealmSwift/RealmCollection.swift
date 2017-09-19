@@ -433,6 +433,17 @@ public protocol RealmCollection: RealmCollectionBase {
     func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<ElementType>>) -> Void) -> NotificationToken
 }
 
+public protocol OptionalProtocol {
+    associatedtype Wrapped
+    func _rlmInferWrappedType() -> Wrapped
+}
+extension Optional: OptionalProtocol {
+    public func _rlmInferWrappedType() -> Wrapped { return self! }
+}
+
+
+// FIXME: See the declaration of RealmCollectionBase for why this `#if` is required.
+#if swift(>=3.2)
 public extension RealmCollection where Element: MinMaxType {
     public func min() -> Element? {
         return min(ofProperty: "self")
@@ -440,14 +451,6 @@ public extension RealmCollection where Element: MinMaxType {
     public func max() -> Element? {
         return max(ofProperty: "self")
     }
-}
-
-public protocol OptionalProtocol {
-    associatedtype Wrapped
-    func _rlmInferWrappedType() -> Wrapped
-}
-extension Optional: OptionalProtocol {
-    public func _rlmInferWrappedType() -> Wrapped { return self! }
 }
 
 public extension RealmCollection where Element: OptionalProtocol, Element.Wrapped: MinMaxType {
@@ -488,6 +491,55 @@ public extension RealmCollection where Element: OptionalProtocol, Element.Wrappe
         return sorted(byKeyPath: "self", ascending: ascending)
     }
 }
+#else
+public extension RealmCollection where ElementType: MinMaxType {
+    public func min() -> ElementType? {
+        return min(ofProperty: "self")
+    }
+    public func max() -> ElementType? {
+        return max(ofProperty: "self")
+    }
+}
+
+public extension RealmCollection where ElementType: OptionalProtocol, ElementType.Wrapped: MinMaxType {
+    public func min() -> ElementType.Wrapped? {
+        return min(ofProperty: "self")
+    }
+    public func max() -> ElementType.Wrapped? {
+        return max(ofProperty: "self")
+    }
+}
+
+public extension RealmCollection where ElementType: AddableType {
+    public func sum() -> ElementType {
+        return sum(ofProperty: "self")
+    }
+    public func average() -> Double? {
+        return average(ofProperty: "self")
+    }
+}
+
+public extension RealmCollection where ElementType: OptionalProtocol, ElementType.Wrapped: AddableType {
+    public func sum() -> ElementType.Wrapped {
+        return sum(ofProperty: "self")
+    }
+    public func average() -> Double? {
+        return average(ofProperty: "self")
+    }
+}
+
+public extension RealmCollection where ElementType: Comparable {
+    public func sorted(ascending: Bool = true) -> Results<ElementType> {
+        return sorted(byKeyPath: "self", ascending: ascending)
+    }
+}
+
+public extension RealmCollection where ElementType: OptionalProtocol, ElementType.Wrapped: Comparable {
+    public func sorted(ascending: Bool = true) -> Results<ElementType> {
+        return sorted(byKeyPath: "self", ascending: ascending)
+    }
+}
+#endif
 
 private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiveCBridgeable {
     typealias Wrapper = AnyRealmCollection<Element>
