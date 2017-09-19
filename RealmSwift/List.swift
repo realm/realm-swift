@@ -319,17 +319,6 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     }
 
     /**
-     Removes the last object in the list. The object is not removed from the Realm that manages it.
-
-     This is a no-op if the List is already empty.
-
-     - warning: This method may only be called during a write transaction.
-     */
-    public func removeLast() {
-        _rlmArray.removeLastObject()
-    }
-
-    /**
      Removes all objects from the list. The objects are not removed from the Realm that manages them.
 
      - warning: This method may only be called during a write transaction.
@@ -525,32 +514,16 @@ extension List: MutableCollection {
     }
 
     /**
-     Removes the first object in the list. The object is not removed from the
-     Realm that manages it.
-
-     This is a no-op if the list is already empty.
-
-     - warning: This method may only be called during a write transaction.
-     */
-    public func removeFirst() {
-        guard _rlmArray.count > 0 else {
-            return
-        }
-        _rlmArray.removeObject(at: 0)
-    }
-
-    /**
      Removes the specified number of objects from the beginning of the list. The
      objects are not removed from the Realm that manages them.
 
-     This is a no-op if the list is already empty.
-
      - warning: This method may only be called during a write transaction.
      */
-    public func removeFirst(_ number: Int) {
+    public func removeFirst(_ number: Int = 1) {
         let count = Int(_rlmArray.count)
         guard number <= count else {
-            throwRealmException("It is not possible to remove more objects from a list than it already contains.")
+            throwRealmException("It is not possible to remove more objects (\(number)) from a list"
+                + " than it already contains (\(count)).")
             return
         }
         for _ in 0..<number {
@@ -562,14 +535,13 @@ extension List: MutableCollection {
      Removes the specified number of objects from the end of the list. The objects
      are not removed from the Realm that manages them.
 
-     This is a no-op if the list is already empty.
-
      - warning: This method may only be called during a write transaction.
      */
-    public func removeLast(_ number: Int) {
+    public func removeLast(_ number: Int = 1) {
         let count = Int(_rlmArray.count)
         guard number <= count else {
-            throwRealmException("It is not possible to remove more objects from a list than it already contains.")
+            throwRealmException("It is not possible to remove more objects (\(number)) from a list"
+                + " than it already contains (\(count)).")
             return
         }
         for _ in 0..<number {
@@ -584,8 +556,10 @@ extension List: MutableCollection {
      */
     public func insert<C: Collection>(contentsOf newElements: C, at i: Int)
         where C.Iterator.Element == Element {
-            for item in newElements.reversed() {
+            var i = i
+            for item in newElements {
                 insert(item, at: i)
+                i += 1
             }
     }
 
@@ -641,6 +615,18 @@ extension List: MutableCollection {
 #else
 // MARK: - RangeReplaceableCollection support
 extension List: RangeReplaceableCollection {
+    /**
+     Removes the last object in the list. The object is not removed from the Realm that manages it.
+
+     - warning: This method may only be called during a write transaction.
+     */
+    public func removeLast() {
+        guard _rlmArray.count > 0 else {
+            throwRealmException("It is not possible to remove an object from an empty list.")
+            return
+        }
+        _rlmArray.removeLastObject()
+    }
 
 #if swift(>=3.1)
     // These should not be necessary, but Swift 3.1's compiler fails to infer the `SubSequence`,

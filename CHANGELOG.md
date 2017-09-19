@@ -30,6 +30,8 @@ x.x.x Release notes (yyyy-MM-dd)
   `RangeReplaceableCollection`. For Swift 4, the empty collection initializer has been
   removed, and default implementations of range replaceable collection methods that
   make sense for `List` have been added.
+* `List.removeLast()` now throws an exception if the list is empty, to match the standard
+  library's `Collection.removeLast()` semantics.
 
 ### Enhancements
 

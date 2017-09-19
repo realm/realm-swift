@@ -196,8 +196,7 @@ class ListTests: TestCase {
         array.removeLast()
         XCTAssertEqual(Int(0), array.count)
 
-        array.removeLast() // should be a no-op
-        XCTAssertEqual(Int(0), array.count)
+        assertThrows(array.removeLast())    // Should throw if already empty
     }
 
     func testRemoveAll() {
@@ -644,7 +643,6 @@ class ListRetrievedTests: ListTests {
     }
 }
 
-#if swift(>=4.0)
 class ListRangeReplaceableCollectionMethodsTests: XCTestCase {
     private func compare(array: [Int], with list: List<SwiftIntObject>) {
         guard array.count == list.count else {
@@ -681,11 +679,13 @@ class ListRangeReplaceableCollectionMethodsTests: XCTestCase {
         array = makeArray(from: list)
     }
 
+#if swift(>=4.0)
     func testSubscript() {
         list[1..<4] = createListObject([10, 11, 12]).intArray[0..<2]
         array[1..<4] = [10, 11]
         compare(array: array, with: list)
     }
+#endif
 
     func testRemoveFirst() {
         list.removeFirst()
@@ -742,4 +742,3 @@ class ListRangeReplaceableCollectionMethodsTests: XCTestCase {
         compare(array: array, with: list)
     }
 }
-#endif
