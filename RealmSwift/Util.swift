@@ -19,6 +19,10 @@
 import Foundation
 import Realm
 
+#if !BUILDING_REALM_SWIFT
+import RealmSwift
+#endif
+
 // MARK: Internal Helpers
 
 // Swift 3.1 provides fixits for some of our uses of unsafeBitCast

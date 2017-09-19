@@ -19,7 +19,7 @@
 // swiftlint:disable type_name identifier_name statement_position cyclomatic_complexity
 
 import XCTest
-@testable import RealmSwift
+import RealmSwift
 
 protocol ObjectFactory {
     static func isManaged() -> Bool
