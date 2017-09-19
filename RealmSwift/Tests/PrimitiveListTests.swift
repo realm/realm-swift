@@ -241,7 +241,7 @@ final class OptionalDataFactory: ValueFactory {
     }
 
     static func values() -> [Data?] {
-        return [nil, "a".data(using: .utf8)!, "c".data(using: .utf8)!]
+        return [nil, "a".data(using: .utf8), "c".data(using: .utf8)]
     }
 }
 
@@ -520,7 +520,7 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
     func testValueForKey() {
         assertEqualTo(array.value(forKey: "self").count, 0)
         array.append(objectsIn: values)
-        assertEqualTo(values!, array.value(forKey: "self") as [AnyObject] as! [V.T])
+        assertEqualTo(values!, array.value(forKey: "self").map { $0 as! V.T })
 
         assertThrows(array.value(forKey: "not self"), named: "NSUnknownKeyException")
     }
