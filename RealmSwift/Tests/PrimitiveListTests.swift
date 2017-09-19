@@ -619,8 +619,12 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
     func testReplaceRange() {
         assertSucceeds { array.replaceSubrange(0..<0, with: []) }
+
+#if false
+        // FIXME: The exception thrown here runs afoul of Swift's exclusive access checking.
         assertThrows(array.replaceSubrange(0..<1, with: []),
                      reason: "Index 0 is out of bounds")
+#endif
 
         array.replaceSubrange(0..<0, with: [values[0]])
         XCTAssertEqual(array.count, 1)
