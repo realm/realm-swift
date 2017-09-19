@@ -301,7 +301,7 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
 
     // No conditional conformance means that Optional<T: Equatable> can't
     // itself conform to Equatable
-    override func assertEqual<T>(_ expected: T, _ actual: T, fileName: StaticString = #file, lineNumber: UInt = #line) {
+    func assertEqualTo<T>(_ expected: T, _ actual: T, fileName: StaticString = #file, lineNumber: UInt = #line) {
         if T.self is Int.Type {
             XCTAssertEqual(expected as! Int, actual as! Int, file: fileName, line: lineNumber)
         }
@@ -440,7 +440,7 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
         }
     }
 
-    override func assertEqual<T>(_ expected: T?, _ actual: T?, fileName: StaticString = #file, lineNumber: UInt = #line) {
+    func assertEqualTo<T>(_ expected: T?, _ actual: T?, fileName: StaticString = #file, lineNumber: UInt = #line) {
         if expected == nil {
             XCTAssertNil(actual, file: fileName, line: lineNumber)
         }
@@ -448,16 +448,16 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
             XCTFail("nil")
         }
         else {
-            assertEqual(expected!, actual!, fileName: fileName, lineNumber: lineNumber)
+            assertEqualTo(expected!, actual!, fileName: fileName, lineNumber: lineNumber)
         }
     }
 
-    func assertEqual<T>(_ expected: T, _ actual: T?) {
+    func assertEqualTo<T>(_ expected: T, _ actual: T?) {
         guard let actual = actual else {
             XCTFail("nil")
             return
         }
-        assertEqual(expected, actual)
+        assertEqualTo(expected, actual)
     }
 }
 
@@ -474,11 +474,11 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         XCTAssertNil(array.index(of: values[0]))
 
         array.append(values[0])
-        assertEqual(0, array.index(of: values[0]))
+        assertEqualTo(0, array.index(of: values[0]))
 
         array.append(values[1])
-        assertEqual(0, array.index(of: values[0]))
-        assertEqual(1, array.index(of: values[1]))
+        assertEqualTo(0, array.index(of: values[0]))
+        assertEqualTo(1, array.index(of: values[1]))
     }
 
     func testIndexMatching() {
@@ -486,17 +486,17 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         XCTAssertNil(array.index(matching: "self = %@", values[0]))
 
         array.append(values[0])
-        assertEqual(0, array.index(matching: "self = %@", values[0]))
+        assertEqualTo(0, array.index(matching: "self = %@", values[0]))
 
         array.append(values[1])
-        assertEqual(0, array.index(matching: "self = %@", values[0]))
-        assertEqual(1, array.index(matching: "self = %@", values[1]))
+        assertEqualTo(0, array.index(matching: "self = %@", values[0]))
+        assertEqualTo(1, array.index(matching: "self = %@", values[1]))
     }
 
     func testSubscript() {
         array.append(objectsIn: values)
         for i in 0..<values.count {
-            assertEqual(array[i], values[i])
+            assertEqualTo(array[i], values[i])
         }
         assertThrows(array[values.count], reason: "Index 3 is out of bounds")
         assertThrows(array[-1], reason: "negative value")
@@ -504,23 +504,23 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
     func testFirst() {
         array.append(objectsIn: values)
-        assertEqual(array.first, values.first)
+        assertEqualTo(array.first, values.first)
         array.removeAll()
         XCTAssertNil(array.first)
     }
 
     func testLast() {
         array.append(objectsIn: values)
-        assertEqual(array.last, values.last)
+        assertEqualTo(array.last, values.last)
         array.removeAll()
         XCTAssertNil(array.last)
 
     }
 
     func testValueForKey() {
-        assertEqual(array.value(forKey: "self").count, 0)
+        assertEqualTo(array.value(forKey: "self").count, 0)
         array.append(objectsIn: values)
-        assertEqual(values!, array.value(forKey: "self") as [AnyObject] as! [V.T])
+        assertEqualTo(values!, array.value(forKey: "self") as [AnyObject] as! [V.T])
 
         assertThrows(array.value(forKey: "not self"), named: "NSUnknownKeyException")
     }
@@ -536,22 +536,22 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
     }
 
     func testInsert() {
-        assertEqual(Int(0), array.count)
+        assertEqualTo(Int(0), array.count)
 
         array.insert(values[0], at: 0)
-        assertEqual(Int(1), array.count)
-        assertEqual(values[0], array[0])
+        assertEqualTo(Int(1), array.count)
+        assertEqualTo(values[0], array[0])
 
         array.insert(values[1], at: 0)
-        assertEqual(Int(2), array.count)
-        assertEqual(values[1], array[0])
-        assertEqual(values[0], array[1])
+        assertEqualTo(Int(2), array.count)
+        assertEqualTo(values[1], array[0])
+        assertEqualTo(values[0], array[1])
 
         array.insert(values[2], at: 2)
-        assertEqual(Int(3), array.count)
-        assertEqual(values[1], array[0])
-        assertEqual(values[0], array[1])
-        assertEqual(values[2], array[2])
+        assertEqualTo(Int(3), array.count)
+        assertEqualTo(values[1], array[0])
+        assertEqualTo(values[0], array[1])
+        assertEqualTo(values[2], array[2])
 
         assertThrows(_ = array.insert(values[0], at: 4))
         assertThrows(_ = array.insert(values[0], at: -1))
@@ -564,19 +564,19 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         array.append(objectsIn: values)
 
         assertThrows(array.remove(at: -1))
-        assertEqual(values[0], array[0])
-        assertEqual(values[1], array[1])
-        assertEqual(values[2], array[2])
+        assertEqualTo(values[0], array[0])
+        assertEqualTo(values[1], array[1])
+        assertEqualTo(values[2], array[2])
         assertThrows(array[3])
 
         array.remove(at: 0)
-        assertEqual(values[1], array[0])
-        assertEqual(values[2], array[1])
+        assertEqualTo(values[1], array[0])
+        assertEqualTo(values[2], array[1])
         assertThrows(array[2])
         assertThrows(array.remove(at: 2))
 
         array.remove(at: 1)
-        assertEqual(values[1], array[0])
+        assertEqualTo(values[1], array[0])
         assertThrows(array[1])
     }
 
@@ -586,19 +586,19 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         array.append(objectsIn: values)
         array.removeLast()
 
-        assertEqual(array.count, 2)
-        assertEqual(values[0], array[0])
-        assertEqual(values[1], array[1])
+        assertEqualTo(array.count, 2)
+        assertEqualTo(values[0], array[0])
+        assertEqualTo(values[1], array[1])
 
         array.removeLast(2)
-        assertEqual(array.count, 0)
+        assertEqualTo(array.count, 0)
     }
 
     func testRemoveAll() {
         array.removeAll()
         array.append(objectsIn: values)
         array.removeAll()
-        assertEqual(array.count, 0)
+        assertEqualTo(array.count, 0)
     }
 
     func testReplace() {
@@ -607,9 +607,9 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
         array.append(objectsIn: values)
         array.replace(index: 1, object: values[0])
-        assertEqual(array[0], values[0])
-        assertEqual(array[1], values[0])
-        assertEqual(array[2], values[2])
+        assertEqualTo(array[0], values[0])
+        assertEqualTo(array[1], values[0])
+        assertEqualTo(array[2], values[2])
 
         assertThrows(array.replace(index: 3, object: values[0]),
                      reason: "Index 3 is out of bounds")
@@ -628,15 +628,15 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
         array.replaceSubrange(0..<0, with: [values[0]])
         XCTAssertEqual(array.count, 1)
-        assertEqual(array[0], values[0])
+        assertEqualTo(array[0], values[0])
 
         array.replaceSubrange(0..<1, with: values)
         XCTAssertEqual(array.count, 3)
 
         array.replaceSubrange(1..<2, with: [])
         XCTAssertEqual(array.count, 2)
-        assertEqual(array[0], values[0])
-        assertEqual(array[1], values[2])
+        assertEqualTo(array[0], values[0])
+        assertEqualTo(array[1], values[2])
     }
 
     func testMove() {
@@ -644,9 +644,9 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
         array.append(objectsIn: values)
         array.move(from: 2, to: 0)
-        assertEqual(array[0], values[2])
-        assertEqual(array[1], values[0])
-        assertEqual(array[2], values[1])
+        assertEqualTo(array[0], values[2])
+        assertEqualTo(array[1], values[0])
+        assertEqualTo(array[2], values[1])
 
         assertThrows(array.move(from: 3, to: 0), reason: "Index 3 is out of bounds")
         assertThrows(array.move(from: 0, to: 3), reason: "Index 3 is out of bounds")
@@ -659,9 +659,9 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
         array.append(objectsIn: values)
         array.swapAt(0, 2)
-        assertEqual(array[0], values[2])
-        assertEqual(array[1], values[1])
-        assertEqual(array[2], values[0])
+        assertEqualTo(array[0], values[2])
+        assertEqualTo(array[1], values[1])
+        assertEqualTo(array[2], values[0])
 
         assertThrows(array.swapAt(3, 0), reason: "Index 3 is out of bounds")
         assertThrows(array.swapAt(0, 3), reason: "Index 3 is out of bounds")
@@ -674,13 +674,13 @@ class MinMaxPrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveList
     func testMin() {
         XCTAssertNil(array.min())
         array.append(objectsIn: values.reversed())
-        assertEqual(array.min(), values.first)
+        assertEqualTo(array.min(), values.first)
     }
 
     func testMax() {
         XCTAssertNil(array.max())
         array.append(objectsIn: values.reversed())
-        assertEqual(array.max(), values.last)
+        assertEqualTo(array.max(), values.last)
     }
 }
 
@@ -695,20 +695,20 @@ class OptionalMinMaxPrimitiveListTests<O: ObjectFactory, V: ValueFactory>: Primi
         XCTAssertNil(array2.min())
         array.append(objectsIn: values.reversed())
         let expected = values[1] as! V.W
-        assertEqual(array2.min(), expected)
+        assertEqualTo(array2.min(), expected)
     }
 
     func testMax() {
         XCTAssertNil(array2.max())
         array.append(objectsIn: values.reversed())
         let expected = values[2] as! V.W
-        assertEqual(array2.max(), expected)
+        assertEqualTo(array2.max(), expected)
     }
 }
 
 class AddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T: AddableType {
     func testSum() {
-        assertEqual(array.sum(), V.T())
+        assertEqualTo(array.sum(), V.T())
         array.append(objectsIn: values)
 
         // Expressing "can be added and converted to a floating point type" as
@@ -735,7 +735,7 @@ class OptionalAddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: Prim
     }
 
     func testSum() {
-        assertEqual(array2.sum(), V.W())
+        assertEqualTo(array2.sum(), V.W())
         array.append(objectsIn: values)
 
         var nonNil = values!
