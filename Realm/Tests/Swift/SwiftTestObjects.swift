@@ -55,12 +55,12 @@ class SwiftOptionalObject: RLMObject {
 }
 
 class SwiftPrimitiveArrayObject: RLMObject {
-    dynamic var stringCol = RLMArray<NSString>(objectType: .string, optional: false)
-    dynamic var optStringCol = RLMArray<NSObject>(objectType: .string, optional: true)
-    dynamic var dataCol = RLMArray<NSData>(objectType: .data, optional: false)
-    dynamic var optDataCol = RLMArray<NSObject>(objectType: .data, optional: true)
-    dynamic var dateCol = RLMArray<NSDate>(objectType: .date, optional: false)
-    dynamic var optDateCol = RLMArray<NSObject>(objectType: .date, optional: true)
+    @objc dynamic var stringCol = RLMArray<NSString>(objectType: .string, optional: false)
+    @objc dynamic var optStringCol = RLMArray<NSObject>(objectType: .string, optional: true)
+    @objc dynamic var dataCol = RLMArray<NSData>(objectType: .data, optional: false)
+    @objc dynamic var optDataCol = RLMArray<NSObject>(objectType: .data, optional: true)
+    @objc dynamic var dateCol = RLMArray<NSDate>(objectType: .date, optional: false)
+    @objc dynamic var optDateCol = RLMArray<NSObject>(objectType: .date, optional: true)
 }
 
 class SwiftDogObject: RLMObject {
