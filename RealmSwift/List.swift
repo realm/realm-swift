@@ -82,7 +82,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      - parameter object: An object to find.
      */
     public func index(of object: Element) -> Int? {
-        return notFoundToNil(index: _rlmArray.index(of: object as AnyObject))
+        return notFoundToNil(index: _rlmArray.index(of: dynamicBridgeCast(fromSwift: object) as AnyObject))
     }
 
     /**
@@ -115,19 +115,19 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     public subscript(position: Int) -> Element {
         get {
             throwForNegativeIndex(position)
-            return cast(_rlmArray.object(at: UInt(position)), to: Element.self)
+            return dynamicBridgeCast(fromObjectiveC: _rlmArray.object(at: UInt(position)))
         }
         set {
             throwForNegativeIndex(position)
-            _rlmArray.replaceObject(at: UInt(position), with: newValue as AnyObject)
+            _rlmArray.replaceObject(at: UInt(position), with: dynamicBridgeCast(fromSwift: newValue) as AnyObject)
         }
     }
 
     /// Returns the first object in the list, or `nil` if the list is empty.
-    public var first: Element? { return cast(_rlmArray.firstObject(), to: Optional<Element>.self) }
+    public var first: Element? { return _rlmArray.firstObject().map(dynamicBridgeCast) }
 
     /// Returns the last object in the list, or `nil` if the list is empty.
-    public var last: Element? { return cast(_rlmArray.lastObject(), to: Optional<Element>.self) }
+    public var last: Element? { return _rlmArray.lastObject().map(dynamicBridgeCast) }
 
     // MARK: KVC
 
@@ -275,7 +275,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      - parameter object: An object.
      */
     public func append(_ object: Element) {
-        _rlmArray.add(object as AnyObject)
+        _rlmArray.add(dynamicBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**
@@ -285,7 +285,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     */
     public func append<S: Sequence>(objectsIn objects: S) where S.Iterator.Element == Element {
         for obj in objects {
-            _rlmArray.add(obj as AnyObject)
+            _rlmArray.add(dynamicBridgeCast(fromSwift: obj) as AnyObject)
         }
     }
 
@@ -301,7 +301,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      */
     public func insert(_ object: Element, at index: Int) {
         throwForNegativeIndex(index)
-        _rlmArray.insert(object as AnyObject, at: UInt(index))
+        _rlmArray.insert(dynamicBridgeCast(fromSwift: object) as AnyObject, at: UInt(index))
     }
 
     /**
@@ -350,7 +350,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      */
     public func replace(index: Int, object: Element) {
         throwForNegativeIndex(index)
-        _rlmArray.replaceObject(at: UInt(index), with: object as AnyObject)
+        _rlmArray.replaceObject(at: UInt(index), with: dynamicBridgeCast(fromSwift: object) as AnyObject)
     }
 
     /**

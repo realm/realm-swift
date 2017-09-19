@@ -157,14 +157,14 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
      */
     public subscript(position: Int) -> Element {
         throwForNegativeIndex(position)
-        return cast(rlmResults.object(at: UInt(position)), to: Element.self)
+        return dynamicBridgeCast(fromObjectiveC: rlmResults.object(at: UInt(position)))
     }
 
     /// Returns the first object in the results, or `nil` if the results are empty.
-    public var first: Element? { return unsafeBitCast(rlmResults.firstObject(), to: Optional<Element>.self) }
+    public var first: Element? { return rlmResults.firstObject().map(dynamicBridgeCast) }
 
     /// Returns the last object in the results, or `nil` if the results are empty.
-    public var last: Element? { return unsafeBitCast(rlmResults.lastObject(), to: Optional<Element>.self) }
+    public var last: Element? { return rlmResults.lastObject().map(dynamicBridgeCast) }
 
     // MARK: KVC
 

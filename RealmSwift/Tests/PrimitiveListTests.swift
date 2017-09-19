@@ -19,7 +19,7 @@
 // swiftlint:disable type_name identifier_name statement_position cyclomatic_complexity
 
 import XCTest
-import RealmSwift
+@testable import RealmSwift
 
 protocol ObjectFactory {
     static func isManaged() -> Bool
@@ -522,7 +522,7 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
     func testValueForKey() {
         assertEqualTo(array.value(forKey: "self").count, 0)
         array.append(objectsIn: values)
-        assertEqualTo(values!, array.value(forKey: "self").map { $0 as! V.T })
+        assertEqualTo(values!, array.value(forKey: "self").map { dynamicBridgeCast(fromObjectiveC: $0) as V.T })
 
         assertThrows(array.value(forKey: "not self"), named: "NSUnknownKeyException")
     }
@@ -715,16 +715,16 @@ class AddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveLis
 
         // Expressing "can be added and converted to a floating point type" as
         // a protocol requirement is awful, so sidestep it all with obj-c
-        let expected = ((values as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
         let actual: V.T = array.sum()
-        XCTAssertEqualWithAccuracy((actual as! NSNumber).doubleValue, expected, accuracy: 0.01)
+        XCTAssertEqualWithAccuracy((dynamicBridgeCast(fromSwift: actual) as! NSNumber).doubleValue, expected, accuracy: 0.01)
     }
 
     func testAverage() {
         XCTAssertNil(array.average())
         array.append(objectsIn: values)
 
-        let expected = ((values as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
+        let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
         XCTAssertEqualWithAccuracy(array.average()!, expected, accuracy: 0.01)
     }
 }
@@ -745,9 +745,9 @@ class OptionalAddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: Prim
 
         // Expressing "can be added and converted to a floating point type" as
         // a protocol requirement is awful, so sidestep it all with obj-c
-        let expected = ((nonNil as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
+        let expected = ((nonNil.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
         let actual: V.W = array2.sum()
-        XCTAssertEqualWithAccuracy((actual as! NSNumber).doubleValue, expected, accuracy: 0.01)
+        XCTAssertEqualWithAccuracy((dynamicBridgeCast(fromSwift: actual) as! NSNumber).doubleValue, expected, accuracy: 0.01)
     }
 
     func testAverage() {
@@ -757,7 +757,7 @@ class OptionalAddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: Prim
         var nonNil = values!
         nonNil.remove(at: 0)
 
-        let expected = ((nonNil as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
+        let expected = ((nonNil.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
         XCTAssertEqualWithAccuracy(array2.average()!, expected, accuracy: 0.01)
     }
 }
