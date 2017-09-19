@@ -562,7 +562,7 @@
 
     // Same property names, but different types
     RLMAssertThrowsWithReasonMatching([BizzaroDog createInRealm:realm withValue:dog],
-                                      @"Invalid value 'Fido' of type 'NSTaggedPointerString' for 'int' property 'BizzaroDog.dogName'");
+                                      @"Invalid value 'Fido' of type '.*' for 'int' property 'BizzaroDog.dogName'");
 
     [realm cancelWriteTransaction];
 }
