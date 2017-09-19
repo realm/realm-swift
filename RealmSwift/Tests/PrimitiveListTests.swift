@@ -264,6 +264,16 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
     var array: List<V.T>!
     var values: [V.T]!
 
+#if swift(>=4)
+    class func _defaultTestSuite() -> XCTestSuite {
+        return defaultTestSuite
+    }
+#else
+    class func _defaultTestSuite() -> XCTestSuite {
+        return defaultTestSuite()
+    }
+#endif
+
     override func setUp() {
         obj = SwiftListObject()
         if O.isManaged() {
@@ -773,96 +783,116 @@ class OptionalSortablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: Pri
 }
 
 func addTests<OF: ObjectFactory>(_ suite: XCTestSuite, _ type: OF.Type) {
-    _ = PrimitiveListTests<OF, IntFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, Int8Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, Int16Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, Int32Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, Int64Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, FloatFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, DoubleFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, StringFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, DataFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, DateFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, IntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, Int8Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, Int16Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, Int32Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, Int64Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, FloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, DoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, StringFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, DataFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, DateFactory>._defaultTestSuite().tests.map(suite.addTest)
 
-    _ = MinMaxPrimitiveListTests<OF, IntFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, Int8Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, Int16Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, Int32Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, Int64Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, FloatFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, DoubleFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = MinMaxPrimitiveListTests<OF, DateFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, IntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, Int8Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, Int16Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, Int32Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, Int64Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, FloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, DoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = MinMaxPrimitiveListTests<OF, DateFactory>._defaultTestSuite().tests.map(suite.addTest)
 
-    _ = AddablePrimitiveListTests<OF, IntFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, Int8Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, Int16Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, Int32Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, Int64Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, FloatFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = AddablePrimitiveListTests<OF, DoubleFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, IntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, Int8Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, Int16Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, Int32Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, Int64Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, FloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = AddablePrimitiveListTests<OF, DoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
 
-    _ = PrimitiveListTests<OF, OptionalIntFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalInt8Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalInt16Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalInt32Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalInt64Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalFloatFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalDoubleFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalStringFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalDataFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = PrimitiveListTests<OF, OptionalDateFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, OptionalIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, OptionalInt8Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, OptionalInt16Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, OptionalInt32Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, OptionalInt64Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, OptionalFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, OptionalDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, OptionalStringFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, OptionalDataFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = PrimitiveListTests<OF, OptionalDateFactory>._defaultTestSuite().tests.map(suite.addTest)
 
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalIntFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt8Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt16Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt32Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt64Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalFloatFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalDoubleFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalDateFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt8Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt16Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt32Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalInt64Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalMinMaxPrimitiveListTests<OF, OptionalDateFactory>._defaultTestSuite().tests.map(suite.addTest)
 
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalIntFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalInt8Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalInt16Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalInt32Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalInt64Factory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalFloatFactory>.defaultTestSuite().tests.map(suite.addTest)
-    _ = OptionalAddablePrimitiveListTests<OF, OptionalDoubleFactory>.defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalAddablePrimitiveListTests<OF, OptionalIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalAddablePrimitiveListTests<OF, OptionalInt8Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalAddablePrimitiveListTests<OF, OptionalInt16Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalAddablePrimitiveListTests<OF, OptionalInt32Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalAddablePrimitiveListTests<OF, OptionalInt64Factory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalAddablePrimitiveListTests<OF, OptionalFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+    _ = OptionalAddablePrimitiveListTests<OF, OptionalDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
 }
 
 class UnmanagedPrimitiveListTests: TestCase {
-    override class func defaultTestSuite() -> XCTestSuite {
+    class func _defaultTestSuite() -> XCTestSuite {
         let suite = XCTestSuite(name: "Unmanaged Primitive Lists")
         addTests(suite, UnmanagedObjectFactory.self)
         return suite
     }
+
+#if swift(>=4)
+    override class var defaultTestSuite: XCTestSuite {
+        return _defaultTestSuite()
+    }
+#else
+    override class func defaultTestSuite() -> XCTestSuite {
+        return _defaultTestSuite()
+    }
+#endif
 }
 
 class ManagedPrimitiveListTests: TestCase {
-    override class func defaultTestSuite() -> XCTestSuite {
+    class func _defaultTestSuite() -> XCTestSuite {
         let suite = XCTestSuite(name: "Managed Primitive Lists")
         addTests(suite, ManagedObjectFactory.self)
 
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, IntFactory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int8Factory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int16Factory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int32Factory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int64Factory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, FloatFactory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, DoubleFactory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, StringFactory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = SortablePrimitiveListTests<ManagedObjectFactory, DateFactory>.defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, IntFactory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int8Factory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int16Factory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int32Factory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, Int64Factory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, FloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, DoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, StringFactory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = SortablePrimitiveListTests<ManagedObjectFactory, DateFactory>._defaultTestSuite().tests.map(suite.addTest)
 
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalIntFactory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalInt8Factory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalInt16Factory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalInt32Factory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalInt64Factory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalFloatFactory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalDoubleFactory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalStringFactory>.defaultTestSuite().tests.map(suite.addTest)
-        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalDateFactory>.defaultTestSuite().tests.map(suite.addTest)
+        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalIntFactory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalInt8Factory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalInt16Factory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalInt32Factory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalInt64Factory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalFloatFactory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalDoubleFactory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalStringFactory>._defaultTestSuite().tests.map(suite.addTest)
+        _ = OptionalSortablePrimitiveListTests<ManagedObjectFactory, OptionalDateFactory>._defaultTestSuite().tests.map(suite.addTest)
 
         return suite
     }
+
+#if swift(>=4)
+    override class var defaultTestSuite: XCTestSuite {
+        return _defaultTestSuite()
+    }
+#else
+    override class func defaultTestSuite() -> XCTestSuite {
+        return _defaultTestSuite()
+    }
+#endif
 }
