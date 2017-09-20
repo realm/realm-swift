@@ -1467,9 +1467,9 @@
     RLMRealmConfiguration *backupConfiguration = error.userInfo[RLMBackupRealmConfigurationErrorKey];
     XCTAssertNotNil(backupConfiguration);
 
-    // Open the backup Realm with dynamic schema since the test Realm's schema doesn't match that of our unit tests.
-    // FIXME: Create a Realm file with the right schema so we don't need this.
-    backupConfiguration.dynamic = YES;
+    // Open the backup Realm with a schema subset since it was created using the schema from .NET's unit tests.
+    // The Person class is declared in SwiftObjectServerTests.swift.
+    backupConfiguration.objectClasses = @[ NSClassFromString(@"Person") ];
 
     error = nil;
     RLMRealm *backupRealm = [RLMRealm realmWithConfiguration:backupConfiguration error:&error];

@@ -68,6 +68,15 @@ extension Realm {
         /// Error thrown by Realm if there is a schema version mismatch, so that a migration is required.
         public static let schemaMismatch: Code = .schemaMismatch
 
+        /// Error thrown by Realm when attempting to open an incompatible synchronized Realm file.
+        ///
+        /// This error occurs when the Realm file was created with an older version of Realm and an automatic
+        /// migration to the current version is not possible. When such an error occurs, the original file is moved
+        /// to a backup location, and future attempts to open the synchronized Realm will result in a new file being
+        /// created. If you wish to migrate any data from the backup Realm, you can open it using the provided
+        /// Realm configuration.
+        public static let incompatibleSyncedFile: Code = .incompatibleSyncedFile
+
         /// :nodoc:
         public var code: Code {
             return (_nsError as! RLMError).code
@@ -79,6 +88,14 @@ extension Realm {
         /// :nodoc:
         public init(_nsError error: NSError) {
             _nsError = error
+        }
+
+        /// Realm configuration that can be used to open the backup copy of a Realm file
+        ///
+        //// Only applicable to `incompatibleSyncedFile`. Will be `nil` for all other errors.
+        public var backupConfiguration: Realm.Configuration? {
+            let configuration = userInfo[RLMBackupRealmConfigurationErrorKey] as! RLMRealmConfiguration?
+            return configuration.map(Realm.Configuration.fromRLMRealmConfiguration)
         }
     }
 }
