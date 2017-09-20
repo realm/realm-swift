@@ -75,6 +75,7 @@ NSString *const kRLMSyncProviderKey             = @"provider";
 NSString *const kRLMSyncProviderIDKey           = @"provider_id";
 NSString *const kRLMSyncRegisterKey             = @"register";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
+NSString *const kRLMSyncUserIDKey               = @"user_id";
 
 #pragma mark - C++ APIs
 

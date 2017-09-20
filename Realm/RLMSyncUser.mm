@@ -124,8 +124,8 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 
 @interface RLMSyncUserInfo ()
 
-@property (nonatomic, readwrite) RLMIdentityProvider provider;
-@property (nonatomic, readwrite) NSString *providerUserIdentity;
+@property (nonatomic, readwrite) NSArray *accounts;
+@property (nonatomic, readwrite) NSDictionary *metadata;
 @property (nonatomic, readwrite) NSString *identity;
 @property (nonatomic, readwrite) BOOL isAdmin;
 
@@ -316,8 +316,8 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     [RLMNetworkClient sendRequestToEndpoint:[RLMSyncChangePasswordEndpoint endpoint]
                                      server:self.authenticationServer
                                        JSON:@{kRLMSyncTokenKey: self._refreshToken,
-                                              @"user_id": userID,
-                                              @"password": newPassword}
+                                              kRLMSyncUserIDKey: userID,
+                                              kRLMSyncPasswordKey: newPassword}
                                     timeout:60
                                  completion:^(NSError *error, __unused NSDictionary *json) {
         completion(error);
@@ -523,8 +523,8 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 
 + (instancetype)syncUserInfoWithModel:(RLMUserResponseModel *)model {
     RLMSyncUserInfo *info = [[RLMSyncUserInfo alloc] initPrivate];
-    info.provider = model.provider;
-    info.providerUserIdentity = model.username;
+    info.accounts = model.accounts;
+    info.metadata = model.metadata;
     info.isAdmin = model.isAdmin;
     info.identity = model.identity;
     return info;

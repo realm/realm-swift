@@ -282,9 +282,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Administration
 
-    // FIXME ROS 2.0: the endpoint exists, but it doesn't do what we want it to anymore.
-    // Tracked in: https://github.com/realm/ros/issues/271
-    func disabled_testRetrieveUserInfo() {
+    func testRetrieveUserInfo() {
         let nonAdminUsername = "meela.swift@realm.example.org"
         let password = "p"
         let server = SwiftObjectServerTests.authServerURL()
@@ -303,8 +301,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             guard let userInfo = userInfo else {
                 return
             }
-            XCTAssertEqual(userInfo.provider, .usernamePassword)
-            XCTAssertEqual(userInfo.providerUserIdentity, nonAdminUsername)
+            let account = userInfo.accounts.first!
+            XCTAssertEqual(account.username, nonAdminUsername)
             XCTAssertFalse(userInfo.isAdmin)
             ex.fulfill()
         }
@@ -327,8 +325,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertNil(user)
                 XCTAssertTrue(error is SyncAuthError)
                 let castError = error as! SyncAuthError
-                // FIXME ROS 2.0: We don't return a 611 error anymore
-                // XCTAssertEqual(castError.code, SyncAuthError.invalidCredential)
+                XCTAssertEqual(castError.code, SyncAuthError.invalidCredential)
                 ex.fulfill()
             }
             waitForExpectations(timeout: 2.0, handler: nil)
@@ -344,13 +341,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try synchronouslyLogInUser(for: basicCredentials(), server: authURL)
 
             // Set a callback on the user
+            var blockCalled = false;
             let ex = expectation(description: "Error callback should fire upon receiving an error")
-            var invoked = false
             user.errorHandler = { (u, error) in
                 XCTAssertEqual(u.identity, user.identity)
-                // FIXME ROS 2.0: ROS 2.0 changed this error
-                // XCTAssertEqual(error.code, .invalidCredential)
-                invoked = true
+                XCTAssertEqual(error.code, .accessDeniedOrInvalidPath)
+                blockCalled = true
                 ex.fulfill()
             }
 
@@ -358,12 +354,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             manuallySetRefreshToken(for: user, value: "not-a-real-token")
 
             // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
+            XCTAssertFalse(blockCalled)
             _ = try immediatelyOpenRealm(url: realmURL, user: user)
-            if !invoked {
-                waitForExpectations(timeout: 10.0, handler: nil)
-            }
+            waitForExpectations(timeout: 10.0, handler: nil)
             XCTAssertEqual(user.state, .loggedOut)
-
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }

@@ -161,7 +161,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
        third party authentication service providing the user's identity has
        logged the user out.
 
- @warning Regardless of whether an error handler is defined, certain user errors
+ @warning Regardless of whether an error handler is installed, certain user errors
           will automatically cause the user to enter the logged out state.
  */
 @property (nullable, nonatomic) RLMUserErrorReportingBlock errorHandler NS_REFINED_FOR_SWIFT;
@@ -169,7 +169,8 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 #pragma mark - Sessions
 
 /**
- Retrieve a valid session object belonging to this user for a given URL, or `nil` if no such object exists.
+ Retrieve a valid session object belonging to this user for a given URL, or `nil`
+ if no such object exists.
  */
 - (nullable RLMSyncSession *)sessionForURL:(NSURL *)url;
 
@@ -276,13 +277,30 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (RLMRealm *)managementRealmWithError:(NSError **)error NS_REFINED_FOR_SWIFT;
 
-#pragma mark - Miscellaneous
-
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));
-
 /// :nodoc:
 + (instancetype)new __attribute__((unavailable("RLMSyncUser cannot be created directly")));
+
+@end
+
+/**
+ A data object representing a user account associated with a user.
+
+ @see `RLMSyncUserInfo`
+ */
+@interface RLMSyncUserAccountInfo : NSObject
+
+/// The authentication provider which manages this user account.
+@property (nonatomic, readonly) NSString *provider;
+
+/// The username or identity of this user account.
+@property (nonatomic, readonly) NSString *username;
+
+/// :nodoc:
+- (instancetype)init __attribute__((unavailable("RLMSyncUserAccountInfo cannot be created directly")));
+/// :nodoc:
++ (instancetype)new __attribute__((unavailable("RLMSyncUserAccountInfo cannot be created directly")));
 
 @end
 
@@ -292,14 +310,9 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 @interface RLMSyncUserInfo : NSObject
 
 /**
- The authentication provider which manages the user represented by this user info instance.
+ An array of all the user accounts associated with this user.
  */
-@property (nonatomic, readonly) RLMIdentityProvider provider;
-
-/**
- The username or identity issued to this user by the authentication provider.
- */
-@property (nonatomic, readonly) NSString *providerUserIdentity;
+@property (nonatomic, readonly) NSArray<RLMSyncUserAccountInfo *> *accounts;
 
 /**
  The identity issued to this user by the Realm Object Server.
@@ -307,15 +320,17 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 @property (nonatomic, readonly) NSString *identity;
 
 /**
+ Metadata about this user stored on the Realm Object Server.
+ */
+@property (nonatomic, readonly) NSDictionary *metadata;
+
+/**
  Whether the user is flagged on the Realm Object Server as an administrator.
  */
 @property (nonatomic, readonly) BOOL isAdmin;
 
-#pragma mark - Miscellaneous
-
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUserInfo cannot be created directly")));
-
 /// :nodoc:
 + (instancetype)new __attribute__((unavailable("RLMSyncUserInfo cannot be created directly")));
 
