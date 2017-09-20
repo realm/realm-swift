@@ -482,7 +482,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         syncConfig.customFileURL = fileURL
         let config = Realm.Configuration(syncConfiguration: ObjectiveCSupport.convert(object: syncConfig))
         do {
-            let _ = try Realm(configuration: config)
+            _ = try Realm(configuration: config)
         } catch let e as Realm.Error where e.code == .incompatibleSyncedFile {
             var backupConfiguration = e.backupConfiguration
             XCTAssertNotNil(backupConfiguration)
@@ -497,7 +497,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertEqual(people[0].LastName, "Smith")
 
             // Verify that we can now successfully open the original synced Realm.
-            let _ = try! Realm(configuration: config)
+            _ = try! Realm(configuration: config)
         } catch {
             fatalError("Unexpected error: \(error)")
         }
@@ -505,6 +505,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 }
 
 // The naming here is nonstandard as the sync-1.x.realm test file comes from the .NET unit tests.
+// swiftlint:disable identifier_name
 @objc(Person)
 class Person: Object {
     @objc dynamic var FirstName: String?
