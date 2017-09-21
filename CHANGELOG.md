@@ -26,7 +26,13 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Opening a synced Realm whose local copy was created with an older version of
+  Realm Mobile Platfrom when a migration is not possible to the current version
+  will result in an `RLMErrorIncompatibleSyncedFile` / `incompatibleSyncedFile`
+  error. When such an error occurs, the original file is moved to a backup
+  location, and future attempts to open the synchronized Realm will result in a new
+  file being created. If you wish to migrate any data from the backup Realm you can
+  open it using the backup Realm configuration available on the error object.
 
 ### Bugfixes
 
