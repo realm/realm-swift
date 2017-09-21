@@ -55,6 +55,8 @@ extern NSString *const kRLMSyncDataKey;
 extern NSString *const kRLMSyncErrorJSONKey;
 extern NSString *const kRLMSyncErrorStatusCodeKey;
 extern NSString *const kRLMSyncIdentityKey;
+extern NSString *const kRLMSyncIsAdminKey;
+extern NSString *const kRLMSyncNewPasswordKey;
 extern NSString *const kRLMSyncPasswordKey;
 extern NSString *const kRLMSyncPathKey;
 extern NSString *const kRLMSyncTokenKey;

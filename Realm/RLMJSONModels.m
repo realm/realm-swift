@@ -28,7 +28,6 @@ static const NSString *const kRLMSyncErrorCodeKey       = @"code";
 static const NSString *const kRLMSyncExpiresKey         = @"expires";
 static const NSString *const kRLMSyncErrorHintKey       = @"hint";
 static const NSString *const kRLMSyncIdKey              = @"id";
-static const NSString *const kRLMSyncIsAdminKey         = @"is_admin";
 static const NSString *const kRLMSyncKeyKey             = @"key";
 static const NSString *const kRLMSyncMetadataKey        = @"metadata";
 static const NSString *const kRLMSyncRefreshTokenKey    = @"refresh_token";

@@ -242,7 +242,7 @@
 }
 
 /// A sync user should be able to successfully change their own password.
-- (void)disabled_testUserChangePassword {
+- (void)testUserChangePassword {
     NSString *userName = NSStringFromSelector(_cmd);
     NSString *firstPassword = @"a";
     NSString *secondPassword = @"b";
@@ -255,7 +255,6 @@
                                                    server:[RLMObjectServerTests authServerURL]];
         XCTestExpectation *ex = [self expectationWithDescription:@"change password callback invoked"];
         [user changePassword:secondPassword completion:^(NSError * _Nullable error) {
-            // FIXME ROS 2.0: this endpoint is broken. Tracked in https://github.com/realm/ros/issues/273
             XCTAssertNil(error);
             [ex fulfill];
         }];
@@ -299,44 +298,43 @@
     }
 }
 
-/// A sync user should be able to successfully change their own password.
-// FIXME ROS 2.0: Issue tracked in https://github.com/realm/ros/issues/273
-- (void)disabled_testOtherUserChangePassword {
+/// A sync admin user should be able to successfully change another user's password.
+- (void)testOtherUserChangePassword {
     // Create admin user.
     NSURL *url = [RLMObjectServerTests authServerURL];
-    RLMSyncUser *adminUser = [self getSharedPersistentAdminUserForURL:url];
+    RLMSyncUser *adminUser = [self createAdminUserForURL:url username:[[NSUUID UUID] UUIDString]];
 
     NSString *username = NSStringFromSelector(_cmd);
     NSString *firstPassword = @"a";
     NSString *secondPassword = @"b";
-    NSString *userID = nil;
+    NSString *nonAdminUserID = nil;
     // Successfully create user.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:username password:firstPassword
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:username
+                                                                       password:firstPassword
                                                                        register:YES];
-        RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
-        userID = user.identity;
+        RLMSyncUser *user = [self logInUserForCredentials:creds server:url];
+        nonAdminUserID = user.identity;
         [user logOut];
     }
-    // Attempt change password from regular user.
+    // Fail to change password from non-admin user.
     {
-        NSString *regularUsername = [[NSUUID UUID] UUIDString];
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:regularUsername
-                                                                       password:@"password"
-                                                                       register:YES];
-        RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
+        NSString *username2 = [NSString stringWithFormat:@"%@_2", username];
+        RLMSyncCredentials *creds2 = [RLMSyncCredentials credentialsWithUsername:username2
+                                                                             password:@"a"
+                                                                             register:YES];
+        RLMSyncUser *user2 = [self logInUserForCredentials:creds2 server:url];
         XCTestExpectation *ex = [self expectationWithDescription:@"change password callback invoked"];
-        [user changePassword:secondPassword forUserID:userID completion:^(NSError * _Nullable error) {
+        [user2 changePassword:@"foobar" forUserID:nonAdminUserID completion:^(NSError *error) {
             XCTAssertNotNil(error);
             [ex fulfill];
         }];
         [self waitForExpectationsWithTimeout:2.0 handler:nil];
-        [user logOut];
     }
     // Change password from admin user.
     {
         XCTestExpectation *ex = [self expectationWithDescription:@"change password callback invoked"];
-        [adminUser changePassword:secondPassword forUserID:userID completion:^(NSError * _Nullable error) {
+        [adminUser changePassword:secondPassword forUserID:nonAdminUserID completion:^(NSError *error) {
             XCTAssertNil(error);
             [ex fulfill];
         }];
@@ -364,7 +362,8 @@
     }
     // Successfully log in with new password.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:username password:secondPassword
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:username
+                                                                       password:secondPassword
                                                                        register:NO];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
         XCTAssertNotNil(user);
@@ -373,9 +372,9 @@
 }
 
 /// A sync admin user should be able to retrieve information about other users.
-- (void)disabled_testRetrieveUserInfo {
+- (void)testRetrieveUserInfo {
     NSString *nonAdminUsername = @"meela@realm.example.org";
-    NSString *adminUsername = @"jyaku@realm.example.org";
+    NSString *adminUsername = @"jyaku";
     NSString *pw = @"p";
     NSURL *server = [RLMObjectServerTests authServerURL];
 
@@ -384,10 +383,10 @@
     RLMSyncUser *nonAdminUser = [self logInUserForCredentials:c1 server:server];
 
     // Create an admin user.
-    __unused RLMSyncUser *adminUser = nil; //[self makeAdminUser:adminUsername password:pw server:server];
+    __unused RLMSyncUser *adminUser = [self createAdminUserForURL:server username:adminUsername];
 
     // Create another admin user.
-    RLMSyncUser *userDoingLookups = nil; //[self makeAdminUser:[[NSUUID UUID] UUIDString] password:pw server:server];
+    RLMSyncUser *userDoingLookups = [self createAdminUserForURL:server username:[[NSUUID UUID] UUIDString]];
 
     // Get the non-admin user's info.
     XCTestExpectation *ex1 = [self expectationWithDescription:@"should be able to get info about non-admin user"];
@@ -408,14 +407,14 @@
     // Get the admin user's info.
     XCTestExpectation *ex2 = [self expectationWithDescription:@"should be able to get info about admin user"];
     [userDoingLookups retrieveInfoForUser:adminUsername
-                         identityProvider:RLMIdentityProviderUsernamePassword
+                         identityProvider:RLMIdentityProviderDebug
                                completion:^(RLMSyncUserInfo *info, NSError *err) {
                                    XCTAssertNil(err);
                                    XCTAssertNotNil(info);
                                    XCTAssertGreaterThan([info.accounts count], ((NSUInteger) 0));
                                    RLMSyncUserAccountInfo *acctInfo = [info.accounts firstObject];
                                    XCTAssertEqualObjects(acctInfo.providerUserIdentity, adminUsername);
-                                   XCTAssertEqualObjects(acctInfo.provider, RLMIdentityProviderUsernamePassword);
+                                   XCTAssertEqualObjects(acctInfo.provider, RLMIdentityProviderDebug);
                                    XCTAssertTrue(info.isAdmin);
                                    [ex2 fulfill];
                                }];
@@ -428,8 +427,7 @@
                                completion:^(RLMSyncUserInfo *info, NSError *err) {
                                    XCTAssertNotNil(err);
                                    XCTAssertEqualObjects(err.domain, RLMSyncAuthErrorDomain);
-                                   XCTAssertEqual(err.code, RLMSyncAuthErrorHTTPStatusCodeError);
-                                   XCTAssertEqualObjects([err.userInfo objectForKey:@"statusCode"], @404);
+                                   XCTAssertEqual(err.code, RLMSyncAuthErrorUserDoesNotExist);
                                    XCTAssertNil(info);
                                    [ex3 fulfill];
                                }];
@@ -442,8 +440,7 @@
                            completion:^(RLMSyncUserInfo *info, NSError *err) {
                                XCTAssertNotNil(err);
                                XCTAssertEqualObjects(err.domain, RLMSyncAuthErrorDomain);
-                               XCTAssertEqual(err.code, RLMSyncAuthErrorHTTPStatusCodeError);
-                               XCTAssertEqualObjects([err.userInfo objectForKey:@"statusCode"], @401);
+                               XCTAssertEqual(err.code, RLMSyncAuthErrorAccessDeniedOrInvalidPath);
                                XCTAssertNil(info);
                                [ex4 fulfill];
                            }];

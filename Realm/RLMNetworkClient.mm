@@ -118,6 +118,16 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return [authServerURL URLByAppendingPathComponent:@"auth/password"];
 }
 
+- (NSDictionary *)httpHeadersForPayload:(NSDictionary *)json {
+    NSString *authToken = [json objectForKey:kRLMSyncTokenKey];
+    if (!authToken) {
+        @throw RLMException(@"Malformed request; this indicates an internal error.");
+    }
+    NSMutableDictionary *headers = [[super httpHeadersForPayload:json] mutableCopy];
+    [headers setObject:authToken forKey:@"Authorization"];
+    return [headers copy];
+}
+
 @end
 
 @implementation RLMSyncGetUserInfoEndpoint
