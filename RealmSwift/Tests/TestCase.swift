@@ -78,7 +78,7 @@ class TestCase: XCTestCase {
         autoreleasepool { super.invokeTest() }
 
         if !exceptionThrown {
-            XCTAssertFalse(RLMHasCachedRealmForPath(defaultRealmURL().path))    // FIXME: this assert sporadically fails
+            XCTAssertFalse(RLMHasCachedRealmForPath(defaultRealmURL().path))
             XCTAssertFalse(RLMHasCachedRealmForPath(testRealmURL().path))
         }
 
