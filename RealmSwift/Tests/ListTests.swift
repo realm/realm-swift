@@ -686,6 +686,18 @@ class ListRRCMethodsTests: XCTestCase {
         array[1..<4] = [10, 11]
         compare(array: array, with: list)
     }
+
+    func testReplaceWithCollectionIndices() {
+        let newElements = [1, 2, 3]
+        list.replaceSubrange(list.indices, with: makeSwiftIntObjects(from: newElements))
+        array.replaceSubrange(array.indices, with: newElements)
+        compare(array: array, with: list)
+    }
+
+    func testRemoveWithCollectionIndices() {
+        list.removeSubrange(list.indices)
+        XCTAssertTrue(list.isEmpty)
+    }
 #endif
 
     func testRemoveFirst() {

@@ -482,12 +482,11 @@ extension List: RealmCollection {
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
-    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) ->
-        NotificationToken {
-            let anyCollection = AnyRealmCollection(self)
-            return _rlmArray.addNotificationBlock { _, change, error in
-                block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
-            }
+    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken {
+        let anyCollection = AnyRealmCollection(self)
+        return _rlmArray.addNotificationBlock { _, change, error in
+            block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
+        }
     }
 }
 
@@ -554,13 +553,12 @@ extension List: MutableCollection {
 
      - warning: This method may only be called during a write transaction.
      */
-    public func insert<C: Collection>(contentsOf newElements: C, at i: Int)
-        where C.Iterator.Element == Element {
-            var i = i
-            for item in newElements {
-                insert(item, at: i)
-                i += 1
-            }
+    public func insert<C: Collection>(contentsOf newElements: C, at i: Int) where C.Iterator.Element == Element {
+        var currentIndex = i
+        for item in newElements {
+            insert(item, at: currentIndex)
+            currentIndex += 1
+        }
     }
 
     /**
@@ -592,6 +590,11 @@ extension List: MutableCollection {
     }
 
     /// :nodoc:
+    public func removeSubrange(_ bounds: DefaultRandomAccessIndices<List>) {
+        removeSubrange(bounds.startIndex..<bounds.endIndex)
+    }
+
+    /// :nodoc:
     public func replaceSubrange<C: Collection>(_ subrange: ClosedRange<Int>, with newElements: C)
         where C.Iterator.Element == Element {
             removeSubrange(subrange)
@@ -610,6 +613,13 @@ extension List: MutableCollection {
         where C.Iterator.Element == Element {
             removeSubrange(subrange)
             insert(contentsOf: newElements, at: subrange.lowerBound)
+    }
+
+    /// :nodoc:
+    public func replaceSubrange<C: Collection>(_ subrange: DefaultRandomAccessIndices<List>, with newElements: C)
+        where C.Iterator.Element == Element {
+            removeSubrange(subrange)
+            insert(contentsOf: newElements, at: subrange.startIndex)
     }
 }
 #else
