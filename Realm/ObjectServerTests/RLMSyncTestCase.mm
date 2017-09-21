@@ -231,6 +231,21 @@ static NSURL *syncDirectoryForChildProcess() {
     return adminUser;
 }
 
++ (NSString *)retrieveAdminToken {
+    NSString *adminTokenPath = @"test-ros-instance/data/keys/admin.json";
+    NSURL *target = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:adminTokenPath];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:[target path]]) {
+        XCTFail(@"Could not find the JSON file containing the admin token.");
+    }
+    NSData *raw = [NSData dataWithContentsOfURL:target];
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:raw options:0 error:nil];
+    NSString *token = json[@"ADMIN_TOKEN"];
+    if ([token length] == 0) {
+        XCTFail(@"Could not successfully extract the token.");
+    }
+    return token;
+}
+
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user url:(NSURL *)url {
     [self waitForDownloadsForUser:user url:url expectation:nil error:nil];
 }
@@ -325,7 +340,9 @@ static NSURL *syncDirectoryForChildProcess() {
                                  URLByAppendingPathComponent:@"test-ros-instance/"] path];
     task.currentDirectoryPath = currentDirPath;
     task.launchPath = @"/usr/local/bin/node";
-    task.arguments = @[@"./ros/bin/ros", @"start"];
+    // Warning: if the way the ROS is launched is changed, remember to also update
+    // the regex in build.sh's kill_object_server() function.
+    task.arguments = @[@"./ros/bin/ros", @"start", @"--auth", @"debug,password"];
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     task.standardOutput = pipe;
     task.standardError = pipe;

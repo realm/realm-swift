@@ -49,10 +49,8 @@
 }
 
 /// A valid admin token should be able to log in a user.
-- (void)disabled_testAdminTokenAuthentication {
-    NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
-    NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
-    XCTAssertNotNil(adminToken);
+- (void)testAdminTokenAuthentication {
+    NSString *adminToken = [RLMSyncTestCase retrieveAdminToken];
     RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken identity:@"test"];
     XCTAssertNotNil(credentials);
 
@@ -454,7 +452,7 @@
 /// The login queue argument should be respected.
 - (void)testLoginQueueForSuccessfulLogin {
     // Make global queue
-    dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0);
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
     RLMSyncCredentials *c1 = [RLMSyncCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
                                                                 password:@"p"
@@ -490,7 +488,7 @@
 /// The login queue argument should be respected.
 - (void)testLoginQueueForFailedLogin {
     // Make global queue
-    dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0);
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
     RLMSyncCredentials *c1 = [RLMSyncCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
                                                                 password:@"p"
@@ -554,12 +552,10 @@
 #pragma mark - Basic Sync
 
 /// It should be possible to successfully open a Realm configured for sync with an access token.
-- (void)disabled_testOpenRealmWithAdminToken {
+- (void)testOpenRealmWithAdminToken {
     // FIXME (tests): opening a Realm with the access token, then opening a Realm at the same virtual path
     // with normal credentials, causes Realms to fail to bind with a "bad virtual path" error.
-    NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
-    NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
-    XCTAssertNotNil(adminToken);
+    NSString *adminToken = [RLMSyncTestCase retrieveAdminToken];
     RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken identity:@"test"];
     XCTAssertNotNil(credentials);
     RLMSyncUser *user = [self logInUserForCredentials:credentials

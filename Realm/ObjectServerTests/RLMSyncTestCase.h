@@ -48,6 +48,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm;
 
+/// Retrieve the administrator token.
++ (NSString *)retrieveAdminToken;
+
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
 
