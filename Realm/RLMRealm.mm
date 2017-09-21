@@ -793,8 +793,8 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
 }
 
 + (uint64_t)schemaVersionAtURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     try {
-        RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
         config.fileURL = fileURL;
         config.encryptionKey = RLMRealmValidatedEncryptionKey(key);
 
@@ -804,8 +804,8 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
         }
         return version;
     }
-    catch (std::exception &exp) {
-        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), error);
+    catch (...) {
+        translateSharedGroupOpenException(config, error);
         return RLMNotVersioned;
     }
 }
