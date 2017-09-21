@@ -20,6 +20,9 @@ x.x.x Release notes (yyyy-MM-dd)
   `LinkingObjects` have had their generic type parameter changed from `T` to
   `Element`).
 * `RealmOptional`'s generic type parameter has been changed from `T` to `Value`.
+* `RLMSyncUserInfo` has been significantly enhanced. It now contains metadata
+  about a user stored on the Realm Object Server, as well as a list of all user account
+  data associated with that user.
 
 ### Enhancements
 
