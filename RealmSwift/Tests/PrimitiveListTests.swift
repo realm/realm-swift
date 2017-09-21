@@ -483,8 +483,8 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         assertEqualTo(1, array.index(of: values[1]))
     }
 
-    func testIndexMatching() {
-        return; // not implemented
+    // FIXME: Not yet implemented
+    func disabled_testIndexMatching() {
         XCTAssertNil(array.index(matching: "self = %@", values[0]))
 
         array.append(values[0])
@@ -717,7 +717,7 @@ class AddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveLis
         // a protocol requirement is awful, so sidestep it all with obj-c
         let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
         let actual: V.T = array.sum()
-        XCTAssertEqualWithAccuracy((dynamicBridgeCast(fromSwift: actual) as! NSNumber).doubleValue, expected, accuracy: 0.01)
+        XCTAssertEqual((dynamicBridgeCast(fromSwift: actual) as! NSNumber).doubleValue, expected, accuracy: 0.01)
     }
 
     func testAverage() {
@@ -725,7 +725,7 @@ class AddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveLis
         array.append(objectsIn: values)
 
         let expected = ((values.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
-        XCTAssertEqualWithAccuracy(array.average()!, expected, accuracy: 0.01)
+        XCTAssertEqual(array.average()!, expected, accuracy: 0.01)
     }
 }
 
@@ -747,7 +747,7 @@ class OptionalAddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: Prim
         // a protocol requirement is awful, so sidestep it all with obj-c
         let expected = ((nonNil.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@sum.self")! as! NSNumber).doubleValue
         let actual: V.W = array2.sum()
-        XCTAssertEqualWithAccuracy((dynamicBridgeCast(fromSwift: actual) as! NSNumber).doubleValue, expected, accuracy: 0.01)
+        XCTAssertEqual((dynamicBridgeCast(fromSwift: actual) as! NSNumber).doubleValue, expected, accuracy: 0.01)
     }
 
     func testAverage() {
@@ -758,7 +758,7 @@ class OptionalAddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: Prim
         nonNil.remove(at: 0)
 
         let expected = ((nonNil.map(dynamicBridgeCast) as NSArray).value(forKeyPath: "@avg.self")! as! NSNumber).doubleValue
-        XCTAssertEqualWithAccuracy(array2.average()!, expected, accuracy: 0.01)
+        XCTAssertEqual(array2.average()!, expected, accuracy: 0.01)
     }
 }
 
