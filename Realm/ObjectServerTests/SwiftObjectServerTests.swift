@@ -302,7 +302,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 return
             }
             let account = userInfo.accounts.first!
-            XCTAssertEqual(account.username, nonAdminUsername)
+            XCTAssertEqual(account.providerUserIdentity, nonAdminUsername)
+            XCTAssertEqual(account.provider, Provider.usernamePassword)
             XCTAssertFalse(userInfo.isAdmin)
             ex.fulfill()
         }
@@ -341,7 +342,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try synchronouslyLogInUser(for: basicCredentials(), server: authURL)
 
             // Set a callback on the user
-            var blockCalled = false;
+            var blockCalled = false
             let ex = expectation(description: "Error callback should fire upon receiving an error")
             user.errorHandler = { (u, error) in
                 XCTAssertEqual(u.identity, user.identity)

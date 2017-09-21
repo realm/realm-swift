@@ -397,8 +397,10 @@
                                completion:^(RLMSyncUserInfo *info, NSError *err) {
                                    XCTAssertNil(err);
                                    XCTAssertNotNil(info);
-                                   XCTAssertTrue([info.accounts count] > 0);
-                                   XCTAssertEqualObjects([[info.accounts firstObject] username], nonAdminUsername);
+                                   XCTAssertGreaterThan([info.accounts count], ((NSUInteger) 0));
+                                   RLMSyncUserAccountInfo *acctInfo = [info.accounts firstObject];
+                                   XCTAssertEqualObjects(acctInfo.providerUserIdentity, nonAdminUsername);
+                                   XCTAssertEqualObjects(acctInfo.provider, RLMIdentityProviderUsernamePassword);
                                    XCTAssertFalse(info.isAdmin);
                                    [ex1 fulfill];
                                }];
@@ -411,8 +413,10 @@
                                completion:^(RLMSyncUserInfo *info, NSError *err) {
                                    XCTAssertNil(err);
                                    XCTAssertNotNil(info);
-                                   XCTAssertTrue([info.accounts count] > 0);
-                                   XCTAssertEqualObjects([[info.accounts firstObject] username], adminUsername);
+                                   XCTAssertGreaterThan([info.accounts count], ((NSUInteger) 0));
+                                   RLMSyncUserAccountInfo *acctInfo = [info.accounts firstObject];
+                                   XCTAssertEqualObjects(acctInfo.providerUserIdentity, adminUsername);
+                                   XCTAssertEqualObjects(acctInfo.provider, RLMIdentityProviderUsernamePassword);
                                    XCTAssertTrue(info.isAdmin);
                                    [ex2 fulfill];
                                }];

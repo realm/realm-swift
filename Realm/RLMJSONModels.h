@@ -18,12 +18,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUser.h"
 #import "RLMSyncUtil_Private.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMTokenDataModel;
+@class RLMTokenDataModel, RLMSyncUserAccountInfo;
 
 #pragma mark - RLMTokenModel
 

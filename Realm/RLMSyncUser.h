@@ -292,10 +292,10 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 @interface RLMSyncUserAccountInfo : NSObject
 
 /// The authentication provider which manages this user account.
-@property (nonatomic, readonly) NSString *provider;
+@property (nonatomic, readonly) RLMIdentityProvider provider;
 
 /// The username or identity of this user account.
-@property (nonatomic, readonly) NSString *username;
+@property (nonatomic, readonly) NSString *providerUserIdentity;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUserAccountInfo cannot be created directly")));
@@ -322,7 +322,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 /**
  Metadata about this user stored on the Realm Object Server.
  */
-@property (nonatomic, readonly) NSDictionary *metadata;
+@property (nonatomic, readonly) NSDictionary<NSString *, NSString *> *metadata;
 
 /**
  Whether the user is flagged on the Realm Object Server as an administrator.
