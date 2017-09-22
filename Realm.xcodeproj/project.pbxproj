@@ -167,8 +167,6 @@
 		3F572C951F2BDAAC00F6C9AB /* ThreadSafeReferenceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F572C911F2BDA9F00F6C9AB /* ThreadSafeReferenceTests.m */; };
 		3F572C961F2BDAB100F6C9AB /* PrimitiveArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F572C901F2BDA9F00F6C9AB /* PrimitiveArrayPropertyTests.m */; };
 		3F572C971F2BDAB100F6C9AB /* PrimitiveArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F572C901F2BDA9F00F6C9AB /* PrimitiveArrayPropertyTests.m */; };
-		3F5734F11EA6BF3700C236B3 /* object_accessor_impl.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F5734EE1EA6BF3700C236B3 /* object_accessor_impl.hpp */; };
-		3F5734F21EA6BF3700C236B3 /* primitive_list_notifier.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F5734EF1EA6BF3700C236B3 /* primitive_list_notifier.hpp */; };
 		3F5B5D301E84230B00953B33 /* binding_callback_thread_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F5B5D2E1E84230B00953B33 /* binding_callback_thread_observer.cpp */; };
 		3F5B5D321E84230E00953B33 /* binding_callback_thread_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F5B5D2E1E84230B00953B33 /* binding_callback_thread_observer.cpp */; };
 		3F643BED1CEA655800F6D0C8 /* mixed-column.realm in Resources */ = {isa = PBXBuildFile; fileRef = 3F643BEB1CEA654D00F6D0C8 /* mixed-column.realm */; };
@@ -734,8 +732,6 @@
 		3F4E324B1B98C6C700183A69 /* RLMSchema_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSchema_Private.hpp; sourceTree = "<group>"; };
 		3F572C901F2BDA9F00F6C9AB /* PrimitiveArrayPropertyTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrimitiveArrayPropertyTests.m; sourceTree = "<group>"; };
 		3F572C911F2BDA9F00F6C9AB /* ThreadSafeReferenceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThreadSafeReferenceTests.m; sourceTree = "<group>"; };
-		3F5734EE1EA6BF3700C236B3 /* object_accessor_impl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = object_accessor_impl.hpp; sourceTree = "<group>"; };
-		3F5734EF1EA6BF3700C236B3 /* primitive_list_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = primitive_list_notifier.hpp; sourceTree = "<group>"; };
 		3F5B5D2E1E84230B00953B33 /* binding_callback_thread_observer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = binding_callback_thread_observer.cpp; sourceTree = "<group>"; };
 		3F5B5D2F1E84230B00953B33 /* binding_callback_thread_observer.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = binding_callback_thread_observer.hpp; sourceTree = "<group>"; };
 		3F62BA9E1BA0AB9000A4CEB2 /* binding_context.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = binding_context.hpp; sourceTree = "<group>"; };
@@ -1609,9 +1605,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F73BC951E3A878500FE80B6 /* NSError+RLMSync.h in Headers */,
-				3F5734F11EA6BF3700C236B3 /* object_accessor_impl.hpp in Headers */,
 				5D44AAE61F709794007BA84C /* RLMSyncPermission.h in Headers */,
-				3F5734F21EA6BF3700C236B3 /* primitive_list_notifier.hpp in Headers */,
 				5D659EA51BE04556006515A0 /* Realm.h in Headers */,
 				5D659EA71BE04556006515A0 /* RLMAccessor.h in Headers */,
 				5D659EA91BE04556006515A0 /* RLMArray.h in Headers */,
@@ -2703,6 +2697,7 @@
 			baseConfigurationReference = 5D660FC01BE98BEF0021E04F /* Tests.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				OTHER_SWIFT_FLAGS = "-D BUILDING_REALM_SWIFT_TESTS";
 			};
 			name = Debug;
 		};
@@ -2711,6 +2706,7 @@
 			baseConfigurationReference = 5D660FC01BE98BEF0021E04F /* Tests.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				OTHER_SWIFT_FLAGS = "-D BUILDING_REALM_SWIFT_TESTS";
 			};
 			name = Release;
 		};

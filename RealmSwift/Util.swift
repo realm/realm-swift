@@ -19,7 +19,7 @@
 import Foundation
 import Realm
 
-#if !BUILDING_REALM_SWIFT
+#if BUILDING_REALM_SWIFT_TESTS
 import RealmSwift
 #endif
 
