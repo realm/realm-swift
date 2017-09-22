@@ -32,7 +32,7 @@ using namespace realm;
 @implementation RLMRealm (Sync)
 
 - (void)fetchResultsForQuery:(NSString *)query objectType:(Class)type callback:(RLMPartialSyncFetchCallback)callback {
-    NSString *className = NSStringFromClass(type);
+    NSString *className = [type className];
     auto cb = [=](Results results, std::exception_ptr err) {
         if (err) {
             try {
