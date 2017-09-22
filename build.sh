@@ -315,8 +315,7 @@ fi
 
 kill_object_server() {
 # Based on build.sh conventions we always run ROS from a path ending in 'ros/bin/ros'.
-    pid=$(ps ax | grep "[r]os/bin/ros start" | sed -e 's/^[[:space:]]*//' | awk '{ print $1 }')
-    kill $pid 2>/dev/null
+    pkill -f ros/bin/ros\ start
 }
 
 download_object_server() {
@@ -439,9 +438,9 @@ case "$COMMAND" in
         ;;
 
     "reset-ros-client-state")
-        rm -rf ~/Library/Application Support/xctest
-        rm -rf ~/Library/Application Support/io.realm.TestHost
-        rm -rf ~/Library/Application Support/xctest-child
+        rm -rf ~/Library/Application\ Support/xctest
+        rm -rf ~/Library/Application\ Support/io.realm.TestHost
+        rm -rf ~/Library/Application\ Support/xctest-child
         exit 0
         ;;
 
