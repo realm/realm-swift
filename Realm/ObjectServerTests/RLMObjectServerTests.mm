@@ -76,8 +76,7 @@
         XCTAssertNil(user);
         XCTAssertNotNil(error);
         XCTAssertEqual(error.domain, RLMSyncAuthErrorDomain);
-        // FIXME ROS 2.0: ROS 2.0 changed the error
-//        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
+        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
         XCTAssertNotNil(error.localizedDescription);
 
         [expectation fulfill];
@@ -398,8 +397,10 @@
                                completion:^(RLMSyncUserInfo *info, NSError *err) {
                                    XCTAssertNil(err);
                                    XCTAssertNotNil(info);
-                                   XCTAssertEqualObjects(info.provider, RLMIdentityProviderUsernamePassword);
-                                   XCTAssertEqualObjects(info.providerUserIdentity, nonAdminUsername);
+                                   XCTAssertGreaterThan([info.accounts count], ((NSUInteger) 0));
+                                   RLMSyncUserAccountInfo *acctInfo = [info.accounts firstObject];
+                                   XCTAssertEqualObjects(acctInfo.providerUserIdentity, nonAdminUsername);
+                                   XCTAssertEqualObjects(acctInfo.provider, RLMIdentityProviderUsernamePassword);
                                    XCTAssertFalse(info.isAdmin);
                                    [ex1 fulfill];
                                }];
@@ -412,8 +413,10 @@
                                completion:^(RLMSyncUserInfo *info, NSError *err) {
                                    XCTAssertNil(err);
                                    XCTAssertNotNil(info);
-                                   XCTAssertEqualObjects(info.provider, RLMIdentityProviderUsernamePassword);
-                                   XCTAssertEqualObjects(info.providerUserIdentity, adminUsername);
+                                   XCTAssertGreaterThan([info.accounts count], ((NSUInteger) 0));
+                                   RLMSyncUserAccountInfo *acctInfo = [info.accounts firstObject];
+                                   XCTAssertEqualObjects(acctInfo.providerUserIdentity, adminUsername);
+                                   XCTAssertEqualObjects(acctInfo.provider, RLMIdentityProviderUsernamePassword);
                                    XCTAssertTrue(info.isAdmin);
                                    [ex2 fulfill];
                                }];
@@ -531,14 +534,11 @@
     XCTestExpectation *ex = [self expectationWithDescription:@"callback should fire"];
     // Set a callback on the user
     __weak RLMSyncUser *weakUser = user;
-    __block BOOL invoked = NO;
     user.errorHandler = ^(RLMSyncUser *u, NSError *error) {
         XCTAssertEqualObjects(u.identity, weakUser.identity);
         // Make sure we get the right error.
         XCTAssertEqualObjects(error.domain, RLMSyncAuthErrorDomain);
-        // FIXME ROS 2.0: ROS 2.0 changed the error
-//        XCTAssertEqual(error.code, RLMSyncAuthErrorInvalidCredential);
-        invoked = YES;
+        XCTAssertEqual(error.code, RLMSyncAuthErrorAccessDeniedOrInvalidPath);
         [ex fulfill];
     };
 
@@ -547,9 +547,7 @@
 
     // Try to log in a Realm; this will cause our errorHandler block defined above to be fired.
     __attribute__((objc_precise_lifetime)) RLMRealm *r = [self immediatelyOpenRealmForURL:REALM_URL() user:user];
-    if (!invoked) {
-        [self waitForExpectationsWithTimeout:10.0 handler:nil];
-    }
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
     XCTAssertTrue(user.state == RLMSyncUserStateLoggedOut);
 }
 

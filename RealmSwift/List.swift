@@ -319,17 +319,6 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     }
 
     /**
-     Removes the last object in the list. The object is not removed from the Realm that manages it.
-
-     This is a no-op if the List is already empty.
-
-     - warning: This method may only be called during a write transaction.
-     */
-    public func removeLast() {
-        _rlmArray.removeLastObject()
-    }
-
-    /**
      Removes all objects from the list. The objects are not removed from the Realm that manages them.
 
      - warning: This method may only be called during a write transaction.
@@ -481,7 +470,7 @@ extension List where Element: AddableType {
     }
 }
 
-extension List: RealmCollection, RangeReplaceableCollection {
+extension List: RealmCollection {
     /// The type of the objects stored within the list.
     public typealias ElementType = Element
 
@@ -491,20 +480,6 @@ extension List: RealmCollection, RangeReplaceableCollection {
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: _rlmArray)
     }
-
-    // MARK: RangeReplaceableCollection Support
-
-#if swift(>=3.1)
-    // These should not be necessary, but Swift 3.1's compiler fails to infer the `SubSequence`,
-    // and the standard library neglects to provide the default implementation of `subscript`
-    /// :nodoc:
-    public typealias SubSequence = RangeReplaceableRandomAccessSlice<List>
-
-    /// :nodoc:
-    public subscript(slice: Range<Int>) -> SubSequence {
-        return SubSequence(base: self, bounds: slice)
-    }
-#endif
 
     /**
      Replace the given `subRange` of elements with `newElements`.
@@ -539,8 +514,7 @@ extension List: RealmCollection, RangeReplaceableCollection {
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
-    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) ->
-        NotificationToken {
+    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken {
         let anyCollection = AnyRealmCollection(self)
         return _rlmArray.addNotificationBlock { _, change, error in
             block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
@@ -548,7 +522,169 @@ extension List: RealmCollection, RangeReplaceableCollection {
     }
 }
 
-// MARK: AssistedObjectiveCBridgeable
+#if swift(>=4.0)
+// MARK: - MutableCollection conformance, range replaceable collection emulation
+extension List: MutableCollection {
+    public typealias SubSequence = RandomAccessSlice<List>
+
+    /**
+     Returns the objects at the given range (get), or replaces the objects at the
+     given range with new objects (set).
+
+     - warning: Objects may only be set during a write transaction.
+
+     - parameter index: The index of the object to retrieve or replace.
+     */
+    public subscript(bounds: Range<Int>) -> SubSequence {
+        get {
+            return SubSequence(base: self, bounds: bounds)
+        }
+        set {
+            replaceSubrange(bounds.lowerBound..<bounds.upperBound, with: newValue)
+        }
+    }
+
+    /**
+     Removes the specified number of objects from the beginning of the list. The
+     objects are not removed from the Realm that manages them.
+
+     - warning: This method may only be called during a write transaction.
+     */
+    public func removeFirst(_ number: Int = 1) {
+        let count = Int(_rlmArray.count)
+        guard number <= count else {
+            throwRealmException("It is not possible to remove more objects (\(number)) from a list"
+                + " than it already contains (\(count)).")
+            return
+        }
+        for _ in 0..<number {
+            _rlmArray.removeObject(at: 0)
+        }
+    }
+
+    /**
+     Removes the specified number of objects from the end of the list. The objects
+     are not removed from the Realm that manages them.
+
+     - warning: This method may only be called during a write transaction.
+     */
+    public func removeLast(_ number: Int = 1) {
+        let count = Int(_rlmArray.count)
+        guard number <= count else {
+            throwRealmException("It is not possible to remove more objects (\(number)) from a list"
+                + " than it already contains (\(count)).")
+            return
+        }
+        for _ in 0..<number {
+            _rlmArray.removeLastObject()
+        }
+    }
+
+    /**
+     Inserts the items in the given collection into the list at the given position.
+
+     - warning: This method may only be called during a write transaction.
+     */
+    public func insert<C: Collection>(contentsOf newElements: C, at i: Int) where C.Iterator.Element == Element {
+        var currentIndex = i
+        for item in newElements {
+            insert(item, at: currentIndex)
+            currentIndex += 1
+        }
+    }
+
+    /**
+     Removes objects from the list at the given range.
+
+     - warning: This method may only be called during a write transaction.
+     */
+    public func removeSubrange(_ bounds: Range<Int>) {
+        removeSubrange(bounds.lowerBound..<bounds.upperBound)
+    }
+
+    /// :nodoc:
+    public func removeSubrange(_ bounds: ClosedRange<Int>) {
+        removeSubrange(bounds.lowerBound...bounds.upperBound)
+    }
+
+    //// :nodoc:
+    public func removeSubrange(_ bounds: CountableRange<Int>) {
+        for _ in bounds {
+            remove(at: bounds.lowerBound)
+        }
+    }
+
+    /// :nodoc:
+    public func removeSubrange(_ bounds: CountableClosedRange<Int>) {
+        for _ in bounds {
+            remove(at: bounds.lowerBound)
+        }
+    }
+
+    /// :nodoc:
+    public func removeSubrange(_ bounds: DefaultRandomAccessIndices<List>) {
+        removeSubrange(bounds.startIndex..<bounds.endIndex)
+    }
+
+    /// :nodoc:
+    public func replaceSubrange<C: Collection>(_ subrange: ClosedRange<Int>, with newElements: C)
+        where C.Iterator.Element == Element {
+            removeSubrange(subrange)
+            insert(contentsOf: newElements, at: subrange.lowerBound)
+    }
+
+    /// :nodoc:
+    public func replaceSubrange<C: Collection>(_ subrange: CountableRange<Int>, with newElements: C)
+        where C.Iterator.Element == Element {
+            removeSubrange(subrange)
+            insert(contentsOf: newElements, at: subrange.lowerBound)
+    }
+
+    /// :nodoc:
+    public func replaceSubrange<C: Collection>(_ subrange: CountableClosedRange<Int>, with newElements: C)
+        where C.Iterator.Element == Element {
+            removeSubrange(subrange)
+            insert(contentsOf: newElements, at: subrange.lowerBound)
+    }
+
+    /// :nodoc:
+    public func replaceSubrange<C: Collection>(_ subrange: DefaultRandomAccessIndices<List>, with newElements: C)
+        where C.Iterator.Element == Element {
+            removeSubrange(subrange)
+            insert(contentsOf: newElements, at: subrange.startIndex)
+    }
+}
+#else
+// MARK: - RangeReplaceableCollection support
+extension List: RangeReplaceableCollection {
+    /**
+     Removes the last object in the list. The object is not removed from the Realm that manages it.
+
+     - warning: This method may only be called during a write transaction.
+     */
+    public func removeLast() {
+        guard _rlmArray.count > 0 else {
+            throwRealmException("It is not possible to remove an object from an empty list.")
+            return
+        }
+        _rlmArray.removeLastObject()
+    }
+
+#if swift(>=3.1)
+    // These should not be necessary, but Swift 3.1's compiler fails to infer the `SubSequence`,
+    // and the standard library neglects to provide the default implementation of `subscript`
+    /// :nodoc:
+    public typealias SubSequence = RangeReplaceableRandomAccessSlice<List>
+
+    /// :nodoc:
+    public subscript(slice: Range<Int>) -> SubSequence {
+        return SubSequence(base: self, bounds: slice)
+    }
+#endif
+}
+#endif
+
+// MARK: - AssistedObjectiveCBridgeable
 
 extension List: AssistedObjectiveCBridgeable {
     internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> List {
@@ -560,7 +696,7 @@ extension List: AssistedObjectiveCBridgeable {
         return (objectiveCValue: _rlmArray, metadata: nil)
     }
 }
-// MARK: Unavailable
+// MARK: - Unavailable
 
 extension List {
     @available(*, unavailable, renamed: "remove(at:)")

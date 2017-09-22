@@ -583,7 +583,7 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
     }
 
     func testRemoveLast() {
-        array.removeLast()
+        assertThrows(array.removeLast())
 
         array.append(objectsIn: values)
         array.removeLast()
