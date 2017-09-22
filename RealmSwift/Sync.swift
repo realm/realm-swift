@@ -207,6 +207,8 @@ public struct SyncConfiguration {
      Whether this Realm should be opened in 'partial synchronization' mode.
      Partial synchronization mode means that no objects are synchronized from the remote Realm
      except those matching queries that the user explicitly specifies.
+
+     -warning: Partial synchronization is a tech preview. Its APIs are subject to change.
      */
     public let isPartial: Bool
 
@@ -709,10 +711,14 @@ extension Realm {
      of a given object type that match the given query (in string format).
 
      The results will be returned asynchronously in the callback.
+     Use `Results.observe(_:)` to be notified to changes to the set of synchronized objects.
+
+     -warning: Partial synchronization is a tech preview. Its APIs are subject to change.
      */
-    public func fetchResults<T: Object>(query: String, type: T.Type, completion: @escaping (Results<T>?, Swift.Error?) -> Void) {
-        rlmRealm.fetchResults(forQuery: query, objectType: T.self) { (rlmResults, error) in
-            completion(rlmResults.map { Results<T>($0) }, error)
+    public func subscribe<T: Object>(to objects: T.Type, where: String,
+                                     completion: @escaping (Results<T>?, Swift.Error?) -> Void) {
+        rlmRealm.subscribe(toObjects: objects, where: `where`) { (results, error) in
+            completion(results.map { Results<T>($0) }, error)
         }
     }
 }

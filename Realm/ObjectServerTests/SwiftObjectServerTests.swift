@@ -458,7 +458,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 let ex = expectation(description: "Should be able to successfully complete a query")
 
                 var results: Results<SwiftPartialSyncObjectA>!
-                realm.fetchResults(query: "number > 5", type: SwiftPartialSyncObjectA.self) { r, error in
+                realm.subscribe(to: SwiftPartialSyncObjectA.self, where: "number > 5") { r, error in
                     XCTAssertNil(error)
                     XCTAssertNotNil(r)
                     results = r

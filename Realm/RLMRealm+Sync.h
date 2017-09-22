@@ -29,7 +29,7 @@ typedef void(^RLMPartialSyncFetchCallback)(RLMResults * _Nullable results, NSErr
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// :nodoc:
+///
 @interface RLMRealm (Sync)
 
 /**
@@ -37,8 +37,12 @@ NS_ASSUME_NONNULL_BEGIN
  of a given object type that match the given query (in string format).
 
  The results will be returned asynchronously in the callback.
- */
-- (void)fetchResultsForQuery:(NSString *)query objectType:(Class)type callback:(RLMPartialSyncFetchCallback)callback;
+ Use `-[RLMResults addNotificationBlock:]` to be notified to changes to the set of
+ synchronized objects.
+
+ @warning Partial synchronization is a tech preview. Its APIs are subject to change.
+*/
+- (void)subscribeToObjects:(Class)type where:(NSString *)query callback:(RLMPartialSyncFetchCallback)callback;
 
 @end
 

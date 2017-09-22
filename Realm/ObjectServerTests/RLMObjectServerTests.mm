@@ -1539,8 +1539,8 @@
         // Perform some partial sync queries
         XCTestExpectation *ex = [self expectationWithDescription:@"Should be able to successfully complete a query"];
         __block RLMResults *objects = nil;
-        [realm fetchResultsForQuery:@"number > 5"
-                         objectType:[PartialSyncObjectA class]
+        [realm subscribeToObjects:[PartialSyncObjectA class]
+                            where:@"number > 5"
                            callback:^(RLMResults *results, NSError *error) {
                                XCTAssertNil(error);
                                XCTAssertNotNil(results);
