@@ -51,6 +51,14 @@ x.x.x Release notes (yyyy-MM-dd)
   location, and future attempts to open the synchronized Realm will result in a new
   file being created. If you wish to migrate any data from the backup Realm you can
   open it using the backup Realm configuration available on the error object.
+* Add preview support for partial synchronization. Partial synchronization is
+  allows a synchronized Realm to be opened in such a way that only objects
+  requested by the user are synchronized to the device. You can use it by setting
+  the `isPartial` property on a `SyncConfiguration`, opening the Realm, and then
+  calling `Realm.subscribe(to:where:callback:)` with the type of object you're
+  interested in, a string containing a query determining which objects you want
+  to subscribe to, and a callback which will report the results. You may add as
+  many subscriptions to a synced Realm as necessary.
 
 ### Bugfixes
 
