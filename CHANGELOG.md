@@ -23,9 +23,6 @@ x.x.x Release notes (yyyy-MM-dd)
 * `RLMSyncUserInfo` has been significantly enhanced. It now contains metadata
   about a user stored on the Realm Object Server, as well as a list of all user account
   data associated with that user.
-* `List` now conforms to `MutableCollection` instead of `RangeReplaceableCollection`.
-  The empty collection initializer has been removed. Default implementations of
-  range replaceable collection methods that make sense for `List` have been added.
 * Starting with Swift 4, `List` now conforms to `MutableCollection` instead of
   `RangeReplaceableCollection`. For Swift 4, the empty collection initializer has been
   removed, and default implementations of range replaceable collection methods that
