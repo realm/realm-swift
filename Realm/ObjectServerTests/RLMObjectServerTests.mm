@@ -1442,4 +1442,49 @@
                                       @"Cannot set `shouldCompactOnLaunch` when `syncConfiguration` is set.");
 }
 
+#pragma mark - Offline Client Reset
+
+- (void)testOfflineClientReset {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                                            register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:REALM_URL()];
+
+    NSURL *sourceFileURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"sync-1.x" withExtension:@"realm"];
+    NSString *fileName = [NSString stringWithFormat:@"%@.realm", [NSUUID new]];
+    NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
+    [[NSFileManager defaultManager] copyItemAtURL:sourceFileURL toURL:fileURL error:nullptr];
+    syncConfig.customFileURL = fileURL;
+
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.syncConfiguration = syncConfig;
+
+    NSError *error;
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
+    XCTAssertNil(realm);
+    XCTAssertEqualObjects(error.domain, RLMErrorDomain);
+    XCTAssertEqual(error.code, RLMErrorIncompatibleSyncedFile);
+    RLMRealmConfiguration *backupConfiguration = error.userInfo[RLMBackupRealmConfigurationErrorKey];
+    XCTAssertNotNil(backupConfiguration);
+
+    // Open the backup Realm with a schema subset since it was created using the schema from .NET's unit tests.
+    // The Person class is declared in SwiftObjectServerTests.swift.
+    backupConfiguration.objectClasses = @[ NSClassFromString(@"Person") ];
+
+    error = nil;
+    RLMRealm *backupRealm = [RLMRealm realmWithConfiguration:backupConfiguration error:&error];
+    XCTAssertNotNil(backupRealm);
+    XCTAssertNil(error);
+
+    RLMResults *people = [backupRealm allObjects:@"Person"];
+    XCTAssertEqual(people.count, 1u);
+    XCTAssertEqualObjects([people[0] valueForKey:@"FirstName"], @"John");
+    XCTAssertEqualObjects([people[0] valueForKey:@"LastName"], @"Smith");
+
+    error = nil;
+    realm = [RLMRealm realmWithConfiguration:configuration error:&error];
+    XCTAssertNotNil(realm);
+    XCTAssertNil(error);
+}
+
 @end
