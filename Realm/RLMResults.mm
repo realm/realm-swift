@@ -138,15 +138,21 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (RLMPropertyType)type {
-    return static_cast<RLMPropertyType>(_results.get_type() & ~realm::PropertyType::Nullable);
+    return translateRLMResultsErrors([&] {
+        return static_cast<RLMPropertyType>(_results.get_type() & ~realm::PropertyType::Nullable);
+    });
 }
 
 - (BOOL)isOptional {
-    return is_nullable(_results.get_type());
+    return translateRLMResultsErrors([&] {
+        return is_nullable(_results.get_type());
+    });
 }
 
 - (NSString *)objectClassName {
-    return RLMStringDataToNSString(_results.get_object_type());
+    return translateRLMResultsErrors([&] {
+        return RLMStringDataToNSString(_results.get_object_type());
+    });
 }
 
 - (RLMClassInfo *)objectInfo {
@@ -181,6 +187,9 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     }
 
     return translateRLMResultsErrors([&] {
+        if (_results.get_type() != realm::PropertyType::Object) {
+            @throw RLMException(@"Querying is currently only implemented for arrays of Realm Objects");
+        }
         return RLMConvertNotFound(_results.index_of(RLMPredicateToQuery(predicate, _info->rlmObjectSchema, _realm.schema, _realm.group)));
     });
 }
@@ -330,7 +339,9 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         if (_results.get_mode() == Results::Mode::Empty) {
             return self;
         }
-        // FIXME: primitive array queries
+        if (_results.get_type() != realm::PropertyType::Object) {
+            @throw RLMException(@"Querying is currently only implemented for arrays of Realm Objects");
+        }
         auto query = RLMPredicateToQuery(predicate, _info->rlmObjectSchema, _realm.schema, _realm.group);
         return [RLMResults resultsWithObjectInfo:*_info results:_results.filter(std::move(query))];
     });

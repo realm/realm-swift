@@ -454,21 +454,20 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 }
 
 - (RLMResults *)objectsWithPredicate:(NSPredicate *)predicate {
+    if (_type != RLMPropertyTypeObject) {
+        @throw RLMException(@"Querying is currently only implemented for arrays of Realm Objects");
+    }
     auto query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema, _realm.schema, _realm.group);
     auto results = translateErrors([&] { return _backingList.filter(std::move(query)); });
     return [RLMResults resultsWithObjectInfo:*_objectInfo results:std::move(results)];
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
-    realm::Query query;
-    if (_objectInfo) {
-        query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema,
-                                    _realm.schema, _realm.group);
+    if (_type != RLMPropertyTypeObject) {
+        @throw RLMException(@"Querying is currently only implemented for arrays of Realm Objects");
     }
-    else {
-        // FIXME
-        query = translateErrors([&] { return _backingList.get_query(); });
-    }
+    realm::Query query = RLMPredicateToQuery(predicate, _objectInfo->rlmObjectSchema,
+                                             _realm.schema, _realm.group);
 
     return translateErrors([&] {
         return RLMConvertNotFound(_backingList.find(std::move(query)));
