@@ -33,7 +33,7 @@ using namespace realm;
 
 - (void)fetchResultsForQuery:(NSString *)query objectType:(Class)type callback:(RLMPartialSyncFetchCallback)callback {
     NSString *className = NSStringFromClass(type);
-    auto cb = [&](Results results, std::exception_ptr err) {
+    auto cb = [=](Results results, std::exception_ptr err) {
         if (err) {
             try {
                 rethrow_exception(err);
@@ -45,9 +45,9 @@ using namespace realm;
             }
             return;
         }
-        callback([RLMResults resultsWithObjectInfo:self->_info[className] results:std::move(results)], nil);
+        callback([RLMResults resultsWithObjectInfo:_info[className] results:std::move(results)], nil);
     };
-    partial_sync::register_query(_realm, [className UTF8String], [query UTF8String], std::move(cb));
+    partial_sync::register_query(_realm, className.UTF8String, query.UTF8String, std::move(cb));
 }
 
 @end
