@@ -181,6 +181,32 @@ static NSURL *syncDirectoryForChildProcess() {
     return realm;
 }
 
+- (RLMRealm *)openRealmWithConfiguration:(RLMRealmConfiguration *)configuration {
+    return [self openRealmWithConfiguration:configuration immediatelyBlock:nullptr];
+}
+
+- (RLMRealm *)openRealmWithConfiguration:(RLMRealmConfiguration *)configuration
+             immediatelyBlock:(nullable void(^)(void))block {
+    const NSTimeInterval timeout = 4;
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    RLMSyncConfiguration *syncConfig = configuration.syncConfiguration;
+    RLMSyncManager.sharedManager.sessionCompletionNotifier = ^(NSError *error) {
+        if (error) {
+            XCTFail(@"Received an asynchronous error when trying to open Realm at '%@' for user '%@': %@ (process: %@)",
+                    syncConfig.realmURL, syncConfig.user.identity, error, self.isParent ? @"parent" : @"child");
+        }
+        dispatch_semaphore_signal(sema);
+    };
+
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nullptr];
+    if (block) {
+        block();
+    }
+    // Wait for login to succeed or fail.
+    XCTAssert(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0,
+              @"Timed out while trying to asynchronously open Realm for URL: %@", syncConfig.realmURL);
+    return realm;
+}
 - (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
     return [self immediatelyOpenRealmForURL:url
                                        user:user

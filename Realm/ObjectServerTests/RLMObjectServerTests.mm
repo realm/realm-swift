@@ -1535,7 +1535,7 @@
         syncConfig.isPartial = YES;
         RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
         configuration.syncConfiguration = syncConfig;
-        RLMRealm *realm = [self openRealmForURL:realmURL user:user];
+        RLMRealm *realm = [self openRealmWithConfiguration:configuration];
         // Perform some partial sync queries
         XCTestExpectation *ex = [self expectationWithDescription:@"Should be able to successfully complete a query"];
         __block RLMResults *objects = nil;
