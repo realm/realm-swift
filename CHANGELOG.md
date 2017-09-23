@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.0.0-beta.4 Release notes (2017-09-22)
 =============================================================
 
 ### Breaking Changes
