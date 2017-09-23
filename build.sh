@@ -315,8 +315,7 @@ fi
 
 kill_object_server() {
 # Based on build.sh conventions we always run ROS from a path ending in 'ros/bin/ros'.
-    pid=$(ps ax | grep "ros/bin/ros start$" | sed -e 's/^[[:space:]]*//' | awk '{ print $1 }')
-    kill $pid 2>/dev/null
+    pkill -f ros/bin/ros\ start
 }
 
 download_object_server() {
@@ -439,9 +438,9 @@ case "$COMMAND" in
         ;;
 
     "reset-ros-client-state")
-        rm -rf "~/Library/Application Support/xctest"
-        rm -rf "~/Library/Application Support/io.realm.TestHost"
-        rm -rf "~/Library/Application Support/xctest-child"
+        rm -rf ~/Library/Application\ Support/xctest
+        rm -rf ~/Library/Application\ Support/io.realm.TestHost
+        rm -rf ~/Library/Application\ Support/xctest-child
         exit 0
         ;;
 
@@ -1098,12 +1097,12 @@ EOM
             sh build.sh prelaunch-simulator
 
             # Reset CoreSimulator.log
-            mkdir -p "~/Library/Logs/CoreSimulator"
-            echo > "~/Library/Logs/CoreSimulator/CoreSimulator.log"
+            mkdir -p ~/Library/Logs/CoreSimulator
+            echo > ~/Library/Logs/CoreSimulator/CoreSimulator.log
 
-            if [ -d "~/Library/Developer/CoreSimulator/Devices/" ]; then
+            if [ -d ~/Library/Developer/CoreSimulator/Devices/ ]; then
                 # Verify that no Realm files still exist
-                ! find "~/Library/Developer/CoreSimulator/Devices/" -name '*.realm' | grep -q .
+                ! find ~/Library/Developer/CoreSimulator/Devices/ -name '*.realm' | grep -q .
             fi
 
             failed=0
@@ -1122,7 +1121,7 @@ EOM
             fi
             if [ "$failed" = "1" ]; then
                 echo "\n\n***\nbuild/build.log\n***\n\n" && cat build/build.log || true
-                echo "\n\n***\nCoreSimulator.log\n***\n\n" && cat "~/Library/Logs/CoreSimulator/CoreSimulator.log"
+                echo "\n\n***\nCoreSimulator.log\n***\n\n" && cat ~/Library/Logs/CoreSimulator/CoreSimulator.log
                 exit 1
             fi
         fi

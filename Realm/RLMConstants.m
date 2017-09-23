@@ -32,3 +32,5 @@ NSString * const RLMRealmVersionKey = @"RLMRealmVersion";
 NSString * const RLMRealmCoreVersionKey = @"RLMRealmCoreVersion";
 
 NSString * const RLMInvalidatedKey = @"invalidated";
+
+NSString * const RLMBackupRealmConfigurationErrorKey = @"RLMBackupRealmConfiguration";

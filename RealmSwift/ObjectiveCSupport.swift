@@ -153,4 +153,14 @@ public final class ObjectiveCSupport {
             return object(Int(totalBytes), Int(usedBytes))
         }
     }
+
+    /// Convert a `SyncConfiguration` to a `RLMSyncConfiguration`.
+    public static func convert(object: SyncConfiguration) -> RLMSyncConfiguration {
+        return object.asConfig()
+    }
+
+    /// Convert a `RLMSyncConfiguration` to a `SyncConfiguration`.
+    public static func convert(object: RLMSyncConfiguration) -> SyncConfiguration {
+        return SyncConfiguration(config: object)
+    }
 }

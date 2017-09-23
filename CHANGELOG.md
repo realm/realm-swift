@@ -23,9 +23,6 @@ x.x.x Release notes (yyyy-MM-dd)
 * `RLMSyncUserInfo` has been significantly enhanced. It now contains metadata
   about a user stored on the Realm Object Server, as well as a list of all user account
   data associated with that user.
-* `List` now conforms to `MutableCollection` instead of `RangeReplaceableCollection`.
-  The empty collection initializer has been removed. Default implementations of
-  range replaceable collection methods that make sense for `List` have been added.
 * Starting with Swift 4, `List` now conforms to `MutableCollection` instead of
   `RangeReplaceableCollection`. For Swift 4, the empty collection initializer has been
   removed, and default implementations of range replaceable collection methods that
@@ -47,6 +44,13 @@ x.x.x Release notes (yyyy-MM-dd)
   required (by overriding `+requiredProperties:`) will instead make the values
   within the array required. Querying `RLMArray`s containing values other than
   `RLMObject` subclasses is not yet implemented.
+* Opening a synced Realm whose local copy was created with an older version of
+  Realm Mobile Platfrom when a migration is not possible to the current version
+  will result in an `RLMErrorIncompatibleSyncedFile` / `incompatibleSyncedFile`
+  error. When such an error occurs, the original file is moved to a backup
+  location, and future attempts to open the synchronized Realm will result in a new
+  file being created. If you wish to migrate any data from the backup Realm you can
+  open it using the backup Realm configuration available on the error object.
 
 ### Bugfixes
 

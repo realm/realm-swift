@@ -49,10 +49,8 @@
 }
 
 /// A valid admin token should be able to log in a user.
-- (void)disabled_testAdminTokenAuthentication {
-    NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
-    NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
-    XCTAssertNotNil(adminToken);
+- (void)testAdminTokenAuthentication {
+    NSString *adminToken = [RLMSyncTestCase retrieveAdminToken];
     RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken identity:@"test"];
     XCTAssertNotNil(credentials);
 
@@ -454,7 +452,7 @@
 /// The login queue argument should be respected.
 - (void)testLoginQueueForSuccessfulLogin {
     // Make global queue
-    dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0);
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
     RLMSyncCredentials *c1 = [RLMSyncCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
                                                                 password:@"p"
@@ -490,7 +488,7 @@
 /// The login queue argument should be respected.
 - (void)testLoginQueueForFailedLogin {
     // Make global queue
-    dispatch_queue_t queue = dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0);
+    dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
     RLMSyncCredentials *c1 = [RLMSyncCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
                                                                 password:@"p"
@@ -554,12 +552,10 @@
 #pragma mark - Basic Sync
 
 /// It should be possible to successfully open a Realm configured for sync with an access token.
-- (void)disabled_testOpenRealmWithAdminToken {
+- (void)testOpenRealmWithAdminToken {
     // FIXME (tests): opening a Realm with the access token, then opening a Realm at the same virtual path
     // with normal credentials, causes Realms to fail to bind with a "bad virtual path" error.
-    NSURL *adminTokenFileURL = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"sync/admin_token.base64"];
-    NSString *adminToken = [NSString stringWithContentsOfURL:adminTokenFileURL encoding:NSUTF8StringEncoding error:nil];
-    XCTAssertNotNil(adminToken);
+    NSString *adminToken = [RLMSyncTestCase retrieveAdminToken];
     RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken identity:@"test"];
     XCTAssertNotNil(credentials);
     RLMSyncUser *user = [self logInUserForCredentials:credentials
@@ -1440,6 +1436,51 @@
     configuration.syncConfiguration = syncConfig;
     RLMAssertThrowsWithReasonMatching(configuration.shouldCompactOnLaunch = ^BOOL(NSUInteger, NSUInteger){ return NO; },
                                       @"Cannot set `shouldCompactOnLaunch` when `syncConfiguration` is set.");
+}
+
+#pragma mark - Offline Client Reset
+
+- (void)testOfflineClientReset {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                                            register:YES]
+                                               server:[RLMObjectServerTests authServerURL]];
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:REALM_URL()];
+
+    NSURL *sourceFileURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"sync-1.x" withExtension:@"realm"];
+    NSString *fileName = [NSString stringWithFormat:@"%@.realm", [NSUUID new]];
+    NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
+    [[NSFileManager defaultManager] copyItemAtURL:sourceFileURL toURL:fileURL error:nullptr];
+    syncConfig.customFileURL = fileURL;
+
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.syncConfiguration = syncConfig;
+
+    NSError *error;
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
+    XCTAssertNil(realm);
+    XCTAssertEqualObjects(error.domain, RLMErrorDomain);
+    XCTAssertEqual(error.code, RLMErrorIncompatibleSyncedFile);
+    RLMRealmConfiguration *backupConfiguration = error.userInfo[RLMBackupRealmConfigurationErrorKey];
+    XCTAssertNotNil(backupConfiguration);
+
+    // Open the backup Realm with a schema subset since it was created using the schema from .NET's unit tests.
+    // The Person class is declared in SwiftObjectServerTests.swift.
+    backupConfiguration.objectClasses = @[ NSClassFromString(@"Person") ];
+
+    error = nil;
+    RLMRealm *backupRealm = [RLMRealm realmWithConfiguration:backupConfiguration error:&error];
+    XCTAssertNotNil(backupRealm);
+    XCTAssertNil(error);
+
+    RLMResults *people = [backupRealm allObjects:@"Person"];
+    XCTAssertEqual(people.count, 1u);
+    XCTAssertEqualObjects([people[0] valueForKey:@"FirstName"], @"John");
+    XCTAssertEqualObjects([people[0] valueForKey:@"LastName"], @"Smith");
+
+    error = nil;
+    realm = [RLMRealm realmWithConfiguration:configuration error:&error];
+    XCTAssertNotNil(realm);
+    XCTAssertNil(error);
 }
 
 @end
