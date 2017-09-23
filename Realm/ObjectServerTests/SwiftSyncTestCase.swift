@@ -42,6 +42,30 @@ class SwiftHugeSyncObject: Object {
     }
 }
 
+class SwiftPartialSyncObjectA: Object {
+    @objc dynamic var number: Int = 0
+    @objc dynamic var string: String = ""
+
+    convenience init(number: Int, string: String) {
+        self.init()
+        self.number = number
+        self.string = string
+    }
+}
+
+class SwiftPartialSyncObjectB: Object {
+    @objc dynamic var number: Int = 0
+    @objc dynamic var firstString: String = ""
+    @objc dynamic var secondString: String = ""
+
+    convenience init(number: Int, firstString: String, secondString: String) {
+        self.init()
+        self.number = number
+        self.firstString = firstString
+        self.secondString = secondString
+    }
+}
+
 // MARK: Test case
 
 class SwiftSyncTestCase: RLMSyncTestCase {
@@ -70,6 +94,11 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     func synchronouslyOpenRealm(url: URL, user: SyncUser, file: StaticString = #file, line: UInt = #line) throws -> Realm {
+        let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: url))
+        return try synchronouslyOpenRealm(configuration: config)
+    }
+
+    func synchronouslyOpenRealm(configuration: Realm.Configuration, file: StaticString = #file, line: UInt = #line) throws -> Realm {
         let semaphore = DispatchSemaphore(value: 0)
         let basicBlock = { (error: Error?) in
             if let error = error {
@@ -79,8 +108,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
             semaphore.signal()
         }
         SyncManager.shared.setSessionCompletionNotifier(basicBlock)
-        let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: url))
-        let realm = try Realm(configuration: config)
+        let realm = try Realm(configuration: configuration)
         // FIXME: Perhaps we should have a reasonable timeout here, instead of allowing bad code to stall forever.
         _ = semaphore.wait(timeout: .distantFuture)
         return realm

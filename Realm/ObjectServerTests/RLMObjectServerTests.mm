@@ -21,6 +21,7 @@
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 #import "RLMSyncUtil_Private.h"
+#import "RLMRealm+Sync.h"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMRealmUtil.hpp"
 #import "RLMRealm_Dynamic.h"
@@ -1481,6 +1482,79 @@
     realm = [RLMRealm realmWithConfiguration:configuration error:&error];
     XCTAssertNotNil(realm);
     XCTAssertNil(error);
+}
+
+#pragma mark - Partial sync
+
+- (void)testPartialSync {
+    // Make credentials.
+    NSString *name = NSStringFromSelector(_cmd);
+    NSURL *server = [RLMObjectServerTests authServerURL];
+    NSURL *realmURL = REALM_URL();
+
+    // Log in and populate the Realm.
+    @autoreleasepool {
+        RLMSyncCredentials *creds = [RLMObjectServerTests basicCredentialsWithName:name register:YES];
+        RLMSyncUser *user = [self logInUserForCredentials:creds server:server];
+        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:realmURL];
+        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+        configuration.syncConfiguration = syncConfig;
+        RLMRealm *realm = [self openRealmForURL:realmURL user:user];
+        [realm beginWriteTransaction];
+        // FIXME: make this less hideous
+        // Add ten of each object
+        [realm addObject:[PartialSyncObjectA objectWithNumber:0 string:@"realm"]];
+        [realm addObject:[PartialSyncObjectA objectWithNumber:1 string:@""]];
+        [realm addObject:[PartialSyncObjectA objectWithNumber:2 string:@""]];
+        [realm addObject:[PartialSyncObjectA objectWithNumber:3 string:@""]];
+        [realm addObject:[PartialSyncObjectA objectWithNumber:4 string:@"realm"]];
+        [realm addObject:[PartialSyncObjectA objectWithNumber:5 string:@"sync"]];
+        [realm addObject:[PartialSyncObjectA objectWithNumber:6 string:@"partial"]];
+        [realm addObject:[PartialSyncObjectA objectWithNumber:7 string:@"partial"]];
+        [realm addObject:[PartialSyncObjectA objectWithNumber:8 string:@"partial"]];
+        [realm addObject:[PartialSyncObjectA objectWithNumber:9 string:@"partial"]];
+        [realm addObject:[PartialSyncObjectB objectWithNumber:0 firstString:@"" secondString:@""]];
+        [realm addObject:[PartialSyncObjectB objectWithNumber:1 firstString:@"" secondString:@""]];
+        [realm addObject:[PartialSyncObjectB objectWithNumber:2 firstString:@"" secondString:@""]];
+        [realm addObject:[PartialSyncObjectB objectWithNumber:3 firstString:@"" secondString:@""]];
+        [realm addObject:[PartialSyncObjectB objectWithNumber:4 firstString:@"" secondString:@""]];
+        [realm addObject:[PartialSyncObjectB objectWithNumber:5 firstString:@"" secondString:@""]];
+        [realm addObject:[PartialSyncObjectB objectWithNumber:6 firstString:@"" secondString:@""]];
+        [realm addObject:[PartialSyncObjectB objectWithNumber:7 firstString:@"" secondString:@""]];
+        [realm addObject:[PartialSyncObjectB objectWithNumber:8 firstString:@"" secondString:@""]];
+        [realm addObject:[PartialSyncObjectB objectWithNumber:9 firstString:@"" secondString:@""]];
+        [realm commitWriteTransaction];
+        [self waitForUploadsForUser:user url:realmURL];
+    }
+
+    // Log back in and do partial sync stuff.
+    @autoreleasepool {
+        RLMSyncCredentials *creds = [RLMObjectServerTests basicCredentialsWithName:name register:NO];
+        RLMSyncUser *user = [self logInUserForCredentials:creds server:server];
+        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:realmURL];
+        syncConfig.isPartial = YES;
+        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+        configuration.syncConfiguration = syncConfig;
+        RLMRealm *realm = [self openRealmWithConfiguration:configuration];
+        // Perform some partial sync queries
+        XCTestExpectation *ex = [self expectationWithDescription:@"Should be able to successfully complete a query"];
+        __block RLMResults *objects = nil;
+        [realm subscribeToObjects:[PartialSyncObjectA class]
+                            where:@"number > 5"
+                           callback:^(RLMResults *results, NSError *error) {
+                               XCTAssertNil(error);
+                               XCTAssertNotNil(results);
+                               objects = results;
+                               [ex fulfill];
+                           }];
+        [self waitForExpectations:@[ex] timeout:20.0];
+        // Verify that we got what we're looking for
+        XCTAssertTrue(objects.count == 4);
+        for (PartialSyncObjectA *object in objects) {
+            XCTAssertTrue(object.number > 5);
+            XCTAssertTrue([object.string isEqualToString:@"partial"]);
+        }
+    }
 }
 
 @end

@@ -19,6 +19,17 @@
 import XCTest
 import RealmSwift
 
+// Used by testOfflineClientReset
+// The naming here is nonstandard as the sync-1.x.realm test file comes from the .NET unit tests.
+// swiftlint:disable identifier_name
+@objc(Person)
+class Person: Object {
+    @objc dynamic var FirstName: String?
+    @objc dynamic var LastName: String?
+
+    override class func shouldIncludeInDefaultSchema() -> Bool { return false }
+}
+
 class SwiftObjectServerTests: SwiftSyncTestCase {
 
     /// It should be possible to successfully open a Realm configured for sync.
@@ -398,14 +409,71 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             fatalError("Unexpected error: \(error)")
         }
     }
-}
 
-// The naming here is nonstandard as the sync-1.x.realm test file comes from the .NET unit tests.
-// swiftlint:disable identifier_name
-@objc(Person)
-class Person: Object {
-    @objc dynamic var FirstName: String?
-    @objc dynamic var LastName: String?
+    // MARK: - Partial sync
 
-    override class func shouldIncludeInDefaultSchema() -> Bool { return false }
+    func testPartialSync() {
+        autoreleasepool {
+            let credentials = basicCredentials(register: true)
+            let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
+
+            // Log in and populate the Realm.
+            autoreleasepool {
+                let syncConfig = SyncConfiguration(user: user, realmURL: realmURL)
+                let configuration = Realm.Configuration(syncConfiguration: syncConfig)
+                let realm = try! synchronouslyOpenRealm(configuration: configuration)
+
+                try! realm.write {
+                    realm.add(SwiftPartialSyncObjectA(number: 0, string: "realm"))
+                    realm.add(SwiftPartialSyncObjectA(number: 1, string: ""))
+                    realm.add(SwiftPartialSyncObjectA(number: 2, string: ""))
+                    realm.add(SwiftPartialSyncObjectA(number: 3, string: ""))
+                    realm.add(SwiftPartialSyncObjectA(number: 4, string: "realm"))
+                    realm.add(SwiftPartialSyncObjectA(number: 5, string: "sync"))
+                    realm.add(SwiftPartialSyncObjectA(number: 6, string: "partial"))
+                    realm.add(SwiftPartialSyncObjectA(number: 7, string: "partial"))
+                    realm.add(SwiftPartialSyncObjectA(number: 8, string: "partial"))
+                    realm.add(SwiftPartialSyncObjectA(number: 9, string: "partial"))
+                    realm.add(SwiftPartialSyncObjectB(number: 0, firstString: "", secondString: ""))
+                    realm.add(SwiftPartialSyncObjectB(number: 1, firstString: "", secondString: ""))
+                    realm.add(SwiftPartialSyncObjectB(number: 2, firstString: "", secondString: ""))
+                    realm.add(SwiftPartialSyncObjectB(number: 3, firstString: "", secondString: ""))
+                    realm.add(SwiftPartialSyncObjectB(number: 4, firstString: "", secondString: ""))
+                    realm.add(SwiftPartialSyncObjectB(number: 5, firstString: "", secondString: ""))
+                    realm.add(SwiftPartialSyncObjectB(number: 6, firstString: "", secondString: ""))
+                    realm.add(SwiftPartialSyncObjectB(number: 7, firstString: "", secondString: ""))
+                    realm.add(SwiftPartialSyncObjectB(number: 8, firstString: "", secondString: ""))
+                    realm.add(SwiftPartialSyncObjectB(number: 9, firstString: "", secondString: ""))
+                }
+
+                waitForUploads(for: user, url: realmURL)
+            }
+
+            // Log back in and do partial sync stuff.
+            autoreleasepool {
+                let syncConfig = SyncConfiguration(user: user, realmURL: realmURL, isPartial: true)
+                let configuration = Realm.Configuration(syncConfiguration: syncConfig)
+                let realm = try! synchronouslyOpenRealm(configuration: configuration)
+
+                let ex = expectation(description: "Should be able to successfully complete a query")
+
+                var results: Results<SwiftPartialSyncObjectA>!
+                realm.subscribe(to: SwiftPartialSyncObjectA.self, where: "number > 5") { r, error in
+                    XCTAssertNil(error)
+                    XCTAssertNotNil(r)
+                    results = r
+                    ex.fulfill()
+                }
+
+                waitForExpectations(timeout: 20.0)
+
+                // Verify that we got what we're looking for
+                XCTAssertEqual(results.count, 4)
+                for object in results {
+                    XCTAssertGreaterThan(object.number, 5)
+                    XCTAssertEqual(object.string, "partial")
+                }
+            }
+        }
+    }
 }

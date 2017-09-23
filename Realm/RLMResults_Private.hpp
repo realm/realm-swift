@@ -20,13 +20,25 @@
 
 #import "results.hpp"
 
+class RLMClassInfo;
+
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMResults () {
 @protected
     realm::Results _results;
 }
+
+/**
+ Initialize a 'raw' `RLMResults` using only an object store level Results.
+ This is only meant for applications where a results collection is being backed
+ by an object store object class that has no binding-level equivalent. The
+ consumer is responsible for bridging between the underlying objects and whatever
+ binding-level class is being vended out.
+ */
 - (instancetype)initWithResults:(realm::Results)results;
+
++ (instancetype)resultsWithObjectInfo:(RLMClassInfo&)info results:(realm::Results)results;
 @end
 
 NS_ASSUME_NONNULL_END

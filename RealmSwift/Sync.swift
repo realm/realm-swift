@@ -203,17 +203,28 @@ public struct SyncConfiguration {
      */
     public let enableSSLValidation: Bool
 
+    /**
+     Whether this Realm should be opened in 'partial synchronization' mode.
+     Partial synchronization mode means that no objects are synchronized from the remote Realm
+     except those matching queries that the user explicitly specifies.
+
+     -warning: Partial synchronization is a tech preview. Its APIs are subject to change.
+     */
+    public let isPartial: Bool
+
     internal init(config: RLMSyncConfiguration) {
         self.user = config.user
         self.realmURL = config.realmURL
         self.stopPolicy = config.stopPolicy
         self.enableSSLValidation = config.enableSSLValidation
+        self.isPartial = config.isPartial
     }
 
     func asConfig() -> RLMSyncConfiguration {
         let config = RLMSyncConfiguration(user: user, realmURL: realmURL)
         config.stopPolicy = stopPolicy
         config.enableSSLValidation = enableSSLValidation
+        config.isPartial = isPartial
         return config
     }
 
@@ -231,11 +242,12 @@ public struct SyncConfiguration {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true) {
+    public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true, isPartial: Bool = false) {
         self.user = user
         self.realmURL = realmURL
         self.stopPolicy = .afterChangesUploaded
         self.enableSSLValidation = enableSSLValidation
+        self.isPartial = isPartial
     }
 }
 
@@ -689,6 +701,24 @@ public extension SyncSession {
                                             ? .reportIndefinitely
                                             : .forCurrentlyOutstandingWork)) { transferred, transferrable in
                                                 block(Progress(transferred: transferred, transferrable: transferrable))
+        }
+    }
+}
+
+extension Realm {
+    /**
+     If the Realm is a partially synchronized Realm, fetch and synchronize the objects
+     of a given object type that match the given query (in string format).
+
+     The results will be returned asynchronously in the callback.
+     Use `Results.observe(_:)` to be notified to changes to the set of synchronized objects.
+
+     -warning: Partial synchronization is a tech preview. Its APIs are subject to change.
+     */
+    public func subscribe<T: Object>(to objects: T.Type, where: String,
+                                     completion: @escaping (Results<T>?, Swift.Error?) -> Void) {
+        rlmRealm.subscribe(toObjects: objects, where: `where`) { (results, error) in
+            completion(results.map { Results<T>($0) }, error)
         }
     }
 }

@@ -30,6 +30,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMPlatform.h',
                               'include/**/RLMProperty.h',
                               'include/**/RLMRealm.h',
+                              'include/**/RLMRealm+Sync.h',
                               'include/**/RLMRealmConfiguration+Sync.h',
                               'include/**/RLMRealmConfiguration.h',
                               'include/**/RLMResults.h',

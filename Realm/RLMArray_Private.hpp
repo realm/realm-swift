@@ -20,7 +20,7 @@
 
 #import "RLMCollection_Private.hpp"
 
-#import <Realm/RLMResults.h>
+#import "RLMResults_Private.hpp"
 
 #import <realm/link_view_fwd.hpp>
 #import <realm/table_ref.hpp>
@@ -69,8 +69,5 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
 // RLMResults private methods
 //
 @interface RLMResults () <RLMFastEnumerable>
-+ (instancetype)resultsWithObjectInfo:(RLMClassInfo&)info
-                              results:(realm::Results)results;
-
 - (void)deleteObjectsFromRealm;
 @end

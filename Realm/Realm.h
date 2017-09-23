@@ -25,6 +25,7 @@
 #import <Realm/RLMPlatform.h>
 #import <Realm/RLMProperty.h>
 #import <Realm/RLMRealm.h>
+#import <Realm/RLMRealm+Sync.h>
 #import <Realm/RLMRealmConfiguration.h>
 #import <Realm/RLMRealmConfiguration+Sync.h>
 #import <Realm/RLMResults.h>
