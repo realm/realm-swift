@@ -125,7 +125,7 @@
 }
 
 /// Errors reported in RLMSyncManager.errorHandler shouldn't contain sync error domain errors as underlying error
-- (void)disabled_testSyncErrorHandlerErrorDomain {
+- (void)testSyncErrorHandlerErrorDomain {
     RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                                             register:YES]
                                                server:[RLMObjectServerTests authServerURL]];
