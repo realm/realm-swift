@@ -441,25 +441,15 @@ class RealmCollectionTypeTests: TestCase {
 
     func testAverage() {
         let collection = getAggregateableCollection()
-        XCTAssertEqual(2, collection.average(ofProperty: "intCol") as NSNumber!)
-        XCTAssertEqual(2, collection.average(ofProperty: "intCol") as Int!)
-        XCTAssertEqual(2, collection.average(ofProperty: "int8Col") as NSNumber!)
-        XCTAssertEqual(2, collection.average(ofProperty: "int8Col") as Int8!)
-        XCTAssertEqual(2, collection.average(ofProperty: "int16Col") as NSNumber!)
-        XCTAssertEqual(2, collection.average(ofProperty: "int16Col") as Int16!)
-        XCTAssertEqual(2, collection.average(ofProperty: "int32Col") as NSNumber!)
-        XCTAssertEqual(2, collection.average(ofProperty: "int32Col") as Int32!)
-        XCTAssertEqual(2, collection.average(ofProperty: "int64Col") as NSNumber!)
-        XCTAssertEqual(2, collection.average(ofProperty: "int64Col") as Int64!)
-        XCTAssertEqual(1.8333, (collection.average(ofProperty: "floatCol") as NSNumber!).floatValue,
-                                   accuracy: 0.001)
-        XCTAssertEqual(1.8333, collection.average(ofProperty: "floatCol") as Float!, accuracy: 0.001)
-        XCTAssertEqual(1.85, (collection.average(ofProperty: "doubleCol") as NSNumber!).doubleValue,
-                                   accuracy: 0.001)
-        XCTAssertEqual(1.85, collection.average(ofProperty: "doubleCol") as Double!, accuracy: 0.001)
+        XCTAssertEqual(2, collection.average(ofProperty: "intCol"))
+        XCTAssertEqual(2, collection.average(ofProperty: "int8Col"))
+        XCTAssertEqual(2, collection.average(ofProperty: "int16Col"))
+        XCTAssertEqual(2, collection.average(ofProperty: "int32Col"))
+        XCTAssertEqual(2, collection.average(ofProperty: "int64Col"))
+        XCTAssertEqual(1.8333, collection.average(ofProperty: "floatCol")!, accuracy: 0.001)
+        XCTAssertEqual(1.85, collection.average(ofProperty: "doubleCol")!, accuracy: 0.001)
 
-        assertThrows(collection.average(ofProperty: "noSuchCol")! as NSNumber, named: "Invalid property name")
-        assertThrows(collection.average(ofProperty: "noSuchCol")! as Float, named: "Invalid property name")
+        assertThrows(collection.average(ofProperty: "noSuchCol"), named: "Invalid property name")
     }
 
     func testFastEnumeration() {

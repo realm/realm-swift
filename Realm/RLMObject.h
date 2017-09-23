@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMPropertyChange;
 @class RLMPropertyDescriptor;
 @class RLMRealm;
-@class RLMResults;
+@class RLMResults<RLMObjectType>;
 
 /**
  `RLMObject` is a base class for model objects representing data stored in Realms.
@@ -350,7 +350,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
 
 /// :nodoc:
-+ (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
++ (RLMResults<__kindof RLMObject *> *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
 
 /**
@@ -399,7 +399,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat, ...;
 
 /// :nodoc:
-+ (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args;
++ (RLMResults<__kindof RLMObject *> *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args;
 
 /**
  Returns all objects of this object type matching the given predicate from the specified Realm.

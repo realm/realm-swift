@@ -32,6 +32,18 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
+* `List` can now contain values of types `Bool`, `Int`, `Int8`, `Int16`,
+  `Int32`, `Int64`, `Float`, `Double`, `String`, `Data`, and `Date` (and
+  optional versions of all of these) in addition to `Object` subclasses.
+  Querying `List`s containing values other than `Object` subclasses is not yet
+  implemented.
+* `RLMArray` can now be constrained with the protocols `RLMBool`, `RLMInt`,
+  `RLMFloat`, `RLMDouble`, `RLMString`, `RLMData`, and `RLMDate` in addition to
+  protocols defined with `RLM_ARRAY_TYPE`. By default `RLMArray`s of
+  non-`RLMObject` types can contain null. Indicating that the property is
+  required (by overriding `+requiredProperties:`) will instead make the values
+  within the array required. Querying `RLMArray`s containing values other than
+  `RLMObject` subclasses is not yet implemented.
 * Opening a synced Realm whose local copy was created with an older version of
   Realm Mobile Platfrom when a migration is not possible to the current version
   will result in an `RLMErrorIncompatibleSyncedFile` / `incompatibleSyncedFile`

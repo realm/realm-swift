@@ -497,7 +497,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
     [RLMRealmConfiguration resetRealmConfigurationState];
 }
 
-- (void)verifyNotificationsAreSupported {
+- (void)verifyNotificationsAreSupported:(bool)isCollection {
     [self verifyThread];
     if (_realm->config().immutable()) {
         @throw RLMException(@"Read-only Realms do not change and do not have change notifications");
@@ -505,13 +505,16 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
     if (!_realm->can_deliver_notifications()) {
         @throw RLMException(@"Can only add notification blocks from within runloops.");
     }
+    if (isCollection && _realm->is_in_transaction()) {
+        @throw RLMException(@"Cannot register notification blocks from within write transactions.");
+    }
 }
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block {
     if (!block) {
         @throw RLMException(@"The notification block should not be nil");
     }
-    [self verifyNotificationsAreSupported];
+    [self verifyNotificationsAreSupported:false];
 
     _realm->read_group();
 
@@ -754,10 +757,17 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
             @throw RLMException(@"Can only delete objects from the Realm they belong to.");
         }
         [idObjects deleteObjectsFromRealm];
+        return;
+    }
+    if (auto array = RLMDynamicCast<RLMArray>(objects)) {
+        if (array.type != RLMPropertyTypeObject) {
+            @throw RLMException(@"Cannot delete objects from RLMArray<%@>: only RLMObjects can be deleted.",
+                                RLMTypeToString(array.type));
+        }
     }
     for (RLMObject *obj in objects) {
         if (![obj isKindOfClass:RLMObjectBase.class]) {
-            @throw RLMException(@"Cannot delete objects of type %@ with deleteObjects:. Only RLMObjects are supported.",
+            @throw RLMException(@"Cannot delete objects of type %@ with deleteObjects:. Only RLMObjects can be deleted.",
                                 NSStringFromClass(obj.class));
         }
         RLMDeleteObjectFromRealm(obj, self);

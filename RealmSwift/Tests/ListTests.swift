@@ -85,6 +85,24 @@ class ListTests: TestCase {
     }
 #endif
 
+    func testPrimitive() {
+        let obj = SwiftListObject()
+        obj.int.append(5)
+        XCTAssertEqual(obj.int.first!, 5)
+        XCTAssertEqual(obj.int.last!, 5)
+        XCTAssertEqual(obj.int[0], 5)
+        obj.int.append(objectsIn: [6, 7, 8] as [Int])
+        XCTAssertEqual(obj.int.index(of: 6), 1)
+        XCTAssertEqual(2, obj.int.index(matching: NSPredicate(format: "self == 7")))
+        XCTAssertNil(obj.int.index(matching: NSPredicate(format: "self == 9")))
+        XCTAssertEqual(obj.int.max(), 8)
+        XCTAssertEqual(obj.int.sum(), 26)
+
+        obj.string.append("str")
+        XCTAssertEqual(obj.string.first!, "str")
+        XCTAssertEqual(obj.string[0], "str")
+    }
+
     func testInvalidated() {
         guard let array = array else {
             fatalError("Test precondition failure")

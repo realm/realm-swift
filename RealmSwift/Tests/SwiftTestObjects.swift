@@ -84,6 +84,30 @@ class SwiftOptionalPrimaryObject: SwiftOptionalObject {
     override class func primaryKey() -> String? { return "id" }
 }
 
+class SwiftListObject: Object {
+    let int = List<Int>()
+    let int8 = List<Int8>()
+    let int16 = List<Int16>()
+    let int32 = List<Int32>()
+    let int64 = List<Int64>()
+    let float = List<Float>()
+    let double = List<Double>()
+    let string = List<String>()
+    let data = List<Data>()
+    let date = List<Date>()
+
+    let intOpt = List<Int?>()
+    let int8Opt = List<Int8?>()
+    let int16Opt = List<Int16?>()
+    let int32Opt = List<Int32?>()
+    let int64Opt = List<Int64?>()
+    let floatOpt = List<Float?>()
+    let doubleOpt = List<Double?>()
+    let stringOpt = List<String?>()
+    let dataOpt = List<Data?>()
+    let dateOpt = List<Date?>()
+}
+
 class SwiftImplicitlyUnwrappedOptionalObject: Object {
     @objc dynamic var optNSStringCol: NSString!
     @objc dynamic var optStringCol: String!

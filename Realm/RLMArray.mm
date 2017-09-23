@@ -134,9 +134,6 @@
 
 - (id)objectAtIndex:(NSUInteger)index {
     validateArrayBounds(self, index);
-    if (!_backingArray) {
-        _backingArray = [NSMutableArray new];
-    }
     return [_backingArray objectAtIndex:index];
 }
 
@@ -213,25 +210,31 @@ static void changeArray(__unsafe_unretained RLMArray *const ar, NSKeyValueChange
     changeArray(ar, kind, f, [=] { return is; });
 }
 
-static void validateMatchingObjectType(RLMArray *array, id value) {
+void RLMArrayValidateMatchingObjectType(__unsafe_unretained RLMArray *const array,
+                                        __unsafe_unretained id const value) {
     if (!value && !array->_optional) {
-        @throw RLMException(@"Object must not be nil");
+        @throw RLMException(@"Invalid nil value for array of '%@'.",
+                            array->_objectClassName ?: RLMTypeToString(array->_type));
     }
     if (array->_type != RLMPropertyTypeObject) {
         if (!RLMValidateValue(value, array->_type, array->_optional, false, nil)) {
-            @throw RLMException(@"Invalid value '%@' of type '%@' for array of '%@'",
-                                value, [value class], RLMTypeToString(array->_type));
+            @throw RLMException(@"Invalid value '%@' of type '%@' for expected type '%@%s'.",
+                                value, [value class], RLMTypeToString(array->_type),
+                                array->_optional ? "?" : "");
         }
         return;
     }
 
-    RLMObject *object = value;
+    auto object = RLMDynamicCast<RLMObjectBase>(value);
+    if (!object) {
+        return;
+    }
     if (!object->_objectSchema) {
         @throw RLMException(@"Object cannot be inserted unless the schema is initialized. "
                             "This can happen if you try to insert objects into a RLMArray / List from a default value or from an overriden unmanaged initializer (`init()`).");
     }
     if (![array->_objectClassName isEqualToString:object->_objectSchema.className]) {
-        @throw RLMException(@"Object type '%@' does not match RLMArray type '%@'.",
+        @throw RLMException(@"Object of type '%@' does not match RLMArray type '%@'.",
                             object->_objectSchema.className, array->_objectClassName);
     }
 }
@@ -247,7 +250,7 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 
 - (void)addObjectsFromArray:(NSArray *)array {
     for (id obj in array) {
-        validateMatchingObjectType(self, obj);
+        RLMArrayValidateMatchingObjectType(self, obj);
     }
     changeArray(self, NSKeyValueChangeInsertion, NSMakeRange(_backingArray.count, array.count), ^{
         [_backingArray addObjectsFromArray:array];
@@ -255,7 +258,7 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 - (void)insertObject:(id)anObject atIndex:(NSUInteger)index {
-    validateMatchingObjectType(self, anObject);
+    RLMArrayValidateMatchingObjectType(self, anObject);
     validateArrayBounds(self, index, true);
     changeArray(self, NSKeyValueChangeInsertion, index, ^{
         [_backingArray insertObject:anObject atIndex:index];
@@ -266,7 +269,7 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
     changeArray(self, NSKeyValueChangeInsertion, indexes, ^{
         NSUInteger currentIndex = [indexes firstIndex];
         for (RLMObject *obj in objects) {
-            validateMatchingObjectType(self, obj);
+            RLMArrayValidateMatchingObjectType(self, obj);
             [_backingArray insertObject:obj atIndex:currentIndex];
             currentIndex = [indexes indexGreaterThanIndex:currentIndex];
         }
@@ -287,7 +290,7 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 - (void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
-    validateMatchingObjectType(self, anObject);
+    RLMArrayValidateMatchingObjectType(self, anObject);
     validateArrayBounds(self, index);
     changeArray(self, NSKeyValueChangeReplacement, index, ^{
         [_backingArray replaceObjectAtIndex:index withObject:anObject];
@@ -321,7 +324,7 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
 }
 
 - (NSUInteger)indexOfObject:(id)object {
-    validateMatchingObjectType(self, object);
+    RLMArrayValidateMatchingObjectType(self, object);
     if (!_backingArray) {
         return NSNotFound;
     }
@@ -357,42 +360,24 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
     return [self objectsWithPredicate:[NSPredicate predicateWithFormat:predicateFormat arguments:args]];
 }
 
-- (id)valueForKeyPath:(NSString *)keyPath {
-    if (!_backingArray) {
-        return [super valueForKeyPath:keyPath];
+static bool canAggregate(RLMPropertyType type, bool allowDate) {
+    switch (type) {
+        case RLMPropertyTypeInt:
+        case RLMPropertyTypeFloat:
+        case RLMPropertyTypeDouble:
+            return true;
+        case RLMPropertyTypeDate:
+            return allowDate;
+        default:
+            return false;
     }
-    // Although delegating to valueForKeyPath: here would allow to support
-    // nested key paths as well, limiting functionality gives consistency
-    // between unmanaged and managed arrays.
-    if ([keyPath characterAtIndex:0] == '@') {
-        NSRange operatorRange = [keyPath rangeOfString:@"." options:NSLiteralSearch];
-        if (operatorRange.location != NSNotFound) {
-            NSString *operatorKeyPath = [keyPath substringFromIndex:operatorRange.location + 1];
-            if ([operatorKeyPath rangeOfString:@"."].location != NSNotFound) {
-                @throw RLMException(@"Nested key paths are not supported yet for KVC collection operators.");
-            }
-        }
-    }
-    return [_backingArray valueForKeyPath:keyPath];
 }
 
-- (id)valueForKey:(NSString *)key {
-    if ([key isEqualToString:RLMInvalidatedKey]) {
-        return @NO; // Unmanaged arrays are never invalidated
+- (RLMPropertyType)typeForProperty:(NSString *)propertyName {
+    if ([propertyName isEqualToString:@"self"]) {
+        return _type;
     }
-    if (!_backingArray) {
-        return @[];
-    }
-    return [_backingArray valueForKey:key];
-}
 
-- (void)setValue:(id)value forKey:(NSString *)key {
-    [_backingArray setValue:value forKey:key];
-}
-
-- (void)validateAggregateProperty:(NSString *)propertyName
-                           method:(SEL)aggregateMethod
-                        allowDate:(bool)allowDate {
     RLMObjectSchema *objectSchema;
     if (_backingArray.count) {
         objectSchema = [_backingArray[0] objectSchema];
@@ -401,42 +386,116 @@ static void validateArrayBounds(__unsafe_unretained RLMArray *const ar,
         objectSchema = [RLMSchema.partialPrivateSharedSchema schemaForClassName:_objectClassName];
     }
 
-    RLMProperty *prop = RLMValidatedProperty(objectSchema, propertyName);
-    switch (prop.type) {
-        case RLMPropertyTypeInt:
-        case RLMPropertyTypeFloat:
-        case RLMPropertyTypeDouble:
-            break;
-        case RLMPropertyTypeDate:
-            if (allowDate) {
-                break;
-            }
-            [[clang::fallthrough]];
-        default:
-            @throw RLMException(@"%@ is not supported for %@ property '%@.%@'",
-                                NSStringFromSelector(aggregateMethod),
-                                RLMTypeToString(prop.type), _objectClassName, propertyName);
+    return RLMValidatedProperty(objectSchema, propertyName).type;
+}
+
+- (id)aggregateProperty:(NSString *)key operation:(NSString *)op method:(SEL)sel {
+    // Although delegating to valueForKeyPath: here would allow to support
+    // nested key paths as well, limiting functionality gives consistency
+    // between unmanaged and managed arrays.
+    if ([key rangeOfString:@"."].location != NSNotFound) {
+        @throw RLMException(@"Nested key paths are not supported yet for KVC collection operators.");
+    }
+
+    bool allowDate = false;
+    bool sum = false;
+    if ([op isEqualToString:@"@min"] || [op isEqualToString:@"@max"]) {
+        allowDate = true;
+    }
+    else if ([op isEqualToString:@"@sum"]) {
+        sum = true;
+    }
+    else if (![op isEqualToString:@"@avg"]) {
+        // Just delegate to NSArray for all other operators
+        return [_backingArray valueForKeyPath:[op stringByAppendingPathExtension:key]];
+    }
+
+    RLMPropertyType type = [self typeForProperty:key];
+    if (!canAggregate(type, allowDate)) {
+        NSString *method = sel ? NSStringFromSelector(sel) : op;
+        if (_type == RLMPropertyTypeObject) {
+            @throw RLMException(@"%@: is not supported for %@ property '%@.%@'",
+                                method, RLMTypeToString(type), _objectClassName, key);
+        }
+        else {
+            @throw RLMException(@"%@ is not supported for %@%s array",
+                                method, RLMTypeToString(_type), _optional ? "?" : "");
+        }
+    }
+
+    NSArray *values = [key isEqualToString:@"self"] ? _backingArray : [_backingArray valueForKey:key];
+    if (_optional) {
+        // Filter out NSNull values to match our behavior on managed arrays
+        NSIndexSet *nonnull = [values indexesOfObjectsPassingTest:^BOOL(id obj, NSUInteger, BOOL *) {
+            return obj != NSNull.null;
+        }];
+        if (nonnull.count < values.count) {
+            values = [values objectsAtIndexes:nonnull];
+        }
+    }
+    id result = [values valueForKeyPath:[op stringByAppendingString:@".self"]];
+    return sum && !result ? @0 : result;
+}
+
+- (id)valueForKeyPath:(NSString *)keyPath {
+    if ([keyPath characterAtIndex:0] != '@') {
+        return _backingArray ? [_backingArray valueForKeyPath:keyPath] : [super valueForKeyPath:keyPath];
+    }
+
+    if (!_backingArray) {
+        _backingArray = [NSMutableArray new];
+    }
+
+    NSUInteger dot = [keyPath rangeOfString:@"."].location;
+    if (dot == NSNotFound) {
+        return [_backingArray valueForKeyPath:keyPath];
+    }
+
+    NSString *op = [keyPath substringToIndex:dot];
+    NSString *key = [keyPath substringFromIndex:dot + 1];
+    return [self aggregateProperty:key operation:op method:nil];
+}
+
+- (id)valueForKey:(NSString *)key {
+    if ([key isEqualToString:RLMInvalidatedKey]) {
+        return @NO; // Unmanaged arrays are never invalidated
+    }
+    if (!_backingArray) {
+        _backingArray = [NSMutableArray new];
+    }
+    return [_backingArray valueForKey:key];
+}
+
+- (void)setValue:(id)value forKey:(NSString *)key {
+    if ([key isEqualToString:@"self"]) {
+        RLMArrayValidateMatchingObjectType(self, value);
+        for (NSUInteger i = 0, count = _backingArray.count; i < count; ++i) {
+            _backingArray[i] = value;
+        }
+        return;
+    }
+    else if (_type == RLMPropertyTypeObject) {
+        [_backingArray setValue:value forKey:key];
+    }
+    else {
+        [self setValue:value forUndefinedKey:key];
     }
 }
 
 - (id)minOfProperty:(NSString *)property {
-    [self validateAggregateProperty:property method:_cmd allowDate:true];
-    return [_backingArray valueForKeyPath:[@"@min." stringByAppendingString:property]];
+    return [self aggregateProperty:property operation:@"@min" method:_cmd];
 }
 
 - (id)maxOfProperty:(NSString *)property {
-    [self validateAggregateProperty:property method:_cmd allowDate:true];
-    return [_backingArray valueForKeyPath:[@"@max." stringByAppendingString:property]];
+    return [self aggregateProperty:property operation:@"@max" method:_cmd];
 }
 
 - (id)sumOfProperty:(NSString *)property {
-    [self validateAggregateProperty:property method:_cmd allowDate:false];
-    return [_backingArray valueForKeyPath:[@"@sum." stringByAppendingString:property]] ?: @0;
+    return [self aggregateProperty:property operation:@"@sum" method:_cmd];
 }
 
 - (id)averageOfProperty:(NSString *)property {
-    [self validateAggregateProperty:property method:_cmd allowDate:false];
-    return [_backingArray valueForKeyPath:[@"@avg." stringByAppendingString:property]];
+    return [self aggregateProperty:property operation:@"@avg" method:_cmd];
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {

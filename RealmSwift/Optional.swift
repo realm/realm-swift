@@ -19,7 +19,15 @@
 import Realm
 
 /// A protocol describing types that can parameterize a `RealmOptional`.
-public protocol RealmOptionalType {}
+public protocol RealmOptionalType {
+}
+
+public extension RealmOptionalType {
+    /// :nodoc:
+    public static func className() -> String {
+        return ""
+    }
+}
 extension Int: RealmOptionalType {}
 extension Int8: RealmOptionalType {}
 extension Int16: RealmOptionalType {}

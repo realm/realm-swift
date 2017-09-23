@@ -83,9 +83,10 @@ static id coerceToObjectType(id obj, Class cls, RLMSchema *schema) {
 }
 
 static id validatedObjectForProperty(__unsafe_unretained id const obj,
+                                     __unsafe_unretained RLMObjectSchema *const objectSchema,
                                      __unsafe_unretained RLMProperty *const prop,
                                      __unsafe_unretained RLMSchema *const schema) {
-    RLMValidateValueForProperty(obj, prop);
+    RLMValidateValueForProperty(obj, objectSchema, prop);
     if (!obj || obj == NSNull.null) {
         return nil;
     }
@@ -127,7 +128,7 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
         NSUInteger i = 0;
         for (id val in array) {
             RLMProperty *prop = properties[i++];
-            [self setValue:validatedObjectForProperty(RLMCoerceToNil(val), prop, schema)
+            [self setValue:validatedObjectForProperty(RLMCoerceToNil(val), _objectSchema, prop, schema)
                     forKey:prop.name];
         }
     }
@@ -141,7 +142,7 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
                 continue;
             }
 
-            [self setValue:validatedObjectForProperty(RLMCoerceToNil(obj), prop, schema)
+            [self setValue:validatedObjectForProperty(RLMCoerceToNil(obj), _objectSchema, prop, schema)
                     forKey:prop.name];
         }
     }
@@ -189,7 +190,8 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
             [array removeAllObjects];
 
             if (value) {
-                [array addObjects:validatedObjectForProperty(value, property, RLMSchema.partialPrivateSharedSchema)];
+                [array addObjects:validatedObjectForProperty(value, _objectSchema, property,
+                                                             RLMSchema.partialPrivateSharedSchema)];
             }
         }
         else if (property.optional) {

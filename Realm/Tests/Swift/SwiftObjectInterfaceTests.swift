@@ -221,7 +221,49 @@ class SwiftObjectInterfaceTests: RLMTestCase {
     }
 
     func testSwiftClassNameIsDemangled() {
-        XCTAssertEqual(SwiftObject.className(), "SwiftObject", "Calling className() on Swift class should return demangled name")
+        XCTAssertEqual(SwiftObject.className(), "SwiftObject",
+                       "Calling className() on Swift class should return demangled name")
+    }
+
+    func testPrimitiveArray() {
+        let obj = SwiftPrimitiveArrayObject()
+        let str = "str" as NSString
+        let data = "str".data(using: .utf8)! as Data as NSData
+        let date = NSDate()
+        let str2 = "str2" as NSString
+        let data2 = "str2".data(using: .utf8)! as Data as NSData
+        let date2 = NSDate(timeIntervalSince1970: 0)
+
+        obj.stringCol.add(str)
+        XCTAssertEqual(obj.stringCol[0], str)
+        XCTAssertEqual(obj.stringCol.index(of: str), 0)
+        XCTAssertEqual(obj.stringCol.index(of: str2), UInt(NSNotFound))
+
+        obj.dataCol.add(data)
+        XCTAssertEqual(obj.dataCol[0], data)
+        XCTAssertEqual(obj.dataCol.index(of: data), 0)
+        XCTAssertEqual(obj.dataCol.index(of: data2), UInt(NSNotFound))
+
+        obj.dateCol.add(date)
+        XCTAssertEqual(obj.dateCol[0], date)
+        XCTAssertEqual(obj.dateCol.index(of: date), 0)
+        XCTAssertEqual(obj.dateCol.index(of: date2), UInt(NSNotFound))
+
+        obj.optStringCol.add(str)
+        XCTAssertEqual(obj.optStringCol[0], str)
+        obj.optDataCol.add(data)
+        XCTAssertEqual(obj.optDataCol[0], data)
+        obj.optDateCol.add(date)
+        XCTAssertEqual(obj.optDateCol[0], date)
+
+        obj.optStringCol.add(NSNull())
+        XCTAssertEqual(obj.optStringCol[1], NSNull())
+        obj.optDataCol.add(NSNull())
+        XCTAssertEqual(obj.optDataCol[1], NSNull())
+        obj.optDateCol.add(NSNull())
+        XCTAssertEqual(obj.optDateCol[1], NSNull())
+
+        assertThrowsWithReasonMatching(obj.optDataCol.add(str), ".*")
     }
 
     // Objective-C models

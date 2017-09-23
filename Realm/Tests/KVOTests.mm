@@ -53,7 +53,15 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSData              *binaryCol;
 @property NSDate              *dateCol;
 @property KVOObject           *objectCol;
-@property RLMArray<KVOObject> *arrayCol;
+
+@property RLMArray<RLMBool>   *boolArray;
+@property RLMArray<RLMInt>    *intArray;
+@property RLMArray<RLMFloat>  *floatArray;
+@property RLMArray<RLMDouble> *doubleArray;
+@property RLMArray<RLMString> *stringArray;
+@property RLMArray<RLMData>   *dataArray;
+@property RLMArray<RLMDate>   *dateArray;
+@property RLMArray<KVOObject> *objectArray;
 
 @property NSNumber<RLMInt> *optIntCol;
 @property NSNumber<RLMFloat> *optFloatCol;
@@ -105,7 +113,15 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSData         *binaryCol;
 @property NSDate         *dateCol;
 @property PlainKVOObject *objectCol;
-@property NSMutableArray *arrayCol;
+
+@property NSMutableArray *boolArray;
+@property NSMutableArray *intArray;
+@property NSMutableArray *floatArray;
+@property NSMutableArray *doubleArray;
+@property NSMutableArray *stringArray;
+@property NSMutableArray *dataArray;
+@property NSMutableArray *dateArray;
+@property NSMutableArray *objectArray;
 
 @property NSNumber<RLMInt> *optIntCol;
 @property NSNumber<RLMFloat> *optFloatCol;
@@ -322,7 +338,14 @@ public:
     obj.binaryCol = NSData.data;
     obj.stringCol = @"";
     obj.dateCol = [NSDate dateWithTimeIntervalSinceReferenceDate:0];
-    obj.arrayCol = [NSMutableArray array];
+    obj.boolArray = [NSMutableArray array];
+    obj.intArray = [NSMutableArray array];
+    obj.floatArray = [NSMutableArray array];
+    obj.doubleArray = [NSMutableArray array];
+    obj.stringArray = [NSMutableArray array];
+    obj.dataArray = [NSMutableArray array];
+    obj.dateArray = [NSMutableArray array];
+    obj.objectArray = [NSMutableArray array];
     return obj;
 }
 
@@ -660,8 +683,57 @@ public:
     }
 
     {
-        KVORecorder r(self, obj, @"arrayCol");
-        obj.arrayCol = obj.arrayCol;
+        KVORecorder r(self, obj, @"intArray");
+        obj.intArray = obj.intArray;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"boolArray");
+        obj.boolArray = obj.boolArray;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"floatArray");
+        obj.floatArray = obj.floatArray;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"doubleArray");
+        obj.doubleArray = obj.doubleArray;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"stringArray");
+        obj.stringArray = obj.stringArray;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"dataArray");
+        obj.dataArray = obj.dataArray;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"dateArray");
+        obj.dateArray = obj.dateArray;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"objectArray");
+        obj.objectArray = obj.objectArray;
         r.refresh();
         r.pop_front(); // asserts that there's something to pop
     }
@@ -779,8 +851,8 @@ public:
     }
 
     {
-        KVORecorder r(self, obj, @"arrayCol");
-        [obj setValue:obj.arrayCol forKey:@"arrayCol"];
+        KVORecorder r(self, obj, @"objectArray");
+        [obj setValue:obj.objectArray forKey:@"objectArray"];
         r.refresh();
         r.pop_front(); // asserts that there's something to pop
     }
@@ -901,8 +973,8 @@ public:
     }
 
     {
-        KVORecorder r(self, obj, @"arrayCol");
-        obj[@"arrayCol"] = obj.arrayCol;
+        KVORecorder r(self, obj, @"objectArray");
+        obj[@"objectArray"] = obj.objectArray;
         r.refresh();
         r.pop_front(); // asserts that there's something to pop
     }
@@ -991,6 +1063,57 @@ public:
     }
 }
 
+- (void)testPrimitiveArrayDiffs {
+    KVOObject *obj = [self createObject];
+    KVORecorder r(self, obj, @"intArray");
+
+    id mutator = [obj mutableArrayValueForKey:@"intArray"];
+
+    [mutator addObject:@1];
+    AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
+
+    [mutator addObject:@2];
+    AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:1]);
+
+    [mutator removeObjectAtIndex:0];
+    AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:0]);
+
+    [mutator replaceObjectAtIndex:0 withObject:@3];
+    AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndex:0]);
+
+    NSMutableIndexSet *indexes = [NSMutableIndexSet new];
+    [indexes addIndex:0];
+    [indexes addIndex:2];
+    [mutator insertObjects:@[@4, @5] atIndexes:indexes];
+    AssertIndexChange(NSKeyValueChangeInsertion, indexes);
+
+    [mutator removeObjectsAtIndexes:indexes];
+    AssertIndexChange(NSKeyValueChangeRemoval, indexes);
+
+    if (![obj.intArray isKindOfClass:[NSArray class]]) {
+        // We deliberately diverge from NSMutableArray for `removeAllObjects` and
+        // `addObjectsFromArray:`, because generating a separate notification for
+        // each object added or removed is needlessly pessimal.
+        [mutator addObjectsFromArray:@[@6, @7]];
+        AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(1, 2)]);
+
+        // NSArray sends multiple notifications for exchange, which we can't do
+        // on refresh
+        [mutator exchangeObjectAtIndex:0 withObjectAtIndex:1];
+        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
+
+        // NSArray doesn't have move
+        [mutator moveObjectAtIndex:1 toIndex:0];
+        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
+
+        [mutator removeLastObject];
+        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:2]);
+
+        [mutator removeAllObjects];
+        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, 2)]);
+    }
+}
+
 - (void)testIgnoredProperty {
     KVOObject *obj = [self createObject];
     KVORecorder r(self, obj, @"ignored");
@@ -1042,18 +1165,18 @@ public:
 
 - (void)testArrayKVC {
     KVOObject *obj = [self createObject];
-    [obj.arrayCol addObject:obj];
+    [obj.objectArray addObject:obj];
 
     KVORecorder r(self, obj, @"boolCol");
-    [obj.arrayCol setValue:@YES forKey:@"boolCol"];
+    [obj.objectArray setValue:@YES forKey:@"boolCol"];
     AssertChanged(r, @NO, @YES);
 }
 
 // RLMArray doesn't support @count at all
 //- (void)testObserveArrayCount {
 //    KVOObject *obj = [self createObject];
-//    KVORecorder r(self, obj, @"arrayCol.@count");
-//    id mutator = [obj mutableArrayValueForKey:@"arrayCol"];
+//    KVORecorder r(self, obj, @"objectArray.@count");
+//    id mutator = [obj mutableArrayValueForKey:@"objectArray"];
 //    [mutator addObject:obj];
 //    AssertChanged(r, @0, @1);
 //}
@@ -1102,9 +1225,9 @@ public:
 
 - (void)testObserveInvalidArrayProperty {
     KVOObject *obj = [self createObject];
-    XCTAssertThrows([obj.arrayCol addObserver:self forKeyPath:@"self" options:0 context:0]);
-    XCTAssertNoThrow([obj.arrayCol addObserver:self forKeyPath:RLMInvalidatedKey options:0 context:0]);
-    XCTAssertNoThrow([obj.arrayCol removeObserver:self forKeyPath:RLMInvalidatedKey context:0]);
+    XCTAssertThrows([obj.objectArray addObserver:self forKeyPath:@"self" options:0 context:0]);
+    XCTAssertNoThrow([obj.objectArray addObserver:self forKeyPath:RLMInvalidatedKey options:0 context:0]);
+    XCTAssertNoThrow([obj.objectArray removeObserver:self forKeyPath:RLMInvalidatedKey context:0]);
 }
 
 - (void)testUnregisteringViaAnAssociatedObject {
@@ -1148,9 +1271,7 @@ public:
     static std::atomic<int> pk{0};
     return [KVOObject createInRealm:_realm withValue:@[@(++pk),
                                                        @NO, @1, @2, @3, @0, @0, @NO, @"",
-                                                       NSData.data, [NSDate dateWithTimeIntervalSinceReferenceDate:0],
-                                                       NSNull.null, NSNull.null,
-                                                       NSNull.null, NSNull.null, NSNull.null, NSNull.null]];
+                                                       NSData.data, [NSDate dateWithTimeIntervalSinceReferenceDate:0]]];
 }
 
 - (id)createLinkObject {
@@ -1176,9 +1297,9 @@ public:
 
 - (void)testDeleteParentOfObservedRLMArray {
     KVOObject *obj = [self createObject];
-    KVORecorder r1(self, obj, @"arrayCol");
-    KVORecorder r2(self, obj, @"arrayCol.invalidated");
-    KVORecorder r3(self, obj.arrayCol, RLMInvalidatedKey);
+    KVORecorder r1(self, obj, @"objectArray");
+    KVORecorder r2(self, obj, @"objectArray.invalidated");
+    KVORecorder r3(self, obj.objectArray, RLMInvalidatedKey);
     [self.realm deleteObject:obj];
     AssertChanged(r2, @NO, @YES);
     AssertChanged(r3, @NO, @YES);
@@ -1214,11 +1335,11 @@ public:
 - (void)testClearLinkView {
     KVOObject *obj = [self createObject];
     KVOObject *obj2 = [self createObject];
-    [obj2.arrayCol addObject:obj];
+    [obj2.objectArray addObject:obj];
 
     KVORecorder r1(self, obj, @"boolCol");
     KVORecorder r2(self, obj, RLMInvalidatedKey);
-    [self.realm deleteObjects:obj2.arrayCol];
+    [self.realm deleteObjects:obj2.objectArray];
     AssertChanged(r2, @NO, @YES);
     // should not crash
 }
@@ -1327,7 +1448,7 @@ public:
 
 - (void)testObserveInvalidArrayProperty {
     KVOObject *obj = [self createObject];
-    RLMArray *array = obj.arrayCol;
+    RLMArray *array = obj.objectArray;
     XCTAssertThrows([array addObserver:self forKeyPath:@"self" options:0 context:0]);
     XCTAssertNoThrow([array addObserver:self forKeyPath:RLMInvalidatedKey options:0 context:0]);
     XCTAssertNoThrow([array removeObserver:self forKeyPath:RLMInvalidatedKey context:0]);
@@ -1464,55 +1585,55 @@ public:
 
 - (void)testCancelWriteWithArrayChanges {
     KVOObject *obj = [self createObject];
-    [obj.arrayCol addObject:obj];
+    [obj.objectArray addObject:obj];
     [self.realm commitWriteTransaction];
     [self.realm beginWriteTransaction];
 
     {
-        [obj.arrayCol addObject:obj];
-        KVORecorder r(self, obj, @"arrayCol");
+        [obj.objectArray addObject:obj];
+        KVORecorder r(self, obj, @"objectArray");
         [self.realm cancelWriteTransaction];
         [self.realm beginWriteTransaction];
         AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:1]);
     }
     {
-        [obj.arrayCol removeLastObject];
-        KVORecorder r(self, obj, @"arrayCol");
+        [obj.objectArray removeLastObject];
+        KVORecorder r(self, obj, @"objectArray");
         [self.realm cancelWriteTransaction];
         [self.realm beginWriteTransaction];
         AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
     }
     {
-        obj.arrayCol[0] = obj;
-        KVORecorder r(self, obj, @"arrayCol");
+        obj.objectArray[0] = obj;
+        KVORecorder r(self, obj, @"objectArray");
         [self.realm cancelWriteTransaction];
         [self.realm beginWriteTransaction];
         AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndex:0]);
     }
 
     // test batching with multiple items changed
-    [obj.arrayCol addObject:obj];
+    [obj.objectArray addObject:obj];
     [self.realm commitWriteTransaction];
     [self.realm beginWriteTransaction];
     {
-        [obj.arrayCol removeAllObjects];
-        KVORecorder r(self, obj, @"arrayCol");
+        [obj.objectArray removeAllObjects];
+        KVORecorder r(self, obj, @"objectArray");
         [self.realm cancelWriteTransaction];
         [self.realm beginWriteTransaction];
         AssertIndexChange(NSKeyValueChangeInsertion, ([NSIndexSet indexSetWithIndexesInRange:{0, 2}]));
     }
     {
-        [obj.arrayCol removeLastObject];
-        [obj.arrayCol removeLastObject];
-        KVORecorder r(self, obj, @"arrayCol");
+        [obj.objectArray removeLastObject];
+        [obj.objectArray removeLastObject];
+        KVORecorder r(self, obj, @"objectArray");
         [self.realm cancelWriteTransaction];
         [self.realm beginWriteTransaction];
         AssertIndexChange(NSKeyValueChangeInsertion, ([NSIndexSet indexSetWithIndexesInRange:{0, 2}]));
     }
     {
-        [obj.arrayCol insertObject:obj atIndex:1];
-        [obj.arrayCol insertObject:obj atIndex:0];
-        KVORecorder r(self, obj, @"arrayCol");
+        [obj.objectArray insertObject:obj atIndex:1];
+        [obj.objectArray insertObject:obj atIndex:0];
+        KVORecorder r(self, obj, @"objectArray");
         [self.realm cancelWriteTransaction];
         [self.realm beginWriteTransaction];
         NSMutableIndexSet *expected = [NSMutableIndexSet new];
@@ -1521,12 +1642,80 @@ public:
         AssertIndexChange(NSKeyValueChangeRemoval, expected);
     }
     {
-        [obj.arrayCol insertObject:obj atIndex:0];
-        [obj.arrayCol removeLastObject];
-        KVORecorder r(self, obj, @"arrayCol");
+        [obj.objectArray insertObject:obj atIndex:0];
+        [obj.objectArray removeLastObject];
+        KVORecorder r(self, obj, @"objectArray");
         [self.realm cancelWriteTransaction];
         [self.realm beginWriteTransaction];
-        AssertChanged(r, obj.arrayCol, obj.arrayCol);
+        AssertChanged(r, obj.objectArray, obj.objectArray);
+    }
+}
+
+- (void)testCancelWriteWithPrimitiveArrayChanges {
+    KVOObject *obj = [self createObject];
+    [obj.intArray addObject:@1];
+    [self.realm commitWriteTransaction];
+    [self.realm beginWriteTransaction];
+
+    {
+        [obj.intArray addObject:@2];
+        KVORecorder r(self, obj, @"intArray");
+        [self.realm cancelWriteTransaction];
+        [self.realm beginWriteTransaction];
+        AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:1]);
+    }
+    {
+        [obj.intArray removeLastObject];
+        KVORecorder r(self, obj, @"intArray");
+        [self.realm cancelWriteTransaction];
+        [self.realm beginWriteTransaction];
+        AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
+    }
+    {
+        obj.intArray[0] = @3;
+        KVORecorder r(self, obj, @"intArray");
+        [self.realm cancelWriteTransaction];
+        [self.realm beginWriteTransaction];
+        AssertIndexChange(NSKeyValueChangeReplacement, [NSIndexSet indexSetWithIndex:0]);
+    }
+
+    // test batching with multiple items changed
+    [obj.intArray addObject:@4];
+    [self.realm commitWriteTransaction];
+    [self.realm beginWriteTransaction];
+    {
+        [obj.intArray removeAllObjects];
+        KVORecorder r(self, obj, @"intArray");
+        [self.realm cancelWriteTransaction];
+        [self.realm beginWriteTransaction];
+        AssertIndexChange(NSKeyValueChangeInsertion, ([NSIndexSet indexSetWithIndexesInRange:{0, 2}]));
+    }
+    {
+        [obj.intArray removeLastObject];
+        [obj.intArray removeLastObject];
+        KVORecorder r(self, obj, @"intArray");
+        [self.realm cancelWriteTransaction];
+        [self.realm beginWriteTransaction];
+        AssertIndexChange(NSKeyValueChangeInsertion, ([NSIndexSet indexSetWithIndexesInRange:{0, 2}]));
+    }
+    {
+        [obj.intArray insertObject:@5 atIndex:1];
+        [obj.intArray insertObject:@6 atIndex:0];
+        KVORecorder r(self, obj, @"intArray");
+        [self.realm cancelWriteTransaction];
+        [self.realm beginWriteTransaction];
+        NSMutableIndexSet *expected = [NSMutableIndexSet new];
+        [expected addIndex:0];
+        [expected addIndex:2]; // shifted due to inserting at 0 after 1
+        AssertIndexChange(NSKeyValueChangeRemoval, expected);
+    }
+    {
+        [obj.intArray insertObject:@7 atIndex:0];
+        [obj.intArray removeLastObject];
+        KVORecorder r(self, obj, @"intArray");
+        [self.realm cancelWriteTransaction];
+        [self.realm beginWriteTransaction];
+        AssertChanged(r, obj.intArray, obj.intArray);
     }
 }
 
@@ -1573,7 +1762,7 @@ public:
     [self.realm commitWriteTransaction];
 
     KVORecorder r1(self, obj, RLMInvalidatedKey);
-    KVORecorder r2(self, obj, @"arrayCol.invalidated");
+    KVORecorder r2(self, obj, @"objectArray.invalidated");
     [self.realm invalidate];
     [self.realm beginWriteTransaction];
 
@@ -1632,14 +1821,14 @@ public:
 
 - (void)testBatchArrayChanges {
     KVOObject *obj = [self createObject];
-    [obj.arrayCol addObject:obj];
-    [obj.arrayCol addObject:obj];
-    [obj.arrayCol addObject:obj];
+    [obj.objectArray addObject:obj];
+    [obj.objectArray addObject:obj];
+    [obj.objectArray addObject:obj];
 
     {
-        KVORecorder r(self, obj, @"arrayCol");
-        [obj.arrayCol insertObject:obj atIndex:1];
-        [obj.arrayCol insertObject:obj atIndex:0];
+        KVORecorder r(self, obj, @"objectArray");
+        [obj.objectArray insertObject:obj atIndex:1];
+        [obj.objectArray insertObject:obj atIndex:0];
 
         NSMutableIndexSet *expected = [NSMutableIndexSet new];
         [expected addIndex:0];
@@ -1648,32 +1837,32 @@ public:
     }
 
     {
-        KVORecorder r(self, obj, @"arrayCol");
-        [obj.arrayCol removeObjectAtIndex:3];
-        [obj.arrayCol removeObjectAtIndex:3];
+        KVORecorder r(self, obj, @"objectArray");
+        [obj.objectArray removeObjectAtIndex:3];
+        [obj.objectArray removeObjectAtIndex:3];
         AssertIndexChange(NSKeyValueChangeRemoval, ([NSIndexSet indexSetWithIndexesInRange:{3, 2}]));
     }
 
     {
-        KVORecorder r(self, obj, @"arrayCol");
-        [obj.arrayCol removeObjectAtIndex:0];
-        [obj.arrayCol removeAllObjects];
+        KVORecorder r(self, obj, @"objectArray");
+        [obj.objectArray removeObjectAtIndex:0];
+        [obj.objectArray removeAllObjects];
         AssertIndexChange(NSKeyValueChangeRemoval, ([NSIndexSet indexSetWithIndexesInRange:{0, 3}]));
     }
 
-    [obj.arrayCol addObject:obj];
+    [obj.objectArray addObject:obj];
     {
-        KVORecorder r(self, obj, @"arrayCol");
-        [obj.arrayCol addObject:obj];
-        [obj.arrayCol removeAllObjects];
+        KVORecorder r(self, obj, @"objectArray");
+        [obj.objectArray addObject:obj];
+        [obj.objectArray removeAllObjects];
         AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:0]);
     }
 
-    [obj.arrayCol addObject:obj];
+    [obj.objectArray addObject:obj];
     {
-        KVORecorder r(self, obj, @"arrayCol");
-        obj.arrayCol[0] = obj;
-        [obj.arrayCol removeAllObjects];
+        KVORecorder r(self, obj, @"objectArray");
+        obj.objectArray[0] = obj;
+        [obj.objectArray removeAllObjects];
         AssertIndexChange(NSKeyValueChangeRemoval, [NSIndexSet indexSetWithIndex:0]);
     }
 }
@@ -1868,9 +2057,9 @@ public:
     KVOObject *obj = [self createObject];
     [self createObject];
 
-    KVORecorder r(self, obj, @"arrayCol");
+    KVORecorder r(self, obj, @"objectArray");
     obj->_info->table()->swap_rows(0, 1);
-    [obj.arrayCol addObject:obj];
+    [obj.objectArray addObject:obj];
     AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
 }
 
@@ -1878,8 +2067,8 @@ public:
     KVOObject *obj = [self createObject];
     [self createObject];
 
-    KVORecorder r(self, obj, @"arrayCol");
-    [obj.arrayCol addObject:obj];
+    KVORecorder r(self, obj, @"objectArray");
+    [obj.objectArray addObject:obj];
     obj->_info->table()->swap_rows(0, 1);
     AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
 }

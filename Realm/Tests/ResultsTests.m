@@ -350,8 +350,7 @@
     RLMAssertThrowsWithReasonMatching([allArray maxOfProperty:@"boolCol"], @"max.*bool");
 }
 
-- (void)testValueForCollectionOperationKeyPath
-{
+- (void)testValueForCollectionOperationKeyPath {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
     [realm beginWriteTransaction];
@@ -388,7 +387,8 @@
                           (@[@"ABC AG", @"InspiringNames LLC"]));
     XCTAssertEqualObjects([allCompanies valueForKeyPath:@"employees.@unionOfArrays.name"],
                           (@[@"Joe", @"John", @"Jill", @"A", @"B", @"C", @"A"]));
-    XCTAssertEqualObjects([[allCompanies valueForKeyPath:@"employees.@distinctUnionOfArrays.name"] sortedArrayUsingSelector:@selector(compare:)],
+    XCTAssertEqualObjects([[allCompanies valueForKeyPath:@"employees.@distinctUnionOfArrays.name"]
+                           sortedArrayUsingSelector:@selector(compare:)],
                           (@[@"A", @"B", @"C", @"Jill", @"Joe", @"John"]));
 
     // invalid key paths

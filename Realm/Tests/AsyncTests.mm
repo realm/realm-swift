@@ -919,7 +919,7 @@
     [realm commitWriteTransaction];
 
     RLMNotificationToken *token1 = [self subscribeAndWaitForInitial:apo.intArray block:^(RLMArray *array) {
-        XCTAssertEqual(array.count, 0U);
+        XCTAssertTrue(array.invalidated);
     }];
     RLMResults *asResults = [apo.intArray objectsWhere:@"intCol = 5"];
     RLMNotificationToken *token2 = [self subscribeAndWaitForInitial:asResults block:^(RLMResults *results) {

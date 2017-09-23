@@ -19,6 +19,10 @@
 import Foundation
 import Realm
 
+#if BUILDING_REALM_SWIFT_TESTS
+import RealmSwift
+#endif
+
 // MARK: Internal Helpers
 
 // Swift 3.1 provides fixits for some of our uses of unsafeBitCast
@@ -105,7 +109,9 @@ extension Object {
 // MARK: CustomObjectiveCBridgeable
 
 internal func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
-    if let BridgeableType = T.self as? CustomObjectiveCBridgeable.Type {
+    if T.self == DynamicObject.self {
+        return unsafeBitCast(x as AnyObject, to: T.self)
+    } else if let BridgeableType = T.self as? CustomObjectiveCBridgeable.Type {
         return BridgeableType.bridging(objCValue: x) as! T
     } else {
         return x as! T
@@ -179,7 +185,7 @@ extension Optional: CustomObjectiveCBridgeable {
     }
     var objCValue: Any {
         if let value = self {
-            return value
+            return dynamicBridgeCast(fromSwift: value)
         } else {
             return NSNull()
         }
