@@ -18,6 +18,7 @@
 
 #import "RLMRealm+Sync.h"
 
+#import "RLMObjectBase.h"
 #import "RLMObjectSchema.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMResults_Private.hpp"
