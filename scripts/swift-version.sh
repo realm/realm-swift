@@ -158,5 +158,5 @@ set_xcode_and_swift_versions() {
 
 return 2>/dev/null || { # only run if called directly
     set_xcode_and_swift_versions
-    echo "Found Swift version $REALM_SWIFT_VERSION in Xcode ${REALM_XCODE_VERSION} at $DEVELOPER_DIR"
+    echo "Found Swift version $REALM_SWIFT_VERSION in Xcode $REALM_XCODE_VERSION at $DEVELOPER_DIR"
 }
