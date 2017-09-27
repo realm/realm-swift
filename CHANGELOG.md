@@ -16,6 +16,8 @@ x.x.x Release notes (yyyy-MM-dd)
   identifier. Keys that were previously stored within the single, shared Realm
   keychain item will be transparently migrated to the per-application keychain
   item.
+* Fix downloading of the Realm core binaries when Xcode's command-line tools are
+  set as the active developer directory for command-line interactions.
 
 2.10.1 Release notes (2017-09-14)
 =============================================================
