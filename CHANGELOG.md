@@ -1,13 +1,5 @@
-x.x.x Release notes (yyyy-MM-dd)
+2.10.2 Release notes (2017-07-27)
 =============================================================
-
-### API Breaking Changes
-
-* None.
-
-### Enhancements
-
-* None.
 
 ### Bugfixes
 
