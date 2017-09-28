@@ -10,6 +10,8 @@
   item.
 * Fix downloading of the Realm core binaries when Xcode's command-line tools are
   set as the active developer directory for command-line interactions.
+* Fix a crash that could occur when resolving a ThreadSafeReference to a `List`
+  whose parent object had since been deleted.
 
 2.10.1 Release notes (2017-09-14)
 =============================================================
