@@ -103,6 +103,31 @@ class ListTests: TestCase {
         XCTAssertEqual(obj.string[0], "str")
     }
 
+    func testPrimitiveIterationAcrossNil() {
+        let obj = SwiftListObject()
+        XCTAssertFalse(obj.int.contains(5))
+        XCTAssertFalse(obj.int8.contains(5))
+        XCTAssertFalse(obj.int16.contains(5))
+        XCTAssertFalse(obj.int32.contains(5))
+        XCTAssertFalse(obj.int64.contains(5))
+        XCTAssertFalse(obj.float.contains(3.141592))
+        XCTAssertFalse(obj.double.contains(3.141592))
+        XCTAssertFalse(obj.string.contains("foobar"))
+        XCTAssertFalse(obj.data.contains(Data()))
+        XCTAssertFalse(obj.date.contains(Date()))
+
+        XCTAssertFalse(obj.intOpt.contains { $0 == nil })
+        XCTAssertFalse(obj.int8Opt.contains { $0 == nil })
+        XCTAssertFalse(obj.int16Opt.contains { $0 == nil })
+        XCTAssertFalse(obj.int32Opt.contains { $0 == nil })
+        XCTAssertFalse(obj.int64Opt.contains { $0 == nil })
+        XCTAssertFalse(obj.floatOpt.contains { $0 == nil })
+        XCTAssertFalse(obj.doubleOpt.contains { $0 == nil })
+        XCTAssertFalse(obj.stringOpt.contains { $0 == nil })
+        XCTAssertFalse(obj.dataOpt.contains { $0 == nil })
+        XCTAssertFalse(obj.dateOpt.contains { $0 == nil })
+    }
+
     func testInvalidated() {
         guard let array = array else {
             fatalError("Test precondition failure")
