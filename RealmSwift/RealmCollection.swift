@@ -33,6 +33,9 @@ public struct RLMIterator<Element: RealmCollectionValue>: IteratorProtocol {
     public mutating func next() -> Element? {
         let next = generatorBase.next()
         if let next = next as? Object? {
+            if next == nil {
+                return nil as Element?
+            }
             return unsafeBitCast(next, to: Optional<Element>.self)
         }
         return next as! Element?
