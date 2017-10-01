@@ -31,6 +31,9 @@
 #import "sync/sync_session.hpp"
 #import "sync/sync_user.hpp"
 
+// Set this to 1 if you intend to start up a ROS instance manually to test against.
+#define PROVIDING_OWN_ROS 0
+
 #if !TARGET_OS_MAC
 #error These tests can only be run on a macOS host.
 #endif
@@ -42,6 +45,10 @@
 
 @interface RLMSyncTestCase ()
 @property (nonatomic) NSTask *task;
+@end
+
+@interface RLMSyncCredentials ()
++ (instancetype)credentialsWithDebugUserID:(NSString *)userID isAdmin:(BOOL)isAdmin;
 @end
 
 @interface RLMSyncSession ()
@@ -247,14 +254,9 @@ static NSURL *syncDirectoryForChildProcess() {
     return theUser;
 }
 
-- (RLMSyncUser *)getSharedPersistentAdminUserForURL:(NSURL *)url {
-    static RLMSyncUser *adminUser = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:@"realm-admin" password:@"" register:NO];
-        adminUser = [self logInUserForCredentials:creds server:url];
-    });
-    return adminUser;
+- (RLMSyncUser *)createAdminUserForURL:(NSURL *)url username:(NSString *)username {
+    return [self logInUserForCredentials:[RLMSyncCredentials credentialsWithDebugUserID:username isAdmin:YES]
+                                  server:url];
 }
 
 + (NSString *)retrieveAdminToken {
@@ -345,15 +347,18 @@ static NSURL *syncDirectoryForChildProcess() {
 
 + (void)setUp {
     [super setUp];
+#if !PROVIDING_OWN_ROS
     NSURL *target = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"test-ros-instance/ros/bin/ros"];
     if (![[NSFileManager defaultManager] fileExistsAtPath:[target path]]) {
         NSLog(@"The Realm Object Server isn't installed. You need to run 'build.sh download-object-server'"
               @" prior to running these tests.");
         abort();
     }
+#endif
 }
 
 - (void)lazilyInitializeObjectServer {
+#if !PROVIDING_OWN_ROS
     if (!self.isParent || s_task) {
         return;
     }
@@ -399,6 +404,7 @@ static NSURL *syncDirectoryForChildProcess() {
         }
         abort();
     }
+#endif
 }
 
 + (void)runResetObjectServer:(BOOL)initial {
@@ -416,8 +422,10 @@ static NSURL *syncDirectoryForChildProcess() {
     [self lazilyInitializeObjectServer];
 
     if (self.isParent) {
+#if !PROVIDING_OWN_ROS
         XCTAssertNotNil(s_task, @"Test suite setup did not complete: server did not start properly.");
         [RLMSyncTestCase runResetObjectServer:NO];
+#endif
         s_managerForTest = [[RLMSyncManager alloc] initWithCustomRootDirectory:nil];
     } else {
         // Configure the sync manager to use a different directory than the parent process.

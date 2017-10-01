@@ -317,7 +317,8 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                      server:self.authenticationServer
                                        JSON:@{kRLMSyncTokenKey: self._refreshToken,
                                               kRLMSyncUserIDKey: userID,
-                                              kRLMSyncPasswordKey: newPassword}
+                                              kRLMSyncDataKey: @{ kRLMSyncNewPasswordKey: newPassword }
+                                              }
                                     timeout:60
                                  completion:^(NSError *error, __unused NSDictionary *json) {
         completion(error);

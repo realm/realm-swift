@@ -294,6 +294,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     // MARK: - Administration
 
     func testRetrieveUserInfo() {
+        let adminUsername = "jyaku.swift"
         let nonAdminUsername = "meela.swift@realm.example.org"
         let password = "p"
         let server = SwiftObjectServerTests.authServerURL()
@@ -301,8 +302,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         // Create a non-admin user.
         _ = logInUser(for: .init(username: nonAdminUsername, password: password, register: true),
                       server: server)
-        // Get the default admin user.
-        let adminUser = getSharedPersistentAdminUser(for: server)
+        // Create an admin user.
+        let adminUser = createAdminUser(for: server, username: adminUsername)
 
         // Look up information about the non-admin user from the admin user.
         let ex = expectation(description: "Should be able to look up user information")

@@ -68,12 +68,14 @@ NSString *const kRLMSyncDataKey                 = @"data";
 NSString *const kRLMSyncErrorJSONKey            = @"json";
 NSString *const kRLMSyncErrorStatusCodeKey      = @"statusCode";
 NSString *const kRLMSyncIdentityKey             = @"identity";
+NSString *const kRLMSyncIsAdminKey              = @"is_admin";
+NSString *const kRLMSyncNewPasswordKey          = @"new_password";
 NSString *const kRLMSyncPasswordKey             = @"password";
 NSString *const kRLMSyncPathKey                 = @"path";
-NSString *const kRLMSyncTokenKey                = @"token";
 NSString *const kRLMSyncProviderKey             = @"provider";
 NSString *const kRLMSyncProviderIDKey           = @"provider_id";
 NSString *const kRLMSyncRegisterKey             = @"register";
+NSString *const kRLMSyncTokenKey                = @"token";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
 NSString *const kRLMSyncUserIDKey               = @"user_id";
 
