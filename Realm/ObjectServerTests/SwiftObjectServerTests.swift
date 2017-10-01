@@ -19,6 +19,8 @@
 import XCTest
 import RealmSwift
 
+// WARNING: Do not merge me!
+
 // Used by testOfflineClientReset
 // The naming here is nonstandard as the sync-1.x.realm test file comes from the .NET unit tests.
 // swiftlint:disable identifier_name
