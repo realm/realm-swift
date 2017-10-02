@@ -54,7 +54,6 @@ bool keypath_is_valid(NSString *keypath)
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         valid = [NSSet setWithArray:@[RLMSyncPermissionSortPropertyPath,
-                                      RLMSyncPermissionSortPropertyUserID,
                                       RLMSyncPermissionSortPropertyUpdated]];
     });
     return [valid containsObject:keypath];
@@ -64,8 +63,6 @@ bool keypath_is_valid(NSString *keypath)
 
 /// Sort by the Realm Object Server path to the Realm to which the permission applies.
 RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyPath       = @"path";
-/// Sort by the identity of the user to whom the permission applies.
-RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUserID     = @"userId";
 /// Sort by the date the permissions were last updated.
 RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated    = @"updatedAt";
 
@@ -115,10 +112,8 @@ RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated    = @"
     if ([path rangeOfString:@"~"].location != NSNotFound) {
         path = [path stringByReplacingOccurrencesOfString:@"~" withString:object.identity];
     }
-    // Build the predicate. (Don't match the actual permission flags; path and identity identify a permission.)
-    NSPredicate *p = [NSPredicate predicateWithFormat:@"%K = %@ AND %K = %@",
-                      RLMSyncPermissionSortPropertyPath, path,
-                      RLMSyncPermissionSortPropertyUserID, object.identity];
+    // Build the predicate. Check based on the path.
+    NSPredicate *p = [NSPredicate predicateWithFormat:@"%K = %@", RLMSyncPermissionSortPropertyPath, path];
     return [self indexOfObjectWithPredicate:p];
 }
 
