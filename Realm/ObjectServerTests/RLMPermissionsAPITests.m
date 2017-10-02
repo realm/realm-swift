@@ -850,15 +850,10 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
         __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:self.userA];
 
         // Give user B read permission for the Realm.
-        XCTestExpectation *ex = [self expectationWithDescription:@"Setting r1 permission for user B should work."];
-        [self.userA applyPermission:[[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url, self.userA) path]
-                                                                        identity:uB
-                                                                     accessLevel:RLMSyncAccessLevelRead]
-                           callback:^(NSError *error) {
-                               XCTAssertNil(error);
-                               [ex fulfill];
-                           }];
-        [self waitForExpectationsWithTimeout:10.0 handler:nil];
+        RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url, self.userA) path]
+                                                                   identity:uB
+                                                                accessLevel:RLMSyncAccessLevelRead];
+        APPLY_PERMISSION_WITH_MESSAGE(p, self.userA, @"Setting r1 permission for user B should work.");
     }
 
     NSString *finalPath;
@@ -868,16 +863,11 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
         __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:self.userA];
 
         // Give user B read permission for the Realm.
-        XCTestExpectation *ex = [self expectationWithDescription:@"Setting r2 permission for user B should work."];
         finalPath = [makeTildeSubstitutedURL(url, self.userA) path];
-        [self.userA applyPermission:[[RLMSyncPermission alloc] initWithRealmPath:finalPath
-                                                                        identity:uB
-                                                                     accessLevel:RLMSyncAccessLevelRead]
-                           callback:^(NSError *error) {
-                               XCTAssertNil(error);
-                               [ex fulfill];
-                           }];
-        [self waitForExpectationsWithTimeout:10.0 handler:nil];
+        RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:finalPath
+                                                                   identity:uB
+                                                                accessLevel:RLMSyncAccessLevelRead];
+        APPLY_PERMISSION_WITH_MESSAGE(p, self.userA, @"Setting r2 permission for user B should work.");
     }
 
     // Wait for changes to propagate

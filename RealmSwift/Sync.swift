@@ -419,6 +419,7 @@ public typealias SyncPermission = RLMSyncPermission
  */
 public typealias SyncAccessLevel = RLMSyncAccessLevel
 
+// swiftlint:disable type_name
 /// :nodoc:
 public final class _SyncPermissionChange: Object {
     @objc dynamic public var id = UUID().uuidString

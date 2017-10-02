@@ -113,8 +113,7 @@ RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated    = @"
         path = [path stringByReplacingOccurrencesOfString:@"~" withString:object.identity];
     }
     // Build the predicate. Check based on the path.
-    NSPredicate *p = [NSPredicate predicateWithFormat:@"%K = %@", RLMSyncPermissionSortPropertyPath, path];
-    return [self indexOfObjectWithPredicate:p];
+    return [self indexOfObjectWhere:@"%K = %@", RLMSyncPermissionSortPropertyPath, path];
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
