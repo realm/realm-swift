@@ -398,7 +398,7 @@ extension SyncUser {
      */
     public func managementRealm() throws -> Realm {
         var config = Realm.Configuration.fromRLMRealmConfiguration(.managementConfiguration(for: self))
-        config.objectTypes = [SyncPermissionOffer.self, SyncPermissionOfferResponse.self]
+        config.objectTypes = [SyncPermissionOffer.self, SyncPermissionOfferResponse.self, _SyncPermissionChange.self]
         return try Realm(configuration: config)
     }
 }
@@ -418,6 +418,27 @@ public typealias SyncPermission = RLMSyncPermission
  - see: `RLMSyncAccessLevel`
  */
 public typealias SyncAccessLevel = RLMSyncAccessLevel
+
+// swiftlint:disable type_name
+/// :nodoc:
+public final class _SyncPermissionChange: Object {
+    @objc dynamic public var id = UUID().uuidString
+    @objc dynamic public var createdAt = Date()
+    @objc dynamic public var updatedAt = Date()
+    public let statusCode = RealmOptional<Int>()
+    @objc dynamic public var statusMessage: String?
+    @objc dynamic public var userId = ""
+    @objc dynamic public var metadataKey: String?
+    @objc dynamic public var metadataValue: String?
+    @objc dynamic public var metadataNameSpace: String?
+    @objc dynamic public var realmUrl = ""
+    public let mayRead = RealmOptional<Bool>()
+    public let mayWrite = RealmOptional<Bool>()
+    public let mayManage = RealmOptional<Bool>()
+    override public class func primaryKey() -> String? { return "id" }
+    override public class func shouldIncludeInDefaultSchema() -> Bool { return false }
+    override public class func _realmObjectName() -> String? { return "PermissionChange" }
+}
 
 /**
  This model is used for offering permission changes to other users.

@@ -125,12 +125,8 @@ static NSURL *makeTestGlobalURL(NSString *name) {
     return [[NSURL alloc] initWithString:[NSString stringWithFormat:@"realm://localhost:9080/%@", name]];
 }
 
-static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RLMSyncUser *owner, NSString *realmName) {
-    return [[RLMSyncPermission alloc] initWithRealmPath:[NSString stringWithFormat:@"/%@/%@",
-                                                         owner.identity,
-                                                         realmName]
-                                               identity:original.identity
-                                            accessLevel:original.accessLevel];
+static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
+    return [NSURL URLWithString:[[url absoluteString] stringByReplacingOccurrencesOfString:@"~" withString:user.identity]];
 }
 
 @interface RLMPermissionsAPITests : RLMSyncTestCase
@@ -193,7 +189,8 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
 #pragma mark - Permissions
 
-/// If user A grants user B read access to a Realm, user B should be able to read to it.
+// FIXME ROS 2.0: see comments inside body
+/// If user A grants user B read access to a Realm, user B should be able to read from it.
 - (void)disabled_testReadAccess {
     __block void(^errorBlock)(NSError *) = nil;
     [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, __unused RLMSyncSession *session) {
@@ -244,6 +241,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     XCTestExpectation *deniedEx = [self expectationWithDescription:@"Expect a permission denied error."];
     errorBlock = ^(NSError *err) {
         // Expect an error from the global error handler.
+        // FIXME ROS 2.0: not sure what's wrong here
         XCTAssertNotNil(err);
         XCTAssertEqual(err.code, RLMSyncErrorPermissionDeniedError);
         [deniedEx fulfill];
@@ -269,7 +267,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 }
 
 /// If user A grants user B write access to a Realm, user B should be able to write to it.
-- (void)disabled_testWriteAccess {
+- (void)testWriteAccess {
     __block void(^errorBlock)(NSError *) = nil;
     [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, __unused RLMSyncSession *session) {
         if (errorBlock) {
@@ -321,7 +319,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 }
 
 /// If user A grants user B manage access to a Realm, user B should be able to set a permission for user C.
-- (void)disabled_testManageAccess {
+- (void)testManageAccess {
     __block void(^errorBlock)(NSError *) = nil;
     [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, __unused RLMSyncSession *session) {
         if (errorBlock) {
@@ -379,6 +377,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     CHECK_COUNT_PENDING_DOWNLOAD(8, SyncObject, userBRealm);
 }
 
+// FIXME ROS 2.0: still broken
 /// If user A grants user B write access to a Realm via username, user B should be able to write to it.
 - (void)disabled_testWriteAccessViaUsername {
     __block void(^workBlock)(NSError *) = ^(NSError *err) {
@@ -401,8 +400,9 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     CHECK_COUNT(3, SyncObject, userARealm);
 
     // Give user B write permissions to that Realm via user B's username.
-    NSString *userBUsername = [NSString stringWithFormat:@"%@_B@example.org", self.currentUsernameBase];
-    RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[userAURL path]
+    NSString *userBUsername = [NSString stringWithFormat:@"%@b", self.currentUsernameBase];
+    NSString *userAFullPath = [makeTildeSubstitutedURL(userAURL, self.userA) path];
+    RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:userAFullPath
                                                                username:userBUsername
                                                             accessLevel:RLMSyncAccessLevelWrite];
     // Set the permission.
@@ -421,7 +421,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 }
 
 /// Setting a permission for all users should work.
-- (void)disabled_testWildcardWriteAccess {
+- (void)testWildcardWriteAccess {
     // Open a Realm for user A.
     NSString *testName = NSStringFromSelector(_cmd);
     NSURL *ownerURL = makeTestURL(testName, nil);
@@ -457,11 +457,9 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 }
 
 /// It should be possible to grant read-only access to a global Realm.
-- (void)disabled_testWildcardGlobalRealmReadAccess {
-    RLMSyncUser *admin = nil;
-//    [self makeAdminUser:[[NSUUID UUID] UUIDString]
-//                                    password:@"password"
-//                                      server:[RLMSyncTestCase authServerURL]];
+- (void)testWildcardGlobalRealmReadAccess {
+    RLMSyncUser *admin = [self createAdminUserForURL:[RLMSyncTestCase authServerURL]
+                                            username:[[NSUUID UUID] UUIDString]];
 
     // Open a Realm for the admin user.
     NSString *testName = NSStringFromSelector(_cmd);
@@ -515,11 +513,9 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 }
 
 /// Setting a permission for all users on a global Realm (no `~`) should work.
-- (void)disabled_testWildcardGlobalRealmWriteAccess {
-    RLMSyncUser *admin = nil;
-//    [self makeAdminUser:[[NSUUID UUID] UUIDString]
-//                                    password:@"password"
-//                                      server:[RLMSyncTestCase authServerURL]];
+- (void)testWildcardGlobalRealmWriteAccess {
+    RLMSyncUser *admin = [self createAdminUserForURL:[RLMSyncTestCase authServerURL]
+                                            username:[[NSUUID UUID] UUIDString]];
 
     // Open a Realm for the admin user.
     NSString *testName = NSStringFromSelector(_cmd);
@@ -557,7 +553,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 #pragma mark - Permission change API
 
 /// Setting a permission should work, and then that permission should be able to be retrieved.
-- (void)disabled_testSettingPermission {
+- (void)testSettingPermission {
     // First, there should be no permissions.
     RLMResults<RLMSyncPermission *> *results = [self getPermissionResultsFor:self.userA];
     CHECK_PERMISSION_COUNT(results, 0);
@@ -567,7 +563,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     [self openRealmForURL:url user:self.userA];
 
     // Give user B read permissions to that Realm.
-    RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[url path]
+    RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url, self.userA) path]
                                                                identity:self.userB.identity
                                                             accessLevel:RLMSyncAccessLevelRead];
 
@@ -575,20 +571,20 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     APPLY_PERMISSION(p, self.userA);
     
     // Now retrieve the permissions again and make sure the new permission is properly set.
-    results = [self getPermissionResultsFor:self.userA message:@"One permission after setting the permission."];
+    results = [self getPermissionResultsFor:self.userB message:@"One permission after setting the permission."];
 
     // Expected permission: applies to user B, but for user A's Realm.
-    id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
     RLMSyncPermission *final = nil;
-    GET_PERMISSION(results, expectedPermission, final);
-    XCTAssertNotNil(final, @"Did not find the permission %@", expectedPermission);
+    GET_PERMISSION(results, p, final);
+    XCTAssertNotNil(final, @"Did not find the permission %@", p);
 
     // Check getting permission by its index.
-    NSUInteger index = [results indexOfObject:expectedPermission];
+    NSUInteger index = [results indexOfObject:p];
     XCTAssertNotEqual(index, NSNotFound);
-    XCTAssertEqualObjects(expectedPermission, [results objectAtIndex:index]);
+    XCTAssertEqualObjects(p, [results objectAtIndex:index]);
 }
 
+// FIXME ROS 2.0: test works in isolation; fails when run as part of the whole suite.
 /// Deleting a permission should work.
 - (void)disabled_testDeletingPermission {
     __block RLMResults<RLMSyncPermission *> *results;
@@ -598,7 +594,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     [self openRealmForURL:url user:self.userA];
 
     // Give user B read permissions to that Realm.
-    RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[url path]
+    RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url, self.userA) path]
                                                                identity:self.userB.identity
                                                             accessLevel:RLMSyncAccessLevelRead];
 
@@ -606,9 +602,8 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     APPLY_PERMISSION(p, self.userA);
 
     // Now retrieve the permissions again and make sure the new permission is properly set.
-    results = [self getPermissionResultsFor:self.userA message:@"One permission after setting the permission."];
-    id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
-    CHECK_PERMISSION_PRESENT(results, expectedPermission);
+    results = [self getPermissionResultsFor:self.userB message:@"One permission after setting the permission."];
+    CHECK_PERMISSION_PRESENT(results, p);
 
     // Delete the permission.
     XCTestExpectation *ex3 = [self expectationWithDescription:@"Deleting a permission should work."];
@@ -619,14 +614,13 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     // Make sure the permission deletion is properly reflected.
-    results = [self getPermissionResultsFor:self.userA message:@"No permissions after deleting the permission."];
-    CHECK_PERMISSION_ABSENT(results, expectedPermission);
+    CHECK_PERMISSION_ABSENT(results, p);
 }
 
 /// Observing permission changes should work.
-- (void)disabled_testObservingPermission {
+- (void)testObservingPermission {
     // Get a reference to the permission results.
-    RLMResults<RLMSyncPermission *> *results = [self getPermissionResultsFor:self.userA];
+    RLMResults<RLMSyncPermission *> *results = [self getPermissionResultsFor:self.userB];
 
     // Open a Realm for user A.
     NSURL *url = REALM_URL();
@@ -642,7 +636,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     }];
 
     // Give user B read permissions to that Realm.
-    RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[url path]
+    RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url, self.userA) path]
                                                                identity:self.userB.identity
                                                             accessLevel:RLMSyncAccessLevelRead];
 
@@ -652,33 +646,35 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     // Wait for the notification to be fired.
     [self waitForExpectations:@[noteEx] timeout:2.0];
     [token invalidate];
-    id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
-    CHECK_PERMISSION_PRESENT(results, expectedPermission);
+    CHECK_PERMISSION_PRESENT(results, p);
 }
 
 /// KVC getting and setting should work properly for `RLMResults<RLMSyncPermission>`.
-- (void)disabled_testKVCWithPermissionsResults {
+- (void)testKVCWithPermissionsResults {
     // Get a reference to the permission results.
-    RLMResults<RLMSyncPermission *> *results = [self getPermissionResultsFor:self.userA];
+    RLMResults<RLMSyncPermission *> *results = [self getPermissionResultsFor:self.userB];
 
     NSURL *url1 = CUSTOM_REALM_URL(@"r1");
+    NSURL *url2 = CUSTOM_REALM_URL(@"r2");
     __attribute__((objc_precise_lifetime)) RLMRealm *r1 = [self openRealmForURL:url1 user:self.userA];
+    __attribute__((objc_precise_lifetime)) RLMRealm *r2 = [self openRealmForURL:url2 user:self.userA];
     NSString *uB = self.userB.identity;
-    NSString *uC = self.userC.identity;
 
-    // Give user B and C read permissions to r1, and user B read permissions for r2.
-    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
+    // Give user B read permissions to r1 and r2.
+    NSString *path1 = [makeTildeSubstitutedURL(url1, self.userA) path];
+    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:path1
+                                                identity:uB
+                                             accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r1 permission for user B should work.");
-    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] identity:uC accessLevel:RLMSyncAccessLevelRead];
-    APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r1 permission for user C should work.");
+    NSString *path2 = [makeTildeSubstitutedURL(url2, self.userA) path];
+    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:path2
+                                                identity:uB
+                                             accessLevel:RLMSyncAccessLevelRead];
+    APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r2 permission for user B should work.");
 
     // Wait for all the permissions to show up.
-    id exp1 = makeExpectedPermission(p1, self.userA,
-                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r1"]);
-    id exp2 = makeExpectedPermission(p2, self.userA,
-                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r1"]);
-    CHECK_PERMISSION_PRESENT(results, exp1);
-    CHECK_PERMISSION_PRESENT(results, exp2);
+    CHECK_PERMISSION_PRESENT(results, p1);
+    CHECK_PERMISSION_PRESENT(results, p2);
 
     // Now use `valueForKey`
     NSArray *selfValues = [results valueForKey:@"self"];
@@ -687,59 +683,61 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
         XCTAssert([object isKindOfClass:[RLMSyncPermission class]]);
     }
 
-    NSArray *identityValues = [results valueForKey:@"identity"];
+    NSArray *identityValues = [results valueForKey:@"path"];
     XCTAssert(identityValues.count == results.count);
-    XCTAssert([identityValues containsObject:uB]);
-    XCTAssert([identityValues containsObject:uC]);
+    XCTAssert([identityValues containsObject:path1]);
+    XCTAssert([identityValues containsObject:path2]);
 
     // Since `RLMSyncPermission`s are read-only, KVC setting should fail.
-    RLMAssertThrows([results setValue:@"foobar" forKey:@"identity"]);
+    RLMAssertThrows([results setValue:@"foobar" forKey:@"path"]);
 }
 
 /// Filtering permissions results should work.
-- (void)disabled_testFilteringPermissions {
+- (void)testFilteringPermissions {
     // Get a reference to the permission results.
-    RLMResults<RLMSyncPermission *> *results = [self getPermissionResultsFor:self.userA];
+    RLMResults<RLMSyncPermission *> *results = [self getPermissionResultsFor:self.userB];
 
     // Open two Realms
     NSURL *url1 = CUSTOM_REALM_URL(@"r1");
     NSURL *url2 = CUSTOM_REALM_URL(@"r2");
+    NSURL *url3 = CUSTOM_REALM_URL(@"r3");
     __attribute__((objc_precise_lifetime)) RLMRealm *r1 = [self openRealmForURL:url1 user:self.userA];
     __attribute__((objc_precise_lifetime)) RLMRealm *r2 = [self openRealmForURL:url2 user:self.userA];
+    __attribute__((objc_precise_lifetime)) RLMRealm *r3 = [self openRealmForURL:url3 user:self.userA];
     NSString *uB = self.userB.identity;
-    NSString *uC = self.userC.identity;
 
-    // Give user B and C read permissions to r1, and user B read permissions for r2.
-    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
+    // Give user B permissions to realms r1, r2, and r3.
+    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url1, self.userA) path]
+                                                identity:uB
+                                             accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r1 permission for user B should work.");
-    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] identity:uC accessLevel:RLMSyncAccessLevelRead];
-    APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r1 permission for user C should work.");
-    id p3 = [[RLMSyncPermission alloc] initWithRealmPath:[url2 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
-    APPLY_PERMISSION_WITH_MESSAGE(p3, self.userA, @"Setting r2 permission for user B should work.");
+    NSString *finalPath = [makeTildeSubstitutedURL(url2, self.userA) path];
+    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:finalPath
+                                                identity:uB
+                                             accessLevel:RLMSyncAccessLevelRead];
+    APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r2 permission for user B should work.");
+    id p3 = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url3, self.userA) path]
+                                                identity:uB
+                                             accessLevel:RLMSyncAccessLevelRead];
+    APPLY_PERMISSION_WITH_MESSAGE(p3, self.userA, @"Setting r3 permission for user B should work.");
 
     // Wait for all the permissions to show up.
-    id exp1 = makeExpectedPermission(p1, self.userA,
-                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r1"]);
-    id exp2 = makeExpectedPermission(p2, self.userA,
-                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r1"]);
-    id exp3 = makeExpectedPermission(p3, self.userA,
-                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r2"]);
-    CHECK_PERMISSION_PRESENT(results, exp1);
-    CHECK_PERMISSION_PRESENT(results, exp2);
-    CHECK_PERMISSION_PRESENT(results, exp3);
+    CHECK_PERMISSION_PRESENT(results, p1);
+    CHECK_PERMISSION_PRESENT(results, p2);
+    CHECK_PERMISSION_PRESENT(results, p3);
 
     // Now make a filter.
     RLMResults<RLMSyncPermission *> *filtered = [results objectsWithPredicate:[NSPredicate predicateWithFormat:@"%K == %@",
-                                                                               RLMSyncPermissionSortPropertyUserID,
-                                                                               self.userB.identity]];
-    CHECK_PERMISSION_PRESENT(filtered, exp1);
-    CHECK_PERMISSION_ABSENT(filtered, exp2);
-    CHECK_PERMISSION_PRESENT(filtered, exp3);
+                                                                               RLMSyncPermissionSortPropertyPath,
+                                                                               finalPath]];
+    CHECK_PERMISSION_ABSENT(filtered, p1);
+    CHECK_PERMISSION_PRESENT(filtered, p2);
+    CHECK_PERMISSION_ABSENT(filtered, p3);
 }
 
-- (void)disabled_testSortingPermissionsOnPath {
+- (void)testSortingPermissionsOnPath {
     // Get a reference to the permission results.
-    RLMResults<RLMSyncPermission *> *results = [self getPermissionResultsFor:self.userA];
+    RLMResults<RLMSyncPermission *> *results = [self getPermissionResultsFor:self.userB];
 
     // Open three Realms
     NSURL *url1 = CUSTOM_REALM_URL(@"r1");
@@ -751,25 +749,21 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     NSString *uB = self.userB.identity;
 
     // Give user B read permissions for all three Realms.
-    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
+    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url1, self.userA) path]
+                                                identity:uB
+                                             accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r1 permission for user B should work.");
-    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url2 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
+    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url2, self.userA) path]
+                                                identity:uB
+                                             accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r2 permission for user B should work.");
-    id p3 = [[RLMSyncPermission alloc] initWithRealmPath:[url3 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
+    id p3 = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url3, self.userA) path]
+                                                identity:uB
+                                             accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p3, self.userA, @"Setting r3 permission for user B should work.");
 
     // Now sort on Realm URL.
-    id exp1 = makeExpectedPermission(p1, self.userA,
-                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r1"]);
-    id exp2 = makeExpectedPermission(p2, self.userA,
-                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r2"]);
-    id exp3 = makeExpectedPermission(p3, self.userA,
-                                     [NSString stringWithFormat:@"%@%@", NSStringFromSelector(_cmd), @"r3"]);
-    RLMResults<RLMSyncPermission *> *filtered = [results objectsWithPredicate:[NSPredicate predicateWithFormat:@"%K == %@",
-                                                                               RLMSyncPermissionSortPropertyUserID,
-                                                                               uB]];
-
-    RLMResults<RLMSyncPermission *> *sorted = [filtered sortedResultsUsingKeyPath:RLMSyncPermissionSortPropertyPath
+    RLMResults<RLMSyncPermission *> *sorted = [results sortedResultsUsingKeyPath:RLMSyncPermissionSortPropertyPath
                                                                         ascending:YES];
     // Wait for changes to propagate
     CHECK_PERMISSION_COUNT(sorted, 3);
@@ -777,9 +771,9 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     RLMSyncPermission *n1 = nil;
     RLMSyncPermission *n2 = nil;
     RLMSyncPermission *n3 = nil;
-    GET_PERMISSION(sorted, exp1, n1);
-    GET_PERMISSION(sorted, exp2, n2);
-    GET_PERMISSION(sorted, exp3, n3);
+    GET_PERMISSION(sorted, p1, n1);
+    GET_PERMISSION(sorted, p2, n2);
+    GET_PERMISSION(sorted, p3, n3);
     NSUInteger idx1 = [sorted indexOfObject:n1];
     NSUInteger idx2 = [sorted indexOfObject:n2];
     NSUInteger idx3 = [sorted indexOfObject:n3];
@@ -791,46 +785,9 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     XCTAssertLessThan(idx2, idx3);
 }
 
-- (void)disabled_testSortingPermissionsOnUserId {
+- (void)testSortingPermissionsOnDate {
     // Get a reference to the permission results.
-    RLMResults<RLMSyncPermission *> *results = [self getPermissionResultsFor:self.userA];
-
-    // Open a Realm
-    NSURL *url = REALM_URL();
-    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:self.userA];
-    NSString *uB = self.userB.identity;
-    NSString *uC = self.userC.identity;
-
-    // Give users B and C read permission for the Realm.
-    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url path] identity:uB accessLevel:RLMSyncAccessLevelRead];
-    APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r1 permission for user B should work.");
-    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url path] identity:uC accessLevel:RLMSyncAccessLevelRead];
-    APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r1 permission for user C should work.");
-
-    // Now sort on user ID.
-    RLMResults<RLMSyncPermission *> *sorted = [results sortedResultsUsingKeyPath:RLMSyncPermissionSortPropertyUserID
-                                                                       ascending:YES];
-
-    // Wait for changes to propagate, then check them.
-    BOOL seenUserBPermission = NO;
-    BOOL seenUserCPermission = NO;
-    CHECK_PERMISSION_COUNT_PREDICATE(sorted, 3, >=);
-    for (NSUInteger i=0; i<sorted.count - 1; i++) {
-        NSString *thisID = [sorted objectAtIndex:i].identity;
-        NSString *nextID = [sorted objectAtIndex:i + 1].identity;
-        seenUserBPermission |= ([thisID isEqualToString:uB] || [nextID isEqualToString:uB]);
-        seenUserCPermission |= ([thisID isEqualToString:uC] || [nextID isEqualToString:uC]);
-        // Make sure permissions are in ascending order.
-        NSComparisonResult result = [thisID compare:nextID];
-        XCTAssertTrue(result == NSOrderedAscending || result == NSOrderedSame);
-    }
-    XCTAssertTrue(seenUserBPermission);
-    XCTAssertTrue(seenUserCPermission);
-}
-
-- (void)disabled_testSortingPermissionsOnDate {
-    // Get a reference to the permission results.
-    RLMResults<RLMSyncPermission *> *results = [self getPermissionResultsFor:self.userA];
+    RLMResults<RLMSyncPermission *> *results = [self getPermissionResultsFor:self.userB];
 
     // Open three Realms
     NSURL *url1 = CUSTOM_REALM_URL(@"-r1");
@@ -842,19 +799,22 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     NSString *uB = self.userB.identity;
 
     // Give user B read permissions for all three Realms.
-    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url3 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
+    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url3, self.userA) path]
+                                                identity:uB
+                                             accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r3 permission for user B should work.");
-    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[url1 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
+    id p2 = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url1, self.userA) path]
+                                                identity:uB
+                                             accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p2, self.userA, @"Setting r1 permission for user B should work.");
-    id p3 = [[RLMSyncPermission alloc] initWithRealmPath:[url2 path] identity:uB accessLevel:RLMSyncAccessLevelRead];
+    id p3 = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url2, self.userA) path]
+                                                identity:uB
+                                             accessLevel:RLMSyncAccessLevelRead];
     APPLY_PERMISSION_WITH_MESSAGE(p3, self.userA, @"Setting r2 permission for user B should work.");
 
-    // Now sort on date. (Note that we only want the results for the user B permissions.)
-    RLMResults<RLMSyncPermission *> *filtered = [results objectsWithPredicate:[NSPredicate predicateWithFormat:@"%K == %@",
-                                                                               RLMSyncPermissionSortPropertyUserID,
-                                                                               uB]];
-    RLMResults<RLMSyncPermission *> *sorted = [filtered sortedResultsUsingKeyPath:RLMSyncPermissionSortPropertyUpdated
-                                                                        ascending:YES];
+    // Now sort on date.
+    RLMResults<RLMSyncPermission *> *sorted = [results sortedResultsUsingKeyPath:RLMSyncPermissionSortPropertyUpdated
+                                                                       ascending:YES];
 
     // Wait for changes to propagate
     CHECK_PERMISSION_COUNT(sorted, 3);
@@ -871,11 +831,11 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     XCTAssertLessThan([n2.updatedAt timeIntervalSinceReferenceDate], [n3.updatedAt timeIntervalSinceReferenceDate]);
 }
 
-- (void)disabled_testPermissionResultsIndexOfObjectWithPredicate {
+- (void)testPermissionResultsIndexOfObjectWithPredicate {
     // Get a reference to the permission results.
     XCTestExpectation *ex = [self expectationWithDescription:@"Get permission results."];
     __block RLMResults<RLMSyncPermission *> *results = nil;
-    [self.userA retrievePermissionsWithCallback:^(RLMResults<RLMSyncPermission *> *r, NSError *error) {
+    [self.userB retrievePermissionsWithCallback:^(RLMResults<RLMSyncPermission *> *r, NSError *error) {
         XCTAssertNil(error);
         XCTAssertNotNil(r);
         results = r;
@@ -883,36 +843,49 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    // Open a Realm
-    NSURL *url = REALM_URL();
-    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:self.userA];
     NSString *uB = self.userB.identity;
+    // Open a Realm
+    {
+        NSURL *url = CUSTOM_REALM_URL(@"r1");
+        __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:self.userA];
 
-    // Give user B read permission for the Realm.
-    XCTestExpectation *ex2 = [self expectationWithDescription:@"Setting r1 permission for user B should work."];
-    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:[url path] identity:uB accessLevel:RLMSyncAccessLevelRead];
-    [self.userA applyPermission:p1 callback:^(NSError *error) {
-        XCTAssertNil(error);
-        [ex2 fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+        // Give user B read permission for the Realm.
+        RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url, self.userA) path]
+                                                                   identity:uB
+                                                                accessLevel:RLMSyncAccessLevelRead];
+        APPLY_PERMISSION_WITH_MESSAGE(p, self.userA, @"Setting r1 permission for user B should work.");
+    }
+
+    NSString *finalPath;
+    {
+        // Do this again so there's more than one permission in the permission Realm.
+        NSURL *url = CUSTOM_REALM_URL(@"r2");
+        __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:self.userA];
+
+        // Give user B read permission for the Realm.
+        finalPath = [makeTildeSubstitutedURL(url, self.userA) path];
+        RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:finalPath
+                                                                   identity:uB
+                                                                accessLevel:RLMSyncAccessLevelRead];
+        APPLY_PERMISSION_WITH_MESSAGE(p, self.userA, @"Setting r2 permission for user B should work.");
+    }
 
     // Wait for changes to propagate
     CHECK_PERMISSION_COUNT_PREDICATE(results, 2, >=);
 
     // Create the predicate and retrieve the index of the object.
-    NSPredicate *pred = [NSPredicate predicateWithFormat:@"%K == %@", RLMSyncPermissionSortPropertyUserID, uB];
+    NSPredicate *pred = [NSPredicate predicateWithFormat:@"%K == %@", RLMSyncPermissionSortPropertyPath, finalPath];
     NSUInteger index = [results indexOfObjectWithPredicate:pred];
     XCTAssertNotEqual(index, NSNotFound);
     if (index == NSNotFound) {
         return;
     }
     RLMSyncPermission *target = [results objectAtIndex:index];
-    XCTAssertEqualObjects(target.identity, uB);
+    XCTAssertEqualObjects(target.path, finalPath);
 }
 
 /// User should not be able to change a permission for a Realm they don't own.
-- (void)disabled_testSettingUnownedRealmPermission {
+- (void)testSettingUnownedRealmPermission {
     __block RLMResults<RLMSyncPermission *> *results;
 
     // Open a Realm for user A.
@@ -920,7 +893,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
     [self openRealmForURL:url user:self.userA];
 
     // Try to have user B give user C permissions to that Realm.
-    RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[url path]
+    RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url, self.userA) path]
                                                                identity:self.userC.identity
                                                             accessLevel:RLMSyncAccessLevelRead];
 
@@ -936,20 +909,16 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     // Now retrieve the permissions again and make sure the new permission was not set.
     results = [self getPermissionResultsFor:self.userB message:@"Retrieving the results should work."];
-    id expectedPermission = makeExpectedPermission(p, self.userA, NSStringFromSelector(_cmd));
-    CHECK_PERMISSION_ABSENT(results, expectedPermission);
+    CHECK_PERMISSION_ABSENT(results, p);
 }
 
 #pragma mark - Permission offer/response
 
 /// Get a token which can be used to offer the permissions as defined
-- (void)disabled_testPermissionOffer {
+- (void)testPermissionOffer {
     NSURL *url = REALM_URL();
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                       register:self.isParent]
-                                               server:[RLMSyncTestCase authServerURL]];
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-    NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+    __unused RLMRealm *realm = [self openRealmForURL:url user:self.userA];
+    NSString *realmURL = [makeTildeSubstitutedURL(url, self.userA) absoluteString];
 
     RLMSyncPermissionOffer *permissionOffer = [RLMSyncPermissionOffer permissionOfferWithRealmURL:realmURL
                                                                                         expiresAt:[NSDate dateWithTimeIntervalSinceNow:30 * 24 * 60 * 60]
@@ -957,7 +926,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
                                                                                             write:YES
                                                                                            manage:NO];
     NSError *error = nil;
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+    RLMRealm *managementRealm = [self.userA managementRealmWithError:&error];
     XCTAssertNotNil(managementRealm);
     XCTAssertNil(error, @"Error when opening management Realm: %@", error);
 
@@ -990,13 +959,10 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 }
 
 /// Failed to process a permission offer object due to the offer expired
-- (void)disabled_testPermissionOfferIsExpired {
+- (void)testPermissionOfferIsExpired {
     NSURL *url = REALM_URL();
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                       register:self.isParent]
-                                               server:[RLMSyncTestCase authServerURL]];
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-    NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+    __unused RLMRealm *realm = [self openRealmForURL:url user:self.userA];
+    NSString *realmURL = [makeTildeSubstitutedURL(url, self.userA) absoluteString];
 
     RLMSyncPermissionOffer *permissionOffer = [RLMSyncPermissionOffer permissionOfferWithRealmURL:realmURL
                                                                                         expiresAt:[NSDate dateWithTimeIntervalSinceNow:-30 * 24 * 60 * 60]
@@ -1004,7 +970,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
                                                                                             write:YES
                                                                                            manage:NO];
     NSError *error = nil;
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+    RLMRealm *managementRealm = [self.userA managementRealmWithError:&error];
     XCTAssertNotNil(managementRealm);
     XCTAssertNil(error, @"Error when opening management Realm: %@", error);
 
@@ -1022,7 +988,6 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
             XCTAssertEqual(permissionOffer.status, RLMSyncManagementObjectStatusError);
             XCTAssertEqualObjects(permissionOffer.statusMessage, @"The permission offer is expired.");
             XCTAssertNil(permissionOffer.token);
-
             [expectation fulfill];
         }
     }];
@@ -1038,21 +1003,16 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 }
 
 /// Get a permission offer token, then permission offer response will be processed, then open another user's Realm file
-- (void)disabled_testPermissionOfferResponse {
-    NSString *userNameA = [NSStringFromSelector(_cmd) stringByAppendingString:@"_A"];
-    RLMSyncUser *userA = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:userNameA
-                                                                                        register:self.isParent]
-                                                server:[RLMSyncTestCase authServerURL]];
-
-    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"realm://localhost:9080/~/%@", userNameA]];
+- (void)testPermissionOfferResponse {
     NSError *error = nil;
-    RLMRealm *realm = [self openRealmForURL:url user:userA];
+    NSURL *url = REALM_URL();
+    __unused RLMRealm *realm = [self openRealmForURL:url user:self.userA];
 
-    RLMRealm *managementRealm = [userA managementRealmWithError:&error];
+    RLMRealm *managementRealm = [self.userA managementRealmWithError:&error];
     XCTAssertNotNil(managementRealm);
     XCTAssertNil(error, @"Error when opening management Realm: %@", error);
 
-    NSString *realmURL = realm.configuration.syncConfiguration.realmURL.absoluteString;
+    NSString *realmURL = [makeTildeSubstitutedURL(url, self.userA) absoluteString];
 
     RLMSyncPermissionOffer *permissionOffer = [RLMSyncPermissionOffer permissionOfferWithRealmURL:realmURL
                                                                                         expiresAt:[NSDate dateWithTimeIntervalSinceNow:30 * 24 * 60 * 60]
@@ -1089,12 +1049,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     [token invalidate];
 
-    NSString *userNameB = [NSStringFromSelector(_cmd) stringByAppendingString:@"_B"];
-    RLMSyncUser *userB = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:userNameB
-                                                                                        register:self.isParent]
-                                                server:[RLMSyncTestCase authServerURL]];
-
-    managementRealm = [userB managementRealmWithError:&error];
+    managementRealm = [self.userB managementRealmWithError:&error];
     XCTAssertNotNil(managementRealm);
     XCTAssertNil(error, @"Error when opening management Realm: %@", error);
 
@@ -1115,11 +1070,8 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
         RLMSyncPermissionOfferResponse *permissionOfferResponse = results[0];
         if (permissionOfferResponse.statusCode) {
             XCTAssertEqual(permissionOfferResponse.status, RLMSyncManagementObjectStatusSuccess);
-            XCTAssertEqualObjects((permissionOfferResponse.realmUrl),
-                                  ([NSString stringWithFormat:@"realm://localhost:9080/%@/%@", userA.identity, userNameA]));
-
+            XCTAssertEqualObjects(permissionOfferResponse.realmUrl, realmURL);
             responseRealmUrl = permissionOfferResponse.realmUrl;
-
             [expectation fulfill];
         }
     }];
@@ -1133,19 +1085,15 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
     [token invalidate];
 
-    XCTAssertNotNil([self openRealmForURL:[NSURL URLWithString:responseRealmUrl] user:userB]);
+    XCTAssertNotNil([self openRealmForURL:[NSURL URLWithString:responseRealmUrl] user:self.userB]);
 }
 
 /// Failed to process a permission offer response object due to `token` is invalid
-- (void)disabled_testPermissionOfferResponseInvalidToken {
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                       register:self.isParent]
-                                               server:[RLMSyncTestCase authServerURL]];
-
+- (void)testPermissionOfferResponseInvalidToken {
     RLMSyncPermissionOfferResponse *permissionOfferResponse = [RLMSyncPermissionOfferResponse permissionOfferResponseWithToken:@"invalid token"];
 
     NSError *error = nil;
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+    RLMRealm *managementRealm = [self.userA managementRealmWithError:&error];
     XCTAssertNotNil(managementRealm);
     XCTAssertNil(error, @"Error when opening management Realm: %@", error);
 
@@ -1178,16 +1126,12 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 }
 
 /// Failed to process a permission offer response object due to `token` does not exist
-- (void)disabled_testPermissionOfferResponseTokenNotExist {
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                       register:self.isParent]
-                                               server:[RLMSyncTestCase authServerURL]];
-
+- (void)testPermissionOfferResponseTokenNotExist {
     NSString *fakeToken = @"00000000000000000000000000000000:00000000-0000-0000-0000-000000000000";
     RLMSyncPermissionOfferResponse *permissionOfferResponse = [RLMSyncPermissionOfferResponse permissionOfferResponseWithToken:fakeToken];
     
     NSError *error = nil;
-    RLMRealm *managementRealm = [user managementRealmWithError:&error];
+    RLMRealm *managementRealm = [self.userA managementRealmWithError:&error];
     XCTAssertNotNil(managementRealm);
     XCTAssertNil(error, @"Error when opening management Realm: %@", error);
 
@@ -1204,7 +1148,6 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
         if (permissionOffer.statusCode) {
             XCTAssertEqual(permissionOffer.status, RLMSyncManagementObjectStatusError);
             XCTAssertNil(permissionOffer.realmUrl);
-
             [expectation fulfill];
         }
     }];
@@ -1221,6 +1164,7 @@ static RLMSyncPermission *makeExpectedPermission(RLMSyncPermission *original, RL
 
 #pragma mark - Delete Realm upon permission denied
 
+// FIXME ROS 2.0: figure out what's wrong and re-enable this test
 /// A Realm which is opened improperly should report an error allowing the app to recover.
 - (void)disabled_testDeleteRealmUponPermissionDenied {
     __block void(^errorBlock)(NSError *, RLMSyncSession *session) = nil;

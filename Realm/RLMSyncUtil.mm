@@ -46,10 +46,59 @@ static RLMRealmConfiguration *RLMRealmSpecialPurposeConfiguration(RLMSyncUser *u
     return config;
 }
 
+// FIXME: get rid of this shim
+@interface RLMSyncPermissionChange : RLMObject
+@property NSString *id;
+@property NSDate *createdAt;
+@property NSDate *updatedAt;
+@property NSNumber<RLMInt> *statusCode;
+@property NSString *statusMessage;
+@property NSString *userId;
+@property NSString *metadataKey;
+@property NSString *metadataValue;
+@property NSString *metadataNameSpace;
+@property NSString *realmUrl;
+@property NSNumber<RLMBool> *mayRead;
+@property NSNumber<RLMBool> *mayWrite;
+@property NSNumber<RLMBool> *mayManage;
+@end
+
+@implementation RLMSyncPermissionChange
+
++ (NSArray<NSString *> *)requiredProperties {
+    return @[@"id", @"createdAt", @"updatedAt", @"userId", @"realmUrl"];
+}
+
++ (NSDictionary *)defaultPropertyValues {
+    NSDate *now = [NSDate date];
+    return @{
+             @"id": [NSUUID UUID].UUIDString,
+             @"createdAt": now,
+             @"updatedAt": now,
+             @"realmUrl": @"",
+             @"userId": @"",
+             };
+}
+
++ (BOOL)shouldIncludeInDefaultSchema {
+    return NO;
+}
+
++ (nullable NSString *)primaryKey {
+    return @"id";
+}
+
++ (NSString *)_realmObjectName {
+    return @"PermissionChange";
+}
+
+@end
+
 @implementation RLMRealmConfiguration (RealmSync)
 + (instancetype)managementConfigurationForUser:(RLMSyncUser *)user {
     RLMRealmConfiguration *config = RLMRealmSpecialPurposeConfiguration(user, @"__management");
-    config.objectClasses = @[RLMSyncPermissionOffer.class, RLMSyncPermissionOfferResponse.class];
+    config.objectClasses = @[RLMSyncPermissionOffer.class, RLMSyncPermissionOfferResponse.class,
+                             RLMSyncPermissionChange.class];
     return config;
 }
 @end

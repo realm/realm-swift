@@ -107,20 +107,18 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         XCTAssertFalse(isPresent, "Permission '\(permission)' was spuriously present (\(file):\(line))")
     }
 
-    private static func makeExpected(from original: SyncPermission,
-                                     owner: SyncUser,
-                                     name: String) -> SyncPermission {
-        return SyncPermission(realmPath: "/\(owner.identity!)/\(name)",
-            identity: original.identity!,
-            accessLevel: original.accessLevel)
+    private func tildeSubstitutedURL(for url: URL, user: SyncUser) -> URL {
+        XCTAssertNotNil(user.identity)
+        let identity = user.identity!
+        return URL(string: url.absoluteString.replacingOccurrences(of: "~", with: identity))!
     }
 
     /// Setting a permission should work, and then that permission should be able to be retrieved.
-    func disabled_testSettingPermissions() {
+    func testSettingPermissions() {
         // First, there should be no permissions.
         let ex = expectation(description: "No permissions for newly created user.")
         var results: SyncPermissionResults!
-        userA.retrievePermissions { (r, error) in
+        userB.retrievePermissions { (r, error) in
             XCTAssertNil(error)
             XCTAssertNotNil(r)
             results = r
@@ -135,7 +133,9 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         _ = try! synchronouslyOpenRealm(url: url, user: userA)
 
         // Give user B read permissions to that Realm.
-        let p = SyncPermission(realmPath: url.path, identity: userB.identity!, accessLevel: .read)
+        let p = SyncPermission(realmPath: tildeSubstitutedURL(for: url, user: userA).path,
+                               identity: userB.identity!,
+                               accessLevel: .read)
 
         // Set the permission.
         let ex2 = expectation(description: "Setting a permission should work.")
@@ -147,7 +147,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
 
         // Now retrieve the permissions again and make sure the new permission is properly set.
         let ex3 = expectation(description: "One permission in results after setting the permission.")
-        userA.retrievePermissions { (r, error) in
+        userB.retrievePermissions { (r, error) in
             XCTAssertNil(error)
             XCTAssertNotNil(r)
             results = r
@@ -155,22 +155,21 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         }
         waitForExpectations(timeout: 2.0, handler: nil)
         // Expected permission: applies to user B, but for user A's Realm.
-        let expectedPermission = SwiftPermissionsAPITests.makeExpected(from: p, owner: userA, name: uuid)
-        let finalValue = get(permission: expectedPermission, from: results)
-        XCTAssertNotNil(finalValue, "Did not find the permission \(expectedPermission)")
+        let finalValue = get(permission: p, from: results)
+        XCTAssertNotNil(finalValue, "Did not find the permission \(p)")
 
         // Check getting permission by its index.
-        let index = results.index(of: expectedPermission)
+        let index = results.index(of: p)
         XCTAssertNotNil(index)
-        XCTAssertTrue(expectedPermission == results[index!])
+        XCTAssertTrue(p == results[index!])
     }
 
     /// Observing permission changes should work.
-    func disabled_testObservingPermissions() {
+    func testObservingPermissions() {
         // Get a reference to the permission results.
         let ex = expectation(description: "Retrieve permission results.")
         var results: SyncPermissionResults!
-        userA.retrievePermissions { (r, error) in
+        userB.retrievePermissions { (r, error) in
             XCTAssertNil(error)
             XCTAssertNotNil(r)
             results = r
@@ -196,7 +195,9 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         }
 
         // Give user B read permissions to that Realm.
-        let p = SyncPermission(realmPath: url.path, identity: userB.identity!, accessLevel: .read)
+        let p = SyncPermission(realmPath: tildeSubstitutedURL(for: url, user: userA).path,
+                               identity: userB.identity!,
+                               accessLevel: .read)
 
         // Set the permission.
         let ex2 = expectation(description: "Setting a permission should work.")
@@ -209,13 +210,12 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         // Wait for the notification to be fired.
         wait(for: [noteEx], timeout: 2.0)
         token.invalidate()
-        let expectedPermission = SwiftPermissionsAPITests.makeExpected(from: p, owner: userA, name: uuid)
-        let finalValue = get(permission: expectedPermission, from: results)
-        XCTAssertNotNil(finalValue, "Did not find the permission \(expectedPermission)")
+        let finalValue = get(permission: p, from: results)
+        XCTAssertNotNil(finalValue, "Did not find the permission \(p)")
     }
 
     /// User should not be able to change a permission for a Realm they don't own.
-    func disabled_testSettingUnownedRealmPermission() {
+    func testSettingUnownedRealmPermission() {
         // Open a Realm for user A.
         let uuid = UUID().uuidString
         let url = SwiftSyncTestCase.uniqueRealmURL(customName: uuid)
@@ -242,20 +242,21 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
             ex3.fulfill()
         }
         waitForExpectations(timeout: 2.0, handler: nil)
-
-        let expectedPermission = SwiftPermissionsAPITests.makeExpected(from: p, owner: userA, name: uuid)
-        ensureAbsence(of: expectedPermission, from: results)
+        ensureAbsence(of: p, from: results)
     }
 
     // MARK: - Offer/response
 
-    func disabled_testPermissionOffer() {
+    func testPermissionOffer() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
-            _ = try synchronouslyOpenRealm(url: realmURL, user: user)
+            _ = try synchronouslyOpenRealm(url: realmURL, user: userA)
 
-            let managementRealm = try user.managementRealm()
-            let permissionOffer = SyncPermissionOffer(realmURL: realmURL.absoluteString, expiresAt: Date(timeIntervalSinceNow: 30 * 24 * 60 * 60), mayRead: true, mayWrite: true, mayManage: false)
+            let managementRealm = try userA.managementRealm()
+            let permissionOffer = SyncPermissionOffer(realmURL: tildeSubstitutedURL(for: realmURL, user: userA).absoluteString,
+                                                      expiresAt: Date(timeIntervalSinceNow: 30 * 24 * 60 * 60),
+                                                      mayRead: true,
+                                                      mayWrite: true,
+                                                      mayManage: false)
 
             let exp = expectation(description: "A new permission offer will be processed by the server")
 
@@ -279,13 +280,16 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         }
     }
 
-    func disabled_testPermissionOfferResponse() {
+    func testPermissionOfferResponse() {
         do {
-            let userA = try synchronouslyLogInUser(for: basicCredentials(register: isParent, usernameSuffix: "_A"), server: authURL)
             _ = try synchronouslyOpenRealm(url: realmURL, user: userA)
 
             var managementRealm = try userA.managementRealm()
-            let permissionOffer = SyncPermissionOffer(realmURL: realmURL.absoluteString, expiresAt: Date(timeIntervalSinceNow: 30 * 24 * 60 * 60), mayRead: true, mayWrite: true, mayManage: false)
+            let permissionOffer = SyncPermissionOffer(realmURL: tildeSubstitutedURL(for: realmURL, user: userA).absoluteString,
+                                                      expiresAt: Date(timeIntervalSinceNow: 30 * 24 * 60 * 60),
+                                                      mayRead: true,
+                                                      mayWrite: true,
+                                                      mayManage: false)
 
             var permissionToken: String?
 
@@ -311,7 +315,6 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
             waitForExpectations(timeout: 2)
             permissionOfferNotificationToken.invalidate()
 
-            let userB = try synchronouslyLogInUser(for: basicCredentials(register: isParent, usernameSuffix: "_B"), server: authURL)
             _ = try synchronouslyOpenRealm(url: realmURL, user: userB)
 
             managementRealm = try userB.managementRealm()
@@ -323,6 +326,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
 
             exp = expectation(description: "A new permission offer response will be processed by the server")
 
+            let userAIdentity = userA.identity!
             let permissionOfferResponseNotificationToken = managementRealm
                 .objects(SyncPermissionOfferResponse.self)
                 .filter("id = %@", permissionOfferResponse.id)
@@ -330,7 +334,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
                     if case .update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
                         XCTAssertEqual(statusCode, 0)
                         XCTAssertEqual(change[0].status, .success)
-                        XCTAssertEqual(change[0].realmUrl, String(format: "realm://localhost:9080/%@/testBasicSync", userA.identity!))
+                        XCTAssertEqual(change[0].realmUrl, String(format: "realm://localhost:9080/%@/testBasicSync", userAIdentity))
 
                         responseRealmUrl = change[0].realmUrl
 

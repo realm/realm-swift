@@ -29,6 +29,8 @@
   make sense for `List` have been added.
 * `List.removeLast()` now throws an exception if the list is empty, to more closely match
   the behavior of the standard library's `Collection.removeLast()` implementation.
+* Remove `RLMSyncPermissionSortPropertyUserID` to reflect changes in how the
+  Realm Object Server reports permissions for a user.
 
 ### Enhancements
 
