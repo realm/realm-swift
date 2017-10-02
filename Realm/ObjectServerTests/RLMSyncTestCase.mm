@@ -97,16 +97,6 @@ static NSURL *syncDirectoryForChildProcess() {
     return s_managerForTest;
 }
 
-- (void)invokeTest {
-    self.continueAfterFailure = NO;
-    @try {
-        [super invokeTest];
-    }
-    @finally {
-        self.continueAfterFailure = YES;
-    }
-}
-
 #pragma mark - Helper methods
 
 + (NSURL *)rootRealmCocoaURL {
