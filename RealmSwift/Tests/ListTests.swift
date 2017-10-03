@@ -85,6 +85,49 @@ class ListTests: TestCase {
     }
 #endif
 
+    func testPrimitive() {
+        let obj = SwiftListObject()
+        obj.int.append(5)
+        XCTAssertEqual(obj.int.first!, 5)
+        XCTAssertEqual(obj.int.last!, 5)
+        XCTAssertEqual(obj.int[0], 5)
+        obj.int.append(objectsIn: [6, 7, 8] as [Int])
+        XCTAssertEqual(obj.int.index(of: 6), 1)
+        XCTAssertEqual(2, obj.int.index(matching: NSPredicate(format: "self == 7")))
+        XCTAssertNil(obj.int.index(matching: NSPredicate(format: "self == 9")))
+        XCTAssertEqual(obj.int.max(), 8)
+        XCTAssertEqual(obj.int.sum(), 26)
+
+        obj.string.append("str")
+        XCTAssertEqual(obj.string.first!, "str")
+        XCTAssertEqual(obj.string[0], "str")
+    }
+
+    func testPrimitiveIterationAcrossNil() {
+        let obj = SwiftListObject()
+        XCTAssertFalse(obj.int.contains(5))
+        XCTAssertFalse(obj.int8.contains(5))
+        XCTAssertFalse(obj.int16.contains(5))
+        XCTAssertFalse(obj.int32.contains(5))
+        XCTAssertFalse(obj.int64.contains(5))
+        XCTAssertFalse(obj.float.contains(3.141592))
+        XCTAssertFalse(obj.double.contains(3.141592))
+        XCTAssertFalse(obj.string.contains("foobar"))
+        XCTAssertFalse(obj.data.contains(Data()))
+        XCTAssertFalse(obj.date.contains(Date()))
+
+        XCTAssertFalse(obj.intOpt.contains { $0 == nil })
+        XCTAssertFalse(obj.int8Opt.contains { $0 == nil })
+        XCTAssertFalse(obj.int16Opt.contains { $0 == nil })
+        XCTAssertFalse(obj.int32Opt.contains { $0 == nil })
+        XCTAssertFalse(obj.int64Opt.contains { $0 == nil })
+        XCTAssertFalse(obj.floatOpt.contains { $0 == nil })
+        XCTAssertFalse(obj.doubleOpt.contains { $0 == nil })
+        XCTAssertFalse(obj.stringOpt.contains { $0 == nil })
+        XCTAssertFalse(obj.dataOpt.contains { $0 == nil })
+        XCTAssertFalse(obj.dateOpt.contains { $0 == nil })
+    }
+
     func testInvalidated() {
         guard let array = array else {
             fatalError("Test precondition failure")
@@ -121,9 +164,9 @@ class ListTests: TestCase {
             array.append(str)
         }
         XCTAssertEqual(Int(3), array.count)
-        XCTAssertEqual(str1, array[0])
-        XCTAssertEqual(str2, array[1])
-        XCTAssertEqual(str1, array[2])
+        assertEqual(str1, array[0])
+        assertEqual(str2, array[1])
+        assertEqual(str1, array[2])
     }
 
     func testAppendArray() {
@@ -132,9 +175,9 @@ class ListTests: TestCase {
         }
         array.append(objectsIn: [str1, str2, str1])
         XCTAssertEqual(Int(3), array.count)
-        XCTAssertEqual(str1, array[0])
-        XCTAssertEqual(str2, array[1])
-        XCTAssertEqual(str1, array[2])
+        assertEqual(str1, array[0])
+        assertEqual(str2, array[1])
+        assertEqual(str1, array[2])
     }
 
     func testAppendResults() {
@@ -143,8 +186,8 @@ class ListTests: TestCase {
         }
         array.append(objectsIn: realmWithTestPath().objects(SwiftStringObject.self))
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str1, array[0])
-        XCTAssertEqual(str2, array[1])
+        assertEqual(str1, array[0])
+        assertEqual(str2, array[1])
     }
 
     func testInsert() {
@@ -156,12 +199,12 @@ class ListTests: TestCase {
 
         array.insert(str1, at: 0)
         XCTAssertEqual(Int(1), array.count)
-        XCTAssertEqual(str1, array[0])
+        assertEqual(str1, array[0])
 
         array.insert(str2, at: 0)
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str1, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str1, array[1])
 
         assertThrows(_ = array.insert(str2, at: 200))
         assertThrows(_ = array.insert(str2, at: -200))
@@ -174,12 +217,12 @@ class ListTests: TestCase {
 
         array.append(objectsIn: [str1, str2, str1])
 
-        array.remove(objectAtIndex: 1)
-        XCTAssertEqual(str1, array[0])
-        XCTAssertEqual(str1, array[1])
+        array.remove(at: 1)
+        assertEqual(str1, array[0])
+        assertEqual(str1, array[1])
 
-        assertThrows(array.remove(objectAtIndex: 200))
-        assertThrows(array.remove(objectAtIndex: -200))
+        assertThrows(array.remove(at: 2))
+        assertThrows(array.remove(at: -2))
     }
 
     func testRemoveLast() {
@@ -191,13 +234,12 @@ class ListTests: TestCase {
 
         array.removeLast()
         XCTAssertEqual(Int(1), array.count)
-        XCTAssertEqual(str1, array[0])
+        assertEqual(str1, array[0])
 
         array.removeLast()
         XCTAssertEqual(Int(0), array.count)
 
-        array.removeLast() // should be a no-op
-        XCTAssertEqual(Int(0), array.count)
+        assertThrows(array.removeLast())    // Should throw if already empty
     }
 
     func testRemoveAll() {
@@ -223,13 +265,13 @@ class ListTests: TestCase {
 
         array.replace(index: 0, object: str2)
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str1, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str1, array[1])
 
         array.replace(index: 1, object: str2)
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str2, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str2, array[1])
 
         assertThrows(array.replace(index: 200, object: str2))
         assertThrows(array.replace(index: -200, object: str2))
@@ -270,19 +312,19 @@ class ListTests: TestCase {
 
         array.replaceSubrange(0..<1, with: [str2])
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str1, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str1, array[1])
 
         array.replaceSubrange(1..<2, with: [str2])
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str2, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str2, array[1])
 
         array.replaceSubrange(0..<0, with: [str2])
         XCTAssertEqual(Int(3), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str2, array[1])
-        XCTAssertEqual(str2, array[2])
+        assertEqual(str2, array[0])
+        assertEqual(str2, array[1])
+        assertEqual(str2, array[2])
 
         array.replaceSubrange(0..<3, with: [])
         XCTAssertEqual(Int(0), array.count)
@@ -292,27 +334,27 @@ class ListTests: TestCase {
         assertThrows(array.replaceSubrange(0..<200, with: [str2]))
     }
 
-    func testSwap() {
+    func testSwapAt() {
         guard let array = array, let str1 = str1, let str2 = str2 else {
             fatalError("Test precondition failure")
         }
 
         array.append(objectsIn: [str1, str2])
 
-        array.swap(index1: 0, 1)
+        array.swapAt(0, 1)
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str1, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str1, array[1])
 
-        array.swap(index1: 1, 1)
+        array.swapAt(1, 1)
         XCTAssertEqual(Int(2), array.count)
-        XCTAssertEqual(str2, array[0])
-        XCTAssertEqual(str1, array[1])
+        assertEqual(str2, array[0])
+        assertEqual(str1, array[1])
 
-        assertThrows(array.swap(index1: -1, 0))
-        assertThrows(array.swap(index1: 0, -1))
-        assertThrows(array.swap(index1: 1000, 0))
-        assertThrows(array.swap(index1: 0, 1000))
+        assertThrows(array.swapAt(-1, 0))
+        assertThrows(array.swapAt(0, -1))
+        assertThrows(array.swapAt(1000, 0))
+        assertThrows(array.swapAt(0, 1000))
     }
 
     func testChangesArePersisted() {
@@ -641,5 +683,118 @@ class ListRetrievedTests: ListTests {
 
         XCTAssertNotNil(array.realm)
         return array
+    }
+}
+
+/// Ensure the range replaceable collection methods behave correctly when emulated for Swift 4 and later.
+class ListRRCMethodsTests: XCTestCase {
+    private func compare(array: [Int], with list: List<SwiftIntObject>) {
+        guard array.count == list.count else {
+            XCTFail("Array and list have different sizes (\(array.count) and \(list.count), respectively).")
+            return
+        }
+        for i in 0..<array.count {
+            XCTAssertEqual(array[i], list[i].intCol,
+                           "Mistmatched array value (\(array[i])) and list value (\(list[i].intCol)) at index \(i)")
+        }
+    }
+
+    private func makeArray(from list: List<SwiftIntObject>) -> [Int] {
+        return list.map { $0.intCol }
+    }
+
+    private func makeSwiftIntObjects(from array: [Int]) -> [SwiftIntObject] {
+        return array.map { SwiftIntObject(value: [$0]) }
+    }
+
+    private func createListObject(_ values: [Int] = [0, 1, 2, 3, 4, 5, 6]) -> SwiftArrayPropertyObject {
+        let object = SwiftArrayPropertyObject()
+        XCTAssertNil(object.realm)
+        object.intArray.append(objectsIn: makeSwiftIntObjects(from: values))
+        return object
+    }
+
+    private var array: [Int]!
+    private var list: List<SwiftIntObject>!
+
+    override func setUp() {
+        super.setUp()
+        list = createListObject().intArray
+        array = makeArray(from: list)
+    }
+
+#if swift(>=4.0)
+    func testSubscript() {
+        list[1..<4] = createListObject([10, 11, 12]).intArray[0..<2]
+        array[1..<4] = [10, 11]
+        compare(array: array, with: list)
+    }
+
+    func testReplaceWithCollectionIndices() {
+        let newElements = [1, 2, 3]
+        list.replaceSubrange(list.indices, with: makeSwiftIntObjects(from: newElements))
+        array.replaceSubrange(array.indices, with: newElements)
+        compare(array: array, with: list)
+    }
+
+    func testRemoveWithCollectionIndices() {
+        list.removeSubrange(list.indices)
+        XCTAssertTrue(list.isEmpty)
+    }
+#endif
+
+    func testRemoveFirst() {
+        list.removeFirst()
+        array.removeFirst()
+        compare(array: array, with: list)
+    }
+
+    func testRemoveFirstFew() {
+        list.removeFirst(3)
+        array.removeFirst(3)
+        compare(array: array, with: list)
+    }
+
+    func testRemoveLastFew() {
+        list.removeLast(3)
+        array.removeLast(3)
+        compare(array: array, with: list)
+    }
+
+    func testInsert() {
+        let newElements = [10, 11, 12, 13]
+        list.insert(contentsOf: makeSwiftIntObjects(from: newElements), at: 2)
+        array.insert(contentsOf: newElements, at: 2)
+        compare(array: array, with: list)
+    }
+
+    func testRemoveClosedSubrange() {
+        let subrange: ClosedRange<Int> = 1...3
+        list.removeSubrange(subrange)
+        array.removeSubrange(subrange)
+        compare(array: array, with: list)
+    }
+
+    func testRemoveOpenSubrange() {
+        let subrange: Range<Int> = 1..<3
+        list.removeSubrange(subrange)
+        array.removeSubrange(subrange)
+        compare(array: array, with: list)
+    }
+
+    func testReplaceClosedSubrange() {
+        let subrange: ClosedRange<Int> = 2...5
+        let newElements = [10, 11, 12, 13, 14, 15, 16]
+        list.replaceSubrange(subrange, with: makeSwiftIntObjects(from: newElements))
+        array.replaceSubrange(subrange, with: newElements)
+        compare(array: array, with: list)
+    }
+
+    func testReplaceOpenSubrange() {
+        let subrange: Range<Int> = 2..<5
+        let newElements = [10, 11, 12, 13, 14, 15, 16]
+        list.replaceSubrange(subrange, with: makeSwiftIntObjects(from: newElements))
+        array.replaceSubrange(subrange, with: newElements)
+        compare(array: array, with: list)
     }
 }

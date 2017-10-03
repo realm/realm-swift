@@ -27,7 +27,7 @@ FOUNDATION_EXTERN void RLMDisableSyncToDisk(void);
 
 FOUNDATION_EXTERN NSData * _Nullable RLMRealmValidatedEncryptionKey(NSData *key);
 
-// Translate an in-flight exception resulting from opening a SharedGroup to
+// Translate an in-flight exception resulting from an operation on a SharedGroup to
 // an NSError or NSException (if error is nil)
 void RLMRealmTranslateException(NSError **error);
 
@@ -45,7 +45,7 @@ void RLMRealmTranslateException(NSError **error);
 
 - (void)sendNotifications:(RLMNotification)notification;
 - (void)verifyThread;
-- (void)verifyNotificationsAreSupported;
+- (void)verifyNotificationsAreSupported:(bool)isCollection;
 
 @end
 

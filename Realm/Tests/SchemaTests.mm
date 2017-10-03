@@ -517,6 +517,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tintCol {\n"
@@ -525,6 +526,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tfloatCol {\n"
@@ -533,6 +535,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tdoubleCol {\n"
@@ -541,6 +544,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tstringCol {\n"
@@ -549,6 +553,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tbinaryCol {\n"
@@ -557,6 +562,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tdateCol {\n"
@@ -565,6 +571,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tcBoolCol {\n"
@@ -573,6 +580,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tlongCol {\n"
@@ -581,6 +589,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t\tobjectCol {\n"
@@ -589,6 +598,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
                                               @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t\tlinkingObjectsCol {\n"
@@ -597,6 +607,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = allTypesCol;\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = YES;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
@@ -607,6 +618,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
                                               @"\t\t\toptional = NO;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
@@ -617,6 +629,7 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
                                               @"\t\t\toptional = YES;\n"
                                               @"\t\t}\n"
                                               @"\t}\n"
@@ -626,8 +639,11 @@ RLM_ARRAY_TYPE(NotARealClass)
 
 - (void)testClassWithDuplicateProperties
 {
-    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithSingleDuplicateProperty.class], @"'string' .* multiple times .* 'SchemaTestClassWithSingleDuplicateProperty'");
-    RLMAssertThrowsWithReasonMatching([RLMObjectSchema schemaForObjectClass:SchemaTestClassWithMultipleDuplicateProperties.class], @"'SchemaTestClassWithMultipleDuplicateProperties' .* declared multiple times");
+    // If a property is overriden in a child class it should not be picked up more than once.
+    RLMObjectSchema *firstSchema = [RLMObjectSchema schemaForObjectClass:SchemaTestClassWithSingleDuplicateProperty.class];
+    XCTAssertEqual((int)firstSchema.properties.count, 1);
+    RLMObjectSchema *secondSchema = [RLMObjectSchema schemaForObjectClass:SchemaTestClassWithMultipleDuplicateProperties.class];
+    XCTAssertEqual((int)secondSchema.properties.count, 2);
 }
 
 - (void)testClassWithInvalidPrimaryKey {
@@ -646,6 +662,28 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:RequiredPropertiesObject.class];
     XCTAssertFalse([objectSchema[@"stringCol"] optional]);
     XCTAssertFalse([objectSchema[@"binaryCol"] optional]);
+}
+
+- (void)testClassWithRequiredPrimitiveArrayProperties {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:AllPrimitiveArrays.class];
+    XCTAssertFalse(objectSchema[@"intObj"].optional);
+    XCTAssertFalse(objectSchema[@"boolObj"].optional);
+    XCTAssertFalse(objectSchema[@"floatObj"].optional);
+    XCTAssertFalse(objectSchema[@"doubleObj"].optional);
+    XCTAssertFalse(objectSchema[@"stringObj"].optional);
+    XCTAssertFalse(objectSchema[@"dateObj"].optional);
+    XCTAssertFalse(objectSchema[@"dataObj"].optional);
+}
+
+- (void)testClassWithOptionalPrimitiveArrayProperties {
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:AllOptionalPrimitiveArrays.class];
+    XCTAssertTrue(objectSchema[@"intObj"].optional);
+    XCTAssertTrue(objectSchema[@"boolObj"].optional);
+    XCTAssertTrue(objectSchema[@"floatObj"].optional);
+    XCTAssertTrue(objectSchema[@"doubleObj"].optional);
+    XCTAssertTrue(objectSchema[@"stringObj"].optional);
+    XCTAssertTrue(objectSchema[@"dateObj"].optional);
+    XCTAssertTrue(objectSchema[@"dataObj"].optional);
 }
 
 - (void)testClassWithRequiredLinkProperty {
@@ -848,7 +886,7 @@ RLM_ARRAY_TYPE(NotARealClass)
         }
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
-    [token stop];
+    [token invalidate];
 
     // Release the write transaction and let them run
     [realm cancelWriteTransaction];

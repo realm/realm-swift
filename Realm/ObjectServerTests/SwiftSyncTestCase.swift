@@ -42,6 +42,30 @@ class SwiftHugeSyncObject: Object {
     }
 }
 
+class SwiftPartialSyncObjectA: Object {
+    @objc dynamic var number: Int = 0
+    @objc dynamic var string: String = ""
+
+    convenience init(number: Int, string: String) {
+        self.init()
+        self.number = number
+        self.string = string
+    }
+}
+
+class SwiftPartialSyncObjectB: Object {
+    @objc dynamic var number: Int = 0
+    @objc dynamic var firstString: String = ""
+    @objc dynamic var secondString: String = ""
+
+    convenience init(number: Int, firstString: String, secondString: String) {
+        self.init()
+        self.number = number
+        self.firstString = firstString
+        self.secondString = secondString
+    }
+}
+
 // MARK: Test case
 
 class SwiftSyncTestCase: RLMSyncTestCase {
@@ -65,10 +89,16 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                           usernameSuffix: String = "",
                           file: StaticString = #file,
                           line: UInt = #line) -> SyncCredentials {
-        return .usernamePassword(username: "\(file)\(line)\(usernameSuffix)", password: "a", register: register)
+        let filename = URL(fileURLWithPath: String(describing: file)).deletingPathExtension().lastPathComponent
+        return .usernamePassword(username: "\(filename)\(line)\(usernameSuffix)", password: "a", register: register)
     }
 
     func synchronouslyOpenRealm(url: URL, user: SyncUser, file: StaticString = #file, line: UInt = #line) throws -> Realm {
+        let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: url))
+        return try synchronouslyOpenRealm(configuration: config)
+    }
+
+    func synchronouslyOpenRealm(configuration: Realm.Configuration, file: StaticString = #file, line: UInt = #line) throws -> Realm {
         let semaphore = DispatchSemaphore(value: 0)
         let basicBlock = { (error: Error?) in
             if let error = error {
@@ -78,10 +108,9 @@ class SwiftSyncTestCase: RLMSyncTestCase {
             semaphore.signal()
         }
         SyncManager.shared.setSessionCompletionNotifier(basicBlock)
-        let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: url))
-        let realm = try Realm(configuration: config)
-        // FIXME: Perhaps we should have a reasonable timeout here, instead of allowing bad code to stall forever.
-        _ = semaphore.wait(timeout: .distantFuture)
+        let realm = try Realm(configuration: configuration)
+        let result = semaphore.wait(timeout: .now() + DispatchTimeInterval.seconds(20))
+        XCTAssertEqual(result, .success)
         return realm
     }
 
@@ -94,7 +123,8 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                                 file: StaticString = #file,
                                 line: UInt = #line) throws -> SyncUser {
         let process = isParent ? "parent" : "child"
-        var theUser: SyncUser? = nil
+        var theUser: SyncUser?
+        var theError: Error?
         let ex = expectation(description: "Should log in the user properly")
         SyncUser.logIn(with: credentials, server: url) { user, error in
             XCTAssertNotNil(user, file: file, line: line)
@@ -103,14 +133,16 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                          file: file,
                          line: line)
             theUser = user
+            theError = error
             ex.fulfill()
         }
         waitForExpectations(timeout: 4, handler: nil)
         XCTAssertNotNil(theUser, file: file, line: line)
-        XCTAssertEqual(theUser!.state, .active,
-                      "User should have been valid, but wasn't. (process: \(process))",
-                      file: file,
-                      line: line)
+        XCTAssertEqual(theUser?.state, .active,
+                       "User should have been valid, but wasn't. (process: \(process), error: "
+                        + "\(theError != nil ? String(describing: theError!) : "n/a"))",
+                       file: file,
+                       line: line)
         return theUser!
     }
 

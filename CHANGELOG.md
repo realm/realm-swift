@@ -1,3 +1,238 @@
+3.0.0-beta.4 Release notes (2017-09-22)
+=============================================================
+
+### Breaking Changes
+
+* Rename `List.remove(objectAtIndex:)` to `List.remove(at:)` to match the name
+  used by 'RangeReplaceableCollection'.
+* Rename `List.swap()` to `List.swapAt()` to match the name used by 'Array'.
+* Loosen `RLMArray` and `RLMResults`'s generic constraint from `RLMObject` to
+  `NSObject`. This may result in having to add some casts to disambiguate
+  types.
+* Remove `RLMPropertyTypeArray` in favor of a separate bool `array` property on
+  `RLMProperty`/`Property`.
+* Remove `RLMSyncPermissionResults`. `RLMSyncPermission`s are now vended out
+  using a `RLMResults`. This results collection supports all normal collection
+  operations except for setting values using KVO (since `RLMSyncPermission`s are
+  immutable) and the property aggregation operations.
+* `RealmCollection`'s associated type `Element` has been renamed `ElementType`.
+* Realm Swift collection types (`List`, `Results`, `AnyRealmCollection`, and
+  `LinkingObjects` have had their generic type parameter changed from `T` to
+  `Element`).
+* `RealmOptional`'s generic type parameter has been changed from `T` to `Value`.
+* `RLMSyncUserInfo` has been significantly enhanced. It now contains metadata
+  about a user stored on the Realm Object Server, as well as a list of all user account
+  data associated with that user.
+* Starting with Swift 4, `List` now conforms to `MutableCollection` instead of
+  `RangeReplaceableCollection`. For Swift 4, the empty collection initializer has been
+  removed, and default implementations of range replaceable collection methods that
+  make sense for `List` have been added.
+* `List.removeLast()` now throws an exception if the list is empty, to more closely match
+  the behavior of the standard library's `Collection.removeLast()` implementation.
+* Remove `RLMSyncPermissionSortPropertyUserID` to reflect changes in how the
+  Realm Object Server reports permissions for a user.
+* Remove `RLMSyncPermissionOffer` and `RLMSyncPermissionOfferResponse` classes
+  and associated helper methods and functions. Use the
+  `-[RLMSyncUser createOfferForRealmAtURL:accessLevel:expiration:callback:]`
+  and `-[RLMSyncUser acceptOfferForToken:callback:]` methods instead.
+
+### Enhancements
+
+* `List` can now contain values of types `Bool`, `Int`, `Int8`, `Int16`,
+  `Int32`, `Int64`, `Float`, `Double`, `String`, `Data`, and `Date` (and
+  optional versions of all of these) in addition to `Object` subclasses.
+  Querying `List`s containing values other than `Object` subclasses is not yet
+  implemented.
+* `RLMArray` can now be constrained with the protocols `RLMBool`, `RLMInt`,
+  `RLMFloat`, `RLMDouble`, `RLMString`, `RLMData`, and `RLMDate` in addition to
+  protocols defined with `RLM_ARRAY_TYPE`. By default `RLMArray`s of
+  non-`RLMObject` types can contain null. Indicating that the property is
+  required (by overriding `+requiredProperties:`) will instead make the values
+  within the array required. Querying `RLMArray`s containing values other than
+  `RLMObject` subclasses is not yet implemented.
+* Opening a synced Realm whose local copy was created with an older version of
+  Realm Mobile Platfrom when a migration is not possible to the current version
+  will result in an `RLMErrorIncompatibleSyncedFile` / `incompatibleSyncedFile`
+  error. When such an error occurs, the original file is moved to a backup
+  location, and future attempts to open the synchronized Realm will result in a new
+  file being created. If you wish to migrate any data from the backup Realm you can
+  open it using the backup Realm configuration available on the error object.
+* Add preview support for partial synchronization. Partial synchronization is
+  allows a synchronized Realm to be opened in such a way that only objects
+  requested by the user are synchronized to the device. You can use it by setting
+  the `isPartial` property on a `SyncConfiguration`, opening the Realm, and then
+  calling `Realm.subscribe(to:where:callback:)` with the type of object you're
+  interested in, a string containing a query determining which objects you want
+  to subscribe to, and a callback which will report the results. You may add as
+  many subscriptions to a synced Realm as necessary.
+
+### Bugfixes
+
+* Realm Swift APIs that filter or look up the index of an object based on a
+  format string now properly handle optional arguments in their variadic argument
+  list.
+
+3.0.0-beta.3 Release notes (2017-08-23)
+=============================================================
+
+### Breaking Changes
+
+* iOS 7 is no longer supported.
+* Computed properties on Realm object types are detected and no
+  longer added to the automatically generated schema.
+* `-[RLMRealm addOrUpdateObjectsInArray:]` has been renamed to
+  `-[RLMRealm addOrUpdateObjects:]` for consistency with similar methods
+  that add or delete objects.
+* `-[RLMRealm addOrUpdateObjects:]` and `-[RLMRealm deleteObjects:]` now
+  require their argument to conform to `NSFastEnumeration`, to match similar
+  APIs that also take collections.
+* Remove deprecated `{RLM}SyncPermission` and `{RLM}SyncPermissionChange`
+  classes.
+* `{RLM}SyncPermissionValue` has been renamed to just `{RLM}SyncPermission`.
+  Its `userId` property has been renamed `identity`, and its
+  `-initWithRealmPath:userID:accessLevel:` initializer has been renamed
+  `-initWithRealmPath:identity:accessLevel:`.
+* Remove deprecated `-[RLMSyncUser permissionRealmWithError:]` and
+  `SyncUser.permissionRealm()` APIs. Use the new permissions system.
+* Remove deprecated error `RLMSyncErrorBadResponse`. Use
+  `RLMSyncAuthErrorBadResponse` instead.
+* The way interactive sync errors (client reset and permission denied)
+  are delivered to the user has been changed. Instead of a block which can
+  be invoked to immediately delete the offending Realm file, an opaque
+  token object of type `RLMSyncErrorActionToken` will be returned in the
+  error object's `userInfo` dictionary. This error object can be passed
+  into the new `+[RLMSyncSession immediatelyHandleError:]` API to delete
+  the files.
+* Remove `-[NSError rlmSync_clientResetBlock]` and
+  `-[NSError rlmSync_deleteRealmBlock]` APIs.
+* The return types of the `SyncError.clientResetInfo()` and
+  `SyncError.deleteRealmUserInfo()` APIs have been changed. They now return
+  `RLMSyncErrorActionToken`s or `SyncError.ActionToken`s instead of closures.
+* The (erroneously added) instance property `Object.className` has been
+  removed.
+* The class methods `Object.className()`, `Object.objectUtilClass()`, and
+  the property `Object.isInvalidated` can no longer be overriden.
+* The callback which runs when a sync user login succeeds or fails
+  now runs on the main queue by default, or can be explicitly specified
+  by a new `callbackQueue` parameter on the `{RLM}SyncUser.logIn(...)` API.
+* Rename `{RLM}NotificationToken.stop()` to `invalidate()` and
+  `{RealmCollection,SyncPermissionResults}.addNotificationBlock(_:)` to
+  `observe(_:)` to mirror Foundation's new KVO APIs.
+* The `RLMSyncProgress` enum has been renamed `RLMSyncProgressMode`.
+* Remove deprecated `{RLM}SyncManager.disableSSLValidation` property. Disable
+  SSL validation on a per-Realm basis by setting the `enableSSLValidation`
+  property on `{RLM}SyncConfiguration` instead.
+* Fix empty strings, binary data, and null on the right side of `BEGINSWITH`,
+  `ENDSWITH` and `CONTAINS` operators in predicates to match Foundation's
+  semantics of never matching any strings or data.
+* Swift `Object` comparison and hashing behavior now works the same way as
+  that of `RLMObject` (objects are now only considered equatable if their
+  model class defines a primary key).
+* Fix the way the hash property works on `Object` when the object model has
+  no primary key.
+* Fix an issue where if a Swift model class defined non-generic managed
+  properties after generic Realm properties (like `List<T>`), the schema
+  would be constructed incorrectly. Fixes an issue where creating such
+  models from an array could fail.
+
+### Enhancements
+
+* Add Swift `Object.isSameObject(as:_)` API to perform the same function as
+  the existing Objective-C API `-[RLMObject isEqualToObject:]`.
+* Expose additional authentication-related errors that might be reported by
+  a Realm Object Server.
+* An error handler can now be registered on `{RLM}SyncUser`s in order to
+  report authentication-related errors that affect the user.
+
+### Bugfixes
+
+* Sync users are now automatically logged out upon receiving certain types
+  of errors that indicate they are no longer logged into the server. For
+  example, users who are authenticated using third-party credentials will find
+  themselves logged out of the Realm Object Server if the third-party identity
+  service indicates that their credential is no longer valid.
+* Address high CPU usage and hangs in certain cases when processing collection
+  notifications in highly-connected object graphs.
+
+3.0.0-beta.2 Release notes (2017-07-26)
+=============================================================
+
+### Breaking Changes
+
+* Remove the following deprecated Objective-C APIs:
+  `-[RLMArray sortedResultsUsingProperty:ascending:]`,
+  `-[RLMCollection sortedResultsUsingProperty:ascending:]`,
+  `-[RLMResults sortedResultsUsingProperty:ascending:]`,
+  `+[RLMSortDescriptor sortDescriptorWithProperty:ascending:]`,
+  `RLMSortDescriptor.property`.
+  These APIs have been superseded by equivalent APIs that take
+  or return key paths instead of property names.
+* Remove the following deprecated Objective-C API:
+  `+[RLMRealm migrateRealm:configuration:]`.
+  Please use `+[RLMRealm performMigrationForConfiguration:error:]` instead.
+* Remove the following deprecated Swift APIs:
+  `AnyRealmCollection.sorted(byProperty:, ascending:)`,
+  `LinkingObjects.sorted(byProperty:, ascending:)`,
+  `List.sorted(byProperty:, ascending:)`,
+  `Results.sorted(byProperty:, ascending:)`,
+  `SortDescriptor.init(property:, ascending:)`,
+  `SortDescriptor.property`.
+  These APIs have been superseded by equivalent APIs that take
+  or return key paths instead of property names.
+* The Objective-C and Swift `create(_:, value: update:)` APIs now
+  correctly nil out nullable properties when updating an existing
+  object when the `value` argument specifies nil or `NSNull` for
+  the property value.
+
+### Enhancements
+
+* It is now possible to create and log in multiple Realm Object Server users
+  with the same identity if they originate from different servers. Note that
+  if the URLs are different aliases for the same authentication server each
+  user will still be treated as separate (e.g. they will have their own copy
+  of each synchronized Realm opened using them). It is highly encouraged that
+  users defined using the access token credential type be logged in with an
+  authentication server URL specified; this parameter will become mandatory
+  in a future version of the SDK.
+* Add `-[RLMSyncUser retrieveInfoForUser:identityProvider:completion:]`
+  API allowing administrator users to retrieve information about a user based
+  on their provider identity (for example, a username). Requires any edition
+  of the Realm Object Server 1.8.2 or later.
+
+### Bugfixes
+
+* Realm no longer throws an "unsupported instruction" exception in some cases
+  when opening a synced Realm asynchronously.
+
+3.0.0-beta Release notes (2017-07-14)
+=============================================================
+
+### Breaking Changes
+
+* Synchronized Realms require a server running Realm Object Server v2.0 or higher.
+
+### Enhancements
+
+* Add a new error code to denote 'permission denied' errors when working
+  with synchronized Realms, as well as an accompanying block that can be
+  called to inform the binding that the offending Realm's files should be
+  deleted immediately. This allows recovering from 'permission denied'
+  errors in a more robust manner. See the documentation for
+  `RLMSyncErrorPermissionDeniedError` for more information.
+* Add `-[RLMSyncPermissionValue initWithRealmPath:username:accessLevel:]`
+  API allowing permissions to be applied to a user based on their username
+  (usually, an email address). Requires any edition of the Realm Object
+  Server 1.6.0 or later.
+* Improve performance of creating Swift objects which contain at least one List
+  property.
+
+### Bugfixes
+
+* `List.description` now reports the correct types for nested lists.
+* Fix unmanaged object initialization when a nested property type returned
+  `false` from `Object.shouldIncludeInDefaultSchema()`.
+* Don't clear RLMArrays on self-assignment.
+
 2.10.2 Release notes (2017-09-27)
 =============================================================
 

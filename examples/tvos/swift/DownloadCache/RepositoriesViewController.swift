@@ -27,14 +27,14 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
     var token: NotificationToken?
 
     deinit {
-        token?.stop()
+        token?.invalidate()
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         let realm = try! Realm()
-        token = realm.addNotificationBlock { [weak self] notification, realm in
+        token = realm.observe { [weak self] notification, realm in
             self?.reloadData()
         }
 

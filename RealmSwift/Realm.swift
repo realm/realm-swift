@@ -322,7 +322,9 @@ public final class Realm {
      If the object is being updated, all properties defined in its schema will be set by copying
      from `value` using key-value coding. If the `value` argument does not respond to `value(forKey:)`
      for a given property name (or getter name, if defined), that value will remain untouched.
-     Nullable properties on the object can be set to nil by using `NSNull` as the updated value.
+     Nullable properties on the object can be set to nil by using `NSNull` as the updated value,
+     or (if you are passing in an instance of an `Object` subclass) setting the corresponding
+     property on `value` to nil.
 
      If the `value` argument is an array, all properties must be present, valid and in the same
      order as the properties defined in the model.
@@ -436,7 +438,7 @@ public final class Realm {
 
      :nodoc:
      */
-    public func delete<T>(_ objects: List<T>) {
+    public func delete<Element: Object>(_ objects: List<Element>) {
         rlmRealm.deleteObjects(objects._rlmArray)
     }
 
@@ -449,7 +451,7 @@ public final class Realm {
 
      :nodoc:
      */
-    public func delete<T>(_ objects: Results<T>) {
+    public func delete<Element: Object>(_ objects: Results<Element>) {
         rlmRealm.deleteObjects(objects.rlmResults)
     }
 
@@ -471,8 +473,8 @@ public final class Realm {
 
      - returns: A `Results` containing the objects.
      */
-    public func objects<T>(_ type: T.Type) -> Results<T> {
-        return Results<T>(RLMGetObjects(rlmRealm, (type as Object.Type).className(), nil))
+    public func objects<Element: Object>(_ type: Element.Type) -> Results<Element> {
+        return Results(RLMGetObjects(rlmRealm, type.className(), nil))
     }
 
     /**
@@ -503,10 +505,10 @@ public final class Realm {
 
      - returns: An object of type `type`, or `nil` if no instance with the given primary key exists.
      */
-    public func object<T: Object, K>(ofType type: T.Type, forPrimaryKey key: K) -> T? {
+    public func object<Element: Object, KeyType>(ofType type: Element.Type, forPrimaryKey key: KeyType) -> Element? {
         return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(),
                                           dynamicBridgeCast(fromSwift: key)) as! RLMObjectBase?,
-                             to: Optional<T>.self)
+                             to: Optional<Element>.self)
     }
 
     /**
@@ -550,7 +552,7 @@ public final class Realm {
      delivered instantly, multiple notifications may be coalesced.
 
      You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
-     updates, call `stop()` on the token.
+     updates, call `invalidate()` on the token.
 
      - parameter block: A block which is called to process Realm notifications. It receives the following parameters:
                         `notification`: the incoming notification; `realm`: the Realm for which the notification
@@ -558,7 +560,7 @@ public final class Realm {
 
      - returns: A token which must be held for as long as you wish to continue receiving change notifications.
      */
-    public func addNotificationBlock(_ block: @escaping NotificationBlock) -> NotificationToken {
+    public func observe(_ block: @escaping NotificationBlock) -> NotificationToken {
         return rlmRealm.addNotificationBlock { rlmNotification, _ in
             switch rlmNotification {
             case RLMNotification.DidChange:
@@ -709,21 +711,3 @@ extension Realm {
 
 /// The type of a block to run for notification purposes when the data in a Realm is modified.
 public typealias NotificationBlock = (_ notification: Realm.Notification, _ realm: Realm) -> Void
-
-
-// MARK: Unavailable
-
-extension Realm {
-
-    @available(*, unavailable, renamed: "isInWriteTransaction")
-    public var inWriteTransaction: Bool { fatalError() }
-
-    @available(*, unavailable, renamed: "object(ofType:forPrimaryKey:)")
-    public func objectForPrimaryKey<T: Object>(_ type: T.Type, key: AnyObject) -> T? { fatalError() }
-
-    @available(*, unavailable, renamed: "dynamicObject(ofType:forPrimaryKey:)")
-    public func dynamicObjectForPrimaryKey(_ className: String, key: AnyObject) -> DynamicObject? { fatalError() }
-
-    @available(*, unavailable, renamed: "writeCopy(toFile:encryptionKey:)")
-    public func writeCopyToURL(_ fileURL: NSURL, encryptionKey: Data? = nil) throws { fatalError() }
-}

@@ -195,18 +195,3 @@ internal func accessorMigrationBlock(_ migrationBlock: @escaping MigrationBlock)
         migrationBlock(Migration(migration), oldVersion)
     }
 }
-
-// MARK: Unavailable
-
-extension Migration {
-    @available(*, unavailable, renamed: "enumerateObjects(ofType:_:)")
-    public func enumerate(_ objectClassName: String, _ block: MigrationObjectEnumerateBlock) { fatalError() }
-
-    @available(*, unavailable, renamed: "deleteData(forType:)")
-    public func deleteData(_ objectClassName: String) -> Bool {
-        fatalError()
-    }
-
-    @available(*, unavailable, renamed: "renameProperty(onType:from:to:)")
-    public func renamePropertyForClass(_ className: String, oldName: String, newName: String) { fatalError() }
-}

@@ -31,8 +31,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock sessionCompletionNotifier;
 
-- (nullable NSNumber *)globalSSLValidationDisabled;
-
 - (void)_fireError:(NSError *)error;
 
 - (void)_fireErrorWithCode:(int)errorCode

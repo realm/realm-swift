@@ -19,6 +19,10 @@
 import Foundation
 import Realm
 
+#if BUILDING_REALM_SWIFT_TESTS
+import RealmSwift
+#endif
+
 // MARK: Internal Helpers
 
 // Swift 3.1 provides fixits for some of our uses of unsafeBitCast
@@ -26,6 +30,42 @@ import Realm
 internal func noWarnUnsafeBitCast<T, U>(_ x: T, to type: U.Type) -> U {
     return unsafeBitCast(x, to: type)
 }
+
+/// Given a list of `Any`-typed varargs, unwrap any optionals and
+/// replace them with the underlying value or NSNull.
+internal func unwrapOptionals(in varargs: [Any]) -> [Any] {
+    return varargs.map { arg in
+#if swift(>=3.1)
+        if let someArg = arg as Any? {
+            return someArg
+        }
+        return NSNull()
+#else
+        if let optionalArg = arg as? RealmAnyOptionalUnboxingWorkaround {
+            return optionalArg.rlm_unwrappedValue()
+        } else {
+            return arg
+        }
+#endif
+    }
+}
+
+// FIXME: Kill this when we drop Xcode 8.0 support.
+#if swift(>=3.1)
+#else
+private protocol RealmAnyOptionalUnboxingWorkaround {
+    func rlm_unwrappedValue() -> Any
+}
+
+extension Optional: RealmAnyOptionalUnboxingWorkaround {
+    func rlm_unwrappedValue() -> Any {
+        switch self {
+        case .none: return NSNull()
+        case let .some(underlying): return underlying
+        }
+    }
+}
+#endif
 
 internal func notFoundToNil(index: UInt) -> Int? {
     if index == UInt(NSNotFound) {
@@ -51,6 +91,13 @@ internal func gsub(pattern: String, template: String, string: String, error: NSE
                                            withTemplate: template)
 }
 
+internal func cast<U, V>(_ value: U, to: V.Type) -> V {
+    if let v = value as? V {
+        return v
+    }
+    return unsafeBitCast(value, to: to)
+}
+
 extension Object {
     // Must *only* be used to call Realm Objective-C APIs that are exposed on `RLMObject`
     // but actually operate on `RLMObjectBase`. Do not expose cast value to user.
@@ -62,7 +109,9 @@ extension Object {
 // MARK: CustomObjectiveCBridgeable
 
 internal func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
-    if let BridgeableType = T.self as? CustomObjectiveCBridgeable.Type {
+    if T.self == DynamicObject.self {
+        return unsafeBitCast(x as AnyObject, to: T.self)
+    } else if let BridgeableType = T.self as? CustomObjectiveCBridgeable.Type {
         return BridgeableType.bridging(objCValue: x) as! T
     } else {
         return x as! T
@@ -136,7 +185,7 @@ extension Optional: CustomObjectiveCBridgeable {
     }
     var objCValue: Any {
         if let value = self {
-            return value
+            return dynamicBridgeCast(fromSwift: value)
         } else {
             return NSNull()
         }

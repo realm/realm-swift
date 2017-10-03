@@ -30,7 +30,7 @@ def release_notes(version)
   end
   current_version_index += 2
   previous_version_lines = changelog[(current_version_index+1)...-1]
-  previous_version_index = current_version_index + (previous_version_lines.find_index { |line| line =~ /^\d+\.\d+\.\d+\s+/ } || changelog.count)
+  previous_version_index = current_version_index + (previous_version_lines.find_index { |line| line =~ /^\d+\.\d+\.\d+(-(alpha|beta|rc)(\.\d+)?)?\s+/ } || changelog.count)
 
   relevant = changelog[current_version_index..previous_version_index]
 
@@ -43,7 +43,8 @@ github = Octokit::Client.new
 github.access_token = ENV['GITHUB_ACCESS_TOKEN']
 
 puts 'Creating GitHub release'
-response = github.create_release(REPOSITORY, RELEASE, name: RELEASE, body: RELEASE_NOTES)
+prerelease = (VERSION =~ /alpha|beta|rc/) ? true : false
+response = github.create_release(REPOSITORY, RELEASE, name: RELEASE, body: RELEASE_NOTES, prerelease: prerelease)
 release_url = response[:url]
 
 uploads = [OBJC_ZIP, SWIFT_ZIP, CARTHAGE_ZIP]

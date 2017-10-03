@@ -420,13 +420,13 @@ class SwiftPerformanceTests: TestCase {
             let object = realm.create(SwiftIntObject.self)
             try! realm.commitWrite()
 
-            let token = realm.addNotificationBlock { _, _ in }
+            let token = realm.observe { _, _ in }
             self.startMeasuring()
             while object.intCol < 100 {
                 try! realm.write { object.intCol += 1 }
             }
             self.stopMeasuring()
-            token.stop()
+            token.invalidate()
         }
     }
 
@@ -446,7 +446,7 @@ class SwiftPerformanceTests: TestCase {
                     let object = realm.objects(SwiftIntObject.self).first!
                     var token: NotificationToken! = nil
                     CFRunLoopPerformBlock(CFRunLoopGetCurrent(), CFRunLoopMode.defaultMode.rawValue) {
-                        token = realm.addNotificationBlock { _, _ in
+                        token = realm.observe { _, _ in
                             if object.intCol == stopValue {
                                 CFRunLoopStop(CFRunLoopGetCurrent())
                             }
@@ -454,7 +454,7 @@ class SwiftPerformanceTests: TestCase {
                         semaphore.signal()
                     }
                     CFRunLoopRun()
-                    token.stop()
+                    token.invalidate()
                 }
             }
 
@@ -485,7 +485,7 @@ class SwiftPerformanceTests: TestCase {
                     let object = realm.objects(SwiftIntObject.self).first!
                     var token: NotificationToken! = nil
                     CFRunLoopPerformBlock(CFRunLoopGetCurrent(), CFRunLoopMode.defaultMode.rawValue) {
-                        token = realm.addNotificationBlock { _, _ in
+                        token = realm.observe { _, _ in
                             if object.intCol == stopValue {
                                 CFRunLoopStop(CFRunLoopGetCurrent())
                             } else if object.intCol % 2 == 0 {
@@ -495,11 +495,11 @@ class SwiftPerformanceTests: TestCase {
                         semaphore.signal()
                     }
                     CFRunLoopRun()
-                    token.stop()
+                    token.invalidate()
                 }
             }
 
-            let token = realm.addNotificationBlock { _, _ in
+            let token = realm.observe { _, _ in
                 if object.intCol % 2 == 1 && object.intCol < stopValue {
                     try! realm.write { object.intCol += 1 }
                 }
@@ -514,7 +514,7 @@ class SwiftPerformanceTests: TestCase {
             }
             queue.sync {}
             self.stopMeasuring()
-            token.stop()
+            token.invalidate()
         }
     }
 

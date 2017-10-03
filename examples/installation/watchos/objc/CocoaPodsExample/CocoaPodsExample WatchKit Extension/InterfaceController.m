@@ -60,7 +60,7 @@
 }
 
 - (void)didDeactivate {
-    [self.token stop];
+    [self.token invalidate];
     [super didDeactivate];
 }
 

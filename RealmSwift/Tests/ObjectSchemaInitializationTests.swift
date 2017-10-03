@@ -18,7 +18,6 @@
 
 import XCTest
 import RealmSwift
-import Realm.Private
 import Realm.Dynamic
 import Foundation
 
@@ -97,7 +96,8 @@ class ObjectSchemaInitializationTests: TestCase {
         let arrayCol = objectSchema["arrayCol"]
         XCTAssertNotNil(arrayCol)
         XCTAssertEqual(arrayCol!.name, "arrayCol")
-        XCTAssertEqual(arrayCol!.type, PropertyType.array)
+        XCTAssertEqual(arrayCol!.type, PropertyType.object)
+        XCTAssertTrue(arrayCol!.isArray)
         XCTAssertFalse(arrayCol!.isIndexed)
         XCTAssertFalse(arrayCol!.isOptional)
         XCTAssertEqual(objectCol!.objectClassName!, "SwiftBoolObject")
@@ -105,7 +105,8 @@ class ObjectSchemaInitializationTests: TestCase {
         let dynamicArrayCol = SwiftCompanyObject().objectSchema["employees"]
         XCTAssertNotNil(dynamicArrayCol)
         XCTAssertEqual(dynamicArrayCol!.name, "employees")
-        XCTAssertEqual(dynamicArrayCol!.type, PropertyType.array)
+        XCTAssertEqual(dynamicArrayCol!.type, PropertyType.object)
+        XCTAssertTrue(dynamicArrayCol!.isArray)
         XCTAssertFalse(dynamicArrayCol!.isIndexed)
         XCTAssertFalse(arrayCol!.isOptional)
         XCTAssertEqual(dynamicArrayCol!.objectClassName!, "SwiftEmployeeObject")
@@ -124,6 +125,10 @@ class ObjectSchemaInitializationTests: TestCase {
                      "Should throw when not ignoring a property of a type we can't persist")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithBadPropertyName.self),
                      "Should throw when not ignoring a property with a name we don't support")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithManagedLazyProperty.self),
+                     "Should throw when not ignoring a lazy property")
+        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithDynamicManagedLazyProperty.self),
+                     "Should throw when not ignoring a lazy property")
 
         // Shouldn't throw when not ignoring a property of a type we can't persist if it's not dynamic
         _ = RLMObjectSchema(forObjectClass: SwiftObjectWithEnum.self)
@@ -203,6 +208,13 @@ class ObjectSchemaInitializationTests: TestCase {
 
     func testNonRealmOptionalTypesDeclaredAsRealmOptional() {
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonRealmOptionalType.self))
+    }
+
+    func testNotExplicitlyIgnoredComputedProperties() {
+        let schema = SwiftComputedPropertyNotIgnoredObject().objectSchema
+        // The two computed properties should not appear on the schema.
+        XCTAssertEqual(schema.properties.count, 1)
+        XCTAssertNotNil(schema["_urlBacking"])
     }
 }
 
@@ -295,4 +307,13 @@ class SwiftObjectWithNonRealmOptionalType: SwiftFakeObject {
 
 class SwiftObjectWithBadPropertyName: SwiftFakeObject {
     @objc dynamic var newValue = false
+}
+
+class SwiftObjectWithManagedLazyProperty: SwiftFakeObject {
+    lazy var foobar: String = "foo"
+}
+
+// swiftlint:disable:next type_name
+class SwiftObjectWithDynamicManagedLazyProperty: SwiftFakeObject {
+    @objc dynamic lazy var foobar: String = "foo"
 }

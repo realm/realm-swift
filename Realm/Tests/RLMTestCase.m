@@ -190,12 +190,12 @@ static BOOL encryptTests() {
         }
     });
 
-    [self waitForExpectationsWithTimeout:4.0 handler:nil];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
 
     // wait for queue to finish
     dispatch_sync(queue, ^{});
 
-    [token stop];
+    [token invalidate];
 }
 
 - (void)dispatchAsync:(dispatch_block_t)block {

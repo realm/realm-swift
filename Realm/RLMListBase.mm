@@ -41,6 +41,10 @@
     return [__rlmArray valueForKey:key];
 }
 
+- (id)valueForKeyPath:(NSString *)keyPath {
+    return [__rlmArray valueForKeyPath:keyPath];
+}
+
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained [])buffer count:(NSUInteger)len {
     return [__rlmArray countByEnumeratingWithState:state objects:buffer count:len];
 }

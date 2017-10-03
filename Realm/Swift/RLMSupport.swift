@@ -40,13 +40,13 @@ extension RLMRealm {
 extension RLMObject {
     // Swift query convenience functions
     public class func objects(where predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
-        return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+        return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args))) as! RLMResults<RLMObject>
     }
 
     public class func objects(in realm: RLMRealm,
                               where predicateFormat: String,
                               _ args: CVarArg...) -> RLMResults<RLMObject> {
-        return objects(in: realm, with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+        return objects(in: realm, with: NSPredicate(format: predicateFormat, arguments: getVaList(args))) as! RLMResults<RLMObject>
     }
 }
 
@@ -80,8 +80,8 @@ extension RLMCollection {
         return indexOfObject(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
     }
 
-    public func objects(where predicateFormat: String, _ args: CVarArg...) -> RLMResults<RLMObject> {
-        return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args)))
+    public func objects(where predicateFormat: String, _ args: CVarArg...) -> RLMResults<NSObject> {
+        return objects(with: NSPredicate(format: predicateFormat, arguments: getVaList(args))) as! RLMResults<NSObject>
     }
 }
 
@@ -114,82 +114,22 @@ extension RLMSyncUser {
     public static func logIn(with credentials: RLMSyncCredentials,
                              server authServerURL: URL,
                              timeout: TimeInterval = 30,
+                             callbackQueue queue: DispatchQueue = DispatchQueue.main,
                              onCompletion completion: @escaping RLMUserCompletionBlock) {
         return __logIn(with: credentials,
                        authServerURL: authServerURL,
                        timeout: timeout,
+                       callbackQueue: queue,
                        onCompletion: completion)
-    }
-
-    public func managementRealm() throws -> RLMRealm {
-        var error: NSError?
-        let realm = __managementRealmWithError(&error)
-        if let error = error {
-            throw error
-        }
-        return realm
     }
 }
 
 extension RLMSyncSession {
     public func addProgressNotification(for direction: RLMSyncProgressDirection,
-                                        mode: RLMSyncProgress,
+                                        mode: RLMSyncProgressMode,
                                         block: @escaping RLMProgressNotificationBlock) -> RLMProgressNotificationToken? {
         return __addProgressNotification(for: direction,
                                          mode: mode,
                                          block: block)
     }
 }
-
-#if swift(>=3.1)
-// Collection conformance for RLMSyncPermissionResults.
-extension RLMSyncPermissionResults: RandomAccessCollection {
-    public subscript(index: Int) -> RLMSyncPermissionValue {
-        return object(at: index)
-    }
-
-    public func index(after i: Int) -> Int {
-        return i + 1
-    }
-
-    public var startIndex: Int {
-        return 0
-    }
-
-    public var endIndex: Int {
-        return count
-    }
-}
-#else
-extension RLMSyncPermissionResults {
-    /// Return the first permission value in the results, or `nil` if
-    /// the results are empty.
-    public var first: RLMSyncPermissionValue? {
-        return count > 0 ? object(at: 0) : nil
-    }
-
-    /// Return the last permission value in the results, or `nil` if
-    /// the results are empty.
-    public var last: RLMSyncPermissionValue? {
-        return count > 0 ? object(at: count - 1) : nil
-    }
-}
-
-extension RLMSyncPermissionResults: Sequence {
-    public struct Iterator: IteratorProtocol {
-        private let iteratorBase: NSFastEnumerationIterator
-
-        fileprivate init(results: RLMSyncPermissionResults) {
-            iteratorBase = NSFastEnumerationIterator(results)
-        }
-
-        public func next() -> RLMSyncPermissionValue? {
-            return iteratorBase.next() as! RLMSyncPermissionValue?
-        }
-    }
-
-    public func makeIterator() -> RLMSyncPermissionResults.Iterator {
-        return Iterator(results: self)
-    }
-}
-#endif

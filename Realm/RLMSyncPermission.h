@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2017 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,38 +17,149 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import <Realm/RLMObject.h>
+
+/**
+ Access levels which can be granted to Realm Mobile Platform users
+ for specific synchronized Realms, using the permissions APIs.
+
+ Note that each access level guarantees all allowed actions provided
+ by less permissive access levels. Specifically, users with write
+ access to a Realm can always read from that Realm, and users with
+ administrative access can always read or write from the Realm.
+ */
+typedef NS_ENUM(NSUInteger, RLMSyncAccessLevel) {
+    /// No access whatsoever.
+    RLMSyncAccessLevelNone          = 0,
+    /**
+     User can only read the contents of the Realm.
+
+     @warning Users who have read-only access to a Realm should open the
+              Realm using `+[RLMRealm asyncOpenWithConfiguration:callbackQueue:callback:]`.
+              Attempting to directly open the Realm is an error; in this
+              case the Realm must be deleted and re-opened.
+     */
+    RLMSyncAccessLevelRead          = 1,
+    /// User can read and write the contents of the Realm.
+    RLMSyncAccessLevelWrite         = 2,
+    /// User can read, write, and administer the Realm, including
+    /// granting permissions to other users.
+    RLMSyncAccessLevelAdmin         = 3,
+};
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- This model is used to reflect permissions.
+ A property on which a `RLMResults<RLMSyncPermission *>` can be queried or filtered.
 
- It should be used in conjunction with a `RLMSyncUser`'s Permission Realm.
- You can only read this Realm. Use the objects in Management Realm to
- make request for modifications of permissions.
-
- See https://realm.io/docs/realm-object-server/#permissions for general
- documentation.
+ @warning If building `NSPredicate`s using format strings including these string
+          constants, use %K instead of %@ as the substitution parameter.
  */
-__deprecated_msg("Use `RLMSyncPermissionValue`")
-@interface RLMSyncPermission : RLMObject
+typedef NSString * RLMSyncPermissionSortProperty NS_STRING_ENUM;
 
-/// The date this object was last modified.
-@property (readonly) NSDate *updatedAt;
+/// Sort by the Realm Object Server path to the Realm to which the permission applies.
+extern RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyPath;
+/// Sort by the date the permissions were last updated.
+extern RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated;
 
-/// The identity of a user affected by this permission.
-@property (readonly) NSString *userId;
+/**
+ A value representing a permission granted to the specified user(s) to access the specified Realm(s).
 
-/// The path to the realm.
-@property (readonly) NSString *path;
+ `RLMSyncPermission` is immutable and can be accessed from any thread.
 
-/// Whether the affected user is allowed to read from the Realm.
-@property (readonly) BOOL mayRead;
-/// Whether the affected user is allowed to write to the Realm.
-@property (readonly) BOOL mayWrite;
-/// Whether the affected user is allowed to manage the access rights for others.
-@property (readonly) BOOL mayManage;
+ See https://realm.io/docs/realm-object-server/#permissions for general documentation.
+ */
+@interface RLMSyncPermission : NSObject
+
+/**
+ The Realm Object Server path to the Realm to which this permission applies (e.g. "/path/to/realm").
+
+ Specify "*" if this permission applies to all Realms managed by the server.
+ */
+@property (nonatomic, readonly) NSString *path;
+
+/**
+ The access level described by this permission.
+ */
+@property (nonatomic, readonly) RLMSyncAccessLevel accessLevel;
+
+/// Whether the access level allows the user to read from the Realm.
+@property (nonatomic, readonly) BOOL mayRead;
+
+/// Whether the access level allows the user to write to the Realm.
+@property (nonatomic, readonly) BOOL mayWrite;
+
+/// Whether the access level allows the user to administer the Realm.
+@property (nonatomic, readonly) BOOL mayManage;
+
+/**
+ Create a new sync permission value, for use with permission APIs.
+
+ @param path        The Realm Object Server path to the Realm whose permission should be modified
+                    (e.g. "/path/to/realm"). Pass "*" to apply to all Realms managed by the user.
+ @param identity    The Realm Object Server identity of the user who should be granted access to
+                    the Realm at `path`.
+                    Pass "*" to apply to all users managed by the server.
+ @param accessLevel The access level to grant.
+ */
+- (instancetype)initWithRealmPath:(NSString *)path
+                         identity:(NSString *)identity
+                      accessLevel:(RLMSyncAccessLevel)accessLevel;
+
+/**
+ Create a new sync permission value, for use with permission APIs.
+
+ @param path        The Realm Object Server path to the Realm whose permission should be modified
+                    (e.g. "/path/to/realm"). Pass "*" to apply to all Realms managed by the user.
+ @param username    The username (often an email address) of the user who should be granted access
+                    to the Realm at `path`.
+ @param accessLevel The access level to grant.
+ */
+- (instancetype)initWithRealmPath:(NSString *)path
+                         username:(NSString *)username
+                      accessLevel:(RLMSyncAccessLevel)accessLevel;
+
+/**
+ The identity of the user to whom this permission is granted, or "*"
+ if all users are granted this permission. Nil if the permission is
+ defined in terms of a key-value pair.
+ */
+@property (nullable, nonatomic, readonly) NSString *identity;
+
+/**
+ If the permission is defined in terms of a key-value pair, the key
+ describing the type of criterion used to determine what users the
+ permission applies to. Otherwise, nil.
+ */
+@property (nullable, nonatomic, readonly) NSString *key;
+
+/**
+ If the permission is defined in terms of a key-value pair, a string
+ describing the criterion value used to determine what users the
+ permission applies to. Otherwise, nil.
+ */
+@property (nullable, nonatomic, readonly) NSString *value;
+
+/**
+ When this permission was last updated.
+ */
+@property (nonatomic, readonly) NSDate *updatedAt;
+
+/// :nodoc:
+- (instancetype)init __attribute__((unavailable("Use the designated initializer")));
+
+/// :nodoc:
++ (instancetype)new __attribute__((unavailable("Use the designated initializer")));
+
+// MARK: - Migration assistance
+
+/// :nodoc:
+@property (nullable, nonatomic, readonly) NSString *userId __attribute__((unavailable("Renamed to `identity`")));
+
+/// :nodoc:
+- (instancetype)initWithRealmPath:(NSString *)path
+                           userID:(NSString *)identity
+                      accessLevel:(RLMSyncAccessLevel)accessLevel
+__attribute__((unavailable("Renamed to `-initWithRealmPath:identity:accessLevel:`")));
 
 @end
 

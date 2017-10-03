@@ -19,7 +19,6 @@
 import XCTest
 import RealmSwift
 import Realm
-import Realm.Private
 import Realm.Dynamic
 import Foundation
 
@@ -117,7 +116,7 @@ class MigrationTests: TestCase {
         _ = try! Realm()
         XCTAssertEqual(0, try! schemaVersionAtURL(defaultRealmURL()),
                        "Initial version should be 0")
-        assertFails(.fail) {
+        assertFails(.filePermissionDenied) {
             try schemaVersionAtURL(URL(fileURLWithPath: "/dev/null"))
         }
     }

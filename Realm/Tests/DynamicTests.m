@@ -186,22 +186,24 @@
         RLMProperty *prop = schema.properties[i];
         id value = prop.type == RLMPropertyTypeString ? @1 : @"";
         RLMAssertThrowsWithReason(o[prop.name] = value,
-                                  @"Invalid property value");
+                                  @"Invalid value '");
         RLMAssertThrowsWithReason(o[prop.name] = NSNull.null,
-                                  @"Invalid property value");
+                                  @"Invalid value '<null>' of type 'NSNull' for");
         RLMAssertThrowsWithReason(o[prop.name] = nil,
-                                  @"Invalid property value");
+                                  @"Invalid value '(null)' of type '(null)' for");
     }
 
     RLMProperty *prop = schema.properties[9];
     RLMAssertThrowsWithReason(o[prop.name] = @"str",
-                              @"Invalid property value");
+                              @"Invalid value 'str' of type '__NSCFConstantString' for 'StringObject?' property 'AllTypesObject.objectCol'.");
     XCTAssertNoThrow(o[prop.name] = nil);
     XCTAssertNoThrow(o[prop.name] = NSNull.null);
 
     id otherObjectType = [dyrealm createObject:IntObject.className withValue:@[@1]];
     RLMAssertThrowsWithReason(o[prop.name] = otherObjectType,
-                              @"Invalid property value");
+                              @"Invalid value 'IntObject");
+
+    [dyrealm cancelWriteTransaction];
 }
 
 - (void)testDynamicAdd {

@@ -20,9 +20,10 @@
 
 #import "RLMCollection_Private.hpp"
 
-#import <Realm/RLMResults.h>
+#import "RLMResults_Private.hpp"
 
 #import <realm/link_view_fwd.hpp>
+#import <realm/table_ref.hpp>
 
 namespace realm {
     class Results;
@@ -35,6 +36,8 @@ class RLMObservationInfo;
 @interface RLMArray () {
 @protected
     NSString *_objectClassName;
+    RLMPropertyType _type;
+    BOOL _optional;
 @public
     // The name of the property which this RLMArray represents
     NSString *_key;
@@ -42,9 +45,6 @@ class RLMObservationInfo;
 }
 @end
 
-//
-// LinkView backed RLMArray subclass
-//
 @interface RLMManagedArray : RLMArray <RLMFastEnumerable>
 - (instancetype)initWithParent:(RLMObjectBase *)parentObject property:(RLMProperty *)property;
 - (RLMManagedArray *)initWithList:(realm::List)list
@@ -69,8 +69,5 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
 // RLMResults private methods
 //
 @interface RLMResults () <RLMFastEnumerable>
-+ (instancetype)resultsWithObjectInfo:(RLMClassInfo&)info
-                              results:(realm::Results)results;
-
 - (void)deleteObjectsFromRealm;
 @end

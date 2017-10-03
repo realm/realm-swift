@@ -78,34 +78,29 @@ static bool maybeInitObjectSchemaForUnmanaged(RLMObjectBase *obj) {
     _observationInfo = nullptr;
 }
 
+static id coerceToObjectType(id obj, Class cls, RLMSchema *schema) {
+    return [obj isKindOfClass:cls] ? obj : [[cls alloc] initWithValue:obj schema:schema];
+}
+
 static id validatedObjectForProperty(__unsafe_unretained id const obj,
+                                     __unsafe_unretained RLMObjectSchema *const objectSchema,
                                      __unsafe_unretained RLMProperty *const prop,
                                      __unsafe_unretained RLMSchema *const schema) {
-    RLMValidateValueForProperty(obj, prop);
-
-    if (obj && prop.type == RLMPropertyTypeObject) {
-        RLMObjectSchema *objSchema = schema[prop.objectClassName];
-        if ([obj isKindOfClass:objSchema.objectClass]) {
-            return obj;
-        }
-        else {
-            return [[objSchema.objectClass alloc] initWithValue:obj schema:schema];
-        }
+    RLMValidateValueForProperty(obj, objectSchema, prop);
+    if (!obj || obj == NSNull.null) {
+        return nil;
     }
-    if (prop.type == RLMPropertyTypeArray) {
-        RLMObjectSchema *objSchema = schema[prop.objectClassName];
-        RLMArray *objects = [[RLMArray alloc] initWithObjectClassName:objSchema.className];
-        for (id el in obj) {
-            if ([el isKindOfClass:objSchema.objectClass]) {
-                [objects addObject:el];
+    if (prop.type == RLMPropertyTypeObject) {
+        Class objectClass = schema[prop.objectClassName].objectClass;
+        if (prop.array) {
+            NSMutableArray *ret = [[NSMutableArray alloc] init];
+            for (id el in obj) {
+                [ret addObject:coerceToObjectType(el, objectClass, schema)];
             }
-            else {
-                [objects addObject:[[objSchema.objectClass alloc] initWithValue:el schema:schema]];
-            }
+            return ret;
         }
-        return objects;
+        return coerceToObjectType(obj, objectClass, schema);
     }
-
     return obj;
 }
 
@@ -133,7 +128,7 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
         NSUInteger i = 0;
         for (id val in array) {
             RLMProperty *prop = properties[i++];
-            [self setValue:validatedObjectForProperty(RLMCoerceToNil(val), prop, schema)
+            [self setValue:validatedObjectForProperty(RLMCoerceToNil(val), _objectSchema, prop, schema)
                     forKey:prop.name];
         }
     }
@@ -147,7 +142,7 @@ static id validatedObjectForProperty(__unsafe_unretained id const obj,
                 continue;
             }
 
-            [self setValue:validatedObjectForProperty(RLMCoerceToNil(obj), prop, schema)
+            [self setValue:validatedObjectForProperty(RLMCoerceToNil(obj), _objectSchema, prop, schema)
                     forKey:prop.name];
         }
     }
@@ -190,12 +185,13 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
     value = RLMCoerceToNil(value);
     RLMProperty *property = _objectSchema[key];
     if (Ivar ivar = property.swiftIvar) {
-        if (property.type == RLMPropertyTypeArray && (!value || [value conformsToProtocol:@protocol(NSFastEnumeration)])) {
+        if (property.array && (!value || [value conformsToProtocol:@protocol(NSFastEnumeration)])) {
             RLMArray *array = [object_getIvar(self, ivar) _rlmArray];
             [array removeAllObjects];
 
             if (value) {
-                [array addObjects:validatedObjectForProperty(value, property, RLMSchema.partialPrivateSharedSchema)];
+                [array addObjects:validatedObjectForProperty(value, _objectSchema, property,
+                                                             RLMSchema.partialPrivateSharedSchema)];
             }
         }
         else if (property.optional) {
@@ -222,10 +218,8 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
 }
 
 + (void)initializeLinkedObjectSchemas {
-    RLMObjectSchema *thisObjectSchema = [self sharedSchema];
-    for (RLMProperty *prop in thisObjectSchema.properties) {
-        if ((prop.type == RLMPropertyTypeObject || prop.type == RLMPropertyTypeArray) &&
-            !RLMSchema.partialPrivateSharedSchema[prop.objectClassName]) {
+    for (RLMProperty *prop in self.sharedSchema.properties) {
+        if (prop.type == RLMPropertyTypeObject && !RLMSchema.partialPrivateSharedSchema[prop.objectClassName]) {
             [[RLMSchema classForString:prop.objectClassName] initializeLinkedObjectSchemas];
         }
     }
@@ -485,11 +479,7 @@ Class RLMObjectUtilClass(BOOL isSwift) {
     return nil;
 }
 
-+ (NSArray *)getGenericListPropertyNames:(__unused id)obj {
-    return nil;
-}
-
-+ (NSDictionary *)getLinkingObjectsProperties:(__unused id)obj {
++ (NSArray *)getSwiftGenericProperties:(__unused id)obj {
     return nil;
 }
 
@@ -499,6 +489,48 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 
 + (NSArray *)requiredPropertiesForClass:(Class)cls {
     return [cls requiredProperties];
+}
+
+@end
+
+@implementation RLMGenericPropertyMetadata
+
++ (instancetype)metadataForListProperty:(NSString *)propertyName index:(NSInteger)index {
+    RLMGenericPropertyMetadata *md = [RLMGenericPropertyMetadata new];
+    md.propertyName = propertyName;
+    md.index = index;
+    md.kind = RLMGenericPropertyKindList;
+    return md;
+}
+
++ (instancetype)metadataForLinkingObjectsProperty:(NSString *)propertyName
+                                        className:(NSString *)className
+                               linkedPropertyName:(NSString *)linkedPropertyName
+                                            index:(NSInteger)index {
+    RLMGenericPropertyMetadata *md = [RLMGenericPropertyMetadata new];
+    md.propertyName = propertyName;
+    md.className = className;
+    md.linkedPropertyName = linkedPropertyName;
+    md.index = index;
+    md.kind = RLMGenericPropertyKindLinkingObjects;
+    return md;
+}
+
++ (instancetype)metadataForOptionalProperty:(NSString *)propertyName type:(NSInteger)type index:(NSInteger)index {
+    RLMGenericPropertyMetadata *md = [RLMGenericPropertyMetadata new];
+    md.propertyName = propertyName;
+    md.propertyType = type;
+    md.index = index;
+    md.kind = RLMGenericPropertyKindOptional;
+    return md;
+}
+
++ (instancetype)metadataForNilLiteralOptionalProperty:(NSString *)propertyName index:(NSInteger)index {
+    RLMGenericPropertyMetadata *md = [RLMGenericPropertyMetadata new];
+    md.propertyName = propertyName;
+    md.index = index;
+    md.kind = RLMGenericPropertyKindNilLiteralOptional;
+    return md;
 }
 
 @end

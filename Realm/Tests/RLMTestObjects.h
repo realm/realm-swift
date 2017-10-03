@@ -160,6 +160,25 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property NSDate *date;
 @end
 
+@interface AllPrimitiveArrays : RLMObject
+@property RLMArray<RLMInt> *intObj;
+@property RLMArray<RLMFloat> *floatObj;
+@property RLMArray<RLMDouble> *doubleObj;
+@property RLMArray<RLMBool> *boolObj;
+@property RLMArray<RLMString> *stringObj;
+@property RLMArray<RLMDate> *dateObj;
+@property RLMArray<RLMData> *dataObj;
+@end
+
+@interface AllOptionalPrimitiveArrays : RLMObject
+@property RLMArray<RLMInt> *intObj;
+@property RLMArray<RLMFloat> *floatObj;
+@property RLMArray<RLMDouble> *doubleObj;
+@property RLMArray<RLMBool> *boolObj;
+@property RLMArray<RLMString> *stringObj;
+@property RLMArray<RLMDate> *dateObj;
+@property RLMArray<RLMData> *dataObj;
+@end
 
 #pragma mark - Real Life Objects
 #pragma mark -
@@ -395,6 +414,13 @@ RLM_ARRAY_TYPE(PrimaryCompanyObject);
 
 @interface ArrayOfPrimaryCompanies : RLMObject
 @property RLM_GENERIC_ARRAY(PrimaryCompanyObject) *companies;
+@end
+
+#pragma mark ComputedPropertyNotExplicitlyIgnoredObject
+
+@interface ComputedPropertyNotExplicitlyIgnoredObject : RLMObject
+@property NSString *_URLBacking;
+@property NSURL *URL;
 @end
 
 #pragma mark FakeObject

@@ -45,7 +45,7 @@
 }
 
 - (void)tearDown {
-    [_token stop];
+    [_token invalidate];
     [super tearDown];
 }
 
@@ -149,7 +149,7 @@
         CFRunLoopStop(CFRunLoopGetCurrent());
     }];
     CFRunLoopRun();
-    [token stop];
+    [token invalidate];
 
     XCTAssertFalse(_called);
 }
@@ -165,7 +165,7 @@
     [realm commitWriteTransactionWithoutNotifying:@[token] error:nil];
 
     // local realm notifications are called synchronously so no need to wait for anything
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testSuppressRealmNotificationForWrongRealm {
@@ -178,7 +178,7 @@
     [realm beginWriteTransaction];
     XCTAssertThrows([realm commitWriteTransactionWithoutNotifying:@[token] error:nil]);
     [realm cancelWriteTransaction];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testSuppressCollectionNotificationForWrongRealm {
@@ -271,7 +271,7 @@ static RLMCollectionChange *getChange(RLMTestCase<ChangesetTestCase> *self, void
         }];
     }];
 
-    [(RLMNotificationToken *)token stop];
+    [(RLMNotificationToken *)token invalidate];
     token = nil;
 
     return changes;
@@ -491,7 +491,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
         }];
     }];
 
-    [token stop];
+    [token invalidate];
     token = nil;
 
     XCTAssertNotNil(changes);
@@ -920,7 +920,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
     [realm commitWriteTransaction];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testChangeAllPropertyTypes {
@@ -953,7 +953,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
 
         [self waitForExpectationsWithTimeout:2.0 handler:nil];
     }
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testChangeAllPropertyTypesFromBackground {
@@ -984,7 +984,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
         }];
         [_obj.realm refresh];
     }
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testChangeAllPropertyTypesInSingleTransaction {
@@ -1015,7 +1015,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
     [_obj.realm commitWriteTransaction];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 - (void)testMultipleObjectNotifiers {
@@ -1053,9 +1053,9 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
     }];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token1 stop];
-    [token2 stop];
-    [token3 stop];
+    [token1 invalidate];
+    [token2 invalidate];
+    [token3 invalidate];
 }
 
 - (void)testArrayPropertiesMerelyReportModification {
@@ -1084,7 +1084,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
     }];
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token stop];
+    [token invalidate];
 }
 
 @end

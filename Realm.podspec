@@ -1,6 +1,7 @@
 Pod::Spec.new do |s|
   s.name                    = 'Realm'
-  s.version                 = `sh build.sh get-version`
+  version                   = `sh build.sh get-version`
+  s.version                 = version
   s.summary                 = 'Realm is a modern data framework & database for iOS, macOS, tvOS & watchOS.'
   s.description             = <<-DESC
                               The Realm Mobile Database, for Objective-C. (If you want to use Realm from Swift, see the “RealmSwift” pod.)
@@ -13,7 +14,8 @@ Pod::Spec.new do |s|
   s.library                 = 'c++', 'z'
   s.requires_arc            = true
   s.social_media_url        = 'https://twitter.com/realm'
-  s.documentation_url       = "https://realm.io/docs/objc/#{s.version}"
+  has_versioned_docs        = !(version =~ /alpha|beta|rc/)
+  s.documentation_url       = "https://realm.io/docs/objc/#{has_versioned_docs ? s.version : 'latest'}"
   s.license                 = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
   public_header_files       = 'include/**/RLMArray.h',
@@ -28,6 +30,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMPlatform.h',
                               'include/**/RLMProperty.h',
                               'include/**/RLMRealm.h',
+                              'include/**/RLMRealm+Sync.h',
                               'include/**/RLMRealmConfiguration+Sync.h',
                               'include/**/RLMRealmConfiguration.h',
                               'include/**/RLMResults.h',
@@ -36,11 +39,6 @@ Pod::Spec.new do |s|
                               'include/**/RLMSyncCredentials.h',
                               'include/**/RLMSyncManager.h',
                               'include/**/RLMSyncPermission.h',
-                              'include/**/RLMSyncPermissionChange.h',
-                              'include/**/RLMSyncPermissionOffer.h',
-                              'include/**/RLMSyncPermissionOfferResponse.h',
-                              'include/**/RLMSyncPermissionResults.h',
-                              'include/**/RLMSyncPermissionValue.h',
                               'include/**/RLMSyncSession.h',
                               'include/**/RLMSyncUser.h',
                               'include/**/RLMSyncUtil.h',
@@ -81,7 +79,7 @@ Pod::Spec.new do |s|
                                 'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"' }
   s.preserve_paths          = %w(build.sh include)
 
-  s.ios.deployment_target   = '7.0'
+  s.ios.deployment_target   = '8.0'
   s.ios.vendored_library    = 'core/librealmcore-ios.a'
 
   s.osx.deployment_target   = '10.9'

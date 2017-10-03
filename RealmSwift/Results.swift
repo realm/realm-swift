@@ -45,7 +45,10 @@ extension NSDate: MinMaxType {}
 
  - see: `sum(ofProperty:)`, `average(ofProperty:)`
  */
-public protocol AddableType {}
+public protocol AddableType {
+    /// :nodoc:
+    init()
+}
 extension NSNumber: AddableType {}
 extension Double: AddableType {}
 extension Float: AddableType {}
@@ -58,8 +61,8 @@ extension Int64: AddableType {}
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.
 
- `Results` can be queried with the same predicates as `List<T>`, and you can chain queries to further filter query
- results.
+ `Results` can be queried with the same predicates as `List<Element>`, and you can
+ chain queries to further filter query results.
 
  `Results` always reflect the current state of the Realm on the current thread, including during write transactions on
  the current thread. The one exception to this is when using `for...in` enumeration, which will always enumerate over
@@ -75,9 +78,9 @@ extension Int64: AddableType {}
 
  Results instances cannot be directly instantiated.
  */
-public final class Results<T: Object>: NSObject, NSFastEnumeration {
+public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnumeration {
 
-    internal let rlmResults: RLMResults<RLMObject>
+    internal let rlmResults: RLMResults<AnyObject>
 
     /// A human-readable description of the objects represented by the results.
     public override var description: String {
@@ -94,7 +97,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     }
 
     /// The type of the objects described by the results.
-    public typealias Element = T
+    public typealias ElementType = Element
 
     // MARK: Properties
 
@@ -114,7 +117,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
     // MARK: Initializers
 
-    internal init(_ rlmResults: RLMResults<RLMObject>) {
+    internal init(_ rlmResults: RLMResults<AnyObject>) {
         self.rlmResults = rlmResults
     }
 
@@ -123,8 +126,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
     /**
      Returns the index of the given object in the results, or `nil` if the object is not present.
      */
-    public func index(of object: T) -> Int? {
-        return notFoundToNil(index: rlmResults.index(of: object.unsafeCastToRLMObject()))
+    public func index(of object: Element) -> Int? {
+        return notFoundToNil(index: rlmResults.index(of: object as AnyObject))
     }
 
     /**
@@ -143,7 +146,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      */
     public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
         return notFoundToNil(index: rlmResults.indexOfObject(with: NSPredicate(format: predicateFormat,
-                                                                               argumentArray: args)))
+                                                                               argumentArray: unwrapOptionals(in: args))))
     }
 
     // MARK: Object Retrieval
@@ -153,16 +156,16 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
      - parameter index: The index.
      */
-    public subscript(position: Int) -> T {
+    public subscript(position: Int) -> Element {
         throwForNegativeIndex(position)
-        return unsafeBitCast(rlmResults.object(at: UInt(position)), to: T.self)
+        return dynamicBridgeCast(fromObjectiveC: rlmResults.object(at: UInt(position)))
     }
 
     /// Returns the first object in the results, or `nil` if the results are empty.
-    public var first: T? { return unsafeBitCast(rlmResults.firstObject(), to: Optional<T>.self) }
+    public var first: Element? { return rlmResults.firstObject().map(dynamicBridgeCast) }
 
     /// Returns the last object in the results, or `nil` if the results are empty.
-    public var last: T? { return unsafeBitCast(rlmResults.lastObject(), to: Optional<T>.self) }
+    public var last: Element? { return rlmResults.lastObject().map(dynamicBridgeCast) }
 
     // MARK: KVC
 
@@ -204,8 +207,9 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
-    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<T> {
-        return Results<T>(rlmResults.objects(with: NSPredicate(format: predicateFormat, argumentArray: args)))
+    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
+        return Results<Element>(rlmResults.objects(with: NSPredicate(format: predicateFormat,
+                                                                     argumentArray: unwrapOptionals(in: args))))
     }
 
     /**
@@ -213,8 +217,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
      - parameter predicate: The predicate with which to filter the objects.
      */
-    public func filter(_ predicate: NSPredicate) -> Results<T> {
-        return Results<T>(rlmResults.objects(with: predicate))
+    public func filter(_ predicate: NSPredicate) -> Results<Element> {
+        return Results<Element>(rlmResults.objects(with: predicate))
     }
 
     // MARK: Sorting
@@ -232,26 +236,8 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      - parameter keyPath:   The key path to sort by.
      - parameter ascending: The direction to sort in.
      */
-    public func sorted(byKeyPath keyPath: String, ascending: Bool = true) -> Results<T> {
+    public func sorted(byKeyPath keyPath: String, ascending: Bool = true) -> Results<Element> {
         return sorted(by: [SortDescriptor(keyPath: keyPath, ascending: ascending)])
-    }
-
-    /**
-     Returns a `Results` containing the objects represented by the results, but sorted.
-
-     Objects are sorted based on the values of the given property. For example, to sort a collection of `Student`s from
-     youngest to oldest based on their `age` property, you might call
-     `students.sorted(byProperty: "age", ascending: true)`.
-
-     - warning: Collections may only be sorted by properties of boolean, `Date`, `NSDate`, single and double-precision
-                floating point, integer, and string types.
-
-     - parameter property:  The name of the property to sort by.
-     - parameter ascending: The direction to sort in.
-     */
-    @available(*, deprecated, renamed: "sorted(byKeyPath:ascending:)")
-    public func sorted(byProperty property: String, ascending: Bool = true) -> Results<T> {
-        return sorted(byKeyPath: property, ascending: ascending)
     }
 
     /**
@@ -264,8 +250,9 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
-    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
-        return Results<T>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
+    public func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element>
+        where S.Iterator.Element == SortDescriptor {
+            return Results<Element>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
 
     // MARK: Aggregate Operations
@@ -277,7 +264,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func min<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func min<T: MinMaxType>(ofProperty property: String) -> T? {
         return rlmResults.min(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -288,7 +275,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
      - parameter property: The name of a property whose minimum value is desired.
      */
-    public func max<U: MinMaxType>(ofProperty property: String) -> U? {
+    public func max<T: MinMaxType>(ofProperty property: String) -> T? {
         return rlmResults.max(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -299,7 +286,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
      - parameter property: The name of a property whose values should be summed.
      */
-    public func sum<U: AddableType>(ofProperty property: String) -> U {
+    public func sum<T: AddableType>(ofProperty property: String) -> T {
         return dynamicBridgeCast(fromObjectiveC: rlmResults.sum(ofProperty: property))
     }
 
@@ -310,7 +297,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
 
      - parameter property: The name of a property whose average value should be calculated.
      */
-    public func average<U: AddableType>(ofProperty property: String) -> U? {
+    public func average<T: AddableType>(ofProperty property: String) -> T? {
         return rlmResults.average(ofProperty: property).map(dynamicBridgeCast)
     }
 
@@ -342,7 +329,7 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      ```swift
      let results = realm.objects(Dog.self)
      print("dogs.count: \(dogs?.count)") // => 0
-     let token = dogs.addNotificationBlock { changes in
+     let token = dogs.observe { changes in
          switch changes {
          case .initial(let dogs):
              // Will print "dogs.count: 1"
@@ -364,14 +351,14 @@ public final class Results<T: Object>: NSObject, NSFastEnumeration {
      ```
 
      You must retain the returned token for as long as you want updates to be sent to the block. To stop receiving
-     updates, call `stop()` on the token.
+     updates, call `invalidate()` on the token.
 
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
 
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<Results>) -> Void) -> NotificationToken {
+    public func observe(_ block: @escaping (RealmCollectionChange<Results>) -> Void) -> NotificationToken {
         return rlmResults.addNotificationBlock { _, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
@@ -382,7 +369,7 @@ extension Results: RealmCollection {
     // MARK: Sequence Support
 
     /// Returns a `RLMIterator` that yields successive elements in the results.
-    public func makeIterator() -> RLMIterator<T> {
+    public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: rlmResults)
     }
 
@@ -401,7 +388,7 @@ extension Results: RealmCollection {
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
-    public func _addNotificationBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<T>>) -> Void) ->
+    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) ->
         NotificationToken {
         let anyCollection = AnyRealmCollection(self)
         return rlmResults.addNotificationBlock { _, change, error in
@@ -420,37 +407,4 @@ extension Results: AssistedObjectiveCBridgeable {
     var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (objectiveCValue: rlmResults, metadata: nil)
     }
-}
-
-// MARK: Unavailable
-
-extension Results {
-    @available(*, unavailable, renamed: "isInvalidated")
-    public var invalidated: Bool { fatalError() }
-
-    @available(*, unavailable, renamed: "index(matching:)")
-    public func index(of predicate: NSPredicate) -> Int? { fatalError() }
-
-    @available(*, unavailable, renamed: "index(matching:_:)")
-    public func index(of predicateFormat: String, _ args: AnyObject...) -> Int? { fatalError() }
-
-    @available(*, unavailable, renamed: "sorted(byKeyPath:ascending:)")
-    public func sorted(_ property: String, ascending: Bool = true) -> Results<T> { fatalError() }
-
-    @available(*, unavailable, renamed: "sorted(by:)")
-    public func sorted<S: Sequence>(_ sortDescriptors: S) -> Results<T> where S.Iterator.Element == SortDescriptor {
-        fatalError()
-    }
-
-    @available(*, unavailable, renamed: "min(ofProperty:)")
-    public func min<U: MinMaxType>(_ property: String) -> U? { fatalError() }
-
-    @available(*, unavailable, renamed: "max(ofProperty:)")
-    public func max<U: MinMaxType>(_ property: String) -> U? { fatalError() }
-
-    @available(*, unavailable, renamed: "sum(ofProperty:)")
-    public func sum<U: AddableType>(_ property: String) -> U { fatalError() }
-
-    @available(*, unavailable, renamed: "average(ofProperty:)")
-    public func average<U: AddableType>(_ property: String) -> U? { fatalError() }
 }

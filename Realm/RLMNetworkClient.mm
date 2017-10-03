@@ -118,6 +118,16 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return [authServerURL URLByAppendingPathComponent:@"auth/password"];
 }
 
+- (NSDictionary *)httpHeadersForPayload:(NSDictionary *)json {
+    NSString *authToken = [json objectForKey:kRLMSyncTokenKey];
+    if (!authToken) {
+        @throw RLMException(@"Malformed request; this indicates an internal error.");
+    }
+    NSMutableDictionary *headers = [[super httpHeadersForPayload:json] mutableCopy];
+    [headers setObject:authToken forKey:@"Authorization"];
+    return [headers copy];
+}
+
 @end
 
 @implementation RLMSyncGetUserInfoEndpoint
@@ -136,7 +146,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     NSAssert([provider isKindOfClass:[NSString class]] && [providerID isKindOfClass:[NSString class]],
              @"malformed request; this indicates a logic error in the binding.");
     NSCharacterSet *allowed = [NSCharacterSet URLQueryAllowedCharacterSet];
-    NSString *pathComponent = [NSString stringWithFormat:@"api/providers/%@/accounts/%@",
+    NSString *pathComponent = [NSString stringWithFormat:@"auth/users/%@/%@",
                                [provider stringByAddingPercentEncodingWithAllowedCharacters:allowed],
                                [providerID stringByAddingPercentEncodingWithAllowedCharacters:allowed]];
     return [authServerURL URLByAppendingPathComponent:pathComponent];

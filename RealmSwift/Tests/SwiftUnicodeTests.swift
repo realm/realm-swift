@@ -34,7 +34,7 @@ class SwiftUnicodeTests: TestCase {
         XCTAssertEqual(obj1.stringCol, utf8TestString)
 
         let obj2 = realm.objects(SwiftStringObject.self).filter("stringCol == %@", utf8TestString).first!
-        XCTAssertEqual(obj1, obj2)
+        assertEqual(obj1, obj2)
         XCTAssertEqual(obj2.stringCol, utf8TestString)
 
         XCTAssertEqual(Int(0), realm.objects(SwiftStringObject.self).filter("stringCol != %@", utf8TestString).count)
@@ -52,6 +52,6 @@ class SwiftUnicodeTests: TestCase {
             "Storing and retrieving a string with UTF8 content should work")
 
         let obj2 = realm.objects(SwiftUTF8Object.self).filter("%K == %@", "柱колоéнǢкƱаم👍", utf8TestString).first!
-        XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
+        assertEqual(obj1, obj2)
     }
 }

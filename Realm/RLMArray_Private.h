@@ -17,12 +17,16 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMArray.h>
+#import <Realm/RLMConstants.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMArray ()
 - (instancetype)initWithObjectClassName:(NSString *)objectClassName;
+- (instancetype)initWithObjectType:(RLMPropertyType)type optional:(BOOL)optional;
 - (NSString *)descriptionWithMaxDepth:(NSUInteger)depth;
 @end
+
+void RLMArrayValidateMatchingObjectType(RLMArray *array, id value);
 
 NS_ASSUME_NONNULL_END

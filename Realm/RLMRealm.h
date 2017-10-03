@@ -490,12 +490,12 @@ NS_REFINED_FOR_SWIFT;
 
  @warning This method may only be called during a write transaction.
 
- @param array   An enumerable object such as `NSArray` or `RLMResults` which contains objects to be added to
-                the Realm.
+ @param objects   An enumerable collection such as `NSArray`, `RLMArray`, or `RLMResults`,
+                  containing Realm objects to be added to the Realm.
 
  @see   `addObject:`
  */
-- (void)addObjects:(id<NSFastEnumeration>)array;
+- (void)addObjects:(id<NSFastEnumeration>)objects;
 
 /**
  Adds or updates an existing object into the Realm.
@@ -507,6 +507,10 @@ NS_REFINED_FOR_SWIFT;
  As with `addObject:`, the object cannot already be managed by a different
  Realm. Use `-[RLMObject createOrUpdateInRealm:withValue:]` to copy values to
  a different Realm.
+ 
+ If there is a property or KVC value on `object` whose value is nil, and it corresponds
+ to a nullable property on an existing object being updated, that nullable property will
+ be set to nil.
 
  @warning This method may only be called during a write transaction.
 
@@ -521,11 +525,12 @@ NS_REFINED_FOR_SWIFT;
 
  @warning This method may only be called during a write transaction.
 
- @param array  An `NSArray`, `RLMArray`, or `RLMResults` of `RLMObject`s (or subclasses) to be added to the Realm.
+ @param objects  An enumerable collection such as `NSArray`, `RLMArray`, or `RLMResults`,
+                 containing Realm objects to be added to or updated within the Realm.
 
  @see   `addOrUpdateObject:`
  */
-- (void)addOrUpdateObjectsFromArray:(id)array;
+- (void)addOrUpdateObjects:(id<NSFastEnumeration>)objects;
 
 /**
  Deletes an object from the Realm. Once the object is deleted it is considered invalidated.
@@ -543,11 +548,12 @@ NS_REFINED_FOR_SWIFT;
 
  @warning This method may only be called during a write transaction.
 
- @param array  An `RLMArray`, `NSArray`, or `RLMResults` of `RLMObject`s (or subclasses) to be deleted.
+ @param objects  An enumerable collection such as `NSArray`, `RLMArray`, or `RLMResults`,
+                 containing objects to be deleted from the Realm.
 
  @see `deleteObject:`
  */
-- (void)deleteObjects:(id)array;
+- (void)deleteObjects:(id<NSFastEnumeration>)objects;
 
 /**
  Deletes all objects from the Realm.
@@ -598,21 +604,6 @@ NS_REFINED_FOR_SWIFT;
 
  @see                 RLMMigration
  */
-+ (nullable NSError *)migrateRealm:(RLMRealmConfiguration *)configuration
-__deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR_SWIFT;
-
-/**
- Performs the given Realm configuration's migration block on a Realm at the given path.
-
- This method is called automatically when opening a Realm for the first time and does
- not need to be called explicitly. You can choose to call this method to control
- exactly when and how migrations are performed.
-
- @param configuration The Realm configuration used to open and migrate the Realm.
- @return              The error that occurred while applying the migration, if any.
-
- @see                 RLMMigration
- */
 + (BOOL)performMigrationForConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
 
 #pragma mark - Unavailable Methods
@@ -633,7 +624,12 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
  */
 + (instancetype)new __attribute__((unavailable("Use +defaultRealm, +realmWithConfiguration: or +realmWithURL:.")));
 
+/// :nodoc:
+- (void)addOrUpdateObjectsFromArray:(id)array __attribute__((unavailable("Renamed to -addOrUpdateObjects:.")));
+
 @end
+
+// MARK: - RLMNotificationToken
 
 /**
  A token which is returned from methods which subscribe to changes to a Realm.
@@ -641,12 +637,15 @@ __deprecated_msg("Use `performMigrationForConfiguration:error:`") NS_REFINED_FOR
  Change subscriptions in Realm return an `RLMNotificationToken` instance,
  which can be used to unsubscribe from the changes. You must store a strong
  reference to the token for as long as you want to continue to receive notifications.
- When you wish to stop, call the `-stop` method. Notifications are also stopped if
+ When you wish to stop, call the `-invalidate` method. Notifications are also stopped if
  the token is deallocated.
  */
 @interface RLMNotificationToken : NSObject
 /// Stops notifications for the change subscription that returned this token.
-- (void)stop;
+- (void)invalidate;
+
+/// Stops notifications for the change subscription that returned this token.
+- (void)stop __attribute__((unavailable("Renamed to -invalidate.")));;
 @end
 
 NS_ASSUME_NONNULL_END

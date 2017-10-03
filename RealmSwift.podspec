@@ -1,6 +1,7 @@
 Pod::Spec.new do |s|
   s.name                      = 'RealmSwift'
-  s.version                   = `sh build.sh get-version`
+  version                     = `sh build.sh get-version`
+  s.version                   = version
   s.summary                   = 'Realm is a modern data framework & database for iOS, macOS, tvOS & watchOS.'
   s.description               = <<-DESC
                                 The Realm Mobile Database, for Swift. (If you want to use Realm from Objective-C, see the “Realm” pod.)
@@ -12,7 +13,8 @@ Pod::Spec.new do |s|
   s.author                    = { 'Realm' => 'help@realm.io' }
   s.requires_arc              = true
   s.social_media_url          = 'https://twitter.com/realm'
-  s.documentation_url         = "https://realm.io/docs/swift/#{s.version}"
+  has_versioned_docs          = !(version =~ /alpha|beta|rc/)
+  s.documentation_url         = "https://realm.io/docs/swift/#{has_versioned_docs ? s.version : 'latest'}"
   s.license                   = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
   s.dependency 'Realm', "= #{s.version}"

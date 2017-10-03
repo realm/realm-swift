@@ -16,13 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
 #import <Realm/RLMCollection.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMObject, RLMRealm, RLMResults<RLMObjectType: RLMObject *>, RLMNotificationToken;
+@class RLMObject, RLMResults<RLMObjectType>;
 
 /**
  `RLMArray` is the container type in Realm used to define to-many relationships.
@@ -57,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
  object. Instead, you can call the mutation methods on the `RLMArray` directly.
  */
 
-@interface RLMArray<RLMObjectType: RLMObject *> : NSObject<RLMCollection, NSFastEnumeration>
+@interface RLMArray<RLMObjectType> : NSObject<RLMCollection, NSFastEnumeration>
 
 #pragma mark - Properties
 
@@ -67,9 +65,21 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, assign) NSUInteger count;
 
 /**
- The class name (i.e. type) of the `RLMObject`s contained in the array.
+ The type of the objects in the array.
  */
-@property (nonatomic, readonly, copy) NSString *objectClassName;
+@property (nonatomic, readonly, assign) RLMPropertyType type;
+
+/**
+ Indicates whether the objects in the collection can be `nil`.
+ */
+@property (nonatomic, readonly, getter = isOptional) BOOL optional;
+
+/**
+ The class name  of the objects contained in the array.
+
+ Will be `nil` if `type` is not RLMPropertyTypeObject.
+ */
+@property (nonatomic, readonly, copy, nullable) NSString *objectClassName;
 
 /**
  The Realm which manages the array. Returns `nil` for unmanaged arrays.
@@ -88,7 +98,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param index   The index to look up.
 
- @return An `RLMObject` of the type contained in the array.
+ @return An object of the type contained in the array.
  */
 - (RLMObjectType)objectAtIndex:(NSUInteger)index;
 
@@ -97,7 +107,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty array.
 
- @return An `RLMObject` of the type contained in the array.
+ @return An object of the type contained in the array.
  */
 - (nullable RLMObjectType)firstObject;
 
@@ -106,7 +116,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  Returns `nil` if called on an empty array.
 
- @return An `RLMObject` of the type contained in the array.
+ @return An object of the type contained in the array.
  */
 - (nullable RLMObjectType)lastObject;
 
@@ -119,7 +129,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning This method may only be called during a write transaction.
 
- @param object  An `RLMObject` of the type contained in the array.
+ @param object  An object of the type contained in the array.
  */
 - (void)addObject:(RLMObjectType)object;
 
@@ -140,7 +150,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning This method may only be called during a write transaction.
 
- @param anObject  An `RLMObject` of the type contained in the array.
+ @param anObject  An object of the type contained in the array.
  @param index   The index at which to insert the object.
  */
 - (void)insertObject:(RLMObjectType)anObject atIndex:(NSUInteger)index;
@@ -158,6 +168,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Removes the last object in the array.
+
+ This is a no-op if the array is already empty.
 
  @warning This method may only be called during a write transaction.
 */
@@ -272,17 +284,6 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns a sorted `RLMResults` from the array.
 
- @param property    The property name to sort by.
- @param ascending   The direction to sort in.
-
- @return    An `RLMResults` sorted by the specified property.
- */
-- (RLMResults<RLMObjectType> *)sortedResultsUsingProperty:(NSString *)property ascending:(BOOL)ascending
-    __deprecated_msg("Use `-sortedResultsUsingKeyPath:ascending:`");
-
-/**
- Returns a sorted `RLMResults` from the array.
-
  @param properties  An array of `RLMSortDescriptor`s to sort by.
 
  @return    An `RLMResults` sorted by the specified properties.
@@ -342,7 +343,7 @@ NS_ASSUME_NONNULL_BEGIN
      // end of run loop execution context
 
  You must retain the returned token for as long as you want updates to continue
- to be sent to the block. To stop receiving updates, call `-stop` on the token.
+ to be sent to the block. To stop receiving updates, call `-invalidate` on the token.
 
  @warning This method cannot be called during a write transaction, or when the
           containing Realm is read-only.

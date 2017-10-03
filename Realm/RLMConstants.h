@@ -69,19 +69,17 @@ typedef NS_ENUM(int32_t, RLMPropertyType) {
     /**
      Any object: `id`.
 
-     This property type is no longer supported for new models. However, old models with any-typed properties are still
-     supported for migration purposes.
+     This property type is no longer supported for new models. However, old files
+     with any-typed properties are still supported for migration purposes.
      */
     RLMPropertyTypeAny    = 9,
     /** Dates: `NSDate` */
     RLMPropertyTypeDate   = 4,
 
-#pragma mark - Array/Linked object types
+#pragma mark - Linked object types
 
     /** Realm model objects. See [Realm Models](https://realm.io/docs/objc/latest/#models) for more information. */
     RLMPropertyTypeObject = 7,
-    /** Realm arrays. See [Realm Models](https://realm.io/docs/objc/latest/#models) for more information. */
-    RLMPropertyTypeArray  = 128,
     /** Realm linking objects. See [Realm Models](https://realm.io/docs/objc/latest/#models) for more information. */
     RLMPropertyTypeLinkingObjects = 8,
 };
@@ -145,6 +143,15 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMError, RLMErrorDomain) {
 
     /** Denotes an error that occurs if there is a schema version mismatch, so that a migration is required. */
     RLMErrorSchemaMismatch = 10,
+
+    /** Denotes an error that occurs when attempting to open an incompatible synchronized Realm file.
+
+     This error occurs when the Realm file was created with an older version of Realm and an automatic migration
+     to the current version is not possible. When such an error occurs, the original file is moved to a backup
+     location, and future attempts to open the synchronized Realm will result in a new file being created.
+     If you wish to migrate any data from the backup Realm, you can open it using the provided Realm configuration.
+     */
+    RLMErrorIncompatibleSyncedFile = 11,
 };
 
 #pragma mark - Constants
@@ -182,6 +189,11 @@ RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(RLMRealmRefreshRequiredNotification, 
  */
 extern RLMNotification const RLMRealmDidChangeNotification
 RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(RLMRealmDidChangeNotification, DidChange);
+
+#pragma mark - Error keys
+
+/** Key to identify the associated backup Realm configuration in an error's `userInfo` dictionary */
+extern NSString * const RLMBackupRealmConfigurationErrorKey;
 
 #pragma mark - Other Constants
 

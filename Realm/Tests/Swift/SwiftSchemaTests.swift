@@ -39,7 +39,7 @@ class SwiftLinkedNonDefaultObject: RLMObject {
 }
 
 class SwiftNonDefaultArrayObject: RLMObject {
-    @objc dynamic var array = RLMArray(objectClassName: SwiftNonDefaultObject.className())
+    @objc dynamic var array = RLMArray<SwiftNonDefaultObject>(objectClassName: SwiftNonDefaultObject.className())
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }

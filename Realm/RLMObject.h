@@ -28,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMPropertyChange;
 @class RLMPropertyDescriptor;
 @class RLMRealm;
-@class RLMResults;
+@class RLMResults<RLMObjectType>;
 
 /**
  `RLMObject` is a base class for model objects representing data stored in Realms.
@@ -350,7 +350,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (RLMResults *)objectsWhere:(NSString *)predicateFormat, ...;
 
 /// :nodoc:
-+ (RLMResults *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
++ (RLMResults<__kindof RLMObject *> *)objectsWhere:(NSString *)predicateFormat args:(va_list)args;
 
 
 /**
@@ -399,7 +399,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat, ...;
 
 /// :nodoc:
-+ (RLMResults *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args;
++ (RLMResults<__kindof RLMObject *> *)objectsInRealm:(RLMRealm *)realm where:(NSString *)predicateFormat args:(va_list)args;
 
 /**
  Returns all objects of this object type matching the given predicate from the specified Realm.
@@ -469,7 +469,7 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
 
  Only objects which are managed by a Realm can be observed in this way. You
  must retain the returned token for as long as you want updates to be sent to
- the block. To stop receiving updates, call `stop` on the token.
+ the block. To stop receiving updates, call `-invalidate` on the token.
 
  It is safe to capture a strong reference to the observed object within the
  callback block. There is no retain cycle due to that the callback is retained
@@ -489,8 +489,8 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
  Returns YES if another Realm object instance points to the same object as the receiver in the Realm managing
  the receiver.
 
- For object types with a primary, key, `isEqual:` is overridden to use this method (along with a corresponding
- implementation for `hash`).
+ For object types with a primary, key, `isEqual:` is overridden to use the same logic as this
+ method (along with a corresponding implementation for `hash`).
 
  @param object  The object to compare the receiver to.
 
