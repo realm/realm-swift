@@ -428,7 +428,11 @@ public class ObjectUtil: NSObject {
         // one named 'x', and another that is optional and is named 'x.storage'. Note
         // that '.' is illegal in either a Swift or Objective-C property name.
         if let storageRange = name.range(of: ".storage", options: [.anchored, .backwards]) {
-            return name.substring(to: storageRange.lowerBound)
+            #if swift(>=4.0)
+                return String(name[..<storageRange.lowerBound])
+            #else
+                return name.substring(to: storageRange.lowerBound)
+            #endif
         }
         return nil
     }
