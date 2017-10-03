@@ -37,7 +37,7 @@ NSError *translate_permission_exception_to_error(std::exception_ptr ptr, bool ge
     NSError *error = nil;
     try {
         std::rethrow_exception(ptr);
-    } catch (PermissionChangeException const& ex) {
+    } catch (PermissionActionException const& ex) {
         error = (get
                  ? make_permission_error_get(@(ex.what()), ex.code)
                  : make_permission_error_change(@(ex.what()), ex.code));

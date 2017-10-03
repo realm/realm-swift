@@ -17,43 +17,12 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncPermission_Private.hpp"
+#import "RLMSyncUtil_Private.hpp"
 
 #import "RLMUtil.hpp"
 
 using namespace realm;
 using ConditionType = Permission::Condition::Type;
-
-namespace {
-
-Permission::AccessLevel accessLevelForObjcAccessLevel(RLMSyncAccessLevel level) {
-    switch (level) {
-        case RLMSyncAccessLevelNone:
-            return Permission::AccessLevel::None;
-        case RLMSyncAccessLevelRead:
-            return Permission::AccessLevel::Read;
-        case RLMSyncAccessLevelWrite:
-            return Permission::AccessLevel::Write;
-        case RLMSyncAccessLevelAdmin:
-            return Permission::AccessLevel::Admin;
-    }
-    REALM_UNREACHABLE();
-}
-
-RLMSyncAccessLevel objCAccessLevelForAccessLevel(Permission::AccessLevel level) {
-    switch (level) {
-        case Permission::AccessLevel::None:
-            return RLMSyncAccessLevelNone;
-        case Permission::AccessLevel::Read:
-            return RLMSyncAccessLevelRead;
-        case Permission::AccessLevel::Write:
-            return RLMSyncAccessLevelWrite;
-        case Permission::AccessLevel::Admin:
-            return RLMSyncAccessLevelAdmin;
-    }
-    REALM_UNREACHABLE();
-}
-
-}
 
 #pragma mark - Permission
 
