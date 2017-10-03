@@ -291,7 +291,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
                         may be the URL of any Realm which you are allowed to manage. If the URL
                         has a `~` wildcard it will be replaced with your user identity.
  @param accessLevel     What access level to grant to whoever accepts the token.
- @param expiration      Optionally, a date which indicates when the offer expires. If the
+ @param expirationDate  Optionally, a date which indicates when the offer expires. If the
                         recepient attempts to accept the offer after the date it will be rejected.
  @param callback        A callback indicating whether the operation succeeded or failed. If it
                         succeeded the token will be passed in as a string.

@@ -45,6 +45,17 @@ CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user);
 realm::AccessLevel accessLevelForObjcAccessLevel(RLMSyncAccessLevel level);
 RLMSyncAccessLevel objCAccessLevelForAccessLevel(realm::AccessLevel level);
 
+#pragma mark - Error conversion
+
+typedef enum : NSUInteger {
+    RLMPermissionActionTypeGet,
+    RLMPermissionActionTypeChange,
+    RLMPermissionActionTypeOffer,
+    RLMPermissionActionTypeAcceptOffer,
+} RLMPermissionActionType;
+
+NSError *translateSyncExceptionPtrToError(std::exception_ptr ptr, RLMPermissionActionType type);
+
 #pragma mark - Error construction
 
 NSError *make_auth_error_bad_response(NSDictionary *json=nil);

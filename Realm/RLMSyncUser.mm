@@ -38,45 +38,12 @@
 using namespace realm;
 using ConfigMaker = std::function<Realm::Config(std::shared_ptr<SyncUser>, std::string)>;
 
-typedef enum : NSUInteger {
-    RLMPermissionActionTypeGet,
-    RLMPermissionActionTypeChange,
-    RLMPermissionActionTypeOffer,
-    RLMPermissionActionTypeAcceptOffer,
-} RLMPermissionActionType;
-
 namespace {
-
-NSError *translateExceptionPtrToError(std::exception_ptr ptr, RLMPermissionActionType type) {
-    NSError *error = nil;
-    try {
-        std::rethrow_exception(ptr);
-    } catch (PermissionActionException const& ex) {
-        switch (type) {
-            case RLMPermissionActionTypeGet:
-                error = make_permission_error_get(@(ex.what()), ex.code);
-                break;
-            case RLMPermissionActionTypeChange:
-                error = make_permission_error_change(@(ex.what()), ex.code);
-                break;
-            case RLMPermissionActionTypeOffer:
-                error = make_permission_error_offer(@(ex.what()), ex.code);
-                break;
-            case RLMPermissionActionTypeAcceptOffer:
-                error = make_permission_error_accept_offer(@(ex.what()), ex.code);
-                break;
-        }
-    }
-    catch (const std::exception &exp) {
-        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), &error);
-    }
-    return error;
-}
 
 std::function<void(Results, std::exception_ptr)> RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock callback) {
     return [callback](Results results, std::exception_ptr ptr) {
         if (ptr) {
-            NSError *error = translateExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeGet);
+            NSError *error = translateSyncExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeGet);
             REALM_ASSERT(error);
             callback(nil, error);
         } else {
@@ -134,7 +101,7 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
 PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBlock callback) {
     return [callback](std::exception_ptr ptr) {
         if (ptr) {
-            NSError *error = translateExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeChange);
+            NSError *error = translateSyncExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeChange);
             REALM_ASSERT(error);
             callback(error);
         } else {
@@ -411,7 +378,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     }
     auto cb = [callback](util::Optional<std::string> token, std::exception_ptr ptr) {
         if (ptr) {
-            NSError *error = translateExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeOffer);
+            NSError *error = translateSyncExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeOffer);
             REALM_ASSERT(error);
             callback(nil, error);
         } else {
@@ -435,7 +402,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     }
     auto cb = [callback](util::Optional<std::string> raw_url, std::exception_ptr ptr) {
         if (ptr) {
-            NSError *error = translateExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeAcceptOffer);
+            NSError *error = translateSyncExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeAcceptOffer);
             REALM_ASSERT(error);
             callback(nil, error);
         } else {

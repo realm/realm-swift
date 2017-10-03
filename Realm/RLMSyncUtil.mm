@@ -24,6 +24,7 @@
 #import "RLMSyncUser_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
+#import "RLMUtil.hpp"
 
 #import "shared_realm.hpp"
 
@@ -88,6 +89,32 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy) {
         case SyncSessionStopPolicy::AfterChangesUploaded:   return RLMSyncStopPolicyAfterChangesUploaded;
     }
     REALM_UNREACHABLE();
+}
+
+NSError *translateSyncExceptionPtrToError(std::exception_ptr ptr, RLMPermissionActionType type) {
+    NSError *error = nil;
+    try {
+        std::rethrow_exception(ptr);
+    } catch (PermissionActionException const& ex) {
+        switch (type) {
+            case RLMPermissionActionTypeGet:
+                error = make_permission_error_get(@(ex.what()), ex.code);
+                break;
+            case RLMPermissionActionTypeChange:
+                error = make_permission_error_change(@(ex.what()), ex.code);
+                break;
+            case RLMPermissionActionTypeOffer:
+                error = make_permission_error_offer(@(ex.what()), ex.code);
+                break;
+            case RLMPermissionActionTypeAcceptOffer:
+                error = make_permission_error_accept_offer(@(ex.what()), ex.code);
+                break;
+        }
+    }
+    catch (const std::exception &exp) {
+        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), &error);
+    }
+    return error;
 }
 
 std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
