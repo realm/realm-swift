@@ -248,110 +248,59 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
     // MARK: - Offer/response
 
     func testPermissionOffer() {
-        do {
-            _ = try synchronouslyOpenRealm(url: realmURL, user: userA)
+        _ = try! synchronouslyOpenRealm(url: realmURL, user: userA)
+        var token: String?
 
-            let managementRealm = try userA.managementRealm()
-            let permissionOffer = SyncPermissionOffer(realmURL: tildeSubstitutedURL(for: realmURL, user: userA).absoluteString,
-                                                      expiresAt: Date(timeIntervalSinceNow: 30 * 24 * 60 * 60),
-                                                      mayRead: true,
-                                                      mayWrite: true,
-                                                      mayManage: false)
-
-            let exp = expectation(description: "A new permission offer will be processed by the server")
-
-            let results = managementRealm.objects(SyncPermissionOffer.self).filter("id = %@", permissionOffer.id)
-            let notificationToken = results.observe { (changes) in
-                if case .update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
-                    XCTAssertEqual(statusCode, 0)
-                    XCTAssertEqual(change[0].status, .success)
-                    exp.fulfill()
-                }
-            }
-
-            try managementRealm.write {
-                managementRealm.add(permissionOffer)
-            }
-
-            waitForExpectations(timeout: 2)
-            notificationToken.invalidate()
-        } catch {
-            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        // Create an offer.
+        let ex = expectation(description: "A new permission offer will be processed by the server.")
+        userA.createOfferForRealm(at: realmURL, accessLevel: .write) { (t, error) in
+            XCTAssertNil(error)
+            XCTAssertNotNil(t)
+            token = t
+            ex.fulfill()
         }
+        waitForExpectations(timeout: 10.0, handler: nil)
+        XCTAssertGreaterThan(token!.lengthOfBytes(using: .utf8), 0)
     }
 
     func testPermissionOfferResponse() {
+        _ = try! synchronouslyOpenRealm(url: realmURL, user: userA)
+        var token: String?
+
+        // Create an offer.
+        let ex = expectation(description: "A new permission offer will be processed by the server.")
+        userA.createOfferForRealm(at: realmURL, accessLevel: .write) { (t, error) in
+            XCTAssertNil(error)
+            XCTAssertNotNil(t)
+            token = t
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 10.0, handler: nil)
+        guard let theToken = token else {
+            XCTFail("We expected an offer token, but did not get one. Aborting the test.")
+            return
+        }
+        XCTAssertGreaterThan(theToken.lengthOfBytes(using: .utf8), 0)
+
+        // Accept the offer.
+        let ex2 = expectation(description: "A permission offer response will be processed by the server.")
+        var url: URL?
+        userB.acceptOffer(forToken: theToken) { (u, error) in
+            XCTAssertNil(error)
+            XCTAssertNotNil(u)
+            url = u
+            ex2.fulfill()
+        }
+        waitForExpectations(timeout: 10.0, handler: nil)
+        guard let theURL = url else {
+            XCTFail("We expected a Realm URL, but did not get one. Aborting the test.")
+            return
+        }
+        XCTAssertEqual(theURL.path, tildeSubstitutedURL(for: realmURL, user: userA).path)
         do {
-            _ = try synchronouslyOpenRealm(url: realmURL, user: userA)
-
-            var managementRealm = try userA.managementRealm()
-            let permissionOffer = SyncPermissionOffer(realmURL: tildeSubstitutedURL(for: realmURL, user: userA).absoluteString,
-                                                      expiresAt: Date(timeIntervalSinceNow: 30 * 24 * 60 * 60),
-                                                      mayRead: true,
-                                                      mayWrite: true,
-                                                      mayManage: false)
-
-            var permissionToken: String?
-
-            var exp = expectation(description: "A new permission offer will be processed by the server")
-
-            let permissionOfferNotificationToken = managementRealm
-                .objects(SyncPermissionOffer.self)
-                .filter("id = %@", permissionOffer.id)
-                .observe { (changes) in
-                    if case .update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
-                        XCTAssertEqual(statusCode, 0)
-                        XCTAssertEqual(change[0].status, .success)
-
-                        permissionToken = change[0].token
-                        exp.fulfill()
-                    }
-            }
-
-            try managementRealm.write {
-                managementRealm.add(permissionOffer)
-            }
-
-            waitForExpectations(timeout: 2)
-            permissionOfferNotificationToken.invalidate()
-
-            _ = try synchronouslyOpenRealm(url: realmURL, user: userB)
-
-            managementRealm = try userB.managementRealm()
-
-            XCTAssertNotNil(permissionToken)
-
-            var responseRealmUrl: String?
-            let permissionOfferResponse = SyncPermissionOfferResponse(token: permissionToken!)
-
-            exp = expectation(description: "A new permission offer response will be processed by the server")
-
-            let userAIdentity = userA.identity!
-            let permissionOfferResponseNotificationToken = managementRealm
-                .objects(SyncPermissionOfferResponse.self)
-                .filter("id = %@", permissionOfferResponse.id)
-                .observe { (changes) in
-                    if case .update(let change, _, _, _) = changes, let statusCode = change[0].statusCode.value {
-                        XCTAssertEqual(statusCode, 0)
-                        XCTAssertEqual(change[0].status, .success)
-                        XCTAssertEqual(change[0].realmUrl, String(format: "realm://localhost:9080/%@/testBasicSync", userAIdentity))
-
-                        responseRealmUrl = change[0].realmUrl
-
-                        exp.fulfill()
-                    }
-            }
-
-            try managementRealm.write {
-                managementRealm.add(permissionOfferResponse)
-            }
-
-            waitForExpectations(timeout: 2)
-            permissionOfferResponseNotificationToken.invalidate()
-
-            _ = try synchronouslyOpenRealm(url: URL(string: responseRealmUrl!)!, user: userB)
+            _ = try synchronouslyOpenRealm(url: theURL, user: userB)
         } catch {
-            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+            XCTFail("Was not able to successfully open the Realm with user B after accepting the offer.")
         }
     }
 }

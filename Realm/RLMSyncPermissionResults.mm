@@ -33,21 +33,6 @@ using namespace realm;
 
 namespace {
 
-NSError *translate_permission_exception_to_error(std::exception_ptr ptr, bool get) {
-    NSError *error = nil;
-    try {
-        std::rethrow_exception(ptr);
-    } catch (PermissionChangeException const& ex) {
-        error = (get
-                 ? make_permission_error_get(@(ex.what()), ex.code)
-                 : make_permission_error_change(@(ex.what()), ex.code));
-    }
-    catch (const std::exception &exp) {
-        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), &error);
-    }
-    return error;
-}
-
 bool keypath_is_valid(NSString *keypath)
 {
     static NSSet<NSString *> *valid = nil;
@@ -154,7 +139,7 @@ RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated    = @"
                                                         NSError *error))block {
     auto cb = [=](const realm::CollectionChangeSet& changes, std::exception_ptr ptr) {
         if (ptr) {
-            NSError *error = translate_permission_exception_to_error(std::move(ptr), true);
+            NSError *error = translateSyncExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeGet);
             REALM_ASSERT(error);
             block(nil, nil, error);
         } else {

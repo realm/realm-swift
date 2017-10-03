@@ -35,6 +35,13 @@ public typealias SyncUser = RLMSyncUser
 public typealias SyncUserInfo = RLMSyncUserInfo
 
 /**
+ An immutable data object representing an account belonging to a particular user.
+
+ - see: `SyncUserInfo`, `RLMSyncUserAccountInfo`
+ */
+public typealias SyncUserAccountInfo = RLMSyncUserAccountInfo
+
+/**
  A singleton which configures and manages the Realm Object Server synchronization-related
  functionality.
 
@@ -160,13 +167,6 @@ public typealias SyncPermissionError = RLMSyncPermissionError
  - see: `RLMSyncLogLevel`
  */
 public typealias SyncLogLevel = RLMSyncLogLevel
-
-/**
- An enum representing the different states a sync management object can take.
-
- - see: `RLMSyncManagementObjectStatus`
- */
-public typealias SyncManagementObjectStatus = RLMSyncManagementObjectStatus
 
 /**
  A data type whose values represent different authentication providers that can be used with
@@ -378,7 +378,18 @@ extension SyncUser {
     }
 
     /**
-     Retrieve permissions for a user.
+     Retrieve permissions for this user. Permissions describe which synchronized
+     Realms this user has access to and what they are allowed to do with them.
+
+     Permissions are retrieved asynchronously and returned via the callback. The
+     callback is run on the same thread that the method is invoked upon.
+
+     - warning: This method must be invoked on a thread with an active run loop.
+
+     - warning: Do not pass the `Results` returned by the callback between threads.
+
+     - parameter callback: A callback providing either a `Results` containing the
+                           permissions, or an error describing what went wrong.
      */
     public func retrievePermissions(callback: @escaping (SyncPermissionResults?, SyncPermissionError?) -> Void) {
         self.__retrievePermissions { (results, error) in
@@ -392,14 +403,36 @@ extension SyncUser {
     }
 
     /**
-     Returns an instance of the Management Realm owned by the user.
+     Create a permission offer for a Realm.
 
-     This Realm can be used to grant other users access to Realms managed by this user.
+     A permission offer is used to grant access to a Realm this user manages to another
+     user. Creating a permission offer produces a string token which can be passed to the
+     recepient in any suitable way (for example, via e-mail).
+
+     The operation will take place asynchronously. The token can be accepted by the recepient
+     using the `SyncUser.acceptOffer(forToken:, callback:)` method.
+
+     - parameter url: The URL of the Realm for which the permission offer should pertain. This
+                      may be the URL of any Realm which this user is allowed to manage. If the URL
+                      has a `~` wildcard it will be replaced with this user's user identity.
+     - parameter accessLevel: What access level to grant to whoever accepts the token.
+     - parameter expiration: Optionally, a date which indicates when the offer expires. If the
+                             recepient attempts to accept the offer after the date it will be rejected.
+                             If nil, the offer will never expire.
+     - parameter callback: A callback indicating whether the operation succeeded or failed. If it
+                           succeeded the token will be passed in as a string.
      */
-    public func managementRealm() throws -> Realm {
-        var config = Realm.Configuration.fromRLMRealmConfiguration(.managementConfiguration(for: self))
-        config.objectTypes = [SyncPermissionOffer.self, SyncPermissionOfferResponse.self, _SyncPermissionChange.self]
-        return try Realm(configuration: config)
+    public func createOfferForRealm(at url: URL,
+                                    accessLevel: SyncAccessLevel,
+                                    expiration: Date? = nil,
+                                    callback: @escaping (String?, SyncPermissionError?) -> Void) {
+        self.__createOfferForRealm(at: url, accessLevel: accessLevel, expiration: expiration) { (token, error) in
+            guard let token = token else {
+                callback(nil, error as! SyncPermissionError?)
+                return
+            }
+            callback(token, nil)
+        }
     }
 }
 
@@ -418,183 +451,6 @@ public typealias SyncPermission = RLMSyncPermission
  - see: `RLMSyncAccessLevel`
  */
 public typealias SyncAccessLevel = RLMSyncAccessLevel
-
-// swiftlint:disable type_name
-/// :nodoc:
-public final class _SyncPermissionChange: Object {
-    @objc dynamic public var id = UUID().uuidString
-    @objc dynamic public var createdAt = Date()
-    @objc dynamic public var updatedAt = Date()
-    public let statusCode = RealmOptional<Int>()
-    @objc dynamic public var statusMessage: String?
-    @objc dynamic public var userId = ""
-    @objc dynamic public var metadataKey: String?
-    @objc dynamic public var metadataValue: String?
-    @objc dynamic public var metadataNameSpace: String?
-    @objc dynamic public var realmUrl = ""
-    public let mayRead = RealmOptional<Bool>()
-    public let mayWrite = RealmOptional<Bool>()
-    public let mayManage = RealmOptional<Bool>()
-    override public class func primaryKey() -> String? { return "id" }
-    override public class func shouldIncludeInDefaultSchema() -> Bool { return false }
-    override public class func _realmObjectName() -> String? { return "PermissionChange" }
-}
-
-/**
- This model is used for offering permission changes to other users.
-
- It should be used in conjunction with a `SyncUser`'s Management Realm.
-
- See https://realm.io/docs/realm-object-server/#permissions for general
- documentation.
- */
-public final class SyncPermissionOffer: Object {
-    /// The globally unique ID string of this permission offer object.
-    @objc public dynamic var id = UUID().uuidString
-    /// The date this object was initially created.
-    @objc public dynamic var createdAt = Date()
-    /// The date this object was last modified.
-    @objc public dynamic var updatedAt = Date()
-
-    /// The status code of the object that was processed by Realm Object Server.
-    public let statusCode = RealmOptional<Int>()
-    /// An error or informational message, typically written to by the Realm Object Server.
-    @objc public dynamic var statusMessage: String?
-
-    /// Sync management object status.
-    public var status: SyncManagementObjectStatus {
-        return SyncManagementObjectStatus(statusCode: statusCode)
-    }
-    /// A token which uniquely identifies this offer. Generated by the server.
-    @objc public dynamic var token: String?
-    /// The remote URL to the realm.
-    @objc public dynamic var realmUrl = ""
-
-    /// Whether this offer allows the receiver to read from the Realm.
-    @objc public dynamic var mayRead = false
-    /// Whether this offer allows the receiver to write to the Realm.
-    @objc public dynamic var mayWrite = false
-    /// Whether this offer allows the receiver to manage the access rights for others.
-    @objc public dynamic var mayManage = false
-
-    /// When this token will expire and become invalid.
-    @objc public dynamic var expiresAt: Date?
-
-    /**
-     Construct a permission offer object used to offer permission changes to other users.
-
-     - parameter realmURL:  The URL to the Realm on which to apply these permission changes
-                            to, once the offer is accepted.
-     - parameter expiresAt: When this token will expire and become invalid.
-                            Pass `nil` if this offer should not expire.
-     - parameter mayRead:   Grant or revoke read access.
-     - parameter mayWrite:  Grant or revoked read-write access.
-     - parameter mayManage: Grant or revoke administrative access.
-     */
-    public convenience init(realmURL: String, expiresAt: Date?, mayRead: Bool, mayWrite: Bool, mayManage: Bool) {
-        self.init()
-        self.realmUrl = realmURL
-        self.expiresAt = expiresAt
-        self.mayRead = mayRead
-        self.mayWrite = mayWrite
-        self.mayManage = mayManage
-    }
-
-    /// :nodoc:
-    override public class func indexedProperties() -> [String] {
-        return ["token"]
-    }
-
-    /// :nodoc:
-    override public class func primaryKey() -> String? {
-        return "id"
-    }
-
-    /// :nodoc:
-    override public class func shouldIncludeInDefaultSchema() -> Bool {
-        return false
-    }
-
-    /// :nodoc:
-    override public class func _realmObjectName() -> String? {
-        return "PermissionOffer"
-    }
-}
-
-/**
- This model is used to apply permission changes defined in the permission offer
- object represented by the specified token, which was created by another user's
- `SyncPermissionOffer` object.
-
- It should be used in conjunction with a `SyncUser`'s Management Realm.
-
- See https://realm.io/docs/realm-object-server/#permissions for general
- documentation.
- */
-public final class SyncPermissionOfferResponse: Object {
-    /// The globally unique ID string of this permission offer response object.
-    @objc public dynamic var id = UUID().uuidString
-    /// The date this object was initially created.
-    @objc public dynamic var createdAt = Date()
-    /// The date this object was last modified.
-    @objc public dynamic var updatedAt = Date()
-
-    /// The status code of the object that was processed by Realm Object Server.
-    public let statusCode = RealmOptional<Int>()
-    /// An error or informational message, typically written to by the Realm Object Server.
-    @objc public dynamic var statusMessage: String?
-
-    /// Sync management object status.
-    public var status: SyncManagementObjectStatus {
-        return SyncManagementObjectStatus(statusCode: statusCode)
-    }
-    /// The received token which uniquely identifies another user's `SyncPermissionOffer`.
-    @objc public dynamic var token = ""
-    /// The remote URL to the realm on which these permission changes were applied.
-    @objc public dynamic var realmUrl: String?
-
-    /**
-     Construct a permission offer response object used to apply permission changes
-     defined in the permission offer object represented by the specified token,
-     which was created by another user's `SyncPermissionOffer` object.
-
-     - parameter token: The received token which uniquely identifies another user's
-                        `SyncPermissionOffer`.
-     */
-    public convenience init(token: String) {
-        self.init()
-        self.token = token
-    }
-
-    /// :nodoc:
-    override public class func primaryKey() -> String? {
-        return "id"
-    }
-
-    /// :nodoc:
-    override public class func shouldIncludeInDefaultSchema() -> Bool {
-        return false
-    }
-
-    /// :nodoc:
-    override public class func _realmObjectName() -> String? {
-        return "PermissionOfferResponse"
-    }
-}
-
-fileprivate extension SyncManagementObjectStatus {
-    fileprivate init(statusCode: RealmOptional<Int>) {
-        guard let statusCode = statusCode.value else {
-            self = .notProcessed
-            return
-        }
-        if statusCode == 0 {
-            self = .success
-        } else {
-            self = .error
-        }
-    }
-}
 
 public extension SyncSession {
     /**
@@ -746,19 +602,7 @@ extension Realm {
 
 // MARK: - Permissions and permission results
 
-extension SyncPermission : RealmCollectionValue {
-    #if os(OSX)
-    /// :nodoc:
-    open override static func className() -> String {
-        return NSStringFromClass(SyncPermission.self)
-    }
-    #else
-    /// :nodoc:
-    open static func className() -> String {
-        return NSStringFromClass(SyncPermission.self)
-    }
-    #endif
-}
+extension SyncPermission : RealmCollectionValue { }
 
 /**
  A `Results` collection containing sync permission results.

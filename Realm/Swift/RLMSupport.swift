@@ -122,15 +122,6 @@ extension RLMSyncUser {
                        callbackQueue: queue,
                        onCompletion: completion)
     }
-
-    public func managementRealm() throws -> RLMRealm {
-        var error: NSError?
-        let realm = __managementRealmWithError(&error)
-        if let error = error {
-            throw error
-        }
-        return realm
-    }
 }
 
 extension RLMSyncSession {

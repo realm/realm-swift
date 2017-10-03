@@ -24,84 +24,12 @@
 #import "RLMSyncUser_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
-#import "RLMSyncPermissionOffer.h"
-#import "RLMSyncPermissionOfferResponse.h"
+#import "RLMUtil.hpp"
 
 #import "shared_realm.hpp"
 
+#import "sync/sync_permission.hpp"
 #import "sync/sync_user.hpp"
-
-static RLMRealmConfiguration *RLMRealmSpecialPurposeConfiguration(RLMSyncUser *user, NSString *realmName) {
-    NSURLComponents *components = [NSURLComponents componentsWithURL:user.authenticationServer resolvingAgainstBaseURL:NO];
-    if ([components.scheme isEqualToString:@"https"]) {
-        components.scheme = @"realms";
-    } else {
-        components.scheme = @"realm";
-    }
-    components.path = [NSString stringWithFormat:@"/~/%@", realmName];
-    NSURL *realmURL = components.URL;
-    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:realmURL];
-    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
-    config.syncConfiguration = syncConfig;
-    return config;
-}
-
-// FIXME: get rid of this shim
-@interface RLMSyncPermissionChange : RLMObject
-@property NSString *id;
-@property NSDate *createdAt;
-@property NSDate *updatedAt;
-@property NSNumber<RLMInt> *statusCode;
-@property NSString *statusMessage;
-@property NSString *userId;
-@property NSString *metadataKey;
-@property NSString *metadataValue;
-@property NSString *metadataNameSpace;
-@property NSString *realmUrl;
-@property NSNumber<RLMBool> *mayRead;
-@property NSNumber<RLMBool> *mayWrite;
-@property NSNumber<RLMBool> *mayManage;
-@end
-
-@implementation RLMSyncPermissionChange
-
-+ (NSArray<NSString *> *)requiredProperties {
-    return @[@"id", @"createdAt", @"updatedAt", @"userId", @"realmUrl"];
-}
-
-+ (NSDictionary *)defaultPropertyValues {
-    NSDate *now = [NSDate date];
-    return @{
-             @"id": [NSUUID UUID].UUIDString,
-             @"createdAt": now,
-             @"updatedAt": now,
-             @"realmUrl": @"",
-             @"userId": @"",
-             };
-}
-
-+ (BOOL)shouldIncludeInDefaultSchema {
-    return NO;
-}
-
-+ (nullable NSString *)primaryKey {
-    return @"id";
-}
-
-+ (NSString *)_realmObjectName {
-    return @"PermissionChange";
-}
-
-@end
-
-@implementation RLMRealmConfiguration (RealmSync)
-+ (instancetype)managementConfigurationForUser:(RLMSyncUser *)user {
-    RLMRealmConfiguration *config = RLMRealmSpecialPurposeConfiguration(user, @"__management");
-    config.objectClasses = @[RLMSyncPermissionOffer.class, RLMSyncPermissionOfferResponse.class,
-                             RLMSyncPermissionChange.class];
-    return config;
-}
-@end
 
 RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
 
@@ -132,7 +60,7 @@ NSString *const kRLMSyncUserIDKey               = @"user_id";
 
 namespace {
 
-NSError *make_permission_error(NSString *description, util::Optional<NSInteger> code, bool is_get) {
+NSError *make_permission_error(NSString *description, util::Optional<NSInteger> code, RLMSyncPermissionError type) {
     NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
     if (description) {
         userInfo[NSLocalizedDescriptionKey] = description;
@@ -140,9 +68,7 @@ NSError *make_permission_error(NSString *description, util::Optional<NSInteger> 
     if (code) {
         userInfo[kRLMSyncErrorStatusCodeKey] = @(*code);
     }
-    return [NSError errorWithDomain:RLMSyncPermissionErrorDomain
-                               code:is_get ? RLMSyncPermissionErrorGetFailed : RLMSyncPermissionErrorChangeFailed
-                           userInfo:userInfo];
+    return [NSError errorWithDomain:RLMSyncPermissionErrorDomain code:type userInfo:userInfo];
 }
 
 }
@@ -165,6 +91,32 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy) {
     REALM_UNREACHABLE();
 }
 
+NSError *translateSyncExceptionPtrToError(std::exception_ptr ptr, RLMPermissionActionType type) {
+    NSError *error = nil;
+    try {
+        std::rethrow_exception(ptr);
+    } catch (PermissionActionException const& ex) {
+        switch (type) {
+            case RLMPermissionActionTypeGet:
+                error = make_permission_error_get(@(ex.what()), ex.code);
+                break;
+            case RLMPermissionActionTypeChange:
+                error = make_permission_error_change(@(ex.what()), ex.code);
+                break;
+            case RLMPermissionActionTypeOffer:
+                error = make_permission_error_offer(@(ex.what()), ex.code);
+                break;
+            case RLMPermissionActionTypeAcceptOffer:
+                error = make_permission_error_accept_offer(@(ex.what()), ex.code);
+                break;
+        }
+    }
+    catch (const std::exception &exp) {
+        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), &error);
+    }
+    return error;
+}
+
 std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
     Realm::Config realmConfig = realm.configuration.config;
     if (auto config = realmConfig.sync_config) {
@@ -179,6 +131,34 @@ std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
 CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user)
 {
     return *std::static_pointer_cast<CocoaSyncUserContext>(user->binding_context());
+}
+
+AccessLevel accessLevelForObjCAccessLevel(RLMSyncAccessLevel level) {
+    switch (level) {
+        case RLMSyncAccessLevelNone:
+            return AccessLevel::None;
+        case RLMSyncAccessLevelRead:
+            return AccessLevel::Read;
+        case RLMSyncAccessLevelWrite:
+            return AccessLevel::Write;
+        case RLMSyncAccessLevelAdmin:
+            return AccessLevel::Admin;
+    }
+    REALM_UNREACHABLE();
+}
+
+RLMSyncAccessLevel objCAccessLevelForAccessLevel(AccessLevel level) {
+    switch (level) {
+        case AccessLevel::None:
+            return RLMSyncAccessLevelNone;
+        case AccessLevel::Read:
+            return RLMSyncAccessLevelRead;
+        case AccessLevel::Write:
+            return RLMSyncAccessLevelWrite;
+        case AccessLevel::Admin:
+            return RLMSyncAccessLevelAdmin;
+    }
+    REALM_UNREACHABLE();
 }
 
 NSError *make_auth_error_bad_response(NSDictionary *json) {
@@ -211,11 +191,19 @@ NSError *make_auth_error(RLMSyncErrorResponseModel *model) {
 }
 
 NSError *make_permission_error_get(NSString *description, util::Optional<NSInteger> code) {
-    return make_permission_error(description, std::move(code), true);
+    return make_permission_error(description, std::move(code), RLMSyncPermissionErrorGetFailed);
 }
 
 NSError *make_permission_error_change(NSString *description, util::Optional<NSInteger> code) {
-    return make_permission_error(description, std::move(code), false);
+    return make_permission_error(description, std::move(code), RLMSyncPermissionErrorChangeFailed);
+}
+
+NSError *make_permission_error_offer(NSString *description, util::Optional<NSInteger> code) {
+    return make_permission_error(description, std::move(code), RLMSyncPermissionErrorOfferFailed);
+}
+
+NSError *make_permission_error_accept_offer(NSString *description, util::Optional<NSInteger> code) {
+    return make_permission_error(description, std::move(code), RLMSyncPermissionErrorAcceptOfferFailed);
 }
 
 NSError *make_sync_error(RLMSyncSystemErrorKind kind, NSString *description, NSInteger code, NSDictionary *custom) {
@@ -263,16 +251,4 @@ NSError *make_sync_error(std::error_code sync_error, RLMSyncSystemErrorKind kind
                                       NSLocalizedDescriptionKey: @(sync_error.message().c_str()),
                                       kRLMSyncErrorStatusCodeKey: @(sync_error.value())
                                       }];
-}
-
-#pragma mark - C APIs
-
-RLMSyncManagementObjectStatus RLMMakeSyncManagementObjectStatus(NSNumber<RLMInt> *statusCode) {
-    if (!statusCode) {
-        return RLMSyncManagementObjectStatusNotProcessed;
-    }
-    if (statusCode.integerValue == 0) {
-        return RLMSyncManagementObjectStatusSuccess;
-    }
-    return RLMSyncManagementObjectStatusError;
 }

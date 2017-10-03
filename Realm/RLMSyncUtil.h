@@ -190,28 +190,27 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncPermissionError, RLMSyncPermissionError
      An error that indicates a permission change operation failed. The `userInfo`
      dictionary contains the underlying error code and a message (if any).
      */
-    RLMSyncPermissionErrorChangeFailed  = 1,
+    RLMSyncPermissionErrorChangeFailed          = 1,
 
     /**
      An error that indicates that attempting to retrieve permissions failed.
      */
-    RLMSyncPermissionErrorGetFailed     = 2,
-};
+    RLMSyncPermissionErrorGetFailed             = 2,
 
-/// An enum representing the different states a sync management object can take.
-typedef NS_ENUM(NSUInteger, RLMSyncManagementObjectStatus) {
-    /// The management object has not yet been processed by the object server.
-    RLMSyncManagementObjectStatusNotProcessed,
-    /// The operations encoded in the management object have been successfully
-    /// performed by the object server.
-    RLMSyncManagementObjectStatusSuccess,
     /**
-     The operations encoded in the management object were not successfully
-     performed by the object server.
-     Refer to the `statusCode` and `statusMessage` properties for more details
-     about the error.
+     An error that indicates that trying to create a permission offer failed.
      */
-    RLMSyncManagementObjectStatusError,
+    RLMSyncPermissionErrorOfferFailed           = 3,
+
+    /**
+     An error that indicates that trying to accept a permission offer failed.
+     */
+    RLMSyncPermissionErrorAcceptOfferFailed     = 4,
+
+    /**
+     An error that indicates that an internal error occurred.
+     */
+    RLMSyncPermissionErrorInternal              = 5,
 };
 
 NS_ASSUME_NONNULL_END

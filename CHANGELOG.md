@@ -31,6 +31,10 @@
   the behavior of the standard library's `Collection.removeLast()` implementation.
 * Remove `RLMSyncPermissionSortPropertyUserID` to reflect changes in how the
   Realm Object Server reports permissions for a user.
+* Remove `RLMSyncPermissionOffer` and `RLMSyncPermissionOfferResponse` classes
+  and associated helper methods and functions. Use the
+  `-[RLMSyncUser createOfferForRealmAtURL:accessLevel:expiration:callback:]`
+  and `-[RLMSyncUser acceptOfferForToken:callback:]` methods instead.
 
 ### Enhancements
 

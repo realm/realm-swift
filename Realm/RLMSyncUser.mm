@@ -40,25 +40,10 @@ using ConfigMaker = std::function<Realm::Config(std::shared_ptr<SyncUser>, std::
 
 namespace {
 
-NSError *translateExceptionPtrToError(std::exception_ptr ptr, bool get) {
-    NSError *error = nil;
-    try {
-        std::rethrow_exception(ptr);
-    } catch (PermissionChangeException const& ex) {
-        error = (get
-                 ? make_permission_error_get(@(ex.what()), ex.code)
-                 : make_permission_error_change(@(ex.what()), ex.code));
-    }
-    catch (const std::exception &exp) {
-        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), &error);
-    }
-    return error;
-}
-
 std::function<void(Results, std::exception_ptr)> RLMWrapPermissionResultsCallback(RLMPermissionResultsBlock callback) {
     return [callback](Results results, std::exception_ptr ptr) {
         if (ptr) {
-            NSError *error = translateExceptionPtrToError(std::move(ptr), true);
+            NSError *error = translateSyncExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeGet);
             REALM_ASSERT(error);
             callback(nil, error);
         } else {
@@ -66,6 +51,10 @@ std::function<void(Results, std::exception_ptr)> RLMWrapPermissionResultsCallbac
             callback([[RLMSyncPermissionResults alloc] initWithResults:std::move(results)], nil);
         }
     };
+}
+
+NSString *tildeSubstitutedPathForRealmURL(NSURL *url, NSString *identity) {
+    return [[url path] stringByReplacingOccurrencesOfString:@"~" withString:identity];
 }
 
 }
@@ -112,7 +101,7 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
 PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBlock callback) {
     return [callback](std::exception_ptr ptr) {
         if (ptr) {
-            NSError *error = translateExceptionPtrToError(std::move(ptr), false);
+            NSError *error = translateSyncExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeChange);
             REALM_ASSERT(error);
             callback(error);
         } else {
@@ -282,10 +271,6 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     }
 }
 
-- (RLMRealm *)managementRealmWithError:(NSError **)error {
-    return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration managementConfigurationForUser:self] error:error];
-}
-
 - (NSURL *)authenticationServer {
     if (!_user || _user->token_type() == SyncUser::TokenType::Admin) {
         return nil;
@@ -381,6 +366,63 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                    [permission rawPermission],
                                    RLMWrapPermissionStatusCallback(callback),
                                    *_configMaker);
+}
+
+- (void)createOfferForRealmAtURL:(NSURL *)url
+                     accessLevel:(RLMSyncAccessLevel)accessLevel
+                      expiration:(NSDate *)expirationDate
+                        callback:(RLMPermissionOfferStatusBlock)callback {
+    if (!_user || _user->state() == SyncUser::State::Error) {
+        callback(nil, make_permission_error_change(@"A permission offer cannot be created using an invalid user."));
+        return;
+    }
+    auto cb = [callback](util::Optional<std::string> token, std::exception_ptr ptr) {
+        if (ptr) {
+            NSError *error = translateSyncExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeOffer);
+            REALM_ASSERT_DEBUG(error);
+            callback(nil, error);
+        } else {
+            REALM_ASSERT_DEBUG(token);
+            callback(@(token->c_str()), nil);
+        }
+    };
+    auto offer = PermissionOffer{
+        [tildeSubstitutedPathForRealmURL(url, self.identity) UTF8String],
+        accessLevelForObjCAccessLevel(accessLevel),
+        RLMTimestampForNSDate(expirationDate),
+    };
+    Permissions::make_offer(_user, std::move(offer), std::move(cb), *_configMaker);
+}
+
+- (void)acceptOfferForToken:(NSString *)token
+                   callback:(RLMPermissionOfferResponseStatusBlock)callback {
+    if (!_user || _user->state() == SyncUser::State::Error) {
+        callback(nil, make_permission_error_change(@"A permission offer cannot be accepted by an invalid user."));
+        return;
+    }
+    auto cb = [callback](util::Optional<std::string> raw_url, std::exception_ptr ptr) {
+        if (ptr) {
+            NSError *error = translateSyncExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeAcceptOffer);
+            REALM_ASSERT_DEBUG(error);
+            callback(nil, error);
+        } else {
+            REALM_ASSERT_DEBUG(raw_url);
+            if (NSURLComponents *mutableURL = [NSURLComponents componentsWithString:@(raw_url->c_str())]) {
+                if ([mutableURL.scheme isEqualToString:@"http"]) {
+                    mutableURL.scheme = @"realm";
+                } else if ([mutableURL.scheme isEqualToString:@"https"]) {
+                    mutableURL.scheme = @"realms";
+                }
+                callback([mutableURL URL], nil);
+            } else {
+                NSError *internalError = [NSError errorWithDomain:RLMSyncPermissionErrorDomain
+                                                             code:RLMSyncPermissionErrorInternal
+                                                         userInfo:@{}];
+                callback(nil, internalError);
+            }
+        }
+    };
+    Permissions::accept_offer(_user, [token UTF8String], std::move(cb), *_configMaker);
 }
 
 #pragma mark - Private API
