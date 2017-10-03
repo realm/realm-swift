@@ -1,3 +1,26 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+* Remove `RLMSyncPermissionSortPropertyUserID` to reflect changes in how the
+  Realm Object Server reports permissions for a user.
+* Remove `RLMSyncPermissionOffer` and `RLMSyncPermissionOfferResponse` classes
+  and associated helper methods and functions. Use the
+  `-[RLMSyncUser createOfferForRealmAtURL:accessLevel:expiration:callback:]`
+  and `-[RLMSyncUser acceptOfferForToken:callback:]` methods instead.
+
+### Bugfixes
+
+* The keychain item name used by Realm to manage the encryption keys for
+  sync-related metadata is now set to a per-app name based on the bundle
+  identifier. Keys that were previously stored within the single, shared Realm
+  keychain item will be transparently migrated to the per-application keychain
+  item.
+* Fix downloading of the Realm core binaries when Xcode's command-line tools are
+  set as the active developer directory for command-line interactions.
+* Fix a crash that could occur when resolving a ThreadSafeReference to a `List`
+  whose parent object had since been deleted.
+
 3.0.0-beta.4 Release notes (2017-09-22)
 =============================================================
 
@@ -29,12 +52,6 @@
   make sense for `List` have been added.
 * `List.removeLast()` now throws an exception if the list is empty, to more closely match
   the behavior of the standard library's `Collection.removeLast()` implementation.
-* Remove `RLMSyncPermissionSortPropertyUserID` to reflect changes in how the
-  Realm Object Server reports permissions for a user.
-* Remove `RLMSyncPermissionOffer` and `RLMSyncPermissionOfferResponse` classes
-  and associated helper methods and functions. Use the
-  `-[RLMSyncUser createOfferForRealmAtURL:accessLevel:expiration:callback:]`
-  and `-[RLMSyncUser acceptOfferForToken:callback:]` methods instead.
 
 ### Enhancements
 
