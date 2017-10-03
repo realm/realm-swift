@@ -219,7 +219,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (void)changePassword:(NSString *)newPassword forUserID:(NSString *)userID completion:(RLMPasswordChangeStatusBlock)completion;
 
-#pragma mark - Administrator API
+#pragma mark - Administrator
 
 /**
  Given a Realm Object Server authentication provider and a provider identifier for a user
@@ -236,10 +236,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
            identityProvider:(RLMIdentityProvider)provider
                  completion:(RLMRetrieveUserBlock)completion;
 
-// This set of permissions APIs uses immutable `RLMSyncPermission` objects to
-// retrieve and apply permissions. It is intended to replace the set of APIs which
-// directly access Realms and Realm model objects to work with permissions.
-#pragma mark - Value-based Permissions API
+#pragma mark - Permissions
 
 /**
  Asynchronously retrieve all permissions associated with the user calling this method.
@@ -278,18 +275,16 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 /**
  Create a permission offer for a Realm.
 
- A permission offer is used to grant a specific permission to a Realm you are allowed to manage
- to another user. Creating a permission offer results in a string token which can be passed to
- another user over whatever channel makes sense (for example, e-mail). The token can then be
- accepted by the other user in order for them to receive the specified permission to work with
- the specified Realm.
+ A permission offer is used to grant access to a Realm this user manages to another
+ user. Creating a permission offer produces a string token which can be passed to the
+ recepient in any suitable way (for example, via e-mail).
 
  The operation will take place asynchronously. The token can be accepted by the recepient
  using the `-[RLMSyncUser acceptOfferForToken:callback:]` method.
 
  @param url             The URL of the Realm for which the permission offer should pertain. This
-                        may be the URL of any Realm which you are allowed to manage. If the URL
-                        has a `~` wildcard it will be replaced with your user identity.
+                        may be the URL of any Realm which this user is allowed to manage. If the URL
+                        has a `~` wildcard it will be replaced with this user's user identity.
  @param accessLevel     What access level to grant to whoever accepts the token.
  @param expirationDate  Optionally, a date which indicates when the offer expires. If the
                         recepient attempts to accept the offer after the date it will be rejected.
@@ -310,7 +305,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  If the operation succeeds, the callback will be passed the URL of the Realm for which the
  offer applied, so the Realm can be opened.
 
- The operation will take place asynchronously. The sender can create the token using the
+ The token this method accepts can be created by the offering user through the
  `-[RLMSyncUser createOfferForRealmAtURL:accessLevel:expiration:callback:]` method.
 
  @see `createOfferForRealmAtURL:accessLevel:expiration:callback:`
@@ -324,6 +319,8 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 + (instancetype)new __attribute__((unavailable("RLMSyncUser cannot be created directly")));
 
 @end
+
+#pragma mark - User info classes
 
 /**
  A data object representing a user account associated with a user.

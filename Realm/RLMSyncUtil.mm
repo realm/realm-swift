@@ -133,7 +133,7 @@ CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user)
     return *std::static_pointer_cast<CocoaSyncUserContext>(user->binding_context());
 }
 
-AccessLevel accessLevelForObjcAccessLevel(RLMSyncAccessLevel level) {
+AccessLevel accessLevelForObjCAccessLevel(RLMSyncAccessLevel level) {
     switch (level) {
         case RLMSyncAccessLevelNone:
             return AccessLevel::None;

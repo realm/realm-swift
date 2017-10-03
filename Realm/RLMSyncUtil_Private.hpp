@@ -42,7 +42,7 @@ CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user);
 
 #pragma mark - Access level conversion
 
-realm::AccessLevel accessLevelForObjcAccessLevel(RLMSyncAccessLevel level);
+realm::AccessLevel accessLevelForObjCAccessLevel(RLMSyncAccessLevel level);
 RLMSyncAccessLevel objCAccessLevelForAccessLevel(realm::AccessLevel level);
 
 #pragma mark - Error conversion

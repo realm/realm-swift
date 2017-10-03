@@ -379,16 +379,16 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     auto cb = [callback](util::Optional<std::string> token, std::exception_ptr ptr) {
         if (ptr) {
             NSError *error = translateSyncExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeOffer);
-            REALM_ASSERT(error);
+            REALM_ASSERT_DEBUG(error);
             callback(nil, error);
         } else {
-            REALM_ASSERT_DEBUG(token != nullptr);
-            callback([NSString stringWithUTF8String:token->c_str()], nil);
+            REALM_ASSERT_DEBUG(token);
+            callback(@(token->c_str()), nil);
         }
     };
     auto offer = PermissionOffer{
         [tildeSubstitutedPathForRealmURL(url, self.identity) UTF8String],
-        accessLevelForObjcAccessLevel(accessLevel),
+        accessLevelForObjCAccessLevel(accessLevel),
         RLMTimestampForNSDate(expirationDate),
     };
     Permissions::make_offer(_user, std::move(offer), std::move(cb), *_configMaker);
@@ -403,13 +403,11 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     auto cb = [callback](util::Optional<std::string> raw_url, std::exception_ptr ptr) {
         if (ptr) {
             NSError *error = translateSyncExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeAcceptOffer);
-            REALM_ASSERT(error);
+            REALM_ASSERT_DEBUG(error);
             callback(nil, error);
         } else {
-            REALM_ASSERT_DEBUG(bool(raw_url));
-            NSString *urlAsString = [NSString stringWithUTF8String:raw_url->c_str()];
-            NSURLComponents *mutableURL = [NSURLComponents componentsWithString:urlAsString];
-            if (mutableURL) {
+            REALM_ASSERT_DEBUG(raw_url);
+            if (NSURLComponents *mutableURL = [NSURLComponents componentsWithString:@(raw_url->c_str())]) {
                 if ([mutableURL.scheme isEqualToString:@"http"]) {
                     mutableURL.scheme = @"realm";
                 } else if ([mutableURL.scheme isEqualToString:@"https"]) {

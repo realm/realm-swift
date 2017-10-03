@@ -35,6 +35,13 @@ public typealias SyncUser = RLMSyncUser
 public typealias SyncUserInfo = RLMSyncUserInfo
 
 /**
+ An immutable data object representing an account belonging to a particular user.
+
+ - see: `SyncUserInfo`, `RLMSyncUserAccountInfo`
+ */
+public typealias SyncUserAccountInfo = RLMSyncUserAccountInfo
+
+/**
  A singleton which configures and manages the Realm Object Server synchronization-related
  functionality.
 
@@ -371,7 +378,18 @@ extension SyncUser {
     }
 
     /**
-     Retrieve permissions for a user.
+     Retrieve permissions for this user. Permissions describe which synchronized
+     Realms this user has access to and what they are allowed to do with them.
+
+     Permissions are retrieved asynchronously and returned via the callback. The
+     callback is run on the same thread that the method is invoked upon.
+
+     - warning: This method must be invoked on a thread with an active run loop.
+
+     - warning: Do not pass the `Results` returned by the callback between threads.
+
+     - parameter callback: A callback providing either a `Results` containing the
+                           permissions, or an error describing what went wrong.
      */
     public func retrievePermissions(callback: @escaping (SyncPermissionResults?, SyncPermissionError?) -> Void) {
         self.__retrievePermissions { (results, error) in
@@ -387,14 +405,22 @@ extension SyncUser {
     /**
      Create a permission offer for a Realm.
 
-     A permission offer is used to grant a specific permission to a Realm you are allowed to manage
-     to another user. Creating a permission offer results in a string token which can be passed to
-     another user over whatever channel makes sense (for example, e-mail). The token can then be
-     accepted by the other user in order for them to receive the specified permission to work with
-     the specified Realm.
+     A permission offer is used to grant access to a Realm this user manages to another
+     user. Creating a permission offer produces a string token which can be passed to the
+     recepient in any suitable way (for example, via e-mail).
 
      The operation will take place asynchronously. The token can be accepted by the recepient
      using the `SyncUser.acceptOffer(forToken:, callback:)` method.
+
+     - parameter url: The URL of the Realm for which the permission offer should pertain. This
+                      may be the URL of any Realm which this user is allowed to manage. If the URL
+                      has a `~` wildcard it will be replaced with this user's user identity.
+     - parameter accessLevel: What access level to grant to whoever accepts the token.
+     - parameter expiration: Optionally, a date which indicates when the offer expires. If the
+                             recepient attempts to accept the offer after the date it will be rejected.
+                             If nil, the offer will never expire.
+     - parameter callback: A callback indicating whether the operation succeeded or failed. If it
+                           succeeded the token will be passed in as a string.
      */
     public func createOfferForRealm(at url: URL,
                                     accessLevel: SyncAccessLevel,
@@ -576,19 +602,7 @@ extension Realm {
 
 // MARK: - Permissions and permission results
 
-extension SyncPermission : RealmCollectionValue {
-    #if os(OSX)
-    /// :nodoc:
-    open override static func className() -> String {
-        return NSStringFromClass(SyncPermission.self)
-    }
-    #else
-    /// :nodoc:
-    open static func className() -> String {
-        return NSStringFromClass(SyncPermission.self)
-    }
-    #endif
-}
+extension SyncPermission : RealmCollectionValue { }
 
 /**
  A `Results` collection containing sync permission results.

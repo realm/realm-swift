@@ -152,7 +152,7 @@ using ConditionType = Permission::Condition::Type;
                       : Permission::Condition([_key UTF8String], [_value UTF8String]));
     return Permission{
         [_path UTF8String],
-        accessLevelForObjcAccessLevel(_accessLevel),
+        accessLevelForObjCAccessLevel(_accessLevel),
         std::move(condition)
     };
 }
@@ -185,7 +185,7 @@ using ConditionType = Permission::Condition::Type;
     return [NSString stringWithFormat:@"<RLMSyncPermission> %@, path: %@, access level: %@",
             typeDescription,
             self.path,
-            @(Permission::description_for_access_level(accessLevelForObjcAccessLevel(self.accessLevel)).c_str())];
+            @(Permission::description_for_access_level(accessLevelForObjCAccessLevel(self.accessLevel)).c_str())];
 }
 
 @end
