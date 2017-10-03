@@ -406,7 +406,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
             REALM_ASSERT(error);
             callback(nil, error);
         } else {
-            REALM_ASSERT_DEBUG(raw_url != nullptr);
+            REALM_ASSERT_DEBUG(bool(raw_url));
             NSString *urlAsString = [NSString stringWithUTF8String:raw_url->c_str()];
             NSURLComponents *mutableURL = [NSURLComponents componentsWithString:urlAsString];
             if (mutableURL) {
