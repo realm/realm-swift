@@ -277,7 +277,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         }
         waitForExpectations(timeout: 10.0, handler: nil)
         guard let theToken = token else {
-            XCTFail()
+            XCTFail("We expected an offer token, but did not get one. Aborting the test.")
             return
         }
         XCTAssertGreaterThan(theToken.lengthOfBytes(using: .utf8), 0)
@@ -293,7 +293,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         }
         waitForExpectations(timeout: 10.0, handler: nil)
         guard let theURL = url else {
-            XCTFail()
+            XCTFail("We expected a Realm URL, but did not get one. Aborting the test.")
             return
         }
         XCTAssertEqual(theURL.path, tildeSubstitutedURL(for: realmURL, user: userA).path)
