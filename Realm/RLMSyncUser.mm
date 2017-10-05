@@ -528,8 +528,8 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     if (serverURL) {
         NSString *scheme = serverURL.scheme;
         if (![scheme isEqualToString:@"http"] && ![scheme isEqualToString:@"https"]) {
-            @throw RLMException(@"The Realm Object Server authentication URL for this user, \"%@\", is improperly"
-                                @" configured. It must begin with http:// or https://.", serverURL);
+            @throw RLMException(@"The Realm Object Server authentication URL provided for this user, \"%@\", "
+                                @" is invalid. It must begin with http:// or https://.", serverURL);
         }
         // Retrieve the user based on the auth server URL.
         util::Optional<std::string> identity_string;
