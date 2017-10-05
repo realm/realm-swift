@@ -155,7 +155,7 @@ class RealmTests: TestCase {
         }
 
         FileManager.default.createFile(atPath: defaultRealmURL().path,
-            contents:"a".data(using: String.Encoding.utf8, allowLossyConversion: false),
+            contents: "a".data(using: String.Encoding.utf8, allowLossyConversion: false),
             attributes: nil)
 
         assertFails(.fileAccess) {

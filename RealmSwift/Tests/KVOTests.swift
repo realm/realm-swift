@@ -95,7 +95,7 @@ class KVOTests: TestCase {
     var changeDictionary: [NSKeyValueChangeKey: Any]?
 
     override func observeValue(forKeyPath keyPath: String?, of object: Any?,
-                               change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+                               change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
         changeDictionary = change
     }
 

@@ -810,16 +810,16 @@ class ObjectCreationTests: TestCase {
             ]
         }
         switch type {
-            case .bool:     return [true, NSNumber(value: 0 as Int), NSNumber(value: 1 as Int)]
-            case .int:      return [NSNumber(value: 1 as Int)]
-            case .float:    return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
-            case .double:   return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
-            case .string:   return ["b"]
-            case .data:     return ["b".data(using: String.Encoding.utf8, allowLossyConversion: false)!]
-            case .date:     return [Date(timeIntervalSince1970: 2)]
-            case .object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
-            case .any: XCTFail("not supported")
-            case .linkingObjects: XCTFail("not supported")
+        case .bool:     return [true, NSNumber(value: 0 as Int), NSNumber(value: 1 as Int)]
+        case .int:      return [NSNumber(value: 1 as Int)]
+        case .float:    return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
+        case .double:   return [NSNumber(value: 1 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
+        case .string:   return ["b"]
+        case .data:     return ["b".data(using: String.Encoding.utf8, allowLossyConversion: false)!]
+        case .date:     return [Date(timeIntervalSince1970: 2)]
+        case .object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
+        case .any: XCTFail("not supported")
+        case .linkingObjects: XCTFail("not supported")
         }
         return []
     }
@@ -833,16 +833,16 @@ class ObjectCreationTests: TestCase {
             return ["invalid", [["a"]], [["boolCol": "a"]], [[SwiftIntObject()]], [[persistedObject]]]
         }
         switch type {
-            case .bool:     return ["invalid", NSNumber(value: 2 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
-            case .int:      return ["invalid", NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
-            case .float:    return ["invalid", true, false]
-            case .double:   return ["invalid", true, false]
-            case .string:   return [0x197A71D, true, false]
-            case .data:     return ["invalid"]
-            case .date:     return ["invalid"]
-            case .object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
-            case .any: XCTFail("not supported")
-            case .linkingObjects: XCTFail("not supported")
+        case .bool:     return ["invalid", NSNumber(value: 2 as Int), NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
+        case .int:      return ["invalid", NSNumber(value: 1.1 as Float), NSNumber(value: 11.1 as Double)]
+        case .float:    return ["invalid", true, false]
+        case .double:   return ["invalid", true, false]
+        case .string:   return [0x197A71D, true, false]
+        case .data:     return ["invalid"]
+        case .date:     return ["invalid"]
+        case .object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
+        case .any: XCTFail("not supported")
+        case .linkingObjects: XCTFail("not supported")
         }
         return []
     }

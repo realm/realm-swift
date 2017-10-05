@@ -502,13 +502,10 @@ class RealmCollectionTypeTests: TestCase {
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 2)
-                break
             case .update:
                 XCTFail("Shouldn't happen")
-                break
             case .error:
                 XCTFail("Shouldn't happen")
-                break
             }
 
             theExpectation.fulfill()
@@ -623,14 +620,11 @@ class ResultsTests: RealmCollectionTypeTests {
             case .initial(let results):
                 XCTAssertEqual(results.count, calls + 2)
                 XCTAssertEqual(results, collection)
-                break
             case .update(let results, _, _, _):
                 XCTAssertEqual(results.count, calls + 2)
                 XCTAssertEqual(results, collection)
-                break
             case .error:
                 XCTFail("Shouldn't happen")
-                break
             }
             calls += 1
             theExpectation.fulfill()
@@ -654,17 +648,14 @@ class ResultsTests: RealmCollectionTypeTests {
             case .initial(let results):
                 XCTAssertEqual(calls, 0)
                 XCTAssertEqual(results.count, 2)
-                break
             case .update(let results, let deletions, let insertions, let modifications):
                 XCTAssertEqual(calls, 1)
                 XCTAssertEqual(results.count, 3)
                 XCTAssertEqual(deletions, [])
                 XCTAssertEqual(insertions, [2])
                 XCTAssertEqual(modifications, [])
-                break
             case .error(let error):
                 XCTFail(String(describing: error))
-                break
             }
 
             calls += 1
@@ -809,13 +800,10 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
             switch changes {
             case .initial(let collection):
                 XCTAssertEqual(collection.count, 2)
-                break
             case .update:
                 XCTFail("Shouldn't happen")
-                break
             case .error:
                 XCTFail("Shouldn't happen")
-                break
             }
 
             theExpectation.fulfill()

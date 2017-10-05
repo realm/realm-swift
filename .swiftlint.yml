@@ -25,3 +25,6 @@ disabled_rules:
   - vertical_whitespace
   - syntactic_sugar
   - block_based_kvo
+  # swiftlint complains about superfluous disable commands when the violation
+  # occurs in an inactive #if and doesn't support conditionally disabling it
+  - cyclomatic_complexity
