@@ -527,7 +527,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     std::shared_ptr<SyncUser> sync_user;
     if (serverURL) {
         NSString *scheme = serverURL.scheme;
-        if (![scheme isEqualToString:@"http"] || ![scheme isEqualToString:@"https"]) {
+        if (![scheme isEqualToString:@"http"] && ![scheme isEqualToString:@"https"]) {
             @throw RLMException(@"The Realm Object Server authentication URL for this user, \"%@\", is improperly"
                                 @" configured. It must begin with http:// or https://.", serverURL);
         }
