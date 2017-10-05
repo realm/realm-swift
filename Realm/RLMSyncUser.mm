@@ -400,26 +400,23 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         callback(nil, make_permission_error_change(@"A permission offer cannot be accepted by an invalid user."));
         return;
     }
-    auto cb = [callback](util::Optional<std::string> raw_url, std::exception_ptr ptr) {
+    NSURLComponents *baseURL = [NSURLComponents componentsWithURL:self.authenticationServer
+                                          resolvingAgainstBaseURL:YES];
+    if ([baseURL.scheme isEqualToString:@"http"]) {
+        baseURL.scheme = @"realm";
+    } else if ([baseURL.scheme isEqualToString:@"https"]) {
+        baseURL.scheme = @"realms";
+    }
+    auto cb = [baseURL, callback](util::Optional<std::string> raw_path, std::exception_ptr ptr) {
         if (ptr) {
             NSError *error = translateSyncExceptionPtrToError(std::move(ptr), RLMPermissionActionTypeAcceptOffer);
             REALM_ASSERT_DEBUG(error);
             callback(nil, error);
         } else {
-            REALM_ASSERT_DEBUG(raw_url);
-            if (NSURLComponents *mutableURL = [NSURLComponents componentsWithString:@(raw_url->c_str())]) {
-                if ([mutableURL.scheme isEqualToString:@"http"]) {
-                    mutableURL.scheme = @"realm";
-                } else if ([mutableURL.scheme isEqualToString:@"https"]) {
-                    mutableURL.scheme = @"realms";
-                }
-                callback([mutableURL URL], nil);
-            } else {
-                NSError *internalError = [NSError errorWithDomain:RLMSyncPermissionErrorDomain
-                                                             code:RLMSyncPermissionErrorInternal
-                                                         userInfo:@{}];
-                callback(nil, internalError);
-            }
+            // Note that ROS currently vends the path to the Realm, so we need to construct the full URL ourselves.
+            REALM_ASSERT_DEBUG(raw_path);
+            baseURL.path = @(raw_path->c_str());
+            callback([baseURL URL], nil);
         }
     };
     Permissions::accept_offer(_user, [token UTF8String], std::move(cb), *_configMaker);
@@ -529,6 +526,11 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     NSString *identity = credentials.userInfo[kRLMSyncIdentityKey];
     std::shared_ptr<SyncUser> sync_user;
     if (serverURL) {
+        NSString *scheme = serverURL.scheme;
+        if (![scheme isEqualToString:@"http"] && ![scheme isEqualToString:@"https"]) {
+            @throw RLMException(@"The Realm Object Server authentication URL provided for this user, \"%@\", "
+                                @" is invalid. It must begin with http:// or https://.", serverURL);
+        }
         // Retrieve the user based on the auth server URL.
         util::Optional<std::string> identity_string;
         if (identity) {

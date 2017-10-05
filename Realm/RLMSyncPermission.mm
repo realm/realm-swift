@@ -62,10 +62,8 @@ using ConditionType = Permission::Condition::Type;
         _accessLevel = accessLevel;
         _path = path;
         _identity = nil;
-        // This is correct; we internally call this key 'email' even though it doesn't have to be...
         _key = @"email";
-        // FIXME: this should be done on the server, not the client.
-        _value = [username lowercaseString];
+        _value = username;
         _updatedAt = [NSDate date];
     }
     return self;
