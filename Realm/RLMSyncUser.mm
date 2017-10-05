@@ -400,13 +400,12 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         callback(nil, make_permission_error_change(@"A permission offer cannot be accepted by an invalid user."));
         return;
     }
-    NSURLComponents *baseURL = [NSURLComponents componentsWithString:[self.authenticationServer absoluteString]];
+    NSURLComponents *baseURL = [NSURLComponents componentsWithURL:self.authenticationServer
+                                          resolvingAgainstBaseURL:YES];
     if ([baseURL.scheme isEqualToString:@"http"]) {
         baseURL.scheme = @"realm";
     } else if ([baseURL.scheme isEqualToString:@"https"]) {
         baseURL.scheme = @"realms";
-    } else {
-        @throw RLMException(@"A ROS server URL must begin with http:// or https://.");
     }
     auto cb = [baseURL, callback](util::Optional<std::string> raw_path, std::exception_ptr ptr) {
         if (ptr) {
@@ -527,6 +526,11 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     NSString *identity = credentials.userInfo[kRLMSyncIdentityKey];
     std::shared_ptr<SyncUser> sync_user;
     if (serverURL) {
+        NSString *scheme = serverURL.scheme;
+        if (![scheme isEqualToString:@"http"] || ![scheme isEqualToString:@"https"]) {
+            @throw RLMException(@"The Realm Object Server authentication URL for this user, \"%@\", is improperly"
+                                @" configured. It must begin with http:// or https://.", serverURL);
+        }
         // Retrieve the user based on the auth server URL.
         util::Optional<std::string> identity_string;
         if (identity) {
