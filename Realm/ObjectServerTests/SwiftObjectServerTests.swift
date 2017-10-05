@@ -91,7 +91,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     realm.deleteAll()
                 }
                 waitForUploads(for: user, url: realmURL)
-                checkCount(expected:0, realm, SwiftSyncObject.self)
+                checkCount(expected: 0, realm, SwiftSyncObject.self)
             }
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")

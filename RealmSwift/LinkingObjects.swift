@@ -360,7 +360,7 @@ public final class LinkingObjects<Element: Object>: LinkingObjectsBase {
     }
 }
 
-extension LinkingObjects : RealmCollection {
+extension LinkingObjects: RealmCollection {
     // MARK: Sequence Support
 
     /// Returns an iterator that yields successive elements in the linking objects.

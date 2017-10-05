@@ -602,7 +602,7 @@ extension Realm {
 
 // MARK: - Permissions and permission results
 
-extension SyncPermission : RealmCollectionValue { }
+extension SyncPermission: RealmCollectionValue { }
 
 /**
  A `Results` collection containing sync permission results.
