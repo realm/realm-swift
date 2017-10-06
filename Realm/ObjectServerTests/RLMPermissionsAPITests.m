@@ -22,8 +22,8 @@
 
 #import "RLMTestUtils.h"
 
-#define APPLY_PERMISSION(ma_permission, ma_user)                                                                       \
-APPLY_PERMISSION_WITH_MESSAGE(ma_permission, ma_user, @"Setting a permission should work")
+#define APPLY_PERMISSION(ma_permission, ma_user) \
+    APPLY_PERMISSION_WITH_MESSAGE(ma_permission, ma_user, @"Setting a permission should work")
 
 #define APPLY_PERMISSION_WITH_MESSAGE(ma_permission, ma_user, ma_message) {                                            \
     XCTestExpectation *ex = [self expectationWithDescription:ma_message];                                              \
@@ -90,7 +90,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 #define RECORD_FAILURE(ma_msg) [self recordFailureWithDescription:ma_msg inFile:file atLine:line expected:YES]
 
 #define CHECK_PERMISSION_PRESENT(ma_results, ma_permission) \
-[self checkPresenceOfPermission:ma_permission inResults:ma_results line:__LINE__ file:@(__FILE__)]
+    [self checkPresenceOfPermission:ma_permission inResults:ma_results line:__LINE__ file:@(__FILE__)]
 
 /// Check that the targeted permission is present in, or eventually appears in the results.
 - (void)checkPresenceOfPermission:(RLMSyncPermission *)permission
@@ -104,11 +104,8 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
             [ex fulfill];
             return;
         }
-        for (NSUInteger i = 0; i < r.count; i++) {
-            if ([[r objectAtIndex:i] isEqual:permission]) {
-                [ex fulfill];
-                return;
-            }
+        if ([r indexOfObject:permission] != NSNotFound) {
+            [ex fulfill];
         }
     }];
     [self waitForExpectations:@[ex] timeout:20.0];
@@ -116,7 +113,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 }
 
 #define CHECK_PERMISSION_ABSENT(ma_results, ma_permission) \
-[self checkAbsenceOfPermission:ma_permission inResults:ma_results line:__LINE__ file:@(__FILE__)]
+    [self checkAbsenceOfPermission:ma_permission inResults:ma_results line:__LINE__ file:@(__FILE__)]
 
 /// Check that the targeted permission is absent from, or eventually disappears from the results.
 - (void)checkAbsenceOfPermission:(RLMSyncPermission *)permission
@@ -130,13 +127,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
             [ex fulfill];
             return;
         }
-        BOOL isPresent = NO;
-        for (NSUInteger i = 0; i < r.count; i++) {
-            if ([[r objectAtIndex:i] isEqual:permission]) {
-                isPresent = YES;
-            }
-        }
-        if (!isPresent) {
+        if ([r indexOfObject:permission] == NSNotFound) {
             [ex fulfill];
         }
     }];
@@ -145,10 +136,10 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 }
 
 #define CHECK_PERMISSION_COUNT_AT_LEAST(ma_results, ma_count) \
-[self checkPermissionCountOfResults:ma_results atLeast:ma_count exact:NO line:__LINE__ file:@(__FILE__)];
+    [self checkPermissionCountOfResults:ma_results atLeast:ma_count exact:NO line:__LINE__ file:@(__FILE__)];
 
 #define CHECK_PERMISSION_COUNT(ma_results, ma_count) \
-[self checkPermissionCountOfResults:ma_results atLeast:ma_count exact:YES line:__LINE__ file:@(__FILE__)];
+    [self checkPermissionCountOfResults:ma_results atLeast:ma_count exact:YES line:__LINE__ file:@(__FILE__)];
 
 - (void)checkPermissionCountOfResults:(RLMResults<RLMSyncPermission *> *)results
                               atLeast:(NSInteger)count
