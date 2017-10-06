@@ -34,6 +34,11 @@
 // Set this to 1 if you intend to start up a ROS instance manually to test against.
 #define PROVIDING_OWN_ROS 0
 
+#if PROVIDING_OWN_ROS
+// Define the admin token as an Objective-C string here if you wish to run tests requiring it.
+// #define OWN_ROS_ADMIN_TOKEN @"token_goes_here"
+#endif
+
 #if !TARGET_OS_MAC
 #error These tests can only be run on a macOS host.
 #endif
@@ -261,7 +266,12 @@ static NSURL *syncDirectoryForChildProcess() {
 
 + (NSString *)retrieveAdminToken {
 #if PROVIDING_OWN_ROS
-    return @"eyJhcHBfaWQiOiJpby5yZWFsbS5hdXRoIiwiaWRlbnRpdHkiOiJfX2FkbWluIiwiYWNjZXNzIjpbImRvd25sb2FkIiwidXBsb2FkIiwibWFuYWdlIl0sInNhbHQiOiI0YTM0NmVlNyJ9:WmB4swR8pQoWfLn1z06z9icasvIBxtLAMcsmt9AfC2bBMWN/4jx/MyuxZVnaassjikvMLp/yfFc4OBPhrpJsm0rjaAtTODaq242qQCaY/eFy5SOd5BH+nJ9WPsW6ByN/ZpccqlaY6ihboEdxCZZRTlIUwy92oH9ljeUzDW1JuURjPnYPmGdAUDnGp+aB9ZHtC/SrKva2J8IGrI2npPZxq0EmN9cbjvo/NQQlBwYqmTX3K0Fa3UmvvxGAuySVpx2ynGUrNsD6LqNkMlO4rkPme49BKJsG40y69itExj0gx45FGYVCd+USba1um4kLusEcePMxR6/Q2kR504M+C68PWA==";
+#ifdef OWN_ROS_ADMIN_TOKEN
+    NSAssert(NO, @"Cannot run admin token related tests unless you define OWN_ROS_ADMIN_TOKEN.");
+    return nil;
+#else
+    return OWN_ROS_ADMIN_TOKEN;
+#endif
 #else
     NSString *adminTokenPath = @"test-ros-instance/data/keys/admin.json";
     NSURL *target = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:adminTokenPath];
