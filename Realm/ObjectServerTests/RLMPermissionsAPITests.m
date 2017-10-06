@@ -22,90 +22,8 @@
 
 #import "RLMTestUtils.h"
 
-#define CHECK_PERMISSION_COUNT_PREDICATE(ma_results, ma_count, ma_op) {                                                \
-    XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission count"];                            \
-    __weak typeof(ma_results) weakResults = ma_results;                                                                \
-    __attribute__((objc_precise_lifetime))id token = [ma_results addNotificationBlock:^(__unused id r,                 \
-                                                                                        __unused id c,                 \
-                                                                                        NSError *err) {                \
-        XCTAssertNil(err);                                                                                             \
-        if (weakResults.count ma_op ma_count) {                                                                        \
-            [ex fulfill];                                                                                              \
-        }                                                                                                              \
-    }];                                                                                                                \
-    [self waitForExpectationsWithTimeout:10.0 handler:^(NSError *err) {                                                \
-        if (err) {                                                                                                     \
-            NSLog(@"Checking permission count failed!\nError: %@\nResults: %@\nResults count: %@",                     \
-                  err, weakResults, @([weakResults count]));                                                           \
-        }                                                                                                              \
-    }];                                                                                                                \
-}
-
-#define CHECK_PERMISSION_COUNT(ma_results, ma_count) CHECK_PERMISSION_COUNT_PREDICATE(ma_results, ma_count, ==)
-
-#define CHECK_PERMISSION_PRESENT(ma_results, ma_permission) {                                                          \
-    XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission presence"];                         \
-    __weak typeof(ma_results) weakResults = ma_results;                                                                \
-    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(__unused id r,                \
-                                                                                         __unused id c,                \
-                                                                                         NSError *err) {               \
-        XCTAssertNil(err);                                                                                             \
-        for (NSUInteger i=0; i<weakResults.count; i++) {                                                               \
-            if ([[weakResults objectAtIndex:i] isEqual:ma_permission]) {                                               \
-                [ex fulfill];                                                                                          \
-                break;                                                                                                 \
-            }                                                                                                          \
-        }                                                                                                              \
-    }];                                                                                                                \
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];                                                            \
-}
-
-/// Check whether a permission disappears or is absent from a results.
-/// This macro is intended to be used to check that a permission is
-/// immediately absent, or eventually disappears, from a results.
-#define CHECK_PERMISSION_ABSENT(ma_results, ma_permission) {                                                           \
-    XCTestExpectation *ex = [self expectationWithDescription:@"Checking permission absence"];                          \
-    __weak typeof(ma_results) weakResults = ma_results;                                                                \
-    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(__unused id r,                \
-                                                                                         __unused id c,                \
-                                                                                         NSError *err) {               \
-        XCTAssertNil(err);                                                                                             \
-        BOOL isPresent = NO;                                                                                           \
-        for (NSUInteger i=0; i<weakResults.count; i++) {                                                               \
-            if ([[weakResults objectAtIndex:i] isEqual:ma_permission]) {                                               \
-                isPresent = YES;                                                                                       \
-                break;                                                                                                 \
-            }                                                                                                          \
-        }                                                                                                              \
-        if (!isPresent) {                                                                                              \
-            [ex fulfill];                                                                                              \
-        }                                                                                                              \
-    }];                                                                                                                \
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];                                                            \
-}
-
-#define GET_PERMISSION(ma_results, ma_permission, ma_destination) {                                                    \
-    XCTestExpectation *ex = [self expectationWithDescription:@"Retrieving permission..."];                             \
-    __block RLMSyncPermission *value = nil;                                                                            \
-    __weak typeof(ma_results) weakResults = ma_results;                                                                \
-    __attribute__((objc_precise_lifetime)) id token = [ma_results addNotificationBlock:^(__unused id r,                \
-                                                                                         __unused id c,                \
-                                                                                         NSError *err) {               \
-        XCTAssertNil(err);                                                                                             \
-        for (NSUInteger i=0; i<weakResults.count; i++) {                                                               \
-            if ([[weakResults objectAtIndex:i] isEqual:ma_permission]) {                                               \
-                value = [weakResults objectAtIndex:i];                                                                 \
-                [ex fulfill];                                                                                          \
-                return;                                                                                                \
-            }                                                                                                          \
-        }                                                                                                              \
-    }];                                                                                                                \
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];                                                            \
-    ma_destination = value;                                                                                            \
-}
-
-#define APPLY_PERMISSION(ma_permission, ma_user)                                                                       \
-APPLY_PERMISSION_WITH_MESSAGE(ma_permission, ma_user, @"Setting a permission should work")
+#define APPLY_PERMISSION(ma_permission, ma_user) \
+    APPLY_PERMISSION_WITH_MESSAGE(ma_permission, ma_user, @"Setting a permission should work")
 
 #define APPLY_PERMISSION_WITH_MESSAGE(ma_permission, ma_user, ma_message) {                                            \
     XCTestExpectation *ex = [self expectationWithDescription:ma_message];                                              \
@@ -165,6 +83,87 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
     [self.userC logOut];
     [super tearDown];
 }
+
+#pragma mark - Permission validation methods
+
+// This macro is only used for the validation methods below.
+#define RECORD_FAILURE(ma_msg) [self recordFailureWithDescription:ma_msg inFile:file atLine:line expected:YES]
+
+#define CHECK_PERMISSION_PRESENT(ma_results, ma_permission) \
+    [self checkPresenceOfPermission:ma_permission inResults:ma_results line:__LINE__ file:@(__FILE__)]
+
+/// Check that the targeted permission is present in, or eventually appears in the results.
+- (void)checkPresenceOfPermission:(RLMSyncPermission *)permission
+                        inResults:(RLMResults<RLMSyncPermission *> *)results
+                             line:(NSUInteger)line
+                             file:(NSString *)file {
+    XCTestExpectation *ex = [self expectationWithDescription:@"Checking presence of permission..."];
+    RLMNotificationToken *token = [results addNotificationBlock:^(RLMResults *r, __unused id c, NSError *err) {
+        if (err) {
+            RECORD_FAILURE(@"Failed to retrieve permissions.");
+            [ex fulfill];
+            return;
+        }
+        if ([r indexOfObject:permission] != NSNotFound) {
+            [ex fulfill];
+        }
+    }];
+    [self waitForExpectations:@[ex] timeout:20.0];
+    [token invalidate];
+}
+
+#define CHECK_PERMISSION_ABSENT(ma_results, ma_permission) \
+    [self checkAbsenceOfPermission:ma_permission inResults:ma_results line:__LINE__ file:@(__FILE__)]
+
+/// Check that the targeted permission is absent from, or eventually disappears from the results.
+- (void)checkAbsenceOfPermission:(RLMSyncPermission *)permission
+                        inResults:(RLMResults<RLMSyncPermission *> *)results
+                             line:(NSUInteger)line
+                             file:(NSString *)file {
+    XCTestExpectation *ex = [self expectationWithDescription:@"Checking presence of permission..."];
+    RLMNotificationToken *token = [results addNotificationBlock:^(RLMResults *r, __unused id c, NSError *err) {
+        if (err) {
+            RECORD_FAILURE(@"Failed to retrieve permissions.");
+            [ex fulfill];
+            return;
+        }
+        if ([r indexOfObject:permission] == NSNotFound) {
+            [ex fulfill];
+        }
+    }];
+    [self waitForExpectations:@[ex] timeout:20.0];
+    [token invalidate];
+}
+
+#define CHECK_PERMISSION_COUNT_AT_LEAST(ma_results, ma_count) \
+    [self checkPermissionCountOfResults:ma_results atLeast:ma_count exact:NO line:__LINE__ file:@(__FILE__)];
+
+#define CHECK_PERMISSION_COUNT(ma_results, ma_count) \
+    [self checkPermissionCountOfResults:ma_results atLeast:ma_count exact:YES line:__LINE__ file:@(__FILE__)];
+
+- (void)checkPermissionCountOfResults:(RLMResults<RLMSyncPermission *> *)results
+                              atLeast:(NSInteger)count
+                                exact:(BOOL)exact
+                                 line:(NSUInteger)line
+                                 file:(NSString *)file {
+    XCTestExpectation *ex = [self expectationWithDescription:@"Checking presence of permission..."];
+    RLMNotificationToken *token = [results addNotificationBlock:^(RLMResults *r, __unused id c, NSError *err) {
+        if (err) {
+            RECORD_FAILURE(@"Failed to retrieve permissions.");
+            [ex fulfill];
+            return;
+        }
+        NSInteger actualCount = (NSInteger)r.count;
+        if (actualCount == count || (!exact && actualCount > count)) {
+            [ex fulfill];
+            return;
+        }
+    }];
+    [self waitForExpectations:@[ex] timeout:20.0];
+    [token invalidate];
+}
+
+#undef RECORD_FAILURE
 
 #pragma mark - Helper methods
 
@@ -574,9 +573,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
     results = [self getPermissionResultsFor:self.userB message:@"One permission after setting the permission."];
 
     // Expected permission: applies to user B, but for user A's Realm.
-    RLMSyncPermission *final = nil;
-    GET_PERMISSION(results, p, final);
-    XCTAssertNotNil(final, @"Did not find the permission %@", p);
+    CHECK_PERMISSION_PRESENT(results, p);
 
     // Check getting permission by its index.
     NSUInteger index = [results indexOfObject:p];
@@ -768,15 +765,12 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
     // Wait for changes to propagate
     CHECK_PERMISSION_COUNT(sorted, 3);
 
-    RLMSyncPermission *n1 = nil;
-    RLMSyncPermission *n2 = nil;
-    RLMSyncPermission *n3 = nil;
-    GET_PERMISSION(sorted, p1, n1);
-    GET_PERMISSION(sorted, p2, n2);
-    GET_PERMISSION(sorted, p3, n3);
-    NSUInteger idx1 = [sorted indexOfObject:n1];
-    NSUInteger idx2 = [sorted indexOfObject:n2];
-    NSUInteger idx3 = [sorted indexOfObject:n3];
+    CHECK_PERMISSION_PRESENT(sorted, p1);
+    CHECK_PERMISSION_PRESENT(sorted, p2);
+    CHECK_PERMISSION_PRESENT(sorted, p3);
+    NSUInteger idx1 = [sorted indexOfObject:p1];
+    NSUInteger idx2 = [sorted indexOfObject:p2];
+    NSUInteger idx3 = [sorted indexOfObject:p3];
     // Make sure they are actually in ascending order.
     XCTAssertNotEqual(idx1, NSNotFound);
     XCTAssertNotEqual(idx2, NSNotFound);
@@ -871,7 +865,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
     }
 
     // Wait for changes to propagate
-    CHECK_PERMISSION_COUNT_PREDICATE(results, 2, >=);
+    CHECK_PERMISSION_COUNT_AT_LEAST(results, 2);
 
     // Create the predicate and retrieve the index of the object.
     NSPredicate *pred = [NSPredicate predicateWithFormat:@"%K == %@", RLMSyncPermissionSortPropertyPath, finalPath];
