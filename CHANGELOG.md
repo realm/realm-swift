@@ -8,17 +8,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 * `-[RLMResults<RLMSyncPermission *> indexOfObject:]` now properly accounts for access
   level.
-### API Breaking Changes
-
-* None.
-
-### Enhancements
-
-* None.
-
-### Bugfixes
-
-* None.
+* Fix a race condition that could lead to a crash accessing to the freed configuration object
+  if a default configuration was set from a different thread.
 
 3.0.0-rc.1 Release notes (2017-10-03)
 =============================================================
@@ -1554,7 +1545,7 @@ Prebuilt frameworks are now built with Xcode 7.3.
   `RLMRealm`/`Realm` instances.
 * Fail with `RLMErrorFileNotFound` instead of the more generic `RLMErrorFileAccess`,
   if no file was found when a realm was opened as read-only or if the directory part
-  of the specified path was not found when a copy should be written.
+  of the specified path was not found when a copy should be written. 
 * Greatly improve performance when deleting objects with one or more indexed
   properties.
 * Indexing `BOOL`/`Bool` and `NSDate` properties are now supported.
@@ -1589,7 +1580,7 @@ Prebuilt frameworks are now built with Xcode 7.3.
 
 * Support for tvOS.
 * Support for building Realm Swift from source when using Carthage.
-* The block parameter of `-[RLMRealm transactionWithBlock:]`/`Realm.write(_:)` is
+* The block parameter of `-[RLMRealm transactionWithBlock:]`/`Realm.write(_:)` is 
   now marked as `__attribute__((noescape))`/`@noescape`.
 * Many forms of queries with key paths on both sides of the comparison operator
   are now supported.
