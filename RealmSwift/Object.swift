@@ -548,12 +548,18 @@ extension Object: AssistedObjectiveCBridgeable {
 
 // MARK: - Migration assistance
 
+extension Object {
+    /// :nodoc:
+    @available(*, unavailable, renamed: "observe()")
+    public func addNotificationBlock(_ block: @escaping (ObjectChange) -> Void) -> NotificationToken {
+        fatalError()
+    }
+
 #if os(OSX)
 #else
-extension Object {
     /// :nodoc:
     @available(*, unavailable, renamed: "isSameObject(as:)") public func isEqual(to object: Any?) -> Bool {
         fatalError()
     }
-}
 #endif
+}

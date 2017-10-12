@@ -645,7 +645,7 @@ NS_REFINED_FOR_SWIFT;
 - (void)invalidate;
 
 /// Stops notifications for the change subscription that returned this token.
-- (void)stop __attribute__((unavailable("Renamed to -invalidate.")));;
+- (void)stop __attribute__((unavailable("Renamed to -invalidate."))) NS_REFINED_FOR_SWIFT;
 @end
 
 NS_ASSUME_NONNULL_END
