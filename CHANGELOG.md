@@ -1,4 +1,4 @@
-3.0.0-rc.2 Release notes (2017-??-??)
+x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
 ### Enhancements
