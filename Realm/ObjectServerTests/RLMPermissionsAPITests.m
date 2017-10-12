@@ -55,6 +55,8 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 @property (nonatomic, strong) RLMSyncUser *userB;
 @property (nonatomic, strong) RLMSyncUser *userC;
 
+@property (nonatomic, strong) NSString *userBUsername;
+
 @end
 
 @implementation RLMPermissionsAPITests
@@ -68,6 +70,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
                                         server:[RLMSyncTestCase authServerURL]];
 
     NSString *userNameB = [accountNameBase stringByAppendingString:@"b"];
+    self.userBUsername = userNameB;
     self.userB = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:userNameB register:YES]
                                         server:[RLMSyncTestCase authServerURL]];
 
@@ -81,6 +84,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
     [self.userA logOut];
     [self.userB logOut];
     [self.userC logOut];
+    self.userBUsername = nil;
     [super tearDown];
 }
 
@@ -108,7 +112,12 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
             [ex fulfill];
         }
     }];
-    [self waitForExpectations:@[ex] timeout:20.0];
+    [self waitForExpectationsWithTimeout:2.0 handler:^(NSError *error) {
+        if (error) {
+            NSLog(@"Timed out. The final state of the permissions is %@; the desired permission was %@",
+                  results, permission);
+        }
+    }];
     [token invalidate];
 }
 
@@ -120,7 +129,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
                         inResults:(RLMResults<RLMSyncPermission *> *)results
                              line:(NSUInteger)line
                              file:(NSString *)file {
-    XCTestExpectation *ex = [self expectationWithDescription:@"Checking presence of permission..."];
+    XCTestExpectation *ex = [self expectationWithDescription:@"Checking absence of permission..."];
     RLMNotificationToken *token = [results addNotificationBlock:^(RLMResults *r, __unused id c, NSError *err) {
         if (err) {
             RECORD_FAILURE(@"Failed to retrieve permissions.");
@@ -131,7 +140,12 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
             [ex fulfill];
         }
     }];
-    [self waitForExpectations:@[ex] timeout:20.0];
+    [self waitForExpectationsWithTimeout:2.0 handler:^(NSError *error) {
+        if (error) {
+            NSLog(@"Timed out. The final state of the permissions is %@; the permission to check for %@",
+                  results, permission);
+        }
+    }];
     [token invalidate];
 }
 
@@ -188,8 +202,9 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
 #pragma mark - Permissions
 
+// FIXME ROS 2.0: works when ROS is manually provided, not when ROS is run as part of tests
 /// If user A grants user B read access to a Realm, user B should be able to read from it.
-- (void)testReadAccess {
+- (void)disabled_testReadAccess {
     __block void(^errorBlock)(NSError *) = nil;
     [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, __unused RLMSyncSession *session) {
         if (errorBlock) {
@@ -244,7 +259,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
         [deniedEx fulfill];
     };
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5", @"child-6"]];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectations:@[deniedEx] timeout:20.0];
 
     // TODO: if we can get the session itself we can check to see if it's been errored out (as expected).
 
@@ -376,7 +391,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
 // FIXME ROS 2.0: still broken
 /// If user A grants user B write access to a Realm via username, user B should be able to write to it.
-- (void)disabled_testWriteAccessViaUsername {
+- (void)testWriteAccessViaUsername {
     __block void(^workBlock)(NSError *) = ^(NSError *err) {
         XCTFail(@"Error handler should not be called unless explicitly expected. Error: %@", err);
     };
@@ -397,10 +412,9 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
     CHECK_COUNT(3, SyncObject, userARealm);
 
     // Give user B write permissions to that Realm via user B's username.
-    NSString *userBUsername = [NSString stringWithFormat:@"%@b", self.currentUsernameBase];
     NSString *userAFullPath = [makeTildeSubstitutedURL(userAURL, self.userA) path];
     RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:userAFullPath
-                                                               username:userBUsername
+                                                               username:self.userBUsername
                                                             accessLevel:RLMSyncAccessLevelWrite];
     // Set the permission.
     APPLY_PERMISSION(p, self.userA);
@@ -608,7 +622,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
     // Make sure the permission deletion is properly reflected.
-    CHECK_PERMISSION_ABSENT(results, p);
+    CHECK_PERMISSION_COUNT(results, 0);
 }
 
 /// Observing permission changes should work.
@@ -1025,8 +1039,9 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
 #pragma mark - Delete Realm upon permission denied
 
+// FIXME ROS 2.0: works when ROS is manually provided, not when ROS is run as part of tests
 /// A Realm which is opened improperly should report an error allowing the app to recover.
-- (void)testDeleteRealmUponPermissionDenied {
+- (void)disabled_testDeleteRealmUponPermissionDenied {
     __block void(^errorBlock)(NSError *, RLMSyncSession *session) = nil;
     [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
         if (errorBlock) {

@@ -34,6 +34,9 @@
 // Set this to 1 if you intend to start up a ROS instance manually to test against.
 #define PROVIDING_OWN_ROS 0
 
+// Set this to 1 if you want the test ROS instance to log its debug messages to console.
+#define LOG_ROS_OUTPUT 0
+
 #if PROVIDING_OWN_ROS
 // Define the admin token as an Objective-C string here if you wish to run tests requiring it.
 // #define OWN_ROS_ADMIN_TOKEN @"token_goes_here"
@@ -267,10 +270,10 @@ static NSURL *syncDirectoryForChildProcess() {
 + (NSString *)retrieveAdminToken {
 #if PROVIDING_OWN_ROS
 #ifdef OWN_ROS_ADMIN_TOKEN
+    return OWN_ROS_ADMIN_TOKEN;
+#else
     NSAssert(NO, @"Cannot run admin token related tests unless you define OWN_ROS_ADMIN_TOKEN.");
     return nil;
-#else
-    return OWN_ROS_ADMIN_TOKEN;
 #endif
 #else
     NSString *adminTokenPath = @"test-ros-instance/data/keys/admin.json";
@@ -372,6 +375,17 @@ static NSURL *syncDirectoryForChildProcess() {
 #endif
 }
 
++ (void)logObjectServerOutput:(__unused NSString *)output {
+#if LOG_ROS_OUTPUT
+    NSArray<NSString *> *array = [output componentsSeparatedByString:@"\n"];
+    for (NSString *piece in array) {
+        if ([piece length] > 0) {
+            NSLog(@"ROS: %@", piece);
+        }
+    }
+#endif
+}
+
 - (void)lazilyInitializeObjectServer {
 #if !PROVIDING_OWN_ROS
     if (!self.isParent || s_task) {
@@ -397,11 +411,14 @@ static NSURL *syncDirectoryForChildProcess() {
         NSString *fragment = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         [stringBuffer appendString:fragment];
         if ([stringBuffer rangeOfString:@"Realm Object Server has started and is listening"].location != NSNotFound) {
+            [RLMSyncTestCase logObjectServerOutput:stringBuffer];
             dispatch_semaphore_signal(sema);
         } else if ([stringBuffer rangeOfString:@"Error: listen EADDRINUSE"].location != NSNotFound) {
+            [RLMSyncTestCase logObjectServerOutput:stringBuffer];
             inUseError = YES;
             dispatch_semaphore_signal(sema);
         } else if ([fragment characterAtIndex:[fragment length] - 1] == '\n') {
+            [RLMSyncTestCase logObjectServerOutput:stringBuffer];
             // Reached EOL, reset the string buffer.
             [stringBuffer setString:@""];
         }
