@@ -204,7 +204,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
 // FIXME ROS 2.0: works when ROS is manually provided, not when ROS is run as part of tests
 /// If user A grants user B read access to a Realm, user B should be able to read from it.
-- (void)disabled_testReadAccess {
+- (void)testReadAccess {
     __block void(^errorBlock)(NSError *) = nil;
     [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, __unused RLMSyncSession *session) {
         if (errorBlock) {
@@ -902,7 +902,6 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
                                              accessLevel:RLMSyncAccessLevelRead];
     XCTAssertEqual([results indexOfObject:p3], NSNotFound);
     // A permission with a differing path should not match.
-    // A permission with a differing identity should not match.
     id p4 = [[RLMSyncPermission alloc] initWithRealmPath:[makeTildeSubstitutedURL(url, self.userB) path]
                                                 identity:uB
                                              accessLevel:RLMSyncAccessLevelRead];
@@ -1105,7 +1104,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
 // FIXME ROS 2.0: works when ROS is manually provided, not when ROS is run as part of tests
 /// A Realm which is opened improperly should report an error allowing the app to recover.
-- (void)disabled_testDeleteRealmUponPermissionDenied {
+- (void)testDeleteRealmUponPermissionDenied {
     __block void(^errorBlock)(NSError *, RLMSyncSession *session) = nil;
     [[RLMSyncManager sharedManager] setErrorHandler:^(NSError *error, RLMSyncSession *session) {
         if (errorBlock) {
