@@ -39,6 +39,7 @@ bool keypath_is_valid(NSString *keypath)
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         valid = [NSSet setWithArray:@[RLMSyncPermissionSortPropertyPath,
+                                      RLMSyncPermissionSortPropertyUserID,
                                       RLMSyncPermissionSortPropertyUpdated]];
     });
     return [valid containsObject:keypath];
@@ -48,6 +49,8 @@ bool keypath_is_valid(NSString *keypath)
 
 /// Sort by the Realm Object Server path to the Realm to which the permission applies.
 RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyPath       = @"path";
+/// Sort by the identity of the user to whom the permission applies.
+RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUserID     = @"userId";
 /// Sort by the date the permissions were last updated.
 RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated    = @"updatedAt";
 
@@ -97,8 +100,27 @@ RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated    = @"
     if ([path rangeOfString:@"~"].location != NSNotFound) {
         path = [path stringByReplacingOccurrencesOfString:@"~" withString:object.identity];
     }
-    // Build the predicate. Check based on the path.
-    return [self indexOfObjectWhere:@"%K = %@", RLMSyncPermissionSortPropertyPath, path];
+    NSString *topPrivilege;
+    switch (object.accessLevel) {
+        case RLMSyncAccessLevelNone:
+            // Deleted permissions are removed from the permissions Realm by ROS.
+            return NSNotFound;
+        case RLMSyncAccessLevelRead:
+            topPrivilege = @"mayRead";
+            break;
+        case RLMSyncAccessLevelWrite:
+            topPrivilege = @"mayWrite";
+            break;
+        case RLMSyncAccessLevelAdmin:
+            topPrivilege = @"mayManage";
+            break;
+    }
+    // Build the predicate.
+    NSPredicate *p = [NSPredicate predicateWithFormat:@"%K = %@ AND %K = %@ AND %K == YES",
+                      RLMSyncPermissionSortPropertyPath, path,
+                      RLMSyncPermissionSortPropertyUserID, object.identity,
+                      topPrivilege];
+    return [self indexOfObjectWithPredicate:p];
 }
 
 - (NSUInteger)indexOfObjectWithPredicate:(NSPredicate *)predicate {
