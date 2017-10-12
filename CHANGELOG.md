@@ -1,3 +1,14 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Enhancements
+* Reinstate `RLMSyncPermissionSortPropertyUserID` to allow users to sort permissions
+  to their own Realms they've granted to others.
+
+### Bugfixes
+* `-[RLMResults<RLMSyncPermission *> indexOfObject:]` now properly accounts for access
+  level.
+
 3.0.0-rc.1 Release notes (2017-10-03)
 =============================================================
 

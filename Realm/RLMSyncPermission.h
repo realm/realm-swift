@@ -58,6 +58,8 @@ typedef NSString * RLMSyncPermissionSortProperty NS_STRING_ENUM;
 
 /// Sort by the Realm Object Server path to the Realm to which the permission applies.
 extern RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyPath;
+/// Sort by the identity of the user to whom the permission applies.
+extern RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUserID;
 /// Sort by the date the permissions were last updated.
 extern RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated;
 
