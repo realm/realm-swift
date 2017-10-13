@@ -8,6 +8,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 * `-[RLMResults<RLMSyncPermission *> indexOfObject:]` now properly accounts for access
   level.
+* Fix a race condition that could lead to a crash accessing to the freed configuration object
+  if a default configuration was set from a different thread.
 
 3.0.0-rc.1 Release notes (2017-10-03)
 =============================================================
