@@ -369,6 +369,34 @@ class MigrationTests: TestCase {
         }
     }
 
+    func testEnumerateObjectsAfterDeleteData() {
+        autoreleasepool {
+            // add object
+            try! Realm().write {
+                try! Realm().create(SwiftStringObject.self, value: ["1"])
+                try! Realm().create(SwiftStringObject.self, value: ["2"])
+                try! Realm().create(SwiftStringObject.self, value: ["3"])
+            }
+        }
+
+        migrateAndTestDefaultRealm(1) { migration, _ in
+            var count = 0
+            migration.enumerateObjects(ofType: "SwiftStringObject") { _, _ in
+                count += 1
+            }
+            XCTAssertEqual(count, 3)
+
+            migration.deleteData(forType: "SwiftStringObject")
+            migration.create("SwiftStringObject", value: ["A"])
+
+            count = 0
+            migration.enumerateObjects(ofType: "SwiftStringObject") { _, _ in
+                count += 1
+            }
+            XCTAssertEqual(count, 0)
+        }
+    }
+
     func testCreate() {
         autoreleasepool {
             _ = try! Realm()
