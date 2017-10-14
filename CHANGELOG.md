@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.0.0-rc.2 Release notes (2017-10-14)
 =============================================================
 
 ### Enhancements
