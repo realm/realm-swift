@@ -721,11 +721,13 @@
         }
     }];
 
-    // Nested call is deferred.
+    // Triggers one call on each block. Nested call is deferred until next refresh.
     [self waitForNotification:RLMRealmDidChangeNotification realm:results.realm block:^{
         [self createObject:0];
     }];
     XCTAssertEqual(calls, 1);
+    [results.realm refresh];
+    XCTAssertEqual(calls, 2);
 
     // Triggers one call on each block
     [self waitForNotification:RLMRealmDidChangeNotification realm:results.realm block:^{
