@@ -403,6 +403,8 @@ static NSURL *syncDirectoryForChildProcess() {
     // Warning: if the way the ROS is launched is changed, remember to also update
     // the regex in build.sh's kill_object_server() function.
     task.arguments = @[@"./ros/bin/ros", @"start", @"--auth", @"debug,password"];
+    // FIXME: We pretend to be running under Jenkins to suppress a prompt. There must be a better way.
+    task.environment = @{@"JENKINS": @"YES"};
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     task.standardOutput = pipe;
     task.standardError = pipe;
