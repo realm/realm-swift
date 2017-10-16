@@ -45,8 +45,8 @@
   types.
 * Remove `RLMSyncPermissionResults`. `RLMSyncPermission`s are now vended out
   using a `RLMResults`. This results collection supports all normal collection
-  operations except for setting values using KVO (since `RLMSyncPermission`s are
-  immutable) and the property aggregation operations.
+  operations except for setting values using key-value coding (since
+  `RLMSyncPermission`s are immutable) and the property aggregation operations.
 * `RLMSyncUserInfo` has been significantly enhanced. It now contains metadata
   about a user stored on the Realm Object Server, as well as a list of all user account
   data associated with that user.
