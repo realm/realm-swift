@@ -57,10 +57,6 @@
 * `List.removeLast()` now throws an exception if the list is empty, to more closely match
   the behavior of the standard library's `Collection.removeLast()` implementation.
 * `RealmCollection`'s associated type `Element` has been renamed `ElementType`.
-* Realm Swift collection types (`List`, `Results`, `AnyRealmCollection`, and
-  `LinkingObjects` have had their generic type parameter changed from `T` to
-  `Element`).
-* `RealmOptional`'s generic type parameter has been changed from `T` to `Value`.
 * The following APIs have been renamed:
 
 | Old API                                                     | New API                                                        |
