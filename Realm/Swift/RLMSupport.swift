@@ -133,3 +133,8 @@ extension RLMSyncSession {
                                          block: block)
     }
 }
+
+extension RLMNotificationToken {
+    @available(*, unavailable, renamed: "invalidate()")
+    @nonobjc public func stop() { fatalError() }
+}
