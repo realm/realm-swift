@@ -6,46 +6,13 @@
 * Synchronized Realms require a server running Realm Object Server v2.0 or higher.
 * Computed properties on Realm object types are detected and no
   longer added to the automatically generated schema.
-* Remove the following deprecated Objective-C APIs:
-  `-[RLMArray sortedResultsUsingProperty:ascending:]`,
-  `-[RLMCollection sortedResultsUsingProperty:ascending:]`,
-  `-[RLMResults sortedResultsUsingProperty:ascending:]`,
-  `+[RLMSortDescriptor sortDescriptorWithProperty:ascending:]`,
-  `RLMSortDescriptor.property`.
-  These APIs have been superseded by equivalent APIs that take
-  or return key paths instead of property names.
-* Remove the following deprecated Objective-C API:
-  `+[RLMRealm migrateRealm:configuration:]`.
-  Please use `+[RLMRealm performMigrationForConfiguration:error:]` instead.
-* Remove the following deprecated Swift APIs:
-  `AnyRealmCollection.sorted(byProperty:, ascending:)`,
-  `LinkingObjects.sorted(byProperty:, ascending:)`,
-  `List.sorted(byProperty:, ascending:)`,
-  `Results.sorted(byProperty:, ascending:)`,
-  `SortDescriptor.init(property:, ascending:)`,
-  `SortDescriptor.property`.
-  These APIs have been superseded by equivalent APIs that take
-  or return key paths instead of property names.
 * The Objective-C and Swift `create(_:, value: update:)` APIs now
   correctly nil out nullable properties when updating an existing
   object when the `value` argument specifies nil or `NSNull` for
   the property value.
-* `-[RLMRealm addOrUpdateObjectsInArray:]` has been renamed to
-  `-[RLMRealm addOrUpdateObjects:]` for consistency with similar methods
-  that add or delete objects.
 * `-[RLMRealm addOrUpdateObjects:]` and `-[RLMRealm deleteObjects:]` now
   require their argument to conform to `NSFastEnumeration`, to match similar
   APIs that also take collections.
-* Remove deprecated `{RLM}SyncPermission` and `{RLM}SyncPermissionChange`
-  classes.
-* `{RLM}SyncPermissionValue` has been renamed to just `{RLM}SyncPermission`.
-  Its `userId` property has been renamed `identity`, and its
-  `-initWithRealmPath:userID:accessLevel:` initializer has been renamed
-  `-initWithRealmPath:identity:accessLevel:`.
-* Remove deprecated `-[RLMSyncUser permissionRealmWithError:]` and
-  `SyncUser.permissionRealm()` APIs. Use the new permissions system.
-* Remove deprecated error `RLMSyncErrorBadResponse`. Use
-  `RLMSyncAuthErrorBadResponse` instead.
 * The way interactive sync errors (client reset and permission denied)
   are delivered to the user has been changed. Instead of a block which can
   be invoked to immediately delete the offending Realm file, an opaque
@@ -53,25 +20,14 @@
   error object's `userInfo` dictionary. This error object can be passed
   into the new `+[RLMSyncSession immediatelyHandleError:]` API to delete
   the files.
-* Remove `-[NSError rlmSync_clientResetBlock]` and
-  `-[NSError rlmSync_deleteRealmBlock]` APIs.
 * The return types of the `SyncError.clientResetInfo()` and
   `SyncError.deleteRealmUserInfo()` APIs have been changed. They now return
   `RLMSyncErrorActionToken`s or `SyncError.ActionToken`s instead of closures.
-* The (erroneously added) instance property `Object.className` has been
-  removed.
 * The class methods `Object.className()`, `Object.objectUtilClass()`, and
   the property `Object.isInvalidated` can no longer be overriden.
 * The callback which runs when a sync user login succeeds or fails
   now runs on the main queue by default, or can be explicitly specified
   by a new `callbackQueue` parameter on the `{RLM}SyncUser.logIn(...)` API.
-* Rename `{RLM}NotificationToken.stop()` to `invalidate()` and
-  `{RealmCollection,SyncPermissionResults}.addNotificationBlock(_:)` to
-  `observe(_:)` to mirror Foundation's new KVO APIs.
-* The `RLMSyncProgress` enum has been renamed `RLMSyncProgressMode`.
-* Remove deprecated `{RLM}SyncManager.disableSSLValidation` property. Disable
-  SSL validation on a per-Realm basis by setting the `enableSSLValidation`
-  property on `{RLM}SyncConfiguration` instead.
 * Fix empty strings, binary data, and null on the right side of `BEGINSWITH`,
   `ENDSWITH` and `CONTAINS` operators in predicates to match Foundation's
   semantics of never matching any strings or data.
@@ -84,14 +40,9 @@
   properties after generic Realm properties (like `List<T>`), the schema
   would be constructed incorrectly. Fixes an issue where creating such
   models from an array could fail.
-* Rename `List.remove(objectAtIndex:)` to `List.remove(at:)` to match the name
-  used by 'RangeReplaceableCollection'.
-* Rename `List.swap()` to `List.swapAt()` to match the name used by 'Array'.
 * Loosen `RLMArray` and `RLMResults`'s generic constraint from `RLMObject` to
   `NSObject`. This may result in having to add some casts to disambiguate
   types.
-* Remove `RLMPropertyTypeArray` in favor of a separate bool `array` property on
-  `RLMProperty`/`Property`.
 * Remove `RLMSyncPermissionResults`. `RLMSyncPermission`s are now vended out
   using a `RLMResults`. This results collection supports all normal collection
   operations except for setting values using KVO (since `RLMSyncPermission`s are
@@ -105,15 +56,57 @@
   make sense for `List` have been added.
 * `List.removeLast()` now throws an exception if the list is empty, to more closely match
   the behavior of the standard library's `Collection.removeLast()` implementation.
-* Remove `RLMSyncPermissionOffer` and `RLMSyncPermissionOfferResponse` classes
-  and associated helper methods and functions. Use the
-  `-[RLMSyncUser createOfferForRealmAtURL:accessLevel:expiration:callback:]`
-  and `-[RLMSyncUser acceptOfferForToken:callback:]` methods instead.
 * `RealmCollection`'s associated type `Element` has been renamed `ElementType`.
 * Realm Swift collection types (`List`, `Results`, `AnyRealmCollection`, and
   `LinkingObjects` have had their generic type parameter changed from `T` to
   `Element`).
 * `RealmOptional`'s generic type parameter has been changed from `T` to `Value`.
+* The following APIs have been renamed:
+
+| Old API                                                     | New API                                                        |
+|:------------------------------------------------------------|:---------------------------------------------------------------|
+| `NotificationToken.stop()`                                  | `NotificationToken.invalidate()`                               |
+| `-[RLMNotificationToken stop]`                              | `-[RLMNotificationToken invalidate]`                           |
+| `RealmCollection.addNotificationBlock(_:)`                  | `RealmCollection.observe(_:)`                                  |
+| `RLMSyncProgress`                                           | `RLMSyncProgressMode`                                          |
+| `List.remove(objectAtIndex:)`                               | `List.remove(at:)`                                             |
+| `List.swap(_:_:)`                                           | `List.swapAt(_:_:)`                                            |
+| `SyncPermissionValue`                                       | `SyncPermission`                                               |
+| `RLMSyncPermissionValue`                                    | `RLMSyncPermission`                                            |
+| `-[RLMSyncPermission initWithRealmPath:userID:accessLevel]` | `-[RLMSyncPermission initWithRealmPath:identity:accessLevel:]` |
+| `RLMSyncPermission.userId`                                  | `RLMSyncPermission.identity`                                   |
+| `-[RLMRealm addOrUpdateObjectsInArray:]`                    | `-[RLMRealm addOrUpdateObjects:]`                              |
+
+* The following APIs have been removed:
+
+| Removed API                                                  | Replacement                                                                               |
+|:-------------------------------------------------------------|:------------------------------------------------------------------------------------------|
+| `Object.className`                                           | None, was erroneously present.                                                            |
+| `RLMPropertyTypeArray`                                       | `RLMProperty.array`                                                                       |
+| `PropertyType.array`                                         | `Property.array`                                                                          |
+| `-[RLMArray sortedResultsUsingProperty:ascending:]`          | `-[RLMArray sortedResultsUsingKeyPath:ascending:]`                                        |
+| `-[RLMCollection sortedResultsUsingProperty:ascending:]`     | `-[RLMCollection sortedResultsUsingKeyPath:ascending:]`                                   |
+| `-[RLMResults sortedResultsUsingProperty:ascending:]`        | `-[RLMResults sortedResultsUsingKeyPath:ascending:]`                                      |
+| `+[RLMSortDescriptor sortDescriptorWithProperty:ascending:]` | `+[RLMSortDescriptor sortDescriptorWithKeyPath:ascending:]`                               |
+| `RLMSortDescriptor.property`                                 | `RLMSortDescriptor.keyPath`                                                               |
+| `AnyRealmCollection.sorted(byProperty:ascending:)`           | `AnyRealmCollection.sorted(byKeyPath:ascending:)`                                         |
+| `List.sorted(byProperty:ascending:)`                         | `List.sorted(byKeyPath:ascending:)`                                                       |
+| `LinkingObjects.sorted(byProperty:ascending:)`               | `LinkingObjects.sorted(byKeyPath:ascending:)`                                             |
+| `Results.sorted(byProperty:ascending:)`                      | `Results.sorted(byKeyPath:ascending:)`                                                    |
+| `SortDescriptor.init(property:ascending:)`                   | `SortDescriptor.init(keyPath:ascending:)`                                                 |
+| `SortDescriptor.property`                                    | `SortDescriptor.keyPath`                                                                  |
+| `+[RLMRealm migrateRealm:configuration:]`                    | `+[RLMRealm performMigrationForConfiguration:error:]`                                     |
+| `RLMSyncManager.disableSSLValidation`                        | `RLMSyncConfiguration.enableSSLValidation`                                                |
+| `SyncManager.disableSSLValidation`                           | `SyncConfiguration.enableSSLValidation`                                                   |
+| `RLMSyncErrorBadResponse`                                    | `RLMSyncAuthErrorBadResponse`                                                             |
+| `RLMSyncPermissionResults`                                   | `RLMResults`                                                                              |
+| `SyncPermissionResults`                                      | `Results`                                                                                 |
+| `RLMSyncPermissionChange`                                    | `-[RLMSyncUser applyPermission:callback]` / `-[RLMSyncUser deletePermission:callback:]`   |
+| `-[RLMSyncUser permissionRealmWithError:]`                   | `-[RLMSyncUser retrievePermissionsWithCallback:]`                                         |
+| `RLMSyncPermissionOffer`                                     | `-[RLMSyncUser createOfferForRealmAtURL:accessLevel:expiration:callback:]`                |
+| `RLMSyncPermissionOfferResponse`                             | `-[RLMSyncUser acceptOfferForToken:callback:]`                                            |
+| `-[NSError rlmSync_clientResetBlock]`                        | `-[NSError rlmSync_errorActionToken]` / `-[NSError rlmSync_clientResetBackedUpRealmPath]` |
+| `-[NSError rlmSync_deleteRealmBlock]`                        | `-[NSError rlmSync_errorActionToken]`                                                     |
 
 ### Enhancements
 * `List` can now contain values of types `Bool`, `Int`, `Int8`, `Int16`,
