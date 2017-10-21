@@ -106,7 +106,7 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
         }
 
         NSString *className = NSStringFromClass(cls);
-        if ([className hasPrefix:@"RLM:"]) {
+        if ([className hasPrefix:@"RLM:"] || [className hasPrefix:@"NSKVONotifying"]) {
             continue;
         }
 

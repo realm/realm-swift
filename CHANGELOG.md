@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Explicitly exclude KVO-generated object subclasses from the schema.
+
 3.0.0 Release notes (2017-10-16)
 =============================================================
 

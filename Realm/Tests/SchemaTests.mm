@@ -836,6 +836,20 @@ RLM_ARRAY_TYPE(NotARealClass)
     XCTAssertNoThrow([[MutualLink1Object alloc] initWithValue:@[@[@{}]]]);
 }
 
+- (void)testKVOSubclassesDoNotAppearInSchema {
+    if (self.isParent) {
+        RLMRunChildAndWait();
+        return;
+    }
+
+    auto obj = [IntObject new];
+    [obj addObserver:self forKeyPath:@"intCol" options:0 context:0];
+    for (RLMObjectSchema *objectSchema in RLMRealm.defaultRealm.schema.objectSchema) {
+        XCTAssertEqual([objectSchema.className rangeOfString:@"RLM:"].location, NSNotFound);
+    }
+    [obj removeObserver:self forKeyPath:@"intCol" context:0];
+}
+
 #if !DEBUG
 - (void)testMultipleProcessesTryingToInitializeSchema {
     RLMRealm *syncRealm = [self realmWithTestPath];
