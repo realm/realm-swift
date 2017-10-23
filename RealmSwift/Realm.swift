@@ -340,7 +340,7 @@ public final class Realm {
      */
     @discardableResult
     public func create<T: Object>(_ type: T.Type, value: Any = [:], update: Bool = false) -> T {
-        let typeName = Realm.normalizedTypeName(for: (type as Object.Type).className())
+        let typeName = (type as Object.Type).className()
         if update && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
         }
@@ -474,7 +474,7 @@ public final class Realm {
      - returns: A `Results` containing the objects.
      */
     public func objects<Element: Object>(_ type: Element.Type) -> Results<Element> {
-        return Results(RLMGetObjects(rlmRealm, Realm.normalizedTypeName(for: type.className()), nil))
+        return Results(RLMGetObjects(rlmRealm, type.className(), nil))
     }
 
     /**
@@ -506,8 +506,7 @@ public final class Realm {
      - returns: An object of type `type`, or `nil` if no instance with the given primary key exists.
      */
     public func object<Element: Object, KeyType>(ofType type: Element.Type, forPrimaryKey key: KeyType) -> Element? {
-        return unsafeBitCast(RLMGetObject(rlmRealm,
-                                          Realm.normalizedTypeName(for: (type as Object.Type).className()),
+        return unsafeBitCast(RLMGetObject(rlmRealm, (type as Object.Type).className(),
                                           dynamicBridgeCast(fromSwift: key)) as! RLMObjectBase?,
                              to: Optional<Element>.self)
     }
@@ -669,16 +668,6 @@ public final class Realm {
 
     internal init(_ rlmRealm: RLMRealm) {
         self.rlmRealm = rlmRealm
-    }
-
-    internal static func normalizedTypeName(for typeName: String) -> String {
-        // A managed object type name consists of the prefix, a sequence number, and then the base type name.
-        // An unmanaged object type name consists of the prefix, then the base type name.
-        guard let normalizedName = typeName.components(separatedBy: " ").last else {
-            throwRealmException("\'\(typeName)\' is not a valid Realm model object class name.")
-            fatalError()
-        }
-        return normalizedName
     }
 }
 

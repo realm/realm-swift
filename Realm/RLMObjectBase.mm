@@ -209,6 +209,12 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
     if ([RLMSwiftSupport isSwiftClassName:className]) {
         className = [RLMSwiftSupport demangleClassName:className];
     }
+    if ([className hasPrefix:@"RLM:"] ) {
+        // Getting an object type at runtime may return the managed or unmanaged
+        // subclass type name instead. If so, demangle it.
+        NSArray<NSString *> *parts = [className componentsSeparatedByString:@" "];
+        return [parts lastObject];
+    }
     return className;
 }
 
