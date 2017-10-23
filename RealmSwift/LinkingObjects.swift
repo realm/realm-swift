@@ -96,8 +96,6 @@ public final class LinkingObjects<Element: Object>: LinkingObjectsBase {
      Creates an instance of a `LinkingObjects`. This initializer should only be called when declaring a property on a
      Realm model.
 
-     - warning: Specify the element type explicitly; do not use Swift's `type(of:)` built-in.
-
      - parameter type:         The type of the object owning the property the linking objects should refer to.
      - parameter propertyName: The property name of the property the linking objects should refer to.
      */
