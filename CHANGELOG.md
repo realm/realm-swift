@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Swift APIs on `Realm` which accept an object type as a parameter now properly
+  accept the runtime types returned by Swift's `type(of:)` built-in.
+
 3.0.0 Release notes (2017-10-16)
 =============================================================
 
