@@ -653,4 +653,46 @@ class ObjectTests: TestCase {
         // Should be able to use `isSameObject(as:)` to check if same row in the database.
         XCTAssertTrue(testObject.isSameObject(as: retrievedObject))
     }
+
+    func testRetrievingObjectWithRuntimeType() {
+        let realm = try! Realm()
+
+        let unmanagedStringObject = SwiftPrimaryStringObject()
+        unmanagedStringObject.stringCol = UUID().uuidString
+        let managedStringObject = SwiftPrimaryStringObject()
+        managedStringObject.stringCol = UUID().uuidString
+
+        // Add the object.
+        try! realm.write {
+            realm.add(managedStringObject)
+        }
+
+        // Shouldn't throw when using type(of:).
+        XCTAssertNotNil(realm.object(ofType: type(of: unmanagedStringObject),
+                                     forPrimaryKey: managedStringObject.stringCol))
+
+        // Shouldn't throw when using type(of:).
+        XCTAssertNotNil(realm.object(ofType: type(of: managedStringObject),
+                                     forPrimaryKey: managedStringObject.stringCol))
+    }
+
+    func testRetrievingObjectsWithRuntimeType() {
+        let realm = try! Realm()
+
+        let unmanagedStringObject = SwiftStringObject()
+        unmanagedStringObject.stringCol = "foo"
+        let managedStringObject = SwiftStringObject()
+        managedStringObject.stringCol = "bar"
+
+        // Add the object.
+        try! realm.write {
+            realm.add(managedStringObject)
+        }
+
+        // Shouldn't throw when using type(of:).
+        XCTAssertEqual(realm.objects(type(of: unmanagedStringObject)).count, 1)
+
+        // Shouldn't throw when using type(of:).
+        XCTAssertEqual(realm.objects(type(of: managedStringObject)).count, 1)
+    }
 }

@@ -559,6 +559,27 @@ class ObjectCreationTests: TestCase {
         realm.cancelWrite()
     }
 
+    func testCreateOrUpdateDynamicUnmanagedType() {
+        let realm = try! Realm()
+        let unmanagedValue = SwiftOptionalPrimaryObject()
+        // Shouldn't throw.
+        realm.beginWrite()
+        _ = realm.create(type(of: unmanagedValue), value: unmanagedValue, update: true)
+        realm.cancelWrite()
+    }
+
+    func testCreateOrUpdateDynamicManagedType() {
+        let realm = try! Realm()
+        let managedValue = SwiftOptionalPrimaryObject()
+        try! realm.write {
+            realm.add(managedValue)
+        }
+        // Shouldn't throw.
+        realm.beginWrite()
+        _ = realm.create(type(of: managedValue), value: managedValue, update: true)
+        realm.cancelWrite()
+    }
+
     // test null object
     // test null list
 

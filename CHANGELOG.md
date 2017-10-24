@@ -12,6 +12,8 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Explicitly exclude KVO-generated object subclasses from the schema.
+* Fix regression where the type of a Realm model class is not properly determined, causing crashes
+  when a type value derived at runtime by `type(of:)` is passed into certain APIs.
 
 3.0.0 Release notes (2017-10-16)
 =============================================================
