@@ -1459,7 +1459,7 @@ EOF
         ;;
 
     "add-empty-changelog")
-        read -r -d '' empty_section << EOS
+        empty_section=$(cat <<EOS
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
@@ -1474,7 +1474,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * None.
-EOS
+EOS)
         changelog=$(cat CHANGELOG.md)
         echo "$empty_section" > CHANGELOG.md
         echo >> CHANGELOG.md
