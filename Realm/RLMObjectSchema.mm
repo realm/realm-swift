@@ -182,7 +182,7 @@ using namespace realm;
 
     unsigned int count;
     std::unique_ptr<objc_property_t[], decltype(&free)> props(class_copyPropertyList(objectClass, &count), &free);
-    NSMutableArray *propArray = [NSMutableArray arrayWithCapacity:count];
+    NSMutableArray<RLMProperty *> *propArray = [NSMutableArray arrayWithCapacity:count];
     NSSet *indexed = [[NSSet alloc] initWithArray:[objectUtil indexedPropertiesForClass:objectClass]];
     for (unsigned int i = 0; i < count; i++) {
         NSString *propertyName = @(property_getName(props[i]));
@@ -210,84 +210,8 @@ using namespace realm;
         }
     }
 
-    auto existingPropertyIndex = [=](NSString *name) -> NSUInteger {
-        return [propArray indexOfObjectPassingTest:^BOOL(RLMProperty *obj, NSUInteger, BOOL *) {
-            return [obj.name isEqualToString:name];
-        }];
-    };
-    auto addProperty = [=](RLMProperty *prop, NSInteger index) {
-        NSUInteger existing = existingPropertyIndex(prop.name);
-        if (existing != NSNotFound) {
-            propArray[existing] = prop;
-        }
-        else {
-            [propArray insertObject:prop atIndex:index];
-        }
-    };
-
     if (isSwiftClass) {
-        // List<> and LinkingObjects<> properties don't show up as Objective-C
-        // properties due to being generic, so use Swift reflection to get a list
-        // of them, and then access their ivars directly.
-        NSArray<RLMGenericPropertyMetadata *> *props = [objectUtil getSwiftGenericProperties:swiftObjectInstance];
-        if (props) {
-            // Types like String? are reported as properties to the obj-c runtime,
-            // but with no indication as to whether or not they're optional. We deal
-            // with this by marking them as required, and then using Swift
-            // reflection to re-check it.
-            for (RLMProperty *property in propArray) {
-                if (!property.array) {
-                    property.optional = false;
-                }
-            }
-        }
-        for (RLMGenericPropertyMetadata *md in props) {
-            switch (md.kind) {
-                case RLMGenericPropertyKindList:
-                    addProperty([[RLMProperty alloc] initSwiftListPropertyWithName:md.propertyName
-                                                                          instance:swiftObjectInstance],
-                                md.index);
-                    break;
-                case RLMGenericPropertyKindLinkingObjects: {
-                    Ivar ivar = class_getInstanceVariable(objectClass, md.propertyName.UTF8String);
-                    addProperty([[RLMProperty alloc] initSwiftLinkingObjectsPropertyWithName:md.propertyName
-                                                                                        ivar:ivar
-                                                                             objectClassName:md.className
-                                                                      linkOriginPropertyName:md.linkedPropertyName],
-                                md.index);
-                    break;
-                }
-                case RLMGenericPropertyKindOptional: {
-                    NSUInteger existing = existingPropertyIndex(md.propertyName);
-                    if (existing != NSNotFound) {
-                        // This optional property corresponds to a property we found
-                        // earlier, while enumerating the Objective-C visible properties.
-                        RLMProperty *property = propArray[existing];
-                        property.optional = true;
-                        property.type = RLMPropertyType(md.propertyType);
-                    } else {
-                        // This property wasn't detected earlier.
-                        Ivar ivar = class_getInstanceVariable(objectClass, md.propertyName.UTF8String);
-                        RLMPropertyType type = RLMPropertyType(md.propertyType);
-                        BOOL isIndexed = [indexed containsObject:md.propertyName];
-                        addProperty([[RLMProperty alloc] initSwiftOptionalPropertyWithName:md.propertyName
-                                                                                   indexed:isIndexed
-                                                                                      ivar:ivar
-                                                                              propertyType:type],
-                                    md.index);
-                    }
-                    break;
-                }
-                case RLMGenericPropertyKindNilLiteralOptional: {
-                    NSUInteger existing = existingPropertyIndex(md.propertyName);
-                    if (existing != NSNotFound) {
-                        RLMProperty *property = propArray[existing];
-                        property.optional = true;
-                    }
-                    break;
-                }
-            }
-        }
+        [self addSwiftProperties:propArray objectUtil:objectUtil instance:swiftObjectInstance indexed:indexed];
     }
 
     if (auto requiredProperties = [objectUtil requiredPropertiesForClass:objectClass]) {
@@ -309,6 +233,94 @@ using namespace realm;
     }
 
     return propArray;
+}
+
++ (void)addSwiftProperties:(NSMutableArray<RLMProperty *> *)propArray
+                objectUtil:(Class)objectUtil
+                  instance:(id)instance
+                   indexed:(NSSet<NSString *> *)indexed {
+    // The property list reported to the obj-c runtime for Swift objects is
+    // incomplete and doesn't include Swift generics like List<> and
+    // RealmOptional<>, and is missing information for some properties that
+    // are reported, such as the difference between `String` and `String?`. To
+    // deal with this, we also get the properties from Swift reflection, and
+    // merge the results.
+
+    NSArray<RLMSwiftPropertyMetadata *> *props = [objectUtil getSwiftProperties:instance];
+    if (!props) {
+        // A Swift subclass of RLMObject, which operates under obj-c rules
+        return;
+    }
+
+    // Track the index that we expect the next property to go in, for inserting
+    // generic properties into the correct place
+    NSUInteger nextIndex = 0;
+    for (RLMSwiftPropertyMetadata *md in props) {
+        // In theory existing should only ever be nextIndex or NSNotFound, and
+        // this search is just a waste of time.
+        // FIXME: verify if this is actually true
+        NSUInteger existing = [propArray indexOfObjectPassingTest:^(RLMProperty *obj, NSUInteger, BOOL *) {
+            return [obj.name isEqualToString:md.propertyName];
+        }];
+
+        switch (md.kind) {
+            case RLMSwiftPropertyKindList: // List<>
+                [propArray insertObject:[[RLMProperty alloc] initSwiftListPropertyWithName:md.propertyName
+                                                                                  instance:instance]
+                                atIndex:nextIndex];
+                break;
+            case RLMSwiftPropertyKindLinkingObjects: { // LinkingObjects<>
+                Ivar ivar = class_getInstanceVariable([instance class], md.propertyName.UTF8String);
+                [propArray insertObject:[[RLMProperty alloc] initSwiftLinkingObjectsPropertyWithName:md.propertyName
+                                                                                                ivar:ivar
+                                                                                     objectClassName:md.className
+                                                                              linkOriginPropertyName:md.linkedPropertyName]
+                                atIndex:nextIndex];
+                break;
+            }
+            case RLMSwiftPropertyKindOptional: {
+                if (existing != NSNotFound) {
+                    // String?, Data?, Date? with a non-nil default value
+                    // We already know about this property from obj-c and we
+                    // defaulted to optional, so nothing to do
+                    break;
+                }
+
+                // RealmOptional<>
+                Ivar ivar = class_getInstanceVariable([instance class], md.propertyName.UTF8String);
+                BOOL isIndexed = [indexed containsObject:md.propertyName];
+                [propArray insertObject:[[RLMProperty alloc] initSwiftOptionalPropertyWithName:md.propertyName
+                                                                                       indexed:isIndexed
+                                                                                          ivar:ivar
+                                                                                  propertyType:md.propertyType]
+                                atIndex:nextIndex];
+                break;
+            }
+
+            case RLMSwiftPropertyKindOther:
+            case RLMSwiftPropertyKindNilLiteralOptional:
+                // This might be a property which wasn't reported to obj-c and
+                // isn't one of our supported generic types, in which case we
+                // ignore it
+                if (existing == NSNotFound) {
+                    --nextIndex;
+                }
+                // or it might be a String?, Data?, Date? or object field with
+                // a nil default value
+                else if (md.kind == RLMSwiftPropertyKindNilLiteralOptional) {
+                    propArray[existing].optional = true;
+                }
+                // or it may be some non-optional property which may have been
+                // previously marked as optional due to that being the default
+                // in obj-c
+                else {
+                    propArray[existing].optional = false;
+                }
+                break;
+        }
+
+        ++nextIndex;
+    }
 }
 
 - (id)copyWithZone:(NSZone *)zone {

@@ -20,6 +20,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class RLMProperty, RLMArray, RLMSwiftPropertyMetadata;
+typedef NS_ENUM(int32_t, RLMPropertyType);
+
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
 @public
@@ -96,7 +99,6 @@ FOUNDATION_EXTERN Class RLMObjectUtilClass(BOOL isSwift);
 
 FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 
-@class RLMProperty, RLMArray, RLMGenericPropertyMetadata;
 @interface RLMObjectUtil : NSObject
 
 + (nullable NSArray<NSString *> *)ignoredPropertiesForClass:(Class)cls;
@@ -104,40 +106,41 @@ FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 + (nullable NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)linkingObjectsPropertiesForClass:(Class)cls;
 
 // Precondition: these must be returned in ascending order.
-+ (nullable NSArray<RLMGenericPropertyMetadata *> *)getSwiftGenericProperties:(id)obj;
++ (nullable NSArray<RLMSwiftPropertyMetadata *> *)getSwiftProperties:(id)obj;
 
 + (nullable NSDictionary<NSString *, NSNumber *> *)getOptionalProperties:(id)obj;
 + (nullable NSArray<NSString *> *)requiredPropertiesForClass:(Class)cls;
 
 @end
 
-typedef NS_ENUM(NSUInteger, RLMGenericPropertyKind) {
-    RLMGenericPropertyKindList,
-    RLMGenericPropertyKindLinkingObjects,
-    RLMGenericPropertyKindOptional,
-    RLMGenericPropertyKindNilLiteralOptional,   // For Swift optional properties that reflect as nil
+typedef NS_ENUM(NSUInteger, RLMSwiftPropertyKind) {
+    RLMSwiftPropertyKindList,
+    RLMSwiftPropertyKindLinkingObjects,
+    RLMSwiftPropertyKindOptional,
+    RLMSwiftPropertyKindNilLiteralOptional,   // For Swift optional properties that reflect as nil
+    RLMSwiftPropertyKindOther,
 };
 
 // Metadata that describes a Swift generic property.
-@interface RLMGenericPropertyMetadata : NSObject
+@interface RLMSwiftPropertyMetadata : NSObject
 
 @property (nonatomic, strong) NSString *propertyName;
 @property (nullable, nonatomic, strong) NSString *className;
 @property (nullable, nonatomic, strong) NSString *linkedPropertyName;
-@property (nonatomic) NSInteger index;
-@property (nonatomic) NSInteger propertyType;
-@property (nonatomic) RLMGenericPropertyKind kind;
+@property (nonatomic) RLMPropertyType propertyType;
+@property (nonatomic) RLMSwiftPropertyKind kind;
 
-+ (instancetype)metadataForListProperty:(NSString *)propertyName index:(NSInteger)index;
++ (instancetype)metadataForOtherProperty:(NSString *)propertyName;
+
++ (instancetype)metadataForListProperty:(NSString *)propertyName;
 
 + (instancetype)metadataForLinkingObjectsProperty:(NSString *)propertyName
                                         className:(NSString *)className
-                               linkedPropertyName:(NSString *)linkedPropertyName
-                                            index:(NSInteger)index;
+                               linkedPropertyName:(NSString *)linkedPropertyName;
 
-+ (instancetype)metadataForOptionalProperty:(NSString *)propertyName type:(NSInteger)type index:(NSInteger)index;
++ (instancetype)metadataForOptionalProperty:(NSString *)propertyName type:(RLMPropertyType)type;
 
-+ (instancetype)metadataForNilLiteralOptionalProperty:(NSString *)propertyName index:(NSInteger)index;
++ (instancetype)metadataForNilLiteralOptionalProperty:(NSString *)propertyName;
 
 @end
 
