@@ -564,7 +564,7 @@ class ObjectCreationTests: TestCase {
         let unmanagedValue = SwiftOptionalPrimaryObject()
         // Shouldn't throw.
         realm.beginWrite()
-        let _ = realm.create(type(of: unmanagedValue), value: unmanagedValue, update: true)
+        _ = realm.create(type(of: unmanagedValue), value: unmanagedValue, update: true)
         realm.cancelWrite()
     }
 
@@ -576,7 +576,7 @@ class ObjectCreationTests: TestCase {
         }
         // Shouldn't throw.
         realm.beginWrite()
-        let _ = realm.create(type(of: managedValue), value: managedValue, update: true)
+        _ = realm.create(type(of: managedValue), value: managedValue, update: true)
         realm.cancelWrite()
     }
 

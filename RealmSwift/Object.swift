@@ -133,15 +133,6 @@ open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
 
     /**
      WARNING: This is an internal helper method not intended for public use.
-     It should never be overriden and is not considered part of the public API.
-     :nodoc:
-     */
-    open override class func className() -> String {
-        return super.className()
-    }
-
-    /**
-     WARNING: This is an internal helper method not intended for public use.
      It is not considered part of the public API.
      :nodoc:
      */
