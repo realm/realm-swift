@@ -479,7 +479,7 @@ Class RLMObjectUtilClass(BOOL isSwift) {
     return nil;
 }
 
-+ (NSArray *)getSwiftGenericProperties:(__unused id)obj {
++ (NSArray *)getSwiftProperties:(__unused id)obj {
     return nil;
 }
 
@@ -493,43 +493,45 @@ Class RLMObjectUtilClass(BOOL isSwift) {
 
 @end
 
-@implementation RLMGenericPropertyMetadata
+@implementation RLMSwiftPropertyMetadata
 
-+ (instancetype)metadataForListProperty:(NSString *)propertyName index:(NSInteger)index {
-    RLMGenericPropertyMetadata *md = [RLMGenericPropertyMetadata new];
++ (instancetype)metadataForOtherProperty:(NSString *)propertyName {
+    RLMSwiftPropertyMetadata *md = [RLMSwiftPropertyMetadata new];
     md.propertyName = propertyName;
-    md.index = index;
-    md.kind = RLMGenericPropertyKindList;
+    md.kind = RLMSwiftPropertyKindOther;
+    return md;
+}
+
++ (instancetype)metadataForListProperty:(NSString *)propertyName {
+    RLMSwiftPropertyMetadata *md = [RLMSwiftPropertyMetadata new];
+    md.propertyName = propertyName;
+    md.kind = RLMSwiftPropertyKindList;
     return md;
 }
 
 + (instancetype)metadataForLinkingObjectsProperty:(NSString *)propertyName
                                         className:(NSString *)className
-                               linkedPropertyName:(NSString *)linkedPropertyName
-                                            index:(NSInteger)index {
-    RLMGenericPropertyMetadata *md = [RLMGenericPropertyMetadata new];
+                               linkedPropertyName:(NSString *)linkedPropertyName {
+    RLMSwiftPropertyMetadata *md = [RLMSwiftPropertyMetadata new];
     md.propertyName = propertyName;
     md.className = className;
     md.linkedPropertyName = linkedPropertyName;
-    md.index = index;
-    md.kind = RLMGenericPropertyKindLinkingObjects;
+    md.kind = RLMSwiftPropertyKindLinkingObjects;
     return md;
 }
 
-+ (instancetype)metadataForOptionalProperty:(NSString *)propertyName type:(NSInteger)type index:(NSInteger)index {
-    RLMGenericPropertyMetadata *md = [RLMGenericPropertyMetadata new];
++ (instancetype)metadataForOptionalProperty:(NSString *)propertyName type:(RLMPropertyType)type {
+    RLMSwiftPropertyMetadata *md = [RLMSwiftPropertyMetadata new];
     md.propertyName = propertyName;
     md.propertyType = type;
-    md.index = index;
-    md.kind = RLMGenericPropertyKindOptional;
+    md.kind = RLMSwiftPropertyKindOptional;
     return md;
 }
 
-+ (instancetype)metadataForNilLiteralOptionalProperty:(NSString *)propertyName index:(NSInteger)index {
-    RLMGenericPropertyMetadata *md = [RLMGenericPropertyMetadata new];
++ (instancetype)metadataForNilLiteralOptionalProperty:(NSString *)propertyName {
+    RLMSwiftPropertyMetadata *md = [RLMSwiftPropertyMetadata new];
     md.propertyName = propertyName;
-    md.index = index;
-    md.kind = RLMGenericPropertyKindNilLiteralOptional;
+    md.kind = RLMSwiftPropertyKindNilLiteralOptional;
     return md;
 }
 

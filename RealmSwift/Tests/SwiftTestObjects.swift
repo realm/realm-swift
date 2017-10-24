@@ -508,6 +508,8 @@ class SwiftCircleObject: Object {
 
 // Exists to serve as a superclass to `SwiftGenericPropsOrderingObject`
 class SwiftGenericPropsOrderingParent: Object {
+    var implicitlyIgnoredComputedProperty: Int { return 0 }
+    let implicitlyIgnoredReadOnlyProperty: Int = 1
     let parentFirstList = List<SwiftIntObject>()
     @objc dynamic var parentFirstNumber = 0
     func parentFunction() -> Int { return parentFirstNumber + 1 }
