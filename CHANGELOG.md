@@ -16,6 +16,8 @@ x.x.x Release notes (yyyy-MM-dd)
   when a type value derived at runtime by `type(of:)` is passed into certain APIs.
 * Fix a crash when an `Object` subclass has implicitly ignored `let`
   properties.
+* Fix several cases where adding a notification block from within a
+  notification callback could produce incorrect results.
 
 3.0.0 Release notes (2017-10-16)
 =============================================================
