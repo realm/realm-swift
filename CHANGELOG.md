@@ -1,13 +1,5 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.0.1 Release notes (2017-10-26)
 =============================================================
-
-### Breaking Changes
-
-* None.
-
-### Enhancements
-
-* None.
 
 ### Bugfixes
 
