@@ -1,3 +1,11 @@
+x.x.x Release notes (yyyy-mm-dd)
+=============================================================
+
+### Bugfixes
+
+* Fix a crash when a linking objects property is retrieved from a model object instance via
+  Swift subscripting.
+
 3.0.1 Release notes (2017-10-26)
 =============================================================
 

@@ -564,6 +564,7 @@ id RLMDynamicGetByName(__unsafe_unretained RLMObjectBase *const obj,
         @throw RLMException(@"Invalid property name '%@' for class '%@'.",
                             propName, obj->_objectSchema.className);
     }
+    asList = asList && (prop.type != RLMPropertyTypeLinkingObjects);
     if (asList && prop.array && prop.swiftIvar) {
         RLMListBase *list = object_getIvar(obj, prop.swiftIvar);
         if (!list._rlmArray) {
