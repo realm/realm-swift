@@ -179,12 +179,7 @@ open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
             if realm == nil {
                 return value(forKey: key)
             }
-            let v = RLMDynamicGetByName(self, key, true)
-            if let v = v as? RLMResults<AnyObject> {
-                return Results<Object>(v) as Any
-            } else {
-                return v
-            }
+            return RLMDynamicGetByName(self, key, true)
         }
         set(value) {
             if realm == nil {

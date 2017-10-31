@@ -346,13 +346,12 @@ class ObjectAccessorTests: TestCase {
             XCTFail("Got an unexpected nil for fido[\"owners\"]")
             return
         }
-        XCTAssertTrue(owners is Results<Object>)
+        XCTAssertTrue(owners is LinkingObjects<SwiftOwnerObject>)
         // Make sure the results actually functions.
-        guard let firstOwner = (owners as? Results<Object>)?.first else {
+        guard let firstOwner = (owners as? LinkingObjects<SwiftOwnerObject>)?.first else {
             XCTFail("Was not able to get first owner")
             return
         }
-        let ownerName = firstOwner["name"] as? String
-        XCTAssertEqual(ownerName, "JP")
+        XCTAssertEqual(firstOwner.name, "JP")
     }
 }
