@@ -87,11 +87,16 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 @implementation RLMSyncManager
 
 static RLMSyncManager *s_sharedManager = nil;
-static dispatch_once_t s_onceToken;
 
 + (instancetype)sharedManager {
-    dispatch_once(&s_onceToken, ^{
-        s_sharedManager = [[RLMSyncManager alloc] initWithCustomRootDirectory:nil];
+    std::once_flag flag;
+    std::call_once(flag, [] {
+        try {
+            s_sharedManager = [[RLMSyncManager alloc] initWithCustomRootDirectory:nil];
+        }
+        catch (std::exception const& e) {
+            @throw RLMException(e);
+        }
     });
     return s_sharedManager;
 }
