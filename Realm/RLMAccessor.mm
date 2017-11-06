@@ -566,7 +566,7 @@ id RLMDynamicGetByName(__unsafe_unretained RLMObjectBase *const obj,
     }
     if (asList && prop.array && prop.swiftIvar) {
         RLMListBase *list = object_getIvar(obj, prop.swiftIvar);
-        if (!list._rlmArray) {
+        if (prop.type != RLMPropertyTypeLinkingObjects && !list._rlmArray) {
             list._rlmArray = RLMDynamicGet(obj, prop);
         }
         return list;

@@ -329,4 +329,29 @@ class ObjectAccessorTests: TestCase {
         object.optObjectCol = nil
         XCTAssertNil(object.optObjectCol)
     }
+
+    func testLinkingObjectsDynamicGet() {
+        let fido = SwiftDogObject()
+        let owner = SwiftOwnerObject()
+        owner.dog = fido
+        owner.name = "JP"
+        let realm = try! Realm()
+        try! realm.write {
+            realm.add([fido, owner])
+        }
+
+        // Get the linking objects property via subscript.
+        let dynamicOwners = fido["owners"]
+        guard let owners = dynamicOwners else {
+            XCTFail("Got an unexpected nil for fido[\"owners\"]")
+            return
+        }
+        XCTAssertTrue(owners is LinkingObjects<SwiftOwnerObject>)
+        // Make sure the results actually functions.
+        guard let firstOwner = (owners as? LinkingObjects<SwiftOwnerObject>)?.first else {
+            XCTFail("Was not able to get first owner")
+            return
+        }
+        XCTAssertEqual(firstOwner.name, "JP")
+    }
 }
