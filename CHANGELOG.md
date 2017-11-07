@@ -5,6 +5,7 @@ x.x.x Release notes (yyyy-mm-dd)
 
 * Fix a crash when a linking objects property is retrieved from a model object instance via
   Swift subscripting.
+* Fix incorrect behavior if a call to `posix_fallocate` is interrupted.
 
 ### Enhancements
 
