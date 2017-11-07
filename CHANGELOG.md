@@ -8,7 +8,7 @@ x.x.x Release notes (yyyy-mm-dd)
 
 ### Enhancements
 
-* Prebuilt binaries are now included for Swift 4.0.2.
+* Prebuilt binaries are now included for Swift 3.2.2 and 4.0.2.
 
 3.0.1 Release notes (2017-10-26)
 =============================================================
