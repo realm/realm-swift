@@ -1,15 +1,13 @@
-x.x.x Release notes (yyyy-mm-dd)
+3.0.2 Release notes (2017-11-08)
 =============================================================
+
+Prebuilt frameworks are now included for Swift 3.2.2 and 4.0.2.
 
 ### Bugfixes
 
 * Fix a crash when a linking objects property is retrieved from a model object instance via
   Swift subscripting.
 * Fix incorrect behavior if a call to `posix_fallocate` is interrupted.
-
-### Enhancements
-
-* Prebuilt binaries are now included for Swift 3.2.2 and 4.0.2.
 
 3.0.1 Release notes (2017-10-26)
 =============================================================
