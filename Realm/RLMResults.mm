@@ -369,11 +369,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         @throw RLMException(@"Must specify at least one keypath.");
     }
     for (NSString *keyPath in keyPaths) {
-        if (keyPath == nil
-            || [[keyPath stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
-                isEqualToString:@""]) {
-                @throw RLMException(@"A valid keypath is required");
-            }
+        if ([[keyPath stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
+             isEqualToString:@""]) {
+            @throw RLMException(@"A valid keypath is required");
+        }
         if ([keyPath containsString:@"@"]) {
             @throw RLMException(@"Cannot distinct on keypath '%@': KVC collection operators are not supported.", keyPath);
         }
@@ -384,18 +383,14 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
             return self;
         }
         
-        const auto& table = _results.get_tableview().get_parent();
-        __block std::vector<std::vector<size_t>> column_indicies;
+        __block std::vector<std::string> kp;
         for (NSString *keyPath in keyPaths) {
-            std::string keyPath_name = std::string([keyPath UTF8String]);
-            size_t col_idx = table.get_descriptor()->get_column_index(keyPath_name);
-            REALM_ASSERT(col_idx != size_t(-1));
-            column_indicies.push_back({ col_idx });
+            kp.push_back(std::string([keyPath UTF8String]));
         }
         
         return [RLMResults
                 resultsWithObjectInfo:*_info
-                results:_results.distinct({ table, std::move(column_indicies) })];
+                results:_results.distinct(kp)];
     });
 }
 
