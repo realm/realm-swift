@@ -254,6 +254,16 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
         where S.Iterator.Element == SortDescriptor {
             return Results<Element>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
+    
+    /**
+     Returns a `Results` containing distinct objects based on the specified key paths
+     
+     - parameter keyPaths:  The key paths used produce distinct results
+     */
+    public func distinct<S: Sequence>(by keyPaths: S) -> Results<Element>
+        where S.Iterator.Element == String {
+            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: keyPaths.map { $0 }))
+    }
 
     // MARK: Aggregate Operations
 
