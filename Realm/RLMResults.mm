@@ -369,10 +369,6 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         @throw RLMException(@"Must specify at least one keypath.");
     }
     for (NSString *keyPath in keyPaths) {
-        if ([[keyPath stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]
-             isEqualToString:@""]) {
-            @throw RLMException(@"A valid keypath is required");
-        }
         if ([keyPath containsString:@"@"]) {
             @throw RLMException(@"Cannot distinct on keypath '%@': KVC collection operators are not supported.", keyPath);
         }
