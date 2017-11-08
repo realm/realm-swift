@@ -999,4 +999,72 @@ static vm_size_t get_resident_size() {
     token = nil;
 }
 
+- (void)testDistinctQuery {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block DogObject *fido;
+    __block DogObject *cujo;
+    __block DogObject *buster;
+    [realm transactionWithBlock:^{
+        fido = [DogObject createInDefaultRealmWithValue:@[ @"Fido", @3 ]];
+        cujo = [DogObject createInDefaultRealmWithValue:@[ @"Cujo", @3 ]];
+        buster = [DogObject createInDefaultRealmWithValue:@[ @"Buster", @5 ]];
+    }];
+    
+    RLMResults *results = [[DogObject allObjects] distinctResultsUsingKeyPaths:@[@"age"]];
+    NSMutableArray *ages = NSMutableArray.new;
+    for (id result in results) {
+        [ages addObject: result];
+    }
+    XCTAssertEqual(2u, results.count);
+    XCTAssertEqualObjects([ages valueForKey:@"age"], (@[@3, @5]));
+}
+- (void)testDistinctQueryWithMultipleKeyPaths {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block DogObject *fido;
+    __block DogObject *fido2;
+    __block DogObject *fido3;
+    __block DogObject *cujo;
+    __block DogObject *buster;
+    __block DogObject *buster2;
+    __block DogObject *rotunda;
+    
+    [realm transactionWithBlock:^{
+        fido = [DogObject createInDefaultRealmWithValue:@[ @"Fido", @3 ]];
+        fido2 = [DogObject createInDefaultRealmWithValue:@[ @"Fido", @3 ]];
+        fido3 = [DogObject createInDefaultRealmWithValue:@[ @"Fido", @4 ]];
+        cujo = [DogObject createInDefaultRealmWithValue:@[ @"Cujo", @3 ]];
+        buster = [DogObject createInDefaultRealmWithValue:@[ @"Buster", @3 ]];
+        buster2 = [DogObject createInDefaultRealmWithValue:@[ @"Buster", @3 ]];
+        rotunda = [DogObject createInDefaultRealmWithValue:@[ @"Rotunda", @7 ]];
+    }];
+    
+    RLMResults *results = [[DogObject allObjects] distinctResultsUsingKeyPaths:@[@"dogName", @"age"]];
+    NSMutableArray *resultsArr = NSMutableArray.new;
+    for (DogObject *result in results) {
+        [resultsArr addObject:[NSString stringWithFormat:@"%@/%@", result.dogName, @(result.age)]];
+    }
+    
+    XCTAssertEqualObjects(resultsArr, (@[@"Fido/3", @"Fido/4", @"Cujo/3", @"Buster/3", @"Rotunda/7"]));
+}
+
+- (void)testDistinctQueryThrowsWhenKeyPathsNotProvided {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm transactionWithBlock:^{
+        [DogObject createInDefaultRealmWithValue:@[ @"Fido", @3 ]];
+        [DogObject createInDefaultRealmWithValue:@[ @"Fido", @3 ]];
+        [DogObject createInDefaultRealmWithValue:@[ @"Fido", @5 ]];
+    }];
+    
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wnonnull"
+    XCTAssertThrows([[DogObject allObjects] distinctResultsUsingKeyPaths:nil]);
+#pragma clang diagnostic pop
+    XCTAssertThrows([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@""]]);
+    XCTAssertThrows([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@" "]]);
+    XCTAssertThrows([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@"\n"]]);
+    XCTAssertThrows(([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@"dogName", @""]]));
+    XCTAssertThrows(([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@"dogName", @" "]]));
+    XCTAssertThrows(([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@"dogName", @"\n"]]));
+}
+
 @end
