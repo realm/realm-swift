@@ -1046,13 +1046,43 @@ static vm_size_t get_resident_size() {
     
     XCTAssertEqualObjects(resultsArr, (@[@"Fido/3", @"Fido/4", @"Cujo/3", @"Buster/3", @"Rotunda/7"]));
 }
+- (void)testDistinctQueryWithMultilevelKeyPath {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block OwnerObject *owner1;
+    __block OwnerObject *owner2;
+    __block OwnerObject *owner3;
+    __block DogObject *dog1;
+    __block DogObject *dog2;
+    __block DogObject *dog3;
+    
+    [realm transactionWithBlock:^{
+        dog1 = [DogObject createInDefaultRealmWithValue:@[ @"Fido", @3 ]];
+        dog2 = [DogObject createInDefaultRealmWithValue:@[ @"Cujo", @3 ]];
+        dog3 = [DogObject createInDefaultRealmWithValue:@[ @"Rotunda", @7 ]];
+        
+        owner1 = [OwnerObject createInDefaultRealmWithValue:@[ @"Joe", dog1 ]];
+        owner2 = [OwnerObject createInDefaultRealmWithValue:@[ @"Marie", dog2 ]];
+        owner3 = [OwnerObject createInDefaultRealmWithValue:@[ @"Marie", dog3 ]];
+    }];
+    
+    RLMResults *results = [[OwnerObject allObjects] distinctResultsUsingKeyPaths:@[@"dog.age"]];
+    NSMutableArray *resultsArr = NSMutableArray.new;
+    for (OwnerObject *result in results) {
+        [resultsArr addObject:@(result.dog.age)];
+    }
+    XCTAssertEqualObjects(resultsArr, (@[@3, @7]));
+}
 
-- (void)testDistinctQueryThrowsWhenKeyPathsNotProvided {
+- (void)testDistinctQueryThrowsInvalidKeyPathsSpecified {
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm transactionWithBlock:^{
         [DogObject createInDefaultRealmWithValue:@[ @"Fido", @3 ]];
         [DogObject createInDefaultRealmWithValue:@[ @"Fido", @3 ]];
         [DogObject createInDefaultRealmWithValue:@[ @"Fido", @5 ]];
+        AggregateObject *ao1 = [AggregateObject createInDefaultRealmWithValue:@[ @0 ]];
+        AggregateObject *ao2 = [AggregateObject createInDefaultRealmWithValue:@[ @0 ]];
+        [AggregateArrayObject createInDefaultRealmWithValue:@[@[ao1, ao2]]];
+        [AllTypesObject createInDefaultRealmWithValue:@[]];
     }];
     
 #pragma clang diagnostic push
@@ -1065,6 +1095,10 @@ static vm_size_t get_resident_size() {
     XCTAssertThrows(([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@"dogName", @""]]));
     XCTAssertThrows(([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@"dogName", @" "]]));
     XCTAssertThrows(([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@"dogName", @"\n"]]));
+    XCTAssertThrows(([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@"@max.age"]]));
+    XCTAssertThrows([[AllTypesObject allObjects] distinctResultsUsingKeyPaths:@[@"linkingObjectsCol"]]);
+    XCTAssertThrows([[AllTypesObject allObjects] distinctResultsUsingKeyPaths:@[@"objectCol"]]);
+    XCTAssertThrows([[AggregateArrayObject allObjects] distinctResultsUsingKeyPaths:@[@"array"]]);
 }
 
 @end
