@@ -262,7 +262,7 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
      */
     public func distinct<S: Sequence>(by keyPaths: S) -> Results<Element>
         where S.Iterator.Element == String {
-            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: keyPaths.map { $0 }))
+            return Results<Element>(rlmResults.distinctResults(usingKeyPaths: Array(keyPaths)))
     }
 
     // MARK: Aggregate Operations

@@ -1085,10 +1085,6 @@ static vm_size_t get_resident_size() {
         [AllTypesObject createInDefaultRealmWithValue:@[]];
     }];
     
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wnonnull"
-    XCTAssertThrows([[DogObject allObjects] distinctResultsUsingKeyPaths:nil]);
-#pragma clang diagnostic pop
     XCTAssertThrows([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@""]]);
     XCTAssertThrows([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@" "]]);
     XCTAssertThrows([[DogObject allObjects] distinctResultsUsingKeyPaths:@[@"\n"]]);

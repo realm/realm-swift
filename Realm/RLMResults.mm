@@ -376,14 +376,12 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
             return self;
         }
         
-        __block std::vector<std::string> kp;
+        std::vector<std::string> keyPathsVector;
         for (NSString *keyPath in keyPaths) {
-            kp.push_back(std::string([keyPath UTF8String]));
+            keyPathsVector.push_back(keyPath.UTF8String);
         }
         
-        return [RLMResults
-                resultsWithObjectInfo:*_info
-                results:_results.distinct(kp)];
+        return [RLMResults resultsWithObjectInfo:*_info results:_results.distinct(keyPathsVector)];
     });
 }
 
