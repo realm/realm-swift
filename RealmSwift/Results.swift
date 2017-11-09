@@ -254,7 +254,7 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
         where S.Iterator.Element == SortDescriptor {
             return Results<Element>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
-    
+
     /**
      Returns a `Results` containing distinct objects based on the specified key paths
      
