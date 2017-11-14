@@ -110,13 +110,15 @@ class TableViewController: UITableViewController {
         // Import many items in a background thread
         DispatchQueue.global().async {
             // Get new realm and table since we are in a new thread
-            let realm = try! Realm()
-            realm.beginWrite()
-            for _ in 0..<5 {
-                // Add row via dictionary. Order is ignored.
-                realm.create(DemoObject.self, value: ["title": TableViewController.randomString(), "date": TableViewController.randomDate()])
+            autoreleasepool {
+                let realm = try! Realm()
+                realm.beginWrite()
+                for _ in 0..<5 {
+                    // Add row via dictionary. Order is ignored.
+                    realm.create(DemoObject.self, value: ["title": TableViewController.randomString(), "date": TableViewController.randomDate()])
+                }
+                try! realm.commitWrite()
             }
-            try! realm.commitWrite()
         }
     }
 

@@ -92,9 +92,7 @@
                                  defaultConfig.syncConfiguration = syncConfig;
                                  [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
                                  
-                                 dispatch_async(dispatch_get_main_queue(), ^{
-                                     self.window.rootViewController.view = [DrawView new];
-                                 });
+                                 self.window.rootViewController.view = [DrawView new];
                              }
                          }];
 }
