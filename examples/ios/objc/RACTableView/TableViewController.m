@@ -215,10 +215,12 @@ RLM_ARRAY_TYPE(Group)
 
 - (void)modifyInBackground:(void (^)(RLMArray *))block {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        GroupParent *parent = GroupParent.allObjects.firstObject;
-        [parent.realm beginWriteTransaction];
-        block(parent.groups);
-        [parent.realm commitWriteTransaction];
+        @autoreleasepool {
+            GroupParent *parent = GroupParent.allObjects.firstObject;
+            [parent.realm beginWriteTransaction];
+            block(parent.groups);
+            [parent.realm commitWriteTransaction];
+        }
     });
 }
 

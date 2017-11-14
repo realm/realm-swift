@@ -131,14 +131,16 @@ static NSString * const kTableName = @"table";
     // Import many items in a background thread
     dispatch_async(queue, ^{
         // Get new realm and table since we are in a new thread
-        RLMRealm *realm = [RLMRealm defaultRealm];
-        [realm beginWriteTransaction];
-        for (NSInteger index = 0; index < 5; index++) {
-            // Add row via dictionary. Order is ignored.
-            [DemoObject createInRealm:realm withValue:@{@"title": [self randomString],
-                                                         @"date": [self randomDate]}];
+        @autoreleasepool {
+            RLMRealm *realm = [RLMRealm defaultRealm];
+            [realm beginWriteTransaction];
+            for (NSInteger index = 0; index < 5; index++) {
+                // Add row via dictionary. Order is ignored.
+                [DemoObject createInRealm:realm withValue:@{@"title": [self randomString],
+                                                             @"date": [self randomDate]}];
+            }
+            [realm commitWriteTransaction];
         }
-        [realm commitWriteTransaction];
     });
 }
 

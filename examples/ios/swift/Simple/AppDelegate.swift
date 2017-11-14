@@ -78,9 +78,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Multi-threading
         DispatchQueue.global().async {
-            let otherRealm = try! Realm()
-            let otherResults = otherRealm.objects(Dog.self).filter(NSPredicate(format: "name contains 'Rex'"))
-            print("Number of dogs \(otherResults.count)")
+            autoreleasepool {
+                let otherRealm = try! Realm()
+                let otherResults = otherRealm.objects(Dog.self).filter(NSPredicate(format: "name contains 'Rex'"))
+                print("Number of dogs \(otherResults.count)")
+            }
         }
 
         return true

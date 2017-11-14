@@ -134,15 +134,17 @@ forRowAtIndexPath:(NSIndexPath *)indexPath
     // Import many items in a background thread
     dispatch_async(queue, ^{
         // Get new realm and table since we are in a new thread
-        RLMRealm *realm = [RLMRealm defaultRealm];
-        [realm beginWriteTransaction];
-        for (NSInteger index = 0; index < 5; index++) {
-            // Add row via dictionary. Order is ignored.
-            [DemoObject createInRealm:realm withValue:@{@"title": [self randomTitle],
-                                                         @"date": [NSDate date],
-                                                         @"sectionTitle": [self randomSectionTitle]}];
+        @autoreleasepool {
+            RLMRealm *realm = [RLMRealm defaultRealm];
+            [realm beginWriteTransaction];
+            for (NSInteger index = 0; index < 5; index++) {
+                // Add row via dictionary. Order is ignored.
+                [DemoObject createInRealm:realm withValue:@{@"title": [self randomTitle],
+                                                             @"date": [NSDate date],
+                                                             @"sectionTitle": [self randomSectionTitle]}];
+            }
+            [realm commitWriteTransaction];
         }
-        [realm commitWriteTransaction];
     });
 }
 

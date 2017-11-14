@@ -83,9 +83,11 @@ RLM_ARRAY_TYPE(Dog)
 
     // Multi-threading
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        RLMRealm *otherRealm = [RLMRealm defaultRealm];
-        RLMResults *otherResults = [Dog objectsInRealm:otherRealm where:@"name contains 'Rex'"];
-        NSLog(@"Number of dogs: %li", (unsigned long)otherResults.count);
+        @autoreleasepool {
+            RLMRealm *otherRealm = [RLMRealm defaultRealm];
+            RLMResults *otherResults = [Dog objectsInRealm:otherRealm where:@"name contains 'Rex'"];
+            NSLog(@"Number of dogs: %li", (unsigned long)otherResults.count);
+        }
     });
 
     return YES;
