@@ -254,6 +254,12 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
         where S.Iterator.Element == SortDescriptor {
             return Results<Element>(rlmResults.sortedResults(using: sortDescriptors.map { $0.rlmSortDescriptorValue }))
     }
+    
+    // MARK: Distinction
+    
+    public func distinct(byProperty property: String) -> Results<T> {
+        return Results<T>(rlmResults.distinctResults(usingProperty: property))
+    }
 
     // MARK: Aggregate Operations
 

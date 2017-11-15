@@ -187,6 +187,8 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties;
 
+- (RLMResults *)distinctResultsUsingProperty:(NSString *)property;
+
 #pragma mark - Notifications
 
 /**

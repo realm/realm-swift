@@ -364,6 +364,27 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     });
 }
 
+- (RLMResults *)distinctResultsUsingProperty:(NSString *)property {
+    if ([property containsString:@"@"]) {
+        @throw RLMException(@"Cannot distinct on property '%@': KVC collection operators are not supported.", property);
+    }
+    
+    return translateErrors([&] {
+        if (_results.get_mode() == Results::Mode::Empty) {
+            return self;
+        }
+        
+        std::string property_name = std::string([property UTF8String]);
+        const auto& table = _results.get_tableview().get_parent();
+        size_t col_idx = table.get_descriptor()->get_column_index(property_name);
+        REALM_ASSERT(col_idx != size_t(-1));
+        
+        return [RLMResults resultsWithObjectInfo:*_info
+                                         results:_results.distinct({ table, {{ col_idx }} })];
+        
+    });
+}
+
 - (id)objectAtIndexedSubscript:(NSUInteger)index {
     return [self objectAtIndex:index];
 }
