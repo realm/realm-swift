@@ -364,6 +364,27 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     });
 }
 
+- (RLMResults *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths {
+    for (NSString *keyPath in keyPaths) {
+        if ([keyPath containsString:@"@"]) {
+            @throw RLMException(@"Cannot distinct on keypath '%@': KVC collection operators are not supported.", keyPath);
+        }
+    }
+    
+    return translateRLMResultsErrors([&] {
+        if (_results.get_mode() == Results::Mode::Empty) {
+            return self;
+        }
+        
+        std::vector<std::string> keyPathsVector;
+        for (NSString *keyPath in keyPaths) {
+            keyPathsVector.push_back(keyPath.UTF8String);
+        }
+        
+        return [RLMResults resultsWithObjectInfo:*_info results:_results.distinct(keyPathsVector)];
+    });
+}
+
 - (id)objectAtIndexedSubscript:(NSUInteger)index {
     return [self objectAtIndex:index];
 }

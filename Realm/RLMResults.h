@@ -187,6 +187,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (RLMResults<RLMObjectType> *)sortedResultsUsingDescriptors:(NSArray<RLMSortDescriptor *> *)properties;
 
+/**
+ Returns a distinct `RLMResults` from an existing results collection.
+ 
+ @param keyPaths  The key paths used produce distinct results
+ 
+ @return    An `RLMResults` made distinct based on the specified key paths
+ */
+- (RLMResults<RLMObjectType> *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths;
+
 #pragma mark - Notifications
 
 /**

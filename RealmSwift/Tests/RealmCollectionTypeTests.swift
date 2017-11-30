@@ -32,6 +32,11 @@ class CTTAggregateObject: Object {
     @objc dynamic var trueCol = true
     let stringListCol = List<CTTNullableStringObjectWithLink>()
     @objc dynamic var linkCol: CTTLinkTarget?
+    @objc dynamic var childIntCol: CTTIntegerObject?
+}
+
+class CTTIntegerObject: Object {
+    @objc dynamic var intCol = 0
 }
 
 class CTTAggregateObjectList: Object {
@@ -683,6 +688,67 @@ class ResultsWithCustomInitializerTests: TestCase {
         let actual = collection.value(forKey: "stringCol") as! [String]!
         XCTAssertEqual(expected, actual!)
         assertEqual(collection.map { $0 }, collection.value(forKey: "self") as! [SwiftCustomInitializerObject])
+    }
+}
+
+class ResultsDistinctTests: TestCase {
+    func testDistinctResultsUsingKeyPaths() {
+        let realm = realmWithTestPath()
+
+        let obj1 = CTTAggregateObject()
+        obj1.intCol = 1
+        obj1.trueCol = true
+        let obj2 = CTTAggregateObject()
+        obj2.intCol = 1
+        obj2.trueCol = true
+        let obj3 = CTTAggregateObject()
+        obj3.intCol = 1
+        obj3.trueCol = false
+        let obj4 = CTTAggregateObject()
+        obj4.intCol = 2
+        obj4.trueCol = false
+
+        let childObj1 = CTTIntegerObject()
+        childObj1.intCol = 1
+        obj1.childIntCol = childObj1
+
+        let childObj2 = CTTIntegerObject()
+        childObj2.intCol = 1
+        obj2.childIntCol = childObj2
+
+        let childObj3 = CTTIntegerObject()
+        childObj3.intCol = 2
+        obj3.childIntCol = childObj3
+
+        try! realm.write {
+            realm.add(obj1)
+            realm.add(obj2)
+            realm.add(obj3)
+            realm.add(obj4)
+        }
+
+        let collection = realm.objects(CTTAggregateObject.self)
+        var distinctResults = collection.distinct(by: ["intCol"])
+        var expected = [["int": 1], ["int": 2]]
+        var actual = Array(distinctResults.map { ["int": $0.intCol] })
+        XCTAssertEqual(expected as NSObject, actual as NSObject)
+        assertEqual(distinctResults.map { $0 }, distinctResults.value(forKey: "self") as! [CTTAggregateObject])
+
+        distinctResults = collection.distinct(by: ["intCol", "trueCol"])
+        expected = [["int": 1, "true": 1], ["int": 1, "true": 0], ["int": 2, "true": 0]]
+        actual = distinctResults.map { ["int": $0.intCol, "true": $0.trueCol ? 1 : 0] }
+        XCTAssertEqual(expected as NSObject, actual as NSObject)
+        assertEqual(distinctResults.map { $0 }, distinctResults.value(forKey: "self") as! [CTTAggregateObject])
+
+        distinctResults = collection.distinct(by: ["childIntCol.intCol"])
+        expected = [["int": 1], ["int": 2]]
+        actual = distinctResults.map { ["int": $0.childIntCol!.intCol] }
+        XCTAssertEqual(expected as NSObject, actual as NSObject)
+        assertEqual(distinctResults.map { $0 }, distinctResults.value(forKey: "self") as! [CTTAggregateObject])
+
+        assertThrows(collection.distinct(by: ["childCol"]))
+        assertThrows(collection.distinct(by: ["@sum.intCol"]))
+        assertThrows(collection.distinct(by: ["stringListCol"]))
     }
 }
 
