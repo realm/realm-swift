@@ -301,6 +301,11 @@ public struct SyncCredentials {
     public static func accessToken(_ accessToken: String, identity: String) -> SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(accessToken: accessToken, identity: identity))
     }
+
+    /// Initialize new credentials using a JWT token.
+    public static func jwt(token: Token) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(jwtToken: token))
+    }
 }
 
 extension RLMSyncCredentials {

@@ -45,6 +45,9 @@ extern RLMIdentityProvider const RLMIdentityProviderGoogle;
 /// A CloudKit account as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderCloudKit;
 
+/// A JWT token as an identity provider.
+extern RLMIdentityProvider const RLMIdentityProviderJWT;
+
 /**
  Opaque credentials representing a specific Realm Object Server user.
  */
@@ -80,6 +83,11 @@ extern RLMIdentityProvider const RLMIdentityProviderCloudKit;
 + (instancetype)credentialsWithUsername:(NSString *)username
                                password:(NSString *)password
                                register:(BOOL)shouldRegister;
+
+/**
+ Construct and return credentials from a JWT token.
+ */
++ (instancetype)credentialsWithJWTToken:(NSString *)token;
 
 /**
  Construct and return special credentials representing a token that can
