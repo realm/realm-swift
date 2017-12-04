@@ -184,11 +184,11 @@ static BOOL isValidRealmURL(NSURL *url) {
 
         _config = std::make_unique<SyncConfig>(SyncConfig{
             [user _syncUser],
-            [[url absoluteString] UTF8String],
-            translateStopPolicy(stopPolicy),
-            std::move(bindHandler),
-            std::move(errorHandler)
+            [[url absoluteString] UTF8String]
         });
+        _config->stop_policy = translateStopPolicy(stopPolicy);
+        _config->bind_session_handler = std::move(bindHandler);
+        _config->error_handler = std::move(errorHandler);
         _config->is_partial = isPartial;
         self.customFileURL = customFileURL;
         return self;
