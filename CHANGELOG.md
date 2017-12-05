@@ -1,3 +1,12 @@
+x.x.x Release notes (yyyy-mm-dd)
+=============================================================
+
+### Enhancements
+
+* Improve performance of change checking for notifications in certain cases.
+* Realm Object Server errors not explicitly recognized by the client are now reported to the application
+  regardless.
+
 3.0.2 Release notes (2017-11-08)
 =============================================================
 
