@@ -366,7 +366,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 - (RLMResults *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths {
     for (NSString *keyPath in keyPaths) {
-        if ([keyPath containsString:@"@"]) {
+        if ([keyPath rangeOfString:@"@"].location != NSNotFound) {
             @throw RLMException(@"Cannot distinct on keypath '%@': KVC collection operators are not supported.", keyPath);
         }
     }
