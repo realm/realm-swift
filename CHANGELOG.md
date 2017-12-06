@@ -1,6 +1,9 @@
 x.x.x Release notes (yyyy-mm-dd)
 =============================================================
 
+Prebuilt frameworks are now included for Swift 3.2.3 and 4.0.3.
+Prebuilt frameworks are no longer included for Swift 3.0.x.
+
 ### Enhancements
 
 * Improve performance of change checking for notifications in certain cases.
