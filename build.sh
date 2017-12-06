@@ -199,12 +199,6 @@ move_to_clean_dir() {
 }
 
 test_ios_static() {
-    local previous_realm_xcode_version="$REALM_XCODE_VERSION"
-    local previous_realm_swift_version="$REALM_SWIFT_VERSION"
-    if [[ "$IS_RUNNING_PACKAGING" == "1" ]]; then
-        force_xcode_82
-    fi
-
     destination="$1"
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' build"
     if (( $(xcode_version_major) < 9 )); then
@@ -218,21 +212,6 @@ test_ios_static() {
     rm "$path"
 
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test"
-
-    if [[ "$IS_RUNNING_PACKAGING" == "1" ]]; then
-        # Reset to state before forcing Xcode 8.2
-        REALM_XCODE_VERSION="$previous_realm_xcode_version"
-        REALM_SWIFT_VERSION="$previous_realm_swift_version"
-        set_xcode_and_swift_versions
-        sh build.sh prelaunch-simulator
-    fi
-}
-
-force_xcode_82() {
-  REALM_XCODE_VERSION=8.2
-  REALM_SWIFT_VERSION=
-  set_xcode_and_swift_versions
-  sh build.sh prelaunch-simulator
 }
 
 ######################################
