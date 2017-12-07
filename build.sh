@@ -199,12 +199,6 @@ move_to_clean_dir() {
 }
 
 test_ios_static() {
-    local previous_realm_xcode_version="$REALM_XCODE_VERSION"
-    local previous_realm_swift_version="$REALM_SWIFT_VERSION"
-    if [[ "$IS_RUNNING_PACKAGING" == "1" ]]; then
-        force_xcode_82
-    fi
-
     destination="$1"
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' build"
     if (( $(xcode_version_major) < 9 )); then
@@ -218,21 +212,6 @@ test_ios_static() {
     rm "$path"
 
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test"
-
-    if [[ "$IS_RUNNING_PACKAGING" == "1" ]]; then
-        # Reset to state before forcing Xcode 8.2
-        REALM_XCODE_VERSION="$previous_realm_xcode_version"
-        REALM_SWIFT_VERSION="$previous_realm_swift_version"
-        set_xcode_and_swift_versions
-        sh build.sh prelaunch-simulator
-    fi
-}
-
-force_xcode_82() {
-  REALM_XCODE_VERSION=8.2
-  REALM_SWIFT_VERSION=
-  set_xcode_and_swift_versions
-  sh build.sh prelaunch-simulator
 }
 
 ######################################
@@ -1193,7 +1172,7 @@ EOM
         ;;
 
     "package-ios-swift")
-        for version in 8.0 8.1 8.2 8.3.3 9.0 9.1; do
+        for version in 8.3.3 9.0 9.1 9.2; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1204,11 +1183,13 @@ EOM
         cd build/ios
         ln -s swift-4.0 swift-3.2
         ln -s swift-4.0.2 swift-3.2.2
-        zip --symlinks -r realm-swift-framework-ios.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1 swift-3.2 swift-3.2.2 swift-4.0 swift-4.0.2
+        ln -s swift-4.0.2 swift-3.2.3
+        ln -s swift-4.0.2 swift-4.0.3
+        zip --symlinks -r realm-swift-framework-ios.zip swift-3.1 swift-3.2 swift-3.2.2 swift-3.2.3 swift-4.0 swift-4.0.2 swift-4.0.3
         ;;
 
     "package-osx-swift")
-        for version in 8.0 8.1 8.2 8.3.3 9.0 9.1; do
+        for version in 8.3.3 9.0 9.1 9.2; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1219,7 +1200,9 @@ EOM
         cd build/osx
         ln -s swift-4.0 swift-3.2
         ln -s swift-4.0.2 swift-3.2.2
-        zip --symlinks -r realm-swift-framework-osx.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1 swift-3.2 swift-3.2.2 swift-4.0 swift-4.0.2
+        ln -s swift-4.0.2 swift-3.2.3
+        ln -s swift-4.0.2 swift-4.0.3
+        zip --symlinks -r realm-swift-framework-osx.zip swift-3.1 swift-3.2 swift-3.2.2 swift-3.2.3 swift-4.0 swift-4.0.2 swift-4.0.3
         ;;
 
     "package-watchos")
@@ -1231,7 +1214,7 @@ EOM
         ;;
 
     "package-watchos-swift")
-        for version in 8.0 8.1 8.2 8.3.3 9.0 9.1; do
+        for version in 8.3.3 9.0 9.1 9.2; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1242,7 +1225,9 @@ EOM
         cd build/watchos
         ln -s swift-4.0 swift-3.2
         ln -s swift-4.0.2 swift-3.2.2
-        zip --symlinks -r realm-swift-framework-watchos.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1 swift-3.2 swift-3.2.2 swift-4.0 swift-4.0.2
+        ln -s swift-4.0.2 swift-3.2.3
+        ln -s swift-4.0.2 swift-4.0.3
+        zip --symlinks -r realm-swift-framework-watchos.zip swift-3.1 swift-3.2 swift-3.2.2 swift-3.2.3 swift-4.0 swift-4.0.2 swift-4.0.3
         ;;
 
     "package-tvos")
@@ -1254,7 +1239,7 @@ EOM
         ;;
 
     "package-tvos-swift")
-        for version in 8.0 8.1 8.2 8.3.3 9.0 9.1; do
+        for version in 8.3.3 9.0 9.1 9.2; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1265,7 +1250,9 @@ EOM
         cd build/tvos
         ln -s swift-4.0 swift-3.2
         ln -s swift-4.0.2 swift-3.2.2
-        zip --symlinks -r realm-swift-framework-tvos.zip swift-3.0 swift-3.0.1 swift-3.0.2 swift-3.1 swift-3.2 swift-3.2.2 swift-4.0 swift-4.0.2
+        ln -s swift-4.0.2 swift-3.2.3
+        ln -s swift-4.0.2 swift-4.0.3
+        zip --symlinks -r realm-swift-framework-tvos.zip swift-3.1 swift-3.2 swift-3.2.2 swift-3.2.3 swift-4.0 swift-4.0.2 swift-4.0.3
         ;;
 
     package-*-swift-3.2)
@@ -1282,6 +1269,22 @@ EOM
         cd build/$PLATFORM
         ln -s swift-4.0.2 swift-3.2.2
         zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.2.2.zip swift-3.2.2
+        ;;
+
+    package-*-swift-3.2.3)
+        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
+        mkdir -p build/$PLATFORM
+        cd build/$PLATFORM
+        ln -s swift-4.0.2 swift-3.2.3
+        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.2.3.zip swift-3.2.3
+        ;;
+
+    package-*-swift-4.0.3)
+        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
+        mkdir -p build/$PLATFORM
+        cd build/$PLATFORM
+        ln -s swift-4.0.2 swift-4.0.3
+        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-4.0.3.zip swift-4.0.3
         ;;
 
     package-*-swift-*)

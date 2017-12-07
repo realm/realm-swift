@@ -1,4 +1,4 @@
-swiftVersions = ['3.0', '3.0.1', '3.0.2', '3.1', '3.2', '3.2.2', '4.0', '4.0.2']
+swiftVersions = ['3.1', '3.2', '3.2.2', '3.2.3', '4.0', '4.0.2', '4.0.3']
 platforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS']
 
