@@ -302,9 +302,9 @@ public struct SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(accessToken: accessToken, identity: identity))
     }
 
-    /// Initialize new credentials using a JWT token.
-    public static func jwt(token: Token) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(jwtToken: token))
+    /// Initialize new credentials using a JSON Web Token.
+    public static func jwt(_ token: Token) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(jwt: token))
     }
 }
 

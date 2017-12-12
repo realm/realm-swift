@@ -6,7 +6,7 @@ x.x.x Release notes (yyyy-mm-dd)
 * Improve performance of change checking for notifications in certain cases.
 * Realm Object Server errors not explicitly recognized by the client are now reported to the application
   regardless.
-* Add support for JWT token as a sync credential source.
+* Add support for JSON Web Token as a sync credential source.
 
 3.0.2 Release notes (2017-11-08)
 =============================================================

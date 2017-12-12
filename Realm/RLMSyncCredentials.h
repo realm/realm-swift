@@ -45,7 +45,7 @@ extern RLMIdentityProvider const RLMIdentityProviderGoogle;
 /// A CloudKit account as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderCloudKit;
 
-/// A JWT token as an identity provider.
+/// A JSON Web Token as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderJWT;
 
 /**
@@ -85,9 +85,9 @@ extern RLMIdentityProvider const RLMIdentityProviderJWT;
                                register:(BOOL)shouldRegister;
 
 /**
- Construct and return credentials from a JWT token.
+ Construct and return credentials from a JSON Web Token.
  */
-+ (instancetype)credentialsWithJWTToken:(NSString *)token;
++ (instancetype)credentialsWithJWT:(NSString *)token;
 
 /**
  Construct and return special credentials representing a token that can

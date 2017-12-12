@@ -66,7 +66,7 @@ RLMIdentityProvider const RLMIdentityProviderJWT                    = @"jwt";
                                                kRLMSyncRegisterKey: @(shouldRegister)}];
 }
 
-+ (instancetype)credentialsWithJWTToken:(NSString *)token {
++ (instancetype)credentialsWithJWT:(NSString *)token {
     return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderJWT userInfo:nil];
 }
 
