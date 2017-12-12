@@ -29,6 +29,7 @@ RLMIdentityProvider const RLMIdentityProviderFacebook               = @"facebook
 RLMIdentityProvider const RLMIdentityProviderTwitter                = @"twitter";
 RLMIdentityProvider const RLMIdentityProviderGoogle                 = @"google";
 RLMIdentityProvider const RLMIdentityProviderCloudKit               = @"cloudkit";
+RLMIdentityProvider const RLMIdentityProviderJWT                    = @"jwt";
 
 @interface RLMSyncCredentials ()
 
@@ -63,6 +64,10 @@ RLMIdentityProvider const RLMIdentityProviderCloudKit               = @"cloudkit
                                     provider:RLMIdentityProviderUsernamePassword
                                     userInfo:@{kRLMSyncPasswordKey: password,
                                                kRLMSyncRegisterKey: @(shouldRegister)}];
+}
+
++ (instancetype)credentialsWithJWT:(NSString *)token {
+    return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderJWT userInfo:nil];
 }
 
 /// Intended only for testing use. Will only work if the ROS is started with the `debug` provider enabled.
