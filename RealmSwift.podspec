@@ -23,7 +23,7 @@ Pod::Spec.new do |s|
   s.prepare_command           = 'sh build.sh cocoapods-setup swift'
   s.preserve_paths            = %w(build.sh)
 
-  s.pod_target_xcconfig = { 'SWIFT_WHOLE_MODULE_OPTIMIZATION' => 'YES',
+  s.pod_target_xcconfig = { 'SWIFT_OPTIMIZATION_LEVEL' => '-Owholemodule',
                             'APPLICATION_EXTENSION_API_ONLY' => 'YES' }
 
   s.ios.deployment_target     = '8.0'
