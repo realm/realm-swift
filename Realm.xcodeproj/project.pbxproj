@@ -352,8 +352,6 @@
 		5DAD37261F73221F00EECA8E /* sync-1.x.realm in Resources */ = {isa = PBXBuildFile; fileRef = 5DAD37231F73220C00EECA8E /* sync-1.x.realm */; };
 		5DAD372E1F7485BB00EECA8E /* sync_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DAD372D1F7485BB00EECA8E /* sync_config.cpp */; };
 		5DAD372F1F7485C500EECA8E /* sync_config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DAD372D1F7485BB00EECA8E /* sync_config.cpp */; };
-		5DB591AA1D063DF8001D8F93 /* format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DB591A71D063DF8001D8F93 /* format.cpp */; };
-		5DB591AC1D0775D2001D8F93 /* format.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DB591A71D063DF8001D8F93 /* format.cpp */; };
 		5DBEC9B11F719A9D001233EC /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FF01BE98D670021E04F /* Util.swift */; };
 		5DD7557F1BE056DE002800DA /* external_commit_helper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F2118A81B97CBE1005A4CFE /* external_commit_helper.cpp */; };
 		5DD755801BE056DE002800DA /* index_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FBD05FA1B94E1C3004559CF /* index_set.cpp */; };
@@ -800,7 +798,6 @@
 		5D3E1A2C1C1FC6D5002913BA /* RLMPredicateUtil.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMPredicateUtil.hpp; sourceTree = "<group>"; };
 		5D3E1A2D1C1FC6D5002913BA /* RLMPredicateUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMPredicateUtil.mm; sourceTree = "<group>"; };
 		5D432B8C1CC0713F00A610A9 /* LinkingObjectsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LinkingObjectsTests.mm; sourceTree = "<group>"; };
-		5D5AF7FC1D3D8F9C003036AB /* compiler.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = compiler.hpp; sourceTree = "<group>"; };
 		5D6156F51BE077E600A4BD3F /* RLMPlatform.h.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = RLMPlatform.h.in; sourceTree = "<group>"; };
 		5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = TestHost.xcconfig; sourceTree = "<group>"; };
 		5D659E6D1BE0398E006515A0 /* Base.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
@@ -851,8 +848,6 @@
 		5DAD37231F73220C00EECA8E /* sync-1.x.realm */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sync-1.x.realm"; path = "Realm/ObjectServerTests/sync-1.x.realm"; sourceTree = "<group>"; };
 		5DAD372D1F7485BB00EECA8E /* sync_config.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = sync_config.cpp; path = sync/sync_config.cpp; sourceTree = "<group>"; };
 		5DB591A61D063DF8001D8F93 /* atomic_shared_ptr.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = atomic_shared_ptr.hpp; sourceTree = "<group>"; };
-		5DB591A71D063DF8001D8F93 /* format.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = format.cpp; sourceTree = "<group>"; };
-		5DB591A81D063DF8001D8F93 /* format.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = format.hpp; sourceTree = "<group>"; };
 		5DD755CF1BE056DE002800DA /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5DD755E01BE05C19002800DA /* Tests.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
 		5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Tests iOS static.xcconfig"; sourceTree = "<group>"; };
@@ -1312,10 +1307,7 @@
 			children = (
 				5D274C511D6D16BA006FEBB1 /* apple */,
 				5DB591A61D063DF8001D8F93 /* atomic_shared_ptr.hpp */,
-				5D5AF7FC1D3D8F9C003036AB /* compiler.hpp */,
 				5D274C4F1D6D16A8006FEBB1 /* event_loop_signal.hpp */,
-				5DB591A71D063DF8001D8F93 /* format.cpp */,
-				5DB591A81D063DF8001D8F93 /* format.hpp */,
 				1AABD4001E9552BA00115A75 /* uuid.cpp */,
 				1AABD4011E9552BA00115A75 /* uuid.hpp */,
 			);
@@ -2215,7 +2207,6 @@
 				3F9801AB1C8E4F6B000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A41C8E4F55000A8B07 /* collection_notifier.cpp in Sources */,
 				5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */,
-				5DB591AA1D063DF8001D8F93 /* format.cpp in Sources */,
 				5D659E821BE04556006515A0 /* index_set.cpp in Sources */,
 				1A64CA8B1D8763B400BC0F9B /* keychain_helper.cpp in Sources */,
 				3F9026111C625C5D006AE98E /* list.cpp in Sources */,
@@ -2356,7 +2347,6 @@
 				3F9801AC1C8E4F6F000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A61C8E4F5A000A8B07 /* collection_notifier.cpp in Sources */,
 				5DD7557F1BE056DE002800DA /* external_commit_helper.cpp in Sources */,
-				5DB591AC1D0775D2001D8F93 /* format.cpp in Sources */,
 				5DD755801BE056DE002800DA /* index_set.cpp in Sources */,
 				E8FD2E381D93345100569F10 /* keychain_helper.cpp in Sources */,
 				3F9026131C625C63006AE98E /* list.cpp in Sources */,
