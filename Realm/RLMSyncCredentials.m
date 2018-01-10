@@ -30,6 +30,8 @@ RLMIdentityProvider const RLMIdentityProviderTwitter                = @"twitter"
 RLMIdentityProvider const RLMIdentityProviderGoogle                 = @"google";
 RLMIdentityProvider const RLMIdentityProviderCloudKit               = @"cloudkit";
 RLMIdentityProvider const RLMIdentityProviderJWT                    = @"jwt";
+RLMIdentityProvider const RLMIdentityProviderAnonymous              = @"anonymous";
+RLMIdentityProvider const RLMIdentityProviderNickname               = @"nickname";
 
 @interface RLMSyncCredentials ()
 
@@ -68,6 +70,16 @@ RLMIdentityProvider const RLMIdentityProviderJWT                    = @"jwt";
 
 + (instancetype)credentialsWithJWT:(NSString *)token {
     return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderJWT userInfo:nil];
+}
+    
++ (instancetype)credentialsWithAnonymous {
+    return [[self alloc] initWithCustomToken:@"" provider:RLMIdentityProviderAnonymous userInfo:nil];
+}
+    
++ (instancetype)credentialsWithNickname:(NSString *)nickname isAdmin:(BOOL)isAdmin {
+    return [[self alloc] initWithCustomToken:nickname
+                                    provider:RLMIdentityProviderDebug
+                                    userInfo:@{kRLMSyncIsAdminKey: @(isAdmin)}];
 }
 
 /// Intended only for testing use. Will only work if the ROS is started with the `debug` provider enabled.
