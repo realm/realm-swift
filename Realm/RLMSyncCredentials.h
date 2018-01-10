@@ -96,7 +96,7 @@ extern RLMIdentityProvider const RLMIdentityProviderNickname;
 + (instancetype)credentialsWithJWT:(NSString *)token;
 
 /**
- Construct and return credentials from an anonymous
+ Construct and return anonymous credentials
  */
 + (instancetype)credentialsWithAnonymous;
     

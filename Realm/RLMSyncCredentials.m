@@ -78,7 +78,7 @@ RLMIdentityProvider const RLMIdentityProviderNickname               = @"nickname
     
 + (instancetype)credentialsWithNickname:(NSString *)nickname isAdmin:(BOOL)isAdmin {
     return [[self alloc] initWithCustomToken:nickname
-                                    provider:RLMIdentityProviderDebug
+                                    provider:RLMIdentityProviderNickname
                                     userInfo:@{kRLMSyncIsAdminKey: @(isAdmin)}];
 }
 
