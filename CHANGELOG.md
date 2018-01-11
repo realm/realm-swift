@@ -12,6 +12,11 @@ x.x.x Release notes (yyyy-mm-dd)
   regardless.
 * Add support for JSON Web Token as a sync credential source.
 
+### Bugfixes
+
+* Add a missing check for a run loop in the permission API methods which
+  require one.
+
 3.0.2 Release notes (2017-11-08)
 =============================================================
 

@@ -22,12 +22,13 @@
 #import "RLMNetworkClient.h"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
+#import "RLMRealmUtil.hpp"
 #import "RLMResults_Private.hpp"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncPermissionResults.h"
 #import "RLMSyncPermission_Private.hpp"
-#import "RLMSyncSession_Private.hpp"
 #import "RLMSyncSessionRefreshHandle.hpp"
+#import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
@@ -338,7 +339,14 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 
 #pragma mark - Permissions API
 
+static void verifyInRunLoop() {
+    if (!RLMIsInRunLoop()) {
+        @throw RLMException(@"Can only access or modify permissions from a thread which has a run loop (by default, only the main thread).");
+    }
+}
+
 - (void)retrievePermissionsWithCallback:(RLMPermissionResultsBlock)callback {
+    verifyInRunLoop();
     if (!_user || _user->state() == SyncUser::State::Error) {
         callback(nullptr, make_permission_error_get(@"Permissions cannot be retrieved using an invalid user."));
         return;
@@ -347,6 +355,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 }
 
 - (void)applyPermission:(RLMSyncPermission *)permission callback:(RLMPermissionStatusBlock)callback {
+    verifyInRunLoop();
     if (!_user || _user->state() == SyncUser::State::Error) {
         callback(make_permission_error_change(@"Permissions cannot be applied using an invalid user."));
         return;
@@ -358,6 +367,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 }
 
 - (void)revokePermission:(RLMSyncPermission *)permission callback:(RLMPermissionStatusBlock)callback {
+    verifyInRunLoop();
     if (!_user || _user->state() == SyncUser::State::Error) {
         callback(make_permission_error_change(@"Permissions cannot be revoked using an invalid user."));
         return;
@@ -372,6 +382,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                      accessLevel:(RLMSyncAccessLevel)accessLevel
                       expiration:(NSDate *)expirationDate
                         callback:(RLMPermissionOfferStatusBlock)callback {
+    verifyInRunLoop();
     if (!_user || _user->state() == SyncUser::State::Error) {
         callback(nil, make_permission_error_change(@"A permission offer cannot be created using an invalid user."));
         return;
@@ -396,6 +407,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 
 - (void)acceptOfferForToken:(NSString *)token
                    callback:(RLMPermissionOfferResponseStatusBlock)callback {
+    verifyInRunLoop();
     if (!_user || _user->state() == SyncUser::State::Error) {
         callback(nil, make_permission_error_change(@"A permission offer cannot be accepted by an invalid user."));
         return;
