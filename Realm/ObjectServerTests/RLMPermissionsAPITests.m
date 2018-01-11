@@ -992,6 +992,23 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
     }];
 }
 
+- (void)testRetrievePermissionsWithTrailingSlash {
+    // Have A open a Realm and grant a permission to B.
+    NSURL *url = REALM_URL();
+    NSString *tildeSubstitutedPath = [makeTildeSubstitutedURL(url, self.userA) path];
+    __attribute__((objc_precise_lifetime)) RLMRealm *r = [self openRealmForURL:url user:self.userA];
+    id p1 = [[RLMSyncPermission alloc] initWithRealmPath:tildeSubstitutedPath
+                                                identity:self.userB.identity
+                                             accessLevel:RLMSyncAccessLevelRead];
+    APPLY_PERMISSION_WITH_MESSAGE(p1, self.userA, @"Setting r permission for user B should work.");
+
+    // Add a trailing slash to the auth URL and try to fetch this new permission
+    NSURL *authURL = [NSURL URLWithString:[[self.class authServerURL].absoluteString stringByAppendingString:@"/"]];
+    RLMSyncUser *userB = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:self.userBUsername register:NO]
+                                                server:authURL];
+    CHECK_PERMISSION_COUNT([self getPermissionResultsFor:userB], 1);
+}
+
 #pragma mark - Permission offer/response
 
 /// Get a token which can be used to offer the permissions as defined

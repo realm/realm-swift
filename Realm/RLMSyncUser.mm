@@ -58,6 +58,14 @@ NSString *tildeSubstitutedPathForRealmURL(NSURL *url, NSString *identity) {
     return [[url path] stringByReplacingOccurrencesOfString:@"~" withString:identity];
 }
 
+std::string normalizedURL(NSURL *url) {
+    std::string ret = url.absoluteString.UTF8String;
+    while (ret.size() && ret.back() == '/') {
+        ret.pop_back();
+    }
+    return ret;
+}
+
 }
 
 void CocoaSyncUserContext::register_refresh_handle(const std::string& path, RLMSyncSessionRefreshHandle *handle)
@@ -232,7 +240,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     if (!_user) {
         return nil;
     }
-    auto path = SyncManager::shared().path_for_realm(*_user, [url.absoluteString UTF8String]);
+    auto path = SyncManager::shared().path_for_realm(*_user, normalizedURL(url));
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }
@@ -497,7 +505,7 @@ static void verifyInRunLoop() {
                 });
                 return;
             } else {
-                std::string server_url = authServerURL.absoluteString.UTF8String;
+                std::string server_url = normalizedURL(authServerURL);
                 SyncUserIdentifier identity{[model.refreshToken.tokenData.identity UTF8String], std::move(server_url)};
                 auto sync_user = SyncManager::shared().get_user(identity , [model.refreshToken.token UTF8String]);
                 if (!sync_user) {
@@ -548,7 +556,7 @@ static void verifyInRunLoop() {
         if (identity) {
             identity_string = std::string(identity.UTF8String);
         }
-        sync_user = SyncManager::shared().get_admin_token_user([serverURL absoluteString].UTF8String,
+        sync_user = SyncManager::shared().get_admin_token_user(normalizedURL(serverURL),
                                                                credentials.token.UTF8String,
                                                                std::move(identity_string));
     } else {
