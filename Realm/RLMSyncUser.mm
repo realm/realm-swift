@@ -341,7 +341,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 
 static void verifyInRunLoop() {
     if (!RLMIsInRunLoop()) {
-        @throw RLMException(@"Can only access or modify permissions from a thread which has a run loop (by default, only the main thread)`.");
+        @throw RLMException(@"Can only access or modify permissions from a thread which has a run loop (by default, only the main thread).");
     }
 }
 

@@ -987,7 +987,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 - (void)testRetrievingPermissionsChecksThreadHasRunLoop {
     [self dispatchAsyncAndWait:^{
         RLMAssertThrowsWithReason([self.userA retrievePermissionsWithCallback:^(__unused RLMResults *r, __unused NSError *e) {
-            XCTFail(@"callback should ot have been invoked");
+            XCTFail(@"callback should not have been invoked");
         }], @"Can only access or modify permissions from a thread which has a run loop");
     }];
 }
