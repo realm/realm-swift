@@ -984,6 +984,14 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
     CHECK_PERMISSION_ABSENT(results, p);
 }
 
+- (void)testRetrievingPermissionsChecksThreadHasRunLoop {
+    [self dispatchAsyncAndWait:^{
+        RLMAssertThrowsWithReason([self.userA retrievePermissionsWithCallback:^(__unused RLMResults *r, __unused NSError *e) {
+            XCTFail(@"callback should ot have been invoked");
+        }], @"Can only access or modify permissions from a thread which has a run loop");
+    }];
+}
+
 #pragma mark - Permission offer/response
 
 /// Get a token which can be used to offer the permissions as defined
