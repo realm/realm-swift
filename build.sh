@@ -220,9 +220,21 @@ test_ios_static() {
 
 test_devices() {
     local serial_numbers=()
-    local serial_numbers_text=$(/usr/sbin/system_profiler SPUSBDataType | /usr/bin/awk '/^ +Serial Number: / { match($0, /^ +Serial Number: /); print substr($0, RLENGTH + 1) }')
+    local awk_script="
+    /^ +Vendor ID: / { is_apple = 0; }
+    /^ +Vendor ID: 0x05[aA][cC] / { is_apple = 1; }
+    /^ +Serial Number: / {
+        if (is_apple) {
+            match(\$0, /^ +Serial Number: /);
+            print substr(\$0, RLENGTH + 1);
+        }
+    }
+    "
+    local serial_numbers_text=$(/usr/sbin/system_profiler SPUSBDataType | /usr/bin/awk "$awk_script")
     while read -r number; do
-        serial_numbers+=("$number")
+        if [[ "$number" != "" ]]; then
+            serial_numbers+=("$number")
+        fi
     done <<< "$serial_numbers_text"
     if [[ ${#serial_numbers[@]} == 0 ]]; then
         echo "At least one iOS/tvOS device must be connected to this computer to run device tests"
