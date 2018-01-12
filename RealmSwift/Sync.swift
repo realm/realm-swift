@@ -308,7 +308,7 @@ public struct SyncCredentials {
     }
 
     /// Initialize new credentials using a nickname.
-    public static func nickname(_ nickname: String, _ isAdmin: Bool = false) -> SyncCredentials {
+    public static func nickname(_ nickname: String, isAdmin: Bool = false) -> SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(nickname: nickname, isAdmin: isAdmin))
     }
 
