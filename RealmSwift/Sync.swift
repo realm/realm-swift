@@ -306,12 +306,12 @@ public struct SyncCredentials {
     public static func jwt(_ token: Token) -> SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(jwt: token))
     }
-    
+
     /// Initialize new credentials using a nickname.
-    public static func nickname(_ nickname: Token, _ isAdmin: Bool = false) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(nickname:nickname, isAdmin: isAdmin))
+    public static func nickname(_ nickname: String, _ isAdmin: Bool = false) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(nickname: nickname, isAdmin: isAdmin))
     }
-    
+
     /// Initialize new credentials anonymously
     public static func anonymous() -> SyncCredentials {
         return SyncCredentials(RLMSyncCredentials.anonymous())
