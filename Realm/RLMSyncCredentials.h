@@ -103,7 +103,7 @@ extern RLMIdentityProvider const RLMIdentityProviderNickname;
 /**
  Construct and return credentials from a nickname
  */
-+ (instancetype)credentialsWithNickname:(NSString *)nickname isAdmin:(BOOL) isAdmin;
++ (instancetype)credentialsWithNickname:(NSString *)nickname isAdmin:(BOOL)isAdmin;
 
 /**
  Construct and return special credentials representing a token that can
