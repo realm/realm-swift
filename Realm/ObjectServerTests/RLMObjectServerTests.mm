@@ -1533,24 +1533,25 @@
         RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
         configuration.syncConfiguration = syncConfig;
         RLMRealm *realm = [self openRealmWithConfiguration:configuration];
+
         // Perform some partial sync queries
-        XCTestExpectation *ex = [self expectationWithDescription:@"Should be able to successfully complete a query"];
-        __block RLMResults *objects = nil;
-        [realm subscribeToObjects:[PartialSyncObjectA class]
-                            where:@"number > 5"
-                           callback:^(RLMResults *results, NSError *error) {
-                               XCTAssertNil(error);
-                               XCTAssertNotNil(results);
-                               objects = results;
-                               [ex fulfill];
-                           }];
+        RLMResults *objects = [PartialSyncObjectA objectsInRealm:realm where:@"number > 5"];
+        [objects subscribe];
+
+        // Wait for the results to become available.
+        XCTestExpectation *ex = [[XCTKVOExpectation alloc] initWithKeyPath:@"partialSyncState" object:objects expectedValue:@(RLMPartialSyncStateComplete)];
         [self waitForExpectations:@[ex] timeout:20.0];
+
         // Verify that we got what we're looking for
         XCTAssertTrue(objects.count == 4);
         for (PartialSyncObjectA *object in objects) {
-            XCTAssertTrue(object.number > 5);
-            XCTAssertTrue([object.string isEqualToString:@"partial"]);
+            XCTAssertGreaterThan(object.number, 5);
+            XCTAssertEqualObjects(object.string, @"partial");
         }
+
+        // Verify that we didn't get any other objects
+        XCTAssertEqual([PartialSyncObjectA allObjectsInRealm:realm].count, objects.count);
+        XCTAssertEqual([PartialSyncObjectB allObjectsInRealm:realm].count, 0u);
     }
 }
 

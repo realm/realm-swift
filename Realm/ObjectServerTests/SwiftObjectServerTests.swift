@@ -458,15 +458,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
                 let ex = expectation(description: "Should be able to successfully complete a query")
 
-                var results: Results<SwiftPartialSyncObjectA>!
-                realm.subscribe(to: SwiftPartialSyncObjectA.self, where: "number > 5") { r, error in
-                    XCTAssertNil(error)
-                    XCTAssertNotNil(r)
-                    results = r
-                    ex.fulfill()
+                let results = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5").subscribe(named: "A")
+                XCTAssertEqual(results.partialSyncState, .incomplete)
+                let token = results.observe(\.partialSyncState) { state, _ in
+                    if state == .complete {
+                        ex.fulfill()
+                    }
                 }
 
                 waitForExpectations(timeout: 20.0)
+                token.invalidate()
 
                 // Verify that we got what we're looking for
                 XCTAssertEqual(results.count, 4)
@@ -474,6 +475,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     XCTAssertGreaterThan(object.number, 5)
                     XCTAssertEqual(object.string, "partial")
                 }
+
+                // And that we didn't get anything else.
+                XCTAssertEqual(realm.objects(SwiftPartialSyncObjectA.self).count, results.count)
+                XCTAssertTrue(realm.objects(SwiftPartialSyncObjectB.self).isEmpty)
+
+                // Re-subscribing to an existing named query should report the query's current state.
+                let results2 = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5").subscribe(named: "A")
+                XCTAssertEqual(results2.partialSyncState, .complete)
             }
         }
     }

@@ -373,6 +373,28 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
     }
+
+    public typealias PartialSyncState = RLMPartialSyncState
+    public var partialSyncState: PartialSyncState { return rlmResults.partialSyncState }
+
+    public func subscribe() -> Results {
+        rlmResults.subscribe()
+        return self
+    }
+
+    public func subscribe(named: String) -> Results {
+        rlmResults.subscribe(withName: named)
+        return self
+    }
+
+    public func observe(_ keyPath: KeyPath<Results, PartialSyncState>,
+                        options: NSKeyValueObservingOptions = [],
+                        _ block: @escaping (PartialSyncState, NSKeyValueObservedChange<PartialSyncState>) -> Void) -> NotificationToken {
+        let observation = rlmResults.observe(\.partialSyncState, options: options) { rlmResults, change in
+            block(rlmResults.partialSyncState, change)
+        }
+        return KeyValueObservationNotificationToken(observation)
+    }
 }
 
 extension Results: RealmCollection {
@@ -416,5 +438,19 @@ extension Results: AssistedObjectiveCBridgeable {
 
     var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (objectiveCValue: rlmResults, metadata: nil)
+    }
+}
+
+internal class KeyValueObservationNotificationToken : NotificationToken {
+    public var observation: NSKeyValueObservation?
+
+    public init(_ observation: NSKeyValueObservation)
+    {
+        super.init()
+        self.observation = observation
+    }
+
+    public override func invalidate() {
+        self.observation = nil
     }
 }

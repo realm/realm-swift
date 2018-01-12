@@ -32,6 +32,7 @@
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import "partial_sync.hpp"
 #import "results.hpp"
 #import "shared_realm.hpp"
 
@@ -47,6 +48,7 @@ using namespace realm;
 #pragma clang diagnostic pop
 
 @interface RLMResults () <RLMThreadConfined_Private>
+@property (nonatomic, readwrite) RLMPartialSyncState partialSyncState;
 @end
 
 //
@@ -256,6 +258,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (id)valueForKey:(NSString *)key {
+    if ([key isEqualToString:@"partialSyncState"]) {
+        return [super valueForKey:key];
+    }
+
     return translateRLMResultsErrors([&] {
         return RLMCollectionValueForKey(_results, key, _realm, *_info);
     });
@@ -443,6 +449,30 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         else {
             RLMTrackDeletions(_realm, [&] { _results.clear(); });
         }
+    });
+}
+
+- (void)subscribe {
+    [self _subscribeWithName:nil];
+}
+
+- (void)subscribeWithName:(NSString *)subscriptionName {
+    [self _subscribeWithName:subscriptionName];
+}
+
+- (void)_subscribeWithName:(NSString *)subscriptionName {
+    self.partialSyncState = RLMPartialSyncStateIncomplete;
+    return translateRLMResultsErrors([&] {
+        RLMResults *weakSelf = self;
+        return partial_sync::subscribe(_results,
+                                       subscriptionName ? util::make_optional<std::string>(subscriptionName.UTF8String) : util::none,
+                                       [weakSelf](bool updated_remote, std::exception_ptr error) {
+            // FIXME: How should we expose the error?
+            fprintf(stderr, "Subscribe callback: %d %d\n", updated_remote, error != nullptr);
+            if (RLMResults *self = weakSelf) {
+                self.partialSyncState = updated_remote ? RLMPartialSyncStateComplete: RLMPartialSyncStateIncomplete;
+            }
+        });
     });
 }
 
