@@ -98,7 +98,7 @@ extern RLMIdentityProvider const RLMIdentityProviderNickname;
 /**
  Construct and return anonymous credentials
  */
-+ (instancetype)credentialsWithAnonymous;
++ (instancetype)anonymousCredentials;
     
 /**
  Construct and return credentials from a nickname

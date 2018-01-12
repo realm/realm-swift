@@ -11,7 +11,7 @@ x.x.x Release notes (yyyy-mm-dd)
 * Realm Object Server errors not explicitly recognized by the client are now reported to the application
   regardless.
 * Add support for JSON Web Token as a sync credential source.
-* Add support for Nickname Auth  as a sync credential source.
+* Add support for Nickname and Anonymous Auth as a sync credential source.
 
 3.0.2 Release notes (2017-11-08)
 =============================================================

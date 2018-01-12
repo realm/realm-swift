@@ -72,14 +72,14 @@ RLMIdentityProvider const RLMIdentityProviderNickname               = @"nickname
     return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderJWT userInfo:nil];
 }
     
-+ (instancetype)credentialsWithAnonymous {
++ (instancetype)anonymousCredentials {
     return [[self alloc] initWithCustomToken:@"" provider:RLMIdentityProviderAnonymous userInfo:nil];
 }
     
 + (instancetype)credentialsWithNickname:(NSString *)nickname isAdmin:(BOOL)isAdmin {
     return [[self alloc] initWithCustomToken:nickname
                                     provider:RLMIdentityProviderNickname
-                                    userInfo:@{kRLMSyncIsAdminKey: @(isAdmin)}];
+                                    userInfo:@{kRLMSyncIsAdminKey: @(isAdmin), kRLMSyncDataKey: nickname}];
 }
 
 /// Intended only for testing use. Will only work if the ROS is started with the `debug` provider enabled.

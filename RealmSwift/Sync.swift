@@ -314,7 +314,7 @@ public struct SyncCredentials {
     
     /// Initialize new credentials anonymously
     public static func anonymous() -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials.withAnonymous())
+        return SyncCredentials(RLMSyncCredentials.anonymous())
     }
 }
 
