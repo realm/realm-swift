@@ -7,6 +7,8 @@ x.x.x Release notes (yyyy-mm-dd)
 
 ### Enhancements
 
+* Add `Results.distinct(by:)` / `-[RLMResults distinctResultsUsingKeyPaths:]`, which return a `Results`
+  containing only objects with unique values at the given key paths.
 * Improve performance of change checking for notifications in certain cases.
 * Realm Object Server errors not explicitly recognized by the client are now reported to the application
   regardless.
