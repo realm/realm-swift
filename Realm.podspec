@@ -75,7 +75,7 @@ Pod::Spec.new do |s|
   s.header_mappings_dir     = 'include'
   s.pod_target_xcconfig     = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES',
                                 'CLANG_CXX_LANGUAGE_STANDARD' => 'c++14',
-                                'OTHER_CPLUSPLUSFLAGS' => '-isystem "${PODS_ROOT}/Realm/include/core"',
+                                'OTHER_CPLUSPLUSFLAGS' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden',
                                 'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"' }
   s.preserve_paths          = %w(build.sh include)
 
