@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-mm-dd)
+3.1.0 Release notes (2018-01-16)
 =============================================================
 
 * Prebuilt frameworks are now included for Swift 3.2.3 and 4.0.3.
