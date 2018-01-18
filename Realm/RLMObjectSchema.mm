@@ -29,6 +29,7 @@
 #import "RLMUtil.hpp"
 
 #import "object_store.hpp"
+#import "object_schema.hpp"
 
 using namespace realm;
 
@@ -78,7 +79,9 @@ using namespace realm;
             self.primaryKeyProperty = prop;
         }
     }
+    index = 0;
     for (RLMProperty *prop in _computedProperties) {
+        prop.index = index++;
         map[prop.name] = prop;
     }
     _allPropertiesByName = map;
@@ -176,6 +179,7 @@ using namespace realm;
     Class objectUtil = [objectClass objectUtilClass:isSwiftClass];
     NSArray *ignoredProperties = [objectUtil ignoredPropertiesForClass:objectClass];
     NSDictionary *linkingObjectsProperties = [objectUtil linkingObjectsPropertiesForClass:objectClass];
+    NSDictionary *columnNameMap = [objectClass _realmColumnNames];
 
     // For Swift classes we need an instance of the object when parsing properties
     id swiftObjectInstance = isSwiftClass ? [[objectClass alloc] init] : nil;
@@ -206,6 +210,9 @@ using namespace realm;
         }
 
         if (prop) {
+            if (columnNameMap) {
+                prop.columnName = columnNameMap[prop.name];
+            }
             [propArray addObject:prop];
         }
     }
@@ -369,17 +376,17 @@ using namespace realm;
     return [self.objectClass _realmObjectName] ?: _className;
 }
 
-- (realm::ObjectSchema)objectStoreCopy {
+- (realm::ObjectSchema)objectStoreCopy:(RLMSchema *)schema {
     ObjectSchema objectSchema;
     objectSchema.name = self.objectName.UTF8String;
-    objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.name.UTF8String : "";
+    objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.columnName.UTF8String : "";
     for (RLMProperty *prop in _properties) {
-        Property p = [prop objectStoreCopy];
+        Property p = [prop objectStoreCopy:schema];
         p.is_primary = (prop == _primaryKeyProperty);
         objectSchema.persisted_properties.push_back(std::move(p));
     }
     for (RLMProperty *prop in _computedProperties) {
-        objectSchema.computed_properties.push_back([prop objectStoreCopy]);
+        objectSchema.computed_properties.push_back([prop objectStoreCopy:schema]);
     }
     return objectSchema;
 }

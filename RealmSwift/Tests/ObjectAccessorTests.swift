@@ -354,4 +354,33 @@ class ObjectAccessorTests: TestCase {
         }
         XCTAssertEqual(firstOwner.name, "JP")
     }
+
+    func testRenamedProperties() {
+        let obj = RenamedProperties1()
+        obj.propA = 5
+        obj.propB = "a"
+
+        let link = LinkToRenamedProperties1()
+        link.linkA = obj
+        link.array.append(obj)
+
+        let realm = try! Realm()
+        try! realm.write {
+            realm.add(link)
+        }
+
+        XCTAssertEqual(obj.propA, 5)
+        XCTAssertEqual(obj.propB, "a")
+        XCTAssertTrue(link.linkA!.isSameObject(as: obj))
+        XCTAssertTrue(link.array[0].isSameObject(as: obj))
+        XCTAssertTrue(obj.linking1[0].isSameObject(as: link))
+
+        XCTAssertEqual(obj["propA"]! as! Int, 5)
+        XCTAssertEqual(obj["propB"]! as! String, "a")
+        XCTAssertTrue((link["linkA"]! as! RenamedProperties1).isSameObject(as: obj))
+        XCTAssertTrue((link["array"]! as! List<RenamedProperties1>)[0].isSameObject(as: obj))
+        XCTAssertTrue((obj["linking1"]! as! LinkingObjects<LinkToRenamedProperties1>)[0].isSameObject(as: link))
+
+        XCTAssertTrue(link.dynamicList("array")[0].isSameObject(as: obj))
+    }
 }

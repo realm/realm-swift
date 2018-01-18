@@ -381,4 +381,70 @@
     [realm commitWriteTransaction];
 }
 
+- (void)testRenamedProperties {
+    RenamedProperties1 *obj1 = [[RenamedProperties1 alloc] initWithValue:@{@"propA": @5, @"propB": @"a"}];
+    XCTAssertEqual(obj1.propA, 5);
+    XCTAssertEqualObjects(obj1.propB, @"a");
+    XCTAssertEqualObjects(obj1[@"propA"], @5);
+    XCTAssertEqualObjects(obj1[@"propB"], @"a");
+    XCTAssertEqualObjects([obj1 valueForKey:@"propA"], @5);
+    XCTAssertEqualObjects([obj1 valueForKey:@"propB"], @"a");
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:obj1];
+    XCTAssertEqual(obj1.propA, 5);
+    XCTAssertEqualObjects(obj1.propB, @"a");
+    XCTAssertEqualObjects(obj1[@"propA"], @5);
+    XCTAssertEqualObjects(obj1[@"propB"], @"a");
+    XCTAssertEqualObjects([obj1 valueForKey:@"propA"], @5);
+    XCTAssertEqualObjects([obj1 valueForKey:@"propB"], @"a");
+
+    RenamedProperties2 *obj2 = [RenamedProperties2 createInRealm:realm withValue:@{@"propC": @6, @"propD": @"b"}];
+    XCTAssertEqual(obj2.propC, 6);
+    XCTAssertEqualObjects(obj2.propD, @"b");
+    XCTAssertEqualObjects(obj2[@"propC"], @6);
+    XCTAssertEqualObjects(obj2[@"propD"], @"b");
+    XCTAssertEqualObjects([obj2 valueForKey:@"propC"], @6);
+    XCTAssertEqualObjects([obj2 valueForKey:@"propD"], @"b");
+
+    RLMResults<RenamedProperties1 *> *results1 = [RenamedProperties1 allObjectsInRealm:realm];
+    RLMResults<RenamedProperties2 *> *results2 = [RenamedProperties2 allObjectsInRealm:realm];
+    XCTAssertTrue([results1[0] isEqualToObject:results2[0]]);
+    XCTAssertTrue([results1[1] isEqualToObject:results2[1]]);
+
+    LinkToRenamedProperties1 *link1 = [LinkToRenamedProperties1 createInRealm:realm withValue:@[obj1, obj2, @[obj1, results1[1]]]];
+    LinkToRenamedProperties2 *link2 = [LinkToRenamedProperties2 createInRealm:realm withValue:@[obj2, obj1, @[obj2, results2[0]]]];
+
+    XCTAssertTrue([link1.linkA isKindOfClass:[RenamedProperties1 class]]);
+    XCTAssertTrue([link1.linkB isKindOfClass:[RenamedProperties2 class]]);
+    XCTAssertTrue([link1.array[0] isKindOfClass:[RenamedProperties1 class]]);
+    XCTAssertTrue([link1.array[1] isKindOfClass:[RenamedProperties1 class]]);
+
+    XCTAssertTrue([link2.linkC isKindOfClass:[RenamedProperties2 class]]);
+    XCTAssertTrue([link2.linkD isKindOfClass:[RenamedProperties1 class]]);
+    XCTAssertTrue([link2.array[0] isKindOfClass:[RenamedProperties2 class]]);
+    XCTAssertTrue([link2.array[1] isKindOfClass:[RenamedProperties2 class]]);
+
+    XCTAssertTrue([link1.linkA isEqualToObject:results1[0]]);
+    XCTAssertTrue([link1.linkB isEqualToObject:results1[1]]);
+    XCTAssertTrue([link1.linkA isEqualToObject:results2[0]]);
+    XCTAssertTrue([link1.linkB isEqualToObject:results2[1]]);
+
+    XCTAssertTrue([link2.linkC isEqualToObject:results1[1]]);
+    XCTAssertTrue([link2.linkD isEqualToObject:results1[0]]);
+    XCTAssertTrue([link2.linkC isEqualToObject:results2[1]]);
+    XCTAssertTrue([link2.linkD isEqualToObject:results2[0]]);
+
+    XCTAssertEqualObjects([link1.array valueForKey:@"propB"], (@[@"a", @"b"]));
+    XCTAssertEqualObjects([link2.array valueForKey:@"propD"], (@[@"b", @"a"]));
+
+    XCTAssertTrue([obj1.linking1[0] isEqualToObject:link1]);
+    XCTAssertTrue([obj1.linking2[0] isEqualToObject:link2]);
+    XCTAssertTrue([obj2.linking1[0] isEqualToObject:link2]);
+    XCTAssertTrue([obj2.linking2[0] isEqualToObject:link1]);
+
+    [realm cancelWriteTransaction];
+}
+
 @end

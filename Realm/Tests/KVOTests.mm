@@ -1769,6 +1769,33 @@ public:
     AssertChanged(r1, @NO, @YES);
     AssertChanged(r2, @NO, @YES);
 }
+
+- (void)testRenamedProperties {
+    auto obj = [RenamedProperties1 createInRealm:self.realm withValue:@[@1, @"a"]];
+    [self.realm commitWriteTransaction];
+    [self.realm beginWriteTransaction];
+    KVORecorder r(self, obj, @"propA");
+
+    obj.propA = 2;
+    AssertChanged(r, @1, @2);
+
+    obj[@"propA"] = @3;
+    AssertChanged(r, @2, @3);
+
+    [obj setValue:@4 forKey:@"propA"];
+    AssertChanged(r, @3, @4);
+
+    // Only rollback will notify objects of different types with the same table,
+    // not direct modification. Probably not worth fixing this.
+    RenamedProperties2 *obj2 = [RenamedProperties2 allObjectsInRealm:self.realm].firstObject;
+    KVORecorder r2(self, obj2, @"propC");
+
+    [self.realm cancelWriteTransaction];
+    [self.realm beginWriteTransaction];
+
+    AssertChanged(r, @4, @1);
+    AssertChanged(r2, @4, @1);
+}
 @end
 
 // Observing an object from a different RLMRealm instance backed by the same

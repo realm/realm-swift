@@ -151,7 +151,10 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 - (NSString *)objectClassName {
     return translateRLMResultsErrors([&] {
-        return RLMStringDataToNSString(_results.get_object_type());
+        if (_info && _results.get_type() == realm::PropertyType::Object) {
+            return _info->rlmObjectSchema.className;
+        }
+        return (NSString *)nil;
     });
 }
 

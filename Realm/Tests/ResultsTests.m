@@ -350,6 +350,29 @@
     RLMAssertThrowsWithReasonMatching([allArray maxOfProperty:@"boolCol"], @"max.*bool");
 }
 
+- (void)testRenamedPropertyAggregate {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    RLMResults *results = [RenamedProperties1 allObjectsInRealm:realm];
+    XCTAssertEqual(0, [results sumOfProperty:@"propA"].intValue);
+    XCTAssertNil([results averageOfProperty:@"propA"]);
+    XCTAssertNil([results minOfProperty:@"propA"]);
+    XCTAssertNil([results maxOfProperty:@"propA"]);
+    XCTAssertThrows([results sumOfProperty:@"prop 1"]);
+
+    [realm transactionWithBlock:^{
+        [RenamedProperties1 createInRealm:realm withValue:@[@1, @""]];
+        [RenamedProperties1 createInRealm:realm withValue:@[@2, @""]];
+        [RenamedProperties1 createInRealm:realm withValue:@[@3, @""]];
+    }];
+
+    XCTAssertEqual(6, [results sumOfProperty:@"propA"].intValue);
+    XCTAssertEqual(2.0, [results averageOfProperty:@"propA"].doubleValue);
+    XCTAssertEqual(1, [[results minOfProperty:@"propA"] intValue]);
+    XCTAssertEqual(3, [[results maxOfProperty:@"propA"] intValue]);
+}
+
+
 - (void)testValueForCollectionOperationKeyPath {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
