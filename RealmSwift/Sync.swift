@@ -666,3 +666,378 @@ extension Results where Element == SyncPermission {
 /// :nodoc:
 @available(*, unavailable, renamed: "SyncPermission")
 public final class SyncPermissionValue { }
+
+// MARK: - Permissions
+
+/**
+ A permission which can be applied to a Realm, Class, or specific Object.
+
+ Permissions are applied by adding the permission to the RealmPermission singleton
+ object, the ClassPermission object for the desired class, or to a user-defined
+ List<Permission> property on a specific Object instance. The meaning of each of
+ the properties of Permission depend on what the permission is applied to, and so are
+ left undocumented here. See `RealmPrivileges`, `ClassPrivileges`, and
+ `ObjectPrivileges` for details about what each of the properties mean when applied to
+ that type.
+ */
+public class Permission: Object {
+    /// The Role which this Permission applies to. All users within the Role are
+    /// granted the permissions specified by the fields below any
+    /// objects/classes/realms which use this Permission.
+    ///
+    /// This property cannot be modified once set.
+    @objc dynamic public var role: PermissionRole?
+
+    @objc dynamic public var canRead = false
+    @objc dynamic public var canUpdate = false
+    @objc dynamic public var canDelete = false
+    @objc dynamic public var canSetPermissions = false
+    @objc dynamic public var canQuery = false
+    @objc dynamic public var canCreate = false
+    @objc dynamic public var canModifySchema = false
+
+    @objc override public class func _realmObjectName() -> String {
+        return "__Permission"
+    }
+}
+
+/**
+ A Role within the permissions system.
+
+ A Role consists of a name for the role and a list of users which are members of the role.
+ Roles are granted privileges on Realms, Classes and Objects, and in turn grant those
+ privileges to all users which are members of the role.
+
+ A role named "everyone" is automatically created in new Realms, and all new users which
+ connect to the Realm are automatically added to it. Any other roles you wish to use are
+ managed as normal Realm objects.
+ */
+public class PermissionRole: Object {
+    @objc dynamic public var name = ""
+    let users = List<PermissionUser>()
+
+    @objc override public class func _realmObjectName() -> String {
+        return "__Role"
+    }
+    @objc override public class func primaryKey() -> String {
+        return "name"
+    }
+    @objc override public class func _realmColumnNames() -> [String: String] {
+        return ["users": "members"]
+    }
+}
+
+/**
+ A representation of a sync user within the permissions system.
+
+ PermissionUser objects are created automatically for each sync user which connects to
+ a Realm, and can also be created manually if you wish to grant permissions to a user
+ which has not yet connected to this Realm. When creating a PermissionUser manually, you
+ must also manually add it to the "everyone" Role.
+ */
+public class PermissionUser: Object {
+    /// The unique Realm Object Server user ID string identifying this user. This will
+    /// have the same value as `SyncUser.identity`
+    @objc dynamic public var identity = ""
+
+    /// Roles which this user belongs to.
+    let roles = LinkingObjects(fromType: PermissionRole.self, property: "users")
+
+    @objc override public class func _realmObjectName() -> String {
+        return "__User"
+    }
+    @objc override public class func primaryKey() -> String {
+        return "identity"
+    }
+    @objc override public class func _realmColumnNames() -> [String: String] {
+        return ["identity": "id"]
+    }
+}
+
+/**
+ A singleton object which describes Realm-wide permissions.
+
+ An object of this type is automatically created in the Realm for you, and more objects
+ cannot be created manually.
+
+ See `RealmPrivileges` for the meaning of permissions applied to a Realm.
+ */
+public class RealmPermission: Object {
+    @objc private var id = 0
+
+    /// The permissions for the Realm.
+    public let permissions = List<Permission>()
+
+    @objc override public class func _realmObjectName() -> String {
+        return "__Realm"
+    }
+    @objc override public class func primaryKey() -> String {
+        return "id"
+    }
+}
+
+/**
+ An object which describes class-wide permissions.
+
+ An instance of this object is automatically created in the Realm for class in your schema,
+ and should not be created manually.
+ */
+public class ClassPermission: Object {
+    /// The name of the class which these permissions apply to.
+    @objc dynamic public var name = ""
+    /// The permissions for this class.
+    public let permissions = List<Permission>()
+
+    @objc override public class func _realmObjectName() -> String {
+        return "__Class"
+    }
+    @objc override public class func primaryKey() -> String {
+        return "name"
+    }
+}
+
+/**
+ A description of the actual privileges which apply to a Realm.
+
+ This is a combination of all of the privileges granted to all of the Roles which the
+ current User is a member of, obtained by calling `realm.getPrivileges()`.
+
+ By default, all operations are permitted, and each privilege field indicates an operation
+ which may be forbidden.
+ */
+public struct RealmPrivileges: OptionSet {
+    public let rawValue: UInt8
+    public init(rawValue: RawValue) {
+        self.rawValue = rawValue
+    }
+
+    /// If `false`, the current User is not permitted to see the Realm at all. This can
+    /// happen only if the Realm was created locally and has not yet been synchronized.
+    public static let read = RealmPrivileges(rawValue: 1 << 0)
+
+    /// If `false`, no modifications to the Realm are permitted. Write transactions can
+    /// be performed locally, but any changes made will be reverted by the server.
+    /// `setPermissions` and `modifySchema` will always be `false` when this is `false`.
+    public static let update = RealmPrivileges(rawValue: 1 << 1)
+
+    /// If `false`, no modifications to the permissions property of the RLMRealmPermissions
+    /// object for are permitted. Write transactions can be performed locally, but any
+    /// changes made will be reverted by the server.
+    ///
+    /// Note that if invalide privilege changes are made, `-[RLMRealm privilegesFor*:]`
+    /// will return results reflecting those invalid changes until synchronization occurs.
+    ///
+    /// Even if this field is `true`, note that the user will be unable to grant
+    /// privileges to a Role which they do not themselves have.
+    ///
+    /// Adding or removing Users from a Role is controlled by Update privileges on that
+    /// Role, and not by this value.
+    public static let setPermissions = RealmPrivileges(rawValue: 1 << 3)
+
+    /// If `false`, the user is not permitted to add new object types to the Realm or add
+    /// new properties to existing objec types. Defining new RLMObject subclasses (and not
+    /// excluding them from the schema with `-[RLMRealmConfiguration setObjectClasses:]`)
+    /// will result in the application crashing if the object types are not first added on
+    /// the server by a more privileged user.
+    public static let modifySchema = RealmPrivileges(rawValue: 1 << 6)
+}
+
+/**
+ A description of the actual privileges which apply to a Class within a Realm.
+
+ This is a combination of all of the privileges granted to all of the Roles which the
+ current User is a member of, obtained by calling `realm.getPrivileges(ObjectClass.self)`
+ or `realm.getPrivileges(forClassNamed: "className")`
+
+ By default, all operations are permitted, and each privilege field indicates an operation
+ which may be forbidden.
+ */
+public struct ClassPrivileges: OptionSet {
+    public let rawValue: UInt8
+    public init(rawValue: RawValue) {
+        self.rawValue = rawValue
+    }
+
+    /// If `false`, the current User is not permitted to see objects of this type, and
+    /// attempting to query this class will always return empty results.
+    ///
+    /// Note that Read permissions are transitive, and so it may be possible to read an
+    /// object which the user does not directly have Read permissions for by following a
+    /// link to it from an object they do have Read permissions for. This does not apply
+    /// to any of the other permission types.
+    public static let read = ClassPrivileges(rawValue: 1 << 0)
+
+    /// If `false`, creating new objects of this type is not permitted. Write transactions
+    /// creating objects can be performed locally, but the objects will be deleted by the
+    /// server when synchronization occurs.
+    ///
+    /// For objects with Primary Keys, it may not be locally determinable if Create or
+    /// Update privileges are applicable. It may appear that you are creating a new object,
+    /// but an object with that Primary Key may already exist and simply not be visible to
+    /// you, in which case it is actually an Update operation.
+    /// Deleting an object is considered a modification, and is governed by this privilege.
+    public static let create = ClassPrivileges(rawValue: 1 << 5)
+
+    /// If `false`, no modifications to objects of this type are permitted. Write
+    /// transactions modifying the objects can be performed locally, but any changes made
+    /// will be reverted by the server.
+    ///
+    /// Deleting an object is considered a modification, and is governed by this privilege.
+    public static let update = ClassPrivileges(rawValue: 1 << 1)
+
+    /// If `false`, the User is not permitted to create new subscriptions for this class.
+    /// Local queries against the objects within the Realm will work, but new
+    /// subscriptions will never add objects to the Realm.
+    public static let subscribe = ClassPrivileges(rawValue: 1 << 4)
+
+    /// If `false`, no modifications to the permissions property of the RLMClassPermissions
+    /// object for this type are permitted. Write transactions can be performed locally,
+    /// but any changes made will be reverted by the server.
+    ///
+    /// Note that if invalid privilege changes are made, `-[Realm privilegesFor*:]`
+    /// will return results reflecting those invalid changes until synchronization occurs.
+    ///
+    /// Even if this field is `true`, note that the user will be unable to grant
+    /// privileges to a Role which they do not themselves have.
+    public static let setPermissions = ClassPrivileges(rawValue: 1 << 3)
+}
+
+/**
+ A description of the actual privileges which apply to a specific Object.
+
+ This is a combination of all of the privileges granted to all of the Roles which the
+ current User is a member of, obtained by calling `realm.getPrivileges(object)`.
+
+ By default, all operations are permitted, and each privilege field indicates an operation
+ which may be forbidden.
+ */
+public struct ObjectPrivileges: OptionSet {
+    public let rawValue: UInt8
+    public init(rawValue: RawValue) {
+        self.rawValue = rawValue
+    }
+
+    /// If `false`, the current User is not permitted to read this object directly.
+    ///
+    /// Objects which cannot be read by a user will appear in a Realm due to that read
+    /// permissions are transitive. All objects which a readable object links to are
+    /// themselves implicitly readable. If the link to an object with `read=false` is
+    /// removed, the object will be deleted from the local Realm.
+    public static let read = ObjectPrivileges(rawValue: 1 << 0)
+
+    /// If `false`, modifying the fields of this type is not permitted. Write
+    /// transactions modifying the objects can be performed locally, but any changes made
+    /// will be reverted by the server.
+    ///
+    /// Note that even if this is `true`, the user may not be able to modify the
+    /// `List<Permission>` property of the object (if it exists), as that is
+    /// governed by `setPermissions`.
+    public static let update = ObjectPrivileges(rawValue: 1 << 1)
+
+    /// If `false`, deleting this object is not permitted. Write transactions which delete
+    /// the object can be performed locally, but the server will restore it.
+    ///
+    /// It is possible to have `update` but not `delete` privileges, or vice versa. For
+    /// objects with primary keys, `delete` but not `update` is ill-advised, as an object
+    /// can be updated by deleting and recreating it.
+    public static let delete = ObjectPrivileges(rawValue: 1 << 2)
+
+    /// If `false`, modifying the privileges of this specific object is not permitted.
+    ///
+    /// Object-specific permissions are set by declaring a `List<Permission>`
+    /// property on the `Object` subclass. Modifications to this property are
+    /// controlled by `setPermissions` rather than `update`.
+    ///
+    /// Even if this field is `true`, note that the user will be unable to grant
+    /// privileges to a Role which they do not themselves have.
+    public static let setPermissions = ObjectPrivileges(rawValue: 1 << 3)
+}
+
+extension Realm {
+    /**
+    Returns the computed privileges which the current user has for this Realm.
+
+    This combines all privileges granted on the Realm by all Roles which the
+    current User is a member of into the final privileges which will be
+    enforced by the server.
+
+    The privilege calculation is done locally using cached data, and inherently
+    may be stale. It is possible that this method may indicate that an
+    operation is permitted but the server will still reject it if permission is
+    revoked before the changes have been integrated on the server.
+
+    Non-synchronized Realms always have permission to perform all operations.
+
+     - returns: The privileges which the current user has for the current Realm.
+     */
+    public func getPrivileges() -> RealmPrivileges {
+        return RealmPrivileges(rawValue: RLMGetComputedPermissions(rlmRealm, nil))
+    }
+
+    /**
+    Returns the computed privileges which the current user has for the given object.
+
+    This combines all privileges granted on the object by all Roles which the
+    current User is a member of into the final privileges which will be
+    enforced by the server.
+
+    The privilege calculation is done locally using cached data, and inherently
+    may be stale. It is possible that this method may indicate that an
+    operation is permitted but the server will still reject it if permission is
+    revoked before the changes have been integrated on the server.
+
+    Non-synchronized Realms always have permission to perform all operations.
+
+    The object must be a valid object managed by this Realm. Passing in an
+    invalidated object, an unmanaged object, or an object managed by a
+    different Realm will throw an exception.
+
+     - parameter object: A managed object to get the privileges for.
+     - returns: The privileges which the current user has for the given object.
+    */
+    public func getPrivileges(_ object: Object) -> ObjectPrivileges {
+        return ObjectPrivileges(rawValue: RLMGetComputedPermissions(rlmRealm, object))
+    }
+
+    /**
+    Returns the computed privileges which the current user has for the given class.
+
+    This combines all privileges granted on the class by all Roles which the
+    current User is a member of into the final privileges which will be
+    enforced by the server.
+
+    The privilege calculation is done locally using cached data, and inherently
+    may be stale. It is possible that this method may indicate that an
+    operation is permitted but the server will still reject it if permission is
+    revoked before the changes have been integrated on the server.
+
+    Non-synchronized Realms always have permission to perform all operations.
+
+     - parameter cls: An Object subclass to get the privileges for.
+     - returns: The privileges which the current user has for the given class.
+    */
+    public func getPrivileges<T: Object>(_ cls: T.Type) -> ClassPrivileges {
+        return ClassPrivileges(rawValue: RLMGetComputedPermissions(rlmRealm, cls.className()))
+    }
+
+    /**
+    Returns the computed privileges which the current user has for the named class.
+
+    This combines all privileges granted on the class by all Roles which the
+    current User is a member of into the final privileges which will be
+    enforced by the server.
+
+    The privilege calculation is done locally using cached data, and inherently
+    may be stale. It is possible that this method may indicate that an
+    operation is permitted but the server will still reject it if permission is
+    revoked before the changes have been integrated on the server.
+
+    Non-synchronized Realms always have permission to perform all operations.
+
+     - parameter className: The name of an Object subclass to get the privileges for.
+     - returns: The privileges which the current user has for the named class.
+    */
+    public func getPrivileges(forClassNamed className: String) -> ClassPrivileges {
+        return ClassPrivileges(rawValue: RLMGetComputedPermissions(rlmRealm, className))
+    }
+}

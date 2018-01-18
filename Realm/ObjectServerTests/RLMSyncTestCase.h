@@ -125,21 +125,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-#pragma mark - Test objects
-
-@interface PartialSyncObjectA : RLMObject
-@property NSInteger number;
-@property NSString *string;
-+ (instancetype)objectWithNumber:(NSInteger)number string:(NSString *)string;
-@end
-
-@interface PartialSyncObjectB : RLMObject
-@property NSInteger number;
-@property NSString *firstString;
-@property NSString *secondString;
-+ (instancetype)objectWithNumber:(NSInteger)number firstString:(NSString *)first secondString:(NSString *)second;
-@end
-
 NS_ASSUME_NONNULL_END
 
 #define WAIT_FOR_SEMAPHORE(macro_semaphore, macro_timeout) \

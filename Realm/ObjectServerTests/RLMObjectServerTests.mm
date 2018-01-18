@@ -26,6 +26,40 @@
 #import "RLMRealmUtil.hpp"
 #import "RLMRealm_Dynamic.h"
 
+#pragma mark - Test objects
+
+@interface PartialSyncObjectA : RLMObject
+@property NSInteger number;
+@property NSString *string;
++ (instancetype)objectWithNumber:(NSInteger)number string:(NSString *)string;
+@end
+
+@interface PartialSyncObjectB : RLMObject
+@property NSInteger number;
+@property NSString *firstString;
+@property NSString *secondString;
++ (instancetype)objectWithNumber:(NSInteger)number firstString:(NSString *)first secondString:(NSString *)second;
+@end
+
+@implementation PartialSyncObjectA
++ (instancetype)objectWithNumber:(NSInteger)number string:(NSString *)string {
+    PartialSyncObjectA *object = [[PartialSyncObjectA alloc] init];
+    object.number = number;
+    object.string = string;
+    return object;
+}
+@end
+
+@implementation PartialSyncObjectB
++ (instancetype)objectWithNumber:(NSInteger)number firstString:(NSString *)first secondString:(NSString *)second {
+    PartialSyncObjectB *object = [[PartialSyncObjectB alloc] init];
+    object.number = number;
+    object.firstString = first;
+    object.secondString = second;
+    return object;
+}
+@end
+
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
 
