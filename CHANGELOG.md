@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix a memory leak when opening Realms with an explicit `objectTypes` array
+  from Swift.
+
 3.1.0 Release notes (2018-01-16)
 =============================================================
 

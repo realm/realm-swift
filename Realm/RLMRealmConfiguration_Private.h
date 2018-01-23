@@ -34,6 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (RLMRealmConfiguration *)rawDefaultConfiguration;
 
 + (void)resetRealmConfigurationState;
+
+- (void)setCustomSchemaWithoutCopying:(nullable RLMSchema *)schema;
 @end
 
 // Get a path in the platform-appropriate documents directory with the given filename

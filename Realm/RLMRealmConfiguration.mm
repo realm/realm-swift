@@ -298,4 +298,8 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     _shouldCompactOnLaunch = shouldCompactOnLaunch;
 }
 
+- (void)setCustomSchemaWithoutCopying:(RLMSchema *)schema {
+    _customSchema = schema;
+}
+
 @end
