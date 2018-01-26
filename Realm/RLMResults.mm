@@ -48,8 +48,12 @@ using namespace realm;
 #pragma clang diagnostic pop
 
 @interface RLMResults () <RLMThreadConfined_Private>
-@property (nonatomic, readwrite) RLMPartialSyncState partialSyncState;
 @end
+
+@interface RLMSyncSubscription ()
+- (instancetype)initWithName:(NSString *)name results:(realm::Results&)results realm:(RLMRealm *)realm;
+@end
+
 
 //
 // RLMResults implementation
@@ -258,10 +262,6 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (id)valueForKey:(NSString *)key {
-    if ([key isEqualToString:@"partialSyncState"]) {
-        return [super valueForKey:key];
-    }
-
     return translateRLMResultsErrors([&] {
         return RLMCollectionValueForKey(_results, key, _realm, *_info);
     });
@@ -452,28 +452,16 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     });
 }
 
-- (void)subscribe {
-    [self _subscribeWithName:nil];
+- (RLMSyncSubscription *)subscribe {
+    return [self _subscribeWithName:nil];
 }
 
-- (void)subscribeWithName:(NSString *)subscriptionName {
-    [self _subscribeWithName:subscriptionName];
+- (RLMSyncSubscription *)subscribeWithName:(NSString *)subscriptionName {
+    return [self _subscribeWithName:subscriptionName];
 }
 
-- (void)_subscribeWithName:(NSString *)subscriptionName {
-    self.partialSyncState = RLMPartialSyncStateIncomplete;
-    return translateRLMResultsErrors([&] {
-        RLMResults *weakSelf = self;
-        return partial_sync::subscribe(_results,
-                                       subscriptionName ? util::make_optional<std::string>(subscriptionName.UTF8String) : util::none,
-                                       [weakSelf](bool updated_remote, std::exception_ptr error) {
-            // FIXME: How should we expose the error?
-            fprintf(stderr, "Subscribe callback: %d %d\n", updated_remote, error != nullptr);
-            if (RLMResults *self = weakSelf) {
-                self.partialSyncState = updated_remote ? RLMPartialSyncStateComplete: RLMPartialSyncStateIncomplete;
-            }
-        });
-    });
+- (RLMSyncSubscription *)_subscribeWithName:(NSString *)subscriptionName {
+    return [[RLMSyncSubscription alloc] initWithName:subscriptionName results:_results realm:self.realm];
 }
 
 - (NSString *)description {
@@ -533,4 +521,48 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 @end
 
 @implementation RLMLinkingObjects
+@end
+
+@interface RLMSyncSubscription ()
+@property (nonatomic, readwrite) RLMPartialSyncState state;
+@end
+
+@implementation RLMSyncSubscription {
+    NotificationToken _token;
+    util::Optional<partial_sync::Subscription> _subscription;
+    RLMRealm *_realm;
+}
+
+- (instancetype)initWithName:(NSString *)name results:(realm::Results&)results realm:(RLMRealm *)realm
+{
+    if (!(self = [super init]))
+        return nil;
+
+    _name = [name copy];
+    _realm = realm;
+    _subscription = partial_sync::subscribe(results, name ? util::make_optional<std::string>(name.UTF8String) : util::none);
+    self.state = (RLMPartialSyncState)_subscription->status();
+    __weak RLMSyncSubscription *weakSelf = self;
+    _token = _subscription->add_notification_callback([=] {
+        RLMSyncSubscription *self = weakSelf;
+        if (!self)
+            return;
+
+        // Retrieve the current status and error. Update our properties if the values have changed.
+        auto status = (RLMPartialSyncState)_subscription->status();
+        if (status != self.state)
+            self.state = (RLMPartialSyncState)status;
+
+        // FIXME: Handle errors.
+    });
+
+    return self;
+}
+
+- (RLMResults *)results
+{
+    auto results = _subscription->results();
+    return [RLMResults resultsWithObjectInfo:_realm->_info[RLMStringDataToNSString(results.get_object_type())]
+                                     results:std::move(results)];
+}
 @end

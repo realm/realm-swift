@@ -458,16 +458,17 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
                 let ex = expectation(description: "Should be able to successfully complete a query")
 
-                let results = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5").subscribe(named: "A")
-                XCTAssertEqual(results.partialSyncState, .incomplete)
-                let token = results.observe(\.partialSyncState) { state, _ in
+                let results = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5")
+                let subscription = results.subscribe(named: "big-numbers")
+                XCTAssertEqual(subscription.state, .incomplete)
+                let subscriptionToken = subscription.observe(\.state, options: .initial) { state in
                     if state == .complete {
                         ex.fulfill()
                     }
                 }
 
                 waitForExpectations(timeout: 20.0)
-                token.invalidate()
+                subscriptionToken.invalidate()
 
                 // Verify that we got what we're looking for
                 XCTAssertEqual(results.count, 4)
@@ -480,9 +481,18 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTAssertEqual(realm.objects(SwiftPartialSyncObjectA.self).count, results.count)
                 XCTAssertTrue(realm.objects(SwiftPartialSyncObjectB.self).isEmpty)
 
-                // Re-subscribing to an existing named query should report the query's current state.
-                let results2 = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5").subscribe(named: "A")
-                XCTAssertEqual(results2.partialSyncState, .complete)
+                // Re-subscribing to an existing named query may not report the query's state immediately,
+                // but it should report it eventually.
+                let ex2 = expectation(description: "Re-subscribing should fire the state change callback")
+                let subscription2 = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5").subscribe(named: "big-numbers")
+                let subscriptionToken2 = subscription2.observe(\.state, options: .initial) { state in
+                    if state == .complete {
+                        ex2.fulfill()
+                    }
+                }
+
+                waitForExpectations(timeout: 20.0)
+                subscriptionToken2.invalidate()
             }
         }
     }

@@ -23,11 +23,18 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMObject;
 
 // FIXME: Document this.
-typedef NS_ENUM(NSUInteger, RLMPartialSyncState) {
-    RLMPartialSyncStateUninitialized,
-    RLMPartialSyncStateIncomplete,
-    RLMPartialSyncStateComplete,
+typedef NS_ENUM(NSInteger, RLMPartialSyncState) {
+    RLMPartialSyncStateError = -1,
+    RLMPartialSyncStateIncomplete = 0,
+    RLMPartialSyncStateComplete = 1,
 };
+
+@interface RLMSyncSubscription : NSObject
+@property (nonatomic, readonly) NSString *name; // FIXME: Would "identifier" be better here?
+@property (nonatomic, readonly) RLMPartialSyncState state;
+@property (nonatomic, readonly, nullable) NSError *error;
+@property (nonatomic, readonly) RLMResults *results;
+@end
 
 /**
  `RLMResults` is an auto-updating container type in Realm returned from object
@@ -327,11 +334,8 @@ typedef NS_ENUM(NSUInteger, RLMPartialSyncState) {
 - (nullable NSNumber *)averageOfProperty:(NSString *)property;
 
 // FIXME: Document this.
-- (void)subscribe;
-- (void)subscribeWithName:(NSString *)subscriptionName;
-
-// FIXME: Document this.
-@property (nonatomic, readonly) RLMPartialSyncState partialSyncState;
+- (RLMSyncSubscription *)subscribe;
+- (RLMSyncSubscription *)subscribeWithName:(NSString *)subscriptionName;
 
 /// :nodoc:
 - (RLMObjectType)objectAtIndexedSubscript:(NSUInteger)index;

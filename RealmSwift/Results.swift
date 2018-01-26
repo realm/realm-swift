@@ -58,6 +58,55 @@ extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
 
+public enum PartialSyncState: Equatable {
+    case incomplete
+    case complete
+    case error(Error)
+
+    internal init(_ rlmSubscription: RLMSyncSubscription) {
+        switch rlmSubscription.state {
+        case .incomplete:
+            self = .incomplete
+        case .complete:
+            self = .complete
+        case .error:
+            self = .error(rlmSubscription.error!)
+        }
+    }
+
+    public static func ==(lhs: PartialSyncState, rhs: PartialSyncState) -> Bool {
+        switch (lhs, rhs) {
+        case (.incomplete, .incomplete), (.complete, .complete):
+            return true
+        case (.error(let e1), .error(let e2)):
+            return e1 == e2
+        default:
+            return false
+        }
+    }
+}
+
+public class SyncSubscription<Type: RealmCollectionValue> {
+    private let rlmSubscription: RLMSyncSubscription
+
+    public var state: PartialSyncState { return PartialSyncState(rlmSubscription) }
+    public var results: Results<Type> { return Results<Type>(rlmSubscription.results) }
+
+    internal init(_ rlmSubscription: RLMSyncSubscription) {
+        self.rlmSubscription = rlmSubscription
+    }
+
+
+    public func observe(_ keyPath: KeyPath<SyncSubscription, PartialSyncState>,
+                        options: NSKeyValueObservingOptions = [],
+                        _ block: @escaping (PartialSyncState) -> Void) -> NotificationToken {
+        let observation = rlmSubscription.observe(\.state, options: options) { rlmSubscription, change in
+            block(PartialSyncState(rlmSubscription))
+        }
+        return KeyValueObservationNotificationToken(observation)
+    }
+}
+
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.
 
@@ -374,26 +423,12 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
         }
     }
 
-    public typealias PartialSyncState = RLMPartialSyncState
-    public var partialSyncState: PartialSyncState { return rlmResults.partialSyncState }
-
-    public func subscribe() -> Results {
-        rlmResults.subscribe()
-        return self
+    public func subscribe() -> SyncSubscription<Element> {
+        return SyncSubscription(rlmResults.subscribe())
     }
 
-    public func subscribe(named: String) -> Results {
-        rlmResults.subscribe(withName: named)
-        return self
-    }
-
-    public func observe(_ keyPath: KeyPath<Results, PartialSyncState>,
-                        options: NSKeyValueObservingOptions = [],
-                        _ block: @escaping (PartialSyncState, NSKeyValueObservedChange<PartialSyncState>) -> Void) -> NotificationToken {
-        let observation = rlmResults.observe(\.partialSyncState, options: options) { rlmResults, change in
-            block(rlmResults.partialSyncState, change)
-        }
-        return KeyValueObservationNotificationToken(observation)
+    public func subscribe(named: String) -> SyncSubscription<Element> {
+        return SyncSubscription(rlmResults.subscribe(withName: named))
     }
 }
 

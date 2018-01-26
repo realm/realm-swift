@@ -1536,10 +1536,10 @@
 
         // Perform some partial sync queries
         RLMResults *objects = [PartialSyncObjectA objectsInRealm:realm where:@"number > 5"];
-        [objects subscribe];
+        RLMSyncSubscription *subscription = [objects subscribe];
 
         // Wait for the results to become available.
-        XCTestExpectation *ex = [[XCTKVOExpectation alloc] initWithKeyPath:@"partialSyncState" object:objects expectedValue:@(RLMPartialSyncStateComplete)];
+        XCTestExpectation *ex = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription expectedValue:@(RLMPartialSyncStateComplete)];
         [self waitForExpectations:@[ex] timeout:20.0];
 
         // Verify that we got what we're looking for
