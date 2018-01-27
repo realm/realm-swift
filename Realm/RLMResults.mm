@@ -32,9 +32,9 @@
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUtil.hpp"
 
-#import "partial_sync.hpp"
 #import "results.hpp"
 #import "shared_realm.hpp"
+#import "sync/partial_sync.hpp"
 
 #import <objc/message.h>
 #import <realm/table_view.hpp>
