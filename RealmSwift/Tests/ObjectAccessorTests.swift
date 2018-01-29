@@ -362,7 +362,7 @@ class ObjectAccessorTests: TestCase {
 
         let link = LinkToRenamedProperties1()
         link.linkA = obj
-        link.array.append(obj)
+        link.array1.append(obj)
 
         let realm = try! Realm()
         try! realm.write {
@@ -372,15 +372,32 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(obj.propA, 5)
         XCTAssertEqual(obj.propB, "a")
         XCTAssertTrue(link.linkA!.isSameObject(as: obj))
-        XCTAssertTrue(link.array[0].isSameObject(as: obj))
+        XCTAssertTrue(link.array1[0].isSameObject(as: obj))
         XCTAssertTrue(obj.linking1[0].isSameObject(as: link))
 
         XCTAssertEqual(obj["propA"]! as! Int, 5)
         XCTAssertEqual(obj["propB"]! as! String, "a")
         XCTAssertTrue((link["linkA"]! as! RenamedProperties1).isSameObject(as: obj))
-        XCTAssertTrue((link["array"]! as! List<RenamedProperties1>)[0].isSameObject(as: obj))
+        XCTAssertTrue((link["array1"]! as! List<RenamedProperties1>)[0].isSameObject(as: obj))
         XCTAssertTrue((obj["linking1"]! as! LinkingObjects<LinkToRenamedProperties1>)[0].isSameObject(as: link))
 
-        XCTAssertTrue(link.dynamicList("array")[0].isSameObject(as: obj))
+        XCTAssertTrue(link.dynamicList("array1")[0].isSameObject(as: obj))
+
+        let obj2 = realm.objects(RenamedProperties2.self).first!
+        let link2 = realm.objects(LinkToRenamedProperties2.self).first!
+
+        XCTAssertEqual(obj2.propC, 5)
+        XCTAssertEqual(obj2.propD, "a")
+        XCTAssertTrue(link2.linkC!.isSameObject(as: obj))
+        XCTAssertTrue(link2.array2[0].isSameObject(as: obj))
+        XCTAssertTrue(obj2.linking1[0].isSameObject(as: link))
+
+        XCTAssertEqual(obj2["propC"]! as! Int, 5)
+        XCTAssertEqual(obj2["propD"]! as! String, "a")
+        XCTAssertTrue((link2["linkC"]! as! RenamedProperties1).isSameObject(as: obj))
+        XCTAssertTrue((link2["array2"]! as! List<RenamedProperties2>)[0].isSameObject(as: obj))
+        XCTAssertTrue((obj2["linking1"]! as! LinkingObjects<LinkToRenamedProperties1>)[0].isSameObject(as: link))
+
+        XCTAssertTrue(link2.dynamicList("array2")[0].isSameObject(as: obj))
     }
 }

@@ -218,7 +218,8 @@ using namespace realm;
     }
 
     if (isSwiftClass) {
-        [self addSwiftProperties:propArray objectUtil:objectUtil instance:swiftObjectInstance indexed:indexed];
+        [self addSwiftProperties:propArray objectUtil:objectUtil instance:swiftObjectInstance
+                         indexed:indexed nameMap:columnNameMap];
     }
 
     if (auto requiredProperties = [objectUtil requiredPropertiesForClass:objectClass]) {
@@ -245,7 +246,8 @@ using namespace realm;
 + (void)addSwiftProperties:(NSMutableArray<RLMProperty *> *)propArray
                 objectUtil:(Class)objectUtil
                   instance:(id)instance
-                   indexed:(NSSet<NSString *> *)indexed {
+                   indexed:(NSSet<NSString *> *)indexed
+                   nameMap:(NSDictionary<NSString *, NSString *> *)columnNameMap {
     // The property list reported to the obj-c runtime for Swift objects is
     // incomplete and doesn't include Swift generics like List<> and
     // RealmOptional<>, and is missing information for some properties that
@@ -270,19 +272,17 @@ using namespace realm;
             return [obj.name isEqualToString:md.propertyName];
         }];
 
+        RLMProperty *prop;
         switch (md.kind) {
             case RLMSwiftPropertyKindList: // List<>
-                [propArray insertObject:[[RLMProperty alloc] initSwiftListPropertyWithName:md.propertyName
-                                                                                  instance:instance]
-                                atIndex:nextIndex];
+                prop = [[RLMProperty alloc] initSwiftListPropertyWithName:md.propertyName instance:instance];
                 break;
             case RLMSwiftPropertyKindLinkingObjects: { // LinkingObjects<>
                 Ivar ivar = class_getInstanceVariable([instance class], md.propertyName.UTF8String);
-                [propArray insertObject:[[RLMProperty alloc] initSwiftLinkingObjectsPropertyWithName:md.propertyName
-                                                                                                ivar:ivar
-                                                                                     objectClassName:md.className
-                                                                              linkOriginPropertyName:md.linkedPropertyName]
-                                atIndex:nextIndex];
+                prop = [[RLMProperty alloc] initSwiftLinkingObjectsPropertyWithName:md.propertyName
+                                                                               ivar:ivar
+                                                                    objectClassName:md.className
+                                                             linkOriginPropertyName:md.linkedPropertyName];
                 break;
             }
             case RLMSwiftPropertyKindOptional: {
@@ -295,12 +295,10 @@ using namespace realm;
 
                 // RealmOptional<>
                 Ivar ivar = class_getInstanceVariable([instance class], md.propertyName.UTF8String);
-                BOOL isIndexed = [indexed containsObject:md.propertyName];
-                [propArray insertObject:[[RLMProperty alloc] initSwiftOptionalPropertyWithName:md.propertyName
-                                                                                       indexed:isIndexed
-                                                                                          ivar:ivar
-                                                                                  propertyType:md.propertyType]
-                                atIndex:nextIndex];
+                prop = [[RLMProperty alloc] initSwiftOptionalPropertyWithName:md.propertyName
+                                                                      indexed:[indexed containsObject:md.propertyName]
+                                                                         ivar:ivar
+                                                                 propertyType:md.propertyType];
                 break;
             }
 
@@ -324,6 +322,13 @@ using namespace realm;
                     propArray[existing].optional = false;
                 }
                 break;
+        }
+
+        if (prop) {
+            if (columnNameMap) {
+                prop.columnName = columnNameMap[prop.name];
+            }
+            [propArray insertObject:prop atIndex:nextIndex];
         }
 
         ++nextIndex;

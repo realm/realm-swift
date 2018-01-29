@@ -577,21 +577,21 @@ class RenamedProperties2: Object {
 class LinkToRenamedProperties1: Object {
     @objc dynamic var linkA: RenamedProperties1?
     @objc dynamic var linkB: RenamedProperties2?
-    let array = List<RenamedProperties1>()
+    let array1 = List<RenamedProperties1>()
 
     override class func _realmObjectName() -> String { return "Link To Renamed Properties" }
     override class func _realmColumnNames() -> [String: String] {
-        return ["linkA": "link 1", "linkB": "link 2"]
+        return ["linkA": "link 1", "linkB": "link 2", "array1": "array"]
     }
 }
 
 class LinkToRenamedProperties2: Object {
     @objc dynamic var linkC: RenamedProperties1?
     @objc dynamic var linkD: RenamedProperties2?
-    let array = List<RenamedProperties2>()
+    let array2 = List<RenamedProperties2>()
 
     override class func _realmObjectName() -> String { return "Link To Renamed Properties" }
     override class func _realmColumnNames() -> [String: String] {
-        return ["linkC": "link 1", "linkD": "link 2"]
+        return ["linkC": "link 1", "linkD": "link 2", "array2": "array"]
     }
 }
