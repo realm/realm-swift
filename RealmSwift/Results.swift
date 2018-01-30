@@ -59,14 +59,17 @@ extension Int32: AddableType {}
 extension Int64: AddableType {}
 
 public enum PartialSyncState: Equatable {
-    case incomplete
+    case creating
+    case pending
     case complete
     case error(Error)
 
     internal init(_ rlmSubscription: RLMSyncSubscription) {
         switch rlmSubscription.state {
-        case .incomplete:
-            self = .incomplete
+        case .creating:
+            self = .creating
+        case .pending:
+            self = .pending
         case .complete:
             self = .complete
         case .error:
@@ -76,7 +79,7 @@ public enum PartialSyncState: Equatable {
 
     public static func ==(lhs: PartialSyncState, rhs: PartialSyncState) -> Bool {
         switch (lhs, rhs) {
-        case (.incomplete, .incomplete), (.complete, .complete):
+        case (.creating, .creating), (.pending, .pending), (.complete, .complete):
             return true
         case (.error(let e1), .error(let e2)):
             return e1 == e2

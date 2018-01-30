@@ -413,6 +413,10 @@
 		5DD755C61BE056DE002800DA /* RLMSchema_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = E81A1F7D1955FC9300FDED82 /* RLMSchema_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		5DD755C71BE056DE002800DA /* RLMSwiftSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */; };
 		5DD755E21BE05DAF002800DA /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DD755CF1BE056DE002800DA /* Realm.framework */; };
+		5DEAA36620212AF00024A6BE /* work_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DEAA36420212AEF0024A6BE /* work_queue.cpp */; };
+		5DEAA36720212AF00024A6BE /* work_queue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5DEAA36520212AF00024A6BE /* work_queue.hpp */; };
+		5DEAA36820212BF90024A6BE /* work_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5DEAA36420212AEF0024A6BE /* work_queue.cpp */; };
+		5DEAA36920212BF90024A6BE /* work_queue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5DEAA36520212AF00024A6BE /* work_queue.hpp */; };
 		C042A48D1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C042A48E1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
 		C0CDC0821B38DABA00C5716D /* UtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 021A88311AAFB5BE00EEAC84 /* UtilTests.mm */; };
@@ -851,6 +855,8 @@
 		5DD755CF1BE056DE002800DA /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework.static; includeInIndex = 0; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5DD755E01BE05C19002800DA /* Tests.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Tests.xcconfig; sourceTree = "<group>"; };
 		5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = "Tests iOS static.xcconfig"; sourceTree = "<group>"; };
+		5DEAA36420212AEF0024A6BE /* work_queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = work_queue.cpp; path = sync/impl/work_queue.cpp; sourceTree = "<group>"; };
+		5DEAA36520212AF00024A6BE /* work_queue.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = work_queue.hpp; path = sync/impl/work_queue.hpp; sourceTree = "<group>"; };
 		A05FA61E1B62C3900000C9B2 /* RLMObjectBase_Dynamic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMObjectBase_Dynamic.h; sourceTree = "<group>"; };
 		C0004BEB1B8E4FCF00304BF3 /* RLMOptionalBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMOptionalBase.h; sourceTree = "<group>"; };
 		C0004BEC1B8E4FCF00304BF3 /* RLMOptionalBase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMOptionalBase.mm; sourceTree = "<group>"; };
@@ -1065,6 +1071,8 @@
 				1A15366E1DB0464800C0EC93 /* sync_file.hpp */,
 				1A15366F1DB0464800C0EC93 /* sync_metadata.cpp */,
 				1A1536701DB0464800C0EC93 /* sync_metadata.hpp */,
+				5DEAA36420212AEF0024A6BE /* work_queue.cpp */,
+				5DEAA36520212AF00024A6BE /* work_queue.hpp */,
 			);
 			name = impl;
 			sourceTree = "<group>";
@@ -1614,6 +1622,7 @@
 				5D659EC11BE04556006515A0 /* RLMRealm_Private.h in Headers */,
 				1ABF256F1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.h in Headers */,
 				5D659EC21BE04556006515A0 /* RLMRealmConfiguration.h in Headers */,
+				5DEAA36720212AF00024A6BE /* work_queue.hpp in Headers */,
 				5D659EC31BE04556006515A0 /* RLMRealmConfiguration_Private.h in Headers */,
 				5D659EC51BE04556006515A0 /* RLMResults.h in Headers */,
 				5D659EC61BE04556006515A0 /* RLMResults_Private.h in Headers */,
@@ -1687,6 +1696,7 @@
 				1A7DE7071D38474F0029F0AE /* RLMSyncManager.h in Headers */,
 				1A7E6C6D1F329F10002DA6C8 /* RLMSyncPermissionResults.h in Headers */,
 				1A7003111D5270FF00FD9EE3 /* RLMSyncSession.h in Headers */,
+				5DEAA36920212BF90024A6BE /* work_queue.hpp in Headers */,
 				1ABDCDB11D793012003489E3 /* RLMSyncUser.h in Headers */,
 				1A7DE70B1D3847670029F0AE /* RLMSyncUtil.h in Headers */,
 				E8C6EAF41DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */,
@@ -2251,6 +2261,7 @@
 				5D659E971BE04556006515A0 /* RLMResults.mm in Sources */,
 				5D659E981BE04556006515A0 /* RLMSchema.mm in Sources */,
 				5D659E991BE04556006515A0 /* RLMSwiftSupport.m in Sources */,
+				5DEAA36620212AF00024A6BE /* work_queue.cpp in Sources */,
 				1A3623681D8384BA00945A54 /* RLMSyncConfiguration.mm in Sources */,
 				1AAF4D221D66585B00058FAD /* RLMSyncCredentials.m in Sources */,
 				1AF7EA971D340AF70001A9B5 /* RLMSyncManager.mm in Sources */,
@@ -2391,6 +2402,7 @@
 				5DD755951BE056DE002800DA /* RLMResults.mm in Sources */,
 				5DD755961BE056DE002800DA /* RLMSchema.mm in Sources */,
 				5DD755971BE056DE002800DA /* RLMSwiftSupport.m in Sources */,
+				5DEAA36820212BF90024A6BE /* work_queue.cpp in Sources */,
 				1A0512721D873F3300806AEC /* RLMSyncConfiguration.mm in Sources */,
 				17051FD01D93E0CC00EF8E67 /* RLMSyncCredentials.m in Sources */,
 				1A90FCBB1D3D37F50086A57F /* RLMSyncManager.mm in Sources */,

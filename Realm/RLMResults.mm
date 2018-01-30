@@ -542,7 +542,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     _name = [name copy];
     _realm = realm;
     _subscription = partial_sync::subscribe(results, name ? util::make_optional<std::string>(name.UTF8String) : util::none);
-    self.state = (RLMPartialSyncState)_subscription->status();
+    self.state = (RLMPartialSyncState)_subscription->state();
     __weak RLMSyncSubscription *weakSelf = self;
     _token = _subscription->add_notification_callback([weakSelf] {
         RLMSyncSubscription *self = weakSelf;
@@ -565,7 +565,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         else if (self.error != nil)
             self.error = nil;
 
-        auto status = (RLMPartialSyncState)self->_subscription->status();
+        auto status = (RLMPartialSyncState)self->_subscription->state();
         if (status != self.state)
             self.state = (RLMPartialSyncState)status;
     });

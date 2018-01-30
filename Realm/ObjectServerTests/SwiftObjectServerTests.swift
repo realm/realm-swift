@@ -460,7 +460,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
                 let results = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5")
                 let subscription = results.subscribe(named: "big-numbers")
-                XCTAssertEqual(subscription.state, .incomplete)
+                XCTAssertEqual(subscription.state, .creating)
                 let subscriptionToken = subscription.observe(\.state, options: .initial) { state in
                     if state == .complete {
                         ex.fulfill()

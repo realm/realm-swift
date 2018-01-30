@@ -25,7 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 // FIXME: Document this.
 typedef NS_ENUM(NSInteger, RLMPartialSyncState) {
     RLMPartialSyncStateError = -1,
-    RLMPartialSyncStateIncomplete = 0,
+    RLMPartialSyncStateCreating = 2,
+    RLMPartialSyncStatePending = 0,
     RLMPartialSyncStateComplete = 1,
 };
 
