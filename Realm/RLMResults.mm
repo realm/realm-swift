@@ -525,10 +525,11 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 
 @interface RLMSyncSubscription ()
 @property (nonatomic, readwrite) RLMPartialSyncState state;
+@property (nonatomic, readwrite, nullable) NSError *error;
 @end
 
 @implementation RLMSyncSubscription {
-    NotificationToken _token;
+    partial_sync::SubscriptionNotificationToken _token;
     util::Optional<partial_sync::Subscription> _subscription;
     RLMRealm *_realm;
 }
@@ -543,17 +544,30 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     _subscription = partial_sync::subscribe(results, name ? util::make_optional<std::string>(name.UTF8String) : util::none);
     self.state = (RLMPartialSyncState)_subscription->status();
     __weak RLMSyncSubscription *weakSelf = self;
-    _token = _subscription->add_notification_callback([=] {
+    _token = _subscription->add_notification_callback([weakSelf] {
         RLMSyncSubscription *self = weakSelf;
         if (!self)
             return;
 
-        // Retrieve the current status and error. Update our properties if the values have changed.
-        auto status = (RLMPartialSyncState)_subscription->status();
+        // Retrieve the current error and status. Update our properties only if the values have changed,
+        // since clients use KVO to observe these properties.
+
+        if (auto error = self->_subscription->error()) {
+            try {
+                std::rethrow_exception(error);
+            } catch (...) {
+                NSError *nsError;
+                RLMRealmTranslateException(&nsError);
+                if (!self.error || ![self.error isEqual:nsError])
+                    self.error = nsError;
+            }
+        }
+        else if (self.error != nil)
+            self.error = nil;
+
+        auto status = (RLMPartialSyncState)self->_subscription->status();
         if (status != self.state)
             self.state = (RLMPartialSyncState)status;
-
-        // FIXME: Handle errors.
     });
 
     return self;
