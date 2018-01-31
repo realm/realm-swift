@@ -93,8 +93,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) NSInteger status;
 @property (nonatomic, readonly) NSInteger code;
-@property (nullable, nonatomic, readonly, copy) NSString *title;
-@property (nullable, nonatomic, readonly, copy) NSString *hint;
+@property (nullable, nonatomic, readonly) NSString *title;
+@property (nullable, nonatomic, readonly) NSString *hint;
 
 - (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;
 

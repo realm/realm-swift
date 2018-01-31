@@ -210,6 +210,15 @@ static const NSString *const kRLMSyncValueKey           = @"value";
         RLM_SYNC_PARSE_DOUBLE_OR_ABORT(jsonDictionary, kRLMSyncErrorCodeKey, code);
         RLM_SYNC_PARSE_OPTIONAL_STRING(jsonDictionary, kRLMSyncErrorTitleKey, title);
         RLM_SYNC_PARSE_OPTIONAL_STRING(jsonDictionary, kRLMSyncErrorHintKey, hint);
+
+        for (NSDictionary<NSString *, NSString *> *problem in jsonDictionary[@"invalid_params"]) {
+            NSString *name = problem[@"name"];
+            NSString *reason = problem[@"reason"];
+            if (name && reason) {
+                _title = [NSString stringWithFormat:@"%@ %@: %@;", _title, name, reason];
+            }
+        }
+
         return self;
     }
     return nil;
