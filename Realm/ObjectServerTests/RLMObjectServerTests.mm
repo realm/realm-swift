@@ -1546,9 +1546,9 @@
                            }];
         [self waitForExpectations:@[ex] timeout:20.0];
         // Verify that we got what we're looking for
-        XCTAssertTrue(objects.count == 4);
+        XCTAssertEqual(objects.count, 4U);
         for (PartialSyncObjectA *object in objects) {
-            XCTAssertTrue(object.number > 5);
+            XCTAssertGreaterThan(object.number, 5);
             XCTAssertTrue([object.string isEqualToString:@"partial"]);
         }
     }
