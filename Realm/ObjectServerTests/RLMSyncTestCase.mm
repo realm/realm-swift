@@ -375,24 +375,12 @@ static NSURL *syncDirectoryForChildProcess() {
 #endif
 }
 
-+ (void)logObjectServerOutput:(__unused NSString *)output {
-#if LOG_ROS_OUTPUT
-    NSArray<NSString *> *array = [output componentsSeparatedByString:@"\n"];
-    for (NSString *piece in array) {
-        if ([piece length] > 0) {
-            NSLog(@"ROS: %@", piece);
-        }
-    }
-#endif
-}
-
 - (void)lazilyInitializeObjectServer {
 #if !PROVIDING_OWN_ROS
     if (!self.isParent || s_task) {
         return;
     }
     NSPipe *pipe = [NSPipe pipe];
-    NSMutableString *stringBuffer = [[NSMutableString alloc] init];
     __block BOOL inUseError = NO;
     [RLMSyncTestCase runResetObjectServer:YES];
     NSTask *task = [[NSTask alloc] init];
@@ -406,26 +394,37 @@ static NSURL *syncDirectoryForChildProcess() {
     // Need to set the environment variables to bypass the mandatory email prompt.
     task.environment = @{@"ROS_TOS_EMAIL_ADDRESS": @"ci@realm.io",
                          @"DOCKER_DATA_PATH": @"/tmp"};
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     task.standardOutput = pipe;
     task.standardError = pipe;
-    [[task.standardError fileHandleForReading] setReadabilityHandler:^(NSFileHandle *file) {
-        NSData *data = [file availableData];
-        NSString *fragment = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        [stringBuffer appendString:fragment];
-        if ([stringBuffer rangeOfString:@"Realm Object Server has started and is listening"].location != NSNotFound) {
-            [RLMSyncTestCase logObjectServerOutput:stringBuffer];
+
+    auto buffer = [[NSMutableData alloc] init];
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    pipe.fileHandleForReading.readabilityHandler = ^(NSFileHandle *file) {
+        [buffer appendData:[file availableData]];
+        const auto bytes = static_cast<const char *>(buffer.bytes);
+        if (strstr(bytes, "Realm Object Server has started and is listening")) {
             dispatch_semaphore_signal(sema);
-        } else if ([stringBuffer rangeOfString:@"Error: listen EADDRINUSE"].location != NSNotFound) {
-            [RLMSyncTestCase logObjectServerOutput:stringBuffer];
+        }
+        else if (strstr(bytes, "Error: listen EADDRINUSE")) {
             inUseError = YES;
             dispatch_semaphore_signal(sema);
-        } else if ([fragment characterAtIndex:[fragment length] - 1] == '\n') {
-            [RLMSyncTestCase logObjectServerOutput:stringBuffer];
-            // Reached EOL, reset the string buffer.
-            [stringBuffer setString:@""];
         }
-    }];
+
+        const char *newline;
+        auto start = bytes;
+        auto end = start + buffer.length;
+        while ((newline = std::find(start, end, '\n')) != end) {
+#if LOG_ROS_OUTPUT
+            if (newline > start + 1) {
+                NSLog(@"ROS: %.*s", int(newline - start), start);
+            }
+#endif
+            start = newline + 1;
+        }
+
+        // Remove everything up to the last newline, leaving any data not newline-terminated in the buffer
+        [buffer replaceBytesInRange:{0, static_cast<NSUInteger>(start - bytes)} withBytes:nullptr length:0];
+    };
     s_task = task;
     [task launch];
     const NSTimeInterval timeout = 60;
