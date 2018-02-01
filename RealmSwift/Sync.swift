@@ -661,6 +661,87 @@ extension Results where Element == SyncPermission {
 }
 #endif
 
+// MARK: - Partial sync subscriptions
+
+// Partial sync subscriptions are only available in Swift 3.2 and newer.
+#if swift(>=3.2)
+public enum PartialSyncState: Equatable {
+    case creating
+    case pending
+    case complete
+    case error(Error)
+
+    internal init(_ rlmSubscription: RLMSyncSubscription) {
+        switch rlmSubscription.state {
+        case .creating:
+            self = .creating
+        case .pending:
+            self = .pending
+        case .complete:
+            self = .complete
+        case .error:
+            self = .error(rlmSubscription.error!)
+        }
+    }
+
+    public static func ==(lhs: PartialSyncState, rhs: PartialSyncState) -> Bool {
+        switch (lhs, rhs) {
+        case (.creating, .creating), (.pending, .pending), (.complete, .complete):
+            return true
+        case (.error(let e1), .error(let e2)):
+            return e1 == e2
+        default:
+            return false
+        }
+    }
+}
+
+public class SyncSubscription<Type: RealmCollectionValue> {
+    private let rlmSubscription: RLMSyncSubscription
+
+    public var state: PartialSyncState { return PartialSyncState(rlmSubscription) }
+    public var results: Results<Type> { return Results<Type>(rlmSubscription.results) }
+
+    internal init(_ rlmSubscription: RLMSyncSubscription) {
+        self.rlmSubscription = rlmSubscription
+    }
+
+    public func observe(_ keyPath: KeyPath<SyncSubscription, PartialSyncState>,
+                        options: NSKeyValueObservingOptions = [],
+                        _ block: @escaping (PartialSyncState) -> Void) -> NotificationToken {
+        let observation = rlmSubscription.observe(\.state, options: options) { rlmSubscription, change in
+            block(PartialSyncState(rlmSubscription))
+        }
+        return KeyValueObservationNotificationToken(observation)
+    }
+}
+
+extension Results {
+    public func subscribe() -> SyncSubscription<Element> {
+        return SyncSubscription(rlmResults.subscribe())
+    }
+
+    public func subscribe(named: String) -> SyncSubscription<Element> {
+        return SyncSubscription(rlmResults.subscribe(withName: named))
+    }
+}
+
+
+internal class KeyValueObservationNotificationToken : NotificationToken {
+    public var observation: NSKeyValueObservation?
+
+    public init(_ observation: NSKeyValueObservation)
+    {
+        super.init()
+        self.observation = observation
+    }
+
+    public override func invalidate() {
+        self.observation = nil
+    }
+}
+#endif // Swift >= 3.2
+
 // MARK: - Migration assistance
 
 /// :nodoc:

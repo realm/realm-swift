@@ -413,6 +413,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Partial sync
 
+// Partial sync subscriptions are only available in Swift 3.2 and newer.
+#if swift(>=3.2)
     func testPartialSync() {
         autoreleasepool {
             let credentials = basicCredentials(register: true)
@@ -496,4 +498,5 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
         }
     }
+#endif // Swift >= 3.2
 }
