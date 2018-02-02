@@ -21,16 +21,16 @@
 NS_ASSUME_NONNULL_BEGIN
 
 // FIXME: Document this.
-typedef NS_ENUM(NSInteger, RLMPartialSyncState) {
-    RLMPartialSyncStateError = -1,
-    RLMPartialSyncStateCreating = 2,
-    RLMPartialSyncStatePending = 0,
-    RLMPartialSyncStateComplete = 1,
+typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
+    RLMSyncSubscriptionStateError = -1,
+    RLMSyncSubscriptionStateCreating = 2,
+    RLMSyncSubscriptionStatePending = 0,
+    RLMSyncSubscriptionStateComplete = 1,
 };
 
 @interface RLMSyncSubscription : NSObject
 @property (nonatomic, readonly) NSString *name; // FIXME: Would "identifier" be better here?
-@property (nonatomic, readonly) RLMPartialSyncState state;
+@property (nonatomic, readonly) RLMSyncSubscriptionState state;
 @property (nonatomic, readonly, nullable) NSError *error;
 @property (nonatomic, readonly) RLMResults *results;
 @end

@@ -1539,7 +1539,7 @@
         RLMSyncSubscription *subscription = [objects subscribe];
 
         // Wait for the results to become available.
-        XCTestExpectation *ex = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription expectedValue:@(RLMPartialSyncStateComplete)];
+        XCTestExpectation *ex = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription expectedValue:@(RLMSyncSubscriptionStateComplete)];
         [self waitForExpectations:@[ex] timeout:20.0];
 
         // Verify that we got what we're looking for

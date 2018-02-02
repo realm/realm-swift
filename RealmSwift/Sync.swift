@@ -665,7 +665,7 @@ extension Results where Element == SyncPermission {
 
 // Partial sync subscriptions are only available in Swift 3.2 and newer.
 #if swift(>=3.2)
-public enum PartialSyncState: Equatable {
+public enum SyncSubscriptionState: Equatable {
     case creating
     case pending
     case complete
@@ -684,7 +684,7 @@ public enum PartialSyncState: Equatable {
         }
     }
 
-    public static func ==(lhs: PartialSyncState, rhs: PartialSyncState) -> Bool {
+    public static func ==(lhs: SyncSubscriptionState, rhs: SyncSubscriptionState) -> Bool {
         switch (lhs, rhs) {
         case (.creating, .creating), (.pending, .pending), (.complete, .complete):
             return true
@@ -699,18 +699,18 @@ public enum PartialSyncState: Equatable {
 public class SyncSubscription<Type: RealmCollectionValue> {
     private let rlmSubscription: RLMSyncSubscription
 
-    public var state: PartialSyncState { return PartialSyncState(rlmSubscription) }
+    public var state: SyncSubscriptionState { return SyncSubscriptionState(rlmSubscription) }
     public var results: Results<Type> { return Results<Type>(rlmSubscription.results) }
 
     internal init(_ rlmSubscription: RLMSyncSubscription) {
         self.rlmSubscription = rlmSubscription
     }
 
-    public func observe(_ keyPath: KeyPath<SyncSubscription, PartialSyncState>,
+    public func observe(_ keyPath: KeyPath<SyncSubscription, SyncSubscriptionState>,
                         options: NSKeyValueObservingOptions = [],
-                        _ block: @escaping (PartialSyncState) -> Void) -> NotificationToken {
+                        _ block: @escaping (SyncSubscriptionState) -> Void) -> NotificationToken {
         let observation = rlmSubscription.observe(\.state, options: options) { rlmSubscription, change in
-            block(PartialSyncState(rlmSubscription))
+            block(SyncSubscriptionState(rlmSubscription))
         }
         return KeyValueObservationNotificationToken(observation)
     }

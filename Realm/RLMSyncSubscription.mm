@@ -29,7 +29,7 @@ using namespace realm;
 @interface RLMSyncSubscription ()
 - (instancetype)initWithName:(NSString *)name results:(realm::Results&)results realm:(RLMRealm *)realm;
 
-@property (nonatomic, readwrite) RLMPartialSyncState state;
+@property (nonatomic, readwrite) RLMSyncSubscriptionState state;
 @property (nonatomic, readwrite, nullable) NSError *error;
 @end
 
@@ -47,7 +47,7 @@ using namespace realm;
     _name = [name copy];
     _realm = realm;
     _subscription = partial_sync::subscribe(results, name ? util::make_optional<std::string>(name.UTF8String) : util::none);
-    self.state = (RLMPartialSyncState)_subscription->state();
+    self.state = (RLMSyncSubscriptionState)_subscription->state();
     __weak RLMSyncSubscription *weakSelf = self;
     _token = _subscription->add_notification_callback([weakSelf] {
         RLMSyncSubscription *self = weakSelf;
@@ -70,9 +70,9 @@ using namespace realm;
         else if (self.error != nil)
             self.error = nil;
 
-        auto status = (RLMPartialSyncState)self->_subscription->state();
+        auto status = (RLMSyncSubscriptionState)self->_subscription->state();
         if (status != self.state)
-            self.state = (RLMPartialSyncState)status;
+            self.state = (RLMSyncSubscriptionState)status;
     });
 
     return self;
