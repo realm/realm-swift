@@ -34,7 +34,6 @@
 
 #import "results.hpp"
 #import "shared_realm.hpp"
-#import "sync/partial_sync.hpp"
 
 #import <objc/message.h>
 #import <realm/table_view.hpp>
@@ -49,11 +48,6 @@ using namespace realm;
 
 @interface RLMResults () <RLMThreadConfined_Private>
 @end
-
-@interface RLMSyncSubscription ()
-- (instancetype)initWithName:(NSString *)name results:(realm::Results&)results realm:(RLMRealm *)realm;
-@end
-
 
 //
 // RLMResults implementation
@@ -452,18 +446,6 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     });
 }
 
-- (RLMSyncSubscription *)subscribe {
-    return [self _subscribeWithName:nil];
-}
-
-- (RLMSyncSubscription *)subscribeWithName:(NSString *)subscriptionName {
-    return [self _subscribeWithName:subscriptionName];
-}
-
-- (RLMSyncSubscription *)_subscribeWithName:(NSString *)subscriptionName {
-    return [[RLMSyncSubscription alloc] initWithName:subscriptionName results:_results realm:self.realm];
-}
-
 - (NSString *)description {
     return RLMDescriptionWithMaxDepth(@"RLMResults", self, RLMDescriptionMaxDepth);
 }
@@ -523,60 +505,3 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 @implementation RLMLinkingObjects
 @end
 
-@interface RLMSyncSubscription ()
-@property (nonatomic, readwrite) RLMPartialSyncState state;
-@property (nonatomic, readwrite, nullable) NSError *error;
-@end
-
-@implementation RLMSyncSubscription {
-    partial_sync::SubscriptionNotificationToken _token;
-    util::Optional<partial_sync::Subscription> _subscription;
-    RLMRealm *_realm;
-}
-
-- (instancetype)initWithName:(NSString *)name results:(realm::Results&)results realm:(RLMRealm *)realm
-{
-    if (!(self = [super init]))
-        return nil;
-
-    _name = [name copy];
-    _realm = realm;
-    _subscription = partial_sync::subscribe(results, name ? util::make_optional<std::string>(name.UTF8String) : util::none);
-    self.state = (RLMPartialSyncState)_subscription->state();
-    __weak RLMSyncSubscription *weakSelf = self;
-    _token = _subscription->add_notification_callback([weakSelf] {
-        RLMSyncSubscription *self = weakSelf;
-        if (!self)
-            return;
-
-        // Retrieve the current error and status. Update our properties only if the values have changed,
-        // since clients use KVO to observe these properties.
-
-        if (auto error = self->_subscription->error()) {
-            try {
-                std::rethrow_exception(error);
-            } catch (...) {
-                NSError *nsError;
-                RLMRealmTranslateException(&nsError);
-                if (!self.error || ![self.error isEqual:nsError])
-                    self.error = nsError;
-            }
-        }
-        else if (self.error != nil)
-            self.error = nil;
-
-        auto status = (RLMPartialSyncState)self->_subscription->state();
-        if (status != self.state)
-            self.state = (RLMPartialSyncState)status;
-    });
-
-    return self;
-}
-
-- (RLMResults *)results
-{
-    auto results = _subscription->results();
-    return [RLMResults resultsWithObjectInfo:_realm->_info[RLMStringDataToNSString(results.get_object_type())]
-                                     results:std::move(results)];
-}
-@end

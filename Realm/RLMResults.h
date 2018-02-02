@@ -22,21 +22,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObject;
 
-// FIXME: Document this.
-typedef NS_ENUM(NSInteger, RLMPartialSyncState) {
-    RLMPartialSyncStateError = -1,
-    RLMPartialSyncStateCreating = 2,
-    RLMPartialSyncStatePending = 0,
-    RLMPartialSyncStateComplete = 1,
-};
-
-@interface RLMSyncSubscription : NSObject
-@property (nonatomic, readonly) NSString *name; // FIXME: Would "identifier" be better here?
-@property (nonatomic, readonly) RLMPartialSyncState state;
-@property (nonatomic, readonly, nullable) NSError *error;
-@property (nonatomic, readonly) RLMResults *results;
-@end
-
 /**
  `RLMResults` is an auto-updating container type in Realm returned from object
  queries. It represents the results of the query in the form of a collection of objects.
@@ -333,10 +318,6 @@ typedef NS_ENUM(NSInteger, RLMPartialSyncState) {
  @return    The average value of the given property, or `nil` if the Results are empty.
  */
 - (nullable NSNumber *)averageOfProperty:(NSString *)property;
-
-// FIXME: Document this.
-- (RLMSyncSubscription *)subscribe;
-- (RLMSyncSubscription *)subscribeWithName:(NSString *)subscriptionName;
 
 /// :nodoc:
 - (RLMObjectType)objectAtIndexedSubscript:(NSUInteger)index;
