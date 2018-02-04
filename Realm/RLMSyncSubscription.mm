@@ -86,7 +86,7 @@ using namespace realm;
 }
 @end
 
-@implementation RLMResults (PartialSync)
+@implementation RLMResults (SyncSubscription)
 
 - (RLMSyncSubscription *)subscribe {
     return [self _subscribeWithName:nil];

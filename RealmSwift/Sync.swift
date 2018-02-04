@@ -665,10 +665,21 @@ extension Results where Element == SyncPermission {
 
 // Partial sync subscriptions are only available in Swift 3.2 and newer.
 #if swift(>=3.2)
+
+
+/// The possible states of a sync subscription.
 public enum SyncSubscriptionState: Equatable {
+    /// The subscription is being created, but has not yet been written to the synced Realm.
     case creating
+
+    /// The subscription has been created, and is waiting to be processed by the server.
     case pending
+
+    /// The subscription has been processed by the server, and objects matching the subscription
+    /// are now being synchronized to this client.
     case complete
+
+    /// An error occurred while creating the subscription or while the server was processing it.
     case error(Error)
 
     internal init(_ rlmSubscription: RLMSyncSubscription) {
@@ -696,16 +707,39 @@ public enum SyncSubscriptionState: Equatable {
     }
 }
 
+/// `SyncSubscription` represents a subscription to a set of objects in a synced Realm.
+///
+/// When partial sync is enabled for a synced Realm, the only objects that the server synchronizes to the
+/// client are those that match a sync subscription registered by that client. A subscription consists of
+/// of a query (represented by a `Results`) and an optional name.
+///
+/// Changes to the state of the subscription can be observed using `SyncSubscription.observe(_:options:_:)`.
+///
+/// Subscriptions are created using `Results.subscribe()` or `Results.subscribe(named:)`.
 public class SyncSubscription<Type: RealmCollectionValue> {
     private let rlmSubscription: RLMSyncSubscription
 
+    /// The name of the subscription.
+    ///
+    /// This will be `nil` if a name was not provided when the subscription was created.
+    public var name: String? { return rlmSubscription.name }
+
+    /// The state of the subscription.
     public var state: SyncSubscriptionState { return SyncSubscriptionState(rlmSubscription) }
-    public var results: Results<Type> { return Results<Type>(rlmSubscription.results) }
 
     internal init(_ rlmSubscription: RLMSyncSubscription) {
         self.rlmSubscription = rlmSubscription
     }
 
+    /// Observe the subscription for state changes.
+    ///
+    /// When the state of the subscription changes, `block` will be invoked and passed the new state.
+    ///
+    /// - parameter keyPath: The path to observe. Must be `\.state`.
+    /// - parameter options: Options for the observation. Only `NSKeyValueObservingOptions.initial` option is
+    ///                      is supported at this time.
+    /// - parameter block: The block to be called whenever a change occurs.
+    /// - returns: A token which must be held for as long as you want updates to be delivered.
     public func observe(_ keyPath: KeyPath<SyncSubscription, SyncSubscriptionState>,
                         options: NSKeyValueObservingOptions = [],
                         _ block: @escaping (SyncSubscriptionState) -> Void) -> NotificationToken {
@@ -725,7 +759,6 @@ extension Results {
         return SyncSubscription(rlmResults.subscribe(withName: named))
     }
 }
-
 
 internal class KeyValueObservationNotificationToken : NotificationToken {
     public var observation: NSKeyValueObservation?
