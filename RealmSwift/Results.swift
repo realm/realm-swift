@@ -418,4 +418,3 @@ extension Results: AssistedObjectiveCBridgeable {
         return (objectiveCValue: rlmResults, metadata: nil)
     }
 }
-

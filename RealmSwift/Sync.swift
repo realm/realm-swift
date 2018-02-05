@@ -695,7 +695,7 @@ public enum SyncSubscriptionState: Equatable {
         }
     }
 
-    public static func ==(lhs: SyncSubscriptionState, rhs: SyncSubscriptionState) -> Bool {
+    public static func == (lhs: SyncSubscriptionState, rhs: SyncSubscriptionState) -> Bool {
         switch (lhs, rhs) {
         case (.creating, .creating), (.pending, .pending), (.complete, .complete):
             return true
@@ -743,7 +743,7 @@ public class SyncSubscription<Type: RealmCollectionValue> {
     public func observe(_ keyPath: KeyPath<SyncSubscription, SyncSubscriptionState>,
                         options: NSKeyValueObservingOptions = [],
                         _ block: @escaping (SyncSubscriptionState) -> Void) -> NotificationToken {
-        let observation = rlmSubscription.observe(\.state, options: options) { rlmSubscription, change in
+        let observation = rlmSubscription.observe(\.state, options: options) { rlmSubscription, _ in
             block(SyncSubscriptionState(rlmSubscription))
         }
         return KeyValueObservationNotificationToken(observation)
@@ -760,11 +760,10 @@ extension Results {
     }
 }
 
-internal class KeyValueObservationNotificationToken : NotificationToken {
+internal class KeyValueObservationNotificationToken: NotificationToken {
     public var observation: NSKeyValueObservation?
 
-    public init(_ observation: NSKeyValueObservation)
-    {
+    public init(_ observation: NSKeyValueObservation) {
         super.init()
         self.observation = observation
     }
