@@ -78,6 +78,11 @@ using namespace realm;
     return self;
 }
 
+- (void)unsubscribe
+{
+    partial_sync::unsubscribe(*_subscription);
+}
+
 - (RLMResults *)results
 {
     auto results = _subscription->results();

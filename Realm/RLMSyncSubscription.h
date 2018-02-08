@@ -44,6 +44,11 @@ typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
      are now being synchronized to this client.
      */
     RLMSyncSubscriptionStateComplete = 1,
+
+    /**
+     This subscription has been removed.
+     */
+    RLMSyncSubscriptionStateInvalidated = 3,
 };
 
 /**
@@ -77,6 +82,11 @@ typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
  Will be non-nil only when `state` is `RLMSyncSubscriptionStateError`.
  */
 @property (nonatomic, readonly, nullable) NSError *error;
+
+/**
+ Remove this subscription.
+ */
+- (void)unsubscribe;
 
 #pragma mark - Unavailable Methods
 

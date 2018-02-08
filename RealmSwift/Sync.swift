@@ -679,6 +679,9 @@ public enum SyncSubscriptionState: Equatable {
     /// are now being synchronized to this client.
     case complete
 
+    /// The subscription has been removed.
+    case invalidated
+
     /// An error occurred while creating the subscription or while the server was processing it.
     case error(Error)
 
@@ -690,6 +693,8 @@ public enum SyncSubscriptionState: Equatable {
             self = .pending
         case .complete:
             self = .complete
+        case .invalidated:
+            self = .invalidated
         case .error:
             self = .error(rlmSubscription.error!)
         }
@@ -697,7 +702,7 @@ public enum SyncSubscriptionState: Equatable {
 
     public static func == (lhs: SyncSubscriptionState, rhs: SyncSubscriptionState) -> Bool {
         switch (lhs, rhs) {
-        case (.creating, .creating), (.pending, .pending), (.complete, .complete):
+        case (.creating, .creating), (.pending, .pending), (.complete, .complete), (.invalidated, .invalidated):
             return true
         case (.error(let e1), .error(let e2)):
             return e1 == e2
@@ -747,6 +752,11 @@ public class SyncSubscription<Type: RealmCollectionValue> {
             block(SyncSubscriptionState(rlmSubscription))
         }
         return KeyValueObservationNotificationToken(observation)
+    }
+
+    /// Remove this subscription
+    public func unsubscribe() {
+        rlmSubscription.unsubscribe()
     }
 }
 
