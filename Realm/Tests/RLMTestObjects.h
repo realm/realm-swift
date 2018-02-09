@@ -423,6 +423,40 @@ RLM_ARRAY_TYPE(PrimaryCompanyObject);
 @property NSURL *URL;
 @end
 
+@interface RenamedProperties1 : RLMObject
+@property (nonatomic) int propA;
+@property (nonatomic) NSString *propB;
+@property (readonly, nonatomic) RLMLinkingObjects *linking1;
+@property (readonly, nonatomic) RLMLinkingObjects *linking2;
+@end
+
+@interface RenamedProperties2 : RLMObject
+@property (nonatomic) int propC;
+@property (nonatomic) NSString *propD;
+@property (readonly, nonatomic) RLMLinkingObjects *linking1;
+@property (readonly, nonatomic) RLMLinkingObjects *linking2;
+@end
+
+RLM_ARRAY_TYPE(RenamedProperties1)
+RLM_ARRAY_TYPE(RenamedProperties2)
+
+@interface LinkToRenamedProperties1 : RLMObject
+@property (nonatomic) RenamedProperties1 *linkA;
+@property (nonatomic) RenamedProperties2 *linkB;
+@property (nonatomic) RLM_GENERIC_ARRAY(RenamedProperties1) *array;
+@end
+
+@interface LinkToRenamedProperties2 : RLMObject
+@property (nonatomic) RenamedProperties2 *linkC;
+@property (nonatomic) RenamedProperties1 *linkD;
+@property (nonatomic) RLM_GENERIC_ARRAY(RenamedProperties2) *array;
+@end
+
+@interface RenamedPrimaryKey : RLMObject
+@property (nonatomic) int pk;
+@property (nonatomic) int value;
+@end
+
 #pragma mark FakeObject
 
 @interface FakeObject : NSObject

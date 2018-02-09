@@ -213,7 +213,7 @@ public:
     : m_links(links), m_property(property), m_schema(schema), m_group(&group), m_query(&query), m_table(query.get_table().get())
     {
         auto& table = walk_link_chain([](Table&, size_t, RLMPropertyType) { });
-        m_index = table.get_column_index(m_property.name.UTF8String);
+        m_index = table.get_column_index(m_property.columnName.UTF8String);
     }
 
     template <typename T, typename... SubQuery>
@@ -292,7 +292,7 @@ private:
         auto table = m_query->get_table().get();
         for (const auto& link : m_links) {
             if (link.type != RLMPropertyTypeLinkingObjects) {
-                auto index = table->get_column_index(link.name.UTF8String);
+                auto index = table->get_column_index(link.columnName.UTF8String);
                 func(*table, index, link.type);
                 table = table->get_link_target(index).get();
             }
@@ -311,7 +311,8 @@ private:
     {
         RLMObjectSchema *link_origin_schema = m_schema[prop.objectClassName];
         Table& link_origin_table = get_table(*m_group, link_origin_schema);
-        size_t link_origin_column = link_origin_table.get_column_index(prop.linkOriginPropertyName.UTF8String);
+        NSString *column_name = link_origin_schema[prop.linkOriginPropertyName].columnName;
+        size_t link_origin_column = link_origin_table.get_column_index(column_name.UTF8String);
         return func(link_origin_table, link_origin_column);
     }
 

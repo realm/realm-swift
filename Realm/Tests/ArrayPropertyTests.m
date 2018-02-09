@@ -830,6 +830,37 @@
     test();
 }
 
+- (void)testRenamedPropertyAggregate {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+
+    LinkToRenamedProperties1 *obj = [LinkToRenamedProperties1 new];
+    XCTAssertEqual(0, [obj.array sumOfProperty:@"propA"].intValue);
+    XCTAssertNil([obj.array averageOfProperty:@"propA"]);
+    XCTAssertNil([obj.array minOfProperty:@"propA"]);
+    XCTAssertNil([obj.array maxOfProperty:@"propA"]);
+    XCTAssertThrows([obj.array sumOfProperty:@"prop 1"]);
+
+    [realm transactionWithBlock:^{
+        [RenamedProperties1 createInRealm:realm withValue:@[@1, @""]];
+        [RenamedProperties1 createInRealm:realm withValue:@[@2, @""]];
+        [RenamedProperties1 createInRealm:realm withValue:@[@3, @""]];
+
+        [obj.array addObjects:[RenamedProperties1 allObjectsInRealm:realm]];
+    }];
+
+    XCTAssertEqual(6, [obj.array sumOfProperty:@"propA"].intValue);
+    XCTAssertEqual(2.0, [obj.array averageOfProperty:@"propA"].doubleValue);
+    XCTAssertEqual(1, [[obj.array minOfProperty:@"propA"] intValue]);
+    XCTAssertEqual(3, [[obj.array maxOfProperty:@"propA"] intValue]);
+
+    [realm transactionWithBlock:^{ [realm addObject:obj]; }];
+
+    XCTAssertEqual(6, [obj.array sumOfProperty:@"propA"].intValue);
+    XCTAssertEqual(2.0, [obj.array averageOfProperty:@"propA"].doubleValue);
+    XCTAssertEqual(1, [[obj.array minOfProperty:@"propA"] intValue]);
+    XCTAssertEqual(3, [[obj.array maxOfProperty:@"propA"] intValue]);
+}
+
 - (void)testValueForCollectionOperationKeyPath
 {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -956,6 +987,28 @@
     XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@YES, @NO], @[b1, a1, b2, a2]));
     XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @YES], @[a2, b2, a1, b1]));
     XCTAssertTrue(checkOrder(@[@"age", @"dogName"], @[@NO, @NO], @[b2, a2, b1, a1]));
+}
+
+- (void)testSortByRenamedColumns {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    id value = @{@"array": @[@[@1, @"c"], @[@2, @"b"], @[@3, @"a"]]};
+    LinkToRenamedProperties1 *obj = [LinkToRenamedProperties1 createInRealm:realm withValue:value];
+
+    // FIXME: sorting has to use the column names because the parsing is done by
+    // the object store. This is not ideal.
+    XCTAssertEqualObjects([[obj.array sortedResultsUsingKeyPath:@"prop 1" ascending:YES] valueForKeyPath:@"propA"],
+                          (@[@1, @2, @3]));
+    XCTAssertEqualObjects([[obj.array sortedResultsUsingKeyPath:@"prop 2" ascending:YES] valueForKeyPath:@"propA"],
+                          (@[@3, @2, @1]));
+
+    LinkToRenamedProperties2 *obj2 = [LinkToRenamedProperties2 allObjectsInRealm:realm].firstObject;
+    XCTAssertEqualObjects([[obj2.array sortedResultsUsingKeyPath:@"prop 1" ascending:YES] valueForKeyPath:@"propC"],
+                          (@[@1, @2, @3]));
+    XCTAssertEqualObjects([[obj2.array sortedResultsUsingKeyPath:@"prop 2" ascending:YES] valueForKeyPath:@"propC"],
+                          (@[@3, @2, @1]));
+
+    [realm cancelWriteTransaction];
 }
 
 - (void)testDeleteLinksAndObjectsInArray

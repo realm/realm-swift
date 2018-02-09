@@ -313,6 +313,23 @@
     XCTAssertEqual(ca.age, 2);
 }
 
+- (void)testInitWithRenamedColumns {
+    // Create with array
+    auto obj = [[RenamedProperties1 alloc] initWithValue:@[@1, @"a"]];
+    XCTAssertEqual(obj.propA, 1);
+    XCTAssertEqualObjects(obj.propB, @"a");
+
+    // Create with dictionary
+    obj = [[RenamedProperties1 alloc] initWithValue:@{@"propB": @"b", @"propA": @2}];
+    XCTAssertEqual(obj.propA, 2);
+    XCTAssertEqualObjects(obj.propB, @"b");
+
+    // Create with KVC-compatible object
+    obj = [[RenamedProperties1 alloc] initWithValue:obj];
+    XCTAssertEqual(obj.propA, 2);
+    XCTAssertEqualObjects(obj.propB, @"b");
+}
+
 - (void)testInitAllPropertyTypes {
     auto now = [NSDate date];
     auto bytes = [NSData dataWithBytes:"a" length:1];
@@ -955,6 +972,37 @@
     [realm cancelWriteTransaction];
 }
 
+- (void)testCreateWithRenamedColumns {
+    auto realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    // Create with array
+    auto obj = [RenamedProperties1 createInRealm:realm withValue:@[@1, @"a"]];
+    XCTAssertEqual(obj.propA, 1);
+    XCTAssertEqualObjects(obj.propB, @"a");
+
+    // Create with dictionary
+    obj = [RenamedProperties1 createInRealm:realm withValue:@{@"propB": @"b", @"propA": @2}];
+    XCTAssertEqual(obj.propA, 2);
+    XCTAssertEqualObjects(obj.propB, @"b");
+
+    // Create with KVC-compatible object
+    obj = [RenamedProperties1 createInRealm:realm withValue:obj];
+    XCTAssertEqual(obj.propA, 2);
+    XCTAssertEqualObjects(obj.propB, @"b");
+
+    // Verify that they're all readable via the other class
+    RLMResults<RenamedProperties2 *> *results = [RenamedProperties2 allObjectsInRealm:realm];
+    XCTAssertEqual(results[0].propC, 1);
+    XCTAssertEqualObjects(results[0].propD, @"a");
+    XCTAssertEqual(results[1].propC, 2);
+    XCTAssertEqualObjects(results[1].propD, @"b");
+    XCTAssertEqual(results[2].propC, 2);
+    XCTAssertEqualObjects(results[2].propD, @"b");
+
+    [realm cancelWriteTransaction];
+}
+
 #pragma mark - Create Or Update
 
 - (void)testCreateOrUpdateWithoutPKThrows {
@@ -1180,6 +1228,21 @@
     [realm cancelWriteTransaction];
 }
 
+- (void)testCreateOrUpdateWithRenamedPrimaryKey {
+    auto realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    auto obj = [RenamedPrimaryKey createInRealm:realm withValue:@[@1, @2]];
+    [RenamedPrimaryKey createOrUpdateInRealm:realm withValue:@[@1, @3]];
+    XCTAssertEqual(obj.pk, 1);
+    XCTAssertEqual(obj.value, 3);
+
+    [RenamedPrimaryKey createOrUpdateInRealm:realm withValue:@{@"pk": @1, @"value": @4}];
+    XCTAssertEqual(obj.value, 4);
+
+    [realm cancelWriteTransaction];
+}
+
 #pragma mark - Add
 
 - (void)testAddInvalidated {
@@ -1244,6 +1307,22 @@
     [realm addObject:ca];
     XCTAssertEqualObjects(ca.name, @"a");
     XCTAssertEqual(ca.age, 1);
+
+    [realm cancelWriteTransaction];
+}
+
+- (void)testAddWithRenamedColumns {
+    auto realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    auto obj = [[RenamedProperties1 alloc] initWithValue:@[@1, @"a"]];
+    [realm addObject:obj];
+    XCTAssertEqual(obj.propA, 1);
+    XCTAssertEqualObjects(obj.propB, @"a");
+
+    RLMResults<RenamedProperties2 *> *results = [RenamedProperties2 allObjectsInRealm:realm];
+    XCTAssertEqual(results[0].propC, 1);
+    XCTAssertEqualObjects(results[0].propD, @"a");
 
     [realm cancelWriteTransaction];
 }

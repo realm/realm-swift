@@ -42,10 +42,10 @@ using namespace realm;
 static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
     for (RLMObjectSchema *objectSchema in realm.schema.objectSchema) {
         auto& info = realm->_info[objectSchema.className];
-        TableRef table = ObjectStore::table_for_object_type(realm.group, objectSchema.className.UTF8String);
+        TableRef table = ObjectStore::table_for_object_type(realm.group, objectSchema.objectName.UTF8String);
         for (RLMProperty *property in objectSchema.properties) {
             auto column = info.tableColumn(property);
-            XCTAssertEqual(column, table->get_column_index(RLMStringDataWithNSString(property.name)));
+            XCTAssertEqual(column, table->get_column_index(RLMStringDataWithNSString(property.columnName)));
             XCTAssertEqual(property.indexed || property.isPrimary, table->has_search_index(column));
         }
     }

@@ -106,6 +106,12 @@ public final class LinkingObjects<Element: Object>: LinkingObjectsBase {
 
     /// A human-readable description of the objects represented by the linking objects.
     public override var description: String {
+        if realm == nil {
+            var this = self
+            return withUnsafePointer(to: &this) {
+                return "LinkingObjects<\(objectClassName)> <\($0)> (\n\n)"
+            }
+        }
         return RLMDescriptionWithMaxDepth("LinkingObjects", rlmResults, RLMDescriptionMaxDepth)
     }
 
