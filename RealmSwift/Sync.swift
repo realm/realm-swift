@@ -761,12 +761,21 @@ public class SyncSubscription<Type: RealmCollectionValue> {
 }
 
 extension Results {
+    /// Subscribe to the query represented by this `Results`
+    ///
+    /// The subscription will not have an explicit name.
+    ///
+    /// - returns: The subscription.
     public func subscribe() -> SyncSubscription<Element> {
         return SyncSubscription(rlmResults.subscribe())
     }
 
-    public func subscribe(named: String) -> SyncSubscription<Element> {
-        return SyncSubscription(rlmResults.subscribe(withName: named))
+    /// Subscribe to the query represented by this `Results`
+    ///
+    /// - parameter subscriptionName: The name of the subscription.
+    /// - returns: The subscription.
+    public func subscribe(named subscriptionName: String) -> SyncSubscription<Element> {
+        return SyncSubscription(rlmResults.subscribe(withName: subscriptionName))
     }
 }
 

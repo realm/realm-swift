@@ -102,9 +102,31 @@ typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
 
 @end
 
+/**
+ Support for subscribing to the results of object queries in a synced Realm.
+ */
 @interface RLMResults (SyncSubscription)
-// FIXME: Document this.
+
+/**
+ Subscribe to the query represented by this `RLMResults`.
+
+ The subscription will not be explicitly named.
+
+ @return The subscription
+
+ @see RLMSyncSubscription
+*/
 - (RLMSyncSubscription *)subscribe;
+
+/**
+ Subscribe to the query represented by this `RLMResults`.
+
+ @param subscriptionName The name of the subscription
+
+ @return The subscription
+
+ @see RLMSyncSubscription
+*/
 - (RLMSyncSubscription *)subscribeWithName:(NSString *)subscriptionName;
 @end
 
