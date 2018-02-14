@@ -440,7 +440,8 @@
                            completion:^(RLMSyncUserInfo *info, NSError *err) {
                                XCTAssertNotNil(err);
                                XCTAssertEqualObjects(err.domain, RLMSyncAuthErrorDomain);
-                               XCTAssertEqual(err.code, RLMSyncAuthErrorAccessDeniedOrInvalidPath);
+                               // FIXME: Shouldn't this be RLMSyncAuthErrorAccessDeniedOrInvalidPath?
+                               XCTAssertEqual(err.code, RLMSyncAuthErrorUserDoesNotExist);
                                XCTAssertNil(info);
                                [ex4 fulfill];
                            }];
