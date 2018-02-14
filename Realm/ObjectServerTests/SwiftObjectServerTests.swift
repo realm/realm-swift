@@ -458,19 +458,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 let configuration = Realm.Configuration(syncConfiguration: syncConfig)
                 let realm = try! synchronouslyOpenRealm(configuration: configuration)
 
+
                 let ex = expectation(description: "Should be able to successfully complete a query")
-
                 let results = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5")
-                let subscription = results.subscribe(named: "big-numbers")
+                let subscription = results.subscribe(named: "query")
                 XCTAssertEqual(subscription.state, .creating)
-                let subscriptionToken = subscription.observe(\.state, options: .initial) { state in
-                    if state == .complete {
-                        ex.fulfill()
-                    }
-                }
-
-                waitForExpectations(timeout: 20.0)
-                subscriptionToken.invalidate()
+                waitUntilStateMatches(subscription, expectation: ex) { state in state == .complete }
 
                 // Verify that we got what we're looking for
                 XCTAssertEqual(results.count, 4)
@@ -486,17 +479,36 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 // Re-subscribing to an existing named query may not report the query's state immediately,
                 // but it should report it eventually.
                 let ex2 = expectation(description: "Re-subscribing should fire the state change callback")
-                let subscription2 = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5").subscribe(named: "big-numbers")
-                let subscriptionToken2 = subscription2.observe(\.state, options: .initial) { state in
-                    if state == .complete {
-                        ex2.fulfill()
+                let subscription2 = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5").subscribe(named: "query")
+                waitUntilStateMatches(subscription2, expectation: ex2) { state in state == .complete }
+
+                // Creating a subscription with the same name but different query should raise an error.
+                let ex3 = expectation(description: "Waiting for error")
+                let subscription3 = realm.objects(SwiftPartialSyncObjectA.self).filter("number < 5").subscribe(named: "query")
+                waitUntilStateMatches(subscription3, expectation: ex3) { state in
+                    if case .error(_) = state {
+                        return true
                     }
+                    return false
                 }
 
-                waitForExpectations(timeout: 20.0)
-                subscriptionToken2.invalidate()
+                // Unsubscribing should move the subscription to the invalidated state.
+                let ex4 = expectation(description: "Waiting for unsubscribe")
+                subscription.unsubscribe()
+                waitUntilStateMatches(subscription, expectation: ex4) { state in state == .invalidated }
             }
         }
+    }
+
+    func waitUntilStateMatches<T>(_ subscription: SyncSubscription<T>, expectation: XCTestExpectation,
+                                  matcher: @escaping (SyncSubscriptionState) -> Bool) {
+        let token = subscription.observe(\.state, options: .initial) { state in
+            if matcher(state) {
+                expectation.fulfill()
+            }
+        }
+        waitForExpectations(timeout: 20.0)
+        token.invalidate()
     }
 #endif // Swift >= 3.2
 }

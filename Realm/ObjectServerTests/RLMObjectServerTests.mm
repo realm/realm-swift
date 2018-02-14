@@ -1536,14 +1536,14 @@
 
         // Perform some partial sync queries
         RLMResults *objects = [PartialSyncObjectA objectsInRealm:realm where:@"number > 5"];
-        RLMSyncSubscription *subscription = [objects subscribe];
+        RLMSyncSubscription *subscription = [objects subscribeWithName:@"query"];
 
         // Wait for the results to become available.
         XCTestExpectation *ex = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription expectedValue:@(RLMSyncSubscriptionStateComplete)];
         [self waitForExpectations:@[ex] timeout:20.0];
 
         // Verify that we got what we're looking for
-        XCTAssertTrue(objects.count == 4);
+        XCTAssertEqual(objects.count, 4u);
         for (PartialSyncObjectA *object in objects) {
             XCTAssertGreaterThan(object.number, 5);
             XCTAssertEqualObjects(object.string, @"partial");
@@ -1552,6 +1552,21 @@
         // Verify that we didn't get any other objects
         XCTAssertEqual([PartialSyncObjectA allObjectsInRealm:realm].count, objects.count);
         XCTAssertEqual([PartialSyncObjectB allObjectsInRealm:realm].count, 0u);
+
+
+        // Create a subscription with the same name but a different query. This should trigger an error.
+        RLMResults *objects2 = [PartialSyncObjectA objectsInRealm:realm where:@"number < 5"];
+        RLMSyncSubscription *subscription2 = [objects2 subscribeWithName:@"query"];
+
+        // Wait for the error to be reported.
+        XCTestExpectation *ex2 = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription2 expectedValue:@(RLMSyncSubscriptionStateError)];
+        [self waitForExpectations:@[ex2] timeout:20.0];
+        XCTAssertNotNil(subscription2.error);
+
+        // Unsubscribe from the query, and ensure that it correctly transitions to the invalidated state.
+        [subscription unsubscribe];
+        XCTestExpectation *ex3 = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription expectedValue:@(RLMSyncSubscriptionStateInvalidated)];
+        [self waitForExpectations:@[ex3] timeout:20.0];
     }
 }
 
