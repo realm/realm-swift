@@ -39,14 +39,37 @@ NS_ASSUME_NONNULL_BEGIN
 /// The Role which this Permission applies to. All users within the Role are
 /// granted the permissions specified by the fields below any
 /// objects/classes/realms which use this Permission.
+///
+/// This property cannot be modified once set.
 @property (nonatomic) RLMPermissionRole *role;
 
+/// Whether the user can read the object to which this Permission is attached.
 @property (nonatomic) bool canRead;
+/// Whether the user can modify the object to which this Permission is attached.
 @property (nonatomic) bool canUpdate;
+/// Whether the user can delete the object to which this Permission is attached.
+///
+/// This field is only applicable to Permissions attached to Objects, and not
+/// to Realms or Classes.
 @property (nonatomic) bool canDelete;
+/// Whether the user can add or modify Permissions for the object which this
+/// Permission is attached to.
 @property (nonatomic) bool canSetPermissions;
+/// Whether the user can subscribe to queries for this object type.
+///
+/// This field is only applicable to Permissions attached to Classes, and not
+/// to Realms or Objects.
 @property (nonatomic) bool canQuery;
+/// Whether the user can create new objects of the type this Permission is attached to.
+///
+/// This field is only applicable to Permissions attached to Classes, and not
+/// to Realms or Objects.
 @property (nonatomic) bool canCreate;
+    /// Whether the user can modify the schema of the Realm which this
+    /// Permission is attached to.
+    ///
+    /// This field is only applicable to Permissions attached to Realms, and not
+    /// to Realms or Objects.
 @property (nonatomic) bool canModifySchema;
 @end
 
@@ -62,7 +85,9 @@ NS_ASSUME_NONNULL_BEGIN
  managed as normal Realm objects.
  */
 @interface RLMPermissionRole : RLMObject
+/// The name of the Role
 @property (nonatomic) NSString *name;
+/// The users which belong to the role
 @property (nonatomic) RLMArray<RLMPermissionUser *><RLMPermissionUser> *users;
 @end
 
@@ -95,17 +120,20 @@ NS_ASSUME_NONNULL_BEGIN
  See `RLMRealmPrivileges` for the meaning of permissions applied to a Realm.
  */
 @interface RLMRealmPermission : RLMObject
+/// The permissions for the Realm.
 @property (nonatomic) RLMArray<RLMPermission *><RLMPermission> *permissions;
 
-+ (instancetype)objectInRealm:(RLMRealm *)realm;
+/// Retrieve the singleton object for the given Realm. This will return `nil`
+/// for non-partial-sync Realms.
++ (nullable instancetype)objectInRealm:(RLMRealm *)realm;
 @end
 
 /**
  An object which describes class-wide permissions.
 
  An instance of this object is automatically created in the Realm for class in your schema,
- and should not be created manually. Call +[RLMClassPermission objectInRealm:forClassNamed:]`
- or  +[RLMClassPermission objectInRealm:forClass:]` to obtain the existing instance, or
+ and should not be created manually. Call `+[RLMClassPermission objectInRealm:forClassNamed:]`
+ or  `+[RLMClassPermission objectInRealm:forClass:]` to obtain the existing instance, or
  query `RLMClassPermission` as normal.
  */
 @interface RLMClassPermission : RLMObject
@@ -114,8 +142,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// The permissions for this class.
 @property (nonatomic) RLMArray<RLMPermission *><RLMPermission> *permissions;
 
-+ (instancetype)objectInRealm:(RLMRealm *)realm forClassNamed:(NSString *)className;
-+ (instancetype)objectInRealm:(RLMRealm *)realm forClass:(Class)cls;
+/// Retrieve the object for the named RLMObject subclass. This will return `nil`
+/// for non-partial-sync Realms.
++ (nullable instancetype)objectInRealm:(RLMRealm *)realm forClassNamed:(NSString *)className;
+/// Retrieve the object for the given RLMObject subclass. This will return `nil`
+/// for non-partial-sync Realms.
++ (nullable instancetype)objectInRealm:(RLMRealm *)realm forClass:(Class)cls;
 @end
 
 /**

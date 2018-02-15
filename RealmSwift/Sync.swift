@@ -688,14 +688,42 @@ public class Permission: Object {
     /// This property cannot be modified once set.
     @objc dynamic public var role: PermissionRole?
 
+    /// Whether the user can read the object to which this Permission is attached.
     @objc dynamic public var canRead = false
+
+    /// Whether the user can modify the object to which this Permission is attached.
     @objc dynamic public var canUpdate = false
+
+    /// Whether the user can delete the object to which this Permission is attached.
+    ///
+    /// This field is only applicable to Permissions attached to Objects, and not
+    /// to Realms or Classes.
     @objc dynamic public var canDelete = false
+
+    /// Whether the user can add or modify Permissions for the object which this
+    /// Permission is attached to.
     @objc dynamic public var canSetPermissions = false
+
+    /// Whether the user can subscribe to queries for this object type.
+    ///
+    /// This field is only applicable to Permissions attached to Classes, and not
+    /// to Realms or Objects.
     @objc dynamic public var canQuery = false
+
+    /// Whether the user can create new objects of the type this Permission is attached to.
+    ///
+    /// This field is only applicable to Permissions attached to Classes, and not
+    /// to Realms or Objects.
     @objc dynamic public var canCreate = false
+
+    /// Whether the user can modify the schema of the Realm which this
+    /// Permission is attached to.
+    ///
+    /// This field is only applicable to Permissions attached to Realms, and not
+    /// to Realms or Objects.
     @objc dynamic public var canModifySchema = false
 
+    /// :nodoc:
     @objc override public class func _realmObjectName() -> String {
         return "__Permission"
     }
@@ -713,15 +741,20 @@ public class Permission: Object {
  managed as normal Realm objects.
  */
 public class PermissionRole: Object {
+    /// The name of the Role
     @objc dynamic public var name = ""
+    /// The users which belong to the role
     let users = List<PermissionUser>()
 
+    /// :nodoc:
     @objc override public class func _realmObjectName() -> String {
         return "__Role"
     }
+    /// :nodoc:
     @objc override public class func primaryKey() -> String {
         return "name"
     }
+    /// :nodoc:
     @objc override public class func _realmColumnNames() -> [String: String] {
         return ["users": "members"]
     }
@@ -743,12 +776,15 @@ public class PermissionUser: Object {
     /// Roles which this user belongs to.
     let roles = LinkingObjects(fromType: PermissionRole.self, property: "users")
 
+    /// :nodoc:
     @objc override public class func _realmObjectName() -> String {
         return "__User"
     }
+    /// :nodoc:
     @objc override public class func primaryKey() -> String {
         return "identity"
     }
+    /// :nodoc:
     @objc override public class func _realmColumnNames() -> [String: String] {
         return ["identity": "id"]
     }
@@ -768,9 +804,11 @@ public class RealmPermission: Object {
     /// The permissions for the Realm.
     public let permissions = List<Permission>()
 
+    /// :nodoc:
     @objc override public class func _realmObjectName() -> String {
         return "__Realm"
     }
+    /// :nodoc:
     @objc override public class func primaryKey() -> String {
         return "id"
     }
@@ -788,9 +826,11 @@ public class ClassPermission: Object {
     /// The permissions for this class.
     public let permissions = List<Permission>()
 
+    /// :nodoc:
     @objc override public class func _realmObjectName() -> String {
         return "__Class"
     }
+    /// :nodoc:
     @objc override public class func primaryKey() -> String {
         return "name"
     }

@@ -20,9 +20,9 @@
 #import "RLMConstants.h"
 
 @class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference;
-typedef struct RLMRealmPrivileges RLMRealmPrivileges;
-typedef struct RLMClassPrivileges RLMClassPrivileges;
-typedef struct RLMObjectPrivileges RLMObjectPrivileges;
+struct RLMRealmPrivileges;
+struct RLMClassPrivileges;
+struct RLMObjectPrivileges;
 
 /**
  A callback block for opening Realms asynchronously.
@@ -628,7 +628,7 @@ NS_REFINED_FOR_SWIFT;
  @warning This currently returns incorrect results for non-partially-synchronized read-only Realms.
  @return The privileges which the current user has for the current Realm.
  */
-- (RLMRealmPrivileges)privilegesForRealm;
+- (struct RLMRealmPrivileges)privilegesForRealm;
 
 /**
  Returns the computed privileges which the current user has for the given object.
@@ -651,7 +651,7 @@ NS_REFINED_FOR_SWIFT;
  @warning This currently returns incorrect results for non-partially-synchronized read-only Realms.
  @return The privileges which the current user has for the given object.
  */
-- (RLMObjectPrivileges)privilegesForObject:(RLMObject *)object;
+- (struct RLMObjectPrivileges)privilegesForObject:(RLMObject *)object;
 
 /**
  Returns the computed privileges which the current user has for the given class.
@@ -670,7 +670,7 @@ NS_REFINED_FOR_SWIFT;
  @warning This currently returns incorrect results for non-partially-synchronized read-only Realms.
  @return The privileges which the current user has for the given object.
  */
-- (RLMClassPrivileges)privilegesForClass:(Class)cls;
+- (struct RLMClassPrivileges)privilegesForClass:(Class)cls;
 
 /**
  Returns the computed privileges which the current user has for the named class.
@@ -689,7 +689,7 @@ NS_REFINED_FOR_SWIFT;
  @warning This currently returns incorrect results for non-partially-synchronized read-only Realms.
  @return The privileges which the current user has for the given object.
  */
-- (RLMClassPrivileges)privilegesForClassNamed:(NSString *)className;
+- (struct RLMClassPrivileges)privilegesForClassNamed:(NSString *)className;
 
 #pragma mark - Unavailable Methods
 
