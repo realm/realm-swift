@@ -85,6 +85,11 @@ typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
 
 /**
  Remove this subscription.
+
+ Removing a subscription will delete all objects from the local Realm that were matched
+ only by that subscription and not any remaining subscriptions. The deletion is performed
+ by the server, and so has no immediate impact on the contents of the local Realm. If the
+ device is currently offline, the removal will not be processed until the device returns online.
  */
 - (void)unsubscribe;
 

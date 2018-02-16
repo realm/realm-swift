@@ -27,7 +27,7 @@
 using namespace realm;
 
 @interface RLMSyncSubscription ()
-- (instancetype)initWithName:(NSString *)name results:(realm::Results&)results realm:(RLMRealm *)realm;
+- (instancetype)initWithName:(NSString *)name results:(Results&)results realm:(RLMRealm *)realm;
 
 @property (nonatomic, readwrite) RLMSyncSubscriptionState state;
 @property (nonatomic, readwrite, nullable) NSError *error;
@@ -39,8 +39,7 @@ using namespace realm;
     RLMRealm *_realm;
 }
 
-- (instancetype)initWithName:(NSString *)name results:(realm::Results&)results realm:(RLMRealm *)realm
-{
+- (instancetype)initWithName:(NSString *)name results:(Results&)results realm:(RLMRealm *)realm {
     if (!(self = [super init]))
         return nil;
 
@@ -78,13 +77,11 @@ using namespace realm;
     return self;
 }
 
-- (void)unsubscribe
-{
+- (void)unsubscribe {
     partial_sync::unsubscribe(*_subscription);
 }
 
-- (RLMResults *)results
-{
+- (RLMResults *)results {
     auto results = _subscription->results();
     return [RLMResults resultsWithObjectInfo:_realm->_info[RLMStringDataToNSString(results.get_object_type())]
                                      results:std::move(results)];
