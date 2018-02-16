@@ -244,4 +244,19 @@
     [token invalidate];
 }
 
+- (void)testRenamedProperties {
+    RLMRealm *realm = self.realmWithTestPath;
+    [realm beginWriteTransaction];
+    auto obj1 = [RenamedProperties1 createInRealm:realm withValue:@[@1, @"a"]];
+    auto obj2 = [RenamedProperties2 createInRealm:realm withValue:@[@2, @"b"]];
+    auto link = [LinkToRenamedProperties1 createInRealm:realm withValue:@[obj1, obj2, @[obj1, obj1]]];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects(obj1.linking1.objectClassName, @"LinkToRenamedProperties1");
+    XCTAssertEqualObjects(obj1.linking2.objectClassName, @"LinkToRenamedProperties2");
+
+    XCTAssertTrue([obj1.linking1[0] isEqualToObject:link]);
+    XCTAssertTrue([obj2.linking2[0] isEqualToObject:link]);
+}
+
 @end

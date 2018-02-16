@@ -1,13 +1,7 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.1.1 Release notes (2018-02-03)
 =============================================================
 
-### Breaking Changes
-
-* None.
-
-### Enhancements
-
-* None.
+Prebuilt Swift frameworks for Carthage are now built with Xcode 9.2.
 
 ### Bugfixes
 
