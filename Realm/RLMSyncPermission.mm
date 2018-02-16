@@ -17,12 +17,111 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncPermission_Private.hpp"
-#import "RLMSyncUtil_Private.hpp"
 
+#import "RLMArray.h"
+#import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
 using namespace realm;
+
 using ConditionType = Permission::Condition::Type;
+
+@implementation RLMPermissionRole
++ (NSString *)_realmObjectName {
+    return @"__Role";
+}
++ (NSString *)primaryKey {
+    return @"name";
+}
++ (NSArray *)requiredProperties {
+    return @[@"name"];
+}
++ (NSDictionary *)_realmColumnNames {
+    return @{@"users": @"members"};
+}
+@end
+
+@implementation RLMPermissionUser
++ (NSString *)_realmObjectName {
+    return @"__User";
+}
++ (NSString *)primaryKey {
+    return @"identity";
+}
++ (NSArray *)requiredProperties {
+    return @[@"identity"];
+}
++ (NSDictionary *)_realmColumnNames {
+    return @{@"identity": @"id"};
+}
++ (NSDictionary *)linkingObjectsProperties {
+    return @{@"roles": [RLMPropertyDescriptor descriptorWithClass:RLMPermissionRole.class propertyName:@"users"]};
+}
+
++ (RLMPermissionUser *)userInRealm:(RLMRealm *)realm withIdentity:(NSString *)identity {
+    if (id user = [self objectInRealm:realm forPrimaryKey:identity]) {
+        return user;
+    }
+    RLMPermissionUser *user = [self createInRealm:realm withValue:@[identity]];
+    RLMPermissionRole *role = [RLMPermissionRole createOrUpdateInRealm:realm withValue:@{@"name": @"everyone"}];
+    [role.users addObject:user];
+    return user;
+}
+@end
+
+@implementation RLMPermission
++ (NSString *)_realmObjectName {
+    return @"__Permission";
+}
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"canRead": @NO,
+             @"canUpdate": @NO,
+             @"canDelete": @NO,
+             @"canSetPermissions": @NO,
+             @"canQuery": @NO,
+             @"canCreate": @NO,
+             @"canModifySchema": @NO};
+}
+@end
+
+@implementation RLMClassPermission
++ (NSString *)_realmObjectName {
+    return @"__Class";
+}
++ (NSString *)primaryKey {
+    return @"name";
+}
++ (NSArray *)requiredProperties {
+    return @[@"name"];
+}
+
++ (instancetype)objectInRealm:(RLMRealm *)realm forClassNamed:(NSString *)name {
+    return [RLMClassPermission objectInRealm:realm forPrimaryKey:name];
+}
++ (instancetype)objectInRealm:(RLMRealm *)realm forClass:(Class)cls {
+    return [RLMClassPermission objectInRealm:realm forPrimaryKey:[cls className]];
+}
+@end
+
+@interface RLMRealmPermission ()
+@property (nonatomic) int pk;
+@end
+
+@implementation RLMRealmPermission
++ (NSString *)_realmObjectName {
+    return @"__Realm";
+}
++ (NSDictionary *)_realmColumnNames {
+    return @{@"pk": @"id"};
+}
++ (NSString *)primaryKey {
+    return @"pk";
+}
+
++ (instancetype)objectInRealm:(RLMRealm *)realm {
+    return [RLMRealmPermission objectInRealm:realm forPrimaryKey:@0];
+}
+@end
 
 #pragma mark - Permission
 
