@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		48824F3D1FD7D813442E0538 /* Pods_CocoaPodsExample_WatchKit_Extension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C95BE77D895CA88792F26187 /* Pods_CocoaPodsExample_WatchKit_Extension.framework */; };
 		E8645B891C7913D600C241AA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8645B881C7913D600C241AA /* main.m */; };
 		E8645B9C1C7913D600C241AA /* CocoaPodsExample WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E8645B9B1C7913D600C241AA /* CocoaPodsExample WatchKit App.app */; };
 		E8645BA21C7913D600C241AA /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8645BA01C7913D600C241AA /* Interface.storyboard */; };
@@ -67,6 +68,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1384BD16091C7F5B2208A9BA /* Pods-CocoaPodsExample WatchKit Extension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPodsExample WatchKit Extension.release.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension.release.xcconfig"; sourceTree = "<group>"; };
+		41C9120472DCD587AA61A675 /* Pods-CocoaPodsExample WatchKit Extension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CocoaPodsExample WatchKit Extension.debug.xcconfig"; path = "Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension.debug.xcconfig"; sourceTree = "<group>"; };
+		C95BE77D895CA88792F26187 /* Pods_CocoaPodsExample_WatchKit_Extension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_CocoaPodsExample_WatchKit_Extension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8645B841C7913D600C241AA /* CocoaPodsExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CocoaPodsExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8645B881C7913D600C241AA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		E8645B981C7913D600C241AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -91,12 +95,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				48824F3D1FD7D813442E0538 /* Pods_CocoaPodsExample_WatchKit_Extension.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F206819AA6C5E865108CEFFB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BE59A43A6B853C8662E4B012 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C95BE77D895CA88792F26187 /* Pods_CocoaPodsExample_WatchKit_Extension.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		E8645B7B1C7913D600C241AA = {
 			isa = PBXGroup;
 			children = (
@@ -104,6 +124,8 @@
 				E8645B9F1C7913D600C241AA /* CocoaPodsExample WatchKit App */,
 				E8645BAE1C7913D600C241AA /* CocoaPodsExample WatchKit Extension */,
 				E8645B851C7913D600C241AA /* Products */,
+				E902E627E024B826288DC2FA /* Pods */,
+				BE59A43A6B853C8662E4B012 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -145,6 +167,15 @@
 			path = "CocoaPodsExample WatchKit Extension";
 			sourceTree = "<group>";
 		};
+		E902E627E024B826288DC2FA /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				41C9120472DCD587AA61A675 /* Pods-CocoaPodsExample WatchKit Extension.debug.xcconfig */,
+				1384BD16091C7F5B2208A9BA /* Pods-CocoaPodsExample WatchKit Extension.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -173,6 +204,7 @@
 			buildPhases = (
 				E8645B991C7913D600C241AA /* Resources */,
 				E8645BBD1C7913D600C241AA /* Embed App Extensions */,
+				F206819AA6C5E865108CEFFB /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -188,10 +220,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = E8645BBA1C7913D600C241AA /* Build configuration list for PBXNativeTarget "CocoaPodsExample WatchKit Extension" */;
 			buildPhases = (
+				74665E8BBC490DCCF9317687 /* [CP] Check Pods Manifest.lock */,
 				E8645BA61C7913D600C241AA /* Sources */,
 				E8645BA71C7913D600C241AA /* Frameworks */,
 				E8645BA81C7913D600C241AA /* Resources */,
 				E82D95AE1C791A58000717F3 /* Embed Frameworks */,
+				7951E2968F200D8F1F14C1C6 /* [CP] Embed Pods Frameworks */,
+				ACC75BC54A56A406E45A095F /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -266,6 +301,60 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		74665E8BBC490DCCF9317687 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CocoaPodsExample WatchKit Extension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7951E2968F200D8F1F14C1C6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		ACC75BC54A56A406E45A095F /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		E8645B801C7913D600C241AA /* Sources */ = {
@@ -395,6 +484,7 @@
 		};
 		E8645BBB1C7913D600C241AA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 41C9120472DCD587AA61A675 /* Pods-CocoaPodsExample WatchKit Extension.debug.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "CocoaPodsExample WatchKit Extension/Info.plist";
@@ -410,6 +500,7 @@
 		};
 		E8645BBC1C7913D600C241AA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1384BD16091C7F5B2208A9BA /* Pods-CocoaPodsExample WatchKit Extension.release.xcconfig */;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = "CocoaPodsExample WatchKit Extension/Info.plist";

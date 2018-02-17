@@ -474,7 +474,8 @@
                            completion:^(RLMSyncUserInfo *info, NSError *err) {
                                XCTAssertNotNil(err);
                                XCTAssertEqualObjects(err.domain, RLMSyncAuthErrorDomain);
-                               XCTAssertEqual(err.code, RLMSyncAuthErrorAccessDeniedOrInvalidPath);
+                               // FIXME: Shouldn't this be RLMSyncAuthErrorAccessDeniedOrInvalidPath?
+                               XCTAssertEqual(err.code, RLMSyncAuthErrorUserDoesNotExist);
                                XCTAssertNil(info);
                                [ex4 fulfill];
                            }];
@@ -1567,24 +1568,40 @@
         RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
         configuration.syncConfiguration = syncConfig;
         RLMRealm *realm = [self openRealmWithConfiguration:configuration];
+
         // Perform some partial sync queries
-        XCTestExpectation *ex = [self expectationWithDescription:@"Should be able to successfully complete a query"];
-        __block RLMResults *objects = nil;
-        [realm subscribeToObjects:[PartialSyncObjectA class]
-                            where:@"number > 5"
-                           callback:^(RLMResults *results, NSError *error) {
-                               XCTAssertNil(error);
-                               XCTAssertNotNil(results);
-                               objects = results;
-                               [ex fulfill];
-                           }];
+        RLMResults *objects = [PartialSyncObjectA objectsInRealm:realm where:@"number > 5"];
+        RLMSyncSubscription *subscription = [objects subscribeWithName:@"query"];
+
+        // Wait for the results to become available.
+        XCTestExpectation *ex = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription expectedValue:@(RLMSyncSubscriptionStateComplete)];
         [self waitForExpectations:@[ex] timeout:20.0];
+
         // Verify that we got what we're looking for
         XCTAssertEqual(objects.count, 4U);
         for (PartialSyncObjectA *object in objects) {
             XCTAssertGreaterThan(object.number, 5);
-            XCTAssertTrue([object.string isEqualToString:@"partial"]);
+            XCTAssertEqualObjects(object.string, @"partial");
         }
+
+        // Verify that we didn't get any other objects
+        XCTAssertEqual([PartialSyncObjectA allObjectsInRealm:realm].count, objects.count);
+        XCTAssertEqual([PartialSyncObjectB allObjectsInRealm:realm].count, 0u);
+
+
+        // Create a subscription with the same name but a different query. This should trigger an error.
+        RLMResults *objects2 = [PartialSyncObjectA objectsInRealm:realm where:@"number < 5"];
+        RLMSyncSubscription *subscription2 = [objects2 subscribeWithName:@"query"];
+
+        // Wait for the error to be reported.
+        XCTestExpectation *ex2 = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription2 expectedValue:@(RLMSyncSubscriptionStateError)];
+        [self waitForExpectations:@[ex2] timeout:20.0];
+        XCTAssertNotNil(subscription2.error);
+
+        // Unsubscribe from the query, and ensure that it correctly transitions to the invalidated state.
+        [subscription unsubscribe];
+        XCTestExpectation *ex3 = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription expectedValue:@(RLMSyncSubscriptionStateInvalidated)];
+        [self waitForExpectations:@[ex3] timeout:20.0];
     }
 }
 

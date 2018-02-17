@@ -35,6 +35,7 @@
 #import <Realm/RLMSyncManager.h>
 #import <Realm/RLMSyncPermission.h>
 #import <Realm/RLMSyncSession.h>
+#import <Realm/RLMSyncSubscription.h>
 #import <Realm/RLMSyncUser.h>
 #import <Realm/RLMSyncUtil.h>
 #import <Realm/NSError+RLMSync.h>
