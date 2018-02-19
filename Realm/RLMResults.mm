@@ -259,6 +259,9 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 
 - (id)valueForKey:(NSString *)key {
+    if (!_info) {
+        return @[];
+    }
     return translateRLMResultsErrors([&] {
         return RLMCollectionValueForKey(_results, key, _realm, *_info);
     });

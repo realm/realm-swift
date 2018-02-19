@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix some warnings when running with UBsan.
+
 3.1.1 Release notes (2018-02-03)
 =============================================================
 
