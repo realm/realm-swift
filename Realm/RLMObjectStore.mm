@@ -229,13 +229,13 @@ RLMResults *RLMGetObjects(__unsafe_unretained RLMRealm *const realm,
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
     RLMVerifyRealmRead(realm);
 
-    RLMAccessorContext *c = nullptr;
     auto& info = realm->_info[objectClassName];
     if (RLMProperty *prop = info.propertyForPrimaryKey()) {
         RLMValidateValueForProperty(key, info.rlmObjectSchema, prop);
     }
     try {
-        auto obj = realm::Object::get_for_primary_key(*c, realm->_realm, *info.objectSchema,
+        RLMAccessorContext c{realm, info};
+        auto obj = realm::Object::get_for_primary_key(c, realm->_realm, *info.objectSchema,
                                                       key ?: NSNull.null);
         if (!obj.is_valid())
             return nil;
