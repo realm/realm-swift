@@ -7,7 +7,11 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Added an improved API for adding subscriptions in partially-synchronized Realms. `Results.subscribe()` can be
+  used to subscribe to any result set, and the returned `SyncSubscription` object can be used to observe the state
+  of the subscription and ultimately to remove the subscription.
+* Added a fine-grained permissions system for use with partially-synchronized Realms. This allows permissions to be
+  defined at the level of individual objects or classes. See `Permission` and related types for more information.
 
 ### Bugfixes
 
