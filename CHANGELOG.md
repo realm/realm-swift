@@ -1,9 +1,5 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.2.0-beta Release notes (2018-02-19)
 =============================================================
-
-### Breaking Changes
-
-* None.
 
 ### Enhancements
 
