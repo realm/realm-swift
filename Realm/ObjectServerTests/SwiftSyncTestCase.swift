@@ -146,6 +146,14 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return theUser!
     }
 
+    func waitForUploads(for realm: Realm) {
+        waitForUploads(for: ObjectiveCSupport.convert(object: realm))
+    }
+
+    func waitForDownloads(for realm: Realm) {
+        waitForDownloads(for: ObjectiveCSupport.convert(object: realm))
+    }
+
     func checkCount<T: Object>(expected: Int,
                                _ realm: Realm,
                                _ type: T.Type,

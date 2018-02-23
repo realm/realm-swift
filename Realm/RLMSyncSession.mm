@@ -18,6 +18,7 @@
 
 #import "RLMSyncSession_Private.hpp"
 
+#import "RLMRealm_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
@@ -201,6 +202,18 @@ using namespace realm;
     }
     token->_isValid = NO;
     SyncManager::shared().immediately_run_file_actions(std::move(token->_originalPath));
+}
+
++ (nullable RLMSyncSession *)sessionForRealm:(RLMRealm *)realm {
+    auto& config = realm->_realm->config().sync_config;
+    if (!config) {
+        return nil;
+    }
+    auto path = SyncManager::shared().path_for_realm(*config->user, config->realm_url());
+    if (auto session = config->user->session_for_on_disk_path(path)) {
+        return [[RLMSyncSession alloc] initWithSyncSession:session];
+    }
+    return nil;
 }
 
 @end
