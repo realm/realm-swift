@@ -881,7 +881,7 @@ public class PermissionRole: Object {
     /// The name of the Role
     @objc dynamic public var name = ""
     /// The users which belong to the role
-    let users = List<PermissionUser>()
+    public let users = List<PermissionUser>()
 
     /// :nodoc:
     @objc override public class func _realmObjectName() -> String {
@@ -973,6 +973,13 @@ public class ClassPermission: Object {
     }
 }
 
+private func optionSetDescription<T: OptionSet>(_ optionSet: T,
+                                                _ allValues: [(T.Element, String)]) -> String {
+    let valueStr = allValues.flatMap({ value, name in optionSet.contains(value) ? name : nil })
+                            .joined(separator: ", ")
+    return "\(String(describing: T.self))[\(valueStr)]"
+}
+
 /**
  A description of the actual privileges which apply to a Realm.
 
@@ -982,10 +989,18 @@ public class ClassPermission: Object {
  By default, all operations are permitted, and each privilege field indicates an operation
  which may be forbidden.
  */
-public struct RealmPrivileges: OptionSet {
+public struct RealmPrivileges: OptionSet, CustomDebugStringConvertible {
     public let rawValue: UInt8
     public init(rawValue: RawValue) {
         self.rawValue = rawValue
+    }
+
+    /// :nodoc:
+    public var debugDescription: String {
+        return optionSetDescription(self, [(.read, "read"),
+                                           (.update, "update"),
+                                           (.setPermissions, "setPermissions"),
+                                           (.modifySchema, "modifySchema")])
     }
 
     /// If `false`, the current User is not permitted to see the Realm at all. This can
@@ -1029,10 +1044,19 @@ public struct RealmPrivileges: OptionSet {
  By default, all operations are permitted, and each privilege field indicates an operation
  which may be forbidden.
  */
-public struct ClassPrivileges: OptionSet {
+public struct ClassPrivileges: OptionSet, CustomDebugStringConvertible {
     public let rawValue: UInt8
     public init(rawValue: RawValue) {
         self.rawValue = rawValue
+    }
+
+    /// :nodoc:
+    public var debugDescription: String {
+        return optionSetDescription(self, [(.read, "read"),
+                                           (.create, "create"),
+                                           (.update, "update"),
+                                           (.subscribe, "subscribe"),
+                                           (.setPermissions, "setPermissions")])
     }
 
     /// If `false`, the current User is not permitted to see objects of this type, and
@@ -1088,10 +1112,18 @@ public struct ClassPrivileges: OptionSet {
  By default, all operations are permitted, and each privilege field indicates an operation
  which may be forbidden.
  */
-public struct ObjectPrivileges: OptionSet {
+public struct ObjectPrivileges: OptionSet, CustomDebugStringConvertible {
     public let rawValue: UInt8
     public init(rawValue: RawValue) {
         self.rawValue = rawValue
+    }
+
+    /// :nodoc:
+    public var debugDescription: String {
+        return optionSetDescription(self, [(.read, "read"),
+                                           (.update, "update"),
+                                           (.delete, "delete"),
+                                           (.setPermissions, "setPermissions")])
     }
 
     /// If `false`, the current User is not permitted to read this object directly.
@@ -1216,5 +1248,43 @@ extension Realm {
     */
     public func getPrivileges(forClassNamed className: String) -> ClassPrivileges {
         return ClassPrivileges(rawValue: RLMGetComputedPermissions(rlmRealm, className))
+    }
+}
+
+extension List where Element == Permission {
+    /**
+    Returns the Permission object for the named Role in this List, creating it if needed.
+
+    This function should be used in preference to manually querying the List for
+    the applicable Permission as it ensures that there is exactly one Permission
+    for the given Role, merging duplicates and inserting new ones as needed.
+
+     - warning: This can only be called on a managed List<Permission>.
+     - warning: The managing Realm must be in a write transaction.
+
+     - parameter roleName: The name of the Role to obtain the Permission for.
+     - returns: A Permission object contained in this List for the named Role.
+    */
+    public func findOrCreate(forRoleNamed roleName: String) -> Permission {
+        precondition(realm != nil, "Cannot be called on an unmanaged object")
+        return RLMPermissionForRole(_rlmArray, realm!.create(PermissionRole.self, value: [roleName], update: true)) as! Permission
+    }
+
+    /**
+    Returns the Permission object for the named Role in this List, creating it if needed.
+
+    This function should be used in preference to manually querying the List for
+    the applicable Permission as it ensures that there is exactly one Permission
+    for the given Role, merging duplicates and inserting new ones as needed.
+
+     - warning: This can only be called on a managed List<Permission>.
+     - warning: The managing Realm must be in a write transaction.
+
+     - parameter roleName: The name of the Role to obtain the Permission for.
+     - returns: A Permission object contained in this List for the named Role.
+    */
+    public func findOrCreate(forRole role: PermissionRole) -> Permission {
+        precondition(realm != nil, "Cannot be called on an unmanaged object")
+        return RLMPermissionForRole(_rlmArray, role) as! Permission
     }
 }

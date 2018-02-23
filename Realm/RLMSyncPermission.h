@@ -65,12 +65,65 @@ NS_ASSUME_NONNULL_BEGIN
 /// This field is only applicable to Permissions attached to Classes, and not
 /// to Realms or Objects.
 @property (nonatomic) bool canCreate;
-    /// Whether the user can modify the schema of the Realm which this
-    /// Permission is attached to.
-    ///
-    /// This field is only applicable to Permissions attached to Realms, and not
-    /// to Realms or Objects.
+/// Whether the user can modify the schema of the Realm which this
+/// Permission is attached to.
+///
+/// This field is only applicable to Permissions attached to Realms, and not
+/// to Realms or Objects.
 @property (nonatomic) bool canModifySchema;
+
+/**
+ Returns the Permission object for the named Role in the array, creating it if needed.
+
+ This function should be used in preference to manually querying the array for
+ the applicable Permission as it ensures that there is exactly one Permission
+ for the given Role in the array, merging duplicates or creating and adding new
+ ones as needed.
+*/
++ (RLMPermission *)permissionForRoleNamed:(NSString *)roleName inArray:(RLMArray<RLMPermission *><RLMPermission> *)array;
+
+/**
+ Returns the Permission object for the named Role on the Realm, creating it if needed.
+
+ This function should be used in preference to manually querying for the
+ applicable Permission as it ensures that there is exactly one Permission for
+ the given Role on the Realm, merging duplicates or creating and adding new ones
+ as needed.
+*/
++ (RLMPermission *)permissionForRoleNamed:(NSString *)roleName onRealm:(RLMRealm *)realm;
+
+/**
+ Returns the Permission object for the named Role on the Class, creating it if needed.
+
+ This function should be used in preference to manually querying for the
+ applicable Permission as it ensures that there is exactly one Permission for
+ the given Role on the Class, merging duplicates or creating and adding new ones
+ as needed.
+*/
++ (RLMPermission *)permissionForRoleNamed:(NSString *)roleName onClass:(Class)cls realm:(RLMRealm *)realm;
+
+/**
+ Returns the Permission object for the named Role on the named class, creating it if needed.
+
+ This function should be used in preference to manually querying for the
+ applicable Permission as it ensures that there is exactly one Permission for
+ the given Role on the Class, merging duplicates or creating and adding new ones
+ as needed.
+*/
++ (RLMPermission *)permissionForRoleNamed:(NSString *)roleName onClassNamed:(NSString *)className realm:(RLMRealm *)realm;
+
+/**
+ Returns the Permission object for the named Role on the object, creating it if needed.
+
+ This function should be used in preference to manually querying for the
+ applicable Permission as it ensures that there is exactly one Permission for
+ the given Role on the Realm, merging duplicates or creating and adding new ones
+ as needed.
+
+ The given object must have a RLMArray<RLMPermission> property defined on it. If
+ more than one such property is present, the first will be used.
+*/
++ (RLMPermission *)permissionForRoleNamed:(NSString *)roleName onObject:(RLMObject *)object;
 @end
 
 /**
@@ -292,6 +345,9 @@ struct RLMObjectPrivileges {
     /// privileges to a Role which they do not themselves have.
     bool setPermissions : 1;
 };
+
+/// :nodoc:
+FOUNDATION_EXTERN id RLMPermissionForRole(RLMArray *array, id role);
 
 /**
  Access levels which can be granted to Realm Mobile Platform users
