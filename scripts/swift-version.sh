@@ -110,7 +110,7 @@ find_default_xcode_version() {
         return 0
     fi
 
-    echo "WARNING: The active Xcode command line tools, as returned by `xcode-select -p`, are not from Xcode."
+    echo "WARNING: The active Xcode command line tools, as returned by 'xcode-select -p', are not from Xcode."
     echo "         The newest version of Xcode will be used instead."
 
     # Find the newest version of Xcode available on the system, based on CFBundleVersion.
