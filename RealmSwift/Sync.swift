@@ -911,7 +911,7 @@ public class PermissionUser: Object {
     @objc dynamic public var identity = ""
 
     /// Roles which this user belongs to.
-    let roles = LinkingObjects(fromType: PermissionRole.self, property: "users")
+    public let roles = LinkingObjects(fromType: PermissionRole.self, property: "users")
 
     /// :nodoc:
     @objc override public class func _realmObjectName() -> String {
