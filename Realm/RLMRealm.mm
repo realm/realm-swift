@@ -870,7 +870,7 @@ static bool hasPrivilege(realm::ComputedPrivileges actual, realm::ComputedPrivil
     return {
         .read = hasPrivilege(p, Privilege::Read),
         .update = hasPrivilege(p, Privilege::Update),
-        .setPermissions = hasPrivilege(p, Privilege::Delete),
+        .setPermissions = hasPrivilege(p, Privilege::SetPermissions),
         .modifySchema = hasPrivilege(p, Privilege::ModifySchema),
     };
 }
@@ -898,7 +898,7 @@ static bool hasPrivilege(realm::ComputedPrivileges actual, realm::ComputedPrivil
     return {
         .read = hasPrivilege(p, Privilege::Read),
         .update = hasPrivilege(p, Privilege::Update),
-        .setPermissions = hasPrivilege(p, Privilege::Delete),
+        .setPermissions = hasPrivilege(p, Privilege::SetPermissions),
         .subscribe = hasPrivilege(p, Privilege::Query),
         .create = hasPrivilege(p, Privilege::Create),
     };

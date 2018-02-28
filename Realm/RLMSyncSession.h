@@ -161,6 +161,12 @@ NS_REFINED_FOR_SWIFT;
  */
 + (void)immediatelyHandleError:(RLMSyncErrorActionToken *)token;
 
+/**
+ Get the sync session for the given Realm if it is a synchronized Realm, or `nil`
+ if it is not.
+ */
++ (nullable RLMSyncSession *)sessionForRealm:(RLMRealm *)realm;
+
 @end
 
 // MARK: - Error action token

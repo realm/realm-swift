@@ -157,6 +157,9 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncAuthError, RLMSyncAuthErrorDomain) {
     /// An error that indicates a problem with the session (a specific Realm opened for sync).
     RLMSyncAuthErrorClientSessionError              = 4,
 
+    /// An error that indicates that the provided credentials are ill-formed.
+    RLMSyncAuthErrorInvalidParameters               = 601,
+
     /// An error that indicates that the provided credentials are invalid.
     RLMSyncAuthErrorInvalidCredential               = 611,
 

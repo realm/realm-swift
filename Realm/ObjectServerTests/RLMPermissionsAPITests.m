@@ -19,7 +19,6 @@
 #import <XCTest/XCTest.h>
 
 // FIXME: Many permission tests appears to fail with the ROS 3.0.0 alpha releases.
-#if 0
 
 #import "RLMSyncTestCase.h"
 
@@ -1195,5 +1194,3 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 }
 
 @end
-
-#endif

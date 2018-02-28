@@ -199,7 +199,8 @@ static NSURL *syncDirectoryForChildProcess() {
                         ];
     // Need to set the environment variables to bypass the mandatory email prompt.
     _task.environment = @{@"ROS_TOS_EMAIL_ADDRESS": @"ci@realm.io",
-                          @"DOCKER_DATA_PATH": @"/tmp"};
+                          @"DOCKER_DATA_PATH": @"/tmp",
+                          @"REALM_DISABLE_SYNC_TO_DISK": @"true"};
 
     _task.standardOutput = pipe;
     _task.standardError = pipe;
@@ -227,11 +228,8 @@ static NSURL *syncDirectoryForChildProcess() {
 
 #pragma mark - Helper methods
 
-+ (NSURL *)rootRealmCocoaURL {
-    return [[[[NSURL fileURLWithPath:@(__FILE__)]
-              URLByDeletingLastPathComponent]
-             URLByDeletingLastPathComponent]
-            URLByDeletingLastPathComponent];
+- (BOOL)isPartial {
+    return NO;
 }
 
 + (NSURL *)authServerURL {
@@ -353,10 +351,13 @@ static NSURL *syncDirectoryForChildProcess() {
                                     user:(RLMSyncUser *)user
                            encryptionKey:(NSData *)encryptionKey
                               stopPolicy:(RLMSyncStopPolicy)stopPolicy {
-    RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
-    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
-    c.syncConfiguration.stopPolicy = stopPolicy;
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    syncConfig.stopPolicy = stopPolicy;
+    syncConfig.isPartial = [self isPartial];
+
+    auto c = [RLMRealmConfiguration defaultConfiguration];
     c.encryptionKey = encryptionKey;
+    c.syncConfiguration = syncConfig;
     return [RLMRealm realmWithConfiguration:c error:nil];
 }
 
@@ -387,7 +388,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                   server:url];
 }
 
-+ (NSString *)retrieveAdminToken {
+- (NSString *)adminToken {
 #if PROVIDING_OWN_ROS
 #ifdef OWN_ROS_ADMIN_TOKEN
     return OWN_ROS_ADMIN_TOKEN;
@@ -396,8 +397,8 @@ static NSURL *syncDirectoryForChildProcess() {
     return nil;
 #endif
 #else
-    NSString *adminTokenPath = @"test-ros-instance/data/keys/admin.json";
-    NSURL *target = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:adminTokenPath];
+    NSURL *target = [RealmObjectServer.sharedServer.serverDataRoot
+                     URLByAppendingPathComponent:@"/data/keys/admin.json"];
     if (![[NSFileManager defaultManager] fileExistsAtPath:[target path]]) {
         XCTFail(@"Could not find the JSON file containing the admin token.");
         return nil;
@@ -412,8 +413,12 @@ static NSURL *syncDirectoryForChildProcess() {
 #endif
 }
 
-- (void)waitForDownloadsForUser:(RLMSyncUser *)user url:(NSURL *)url {
-    [self waitForDownloadsForUser:user url:url expectation:nil error:nil];
+- (void)waitForDownloadsForRealm:(RLMRealm *)realm {
+    [self waitForDownloadsForRealm:realm error:nil];
+}
+
+- (void)waitForUploadsForRealm:(RLMRealm *)realm {
+    [self waitForUploadsForRealm:realm error:nil];
 }
 
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
@@ -422,13 +427,12 @@ static NSURL *syncDirectoryForChildProcess() {
                           error:(NSError **)error {
     RLMSyncSession *session = [user sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
-    XCTestExpectation *ex = expectation ?: [self expectationWithDescription:@"Download waiter expectation"];
+    XCTestExpectation *ex = expectation ?: [self expectationWithDescription:@"Wait for download completion"];
     __block NSError *theError = nil;
-    BOOL queued = [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                   callback:^(NSError *err){
-                                                       theError = err;
-                                                       [ex fulfill];
-                                                   }];
+    BOOL queued = [session waitForDownloadCompletionOnQueue:nil callback:^(NSError *err) {
+        theError = err;
+        [ex fulfill];
+    }];
     if (!queued) {
         XCTFail(@"Download waiter did not queue; session was invalid or errored out.");
         return;
@@ -439,30 +443,38 @@ static NSURL *syncDirectoryForChildProcess() {
     }
 }
 
-- (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url {
-    [self waitForUploadsForUser:user url:url error:nil];
-}
-
-- (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url error:(NSError **)error {
-    RLMSyncSession *session = [user sessionForURL:url];
-    NSAssert(session, @"Cannot call with invalid URL");
-    XCTestExpectation *ex = [self expectationWithDescription:@"Upload waiter expectation"];
-    __block NSError *theError = nil;
-    BOOL queued = [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                 callback:^(NSError *err){
-                                                     theError = err;
-                                                     [ex fulfill];
-                                                 }];
+- (void)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)outError {
+    RLMSyncSession *session = [RLMSyncSession sessionForRealm:realm];
+    NSAssert(session, @"Cannot call with invalid Realm");
+    XCTestExpectation *ex = [self expectationWithDescription:@"Wait for upload completion"];
+    BOOL queued = [session waitForUploadCompletionOnQueue:nil callback:^(NSError *error) {
+        if (outError) {
+            *outError = error;
+        }
+        [ex fulfill];
+    }];
     if (!queued) {
         XCTFail(@"Upload waiter did not queue; session was invalid or errored out.");
         return;
     }
-    // FIXME: If tests involving `HugeSyncObject` are more reliable after July 2017, file an issue against sync
-    // regarding performance of ROS.
-    [self waitForExpectations:@[ex] timeout:20.0];
-    if (error) {
-        *error = theError;
+    [self waitForExpectations:@[ex] timeout:2.0];
+}
+
+- (void)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)outError {
+    RLMSyncSession *session = [RLMSyncSession sessionForRealm:realm];
+    NSAssert(session, @"Cannot call with invalid Realm");
+    XCTestExpectation *ex = [self expectationWithDescription:@"Wait for download completion"];
+    BOOL queued = [session waitForDownloadCompletionOnQueue:nil callback:^(NSError *error) {
+        if (outError) {
+            *outError = error;
+        }
+        [ex fulfill];
+    }];
+    if (!queued) {
+        XCTFail(@"Download waiter did not queue; session was invalid or errored out.");
+        return;
     }
+    [self waitForExpectations:@[ex] timeout:2.0];
 }
 
 - (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue {
@@ -494,9 +506,10 @@ static NSURL *syncDirectoryForChildProcess() {
     else {
         clientDataRoot = syncDirectoryForChildProcess();
     }
-    [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:nil];
+    NSError *error;
+    [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:&error];
     [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
-                           withIntermediateDirectories:YES attributes:nil error:nil];
+                           withIntermediateDirectories:YES attributes:nil error:&error];
     s_managerForTest = [[RLMSyncManager alloc] initWithCustomRootDirectory:clientDataRoot];
     [RLMSyncManager sharedManager].logLevel = RLMSyncLogLevelOff;
 }
