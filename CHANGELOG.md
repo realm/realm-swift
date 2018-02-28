@@ -1,3 +1,23 @@
+3.2.0-beta.2 Release notes (2018-02-28)
+=============================================================
+
+Realm Object Server v3.0.0-alpha.8 or newer is required when using synchronized Realms.
+
+### Enhancements
+
+* Added `findOrCreate(forRoleNamed:)` and `findOrCreate(forRole:)` to `List<Permission>`
+  to simplify the process of adding permissions for a role.
+* Added `+permissionForRoleNamed:inArray:`, `+permissionForRoleNamed:onRealm:`,
+  `+permissionForRoleNamed:onClass:realm:`, `+permissionForRoleNamed:onClassNamed:realm:`,
+  and `+permissionForRoleNamed:onObject:` to `RLMSyncPermission` to simplify the process
+  of adding permissions for a role.
+* Added `+[RLMSyncSession sessionForRealm:]` to retrieve the sync session corresponding to a `RLMRealm`.
+
+### Bugfixes
+
+* `PermissionRole.users` and `PermissionUser.roles` are now public as intended.
+* Fixed the handling of `setPermissions` in `-[RLMRealm privilegesForRealm]` and related methods.
+
 3.2.0-beta.1 Release notes (2018-02-19)
 =============================================================
 
