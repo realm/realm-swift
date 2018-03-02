@@ -1,3 +1,20 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+Realm Object Server v3.0.0-alpha.9 or newer is required when using synchronized Realms.
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix a crash that would occur when using partial sync with Realm Object Server v3.0.0-alpha.9.
+
 3.2.0-beta.2 Release notes (2018-02-28)
 =============================================================
 
