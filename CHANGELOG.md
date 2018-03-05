@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix incorrect initalization of `RLMSyncManager` that made it impossible to
+  set `errorHandler`.
+
 3.2.0-beta.3 Release notes (2018-03-01)
 =============================================================
 
