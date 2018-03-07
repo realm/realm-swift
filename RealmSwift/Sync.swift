@@ -249,6 +249,26 @@ public struct SyncConfiguration {
         self.enableSSLValidation = enableSSLValidation
         self.isPartial = isPartial
     }
+
+    /**
+     Return a Realm configuration for syncing with the default Realm of the currently logged-in sync user.
+
+     Partial synchronization is enabled in the returned configuration.
+
+     - requires: There be exactly one logged-in `SyncUser`
+     */
+    public static func automatic() -> Realm.Configuration {
+        return ObjectiveCSupport.convert(object: RLMSyncConfiguration.automaticConfiguration())
+    }
+
+    /**
+     Return a Realm configuration for syncing with the default Realm of the given sync user.
+
+     Partial synchronization is enabled in the returned configuration.
+    */
+    public static func automatic(user: SyncUser) -> Realm.Configuration {
+        return ObjectiveCSupport.convert(object: RLMSyncConfiguration.automaticConfiguration(for: user))
+    }
 }
 
 /// A `SyncCredentials` represents data that uniquely identifies a Realm Object Server user.

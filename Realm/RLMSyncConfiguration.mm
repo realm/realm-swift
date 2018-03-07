@@ -18,6 +18,7 @@
 
 #import "RLMSyncConfiguration_Private.hpp"
 
+#import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncSessionRefreshHandle.hpp"
@@ -194,6 +195,25 @@ static BOOL isValidRealmURL(NSURL *url) {
         return self;
     }
     return nil;
+}
+
++ (RLMRealmConfiguration *)automaticConfiguration {
+    if (RLMSyncUser.allUsers.count != 1)
+        @throw RLMException(@"The automatic configuration requires there be exactly one logged-in sync user.");
+
+    return [RLMSyncConfiguration automaticConfigurationForUser:RLMSyncUser.currentUser];
+}
+
++ (RLMRealmConfiguration *)automaticConfigurationForUser:(RLMSyncUser *)user {
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user
+                                                                         realmURL:user.defaultRealmURL
+                                                                    customFileURL:nil
+                                                                        isPartial:YES
+                                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                                                                     errorHandler:nullptr];
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    config.syncConfiguration = syncConfig;
+    return config;
 }
 
 @end
