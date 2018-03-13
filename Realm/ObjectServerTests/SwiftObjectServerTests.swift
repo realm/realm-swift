@@ -417,12 +417,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 #if swift(>=3.2)
     func testPartialSync() {
         autoreleasepool {
-            let credentials = basicCredentials(register: true)
-            let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
-
             // Log in and populate the Realm.
             autoreleasepool {
-                let syncConfig = SyncConfiguration(user: user, realmURL: realmURL)
+                let credentials = SyncCredentials.usernamePassword(username: "Swift.testPartialSync", password: "a", register: true)
+                let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
+                let syncConfig = SyncConfiguration(user: user, realmURL: realmURL, isPartial: true)
                 let configuration = Realm.Configuration(syncConfiguration: syncConfig)
                 let realm = try! synchronouslyOpenRealm(configuration: configuration)
 
@@ -454,6 +453,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             // Log back in and do partial sync stuff.
             autoreleasepool {
+                let credentials = SyncCredentials.usernamePassword(username: "Swift.testPartialSync", password: "a")
+                let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
                 let syncConfig = SyncConfiguration(user: user, realmURL: realmURL, isPartial: true)
                 let configuration = Realm.Configuration(syncConfiguration: syncConfig)
                 let realm = try! synchronouslyOpenRealm(configuration: configuration)
