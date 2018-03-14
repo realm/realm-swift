@@ -183,7 +183,7 @@
         [expectation fulfill];
     };
 
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
 }
 
 /// The pre-emptive token refresh subsystem should function, and properly refresh the token.
