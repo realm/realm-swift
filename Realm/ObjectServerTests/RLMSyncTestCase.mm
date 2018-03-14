@@ -199,9 +199,11 @@ static NSURL *syncDirectoryForChildProcess() {
                         #endif
                         ];
     // Need to set the environment variables to bypass the mandatory email prompt.
+    // ROS_SUPERAGENT_RETRY_DELAY is a workaround for <https://github.com/realm/realm-object-server-private/issues/950>.
     _task.environment = @{@"ROS_TOS_EMAIL_ADDRESS": @"ci@realm.io",
                           @"DOCKER_DATA_PATH": @"/tmp",
-                          @"REALM_DISABLE_SYNC_TO_DISK": @"true"};
+                          @"REALM_DISABLE_SYNC_TO_DISK": @"true",
+                          @"ROS_SUPERAGENT_RETRY_DELAY": @"0" };
 
     _task.standardOutput = pipe;
     _task.standardError = pipe;
