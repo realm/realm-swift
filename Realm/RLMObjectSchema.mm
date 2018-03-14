@@ -28,6 +28,7 @@
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
 
+#import "object_schema.hpp"
 #import "object_store.hpp"
 
 using namespace realm;
@@ -78,7 +79,9 @@ using namespace realm;
             self.primaryKeyProperty = prop;
         }
     }
+    index = 0;
     for (RLMProperty *prop in _computedProperties) {
+        prop.index = index++;
         map[prop.name] = prop;
     }
     _allPropertiesByName = map;
@@ -176,6 +179,7 @@ using namespace realm;
     Class objectUtil = [objectClass objectUtilClass:isSwiftClass];
     NSArray *ignoredProperties = [objectUtil ignoredPropertiesForClass:objectClass];
     NSDictionary *linkingObjectsProperties = [objectUtil linkingObjectsPropertiesForClass:objectClass];
+    NSDictionary *columnNameMap = [objectClass _realmColumnNames];
 
     // For Swift classes we need an instance of the object when parsing properties
     id swiftObjectInstance = isSwiftClass ? [[objectClass alloc] init] : nil;
@@ -206,12 +210,16 @@ using namespace realm;
         }
 
         if (prop) {
+            if (columnNameMap) {
+                prop.columnName = columnNameMap[prop.name];
+            }
             [propArray addObject:prop];
         }
     }
 
     if (isSwiftClass) {
-        [self addSwiftProperties:propArray objectUtil:objectUtil instance:swiftObjectInstance indexed:indexed];
+        [self addSwiftProperties:propArray objectUtil:objectUtil instance:swiftObjectInstance
+                         indexed:indexed nameMap:columnNameMap];
     }
 
     if (auto requiredProperties = [objectUtil requiredPropertiesForClass:objectClass]) {
@@ -238,7 +246,8 @@ using namespace realm;
 + (void)addSwiftProperties:(NSMutableArray<RLMProperty *> *)propArray
                 objectUtil:(Class)objectUtil
                   instance:(id)instance
-                   indexed:(NSSet<NSString *> *)indexed {
+                   indexed:(NSSet<NSString *> *)indexed
+                   nameMap:(NSDictionary<NSString *, NSString *> *)columnNameMap {
     // The property list reported to the obj-c runtime for Swift objects is
     // incomplete and doesn't include Swift generics like List<> and
     // RealmOptional<>, and is missing information for some properties that
@@ -263,19 +272,17 @@ using namespace realm;
             return [obj.name isEqualToString:md.propertyName];
         }];
 
+        RLMProperty *prop;
         switch (md.kind) {
             case RLMSwiftPropertyKindList: // List<>
-                [propArray insertObject:[[RLMProperty alloc] initSwiftListPropertyWithName:md.propertyName
-                                                                                  instance:instance]
-                                atIndex:nextIndex];
+                prop = [[RLMProperty alloc] initSwiftListPropertyWithName:md.propertyName instance:instance];
                 break;
             case RLMSwiftPropertyKindLinkingObjects: { // LinkingObjects<>
                 Ivar ivar = class_getInstanceVariable([instance class], md.propertyName.UTF8String);
-                [propArray insertObject:[[RLMProperty alloc] initSwiftLinkingObjectsPropertyWithName:md.propertyName
-                                                                                                ivar:ivar
-                                                                                     objectClassName:md.className
-                                                                              linkOriginPropertyName:md.linkedPropertyName]
-                                atIndex:nextIndex];
+                prop = [[RLMProperty alloc] initSwiftLinkingObjectsPropertyWithName:md.propertyName
+                                                                               ivar:ivar
+                                                                    objectClassName:md.className
+                                                             linkOriginPropertyName:md.linkedPropertyName];
                 break;
             }
             case RLMSwiftPropertyKindOptional: {
@@ -288,12 +295,10 @@ using namespace realm;
 
                 // RealmOptional<>
                 Ivar ivar = class_getInstanceVariable([instance class], md.propertyName.UTF8String);
-                BOOL isIndexed = [indexed containsObject:md.propertyName];
-                [propArray insertObject:[[RLMProperty alloc] initSwiftOptionalPropertyWithName:md.propertyName
-                                                                                       indexed:isIndexed
-                                                                                          ivar:ivar
-                                                                                  propertyType:md.propertyType]
-                                atIndex:nextIndex];
+                prop = [[RLMProperty alloc] initSwiftOptionalPropertyWithName:md.propertyName
+                                                                      indexed:[indexed containsObject:md.propertyName]
+                                                                         ivar:ivar
+                                                                 propertyType:md.propertyType];
                 break;
             }
 
@@ -317,6 +322,13 @@ using namespace realm;
                     propArray[existing].optional = false;
                 }
                 break;
+        }
+
+        if (prop) {
+            if (columnNameMap) {
+                prop.columnName = columnNameMap[prop.name];
+            }
+            [propArray insertObject:prop atIndex:nextIndex];
         }
 
         ++nextIndex;
@@ -369,17 +381,17 @@ using namespace realm;
     return [self.objectClass _realmObjectName] ?: _className;
 }
 
-- (realm::ObjectSchema)objectStoreCopy {
+- (realm::ObjectSchema)objectStoreCopy:(RLMSchema *)schema {
     ObjectSchema objectSchema;
     objectSchema.name = self.objectName.UTF8String;
-    objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.name.UTF8String : "";
+    objectSchema.primary_key = _primaryKeyProperty ? _primaryKeyProperty.columnName.UTF8String : "";
     for (RLMProperty *prop in _properties) {
-        Property p = [prop objectStoreCopy];
+        Property p = [prop objectStoreCopy:schema];
         p.is_primary = (prop == _primaryKeyProperty);
         objectSchema.persisted_properties.push_back(std::move(p));
     }
     for (RLMProperty *prop in _computedProperties) {
-        objectSchema.computed_properties.push_back([prop objectStoreCopy]);
+        objectSchema.computed_properties.push_back([prop objectStoreCopy:schema]);
     }
     return objectSchema;
 }

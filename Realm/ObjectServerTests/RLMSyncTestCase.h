@@ -40,8 +40,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (RLMSyncManager *)managerForCurrentTest;
 
-+ (NSURL *)rootRealmCocoaURL;
-
 + (NSURL *)authServerURL;
 
 + (RLMSyncCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
@@ -49,7 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm;
 
 /// Retrieve the administrator token.
-+ (NSString *)retrieveAdminToken;
+- (NSString *)adminToken;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
@@ -106,10 +104,12 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)primeSyncManagerWithSemaphore:(nullable dispatch_semaphore_t)semaphore;
 
 /// Wait for downloads to complete; drop any error.
-- (void)waitForDownloadsForUser:(RLMSyncUser *)user url:(NSURL *)url;
+- (void)waitForDownloadsForRealm:(RLMRealm *)realm;
+- (void)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)error;
 
 /// Wait for uploads to complete; drop any error.
-- (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url;
+- (void)waitForUploadsForRealm:(RLMRealm *)realm;
+- (void)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)error;
 
 /// Wait for downloads to complete while spinning the runloop. This method uses expectations.
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
@@ -117,27 +117,9 @@ NS_ASSUME_NONNULL_BEGIN
                     expectation:(nullable XCTestExpectation *)expectation
                           error:(NSError **)error;
 
-/// Wait for uploads to complete while spinning the runloop. This method uses expectations.
-- (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url error:(NSError **)error;
-
 /// Manually set the refresh token for a user. Used for testing invalid token conditions.
 - (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue;
 
-@end
-
-#pragma mark - Test objects
-
-@interface PartialSyncObjectA : RLMObject
-@property NSInteger number;
-@property NSString *string;
-+ (instancetype)objectWithNumber:(NSInteger)number string:(NSString *)string;
-@end
-
-@interface PartialSyncObjectB : RLMObject
-@property NSInteger number;
-@property NSString *firstString;
-@property NSString *secondString;
-+ (instancetype)objectWithNumber:(NSInteger)number firstString:(NSString *)first secondString:(NSString *)second;
 @end
 
 NS_ASSUME_NONNULL_END
@@ -155,26 +137,4 @@ NS_ASSUME_NONNULL_END
     NSInteger c = [macro_object_type allObjectsInRealm:macro_realm].count;                              \
     NSString *w = self.isParent ? @"parent" : @"child";                                                 \
     XCTAssert(d_count == c, @"Expected %@ items, but actually got %@ (%@)", @(d_count), @(c), w);       \
-}
-
-#define CHECK_COUNT_PENDING_DOWNLOAD(expected_count, m_type, m_realm) \
-CHECK_COUNT_PENDING_DOWNLOAD_CUSTOM_EXPECTATION(expected_count, m_type, m_realm, nil)
-
-/// This macro tries ten times to wait for downloads and then check for object count.
-/// If the object count does not match, it waits 0.1 second before trying again.
-/// It is most useful in cases where the test ROS might be expected to take some
-/// non-negligible amount of time performing an operation whose completion is required
-/// for the test on the client side to proceed.
-#define CHECK_COUNT_PENDING_DOWNLOAD_CUSTOM_EXPECTATION(expected_count, m_type, m_realm, m_exp)                        \
-{                                                                                                                      \
-    RLMSyncConfiguration *m_config = m_realm.configuration.syncConfiguration;                                          \
-    XCTAssertNotNil(m_config, @"Realm passed to CHECK_COUNT_PENDING_DOWNLOAD() doesn't have a sync config!");          \
-    RLMSyncUser *m_user = m_config.user;                                                                               \
-    NSURL *m_url = m_config.realmURL;                                                                                  \
-    for (int i=0; i<10; i++) {                                                                                         \
-        [self waitForDownloadsForUser:m_user url:m_url expectation:m_exp error:nil];                                   \
-        if (expected_count == [m_type allObjectsInRealm:m_realm].count) { break; }                                     \
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];                           \
-    }                                                                                                                  \
-    CHECK_COUNT(expected_count, m_type, m_realm);                                                                      \
 }

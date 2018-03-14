@@ -525,7 +525,11 @@ extension List: RealmCollection {
 #if swift(>=4.0)
 // MARK: - MutableCollection conformance, range replaceable collection emulation
 extension List: MutableCollection {
+#if swift(>=4.1)
+    public typealias SubSequence = Slice<List>
+#else
     public typealias SubSequence = RandomAccessSlice<List>
+#endif
 
     /**
      Returns the objects at the given range (get), or replaces the objects at the
@@ -670,7 +674,9 @@ extension List: RangeReplaceableCollection {
         _rlmArray.removeLastObject()
     }
 
-#if swift(>=3.1)
+#if swift(>=3.2)
+    // The issue described below is fixed in Swift 3.2 and above.
+#elseif swift(>=3.1)
     // These should not be necessary, but Swift 3.1's compiler fails to infer the `SubSequence`,
     // and the standard library neglects to provide the default implementation of `subscript`
     /// :nodoc:

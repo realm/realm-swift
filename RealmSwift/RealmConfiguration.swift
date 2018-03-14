@@ -228,7 +228,7 @@ extension Realm {
             } else {
                 configuration.shouldCompactOnLaunch = nil
             }
-            configuration.customSchema = self.customSchema
+            configuration.setCustomSchemaWithoutCopying(self.customSchema)
             configuration.disableFormatUpgrade = self.disableFormatUpgrade
             return configuration
         }

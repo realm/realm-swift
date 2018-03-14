@@ -136,7 +136,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
             theError = error
             ex.fulfill()
         }
-        waitForExpectations(timeout: 4, handler: nil)
+        waitForExpectations(timeout: 10, handler: nil)
         XCTAssertNotNil(theUser, file: file, line: line)
         XCTAssertEqual(theUser?.state, .active,
                        "User should have been valid, but wasn't. (process: \(process), error: "
@@ -144,6 +144,14 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                        file: file,
                        line: line)
         return theUser!
+    }
+
+    func waitForUploads(for realm: Realm) {
+        waitForUploads(for: ObjectiveCSupport.convert(object: realm))
+    }
+
+    func waitForDownloads(for realm: Realm) {
+        waitForDownloads(for: ObjectiveCSupport.convert(object: realm))
     }
 
     func checkCount<T: Object>(expected: Int,

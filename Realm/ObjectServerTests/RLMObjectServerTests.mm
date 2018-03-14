@@ -26,6 +26,40 @@
 #import "RLMRealmUtil.hpp"
 #import "RLMRealm_Dynamic.h"
 
+#pragma mark - Test objects
+
+@interface PartialSyncObjectA : RLMObject
+@property NSInteger number;
+@property NSString *string;
++ (instancetype)objectWithNumber:(NSInteger)number string:(NSString *)string;
+@end
+
+@interface PartialSyncObjectB : RLMObject
+@property NSInteger number;
+@property NSString *firstString;
+@property NSString *secondString;
++ (instancetype)objectWithNumber:(NSInteger)number firstString:(NSString *)first secondString:(NSString *)second;
+@end
+
+@implementation PartialSyncObjectA
++ (instancetype)objectWithNumber:(NSInteger)number string:(NSString *)string {
+    PartialSyncObjectA *object = [[PartialSyncObjectA alloc] init];
+    object.number = number;
+    object.string = string;
+    return object;
+}
+@end
+
+@implementation PartialSyncObjectB
++ (instancetype)objectWithNumber:(NSInteger)number firstString:(NSString *)first secondString:(NSString *)second {
+    PartialSyncObjectB *object = [[PartialSyncObjectB alloc] init];
+    object.number = number;
+    object.firstString = first;
+    object.secondString = second;
+    return object;
+}
+@end
+
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
 
@@ -51,8 +85,7 @@
 
 /// A valid admin token should be able to log in a user.
 - (void)testAdminTokenAuthentication {
-    NSString *adminToken = [RLMSyncTestCase retrieveAdminToken];
-    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken identity:@"test"];
+    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:self.adminToken identity:@"test"];
     XCTAssertNotNil(credentials);
 
     RLMSyncUser *user = [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
@@ -440,7 +473,8 @@
                            completion:^(RLMSyncUserInfo *info, NSError *err) {
                                XCTAssertNotNil(err);
                                XCTAssertEqualObjects(err.domain, RLMSyncAuthErrorDomain);
-                               XCTAssertEqual(err.code, RLMSyncAuthErrorAccessDeniedOrInvalidPath);
+                               // FIXME: Shouldn't this be RLMSyncAuthErrorAccessDeniedOrInvalidPath?
+                               XCTAssertEqual(err.code, RLMSyncAuthErrorUserDoesNotExist);
                                XCTAssertNil(info);
                                [ex4 fulfill];
                            }];
@@ -553,8 +587,7 @@
 - (void)testOpenRealmWithAdminToken {
     // FIXME (tests): opening a Realm with the access token, then opening a Realm at the same virtual path
     // with normal credentials, causes Realms to fail to bind with a "bad virtual path" error.
-    NSString *adminToken = [RLMSyncTestCase retrieveAdminToken];
-    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:adminToken identity:@"test"];
+    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:self.adminToken identity:@"test"];
     XCTAssertNotNil(credentials);
     RLMSyncUser *user = [self logInUserForCredentials:credentials
                                                server:[RLMObjectServerTests authServerURL]];
@@ -591,7 +624,7 @@
     } else {
         // Add objects.
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
@@ -606,18 +639,18 @@
     if (self.isParent) {
         // Add objects.
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1", @"parent-2", @"parent-3"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(3, SyncObject, realm);
         RLMRunChildAndWait();
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(0, SyncObject, realm);
     } else {
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(3, SyncObject, realm);
         [realm beginWriteTransaction];
         [realm deleteAllObjects];
         [realm commitWriteTransaction];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(0, SyncObject, realm);
     }
 }
@@ -641,7 +674,7 @@
     } else {
         // Add objects.
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
@@ -678,7 +711,7 @@
         RLMRealm *realm = [self openRealmForURL:url user:user encryptionKey:RLMGenerateKey()
                                      stopPolicy:RLMSyncStopPolicyImmediately immediatelyBlock:nil];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
@@ -719,9 +752,9 @@
     RLMRealm *realmB = [self openRealmForURL:urlB user:user];
     RLMRealm *realmC = [self openRealmForURL:urlC user:user];
     if (self.isParent) {
-        [self waitForDownloadsForUser:user url:urlA];
-        [self waitForDownloadsForUser:user url:urlB];
-        [self waitForDownloadsForUser:user url:urlC];
+        [self waitForDownloadsForRealm:realmA];
+        [self waitForDownloadsForRealm:realmB];
+        [self waitForDownloadsForRealm:realmC];
         CHECK_COUNT(0, SyncObject, realmA);
         CHECK_COUNT(0, SyncObject, realmB);
         CHECK_COUNT(0, SyncObject, realmC);
@@ -738,9 +771,9 @@
                        descriptions:@[@"child-B1", @"child-B2"]];
         [self addSyncObjectsToRealm:realmC
                        descriptions:@[@"child-C1", @"child-C2", @"child-C3", @"child-C4", @"child-C5"]];
-        [self waitForUploadsForUser:user url:urlA];
-        [self waitForUploadsForUser:user url:urlB];
-        [self waitForUploadsForUser:user url:urlC];
+        [self waitForUploadsForRealm:realmA];
+        [self waitForUploadsForRealm:realmB];
+        [self waitForUploadsForRealm:realmC];
         CHECK_COUNT(3, SyncObject, realmA);
         CHECK_COUNT(2, SyncObject, realmB);
         CHECK_COUNT(5, SyncObject, realmC);
@@ -759,9 +792,9 @@
     RLMRealm *realmB = [self openRealmForURL:urlB user:user];
     RLMRealm *realmC = [self openRealmForURL:urlC user:user];
     if (self.isParent) {
-        [self waitForDownloadsForUser:user url:urlA];
-        [self waitForDownloadsForUser:user url:urlB];
-        [self waitForDownloadsForUser:user url:urlC];
+        [self waitForDownloadsForRealm:realmA];
+        [self waitForDownloadsForRealm:realmB];
+        [self waitForDownloadsForRealm:realmC];
         // Add objects.
         [self addSyncObjectsToRealm:realmA
                        descriptions:@[@"parent-A1", @"parent-A2", @"parent-A3", @"parent-A4"]];
@@ -769,9 +802,9 @@
                        descriptions:@[@"parent-B1", @"parent-B2", @"parent-B3", @"parent-B4", @"parent-B5"]];
         [self addSyncObjectsToRealm:realmC
                        descriptions:@[@"parent-C1", @"parent-C2"]];
-        [self waitForUploadsForUser:user url:urlA];
-        [self waitForUploadsForUser:user url:urlB];
-        [self waitForUploadsForUser:user url:urlC];
+        [self waitForUploadsForRealm:realmA];
+        [self waitForUploadsForRealm:realmB];
+        [self waitForUploadsForRealm:realmC];
         CHECK_COUNT(4, SyncObject, realmA);
         CHECK_COUNT(5, SyncObject, realmB);
         CHECK_COUNT(2, SyncObject, realmC);
@@ -782,9 +815,9 @@
                        expectedCounts:@[@0, @0, @0]];
     } else {
         // Delete all the objects from the Realms.
-        [self waitForDownloadsForUser:user url:urlA];
-        [self waitForDownloadsForUser:user url:urlB];
-        [self waitForDownloadsForUser:user url:urlC];
+        [self waitForDownloadsForRealm:realmA];
+        [self waitForDownloadsForRealm:realmB];
+        [self waitForDownloadsForRealm:realmC];
         CHECK_COUNT(4, SyncObject, realmA);
         CHECK_COUNT(5, SyncObject, realmB);
         CHECK_COUNT(2, SyncObject, realmC);
@@ -797,9 +830,9 @@
         [realmC beginWriteTransaction];
         [realmC deleteAllObjects];
         [realmC commitWriteTransaction];
-        [self waitForUploadsForUser:user url:urlA];
-        [self waitForUploadsForUser:user url:urlB];
-        [self waitForUploadsForUser:user url:urlC];
+        [self waitForUploadsForRealm:realmA];
+        [self waitForUploadsForRealm:realmB];
+        [self waitForUploadsForRealm:realmC];
         CHECK_COUNT(0, SyncObject, realmA);
         CHECK_COUNT(0, SyncObject, realmB);
         CHECK_COUNT(0, SyncObject, realmC);
@@ -837,7 +870,7 @@
     } else {
         RLMRealm *realm = [self openRealmForURL:url user:user];
         // Wait for download to complete.
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(OBJECT_COUNT, SyncObject, realm);
     }
 }
@@ -856,7 +889,7 @@
     if (self.isParent) {
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1"]];
         CHECK_COUNT(1, SyncObject, realm);
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         // Log out the user.
         [user logOut];
         // Log the user back in.
@@ -864,11 +897,11 @@
                                                                                    register:NO]
                                       server:[RLMObjectServerTests authServerURL]];
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-2", @"parent-3"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(3, SyncObject, realm);
         RLMRunChildAndWait();
     } else {
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
@@ -885,7 +918,7 @@
     if (self.isParent) {
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1"]];
         CHECK_COUNT(1, SyncObject, realm);
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         // Log out the user.
         [user logOut];
         // Log the user back in.
@@ -893,12 +926,12 @@
                                                                                    register:NO]
                                       server:[RLMObjectServerTests authServerURL]];
         RLMRunChildAndWait();
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(3, SyncObject, realm);
     } else {
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForDownloadsForRealm:realm];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
@@ -929,13 +962,13 @@
         // Wait for the Realm's session to be bound.
         WAIT_FOR_SEMAPHORE(sema, 30);
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-2", @"parent-3"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(3, SyncObject, realm);
         RLMRunChildAndWait();
     } else {
         RLMRealm *realm = [self openRealmForURL:url user:user];
         XCTAssertNil(error, @"Error when opening Realm: %@", error);
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
@@ -970,7 +1003,7 @@
         RLMRealm *realm = [self openRealmForURL:url user:user];
         XCTAssertNil(error, @"Error when opening Realm: %@", error);
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
@@ -994,13 +1027,13 @@
         // Open the Realm (for the first time).
         RLMRealm *realm = [self openRealmForURL:url user:user];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(2, SyncObject, realm);
         RLMRunChildAndWait();
     } else {
         RLMRealm *realm = [self openRealmForURL:url user:user];
         // Add objects.
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(2, SyncObject, realm);
     }
 }
@@ -1025,14 +1058,14 @@
         RLMRealm *realm = [self openRealmForURL:url user:user];
         // Run the sub-test.
         RLMRunChildAndWait();
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(2, SyncObject, realm);
     } else {
         RLMRealm *realm = [self openRealmForURL:url user:user];
         // Add objects.
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForDownloadsForRealm:realm];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(2, SyncObject, realm);
     }
 }
@@ -1049,7 +1082,7 @@
     RLMRealm *realm = [self openRealmForURL:url user:user];
     if (self.isParent) {
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, SyncObject, realm);
         // Log out the user.
         [user logOut];
@@ -1061,10 +1094,10 @@
         realm = [self immediatelyOpenRealmForURL:url user:user];
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3", @"child-4"]];
         CHECK_COUNT(5, SyncObject, realm);
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         RLMRunChildAndWait();
     } else {
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(5, SyncObject, realm);
     }
 }
@@ -1081,7 +1114,7 @@
     RLMRealm *realm = [self openRealmForURL:url user:user];
     if (self.isParent) {
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         XCTAssert([SyncObject allObjectsInRealm:realm].count == 1, @"Expected 1 item");
         // Log out the user.
         [user logOut];
@@ -1096,10 +1129,10 @@
         [self waitForDownloadsForUser:user realms:@[realm] realmURLs:@[url] expectedCounts:@[@5]];
     } else {
         // Add objects.
-        [self waitForDownloadsForUser:user url:url];
+        [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(1, SyncObject, realm);
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3", @"child-4"]];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(5, SyncObject, realm);
     }
 }
@@ -1215,7 +1248,7 @@
             [realm addObject:[HugeSyncObject object]];
         }
         [realm commitWriteTransaction];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
     }
 }
@@ -1322,7 +1355,7 @@
             [realm addObject:[HugeSyncObject object]];
         }
         [realm commitWriteTransaction];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
     }
 }
@@ -1334,51 +1367,47 @@
     RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                                             register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
-    if (self.isParent) {
-        // Wait for the child process to upload everything.
-        RLMRunChildAndWait();
-        XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-        XCTestExpectation *ex2 = [self expectationWithDescription:@"wait for downloads after asyncOpen"];
-        RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
-        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
-        c.syncConfiguration = syncConfig;
-        XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
-        RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
-        CHECK_COUNT(0, HugeSyncObject, realm);
-        [RLMRealm asyncOpenWithConfiguration:c
-                               callbackQueue:dispatch_get_main_queue()
-                                    callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
-            XCTAssertNil(error);
-            // The big objects might take some time for the server to process,
-            // so we may need to ask it a few times before it's ready.
-            CHECK_COUNT_PENDING_DOWNLOAD_CUSTOM_EXPECTATION(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm, ex2);
-            [ex fulfill];
-        }];
-        NSUInteger (^fileSize)(NSString *) = ^NSUInteger(NSString *path) {
-            NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
-            if (attributes)
-                return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
-
-            return 0;
-        };
-        NSUInteger sizeBefore = fileSize(c.pathOnDisk);
-        XCTAssertGreaterThan(sizeBefore, 0U);
-        XCTAssertNotNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
-        [self waitForExpectationsWithTimeout:10.0 handler:nil];
-        XCTAssertGreaterThan(fileSize(c.pathOnDisk), sizeBefore);
-        XCTAssertNotNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
-        CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
-    } else {
+    if (!self.isParent) {
         RLMRealm *realm = [self openRealmForURL:url user:user];
         // Write lots of data to the Realm, then wait for it to be uploaded.
         [realm beginWriteTransaction];
-        for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
+        for (NSInteger i = 0; i < NUMBER_OF_BIG_OBJECTS; i++) {
             [realm addObject:[HugeSyncObject object]];
         }
         [realm commitWriteTransaction];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
+        return;
     }
+
+    // Wait for the child process to upload everything.
+    RLMRunChildAndWait();
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
+    RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
+    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
+    CHECK_COUNT(0, HugeSyncObject, realm);
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+        XCTAssertNil(error);
+        CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
+        [ex fulfill];
+    }];
+    auto fileSize = ^NSUInteger(NSString *path) {
+        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+        return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
+    };
+    NSUInteger sizeBefore = fileSize(c.pathOnDisk);
+    XCTAssertGreaterThan(sizeBefore, 0U);
+    XCTAssertNotNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    XCTAssertGreaterThan(fileSize(c.pathOnDisk), sizeBefore);
+    XCTAssertNotNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
+    CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
 }
 
 - (void)testDownloadWhileOpeningRealm {
@@ -1417,7 +1446,7 @@
             [realm addObject:[HugeSyncObject object]];
         }
         [realm commitWriteTransaction];
-        [self waitForUploadsForUser:user url:url];
+        [self waitForUploadsForRealm:realm];
         CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
     }
 }
@@ -1494,9 +1523,10 @@
         RLMSyncCredentials *creds = [RLMObjectServerTests basicCredentialsWithName:name register:YES];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:server];
         RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:realmURL];
+        syncConfig.isPartial = YES;
         RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
         configuration.syncConfiguration = syncConfig;
-        RLMRealm *realm = [self openRealmForURL:realmURL user:user];
+        RLMRealm *realm = [self openRealmWithConfiguration:configuration];
         [realm beginWriteTransaction];
         // FIXME: make this less hideous
         // Add ten of each object
@@ -1521,7 +1551,7 @@
         [realm addObject:[PartialSyncObjectB objectWithNumber:8 firstString:@"" secondString:@""]];
         [realm addObject:[PartialSyncObjectB objectWithNumber:9 firstString:@"" secondString:@""]];
         [realm commitWriteTransaction];
-        [self waitForUploadsForUser:user url:realmURL];
+        [self waitForUploadsForRealm:realm];
     }
 
     // Log back in and do partial sync stuff.
@@ -1533,24 +1563,40 @@
         RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
         configuration.syncConfiguration = syncConfig;
         RLMRealm *realm = [self openRealmWithConfiguration:configuration];
+
         // Perform some partial sync queries
-        XCTestExpectation *ex = [self expectationWithDescription:@"Should be able to successfully complete a query"];
-        __block RLMResults *objects = nil;
-        [realm subscribeToObjects:[PartialSyncObjectA class]
-                            where:@"number > 5"
-                           callback:^(RLMResults *results, NSError *error) {
-                               XCTAssertNil(error);
-                               XCTAssertNotNil(results);
-                               objects = results;
-                               [ex fulfill];
-                           }];
+        RLMResults *objects = [PartialSyncObjectA objectsInRealm:realm where:@"number > 5"];
+        RLMSyncSubscription *subscription = [objects subscribeWithName:@"query"];
+
+        // Wait for the results to become available.
+        XCTestExpectation *ex = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription expectedValue:@(RLMSyncSubscriptionStateComplete)];
         [self waitForExpectations:@[ex] timeout:20.0];
+
         // Verify that we got what we're looking for
-        XCTAssertTrue(objects.count == 4);
+        XCTAssertEqual(objects.count, 4U);
         for (PartialSyncObjectA *object in objects) {
-            XCTAssertTrue(object.number > 5);
-            XCTAssertTrue([object.string isEqualToString:@"partial"]);
+            XCTAssertGreaterThan(object.number, 5);
+            XCTAssertEqualObjects(object.string, @"partial");
         }
+
+        // Verify that we didn't get any other objects
+        XCTAssertEqual([PartialSyncObjectA allObjectsInRealm:realm].count, objects.count);
+        XCTAssertEqual([PartialSyncObjectB allObjectsInRealm:realm].count, 0u);
+
+
+        // Create a subscription with the same name but a different query. This should trigger an error.
+        RLMResults *objects2 = [PartialSyncObjectA objectsInRealm:realm where:@"number < 5"];
+        RLMSyncSubscription *subscription2 = [objects2 subscribeWithName:@"query"];
+
+        // Wait for the error to be reported.
+        XCTestExpectation *ex2 = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription2 expectedValue:@(RLMSyncSubscriptionStateError)];
+        [self waitForExpectations:@[ex2] timeout:20.0];
+        XCTAssertNotNil(subscription2.error);
+
+        // Unsubscribe from the query, and ensure that it correctly transitions to the invalidated state.
+        [subscription unsubscribe];
+        XCTestExpectation *ex3 = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription expectedValue:@(RLMSyncSubscriptionStateInvalidated)];
+        [self waitForExpectations:@[ex3] timeout:20.0];
     }
 }
 

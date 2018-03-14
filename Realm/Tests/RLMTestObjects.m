@@ -322,7 +322,63 @@
 
 @end
 
+@implementation RenamedProperties1
++ (NSString *)_realmObjectName {
+    return @"Renamed Properties";
+}
++ (NSDictionary *)_realmColumnNames {
+    return @{@"propA": @"prop 1",
+             @"propB": @"prop 2"};
+}
++ (NSDictionary *)linkingObjectsProperties {
+    return @{@"linking1": [RLMPropertyDescriptor descriptorWithClass:LinkToRenamedProperties1.class propertyName:@"linkA"],
+             @"linking2": [RLMPropertyDescriptor descriptorWithClass:LinkToRenamedProperties2.class propertyName:@"linkD"]};
+}
+@end
 
+@implementation RenamedProperties2
++ (NSString *)_realmObjectName {
+    return @"Renamed Properties";
+}
++ (NSDictionary *)_realmColumnNames {
+    return @{@"propC": @"prop 1",
+             @"propD": @"prop 2"};
+}
++ (NSDictionary *)linkingObjectsProperties {
+    return @{@"linking1": [RLMPropertyDescriptor descriptorWithClass:LinkToRenamedProperties1.class propertyName:@"linkA"],
+             @"linking2": [RLMPropertyDescriptor descriptorWithClass:LinkToRenamedProperties2.class propertyName:@"linkD"]};
+}
+@end
+
+@implementation LinkToRenamedProperties1
++ (NSString *)_realmObjectName {
+    return @"Link To Renamed Properties";
+}
++ (NSDictionary *)_realmColumnNames {
+    return @{@"linkA": @"Link A",
+             @"linkB": @"Link B"};
+}
+@end
+
+@implementation LinkToRenamedProperties2
++ (NSString *)_realmObjectName {
+    return @"Link To Renamed Properties";
+}
++ (NSDictionary *)_realmColumnNames {
+    return @{@"linkC": @"Link A",
+             @"linkD": @"Link B"};
+}
+@end
+
+@implementation RenamedPrimaryKey
++ (NSString *)primaryKey {
+    return @"pk";
+}
++ (NSDictionary *)_realmColumnNames {
+    return @{@"pk": @"Primary Key",
+             @"value": @"Value"};
+}
+@end
 
 #pragma mark FakeObject
 
@@ -335,6 +391,7 @@
 + (NSDictionary *)linkingObjectsProperties { return nil; }
 + (BOOL)shouldIncludeInDefaultSchema { return NO; }
 + (NSString *)_realmObjectName { return nil; }
++ (NSDictionary *)_realmColumnNames { return nil; }
 @end
 
 #pragma mark ComputedPropertyNotExplicitlyIgnoredObject

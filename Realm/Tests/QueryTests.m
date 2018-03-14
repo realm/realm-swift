@@ -2746,6 +2746,68 @@ struct NullTestData {
     [self testClass:[AllOptionalTypes class] withNormalCount:0U notCount:1U where:@"date IN %@", @[[NSDate dateWithTimeIntervalSince1970:1]]];
 }
 
+- (void)testQueryOnRenamedProperties {
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+    [RenamedProperties1 createInRealm:realm withValue:@[@1, @"a"]];
+    [RenamedProperties2 createInRealm:realm withValue:@[@2, @"b"]];
+    [realm commitWriteTransaction];
+
+    [self testClass:[RenamedProperties1 class] withNormalCount:2 notCount:0 where:@"propA != 0"];
+    [self testClass:[RenamedProperties1 class] withNormalCount:1 notCount:1 where:@"propA = 1"];
+    [self testClass:[RenamedProperties1 class] withNormalCount:1 notCount:1 where:@"propA = 2"];
+    [self testClass:[RenamedProperties1 class] withNormalCount:0 notCount:2 where:@"propA = 3"];
+
+    [self testClass:[RenamedProperties2 class] withNormalCount:2 notCount:0 where:@"propC != 0"];
+    [self testClass:[RenamedProperties2 class] withNormalCount:1 notCount:1 where:@"propC = 1"];
+    [self testClass:[RenamedProperties2 class] withNormalCount:1 notCount:1 where:@"propC = 2"];
+    [self testClass:[RenamedProperties2 class] withNormalCount:0 notCount:2 where:@"propC = 3"];
+}
+
+- (void)testQueryOverRenamedLinks {
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+    id obj1 = [RenamedProperties1 createInRealm:realm withValue:@[@1, @"a"]];
+    id obj2 = [RenamedProperties2 createInRealm:realm withValue:@[@2, @"b"]];
+    [LinkToRenamedProperties1 createInRealm:realm withValue:@[obj1, NSNull.null, @[obj1]]];
+    [LinkToRenamedProperties2 createInRealm:realm withValue:@[obj2, NSNull.null, @[obj2]]];
+    [realm commitWriteTransaction];
+
+    [self testClass:[LinkToRenamedProperties1 class] withNormalCount:2 notCount:0 where:@"linkA.propA != 0"];
+    [self testClass:[LinkToRenamedProperties1 class] withNormalCount:1 notCount:1 where:@"linkA.propA = 1"];
+    [self testClass:[LinkToRenamedProperties1 class] withNormalCount:1 notCount:1 where:@"linkA.propA = 2"];
+    [self testClass:[LinkToRenamedProperties1 class] withNormalCount:0 notCount:2 where:@"linkA.propA = 3"];
+
+    [self testClass:[LinkToRenamedProperties2 class] withNormalCount:2 notCount:0 where:@"linkC.propC != 0"];
+    [self testClass:[LinkToRenamedProperties2 class] withNormalCount:1 notCount:1 where:@"linkC.propC = 1"];
+    [self testClass:[LinkToRenamedProperties2 class] withNormalCount:1 notCount:1 where:@"linkC.propC = 2"];
+    [self testClass:[LinkToRenamedProperties2 class] withNormalCount:0 notCount:2 where:@"linkC.propC = 3"];
+
+    [self testClass:[LinkToRenamedProperties1 class] withNormalCount:2 notCount:0 where:@"ANY array.propA != 0"];
+    [self testClass:[LinkToRenamedProperties1 class] withNormalCount:1 notCount:1 where:@"ANY array.propA = 1"];
+    [self testClass:[LinkToRenamedProperties1 class] withNormalCount:1 notCount:1 where:@"ANY array.propA = 2"];
+    [self testClass:[LinkToRenamedProperties1 class] withNormalCount:0 notCount:2 where:@"ANY array.propA = 3"];
+
+    [self testClass:[LinkToRenamedProperties2 class] withNormalCount:2 notCount:0 where:@"ANY array.propC != 0"];
+    [self testClass:[LinkToRenamedProperties2 class] withNormalCount:1 notCount:1 where:@"ANY array.propC = 1"];
+    [self testClass:[LinkToRenamedProperties2 class] withNormalCount:1 notCount:1 where:@"ANY array.propC = 2"];
+    [self testClass:[LinkToRenamedProperties2 class] withNormalCount:0 notCount:2 where:@"ANY array.propC = 3"];
+}
+
+- (void)testQueryOverRenamedBacklinks {
+    RLMRealm *realm = [self realm];
+    [realm beginWriteTransaction];
+    id obj1 = [RenamedProperties1 createInRealm:realm withValue:@[@1, @"a"]];
+    id obj2 = [RenamedProperties2 createInRealm:realm withValue:@[@2, @"b"]];
+    [LinkToRenamedProperties1 createInRealm:realm withValue:@[obj1, NSNull.null, @[obj1]]];
+    [LinkToRenamedProperties2 createInRealm:realm withValue:@[obj2, NSNull.null, @[obj2]]];
+    [realm commitWriteTransaction];
+
+    [self testClass:[RenamedProperties1 class] withNormalCount:2 notCount:0 where:@"ANY linking1.linkA.propA != 0"];
+    [self testClass:[RenamedProperties1 class] withNormalCount:1 notCount:1 where:@"ANY linking1.linkA.propA = 1"];
+    [self testClass:[RenamedProperties1 class] withNormalCount:1 notCount:1 where:@"ANY linking1.linkA.propA = 2"];
+    [self testClass:[RenamedProperties1 class] withNormalCount:0 notCount:2 where:@"ANY linking1.linkA.propA = 3"];
+}
 @end
 
 @interface AsyncQueryTests : QueryTests

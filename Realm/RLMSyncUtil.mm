@@ -16,14 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMSyncUtil_Private.hpp"
 
 #import "RLMJSONModels.h"
-#import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncUtil_Private.hpp"
-#import "RLMSyncUser_Private.hpp"
+#import "RLMObject_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
+#import "RLMRealm_Private.hpp"
+#import "RLMSyncConfiguration_Private.hpp"
+#import "RLMSyncUser_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import "shared_realm.hpp"
@@ -55,6 +56,20 @@ NSString *const kRLMSyncRegisterKey             = @"register";
 NSString *const kRLMSyncTokenKey                = @"token";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
 NSString *const kRLMSyncUserIDKey               = @"user_id";
+
+uint8_t RLMGetComputedPermissions(RLMRealm *realm, id _Nullable object) {
+    if (!object) {
+        return static_cast<unsigned char>(realm->_realm->get_privileges());
+    }
+    if ([object isKindOfClass:[NSString class]]) {
+        return static_cast<unsigned char>(realm->_realm->get_privileges([object UTF8String]));
+    }
+    if (auto obj = RLMDynamicCast<RLMObjectBase>(object)) {
+        RLMVerifyAttached(obj);
+        return static_cast<unsigned char>(realm->_realm->get_privileges(obj->_row));
+    }
+    return 0;
+}
 
 #pragma mark - C++ APIs
 

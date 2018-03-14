@@ -18,6 +18,8 @@
 
 #import <XCTest/XCTest.h>
 
+// FIXME: Many permission tests appears to fail with the ROS 3.0.0 alpha releases.
+
 #import "RLMSyncTestCase.h"
 
 #import "RLMTestUtils.h"

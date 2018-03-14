@@ -40,6 +40,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMSyncManager.h',
                               'include/**/RLMSyncPermission.h',
                               'include/**/RLMSyncSession.h',
+                              'include/**/RLMSyncSubscription.h',
                               'include/**/RLMSyncUser.h',
                               'include/**/RLMSyncUtil.h',
                               'include/**/RLMThreadSafeReference.h',
@@ -67,6 +68,7 @@ Pod::Spec.new do |s|
                               'Realm/ObjectStore/src/util/*.cpp',
                               'Realm/ObjectStore/src/util/apple/*.cpp'
 
+  s.frameworks              = 'Security'
   s.module_map              = 'Realm/Realm.modulemap'
   s.compiler_flags          = "-DREALM_HAVE_CONFIG -DREALM_COCOA_VERSION='@\"#{s.version}\"' -D__ASSERTMACROS__ -DREALM_ENABLE_SYNC"
   s.prepare_command         = 'sh build.sh cocoapods-setup'
@@ -75,8 +77,10 @@ Pod::Spec.new do |s|
   s.header_mappings_dir     = 'include'
   s.pod_target_xcconfig     = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES',
                                 'CLANG_CXX_LANGUAGE_STANDARD' => 'c++14',
+                                'CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF' => 'NO',
                                 'OTHER_CPLUSPLUSFLAGS' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden',
-                                'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"' }
+                                'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"',
+                              }
   s.preserve_paths          = %w(build.sh include)
 
   s.ios.deployment_target   = '8.0'

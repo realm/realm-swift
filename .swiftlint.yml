@@ -11,6 +11,7 @@ identifier_name:
     - _nsError
     - _nsErrorDomain
     - _realmObjectName()
+    - _realmColumnNames()
     - id
     - pk
     - to

@@ -26,6 +26,7 @@
 #import "RLMSyncManager+ObjectServerTests.h"
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncConfiguration_Private.h"
+#import "RLMUtil.hpp"
 
 #import "sync/sync_manager.hpp"
 #import "sync/sync_session.hpp"
@@ -36,6 +37,11 @@
 
 // Set this to 1 if you want the test ROS instance to log its debug messages to console.
 #define LOG_ROS_OUTPUT 0
+
+// Set this to 1 for extremely verbose trace logging from ROS
+#define LOG_ROS_TRACE 0
+
+#define NODE_PATH @"/usr/local/bin/node"
 
 #if PROVIDING_OWN_ROS
 // Define the admin token as an Objective-C string here if you wish to run tests requiring it.
@@ -99,6 +105,121 @@ static NSURL *syncDirectoryForChildProcess() {
     return [NSURL fileURLWithPath:path isDirectory:YES];
 }
 
+@interface RealmObjectServer : NSObject
+@property (nonatomic, readonly) NSURL *serverDataRoot;
+
++ (instancetype)sharedServer;
+
+- (void)launch;
+@end
+
+@implementation RealmObjectServer {
+    NSTask *_task;
+    NSURL *_serverDataRoot;
+}
++ (instancetype)sharedServer {
+    static RealmObjectServer *instance = [RealmObjectServer new];
+    return instance;
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        _serverDataRoot = [[[[[NSURL fileURLWithPath:@(__FILE__)]
+                             URLByDeletingLastPathComponent]
+                            URLByDeletingLastPathComponent]
+                           URLByDeletingLastPathComponent]
+                           URLByAppendingPathComponent:@"test-ros-instance/"];
+    }
+    return self;
+}
+
+- (void)launch {
+#if !PROVIDING_OWN_ROS
+    if (_task) {
+        return;
+    }
+
+    // Kill any old running processes from a previous run
+    // Make sure this argument list matches the one used to launch below
+    [[NSTask launchedTaskWithLaunchPath:@"/usr/bin/pkill"
+                              arguments:@[@"-f", @"ros/bin/ros", @"start"]] waitUntilExit];
+
+    NSFileManager *fileManager = NSFileManager.defaultManager;
+
+    NSURL *target = [self.serverDataRoot URLByAppendingPathComponent:@"ros/bin/ros"];
+    if (![fileManager fileExistsAtPath:target.path]) {
+        NSLog(@"The Realm Object Server isn't installed. You need to run 'build.sh download-object-server'"
+              @" prior to running these tests.");
+        abort();
+    }
+
+    [fileManager removeItemAtURL:[self.serverDataRoot URLByAppendingPathComponent:@"data"] error:nil];
+    [fileManager removeItemAtURL:[self.serverDataRoot URLByAppendingPathComponent:@"realm-object-server"] error:nil];
+
+    NSPipe *pipe = [NSPipe pipe];
+    auto buffer = [[NSMutableData alloc] init];
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    __block BOOL inUseError = NO;
+    pipe.fileHandleForReading.readabilityHandler = ^(NSFileHandle *file) {
+        [buffer appendData:[file availableData]];
+        const auto bytes = static_cast<const char *>(buffer.bytes);
+        if (strstr(bytes, "Realm Object Server has started and is listening")) {
+            dispatch_semaphore_signal(sema);
+        }
+        else if (strstr(bytes, "Error: listen EADDRINUSE")) {
+            inUseError = YES;
+            dispatch_semaphore_signal(sema);
+        }
+
+        const char *newline;
+        auto start = bytes;
+        auto end = start + buffer.length;
+        while ((newline = std::find(start, end, '\n')) != end) {
+#if LOG_ROS_OUTPUT
+            if (newline > start + 1) {
+                NSLog(@"ROS: %.*s", int(newline - start), start);
+            }
+#endif
+            start = newline + 1;
+        }
+
+        // Remove everything up to the last newline, leaving any data not newline-terminated in the buffer
+        [buffer replaceBytesInRange:{0, static_cast<NSUInteger>(start - bytes)} withBytes:nullptr length:0];
+    };
+
+    _task = [[NSTask alloc] init];
+    _task.currentDirectoryPath = self.serverDataRoot.path;
+    _task.launchPath = NODE_PATH;
+    // Warning: if the way the ROS is launched is changed, remember to also update
+    // the regex in build.sh's kill_object_server() function.
+    _task.arguments = @[target.path, @"start", @"--auth", @"debug,password"
+                        #if LOG_ROS_TRACE
+                            , @"--loglevel", @"trace"
+                        #endif
+                        ];
+    // Need to set the environment variables to bypass the mandatory email prompt.
+    _task.environment = @{@"ROS_TOS_EMAIL_ADDRESS": @"ci@realm.io",
+                          @"DOCKER_DATA_PATH": @"/tmp",
+                          @"REALM_DISABLE_SYNC_TO_DISK": @"true"};
+
+    _task.standardOutput = pipe;
+    _task.standardError = pipe;
+
+    [_task launch];
+
+    long wait_result = dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(60 * NSEC_PER_SEC)));
+    if (inUseError) {
+        NSLog(@"Server tried to start up, but the port was already in use (probably already running).");
+        abort();
+    }
+    if (wait_result != 0) {
+        NSLog(@"Server did not start up within the allotted timeout interval.");
+        abort();
+    }
+#endif // !PROVIDING_OWN_ROS
+}
+@end
+
 @implementation RLMSyncTestCase
 
 + (RLMSyncManager *)managerForCurrentTest {
@@ -107,11 +228,8 @@ static NSURL *syncDirectoryForChildProcess() {
 
 #pragma mark - Helper methods
 
-+ (NSURL *)rootRealmCocoaURL {
-    return [[[[NSURL fileURLWithPath:@(__FILE__)]
-              URLByDeletingLastPathComponent]
-             URLByDeletingLastPathComponent]
-            URLByDeletingLastPathComponent];
+- (BOOL)isPartial {
+    return NO;
 }
 
 + (NSURL *)authServerURL {
@@ -233,10 +351,13 @@ static NSURL *syncDirectoryForChildProcess() {
                                     user:(RLMSyncUser *)user
                            encryptionKey:(NSData *)encryptionKey
                               stopPolicy:(RLMSyncStopPolicy)stopPolicy {
-    RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
-    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
-    c.syncConfiguration.stopPolicy = stopPolicy;
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    syncConfig.stopPolicy = stopPolicy;
+    syncConfig.isPartial = [self isPartial];
+
+    auto c = [RLMRealmConfiguration defaultConfiguration];
     c.encryptionKey = encryptionKey;
+    c.syncConfiguration = syncConfig;
     return [RLMRealm realmWithConfiguration:c error:nil];
 }
 
@@ -267,7 +388,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                   server:url];
 }
 
-+ (NSString *)retrieveAdminToken {
+- (NSString *)adminToken {
 #if PROVIDING_OWN_ROS
 #ifdef OWN_ROS_ADMIN_TOKEN
     return OWN_ROS_ADMIN_TOKEN;
@@ -276,8 +397,8 @@ static NSURL *syncDirectoryForChildProcess() {
     return nil;
 #endif
 #else
-    NSString *adminTokenPath = @"test-ros-instance/data/keys/admin.json";
-    NSURL *target = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:adminTokenPath];
+    NSURL *target = [RealmObjectServer.sharedServer.serverDataRoot
+                     URLByAppendingPathComponent:@"/data/keys/admin.json"];
     if (![[NSFileManager defaultManager] fileExistsAtPath:[target path]]) {
         XCTFail(@"Could not find the JSON file containing the admin token.");
         return nil;
@@ -292,8 +413,12 @@ static NSURL *syncDirectoryForChildProcess() {
 #endif
 }
 
-- (void)waitForDownloadsForUser:(RLMSyncUser *)user url:(NSURL *)url {
-    [self waitForDownloadsForUser:user url:url expectation:nil error:nil];
+- (void)waitForDownloadsForRealm:(RLMRealm *)realm {
+    [self waitForDownloadsForRealm:realm error:nil];
+}
+
+- (void)waitForUploadsForRealm:(RLMRealm *)realm {
+    [self waitForUploadsForRealm:realm error:nil];
 }
 
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
@@ -302,13 +427,12 @@ static NSURL *syncDirectoryForChildProcess() {
                           error:(NSError **)error {
     RLMSyncSession *session = [user sessionForURL:url];
     NSAssert(session, @"Cannot call with invalid URL");
-    XCTestExpectation *ex = expectation ?: [self expectationWithDescription:@"Download waiter expectation"];
+    XCTestExpectation *ex = expectation ?: [self expectationWithDescription:@"Wait for download completion"];
     __block NSError *theError = nil;
-    BOOL queued = [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                   callback:^(NSError *err){
-                                                       theError = err;
-                                                       [ex fulfill];
-                                                   }];
+    BOOL queued = [session waitForDownloadCompletionOnQueue:nil callback:^(NSError *err) {
+        theError = err;
+        [ex fulfill];
+    }];
     if (!queued) {
         XCTFail(@"Download waiter did not queue; session was invalid or errored out.");
         return;
@@ -319,30 +443,40 @@ static NSURL *syncDirectoryForChildProcess() {
     }
 }
 
-- (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url {
-    [self waitForUploadsForUser:user url:url error:nil];
-}
-
-- (void)waitForUploadsForUser:(RLMSyncUser *)user url:(NSURL *)url error:(NSError **)error {
-    RLMSyncSession *session = [user sessionForURL:url];
-    NSAssert(session, @"Cannot call with invalid URL");
-    XCTestExpectation *ex = [self expectationWithDescription:@"Upload waiter expectation"];
-    __block NSError *theError = nil;
-    BOOL queued = [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
-                                                 callback:^(NSError *err){
-                                                     theError = err;
-                                                     [ex fulfill];
-                                                 }];
+- (void)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)error {
+    RLMSyncSession *session = [RLMSyncSession sessionForRealm:realm];
+    NSAssert(session, @"Cannot call with invalid Realm");
+    XCTestExpectation *ex = [self expectationWithDescription:@"Wait for upload completion"];
+    __block NSError *completionError;
+    BOOL queued = [session waitForUploadCompletionOnQueue:nil callback:^(NSError *error) {
+        completionError = error;
+        [ex fulfill];
+    }];
     if (!queued) {
         XCTFail(@"Upload waiter did not queue; session was invalid or errored out.");
         return;
     }
-    // FIXME: If tests involving `HugeSyncObject` are more reliable after July 2017, file an issue against sync
-    // regarding performance of ROS.
-    [self waitForExpectations:@[ex] timeout:20.0];
-    if (error) {
-        *error = theError;
+    [self waitForExpectations:@[ex] timeout:2.0];
+    if (error)
+        *error = completionError;
+}
+
+- (void)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)error {
+    RLMSyncSession *session = [RLMSyncSession sessionForRealm:realm];
+    NSAssert(session, @"Cannot call with invalid Realm");
+    XCTestExpectation *ex = [self expectationWithDescription:@"Wait for download completion"];
+    __block NSError *completionError;
+    BOOL queued = [session waitForDownloadCompletionOnQueue:nil callback:^(NSError *error) {
+        completionError = error;
+        [ex fulfill];
+    }];
+    if (!queued) {
+        XCTFail(@"Download waiter did not queue; session was invalid or errored out.");
+        return;
     }
+    [self waitForExpectations:@[ex] timeout:2.0];
+    if (error)
+        *error = completionError;
 }
 
 - (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue {
@@ -363,109 +497,22 @@ static NSURL *syncDirectoryForChildProcess() {
 
 #pragma mark - XCUnitTest Lifecycle
 
-+ (void)setUp {
-    [super setUp];
-#if !PROVIDING_OWN_ROS
-    NSURL *target = [[RLMSyncTestCase rootRealmCocoaURL] URLByAppendingPathComponent:@"test-ros-instance/ros/bin/ros"];
-    if (![[NSFileManager defaultManager] fileExistsAtPath:[target path]]) {
-        NSLog(@"The Realm Object Server isn't installed. You need to run 'build.sh download-object-server'"
-              @" prior to running these tests.");
-        abort();
-    }
-#endif
-}
-
-+ (void)logObjectServerOutput:(__unused NSString *)output {
-#if LOG_ROS_OUTPUT
-    NSArray<NSString *> *array = [output componentsSeparatedByString:@"\n"];
-    for (NSString *piece in array) {
-        if ([piece length] > 0) {
-            NSLog(@"ROS: %@", piece);
-        }
-    }
-#endif
-}
-
-- (void)lazilyInitializeObjectServer {
-#if !PROVIDING_OWN_ROS
-    if (!self.isParent || s_task) {
-        return;
-    }
-    NSPipe *pipe = [NSPipe pipe];
-    NSMutableString *stringBuffer = [[NSMutableString alloc] init];
-    __block BOOL inUseError = NO;
-    [RLMSyncTestCase runResetObjectServer:YES];
-    NSTask *task = [[NSTask alloc] init];
-    NSString *currentDirPath = [[[RLMSyncTestCase rootRealmCocoaURL]
-                                 URLByAppendingPathComponent:@"test-ros-instance/"] path];
-    task.currentDirectoryPath = currentDirPath;
-    task.launchPath = @"/usr/local/bin/node";
-    // Warning: if the way the ROS is launched is changed, remember to also update
-    // the regex in build.sh's kill_object_server() function.
-    task.arguments = @[@"./ros/bin/ros", @"start", @"--auth", @"debug,password"];
-    // Need to set the environment variables to bypass the mandatory email prompt.
-    task.environment = @{@"ROS_TOS_EMAIL_ADDRESS": @"ci@realm.io",
-                         @"DOCKER_DATA_PATH": @"/tmp"};
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    task.standardOutput = pipe;
-    task.standardError = pipe;
-    [[task.standardError fileHandleForReading] setReadabilityHandler:^(NSFileHandle *file) {
-        NSData *data = [file availableData];
-        NSString *fragment = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        [stringBuffer appendString:fragment];
-        if ([stringBuffer rangeOfString:@"Realm Object Server has started and is listening"].location != NSNotFound) {
-            [RLMSyncTestCase logObjectServerOutput:stringBuffer];
-            dispatch_semaphore_signal(sema);
-        } else if ([stringBuffer rangeOfString:@"Error: listen EADDRINUSE"].location != NSNotFound) {
-            [RLMSyncTestCase logObjectServerOutput:stringBuffer];
-            inUseError = YES;
-            dispatch_semaphore_signal(sema);
-        } else if ([fragment characterAtIndex:[fragment length] - 1] == '\n') {
-            [RLMSyncTestCase logObjectServerOutput:stringBuffer];
-            // Reached EOL, reset the string buffer.
-            [stringBuffer setString:@""];
-        }
-    }];
-    s_task = task;
-    [task launch];
-    const NSTimeInterval timeout = 60;
-    BOOL wait_result = dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
-    if (!wait_result || inUseError) {
-        s_task = nil;
-        if (inUseError) {
-            XCTFail(@"Server tried to start up, but the port was already in use (probably already running).");
-        } else {
-            XCTFail(@"Server did not start up within the allotted timeout interval.");
-        }
-        abort();
-    }
-#endif
-}
-
-+ (void)runResetObjectServer:(BOOL)initial {
-    NSTask *task = [[NSTask alloc] init];
-    task.currentDirectoryPath = [[RLMSyncTestCase rootRealmCocoaURL] path];
-    task.launchPath = @"/bin/sh";
-    task.arguments = @[@"build.sh", initial ? @"reset-object-server" : @"reset-ros-client-state"];
-    [task launch];
-    [task waitUntilExit];
-}
-
 - (void)setUp {
     [super setUp];
     self.continueAfterFailure = NO;
-    [self lazilyInitializeObjectServer];
-
+    NSURL *clientDataRoot;
     if (self.isParent) {
-#if !PROVIDING_OWN_ROS
-        XCTAssertNotNil(s_task, @"Test suite setup did not complete: server did not start properly.");
-        [RLMSyncTestCase runResetObjectServer:NO];
-#endif
-        s_managerForTest = [[RLMSyncManager alloc] initWithCustomRootDirectory:nil];
-    } else {
-        // Configure the sync manager to use a different directory than the parent process.
-        s_managerForTest = [[RLMSyncManager alloc] initWithCustomRootDirectory:syncDirectoryForChildProcess()];
+        [RealmObjectServer.sharedServer launch];
+        clientDataRoot = [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
     }
+    else {
+        clientDataRoot = syncDirectoryForChildProcess();
+    }
+    NSError *error;
+    [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:&error];
+    [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
+                           withIntermediateDirectories:YES attributes:nil error:&error];
+    s_managerForTest = [[RLMSyncManager alloc] initWithCustomRootDirectory:clientDataRoot];
     [RLMSyncManager sharedManager].logLevel = RLMSyncLogLevelOff;
 }
 
@@ -475,31 +522,6 @@ static NSURL *syncDirectoryForChildProcess() {
     [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:NO blockOnRefreshCompletion:nil];
 
     [super tearDown];
-}
-
-@end
-
-#pragma mark - Test objects
-
-@implementation PartialSyncObjectA
-
-+ (instancetype)objectWithNumber:(NSInteger)number string:(NSString *)string {
-    PartialSyncObjectA *object = [[PartialSyncObjectA alloc] init];
-    object.number = number;
-    object.string = string;
-    return object;
-}
-
-@end
-
-@implementation PartialSyncObjectB
-
-+ (instancetype)objectWithNumber:(NSInteger)number firstString:(NSString *)first secondString:(NSString *)second {
-    PartialSyncObjectB *object = [[PartialSyncObjectB alloc] init];
-    object.number = number;
-    object.firstString = first;
-    object.secondString = second;
-    return object;
 }
 
 @end

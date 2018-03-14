@@ -1769,6 +1769,33 @@ public:
     AssertChanged(r1, @NO, @YES);
     AssertChanged(r2, @NO, @YES);
 }
+
+- (void)testRenamedProperties {
+    auto obj = [RenamedProperties1 createInRealm:self.realm withValue:@[@1, @"a"]];
+    [self.realm commitWriteTransaction];
+    [self.realm beginWriteTransaction];
+    KVORecorder r(self, obj, @"propA");
+
+    obj.propA = 2;
+    AssertChanged(r, @1, @2);
+
+    obj[@"propA"] = @3;
+    AssertChanged(r, @2, @3);
+
+    [obj setValue:@4 forKey:@"propA"];
+    AssertChanged(r, @3, @4);
+
+    // Only rollback will notify objects of different types with the same table,
+    // not direct modification. Probably not worth fixing this.
+    RenamedProperties2 *obj2 = [RenamedProperties2 allObjectsInRealm:self.realm].firstObject;
+    KVORecorder r2(self, obj2, @"propC");
+
+    [self.realm cancelWriteTransaction];
+    [self.realm beginWriteTransaction];
+
+    AssertChanged(r, @4, @1);
+    AssertChanged(r2, @4, @1);
+}
 @end
 
 // Observing an object from a different RLMRealm instance backed by the same
@@ -1928,43 +1955,6 @@ public:
     AssertChanged(r2, @2, @3);
 }
 
-- (void)testMoveObservedTableBeforeChange {
-    KVOObject *obj = [self createObject];
-    KVORecorder r(self, obj, @"boolCol");
-    realm::Group &group = self.realm->_realm->read_group();
-    group.move_table(obj->_info->table()->get_index_in_group(), 0);
-    obj.boolCol = YES;
-    AssertChanged(r, @NO, @YES);
-}
-
-- (void)testMoveObservedTableAfterChange {
-    KVOObject *obj = [self createObject];
-    KVORecorder r(self, obj, @"boolCol");
-    obj.boolCol = YES;
-    realm::Group &group = self.realm->_realm->read_group();
-    group.move_table(obj->_info->table()->get_index_in_group(), group.size() - 1);
-    AssertChanged(r, @NO, @YES);
-}
-
-- (void)testShiftObservedTableBeforeChange {
-    KVOObject *obj = [self createObject];
-    KVORecorder r(self, obj, @"boolCol");
-    realm::Group &group = self.realm->_realm->read_group();
-    group.move_table(0, group.size() - 1);
-    obj.boolCol = YES;
-    AssertChanged(r, @NO, @YES);
-}
-
-- (void)testShiftObservedTableAfterChange {
-    KVOObject *obj = [self createObject];
-
-    KVORecorder r(self, obj, @"boolCol");
-    obj.boolCol = YES;
-    realm::Group &group = self.realm->_realm->read_group();
-    group.move_table(group.size() - 1, 0);
-    AssertChanged(r, @NO, @YES);
-}
-
 - (void)testInsertNewColumns {
     KVOObject *obj = [self createObject];
 
@@ -1981,27 +1971,6 @@ public:
 
     AssertChanged(r1, @NO, @YES);
     AssertChanged(r2, @2, @3);
-}
-
-- (void)testMoveObservedColumnBeforeChange {
-    KVOObject *obj = [self createObject];
-    auto ndx = obj->_info->tableColumn(@"boolCol");
-
-    KVORecorder r(self, obj, @"boolCol");
-    auto& table = *obj->_info->table();
-    realm::_impl::TableFriend::move_column(*table.get_descriptor(), ndx, 0);
-    obj->_row.set_bool(0, true); // can't use the accessor after a local schema change
-    AssertChanged(r, @NO, @YES);
-}
-
-- (void)testMoveObservedColumnAfterChange {
-    KVOObject *obj = [self createObject];
-    auto ndx = obj->_info->tableColumn(@"boolCol");
-
-    KVORecorder r(self, obj, @"boolCol");
-    obj.boolCol = YES;
-    realm::_impl::TableFriend::move_column(*obj->_info->table()->get_descriptor(), ndx, 0);
-    AssertChanged(r, @NO, @YES);
 }
 
 - (void)testShiftObservedColumnBeforeChange {

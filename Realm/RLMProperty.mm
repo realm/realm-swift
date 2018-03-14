@@ -21,11 +21,14 @@
 #import "RLMArray_Private.hpp"
 #import "RLMListBase.h"
 #import "RLMObject.h"
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMObject_Private.h"
 #import "RLMOptionalBase.h"
 #import "RLMSchema_Private.h"
 #import "RLMSwiftSupport.h"
 #import "RLMUtil.hpp"
+
+#import "property.hpp"
 
 static_assert((int)RLMPropertyTypeInt    == (int)realm::PropertyType::Int, "");
 static_assert((int)RLMPropertyTypeBool   == (int)realm::PropertyType::Bool, "");
@@ -550,6 +553,7 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
 - (id)copyWithZone:(NSZone *)zone {
     RLMProperty *prop = [[RLMProperty allocWithZone:zone] init];
     prop->_name = _name;
+    prop->_columnName = _columnName;
     prop->_type = _type;
     prop->_objectClassName = _objectClassName;
     prop->_array = _array;
@@ -610,12 +614,21 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
             self.optional ? @"YES" : @"NO"];
 }
 
-- (realm::Property)objectStoreCopy {
+- (NSString *)columnName {
+    return _columnName ?: _name;
+}
+
+- (realm::Property)objectStoreCopy:(RLMSchema *)schema {
     realm::Property p;
-    p.name = _name.UTF8String;
-    p.object_type = _objectClassName ? _objectClassName.UTF8String : "";
-    p.is_indexed = (bool)_indexed;
-    p.link_origin_property_name = _linkOriginPropertyName ? _linkOriginPropertyName.UTF8String : "";
+    p.name = self.columnName.UTF8String;
+    if (_objectClassName) {
+        RLMObjectSchema *targetSchema = schema[_objectClassName];
+        p.object_type = (targetSchema.objectName ?: _objectClassName).UTF8String;
+        if (_linkOriginPropertyName) {
+            p.link_origin_property_name = (targetSchema[_linkOriginPropertyName].columnName ?: _linkOriginPropertyName).UTF8String;
+        }
+    }
+    p.is_indexed = static_cast<bool>(_indexed);
     p.type = static_cast<realm::PropertyType>(_type);
     if (_array) {
         p.type |= realm::PropertyType::Array;

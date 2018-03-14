@@ -35,13 +35,9 @@ namespace {
 
 bool keypath_is_valid(NSString *keypath)
 {
-    static NSSet<NSString *> *valid = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        valid = [NSSet setWithArray:@[RLMSyncPermissionSortPropertyPath,
-                                      RLMSyncPermissionSortPropertyUserID,
-                                      RLMSyncPermissionSortPropertyUpdated]];
-    });
+    static auto valid = [NSSet setWithArray:@[RLMSyncPermissionSortPropertyPath,
+                                              RLMSyncPermissionSortPropertyUserID,
+                                              RLMSyncPermissionSortPropertyUpdated]];
     return [valid containsObject:keypath];
 }
 

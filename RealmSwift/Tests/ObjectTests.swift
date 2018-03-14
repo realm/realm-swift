@@ -120,6 +120,16 @@ class ObjectTests: TestCase {
         let recursiveObject = SwiftRecursiveObject()
         recursiveObject.objects.append(recursiveObject)
         assertMatches(recursiveObject.description, "SwiftRecursiveObject \\{\n\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\tobjects = List<SwiftRecursiveObject> <0x[0-9a-f]+> \\(\n\t\t\t\t\\[0\\] SwiftRecursiveObject \\{\n\t\t\t\t\tobjects = <Maximum depth exceeded>;\n\t\t\t\t\\}\n\t\t\t\\);\n\t\t\\}\n\t\\);\n\\}")
+
+        let renamedObject = LinkToRenamedProperties1()
+        renamedObject.linkA = RenamedProperties1()
+        assertMatches(renamedObject.description, "LinkToRenamedProperties1 \\{\n\tlinkA = RenamedProperties1 \\{\n\t\tpropA = 0;\n\t\tpropB = ;\n\t\\};\n\tlinkB = \\(null\\);\n\tarray1 = List<RenamedProperties1> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+        assertMatches(renamedObject.linkA!.linking1.description, "LinkingObjects<LinkToRenamedProperties1> <0x[0-9a-f]+> \\(\n\n\\)")
+
+        let realm = try! Realm()
+        try! realm.write { realm.add(renamedObject) }
+        assertMatches(renamedObject.description, "LinkToRenamedProperties1 \\{\n\tlinkA = RenamedProperties1 \\{\n\t\tpropA = 0;\n\t\tpropB = ;\n\t\\};\n\tlinkB = \\(null\\);\n\tarray1 = List<RenamedProperties1> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+        assertMatches(renamedObject.linkA!.linking1.description, "LinkingObjects<LinkToRenamedProperties1> <0x[0-9a-f]+> \\(\n\t\\[0\\] LinkToRenamedProperties1 \\{\n\t\tlinkA = RenamedProperties1 \\{\n\t\t\tpropA = 0;\n\t\t\tpropB = ;\n\t\t\\};\n\t\tlinkB = \\(null\\);\n\t\tarray1 = List<RenamedProperties1> <0x[0-9a-f]+> \\(\n\t\t\n\t\t\\);\n\t\\}\n\\)")
         // swiftlint:enable line_length
     }
 
@@ -230,17 +240,17 @@ class ObjectTests: TestCase {
 
     func testValueForKey() {
         let test: (SwiftObject) -> Void = { object in
-            XCTAssertEqual(object.value(forKey: "boolCol") as! Bool!, false)
-            XCTAssertEqual(object.value(forKey: "intCol") as! Int!, 123)
-            XCTAssertEqual(object.value(forKey: "floatCol") as! Float!, 1.23 as Float)
-            XCTAssertEqual(object.value(forKey: "doubleCol") as! Double!, 12.3)
-            XCTAssertEqual(object.value(forKey: "stringCol") as! String!, "a")
+            XCTAssertEqual(object.value(forKey: "boolCol") as! Bool?, false)
+            XCTAssertEqual(object.value(forKey: "intCol") as! Int?, 123)
+            XCTAssertEqual(object.value(forKey: "floatCol") as! Float?, 1.23 as Float)
+            XCTAssertEqual(object.value(forKey: "doubleCol") as! Double?, 12.3)
+            XCTAssertEqual(object.value(forKey: "stringCol") as! String?, "a")
 
             let expected = object.value(forKey: "binaryCol") as! Data
             let actual = "a".data(using: String.Encoding.utf8)!
             XCTAssertTrue(expected == actual)
 
-            XCTAssertEqual(object.value(forKey: "dateCol") as! Date!, Date(timeIntervalSince1970: 1))
+            XCTAssertEqual(object.value(forKey: "dateCol") as! Date?, Date(timeIntervalSince1970: 1))
             XCTAssertEqual((object.value(forKey: "objectCol")! as! SwiftBoolObject).boolCol, false)
             XCTAssert(object.value(forKey: "arrayCol")! is List<SwiftBoolObject>)
         }
@@ -272,26 +282,26 @@ class ObjectTests: TestCase {
     func setAndTestAllTypes(_ setter: (SwiftObject, Any?, String) -> Void,
                             getter: (SwiftObject, String) -> (Any?), object: SwiftObject) {
         setter(object, true, "boolCol")
-        XCTAssertEqual(getter(object, "boolCol") as! Bool!, true)
+        XCTAssertEqual(getter(object, "boolCol") as! Bool?, true)
 
         setter(object, 321, "intCol")
-        XCTAssertEqual(getter(object, "intCol") as! Int!, 321)
+        XCTAssertEqual(getter(object, "intCol") as! Int?, 321)
 
         setter(object, NSNumber(value: 32.1 as Float), "floatCol")
-        XCTAssertEqual(getter(object, "floatCol") as! Float!, 32.1 as Float)
+        XCTAssertEqual(getter(object, "floatCol") as! Float?, 32.1 as Float)
 
         setter(object, 3.21, "doubleCol")
-        XCTAssertEqual(getter(object, "doubleCol") as! Double!, 3.21)
+        XCTAssertEqual(getter(object, "doubleCol") as! Double?, 3.21)
 
         setter(object, "z", "stringCol")
-        XCTAssertEqual(getter(object, "stringCol") as! String!, "z")
+        XCTAssertEqual(getter(object, "stringCol") as! String?, "z")
 
         setter(object, "z".data(using: String.Encoding.utf8)! as Data, "binaryCol")
         let gotData = getter(object, "binaryCol") as! Data
         XCTAssertTrue(gotData == "z".data(using: String.Encoding.utf8)!)
 
         setter(object, Date(timeIntervalSince1970: 333), "dateCol")
-        XCTAssertEqual(getter(object, "dateCol") as! Date!, Date(timeIntervalSince1970: 333))
+        XCTAssertEqual(getter(object, "dateCol") as! Date?, Date(timeIntervalSince1970: 333))
 
         let boolObject = SwiftBoolObject(value: [true])
         setter(object, boolObject, "objectCol")

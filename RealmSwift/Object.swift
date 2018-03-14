@@ -502,7 +502,7 @@ public class ObjectUtil: NSObject {
     }
 
     @objc private class func getSwiftProperties(_ object: Any) -> [RLMSwiftPropertyMetadata] {
-        return getNonIgnoredMirrorChildren(for: object).enumerated().flatMap { idx, prop in
+        return getNonIgnoredMirrorChildren(for: object).enumerated().map { idx, prop in
             if let value = prop.value as? LinkingObjectsBase {
                 return RLMSwiftPropertyMetadata(forLinkingObjectsProperty: prop.label!,
                                                 className: value.objectClassName,

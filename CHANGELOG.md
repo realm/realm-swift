@@ -1,4 +1,78 @@
-x.x.x Release notes (yyyy-mm-dd)
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* A role is now automatically created for each user with that user as its only member.
+  This simplifies the common use case of restricting access to specific objects to a single user.
+  This role can be accessed at `PermissionUser.role`.
+* Improved error reporting when the server rejects a schema change due to a lack of permissions.
+
+### Bugfixes
+
+* Fix incorrect initalization of `RLMSyncManager` that made it impossible to
+  set `errorHandler`.
+* Fix compiler warnings when building with Xcode 9.3.
+
+3.2.0-beta.3 Release notes (2018-03-01)
+=============================================================
+
+Realm Object Server v3.0.0-alpha.9 or newer is required when using synchronized Realms.
+
+### Bugfixes
+
+* Fix a crash that would occur when using partial sync with Realm Object Server v3.0.0-alpha.9.
+
+3.2.0-beta.2 Release notes (2018-02-28)
+=============================================================
+
+Realm Object Server v3.0.0-alpha.8 or newer is required when using synchronized Realms.
+
+### Enhancements
+
+* Added `findOrCreate(forRoleNamed:)` and `findOrCreate(forRole:)` to `List<Permission>`
+  to simplify the process of adding permissions for a role.
+* Added `+permissionForRoleNamed:inArray:`, `+permissionForRoleNamed:onRealm:`,
+  `+permissionForRoleNamed:onClass:realm:`, `+permissionForRoleNamed:onClassNamed:realm:`,
+  and `+permissionForRoleNamed:onObject:` to `RLMSyncPermission` to simplify the process
+  of adding permissions for a role.
+* Added `+[RLMSyncSession sessionForRealm:]` to retrieve the sync session corresponding to a `RLMRealm`.
+
+### Bugfixes
+
+* `PermissionRole.users` and `PermissionUser.roles` are now public as intended.
+* Fixed the handling of `setPermissions` in `-[RLMRealm privilegesForRealm]` and related methods.
+
+3.2.0-beta.1 Release notes (2018-02-19)
+=============================================================
+
+### Enhancements
+
+* Added an improved API for adding subscriptions in partially-synchronized Realms. `Results.subscribe()` can be
+  used to subscribe to any result set, and the returned `SyncSubscription` object can be used to observe the state
+  of the subscription and ultimately to remove the subscription.
+* Added a fine-grained permissions system for use with partially-synchronized Realms. This allows permissions to be
+  defined at the level of individual objects or classes. See `Permission` and related types for more information.
+
+### Bugfixes
+
+* Fix some warnings when running with UBsan.
+
+3.1.1 Release notes (2018-02-03)
+=============================================================
+
+Prebuilt Swift frameworks for Carthage are now built with Xcode 9.2.
+
+### Bugfixes
+
+* Fix a memory leak when opening Realms with an explicit `objectTypes` array
+  from Swift.
+
+3.1.0 Release notes (2018-01-16)
 =============================================================
 
 * Prebuilt frameworks are now included for Swift 3.2.3 and 4.0.3.
@@ -7,16 +81,24 @@ x.x.x Release notes (yyyy-mm-dd)
 
 ### Enhancements
 
+* Add `Results.distinct(by:)` / `-[RLMResults distinctResultsUsingKeyPaths:]`, which return a `Results`
+  containing only objects with unique values at the given key paths.
 * Improve performance of change checking for notifications in certain cases.
 * Realm Object Server errors not explicitly recognized by the client are now reported to the application
   regardless.
 * Add support for JSON Web Token as a sync credential source.
 * Add support for Nickname and Anonymous Auth as a sync credential source.
+* Improve allocator performance when writing to a highly fragmented file. This
+  should significantly improve performance when inserting large numbers of
+  objects which have indexed properties.
+* Improve write performance for complex object graphs involving many classes
+  linking to each other.
 
 ### Bugfixes
 
 * Add a missing check for a run loop in the permission API methods which
   require one.
+* Fix some cases where non-fatal sync errors were being treated as fatal errors.
 
 3.0.2 Release notes (2017-11-08)
 =============================================================

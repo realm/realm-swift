@@ -89,7 +89,7 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
 static RLMSyncManager *s_sharedManager = nil;
 
 + (instancetype)sharedManager {
-    std::once_flag flag;
+    static std::once_flag flag;
     std::call_once(flag, [] {
         try {
             s_sharedManager = [[RLMSyncManager alloc] initWithCustomRootDirectory:nil];
