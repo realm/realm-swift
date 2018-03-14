@@ -1,12 +1,18 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
+Realm Object Server v3.0.0-rc.1 or newer is required when using synchronized Realms.
+
 ### Breaking Changes
 
 * None.
 
 ### Enhancements
 
+* Added `SyncConfiguration.automatic()` and `SyncConfiguration.automatic(user:)`.
+  These methods return a `Realm.Configuration` appropriate for syncing with the default
+  synced Realm for the current (or specified). These should be considered the preferred methods
+  for accessing synced Realms going forwards.
 * A role is now automatically created for each user with that user as its only member.
   This simplifies the common use case of restricting access to specific objects to a single user.
   This role can be accessed at `PermissionUser.role`.

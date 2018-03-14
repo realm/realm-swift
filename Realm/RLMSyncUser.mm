@@ -436,6 +436,20 @@ static void verifyInRunLoop() {
 
 #pragma mark - Private API
 
+- (NSURL *)defaultRealmURL
+{
+    NSURLComponents *components = [NSURLComponents componentsWithURL:self.authenticationServer resolvingAgainstBaseURL:YES];
+    if ([components.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame)
+        components.scheme = @"realm";
+    else if ([components.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame)
+        components.scheme = @"realms";
+    else
+        @throw RLMException(@"The provided user's authentication server URL (%@) was not valid.", self.authenticationServer);
+
+    components.path = @"/default";
+    return components.URL;
+}
+
 + (void)_setUpBindingContextFactory {
     SyncUser::set_binding_context_factory([] {
         return std::make_shared<CocoaSyncUserContext>();

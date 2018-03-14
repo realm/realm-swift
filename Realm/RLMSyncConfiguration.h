@@ -18,6 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
+@class RLMRealmConfiguration;
 @class RLMSyncUser;
 
 NS_ASSUME_NONNULL_BEGIN
@@ -66,6 +67,20 @@ NS_ASSUME_NONNULL_BEGIN
                 the user identity by the Realm Object Server.
  */
 - (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url;
+
+/**
+Return a Realm configuration for syncing with the default Realm of the currently logged-in sync user.
+
+Partial synchronization is enabled in the returned configuration.
+ */
++ (RLMRealmConfiguration *)automaticConfiguration;
+
+/**
+ Return a Realm configuration for syncing with the default Realm of the given sync user.
+
+ Partial synchronization is enabled in the returned configuration.
+ */
++ (RLMRealmConfiguration *)automaticConfigurationForUser:(RLMSyncUser *)user;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly")));
