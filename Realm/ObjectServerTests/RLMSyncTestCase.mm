@@ -22,6 +22,7 @@
 #import <Realm/Realm.h>
 
 #import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMSyncManager+ObjectServerTests.h"
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
@@ -243,17 +244,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm {
-    RLMSyncConfiguration *config = [realm.configuration syncConfiguration];
-    if (config.user.state == RLMSyncUserStateError) {
-        return nil;
-    }
-    auto on_disk_path = realm::SyncManager::shared().path_for_realm(*[config.user _syncUser],
-                                                                    [config.realmURL.absoluteString UTF8String]);
-    auto ptr = realm::SyncManager::shared().get_existing_session(on_disk_path);
-    if (ptr) {
-        return [NSURL fileURLWithPath:@(ptr->path().c_str())];
-    }
-    return nil;
+    return [NSURL fileURLWithPath:@(realm->_realm->config().path.data())];
 }
 
 - (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions {

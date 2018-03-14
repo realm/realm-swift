@@ -81,7 +81,7 @@ static BOOL isValidRealmURL(NSURL *url) {
 
 - (instancetype)initWithRawConfig:(realm::SyncConfig)config {
     if (self = [super init]) {
-        _config = std::make_unique<realm::SyncConfig>(config);
+        _config = std::make_unique<realm::SyncConfig>(std::move(config));
     }
     return self;
 }
@@ -93,7 +93,8 @@ static BOOL isValidRealmURL(NSURL *url) {
     RLMSyncConfiguration *that = (RLMSyncConfiguration *)object;
     return [self.realmURL isEqual:that.realmURL]
         && [self.user isEqual:that.user]
-        && self.stopPolicy == that.stopPolicy;
+        && self.stopPolicy == that.stopPolicy
+        && self.isPartial == that.isPartial;
 }
 
 - (void)setEnableSSLValidation:(BOOL)enableSSLValidation {
@@ -129,7 +130,7 @@ static BOOL isValidRealmURL(NSURL *url) {
 }
 
 - (NSURL *)realmURL {
-    NSString *rawStringURL = @(_config->realm_url().c_str());
+    NSString *rawStringURL = @(_config->reference_realm_url.c_str());
     return [NSURL URLWithString:rawStringURL];
 }
 
