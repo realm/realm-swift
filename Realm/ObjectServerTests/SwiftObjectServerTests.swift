@@ -421,9 +421,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             autoreleasepool {
                 let credentials = SyncCredentials.usernamePassword(username: "Swift.testPartialSync", password: "a", register: true)
                 let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
-                let syncConfig = SyncConfiguration(user: user, realmURL: realmURL, isPartial: true)
-                let configuration = Realm.Configuration(syncConfiguration: syncConfig)
-                let realm = try! synchronouslyOpenRealm(configuration: configuration)
+                let realm = try! synchronouslyOpenRealm(configuration: SyncConfiguration.automatic(user: user))
 
                 try! realm.write {
                     realm.add(SwiftPartialSyncObjectA(number: 0, string: "realm"))
@@ -455,10 +453,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             autoreleasepool {
                 let credentials = SyncCredentials.usernamePassword(username: "Swift.testPartialSync", password: "a")
                 let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
-                let syncConfig = SyncConfiguration(user: user, realmURL: realmURL, isPartial: true)
-                let configuration = Realm.Configuration(syncConfiguration: syncConfig)
-                let realm = try! synchronouslyOpenRealm(configuration: configuration)
-
+                let realm = try! synchronouslyOpenRealm(configuration: SyncConfiguration.automatic(user: user))
 
                 let ex = expectation(description: "Should be able to successfully complete a query")
                 let results = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5")

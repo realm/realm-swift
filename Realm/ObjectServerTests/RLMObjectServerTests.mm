@@ -1516,16 +1516,12 @@
     // Make credentials.
     NSString *name = NSStringFromSelector(_cmd);
     NSURL *server = [RLMObjectServerTests authServerURL];
-    NSURL *realmURL = REALM_URL();
 
     // Log in and populate the Realm.
     @autoreleasepool {
         RLMSyncCredentials *creds = [RLMObjectServerTests basicCredentialsWithName:name register:YES];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:server];
-        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:realmURL];
-        syncConfig.isPartial = YES;
-        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-        configuration.syncConfiguration = syncConfig;
+        RLMRealmConfiguration *configuration = [RLMSyncConfiguration automaticConfigurationForUser:user];
         RLMRealm *realm = [self openRealmWithConfiguration:configuration];
         [realm beginWriteTransaction];
         // FIXME: make this less hideous
@@ -1558,10 +1554,7 @@
     @autoreleasepool {
         RLMSyncCredentials *creds = [RLMObjectServerTests basicCredentialsWithName:name register:NO];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:server];
-        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:realmURL];
-        syncConfig.isPartial = YES;
-        RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-        configuration.syncConfiguration = syncConfig;
+        RLMRealmConfiguration *configuration = [RLMSyncConfiguration automaticConfigurationForUser:user];
         RLMRealm *realm = [self openRealmWithConfiguration:configuration];
 
         // Perform some partial sync queries
