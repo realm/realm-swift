@@ -975,7 +975,8 @@ public class ClassPermission: Object {
 
 private func optionSetDescription<T: OptionSet>(_ optionSet: T,
                                                 _ allValues: [(T.Element, String)]) -> String {
-    let valueStr = allValues.flatMap({ value, name in optionSet.contains(value) ? name : nil })
+    let valueStr = allValues.filter({ value, _ in optionSet.contains(value) })
+                            .map({ _, name in name })
                             .joined(separator: ", ")
     return "\(String(describing: T.self))[\(valueStr)]"
 }

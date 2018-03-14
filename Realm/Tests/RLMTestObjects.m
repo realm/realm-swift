@@ -371,7 +371,7 @@
 @end
 
 @implementation RenamedPrimaryKey
-+ (NSDictionary *)primaryKey {
++ (NSString *)primaryKey {
     return @"pk";
 }
 + (NSDictionary *)_realmColumnNames {

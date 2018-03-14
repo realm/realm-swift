@@ -443,14 +443,13 @@ static NSURL *syncDirectoryForChildProcess() {
     }
 }
 
-- (void)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)outError {
+- (void)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)error {
     RLMSyncSession *session = [RLMSyncSession sessionForRealm:realm];
     NSAssert(session, @"Cannot call with invalid Realm");
     XCTestExpectation *ex = [self expectationWithDescription:@"Wait for upload completion"];
+    __block NSError *completionError;
     BOOL queued = [session waitForUploadCompletionOnQueue:nil callback:^(NSError *error) {
-        if (outError) {
-            *outError = error;
-        }
+        completionError = error;
         [ex fulfill];
     }];
     if (!queued) {
@@ -458,16 +457,17 @@ static NSURL *syncDirectoryForChildProcess() {
         return;
     }
     [self waitForExpectations:@[ex] timeout:2.0];
+    if (error)
+        *error = completionError;
 }
 
-- (void)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)outError {
+- (void)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)error {
     RLMSyncSession *session = [RLMSyncSession sessionForRealm:realm];
     NSAssert(session, @"Cannot call with invalid Realm");
     XCTestExpectation *ex = [self expectationWithDescription:@"Wait for download completion"];
+    __block NSError *completionError;
     BOOL queued = [session waitForDownloadCompletionOnQueue:nil callback:^(NSError *error) {
-        if (outError) {
-            *outError = error;
-        }
+        completionError = error;
         [ex fulfill];
     }];
     if (!queued) {
@@ -475,6 +475,8 @@ static NSURL *syncDirectoryForChildProcess() {
         return;
     }
     [self waitForExpectations:@[ex] timeout:2.0];
+    if (error)
+        *error = completionError;
 }
 
 - (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue {
