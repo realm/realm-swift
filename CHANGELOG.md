@@ -7,7 +7,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* A role is now automatically created for each user with that user as its only member.
+  This simplifies the common use case of restricting access to specific objects to a single user.
+  This role can be accessed at `PermissionUser.role`.
+* Improved error reporting when the server rejects a schema change due to a lack of permissions.
 
 ### Bugfixes
 
