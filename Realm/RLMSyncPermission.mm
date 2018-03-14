@@ -106,7 +106,7 @@ id RLMPermissionForRole(RLMArray *array, id role) {
     return @[@"identity"];
 }
 + (NSDictionary *)_realmColumnNames {
-    return @{@"identity": @"id"};
+    return @{@"identity": @"id", @"role": @"role"};
 }
 + (NSDictionary *)linkingObjectsProperties {
     return @{@"roles": [RLMPropertyDescriptor descriptorWithClass:RLMPermissionRole.class propertyName:@"users"]};

@@ -910,6 +910,10 @@ public class PermissionUser: Object {
     /// have the same value as `SyncUser.identity`
     @objc dynamic public var identity = ""
 
+    /// The user's private role. This will be initialized to a role named for the user's
+    /// identity that contains this user as its only member.
+    @objc dynamic public var role: PermissionRole?
+
     /// Roles which this user belongs to.
     public let roles = LinkingObjects(fromType: PermissionRole.self, property: "users")
 
@@ -923,7 +927,7 @@ public class PermissionUser: Object {
     }
     /// :nodoc:
     @objc override public class func _realmColumnNames() -> [String: String] {
-        return ["identity": "id"]
+        return ["identity": "id", "role": "role"]
     }
 }
 

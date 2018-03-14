@@ -156,6 +156,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// the same value as `-[RLMSyncUser identity]`.
 @property (nonatomic) NSString *identity;
 
+/// The user's private role. This will be initialized to a role named for the user's
+/// identity that contains this user as its only member.
+@property (nonatomic) RLMPermissionRole *role;
+
 /// Roles which this user belongs to.
 @property (nonatomic, readonly) RLMLinkingObjects<RLMPermissionRole *> *roles;
 
