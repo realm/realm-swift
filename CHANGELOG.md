@@ -13,6 +13,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix incorrect initalization of `RLMSyncManager` that made it impossible to
   set `errorHandler`.
+* Fix compiler warnings when building with Xcode 9.3.
 
 3.2.0-beta.3 Release notes (2018-03-01)
 =============================================================
