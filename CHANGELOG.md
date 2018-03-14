@@ -1,11 +1,7 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.2.0-rc.1 Release notes (2018-03-14)
 =============================================================
 
 Realm Object Server v3.0.0-rc.1 or newer is required when using synchronized Realms.
-
-### Breaking Changes
-
-* None.
 
 ### Enhancements
 
