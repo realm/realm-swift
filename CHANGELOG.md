@@ -1,3 +1,30 @@
+3.2.0 Release notes (2018-03-15)
+=============================================================
+
+Realm Object Server v3.0.0 or newer is required when using synchronized Realms.
+
+### Enhancements
+
+* Added an improved API for adding subscriptions in partially-synchronized Realms. `Results.subscribe()` can be
+  used to subscribe to any result set, and the returned `SyncSubscription` object can be used to observe the state
+  of the subscription and ultimately to remove the subscription. See the documentation for more information
+  (<https://docs.realm.io/platform/v/3.x/using-synced-realms/syncing-data>).
+* Added a fine-grained permissions system for use with partially-synchronized Realms. This allows permissions to be
+  defined at the level of individual objects or classes. See the documentation for more information
+  (<https://docs.realm.io/platform/v/3.x/using-synced-realms/access-control>).
+* Added `SyncConfiguration.automatic()` and `SyncConfiguration.automatic(user:)`.
+  These methods return a `Realm.Configuration` appropriate for syncing with the default
+  synced Realm for the current (or specified) user. These should be considered the preferred methods
+  for accessing synced Realms going forwards.
+* Added `+[RLMSyncSession sessionForRealm:]` to retrieve the sync session corresponding to a `RLMRealm`.
+
+### Bugfixes
+
+* Fix incorrect initalization of `RLMSyncManager` that made it impossible to
+  set `errorHandler`.
+* Fix compiler warnings when building with Xcode 9.3.
+* Fix some warnings when running with UBsan.
+
 3.2.0-rc.1 Release notes (2018-03-14)
 =============================================================
 
