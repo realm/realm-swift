@@ -613,4 +613,10 @@ static void createPermissions(RLMArray<RLMPermission> *permissions) {
     CHECK_COUNT(1, ObjectWithPermissions, userBRealm);
 }
 
+- (void)testRetrieveClassPermissionsForRenamedClass {
+    [self createRealmWithName:_cmd permissions:^(RLMRealm *realm) {
+        XCTAssertNotNil([RLMClassPermission objectInRealm:realm forClass:RLMPermissionRole.class]);
+    }];
+}
+
 @end

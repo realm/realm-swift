@@ -193,7 +193,7 @@ id RLMPermissionForRole(RLMArray *array, id role) {
     return [RLMClassPermission objectInRealm:realm forPrimaryKey:name];
 }
 + (instancetype)objectInRealm:(RLMRealm *)realm forClass:(Class)cls {
-    return [RLMClassPermission objectInRealm:realm forPrimaryKey:[cls className]];
+    return [RLMClassPermission objectInRealm:realm forPrimaryKey:[cls _realmObjectName] ?: [cls className]];
 }
 @end
 
