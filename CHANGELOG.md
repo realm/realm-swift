@@ -1,3 +1,20 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Add `Realm.permissions`, `Realm.permissions(forType:)`, and `Realm.permissions(forClassNamed:)` as convenience
+  methods for accessing the permissions of the Realm or a type.
+
+### Bugfixes
+
+* Fix `+[RLMClassPermission objectInRealm:forClass:]` to work for classes that are part of the permissions API,
+  such as `RLMPermissionRole`.
+
 3.2.0 Release notes (2018-03-15)
 =============================================================
 

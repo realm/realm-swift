@@ -1274,6 +1274,39 @@ extension Realm {
     public func getPrivileges(forClassNamed className: String) -> ClassPrivileges {
         return ClassPrivileges(rawValue: RLMGetComputedPermissions(rlmRealm, className))
     }
+
+    /**
+    Returns the class-wide permissions for the given class.
+
+     - parameter cls: An Object subclass to get the permissions for.
+     - returns: The class-wide permissions for the given class.
+     - requires: This must only be called on a partially-synced Realm.
+    */
+    public func permissions<T: Object>(forType cls: T.Type) -> List<Permission> {
+        return permissions(forClassNamed: cls._realmObjectName() ?? cls.className())
+    }
+
+    /**
+    Returns the class-wide permissions for the named class.
+
+     - parameter cls: The name of an Object subclass to get the permissions for.
+     - returns: The class-wide permissions for the named class.
+     - requires: className must name a class in this Realm's schema.
+     - requires: This must only be called on a partially-synced Realm.
+    */
+    public func permissions(forClassNamed className: String) -> List<Permission> {
+        let classPermission = object(ofType: ClassPermission.self, forPrimaryKey: className)!
+        return classPermission.permissions
+    }
+
+    /**
+    Returns the Realm-wide permissions.
+
+     - requires: This must only be called on a partially-synced Realm.
+    */
+    public var permissions: List<Permission> {
+        return object(ofType: RealmPermission.self, forPrimaryKey: 0)!.permissions
+    }
 }
 
 extension List where Element == Permission {
