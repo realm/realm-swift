@@ -1,6 +1,7 @@
 swiftVersions = ['3.1', '3.2', '3.2.2', '3.2.3', '4.0', '4.0.2', '4.0.3']
 platforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS']
+carthageXcodeVersion = '9.2'
 
 def installationTest(platform, test, language) {
   return {
@@ -100,6 +101,27 @@ def doBuild() {
     for (def p in platforms) {
       def platform = p
       def platformName = platformNames[platform]
+      parallelBuilds["${platformName} Carthage"] = {
+        node('osx') {
+          deleteDir()
+          unstash 'source'
+          sh """
+          export REALM_XCODE_VERSION=${carthageXcodeVersion}
+          . ./scripts/swift-version.sh
+          set_xcode_and_swift_versions
+
+          carthage build --no-skip-current --platform ${platform}
+          carthage archive --output Carthage-${platform}.framework.zip
+          """
+          stash includes: "Carthage-${platform}.framework.zip",
+                name: "${platform}-carthage"
+        }
+      }
+    }
+
+    for (def p in platforms) {
+      def platform = p
+      def platformName = platformNames[platform]
       for (def v in swiftVersions) {
         def swiftVersion = v
         parallelBuilds["${platformName} Swift ${swiftVersion}"] = {
@@ -155,6 +177,25 @@ def doBuild() {
           sh 'rm realm-swift-framework-*.zip'
           stash include: 'realm-swift-*.zip', name: 'swift-packaged'
           archiveArtifacts artifacts: 'realm-swift-*.zip'
+        }
+      },
+      "Carthage": {
+        node('osx') {
+          deleteDir()
+
+          for (def platform in platforms) {
+            unstash "${platform}-carthage"
+          }
+
+          sh '''
+          for zip in Carthage-*.framework.zip; do
+            ditto -xk $zip merged/
+          done
+
+          ditto -ck merged/ Carthage.framework.zip
+          '''
+
+          archiveArtifacts artifacts: 'Carthage.framework.zip'
         }
       }
     )
