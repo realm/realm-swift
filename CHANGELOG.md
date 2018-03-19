@@ -14,6 +14,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix `+[RLMClassPermission objectInRealm:forClass:]` to work for classes that are part of the permissions API,
   such as `RLMPermissionRole`.
+* Fix runtime errors when applications define an `Object` subclass with the
+  same name as one of the Permissions object types.
 
 3.2.0 Release notes (2018-03-15)
 =============================================================

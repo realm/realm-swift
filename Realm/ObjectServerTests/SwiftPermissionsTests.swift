@@ -19,6 +19,11 @@
 import XCTest
 import RealmSwift
 
+final class PermissionUser: Object {
+    // A class with a name that conflicts with an Object class from RealmSwift to verify
+    // that it doesn't break anything
+}
+
 class SwiftPermissionsAPITests: SwiftSyncTestCase {
     var userA: SyncUser!
     var userB: SyncUser!
@@ -130,7 +135,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
     }
 
     func add(user: SyncUser, toRole roleName: String, inRealm realm: Realm) {
-        let user = realm.create(PermissionUser.self, value: [user.identity!], update: true)
+        let user = realm.create(RealmSwift.PermissionUser.self, value: [user.identity!], update: true)
         realm.create(PermissionRole.self, value: [roleName], update: true).users.append(user)
     }
 
