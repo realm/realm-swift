@@ -1300,6 +1300,9 @@ extension Realm {
      - requires: This must only be called on a partially-synced Realm.
     */
     public func permissions(forClassNamed className: String) -> List<Permission> {
+        guard let syncConfiguration = configuration.syncConfiguration, syncConfiguration.isPartial else {
+            fatalError("\(#function) must only be called on a partially-synced Realm.")
+        }
         let classPermission = object(ofType: ClassPermission.self, forPrimaryKey: className)!
         return classPermission.permissions
     }
@@ -1310,6 +1313,9 @@ extension Realm {
      - requires: This must only be called on a partially-synced Realm.
     */
     public var permissions: List<Permission> {
+        guard let syncConfiguration = configuration.syncConfiguration, syncConfiguration.isPartial else {
+            fatalError("\(#function) must only be called on a partially-synced Realm.")
+        }
         return object(ofType: RealmPermission.self, forPrimaryKey: 0)!.permissions
     }
 }
