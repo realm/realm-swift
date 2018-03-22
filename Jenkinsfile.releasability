@@ -3,6 +3,11 @@ platforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS']
 carthageXcodeVersion = '9.2'
 
+@NonCPS
+def nodeLabelForSwiftVersion(version) {
+  return ['3.3': 'xcode93', '4.1': 'xcode93'].get(version, 'osx')
+}
+
 def installationTest(platform, test, language) {
   return {
     node('osx') {
@@ -125,7 +130,7 @@ def doBuild() {
       for (def v in swiftVersions) {
         def swiftVersion = v
         parallelBuilds["${platformName} Swift ${swiftVersion}"] = {
-          node('osx') {
+          node(nodeLabelForSwiftVersion(swiftVersion)) {
             deleteDir()
             unstash 'source'
             sh "XCMODE=xcpretty ./build.sh package-${platform}-swift-${swiftVersion}"
