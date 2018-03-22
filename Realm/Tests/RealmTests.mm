@@ -82,7 +82,9 @@
     RLMRealmConfiguration *newDefaultConfiguration = [originalDefaultConfiguration copy];
     newDefaultConfiguration.objectClasses = @[];
     [RLMRealmConfiguration setDefaultConfiguration:newDefaultConfiguration];
-    XCTAssertEqual([[[[RLMRealm realmWithURL:RLMTestRealmURL()] configuration] objectClasses] count], 0U);
+    NSArray *permissionObjectClasses = @[RLMRealmPermission.class, RLMClassPermission.class,
+                                         RLMPermission.class, RLMPermissionUser.class, RLMPermissionRole.class];
+    XCTAssertEqual([[[[RLMRealm realmWithURL:RLMTestRealmURL()] configuration] objectClasses] count], permissionObjectClasses.count);
     [RLMRealmConfiguration setDefaultConfiguration:originalDefaultConfiguration];
 }
 

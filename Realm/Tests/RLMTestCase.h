@@ -51,6 +51,8 @@ NSData *RLMGenerateKey(void);
 - (void)dispatchAsync:(dispatch_block_t)block;
 - (void)dispatchAsyncAndWait:(dispatch_block_t)block;
 
++ (NSArray *)permissionObjectClasses;
+
 @end
 
 NS_ASSUME_NONNULL_END

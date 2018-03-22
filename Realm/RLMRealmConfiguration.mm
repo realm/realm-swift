@@ -21,6 +21,7 @@
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm_Private.h"
 #import "RLMSchema_Private.hpp"
+#import "RLMSyncPermission.h"
 #import "RLMUtil.hpp"
 
 #import "schema.hpp"
@@ -253,7 +254,9 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 }
 
 - (void)setObjectClasses:(NSArray *)objectClasses {
-    self.customSchema = [RLMSchema schemaWithObjectClasses:objectClasses];
+    NSArray *permissionObjectClasses = @[RLMRealmPermission.class, RLMClassPermission.class,
+                                         RLMPermission.class, RLMPermissionUser.class, RLMPermissionRole.class];
+    self.customSchema = [RLMSchema schemaWithObjectClasses:[objectClasses arrayByAddingObjectsFromArray:permissionObjectClasses]];
 }
 
 - (void)setDynamic:(bool)dynamic {

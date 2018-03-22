@@ -192,7 +192,13 @@ extension Realm {
         /// The classes managed by the Realm.
         public var objectTypes: [Object.Type]? {
             set {
-                self.customSchema = newValue.map { RLMSchema(objectClasses: $0) }
+                if let newValue = newValue {
+                    let permissionObjectTypes = [RealmPermission.self, ClassPermission.self,
+                                                 Permission.self, PermissionUser.self, PermissionRole.self]
+                    self.customSchema = RLMSchema(objectClasses: newValue + permissionObjectTypes)
+                } else {
+                    self.customSchema = nil
+                }
             }
             get {
                 return self.customSchema.map { $0.objectSchema.map { $0.objectClass as! Object.Type } }

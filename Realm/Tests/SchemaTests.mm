@@ -753,6 +753,8 @@ RLM_ARRAY_TYPE(NotARealClass)
 // Can't spawn child processes on iOS
 #if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
 - (void)testPartialSharedSchemaInit {
+    NSArray *permissionObjectClasses = [RLMTestCase permissionObjectClasses];
+
     if (self.isParent) {
         RLMRunChildAndWait();
         return;
@@ -765,14 +767,14 @@ RLM_ARRAY_TYPE(NotARealClass)
     config.objectClasses = @[IntObject.class];
     @autoreleasepool {
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-        XCTAssertEqual(1U, realm.schema.objectSchema.count);
+        XCTAssertEqual(1 + permissionObjectClasses.count, realm.schema.objectSchema.count);
         XCTAssertNoThrow(realm.schema[@"IntObject"]);
     }
 
     config.objectClasses = @[IntObject.class, StringObject.class];
     @autoreleasepool {
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-        XCTAssertEqual(2U, realm.schema.objectSchema.count);
+        XCTAssertEqual(2 + permissionObjectClasses.count, realm.schema.objectSchema.count);
         XCTAssertNoThrow(realm.schema[@"IntObject"]);
         XCTAssertNoThrow(realm.schema[@"StringObject"]);
     }
@@ -800,6 +802,8 @@ RLM_ARRAY_TYPE(NotARealClass)
 }
 
 - (void)testPartialSharedSchemaInitInheritance {
+    NSArray *permissionObjectClasses = [RLMTestCase permissionObjectClasses];
+
     if (self.isParent) {
         RLMRunChildAndWait();
         return;
@@ -809,7 +813,7 @@ RLM_ARRAY_TYPE(NotARealClass)
     config.objectClasses = @[NumberObject.class];
 
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-    XCTAssertEqual(1U, realm.schema.objectSchema.count);
+    XCTAssertEqual(1 + permissionObjectClasses.count, realm.schema.objectSchema.count);
     XCTAssertEqualObjects(@"NumberObject", [[[[NumberObject alloc] init] objectSchema] className]);
     // Verify that child class doesn't use the parent class's schema
     XCTAssertEqualObjects(@"NumberDefaultsObject", [[[[NumberDefaultsObject alloc] init] objectSchema] className]);
@@ -909,12 +913,14 @@ RLM_ARRAY_TYPE(NotARealClass)
 #endif
 
 - (void)testOpeningFileWithDifferentClassSubsetsInDifferentProcesses {
+    NSArray *permissionObjectClasses = [RLMTestCase permissionObjectClasses];
+
     if (!self.isParent) {
         RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
         config.objectClasses = @[StringObject.class];
 
         RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
-        XCTAssertEqual(1U, realm.schema.objectSchema.count);
+        XCTAssertEqual(1 + permissionObjectClasses.count, realm.schema.objectSchema.count);
 
         // Verify that the StringObject table actually exists
         [realm beginWriteTransaction];
@@ -928,7 +934,7 @@ RLM_ARRAY_TYPE(NotARealClass)
 
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     realm.autorefresh = false;
-    XCTAssertEqual(1U, realm.schema.objectSchema.count);
+    XCTAssertEqual(1 + permissionObjectClasses.count, realm.schema.objectSchema.count);
 
     [realm beginWriteTransaction];
     [IntObject createInRealm:realm withValue:@[@1]];
@@ -952,6 +958,8 @@ RLM_ARRAY_TYPE(NotARealClass)
 }
 
 - (void)testAddingIndexToExistingColumnInBackgroundProcess {
+    NSArray *permissionObjectClasses = [RLMTestCase permissionObjectClasses];
+
     if (!self.isParent) {
         RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[IntObject.class]];
         RLMObjectSchema *objectSchema = schema.objectSchema[0];
@@ -969,7 +977,7 @@ RLM_ARRAY_TYPE(NotARealClass)
 
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     realm.autorefresh = false;
-    XCTAssertEqual(1U, realm.schema.objectSchema.count);
+    XCTAssertEqual(1 + permissionObjectClasses.count, realm.schema.objectSchema.count);
 
     // Insert a value to ensure stuff actually happens when the index is added/removed
     [realm beginWriteTransaction];
@@ -983,6 +991,8 @@ RLM_ARRAY_TYPE(NotARealClass)
 }
 
 - (void)testRemovingIndexFromExistingColumnInBackgroundProcess {
+    NSArray *permissionObjectClasses = [RLMTestCase permissionObjectClasses];
+
     if (!self.isParent) {
         RLMSchema *schema = [RLMSchema schemaWithObjectClasses:@[IndexedStringObject.class]];
         RLMObjectSchema *objectSchema = schema.objectSchema[0];
@@ -1000,7 +1010,7 @@ RLM_ARRAY_TYPE(NotARealClass)
 
     RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
     realm.autorefresh = false;
-    XCTAssertEqual(1U, realm.schema.objectSchema.count);
+    XCTAssertEqual(1 + permissionObjectClasses.count, realm.schema.objectSchema.count);
 
     // Insert a value to ensure stuff actually happens when the index is added/removed
     [realm beginWriteTransaction];

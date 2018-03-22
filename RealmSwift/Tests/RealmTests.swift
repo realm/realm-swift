@@ -190,9 +190,11 @@ class RealmTests: TestCase {
     func testInitCustomClassList() {
         let configuration = Realm.Configuration(fileURL: Realm.Configuration.defaultConfiguration.fileURL,
             objectTypes: [SwiftStringObject.self])
-        XCTAssert(configuration.objectTypes! is [SwiftStringObject.Type])
         let realm = try! Realm(configuration: configuration)
-        XCTAssertEqual(["SwiftStringObject"], realm.schema.objectSchema.map { $0.className })
+        let permissionObjectTypes = [RealmPermission.self, ClassPermission.self,
+                                     Permission.self, PermissionUser.self, PermissionRole.self]
+        XCTAssertEqual(([SwiftStringObject.self] + permissionObjectTypes).map { $0.className() }.sorted(),
+                       realm.schema.objectSchema.map { $0.className }.sorted())
     }
 
     func testWrite() {

@@ -219,5 +219,10 @@ static BOOL encryptTests() {
     return nil;
 }
 
++ (NSArray *)permissionObjectClasses {
+    return @[RLMRealmPermission.class, RLMClassPermission.class,
+             RLMPermission.class, RLMPermissionUser.class, RLMPermissionRole.class];
+}
+
 @end
 
