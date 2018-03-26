@@ -374,7 +374,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return    An object of this object type, or `nil` if an object with the given primary key does not exist.
  @see       `-primaryKey`
  */
-+ (nullable instancetype)objectForPrimaryKey:(nullable id)primaryKey;
++ (nullable instancetype)objectForPrimaryKey:(nullable id)primaryKey NS_SWIFT_NAME(object(forPrimaryKey:));
 
 
 #pragma mark - Querying Specific Realms
@@ -423,7 +423,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return    An object of this object type, or `nil` if an object with the given primary key does not exist.
  @see       `-primaryKey`
  */
-+ (nullable instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(nullable id)primaryKey;
++ (nullable instancetype)objectInRealm:(RLMRealm *)realm forPrimaryKey:(nullable id)primaryKey NS_SWIFT_NAME(object(in:forPrimaryKey:));
 
 #pragma mark - Notifications
 
