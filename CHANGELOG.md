@@ -15,6 +15,8 @@ x.x.x Release notes (yyyy-MM-dd)
 * Exclude the RLMObject-derived Permissions classes from the types repored by
   `Realm.Configuration.defaultConfiguration.objectTypes` to avoid a failed
   cast.
+* Cancel pending `Realm.asyncOpen()` calls when authentication fails with a
+  non-transient error such as missing the Realm path in the URL.
 
 3.3.0 Release notes (2018-03-19)
 =============================================================
