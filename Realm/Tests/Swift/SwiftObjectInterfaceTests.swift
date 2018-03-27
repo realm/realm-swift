@@ -321,6 +321,8 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         let obj = SwiftPrimaryStringObject.object(forPrimaryKey: "string")
         XCTAssertNotNil(obj!)
         XCTAssertEqual(obj!.intCol, 1)
+
+        realm.cancelWriteTransaction()
     }
 
     // if this fails (and you haven't changed the test module name), the checks
