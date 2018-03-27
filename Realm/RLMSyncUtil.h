@@ -160,6 +160,9 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncAuthError, RLMSyncAuthErrorDomain) {
     /// An error that indicates that the provided credentials are ill-formed.
     RLMSyncAuthErrorInvalidParameters               = 601,
 
+    /// An error that indicates that no Realm path was included in the URL.
+    RLMSyncAuthErrorMissingPath                     = 602,
+
     /// An error that indicates that the provided credentials are invalid.
     RLMSyncAuthErrorInvalidCredential               = 611,
 
