@@ -264,6 +264,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
         if (RLMSyncErrorResponseModel *responseModel = [self responseModelFromData:data]) {
             switch (responseModel.code) {
                 case RLMSyncAuthErrorInvalidParameters:
+                case RLMSyncAuthErrorMissingPath:
                 case RLMSyncAuthErrorInvalidCredential:
                 case RLMSyncAuthErrorUserDoesNotExist:
                 case RLMSyncAuthErrorUserAlreadyExists:

@@ -1451,6 +1451,22 @@
     }
 }
 
+- (void)testDownloadCancelsOnAuthError {
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+    auto c = [RLMRealmConfiguration defaultConfiguration];
+    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:[NSURL URLWithString:@"realm://localhost:9080/invalid"]];
+    auto ex = [self expectationWithDescription:@"async open"];
+    [RLMRealm asyncOpenWithConfiguration:c callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *error) {
+                                    XCTAssertNil(realm);
+                                    XCTAssertNotNil(error);
+                                    [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
 #pragma mark - Validation
 
 - (void)testCompactOnLaunchCannotBeSet {
