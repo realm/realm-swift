@@ -17,6 +17,7 @@ x.x.x Release notes (yyyy-MM-dd)
   cast.
 * Cancel pending `Realm.asyncOpen()` calls when authentication fails with a
   non-transient error such as missing the Realm path in the URL.
+* Fix "fcntl() inside prealloc()" errors on APFS.
 
 3.3.0 Release notes (2018-03-19)
 =============================================================
