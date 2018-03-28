@@ -313,6 +313,18 @@ class SwiftObjectInterfaceTests: RLMTestCase {
         try! realm.commitWriteTransaction()
     }
 
+    func testObjectForPrimaryKey() {
+        let realm = RLMRealm.default()
+        realm.beginWriteTransaction()
+        _ = SwiftPrimaryStringObject.createOrUpdateInDefaultRealm(withValue: ["string", 1])
+
+        let obj = SwiftPrimaryStringObject.object(forPrimaryKey: "string")
+        XCTAssertNotNil(obj!)
+        XCTAssertEqual(obj!.intCol, 1)
+
+        realm.cancelWriteTransaction()
+    }
+
     // if this fails (and you haven't changed the test module name), the checks
     // for swift class names and the demangling logic need to be updated
     func testNSStringFromClassDemangledTopLevelClassNames() {

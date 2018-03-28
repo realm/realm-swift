@@ -1,3 +1,21 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Expose `RLMObject.object(forPrimaryKey:)` as a factory method for Swift so
+  that it is callable with recent versions of Swift.
+
+### Bugfixes
+
+* Exclude the RLMObject-derived Permissions classes from the types repored by
+  `Realm.Configuration.defaultConfiguration.objectTypes` to avoid a failed
+  cast.
+
 3.3.0 Release notes (2018-03-19)
 =============================================================
 
