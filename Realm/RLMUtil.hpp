@@ -82,15 +82,19 @@ static inline T *RLMDynamicCast(__unsafe_unretained id obj) {
     return nil;
 }
 
-template<typename T>
-static inline T RLMCoerceToNil(__unsafe_unretained T obj) {
+static inline id RLMCoerceToNil(__unsafe_unretained id obj) {
     if (static_cast<id>(obj) == NSNull.null) {
         return nil;
     }
     else if (__unsafe_unretained auto optional = RLMDynamicCast<RLMOptionalBase>(obj)) {
-        return RLMCoerceToNil(optional.underlyingValue);
+        return RLMCoerceToNil(RLMGetOptional(optional));
     }
     return obj;
+}
+
+template<typename T>
+static inline T RLMCoerceToNil(__unsafe_unretained T obj) {
+    return RLMCoerceToNil(static_cast<id>(obj));
 }
 
 // String conversion utilities

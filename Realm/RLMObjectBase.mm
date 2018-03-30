@@ -196,8 +196,7 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
             }
         }
         else if (property.optional) {
-            RLMOptionalBase *optional = object_getIvar(self, ivar);
-            optional.underlyingValue = value;
+            RLMSetOptional(object_getIvar(self, ivar), value);
         }
         return;
     }

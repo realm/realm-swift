@@ -43,7 +43,7 @@ class ObjectCreationTests: TestCase {
         for prop in object.objectSchema.properties {
             let value = object[prop.name]
             if let value = value as? RLMOptionalBase {
-                XCTAssertNil(value.underlyingValue)
+                XCTAssertNil(RLMGetOptional(value))
             } else {
                 XCTAssertNil(value)
             }

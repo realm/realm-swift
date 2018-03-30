@@ -167,9 +167,9 @@ class ObjectTests: TestCase {
             assertThrows(intObj.setValue(2, forKey: "intCol"), reasonMatching: primaryKeyReason)
 
             realm.add(optionalIntObj)
-            assertThrows(optionalIntObj.intCol.value = 2, reasonMatching: primaryKeyReason)
+            assertThrows(optionalIntObj.intCol.value = 2, reasonMatching: "Cannot modify primary key")
             assertThrows(optionalIntObj["intCol"] = 2, reasonMatching: primaryKeyReason)
-            assertThrows(optionalIntObj.setValue(2, forKey: "intCol"), reasonMatching: primaryKeyReason)
+            assertThrows(optionalIntObj.setValue(2, forKey: "intCol"), reasonMatching: "Cannot modify primary key")
 
             realm.add(stringObj)
             assertThrows(stringObj.stringCol = "c", reasonMatching: primaryKeyReason)

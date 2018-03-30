@@ -400,4 +400,52 @@ class ObjectAccessorTests: TestCase {
 
         XCTAssertTrue(link2.dynamicList("array2")[0].isSameObject(as: obj))
     }
+
+    func testPropertiesOutlivingParentObject() {
+        var optional: RealmOptional<Int>!
+        var list: List<Int>!
+
+        let realm = try! Realm()
+        try! realm.write {
+            autoreleasepool {
+                optional = realm.create(SwiftOptionalObject.self, value: ["optIntCol": 1]).optIntCol
+                list = realm.create(SwiftListObject.self, value: ["int": [1]]).int
+            }
+        }
+
+        // Verify that we can still read the correct value
+        XCTAssertEqual(optional.value, 1)
+        XCTAssertEqual(list.count, 1)
+        XCTAssertEqual(list[0], 1)
+
+        // Verify that we can modify the values via the standalone property objects and
+        // have it properly update the parent
+        try! realm.write {
+            optional.value = 2
+            list.append(2)
+        }
+
+        XCTAssertEqual(optional.value, 2)
+        XCTAssertEqual(list.count, 2)
+        XCTAssertEqual(list[0], 1)
+        XCTAssertEqual(list[1], 2)
+
+        autoreleasepool {
+            XCTAssertEqual(realm.objects(SwiftOptionalObject.self).first!.optIntCol.value, 2)
+            XCTAssertEqual(Array(realm.objects(SwiftListObject.self).first!.int), [1, 2])
+        }
+
+        try! realm.write {
+            optional.value = nil
+            list.removeAll()
+        }
+
+        XCTAssertEqual(optional.value, nil)
+        XCTAssertEqual(list.count, 0)
+
+        autoreleasepool {
+            XCTAssertEqual(realm.objects(SwiftOptionalObject.self).first!.optIntCol.value, nil)
+            XCTAssertEqual(Array(realm.objects(SwiftListObject.self).first!.int), [])
+        }
+    }
 }
