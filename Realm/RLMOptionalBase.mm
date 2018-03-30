@@ -16,74 +16,148 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMAccessor.h"
 #import "RLMOptionalBase.h"
-#import "RLMObject_Private.h"
-#import "RLMObjectStore.h"
-#import "RLMProperty_Private.h"
+
+#import "RLMAccessor.hpp"
+#import "RLMObject_Private.hpp"
+#import "RLMProperty.h"
 #import "RLMUtil.hpp"
+#import "object.hpp"
 
-#import <objc/runtime.h>
+namespace {
+struct OptionalBase {
+    virtual id get() = 0;
+    virtual void set(id) = 0;
+    virtual ~OptionalBase() = default;
+};
 
-@interface RLMOptionalBase ()
-@property (nonatomic) id unmanagedValue;
+class UnmanagedOptional : public OptionalBase {
+public:
+    id get() override {
+        return _value;
+    }
+
+    void set(__unsafe_unretained const id newValue) override {
+        @autoreleasepool {
+            RLMObjectBase *object = _parent;
+            [object willChangeValueForKey:_property];
+            _value = newValue;
+            [object didChangeValueForKey:_property];
+        }
+    }
+
+    void attach(__unsafe_unretained RLMObjectBase *const obj, NSString *property) {
+        if (!_property) {
+            _property = property;
+            _parent = obj;
+        }
+    }
+
+private:
+    id _value;
+    NSString *_property;
+    __weak RLMObjectBase *_parent;
+
+};
+
+class ManagedOptional : public OptionalBase {
+public:
+    ManagedOptional(RLMObjectBase *obj, RLMProperty *prop)
+    : _realm(obj->_realm)
+    , _object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row)
+    , _propertyName(prop.name.UTF8String)
+    , _ctx(obj->_realm, *obj->_info)
+    {
+    }
+
+    id get() override {
+        return _object.get_property_value<id>(_ctx, _propertyName);
+    }
+
+    void set(__unsafe_unretained id const value) override {
+        _object.set_property_value(_ctx, _propertyName, value ?: NSNull.null, false);
+    }
+
+private:
+    // We have to hold onto a strong reference to the Realm as
+    // RLMAccessorContext holds a non-retaining one.
+    __unused RLMRealm *_realm;
+    realm::Object _object;
+    std::string _propertyName;
+    RLMAccessorContext _ctx;
+};
+} // anonymous namespace
+
+@interface RLMOptionalBase () {
+    std::unique_ptr<OptionalBase> _impl;
+}
 @end
 
 @implementation RLMOptionalBase
-
 - (instancetype)init {
     return self;
 }
 
-- (id)underlyingValue {
-    if ((_object && _object->_realm) || _object.isInvalidated) {
-        return RLMDynamicGet(_object, _property);
-    }
-    else {
-        return _unmanagedValue;
-    }
-}
-
-- (void)setUnderlyingValue:(id)underlyingValue {
-    if ((_object && _object->_realm) || _object.isInvalidated) {
-        if (_property.isPrimary) {
-            @throw RLMException(@"Primary key can't be changed after an object is inserted.");
-        }
-        RLMDynamicSet(_object, _property, underlyingValue);
-    }
-    else {
-        NSString *propertyName = _property.name;
-        [_object willChangeValueForKey:propertyName];
-        _unmanagedValue = underlyingValue;
-        [_object didChangeValueForKey:propertyName];
-    }
-}
-
 - (BOOL)isKindOfClass:(Class)aClass {
-    return [self.underlyingValue isKindOfClass:aClass] || RLMIsKindOfClass(object_getClass(self), aClass);
+    return [RLMGetOptional(self) isKindOfClass:aClass] || RLMIsKindOfClass(object_getClass(self), aClass);
 }
 
 - (NSMethodSignature *)methodSignatureForSelector:(SEL)sel {
-    return [self.underlyingValue methodSignatureForSelector:sel];
+    return [RLMGetOptional(self) methodSignatureForSelector:sel];
 }
 
 - (void)forwardInvocation:(NSInvocation *)invocation {
-    [invocation invokeWithTarget:self.underlyingValue];
+    [invocation invokeWithTarget:RLMGetOptional(self)];
 }
 
 - (id)forwardingTargetForSelector:(__unused SEL)sel {
-    return self.underlyingValue;
+    return RLMGetOptional(self);
 }
 
 - (BOOL)respondsToSelector:(SEL)aSelector {
-    if (id val = self.underlyingValue) {
-        return [val respondsToSelector:aSelector];
-    }
-    return NO;
+    return [RLMGetOptional(self) respondsToSelector:aSelector];
 }
 
 - (void)doesNotRecognizeSelector:(SEL)aSelector {
-    [self.underlyingValue doesNotRecognizeSelector:aSelector];
+    [RLMGetOptional(self) doesNotRecognizeSelector:aSelector];
 }
 
+id RLMGetOptional(__unsafe_unretained RLMOptionalBase *const self) {
+    try {
+        return self->_impl ? RLMCoerceToNil(self->_impl->get()) : nil;
+    }
+    catch (std::exception const& err) {
+        @throw RLMException(err);
+    }
+}
+
+void RLMSetOptional(__unsafe_unretained RLMOptionalBase *const self, __unsafe_unretained const id value) {
+    try {
+        if (!self->_impl && value) {
+            self->_impl.reset(new UnmanagedOptional);
+        }
+        if (self->_impl) {
+            self->_impl->set(value);
+        }
+    }
+    catch (std::exception const& err) {
+        @throw RLMException(err);
+    }
+}
+
+void RLMInitializeManagedOptional(__unsafe_unretained RLMOptionalBase *const self,
+                                  __unsafe_unretained RLMObjectBase *const parent,
+                                  __unsafe_unretained RLMProperty *const prop) {
+    REALM_ASSERT(parent->_realm);
+    self->_impl.reset(new ManagedOptional(parent, prop));
+}
+
+void RLMInitializeUnmanagedOptional(__unsafe_unretained RLMOptionalBase *const self,
+                                    __unsafe_unretained RLMObjectBase *const parent,
+                                    __unsafe_unretained RLMProperty *const prop) {
+    if (!self->_impl) {
+        self->_impl.reset(new UnmanagedOptional);
+    }
+    static_cast<UnmanagedOptional&>(*self->_impl).attach(parent, prop.name);
+}
 @end

@@ -1,3 +1,20 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix incorrect results when using optional chaining to access a RealmOptional
+  property in Release builds, or otherwise interacting with a RealmOptional
+  object after the owning Object has been deallocated.
+
 3.4.0 Release notes (2018-04-19)
 =============================================================
 

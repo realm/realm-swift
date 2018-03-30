@@ -24,15 +24,13 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMObjectBase, RLMProperty;
 
 @interface RLMOptionalBase : NSProxy
-
 - (instancetype)init;
-
-@property (nonatomic, weak) RLMObjectBase *object;
-
-@property (nonatomic, unsafe_unretained) RLMProperty *property;
-
-@property (nonatomic, strong, nullable) id underlyingValue;
-
 @end
+
+FOUNDATION_EXTERN id _Nullable RLMGetOptional(RLMOptionalBase *);
+FOUNDATION_EXTERN void RLMSetOptional(RLMOptionalBase *, id _Nullable);
+
+void RLMInitializeManagedOptional(RLMOptionalBase *, RLMObjectBase *parent, RLMProperty *prop);
+void RLMInitializeUnmanagedOptional(RLMOptionalBase *, RLMObjectBase *parent, RLMProperty *prop);
 
 NS_ASSUME_NONNULL_END
