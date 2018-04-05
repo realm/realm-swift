@@ -640,6 +640,7 @@ extension Realm {
 
      -warning: Partial synchronization is a tech preview. Its APIs are subject to change.
      */
+    @available(*, deprecated, message: "Use Results.subscribe()")
     public func subscribe<T: Object>(to objects: T.Type, where: String,
                                      completion: @escaping (Results<T>?, Swift.Error?) -> Void) {
         rlmRealm.subscribe(toObjects: objects, where: `where`) { (results, error) in
