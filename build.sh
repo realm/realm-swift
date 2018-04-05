@@ -305,8 +305,15 @@ fi
 ######################################
 
 kill_object_server() {
-# Based on build.sh conventions we always run ROS from a path ending in 'ros/bin/ros'.
+    set +e
+    # Based on build.sh conventions we always run ROS from a path ending in 'ros/bin/ros'.
     pkill -f ros/bin/ros\ start
+    # 0 = process killed, 1 = no processes running, 2+ = error
+    local status=$?
+    if [ $status -gt 1 ]; then
+        exit $status
+    fi
+    set -e
 }
 
 download_object_server() {
