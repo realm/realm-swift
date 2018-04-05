@@ -36,7 +36,7 @@ configuration:
 # | Configuration Matrix | osx | docs | ios-static | ios-dynamic | ios-swift | osx-swift | watchos | cocoapods | swiftlint | tvos | osx-encryption | osx-object-server | ios-device-objc-ios8 | ios-device-swift-ios8 | ios-device-objc-ios10 | ios-device-swift-ios10 | tvos-device |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
 # | 8.3.3 | Debug        | X   |      | X          |             |           |           |         |           |           |      |                |                   |                      |                       |                       |                        |             |
-# | 8.3.3 | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    | X              | X                 | X                    |                       | X                     |                        | X           |
+# | 8.3.3 | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    | X              | X                 | X                    |                       | X                     |                        |             |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
 # | 9.0   | Debug        | X   |      |            |             |           |           |         |           |           |      |                |                   |                      |                       |                       |                        |             |
 # | 9.0   | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                      |                       |                       |                        |             |
@@ -235,7 +235,9 @@ exclude:
   ################
   # tvos-device
   ################
-  # Just run on 8.3.3/9.2 Release
+  # Just run on 9.2 Release
+  - xcode_version: 8.3.3
+    target: tvos-device
   - xcode_version: 9.0
     target: tvos-device
   - xcode_version: 9.1
