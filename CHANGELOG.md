@@ -1,3 +1,15 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Enhancements
+
+* Expose `RLMSSyncManager.authorizationHeaderName`/`SyncManager.authorizationHeaderName`
+  as a way to override the transport header for Realm Object Server authorization.
+* Expose `RLMSyncManager.customRequestHeaders`/`SyncManager.customRequestHeaders`
+  which allows custom HTTP headers to be appended on requests to the Realm Object Server.
+* Expose `RLMSSyncConfiguration.urlPrefix`/`SyncConfiguration.urlPrefix` as a mechanism
+  to replace the default path prefix in Realm Sync WebSocket requests.
+
 3.3.2 Release notes (2018-04-03)
 =============================================================
 
