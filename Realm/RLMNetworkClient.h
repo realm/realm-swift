@@ -49,12 +49,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)sendRequestToEndpoint:(RLMSyncServerEndpoint *)endpoint
                        server:(NSURL *)serverURL
                          JSON:(NSDictionary *)jsonDictionary
-                   completion:(RLMSyncCompletionBlock)completionBlock;
-
-+ (void)sendRequestToEndpoint:(RLMSyncServerEndpoint *)endpoint
-                       server:(NSURL *)serverURL
-                         JSON:(NSDictionary *)jsonDictionary
                       timeout:(NSTimeInterval)timeout
+                      options:(nullable NSDictionary *)options
                    completion:(RLMSyncCompletionBlock)completionBlock;
 
 NS_ASSUME_NONNULL_END

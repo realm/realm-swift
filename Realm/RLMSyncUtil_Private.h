@@ -62,6 +62,11 @@ extern NSString *const kRLMSyncRegisterKey;
 extern NSString *const kRLMSyncUnderlyingErrorKey;
 extern NSString *const kRLMSyncUserIDKey;
 
+extern NSString *const kRLMSyncRequestAuthorizationHeaderNameKey;
+extern NSString *const kRLMSyncRequestExtraHeadersKey;
+
+NSDictionary *RLMSyncRequestOptions(void);
+
 FOUNDATION_EXTERN uint8_t RLMGetComputedPermissions(RLMRealm *realm, id _Nullable object);
 
 #define RLM_SYNC_UNINITIALIZABLE \

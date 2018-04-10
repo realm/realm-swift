@@ -52,7 +52,8 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 - (NSData *)httpBodyForPayload:(NSDictionary *)json error:(NSError **)error;
 
 /// The HTTP headers to be added to the request, if any.
-- (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(NSDictionary *)json;
+- (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(NSDictionary *)json
+                                                        options:(nullable NSDictionary *)options;
 @end
 
 @implementation RLMSyncServerEndpoint
@@ -85,9 +86,14 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return nil;
 }
 
-- (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(__unused NSDictionary *)json {
-    return @{@"Content-Type":   @"application/json;charset=utf-8",
-             @"Accept":         @"application/json"};
+- (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(__unused NSDictionary *)json options:(nullable NSDictionary *)options {
+    NSMutableDictionary<NSString *, NSString *> *headers = [@{@"Content-Type":   @"application/json;charset=utf-8",
+                                                              @"Accept":         @"application/json"} mutableCopy];
+    if (NSDictionary<NSString *, NSString *> *customHeaders = options[kRLMSyncRequestExtraHeadersKey]) {
+        [headers addEntriesFromDictionary:customHeaders];
+    }
+
+    return [headers copy];
 }
 
 @end
@@ -118,13 +124,13 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return [authServerURL URLByAppendingPathComponent:@"auth/password"];
 }
 
-- (NSDictionary *)httpHeadersForPayload:(NSDictionary *)json {
+- (NSDictionary *)httpHeadersForPayload:(NSDictionary *)json options:(nullable NSDictionary *)options {
     NSString *authToken = [json objectForKey:kRLMSyncTokenKey];
     if (!authToken) {
         @throw RLMException(@"Malformed request; this indicates an internal error.");
     }
-    NSMutableDictionary *headers = [[super httpHeadersForPayload:json] mutableCopy];
-    [headers setObject:authToken forKey:@"Authorization"];
+    NSMutableDictionary *headers = [[super httpHeadersForPayload:json options:options] mutableCopy];
+    [headers setObject:authToken forKey:options[kRLMSyncRequestAuthorizationHeaderNameKey] ?: @"Authorization"];
     return [headers copy];
 }
 
@@ -156,12 +162,14 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return nil;
 }
 
-- (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(NSDictionary *)json {
+- (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(NSDictionary *)json options:(nullable NSDictionary *)options {
     NSString *authToken = [json objectForKey:kRLMSyncTokenKey];
     if (!authToken) {
         @throw RLMException(@"Malformed request; this indicates an internal error.");
     }
-    return @{@"Authorization": authToken};
+    NSMutableDictionary *headers = [[super httpHeadersForPayload:json options:options] mutableCopy];
+    [headers setObject:authToken forKey:options[kRLMSyncRequestAuthorizationHeaderNameKey] ?: @"Authorization"];
+    return [headers copy];
 }
 
 @end
@@ -176,19 +184,8 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 + (void)sendRequestToEndpoint:(RLMSyncServerEndpoint *)endpoint
                        server:(NSURL *)serverURL
                          JSON:(NSDictionary *)jsonDictionary
-                   completion:(RLMSyncCompletionBlock)completionBlock {
-    static NSTimeInterval const defaultTimeout = 60;
-    [self sendRequestToEndpoint:endpoint
-                         server:serverURL
-                           JSON:jsonDictionary
-                        timeout:defaultTimeout
-                     completion:completionBlock];
-}
-
-+ (void)sendRequestToEndpoint:(RLMSyncServerEndpoint *)endpoint
-                       server:(NSURL *)serverURL
-                         JSON:(NSDictionary *)jsonDictionary
                       timeout:(NSTimeInterval)timeout
+                      options:(nullable NSDictionary *)options
                    completion:(RLMSyncCompletionBlock)completionBlock {
     // Create the request
     NSError *localError = nil;
@@ -201,7 +198,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     }
     request.HTTPMethod = [endpoint httpMethod];
     request.timeoutInterval = MAX(timeout, 10);
-    NSDictionary<NSString *, NSString *> *headers = [endpoint httpHeadersForPayload:jsonDictionary];
+    NSDictionary<NSString *, NSString *> *headers = [endpoint httpHeadersForPayload:jsonDictionary options:options];
     for (NSString *key in headers) {
         [request addValue:headers[key] forHTTPHeaderField:key];
     }
