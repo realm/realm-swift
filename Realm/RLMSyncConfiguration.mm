@@ -129,6 +129,21 @@ static BOOL isValidRealmURL(NSURL *url) {
     _config->stop_policy = translateStopPolicy(stopPolicy);
 }
 
+- (NSString *)urlPrefix {
+    if (auto prefix = _config->url_prefix) {
+        return @(prefix->c_str());
+    }
+    return nil;
+}
+
+- (void)setUrlPrefix:(NSString *)urlPrefix {
+    if (urlPrefix) {
+        _config->url_prefix.emplace(urlPrefix.UTF8String);
+    } else {
+        _config->url_prefix = none;
+    }
+}
+
 - (NSURL *)realmURL {
     NSString *rawStringURL = @(_config->reference_realm_url.c_str());
     return [NSURL URLWithString:rawStringURL];

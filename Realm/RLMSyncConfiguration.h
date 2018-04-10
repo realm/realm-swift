@@ -58,6 +58,15 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) BOOL isPartial;
 
 /**
+ The prefix that is prepended to the path in the HTTP request
+ that initiates a sync connection. The value specified must match with the server's expectation.
+ Changing the value of `urlPrefix` should be matched with a corresponding
+ change of the server's configuration.
+ If no value is specified here then the default `/realm-sync` path is used.
+*/
+@property (nonatomic, nullable, copy) NSString *urlPrefix;
+
+/**
  Create a sync configuration instance.
 
  @param user    A `RLMSyncUser` that owns the Realm at the given URL.
