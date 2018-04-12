@@ -306,7 +306,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                               kRLMSyncDataKey: @{ kRLMSyncNewPasswordKey: newPassword }
                                               }
                                     timeout:60
-                                    options:RLMSyncRequestOptions()
+                                    options:[[RLMSyncManager sharedManager] networkRequestOptions]
                                  completion:^(NSError *error, __unused NSDictionary *json) {
         completion(error);
     }];
@@ -325,7 +325,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                               kRLMSyncTokenKey: self._refreshToken
                                               }
                                     timeout:60
-                                    options:RLMSyncRequestOptions()
+                                    options:[[RLMSyncManager sharedManager] networkRequestOptions]
                                  completion:^(NSError *error, NSDictionary *json) {
                                      if (error) {
                                          completion(nil, error);
@@ -542,7 +542,7 @@ static void verifyInRunLoop() {
                                      server:authServerURL
                                        JSON:json
                                     timeout:timeout
-                                    options:RLMSyncRequestOptions()
+                                    options:[[RLMSyncManager sharedManager] networkRequestOptions]
                                  completion:^(NSError *error, NSDictionary *dictionary) {
                                      dispatch_async(callbackQueue, ^{
                                          handler(error, dictionary);

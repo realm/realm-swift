@@ -3,7 +3,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* Expose `RLMSSyncManager.authorizationHeaderName`/`SyncManager.authorizationHeaderName`
+* Expose `RLMSyncManager.authorizationHeaderName`/`SyncManager.authorizationHeaderName`
   as a way to override the transport header for Realm Object Server authorization.
 * Expose `RLMSyncManager.customRequestHeaders`/`SyncManager.customRequestHeaders`
   which allows custom HTTP headers to be appended on requests to the Realm Object Server.

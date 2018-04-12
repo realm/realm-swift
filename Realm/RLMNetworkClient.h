@@ -41,6 +41,13 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)endpoint;
 @end
 
+@interface RLMNetworkRequestOptions : NSObject
+
+@property (nonatomic, copy, nullable) NSString *authorizationHeaderName;
+@property (nonatomic, copy, nullable) NSDictionary<NSString *, NSString *> *customHeaders;
+
+@end
+
 /**
  A simple Realm Object Server network client that wraps `NSURLSession`.
  */
@@ -50,7 +57,7 @@ NS_ASSUME_NONNULL_BEGIN
                        server:(NSURL *)serverURL
                          JSON:(NSDictionary *)jsonDictionary
                       timeout:(NSTimeInterval)timeout
-                      options:(nullable NSDictionary *)options
+                      options:(nullable RLMNetworkRequestOptions *)options
                    completion:(RLMSyncCompletionBlock)completionBlock;
 
 NS_ASSUME_NONNULL_END

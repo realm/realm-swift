@@ -53,7 +53,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 
 /// The HTTP headers to be added to the request, if any.
 - (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(NSDictionary *)json
-                                                        options:(nullable NSDictionary *)options;
+                                                        options:(nullable RLMNetworkRequestOptions *)options;
 @end
 
 @implementation RLMSyncServerEndpoint
@@ -86,14 +86,16 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return nil;
 }
 
-- (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(__unused NSDictionary *)json options:(nullable NSDictionary *)options {
-    NSMutableDictionary<NSString *, NSString *> *headers = [@{@"Content-Type":   @"application/json;charset=utf-8",
-                                                              @"Accept":         @"application/json"} mutableCopy];
-    if (NSDictionary<NSString *, NSString *> *customHeaders = options[kRLMSyncRequestExtraHeadersKey]) {
+- (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(__unused NSDictionary *)json options:(nullable RLMNetworkRequestOptions *)options {
+    NSMutableDictionary<NSString *, NSString *> *headers = [[NSMutableDictionary alloc] init];
+    headers[@"Content-Type"] = @"application/json;charset=utf-8";
+    headers[@"Accept"] = @"application/json";
+
+    if (NSDictionary<NSString *, NSString *> *customHeaders = options.customHeaders) {
         [headers addEntriesFromDictionary:customHeaders];
     }
 
-    return [headers copy];
+    return headers;
 }
 
 @end
@@ -124,14 +126,14 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return [authServerURL URLByAppendingPathComponent:@"auth/password"];
 }
 
-- (NSDictionary *)httpHeadersForPayload:(NSDictionary *)json options:(nullable NSDictionary *)options {
+- (NSDictionary *)httpHeadersForPayload:(NSDictionary *)json options:(nullable RLMNetworkRequestOptions *)options {
     NSString *authToken = [json objectForKey:kRLMSyncTokenKey];
     if (!authToken) {
         @throw RLMException(@"Malformed request; this indicates an internal error.");
     }
     NSMutableDictionary *headers = [[super httpHeadersForPayload:json options:options] mutableCopy];
-    [headers setObject:authToken forKey:options[kRLMSyncRequestAuthorizationHeaderNameKey] ?: @"Authorization"];
-    return [headers copy];
+    headers[options.authorizationHeaderName ?: @"Authorization"] = authToken;
+    return headers;
 }
 
 @end
@@ -162,14 +164,14 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return nil;
 }
 
-- (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(NSDictionary *)json options:(nullable NSDictionary *)options {
+- (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(NSDictionary *)json options:(nullable RLMNetworkRequestOptions *)options {
     NSString *authToken = [json objectForKey:kRLMSyncTokenKey];
     if (!authToken) {
         @throw RLMException(@"Malformed request; this indicates an internal error.");
     }
     NSMutableDictionary *headers = [[super httpHeadersForPayload:json options:options] mutableCopy];
-    [headers setObject:authToken forKey:options[kRLMSyncRequestAuthorizationHeaderNameKey] ?: @"Authorization"];
-    return [headers copy];
+    headers[options.authorizationHeaderName ?: @"Authorization"] = authToken;
+    return headers;
 }
 
 @end
@@ -185,7 +187,7 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
                        server:(NSURL *)serverURL
                          JSON:(NSDictionary *)jsonDictionary
                       timeout:(NSTimeInterval)timeout
-                      options:(nullable NSDictionary *)options
+                      options:(nullable RLMNetworkRequestOptions *)options
                    completion:(RLMSyncCompletionBlock)completionBlock {
     // Create the request
     NSError *localError = nil;
@@ -306,5 +308,9 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     }
     return [[RLMSyncErrorResponseModel alloc] initWithDictionary:json];
 }
+
+@end
+
+@implementation RLMNetworkRequestOptions
 
 @end

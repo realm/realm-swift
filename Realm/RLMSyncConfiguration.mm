@@ -130,8 +130,8 @@ static BOOL isValidRealmURL(NSURL *url) {
 }
 
 - (NSString *)urlPrefix {
-    if (auto prefix = _config->url_prefix) {
-        return @(prefix->c_str());
+    if (_config->url_prefix) {
+        return @(_config->url_prefix->c_str());
     }
     return nil;
 }
@@ -212,7 +212,7 @@ static BOOL isValidRealmURL(NSURL *url) {
             _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);
         }
         if (NSDictionary<NSString *, NSString *> *customRequestHeaders = [RLMSyncManager sharedManager].customRequestHeaders) {
-            for (NSString *key in customRequestHeaders.allKeys) {
+            for (NSString *key in customRequestHeaders) {
                 _config->custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
             }
         }

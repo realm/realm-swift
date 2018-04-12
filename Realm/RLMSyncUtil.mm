@@ -60,20 +60,6 @@ NSString *const kRLMSyncTokenKey                = @"token";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
 NSString *const kRLMSyncUserIDKey               = @"user_id";
 
-NSString *const kRLMSyncRequestAuthorizationHeaderNameKey = @"authorizationHeaderName";
-NSString *const kRLMSyncRequestExtraHeadersKey            = @"extraHeaders";
-
-NSDictionary *RLMSyncRequestOptions() {
-    NSMutableDictionary *requestOptions = [[NSMutableDictionary alloc] init];
-    if (NSString *authorizationHeaderName = [RLMSyncManager sharedManager].authorizationHeaderName) {
-        requestOptions[kRLMSyncRequestAuthorizationHeaderNameKey] = authorizationHeaderName;
-    }
-    if (NSDictionary<NSString *, NSString *> *customRequestHeaders = [RLMSyncManager sharedManager].customRequestHeaders) {
-        requestOptions[kRLMSyncRequestExtraHeadersKey] = customRequestHeaders;
-    }
-    return [requestOptions copy];
-}
-
 uint8_t RLMGetComputedPermissions(RLMRealm *realm, id _Nullable object) {
     if (!object) {
         return static_cast<unsigned char>(realm->_realm->get_privileges());
