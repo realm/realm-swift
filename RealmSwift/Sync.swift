@@ -285,6 +285,7 @@ public struct SyncConfiguration {
 
 /// A `SyncCredentials` represents data that uniquely identifies a Realm Object Server user.
 public struct SyncCredentials {
+    /// An account token serialized as a string
     public typealias Token = String
 
     internal var token: Token
