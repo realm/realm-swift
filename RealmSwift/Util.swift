@@ -111,8 +111,8 @@ extension Object {
 internal func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
     if T.self == DynamicObject.self {
         return unsafeBitCast(x as AnyObject, to: T.self)
-    } else if let BridgeableType = T.self as? CustomObjectiveCBridgeable.Type {
-        return BridgeableType.bridging(objCValue: x) as! T
+    } else if let bridgeableType = T.self as? CustomObjectiveCBridgeable.Type {
+        return bridgeableType.bridging(objCValue: x) as! T
     } else {
         return x as! T
     }
