@@ -69,13 +69,14 @@ def doBuild() {
         node('osx') {
           deleteDir()
           unstash 'source'
-          sh '''
+          sh """
+          export REALM_SWIFT_VERSION=${swiftVersions.last()}
           ./scripts/reset-simulators.sh
           ./build.sh docs
           cd docs
           zip -r objc-docs.zip objc_output
           zip -r swift-docs.zip swift_output
-          '''
+          """
           dir('docs') {
             archiveArtifacts artifacts: '*-docs.zip'
           }
