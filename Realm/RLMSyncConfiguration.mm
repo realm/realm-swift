@@ -129,6 +129,21 @@ static BOOL isValidRealmURL(NSURL *url) {
     _config->stop_policy = translateStopPolicy(stopPolicy);
 }
 
+- (NSString *)urlPrefix {
+    if (_config->url_prefix) {
+        return @(_config->url_prefix->c_str());
+    }
+    return nil;
+}
+
+- (void)setUrlPrefix:(NSString *)urlPrefix {
+    if (urlPrefix) {
+        _config->url_prefix.emplace(urlPrefix.UTF8String);
+    } else {
+        _config->url_prefix = none;
+    }
+}
+
 - (NSURL *)realmURL {
     NSString *rawStringURL = @(_config->reference_realm_url.c_str());
     return [NSURL URLWithString:rawStringURL];
@@ -192,6 +207,16 @@ static BOOL isValidRealmURL(NSURL *url) {
         _config->bind_session_handler = std::move(bindHandler);
         _config->error_handler = std::move(errorHandler);
         _config->is_partial = isPartial;
+
+        if (NSString *authorizationHeaderName = [RLMSyncManager sharedManager].authorizationHeaderName) {
+            _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);
+        }
+        if (NSDictionary<NSString *, NSString *> *customRequestHeaders = [RLMSyncManager sharedManager].customRequestHeaders) {
+            for (NSString *key in customRequestHeaders) {
+                _config->custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
+            }
+        }
+
         self.customFileURL = customFileURL;
         return self;
     }

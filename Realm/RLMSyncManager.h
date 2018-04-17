@@ -92,6 +92,17 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
  */
 @property (nonatomic) RLMSyncLogLevel logLevel;
 
+/**
+ The name of the HTTP header to send authorization data in when making requests to a Realm Object Server which has
+ been configured to expect a custom authorization header.
+ */
+@property (nullable, nonatomic, copy) NSString *authorizationHeaderName;
+
+/**
+ Extra HTTP headers to append to every request to a Realm Object Server.
+ */
+@property (nullable, nonatomic, copy) NSDictionary<NSString *, NSString *> *customRequestHeaders;
+
 /// The sole instance of the singleton.
 + (instancetype)sharedManager NS_REFINED_FOR_SWIFT;
 
