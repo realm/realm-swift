@@ -20,9 +20,6 @@
 
 #import "RLMJSONModels.h"
 #import "RLMObject_Private.hpp"
-#import "RLMSyncManager.h"
-#import "RLMSyncUtil_Private.hpp"
-#import "RLMSyncUser_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Private.hpp"
