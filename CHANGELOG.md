@@ -1,6 +1,8 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
+The prebuilt binary for Carthage is now built for Swift 4.1.
+
 ### Enhancements
 
 * Expose `RLMSyncManager.authorizationHeaderName`/`SyncManager.authorizationHeaderName`
