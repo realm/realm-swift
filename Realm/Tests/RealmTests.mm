@@ -989,6 +989,9 @@
     [realm beginWriteTransaction];
     [StringObject createInRealm:realm withValue:@[@"string"]];
     [realm commitWriteTransaction];
+
+    XCTAssertFalse(first);
+    [token invalidate];
 }
 
 - (void)testBeginWriteTransactionFromWithinCollectionChangedNotification {
