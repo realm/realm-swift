@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.4.0 Release notes (2018-04-19)
 =============================================================
 
 The prebuilt binary for Carthage is now built for Swift 4.1.
