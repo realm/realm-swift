@@ -42,7 +42,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning Partial synchronization is a tech preview. Its APIs are subject to change.
 */
-- (void)subscribeToObjects:(Class)type where:(NSString *)query callback:(RLMPartialSyncFetchCallback)callback;
+- (void)subscribeToObjects:(Class)type where:(NSString *)query callback:(RLMPartialSyncFetchCallback)callback
+__deprecated_msg("Use -[RLMResults subscribe]");
 
 @end
 

@@ -1,12 +1,7 @@
 swiftVersions = ['3.1', '3.2', '3.2.2', '3.2.3', '3.3', '4.0', '4.0.2', '4.0.3', '4.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS']
-carthageXcodeVersion = '9.2'
-
-@NonCPS
-def nodeLabelForSwiftVersion(version) {
-  return ['3.3': 'xcode93', '4.1': 'xcode93'].get(version, 'osx')
-}
+carthageXcodeVersion = '9.3'
 
 def installationTest(platform, test, language) {
   return {
@@ -74,13 +69,14 @@ def doBuild() {
         node('osx') {
           deleteDir()
           unstash 'source'
-          sh '''
+          sh """
+          export REALM_SWIFT_VERSION=${swiftVersions.last()}
           ./scripts/reset-simulators.sh
           ./build.sh docs
           cd docs
           zip -r objc-docs.zip objc_output
           zip -r swift-docs.zip swift_output
-          '''
+          """
           dir('docs') {
             archiveArtifacts artifacts: '*-docs.zip'
           }
@@ -130,7 +126,7 @@ def doBuild() {
       for (def v in swiftVersions) {
         def swiftVersion = v
         parallelBuilds["${platformName} Swift ${swiftVersion}"] = {
-          node(nodeLabelForSwiftVersion(swiftVersion)) {
+          node('osx') {
             deleteDir()
             unstash 'source'
             sh "XCMODE=xcpretty ./build.sh package-${platform}-swift-${swiftVersion}"
