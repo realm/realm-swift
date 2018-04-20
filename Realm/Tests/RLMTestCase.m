@@ -175,11 +175,12 @@ static BOOL encryptTests() {
 
 - (void)waitForNotification:(NSString *)expectedNote realm:(RLMRealm *)realm block:(dispatch_block_t)block {
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
+    __block RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *realm) {
         XCTAssertNotNil(note, @"Note should not be nil");
         XCTAssertNotNil(realm, @"Realm should not be nil");
         if (note == expectedNote) { // Check pointer equality to ensure we're using the interned string constant
             [notificationFired fulfill];
+            [token invalidate];
         }
     }];
 
@@ -194,8 +195,6 @@ static BOOL encryptTests() {
 
     // wait for queue to finish
     dispatch_sync(queue, ^{});
-
-    [token invalidate];
 }
 
 - (void)dispatchAsync:(dispatch_block_t)block {
