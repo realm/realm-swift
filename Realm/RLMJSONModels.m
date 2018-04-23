@@ -211,6 +211,11 @@ static const NSString *const kRLMSyncValueKey           = @"value";
         RLM_SYNC_PARSE_OPTIONAL_STRING(jsonDictionary, kRLMSyncErrorTitleKey, title);
         RLM_SYNC_PARSE_OPTIONAL_STRING(jsonDictionary, kRLMSyncErrorHintKey, hint);
 
+        NSString *detail = jsonDictionary[@"detail"];
+        if ([detail isKindOfClass:[NSString class]]) {
+            _title = detail;
+        }
+
         for (NSDictionary<NSString *, NSString *> *problem in jsonDictionary[@"invalid_params"]) {
             NSString *name = problem[@"name"];
             NSString *reason = problem[@"reason"];

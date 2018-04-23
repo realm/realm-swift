@@ -404,6 +404,49 @@
     }
 }
 
+- (void)testRequestPasswordResetForRegisteredUser {
+    NSString *userName = [NSStringFromSelector(_cmd) stringByAppendingString:@"@example.com"];
+    RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:@"a" register:YES];
+    [[self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]] logOut];
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser requestPasswordResetForAuthServer:[RLMObjectServerTests authServerURL] userEmail:userName completion:^(NSError *error) {
+        // Shouldn't be an error, but is due to not having an email handler set up in our test instance
+        XCTAssertEqualObjects(error.domain, @"io.realm.sync.auth");
+        XCTAssertEqual(error.code, 614);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // We don't have any way to actually get the email and test the rest of the flow
+}
+
+- (void)testRequestPasswordResetForNonexistentUser {
+    NSString *userName = [NSStringFromSelector(_cmd) stringByAppendingString:@"@example.com"];
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser requestPasswordResetForAuthServer:[RLMObjectServerTests authServerURL] userEmail:userName completion:^(NSError *error) {
+        // Shouldn't be an error, but is due to not having an email handler set up in our test instance
+        XCTAssertEqualObjects(error.domain, @"io.realm.sync.auth");
+        XCTAssertEqual(error.code, 614);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+- (void)testRequestPasswordResetWithBadAuthURL {
+    NSString *userName = [NSStringFromSelector(_cmd) stringByAppendingString:@"@example.com"];
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"callback invoked"];
+    NSURL *badAuthUrl = [[RLMObjectServerTests authServerURL] URLByAppendingPathComponent:@"/bad"];
+    [RLMSyncUser requestPasswordResetForAuthServer:badAuthUrl userEmail:userName completion:^(NSError *error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.userInfo[@"statusCode"], @404);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
 /// A sync admin user should be able to retrieve information about other users.
 - (void)testRetrieveUserInfo {
     NSString *nonAdminUsername = @"meela@realm.example.org";
