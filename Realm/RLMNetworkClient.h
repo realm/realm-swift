@@ -36,6 +36,10 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)endpoint;
 @end
 
+@interface RLMSyncUpdateAccountEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
++ (instancetype)endpoint;
+@end
+
 /// The get user info endpoint.
 @interface RLMSyncGetUserInfoEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
 + (instancetype)endpoint;

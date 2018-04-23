@@ -138,6 +138,16 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 
 @end
 
+@implementation RLMSyncUpdateAccountEndpoint
++ (instancetype)endpoint {
+    return [[RLMSyncUpdateAccountEndpoint alloc] initPrivate];
+}
+
+- (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
+    return [authServerURL URLByAppendingPathComponent:@"auth/password/updateAccount"];
+}
+@end
+
 @implementation RLMSyncGetUserInfoEndpoint
 
 + (instancetype)endpoint {
