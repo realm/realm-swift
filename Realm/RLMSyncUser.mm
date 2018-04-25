@@ -299,17 +299,53 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                    userInfo:nil]);
         return;
     }
-    [RLMNetworkClient sendRequestToEndpoint:[RLMSyncChangePasswordEndpoint endpoint]
-                                     server:self.authenticationServer
+    [RLMSyncChangePasswordEndpoint sendRequestToServer:self.authenticationServer
                                        JSON:@{kRLMSyncTokenKey: self._refreshToken,
                                               kRLMSyncUserIDKey: userID,
-                                              kRLMSyncDataKey: @{ kRLMSyncNewPasswordKey: newPassword }
-                                              }
-                                    timeout:60
+                                              kRLMSyncDataKey: @{kRLMSyncNewPasswordKey: newPassword}}
                                     options:[[RLMSyncManager sharedManager] networkRequestOptions]
-                                 completion:^(NSError *error, __unused NSDictionary *json) {
-        completion(error);
-    }];
+                                 completion:completion];
+}
+
++ (void)requestPasswordResetForAuthServer:(NSURL *)serverURL
+                                userEmail:(NSString *)email
+                               completion:(RLMPasswordChangeStatusBlock)completion {
+    [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
+                                                 JSON:@{@"provider_id": email, @"data": @{@"action": @"reset_password"}}
+                                              options:[[RLMSyncManager sharedManager] networkRequestOptions]
+                                           completion:completion];
+}
+
++ (void)completePasswordResetForAuthServer:(NSURL *)serverURL
+                                     token:(NSString *)token
+                                  password:(NSString *)newPassword
+                                completion:(RLMPasswordChangeStatusBlock)completion {
+    [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
+                                                 JSON:@{@"data": @{@"action": @"complete_reset",
+                                                                   @"token": token,
+                                                                   @"new_password": newPassword}}
+                                              options:[[RLMSyncManager sharedManager] networkRequestOptions]
+                                           completion:completion];
+}
+
++ (void)requestEmailConfirmationForAuthServer:(NSURL *)serverURL
+                                    userEmail:(NSString *)email
+                                   completion:(RLMPasswordChangeStatusBlock)completion {
+    [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
+                                                 JSON:@{@"data": @{@"provider_id": email,
+                                                                   @"action": @"request_email_confirmation"}}
+                                              options:[[RLMSyncManager sharedManager] networkRequestOptions]
+                                           completion:completion];
+}
+
++ (void)confirmEmailForAuthServer:(NSURL *)serverURL
+                            token:(NSString *)token
+                       completion:(RLMPasswordChangeStatusBlock)completion {
+    [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
+                                                 JSON:@{@"data": @{@"action": @"confirm_email",
+                                                                   @"token": token}}
+                                              options:[[RLMSyncManager sharedManager] networkRequestOptions]
+                                           completion:completion];
 }
 
 #pragma mark - Administrator API

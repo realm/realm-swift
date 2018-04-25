@@ -35,9 +35,11 @@ typedef enum : NSUInteger {
     ServerError         = 5, // 5XX
 } RLMServerHTTPErrorCodeType;
 
-static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
+static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return NSMakeRange(type*100, kHTTPCodeRange);
 }
+
+static std::atomic<NSTimeInterval> g_defaultTimeout{60.0};
 
 @interface RLMSyncServerEndpoint ()
 - (instancetype)initPrivate NS_DESIGNATED_INITIALIZER;
@@ -57,6 +59,24 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 @end
 
 @implementation RLMSyncServerEndpoint
+
++ (void)sendRequestToServer:(NSURL *)serverURL
+                       JSON:(NSDictionary *)jsonDictionary
+                    options:(nullable RLMNetworkRequestOptions *)options
+                 completion:(void (^)(NSError *))completionBlock {
+    [RLMNetworkClient sendRequestToEndpoint:[self endpoint]
+                                     server:serverURL
+                                       JSON:jsonDictionary
+                                    timeout:g_defaultTimeout.load()
+                                    options:options
+                                 completion:^(NSError *error, NSDictionary *) {
+                                     completionBlock(error);
+                                 }];
+}
+
++ (instancetype)endpoint {
+    return [[self alloc] initPrivate];
+}
 
 - (instancetype)initPrivate {
     return (self = [super init]);
@@ -97,27 +117,15 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 
     return headers;
 }
-
 @end
 
 @implementation RLMSyncAuthEndpoint
-
-+ (instancetype)endpoint {
-    return [[RLMSyncAuthEndpoint alloc] initPrivate];
-}
-
 - (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
     return [authServerURL URLByAppendingPathComponent:@"auth"];
 }
-
 @end
 
 @implementation RLMSyncChangePasswordEndpoint
-
-+ (instancetype)endpoint {
-    return [[RLMSyncChangePasswordEndpoint alloc] initPrivate];
-}
-
 - (NSString *)httpMethod {
     return @"PUT";
 }
@@ -135,15 +143,15 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     headers[options.authorizationHeaderName ?: @"Authorization"] = authToken;
     return headers;
 }
+@end
 
+@implementation RLMSyncUpdateAccountEndpoint
+- (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
+    return [authServerURL URLByAppendingPathComponent:@"auth/password/updateAccount"];
+}
 @end
 
 @implementation RLMSyncGetUserInfoEndpoint
-
-+ (instancetype)endpoint {
-    return [[RLMSyncGetUserInfoEndpoint alloc] initPrivate];
-}
-
 - (NSString *)httpMethod {
     return @"GET";
 }
@@ -173,11 +181,13 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     headers[options.authorizationHeaderName ?: @"Authorization"] = authToken;
     return headers;
 }
-
 @end
 
 
 @implementation RLMNetworkClient
++ (void)setDefaultTimeout:(NSTimeInterval)timeOut {
+    g_defaultTimeout = timeOut;
+}
 
 + (NSURLSession *)session {
     return [NSURLSession sharedSession];
@@ -257,8 +267,8 @@ static NSRange RLM_rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     }
 
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-    BOOL badResponse = (NSLocationInRange(httpResponse.statusCode, RLM_rangeForErrorType(ClientError))
-                        || NSLocationInRange(httpResponse.statusCode, RLM_rangeForErrorType(ServerError)));
+    BOOL badResponse = (NSLocationInRange(httpResponse.statusCode, rangeForErrorType(ClientError))
+                        || NSLocationInRange(httpResponse.statusCode, rangeForErrorType(ServerError)));
     if (badResponse) {
         if (RLMSyncErrorResponseModel *responseModel = [self responseModelFromData:data]) {
             switch (responseModel.code) {

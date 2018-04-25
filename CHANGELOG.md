@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add wrapper functions for email confirmation and password reset to `SyncUser`.
 
 ### Bugfixes
 

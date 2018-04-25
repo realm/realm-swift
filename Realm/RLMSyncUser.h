@@ -219,6 +219,88 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (void)changePassword:(NSString *)newPassword forUserID:(NSString *)userID completion:(RLMPasswordChangeStatusBlock)completion;
 
+/**
+ Ask the server to send a password reset email to the given email address.
+
+ If `email` is an email address which is associated with a user account that was
+ registered using the "password" authentication service, the server will send an
+ email to that address with a password reset token. No error is reported if the
+ email address is invalid or not associated with an account.
+
+ @param serverURL  The authentication server URL for the user.
+ @param email      The email address to send the email to.
+ @param completion A block which will be called when the request completes or
+                   fails. The callback will be invoked on a background queue
+                   provided by `NSURLSession`, and not on the calling queue.
+ */
++ (void)requestPasswordResetForAuthServer:(NSURL *)serverURL
+                                userEmail:(NSString *)email
+                               completion:(RLMPasswordChangeStatusBlock)completion;
+
+/**
+ Change a user's password using a one-time password reset token.
+
+ By default, the password reset email sent by ROS will link to a web site where
+ the user can select a new password, and the app will not need to call this
+ method. If you wish to instead handle this within your native app, you must
+ change the `baseURL` in the server configuration for `PasswordAuthProvider` to
+ a scheme registered for your app, extract the token from the URL, and call this
+ method after prompting the user for a new password.
+
+ @warning Changing a user's password using an authentication server that doesn't
+          use HTTPS is a major security flaw, and should only be done while
+          testing.
+
+ @param serverURL   The authentication server URL for the user.
+ @param token       The one-time use token from the URL.
+ @param newPassword The user's new password.
+ @param completion  A block which will be called when the request completes or
+                    fails. The callback will be invoked on a background queue
+                    provided by `NSURLSession`, and not on the calling queue.
+ */
++ (void)completePasswordResetForAuthServer:(NSURL *)serverURL
+                                     token:(NSString *)token
+                                  password:(NSString *)newPassword
+                                completion:(RLMPasswordChangeStatusBlock)completion;
+
+/**
+ Ask the server to send a confirmation email to the given email address.
+
+ If `email` is an email address which is associated with a user account that was
+ registered using the "password" authentication service, the server will send an
+ email to that address with a confirmation token. No error is reported if the
+ email address is invalid or not associated with an account.
+
+ @param serverURL  The authentication server URL for the user.
+ @param email      The email address to send the email to.
+ @param completion A block which will be called when the request completes or
+                   fails. The callback will be invoked on a background queue
+                   provided by `NSURLSession`, and not on the calling queue.
+ */
++ (void)requestEmailConfirmationForAuthServer:(NSURL *)serverURL
+                                    userEmail:(NSString *)email
+                                   completion:(RLMPasswordChangeStatusBlock)completion;
+
+/**
+ Confirm a user's email using a one-time confirmation token.
+
+ By default, the confirmation email sent by ROS will link to a web site with
+ a generic "thank you for confirming your email" message, and the app will not
+ need to call this method. If you wish to instead handle this within your native
+ app, you must change the `baseURL` in the server configuration for
+ `PasswordAuthProvider` to a scheme registered for your app, extract the token
+ from the URL, and call this method.
+
+ @param serverURL   The authentication server URL for the user.
+ @param token       The one-time use token from the URL.
+ @param completion  A block which will be called when the request completes or
+                    fails. The callback will be invoked on a background queue
+                    provided by `NSURLSession`, and not on the calling queue.
+ */
++ (void)confirmEmailForAuthServer:(NSURL *)serverURL
+                            token:(NSString *)token
+                       completion:(RLMPasswordChangeStatusBlock)completion;
+
 #pragma mark - Administrator
 
 /**
