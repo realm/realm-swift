@@ -33,21 +33,10 @@
 #import "sync/sync_session.hpp"
 #import "sync/sync_user.hpp"
 
-// Set this to 1 if you intend to start up a ROS instance manually to test against.
-#define PROVIDING_OWN_ROS 0
-
 // Set this to 1 if you want the test ROS instance to log its debug messages to console.
 #define LOG_ROS_OUTPUT 0
 
-// Set this to 1 for extremely verbose trace logging from ROS
-#define LOG_ROS_TRACE 0
-
 #define NODE_PATH @"/usr/local/bin/node"
-
-#if PROVIDING_OWN_ROS
-// Define the admin token as an Objective-C string here if you wish to run tests requiring it.
-// #define OWN_ROS_ADMIN_TOKEN @"token_goes_here"
-#endif
 
 #if !TARGET_OS_MAC
 #error These tests can only be run on a macOS host.
@@ -125,101 +114,112 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (instancetype)init {
     if (self = [super init]) {
-        _serverDataRoot = [[[[[NSURL fileURLWithPath:@(__FILE__)]
-                             URLByDeletingLastPathComponent]
-                            URLByDeletingLastPathComponent]
-                           URLByDeletingLastPathComponent]
-                           URLByAppendingPathComponent:@"test-ros-instance/"];
+        _serverDataRoot = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"test-ros-data"]];
     }
     return self;
 }
 
 - (void)launch {
-#if !PROVIDING_OWN_ROS
     if (_task) {
         return;
     }
-
-    // Kill any old running processes from a previous run
-    // Make sure this argument list matches the one used to launch below
+    // Clean up any old state from the server
     [[NSTask launchedTaskWithLaunchPath:@"/usr/bin/pkill"
-                              arguments:@[@"-f", @"ros/bin/ros", @"start"]] waitUntilExit];
+                              arguments:@[@"-f", @"node.*test-ros-server.js"]] waitUntilExit];
+    [NSFileManager.defaultManager removeItemAtURL:self.serverDataRoot error:nil];
+    [NSFileManager.defaultManager createDirectoryAtURL:self.serverDataRoot
+                           withIntermediateDirectories:YES attributes:nil error:nil];
 
-    NSFileManager *fileManager = NSFileManager.defaultManager;
+    // Install ROS if it isn't already present
+    [self downloadObjectServer];
 
-    NSURL *target = [self.serverDataRoot URLByAppendingPathComponent:@"ros/bin/ros"];
-    if (![fileManager fileExistsAtPath:target.path]) {
-        NSLog(@"The Realm Object Server isn't installed. You need to run 'build.sh download-object-server'"
-              @" prior to running these tests.");
-        abort();
-    }
-
-    [fileManager removeItemAtURL:[self.serverDataRoot URLByAppendingPathComponent:@"data"] error:nil];
-    [fileManager removeItemAtURL:[self.serverDataRoot URLByAppendingPathComponent:@"realm-object-server"] error:nil];
-
+    // Set up the actual ROS task
     NSPipe *pipe = [NSPipe pipe];
-    auto buffer = [[NSMutableData alloc] init];
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    __block BOOL inUseError = NO;
-    pipe.fileHandleForReading.readabilityHandler = ^(NSFileHandle *file) {
-        [buffer appendData:[file availableData]];
-        const auto bytes = static_cast<const char *>(buffer.bytes);
-        if (strstr(bytes, "Realm Object Server has started and is listening")) {
-            dispatch_semaphore_signal(sema);
-        }
-        else if (strstr(bytes, "Error: listen EADDRINUSE")) {
-            inUseError = YES;
-            dispatch_semaphore_signal(sema);
-        }
-
-        const char *newline;
-        auto start = bytes;
-        auto end = start + buffer.length;
-        while ((newline = std::find(start, end, '\n')) != end) {
-#if LOG_ROS_OUTPUT
-            if (newline > start + 1) {
-                NSLog(@"ROS: %.*s", int(newline - start), start);
-            }
-#endif
-            start = newline + 1;
-        }
-
-        // Remove everything up to the last newline, leaving any data not newline-terminated in the buffer
-        [buffer replaceBytesInRange:{0, static_cast<NSUInteger>(start - bytes)} withBytes:nullptr length:0];
-    };
-
     _task = [[NSTask alloc] init];
     _task.currentDirectoryPath = self.serverDataRoot.path;
     _task.launchPath = NODE_PATH;
-    // Warning: if the way the ROS is launched is changed, remember to also update
-    // the regex in build.sh's kill_object_server() function.
-    _task.arguments = @[target.path, @"start", @"--auth", @"debug,password"
-                        #if LOG_ROS_TRACE
-                            , @"--loglevel", @"trace"
-                        #endif
-                        ];
-    // Need to set the environment variables to bypass the mandatory email prompt.
-    // ROS_SUPERAGENT_RETRY_DELAY is a workaround for <https://github.com/realm/realm-object-server-private/issues/950>.
-    _task.environment = @{@"ROS_TOS_EMAIL_ADDRESS": @"ci@realm.io",
-                          @"DOCKER_DATA_PATH": @"/tmp",
-                          @"REALM_DISABLE_SYNC_TO_DISK": @"true",
-                          @"ROS_SUPERAGENT_RETRY_DELAY": @"0" };
-
+    NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
+    _task.arguments = @[[directory stringByAppendingPathComponent:@"test-ros-server.js"],
+                        self.serverDataRoot.path];
     _task.standardOutput = pipe;
-    _task.standardError = pipe;
-
     [_task launch];
 
-    long wait_result = dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(60 * NSEC_PER_SEC)));
-    if (inUseError) {
-        NSLog(@"Server tried to start up, but the port was already in use (probably already running).");
+    NSData *childStdout = pipe.fileHandleForReading.readDataToEndOfFile;
+    if (![childStdout isEqual:[@"started\n" dataUsingEncoding:NSUTF8StringEncoding]]) {
         abort();
     }
-    if (wait_result != 0) {
-        NSLog(@"Server did not start up within the allotted timeout interval.");
+
+    atexit([] {
+        auto self = RealmObjectServer.sharedServer;
+        [self->_task terminate];
+        [self->_task waitUntilExit];
+        [NSFileManager.defaultManager removeItemAtURL:self->_serverDataRoot error:nil];
+    });
+}
+
+- (NSString *)desiredObjectServerVersion {
+    auto path = [[[[@(__FILE__) stringByDeletingLastPathComponent] // RLMSyncTestCase.mm
+                 stringByDeletingLastPathComponent] // ObjectServerTests
+                 stringByDeletingLastPathComponent] // Realm
+                 stringByAppendingPathComponent:@"dependencies.list"];
+    auto file = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
+    if (!file) {
+        NSLog(@"Failed to read dependencies.list");
         abort();
     }
-#endif // !PROVIDING_OWN_ROS
+
+    auto regex = [NSRegularExpression regularExpressionWithPattern:@"^REALM_OBJECT_SERVER_VERSION=(.*)$"
+                                                           options:NSRegularExpressionAnchorsMatchLines error:nil];
+    auto match = [regex firstMatchInString:file options:0 range:{0, file.length}];
+    if (!match) {
+        NSLog(@"Failed to read REALM_OBJECT_SERVER_VERSION from dependencies.list");
+        abort();
+    }
+    return [file substringWithRange:[match rangeAtIndex:1]];
+}
+
+- (NSString *)currentObjectServerVersion {
+    auto path = [[[[@(__FILE__) stringByDeletingLastPathComponent] // RLMSyncTestCase.mm
+                 stringByAppendingPathComponent:@"node_modules"]
+                 stringByAppendingPathComponent:@"realm-object-server"]
+                 stringByAppendingPathComponent:@"package.json"];
+    auto file = [NSData dataWithContentsOfFile:path];
+    if (!file) {
+        return nil;
+    }
+
+    NSError *error;
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:file options:0 error:&error];
+    if (!json) {
+        NSLog(@"Error reading version from installed ROS: %@", error);
+        abort();
+    }
+
+    return json[@"version"];
+}
+
+- (void)downloadObjectServer {
+    NSString *desiredVersion = [self desiredObjectServerVersion];
+    NSString *currentVersion = [self currentObjectServerVersion];
+    if ([currentVersion isEqualToString:desiredVersion]) {
+        return;
+    }
+
+    NSLog(@"Installing Realm Object Server %@", desiredVersion);
+    NSTask *task = [[NSTask alloc] init];
+    task.currentDirectoryPath = [@(__FILE__) stringByDeletingLastPathComponent];
+    task.launchPath = NODE_PATH;
+    task.arguments = @[[[NODE_PATH stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"npm"],
+                       @"--scripts-prepend-node-path=auto",
+                       @"--no-color",
+                       @"--no-progress",
+                       @"--no-save",
+                       @"--no-package-lock",
+                       @"install",
+                       [@"realm-object-server@" stringByAppendingString:desiredVersion]
+                       ];
+    [task launch];
+    [task waitUntilExit];
 }
 @end
 
@@ -382,16 +382,8 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (NSString *)adminToken {
-#if PROVIDING_OWN_ROS
-#ifdef OWN_ROS_ADMIN_TOKEN
-    return OWN_ROS_ADMIN_TOKEN;
-#else
-    NSAssert(NO, @"Cannot run admin token related tests unless you define OWN_ROS_ADMIN_TOKEN.");
-    return nil;
-#endif
-#else
     NSURL *target = [RealmObjectServer.sharedServer.serverDataRoot
-                     URLByAppendingPathComponent:@"/data/keys/admin.json"];
+                     URLByAppendingPathComponent:@"/keys/admin.json"];
     if (![[NSFileManager defaultManager] fileExistsAtPath:[target path]]) {
         XCTFail(@"Could not find the JSON file containing the admin token.");
         return nil;
@@ -403,7 +395,6 @@ static NSURL *syncDirectoryForChildProcess() {
         XCTFail(@"Could not successfully extract the token.");
     }
     return token;
-#endif
 }
 
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm {
