@@ -230,7 +230,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  @param serverURL  The authentication server URL for the user.
  @param email      The email address to send the email to.
  @param completion A block which will be called when the request completes or
-                   failes. The callback will be invoked on a background queue
+                   fails. The callback will be invoked on a background queue
                    provided by `NSURLSession`, and not on the calling queue.
  */
 + (void)requestPasswordResetForAuthServer:(NSURL *)serverURL
@@ -255,7 +255,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  @param token       The one-time use token from the URL.
  @param newPassword The user's new password.
  @param completion  A block which will be called when the request completes or
-                    failes. The callback will be invoked on a background queue
+                    fails. The callback will be invoked on a background queue
                     provided by `NSURLSession`, and not on the calling queue.
  */
 + (void)completePasswordResetForAuthServer:(NSURL *)serverURL
@@ -274,7 +274,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  @param serverURL  The authentication server URL for the user.
  @param email      The email address to send the email to.
  @param completion A block which will be called when the request completes or
-                   failes. The callback will be invoked on a background queue
+                   fails. The callback will be invoked on a background queue
                    provided by `NSURLSession`, and not on the calling queue.
  */
 + (void)requestEmailConfirmationForAuthServer:(NSURL *)serverURL
@@ -294,7 +294,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  @param serverURL   The authentication server URL for the user.
  @param token       The one-time use token from the URL.
  @param completion  A block which will be called when the request completes or
-                    failes. The callback will be invoked on a background queue
+                    fails. The callback will be invoked on a background queue
                     provided by `NSURLSession`, and not on the calling queue.
  */
 + (void)confirmEmailForAuthServer:(NSURL *)serverURL
