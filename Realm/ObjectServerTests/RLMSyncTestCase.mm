@@ -397,6 +397,17 @@ static NSURL *syncDirectoryForChildProcess() {
     return token;
 }
 
+- (NSString *)emailForAddress:(NSString *)email {
+    NSURL *target = [[RealmObjectServer.sharedServer.serverDataRoot
+                     URLByAppendingPathComponent:@"/email"]
+                     URLByAppendingPathComponent:email];
+    NSString *body = [NSString stringWithContentsOfURL:target encoding:NSUTF8StringEncoding error:nil];
+    if (body) {
+        [NSFileManager.defaultManager removeItemAtURL:target error:nil];
+    }
+    return body;
+}
+
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm {
     [self waitForDownloadsForRealm:realm error:nil];
 }

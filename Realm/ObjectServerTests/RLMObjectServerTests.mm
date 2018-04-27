@@ -411,14 +411,41 @@
 
     XCTestExpectation *ex = [self expectationWithDescription:@"callback invoked"];
     [RLMSyncUser requestPasswordResetForAuthServer:[RLMObjectServerTests authServerURL] userEmail:userName completion:^(NSError *error) {
-        // Shouldn't be an error, but is due to not having an email handler set up in our test instance
-        XCTAssertEqualObjects(error.domain, @"io.realm.sync.auth");
-        XCTAssertEqual(error.code, 614);
+        XCTAssertNil(error);
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    // We don't have any way to actually get the email and test the rest of the flow
+    NSString *token = [self emailForAddress:userName];
+    XCTAssertNotNil(token);
+
+    // Use the password reset token
+    ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser completePasswordResetForAuthServer:[RLMObjectServerTests authServerURL] token:token password:@"new password"
+                                         completion:^(NSError *error) {
+                                             XCTAssertNil(error);
+                                             [ex fulfill];
+                                         }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Should now be able to log in with the new password
+    {
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName
+                                                                       password:@"new password"
+                                                                       register:NO];
+        RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
+        XCTAssertNotNil(user);
+        [user logOut];
+    }
+
+    // Reusing the token should fail
+    ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser completePasswordResetForAuthServer:[RLMObjectServerTests authServerURL] token:token password:@"new password 2"
+                                         completion:^(NSError *error) {
+                                             XCTAssertNotNil(error);
+                                             [ex fulfill];
+                                         }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 - (void)testRequestPasswordResetForNonexistentUser {
@@ -426,12 +453,14 @@
 
     XCTestExpectation *ex = [self expectationWithDescription:@"callback invoked"];
     [RLMSyncUser requestPasswordResetForAuthServer:[RLMObjectServerTests authServerURL] userEmail:userName completion:^(NSError *error) {
-        // Shouldn't be an error, but is due to not having an email handler set up in our test instance
-        XCTAssertEqualObjects(error.domain, @"io.realm.sync.auth");
-        XCTAssertEqual(error.code, 614);
+        // Not an error even though the user doesn't exist
+        XCTAssertNil(error);
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Should not have sent an email to the non-registered user
+    XCTAssertNil([self emailForAddress:userName]);
 }
 
 - (void)testRequestPasswordResetWithBadAuthURL {
@@ -445,6 +474,57 @@
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+- (void)testRequestConfirmEmailForRegisteredUser {
+    NSString *userName = [NSStringFromSelector(_cmd) stringByAppendingString:@"@example.com"];
+    RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:@"a" register:YES];
+    [[self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]] logOut];
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser requestEmailConfirmationForAuthServer:[RLMObjectServerTests authServerURL]
+                                             userEmail:userName completion:^(NSError *error) {
+                                                 XCTAssertNil(error);
+                                                 [ex fulfill];
+                                             }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    NSString *token = [self emailForAddress:userName];
+    XCTAssertNotNil(token);
+
+    // Use the token
+    ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser confirmEmailForAuthServer:[RLMObjectServerTests authServerURL] token:token
+                                            completion:^(NSError *error) {
+                                                XCTAssertNil(error);
+                                                [ex fulfill];
+                                            }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Reusing the token should fail
+    ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser confirmEmailForAuthServer:[RLMObjectServerTests authServerURL] token:token
+                                            completion:^(NSError *error) {
+                                                XCTAssertNotNil(error);
+                                                [ex fulfill];
+                                            }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+- (void)testRequestConfirmEmailForNonexistentUser {
+    NSString *userName = [NSStringFromSelector(_cmd) stringByAppendingString:@"@example.com"];
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser requestEmailConfirmationForAuthServer:[RLMObjectServerTests authServerURL]
+                                             userEmail:userName completion:^(NSError *error) {
+                                                 // Not an error even though the user doesn't exist
+                                                 XCTAssertNil(error);
+                                                 [ex fulfill];
+                                             }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Should not have sent an email to the non-registered user
+    XCTAssertNil([self emailForAddress:userName]);
 }
 
 /// A sync admin user should be able to retrieve information about other users.
