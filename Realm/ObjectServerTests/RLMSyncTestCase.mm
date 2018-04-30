@@ -88,10 +88,6 @@ static NSURL *syncDirectoryForChildProcess() {
     NSBundle *bundle = [NSBundle mainBundle];
     NSString *bundleIdentifier = bundle.bundleIdentifier ?: bundle.executablePath.lastPathComponent;
     path = [path stringByAppendingPathComponent:[NSString stringWithFormat:@"%@-child", bundleIdentifier]];
-    [[NSFileManager defaultManager] createDirectoryAtPath:path
-                              withIntermediateDirectories:YES
-                                               attributes:nil
-                                                    error:nil];
     return [NSURL fileURLWithPath:path isDirectory:YES];
 }
 
