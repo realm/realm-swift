@@ -162,7 +162,7 @@ NSUInteger count = 1000;
         }
         dispatch_semaphore_signal(bgRealmClosedSema);
     }];
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:2 handler:nil];
 
     @autoreleasepool {
         // Configure the Realm to compact on launch
