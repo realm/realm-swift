@@ -123,36 +123,36 @@
 }
 
 - (int)runChildAndWait {
-    NSPipe *outputPipe = [NSPipe pipe];
-    NSFileHandle *handle = outputPipe.fileHandleForReading;
+//    NSPipe *outputPipe = [NSPipe pipe];
+//    NSFileHandle *handle = outputPipe.fileHandleForReading;
 
     NSTask *task = [self childTask];
-    task.standardError = outputPipe;
+//    task.standardError = outputPipe;
     [task launch];
 
-    NSFileHandle *err = [NSFileHandle fileHandleWithStandardError];
-    NSData *delimiter = [@"\n" dataUsingEncoding:NSUTF8StringEncoding];
-    NSMutableData *buffer = [NSMutableData data];
-
-    // Filter the output from the child process to reduce xctest noise
-    while (true) {
-        NSUInteger newline;
-        while ((newline = [buffer rangeOfData:delimiter options:(NSDataSearchOptions)0 range:NSMakeRange(0, buffer.length)].location) != NSNotFound) {
-            // Skip lines starting with "Test Case", "Test Suite" and "     Executed"
-            const void *b = buffer.bytes;
-            if (newline < 17 || (memcmp(b, "Test Suite", 10) && memcmp(b, "Test Case", 9) && memcmp(b, "	 Executed 1 test", 17))) {
-                [err writeData:[[NSData alloc] initWithBytesNoCopy:buffer.mutableBytes length:newline + 1 freeWhenDone:NO]];
-            }
-            [buffer replaceBytesInRange:NSMakeRange(0, newline + 1) withBytes:NULL length:0];
-        }
-
-        @autoreleasepool {
-            NSData *next = [handle availableData];
-            if (!next.length)
-                break;
-            [buffer appendData:next];
-        }
-    }
+//    NSFileHandle *err = [NSFileHandle fileHandleWithStandardError];
+//    NSData *delimiter = [@"\n" dataUsingEncoding:NSUTF8StringEncoding];
+//    NSMutableData *buffer = [NSMutableData data];
+//
+//    // Filter the output from the child process to reduce xctest noise
+//    while (true) {
+//        NSUInteger newline;
+//        while ((newline = [buffer rangeOfData:delimiter options:(NSDataSearchOptions)0 range:NSMakeRange(0, buffer.length)].location) != NSNotFound) {
+//            // Skip lines starting with "Test Case", "Test Suite" and "     Executed"
+//            const void *b = buffer.bytes;
+//            if (newline < 17 || (memcmp(b, "Test Suite", 10) && memcmp(b, "Test Case", 9) && memcmp(b, "	 Executed 1 test", 17))) {
+//                [err writeData:[[NSData alloc] initWithBytesNoCopy:buffer.mutableBytes length:newline + 1 freeWhenDone:NO]];
+//            }
+//            [buffer replaceBytesInRange:NSMakeRange(0, newline + 1) withBytes:NULL length:0];
+//        }
+//
+//        @autoreleasepool {
+//            NSData *next = [handle availableData];
+//            if (!next.length)
+//                break;
+//            [buffer appendData:next];
+//        }
+//    }
 
     [task waitUntilExit];
 

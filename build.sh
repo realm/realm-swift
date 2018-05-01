@@ -720,13 +720,6 @@ case "$COMMAND" in
 
     "verify-osx")
         sh build.sh test-osx
-        sh build.sh analyze-osx
-        sh build.sh examples-osx
-
-        (
-            cd examples/osx/objc/build/DerivedData/RealmExamples/Build/Products/$CONFIGURATION
-            DYLD_FRAMEWORK_PATH=. ./JSONImport >/dev/null
-        )
         exit 0
         ;;
 
@@ -1028,6 +1021,11 @@ EOM
             export target=${BASH_REMATCH[1]}
         fi
 
+        ramdisk="$(hdiutil attach -nomount ram://2048000)"
+        diskutil partitionDisk $ramdisk 1 GPTFormat HFS+ 'realm-cocoa-scratch' '100%'
+        trap "hdiutil detach $ramdisk" EXIT
+        export REALM_OVERRIDE_DOCUMENTS_DIR="/Volumes/realm-cocoa-scratch/"
+
         if [ "$target" = "docs" ]; then
             sh build.sh set-swift-version
             sh build.sh verify-docs
@@ -1050,6 +1048,7 @@ EOM
 
             failed=0
             sh build.sh verify-$target 2>&1 | tee build/build.log | xcpretty -r junit -o build/reports/junit.xml || failed=1
+            cat build/build.log
             if [ "$failed" = "1" ] && cat build/build.log | grep -E 'DTXProxyChannel|DTXChannel|out of date and needs to be rebuilt|operation never finished bootstrapping'; then
                 echo "Known Xcode error detected. Running job again."
                 if cat build/build.log | grep -E 'out of date and needs to be rebuilt'; then
