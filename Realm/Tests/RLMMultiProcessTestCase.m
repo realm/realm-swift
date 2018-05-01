@@ -131,7 +131,8 @@
         [buffer appendData:[file availableData]];
         const char *newline;
         const char *start = buffer.bytes;
-        while ((newline = memchr(start, (int)buffer.length, '\n'))) {
+        const char *end = start + buffer.length;
+        while ((newline = memchr(start, '\n', end - start))) {
             if (newline < start + 17 ||
                 (memcmp(start, "Test Suite", 10) && memcmp(start, "Test Case", 9) && memcmp(start, "	 Executed 1 test", 17))) {
                 fwrite(start, newline - start + 1, 1, stderr);
