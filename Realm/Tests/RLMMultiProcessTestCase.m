@@ -118,7 +118,6 @@
     task.launchPath = self.xctestPath;
     task.arguments = @[@"-XCTest", testName, self.testsPath];
     task.environment = env;
-    task.standardError = nil;
     return task;
 }
 
