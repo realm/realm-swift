@@ -118,41 +118,34 @@
     task.launchPath = self.xctestPath;
     task.arguments = @[@"-XCTest", testName, self.testsPath];
     task.environment = env;
+    task.standardError = nil;
     return task;
 }
 
 - (int)runChildAndWait {
-//    NSPipe *outputPipe = [NSPipe pipe];
-//    NSFileHandle *handle = outputPipe.fileHandleForReading;
+    NSPipe *pipe = [NSPipe pipe];
+    NSMutableData *buffer = [[NSMutableData alloc] init];
+
+    // Filter the output from the child process to reduce xctest noise
+    pipe.fileHandleForReading.readabilityHandler = ^(NSFileHandle *file) {
+        [buffer appendData:[file availableData]];
+        const char *newline;
+        const char *start = buffer.bytes;
+        while ((newline = memchr(start, (int)buffer.length, '\n'))) {
+            if (newline < start + 17 ||
+                (memcmp(start, "Test Suite", 10) && memcmp(start, "Test Case", 9) && memcmp(start, "	 Executed 1 test", 17))) {
+                fwrite(start, newline - start + 1, 1, stderr);
+            }
+            start = newline + 1;
+        }
+
+        // Remove everything up to the last newline, leaving any data not newline-terminated in the buffer
+        [buffer replaceBytesInRange:NSMakeRange(0, start - (char *)buffer.bytes) withBytes:0 length:0];
+    };
 
     NSTask *task = [self childTask];
-//    task.standardError = outputPipe;
+    task.standardError = pipe;
     [task launch];
-
-//    NSFileHandle *err = [NSFileHandle fileHandleWithStandardError];
-//    NSData *delimiter = [@"\n" dataUsingEncoding:NSUTF8StringEncoding];
-//    NSMutableData *buffer = [NSMutableData data];
-//
-//    // Filter the output from the child process to reduce xctest noise
-//    while (true) {
-//        NSUInteger newline;
-//        while ((newline = [buffer rangeOfData:delimiter options:(NSDataSearchOptions)0 range:NSMakeRange(0, buffer.length)].location) != NSNotFound) {
-//            // Skip lines starting with "Test Case", "Test Suite" and "     Executed"
-//            const void *b = buffer.bytes;
-//            if (newline < 17 || (memcmp(b, "Test Suite", 10) && memcmp(b, "Test Case", 9) && memcmp(b, "	 Executed 1 test", 17))) {
-//                [err writeData:[[NSData alloc] initWithBytesNoCopy:buffer.mutableBytes length:newline + 1 freeWhenDone:NO]];
-//            }
-//            [buffer replaceBytesInRange:NSMakeRange(0, newline + 1) withBytes:NULL length:0];
-//        }
-//
-//        @autoreleasepool {
-//            NSData *next = [handle availableData];
-//            if (!next.length)
-//                break;
-//            [buffer appendData:next];
-//        }
-//    }
-
     [task waitUntilExit];
 
     return task.terminationStatus;
