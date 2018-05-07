@@ -1510,18 +1510,55 @@
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
-#pragma mark - Validation
+#pragma mark - Compact on Launch
 
-- (void)testCompactOnLaunchCannotBeSet {
+- (void)testCompactOnLaunch {
+    NSURL *url = REALM_URL();
     RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                                             register:YES]
                                                server:[RLMObjectServerTests authServerURL]];
-    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:REALM_URL()];
 
-    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.syncConfiguration = syncConfig;
-    RLMAssertThrowsWithReasonMatching(configuration.shouldCompactOnLaunch = ^BOOL(NSUInteger, NSUInteger){ return NO; },
-                                      @"Cannot set `shouldCompactOnLaunch` when `syncConfiguration` is set.");
+    NSString *path;
+    // Create a large object and then delete it in the next transaction so that
+    // the file is bloated
+    @autoreleasepool {
+        auto realm = [self openRealmForURL:url user:user];
+        [realm beginWriteTransaction];
+        [realm addObject:[HugeSyncObject object]];
+        [realm commitWriteTransaction];
+        [self waitForUploadsForRealm:realm];
+
+        [realm beginWriteTransaction];
+        [realm deleteAllObjects];
+        [realm commitWriteTransaction];
+        [self waitForUploadsForRealm:realm];
+
+        path = realm.configuration.pathOnDisk;
+    }
+
+    auto fileManager = NSFileManager.defaultManager;
+    auto initialSize = [[fileManager attributesOfItemAtPath:path error:nil][NSFileSize] unsignedLongLongValue];
+
+    // Reopen the file with a shouldCompactOnLaunch block and verify that it is
+    // actually compacted
+    auto config = [RLMRealmConfiguration defaultConfiguration];
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    config.syncConfiguration = syncConfig;
+
+    __block bool blockCalled = false;
+    config.shouldCompactOnLaunch = ^(NSUInteger, NSUInteger){
+        blockCalled = true;
+        return YES;
+    };
+
+    @autoreleasepool {
+        [RLMRealm realmWithConfiguration:config error:nil];
+    }
+    XCTAssertTrue(blockCalled);
+
+    auto finalSize = [[fileManager attributesOfItemAtPath:path error:nil][NSFileSize] unsignedLongLongValue];
+    XCTAssertLessThan(finalSize, initialSize);
+    XCTAssertLessThan(finalSize, 10000U);
 }
 
 #pragma mark - Offline Client Reset
