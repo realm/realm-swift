@@ -1,3 +1,23 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Improve performance of sync metadata operations and resolving thread-safe
+  references.
+* `shouldCompactOnLaunch` is now supported for synchronized Realms.
+
+### Bugfixes
+
+* Fix a potential deadlock when a sync session progress callback held the last
+  strong reference to the sync session.
+* Fix some cases where comparisons to `nil` in queries were not properly
+  serialized when subscribing to a query.
+
 3.5.0 Release notes (2018-04-25)
 =============================================================
 
