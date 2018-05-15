@@ -9,6 +9,23 @@ xcode_version:
   - 9.3
 target:
   - osx
+  - docs
+  - ios-static
+  - ios-dynamic
+  - ios-swift
+  - osx-swift
+  - watchos
+  - cocoapods
+  - swiftlint
+  - tvos
+  - osx-encryption
+  - osx-object-server
+
+  - ios-device-objc-ios8
+  # - ios-device-swift-ios8
+  - ios-device-objc-ios10
+  # - ios-device-swift-ios10
+  - tvos-device
 configuration:
   - Debug
   - Release
