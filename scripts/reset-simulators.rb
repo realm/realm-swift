@@ -35,8 +35,8 @@ def shutdown_simulator_devices(devices)
   end
 end
 
+attempts = 0
 begin
-
   # Kill all the current simulator processes as they may be from a different Xcode version
   print 'Killing running Simulator processes...'
   while system('pgrep -q Simulator')
@@ -105,7 +105,15 @@ begin
   end
   puts ' done!'
 
-rescue
+rescue => e
+  if (attempts += 1) < 5
+    puts ''
+    puts e.message
+    e.backtrace.each { |line| puts line }
+    puts ''
+    puts 'Retrying...'
+    retry
+  end
   system('ps auxwww')
   system('xcrun simctl list')
   raise
