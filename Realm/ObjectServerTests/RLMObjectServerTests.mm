@@ -1614,7 +1614,7 @@
 
     NSURL *sourceFileURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"sync-1.x" withExtension:@"realm"];
     NSString *fileName = [NSString stringWithFormat:@"%@.realm", [NSUUID new]];
-    NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
+    NSURL *fileURL = [NSURL fileURLWithPath:RLMRealmPathForFile(fileName)];
     [NSFileManager.defaultManager copyItemAtURL:sourceFileURL toURL:fileURL error:&error];
     XCTAssertNil(error);
     if (error) {
