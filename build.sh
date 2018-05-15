@@ -1026,11 +1026,13 @@ EOM
             export target=${BASH_REMATCH[1]}
         fi
 
-        ramdisk="$(hdiutil attach -nomount ram://2048000)"
-        volume_name="realm-cocoa-scratch-$RANDOM"
-        diskutil partitionDisk $ramdisk 1 GPTFormat HFS+ $volume_name '100%'
-        trap "hdiutil detach $ramdisk -force" EXIT
-        export REALM_OVERRIDE_DOCUMENTS_DIR="/Volumes/$volume_name/"
+        if [[ "$target" =~ osx ]]; then
+            ramdisk="$(hdiutil attach -nomount ram://2048000)"
+            volume_name="realm-cocoa-scratch-$RANDOM"
+            diskutil partitionDisk $ramdisk 1 GPTFormat HFS+ $volume_name '100%'
+            trap "hdiutil detach $ramdisk -force" EXIT
+            export REALM_OVERRIDE_DOCUMENTS_DIR="/Volumes/$volume_name/"
+        fi
 
         if [ "$target" = "docs" ]; then
             sh build.sh set-swift-version
