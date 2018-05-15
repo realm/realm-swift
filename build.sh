@@ -1023,7 +1023,7 @@ EOM
 
         ramdisk="$(hdiutil attach -nomount ram://2048000)"
         diskutil partitionDisk $ramdisk 1 GPTFormat HFS+ 'realm-cocoa-scratch' '100%'
-        trap "hdiutil detach $ramdisk" EXIT
+        trap "hdiutil detach $ramdisk -force" EXIT
         export REALM_OVERRIDE_DOCUMENTS_DIR="/Volumes/realm-cocoa-scratch/"
 
         if [ "$target" = "docs" ]; then
