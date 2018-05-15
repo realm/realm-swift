@@ -1027,9 +1027,10 @@ EOM
         fi
 
         ramdisk="$(hdiutil attach -nomount ram://2048000)"
-        diskutil partitionDisk $ramdisk 1 GPTFormat HFS+ 'realm-cocoa-scratch' '100%'
+        volume_name="realm-cocoa-scratch-$RANDOM"
+        diskutil partitionDisk $ramdisk 1 GPTFormat HFS+ $volume_name '100%'
         trap "hdiutil detach $ramdisk -force" EXIT
-        export REALM_OVERRIDE_DOCUMENTS_DIR="/Volumes/realm-cocoa-scratch/"
+        export REALM_OVERRIDE_DOCUMENTS_DIR="/Volumes/$volume_name/"
 
         if [ "$target" = "docs" ]; then
             sh build.sh set-swift-version
