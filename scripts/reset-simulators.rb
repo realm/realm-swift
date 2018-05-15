@@ -52,8 +52,13 @@ begin
   # simulators are currently in the process of booting or being created.
   all_available_devices = []
   (0..5).each do |shutdown_attempt|
-    devices_json = `xcrun simctl list devices -j`
-    all_devices = JSON.parse(devices_json)['devices'].flat_map { |_, devices| devices }
+    begin
+      devices_json = `xcrun simctl list devices -j`
+      all_devices = JSON.parse(devices_json)['devices'].flat_map { |_, devices| devices }
+    rescue JSON::ParserError
+      sleep shutdown_attempt if shutdown_attempt > 0
+      next
+    end
 
     # Exclude devices marked as unavailable as they're from a different version of Xcode.
     all_available_devices = all_devices.reject { |device| device['availability'] =~ /unavailable/ }
