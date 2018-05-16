@@ -1121,6 +1121,144 @@ RLM_ARRAY_TYPE(MigrationObject);
     }];
 }
 
+- (void)testEnumerateObjectsAfterDeleteDataForRemovedType {
+    [self createTestRealmWithClasses:@[IntObject.class] block:^(RLMRealm *realm) {
+        [IntObject createInRealm:realm withValue:@[@1]];
+        [IntObject createInRealm:realm withValue:@[@2]];
+    }];
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration new];
+    config.objectClasses = @[StringObject.class];
+    config.fileURL = RLMTestRealmURL();
+    config.schemaVersion = 1;
+    config.migrationBlock = ^(RLMMigration *migration, uint64_t) {
+        [migration enumerateObjects:IntObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertNotNil(oldObject);
+            XCTAssertNil(newObject);
+        }];
+        [migration deleteDataForClassName:IntObject.className];
+        [migration enumerateObjects:IntObject.className block:^(RLMObject *, RLMObject *) {
+            XCTFail(@"should not have enumerated any objects");
+        }];
+        [migration deleteDataForClassName:IntObject.className];
+    };
+    XCTAssertTrue([RLMRealm performMigrationForConfiguration:config error:nil]);
+}
+
+- (void)testEnumerateObjectsAfterDeleteData {
+    [self createTestRealmWithClasses:@[IntObject.class] block:^(RLMRealm *realm) {
+        [IntObject createInRealm:realm withValue:@[@1]];
+        [IntObject createInRealm:realm withValue:@[@2]];
+    }];
+
+    [self migrateTestRealmWithBlock:^(RLMMigration *migration, uint64_t) {
+        [migration enumerateObjects:IntObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
+            XCTAssertNotNil(oldObject);
+            XCTAssertNotNil(newObject);
+        }];
+        [migration deleteDataForClassName:IntObject.className];
+        [migration enumerateObjects:IntObject.className block:^(RLMObject *, RLMObject *) {
+            XCTFail(@"should not have enumerated any objects");
+        }];
+    }];
+}
+
+- (RLMResults *)objectsOfType:(Class)cls {
+    auto config = self.config;
+    config.schemaVersion = 1;
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+    return [cls allObjectsInRealm:realm];
+}
+
+- (void)testDeleteSomeObjectsWithinMigration {
+    [self createTestRealmWithClasses:@[IntObject.class] block:^(RLMRealm *realm) {
+        [IntObject createInRealm:realm withValue:@[@1]];
+        [IntObject createInRealm:realm withValue:@[@2]];
+        [IntObject createInRealm:realm withValue:@[@3]];
+    }];
+
+    [self migrateTestRealmWithBlock:^(RLMMigration *migration, uint64_t) {
+        [migration enumerateObjects:IntObject.className block:^(RLMObject *, RLMObject *newObject) {
+            if ([newObject[@"intCol"] intValue] != 2) {
+                [migration deleteObject:newObject];
+            }
+        }];
+    }];
+
+    XCTAssertEqualObjects([[self objectsOfType:IntObject.class] valueForKey:@"intCol"], (@[@2]));
+}
+
+- (void)testDeleteObjectsWithinSeparateEnumerations {
+    [self createTestRealmWithClasses:@[IntObject.class] block:^(RLMRealm *realm) {
+        [IntObject createInRealm:realm withValue:@[@1]];
+        [IntObject createInRealm:realm withValue:@[@2]];
+        [IntObject createInRealm:realm withValue:@[@3]];
+    }];
+
+    [self migrateTestRealmWithBlock:^(RLMMigration *migration, uint64_t) {
+        [migration enumerateObjects:IntObject.className block:^(RLMObject *, RLMObject *newObject) {
+            if ([newObject[@"intCol"] intValue] == 1) {
+                [migration deleteObject:newObject];
+            }
+        }];
+        [migration enumerateObjects:IntObject.className block:^(RLMObject *, RLMObject *newObject) {
+            if ([newObject[@"intCol"] intValue] == 3) {
+                [migration deleteObject:newObject];
+            }
+        }];
+    }];
+
+    XCTAssertEqualObjects([[self objectsOfType:IntObject.class] valueForKey:@"intCol"], (@[@2]));
+}
+
+- (void)testDeleteAndRecreateObjectsWithinMigration {
+    [self createTestRealmWithClasses:@[IntObject.class, PrimaryIntObject.class] block:^(RLMRealm *realm) {
+        [IntObject createInRealm:realm withValue:@[@1]];
+        [IntObject createInRealm:realm withValue:@[@2]];
+        [PrimaryIntObject createInRealm:realm withValue:@[@1]];
+        [PrimaryIntObject createInRealm:realm withValue:@[@2]];
+    }];
+
+    [self migrateTestRealmWithBlock:^(RLMMigration *migration, uint64_t) {
+        [migration enumerateObjects:IntObject.className block:^(RLMObject *, RLMObject *newObject) {
+            [migration deleteObject:newObject];
+        }];
+        [migration enumerateObjects:PrimaryIntObject.className block:^(RLMObject *, RLMObject *newObject) {
+            [migration deleteObject:newObject];
+        }];
+
+        [migration createObject:IntObject.className withValue:@[@2]];
+        [migration createObject:IntObject.className withValue:@[@4]];
+        [migration createObject:PrimaryIntObject.className withValue:@[@2]];
+        [migration createObject:PrimaryIntObject.className withValue:@[@4]];
+    }];
+
+    XCTAssertEqualObjects([[self objectsOfType:IntObject.class] valueForKey:@"intCol"], (@[@2, @4]));
+    XCTAssertEqualObjects([[self objectsOfType:PrimaryIntObject.class] valueForKey:@"intCol"], (@[@2, @4]));
+}
+
+- (void)testDeleteAllDataAndRecreateObjectsWithinMigration {
+    [self createTestRealmWithClasses:@[IntObject.class, PrimaryIntObject.class] block:^(RLMRealm *realm) {
+        [IntObject createInRealm:realm withValue:@[@1]];
+        [IntObject createInRealm:realm withValue:@[@2]];
+        [PrimaryIntObject createInRealm:realm withValue:@[@1]];
+        [PrimaryIntObject createInRealm:realm withValue:@[@2]];
+    }];
+
+    [self migrateTestRealmWithBlock:^(RLMMigration *migration, uint64_t) {
+        [migration deleteDataForClassName:IntObject.className];
+        [migration deleteDataForClassName:PrimaryIntObject.className];
+
+        [migration createObject:IntObject.className withValue:@[@2]];
+        [migration createObject:IntObject.className withValue:@[@4]];
+        [migration createObject:PrimaryIntObject.className withValue:@[@2]];
+        [migration createObject:PrimaryIntObject.className withValue:@[@4]];
+    }];
+
+    XCTAssertEqualObjects([[self objectsOfType:IntObject.class] valueForKey:@"intCol"], (@[@2, @4]));
+    XCTAssertEqualObjects([[self objectsOfType:PrimaryIntObject.class] valueForKey:@"intCol"], (@[@2, @4]));
+}
+
 - (void)testRequiredToNullableAutoMigration {
     RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:AllOptionalTypes.class];
     [objectSchema.properties setValue:@NO forKey:@"optional"];
