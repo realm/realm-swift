@@ -17,6 +17,12 @@ x.x.x Release notes (yyyy-MM-dd)
   strong reference to the sync session.
 * Fix some cases where comparisons to `nil` in queries were not properly
   serialized when subscribing to a query.
+* Don't delete objects added during a migration after a call to `-[RLMMigration
+  deleteDataForClassName:]`.
+* Fix incorrect results and/or crashes when multiple `-[RLMMigration
+  enumerateObjects:block:]` blocks deleted objects of the same type.
+* Fix some edge-cases where `-[RLMMigration enumerateObjects:block:]`
+  enumerated the incorrect objects following deletions.
 
 3.5.0 Release notes (2018-04-25)
 =============================================================
