@@ -24,6 +24,14 @@
 @end
 
 @implementation InterprocessTest
+- (void)setUp {
+    [super setUp];
+
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[IntObject.class, DoubleObject.class];
+    [RLMRealmConfiguration setDefaultConfiguration:config];
+}
+
 - (void)testCreateInitialRealmInChild {
     if (self.isParent) {
         RLMRunChildAndWait();
@@ -55,7 +63,15 @@
 - (void)testCompactOnLaunchSuccessful {
     if (self.isParent) {
         @autoreleasepool {
-            [[RLMRealm defaultRealm] transactionWithBlock:^{}];
+            RLMRealm *realm = RLMRealm.defaultRealm;
+            [realm transactionWithBlock:^{
+                for (int i = 0; i < 100; ++i) {
+                    [IntObject createInRealm:realm withValue:@[@(i)]];
+                }
+            }];
+            [realm transactionWithBlock:^{
+                [realm deleteAllObjects];
+            }];
         }
         RLMRunChildAndWait(); // runs the event loop
     } else {
