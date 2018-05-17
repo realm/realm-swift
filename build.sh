@@ -1029,6 +1029,8 @@ EOM
 
     "ci-pr")
         mkdir -p build/reports
+        export REALM_DISABLE_ANALYTICS=1
+        export REALM_DISABLE_UPDATE_CHECKER=1
         # FIXME: Re-enable once CI can properly unlock the keychain
         export REALM_DISABLE_METADATA_ENCRYPTION=1
 
