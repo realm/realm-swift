@@ -36,11 +36,20 @@
 // Set this to 1 if you want the test ROS instance to log its debug messages to console.
 #define LOG_ROS_OUTPUT 0
 
-#define NODE_PATH @"/usr/local/bin/node"
-
 #if !TARGET_OS_MAC
 #error These tests can only be run on a macOS host.
 #endif
+
+static NSString *nodePath() {
+    static NSString *path = [] {
+        NSDictionary *environment = NSProcessInfo.processInfo.environment;
+        if (NSString *path = environment[@"REALM_NODE_PATH"]) {
+            return path;
+        }
+        return @"/usr/local/bin/node";
+    }();
+    return path;
+}
 
 @interface RLMSyncManager ()
 + (void)_setCustomBundleID:(NSString *)customBundleID;
@@ -133,7 +142,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSPipe *pipe = [NSPipe pipe];
     _task = [[NSTask alloc] init];
     _task.currentDirectoryPath = self.serverDataRoot.path;
-    _task.launchPath = NODE_PATH;
+    _task.launchPath = nodePath();
     NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
     _task.arguments = @[[directory stringByAppendingPathComponent:@"test-ros-server.js"],
                         self.serverDataRoot.path];
@@ -204,8 +213,8 @@ static NSURL *syncDirectoryForChildProcess() {
     NSLog(@"Installing Realm Object Server %@", desiredVersion);
     NSTask *task = [[NSTask alloc] init];
     task.currentDirectoryPath = [@(__FILE__) stringByDeletingLastPathComponent];
-    task.launchPath = NODE_PATH;
-    task.arguments = @[[[NODE_PATH stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"npm"],
+    task.launchPath = nodePath();
+    task.arguments = @[[[nodePath() stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"npm"],
                        @"--scripts-prepend-node-path=auto",
                        @"--no-color",
                        @"--no-progress",

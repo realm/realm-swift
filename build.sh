@@ -1048,6 +1048,9 @@ EOM
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
             sh build.sh prelaunch-simulator
 
+            source $(brew --prefix nvm)/nvm.sh
+            export REALM_NODE_PATH="$(nvm which 8)"
+
             # Reset CoreSimulator.log
             mkdir -p ~/Library/Logs/CoreSimulator
             echo > ~/Library/Logs/CoreSimulator/CoreSimulator.log
