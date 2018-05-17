@@ -1383,6 +1383,7 @@
     RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *) {
         if (note == RLMRealmDidChangeNotification) {
             [notificationFired fulfill];
+            [token invalidate];
         }
     }];
 
@@ -1391,7 +1392,6 @@
         [RLMRealm.defaultRealm transactionWithBlock:^{ }];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-    [token invalidate];
 }
 
 - (void)testNotificationBlockMustNotBeNil {
