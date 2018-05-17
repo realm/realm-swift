@@ -123,37 +123,30 @@
 }
 
 - (int)runChildAndWait {
-    NSPipe *outputPipe = [NSPipe pipe];
-    NSFileHandle *handle = outputPipe.fileHandleForReading;
-
-    NSTask *task = [self childTask];
-    task.standardError = outputPipe;
-    [task launch];
-
-    NSFileHandle *err = [NSFileHandle fileHandleWithStandardError];
-    NSData *delimiter = [@"\n" dataUsingEncoding:NSUTF8StringEncoding];
-    NSMutableData *buffer = [NSMutableData data];
+    NSPipe *pipe = [NSPipe pipe];
+    NSMutableData *buffer = [[NSMutableData alloc] init];
 
     // Filter the output from the child process to reduce xctest noise
-    while (true) {
-        NSUInteger newline;
-        while ((newline = [buffer rangeOfData:delimiter options:(NSDataSearchOptions)0 range:NSMakeRange(0, buffer.length)].location) != NSNotFound) {
-            // Skip lines starting with "Test Case", "Test Suite" and "     Executed"
-            const void *b = buffer.bytes;
-            if (newline < 17 || (memcmp(b, "Test Suite", 10) && memcmp(b, "Test Case", 9) && memcmp(b, "	 Executed 1 test", 17))) {
-                [err writeData:[[NSData alloc] initWithBytesNoCopy:buffer.mutableBytes length:newline + 1 freeWhenDone:NO]];
+    pipe.fileHandleForReading.readabilityHandler = ^(NSFileHandle *file) {
+        [buffer appendData:[file availableData]];
+        const char *newline;
+        const char *start = buffer.bytes;
+        const char *end = start + buffer.length;
+        while ((newline = memchr(start, '\n', end - start))) {
+            if (newline < start + 17 ||
+                (memcmp(start, "Test Suite", 10) && memcmp(start, "Test Case", 9) && memcmp(start, "	 Executed 1 test", 17))) {
+                fwrite(start, newline - start + 1, 1, stderr);
             }
-            [buffer replaceBytesInRange:NSMakeRange(0, newline + 1) withBytes:NULL length:0];
+            start = newline + 1;
         }
 
-        @autoreleasepool {
-            NSData *next = [handle availableData];
-            if (!next.length)
-                break;
-            [buffer appendData:next];
-        }
-    }
+        // Remove everything up to the last newline, leaving any data not newline-terminated in the buffer
+        [buffer replaceBytesInRange:NSMakeRange(0, start - (char *)buffer.bytes) withBytes:0 length:0];
+    };
 
+    NSTask *task = [self childTask];
+    task.standardError = pipe;
+    [task launch];
     [task waitUntilExit];
 
     return task.terminationStatus;
