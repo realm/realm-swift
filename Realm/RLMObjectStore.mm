@@ -95,6 +95,7 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
             // FIXME: this should actually be an error as it's the result of an
             // invalid object definition, but that's a breaking change so
             // instead preserve the old behavior until the next major version bump
+            // https://github.com/realm/realm-cocoa/issues/5784
             continue;
         }
 

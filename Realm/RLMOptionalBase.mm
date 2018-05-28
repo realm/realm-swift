@@ -125,6 +125,7 @@ private:
 id RLMGetOptional(__unsafe_unretained RLMOptionalBase *const self) {
     if (!self) {
         // FIXME: this should actually be an error
+        // https://github.com/realm/realm-cocoa/issues/5784
         return nil;
     }
     try {
@@ -138,6 +139,7 @@ id RLMGetOptional(__unsafe_unretained RLMOptionalBase *const self) {
 void RLMSetOptional(__unsafe_unretained RLMOptionalBase *const self, __unsafe_unretained const id value) {
     if (!self) {
         // FIXME: this should actually be an error
+        // https://github.com/realm/realm-cocoa/issues/5784
         return;
     }
     try {
