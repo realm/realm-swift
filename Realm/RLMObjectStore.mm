@@ -90,17 +90,25 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
     }
 
     for (RLMProperty *prop in object->_objectSchema.swiftGenericProperties) {
+        id ivar = object_getIvar(object, prop.swiftIvar);
+        if (!ivar) {
+            // FIXME: this should actually be an error as it's the result of an
+            // invalid object definition, but that's a breaking change so
+            // instead preserve the old behavior until the next major version bump
+            // https://github.com/realm/realm-cocoa/issues/5784
+            continue;
+        }
+
         if (prop.type == RLMPropertyTypeLinkingObjects) {
-            id linkingObjects = object_getIvar(object, prop.swiftIvar);
-            [linkingObjects setObject:(id)[[RLMWeakObjectHandle alloc] initWithObject:object]];
-            [linkingObjects setProperty:prop];
+            [ivar setObject:(id)[[RLMWeakObjectHandle alloc] initWithObject:object]];
+            [ivar setProperty:prop];
         }
         else if (prop.array) {
             RLMArray *array = [[RLMManagedArray alloc] initWithParent:object property:prop];
-            [object_getIvar(object, prop.swiftIvar) set_rlmArray:array];
+            [ivar set_rlmArray:array];
         }
         else {
-            RLMInitializeManagedOptional(object_getIvar(object, prop.swiftIvar), object, prop);
+            RLMInitializeManagedOptional(ivar, object, prop);
         }
     }
 }

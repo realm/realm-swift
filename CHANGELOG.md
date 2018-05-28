@@ -23,6 +23,8 @@ x.x.x Release notes (yyyy-MM-dd)
   enumerateObjects:block:]` blocks deleted objects of the same type.
 * Fix some edge-cases where `-[RLMMigration enumerateObjects:block:]`
   enumerated the incorrect objects following deletions.
+* Restore the pre-3.5.0 behavior for Swift optional properties missing an ivar
+  rather than crashing.
 
 3.5.0 Release notes (2018-04-25)
 =============================================================
