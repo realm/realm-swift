@@ -123,6 +123,10 @@ private:
 }
 
 id RLMGetOptional(__unsafe_unretained RLMOptionalBase *const self) {
+    if (!self) {
+        // FIXME: this should actually be an error
+        return nil;
+    }
     try {
         return self->_impl ? RLMCoerceToNil(self->_impl->get()) : nil;
     }
@@ -132,6 +136,10 @@ id RLMGetOptional(__unsafe_unretained RLMOptionalBase *const self) {
 }
 
 void RLMSetOptional(__unsafe_unretained RLMOptionalBase *const self, __unsafe_unretained const id value) {
+    if (!self) {
+        // FIXME: this should actually be an error
+        return;
+    }
     try {
         if (!self->_impl && value) {
             self->_impl.reset(new UnmanagedOptional);
