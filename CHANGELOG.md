@@ -1,4 +1,4 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.6.0 Release notes (2018-05-29)
 =============================================================
 
 ### Breaking Changes
@@ -9,7 +9,8 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Improve performance of sync metadata operations and resolving thread-safe
   references.
-* `shouldCompactOnLaunch` is now supported for synchronized Realms.
+* `shouldCompactOnLaunch` is now supported for compacting the local data of
+  synchronized Realms.
 
 ### Bugfixes
 
