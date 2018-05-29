@@ -980,10 +980,12 @@ case "$COMMAND" in
     ######################################
 
     "binary-has-bitcode")
+        # Disable pipefail as grep -q will make otool fail due to exiting
+        # before reading all the output
+        set +o pipefail
+
         BINARY="$2"
-        # Although grep has a '-q' flag to prevent logging to stdout, grep
-        # behaves differently when used, so redirect stdout to /dev/null.
-        if otool -l "$BINARY" | grep "segname __LLVM" > /dev/null 2>&1; then
+        if otool -l "$BINARY" | grep -q "segname __LLVM"; then
             exit 0
         fi
         # Work around rdar://21826157 by checking for bitcode in thin binaries
@@ -993,6 +995,7 @@ case "$COMMAND" in
 
         archs_array=( $archs )
         if [[ ${#archs_array[@]} -lt 2 ]]; then
+            echo 'Error: Built library is not a fat binary'
             exit 1 # Early exit if not a fat binary
         fi
 
@@ -1004,6 +1007,7 @@ case "$COMMAND" in
                 exit 0
             fi
         done
+        echo 'Error: Built library does not contain bitcode'
         exit 1
         ;;
 
