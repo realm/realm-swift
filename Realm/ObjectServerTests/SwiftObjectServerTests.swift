@@ -169,7 +169,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             if isParent {
-                let session = user.session(for: realmURL)
+                let session = realm.syncSession
                 XCTAssertNotNil(session)
                 let ex = expectation(description: "streaming-downloads-expectation")
                 var hasBeenFulfilled = false
@@ -212,7 +212,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             var transferrable = 0
             let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
-            let session = user.session(for: realmURL)
+            let session = realm.syncSession
             XCTAssertNotNil(session)
             let ex = expectation(description: "streaming-uploads-expectation")
             var hasBeenFulfilled = false

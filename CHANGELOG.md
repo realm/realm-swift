@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Add `-[RLMRealm syncSession]` and  `Realm.syncSession` to obtain the session
+  used for a synchronized Realm.
+
+### Bugfixes
+
+* None.
+
 3.6.0 Release notes (2018-05-29)
 =============================================================
 

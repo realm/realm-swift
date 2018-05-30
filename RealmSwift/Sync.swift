@@ -647,6 +647,16 @@ extension Realm {
             completion(results.map { Results<T>($0) }, error)
         }
     }
+
+    /**
+     Get the SyncSession used by this Realm. Will be nil if this is not a
+     synchronized Realm.
+    */
+    public var syncSession: SyncSession? {
+        get {
+            return SyncSession(for: rlmRealm)
+        }
+    }
 }
 
 // MARK: - Permissions and permission results

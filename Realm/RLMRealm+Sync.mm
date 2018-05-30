@@ -23,6 +23,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMResults_Private.hpp"
 #import "RLMSchema.h"
+#import "RLMSyncSession.h"
 
 #import "results.hpp"
 #import "sync/partial_sync.hpp"
@@ -49,6 +50,10 @@ using namespace realm;
         callback([RLMResults resultsWithObjectInfo:_info[className] results:std::move(results)], nil);
     };
     partial_sync::register_query(_realm, className.UTF8String, query.UTF8String, std::move(cb));
+}
+
+- (RLMSyncSession *)syncSession {
+    return [RLMSyncSession sessionForRealm:self];
 }
 
 @end
