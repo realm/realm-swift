@@ -165,7 +165,7 @@
                                                server:[RLMObjectServerTests authServerURL]];
     XCTAssertNotNil(user);
 
-    NSURL *realmURL = [NSURL URLWithString:@"realm://localhost:9080/THE_PATH_USER_DONT_HAVE_ACCESS_TO/test"];
+    NSURL *realmURL = [NSURL URLWithString:@"realm://127.0.0.1:9080/THE_PATH_USER_DONT_HAVE_ACCESS_TO/test"];
 
     RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
     c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:realmURL];
@@ -270,7 +270,7 @@
     RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                                             register:YES]
                                                server:[RLMObjectServerTests authServerURL]];
-    RLMSyncSession *badSession = [user sessionForURL:[NSURL URLWithString:@"realm://localhost:9080/noSuchRealm"]];
+    RLMSyncSession *badSession = [user sessionForURL:[NSURL URLWithString:@"realm://127.0.0.1:9080/noSuchRealm"]];
     XCTAssertNil(badSession);
 }
 
@@ -411,14 +411,41 @@
 
     XCTestExpectation *ex = [self expectationWithDescription:@"callback invoked"];
     [RLMSyncUser requestPasswordResetForAuthServer:[RLMObjectServerTests authServerURL] userEmail:userName completion:^(NSError *error) {
-        // Shouldn't be an error, but is due to not having an email handler set up in our test instance
-        XCTAssertEqualObjects(error.domain, @"io.realm.sync.auth");
-        XCTAssertEqual(error.code, 614);
+        XCTAssertNil(error);
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    // We don't have any way to actually get the email and test the rest of the flow
+    NSString *token = [self emailForAddress:userName];
+    XCTAssertNotNil(token);
+
+    // Use the password reset token
+    ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser completePasswordResetForAuthServer:[RLMObjectServerTests authServerURL] token:token password:@"new password"
+                                         completion:^(NSError *error) {
+                                             XCTAssertNil(error);
+                                             [ex fulfill];
+                                         }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Should now be able to log in with the new password
+    {
+        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName
+                                                                       password:@"new password"
+                                                                       register:NO];
+        RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
+        XCTAssertNotNil(user);
+        [user logOut];
+    }
+
+    // Reusing the token should fail
+    ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser completePasswordResetForAuthServer:[RLMObjectServerTests authServerURL] token:token password:@"new password 2"
+                                         completion:^(NSError *error) {
+                                             XCTAssertNotNil(error);
+                                             [ex fulfill];
+                                         }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
 - (void)testRequestPasswordResetForNonexistentUser {
@@ -426,12 +453,14 @@
 
     XCTestExpectation *ex = [self expectationWithDescription:@"callback invoked"];
     [RLMSyncUser requestPasswordResetForAuthServer:[RLMObjectServerTests authServerURL] userEmail:userName completion:^(NSError *error) {
-        // Shouldn't be an error, but is due to not having an email handler set up in our test instance
-        XCTAssertEqualObjects(error.domain, @"io.realm.sync.auth");
-        XCTAssertEqual(error.code, 614);
+        // Not an error even though the user doesn't exist
+        XCTAssertNil(error);
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Should not have sent an email to the non-registered user
+    XCTAssertNil([self emailForAddress:userName]);
 }
 
 - (void)testRequestPasswordResetWithBadAuthURL {
@@ -445,6 +474,57 @@
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+- (void)testRequestConfirmEmailForRegisteredUser {
+    NSString *userName = [NSStringFromSelector(_cmd) stringByAppendingString:@"@example.com"];
+    RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:@"a" register:YES];
+    [[self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]] logOut];
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser requestEmailConfirmationForAuthServer:[RLMObjectServerTests authServerURL]
+                                             userEmail:userName completion:^(NSError *error) {
+                                                 XCTAssertNil(error);
+                                                 [ex fulfill];
+                                             }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    NSString *token = [self emailForAddress:userName];
+    XCTAssertNotNil(token);
+
+    // Use the token
+    ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser confirmEmailForAuthServer:[RLMObjectServerTests authServerURL] token:token
+                                            completion:^(NSError *error) {
+                                                XCTAssertNil(error);
+                                                [ex fulfill];
+                                            }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Reusing the token should fail
+    ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser confirmEmailForAuthServer:[RLMObjectServerTests authServerURL] token:token
+                                            completion:^(NSError *error) {
+                                                XCTAssertNotNil(error);
+                                                [ex fulfill];
+                                            }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+- (void)testRequestConfirmEmailForNonexistentUser {
+    NSString *userName = [NSStringFromSelector(_cmd) stringByAppendingString:@"@example.com"];
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"callback invoked"];
+    [RLMSyncUser requestEmailConfirmationForAuthServer:[RLMObjectServerTests authServerURL]
+                                             userEmail:userName completion:^(NSError *error) {
+                                                 // Not an error even though the user doesn't exist
+                                                 XCTAssertNil(error);
+                                                 [ex fulfill];
+                                             }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Should not have sent an email to the non-registered user
+    XCTAssertNil([self emailForAddress:userName]);
 }
 
 /// A sync admin user should be able to retrieve information about other users.
@@ -634,7 +714,7 @@
     XCTAssertNotNil(credentials);
     RLMSyncUser *user = [self logInUserForCredentials:credentials
                                                server:[RLMObjectServerTests authServerURL]];
-    NSURL *url = [NSURL URLWithString:@"realm://localhost:9080/testSyncWithAdminToken"];
+    NSURL *url = [NSURL URLWithString:@"realm://127.0.0.1:9080/testSyncWithAdminToken"];
     RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
     c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
     NSError *error = nil;
@@ -1499,7 +1579,7 @@
                                                                                             register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
     auto c = [RLMRealmConfiguration defaultConfiguration];
-    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:[NSURL URLWithString:@"realm://localhost:9080/invalid"]];
+    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:[NSURL URLWithString:@"realm://127.0.0.1:9080/invalid"]];
     auto ex = [self expectationWithDescription:@"async open"];
     [RLMRealm asyncOpenWithConfiguration:c callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
@@ -1564,21 +1644,25 @@
 #pragma mark - Offline Client Reset
 
 - (void)testOfflineClientReset {
+    NSError *error;
     RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                                             register:YES]
                                                server:[RLMObjectServerTests authServerURL]];
-    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:REALM_URL()];
 
     NSURL *sourceFileURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"sync-1.x" withExtension:@"realm"];
     NSString *fileName = [NSString stringWithFormat:@"%@.realm", [NSUUID new]];
-    NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
-    [[NSFileManager defaultManager] copyItemAtURL:sourceFileURL toURL:fileURL error:nullptr];
-    syncConfig.customFileURL = fileURL;
+    NSURL *fileURL = [NSURL fileURLWithPath:RLMRealmPathForFile(fileName)];
+    [NSFileManager.defaultManager copyItemAtURL:sourceFileURL toURL:fileURL error:&error];
+    XCTAssertNil(error);
+    if (error) {
+        return;
+    }
 
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:REALM_URL()];
+    syncConfig.customFileURL = fileURL;
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.syncConfiguration = syncConfig;
 
-    NSError *error;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
     XCTAssertNil(realm);
     XCTAssertEqualObjects(error.domain, RLMErrorDomain);
@@ -1588,7 +1672,7 @@
 
     // Open the backup Realm with a schema subset since it was created using the schema from .NET's unit tests.
     // The Person class is declared in SwiftObjectServerTests.swift.
-    backupConfiguration.objectClasses = @[ NSClassFromString(@"Person") ];
+    backupConfiguration.objectClasses = @[NSClassFromString(@"Person")];
 
     error = nil;
     RLMRealm *backupRealm = [RLMRealm realmWithConfiguration:backupConfiguration error:&error];

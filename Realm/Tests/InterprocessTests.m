@@ -199,20 +199,28 @@
 }
 
 - (void)testBackgroundProcessDoesNotTriggerSpuriousNotifications {
+    NSLog(@"%d a", self.isParent);
     RLMRealm *realm = [RLMRealm defaultRealm];
+    NSLog(@"%d b", self.isParent);
     RLMNotificationToken *token = [realm addNotificationBlock:^(__unused RLMNotification notification, __unused RLMRealm *realm) {
         XCTFail(@"Notification should not have been triggered");
     }];
+    NSLog(@"%d c", self.isParent);
 
     if (self.isParent) {
+        NSLog(@"%d RunChildAndWait", self.isParent);
         RLMRunChildAndWait();
+        NSLog(@"%d RunChildAndWait complete", self.isParent);
     }
     else {
         // Just a meaningless thing that reads from the realm
+        NSLog(@"%d read", self.isParent);
         XCTAssertEqual(0U, [IntObject allObjectsInRealm:realm].count);
     }
 
+    NSLog(@"%d invalidate", self.isParent);
     [token invalidate];
+    NSLog(@"%d complete", self.isParent);
 }
 
 // FIXME: Re-enable this test when it can be made to pass reliably.

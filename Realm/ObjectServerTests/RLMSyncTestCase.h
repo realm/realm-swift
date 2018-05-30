@@ -49,6 +49,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// Retrieve the administrator token.
 - (NSString *)adminToken;
 
+/// Read and delete the last email sent by ROS to the given address.
+/// Returns nil if none has been sent to that address.
+- (nullable NSString *)emailForAddress:(NSString *)email;
+
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
 

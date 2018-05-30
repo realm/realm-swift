@@ -384,6 +384,11 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
 }
 
 NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier) {
+    NSDictionary *environment = NSProcessInfo.processInfo.environment;
+    if (NSString *path = environment[@"REALM_OVERRIDE_DOCUMENTS_DIR"]) {
+        return path;
+    }
+
 #if TARGET_OS_TV
     (void)bundleIdentifier;
     // tvOS prohibits writing to the Documents directory, so we use the Library/Caches directory instead.
@@ -397,7 +402,7 @@ NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier) {
     // in a sandbox, put it in a subdirectory based on the bundle identifier
     // to avoid accidentally sharing files between applications
     NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
-    if (![[NSProcessInfo processInfo] environment][@"APP_SANDBOX_CONTAINER_ID"]) {
+    if (!environment[@"APP_SANDBOX_CONTAINER_ID"]) {
         if (!bundleIdentifier) {
             bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
         }
