@@ -569,10 +569,21 @@ class MigrationTests: TestCase {
 
                 // set it again
                 newObj!["arrayCol"] = [falseObj, trueObj]
+                XCTAssertEqual(list.count, 2)
+
+                newObj!["arrayCol"] = [SwiftBoolObject(value: [false])]
+                XCTAssertEqual(list.count, 1)
+                XCTAssertEqual((list[0]["boolCol"] as! Bool), false)
+
+                self.assertMatches(newObj!.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 1;\n\tfloatCol = 1;\n\tdoubleCol = 10;\n\tstringCol = a;\n\tbinaryCol = <62 — 1 total bytes>;\n\tdateCol = 1970-01-01 00:00:02 \\+0000;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\t\\[0\\] SwiftBoolObject \\{\n\t\t\tboolCol = 0;\n\t\t\\}\n\t\\);\n\\}")
 
                 enumerated = true
             })
             XCTAssertEqual(enumerated, true)
+
+            let newObj = migration.create(SwiftObject.className())
+            // swiftlint:next:disable line_length
+            self.assertMatches(newObj.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <61 — 1 total bytes>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
         }
 
         // refresh to update realm
@@ -587,12 +598,11 @@ class MigrationTests: TestCase {
         XCTAssertEqual(object.binaryCol, Data(bytes: "b", count: 1))
         XCTAssertEqual(object.dateCol, Date(timeIntervalSince1970: 2))
         XCTAssertEqual(object.objectCol!.boolCol, false)
-        XCTAssertEqual(object.arrayCol.count, 2)
+        XCTAssertEqual(object.arrayCol.count, 1)
         XCTAssertEqual(object.arrayCol[0].boolCol, false)
-        XCTAssertEqual(object.arrayCol[1].boolCol, true)
 
         // make sure we added new bool objects as object property and in the list
-        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 4)
+        XCTAssertEqual(try! Realm().objects(SwiftBoolObject.self).count, 6)
     }
 
     func testFailOnSchemaMismatch() {
