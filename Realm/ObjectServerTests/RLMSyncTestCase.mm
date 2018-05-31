@@ -437,7 +437,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)error {
-    RLMSyncSession *session = [RLMSyncSession sessionForRealm:realm];
+    RLMSyncSession *session = realm.syncSession;
     NSAssert(session, @"Cannot call with invalid Realm");
     XCTestExpectation *ex = [self expectationWithDescription:@"Wait for upload completion"];
     __block NSError *completionError;
@@ -455,7 +455,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm error:(NSError **)error {
-    RLMSyncSession *session = [RLMSyncSession sessionForRealm:realm];
+    RLMSyncSession *session = realm.syncSession;
     NSAssert(session, @"Cannot call with invalid Realm");
     XCTestExpectation *ex = [self expectationWithDescription:@"Wait for download completion"];
     __block NSError *completionError;
