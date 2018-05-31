@@ -17,12 +17,20 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncConfiguration_Private.h"
+#import "sync_config.hpp"
 
 namespace realm {
 struct SyncConfig;
 }
 
 @interface RLMSyncConfiguration ()
+
+- (instancetype)initWithUser:(RLMSyncUser *)user
+         realmURL:(NSURL *)url
+    customFileURL:(nullable NSURL *)customFileURL
+        isPartial:(BOOL)isPartial
+       stopPolicy:(RLMSyncStopPolicy)stopPolicy
+     errorHandler:(std::function<realm::SyncSessionErrorHandler>)errorHandler;
 
 - (instancetype)initWithRawConfig:(realm::SyncConfig)config;
 

@@ -24,6 +24,8 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMResults_Private.hpp"
+#import "RLMSyncConfiguration.h"
+#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncPermissionResults.h"
 #import "RLMSyncPermission_Private.hpp"
@@ -206,12 +208,28 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                       completionBlock:completion];
 }
 
+- (RLMRealmConfiguration *)createConfiguration:(NSURL *)url; {
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
+                                                                         realmURL:url
+                                                                    customFileURL:nil
+                                                                        isPartial:YES
+                                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                                                                     errorHandler:nullptr];
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    config.syncConfiguration = syncConfig;
+    return config;
+}
+
 - (void)logOut {
     if (!_user) {
         return;
     }
     _user->log_out();
     context_for(_user).invalidate_all_handles();
+}
+
+- (RLMRealmConfiguration *)defaultConfiguration {
+    return nil;
 }
 
 - (RLMUserErrorReportingBlock)errorHandler {

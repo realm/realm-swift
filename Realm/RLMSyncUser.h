@@ -18,6 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMRealmConfiguration.h"
 #import "RLMResults.h"
 #import "RLMSyncCredentials.h"
 #import "RLMSyncPermission.h"
@@ -111,6 +112,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMSyncUserState state;
 
+/**
+ Returns the default configuration for the user. The default configuration points to the default
+ query-based Realm on the server the user authenticated against.
+*/
+@property (nonatomic, readonly) RLMRealmConfiguration *defaultConfiguration;
+
+
 #pragma mark - Lifecycle
 
 /**
@@ -144,6 +152,16 @@ NS_ASSUME_NONNULL_BEGIN
                authServerURL:(NSURL *)authServerURL
                 onCompletion:(RLMUserCompletionBlock)completion
 NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
+
+/**
+ Create a sync configuration instance.
+ 
+ @param url     The unresolved absolute URL to the Realm on the Realm Object Server, e.g.
+ `realm://example.org/~/path/to/realm`. "Unresolved" means the path should
+ contain the wildcard marker `~`, which will automatically be filled in with
+ the user identity by the Realm Object Server.
+ */
+-(RLMRealmConfiguration *)createConfiguration:(NSURL *)url;
 
 /**
  Log a user out, destroying their server state, unregistering them from the SDK,

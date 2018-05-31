@@ -94,7 +94,7 @@ static BOOL isValidRealmURL(NSURL *url) {
     return [self.realmURL isEqual:that.realmURL]
         && [self.user isEqual:that.user]
         && self.stopPolicy == that.stopPolicy
-        && self.isPartial == that.isPartial;
+        && self.fullSynchronization == that.fullSynchronization;
 }
 
 - (void)setEnableSSLValidation:(BOOL)enableSSLValidation {
@@ -111,6 +111,14 @@ static BOOL isValidRealmURL(NSURL *url) {
 
 - (BOOL)isPartial {
     return (BOOL)_config->is_partial;
+}
+
+- (void)setFullSynchronization:(BOOL)fullSynchronization {
+    _config->is_partial = !(bool)fullSynchronization;
+}
+
+- (BOOL)fullSynchronization {
+    return !(BOOL)_config->is_partial;
 }
 
 - (realm::SyncConfig)rawConfiguration {

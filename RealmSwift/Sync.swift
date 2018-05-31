@@ -210,7 +210,18 @@ public struct SyncConfiguration {
 
      -warning: Partial synchronization is a tech preview. Its APIs are subject to change.
      */
-    public let isPartial: Bool
+    @available(*, deprecated)
+    public var isPartial: Bool
+    
+    /**
+     Whether this Realm should be a fully synchronized Realm.
+     
+     Synchronized Realms comes in two flavors: Query-based and Fully synchronized.
+     A fully synchronized Realm will automatically synchronize the entire Realm in the background
+     while a query-based Realm will only synchronize the data being subscribed to.
+     Synchronized realms are by default query-based unless this boolean is set.
+     */
+    public let fullSynchronization: Bool
 
     /**
      The prefix that is prepended to the path in the HTTP request
@@ -226,6 +237,7 @@ public struct SyncConfiguration {
         self.realmURL = config.realmURL
         self.stopPolicy = config.stopPolicy
         self.enableSSLValidation = config.enableSSLValidation
+        self.fullSynchronization = config.fullSynchronization
         self.isPartial = config.isPartial
         self.urlPrefix = config.urlPrefix
     }
@@ -234,7 +246,7 @@ public struct SyncConfiguration {
         let config = RLMSyncConfiguration(user: user, realmURL: realmURL)
         config.stopPolicy = stopPolicy
         config.enableSSLValidation = enableSSLValidation
-        config.isPartial = isPartial
+        config.fullSynchronization = fullSynchronization
         config.urlPrefix = urlPrefix
         return config
     }
@@ -253,12 +265,14 @@ public struct SyncConfiguration {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
+    @available(*, deprecated, message: "Use SyncUser.createConfiguration instead")
     public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true, isPartial: Bool = false, urlPrefix: String? = nil) {
         self.user = user
         self.realmURL = realmURL
         self.stopPolicy = .afterChangesUploaded
         self.enableSSLValidation = enableSSLValidation
-        self.isPartial = isPartial
+        self.fullSynchronization = !isPartial
+        self.isPartial = isPartial // FIXME
         self.urlPrefix = urlPrefix
     }
 
@@ -269,6 +283,7 @@ public struct SyncConfiguration {
 
      - requires: There be exactly one logged-in `SyncUser`
      */
+    @available(*, deprecated, message: "Use SyncUser.defaultConfiguration() instead")
     public static func automatic() -> Realm.Configuration {
         return ObjectiveCSupport.convert(object: RLMSyncConfiguration.automaticConfiguration())
     }
@@ -278,6 +293,7 @@ public struct SyncConfiguration {
 
      Partial synchronization is enabled in the returned configuration.
     */
+    @available(*, deprecated, message: "Use SyncUser.defaultConfiguration() instead")
     public static func automatic(user: SyncUser) -> Realm.Configuration {
         return ObjectiveCSupport.convert(object: RLMSyncConfiguration.automaticConfiguration(for: user))
     }

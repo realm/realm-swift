@@ -54,8 +54,18 @@ NS_ASSUME_NONNULL_BEGIN
  except those matching queries that the user explicitly specifies.
 
  @warning Partial synchronization is a tech preview. Its APIs are subject to change.
-*/
-@property (nonatomic) BOOL isPartial;
+ */
+@property (nonatomic) BOOL isPartial DEPRECATED_MSG_ATTRIBUTE("Use 'fullSynchronization' instead.");
+
+/**
+ Whether this Realm should be a fully synchronized Realm.
+ 
+ Synchronized Realms comes in two flavors: Query-based and Fully synchronized.
+ A fully synchronized Realm will automatically synchronize the entire Realm in the background
+ while a query-based Realm will only synchronize the data being subscribed to.
+ Synchronized realms are by default query-based unless this boolean is set.
+ */
+@property (nonatomic) BOOL fullSynchronization;
 
 /**
  The prefix that is prepended to the path in the HTTP request
@@ -75,21 +85,21 @@ NS_ASSUME_NONNULL_BEGIN
                 contain the wildcard marker `~`, which will automatically be filled in with
                 the user identity by the Realm Object Server.
  */
-- (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url;
+- (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url __attribute__((deprecated("Use 'RLMSyncUser.createConfiguration' instead")));
 
 /**
 Return a Realm configuration for syncing with the default Realm of the currently logged-in sync user.
 
 Partial synchronization is enabled in the returned configuration.
  */
-+ (RLMRealmConfiguration *)automaticConfiguration;
++ (RLMRealmConfiguration *)automaticConfiguration __attribute__((deprecated("Use 'RLMSyncUser.defaultConfiguration' instead")));
 
 /**
  Return a Realm configuration for syncing with the default Realm of the given sync user.
 
  Partial synchronization is enabled in the returned configuration.
  */
-+ (RLMRealmConfiguration *)automaticConfigurationForUser:(RLMSyncUser *)user;
++ (RLMRealmConfiguration *)automaticConfigurationForUser:(RLMSyncUser *)user __attribute__((deprecated("Use 'RLMSyncUser.defaultConfiguration' instead")));
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly")));
