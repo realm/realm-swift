@@ -167,8 +167,7 @@
 
     NSURL *realmURL = [NSURL URLWithString:@"realm://127.0.0.1:9080/THE_PATH_USER_DONT_HAVE_ACCESS_TO/test"];
 
-    RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
-    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:realmURL];
+    RLMRealmConfiguration *c = [user createConfiguration:realmURL];
 
     NSError *error = nil;
     __attribute__((objc_precise_lifetime)) RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:&error];
@@ -715,8 +714,8 @@
     RLMSyncUser *user = [self logInUserForCredentials:credentials
                                                server:[RLMObjectServerTests authServerURL]];
     NSURL *url = [NSURL URLWithString:@"realm://127.0.0.1:9080/testSyncWithAdminToken"];
-    RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
-    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    RLMRealmConfiguration *c = [user createConfiguration:url];
+    c.syncConfiguration.fullSynchronization = true;
     NSError *error = nil;
     RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:&error];
     XCTAssertNil(error);
@@ -1070,8 +1069,7 @@
     if (self.isParent) {
         // Semaphore for knowing when the Realm is successfully opened for sync.
         dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-        RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-        config.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+        RLMRealmConfiguration *config = [user createConfiguration:url];
         [user logOut];
         // Open a Realm after the user's been logged out.
         [self primeSyncManagerWithSemaphore:sema];
@@ -1107,8 +1105,7 @@
     if (self.isParent) {
         dispatch_semaphore_t sema = dispatch_semaphore_create(0);
         RLMRunChildAndWait();
-        RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-        config.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+        RLMRealmConfiguration *config = [user createConfiguration:url];
         [user logOut];
         // Open a Realm after the user's been logged out.
         [self primeSyncManagerWithSemaphore:sema];
@@ -1442,9 +1439,7 @@
         // Wait for the child process to upload everything.
         RLMRunChildAndWait();
         XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-        RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
-        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
-        c.syncConfiguration = syncConfig;
+        RLMRealmConfiguration *c = [user createConfiguration:url];
         XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
         [RLMRealm asyncOpenWithConfiguration:c
                                callbackQueue:dispatch_get_main_queue()
@@ -1507,8 +1502,7 @@
     RLMRunChildAndWait();
 
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-    RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
-    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
+    RLMRealmConfiguration *c = [user createConfiguration:url];
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
     CHECK_COUNT(0, HugeSyncObject, realm);
@@ -1544,9 +1538,7 @@
         // Wait for the child process to upload everything.
         RLMRunChildAndWait();
         XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-        RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
-        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
-        c.syncConfiguration = syncConfig;
+        RLMRealmConfiguration *c = [user createConfiguration:url];
         XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
         [RLMRealm asyncOpenWithConfiguration:c
                                callbackQueue:dispatch_get_main_queue()
@@ -1578,8 +1570,7 @@
     RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                                             register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
-    auto c = [RLMRealmConfiguration defaultConfiguration];
-    c.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:[NSURL URLWithString:@"realm://127.0.0.1:9080/invalid"]];
+    auto c = [user createConfiguration:[NSURL URLWithString:@"realm://127.0.0.1:9080/invalid"]];
     auto ex = [self expectationWithDescription:@"async open"];
     [RLMRealm asyncOpenWithConfiguration:c callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
@@ -1621,10 +1612,7 @@
 
     // Reopen the file with a shouldCompactOnLaunch block and verify that it is
     // actually compacted
-    auto config = [RLMRealmConfiguration defaultConfiguration];
-    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
-    config.syncConfiguration = syncConfig;
-
+    auto config = [user createConfiguration:url];
     __block bool blockCalled = false;
     config.shouldCompactOnLaunch = ^(NSUInteger, NSUInteger){
         blockCalled = true;
@@ -1648,7 +1636,7 @@
     RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                                             register:YES]
                                                server:[RLMObjectServerTests authServerURL]];
-
+    RLMRealmConfiguration *configuration = [user createConfiguration:REALM_URL()];
     NSURL *sourceFileURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"sync-1.x" withExtension:@"realm"];
     NSString *fileName = [NSString stringWithFormat:@"%@.realm", [NSUUID new]];
     NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
@@ -1658,10 +1646,7 @@
         return;
     }
 
-    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:REALM_URL()];
-    syncConfig.customFileURL = fileURL;
-    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
-    configuration.syncConfiguration = syncConfig;
+    configuration.syncConfiguration.customFileURL = fileURL;
 
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
     XCTAssertNil(realm);
@@ -1744,7 +1729,7 @@
     @autoreleasepool {
         RLMSyncCredentials *creds = [RLMObjectServerTests basicCredentialsWithName:name register:YES];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:server];
-        RLMRealmConfiguration *configuration = [RLMSyncConfiguration automaticConfigurationForUser:user];
+        RLMRealmConfiguration *configuration = [user defaultConfiguration];
         RLMRealm *realm = [self openRealmWithConfiguration:configuration];
         [realm beginWriteTransaction];
         // FIXME: make this less hideous
@@ -1777,7 +1762,7 @@
     @autoreleasepool {
         RLMSyncCredentials *creds = [RLMObjectServerTests basicCredentialsWithName:name register:NO];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:server];
-        RLMRealmConfiguration *configuration = [RLMSyncConfiguration automaticConfigurationForUser:user];
+        RLMRealmConfiguration *configuration = [user defaultConfiguration];
         RLMRealm *realm = [self openRealmWithConfiguration:configuration];
 
         // Perform some partial sync queries

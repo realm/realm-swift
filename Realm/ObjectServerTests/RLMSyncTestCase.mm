@@ -349,13 +349,10 @@ static NSURL *syncDirectoryForChildProcess() {
                                     user:(RLMSyncUser *)user
                            encryptionKey:(NSData *)encryptionKey
                               stopPolicy:(RLMSyncStopPolicy)stopPolicy {
-    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:url];
-    syncConfig.stopPolicy = stopPolicy;
-    syncConfig.isPartial = [self isPartial];
-
-    auto c = [RLMRealmConfiguration defaultConfiguration];
-    c.encryptionKey = encryptionKey;
-    c.syncConfiguration = syncConfig;
+    auto c = [user createConfiguration:url];
+    c.encryptionKey = encryptionKey;  
+    c.syncConfiguration.stopPolicy = stopPolicy;
+    c.syncConfiguration.fullSynchronization = ![self isPartial];
     return [RLMRealm realmWithConfiguration:c error:nil];
 }
 

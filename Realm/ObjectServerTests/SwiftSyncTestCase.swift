@@ -94,7 +94,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     func synchronouslyOpenRealm(url: URL, user: SyncUser, file: StaticString = #file, line: UInt = #line) throws -> Realm {
-        let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: url))
+        let config = user.createConfiguration(realmURL: url, fullSynchronization: true)
         return try synchronouslyOpenRealm(configuration: config)
     }
 
@@ -115,7 +115,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     func immediatelyOpenRealm(url: URL, user: SyncUser) throws -> Realm {
-        return try Realm(configuration: Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: url)))
+        return try Realm(configuration: user.createConfiguration(realmURL: url, fullSynchronization: true))
     }
 
     func synchronouslyLogInUser(for credentials: SyncCredentials,

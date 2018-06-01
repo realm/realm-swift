@@ -251,7 +251,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 // Wait for the child process to upload everything.
                 executeChild()
                 let ex = expectation(description: "download-realm")
-                let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: realmURL))
+                let config = user.createConfiguration(realmURL: realmURL, fullSynchronization: true)
                 let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
                 XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
                 Realm.asyncOpen(configuration: config) { realm, error in
@@ -421,7 +421,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             autoreleasepool {
                 let credentials = SyncCredentials.usernamePassword(username: "Swift.testPartialSync", password: "a", register: true)
                 let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
-                let realm = try! synchronouslyOpenRealm(configuration: SyncConfiguration.automatic(user: user))
+                let realm = try! synchronouslyOpenRealm(configuration: user.defaultConfiguration)
 
                 try! realm.write {
                     realm.add(SwiftPartialSyncObjectA(number: 0, string: "realm"))
@@ -453,7 +453,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             autoreleasepool {
                 let credentials = SyncCredentials.usernamePassword(username: "Swift.testPartialSync", password: "a")
                 let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
-                let realm = try! synchronouslyOpenRealm(configuration: SyncConfiguration.automatic(user: user))
+                let realm = try! synchronouslyOpenRealm(configuration: user.defaultConfiguration)
 
                 let ex = expectation(description: "Should be able to successfully complete a query")
                 let results = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5")

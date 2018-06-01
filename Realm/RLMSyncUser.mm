@@ -158,10 +158,9 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 - (instancetype)initPrivate {
     if (self = [super init]) {
         _configMaker = std::make_unique<ConfigMaker>([](std::shared_ptr<SyncUser> user, std::string url) {
-            RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
             NSURL *objCUrl = [NSURL URLWithString:@(url.c_str())];
             RLMSyncUser *objCUser = [[RLMSyncUser alloc] initWithSyncUser:std::move(user)];
-            config.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:objCUser realmURL:objCUrl];
+            RLMRealmConfiguration *config = [objCUser createConfiguration:objCUrl];
             return [config config];
         });
         return self;
@@ -208,7 +207,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                       completionBlock:completion];
 }
 
-- (RLMRealmConfiguration *)createConfiguration:(NSURL *)url; {
+- (RLMRealmConfiguration *)createConfiguration:(NSURL *)url {
     RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                                          realmURL:url
                                                                     customFileURL:nil
@@ -229,7 +228,15 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 }
 
 - (RLMRealmConfiguration *)defaultConfiguration {
-    return nil;
+    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
+                                                                         realmURL:self.defaultRealmURL
+                                                                    customFileURL:nil
+                                                                        isPartial:YES
+                                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                                                                     errorHandler:nullptr];
+    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
+    config.syncConfiguration = syncConfig;
+    return config;
 }
 
 - (RLMUserErrorReportingBlock)errorHandler {

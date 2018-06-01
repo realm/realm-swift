@@ -50,8 +50,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
     // MARK: Helper functions
 
     func openRealm(_ url: URL, _ user: SyncUser) -> Realm {
-        let realm = try! Realm(configuration: Realm.Configuration(syncConfiguration:
-            SyncConfiguration(user: user, realmURL: url, isPartial: true)))
+        let realm = try! Realm(configuration: user.createConfiguration(realmURL: url))
         waitForSync(realm)
         return realm
     }

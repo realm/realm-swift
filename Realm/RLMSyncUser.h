@@ -116,7 +116,7 @@ NS_ASSUME_NONNULL_BEGIN
  Returns the default configuration for the user. The default configuration points to the default
  query-based Realm on the server the user authenticated against.
 */
-@property (nonatomic, readonly) RLMRealmConfiguration *defaultConfiguration;
+@property (nonatomic, readonly) RLMRealmConfiguration *defaultConfiguration NS_REFINED_FOR_SWIFT;
 
 
 #pragma mark - Lifecycle
@@ -161,7 +161,8 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  contain the wildcard marker `~`, which will automatically be filled in with
  the user identity by the Realm Object Server.
  */
--(RLMRealmConfiguration *)createConfiguration:(NSURL *)url;
+-(RLMRealmConfiguration *)createConfiguration:(NSURL *)url
+NS_REFINED_FOR_SWIFT;
 
 /**
  Log a user out, destroying their server state, unregistering them from the SDK,

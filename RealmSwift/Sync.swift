@@ -440,6 +440,12 @@ extension SyncUser {
             }
         }
     }
+    
+    @nonobjc public var defaultConfiguration: Realm.Configuration {
+        get {
+            return ObjectiveCSupport.convert(object: __defaultConfiguration)
+        }
+    }
 
     /**
      Retrieve permissions for this user. Permissions describe which synchronized
@@ -497,6 +503,28 @@ extension SyncUser {
             }
             callback(token, nil)
         }
+    }
+
+    /**
+     Create a sync configuration instance.
+
+     Additional settings can be optionally specified. Descriptions of these
+     settings follow.
+     
+     `enableSSLValidation` is true by default. It can be disabled for debugging
+     purposes.
+     
+     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
+     `.realm`, `.realm.lock` or `.realm.management`.
+     
+     - warning: NEVER disable SSL validation for a system running in production.
+     */
+    public func createConfiguration(realmURL: URL, fullSynchronization: Bool = false, enableSSLValidation: Bool = true, urlPrefix: String? = nil) -> Realm.Configuration {
+        let config = RLMRealmConfiguration()
+        config.syncConfiguration?.enableSSLValidation = enableSSLValidation
+        config.syncConfiguration?.fullSynchronization = fullSynchronization
+        config.syncConfiguration?.urlPrefix = urlPrefix
+        return ObjectiveCSupport.convert(object: config)
     }
 }
 
