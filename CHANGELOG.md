@@ -22,10 +22,10 @@ has impacted a number of API's. See below for the details.
 
 ###  Deprecated
 
-* `-[RLMSyncConfiguration automaticConfiguration] has been deprecated in favor of `-[RLMSyncUser defaultConfiguration]. 
-* `-[RLMSyncConfiguration automaticConfigurationForUser] has been deprecated in favor of `-[RLMSyncUser defaultConfiguration].
+* `+[RLMSyncConfiguration initWithUser] has been deprecated in favor of `-[RLMSyncUser createConfiguration:url]. 
+* `+[RLMSyncConfiguration automaticConfiguration] has been deprecated in favor of `-[RLMSyncUser defaultConfiguration]. 
+* `+[RLMSyncConfiguration automaticConfigurationForUser] has been deprecated in favor of `-[RLMSyncUser defaultConfiguration].
 * `-[RLMSyncConfiguration isPartial] has been deprecated in favor of `-[RLMSyncConfiguration fullSynchronization]`.
-
 
 ### Enhancements
 
