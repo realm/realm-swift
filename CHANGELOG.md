@@ -14,6 +14,25 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * None.
 
+3.7.0 Release notes (YYYY-MM-DD)
+=============================================================
+
+The feature known as Partial Sync has been renamed to Query-based Synchronization. This
+has impacted a number of API's. See below for the details.
+
+###  Deprecated
+
+* `-[RLMSyncConfiguration automaticConfiguration] has been deprecated in favor of `-[RLMSyncUser defaultConfiguration]. 
+* `-[RLMSyncConfiguration automaticConfigurationForUser] has been deprecated in favor of `-[RLMSyncUser defaultConfiguration].
+* `-[RLMSyncConfiguration isPartial] has been deprecated in favor of `-[RLMSyncConfiguration fullSynchronization]`.
+
+
+### Enhancements
+
+* Added `-[RLMSyncUser createConfiguration:url]`. Query-based sync is the default sync mode for this configuration.
+* Added `-[RLMSyncUser defaultConfiguration]`. Query-based sync is the default sync mode for this configuration.
+
+
 3.6.0 Release notes (2018-05-29)
 =============================================================
 
