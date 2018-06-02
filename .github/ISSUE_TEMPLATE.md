@@ -1,8 +1,9 @@
+!!! MANDATORY TO FILL OUT !!!
 <!---
 
-**Questions**: If you have questions about how to use Realm, ask on
-[StackOverflow](http://stackoverflow.com/questions/ask?tags=realm).
-We monitor the `realm` tag.
+**Questions**: If you have questions about HOW TO USE Realm, ask on
+[StackOverflow](http://stackoverflow.com/questions/ask?tags=realm),
+or in our [Swift Forum](https://forums.realm.io/c/swift) or [Obj-C Forum](https://forums.realm.io/c/objc).
 
 **Feature Request**: Just fill in the first two sections below.
 
