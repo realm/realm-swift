@@ -349,7 +349,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                     user:(RLMSyncUser *)user
                            encryptionKey:(NSData *)encryptionKey
                               stopPolicy:(RLMSyncStopPolicy)stopPolicy {
-    auto c = [user createConfiguration:url];
+    auto c = [user configurationWithUrl:url];
     c.encryptionKey = encryptionKey;  
     c.syncConfiguration.stopPolicy = stopPolicy;
     c.syncConfiguration.fullSynchronization = ![self isPartial];

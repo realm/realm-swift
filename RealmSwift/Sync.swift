@@ -265,7 +265,7 @@ public struct SyncConfiguration {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    @available(*, deprecated, message: "Use SyncUser.createConfiguration instead")
+    @available(*, deprecated, message: "Use SyncUser.configurationWithUrl instead")
     public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true, isPartial: Bool = false, urlPrefix: String? = nil) {
         self.user = user
         self.realmURL = realmURL
@@ -283,7 +283,7 @@ public struct SyncConfiguration {
 
      - requires: There be exactly one logged-in `SyncUser`
      */
-    @available(*, deprecated, message: "Use SyncUser.defaultConfiguration() instead")
+    @available(*, deprecated, message: "Use SyncUser.configuration instead")
     public static func automatic() -> Realm.Configuration {
         return ObjectiveCSupport.convert(object: RLMSyncConfiguration.automaticConfiguration())
     }
@@ -293,7 +293,7 @@ public struct SyncConfiguration {
 
      Partial synchronization is enabled in the returned configuration.
     */
-    @available(*, deprecated, message: "Use SyncUser.defaultConfiguration() instead")
+    @available(*, deprecated, message: "Use SyncUser.configuration instead")
     public static func automatic(user: SyncUser) -> Realm.Configuration {
         return ObjectiveCSupport.convert(object: RLMSyncConfiguration.automaticConfiguration(for: user))
     }
@@ -441,12 +441,6 @@ extension SyncUser {
         }
     }
     
-    @nonobjc public var defaultConfiguration: Realm.Configuration {
-        get {
-            return ObjectiveCSupport.convert(object: __defaultConfiguration)
-        }
-    }
-
     /**
      Retrieve permissions for this user. Permissions describe which synchronized
      Realms this user has access to and what they are allowed to do with them.
@@ -519,12 +513,14 @@ extension SyncUser {
      
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    public func createConfiguration(realmURL: URL, fullSynchronization: Bool = false, enableSSLValidation: Bool = true, urlPrefix: String? = nil) -> Realm.Configuration {
-        let config = RLMRealmConfiguration()
-        config.syncConfiguration?.enableSSLValidation = enableSSLValidation
-        config.syncConfiguration?.fullSynchronization = fullSynchronization
-        config.syncConfiguration?.urlPrefix = urlPrefix
-        return ObjectiveCSupport.convert(object: config)
+    public func configuration(realmURL: URL? = nil, fullSynchronization: Bool = false, enableSSLValidation: Bool = true, urlPrefix: String? = nil) -> Realm.Configuration {
+        if (realmURL == nil) {
+            let config = self.configuration()
+            return ObjectiveCSupport.convert(object: config);
+        } else {
+            let config = self.configuration(with: realmURL!, fullSynchronization: fullSynchronization, enableSSLValidation: enableSSLValidation, urlPrefix: urlPrefix)
+            return ObjectiveCSupport.convert(object: config)
+        }
     }
 }
 

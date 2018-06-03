@@ -22,15 +22,15 @@ has impacted a number of API's. See below for the details.
 
 ###  Deprecated
 
-* `+[RLMSyncConfiguration initWithUser] has been deprecated in favor of `-[RLMSyncUser createConfiguration:url]. 
-* `+[RLMSyncConfiguration automaticConfiguration] has been deprecated in favor of `-[RLMSyncUser defaultConfiguration]. 
-* `+[RLMSyncConfiguration automaticConfigurationForUser] has been deprecated in favor of `-[RLMSyncUser defaultConfiguration].
+* `+[RLMSyncConfiguration initWithUser] has been deprecated in favor of `-[RLMSyncUser configurationWithUrl:url]. 
+* `+[RLMSyncConfiguration automaticConfiguration] has been deprecated in favor of `-[RLMSyncUser configuration]. 
+* `+[RLMSyncConfiguration automaticConfigurationForUser] has been deprecated in favor of `-[RLMSyncUser configuration].
 * `-[RLMSyncConfiguration isPartial] has been deprecated in favor of `-[RLMSyncConfiguration fullSynchronization]`.
 
 ### Enhancements
 
-* Added `-[RLMSyncUser createConfiguration:url]`. Query-based sync is the default sync mode for this configuration.
-* Added `-[RLMSyncUser defaultConfiguration]`. Query-based sync is the default sync mode for this configuration.
+* Added `-[RLMSyncUser configurationWithUrl:url]`. Query-based sync is the default sync mode for this configuration.
+* Added `-[RLMSyncUser configuration]`. Query-based sync is the default sync mode for this configuration.
 
 
 3.6.0 Release notes (2018-05-29)

@@ -160,7 +160,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         _configMaker = std::make_unique<ConfigMaker>([](std::shared_ptr<SyncUser> user, std::string url) {
             NSURL *objCUrl = [NSURL URLWithString:@(url.c_str())];
             RLMSyncUser *objCUser = [[RLMSyncUser alloc] initWithSyncUser:std::move(user)];
-            RLMRealmConfiguration *config = [objCUser createConfiguration:objCUrl];
+            RLMRealmConfiguration *config = [objCUser configurationWithUrl:objCUrl];
             return [config config];
         });
         return self;
@@ -207,13 +207,29 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                       completionBlock:completion];
 }
 
-- (RLMRealmConfiguration *)createConfiguration:(NSURL *)url {
+- (RLMRealmConfiguration *)configuration {
+    return [self configurationWithUrl:self.defaultRealmURL];
+}
+
+- (RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url {
+    return [self configurationWithUrl:url
+                  fullSynchronization:NO
+                  enableSSLValidation:YES
+                            urlPrefix:nil];
+}
+
+- (RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url
+                            fullSynchronization:(bool)fullSynchronization
+                            enableSSLValidation:(bool)enableSSLValidation
+                                      urlPrefix:(NSString * _Nullable)urlPrefix {
     RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                                          realmURL:url
                                                                     customFileURL:nil
-                                                                        isPartial:YES
+                                                                        isPartial:!fullSynchronization
                                                                        stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
                                                                      errorHandler:nullptr];
+    syncConfig.urlPrefix = urlPrefix;
+    syncConfig.enableSSLValidation = enableSSLValidation;
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = syncConfig;
     return config;
@@ -225,18 +241,6 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
     }
     _user->log_out();
     context_for(_user).invalidate_all_handles();
-}
-
-- (RLMRealmConfiguration *)defaultConfiguration {
-    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
-                                                                         realmURL:self.defaultRealmURL
-                                                                    customFileURL:nil
-                                                                        isPartial:YES
-                                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-                                                                     errorHandler:nullptr];
-    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-    config.syncConfiguration = syncConfig;
-    return config;
 }
 
 - (RLMUserErrorReportingBlock)errorHandler {
