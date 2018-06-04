@@ -168,6 +168,23 @@ static BOOL isValidRealmURL(NSURL *url) {
 
 - (instancetype)initWithUser:(RLMSyncUser *)user
                     realmURL:(NSURL *)url
+                   isPartial:(BOOL)isPartial
+                   urlPrefix:(NSString *)urlPrefix
+                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
+         enableSSLValidation:(BOOL)enableSSLValidation {
+    auto config = [self initWithUser:user
+                            realmURL:url
+                       customFileURL:nil
+                           isPartial:isPartial
+                          stopPolicy:stopPolicy
+                        errorHandler:nullptr];
+    config.urlPrefix = urlPrefix;
+    config.enableSSLValidation = enableSSLValidation;
+    return config;
+}
+
+- (instancetype)initWithUser:(RLMSyncUser *)user
+                    realmURL:(NSURL *)url
                customFileURL:(nullable NSURL *)customFileURL
                    isPartial:(BOOL)isPartial
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy

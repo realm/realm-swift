@@ -1675,6 +1675,8 @@
     XCTAssertNil(error);
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated"
 - (void)testAutomaticSyncConfiguration {
     NSURL *server = [RLMObjectServerTests authServerURL];
 
@@ -1717,6 +1719,7 @@
     configuration = [RLMSyncConfiguration automaticConfiguration];
     XCTAssert(configuration);
 }
+#pragma clang diagnostic pop
 
 #pragma mark - Partial sync
 

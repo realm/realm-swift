@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Realm
-import Foundation
+import Realm.Private
 
 /**
  An object representing a Realm Object Server user.
@@ -210,12 +210,14 @@ public struct SyncConfiguration {
 
      -warning: Partial synchronization is a tech preview. Its APIs are subject to change.
      */
-    @available(*, deprecated)
-    public var isPartial: Bool
+    @available(*, deprecated, message: "Use fullSynchronization instead")
+    public var isPartial: Bool {
+        return !fullSynchronization
+    }
 
     /**
      Whether this Realm should be a fully synchronized Realm.
-     
+
      Synchronized Realms comes in two flavors: Query-based and Fully synchronized.
      A fully synchronized Realm will automatically synchronize the entire Realm in the background
      while a query-based Realm will only synchronize the data being subscribed to.
@@ -238,17 +240,15 @@ public struct SyncConfiguration {
         self.stopPolicy = config.stopPolicy
         self.enableSSLValidation = config.enableSSLValidation
         self.fullSynchronization = config.fullSynchronization
-        self.isPartial = config.isPartial
         self.urlPrefix = config.urlPrefix
     }
 
     func asConfig() -> RLMSyncConfiguration {
-        let config = RLMSyncConfiguration(user: user, realmURL: realmURL)
-        config.stopPolicy = stopPolicy
-        config.enableSSLValidation = enableSSLValidation
-        config.fullSynchronization = fullSynchronization
-        config.urlPrefix = urlPrefix
-        return config
+        return RLMSyncConfiguration(user: user, realmURL: realmURL,
+                                    isPartial: !fullSynchronization,
+                                    urlPrefix: urlPrefix,
+                                    stopPolicy: stopPolicy,
+                                    enableSSLValidation: enableSSLValidation)
     }
 
     /**
@@ -265,14 +265,13 @@ public struct SyncConfiguration {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    @available(*, deprecated, message: "Use SyncUser.configurationWithURL instead")
+    @available(*, deprecated, message: "Use SyncUser.configuration() instead")
     public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true, isPartial: Bool = false, urlPrefix: String? = nil) {
         self.user = user
         self.realmURL = realmURL
         self.stopPolicy = .afterChangesUploaded
         self.enableSSLValidation = enableSSLValidation
         self.fullSynchronization = !isPartial
-        self.isPartial = isPartial // FIXME
         self.urlPrefix = urlPrefix
     }
 
@@ -283,7 +282,7 @@ public struct SyncConfiguration {
 
      - requires: There be exactly one logged-in `SyncUser`
      */
-    @available(*, deprecated, message: "Use SyncUser.configuration instead")
+    @available(*, deprecated, message: "Use SyncUser.configuration() instead")
     public static func automatic() -> Realm.Configuration {
         return ObjectiveCSupport.convert(object: RLMSyncConfiguration.automaticConfiguration())
     }
@@ -293,7 +292,7 @@ public struct SyncConfiguration {
 
      Partial synchronization is enabled in the returned configuration.
     */
-    @available(*, deprecated, message: "Use SyncUser.configuration instead")
+    @available(*, deprecated, message: "Use SyncUser.configuration() instead")
     public static func automatic(user: SyncUser) -> Realm.Configuration {
         return ObjectiveCSupport.convert(object: RLMSyncConfiguration.automaticConfiguration(for: user))
     }
@@ -504,13 +503,13 @@ extension SyncUser {
 
      Additional settings can be optionally specified. Descriptions of these
      settings follow.
-     
+
      `enableSSLValidation` is true by default. It can be disabled for debugging
      purposes.
-     
+
      - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
      `.realm`, `.realm.lock` or `.realm.management`.
-     
+
      - warning: NEVER disable SSL validation for a system running in production.
      */
     public func configuration(realmURL: URL? = nil, fullSynchronization: Bool = false, enableSSLValidation: Bool = true, urlPrefix: String? = nil) -> Realm.Configuration {
