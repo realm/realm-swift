@@ -497,10 +497,6 @@ extension List: RealmCollection {
             }
     }
 
-    // This should be inferred, but Xcode 8.1 is unable to
-    /// :nodoc:
-    public typealias Indices = DefaultRandomAccessIndices<List>
-
     /// The position of the first element in a non-empty collection.
     /// Identical to endIndex in an empty collection.
     public var startIndex: Int { return 0 }
