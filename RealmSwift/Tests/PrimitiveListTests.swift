@@ -500,8 +500,8 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         for i in 0..<values.count {
             assertEqualTo(array[i], values[i])
         }
-        assertThrows(array[values.count], reason: "Index 3 is out of bounds")
-        assertThrows(array[-1], reason: "negative value")
+        assertThrows(self.array[self.values.count], reason: "Index 3 is out of bounds")
+        assertThrows(self.array[-1], reason: "negative value")
     }
 
     func testFirst() {
@@ -524,7 +524,7 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         array.append(objectsIn: values)
         assertEqualTo(values!, array.value(forKey: "self").map { dynamicBridgeCast(fromObjectiveC: $0) as V.T })
 
-        assertThrows(array.value(forKey: "not self"), named: "NSUnknownKeyException")
+        assertThrows(self.array.value(forKey: "not self"), named: "NSUnknownKeyException")
     }
 
     func testSetValueForKey() {
@@ -555,35 +555,35 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         assertEqualTo(values[0], array[1])
         assertEqualTo(values[2], array[2])
 
-        assertThrows(_ = array.insert(values[0], at: 4))
-        assertThrows(_ = array.insert(values[0], at: -1))
+        assertThrows(_ = self.array.insert(self.values[0], at: 4))
+        assertThrows(_ = self.array.insert(self.values[0], at: -1))
     }
 
     func testRemove() {
-        assertThrows(array.remove(at: 0))
-        assertThrows(array.remove(at: -1))
+        assertThrows(self.array.remove(at: 0))
+        assertThrows(self.array.remove(at: -1))
 
         array.append(objectsIn: values)
 
-        assertThrows(array.remove(at: -1))
+        assertThrows(self.array.remove(at: -1))
         assertEqualTo(values[0], array[0])
         assertEqualTo(values[1], array[1])
         assertEqualTo(values[2], array[2])
-        assertThrows(array[3])
+        assertThrows(self.array[3])
 
         array.remove(at: 0)
         assertEqualTo(values[1], array[0])
         assertEqualTo(values[2], array[1])
-        assertThrows(array[2])
-        assertThrows(array.remove(at: 2))
+        assertThrows(self.array[2])
+        assertThrows(self.array.remove(at: 2))
 
         array.remove(at: 1)
         assertEqualTo(values[1], array[0])
-        assertThrows(array[1])
+        assertThrows(self.array[1])
     }
 
     func testRemoveLast() {
-        assertThrows(array.removeLast())
+        assertThrows(self.array.removeLast())
 
         array.append(objectsIn: values)
         array.removeLast()
@@ -604,7 +604,7 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
     }
 
     func testReplace() {
-        assertThrows(array.replace(index: 0, object: values[0]),
+        assertThrows(self.array.replace(index: 0, object: self.values[0]),
                      reason: "Index 0 is out of bounds")
 
         array.append(objectsIn: values)
@@ -613,9 +613,9 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         assertEqualTo(array[1], values[0])
         assertEqualTo(array[2], values[2])
 
-        assertThrows(array.replace(index: 3, object: values[0]),
+        assertThrows(self.array.replace(index: 3, object: self.values[0]),
                      reason: "Index 3 is out of bounds")
-        assertThrows(array.replace(index: -1, object: values[0]),
+        assertThrows(self.array.replace(index: -1, object: self.values[0]),
                      reason: "Cannot pass a negative value")
     }
 
@@ -624,7 +624,7 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
 #if false
         // FIXME: The exception thrown here runs afoul of Swift's exclusive access checking.
-        assertThrows(array.replaceSubrange(0..<1, with: []),
+        assertThrows(self.array.replaceSubrange(0..<1, with: []),
                      reason: "Index 0 is out of bounds")
 #endif
 
@@ -642,7 +642,7 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
     }
 
     func testMove() {
-        assertThrows(array.move(from: 1, to: 0), reason: "out of bounds")
+        assertThrows(self.array.move(from: 1, to: 0), reason: "out of bounds")
 
         array.append(objectsIn: values)
         array.move(from: 2, to: 0)
@@ -650,14 +650,14 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         assertEqualTo(array[1], values[0])
         assertEqualTo(array[2], values[1])
 
-        assertThrows(array.move(from: 3, to: 0), reason: "Index 3 is out of bounds")
-        assertThrows(array.move(from: 0, to: 3), reason: "Index 3 is out of bounds")
-        assertThrows(array.move(from: -1, to: 0), reason: "negative value")
-        assertThrows(array.move(from: 0, to: -1), reason: "negative value")
+        assertThrows(self.array.move(from: 3, to: 0), reason: "Index 3 is out of bounds")
+        assertThrows(self.array.move(from: 0, to: 3), reason: "Index 3 is out of bounds")
+        assertThrows(self.array.move(from: -1, to: 0), reason: "negative value")
+        assertThrows(self.array.move(from: 0, to: -1), reason: "negative value")
     }
 
     func testSwap() {
-        assertThrows(array.swapAt(0, 1), reason: "out of bounds")
+        assertThrows(self.array.swapAt(0, 1), reason: "out of bounds")
 
         array.append(objectsIn: values)
         array.swapAt(0, 2)
@@ -665,10 +665,10 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         assertEqualTo(array[1], values[1])
         assertEqualTo(array[2], values[0])
 
-        assertThrows(array.swapAt(3, 0), reason: "Index 3 is out of bounds")
-        assertThrows(array.swapAt(0, 3), reason: "Index 3 is out of bounds")
-        assertThrows(array.swapAt(-1, 0), reason: "negative value")
-        assertThrows(array.swapAt(0, -1), reason: "negative value")
+        assertThrows(self.array.swapAt(3, 0), reason: "Index 3 is out of bounds")
+        assertThrows(self.array.swapAt(0, 3), reason: "Index 3 is out of bounds")
+        assertThrows(self.array.swapAt(-1, 0), reason: "negative value")
+        assertThrows(self.array.swapAt(0, -1), reason: "negative value")
     }
 }
 
