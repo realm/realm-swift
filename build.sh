@@ -42,7 +42,6 @@ Usage: sh $0 command [argument]
 command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
-  download-object-server:  downloads and installs the Realm Object Server
   download-sync:        downloads sync library (binary version, core+sync)
   build:                builds all iOS  and OS X frameworks
   ios-static:           builds fat iOS static framework
@@ -122,6 +121,11 @@ xc() {
     elif [[ "$XCMODE" == "xctool" ]]; then
         xctool "$args"
     fi
+}
+
+xctest() {
+  xc "$@" build
+  xc "$@" test
 }
 
 copy_bcsymbolmap() {
@@ -304,26 +308,6 @@ fi
 # Downloading
 ######################################
 
-kill_object_server() {
-    set +e
-    # Based on build.sh conventions we always run ROS from a path ending in 'ros/bin/ros'.
-    pkill -f ros/bin/ros\ start
-    # 0 = process killed, 1 = no processes running, 2+ = error
-    local status=$?
-    if [ $status -gt 1 ]; then
-        exit $status
-    fi
-    set -e
-}
-
-download_object_server() {
-    rm -rf ./test-ros-instance
-    mkdir -p ./test-ros-instance/ros
-    chmod 777 ./test-ros-instance
-    /usr/local/bin/node /usr/local/bin/npm install --scripts-prepend-node-path=auto --prefix ./test-ros-instance/ros \
-        -g realm-object-server@${REALM_OBJECT_SERVER_VERSION}
-}
-
 download_common() {
     local download_type=$1 tries_left=3 version url error temp_dir temp_path tar_path
 
@@ -418,38 +402,6 @@ case "$COMMAND" in
     ######################################
     "clean")
         find . -type d -name build -exec rm -r "{}" +
-        exit 0
-        ;;
-
-    ######################################
-    # Object Server
-    ######################################
-    "download-object-server")
-        download_object_server
-        exit 0
-        ;;
-
-    "reset-ros-server-state")
-        rm -rf "./test-ros-instance/data"
-        rm -rf "./test-ros-instance/realm-object-server"
-        exit 0
-        ;;
-
-    "reset-ros-client-state")
-        rm -rf ~/Library/Application\ Support/xctest
-        rm -rf ~/Library/Application\ Support/io.realm.TestHost
-        rm -rf ~/Library/Application\ Support/xctest-child
-        exit 0
-        ;;
-
-    "reset-object-server")
-        kill_object_server
-        # Add a short delay, so file system doesn't complain about files in use
-        sleep 1
-        sh build.sh reset-ros-server-state
-        sh build.sh reset-ros-client-state
-        # Add another delay to ensure files are actually gone from file system
-        sleep 1
         exit 0
         ;;
 
@@ -678,7 +630,7 @@ case "$COMMAND" in
         else
             destination="Apple TV 1080p"
         fi
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination' test"
+        xctest "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination'"
         exit $?
         ;;
 
@@ -688,7 +640,7 @@ case "$COMMAND" in
         else
             destination="Apple TV 1080p"
         fi
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination' test"
+        xctest "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination'"
         exit $?
         ;;
 
@@ -701,17 +653,17 @@ case "$COMMAND" in
         if [[ "$CONFIGURATION" == "Debug" ]]; then
             COVERAGE_PARAMS="GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
         fi
-        xc "-scheme Realm -configuration $CONFIGURATION test $COVERAGE_PARAMS"
+        xctest "-scheme Realm -configuration $CONFIGURATION $COVERAGE_PARAMS"
         exit 0
         ;;
 
     "test-osx-swift")
-        xc "-scheme RealmSwift -configuration $CONFIGURATION test"
+        xctest "-scheme RealmSwift -configuration $CONFIGURATION"
         exit 0
         ;;
 
     "test-osx-object-server")
-        xc "-scheme 'Object Server Tests' -configuration $CONFIGURATION -sdk macosx test"
+        xctest "-scheme 'Object Server Tests' -configuration $CONFIGURATION -sdk macosx"
         exit 0
         ;;
 
@@ -849,9 +801,7 @@ case "$COMMAND" in
         ;;
 
     "verify-osx-object-server")
-        sh build.sh download-object-server
         sh build.sh test-osx-object-server
-        sh build.sh reset-object-server
         exit 0
         ;;
 
@@ -1079,6 +1029,8 @@ EOM
 
     "ci-pr")
         mkdir -p build/reports
+        export REALM_DISABLE_ANALYTICS=1
+        export REALM_DISABLE_UPDATE_CHECKER=1
         # FIXME: Re-enable once CI can properly unlock the keychain
         export REALM_DISABLE_METADATA_ENCRYPTION=1
 
@@ -1097,6 +1049,9 @@ EOM
             export CONFIGURATION=$configuration
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
             sh build.sh prelaunch-simulator
+
+            source $(brew --prefix nvm)/nvm.sh
+            export REALM_NODE_PATH="$(nvm which 8)"
 
             # Reset CoreSimulator.log
             mkdir -p ~/Library/Logs/CoreSimulator

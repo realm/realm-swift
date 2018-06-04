@@ -78,7 +78,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         // Create a new Realm with an admin user
         let admin = createAdminUser(for: SwiftSyncTestCase.authServerURL(),
                                     username: UUID().uuidString + "-admin")
-        let url = URL(string: "realm://localhost:9080/\(name)")!
+        let url = URL(string: "realm://127.0.0.1:9080/\(name)")!
         let adminRealm = openRealm(url, admin)
         // FIXME: we currently need to add a subscription to get the permissions types sent to us
         subscribe(realm: adminRealm, type: SwiftSyncObject.self)

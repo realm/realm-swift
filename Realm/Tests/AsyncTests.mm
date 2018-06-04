@@ -321,44 +321,27 @@
         [expectation fulfill];
     }];
 
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    // Advance the version on a different thread, and then wait for async work
+    // to complete for that new version
+    [self dispatchAsyncAndWait:^{
+        [RLMRealm.defaultRealm transactionWithBlock:^{
+            [IntObject createInDefaultRealmWithValue:@[@0]];
+        } error:nil];
 
-    // Add a notification block on a background thread and wait for it to have been added
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        @autoreleasepool {
-            __block RLMNotificationToken *token;
-            CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
-                token = [RLMRealm.defaultRealm addNotificationBlock:^(RLMNotification notification, RLMRealm *realm) {
-                    CFRunLoopStop(CFRunLoopGetCurrent());
-                    dispatch_semaphore_signal(sema);
-                    [token invalidate];
-                    token = nil;
-                }];
-                dispatch_semaphore_signal(sema);
-            });
-
-            CFRunLoopRun();
-        }
-        dispatch_semaphore_signal(sema);
-    });
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-
-    // Make a commit on a background thread, and wait for the notification for
-    // it to have been sent to the other background thread (which happens only
-    // after all queries have run)
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        @autoreleasepool {
-            [RLMRealm.defaultRealm transactionWithBlock:^{
-                [IntObject createInDefaultRealmWithValue:@[@0]];
-            } error:nil];
-        }
-    });
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+        __block RLMNotificationToken *token;
+        CFRunLoopPerformBlock(CFRunLoopGetCurrent(), kCFRunLoopDefaultMode, ^{
+            token = [IntObject.allObjects addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) {
+                [token invalidate];
+                token = nil;
+                CFRunLoopStop(CFRunLoopGetCurrent());
+            }];
+        });
+        CFRunLoopRun();
+    }];
 
     // Only now let the main thread pick up the notifications
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
     [token invalidate];
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
 }
 
 - (void)testCommitInOneNotificationDoesNotCancelOtherNotifications {

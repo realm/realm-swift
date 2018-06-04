@@ -111,7 +111,7 @@
     RLMSyncUser *admin = [self createAdminUserForURL:[RLMSyncTestCase authServerURL]
                                             username:[[NSUUID UUID] UUIDString]];
 
-    auto url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"realm://localhost:9080/%@", NSStringFromSelector(sel)]];
+    auto url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"realm://127.0.0.1:9080/%@", NSStringFromSelector(sel)]];
     RLMRealm *adminRealm = [self openRealmForURL:url user:admin];
     [self addSyncObjectsToRealm:adminRealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
     CHECK_COUNT(3, SyncObject, adminRealm);

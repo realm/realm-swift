@@ -34,7 +34,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
-        let url = URL(string: "realm://localhost:9080/~/testBasicSync")!
+        let url = URL(string: "realm://127.0.0.1:9080/~/testBasicSync")!
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials(register: true), server: authURL)
             let realm = try synchronouslyOpenRealm(url: url, user: user)
