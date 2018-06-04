@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncConfiguration_Private.h"
-#import "sync_config.hpp"
+#import "sync/sync_config.hpp"
 
 namespace realm {
 struct SyncConfig;
