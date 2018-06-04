@@ -653,9 +653,7 @@ extension Realm {
      synchronized Realm.
     */
     public var syncSession: SyncSession? {
-        get {
-            return SyncSession(for: rlmRealm)
-        }
+        return SyncSession(for: rlmRealm)
     }
 }
 
