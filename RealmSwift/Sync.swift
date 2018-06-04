@@ -512,14 +512,13 @@ extension SyncUser {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    public func configuration(realmURL: URL? = nil, fullSynchronization: Bool = false, enableSSLValidation: Bool = true, urlPrefix: String? = nil) -> Realm.Configuration {
-        if realmURL == nil {
-            let config = self.configuration()
-            return ObjectiveCSupport.convert(object: config)
-        } else {
-            let config = self.configuration(with: realmURL!, fullSynchronization: fullSynchronization, enableSSLValidation: enableSSLValidation, urlPrefix: urlPrefix)
-            return ObjectiveCSupport.convert(object: config)
-        }
+    public func configuration(realmURL: URL? = nil, fullSynchronization: Bool = false,
+                              enableSSLValidation: Bool = true, urlPrefix: String? = nil) -> Realm.Configuration {
+        let config = self.__configuration(with: realmURL,
+                                          fullSynchronization: fullSynchronization,
+                                          enableSSLValidation: enableSSLValidation,
+                                          urlPrefix: urlPrefix)
+        return ObjectiveCSupport.convert(object: config)
     }
 }
 

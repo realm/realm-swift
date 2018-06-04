@@ -151,7 +151,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  Returns the default configuration for the user. The default configuration
  points to the default query-based Realm on the server the user authenticated against.
  */
-- (RLMRealmConfiguration *)configuration;
+- (RLMRealmConfiguration *)configuration NS_REFINED_FOR_SWIFT;
 
 /**
  Create a query-based configuration instance for the given url.
@@ -162,7 +162,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
             be filled in with the user identity by the Realm Object Server.
  @return A default configuration object with the sync configuration set to use the given URL.
  */
-- (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url;
+- (RLMRealmConfiguration *)configurationWithURL:(nullable NSURL *)url NS_REFINED_FOR_SWIFT;
 
 /**
  Create a configuration instance for the given url.
@@ -177,8 +177,8 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  @return A default configuration object with the sync configuration set to use
          the given URL and options.
  */
-- (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url
-                            fullSynchronization:(bool)fullSynchronization;
+- (RLMRealmConfiguration *)configurationWithURL:(nullable NSURL *)url
+                            fullSynchronization:(bool)fullSynchronization NS_REFINED_FOR_SWIFT;
 
 /**
  Create a configuration instance for the given url.
@@ -199,10 +199,10 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  @return A default configuration object with the sync configuration set to use
          the given URL and options.
  */
--(RLMRealmConfiguration *)configurationWithURL:(NSURL *)url
-                           fullSynchronization:(bool)fullSynchronization
-                           enableSSLValidation:(bool)enableSSLValidation
-                                     urlPrefix:(nullable NSString *)urlPrefix;
+- (RLMRealmConfiguration *)configurationWithURL:(nullable NSURL *)url
+                            fullSynchronization:(bool)fullSynchronization
+                            enableSSLValidation:(bool)enableSSLValidation
+                                      urlPrefix:(nullable NSString *)urlPrefix NS_REFINED_FOR_SWIFT;
 
 /**
  Log a user out, destroying their server state, unregistering them from the SDK,

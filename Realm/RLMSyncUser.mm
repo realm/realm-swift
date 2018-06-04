@@ -208,7 +208,10 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 }
 
 - (RLMRealmConfiguration *)configuration {
-    return [self configurationWithURL:self.defaultRealmURL];
+    return [self configurationWithURL:nil
+                  fullSynchronization:NO
+                  enableSSLValidation:YES
+                            urlPrefix:nil];
 }
 
 - (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url {
@@ -229,12 +232,12 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                             fullSynchronization:(bool)fullSynchronization
                             enableSSLValidation:(bool)enableSSLValidation
                                       urlPrefix:(NSString * _Nullable)urlPrefix {
-    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
-                                                                         realmURL:url
-                                                                    customFileURL:nil
-                                                                        isPartial:!fullSynchronization
-                                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-                                                                     errorHandler:nullptr];
+    auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
+                                                        realmURL:url ?: self.defaultRealmURL
+                                                   customFileURL:nil
+                                                       isPartial:!fullSynchronization
+                                                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                                                    errorHandler:nullptr];
     syncConfig.urlPrefix = urlPrefix;
     syncConfig.enableSSLValidation = enableSSLValidation;
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
