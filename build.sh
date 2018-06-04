@@ -124,8 +124,8 @@ xc() {
 }
 
 xctest() {
-  xc "$@ build"
-  xc "$@ test"
+  xc "$@" build
+  xc "$@" test
 }
 
 copy_bcsymbolmap() {
