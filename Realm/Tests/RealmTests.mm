@@ -1380,7 +1380,7 @@
     RLMRealm *realm = RLMRealm.defaultRealm;
 
     XCTestExpectation *notificationFired = [self expectationWithDescription:@"notification fired"];
-    RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *) {
+    __block RLMNotificationToken *token = [realm addNotificationBlock:^(NSString *note, RLMRealm *) {
         if (note == RLMRealmDidChangeNotification) {
             [notificationFired fulfill];
             [token invalidate];
