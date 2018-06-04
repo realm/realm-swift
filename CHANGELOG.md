@@ -14,6 +14,38 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * None.
 
+3.7.0 Release notes (YYYY-MM-DD)
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+The feature known as Partial Sync has been renamed to Query-based Synchronization. This
+has impacted a number of API's. See below for the details.
+
+### Breaking Changes
+
+* None.
+
+###  Deprecated
+
+* `+[RLMSyncConfiguration initWithUser] has been deprecated in favor of `-[RLMSyncUser configurationWithURL:url].
+* `+[RLMSyncConfiguration automaticConfiguration] has been deprecated in favor of `-[RLMSyncUser configuration]. 
+* `+[RLMSyncConfiguration automaticConfigurationForUser] has been deprecated in favor of `-[RLMSyncUser configuration].
+* `-[RLMSyncConfiguration isPartial] has been deprecated in favor of `-[RLMSyncConfiguration fullSynchronization]`.
+
+### Enhancements
+
+* Added `-[RLMSyncUser configurationWithURL:url]`. Query-based sync is the default sync mode for this configuration.
+* Added `-[RLMSyncUser configuration]`. Query-based sync is the default sync mode for this configuration.
+
+* Add `-[RLMRealm syncSession]` and  `Realm.syncSession` to obtain the session
+  used for a synchronized Realm.
+* Added `-[RLMSyncUser configurationWithURL:url]`. Query-based sync is the default sync mode for this configuration.
+* Added `-[RLMSyncUser configuration]`. Query-based sync is the default sync mode for this configuration.
+
+### Bugfixes
+
+* None.
+
 3.6.0 Release notes (2018-05-29)
 =============================================================
 

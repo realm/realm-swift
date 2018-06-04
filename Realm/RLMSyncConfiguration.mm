@@ -94,7 +94,7 @@ static BOOL isValidRealmURL(NSURL *url) {
     return [self.realmURL isEqual:that.realmURL]
         && [self.user isEqual:that.user]
         && self.stopPolicy == that.stopPolicy
-        && self.isPartial == that.isPartial;
+        && self.fullSynchronization == that.fullSynchronization;
 }
 
 - (void)setEnableSSLValidation:(BOOL)enableSSLValidation {
@@ -111,6 +111,14 @@ static BOOL isValidRealmURL(NSURL *url) {
 
 - (BOOL)isPartial {
     return (BOOL)_config->is_partial;
+}
+
+- (void)setFullSynchronization:(BOOL)fullSynchronization {
+    _config->is_partial = !(bool)fullSynchronization;
+}
+
+- (BOOL)fullSynchronization {
+    return !(BOOL)_config->is_partial;
 }
 
 - (realm::SyncConfig)rawConfiguration {
@@ -156,6 +164,23 @@ static BOOL isValidRealmURL(NSURL *url) {
                     isPartial:NO
                    stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
                  errorHandler:nullptr];
+}
+
+- (instancetype)initWithUser:(RLMSyncUser *)user
+                    realmURL:(NSURL *)url
+                   isPartial:(BOOL)isPartial
+                   urlPrefix:(NSString *)urlPrefix
+                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
+         enableSSLValidation:(BOOL)enableSSLValidation {
+    auto config = [self initWithUser:user
+                            realmURL:url
+                       customFileURL:nil
+                           isPartial:isPartial
+                          stopPolicy:stopPolicy
+                        errorHandler:nullptr];
+    config.urlPrefix = urlPrefix;
+    config.enableSSLValidation = enableSSLValidation;
+    return config;
 }
 
 - (instancetype)initWithUser:(RLMSyncUser *)user
