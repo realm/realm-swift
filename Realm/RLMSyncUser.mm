@@ -218,6 +218,13 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                             urlPrefix:nil];
 }
 
+- (RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url fullSynchronization:(bool)fullSynchronization {
+    return [self configurationWithUrl:url
+                  fullSynchronization:fullSynchronization
+                  enableSSLValidation:YES
+                            urlPrefix:nil];
+}
+
 - (RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url
                             fullSynchronization:(bool)fullSynchronization
                             enableSSLValidation:(bool)enableSSLValidation

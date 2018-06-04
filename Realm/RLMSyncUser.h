@@ -148,33 +148,61 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
 
 /**
- Returns the default configuration for the user. The default configuration points to the default
- query-based Realm on the server the user authenticated against.
+ Returns the default configuration for the user. The default configuration
+ points to the default query-based Realm on the server the user authenticated against.
  */
--(RLMRealmConfiguration *)configuration;
+- (RLMRealmConfiguration *)configuration;
 
 /**
- Create a default configuration instance for the given url.
- 
- @param url The unresolved absolute URL to the Realm on the Realm Object Server, e.g.
- `realm://example.org/~/path/to/realm`. "Unresolved" means the path should
- contain the wildcard marker `~`, which will automatically be filled in with
- the user identity by the Realm Object Server.
+ Create a query-based configuration instance for the given url.
+
+ @param url The unresolved absolute URL to the Realm on the Realm Object Server,
+            e.g. "realm://example.org/~/path/to/realm". "Unresolved" means the
+            path should contain the wildcard marker `~`, which will automatically
+            be filled in with the user identity by the Realm Object Server.
+ @return A default configuration object with the sync configuration set to use the given URL.
  */
--(RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url;
+- (RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url;
 
 /**
  Create a configuration instance for the given url.
- 
- @param url The unresolved absolute URL to the Realm on the Realm Object Server, e.g.
- `realm://example.org/~/path/to/realm`. "Unresolved" means the path should
- contain the wildcard marker `~`, which will automatically be filled in with
- the user identity by the Realm Object Server.
+
+ @param url The unresolved absolute URL to the Realm on the Realm Object Server,
+            e.g. "realm://example.org/~/path/to/realm". "Unresolved" means the
+            path should contain the wildcard marker `~`, which will automatically
+            be filled in with the user identity by the Realm Object Server.
+ @param fullSynchronization If YES, all objects in the server Realm are
+                            automatically synchronized, and the query subscription
+                            methods cannot be used.
+ @return A default configuration object with the sync configuration set to use
+         the given URL and options.
+ */
+- (RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url
+                            fullSynchronization:(bool)fullSynchronization;
+
+/**
+ Create a configuration instance for the given url.
+
+ @param url The unresolved absolute URL to the Realm on the Realm Object Server,
+            e.g. "realm://example.org/~/path/to/realm". "Unresolved" means the
+            path should contain the wildcard marker `~`, which will automatically
+            be filled in with the user identity by the Realm Object Server.
+ @param fullSynchronization If YES, all objects in the server Realm are
+                            automatically synchronized, and the query subscription
+                            methods cannot be used.
+ @param enableSSLValidation If NO, invalid SSL certificates for the server will
+                            not be rejected. THIS SHOULD NEVER BE USED IN
+                            PRODUCTION AND EXISTS ONLY FOR TESTING PURPOSES.
+ @param urlPrefix A prefix which is prepending to URLs constructed for
+                  the server. This should normally be `nil`, and customized only
+                  to match corresponding settings on the server.
+ @return A default configuration object with the sync configuration set to use
+         the given URL and options.
  */
 -(RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url
                            fullSynchronization:(bool)fullSynchronization
                            enableSSLValidation:(bool)enableSSLValidation
-                                     urlPrefix:(NSString * _Nullable)urlPrefix;
+                                     urlPrefix:(nullable NSString *)urlPrefix;
 
 /**
  Log a user out, destroying their server state, unregistering them from the SDK,

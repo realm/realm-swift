@@ -61,15 +61,16 @@ NS_ASSUME_NONNULL_BEGIN
  Whether this Realm should be a fully synchronized Realm.
  
  Synchronized Realms comes in two flavors: Query-based and Fully synchronized.
- A fully synchronized Realm will automatically synchronize the entire Realm in the background
- while a query-based Realm will only synchronize the data being subscribed to.
- Synchronized realms are by default query-based unless this boolean is set.
+ A fully synchronized Realm will automatically synchronize the entire Realm in
+ the background while a query-based Realm will only synchronize the data being
+ subscribed to. Synchronized realms are by default query-based unless this
+ boolean is set.
  */
 @property (nonatomic) BOOL fullSynchronization;
 
 /**
- The prefix that is prepended to the path in the HTTP request
- that initiates a sync connection. The value specified must match with the server's expectation.
+ The prefix that is prepended to the path in the HTTP request that initiates a
+ sync connection. The value specified must match with the server's expectation.
  Changing the value of `urlPrefix` should be matched with a corresponding
  change of the server's configuration.
  If no value is specified here then the default `/realm-sync` path is used.
