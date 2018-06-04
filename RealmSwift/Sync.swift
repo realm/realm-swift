@@ -212,7 +212,7 @@ public struct SyncConfiguration {
      */
     @available(*, deprecated)
     public var isPartial: Bool
-    
+
     /**
      Whether this Realm should be a fully synchronized Realm.
      
@@ -440,7 +440,7 @@ extension SyncUser {
             }
         }
     }
-    
+
     /**
      Retrieve permissions for this user. Permissions describe which synchronized
      Realms this user has access to and what they are allowed to do with them.
@@ -514,9 +514,9 @@ extension SyncUser {
      - warning: NEVER disable SSL validation for a system running in production.
      */
     public func configuration(realmURL: URL? = nil, fullSynchronization: Bool = false, enableSSLValidation: Bool = true, urlPrefix: String? = nil) -> Realm.Configuration {
-        if (realmURL == nil) {
+        if realmURL == nil {
             let config = self.configuration()
-            return ObjectiveCSupport.convert(object: config);
+            return ObjectiveCSupport.convert(object: config)
         } else {
             let config = self.configuration(with: realmURL!, fullSynchronization: fullSynchronization, enableSSLValidation: enableSSLValidation, urlPrefix: urlPrefix)
             return ObjectiveCSupport.convert(object: config)
