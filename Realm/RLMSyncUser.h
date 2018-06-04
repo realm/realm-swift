@@ -162,7 +162,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
             be filled in with the user identity by the Realm Object Server.
  @return A default configuration object with the sync configuration set to use the given URL.
  */
-- (RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url;
+- (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url;
 
 /**
  Create a configuration instance for the given url.
@@ -177,7 +177,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  @return A default configuration object with the sync configuration set to use
          the given URL and options.
  */
-- (RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url
+- (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url
                             fullSynchronization:(bool)fullSynchronization;
 
 /**
@@ -199,7 +199,7 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  @return A default configuration object with the sync configuration set to use
          the given URL and options.
  */
--(RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url
+-(RLMRealmConfiguration *)configurationWithURL:(NSURL *)url
                            fullSynchronization:(bool)fullSynchronization
                            enableSSLValidation:(bool)enableSSLValidation
                                      urlPrefix:(nullable NSString *)urlPrefix;

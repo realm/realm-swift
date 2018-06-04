@@ -160,7 +160,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         _configMaker = std::make_unique<ConfigMaker>([](std::shared_ptr<SyncUser> user, std::string url) {
             NSURL *objCUrl = [NSURL URLWithString:@(url.c_str())];
             RLMSyncUser *objCUser = [[RLMSyncUser alloc] initWithSyncUser:std::move(user)];
-            RLMRealmConfiguration *config = [objCUser configurationWithUrl:objCUrl];
+            RLMRealmConfiguration *config = [objCUser configurationWithURL:objCUrl];
             return [config config];
         });
         return self;
@@ -208,24 +208,24 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
 }
 
 - (RLMRealmConfiguration *)configuration {
-    return [self configurationWithUrl:self.defaultRealmURL];
+    return [self configurationWithURL:self.defaultRealmURL];
 }
 
-- (RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url {
-    return [self configurationWithUrl:url
+- (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url {
+    return [self configurationWithURL:url
                   fullSynchronization:NO
                   enableSSLValidation:YES
                             urlPrefix:nil];
 }
 
-- (RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url fullSynchronization:(bool)fullSynchronization {
-    return [self configurationWithUrl:url
+- (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url fullSynchronization:(bool)fullSynchronization {
+    return [self configurationWithURL:url
                   fullSynchronization:fullSynchronization
                   enableSSLValidation:YES
                             urlPrefix:nil];
 }
 
-- (RLMRealmConfiguration *)configurationWithUrl:(NSURL *)url
+- (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url
                             fullSynchronization:(bool)fullSynchronization
                             enableSSLValidation:(bool)enableSSLValidation
                                       urlPrefix:(NSString * _Nullable)urlPrefix {

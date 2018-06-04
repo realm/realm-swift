@@ -86,7 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
                 contain the wildcard marker `~`, which will automatically be filled in with
                 the user identity by the Realm Object Server.
  */
-- (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url __attribute__((deprecated("Use [RLMSyncUser configurationWithUrl] instead")));
+- (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url __attribute__((deprecated("Use [RLMSyncUser configurationWithURL] instead")));
 
 /**
 Return a Realm configuration for syncing with the default Realm of the currently logged-in sync user.

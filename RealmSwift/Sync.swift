@@ -265,7 +265,7 @@ public struct SyncConfiguration {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    @available(*, deprecated, message: "Use SyncUser.configurationWithUrl instead")
+    @available(*, deprecated, message: "Use SyncUser.configurationWithURL instead")
     public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true, isPartial: Bool = false, urlPrefix: String? = nil) {
         self.user = user
         self.realmURL = realmURL

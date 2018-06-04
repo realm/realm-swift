@@ -27,19 +27,19 @@ has impacted a number of API's. See below for the details.
 
 ###  Deprecated
 
-* `+[RLMSyncConfiguration initWithUser] has been deprecated in favor of `-[RLMSyncUser configurationWithUrl:url]. 
+* `+[RLMSyncConfiguration initWithUser] has been deprecated in favor of `-[RLMSyncUser configurationWithURL:url].
 * `+[RLMSyncConfiguration automaticConfiguration] has been deprecated in favor of `-[RLMSyncUser configuration]. 
 * `+[RLMSyncConfiguration automaticConfigurationForUser] has been deprecated in favor of `-[RLMSyncUser configuration].
 * `-[RLMSyncConfiguration isPartial] has been deprecated in favor of `-[RLMSyncConfiguration fullSynchronization]`.
 
 ### Enhancements
 
-* Added `-[RLMSyncUser configurationWithUrl:url]`. Query-based sync is the default sync mode for this configuration.
+* Added `-[RLMSyncUser configurationWithURL:url]`. Query-based sync is the default sync mode for this configuration.
 * Added `-[RLMSyncUser configuration]`. Query-based sync is the default sync mode for this configuration.
 
 * Add `-[RLMRealm syncSession]` and  `Realm.syncSession` to obtain the session
   used for a synchronized Realm.
-* Added `-[RLMSyncUser configurationWithUrl:url]`. Query-based sync is the default sync mode for this configuration.
+* Added `-[RLMSyncUser configurationWithURL:url]`. Query-based sync is the default sync mode for this configuration.
 * Added `-[RLMSyncUser configuration]`. Query-based sync is the default sync mode for this configuration.
 
 ### Bugfixes
