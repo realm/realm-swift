@@ -160,8 +160,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         _configMaker = std::make_unique<ConfigMaker>([](std::shared_ptr<SyncUser> user, std::string url) {
             NSURL *objCUrl = [NSURL URLWithString:@(url.c_str())];
             RLMSyncUser *objCUser = [[RLMSyncUser alloc] initWithSyncUser:std::move(user)];
-            RLMRealmConfiguration *config = [objCUser configurationWithURL:objCUrl];
-            return [config config];
+            return [objCUser configurationWithURL:objCUrl fullSynchronization:true].config;
         });
         return self;
     }
