@@ -133,11 +133,19 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
 }
 
 /// A type which can be stored in a Realm List or Results
+#if swift(>=3.4)
+public protocol RealmCollectionValue: Equatable {
+    /// :nodoc:
+    // swiftlint:disable:next identifier_name
+    static func _rlmArray() -> RLMArray<AnyObject>
+}
+#else
 public protocol RealmCollectionValue {
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     static func _rlmArray() -> RLMArray<AnyObject>
 }
+#endif
 
 extension RealmCollectionValue {
     /// :nodoc:
@@ -147,23 +155,37 @@ extension RealmCollectionValue {
     }
 }
 
+fileprivate func arrayType<T>(_ type: T.Type) -> RLMArray<AnyObject> {
+    switch type {
+    case is Int.Type, is Int8.Type, is Int16.Type, is Int32.Type, is Int64.Type:
+        return RLMArray(objectType: .int, optional: true)
+    case is Bool.Type:   return RLMArray(objectType: .bool, optional: true)
+    case is Float.Type:  return RLMArray(objectType: .float, optional: true)
+    case is Double.Type: return RLMArray(objectType: .double, optional: true)
+    case is String.Type: return RLMArray(objectType: .string, optional: true)
+    case is Data.Type:   return RLMArray(objectType: .data, optional: true)
+    case is Date.Type:   return RLMArray(objectType: .date, optional: true)
+    default: fatalError("Unsupported type for List: \(T.self)?")
+    }
+}
+
+#if swift(>=3.4)
+extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue {
+    /// :nodoc:
+    // swiftlint:disable:next identifier_name
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return arrayType(Wrapped.self)
+    }
+}
+#else
 extension Optional: RealmCollectionValue {
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
-        switch Wrapped.self {
-        case is Int.Type, is Int8.Type, is Int16.Type, is Int32.Type, is Int64.Type:
-            return RLMArray(objectType: .int, optional: true)
-        case is Bool.Type:   return RLMArray(objectType: .bool, optional: true)
-        case is Float.Type:  return RLMArray(objectType: .float, optional: true)
-        case is Double.Type: return RLMArray(objectType: .double, optional: true)
-        case is String.Type: return RLMArray(objectType: .string, optional: true)
-        case is Data.Type:   return RLMArray(objectType: .data, optional: true)
-        case is Date.Type:   return RLMArray(objectType: .date, optional: true)
-        default: fatalError("Unsupported type for List: \(Wrapped.self)?")
-        }
+        return arrayType(Wrapped.self)
     }
 }
+#endif
 
 extension Int: RealmCollectionValue {}
 extension Int8: RealmCollectionValue {}

@@ -301,6 +301,11 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
         return value as! U
     }
 
+#if swift(>=3.4)
+    func assertEqualTo<T: Equatable>(_ expected: T, _ actual: T, fileName: StaticString = #file, lineNumber: UInt = #line) {
+        XCTAssertEqual(expected, actual, file: fileName, line: lineNumber)
+    }
+#else
     // No conditional conformance means that Optional<T: Equatable> can't
     // itself conform to Equatable
     func assertEqualTo<T>(_ expected: T, _ actual: T, fileName: StaticString = #file, lineNumber: UInt = #line) {
@@ -461,6 +466,7 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
         }
         assertEqualTo(expected, actual)
     }
+#endif
 }
 
 class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> {
