@@ -32,6 +32,9 @@ public struct RLMIterator<Element: RealmCollectionValue>: IteratorProtocol {
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Element? {
         let next = generatorBase.next()
+        if next is NSNull {
+            return nil as Element?
+        }
         if let next = next as? Object? {
             if next == nil {
                 return nil as Element?
