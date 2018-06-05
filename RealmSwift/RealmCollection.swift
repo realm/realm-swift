@@ -33,7 +33,7 @@ public struct RLMIterator<Element: RealmCollectionValue>: IteratorProtocol {
     public mutating func next() -> Element? {
         let next = generatorBase.next()
         if next is NSNull {
-            return nil as Element?
+            return Element._nilValue()
         }
         if let next = next as? Object? {
             if next == nil {
@@ -138,6 +138,7 @@ public protocol RealmCollectionValue: Equatable {
     /// :nodoc:
     // swiftlint:disable:next identifier_name
     static func _rlmArray() -> RLMArray<AnyObject>
+    static func _nilValue() -> Self
 }
 #else
 public protocol RealmCollectionValue {
@@ -152,6 +153,9 @@ extension RealmCollectionValue {
     // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .int, optional: false)
+    }
+    public static func _nilValue() -> Self {
+        fatalError("unexpected NSNull for non-Optioanl type")
     }
 }
 
@@ -175,6 +179,9 @@ extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue {
     // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return arrayType(Wrapped.self)
+    }
+    public static func _nilValue() -> Optional {
+        return nil
     }
 }
 #else
