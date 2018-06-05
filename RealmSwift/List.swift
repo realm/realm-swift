@@ -672,7 +672,7 @@ extension List: RangeReplaceableCollection {
 
 #if swift(>=3.2)
     // The issue described below is fixed in Swift 3.2 and above.
-#elseif swift(>=3.1)
+#else
     // These should not be necessary, but Swift 3.1's compiler fails to infer the `SubSequence`,
     // and the standard library neglects to provide the default implementation of `subscript`
     /// :nodoc:

@@ -726,7 +726,6 @@ extension SortDescriptor {
     }
 }
 
-#if swift(>=3.1)
 extension Results where Element == SyncPermission {
     /**
      Return a `Results<SyncPermissionValue>` containing the objects represented
@@ -739,7 +738,6 @@ extension Results where Element == SyncPermission {
         return sorted(by: [SortDescriptor(sortProperty: sortProperty, ascending: ascending)])
     }
 }
-#endif
 
 // MARK: - Partial sync subscriptions
 
