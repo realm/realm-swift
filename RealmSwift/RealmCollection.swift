@@ -134,7 +134,6 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
     return from as! U
 }
 
-// swiftlint:disable identifier_name
 /// A type which can be stored in a Realm List or Results
 #if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
 public protocol RealmCollectionValue: Equatable {
@@ -241,7 +240,6 @@ extension Data: RealmCollectionValue {
         return RLMArray(objectType: .data, optional: false)
     }
 }
-// swiftlint:enable identifier_name
 
 #if swift(>=3.2)
 // FIXME: When we drop support for Swift 3.1, change ElementType to Element

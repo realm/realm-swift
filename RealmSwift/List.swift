@@ -489,7 +489,7 @@ extension List: RealmCollection {
      - parameter newElements: The new elements to be inserted into the List.
      */
     public func replaceSubrange<C: Collection, R>(_ subrange: R, with newElements: C)
-        where C.Iterator.Element == Element, R : RangeExpression, List<Element>.Index == R.Bound {
+        where C.Iterator.Element == Element, R: RangeExpression, List<Element>.Index == R.Bound {
             let subrange = subrange.relative(to: self)
             for _ in subrange.lowerBound..<subrange.upperBound {
                 remove(at: subrange.lowerBound)
