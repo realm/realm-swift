@@ -276,13 +276,15 @@ class KVOTests: TestCase {
         observeChange(obs, \.floatCol, 5 as Float, 10 as Float) { obj.floatCol = 10 }
         observeChange(obs, \.doubleCol, 6 as Double, 10 as Double) { obj.doubleCol = 10 }
         observeChange(obs, \.stringCol, "", "abc") { obj.stringCol = "abc" }
-        observeChange(obs, \.objectCol, nil, obj) { obj.objectCol = obj }
 
         let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)!
         observeChange(obs, \.binaryCol, Data(), data) { obj.binaryCol = data }
 
         let date = Date(timeIntervalSince1970: 1)
         observeChange(obs, \.dateCol, Date(timeIntervalSince1970: 0), date) { obj.dateCol = date }
+
+#if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
+        observeChange(obs, \.objectCol, nil, obj) { obj.objectCol = obj }
 
         observeChange(obs, \.optStringCol, nil, "abc") { obj.optStringCol = "abc" }
         observeChange(obs, \.optBinaryCol, nil, data) { obj.optBinaryCol = data }
@@ -291,6 +293,7 @@ class KVOTests: TestCase {
         observeChange(obs, \.optStringCol, "abc", nil) { obj.optStringCol = nil }
         observeChange(obs, \.optBinaryCol, data, nil) { obj.optBinaryCol = nil }
         observeChange(obs, \.optDateCol, date, nil) { obj.optDateCol = nil }
+#endif
 
         if obs.realm == nil {
             return

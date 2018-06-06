@@ -301,7 +301,7 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
         return value as! U
     }
 
-#if swift(>=3.4)
+#if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
     func assertEqualTo<T: Equatable>(_ expected: T, _ actual: T, fileName: StaticString = #file, lineNumber: UInt = #line) {
         XCTAssertEqual(expected, actual, file: fileName, line: lineNumber)
     }

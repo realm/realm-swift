@@ -32,7 +32,7 @@ public struct RLMIterator<Element: RealmCollectionValue>: IteratorProtocol {
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Element? {
         let next = generatorBase.next()
-        #if swift(>=3.4)
+        #if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
         if next is NSNull {
             return Element._nilValue()
         }
@@ -136,7 +136,7 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
 
 // swiftlint:disable identifier_name
 /// A type which can be stored in a Realm List or Results
-#if swift(>=3.4)
+#if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
 public protocol RealmCollectionValue: Equatable {
     /// :nodoc:
     static func _rlmArray() -> RLMArray<AnyObject>
@@ -175,7 +175,7 @@ private func arrayType<T>(_ type: T.Type) -> RLMArray<AnyObject> {
     }
 }
 
-#if swift(>=3.4)
+#if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
 extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
