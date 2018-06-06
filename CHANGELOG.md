@@ -1,31 +1,11 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.7.0 Release notes (2018-06-06)
 =============================================================
 
-### Breaking Changes
+The feature known as Partial Sync has been renamed to Query-based
+Synchronization. This has impacted a number of API's. See below for the
+details.
 
-* None.
-
-### Enhancements
-
-* Add `-[RLMRealm syncSession]` and  `Realm.syncSession` to obtain the session
-  used for a synchronized Realm.
-
-### Bugfixes
-
-* None.
-
-3.7.0 Release notes (YYYY-MM-DD)
-x.x.x Release notes (yyyy-MM-dd)
-=============================================================
-
-The feature known as Partial Sync has been renamed to Query-based Synchronization. This
-has impacted a number of API's. See below for the details.
-
-### Breaking Changes
-
-* None.
-
-###  Deprecated
+### Deprecations
 
 * `+[RLMSyncConfiguration initWithUser] has been deprecated in favor of `-[RLMSyncUser configurationWithURL:url].
 * `+[RLMSyncConfiguration automaticConfiguration] has been deprecated in favor of `-[RLMSyncUser configuration]. 
@@ -34,24 +14,12 @@ has impacted a number of API's. See below for the details.
 
 ### Enhancements
 
-* Added `-[RLMSyncUser configurationWithURL:url]`. Query-based sync is the default sync mode for this configuration.
-* Added `-[RLMSyncUser configuration]`. Query-based sync is the default sync mode for this configuration.
-
-* Add `-[RLMRealm syncSession]` and  `Realm.syncSession` to obtain the session
-  used for a synchronized Realm.
-* Added `-[RLMSyncUser configurationWithURL:url]`. Query-based sync is the default sync mode for this configuration.
-* Added `-[RLMSyncUser configuration]`. Query-based sync is the default sync mode for this configuration.
-
-### Bugfixes
-
-* None.
+* Add `-[RLMRealm syncSession]` and  `Realm.syncSession` to obtain the session used for a synchronized Realm.
+* Add `-[RLMSyncUser configuration]`. Query-based sync is the default sync mode for this configuration.
+* Add `-[RLMSyncUser configurationWithURL:url]`. Query-based sync is the default sync mode for this configuration.
 
 3.6.0 Release notes (2018-05-29)
 =============================================================
-
-### Breaking Changes
-
-* None.
 
 ### Enhancements
 
