@@ -32,9 +32,11 @@ public struct RLMIterator<Element: RealmCollectionValue>: IteratorProtocol {
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Element? {
         let next = generatorBase.next()
+        #if swift(>=3.4)
         if next is NSNull {
             return Element._nilValue()
         }
+        #endif
         if let next = next as? Object? {
             if next == nil {
                 return nil as Element?
@@ -132,34 +134,34 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
     return from as! U
 }
 
+// swiftlint:disable identifier_name
 /// A type which can be stored in a Realm List or Results
 #if swift(>=3.4)
 public protocol RealmCollectionValue: Equatable {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     static func _rlmArray() -> RLMArray<AnyObject>
+    /// :nodoc:
     static func _nilValue() -> Self
 }
 #else
 public protocol RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     static func _rlmArray() -> RLMArray<AnyObject>
 }
 #endif
 
 extension RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .int, optional: false)
     }
+    /// :nodoc:
     public static func _nilValue() -> Self {
-        fatalError("unexpected NSNull for non-Optioanl type")
+        fatalError("unexpected NSNull for non-Optional type")
     }
 }
 
-fileprivate func arrayType<T>(_ type: T.Type) -> RLMArray<AnyObject> {
+private func arrayType<T>(_ type: T.Type) -> RLMArray<AnyObject> {
     switch type {
     case is Int.Type, is Int8.Type, is Int16.Type, is Int32.Type, is Int64.Type:
         return RLMArray(objectType: .int, optional: true)
@@ -176,10 +178,10 @@ fileprivate func arrayType<T>(_ type: T.Type) -> RLMArray<AnyObject> {
 #if swift(>=3.4)
 extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return arrayType(Wrapped.self)
     }
+    /// :nodoc:
     public static func _nilValue() -> Optional {
         return nil
     }
@@ -187,9 +189,12 @@ extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue {
 #else
 extension Optional: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return arrayType(Wrapped.self)
+    }
+    /// :nodoc:
+    public static func _nilValue() -> Optional {
+        return nil
     }
 }
 #endif
@@ -201,21 +206,18 @@ extension Int32: RealmCollectionValue {}
 extension Int64: RealmCollectionValue {}
 extension Float: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .float, optional: false)
     }
 }
 extension Double: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .double, optional: false)
     }
 }
 extension Bool: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .bool, optional: false)
     }
@@ -223,25 +225,23 @@ extension Bool: RealmCollectionValue {
 
 extension String: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .string, optional: false)
     }
 }
 extension Date: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .date, optional: false)
     }
 }
 extension Data: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .data, optional: false)
     }
 }
+// swiftlint:enable identifier_name
 
 #if swift(>=3.2)
 // FIXME: When we drop support for Swift 3.1, change ElementType to Element
