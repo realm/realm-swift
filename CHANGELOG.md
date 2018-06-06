@@ -7,7 +7,7 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add support for compiling Realm Swift with Xcode 10 beta 1.
 
 ### Bugfixes
 
