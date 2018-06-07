@@ -1,17 +1,7 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.7.1 Release notes (2018-06-07)
 =============================================================
 
-### Breaking Changes
-
-* None.
-
-### Enhancements
-
 * Add support for compiling Realm Swift with Xcode 10 beta 1.
-
-### Bugfixes
-
-* None.
 
 3.7.0 Release notes (2018-06-06)
 =============================================================
