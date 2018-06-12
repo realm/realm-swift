@@ -12,7 +12,7 @@ x.x.x Release notes (yyyy-MM-dd)
 ### Bugfixes
 
 * Fixed a problem in the changeset indexing algorithm that would sometimes
-  cause bad permission object" and "bad changeset" errors.
+  cause "bad permission object" and "bad changeset" errors.
 
 3.7.1 Release notes (2018-06-07)
 =============================================================
