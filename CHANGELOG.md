@@ -1,9 +1,5 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.7.2 Release notes (2018-06-13)
 =============================================================
-
-### Breaking Changes
-
-* None.
 
 ### Enhancements
 
