@@ -7,12 +7,16 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Add some additional consistency checks that will hopefully produce better
+  errors when the "prev_ref + prev_size <= ref" assertion failure occurs.
 
 ### Bugfixes
 
-* Fixed a problem in the changeset indexing algorithm that would sometimes
+* Fix a problem in the changeset indexing algorithm that would sometimes
   cause "bad permission object" and "bad changeset" errors.
+* Fix a large number of linking warnings about symbol visibility by aligning
+  compiler flags used.
+* Fix large increase in size of files produced by `Realm.writeCopy()` introduced in 3.6.0.
 
 3.7.1 Release notes (2018-06-07)
 =============================================================
