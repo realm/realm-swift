@@ -1,3 +1,11 @@
+3.7.4 Release notes (2018-06-19)
+=============================================================
+
+### Bugfixes
+
+* Fix a bug which could potentially flood Realm Object Server with PING
+  messages after a client device comes back online.
+
 3.7.3 Release notes (2018-06-18)
 =============================================================
 
