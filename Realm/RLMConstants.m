@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMConstants.h>
+#import "RLMConstants.h"
 
 RLMNotification const RLMRealmRefreshRequiredNotification = @"RLMRealmRefreshRequiredNotification";
 RLMNotification const RLMRealmDidChangeNotification = @"RLMRealmDidChangeNotification";

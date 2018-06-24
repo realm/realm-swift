@@ -23,8 +23,8 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMUtil.hpp"
 
-#import <Realm/RLMConstants.h>
-#import <Realm/RLMSchema.h>
+#import "RLMConstants.h"
+#import "RLMSchema.h"
 
 #import "binding_context.hpp"
 

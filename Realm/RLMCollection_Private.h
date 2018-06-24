@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMCollection.h>
+#import "RLMCollection.h"
 
-#import <Realm/RLMRealm.h>
+#import "RLMRealm.h"
 
 @protocol RLMFastEnumerable;
 

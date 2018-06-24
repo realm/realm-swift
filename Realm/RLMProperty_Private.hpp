@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMProperty_Private.h>
+#import "RLMProperty_Private.h"
 
 namespace realm {
     struct Property;

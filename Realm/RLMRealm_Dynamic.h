@@ -16,10 +16,10 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMRealm.h>
+#import "RLMRealm.h"
 
-#import <Realm/RLMObjectSchema.h>
-#import <Realm/RLMProperty.h>
+#import "RLMObjectSchema.h"
+#import "RLMProperty.h"
 
 @class RLMResults<RLMObjectType>;
 

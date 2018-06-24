@@ -1,0 +1,12 @@
+HEADER_SEARCH_PATHS = $(inherited) $(SRCROOT)/sync-3.5.6/include Realm/ObjectStore/src
+LIBRARY_SEARCH_PATHS = $(inherited) $(SRCROOT)/sync-3.5.6
+OTHER_CPLUSPLUSFLAGS = $(inherited) -DREALM_ENABLE_SYNC=1
+OTHER_LDFLAGS = $(inherited) -framework Foundation -framework Security -lz
+OTHER_LDFLAGS[sdk=macosx*] = $(inherited) -lrealm-macosx
+OTHER_LDFLAGS[sdk=iphoneos*] = $(inherited) -lrealm-ios
+OTHER_LDFLAGS[sdk=iphonesimulator*] = $(inherited) -lrealm-ios
+OTHER_LDFLAGS[sdk=appletvos*] = $(inherited) -lrealm-tvos
+OTHER_LDFLAGS[sdk=appletvsimulator*] = $(inherited) -lrealm-tvos
+OTHER_LDFLAGS[sdk=watchos*] = $(inherited) -lrealm-watchos
+OTHER_LDFLAGS[sdk=watchsimulator*] = $(inherited) -lrealm-watchos
+FRAMEWORK_SEARCH_PATHS =

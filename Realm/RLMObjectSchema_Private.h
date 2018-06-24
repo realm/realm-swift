@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMObjectSchema.h>
+#import "RLMObjectSchema.h"
 
 #import <objc/runtime.h>
 

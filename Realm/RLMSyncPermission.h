@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMObject.h>
+#import "RLMObject.h"
 
 @protocol RLMPermission, RLMPermissionUser;
 @class RLMPermission, RLMPermissionUser, RLMPermissionRole,

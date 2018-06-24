@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMCollection_Private.h>
+#import "RLMCollection_Private.h"
 
 #import <vector>
 

@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMObjectBase_Dynamic.h>
+#import "RLMObjectBase_Dynamic.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

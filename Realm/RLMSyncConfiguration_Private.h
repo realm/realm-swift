@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMSyncConfiguration.h>
+#import "RLMSyncConfiguration.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

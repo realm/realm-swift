@@ -16,11 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMSyncUtil.h>
+#import "RLMSyncUtil.h"
 
-#import <Realm/RLMProperty.h>
-#import <Realm/RLMRealmConfiguration.h>
-#import <Realm/RLMSyncCredentials.h>
+#import "RLMProperty.h"
+#import "RLMRealmConfiguration.h"
+#import "RLMSyncCredentials.h"
 
 typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
     // Specific

@@ -16,8 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMArray.h>
-#import <Realm/RLMConstants.h>
+#import "RLMArray.h"
+#import "RLMConstants.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

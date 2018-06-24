@@ -111,3 +111,9 @@ examples/ios/objc/Draw/Constants.h
 ## Sync testing
 test-ros-instance
 Realm/ObjectServerTests/node_modules
+
+## Swift Package Manager
+.DS_Store
+/.build
+/Packages
+/RealmSwift.xcodeproj
