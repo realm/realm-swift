@@ -153,10 +153,8 @@ public final class LinkingObjects<Element: Object>: LinkingObjectsBase {
      - parameter index: The index.
      */
     public subscript(index: Int) -> Element {
-        get {
-            throwForNegativeIndex(index)
-            return unsafeBitCast(rlmResults[UInt(index)], to: Element.self)
-        }
+        throwForNegativeIndex(index)
+        return unsafeBitCast(rlmResults[UInt(index)], to: Element.self)
     }
 
     /// Returns the first object in the linking objects, or `nil` if the linking objects are empty.
