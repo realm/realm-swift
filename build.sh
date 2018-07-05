@@ -1005,7 +1005,7 @@ EOM
           cp Realm/ObjectStore/src/util/*.hpp include/util
           cp Realm/ObjectStore/src/util/apple/*.hpp include/util/apple
 
-          touch Realm/RLMPlatform.h
+          echo '' > Realm/RLMPlatform.h
           if [ -n "$COCOAPODS_VERSION" ]; then
             # This variable is set for the prepare_command available
             # from the 1.0 prereleases, which requires a different

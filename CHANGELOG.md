@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix permission denied errors for RLMPlatform.h when building with CocoaPods
+  and Xcode 10 beta 3.
+
 3.7.4 Release notes (2018-06-19)
 =============================================================
 
