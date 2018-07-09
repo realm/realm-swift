@@ -254,4 +254,19 @@ NSUInteger count = 1000;
                                       @"Cannot set `readOnly` when `shouldCompactOnLaunch` is set.");
 }
 
+- (void)testAccessDeniedOnTemporaryFile {
+    RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
+    configuration.fileURL = RLMTestRealmURL();
+    configuration.shouldCompactOnLaunch = ^(__unused NSUInteger totalBytes, __unused NSUInteger usedBytes){
+        return YES;
+    };
+    NSURL *tmpURL = [configuration.fileURL URLByAppendingPathExtension:@"tmp_compaction_space"];
+    [NSData.data writeToURL:tmpURL atomically:NO];
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @YES} ofItemAtPath:tmpURL.path error:nil];
+    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:configuration error:nil],
+                              @"unlink() failed: Operation not permitted");
+    [NSFileManager.defaultManager setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:tmpURL.path error:nil];
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:configuration error:nil]);
+}
+
 @end
