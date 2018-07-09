@@ -75,7 +75,7 @@ extension SortDescriptor: Equatable {
     /// Returns whether the two sort descriptors are equal.
     public static func == (lhs: SortDescriptor, rhs: SortDescriptor) -> Bool {
         return lhs.keyPath == rhs.keyPath &&
-            lhs.ascending == lhs.ascending
+            lhs.ascending == rhs.ascending
     }
 }
 
