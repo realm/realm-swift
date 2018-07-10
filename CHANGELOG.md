@@ -7,7 +7,11 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Improve performance of applying remote changesets from sync.
+* Improve performance of creating objects with string primary keys.
+* Imrpove performance of large write transactions.
+* Adjust file space allocation strategy to reduce fragmentation, producing
+  smaller Realm files and typically better performance.
 
 ### Bugfixes
 
