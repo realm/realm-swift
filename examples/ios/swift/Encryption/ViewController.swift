@@ -107,9 +107,8 @@ class ViewController: UIViewController {
         }
 
         // No pre-existing key from this application, so generate a new one
-        let keyData = NSMutableData(length: 64)!
-        let result = SecRandomCopyBytes(kSecRandomDefault, 64, keyData.mutableBytes.bindMemory(to: UInt8.self, capacity: 64))
-        assert(result == 0, "Failed to get random bytes")
+        let keyData = generateNewKey()
+		
 
         // Store the key in the keychain
         query = [
@@ -124,4 +123,17 @@ class ViewController: UIViewController {
 
         return keyData
     }
+	
+	/// This will simply generate the new key
+	///
+	/// - Returns: A new NSData key
+	func generateNewKey() -> NSData {
+		let length = 64 //lenght of the  key
+		let randomBytes = [UInt32](repeating: 0, count: length).map { _ in arc4random() }
+		//This is the actual key that we want
+		let keyData = Data(bytes: randomBytes, count: length)
+		
+		assert(keyData == 0, "Failed to get random bytes")
+		return keyData as NSData
+	}
 }
