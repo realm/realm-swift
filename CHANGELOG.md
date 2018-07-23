@@ -1,9 +1,5 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.7.5 Release notes (2018-07-23)
 =============================================================
-
-### Breaking Changes
-
-* None.
 
 ### Enhancements
 
@@ -19,9 +15,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Fix permission denied errors for RLMPlatform.h when building with CocoaPods
   and Xcode 10 beta 3.
-* Fix a use-after-free when canceling back a write transaction which could
-  result in incorrect "before" values in KVO observations (typically `nil` when
-  a non-nil value is expected).
+* Fix a use-after-free when canceling a write transaction which could result in
+  incorrect "before" values in KVO observations (typically `nil` when a non-nil
+  value is expected).
 * Fix several bugs in the merge algorithm that could lead to memory corruption
   and crashes with errors like "bad changeset" and "unreachable code".
 
