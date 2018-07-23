@@ -7,12 +7,23 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Improve performance of applying remote changesets from sync.
+* Improve performance of creating objects with string primary keys.
+* Improve performance of large write transactions.
+* Adjust file space allocation strategy to reduce fragmentation, producing
+  smaller Realm files and typically better performance.
+* Close network connections immediately when a sync session is destroyed.
+* Report more information in `InvalidDatabase` exceptions.
 
 ### Bugfixes
 
 * Fix permission denied errors for RLMPlatform.h when building with CocoaPods
   and Xcode 10 beta 3.
+* Fix a use-after-free when canceling back a write transaction which could
+  result in incorrect "before" values in KVO observations (typically `nil` when
+  a non-nil value is expected).
+* Fix several bugs in the merge algorithm that could lead to memory corruption
+  and crashes with errors like "bad changeset" and "unreachable code".
 
 3.7.4 Release notes (2018-06-19)
 =============================================================
