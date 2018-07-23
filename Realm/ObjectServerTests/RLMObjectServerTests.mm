@@ -822,7 +822,7 @@
         RLMAssertThrowsWithError([RLMRealm realmWithConfiguration:c error:nil],
                                  @"Unable to open a realm at path",
                                  RLMErrorFileAccess,
-                                 @"not a realm file");
+                                 @"invalid mnemonic");
         c.encryptionKey = RLMGenerateKey();
         RLMAssertThrowsWithError([RLMRealm realmWithConfiguration:c error:nil],
                                  @"Unable to open a realm at path",
