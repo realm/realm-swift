@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+
 #import <unordered_map>
 #import <vector>
 
@@ -25,6 +26,7 @@ namespace realm {
     class Schema;
     class Table;
     struct Property;
+    struct ColKey;
 }
 
 class RLMObservationInfo;
@@ -66,7 +68,7 @@ public:
 
     // Get the RLMProperty for a given table column, or `nil` if it is a column
     // not used by the current schema
-    RLMProperty *_Nullable propertyForTableColumn(NSUInteger) const noexcept;
+    RLMProperty *_Nullable propertyForTableColumn(realm::ColKey) const noexcept;
 
     // Get the RLMProperty that's used as the primary key, or `nil` if there is
     // no primary key for the current schema
@@ -74,8 +76,8 @@ public:
 
     // Get the table column for the given property. The property must be a valid
     // persisted property.
-    NSUInteger tableColumn(NSString *propertyName) const;
-    NSUInteger tableColumn(RLMProperty *property) const;
+    realm::ColKey tableColumn(NSString *propertyName) const;
+    realm::ColKey tableColumn(RLMProperty *property) const;
 
     // Get the info for the target of the link at the given property index.
     RLMClassInfo &linkTargetType(size_t propertyIndex);

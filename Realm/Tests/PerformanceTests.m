@@ -177,6 +177,18 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
     }];
 }
 
+- (void)testEnumerateAndAccessAllTV {
+    RLMRealm *realm = [self getStringObjects:50];
+
+    [self measureBlock:^{
+        [realm beginWriteTransaction];
+        for (StringObject *so in [StringObject allObjectsInRealm:realm]) {
+            (void)[so stringCol];
+        }
+        [realm cancelWriteTransaction];
+    }];
+}
+
 - (void)testEnumerateAndAccessAllSlow {
     RLMRealm *realm = [self getStringObjects:5];
 
@@ -595,7 +607,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
         const NSUInteger initial = obj.array.count;
         [self observeObject:obj keyPath:@"array"
-                      until:^(id obj) { return [obj array].count < initial; }];
+                      until:^(ArrayPropertyObject *obj) { return obj.array.count < initial; }];
 
         [self startMeasuring];
         [realm beginWriteTransaction];
@@ -616,7 +628,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
 
         const NSUInteger initial = obj.array.count;
         [self observeObject:obj keyPath:@"array"
-                      until:^(id obj) { return [obj array].count < initial; }];
+                      until:^(ArrayPropertyObject *obj) { return obj.array.count < initial; }];
 
         [self startMeasuring];
         [realm beginWriteTransaction];
@@ -639,7 +651,7 @@ static RLMRealm *s_smallRealm, *s_mediumRealm, *s_largeRealm;
         const NSUInteger factor = count / 10;
 
         [self observeObject:obj keyPath:@"array"
-                      until:^(id obj) { return [obj array].count >= count; }];
+                      until:^(ArrayPropertyObject *obj) { return obj.array.count >= count; }];
 
         RLMArray *array = obj.array;
         [self startMeasuring];

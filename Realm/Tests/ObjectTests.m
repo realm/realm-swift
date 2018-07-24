@@ -1139,10 +1139,11 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    [PrimaryNullableStringObject createOrUpdateInDefaultRealmWithValue:@[@"string", @1]];
+    PrimaryNullableStringObject *obj1 = [PrimaryNullableStringObject
+                                         createOrUpdateInDefaultRealmWithValue:@[@"string", @1]];
     RLMResults *objects = [PrimaryNullableStringObject allObjects];
     XCTAssertEqual([objects count], 1U, @"Should have 1 object");
-    XCTAssertEqual([(PrimaryNullableStringObject *)objects[0] intCol], 1, @"Value should be 1");
+    XCTAssertEqual(obj1.intCol, 1, @"Value should be 1");
 
     [PrimaryNullableStringObject createOrUpdateInRealm:realm withValue:@{@"stringCol": @"string2", @"intCol": @2}];
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
@@ -1156,7 +1157,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     // upsert with new secondary property
     [PrimaryNullableStringObject createOrUpdateInDefaultRealmWithValue:@[@"string", @3]];
     XCTAssertEqual([objects count], 3U, @"Should have 3 objects");
-    XCTAssertEqual([(PrimaryNullableStringObject *)objects[0] intCol], 3, @"Value should be 3");
+    XCTAssertEqual(obj1.intCol, 3, @"Value should be 3");
 
     [realm commitWriteTransaction];
 }

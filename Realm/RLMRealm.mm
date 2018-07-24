@@ -72,8 +72,13 @@ void RLMDisableSyncToDisk() {
     realm::disable_sync_to_disk();
 }
 
-static void RLMAddSkipBackupAttributeToItemAtPath(std::string const& path) {
-    [[NSURL fileURLWithPath:@(path.c_str())] setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:nil];
+static std::atomic<bool> s_set_skip_backup_attribute{true};
+void RLMSetSkipBackupAttribute(bool value) {
+    s_set_skip_backup_attribute = value;
+}
+
+static void RLMAddSkipBackupAttributeToItemAtPath(std::string_view path) {
+    [[NSURL fileURLWithPath:@(path.data())] setResourceValue:@YES forKey:NSURLIsExcludedFromBackupKey error:nil];
 }
 
 @implementation RLMRealmNotificationToken
@@ -207,15 +212,15 @@ static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
     auto table = ObjectStore::table_for_object_type(realm->read_group(), "__ResultSets");
 
     realm->begin_transaction();
-    size_t row = realm::sync::create_object(realm->read_group(), *table);
+    auto row = realm::sync::create_object(realm->transaction(), *table);
 
     // Set expires_at to time 0 so that this object will be cleaned up the first
     // time the user creates a subscription
-    size_t expires_at_col = table->get_column_index("expires_at");
-    if (expires_at_col == npos) {
+    auto expires_at_col = table->get_column_key("expires_at");
+    if (!expires_at_col) {
         expires_at_col = table->add_column(type_Timestamp, "expires_at", true);
     }
-    table->set_timestamp(expires_at_col, row, Timestamp(0, 0));
+    row.set(expires_at_col, Timestamp(0, 0));
     realm->commit_transaction();
 
     NotificationToken token;
@@ -244,7 +249,7 @@ void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                                    callbackQueue:(dispatch_queue_t)callbackQueue
                                         callback:(RLMAsyncOpenRealmCallback)callback {
-    auto openCompletion = [=](ThreadSafeReference<Realm> ref, std::exception_ptr err) {
+    auto openCompletion = [=](ThreadSafeReference ref, std::exception_ptr err) {
         @autoreleasepool {
             if (err) {
                 try {
@@ -393,29 +398,9 @@ REALM_NOINLINE void RLMRealmTranslateException(NSError **error) {
     }
 }
 
-REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfiguration *originalConfiguration, NSError **error) {
+REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
     try {
         throw;
-    }
-    catch (RealmFileException const& ex) {
-        switch (ex.kind()) {
-            case RealmFileException::Kind::IncompatibleSyncedRealm: {
-                RLMRealmConfiguration *configuration = [originalConfiguration copy];
-                configuration.fileURL = [NSURL fileURLWithPath:@(ex.path().data())];
-                configuration.readOnly = YES;
-
-                NSError *intermediateError = RLMMakeError(RLMErrorIncompatibleSyncedFile, ex);
-                NSMutableDictionary *userInfo = [intermediateError.userInfo mutableCopy];
-                userInfo[RLMBackupRealmConfigurationErrorKey] = configuration;
-                NSError *finalError = [NSError errorWithDomain:intermediateError.domain code:intermediateError.code
-                                                      userInfo:userInfo];
-                RLMSetErrorOrThrow(finalError, error);
-                break;
-            }
-            default:
-                RLMRealmTranslateException(error);
-                break;
-        }
     }
     catch (...) {
         RLMRealmTranslateException(error);
@@ -467,7 +452,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
         realm->_realm = Realm::get_shared_realm(config);
     }
     catch (...) {
-        translateSharedGroupOpenException(configuration, error);
+        translateSharedGroupOpenException(error);
         return nil;
     }
 
@@ -528,9 +513,11 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
             // initializing the schema started a read transaction, so end it
             [realm invalidate];
 
-            RLMAddSkipBackupAttributeToItemAtPath(config.path + ".management");
-            RLMAddSkipBackupAttributeToItemAtPath(config.path + ".lock");
-            RLMAddSkipBackupAttributeToItemAtPath(config.path + ".note");
+            if (s_set_skip_backup_attribute) {
+                RLMAddSkipBackupAttributeToItemAtPath(config.path + ".management");
+                RLMAddSkipBackupAttributeToItemAtPath(config.path + ".lock");
+                RLMAddSkipBackupAttributeToItemAtPath(config.path + ".note");
+            }
         }
     }
 
@@ -544,18 +531,6 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
     }
 
     return RLMAutorelease(realm);
-}
-
-+ (instancetype)uncachedSchemalessRealmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
-    RLMRealm *realm = [[RLMRealm alloc] initPrivate];
-    try {
-        realm->_realm = Realm::get_shared_realm(configuration.config);
-    }
-    catch (...) {
-        translateSharedGroupOpenException(configuration, error);
-        return nil;
-    }
-    return realm;
 }
 
 + (void)resetRealmState {
@@ -883,7 +858,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
         return version;
     }
     catch (...) {
-        translateSharedGroupOpenException(config, error);
+        translateSharedGroupOpenException(error);
         return RLMNotVersioned;
     }
 }

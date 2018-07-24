@@ -140,7 +140,7 @@ using namespace realm;
 }
 
 - (void)deleteObject:(RLMObject *)object {
-    _deletedObjectIndices[object.objectSchema.className].add(object->_row.get_index());
+    _deletedObjectIndices[object.objectSchema.className].add(object->_row.get_key().value);
 }
 
 - (void)deleteObjectsMarkedForDeletion {
@@ -155,13 +155,9 @@ using namespace realm;
         if (table->size() == indices.count()) {
             table->clear();
         }
-        // Otherwise delete in reverse order to avoid invaliding any of the
-        // not-yet-deleted indices
         else {
-            for (auto it = std::make_reverse_iterator(indices.end()), end = std::make_reverse_iterator(indices.begin()); it != end; ++it) {
-                for (size_t i = it->second; i > it->first; --i) {
-                    table->move_last_over(i - 1);
-                }
+            for (auto key : indices.as_indexes()) {
+                table->remove_object(realm::ObjKey(key));
             }
         }
     }
