@@ -290,6 +290,30 @@ static NSData *data(int i) {
     XCTAssertEqual(1U, [$array indexOfObject:$v1]);
 }
 
+- (void)testIndexOfObjectSorted {
+    %man %r [$array addObjects:@[$v0, $v1, $v0, $v1]];
+    %man %o [$array addObjects:@[$v0, $v1, NSNull.null, $v1, $v0]];
+
+    %man %r XCTAssertEqual(0U, [[$array sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
+    %man %r XCTAssertEqual(2U, [[$array sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
+
+    %man %o XCTAssertEqual(0U, [[$array sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v1]);
+    %man %o XCTAssertEqual(2U, [[$array sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:$v0]);
+    %man %o XCTAssertEqual(4U, [[$array sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
+}
+
+- (void)testIndexOfObjectDistinct {
+    %man %r [$array addObjects:@[$v0, $v0, $v1]];
+    %man %o [$array addObjects:@[$v0, $v0, NSNull.null, $v1, $v0]];
+
+    %man %r XCTAssertEqual(0U, [[$array distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
+    %man %r XCTAssertEqual(1U, [[$array distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
+
+    %man %o XCTAssertEqual(0U, [[$array distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v0]);
+    %man %o XCTAssertEqual(2U, [[$array distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:$v1]);
+    %man %o XCTAssertEqual(1U, [[$array distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
+}
+
 - (void)testIndexOfObjectWhere {
     %man RLMAssertThrowsWithReason([$array indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
     %man RLMAssertThrowsWithReason([[$array sortedResultsUsingKeyPath:@"self" ascending:NO] ^n  indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
@@ -419,6 +443,14 @@ static NSData *data(int i) {
     %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@max.self"], $v1);
     %sum XCTAssertEqualObjects([$array valueForKeyPath:@"@sum.self"], @($s0 + $s1));
     %avg XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@avg.self"] doubleValue], ($s0 + $s1) / 2.0, .001);
+}
+
+- (void)testValueForKeyLength {
+    XCTAssertEqualObjects([$array valueForKey:@"length"], @[]);
+
+    %string [$array addObjects:$values];
+
+    %string XCTAssertEqualObjects([$array valueForKey:@"length"], ([$values valueForKey:@"length"]));
 }
 
 // Sort the distinct results to match the order used in values, as it

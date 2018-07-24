@@ -329,26 +329,29 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithNestedObjects() {
         let standalone = SwiftPrimaryStringObject(value: ["p0", 11])
+        let realm = try! Realm()
 
-        try! Realm().beginWrite()
-        let objectWithNestedObjects = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p1", ["p1", 11],
+        realm.beginWrite()
+        let objectWithNestedObjects = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p1", ["p1", 12],
             [standalone]])
-        try! Realm().commitWrite()
+        try! realm.commitWrite()
 
-        let stringObjects = try! Realm().objects(SwiftPrimaryStringObject.self)
+        let stringObjects = realm.objects(SwiftPrimaryStringObject.self)
         XCTAssertEqual(stringObjects.count, 2)
-        let persistedObject = stringObjects.first!
+        let p0 = realm.object(ofType: SwiftPrimaryStringObject.self, forPrimaryKey: "p0")
+        let p1 = realm.object(ofType: SwiftPrimaryStringObject.self, forPrimaryKey: "p1")
 
         // standalone object should be copied into the realm, not added directly
-        XCTAssertNotEqual(standalone, persistedObject)
-        XCTAssertEqual(objectWithNestedObjects.object!, persistedObject)
-        XCTAssertEqual(objectWithNestedObjects.objects.first!, stringObjects.last!)
+        XCTAssertNil(standalone.realm)
+        XCTAssertNotEqual(standalone, p0)
+        XCTAssertEqual(objectWithNestedObjects.object!, p1)
+        XCTAssertEqual(objectWithNestedObjects.objects.first!, p0)
 
         let standalone1 = SwiftPrimaryStringObject(value: ["p3", 11])
-        try! Realm().beginWrite()
-        assertThrows(try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["p3", ["p3", 11], [standalone1]]),
+        realm.beginWrite()
+        assertThrows(realm.create(SwiftLinkToPrimaryStringObject.self, value: ["p3", ["p3", 11], [standalone1]]),
             "Should throw with duplicate primary key")
-        try! Realm().commitWrite()
+        try! realm.commitWrite()
     }
 
     func testUpdateWithNestedObjects() {

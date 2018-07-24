@@ -80,14 +80,13 @@ void RLMInitializeSwiftAccessorGenerics(RLMObjectBase *object);
 
 namespace realm {
     class Table;
-    template<typename T> class BasicRowExpr;
-    using RowExpr = BasicRowExpr<Table>;
+    class Obj;
 }
 class RLMClassInfo;
 
 // Create accessors
-RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, NSUInteger index) NS_RETURNS_RETAINED;
-RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, realm::RowExpr row) NS_RETURNS_RETAINED;
+RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, int64_t key) NS_RETURNS_RETAINED;
+RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, realm::Obj&& obj) NS_RETURNS_RETAINED;
 #endif
 
 NS_ASSUME_NONNULL_END

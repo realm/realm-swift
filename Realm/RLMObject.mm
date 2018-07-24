@@ -285,12 +285,9 @@ RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjec
             }
 
             auto properties = [NSMutableArray new];
-            for (size_t i = 0; i < c.columns.size(); ++i) {
-                if (c.columns[i].empty()) {
-                    continue;
-                }
-                if (auto prop = object->_info->propertyForTableColumn(i)) {
-                    [properties addObject:prop.name];
+            for (RLMProperty *property in object->_info->rlmObjectSchema.properties) {
+                if (c.columns.count(object->_info->tableColumn(property).value)) {
+                    [properties addObject:property.name];
                 }
             }
             if (properties.count) {
@@ -361,4 +358,8 @@ RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjec
 }
 
 @implementation RLMPropertyChange
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<RLMPropertyChange: %p> %@ %@ -> %@",
+            (__bridge void *)self, _name, _previousValue, _value];
+}
 @end

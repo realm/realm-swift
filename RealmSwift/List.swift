@@ -96,15 +96,6 @@ public final class List<Element: RealmCollectionValue>: ListBase {
         return notFoundToNil(index: _rlmArray.indexOfObject(with: predicate))
     }
 
-    /**
-     Returns the index of the first object in the list matching the predicate, or `nil` if no objects match.
-
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-    */
-    public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
-        return index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
-
     // MARK: Object Retrieval
 
     /**
@@ -164,16 +155,6 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     }
 
     // MARK: Filtering
-
-    /**
-     Returns a `Results` containing all objects matching the given predicate in the list.
-
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-    */
-    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
-        return Results<Element>(_rlmArray.objects(with: NSPredicate(format: predicateFormat,
-                                                              argumentArray: unwrapOptionals(in: args))))
-    }
 
     /**
      Returns a `Results` containing all objects matching the given predicate in the list.
@@ -583,6 +564,7 @@ extension List: MutableCollection {
      - warning: This method may only be called during a write transaction.
      */
     public func removeFirst(_ number: Int = 1) {
+        throwForNegativeIndex(number)
         let count = Int(_rlmArray.count)
         guard number <= count else {
             throwRealmException("It is not possible to remove more objects (\(number)) from a list"
@@ -600,6 +582,7 @@ extension List: MutableCollection {
      - warning: This method may only be called during a write transaction.
      */
     public func removeLast(_ number: Int = 1) {
+        throwForNegativeIndex(number)
         let count = Int(_rlmArray.count)
         guard number <= count else {
             throwRealmException("It is not possible to remove more objects (\(number)) from a list"

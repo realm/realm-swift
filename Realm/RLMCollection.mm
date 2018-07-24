@@ -203,9 +203,9 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClas
             RLMAccessorContext context(info);
             for (size_t i = 0; i < count; ++i) {
                 RLMListBase *list = [[cls alloc] init];
-                list._rlmArray = [[RLMManagedArray alloc] initWithList:realm::List(info.realm->_realm, *info.table(),
-                                                                                   info.tableColumn(prop),
-                                                                                   collection.get(i).get_index())
+                list._rlmArray = [[RLMManagedArray alloc] initWithList:realm::List(info.realm->_realm,
+                                                                                   collection.get(i),
+                                                                                   info.tableColumn(prop))
                                                             parentInfo:&info
                                                               property:prop];
                 [array addObject:list];
@@ -369,13 +369,17 @@ static NSArray *toIndexPathArray(realm::IndexSet const& set, NSUInteger section)
 
 - (NSArray<NSIndexPath *> *)insertionsInSection:(NSUInteger)section {
     return toIndexPathArray(_indices.insertions, section);
-
 }
 
 - (NSArray<NSIndexPath *> *)modificationsInSection:(NSUInteger)section {
     return toIndexPathArray(_indices.modifications, section);
-
 }
+
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<RLMCollectionChange: %p> insertions: %@, deletions: %@, modifications: %@",
+            (__bridge void *)self, self.insertions, self.deletions, self.modifications];
+}
+
 @end
 
 template<typename Collection>

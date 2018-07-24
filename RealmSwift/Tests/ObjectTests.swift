@@ -423,9 +423,8 @@ class ObjectTests: TestCase {
     func testSubscript() {
         let setter: (Object, Any?, String) -> Void = { object, value, key in
             object[key] = value
-            return
         }
-        let getter: (Object, String) -> (Any?) = { object, key in
+        let getter: (Object, String) -> Any? = { object, key in
             object[key]
         }
 

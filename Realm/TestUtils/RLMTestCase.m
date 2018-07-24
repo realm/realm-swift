@@ -80,6 +80,9 @@ static BOOL encryptTests() {
     // re-enabled and we need it enabled for performance tests
     RLMDisableSyncToDisk();
 #endif
+    // Don't bother disabling backups on our non-Realm files because it takes
+    // a while and we're going to delete them anyway.
+    RLMSetSkipBackupAttribute(false);
 
     if (!getenv("RLMProcessIsChild")) {
         [self preinitializeSchema];
