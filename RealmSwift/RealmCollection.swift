@@ -465,6 +465,27 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
     func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
+public extension RealmCollection {
+    /**
+     Returns the index of the first object matching the given predicate, or `nil` if no objects match.
+
+     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
+     */
+    func index(matching predicateFormat: String, _ args: Any...) -> Int? {
+        return index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
+    }
+
+    /**
+     Returns a `Results` containing all objects matching the given predicate in the collection.
+
+     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
+     */
+    func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
+        return filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
+    }
+}
+
+
 /// :nodoc:
 public protocol OptionalProtocol {
     associatedtype Wrapped
@@ -577,8 +598,6 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     var description: String { fatalError() }
     func index(of object: Element) -> Int? { fatalError() }
     func index(matching predicate: NSPredicate) -> Int? { fatalError() }
-    func index(matching predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
-    func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> { fatalError() }
     func filter(_ predicate: NSPredicate) -> Results<Element> { fatalError() }
     func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element> { fatalError() }
     func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
@@ -623,15 +642,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     override func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
 
-    override func index(matching predicateFormat: String, _ args: Any...) -> Int? {
-        return base.index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
-
     // MARK: Filtering
-
-    override func filter(_ predicateFormat: String, _ args: Any...) -> Results<C.Element> {
-        return base.filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
 
     override func filter(_ predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
 
@@ -781,25 +792,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      */
     public func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
 
-    /**
-     Returns the index of the first object matching the given predicate, or `nil` if no objects match.
-
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-     */
-    public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
-        return base.index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
-
     // MARK: Filtering
-
-    /**
-     Returns a `Results` containing all objects matching the given predicate in the collection.
-
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-     */
-    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
-        return base.filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
 
     /**
      Returns a `Results` containing all objects matching the given predicate in the collection.

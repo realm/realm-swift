@@ -52,22 +52,14 @@ class ThreadSafeReferenceTests: TestCase {
         let realm = try! Realm()
         realm.beginWrite()
         let stringObject = realm.create(SwiftStringObject.self, value: ["stringCol": "hello"])
-        assertThrows(ThreadSafeReference(to: stringObject),
-                     reason: "Cannot obtain thread safe reference during a write transaction")
-        try! realm.commitWrite()
         let ref1 = ThreadSafeReference(to: stringObject)
+        try! realm.commitWrite()
         let ref2 = ThreadSafeReference(to: stringObject)
         let ref3 = ThreadSafeReference(to: stringObject)
         dispatchSyncNewThread {
-            self.assertThrows(self.realmWithTestPath().resolve(ref1),
-                              reason: "Cannot resolve thread safe reference in Realm with different configuration than the source Realm")
+            XCTAssertNil(self.realmWithTestPath().resolve(ref1))
             let realm = try! Realm()
-            realm.beginWrite()
-            self.assertThrows(realm.resolve(ref2),
-                              reason: "Cannot resolve thread safe reference during a write transaction")
-            self.assertThrows(realm.resolve(ref2),
-                              reason: "Can only resolve a thread safe reference once")
-            realm.cancelWrite()
+            _ = realm.resolve(ref2)
             self.assertThrows(realm.resolve(ref2),
                               reason: "Can only resolve a thread safe reference once")
             // Assert that we can resolve a different reference to the same object.

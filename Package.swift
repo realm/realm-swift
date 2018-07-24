@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "5.23.6"
-let cocoaVersionStr = "4.1.1"
+let coreVersionStr = "6.0.0-alpha.27"
+let cocoaVersionStr = "5.0.0-alpha.1"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let cxxSettings: [CXXSetting] = [
@@ -128,5 +128,5 @@ let package = Package(
             exclude: ["TestUtils.mm"]
         )
     ],
-    cxxLanguageStandard: .cxx14
+    cxxLanguageStandard: .cxx1z
 )

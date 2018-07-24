@@ -533,6 +533,10 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
 }
 
+- (RLMResults *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths {
+    @throw RLMException(@"This method may only be called on RLMArray instances retrieved from an RLMRealm");
+}
+
 // The compiler complains about the method's argument type not matching due to
 // it not having the generic type attached, but it doesn't seem to be possible
 // to actually include the generic type
@@ -544,7 +548,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
 
 #pragma mark - Thread Confined Protocol Conformance
 
-- (std::unique_ptr<realm::ThreadSafeReferenceBase>)makeThreadSafeReference {
+- (realm::ThreadSafeReference)makeThreadSafeReference {
     REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
 }
 
@@ -552,7 +556,7 @@ static bool canAggregate(RLMPropertyType type, bool allowDate) {
     REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");
 }
 
-+ (instancetype)objectWithThreadSafeReference:(std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
++ (instancetype)objectWithThreadSafeReference:(realm::ThreadSafeReference)reference
                                      metadata:(id)metadata
                                         realm:(RLMRealm *)realm {
     REALM_TERMINATE("Unexpected handover of unmanaged `RLMArray`");

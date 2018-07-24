@@ -96,16 +96,6 @@ public struct LinkingObjects<Element: Object> {
         return notFoundToNil(index: rlmResults.indexOfObject(with: predicate))
     }
 
-    /**
-     Returns the index of the first object matching the given predicate, or `nil` if no objects match.
-
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-     */
-    public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
-        return notFoundToNil(index: rlmResults.indexOfObject(with: NSPredicate(format: predicateFormat,
-                                                                               argumentArray: unwrapOptionals(in: args))))
-    }
-
     // MARK: Object Retrieval
 
     /**
@@ -158,16 +148,6 @@ public struct LinkingObjects<Element: Object> {
     }
 
     // MARK: Filtering
-
-    /**
-     Returns a `Results` containing all objects matching the given predicate in the linking objects.
-
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-     */
-    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
-        return Results(rlmResults.objects(with: NSPredicate(format: predicateFormat,
-                                                            argumentArray: unwrapOptionals(in: args))))
-    }
 
     /**
      Returns a `Results` containing all objects matching the given predicate in the linking objects.

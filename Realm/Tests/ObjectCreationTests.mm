@@ -922,11 +922,15 @@
                                       @"Realm must not be nil");
 }
 
-- (void)testCreatingObjectWithoutAnyPropertiesThrows {
+- (void)testCreatingObjectWithoutAnyPropertiesWorks {
+    @autoreleasepool {
+        auto realm = [RLMRealm defaultRealm];
+        [realm beginWriteTransaction];
+        [AbstractObject createInRealm:realm withValue:@[]];
+        [realm commitWriteTransaction];
+    }
     auto realm = [RLMRealm defaultRealm];
-    [realm beginWriteTransaction];
-    RLMAssertThrows([AbstractObject createInRealm:realm withValue:@[]]);
-    [realm cancelWriteTransaction];
+    XCTAssertEqual(1U, [AbstractObject allObjectsInRealm:realm].count);
 }
 
 - (void)testCreateWithNonEnumerableValueForArrayProperty {
@@ -1292,11 +1296,15 @@
     [realm cancelWriteTransaction];
 }
 
-- (void)testAddingObjectWithoutAnyPropertiesThrows {
+- (void)testAddingObjectWithoutAnyPropertiesWorks {
+    @autoreleasepool {
+        auto realm = [RLMRealm defaultRealm];
+        [realm beginWriteTransaction];
+        [realm addObject:[[AbstractObject alloc] initWithValue:@[]]];
+        [realm commitWriteTransaction];
+    }
     auto realm = [RLMRealm defaultRealm];
-    [realm beginWriteTransaction];
-    RLMAssertThrows([realm addObject:[[AbstractObject alloc] initWithValue:@[]]]);
-    [realm cancelWriteTransaction];
+    XCTAssertEqual(1U, [AbstractObject allObjectsInRealm:realm].count);
 }
 
 - (void)testAddWithCustomAccessors {
