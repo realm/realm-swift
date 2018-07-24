@@ -20,9 +20,10 @@
 
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealmConfiguration_Private.hpp"
-#import "RLMRealm_Dynamic.h"
-#import "RLMSchema_Private.h"
 #import "RLMRealmUtil.hpp"
+#import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
 
 #import <mach/mach_init.h>
 #import <mach/vm_map.h>
@@ -30,7 +31,7 @@
 #import <thread>
 
 #import <realm/util/file.hpp>
-#import <realm/group_shared_options.hpp>
+#import <realm/db_options.hpp>
 
 @interface RLMRealm ()
 + (BOOL)isCoreDebug;
@@ -205,7 +206,7 @@
         XCTAssertEqualObjects(oldData, newData); \
 } while (0)
 
-#ifndef REALM_SPM
+#if 0 // FIXME: replace with migration from core 5 files
 - (void)testFileFormatUpgradeRequiredDeleteRealmIfNeeded {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.deleteRealmIfMigrationNeeded = YES;
@@ -672,20 +673,20 @@
     [realm addObject:obj3];
 
     RLMResults *objects = [PrimaryStringObject allObjects];
-    XCTAssertEqual([objects count], 3U, @"Should have 3 object");
-    XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
-    XCTAssertEqual([(PrimaryStringObject *)objects[1] intCol], 2, @"Value should be 2");
-    XCTAssertEqual([(PrimaryStringObject *)objects[2] intCol], 3, @"Value should be 3");
+    XCTAssertEqual([objects count], 3U);
+    XCTAssertEqual(obj.intCol, 1);
+    XCTAssertEqual(obj2.intCol, 2);
+    XCTAssertEqual(obj3.intCol, 3);
 
     // upsert with array of 2 objects. One is to update the existing value, another is added
     NSArray *array = @[[[PrimaryStringObject alloc] initWithValue:@[@"string2", @4]],
                        [[PrimaryStringObject alloc] initWithValue:@[@"string4", @5]]];
     [realm addOrUpdateObjects:array];
     XCTAssertEqual([objects count], 4U, @"Should have 4 objects");
-    XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
-    XCTAssertEqual([(PrimaryStringObject *)objects[1] intCol], 4, @"Value should be 4");
-    XCTAssertEqual([(PrimaryStringObject *)objects[2] intCol], 3, @"Value should be 3");
-    XCTAssertEqual([(PrimaryStringObject *)objects[3] intCol], 5, @"Value should be 5");
+    XCTAssertEqual(obj.intCol, 1);
+    XCTAssertEqual(obj2.intCol, 4);
+    XCTAssertEqual(obj3.intCol, 3);
+    XCTAssertEqual([array[1] intCol], 5);
 
     [realm commitWriteTransaction];
 }
@@ -1060,15 +1061,16 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    IntObject *objectToDelete = [IntObject createInRealm:realm withValue:@[@0]];
+    IntObject *objectToDelete = [IntObject createInRealm:realm withValue:@[@5]];
     [realm commitWriteTransaction];
 
     [realm beginWriteTransaction];
     [realm deleteObject:objectToDelete];
     [realm cancelWriteTransaction];
 
-    XCTAssertTrue(objectToDelete.isInvalidated);
+    XCTAssertFalse(objectToDelete.isInvalidated);
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
+    XCTAssertEqual(5, objectToDelete.intCol);
 }
 
 - (void)testRollbackModify
@@ -1785,15 +1787,15 @@
     [manager createDirectoryAtPath:fifoURL.path withIntermediateDirectories:YES attributes:nil error:nil];
 
     // Ensure that it doesn't try to fall back to putting it in the temp directory
-    auto oldTempDir = realm::SharedGroupOptions::get_sys_tmp_dir();
-    realm::SharedGroupOptions::set_sys_tmp_dir("");
+    auto oldTempDir = realm::DBOptions::get_sys_tmp_dir();
+    realm::DBOptions::set_sys_tmp_dir("");
 
     NSError *error;
     XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Should not have been able to open FIFO");
     XCTAssertNotNil(error);
     RLMValidateRealmError(error, RLMErrorFileAccess, @"Is a directory", nil);
 
-    realm::SharedGroupOptions::set_sys_tmp_dir(std::move(oldTempDir));
+    realm::DBOptions::set_sys_tmp_dir(std::move(oldTempDir));
 }
 #endif
 
@@ -1886,6 +1888,7 @@
 }
 
 - (void)testAuxiliaryFilesAreExcludedFromBackup {
+    RLMSetSkipBackupAttribute(true);
     @autoreleasepool { [RLMRealm defaultRealm]; }
 
 #if TARGET_OS_TV
@@ -1902,9 +1905,11 @@
         XCTAssertNil(error);
         XCTAssertTrue(attribute.boolValue);
     }
+    RLMSetSkipBackupAttribute(false);
 }
 
 - (void)testAuxiliaryFilesAreExcludedFromBackupPerformance {
+    RLMSetSkipBackupAttribute(true);
     [self measureBlock:^{
         @autoreleasepool {
             RLMRealm *realm = [RLMRealm defaultRealm];

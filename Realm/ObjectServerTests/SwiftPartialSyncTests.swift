@@ -69,15 +69,19 @@ class SwiftPartialSyncTests: SwiftSyncTestCase {
         token.invalidate()
     }
 
-    func waitForError(_ subscription: SyncSubscription) {
+    @discardableResult
+    func waitForError(_ subscription: SyncSubscription) -> Error? {
+        var err: Error?
         let ex = expectation(description: "Waiting for error state")
         let token = subscription.observe(\.state, options: .initial) { state in
-            if case .error(_) = state {
+            if case .error(let e) = state {
+                err = e
                 ex.fulfill()
             }
         }
         waitForExpectations(timeout: 20.0)
         token.invalidate()
+        return err
     }
 
     func testPartialSync() {
@@ -361,5 +365,44 @@ class SwiftPartialSyncTests: SwiftSyncTestCase {
         XCTAssertEqual(objects.count, 5)
         XCTAssertEqual(Set(objects.value(forKey: "value")! as! [Int]),
                        Set([0, 1, 5, 9, 12]))
+    }
+
+    func testSubscribeToQueriesWithCustomComparators() {
+        populateTestRealm(#function)
+        let credentials = SyncCredentials.usernamePassword(username: #function, password: "a")
+        let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
+        let realm = try! synchronouslyOpenRealm(configuration: user.configuration())
+
+        let objects = realm.objects(SwiftPartialSyncObjectA.self)
+
+        func assertCount(_ filter: String, _ count: Int, fileName: StaticString = #file, lineNumber: UInt = #line) {
+            waitForState(objects.filter(filter).subscribe(named: "query", update: true), .complete)
+            XCTAssertEqual(objects.count, count, file: fileName, line: lineNumber)
+        }
+        assertCount("string CONTAINS 'art'", 4)
+        assertCount("string CONTAINS 'ART'", 0)
+        assertCount("string CONTAINS[c] 'art'", 4)
+        assertCount("string CONTAINS[c] 'ART'", 4)
+
+        assertCount("string = 'partial'", 4)
+        assertCount("string = 'PARTIAL'", 0)
+        assertCount("string =[c] 'partial'", 4)
+        assertCount("string =[c] 'PARTIAL'", 4)
+
+        func assertError(_ filter: String, fileName: StaticString = #file, lineNumber: UInt = #line) {
+            let error = waitForError(objects.filter(filter).subscribe(named: "query", update: true))
+            if let error = error {
+                XCTAssertTrue(error.localizedDescription.contains("Invalid predicate"))
+            }
+        }
+        assertError("string CONTAINS[d] 'art'")
+        assertError("string CONTAINS[d] 'ART'")
+        assertError("string CONTAINS[cd] 'art'")
+        assertError("string CONTAINS[cd] 'ART'")
+
+        assertError("string =[d] 'partial'")
+        assertError("string =[d] 'PARTIAL'")
+        assertError("string =[cd] 'partial'")
+        assertError("string =[cd] 'PARTIAL'")
     }
 }

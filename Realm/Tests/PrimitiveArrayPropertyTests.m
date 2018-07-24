@@ -2521,6 +2521,114 @@ static NSData *data(int i) {
     XCTAssertEqual(1U, [optManaged.dateObj indexOfObject:date(2)]);
 }
 
+- (void)testIndexOfObjectSorted {
+    [managed.boolObj addObjects:@[@NO, @YES, @NO, @YES]];
+    [managed.intObj addObjects:@[@2, @3, @2, @3]];
+    [managed.floatObj addObjects:@[@2.2f, @3.3f, @2.2f, @3.3f]];
+    [managed.doubleObj addObjects:@[@2.2, @3.3, @2.2, @3.3]];
+    [managed.stringObj addObjects:@[@"a", @"b", @"a", @"b"]];
+    [managed.dataObj addObjects:@[data(1), data(2), data(1), data(2)]];
+    [managed.dateObj addObjects:@[date(1), date(2), date(1), date(2)]];
+    [optManaged.boolObj addObjects:@[@NO, @YES, NSNull.null, @YES, @NO]];
+    [optManaged.intObj addObjects:@[@2, @3, NSNull.null, @3, @2]];
+    [optManaged.floatObj addObjects:@[@2.2f, @3.3f, NSNull.null, @3.3f, @2.2f]];
+    [optManaged.doubleObj addObjects:@[@2.2, @3.3, NSNull.null, @3.3, @2.2]];
+    [optManaged.stringObj addObjects:@[@"a", @"b", NSNull.null, @"b", @"a"]];
+    [optManaged.dataObj addObjects:@[data(1), data(2), NSNull.null, data(2), data(1)]];
+    [optManaged.dateObj addObjects:@[date(1), date(2), NSNull.null, date(2), date(1)]];
+
+    XCTAssertEqual(0U, [[managed.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@YES]);
+    XCTAssertEqual(0U, [[managed.intObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@3]);
+    XCTAssertEqual(0U, [[managed.floatObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@3.3f]);
+    XCTAssertEqual(0U, [[managed.doubleObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@3.3]);
+    XCTAssertEqual(0U, [[managed.stringObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@"b"]);
+    XCTAssertEqual(0U, [[managed.dataObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:data(2)]);
+    XCTAssertEqual(0U, [[managed.dateObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:date(2)]);
+    XCTAssertEqual(2U, [[managed.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@NO]);
+    XCTAssertEqual(2U, [[managed.intObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@2]);
+    XCTAssertEqual(2U, [[managed.floatObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@2.2f]);
+    XCTAssertEqual(2U, [[managed.doubleObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@2.2]);
+    XCTAssertEqual(2U, [[managed.stringObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@"a"]);
+    XCTAssertEqual(2U, [[managed.dataObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:data(1)]);
+    XCTAssertEqual(2U, [[managed.dateObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:date(1)]);
+
+    XCTAssertEqual(0U, [[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@YES]);
+    XCTAssertEqual(0U, [[optManaged.intObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@3]);
+    XCTAssertEqual(0U, [[optManaged.floatObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@3.3f]);
+    XCTAssertEqual(0U, [[optManaged.doubleObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@3.3]);
+    XCTAssertEqual(0U, [[optManaged.stringObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@"b"]);
+    XCTAssertEqual(0U, [[optManaged.dataObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:data(2)]);
+    XCTAssertEqual(0U, [[optManaged.dateObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:date(2)]);
+    XCTAssertEqual(2U, [[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@NO]);
+    XCTAssertEqual(2U, [[optManaged.intObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@2]);
+    XCTAssertEqual(2U, [[optManaged.floatObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@2.2f]);
+    XCTAssertEqual(2U, [[optManaged.doubleObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@2.2]);
+    XCTAssertEqual(2U, [[optManaged.stringObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:@"a"]);
+    XCTAssertEqual(2U, [[optManaged.dataObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:data(1)]);
+    XCTAssertEqual(2U, [[optManaged.dateObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:date(1)]);
+    XCTAssertEqual(4U, [[optManaged.boolObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
+    XCTAssertEqual(4U, [[optManaged.intObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
+    XCTAssertEqual(4U, [[optManaged.floatObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
+    XCTAssertEqual(4U, [[optManaged.doubleObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
+    XCTAssertEqual(4U, [[optManaged.stringObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
+    XCTAssertEqual(4U, [[optManaged.dataObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
+    XCTAssertEqual(4U, [[optManaged.dateObj sortedResultsUsingKeyPath:@"self" ascending:NO] indexOfObject:NSNull.null]);
+}
+
+- (void)testIndexOfObjectDistinct {
+    [managed.boolObj addObjects:@[@NO, @NO, @YES]];
+    [managed.intObj addObjects:@[@2, @2, @3]];
+    [managed.floatObj addObjects:@[@2.2f, @2.2f, @3.3f]];
+    [managed.doubleObj addObjects:@[@2.2, @2.2, @3.3]];
+    [managed.stringObj addObjects:@[@"a", @"a", @"b"]];
+    [managed.dataObj addObjects:@[data(1), data(1), data(2)]];
+    [managed.dateObj addObjects:@[date(1), date(1), date(2)]];
+    [optManaged.boolObj addObjects:@[@NO, @NO, NSNull.null, @YES, @NO]];
+    [optManaged.intObj addObjects:@[@2, @2, NSNull.null, @3, @2]];
+    [optManaged.floatObj addObjects:@[@2.2f, @2.2f, NSNull.null, @3.3f, @2.2f]];
+    [optManaged.doubleObj addObjects:@[@2.2, @2.2, NSNull.null, @3.3, @2.2]];
+    [optManaged.stringObj addObjects:@[@"a", @"a", NSNull.null, @"b", @"a"]];
+    [optManaged.dataObj addObjects:@[data(1), data(1), NSNull.null, data(2), data(1)]];
+    [optManaged.dateObj addObjects:@[date(1), date(1), NSNull.null, date(2), date(1)]];
+
+    XCTAssertEqual(0U, [[managed.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@NO]);
+    XCTAssertEqual(0U, [[managed.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2]);
+    XCTAssertEqual(0U, [[managed.floatObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2.2f]);
+    XCTAssertEqual(0U, [[managed.doubleObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2.2]);
+    XCTAssertEqual(0U, [[managed.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"a"]);
+    XCTAssertEqual(0U, [[managed.dataObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:data(1)]);
+    XCTAssertEqual(0U, [[managed.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(1)]);
+    XCTAssertEqual(1U, [[managed.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@YES]);
+    XCTAssertEqual(1U, [[managed.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3]);
+    XCTAssertEqual(1U, [[managed.floatObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3.3f]);
+    XCTAssertEqual(1U, [[managed.doubleObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3.3]);
+    XCTAssertEqual(1U, [[managed.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"b"]);
+    XCTAssertEqual(1U, [[managed.dataObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:data(2)]);
+    XCTAssertEqual(1U, [[managed.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(2)]);
+
+    XCTAssertEqual(0U, [[optManaged.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@NO]);
+    XCTAssertEqual(0U, [[optManaged.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2]);
+    XCTAssertEqual(0U, [[optManaged.floatObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2.2f]);
+    XCTAssertEqual(0U, [[optManaged.doubleObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@2.2]);
+    XCTAssertEqual(0U, [[optManaged.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"a"]);
+    XCTAssertEqual(0U, [[optManaged.dataObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:data(1)]);
+    XCTAssertEqual(0U, [[optManaged.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(1)]);
+    XCTAssertEqual(2U, [[optManaged.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@YES]);
+    XCTAssertEqual(2U, [[optManaged.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3]);
+    XCTAssertEqual(2U, [[optManaged.floatObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3.3f]);
+    XCTAssertEqual(2U, [[optManaged.doubleObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@3.3]);
+    XCTAssertEqual(2U, [[optManaged.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:@"b"]);
+    XCTAssertEqual(2U, [[optManaged.dataObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:data(2)]);
+    XCTAssertEqual(2U, [[optManaged.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:date(2)]);
+    XCTAssertEqual(1U, [[optManaged.boolObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
+    XCTAssertEqual(1U, [[optManaged.intObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
+    XCTAssertEqual(1U, [[optManaged.floatObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
+    XCTAssertEqual(1U, [[optManaged.doubleObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
+    XCTAssertEqual(1U, [[optManaged.stringObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
+    XCTAssertEqual(1U, [[optManaged.dataObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
+    XCTAssertEqual(1U, [[optManaged.dateObj distinctResultsUsingKeyPaths:@[@"self"]] indexOfObject:NSNull.null]);
+}
+
 - (void)testIndexOfObjectWhere {
     RLMAssertThrowsWithReason([managed.boolObj indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
     RLMAssertThrowsWithReason([managed.intObj indexOfObjectWhere:@"TRUEPREDICATE"], @"implemented");
@@ -3944,6 +4052,43 @@ static NSData *data(int i) {
     XCTAssertEqualWithAccuracy([[optManaged.intObj valueForKeyPath:@"@avg.self"] doubleValue], (2 + 3) / 2.0, .001);
     XCTAssertEqualWithAccuracy([[optManaged.floatObj valueForKeyPath:@"@avg.self"] doubleValue], (2.2f + 3.3f) / 2.0, .001);
     XCTAssertEqualWithAccuracy([[optManaged.doubleObj valueForKeyPath:@"@avg.self"] doubleValue], (2.2 + 3.3) / 2.0, .001);
+}
+
+- (void)testValueForKeyLength {
+    XCTAssertEqualObjects([unmanaged.boolObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([unmanaged.intObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([unmanaged.floatObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([unmanaged.doubleObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([unmanaged.stringObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([unmanaged.dataObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([unmanaged.dateObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optUnmanaged.boolObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optUnmanaged.intObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optUnmanaged.floatObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optUnmanaged.doubleObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optUnmanaged.stringObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optUnmanaged.dataObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optUnmanaged.dateObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([managed.boolObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([managed.intObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([managed.floatObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([managed.doubleObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([managed.stringObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([managed.dataObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([managed.dateObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optManaged.boolObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optManaged.intObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optManaged.floatObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optManaged.doubleObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optManaged.stringObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optManaged.dataObj valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([optManaged.dateObj valueForKey:@"length"], @[]);
+
+    [unmanaged.stringObj addObjects:@[@"a", @"b"]];
+    [managed.stringObj addObjects:@[@"a", @"b"]];
+
+    XCTAssertEqualObjects([unmanaged.stringObj valueForKey:@"length"], ([@[@"a", @"b"] valueForKey:@"length"]));
+    XCTAssertEqualObjects([managed.stringObj valueForKey:@"length"], ([@[@"a", @"b"] valueForKey:@"length"]));
 }
 
 // Sort the distinct results to match the order used in values, as it

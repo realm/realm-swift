@@ -1,23 +1,34 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.0.0-alpha.1 Release notes (2019-11-14)
 =============================================================
 ### Enhancements
 * None.
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+NOTE: This version bumps the Realm file format to version 10. It is not
+possible to downgrade version 9 or earlier. Files created with older versions
+of Realm will be automatically upgraded. This automatic upgrade process is not
+yet well tested. Do not open Realm files with data you care about with this
+alpha version.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+
+* Files containing Date properties written by version of Realm prior to 1.0 can
+  no longer be opened.
+* Files containing Any properties can no longer be opened. This property type
+  was never documented and was deprecated in 1.0.
 
 ### Compatibility
-* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+
+* File format: Generates Realms with format v10 (Reads and upgrades v9)
 * Realm Object Server: 3.21.0 or later.
 * APIs are backwards compatible with all previous releases in the 4.x.y series.
 * Carthage release for Swift is built with Xcode 11.3.
+* Carthage release for Swift is built with Xcode 11.2.1.
+* Carthage release for Swift is built with Xcode 11.2.
 
 ### Internal
-Upgraded realm-core from ? to ?
-Upgraded realm-sync from ? to ?
+
+* Upgraded realm-core from 5.23.6 to v6.0.0-alpha.24.
+* Upgraded realm-sync from 4.8.2 to 4.7.1-core6.5.
 
 4.3.2 Release notes (2020-02-06)
 =============================================================
