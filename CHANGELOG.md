@@ -1,3 +1,22 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Speed up the actual compaction when using compact-on-launch.
+* Reduce memory usage when locally merging changes from sync.
+* When first connecting to a server, wait to begin uploading changes until
+  after all changes have been downloaded to reduce the server-side load for
+  query-based sync.
+
+### Bugfixes
+
+* None.
+
 3.7.5 Release notes (2018-07-23)
 =============================================================
 
