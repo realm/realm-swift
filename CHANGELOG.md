@@ -1,9 +1,5 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.7.6 Release notes (2018-08-08)
 =============================================================
-
-### Breaking Changes
-
-* None.
 
 ### Enhancements
 
@@ -12,10 +8,6 @@ x.x.x Release notes (yyyy-MM-dd)
 * When first connecting to a server, wait to begin uploading changes until
   after all changes have been downloaded to reduce the server-side load for
   query-based sync.
-
-### Bugfixes
-
-* None.
 
 3.7.5 Release notes (2018-07-23)
 =============================================================
