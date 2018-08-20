@@ -20,7 +20,7 @@
 #import <XCTest/XCTestCase.h>
 
 FOUNDATION_EXTERN void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
-                                                              dispatch_block_t block,
+                                                              __attribute__((noescape)) dispatch_block_t block,
                                                               NSString *regexString,
                                                               NSString *message,
                                                               NSString *fileName,
