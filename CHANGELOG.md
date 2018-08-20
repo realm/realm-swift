@@ -1,3 +1,18 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fix warnings when building Realm as a static framework with CocoaPods.
+
 3.7.6 Release notes (2018-08-08)
 =============================================================
 
