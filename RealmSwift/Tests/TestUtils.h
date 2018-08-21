@@ -19,22 +19,22 @@
 #import <Foundation/Foundation.h>
 #import <XCTest/XCTestCase.h>
 
-FOUNDATION_EXTERN void RLMAssertThrowsWithName(XCTestCase *self, dispatch_block_t block,
+FOUNDATION_EXTERN void RLMAssertThrowsWithName(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block,
                                                NSString *name, NSString *message, NSString *fileName,
                                                NSUInteger lineNumber);
 
 
 FOUNDATION_EXTERN void RLMAssertThrowsWithReasonMatching(XCTestCase *self,
-                                                         dispatch_block_t block,
+                                                         __attribute__((noescape)) dispatch_block_t block,
                                                          NSString *regexString, NSString *message,
                                                          NSString *fileName, NSUInteger lineNumber);
 
-FOUNDATION_EXTERN void RLMAssertMatches(XCTestCase *self, NSString *(^block)(),
+FOUNDATION_EXTERN void RLMAssertMatches(XCTestCase *self, __attribute__((noescape)) NSString *(^block)(),
                                         NSString *regexString, NSString *message, NSString *fileName,
                                         NSUInteger lineNumber);
 
 FOUNDATION_EXTERN void RLMAssertThrowsWithReason(XCTestCase *self,
-                                      dispatch_block_t block,
+                                      __attribute__((noescape)) dispatch_block_t block,
                                       NSString *regexString, NSString *message,
                                       NSString *fileName, NSUInteger lineNumber);
 

@@ -299,7 +299,7 @@ class KVOTests: TestCase {
             return
         }
 
-        observeChange(obs, \.invalidated, false, true) {
+        observeChange(obs, \.isInvalidated, false, true) {
             self.realm.delete(obj)
         }
     }

@@ -149,20 +149,19 @@ class TestCase: XCTestCase {
         }
     }
 
-    func assertThrows<T>(_ block: @escaping @autoclosure () -> T,
-                         named: String? = RLMExceptionName,
+    func assertThrows<T>(_ block: @autoclosure () -> T, named: String? = RLMExceptionName,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithName(self, { _ = block() }, named, message, fileName, lineNumber)
     }
 
-    func assertThrows<T>(_ block: @escaping @autoclosure () -> T, reason: String,
+    func assertThrows<T>(_ block: @autoclosure () -> T, reason: String,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithReason(self, { _ = block() }, reason, message, fileName, lineNumber)
     }
 
-    func assertThrows<T>(_ block: @escaping @autoclosure () -> T, reasonMatching regexString: String,
+    func assertThrows<T>(_ block: @autoclosure () -> T, reasonMatching regexString: String,
                          _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {
         exceptionThrown = true
         RLMAssertThrowsWithReasonMatching(self, { _ = block() }, regexString, message, fileName, lineNumber)
@@ -213,8 +212,7 @@ class TestCase: XCTestCase {
         XCTAssert(block() == nil, message ?? "", file: fileName, line: lineNumber)
     }
 
-    func assertMatches(_ block: @escaping @autoclosure () -> String,
-                       _ regexString: String, _ message: String? = nil,
+    func assertMatches(_ block: @autoclosure () -> String, _ regexString: String, _ message: String? = nil,
                        fileName: String = #file, lineNumber: UInt = #line) {
         RLMAssertMatches(self, block, regexString, message, fileName, lineNumber)
     }

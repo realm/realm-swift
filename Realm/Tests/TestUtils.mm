@@ -22,7 +22,8 @@
 #import <Realm/RLMSchema_Private.h>
 #import "RLMRealmUtil.hpp"
 
-void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self, dispatch_block_t block,
+void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
+                                            __attribute__((noescape)) dispatch_block_t block,
                                             NSString *regexString, NSString *message,
                                             NSString *fileName, NSUInteger lineNumber) {
     BOOL didThrow = NO;

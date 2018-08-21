@@ -47,8 +47,8 @@ static void assertThrows(XCTestCase *self, dispatch_block_t block, NSString *mes
     }
 }
 
-void RLMAssertThrowsWithName(XCTestCase *self, dispatch_block_t block, NSString *name,
-                             NSString *message, NSString *fileName, NSUInteger lineNumber) {
+void RLMAssertThrowsWithName(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block,
+                             NSString *name, NSString *message, NSString *fileName, NSUInteger lineNumber) {
     assertThrows(self, block, message, fileName, lineNumber, ^NSString *(NSException *e) {
         if ([name isEqualToString:e.name]) {
             return nil;
@@ -58,8 +58,8 @@ void RLMAssertThrowsWithName(XCTestCase *self, dispatch_block_t block, NSString 
     });
 }
 
-void RLMAssertThrowsWithReason(XCTestCase *self, dispatch_block_t block, NSString *expected,
-                               NSString *message, NSString *fileName, NSUInteger lineNumber) {
+void RLMAssertThrowsWithReason(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block,
+                               NSString *expected, NSString *message, NSString *fileName, NSUInteger lineNumber) {
     assertThrows(self, block, message, fileName, lineNumber, ^NSString *(NSException *e) {
         if ([e.reason rangeOfString:expected].location != NSNotFound) {
             return nil;
@@ -69,7 +69,7 @@ void RLMAssertThrowsWithReason(XCTestCase *self, dispatch_block_t block, NSStrin
     });
 }
 
-void RLMAssertThrowsWithReasonMatching(XCTestCase *self, dispatch_block_t block,
+void RLMAssertThrowsWithReasonMatching(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block,
                                        NSString *regexString, NSString *message,
                                        NSString *fileName, NSUInteger lineNumber) {
     auto regex = [NSRegularExpression regularExpressionWithPattern:regexString
@@ -84,7 +84,8 @@ void RLMAssertThrowsWithReasonMatching(XCTestCase *self, dispatch_block_t block,
 }
 
 
-void RLMAssertMatches(XCTestCase *self, NSString *(^block)(), NSString *regexString, NSString *message, NSString *fileName, NSUInteger lineNumber) {
+void RLMAssertMatches(XCTestCase *self, __attribute__((noescape)) NSString *(^block)(),
+                      NSString *regexString, NSString *message, NSString *fileName, NSUInteger lineNumber) {
     NSString *result = block();
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regexString options:(NSRegularExpressionOptions)0 error:nil];
     if ([regex numberOfMatchesInString:result options:(NSMatchingOptions)0 range:NSMakeRange(0, result.length)] == 0) {
