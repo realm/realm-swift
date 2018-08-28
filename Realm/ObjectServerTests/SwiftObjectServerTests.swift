@@ -507,4 +507,67 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         token.invalidate()
     }
 #endif // Swift >= 3.2
+
+    // MARK: - Certificate Pinning
+
+    func testSecureConnectionToLocalhostWithDefaultSecurity() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
+        let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
+                                        serverValidationPolicy: .system)
+
+        let ex = expectation(description: "Waiting for error handler to be called")
+        SyncManager.shared.errorHandler = { (error, session) in
+            ex.fulfill()
+        }
+
+        let _ = try! Realm(configuration: config)
+        self.waitForExpectations(timeout: 4.0)
+    }
+
+    func testSecureConnectionToLocalhostWithValidationDisabled() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
+        let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
+                                        serverValidationPolicy: .none)
+        SyncManager.shared.errorHandler = { (error, session) in
+            XCTFail("Unexpected connection failure: \(error)")
+        }
+
+        let realm = try! Realm(configuration: config)
+        self.waitForUploads(for: realm)
+    }
+
+    func testSecureConnectionToLocalhostWithPinnedCertificate() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
+        let certURL = URL(string: #file)!
+            .deletingLastPathComponent()
+            .appendingPathComponent("certificates")
+            .appendingPathComponent("localhost-cert.pem")
+
+        let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
+                                        serverValidationPolicy: .pinCertificate(path: certURL))
+        SyncManager.shared.errorHandler = { (error, session) in
+            XCTFail("Unexpected connection failure: \(error)")
+        }
+
+        let realm = try! Realm(configuration: config)
+        self.waitForUploads(for: realm)
+    }
+
+    func testSecureConnectionToLocalhostWithIncorrectPinnedCertificate() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
+        let certURL = URL(string: #file)!
+            .deletingLastPathComponent()
+            .appendingPathComponent("certificates")
+            .appendingPathComponent("localhost-other-cert.pem")
+        let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
+                                        serverValidationPolicy: .pinCertificate(path: certURL))
+
+        let ex = expectation(description: "Waiting for error handler to be called")
+        SyncManager.shared.errorHandler = { (error, session) in
+            ex.fulfill()
+        }
+
+        let _ = try! Realm(configuration: config)
+        self.waitForExpectations(timeout: 4.0)
+    }
 }

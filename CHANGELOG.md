@@ -862,7 +862,8 @@ Swift binaries are now produced for Swift 3.0, 3.0.1, 3.0.2, 3.1, 3.2 and 4.0.
 
 ### Enhancements
 
-* None.
+* Add support for pinning SSL certificates used for https and realms
+  connections by setting `RLMSyncManager.sharedManager.pinnedCertificatePaths`.
 
 ### Bugfixes
 

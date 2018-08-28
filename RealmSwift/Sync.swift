@@ -177,6 +177,35 @@ public typealias SyncLogLevel = RLMSyncLogLevel
 public typealias Provider = RLMIdentityProvider
 
 /**
+ * How the SSL certificate for the Realm Object Server should be validated.
+ *
+ * By default, when connecting to the Realm Object Server over HTTPS, Realm will
+ * validate the server's HTTPS certificate using the system trust store and root
+ * certificates. For additional protection against man-in-the-middle (MITM)
+ * attacks and similar vulnerabilities, you can pin a certificate or public key,
+ * and reject all others, even if they are signed by a trusted CA.
+ */
+public enum ServerValidationPolicy {
+    /// Perform no validation and accept potentially invalid certificates.
+    ///
+    /// -warning: DO NOT USE THIS OPTION IN PRODUCTION.
+    case none
+
+    /// Uses the default server trust evaluation based on the system-wide CA store.
+    case system
+
+    /// Use a specific pinned certificate to validate the server identify.
+    ///
+    /// This will only connect to a server if one of the server certificates
+    /// matches the certificate stored at the given local path and that
+    /// certificate has a valid trust chain.
+    ///
+    /// The certificate can be stored in any format supported by
+    /// Security.framework, including but not limited to PEM and DER.
+    case pinCertificate(path: URL)
+}
+
+/**
  A `SyncConfiguration` represents configuration parameters for Realms intended to sync with
  a Realm Object Server.
  */
@@ -199,9 +228,18 @@ public struct SyncConfiguration {
     internal let stopPolicy: RLMSyncStopPolicy
 
     /**
+     How the SSL certificate of the Realm Object Server should be validated.
+     */
+    public let serverValidationPolicy: ServerValidationPolicy
+
+    /**
      Whether the SSL certificate of the Realm Object Server should be validated.
      */
-    public let enableSSLValidation: Bool
+    @available(*, deprecated, message: "Use serverValidationPolicy instead")
+    public var enableSSLValidation: Bool {
+        if case .none = serverValidationPolicy { return true }
+        return false
+    }
 
     /**
      Whether this Realm should be opened in 'partial synchronization' mode.
@@ -238,17 +276,34 @@ public struct SyncConfiguration {
         self.user = config.user
         self.realmURL = config.realmURL
         self.stopPolicy = config.stopPolicy
-        self.enableSSLValidation = config.enableSSLValidation
+        if let certificateURL = config.pinnedCertificateURL {
+            self.serverValidationPolicy = .pinCertificate(path: certificateURL)
+        } else {
+            self.serverValidationPolicy = config.enableSSLValidation ? .system : .none
+        }
         self.fullSynchronization = config.fullSynchronization
         self.urlPrefix = config.urlPrefix
     }
 
     func asConfig() -> RLMSyncConfiguration {
+        var validateSSL = true
+        var certificate: URL?
+        switch serverValidationPolicy {
+        case .none:
+            validateSSL = false
+            break
+        case .system:
+            break
+        case .pinCertificate(let path):
+            certificate = path
+            break
+        }
         return RLMSyncConfiguration(user: user, realmURL: realmURL,
                                     isPartial: !fullSynchronization,
                                     urlPrefix: urlPrefix,
                                     stopPolicy: stopPolicy,
-                                    enableSSLValidation: enableSSLValidation)
+                                    enableSSLValidation: validateSSL,
+                                    certificatePath: certificate)
     }
 
     /**
@@ -270,7 +325,7 @@ public struct SyncConfiguration {
         self.user = user
         self.realmURL = realmURL
         self.stopPolicy = .afterChangesUploaded
-        self.enableSSLValidation = enableSSLValidation
+        self.serverValidationPolicy = enableSSLValidation ? .system : .none
         self.fullSynchronization = !isPartial
         self.urlPrefix = urlPrefix
     }
@@ -518,6 +573,41 @@ extension SyncUser {
                                           fullSynchronization: fullSynchronization,
                                           enableSSLValidation: enableSSLValidation,
                                           urlPrefix: urlPrefix)
+        return ObjectiveCSupport.convert(object: config)
+    }
+
+    /**
+     Create a sync configuration instance.
+
+     Additional settings can be optionally specified. Descriptions of these
+     settings follow.
+
+     `serverValidationPolicy` defaults to `.system`. It can be set to
+     `.pinCertificate` to pin a specific SSL certificate, or `.none` for
+     debugging purposes.
+
+     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
+     `.realm`, `.realm.lock` or `.realm.management`.
+
+     - warning: NEVER disable SSL validation for a system running in production.
+     */
+    public func configuration(realmURL: URL? = nil, fullSynchronization: Bool = false,
+                              serverValidationPolicy: ServerValidationPolicy,
+                              urlPrefix: String? = nil) -> Realm.Configuration {
+        let config = self.__configuration(with: realmURL, fullSynchronization: fullSynchronization)
+        let syncConfig = config.syncConfiguration!
+        syncConfig.urlPrefix = urlPrefix
+        switch serverValidationPolicy {
+        case .none:
+            syncConfig.enableSSLValidation = false
+            break
+        case .system:
+            break
+        case .pinCertificate(let path):
+            syncConfig.pinnedCertificateURL = path
+            break
+        }
+        config.syncConfiguration = syncConfig
         return ObjectiveCSupport.convert(object: config)
     }
 }

@@ -56,6 +56,12 @@ server.start({
 
     address: '0.0.0.0',
     port: 9080,
+    httpsPort: 9443,
+
+    https: true,
+    httpsKeyPath: __dirname + '/certificates/localhost-cert-key.pem',
+    httpsCertChainPath: __dirname + '/certificates/localhost-cert.pem',
+
     dataPath: process.argv[2],
     authProviders: [
         new ROS.auth.DebugAuthProvider(),
