@@ -222,9 +222,14 @@ static std::atomic<NSTimeInterval> g_defaultTimeout{60.0};
         certPath = [NSURL fileURLWithPath:(id)certPath];
     }
 
+
     // Reject the server auth and report an error if any errors occur along the way
+    CFArrayRef items = nil;
     NSError *error;
     auto reportStatus = realm::util::make_scope_exit([&]() noexcept {
+        if (items) {
+            CFRelease(items);
+        }
         if (error) {
             _completionBlock(error, nil);
             // Don't also report errors about the connection itself failing later
@@ -239,7 +244,14 @@ static std::atomic<NSTimeInterval> g_defaultTimeout{60.0};
     }
 
     // Load our pinned certificate and add it to the anchor set
-    CFArrayRef items;
+#if TARGET_OS_IPHONE
+    id certificate = (__bridge_transfer id)SecCertificateCreateWithData(NULL, (__bridge CFDataRef)data);
+    if (!certificate) {
+        error = [NSError errorWithDomain:NSOSStatusErrorDomain code:errSecInvalidCertificateRef userInfo:nil];
+        return;
+    }
+    items = (CFArrayRef)CFBridgingRetain(@[certificate]);
+#else
     SecItemImportExportKeyParameters params{
         .version = SEC_KEY_IMPORT_EXPORT_PARAMS_VERSION
     };
@@ -248,6 +260,7 @@ static std::atomic<NSTimeInterval> g_defaultTimeout{60.0};
         error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
         return;
     }
+#endif
     SecTrustRef serverTrust = protectionSpace.serverTrust;
     if (OSStatus status = SecTrustSetAnchorCertificates(serverTrust, items)) {
         error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];

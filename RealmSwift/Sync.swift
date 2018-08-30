@@ -200,8 +200,10 @@ public enum ServerValidationPolicy {
     /// matches the certificate stored at the given local path and that
     /// certificate has a valid trust chain.
     ///
-    /// The certificate can be stored in any format supported by
-    /// Security.framework, including but not limited to PEM and DER.
+    /// On macOS, the certificate files may be in any of the formats supported
+    /// by SecItemImport(), including PEM and .cer (see SecExternalFormat for a
+    /// complete list of possible formats). On iOS and other platforms, only
+    /// DER .cer files are supported.
     case pinCertificate(path: URL)
 }
 

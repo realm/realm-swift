@@ -48,9 +48,9 @@ NS_ASSUME_NONNULL_BEGIN
  attacks, and can also be used to trust a self-signed certificate which would
  otherwise be untrusted.
 
- The file is loaded by Security.framework, and may be in any of the formats
- supported by SecItemImport. See SecExternalFormat for a complete list of
- possible formats.
+ On macOS, the file may be in any of the formats supported by SecItemImport(),
+ including PEM and .cer (see SecExternalFormat for a complete list of possible
+ formats). On iOS and other platforms, only DER .cer files are supported.
  */
 @property (nonatomic, nullable) NSURL *pinnedCertificateURL;
 

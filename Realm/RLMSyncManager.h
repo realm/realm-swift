@@ -113,9 +113,10 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
  of man-in-the-middle (MITM) attacks, and can also be used to trust a self-signed
  certificate which would otherwise be untrusted.
 
- The certificate files are loaded by Security.framework, and may be in any of
- the formats supported by SecItemImport, including but not limited to PEM and
- DER. See SecExternalFormat for a complete list of possible formats.
+ On macOS, the certificate files may be in any of the formats supported by
+ SecItemImport(), including PEM and .cer (see SecExternalFormat for a complete
+ list of possible formats). On iOS and other platforms, only DER .cer files are
+ supported.
 
  For example, to pin example.com to a .cer file included in your bundle:
 
