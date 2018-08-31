@@ -293,12 +293,10 @@ public struct SyncConfiguration {
         switch serverValidationPolicy {
         case .none:
             validateSSL = false
-            break
         case .system:
             break
         case .pinCertificate(let path):
             certificate = path
-            break
         }
         return RLMSyncConfiguration(user: user, realmURL: realmURL,
                                     isPartial: !fullSynchronization,
@@ -602,12 +600,10 @@ extension SyncUser {
         switch serverValidationPolicy {
         case .none:
             syncConfig.enableSSLValidation = false
-            break
         case .system:
             break
         case .pinCertificate(let path):
             syncConfig.pinnedCertificateURL = path
-            break
         }
         config.syncConfiguration = syncConfig
         return ObjectiveCSupport.convert(object: config)

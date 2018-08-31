@@ -520,7 +520,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             ex.fulfill()
         }
 
-        let _ = try! Realm(configuration: config)
+        _ = try! Realm(configuration: config)
         self.waitForExpectations(timeout: 4.0)
     }
 
@@ -567,7 +567,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             ex.fulfill()
         }
 
-        let _ = try! Realm(configuration: config)
+        _ = try! Realm(configuration: config)
         self.waitForExpectations(timeout: 4.0)
     }
 }
