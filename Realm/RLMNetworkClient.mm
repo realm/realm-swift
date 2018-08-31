@@ -247,7 +247,7 @@ static std::atomic<NSTimeInterval> g_defaultTimeout{60.0};
 #if TARGET_OS_IPHONE
     id certificate = (__bridge_transfer id)SecCertificateCreateWithData(NULL, (__bridge CFDataRef)data);
     if (!certificate) {
-        error = [NSError errorWithDomain:NSOSStatusErrorDomain code:errSecInvalidCertificateRef userInfo:nil];
+        error = [NSError errorWithDomain:NSOSStatusErrorDomain code:errSecUnknownFormat userInfo:nil];
         return;
     }
     items = (CFArrayRef)CFBridgingRetain(@[certificate]);

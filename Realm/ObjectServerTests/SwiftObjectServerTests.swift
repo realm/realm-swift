@@ -541,7 +541,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let certURL = URL(string: #file)!
             .deletingLastPathComponent()
             .appendingPathComponent("certificates")
-            .appendingPathComponent("localhost-cert.pem")
+            .appendingPathComponent("localhost.cer")
 
         let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
                                         serverValidationPolicy: .pinCertificate(path: certURL))
@@ -558,7 +558,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let certURL = URL(string: #file)!
             .deletingLastPathComponent()
             .appendingPathComponent("certificates")
-            .appendingPathComponent("localhost-other-cert.pem")
+            .appendingPathComponent("localhost-other.cer")
         let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
                                         serverValidationPolicy: .pinCertificate(path: certURL))
 

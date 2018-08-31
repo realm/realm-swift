@@ -1838,7 +1838,7 @@ static NSURL *certificateURL(NSString *filename) {
 }
 
 - (void)testHTTPSLoginFailsWithIncorrectCertificate {
-    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"localhost": certificateURL(@"not-localhost-cert.pem")};
+    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"localhost": certificateURL(@"not-localhost.cer")};
     [self attemptLoginWithUsername:NSStringFromSelector(_cmd) callback:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNil(user);
         XCTAssertNotNil(error);
@@ -1858,7 +1858,7 @@ static NSURL *certificateURL(NSString *filename) {
 }
 
 - (void)testHTTPSLoginFailsWithDifferentValidCert {
-    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"localhost": certificateURL(@"localhost-other-cert.pem")};
+    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"localhost": certificateURL(@"localhost-other.cer")};
     [self attemptLoginWithUsername:NSStringFromSelector(_cmd) callback:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNil(user);
         XCTAssertNotNil(error);
@@ -1878,7 +1878,7 @@ static NSURL *certificateURL(NSString *filename) {
 }
 
 - (void)testHTTPSLoginDoesNotUseCertificateForDifferentDomain {
-    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"example.com": certificateURL(@"localhost-cert.pem")};
+    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"example.com": certificateURL(@"localhost.cer")};
     [self attemptLoginWithUsername:NSStringFromSelector(_cmd) callback:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNil(user);
         XCTAssertNotNil(error);
@@ -1888,7 +1888,7 @@ static NSURL *certificateURL(NSString *filename) {
 }
 
 - (void)testHTTPSLoginSucceedsWithValidSelfSignedCertificate {
-    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"localhost": certificateURL(@"localhost-cert.pem")};
+    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"localhost": certificateURL(@"localhost.cer")};
 
     [self attemptLoginWithUsername:NSStringFromSelector(_cmd) callback:^(RLMSyncUser *user, NSError *error) {
         XCTAssertNotNil(user);
@@ -1897,7 +1897,7 @@ static NSURL *certificateURL(NSString *filename) {
 }
 
 - (void)testConfigurationFromUserAutomaticallyUsesCert {
-    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"localhost": certificateURL(@"localhost-cert.pem")};
+    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"localhost": certificateURL(@"localhost.cer")};
 
     __block RLMSyncUser *user;
     [self attemptLoginWithUsername:NSStringFromSelector(_cmd) callback:^(RLMSyncUser *u, NSError *error) {
@@ -1908,7 +1908,7 @@ static NSURL *certificateURL(NSString *filename) {
 
     RLMRealmConfiguration *config = [user configuration];
     XCTAssertEqualObjects(config.syncConfiguration.realmURL.scheme, @"realms");
-    XCTAssertEqualObjects(config.syncConfiguration.pinnedCertificateURL, certificateURL(@"localhost-cert.pem"));
+    XCTAssertEqualObjects(config.syncConfiguration.pinnedCertificateURL, certificateURL(@"localhost.cer"));
 
     // Verify that we can actually open the Realm
     auto realm = [self openRealmWithConfiguration:config];
@@ -1938,7 +1938,7 @@ static NSURL *certificateURL(NSString *filename) {
 }
 
 - (void)testConfigurationFromInsecureUserAutomaticallyUsesCert {
-    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"localhost": certificateURL(@"localhost-cert.pem")};
+    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"localhost": certificateURL(@"localhost.cer")};
 
     RLMSyncUser *user = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                                        register:YES]
@@ -1946,7 +1946,7 @@ static NSURL *certificateURL(NSString *filename) {
 
     RLMRealmConfiguration *config = [user configurationWithURL:[NSURL URLWithString:@"realms://localhost:9443/~/default"]];
     XCTAssertEqualObjects(config.syncConfiguration.realmURL.scheme, @"realms");
-    XCTAssertEqualObjects(config.syncConfiguration.pinnedCertificateURL, certificateURL(@"localhost-cert.pem"));
+    XCTAssertEqualObjects(config.syncConfiguration.pinnedCertificateURL, certificateURL(@"localhost.cer"));
 
     [self verifyOpenSucceeds:config];
 }
@@ -1959,7 +1959,7 @@ static NSURL *certificateURL(NSString *filename) {
 }
 
 - (void)testOpenSecureRealmWithIncorrectCert {
-    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"localhost": certificateURL(@"not-localhost-cert.pem")};
+    RLMSyncManager.sharedManager.pinnedCertificatePaths = @{@"localhost": certificateURL(@"not-localhost.cer")};
 
     RLMSyncUser *user = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                                        register:YES]
