@@ -103,9 +103,7 @@ using namespace realm;
 
 - (RLMSyncConfiguration *)configuration {
     if (auto session = _session.lock()) {
-        if (session->state() != SyncSession::PublicState::Error) {
-            return [[RLMSyncConfiguration alloc] initWithRawConfig:session->config()];
-        }
+        return [[RLMSyncConfiguration alloc] initWithRawConfig:session->config()];
     }
     return nil;
 }
@@ -121,9 +119,7 @@ using namespace realm;
 
 - (RLMSyncUser *)parentUser {
     if (auto session = _session.lock()) {
-        if (session->state() != SyncSession::PublicState::Error) {
-            return [[RLMSyncUser alloc] initWithSyncUser:session->user()];
-        }
+        return [[RLMSyncUser alloc] initWithSyncUser:session->user()];
     }
     return nil;
 }
@@ -133,18 +129,13 @@ using namespace realm;
         if (session->state() == SyncSession::PublicState::Inactive) {
             return RLMSyncSessionStateInactive;
         }
-        if (session->state() != SyncSession::PublicState::Error) {
-            return RLMSyncSessionStateActive;
-        }
+        return RLMSyncSessionStateActive;
     }
     return RLMSyncSessionStateInvalid;
 }
 
 - (BOOL)waitForUploadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback {
     if (auto session = _session.lock()) {
-        if (session->state() == SyncSession::PublicState::Error) {
-            return NO;
-        }
         queue = queue ?: dispatch_get_main_queue();
         session->wait_for_upload_completion([=](std::error_code err) {
             NSError *error = (err == std::error_code{}) ? nil : make_sync_error(err);
@@ -159,9 +150,6 @@ using namespace realm;
 
 - (BOOL)waitForDownloadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback {
     if (auto session = _session.lock()) {
-        if (session->state() == SyncSession::PublicState::Error) {
-            return NO;
-        }
         queue = queue ?: dispatch_get_main_queue();
         session->wait_for_download_completion([=](std::error_code err) {
             NSError *error = (err == std::error_code{}) ? nil : make_sync_error(err);
@@ -178,9 +166,6 @@ using namespace realm;
                                                                  mode:(RLMSyncProgressMode)mode
                                                                 block:(RLMProgressNotificationBlock)block {
     if (auto session = _session.lock()) {
-        if (session->state() == SyncSession::PublicState::Error) {
-            return nil;
-        }
         dispatch_queue_t queue = RLMSyncSession.notificationsQueue;
         auto notifier_direction = (direction == RLMSyncProgressDirectionUpload
                                    ? SyncSession::NotifierType::upload
