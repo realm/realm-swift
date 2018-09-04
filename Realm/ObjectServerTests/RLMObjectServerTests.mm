@@ -1602,6 +1602,7 @@
         [realm deleteAllObjects];
         [realm commitWriteTransaction];
         [self waitForUploadsForRealm:realm];
+        [self waitForDownloadsForRealm:realm];
 
         path = realm.configuration.pathOnDisk;
     }
