@@ -7,7 +7,9 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Enhancements
 
-* None.
+* Remove some old and no longer applicable migration logic which created an
+  unencrypted file in the sync metadata direction containing a list of ROS URLs
+  connected to.
 
 ### Bugfixes
 
