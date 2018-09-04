@@ -177,7 +177,7 @@ public typealias SyncLogLevel = RLMSyncLogLevel
 public typealias Provider = RLMIdentityProvider
 
 /**
- * How the SSL certificate for the Realm Object Server should be validated.
+ * How the Realm client should validate the identity of the server for secure connections.
  *
  * By default, when connecting to the Realm Object Server over HTTPS, Realm will
  * validate the server's HTTPS certificate using the system trust store and root
@@ -191,7 +191,8 @@ public enum ServerValidationPolicy {
     /// -warning: DO NOT USE THIS OPTION IN PRODUCTION.
     case none
 
-    /// Uses the default server trust evaluation based on the system-wide CA store.
+    /// Use the default server trust evaluation based on the system-wide CA
+    /// store. Any certificate signed by a trusted CA will be accepted.
     case system
 
     /// Use a specific pinned certificate to validate the server identify.
