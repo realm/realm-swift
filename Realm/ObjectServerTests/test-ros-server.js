@@ -1,6 +1,7 @@
 const ROS = require('realm-object-server');
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 
 // Bypass the mandatory email prompt.
 process.env.ROS_TOS_EMAIL_ADDRESS = 'ci@realm.io';
@@ -15,6 +16,16 @@ process.env.ROS_SUPERAGENT_RETRY_DELAY = '0';
 
 // Enable timestamps in the logs
 process.env.ROS_LOG_TIMESTAMP = '1';
+
+if (!process.env.SYNC_WORKER_FEATURE_TOKEN) {
+    try {
+        require(os.homedir() + '/.ros-feature-token.js');
+    }
+    catch (e) {
+        console.error('ROS feature token not found. Running Object Server tests requires setting the SYNC_WORKER_FEATURE_TOKEN environment variable.');
+        process.exit(1);
+    }
+}
 
 // A "email handler" which actually just writes the tokens to files that the
 // tests can read
