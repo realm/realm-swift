@@ -1,15 +1,14 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.8.0 Release notes (2018-09-05)
 =============================================================
-
-### Breaking Changes
-
-* None.
 
 ### Enhancements
 
 * Remove some old and no longer applicable migration logic which created an
-  unencrypted file in the sync metadata direction containing a list of ROS URLs
+  unencrypted file in the sync metadata directory containing a list of ROS URLs
   connected to.
+* Add support for pinning SSL certificates used for https and realms
+  connections by setting `RLMSyncManager.sharedManager.pinnedCertificatePaths`
+  in obj-c and `SyncManager.shared.pinnedCertificatePaths` in Swift.
 
 ### Bugfixes
 
@@ -862,8 +861,7 @@ Swift binaries are now produced for Swift 3.0, 3.0.1, 3.0.2, 3.1, 3.2 and 4.0.
 
 ### Enhancements
 
-* Add support for pinning SSL certificates used for https and realms
-  connections by setting `RLMSyncManager.sharedManager.pinnedCertificatePaths`.
+* None.
 
 ### Bugfixes
 
