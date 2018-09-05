@@ -42,7 +42,9 @@ public class ListBase: RLMListBase {
 /**
  `List` is the container type in Realm used to define to-many relationships.
 
- Like Swift's `Array`, `List` is a generic type that is parameterized on the type of `Object` it stores.
+ Like Swift's `Array`, `List` is a generic type that is parameterized on the type it stores. This can be either an `Object`
+ subclass or one of the following types: `Bool`, `Int`, `Int8`, `Int16`, `Int32`, `Int64`, `Float`, `Double`, `String`, `Data`,
+ and `Date` (and their optional versions)
 
  Unlike Swift's native collections, `List`s are reference types, and are only immutable if the Realm that manages them
  is opened as read-only.
