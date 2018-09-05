@@ -41,6 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (RLMSyncManager *)managerForCurrentTest;
 
 + (NSURL *)authServerURL;
++ (NSURL *)secureAuthServerURL;
 
 + (RLMSyncCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
 

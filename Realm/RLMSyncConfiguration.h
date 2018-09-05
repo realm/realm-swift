@@ -39,6 +39,20 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) NSURL *realmURL;
 
+/**
+ A local path to a file containing the trust anchors for SSL connections.
+
+ Only the certificates stored in the PEM file (or any certificates signed by it,
+ if the file contains a CA cert) will be accepted when initiating a connection
+ to a server. This prevents certain certain kinds of man-in-the-middle (MITM)
+ attacks, and can also be used to trust a self-signed certificate which would
+ otherwise be untrusted.
+
+ On macOS, the file may be in any of the formats supported by SecItemImport(),
+ including PEM and .cer (see SecExternalFormat for a complete list of possible
+ formats). On iOS and other platforms, only DER .cer files are supported.
+ */
+@property (nonatomic, nullable) NSURL *pinnedCertificateURL;
 
 /**
  Whether SSL certificate validation is enabled for the connection associated

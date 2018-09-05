@@ -23,6 +23,8 @@
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import <realm/util/scope_exit.hpp>
+
 typedef void(^RLMServerURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
 
 static NSUInteger const kHTTPCodeRange = 100;
@@ -183,83 +185,152 @@ static std::atomic<NSTimeInterval> g_defaultTimeout{60.0};
 }
 @end
 
+@interface RLMSessionDelegate <NSURLSessionDelegate> : NSObject
+@end
 
-@implementation RLMNetworkClient
-+ (void)setDefaultTimeout:(NSTimeInterval)timeOut {
-    g_defaultTimeout = timeOut;
+@implementation RLMSessionDelegate {
+    NSDictionary<NSString *, NSURL *> *_certificatePaths;
+    NSData *_data;
+    void (^_completionBlock)(NSError *, NSDictionary *);
 }
 
-+ (NSURLSession *)session {
-    return [NSURLSession sharedSession];
++ (instancetype)delegateWithCertificatePaths:(NSDictionary *)paths completion:(void (^)(NSError *, NSDictionary *))completion {
+    RLMSessionDelegate *delegate = [RLMSessionDelegate new];
+    delegate->_certificatePaths = paths;
+    delegate->_completionBlock = completion;
+    return delegate;
 }
 
-+ (void)sendRequestToEndpoint:(RLMSyncServerEndpoint *)endpoint
-                       server:(NSURL *)serverURL
-                         JSON:(NSDictionary *)jsonDictionary
-                      timeout:(NSTimeInterval)timeout
-                      options:(nullable RLMNetworkRequestOptions *)options
-                   completion:(RLMSyncCompletionBlock)completionBlock {
-    // Create the request
-    NSError *localError = nil;
-    NSURL *requestURL = [endpoint urlForAuthServer:serverURL payload:jsonDictionary];
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:requestURL];
-    request.HTTPBody = [endpoint httpBodyForPayload:jsonDictionary error:&localError];
-    if (localError) {
-        completionBlock(localError, nil);
+- (void)URLSession:(__unused NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+ completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
+    auto protectionSpace = challenge.protectionSpace;
+
+    // Just fall back to the default logic for HTTP basic auth
+    if (protectionSpace.authenticationMethod != NSURLAuthenticationMethodServerTrust || !protectionSpace.serverTrust) {
+        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
         return;
     }
-    request.HTTPMethod = [endpoint httpMethod];
-    request.timeoutInterval = MAX(timeout, 10);
-    NSDictionary<NSString *, NSString *> *headers = [endpoint httpHeadersForPayload:jsonDictionary options:options];
-    for (NSString *key in headers) {
-        [request addValue:headers[key] forHTTPHeaderField:key];
+
+    // If we have a pinned certificate for this hostname, we want to validate
+    // against that, and otherwise just do the default thing
+    auto certPath = _certificatePaths[protectionSpace.host];
+    if (!certPath) {
+        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+        return;
     }
-    RLMServerURLSessionCompletionBlock handler = ^(NSData *data,
-                                                   NSURLResponse *response,
-                                                   NSError *error) {
-        if (error != nil) {
-            // Network error
-            completionBlock(error, nil);
-            return;
-        }
+    if ([certPath isKindOfClass:[NSString class]]) {
+        certPath = [NSURL fileURLWithPath:(id)certPath];
+    }
 
-        NSError *localError = nil;
 
-        if (![self validateResponse:response data:data error:&localError]) {
-            // Response error
-            completionBlock(localError, nil);
-            return;
+    // Reject the server auth and report an error if any errors occur along the way
+    CFArrayRef items = nil;
+    NSError *error;
+    auto reportStatus = realm::util::make_scope_exit([&]() noexcept {
+        if (items) {
+            CFRelease(items);
         }
+        if (error) {
+            _completionBlock(error, nil);
+            // Don't also report errors about the connection itself failing later
+            _completionBlock = ^(NSError *, id) { };
+            completionHandler(NSURLSessionAuthChallengeRejectProtectionSpace, nil);
+        }
+    });
 
-        // Parse out the JSON
-        id json = [NSJSONSerialization JSONObjectWithData:data
-                                                  options:(NSJSONReadingOptions)0
-                                                    error:&localError];
-        if (!json || localError) {
-            // JSON parsing error
-            completionBlock(localError, nil);
-        } else if (![json isKindOfClass:[NSDictionary class]]) {
-            // JSON response malformed
-            localError = make_auth_error_bad_response(json);
-            completionBlock(localError, nil);
-        } else {
-            // JSON parsed successfully
-            completionBlock(nil, (NSDictionary *)json);
-        }
+    NSData *data = [NSData dataWithContentsOfURL:certPath options:0 error:&error];
+    if (!data) {
+        return;
+    }
+
+    // Load our pinned certificate and add it to the anchor set
+#if TARGET_OS_IPHONE
+    id certificate = (__bridge_transfer id)SecCertificateCreateWithData(NULL, (__bridge CFDataRef)data);
+    if (!certificate) {
+        error = [NSError errorWithDomain:NSOSStatusErrorDomain code:errSecUnknownFormat userInfo:nil];
+        return;
+    }
+    items = (CFArrayRef)CFBridgingRetain(@[certificate]);
+#else
+    SecItemImportExportKeyParameters params{
+        .version = SEC_KEY_IMPORT_EXPORT_PARAMS_VERSION
     };
+    if (OSStatus status = SecItemImport((__bridge CFDataRef)data, (__bridge CFStringRef)certPath.absoluteString,
+                                        nullptr, nullptr, 0, &params, nullptr, &items)) {
+        error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+        return;
+    }
+#endif
+    SecTrustRef serverTrust = protectionSpace.serverTrust;
+    if (OSStatus status = SecTrustSetAnchorCertificates(serverTrust, items)) {
+        error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+        return;
+    }
 
-    // Add the request to a task and start it
-    NSURLSessionTask *task = [self.session dataTaskWithRequest:request
-                                             completionHandler:handler];
-    [task resume];
+    // Only use our certificate and not the ones from the default CA roots
+    if (OSStatus status = SecTrustSetAnchorCertificatesOnly(serverTrust, true)) {
+        error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+        return;
+    }
+
+    // Verify that our pinned certificate is valid for this connection
+    SecTrustResultType trustResult;
+    if (OSStatus status = SecTrustEvaluate(serverTrust, &trustResult)) {
+        error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
+        return;
+    }
+    if (trustResult != kSecTrustResultProceed && trustResult != kSecTrustResultUnspecified) {
+        completionHandler(NSURLSessionAuthChallengeRejectProtectionSpace, nil);
+        return;
+    }
+
+    completionHandler(NSURLSessionAuthChallengeUseCredential,
+                      [NSURLCredential credentialForTrust:protectionSpace.serverTrust]);
 }
 
-+ (BOOL)validateResponse:(NSURLResponse *)response data:(NSData *)data error:(NSError * __autoreleasing *)error {
-    __autoreleasing NSError *localError = nil;
-    if (!error) {
-        error = &localError;
+- (void)URLSession:(__unused NSURLSession *)session
+          dataTask:(__unused NSURLSessionDataTask *)dataTask
+    didReceiveData:(NSData *)data {
+    if (!_data) {
+        _data = data;
+        return;
+    }
+    if (![_data respondsToSelector:@selector(appendData:)]) {
+        _data = [_data mutableCopy];
+    }
+    [(id)_data appendData:data];
+}
+
+- (void)URLSession:(__unused NSURLSession *)session
+              task:(NSURLSessionTask *)task
+didCompleteWithError:(NSError *)error
+{
+    if (error) {
+        _completionBlock(error, nil);
+        return;
     }
 
+    if (![self validateResponse:task.response data:_data error:&error]) {
+        _completionBlock(error, nil);
+        return;
+    }
+
+    id json = [NSJSONSerialization JSONObjectWithData:_data
+                                              options:(NSJSONReadingOptions)0
+                                                error:&error];
+    if (!json) {
+        _completionBlock(error, nil);
+        return;
+    }
+    if (![json isKindOfClass:[NSDictionary class]]) {
+        _completionBlock(make_auth_error_bad_response(json), nil);
+        return;
+    }
+
+    _completionBlock(nil, (NSDictionary *)json);
+}
+
+- (BOOL)validateResponse:(NSURLResponse *)response data:(NSData *)data error:(NSError * __autoreleasing *)error {
     if (![response isKindOfClass:[NSHTTPURLResponse class]]) {
         // FIXME: Provide error message
         *error = make_auth_error_bad_response();
@@ -306,7 +377,7 @@ static std::atomic<NSTimeInterval> g_defaultTimeout{60.0};
     return YES;
 }
 
-+ (RLMSyncErrorResponseModel *)responseModelFromData:(NSData *)data {
+- (RLMSyncErrorResponseModel *)responseModelFromData:(NSData *)data {
     if (data.length == 0) {
         return nil;
     }
@@ -319,6 +390,42 @@ static std::atomic<NSTimeInterval> g_defaultTimeout{60.0};
     return [[RLMSyncErrorResponseModel alloc] initWithDictionary:json];
 }
 
+@end
+
+@implementation RLMNetworkClient
++ (void)setDefaultTimeout:(NSTimeInterval)timeOut {
+    g_defaultTimeout = timeOut;
+}
+
++ (void)sendRequestToEndpoint:(RLMSyncServerEndpoint *)endpoint
+                       server:(NSURL *)serverURL
+                         JSON:(NSDictionary *)jsonDictionary
+                      timeout:(NSTimeInterval)timeout
+                      options:(nullable RLMNetworkRequestOptions *)options
+                   completion:(RLMSyncCompletionBlock)completionBlock {
+    // Create the request
+    NSError *localError = nil;
+    NSURL *requestURL = [endpoint urlForAuthServer:serverURL payload:jsonDictionary];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:requestURL];
+    request.HTTPBody = [endpoint httpBodyForPayload:jsonDictionary error:&localError];
+    if (localError) {
+        completionBlock(localError, nil);
+        return;
+    }
+    request.HTTPMethod = [endpoint httpMethod];
+    request.timeoutInterval = MAX(timeout, 10);
+    NSDictionary<NSString *, NSString *> *headers = [endpoint httpHeadersForPayload:jsonDictionary options:options];
+    for (NSString *key in headers) {
+        [request addValue:headers[key] forHTTPHeaderField:key];
+    }
+    id delegate = [RLMSessionDelegate delegateWithCertificatePaths:options.pinnedCertificatePaths
+                                                        completion:completionBlock];
+    auto session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration
+                                                 delegate:delegate delegateQueue:nil];
+
+    // Add the request to a task and start it
+    [[session dataTaskWithRequest:request] resume];
+}
 @end
 
 @implementation RLMNetworkRequestOptions

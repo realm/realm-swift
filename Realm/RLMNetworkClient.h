@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMNetworkRequestOptions : NSObject
 @property (nonatomic, copy, nullable) NSString *authorizationHeaderName;
 @property (nonatomic, copy, nullable) NSDictionary<NSString *, NSString *> *customHeaders;
+@property (nullable, nonatomic, copy) NSDictionary<NSString *, NSURL *> *pinnedCertificatePaths;
 @end
 
 /// An abstract class representing a server endpoint.
