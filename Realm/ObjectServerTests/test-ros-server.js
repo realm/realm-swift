@@ -1,7 +1,8 @@
 const ROS = require('realm-object-server');
 const fs = require('fs');
-const path = require('path');
+const https = require('https');
 const os = require('os');
+const path = require('path');
 
 // Bypass the mandatory email prompt.
 process.env.ROS_TOS_EMAIL_ADDRESS = 'ci@realm.io';
@@ -16,6 +17,10 @@ process.env.ROS_SUPERAGENT_RETRY_DELAY = '0';
 
 // Enable timestamps in the logs
 process.env.ROS_LOG_TIMESTAMP = '1';
+
+// Accept invalid TLS certificates so that the ROS services can talk to each
+// other despite using a self-signed certificate
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 if (!process.env.SYNC_WORKER_FEATURE_TOKEN) {
     try {
@@ -71,6 +76,7 @@ server.start({
         }),
     ],
     autoKeyGen: true,
+    serviceAgent: new https.Agent({rejectUnauthorized: false})
 }).then(() => {
     console.log('started');
     fs.closeSync(1);
