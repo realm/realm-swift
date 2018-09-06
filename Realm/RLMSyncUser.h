@@ -97,6 +97,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, readonly) NSString *identity;
 
 /**
+ The user's refresh token used to access the Realm Object Server.
+
+ This is required to make HTTP requests to Realm Object Server's REST API
+ for functionality not exposed natively. It should be treated as sensitive data.
+ */
+@property (nullable, nonatomic, readonly) NSString *refreshToken;
+
+/**
  The URL of the authentication server this user will communicate with.
  */
 @property (nullable, nonatomic, readonly) NSURL *authenticationServer;
