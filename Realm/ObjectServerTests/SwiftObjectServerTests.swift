@@ -106,7 +106,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         func wait(forState desiredState: SyncSession.ConnectionState) {
             let ex = expectation(description: "Wait for connection state: \(desiredState)")
-            let token = session.observe(\.connectionState, options: .initial) { state in
+            let token = session.observe(\.connectionState, options: .initial) { _ in
                 if session.connectionState == desiredState {
                     ex.fulfill()
                 }
