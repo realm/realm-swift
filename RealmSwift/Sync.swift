@@ -629,6 +629,20 @@ public typealias SyncAccessLevel = RLMSyncAccessLevel
 
 public extension SyncSession {
     /**
+     The current state of the session represented by a session object.
+
+     - see: `RLMSyncSessionState`
+     */
+    public typealias State = RLMSyncSessionState
+
+    /**
+     The current state of a sync session's connection.
+
+     - see: `RLMSyncConnectionState`
+     */
+    public typealias ConnectionState = RLMSyncConnectionState
+
+    /**
      The transfer direction (upload or download) tracked by a given progress notification block.
 
      Progress notification blocks can be registered on sessions if your app wishes to be informed
