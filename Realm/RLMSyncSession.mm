@@ -149,6 +149,18 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
     return RLMSyncSessionStateInvalid;
 }
 
+- (void)suspend {
+    if (auto session = _session.lock()) {
+        session->log_out();
+    }
+}
+
+- (void)resume {
+    if (auto session = _session.lock()) {
+        session->revive_if_needed();
+    }
+}
+
 - (BOOL)waitForUploadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback {
     if (auto session = _session.lock()) {
         queue = queue ?: dispatch_get_main_queue();

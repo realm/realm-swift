@@ -98,6 +98,34 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+#if swift(>=3.2)
+    func testConnectionState() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials(register: true), server: authURL)
+        let realm = try! synchronouslyOpenRealm(url: realmURL, user: user)
+        let session = realm.syncSession!
+
+        func wait(forState desiredState: SyncSession.ConnectionState) {
+            let ex = expectation(description: "Wait for connection state: \(desiredState)")
+            let token = session.observe(\.connectionState, options: .initial) { state in
+                if session.connectionState == desiredState {
+                    ex.fulfill()
+                }
+            }
+            waitForExpectations(timeout: 2.0)
+            token.invalidate()
+        }
+
+        wait(forState: .connected)
+
+        session.suspend()
+        wait(forState: .disconnected)
+
+        session.resume()
+        wait(forState: .connecting)
+        wait(forState: .connected)
+    }
+#endif // Swift >= 3.2
+
     // MARK: - Client reset
 
     func testClientReset() {
