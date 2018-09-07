@@ -119,7 +119,7 @@ typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
  client which match the query, along with all objects which are reachable
  from those objects via links. This happens asynchronously, and the local
  client Realm may not immediately have all objects which match the query.
- Observer the `state` property of the returned subscription object to be
+ Observe the `state` property of the returned subscription object to be
  notified of when the subscription has been processed by the server and
  all objects matching the query are available.
 
@@ -138,7 +138,7 @@ typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
  client which match the query, along with all objects which are reachable
  from those objects via links. This happens asynchronously, and the local
  client Realm may not immediately have all objects which match the query.
- Observer the `state` property of the returned subscription object to be
+ Observe the `state` property of the returned subscription object to be
  notified of when the subscription has been processed by the server and
  all objects matching the query are available.
 
@@ -163,7 +163,7 @@ typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
  client which match the query, along with all objects which are reachable
  from those objects via links. This happens asynchronously, and the local
  client Realm may not immediately have all objects which match the query.
- Observer the `state` property of the returned subscription object to be
+ Observe the `state` property of the returned subscription object to be
  notified of when the subscription has been processed by the server and
  all objects matching the query are available.
 
@@ -178,7 +178,9 @@ typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
  if any. Please note that the limit does not count or apply to objects
  which are added indirectly due to being linked to by the objects in the
  subscription. If the limit is larger than the number of objects which
- match the query, all objects will be included.
+ match the query, all objects will be included. Limiting a subscription
+ requires ROS 3.10.1 or newer, and will fail with an invalid predicate
+ error with older versions.
 
  @param subscriptionName The name of the subscription
  @param limit The maximum number of objects to include in the subscription.

@@ -922,7 +922,7 @@ public class SyncSubscription<Type: RealmCollectionValue> {
     /// When the state of the subscription changes, `block` will be invoked and
     /// passed the new state.
     ///
-    /// The token returns from this function does not hold a strong reference to
+    /// The token returned from this function does not hold a strong reference to
     /// this subscription object. This means that you must hold a reference to
     /// the subscription object itself along with the returned token in order to
     /// actually receive updates about the state.
@@ -959,7 +959,7 @@ extension Results {
     /// client which match the query, along with all objects which are reachable
     /// from those objects via links. This happens asynchronously, and the local
     /// client Realm may not immediately have all objects which match the query.
-    /// Observer the `state` property of the returned subscription object to be
+    /// Observe the `state` property of the returned subscription object to be
     /// notified of when the subscription has been processed by the server and
     /// all objects matching the query are available.
     ///
@@ -974,7 +974,9 @@ extension Results {
     /// if any. Please note that the limit does not count or apply to objects
     /// which are added indirectly due to being linked to by the objects in the
     /// subscription. If the limit is larger than the number of objects which
-    /// match the query, all objects will be included.
+    /// match the query, all objects will be included. Limiting a subscription
+    /// requires ROS 3.10.1 or newer, and will fail with an invalid predicate
+    /// error with older versions.
     ///
     /// - parameter subscriptionName: An optional name for the subscription.
     /// - parameter limit: The maximum number of objects to include in the subscription.
