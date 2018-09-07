@@ -339,7 +339,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
         return;
     }
     [RLMSyncChangePasswordEndpoint sendRequestToServer:self.authenticationServer
-                                       JSON:@{kRLMSyncTokenKey: self._refreshToken,
+                                       JSON:@{kRLMSyncTokenKey: self.refreshToken,
                                               kRLMSyncUserIDKey: userID,
                                               kRLMSyncDataKey: @{kRLMSyncNewPasswordKey: newPassword}}
                                     options:[[RLMSyncManager sharedManager] networkRequestOptions]
@@ -397,7 +397,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                        JSON:@{
                                               kRLMSyncProviderKey: provider,
                                               kRLMSyncProviderIDKey: providerUserIdentity,
-                                              kRLMSyncTokenKey: self._refreshToken
+                                              kRLMSyncTokenKey: self.refreshToken
                                               }
                                     timeout:60
                                     options:[[RLMSyncManager sharedManager] networkRequestOptions]
@@ -534,7 +534,7 @@ static void verifyInRunLoop() {
     });
 }
 
-- (NSString *)_refreshToken {
+- (NSString *)refreshToken {
     if (!_user) {
         return nil;
     }

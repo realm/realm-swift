@@ -1,3 +1,19 @@
+x.x.x Release notes (yyyy-MM-dd)
+=============================================================
+
+### Breaking Changes
+
+* None.
+
+### Enhancements
+
+* Expose RLMSyncUser.refreshToken publicly so that it can be used for custom
+  HTTP requests to Realm Object Server.
+
+### Bugfixes
+
+* None.
+
 3.8.0 Release notes (2018-09-05)
 =============================================================
 
