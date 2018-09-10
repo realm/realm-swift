@@ -1986,7 +1986,7 @@ static NSURL *certificateURL(NSString *filename) {
         [expectation fulfill];
     };
 
-    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
 }
 
 - (void)testConfigurationFromInsecureUserAutomaticallyUsesCert {
