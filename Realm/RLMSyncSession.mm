@@ -80,6 +80,7 @@ using namespace realm;
 
 @interface RLMSyncSession ()
 @property (class, nonatomic, readonly) dispatch_queue_t notificationsQueue;
+@property (atomic, readwrite) RLMSyncConnectionState connectionState;
 @end
 
 @implementation RLMSyncSession
@@ -93,9 +94,23 @@ using namespace realm;
     return queue;
 }
 
-- (instancetype)initWithSyncSession:(std::shared_ptr<SyncSession>)session {
+static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionState state) {
+    switch (state) {
+        case SyncSession::ConnectionState::Disconnected: return RLMSyncConnectionStateDisconnected;
+        case SyncSession::ConnectionState::Connecting:   return RLMSyncConnectionStateConnecting;
+        case SyncSession::ConnectionState::Connected:    return RLMSyncConnectionStateConnected;
+    }
+}
+
+- (instancetype)initWithSyncSession:(std::shared_ptr<SyncSession> const&)session {
     if (self = [super init]) {
         _session = session;
+        _connectionState = convertConnectionState(session->connection_state());
+        // No need to save the token as RLMSyncSession always outlives the
+        // underlying SyncSession
+        session->register_connection_change_callback([=](auto, auto newState) {
+            self.connectionState = convertConnectionState(newState);
+        });
         return self;
     }
     return nil;
@@ -132,6 +147,18 @@ using namespace realm;
         return RLMSyncSessionStateActive;
     }
     return RLMSyncSessionStateInvalid;
+}
+
+- (void)suspend {
+    if (auto session = _session.lock()) {
+        session->log_out();
+    }
+}
+
+- (void)resume {
+    if (auto session = _session.lock()) {
+        session->revive_if_needed();
+    }
 }
 
 - (BOOL)waitForUploadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback {

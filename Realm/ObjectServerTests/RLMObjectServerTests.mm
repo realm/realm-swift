@@ -1256,6 +1256,58 @@
     }
 }
 
+#pragma mark - Session suspend and resume
+
+- (void)testSuspendAndResume {
+    NSURL *urlA = CUSTOM_REALM_URL(@"a");
+    NSURL *urlB = CUSTOM_REALM_URL(@"b");
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                                            register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+    RLMRealm *realmA = [self openRealmForURL:urlA user:user];
+    RLMRealm *realmB = [self openRealmForURL:urlB user:user];
+    if (self.isParent) {
+        [self waitForDownloadsForRealm:realmA];
+        [self waitForDownloadsForRealm:realmB];
+        CHECK_COUNT(0, SyncObject, realmA);
+        CHECK_COUNT(0, SyncObject, realmB);
+
+        // Suspend the session for realm A and then add an object to each Realm
+        RLMSyncSession *sessionA = [RLMSyncSession sessionForRealm:realmA];
+        [sessionA suspend];
+
+        [self addSyncObjectsToRealm:realmA descriptions:@[@"child-A1"]];
+        [self addSyncObjectsToRealm:realmB descriptions:@[@"child-B1"]];
+        [self waitForUploadsForRealm:realmB];
+
+        RLMRunChildAndWait();
+
+        // A should still be 1 since it's suspended. If it wasn't suspended, it
+        // should have downloaded before B due to the ordering in the child.
+        [self waitForDownloadsForRealm:realmB];
+        CHECK_COUNT(1, SyncObject, realmA);
+        CHECK_COUNT(3, SyncObject, realmB);
+
+        // A should see the other two from the child after resuming
+        [sessionA resume];
+        [self waitForDownloadsForRealm:realmA];
+        CHECK_COUNT(3, SyncObject, realmA);
+    } else {
+        // Child shouldn't see the object in A
+        [self waitForDownloadsForRealm:realmA];
+        [self waitForDownloadsForRealm:realmB];
+        CHECK_COUNT(0, SyncObject, realmA);
+        CHECK_COUNT(1, SyncObject, realmB);
+
+        [self addSyncObjectsToRealm:realmA descriptions:@[@"child-A2", @"child-A3"]];
+        [self waitForUploadsForRealm:realmA];
+        [self addSyncObjectsToRealm:realmB descriptions:@[@"child-B2", @"child-B3"]];
+        [self waitForUploadsForRealm:realmB];
+        CHECK_COUNT(2, SyncObject, realmA);
+        CHECK_COUNT(3, SyncObject, realmB);
+    }
+}
+
 #pragma mark - Client reset
 
 /// Ensure that a client reset error is propagated up to the binding successfully.

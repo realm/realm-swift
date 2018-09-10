@@ -9,6 +9,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 * Expose RLMSyncUser.refreshToken publicly so that it can be used for custom
   HTTP requests to Realm Object Server.
+* Add RLMSyncSession.connectionState, which reports whether the session is
+  currently connected to the Realm Object Server or if it is offline.
+* Add `-suspend` and `-resume` methods to `RLMSyncSession` to enable manually
+  pausing data synchronization.
 
 ### Bugfixes
 
