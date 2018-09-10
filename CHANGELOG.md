@@ -1,9 +1,5 @@
-x.x.x Release notes (yyyy-MM-dd)
+3.9.0 Release notes (2018-09-10)
 =============================================================
-
-### Breaking Changes
-
-* None.
 
 ### Enhancements
 
