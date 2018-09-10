@@ -919,7 +919,13 @@ public class SyncSubscription<Type: RealmCollectionValue> {
 
     /// Observe the subscription for state changes.
     ///
-    /// When the state of the subscription changes, `block` will be invoked and passed the new state.
+    /// When the state of the subscription changes, `block` will be invoked and
+    /// passed the new state.
+    ///
+    /// The token returned from this function does not hold a strong reference to
+    /// this subscription object. This means that you must hold a reference to
+    /// the subscription object itself along with the returned token in order to
+    /// actually receive updates about the state.
     ///
     /// - parameter keyPath: The path to observe. Must be `\.state`.
     /// - parameter options: Options for the observation. Only `NSKeyValueObservingOptions.initial` option is
@@ -949,19 +955,40 @@ public class SyncSubscription<Type: RealmCollectionValue> {
 extension Results {
     /// Subscribe to the query represented by this `Results`
     ///
-    /// The subscription will not have an explicit name.
+    /// Subscribing to a query asks the server to synchronize all objects to the
+    /// client which match the query, along with all objects which are reachable
+    /// from those objects via links. This happens asynchronously, and the local
+    /// client Realm may not immediately have all objects which match the query.
+    /// Observe the `state` property of the returned subscription object to be
+    /// notified of when the subscription has been processed by the server and
+    /// all objects matching the query are available.
     ///
+    /// Creating a new subscription with the same name and query as an existing
+    /// subscription will not create a new subscription, but instead will return
+    /// an object referring to the existing sync subscription. This means that
+    /// performing the same subscription twice followed by removing it once will
+    /// result in no subscription existing.
+    ///
+    /// The number of top-level matches may optionally be limited. This limit
+    /// respects the sort and distinct order of the query being subscribed to,
+    /// if any. Please note that the limit does not count or apply to objects
+    /// which are added indirectly due to being linked to by the objects in the
+    /// subscription. If the limit is larger than the number of objects which
+    /// match the query, all objects will be included. Limiting a subscription
+    /// requires ROS 3.10.1 or newer, and will fail with an invalid predicate
+    /// error with older versions.
+    ///
+    /// - parameter subscriptionName: An optional name for the subscription.
+    /// - parameter limit: The maximum number of objects to include in the subscription.
     /// - returns: The subscription.
-    public func subscribe() -> SyncSubscription<Element> {
+    public func subscribe(named subscriptionName: String? = nil, limit: Int? = nil) -> SyncSubscription<Element> {
+        if let limit = limit {
+            return SyncSubscription(rlmResults.subscribe(withName: subscriptionName, limit: UInt(limit)))
+        }
+        if let name = subscriptionName {
+            return SyncSubscription(rlmResults.subscribe(withName: name))
+        }
         return SyncSubscription(rlmResults.subscribe())
-    }
-
-    /// Subscribe to the query represented by this `Results`
-    ///
-    /// - parameter subscriptionName: The name of the subscription.
-    /// - returns: The subscription.
-    public func subscribe(named subscriptionName: String) -> SyncSubscription<Element> {
-        return SyncSubscription(rlmResults.subscribe(withName: subscriptionName))
     }
 }
 

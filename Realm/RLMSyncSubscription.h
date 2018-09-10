@@ -115,6 +115,14 @@ typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
 /**
  Subscribe to the query represented by this `RLMResults`.
 
+ Subscribing to a query asks the server to synchronize all objects to the
+ client which match the query, along with all objects which are reachable
+ from those objects via links. This happens asynchronously, and the local
+ client Realm may not immediately have all objects which match the query.
+ Observe the `state` property of the returned subscription object to be
+ notified of when the subscription has been processed by the server and
+ all objects matching the query are available.
+
  The subscription will not be explicitly named.
 
  @return The subscription
@@ -126,13 +134,62 @@ typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
 /**
  Subscribe to the query represented by this `RLMResults`.
 
+ Subscribing to a query asks the server to synchronize all objects to the
+ client which match the query, along with all objects which are reachable
+ from those objects via links. This happens asynchronously, and the local
+ client Realm may not immediately have all objects which match the query.
+ Observe the `state` property of the returned subscription object to be
+ notified of when the subscription has been processed by the server and
+ all objects matching the query are available.
+
+ Creating a new subscription with the same name and query as an existing
+ subscription will not create a new subscription, but instead will return
+ an object referring to the existing sync subscription. This means that
+ performing the same subscription twice followed by removing it once will
+ result in no subscription existing.
+
  @param subscriptionName The name of the subscription
 
  @return The subscription
 
  @see RLMSyncSubscription
 */
-- (RLMSyncSubscription *)subscribeWithName:(NSString *)subscriptionName;
+- (RLMSyncSubscription *)subscribeWithName:(nullable NSString *)subscriptionName;
+
+/**
+ Subscribe to a subset of the query represented by this `RLMResults`.
+
+ Subscribing to a query asks the server to synchronize all objects to the
+ client which match the query, along with all objects which are reachable
+ from those objects via links. This happens asynchronously, and the local
+ client Realm may not immediately have all objects which match the query.
+ Observe the `state` property of the returned subscription object to be
+ notified of when the subscription has been processed by the server and
+ all objects matching the query are available.
+
+ Creating a new subscription with the same name and query as an existing
+ subscription will not create a new subscription, but instead will return
+ an object referring to the existing sync subscription. This means that
+ performing the same subscription twice followed by removing it once will
+ result in no subscription existing.
+
+ The number of top-level matches may optionally be limited. This limit
+ respects the sort and distinct order of the query being subscribed to,
+ if any. Please note that the limit does not count or apply to objects
+ which are added indirectly due to being linked to by the objects in the
+ subscription. If the limit is larger than the number of objects which
+ match the query, all objects will be included. Limiting a subscription
+ requires ROS 3.10.1 or newer, and will fail with an invalid predicate
+ error with older versions.
+
+ @param subscriptionName The name of the subscription
+ @param limit The maximum number of objects to include in the subscription.
+
+ @return The subscription
+
+ @see RLMSyncSubscription
+ */
+- (RLMSyncSubscription *)subscribeWithName:(nullable NSString *)subscriptionName limit:(NSUInteger)limit;
 @end
 
 NS_ASSUME_NONNULL_END
