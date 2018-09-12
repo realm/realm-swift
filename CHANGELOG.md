@@ -1,6 +1,11 @@
 x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
+Prebuilt binaries are now built for Xcode 9.2, 9.3, 9.4 and 10.0.
+
+Older versions of Xcode are still supported when building from source, but you
+should be migrating to at least Xcode 9.2 as soon as possible.
+
 ### Breaking Changes
 
 * None.
