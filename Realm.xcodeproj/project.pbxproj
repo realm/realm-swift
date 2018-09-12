@@ -1900,7 +1900,7 @@
 					};
 					5D660FCB1BE98C560021E04F = {
 						CreatedOnToolsVersion = 7.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
 					5D660FD71BE98C7C0021E04F = {
@@ -1916,6 +1916,9 @@
 					C04B4BD71B55C47600FAE58E = {
 						CreatedOnToolsVersion = 6.4;
 						LastSwiftMigration = 0900;
+					};
+					E8267FB11D90B79000E001C7 = {
+						LastSwiftMigration = 1000;
 					};
 					E83EAC791BED3D880085CCD2 = {
 						CreatedOnToolsVersion = 7.1;
