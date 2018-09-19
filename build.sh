@@ -148,7 +148,11 @@ build_combined() {
         destination="iPhone 6"
     elif [[ "$os" == "watchos"  ]]; then
         os_name="$os"
-        destination="Apple Watch - 42mm"
+        if (( $(xcode_version_major) >= 10 )); then
+            destination="Apple Watch Series 3 - 42mm"
+        else
+            destination="Apple Watch - 42mm"
+        fi
     elif [[ "$os" == "appletvos"  ]]; then
         os_name="tvos"
         if (( $(xcode_version_major) >= 9 )); then
@@ -185,6 +189,8 @@ build_combined() {
     LIPO_OUTPUT="$out_path/$product_name/$module_name"
     xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
 
+    # Verify that the combined library has bitcode and we didn't accidentally
+    # remove it somewhere along the line
     if [[ "$destination" != "" && "$config" == "Release" ]]; then
         sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
     fi
@@ -708,6 +714,8 @@ case "$COMMAND" in
           fi
         fi
 
+        # https://github.com/CocoaPods/CocoaPods/issues/7708
+        export EXPANDED_CODE_SIGN_IDENTITY=''
         cd examples/installation
         sh build.sh test-ios-objc-cocoapods
         sh build.sh test-ios-objc-cocoapods-dynamic
@@ -1047,7 +1055,7 @@ EOM
         else
             export sha=$GITHUB_PR_SOURCE_BRANCH
             export CONFIGURATION=$configuration
-            export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
+            export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO'
             sh build.sh prelaunch-simulator
 
             source $(brew --prefix nvm)/nvm.sh
@@ -1153,6 +1161,24 @@ EOM
         sh build.sh prelaunch-simulator
         sh build.sh watchos
 
+        # If we're building the obj-c library with an Xcode version older than
+        # 10, we need to also build the arm64_32 slice with Xcode 10 and lipo
+        # it in
+        if (( $(xcode_version_major) < 10 )); then
+            (
+                REALM_XCODE_VERSION=10.0
+                REALM_SWIFT_VERSION=
+                set_xcode_and_swift_versions
+                sh build.sh prelaunch-simulator
+                xc "-scheme Realm -configuration $CONFIGURATION -sdk watchos ARCHS='arm64_32'"
+                cp build/DerivedData/Realm/Build/Products/Release-watchos/Realm.framework/*.bcsymbolmap build/watchos/Realm.framework
+                xcrun lipo \
+                  -create build/watchos/Realm.framework/Realm build/DerivedData/Realm/Build/Products/Release-watchos/Realm.framework/Realm \
+                  -output build/watchos-tmp
+                mv build/watchos-tmp build/watchos/Realm.framework/Realm
+            )
+        fi
+
         cd build/watchos
         zip --symlinks -r realm-framework-watchos.zip Realm.framework
         ;;
@@ -1167,7 +1193,7 @@ EOM
 
     package-*-swift)
         PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        for version in 8.3.3 9.0 9.1 9.2 9.3; do
+        for version in 9.1 9.2 9.3 9.4 10.0; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1176,29 +1202,11 @@ EOM
         done
 
         cd build/$PLATFORM
-        ln -s swift-4.0 swift-3.2
-        ln -s swift-4.0.2 swift-3.2.2
-        ln -s swift-4.0.2 swift-3.2.3
-        ln -s swift-4.0.2 swift-4.0.3
+        ln -s swift-4.0.3 swift-3.2.3
         ln -s swift-4.1 swift-3.3
-        ln -s swift-4.1 swift-4.1.2
-        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-3.1 swift-3.2 swift-3.2.2 swift-3.2.3 swift-3.3 swift-4.0 swift-4.0.2 swift-4.0.3 swift-4.1 swift-4.1.2
-        ;;
-
-    package-*-swift-3.2)
-        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        mkdir -p build/$PLATFORM
-        cd build/$PLATFORM
-        ln -s swift-4.0 swift-3.2
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.2.zip swift-3.2
-        ;;
-
-    package-*-swift-3.2.2)
-        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        mkdir -p build/$PLATFORM
-        cd build/$PLATFORM
-        ln -s swift-4.0.2 swift-3.2.2
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.2.2.zip swift-3.2.2
+        ln -s swift-4.1.2 swift-3.3.2
+        ln -s swift-4.2 swift-3.4
+        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-3.2.3 swift-3.3 swift-3.3.2 swift-3.4 swift-4.0.3 swift-4.1 swift-4.1.2 swift-4.2
         ;;
 
     package-*-swift-3.2.3)
@@ -1217,20 +1225,20 @@ EOM
         zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.3.zip swift-3.3
         ;;
 
-    package-*-swift-4.0.3)
+    package-*-swift-3.3.2)
         PLATFORM=$(echo $COMMAND | cut -d - -f 2)
         mkdir -p build/$PLATFORM
         cd build/$PLATFORM
-        ln -s swift-4.0.2 swift-4.0.3
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-4.0.3.zip swift-4.0.3
+        ln -s swift-4.1.2 swift-3.3.2
+        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.3.2.zip swift-3.3.2
         ;;
 
-    package-*-swift-4.1.2)
+    package-*-swift-3.4)
         PLATFORM=$(echo $COMMAND | cut -d - -f 2)
         mkdir -p build/$PLATFORM
         cd build/$PLATFORM
-        ln -s swift-4.1 swift-4.1.2
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-4.1.2.zip swift-4.1.2
+        ln -s swift-4.2 swift-3.4
+        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.4.zip swift-3.4
         ;;
 
     package-*-swift-*)

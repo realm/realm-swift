@@ -209,6 +209,7 @@
 		3F9801B11C90FD31000A8B07 /* results_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F9801AE1C90FD2D000A8B07 /* results_notifier.cpp */; };
 		3F9863BB1D36876B00641C98 /* RLMClassInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F9863B91D36876B00641C98 /* RLMClassInfo.mm */; };
 		3F9863BC1D36876B00641C98 /* RLMClassInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F9863B91D36876B00641C98 /* RLMClassInfo.mm */; };
+		3F9D91822152D42F00474F09 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8839B2D19E31FD90047B1A8 /* main.m */; };
 		3FAB08481E1EC382001BC8DA /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAB08441E1EC382001BC8DA /* object.cpp */; };
 		3FAB08491E1EC385001BC8DA /* object.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAB08441E1EC382001BC8DA /* object.cpp */; };
 		3FAB084A1E1EC3A2001BC8DA /* sync_client.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1A15366C1DB0464800C0EC93 /* sync_client.hpp */; };
@@ -471,6 +472,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
 			remoteInfo = "Prepare Generated Files";
+		};
+		3F9D917E2152D41A00474F09 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3F1A5E711992EB7400F45F4C;
+			remoteInfo = TestHost;
+		};
+		3F9D91892152D47B00474F09 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3F9D91802152D42F00474F09;
+			remoteInfo = "TestHost static";
 		};
 		3FC8BF34212B79F4001C2025 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -760,6 +775,8 @@
 		3F9801AE1C90FD2D000A8B07 /* results_notifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = results_notifier.cpp; sourceTree = "<group>"; };
 		3F9863B91D36876B00641C98 /* RLMClassInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMClassInfo.mm; sourceTree = "<group>"; };
 		3F9863BA1D36876B00641C98 /* RLMClassInfo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMClassInfo.hpp; sourceTree = "<group>"; };
+		3F9D91872152D42F00474F09 /* TestHost static.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TestHost static.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3F9D91882152D42F00474F09 /* TestHost copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "TestHost copy-Info.plist"; path = "/src/realm-cocoa/TestHost copy-Info.plist"; sourceTree = "<absolute>"; };
 		3FAB08411E1EC382001BC8DA /* execution_context_id.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = execution_context_id.hpp; sourceTree = "<group>"; };
 		3FAB08421E1EC382001BC8DA /* object_accessor.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = object_accessor.hpp; sourceTree = "<group>"; };
 		3FAB08431E1EC382001BC8DA /* object.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = object.hpp; sourceTree = "<group>"; };
@@ -951,6 +968,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		3F1A5E6F1992EB7400F45F4C /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3F9D91832152D42F00474F09 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1443,6 +1467,7 @@
 				5D660FCD1BE98C560021E04F /* RealmSwift */,
 				5D660FD91BE98C7C0021E04F /* RealmSwift Tests */,
 				E81A1FB31955FCE000FDED82 /* CHANGELOG.md */,
+				3F9D91882152D42F00474F09 /* TestHost copy-Info.plist */,
 			);
 			indentWidth = 4;
 			sourceTree = "<group>";
@@ -1459,6 +1484,7 @@
 				5D660FCC1BE98C560021E04F /* RealmSwift.framework */,
 				3F1A5E721992EB7400F45F4C /* TestHost.app */,
 				E8D89BA31955FC6D00CF2B9A /* Tests.xctest */,
+				3F9D91872152D42F00474F09 /* TestHost static.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1732,6 +1758,22 @@
 			productReference = 3F1A5E721992EB7400F45F4C /* TestHost.app */;
 			productType = "com.apple.product-type.application";
 		};
+		3F9D91802152D42F00474F09 /* TestHost static */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3F9D91842152D42F00474F09 /* Build configuration list for PBXNativeTarget "TestHost static" */;
+			buildPhases = (
+				3F9D91812152D42F00474F09 /* Sources */,
+				3F9D91832152D42F00474F09 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "TestHost static";
+			productName = TestHost;
+			productReference = 3F9D91872152D42F00474F09 /* TestHost static.app */;
+			productType = "com.apple.product-type.application";
+		};
 		5D659E7D1BE04556006515A0 /* Realm */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5D659ED61BE04556006515A0 /* Build configuration list for PBXNativeTarget "Realm" */;
@@ -1847,6 +1889,8 @@
 			dependencies = (
 				C04B4BDD1B55C51500FAE58E /* PBXTargetDependency */,
 				5DD755D41BE0582A002800DA /* PBXTargetDependency */,
+				3F9D917F2152D41A00474F09 /* PBXTargetDependency */,
+				3F9D918A2152D47B00474F09 /* PBXTargetDependency */,
 			);
 			name = "iOS static tests";
 			productName = iOSTests;
@@ -1900,7 +1944,7 @@
 					};
 					5D660FCB1BE98C560021E04F = {
 						CreatedOnToolsVersion = 7.1;
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1000;
 						ProvisioningStyle = Automatic;
 					};
 					5D660FD71BE98C7C0021E04F = {
@@ -1917,6 +1961,9 @@
 						CreatedOnToolsVersion = 6.4;
 						LastSwiftMigration = 0900;
 					};
+					E8267FB11D90B79000E001C7 = {
+						LastSwiftMigration = 1000;
+					};
 					E83EAC791BED3D880085CCD2 = {
 						CreatedOnToolsVersion = 7.1;
 					};
@@ -1925,6 +1972,7 @@
 						DevelopmentTeam = QX5CR2FTN2;
 						DevelopmentTeamName = "Realm ApS";
 						ProvisioningStyle = Automatic;
+						TestTargetID = 3F9D91802152D42F00474F09;
 					};
 					E8D89BA21955FC6D00CF2B9A = {
 						CreatedOnToolsVersion = 6.0;
@@ -1959,6 +2007,7 @@
 				5D660FCB1BE98C560021E04F /* RealmSwift */,
 				5D660FD71BE98C7C0021E04F /* RealmSwift Tests */,
 				E83EAC791BED3D880085CCD2 /* SwiftLint */,
+				3F9D91802152D42F00474F09 /* TestHost static */,
 			);
 		};
 /* End PBXProject section */
@@ -2154,6 +2203,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				29EDB8E41A7708E700458D80 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		3F9D91812152D42F00474F09 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3F9D91822152D42F00474F09 /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2516,6 +2573,16 @@
 			target = C04B4BD71B55C47600FAE58E /* Download Core Library */;
 			targetProxy = 3F8F357A212B6FB40035E7B8 /* PBXContainerItemProxy */;
 		};
+		3F9D917F2152D41A00474F09 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
+			targetProxy = 3F9D917E2152D41A00474F09 /* PBXContainerItemProxy */;
+		};
+		3F9D918A2152D47B00474F09 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3F9D91802152D42F00474F09 /* TestHost static */;
+			targetProxy = 3F9D91892152D47B00474F09 /* PBXContainerItemProxy */;
+		};
 		3FC8BF35212B79F4001C2025 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
@@ -2585,6 +2652,28 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */;
 			buildSettings = {
+			};
+			name = Release;
+		};
+		3F9D91852152D42F00474F09 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "TestHost copy-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+			};
+			name = Debug;
+		};
+		3F9D91862152D42F00474F09 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5D6156F71BE07B6B00A4BD3F /* TestHost.xcconfig */;
+			buildSettings = {
+				INFOPLIST_FILE = "TestHost copy-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 			};
 			name = Release;
 		};
@@ -2717,6 +2806,7 @@
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TestHost static.app/TestHost static";
 			};
 			name = Debug;
 		};
@@ -2726,6 +2816,7 @@
 			buildSettings = {
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TestHost static.app/TestHost static";
 			};
 			name = Release;
 		};
@@ -2767,6 +2858,15 @@
 			buildConfigurations = (
 				3F1A5E8F1992EB7400F45F4C /* Debug */,
 				3F1A5E901992EB7400F45F4C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		3F9D91842152D42F00474F09 /* Build configuration list for PBXNativeTarget "TestHost static" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3F9D91852152D42F00474F09 /* Debug */,
+				3F9D91862152D42F00474F09 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

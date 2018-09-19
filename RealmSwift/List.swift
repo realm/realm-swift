@@ -619,7 +619,7 @@ extension List: MutableCollection {
 
      - warning: This method may only be called during a write transaction.
      */
-    public func removeSubrange<R>(_ boundsExpression: R) where R : RangeExpression, List<Element>.Index == R.Bound {
+    public func removeSubrange<R>(_ boundsExpression: R) where R: RangeExpression, List<Element>.Index == R.Bound {
         let bounds = boundsExpression.relative(to: self)
         for _ in bounds {
             remove(at: bounds.lowerBound)

@@ -1,7 +1,8 @@
-swiftVersions = ['3.1', '3.2', '3.2.2', '3.2.3', '3.3', '4.0', '4.0.2', '4.0.3', '4.1', '4.1.2']
+swiftVersions = ['3.2.3', '3.3', '4.0.3', '4.1', '4.1.2', '4.2']
 platforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS']
 carthageXcodeVersion = '9.4'
+carthageSwiftVersion = '3.3.2'
 
 def installationTest(platform, test, language) {
   return {
@@ -23,6 +24,9 @@ def installationTest(platform, test, language) {
         find . -name 'realm-${language}-*' -print0 | xargs -J% mv % realm-${language}-latest
       fi
 
+      sed -i '' 's/swift-3.[0-9.]*/swift-${carthageSwiftVersion}/g' osx/swift/DynamicExample/DynamicExample.xcodeproj/project.pbxproj
+      sed -i '' 's/swift-3.[0-9.]*/swift-${carthageSwiftVersion}/g' ios/swift/DynamicExample/DynamicExample.xcodeproj/project.pbxproj
+      export REALM_XCODE_VERSION=${carthageXcodeVersion}
       ./build.sh test-${platform}-${language}-${test}
       """
     }

@@ -546,7 +546,8 @@ class ObjectTests: TestCase {
             }
         }
 
-        waitForExpectations(timeout: 2)
+        realm.refresh()
+        waitForExpectations(timeout: 0)
         token.invalidate()
     }
 
@@ -583,7 +584,8 @@ class ObjectTests: TestCase {
                 realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 2
             }
         }
-        waitForExpectations(timeout: 2)
+        realm.refresh()
+        waitForExpectations(timeout: 0)
         token.invalidate()
 
         token = object.observe(expectChange("optIntCol", 2, Int?.none))
@@ -593,7 +595,8 @@ class ObjectTests: TestCase {
                 realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = nil
             }
         }
-        waitForExpectations(timeout: 2)
+        realm.refresh()
+        waitForExpectations(timeout: 0)
         token.invalidate()
 
         token = object.observe(expectChange("optIntCol", Int?.none, 3))
@@ -603,7 +606,8 @@ class ObjectTests: TestCase {
                 realm.objects(SwiftOptionalDefaultValuesObject.self).first!.optIntCol.value = 3
             }
         }
-        waitForExpectations(timeout: 2)
+        realm.refresh()
+        waitForExpectations(timeout: 0)
         token.invalidate()
     }
 

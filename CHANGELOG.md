@@ -1,3 +1,15 @@
+3.10.0 Release notes (2018-09-19)
+=============================================================
+
+Prebuilt binaries are now built for Xcode 9.2, 9.3, 9.4 and 10.0.
+
+Older versions of Xcode are still supported when building from source, but you
+should be migrating to at least Xcode 9.2 as soon as possible.
+
+### Enhancements
+
+* Add support for Watch Series 4 by adding an arm64_32 slice to the library.
+
 3.9.0 Release notes (2018-09-10)
 =============================================================
 
