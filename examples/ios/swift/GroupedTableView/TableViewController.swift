@@ -19,6 +19,13 @@
 import UIKit
 import RealmSwift
 
+#if !swift(>=4.2)
+extension UITableViewCell {
+    typealias CellStyle = UITableViewCellStyle
+    typealias EditingStyle = UITableViewCellEditingStyle
+}
+#endif
+
 class DemoObject: Object {
     @objc dynamic var title = ""
     @objc dynamic var date = NSDate()
@@ -26,7 +33,7 @@ class DemoObject: Object {
 }
 
 class Cell: UITableViewCell {
-    override init(style: UITableViewCellStyle, reuseIdentifier: String!) {
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String!) {
         super.init(style: .subtitle, reuseIdentifier: reuseIdentifier)
     }
 
@@ -95,7 +102,7 @@ class TableViewController: UITableViewController {
         return cell
     }
 
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
+    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             try! realm.write {
                 realm.delete(objectForIndexPath(indexPath: indexPath)!)
