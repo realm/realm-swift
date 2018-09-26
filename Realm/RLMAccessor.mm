@@ -624,6 +624,11 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
         if (prop.array) {
             return static_cast<RLMListBase *>(object_getIvar(obj, prop.swiftIvar))._rlmArray;
         }
+        else if (prop.swiftIvar == RLMDummySwiftIvar) {
+            // FIXME: An invalid property which we're pretending is nil until 4.0
+            // https://github.com/realm/realm-cocoa/issues/5784
+            return NSNull.null;
+        }
         else { // optional
             value = RLMGetOptional(static_cast<RLMOptionalBase *>(object_getIvar(obj, prop.swiftIvar)));
         }

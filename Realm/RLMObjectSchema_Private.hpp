@@ -30,3 +30,7 @@ namespace realm {
 // initialize with realm::ObjectSchema
 + (instancetype)objectSchemaForObjectStoreSchema:(realm::ObjectSchema const&)objectSchema;
 @end
+
+// An objc_ivar pointer which is guaranteed to not point to any actually-existing
+// ivar. Used as part of https://github.com/realm/realm-cocoa/issues/5784
+extern const Ivar RLMDummySwiftIvar;
