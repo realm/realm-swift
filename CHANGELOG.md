@@ -11,7 +11,10 @@ x.x.x Release notes (yyyy-MM-dd)
 
 ### Bugfixes
 
-* None.
+* Fix a crash when adding an object with a non-`@objc` `String?` property which
+  has not been explicitly ignored to a Realm on watchOS 5 (and possibly other
+  platforms when building with Xcode 10).
+  https://github.com/realm/realm-cocoa/issues/5929
 
 3.10.0 Release notes (2018-09-19)
 =============================================================

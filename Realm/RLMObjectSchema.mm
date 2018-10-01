@@ -33,6 +33,11 @@
 
 using namespace realm;
 
+const Ivar RLMDummySwiftIvar = []() {
+    static int dummy;
+    return reinterpret_cast<objc_ivar *>(&dummy);
+}();
+
 // private properties
 @interface RLMObjectSchema ()
 @property (nonatomic, readwrite) NSDictionary<id, RLMProperty *> *allPropertiesByName;
@@ -293,8 +298,18 @@ using namespace realm;
                     break;
                 }
 
-                // RealmOptional<>
-                Ivar ivar = class_getInstanceVariable([instance class], md.propertyName.UTF8String);
+                Ivar ivar;
+                if (md.propertyType == RLMPropertyTypeString) {
+                    // FIXME: A non-@objc dynamic String? property which we
+                    // can't actually read so we're always just going to pretend it's nil
+                    // https://github.com/realm/realm-cocoa/issues/5784
+                    ivar = RLMDummySwiftIvar;
+                }
+                else {
+                    // RealmOptional<>
+                    ivar = class_getInstanceVariable([instance class], md.propertyName.UTF8String);
+                }
+
                 prop = [[RLMProperty alloc] initSwiftOptionalPropertyWithName:md.propertyName
                                                                       indexed:[indexed containsObject:md.propertyName]
                                                                          ivar:ivar
