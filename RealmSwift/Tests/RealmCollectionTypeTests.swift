@@ -750,6 +750,64 @@ class ResultsDistinctTests: TestCase {
         assertThrows(collection.distinct(by: ["@sum.intCol"]))
         assertThrows(collection.distinct(by: ["stringListCol"]))
     }
+    
+    func testSortAndDistinctUsingKeyPath() {
+        
+        let realm = realmWithTestPath()
+        
+        let obj1 = CTTAggregateObject()
+        obj1.intCol = 1
+        obj1.dateCol = .distantPast
+        let childObj1 = CTTIntegerObject()
+        childObj1.intCol = 1
+        obj1.childIntCol = childObj1
+        
+        let obj2 = CTTAggregateObject()
+        obj2.intCol = 2
+        obj2.dateCol = .distantFuture
+        let childObj2 = CTTIntegerObject()
+        childObj2.intCol = 1
+        obj2.childIntCol = childObj2
+        
+        let now = Date()
+        let obj3 = CTTAggregateObject()
+        obj3.intCol = 3
+        obj3.dateCol = now
+        let childObj3 = CTTIntegerObject()
+        childObj3.intCol = 2
+        obj3.childIntCol = childObj3
+        
+        try! realm.write {
+            realm.add(obj1)
+            realm.add(obj2)
+            realm.add(obj3)
+        }
+        
+        let objects = realm.objects(CTTAggregateObject.self)
+        
+        // ascending
+        var sortResults = objects.sorted(byKeyPath: "dateCol", ascending: true)
+        var expectedSortResults = [["int": 1], ["int": 3], ["int": 2]]
+        var actualSortResults = Array(sortResults.map { ["int": $0.intCol] })
+        XCTAssertEqual(expectedSortResults, actualSortResults)
+        
+        var distinctResults = sortResults.distinct(by: ["childIntCol.intCol"])
+        var expectedDistinctResults = [["int": 1], ["int": 3]]
+        var actualDistinctResults = Array(distinctResults.map { ["int": $0.intCol] })
+        XCTAssertEqual(expectedDistinctResults, actualDistinctResults)
+        
+        // descending
+        sortResults = objects.sorted(byKeyPath: "dateCol", ascending: false)
+        expectedSortResults = [["int": 2], ["int": 3], ["int": 1]]
+        actualSortResults = Array(sortResults.map { ["int": $0.intCol] })
+        XCTAssertEqual(expectedSortResults, actualSortResults)
+        
+        distinctResults = sortResults.distinct(by: ["childIntCol.intCol"])
+        expectedDistinctResults = [["int": 2], ["int": 3]]
+        actualDistinctResults = Array(distinctResults.map { ["int": $0.intCol] })
+        XCTAssertEqual(expectedDistinctResults, actualDistinctResults)
+    }
+
 }
 
 class ResultsFromTableTests: ResultsTests {
