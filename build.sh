@@ -1431,7 +1431,7 @@ EOF
         empty_section=$(cat <<EOS
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
-## Enhancements
+### Enhancements
 * None.
 
 ### Fixed
