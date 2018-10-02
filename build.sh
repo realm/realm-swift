@@ -1429,19 +1429,23 @@ EOF
 
     "add-empty-changelog")
         empty_section=$(cat <<EOS
-x.x.x Release notes (yyyy-MM-dd)
+x.y.z Release notes (yyyy-MM-dd)
 =============================================================
-
-### Breaking Changes
-
+## Enhancements
 * None.
 
-### Enhancements
-
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
 * None.
 
-### Bugfixes
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
+### Compatibility
+* File format: ver. 7 (upgrades automatically from previous formats)
+* Realm Object Server: 3.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 3.x.y series.
+ 
+ ### Internal
 * None.
 EOS)
         changelog=$(cat CHANGELOG.md)
