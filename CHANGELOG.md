@@ -2,32 +2,33 @@ x.x.x Release notes (yyyy-MM-dd)
 =============================================================
 
 ### Enhancements
+
 * Reduce memory usage when integrating synchronized changes sent by ROS.
 * Devices will now report download progress for read-only Realms, allowing the
   server to compact Realms more aggressively and reducing the amount of
   server-side storage space required.
 
 ### Fixed
-* Fixed a crash when adding an object with a non-`@objc` `String?` property which
+
+* Fix a crash when adding an object with a non-`@objc` `String?` property which
   has not been explicitly ignored to a Realm on watchOS 5 (and possibly other
   platforms when building with Xcode 10).
-  (Issue: [5929](https://github.com/realm/realm-cocoa/issues/5929), since v3.10.0).
-* Fixed some merge algorithm bugs which could result in `BadChangesetError`
+  (Issue: [5929](https://github.com/realm/realm-cocoa/issues/5929)).
+* Fix some merge algorithm bugs which could result in `BadChangesetError`
   being thrown when integrating changes sent by the server.
 
 ### Compatibility
+
 * **NOTE!!!
   You will need to upgrade your Realm Object Server to at least version 3.11.0
   or use [Realm Cloud](https://cloud.realm.io).
-  If you try to connect to a ROS v3.10.x or previous, you will see an error 
+  If you try to connect to a ROS v3.10.x or previous, you will see an error
   like `Wrong protocol version in Sync HTTP request, client protocol version = 25,
   server protocol version = 24`.**
-* File format: ver. 7 (upgrades automatically from previous formats)
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 
 ### Internal
-* Updated to Sync 3.12.2.
 
+* Update to Sync 3.12.2.
 
 3.10.0 Release notes (2018-09-19)
 =============================================================
