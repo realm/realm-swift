@@ -25,6 +25,10 @@ x.x.x Release notes (yyyy-MM-dd)
 * File format: ver. 7 (upgrades automatically from previous formats)
 * APIs are backwards compatible with all previous releases in the 3.x.y series.
 
+### Internal
+* Updated to Sync 3.12.2.
+
+
 3.10.0 Release notes (2018-09-19)
 =============================================================
 
