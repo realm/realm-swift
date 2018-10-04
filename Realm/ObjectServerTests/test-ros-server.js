@@ -1,6 +1,5 @@
 const ROS = require('realm-object-server');
 const fs = require('fs');
-const https = require('https');
 const os = require('os');
 const path = require('path');
 
