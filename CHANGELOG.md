@@ -11,7 +11,7 @@ x.x.x Release notes (yyyy-MM-dd)
 * Fixed a crash when adding an object with a non-`@objc` `String?` property which
   has not been explicitly ignored to a Realm on watchOS 5 (and possibly other
   platforms when building with Xcode 10).
-  (Issue: [5929](https://github.com/realm/realm-cocoa/issues/5929), since v?).
+  (Issue: [5929](https://github.com/realm/realm-cocoa/issues/5929), since v3.10.0).
 * Fixed some merge algorithm bugs which could result in `BadChangesetError`
   being thrown when integrating changes sent by the server.
 
