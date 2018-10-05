@@ -2,14 +2,12 @@
 =============================================================
 
 ### Enhancements
-
 * Reduce memory usage when integrating synchronized changes sent by ROS.
 * Devices will now report download progress for read-only Realms, allowing the
   server to compact Realms more aggressively and reducing the amount of
   server-side storage space required.
 
 ### Fixed
-
 * Fix a crash when adding an object with a non-`@objc` `String?` property which
   has not been explicitly ignored to a Realm on watchOS 5 (and possibly other
   platforms when building with Xcode 10).
@@ -18,7 +16,7 @@
   being thrown when integrating changes sent by the server.
 
 ### Compatibility
-
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * **NOTE!!!
   You will need to upgrade your Realm Object Server to at least version 3.11.0
   or use [Realm Cloud](https://cloud.realm.io).
@@ -27,8 +25,8 @@
   server protocol version = 24`.**
 
 ### Internal
-
 * Update to Sync 3.12.2.
+
 
 3.10.0 Release notes (2018-09-19)
 =============================================================
