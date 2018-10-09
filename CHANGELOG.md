@@ -6,6 +6,11 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Fixed
 * Fix `SyncUser.requestEmailConfirmation` not triggering the email confirmation
   flow on ROS. (PR [#5953](https://github.com/realm/realm-cocoa/pull/5953), since 3.5.0)
+* Add some missing validation in the getters and setters of properties on
+  managed Realm objects, which would sometimes result in an application
+  crashing with a segfault rather than the appropriate exception being thrown
+  when trying to write to an object which has been deleted.
+  (PR [#5952](https://github.com/realm/realm-cocoa/pull/5952), since 2.8.0)
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)

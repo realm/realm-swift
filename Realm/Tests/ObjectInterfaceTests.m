@@ -447,4 +447,133 @@
     [realm cancelWriteTransaction];
 }
 
+- (void)testAllMethodsCheckThread {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block AllTypesObject *obj;
+    __block StringObject *stringObj;
+    NSDictionary *values = @{@"boolCol": @NO,
+                             @"intCol": @0,
+                             @"floatCol": @0,
+                             @"doubleCol": @0,
+                             @"stringCol": @"",
+                             @"binaryCol": NSData.data,
+                             @"dateCol": NSDate.date,
+                             @"cBoolCol": @NO,
+                             @"longCol": @0,
+                             @"objectCol": NSNull.null};
+    [realm transactionWithBlock:^{
+        obj = [AllTypesObject createInRealm:realm withValue:values];
+        stringObj = [StringObject createInRealm:realm withValue:@[@""]];
+    }];
+    [realm beginWriteTransaction];
+
+    NSArray<NSString *> *propertyNames = [obj.objectSchema.properties valueForKey:@"name"];
+    [self dispatchAsyncAndWait:^{
+        // Getters
+        for (NSString *prop in propertyNames) {
+            RLMAssertThrowsWithReasonMatching(obj[prop], @"thread");
+            RLMAssertThrowsWithReasonMatching([obj valueForKey:prop], @"thread");
+        }
+        RLMAssertThrowsWithReasonMatching(obj.boolCol, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.intCol, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.floatCol, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.doubleCol, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.stringCol, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.binaryCol, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.dateCol, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.cBoolCol, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.longCol, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.objectCol, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.linkingObjectsCol, @"thread");
+
+        // Setters
+        for (NSString *prop in propertyNames) {
+            RLMAssertThrowsWithReasonMatching(obj[prop] = values[prop], @"thread");
+            RLMAssertThrowsWithReasonMatching([obj setValue:values[prop] forKey:prop], @"thread");
+        }
+        RLMAssertThrowsWithReasonMatching(obj.boolCol = 0, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.intCol = 0, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.floatCol = 0, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.doubleCol = 0, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.stringCol = nil, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.binaryCol = nil, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.dateCol = nil, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.cBoolCol = 0, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.longCol = 0, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.objectCol = nil, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.objectCol = [StringObject new], @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.objectCol = stringObj, @"thread");
+    }];
+    [realm cancelWriteTransaction];
+}
+
+- (void)testAllMethodsCheckForInvalidation {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block StringObject *stringObj;
+    NSDictionary *values = @{@"boolCol": @NO,
+                             @"intCol": @0,
+                             @"floatCol": @0,
+                             @"doubleCol": @0,
+                             @"stringCol": @"",
+                             @"binaryCol": NSData.data,
+                             @"dateCol": NSDate.date,
+                             @"cBoolCol": @NO,
+                             @"longCol": @0,
+                             @"objectCol": NSNull.null};
+    [realm transactionWithBlock:^{
+        [AllTypesObject createInRealm:realm withValue:values];
+        stringObj = [StringObject createInRealm:realm withValue:@[@""]];
+    }];
+
+    for (int i = 0; i < 2; ++i) {
+        AllTypesObject *obj = [[AllTypesObject allObjectsInRealm:realm] firstObject];
+        [realm beginWriteTransaction];
+        // Deleting the object directly and indirectly leave the managed
+        // accessor in different states, so test both
+        if (i == 0) {
+            [realm deleteObject:obj];
+        }
+        else {
+            [realm deleteObjects:[AllTypesObject allObjectsInRealm:realm]];
+        }
+
+        NSArray<NSString *> *propertyNames = [obj.objectSchema.properties valueForKey:@"name"];
+        // Getters
+        for (NSString *prop in propertyNames) {
+            RLMAssertThrowsWithReasonMatching(obj[prop], @"invalidated");
+            RLMAssertThrowsWithReasonMatching([obj valueForKey:prop], @"invalidated");
+        }
+        RLMAssertThrowsWithReasonMatching(obj.boolCol, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.intCol, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.floatCol, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.doubleCol, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.stringCol, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.binaryCol, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.dateCol, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.cBoolCol, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.longCol, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.objectCol, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.linkingObjectsCol, @"invalidated");
+
+        // Setters
+        for (NSString *prop in propertyNames) {
+            RLMAssertThrowsWithReasonMatching(obj[prop] = values[prop], @"invalidated");
+            RLMAssertThrowsWithReasonMatching([obj setValue:values[prop] forKey:prop], @"invalidated");
+        }
+        RLMAssertThrowsWithReasonMatching(obj.boolCol = 0, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.intCol = 0, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.floatCol = 0, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.doubleCol = 0, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.stringCol = nil, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.binaryCol = nil, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.dateCol = nil, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.cBoolCol = 0, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.longCol = 0, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.objectCol = nil, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.objectCol = [StringObject new], @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.objectCol = stringObj, @"invalidated");
+        [realm cancelWriteTransaction];
+    }
+}
+
 @end
