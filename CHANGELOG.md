@@ -1,3 +1,17 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* Fix `SyncUser.requestEmailConfirmation` not triggering the email confirmation
+  flow on ROS. (PR [#5953](https://github.com/realm/realm-cocoa/pull/5953), since 3.5.0)
+
+### Compatibility
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.11.0 or later.
+* APIs are backwards compatible with all previous releases in the 3.x.y series.
+
 3.11.0 Release notes (2018-10-04)
 =============================================================
 
@@ -163,7 +177,7 @@ details.
 ### Deprecations
 
 * `+[RLMSyncConfiguration initWithUser] has been deprecated in favor of `-[RLMSyncUser configurationWithURL:url].
-* `+[RLMSyncConfiguration automaticConfiguration] has been deprecated in favor of `-[RLMSyncUser configuration]. 
+* `+[RLMSyncConfiguration automaticConfiguration] has been deprecated in favor of `-[RLMSyncUser configuration].
 * `+[RLMSyncConfiguration automaticConfigurationForUser] has been deprecated in favor of `-[RLMSyncUser configuration].
 * `-[RLMSyncConfiguration isPartial] has been deprecated in favor of `-[RLMSyncConfiguration fullSynchronization]`.
 
@@ -2142,7 +2156,7 @@ Prebuilt frameworks are now built with Xcode 7.3.
   `RLMRealm`/`Realm` instances.
 * Fail with `RLMErrorFileNotFound` instead of the more generic `RLMErrorFileAccess`,
   if no file was found when a realm was opened as read-only or if the directory part
-  of the specified path was not found when a copy should be written. 
+  of the specified path was not found when a copy should be written.
 * Greatly improve performance when deleting objects with one or more indexed
   properties.
 * Indexing `BOOL`/`Bool` and `NSDate` properties are now supported.
@@ -2177,7 +2191,7 @@ Prebuilt frameworks are now built with Xcode 7.3.
 
 * Support for tvOS.
 * Support for building Realm Swift from source when using Carthage.
-* The block parameter of `-[RLMRealm transactionWithBlock:]`/`Realm.write(_:)` is 
+* The block parameter of `-[RLMRealm transactionWithBlock:]`/`Realm.write(_:)` is
   now marked as `__attribute__((noescape))`/`@noescape`.
 * Many forms of queries with key paths on both sides of the comparison operator
   are now supported.
