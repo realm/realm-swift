@@ -371,7 +371,7 @@ PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBloc
                                     userEmail:(NSString *)email
                                    completion:(RLMPasswordChangeStatusBlock)completion {
     [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
-                                                 JSON:@{@"provider_id": email, @"data": @{                                                                   @"action": @"request_email_confirmation"}}
+                                                 JSON:@{@"provider_id": email, @"data": @{@"action": @"request_email_confirmation"}}
                                               options:[[RLMSyncManager sharedManager] networkRequestOptions]
                                            completion:completion];
 }
