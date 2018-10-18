@@ -26,6 +26,8 @@ x.y.z Release notes (yyyy-MM-dd)
   crashing with a segfault rather than the appropriate exception being thrown
   when trying to write to an object which has been deleted.
   (PR [#5952](https://github.com/realm/realm-cocoa/pull/5952), since 2.8.0)
+* Fix a memory leak when removing notification blocks from collections.
+  (PR: https://github.com/realm/realm-object-store/pull/702, since 1.1.0).
 
 ### Compatibility
 

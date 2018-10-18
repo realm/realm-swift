@@ -779,7 +779,7 @@ void RLMAccessorContext::did_change() {
 }
 
 RLMOptionalId RLMAccessorContext::value_for_property(__unsafe_unretained id const obj,
-                                                     std::string const&, size_t propIndex) {
+                                                     realm::Property const&, size_t propIndex) {
     auto prop = _info.rlmObjectSchema.properties[propIndex];
     id value = propertyValue(obj, propIndex, prop);
     if (value) {
@@ -801,9 +801,9 @@ RLMOptionalId RLMAccessorContext::value_for_property(__unsafe_unretained id cons
 }
 
 RLMOptionalId RLMAccessorContext::default_value_for_property(realm::ObjectSchema const&,
-                                                             std::string const& prop)
+                                                             realm::Property const& prop)
 {
-    return RLMOptionalId{defaultValue(@(prop.c_str()))};
+    return RLMOptionalId{defaultValue(@(prop.name.c_str()))};
 }
 
 bool RLMAccessorContext::is_same_list(realm::List const& list, __unsafe_unretained id const v) const noexcept {
