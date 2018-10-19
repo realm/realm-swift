@@ -1,9 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.11.1 Release notes (2018-10-19)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
+
 * Fix `SyncUser.requestEmailConfirmation` not triggering the email confirmation
   flow on ROS. (PR [#5953](https://github.com/realm/realm-cocoa/pull/5953), since 3.5.0)
 * Add some missing validation in the getters and setters of properties on
@@ -13,9 +12,9 @@ x.y.z Release notes (yyyy-MM-dd)
   (PR [#5952](https://github.com/realm/realm-cocoa/pull/5952), since 2.8.0)
 
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.11.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 
 3.11.0 Release notes (2018-10-04)
 =============================================================
@@ -45,7 +44,6 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Update to Sync 3.12.2.
-
 
 3.10.0 Release notes (2018-09-19)
 =============================================================
