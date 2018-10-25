@@ -140,7 +140,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     object->_objectSchema = info.rlmObjectSchema;
     try {
         realm::Object::create(c, realm->_realm, *info.objectSchema, (id)object,
-                              createOrUpdate, &object->_row);
+                              createOrUpdate, /* diff */ false, -1, &object->_row);
     }
     catch (std::exception const& e) {
         @throw RLMException(e);
