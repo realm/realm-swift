@@ -460,6 +460,10 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
         if (!readOnly) {
             // initializing the schema started a read transaction, so end it
             [realm invalidate];
+
+            RLMAddSkipBackupAttributeToItemAtPath(config.path + ".management");
+            RLMAddSkipBackupAttributeToItemAtPath(config.path + ".lock");
+            RLMAddSkipBackupAttributeToItemAtPath(config.path + ".note");
         }
     }
 
@@ -470,10 +474,6 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
     if (!readOnly) {
         realm->_realm->m_binding_context = RLMCreateBindingContext(realm);
         realm->_realm->m_binding_context->realm = realm->_realm;
-
-        RLMAddSkipBackupAttributeToItemAtPath(config.path + ".management");
-        RLMAddSkipBackupAttributeToItemAtPath(config.path + ".lock");
-        RLMAddSkipBackupAttributeToItemAtPath(config.path + ".note");
     }
 
     return RLMAutorelease(realm);
