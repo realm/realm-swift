@@ -1,13 +1,20 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Improve the performance of the merge algorithm used for integrating remote
+  changes from the server. In particular, changesets involving many objects
+  which all link to a single object should be greatly improved.
 
 ### Fixed
 * Fix a memory leak when removing notification blocks from collections.
-  (PR: [#702](https://github.com/realm/realm-object-store/pull/702), since 1.1.0).
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+  PR: [#702](https://github.com/realm/realm-object-store/pull/702), since 1.1.0.
+* Fix re-sorting or distincting an already-sorted Results using values from
+  linked objects. Previously the unsorted order was used to read the values
+  from the linked objects.
+  PR [#3102](https://github.com/realm/realm-core/pull/3102), since 3.1.0.
+* Fix a set of bugs which could lead to bad changeset assertions when using
+  sync. The assertions would look something like the following:
+  `[realm-core-5.10.0] Assertion failed: ndx < size() with (ndx, size()) =  [742, 742]`.
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)

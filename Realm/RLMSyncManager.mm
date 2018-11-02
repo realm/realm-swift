@@ -110,7 +110,7 @@ static RLMSyncManager *s_sharedManager = nil;
         bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
         auto mode = should_encrypt ? SyncManager::MetadataMode::Encryption : SyncManager::MetadataMode::NoEncryption;
         rootDirectory = rootDirectory ?: [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
-        SyncManager::shared().configure_file_system(rootDirectory.path.UTF8String, mode, none, true);
+        SyncManager::shared().configure(rootDirectory.path.UTF8String, mode, "", none, true);
         return self;
     }
     return nil;
