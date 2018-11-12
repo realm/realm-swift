@@ -131,9 +131,19 @@ static NSURL *syncDirectoryForChildProcess() {
     // Clean up any old state from the server
     [[NSTask launchedTaskWithLaunchPath:@"/usr/bin/pkill"
                               arguments:@[@"-f", @"node.*test-ros-server.js"]] waitUntilExit];
-    [NSFileManager.defaultManager removeItemAtURL:self.serverDataRoot error:nil];
+    NSError *error;
+    [NSFileManager.defaultManager removeItemAtURL:self.serverDataRoot error:&error];
+    if (error && error.code != NSFileNoSuchFileError) {
+        NSLog(@"Failed to delete old test state: %@", error);
+        abort();
+    }
+    error = nil;
     [NSFileManager.defaultManager createDirectoryAtURL:self.serverDataRoot
-                           withIntermediateDirectories:YES attributes:nil error:nil];
+                           withIntermediateDirectories:YES attributes:nil error:&error];
+    if (error) {
+        NSLog(@"Failed to create scratch directory: %@", error);
+        abort();
+    }
 
     // Install ROS if it isn't already present
     [self downloadObjectServer];
