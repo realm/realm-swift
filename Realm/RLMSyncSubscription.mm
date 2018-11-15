@@ -81,12 +81,6 @@ using namespace realm;
 - (void)unsubscribe {
     partial_sync::unsubscribe(*_subscription);
 }
-
-- (RLMResults *)results {
-    auto results = _subscription->results();
-    return [RLMResults resultsWithObjectInfo:_realm->_info[RLMStringDataToNSString(results.get_object_type())]
-                                     results:std::move(results)];
-}
 @end
 
 @implementation RLMResults (SyncSubscription)

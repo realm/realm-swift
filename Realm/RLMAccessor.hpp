@@ -64,9 +64,9 @@ public:
     void will_change(realm::Object& obj, realm::Property const& prop) { will_change(obj.row(), prop); }
     void did_change();
 
-    RLMOptionalId value_for_property(id dict, std::string const&, size_t prop_index);
+    RLMOptionalId value_for_property(id dict, realm::Property const&, size_t prop_index);
     RLMOptionalId default_value_for_property(realm::ObjectSchema const&,
-                                             std::string const& prop);
+                                             realm::Property const& prop);
 
     bool is_same_list(realm::List const& list, id v) const noexcept;
 
@@ -78,7 +78,7 @@ public:
     }
 
     template<typename T>
-    T unbox(id v, bool create = false, bool update = false);
+    T unbox(id v, bool create = false, bool update = false, bool = false, size_t = 0);
 
     bool is_null(id v) { return v == NSNull.null; }
     id null_value() { return NSNull.null; }

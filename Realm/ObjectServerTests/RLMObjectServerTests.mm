@@ -1873,7 +1873,6 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"HTTP login"];
     [RLMSyncUser logInWithCredentials:creds authServerURL:url
                          onCompletion:^(RLMSyncUser *user, NSError *error) {
-                             NSLog(@"onCompletion %@ %@", user, error);
                              callback(user, error);
                              [expectation fulfill];
                          }];
