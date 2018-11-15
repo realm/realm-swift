@@ -1,11 +1,14 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.11.2 Release notes (2018-11-15)
 =============================================================
+
 ### Enhancements
+
 * Improve the performance of the merge algorithm used for integrating remote
   changes from the server. In particular, changesets involving many objects
   which all link to a single object should be greatly improved.
 
 ### Fixed
+
 * Fix a memory leak when removing notification blocks from collections.
   PR: [#702](https://github.com/realm/realm-object-store/pull/702), since 1.1.0.
 * Fix re-sorting or distincting an already-sorted Results using values from
@@ -17,9 +20,9 @@ x.y.z Release notes (yyyy-MM-dd)
   `[realm-core-5.10.0] Assertion failed: ndx < size() with (ndx, size()) =  [742, 742]`.
 
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.11.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 
 3.11.1 Release notes (2018-10-19)
 =============================================================
