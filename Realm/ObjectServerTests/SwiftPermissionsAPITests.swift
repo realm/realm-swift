@@ -19,7 +19,7 @@
 import XCTest
 import RealmSwift
 
-class SwiftPermissionsAPITests: SwiftSyncTestCase {
+class SwiftRealmPermissionsAPITests: SwiftSyncTestCase {
     var userA: SyncUser!
     var userB: SyncUser!
     var userC: SyncUser!
@@ -175,7 +175,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
             results = r
             ex.fulfill()
         }
-        waitForExpectations(timeout: 2.0, handler: nil)
+        wait(for: [ex], timeout: 2.0)
 
         // Open a Realm for user A.
         let uuid = UUID().uuidString
@@ -205,7 +205,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
             XCTAssertNil(error)
             ex2.fulfill()
         }
-        waitForExpectations(timeout: 2.0, handler: nil)
+        wait(for: [ex2], timeout: 2.0)
 
         // Wait for the notification to be fired.
         wait(for: [noteEx], timeout: 2.0)

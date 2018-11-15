@@ -18,8 +18,6 @@
 
 #import <XCTest/XCTest.h>
 
-// FIXME: Many permission tests appears to fail with the ROS 3.0.0 alpha releases.
-
 #import "RLMSyncTestCase.h"
 
 #import "RLMTestUtils.h"
@@ -33,8 +31,31 @@
         XCTAssertNil(err, @"Received an error when applying permission: %@", err);                                     \
         [ex fulfill];                                                                                                  \
     }];                                                                                                                \
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];                                                            \
+    [self waitForExpectations:@[ex] timeout:2.0];                                                                      \
 }                                                                                                                      \
+
+#define CHECK_COUNT_PENDING_DOWNLOAD(expected_count, m_type, m_realm) \
+    CHECK_COUNT_PENDING_DOWNLOAD_CUSTOM_EXPECTATION(expected_count, m_type, m_realm, nil)
+
+/// This macro tries ten times to wait for downloads and then check for object count.
+/// If the object count does not match, it waits 0.1 second before trying again.
+/// It is most useful in cases where the test ROS might be expected to take some
+/// non-negligible amount of time performing an operation whose completion is required
+/// for the test on the client side to proceed.
+#define CHECK_COUNT_PENDING_DOWNLOAD_CUSTOM_EXPECTATION(expected_count, m_type, m_realm, m_exp)                        \
+{                                                                                                                      \
+    RLMSyncConfiguration *m_config = m_realm.configuration.syncConfiguration;                                          \
+    XCTAssertNotNil(m_config, @"Realm passed to CHECK_COUNT_PENDING_DOWNLOAD() doesn't have a sync config!");          \
+    RLMSyncUser *m_user = m_config.user;                                                                               \
+    NSURL *m_url = m_config.realmURL;                                                                                  \
+    for (int i=0; i<10; i++) {                                                                                         \
+        [self waitForDownloadsForUser:m_user url:m_url expectation:m_exp error:nil];                                   \
+        if (expected_count == [m_type allObjectsInRealm:m_realm].count) { break; }                                     \
+        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];                           \
+    }                                                                                                                  \
+    CHECK_COUNT(expected_count, m_type, m_realm);                                                                      \
+}
+
 
 static NSURL *makeTestURL(NSString *name, RLMSyncUser *owner) {
     NSString *userID = [owner identity] ?: @"~";
@@ -104,13 +125,15 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
                              line:(NSUInteger)line
                              file:(NSString *)file {
     XCTestExpectation *ex = [self expectationWithDescription:@"Checking presence of permission..."];
-    RLMNotificationToken *token = [results addNotificationBlock:^(RLMResults *r, __unused id c, NSError *err) {
+    __block RLMNotificationToken *token = [results addNotificationBlock:^(RLMResults *r, __unused id c, NSError *err) {
         if (err) {
             RECORD_FAILURE(@"Failed to retrieve permissions.");
+            [token invalidate];
             [ex fulfill];
             return;
         }
         if ([r indexOfObject:permission] != NSNotFound) {
+            [token invalidate];
             [ex fulfill];
         }
     }];
@@ -120,7 +143,6 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
                   results, permission);
         }
     }];
-    [token invalidate];
 }
 
 #define CHECK_PERMISSION_ABSENT(ma_results, ma_permission) \
@@ -228,7 +250,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // Have user A add some items to the Realm.
     [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-    [self waitForUploadsForUser:self.userA url:userAURL];
+    [self waitForUploadsForRealm:userARealm];
     CHECK_COUNT(3, SyncObject, userARealm);
 
     // Give user B read permissions to that Realm.
@@ -240,8 +262,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // Open the same Realm for user B.
     NSURL *userBURL = makeTestURL(testName, self.userA);
-    RLMRealmConfiguration *userBConfig = [RLMRealmConfiguration defaultConfiguration];
-    userBConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:self.userB realmURL:userBURL];
+    RLMRealmConfiguration *userBConfig = [self.userB configurationWithURL:userBURL fullSynchronization:YES];
     __block RLMRealm *userBRealm = nil;
     XCTestExpectation *asyncOpenEx = [self expectationWithDescription:@"Should asynchronously open a Realm"];
     [RLMRealm asyncOpenWithConfiguration:userBConfig
@@ -303,7 +324,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // Have user A add some items to the Realm.
     [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-    [self waitForUploadsForUser:self.userA url:userAURL];
+    [self waitForUploadsForRealm:userARealm];
     CHECK_COUNT(3, SyncObject, userARealm);
 
     // Give user B write permissions to that Realm.
@@ -320,7 +341,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // Add some objects using user B.
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
-    [self waitForUploadsForUser:self.userB url:userBURL];
+    [self waitForUploadsForRealm:userBRealm];
     CHECK_COUNT(5, SyncObject, userBRealm);
     CHECK_COUNT_PENDING_DOWNLOAD(5, SyncObject, userARealm);
 
@@ -359,7 +380,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // Have user A add some items to the Realm.
     [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-    [self waitForUploadsForUser:self.userA url:userAURLUnresolved];
+    [self waitForUploadsForRealm:userARealm];
     CHECK_COUNT(3, SyncObject, userARealm);
 
     // Give user B admin permissions to that Realm.
@@ -375,7 +396,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // Add some objects using user B.
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
-    [self waitForUploadsForUser:self.userB url:userAURLResolved];
+    [self waitForUploadsForRealm:userBRealm];
     CHECK_COUNT(5, SyncObject, userBRealm);
     CHECK_COUNT_PENDING_DOWNLOAD(5, SyncObject, userARealm);
 
@@ -389,7 +410,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
     RLMRealm *userCRealm = [self openRealmForURL:userAURLResolved user:self.userC];
     CHECK_COUNT_PENDING_DOWNLOAD(5, SyncObject, userCRealm);
     [self addSyncObjectsToRealm:userCRealm descriptions:@[@"child-6", @"child-7", @"child-8"]];
-    [self waitForUploadsForUser:self.userC url:userAURLResolved];
+    [self waitForUploadsForRealm:userCRealm];
     CHECK_COUNT(8, SyncObject, userCRealm);
     CHECK_COUNT_PENDING_DOWNLOAD(8, SyncObject, userARealm);
     CHECK_COUNT_PENDING_DOWNLOAD(8, SyncObject, userBRealm);
@@ -413,7 +434,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // Have user A add some items to the Realm.
     [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-    [self waitForUploadsForUser:self.userA url:userAURL];
+    [self waitForUploadsForRealm:userARealm];
     CHECK_COUNT(3, SyncObject, userARealm);
 
     // Give user B write permissions to that Realm via user B's username.
@@ -431,7 +452,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // Add some objects using user B.
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
-    [self waitForUploadsForUser:self.userB url:userBURL];
+    [self waitForUploadsForRealm:userBRealm];
     CHECK_COUNT(5, SyncObject, userBRealm);
     CHECK_COUNT_PENDING_DOWNLOAD(5, SyncObject, userARealm);
 }
@@ -454,21 +475,21 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // Have user A write a few objects first.
     [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-    [self waitForUploadsForUser:self.userA url:ownerURL];
+    [self waitForUploadsForRealm:userARealm];
     CHECK_COUNT(3, SyncObject, userARealm);
 
     // User B should be able to write to the Realm.
     RLMRealm *userBRealm = [self openRealmForURL:guestURL user:self.userB];
     CHECK_COUNT_PENDING_DOWNLOAD(3, SyncObject, userBRealm);
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
-    [self waitForUploadsForUser:self.userB url:guestURL];
+    [self waitForUploadsForRealm:userBRealm];
     CHECK_COUNT(5, SyncObject, userBRealm);
 
     // User C should be able to write to the Realm.
     RLMRealm *userCRealm = [self openRealmForURL:guestURL user:self.userC];
     CHECK_COUNT_PENDING_DOWNLOAD(5, SyncObject, userCRealm);
     [self addSyncObjectsToRealm:userCRealm descriptions:@[@"child-6", @"child-7", @"child-8", @"child-9"]];
-    [self waitForUploadsForUser:self.userC url:guestURL];
+    [self waitForUploadsForRealm:userCRealm];
     CHECK_COUNT(9, SyncObject, userCRealm);
 }
 
@@ -492,13 +513,12 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // Have the admin user write a few objects first.
     [self addSyncObjectsToRealm:adminUserRealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-    [self waitForUploadsForUser:admin url:globalRealmURL];
+    [self waitForUploadsForRealm:adminUserRealm];
     CHECK_COUNT(3, SyncObject, adminUserRealm);
 
     // User B should be able to read from the Realm.
     __block RLMRealm *userBRealm = nil;
-    RLMRealmConfiguration *userBConfig = [RLMRealmConfiguration defaultConfiguration];
-    userBConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:self.userB realmURL:globalRealmURL];
+    RLMRealmConfiguration *userBConfig = [self.userB configurationWithURL:globalRealmURL fullSynchronization:YES];
     XCTestExpectation *asyncOpenEx = [self expectationWithDescription:@"Should asynchronously open a Realm"];
     [RLMRealm asyncOpenWithConfiguration:userBConfig
                            callbackQueue:dispatch_get_main_queue()
@@ -513,8 +533,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // User C should be able to read from the Realm.
     __block RLMRealm *userCRealm = nil;
-    RLMRealmConfiguration *userCConfig = [RLMRealmConfiguration defaultConfiguration];
-    userCConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:self.userC realmURL:globalRealmURL];
+    RLMRealmConfiguration *userCConfig = [self.userC configurationWithURL:globalRealmURL fullSynchronization:YES];
     XCTestExpectation *asyncOpenEx2 = [self expectationWithDescription:@"Should asynchronously open a Realm"];
     [RLMRealm asyncOpenWithConfiguration:userCConfig
                            callbackQueue:dispatch_get_main_queue()
@@ -548,21 +567,21 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // Have the admin user write a few objects first.
     [self addSyncObjectsToRealm:adminUserRealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-    [self waitForUploadsForUser:admin url:globalRealmURL];
+    [self waitForUploadsForRealm:adminUserRealm];
     CHECK_COUNT(3, SyncObject, adminUserRealm);
 
     // User B should be able to write to the Realm.
     RLMRealm *userBRealm = [self openRealmForURL:globalRealmURL user:self.userB];
     CHECK_COUNT_PENDING_DOWNLOAD(3, SyncObject, userBRealm);
     [self addSyncObjectsToRealm:userBRealm descriptions:@[@"child-4", @"child-5"]];
-    [self waitForUploadsForUser:self.userB url:globalRealmURL];
+    [self waitForUploadsForRealm:userBRealm];
     CHECK_COUNT(5, SyncObject, userBRealm);
 
     // User C should be able to write to the Realm.
     RLMRealm *userCRealm = [self openRealmForURL:globalRealmURL user:self.userC];
     CHECK_COUNT_PENDING_DOWNLOAD(5, SyncObject, userCRealm);
     [self addSyncObjectsToRealm:userCRealm descriptions:@[@"child-6", @"child-7", @"child-8", @"child-9"]];
-    [self waitForUploadsForUser:self.userC url:globalRealmURL];
+    [self waitForUploadsForRealm:userCRealm];
     CHECK_COUNT(9, SyncObject, userCRealm);
 }
 
@@ -1136,7 +1155,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
 
     // Have user A add some items to the Realm.
     [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
-    [self waitForUploadsForUser:self.userA url:userAURL];
+    [self waitForUploadsForRealm:userARealm];
     CHECK_COUNT(3, SyncObject, userARealm);
 
     // Give user B read permissions to that Realm.
@@ -1147,8 +1166,7 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
     APPLY_PERMISSION(p, self.userA);
 
     NSURL *userBURL = makeTestURL(testName, self.userA);
-    RLMRealmConfiguration *userBConfig = [RLMRealmConfiguration defaultConfiguration];
-    userBConfig.syncConfiguration = [[RLMSyncConfiguration alloc] initWithUser:self.userB realmURL:userBURL];
+    RLMRealmConfiguration *userBConfig = [self.userB configurationWithURL:userBURL fullSynchronization:YES];
     __block NSError *theError = nil;
 
     // Incorrectly open the Realm for user B.
