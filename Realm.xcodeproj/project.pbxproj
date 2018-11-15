@@ -232,6 +232,8 @@
 		3FAB08881E1EC51F001BC8DA /* object_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAB08861E1EC51F001BC8DA /* object_notifier.cpp */; };
 		3FAB08891E1EC526001BC8DA /* object_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAB08861E1EC51F001BC8DA /* object_notifier.cpp */; };
 		3FAF8D02227A05BD005F1DB6 /* SwiftPartialSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FAF8D01227A05BD005F1DB6 /* SwiftPartialSyncTests.swift */; };
+		3FAD40B7219E3F8700509E5B /* RLMPermissionsAPITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AD6E7A51E8C2BDF00D4C8B4 /* RLMPermissionsAPITests.m */; };
+		3FAD40B9219E3F9200509E5B /* SwiftPermissionsAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A877BEE1EAE9F79001BEC40 /* SwiftPermissionsAPITests.swift */; };
 		3FB4FA1719F5D2740020D53B /* SwiftTestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */; };
 		3FB4FA1819F5D2740020D53B /* SwiftArrayPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */; };
 		3FB4FA1919F5D2740020D53B /* SwiftArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */; };
@@ -1047,8 +1049,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3F98162B2317763600C3543D /* libz.tbd in Frameworks */,
 				3F98162A2317763000C3543D /* libc++.tbd in Frameworks */,
+				3F98162B2317763600C3543D /* libz.tbd in Frameworks */,
 				5D66102A1BE98DD00021E04F /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2623,6 +2625,7 @@
 				1A2713D71E3BBAC8001F6BFC /* RLMAncillaryObjectServerTests.m in Sources */,
 				3F558C9422C29A03002F0F30 /* RLMMultiProcessTestCase.m in Sources */,
 				E8267FF11D90B8E700E001C7 /* RLMObjectServerTests.mm in Sources */,
+				3FAD40B7219E3F8700509E5B /* RLMPermissionsAPITests.m in Sources */,
 				3FB60BAB204095B500583735 /* RLMPermissionsTests.mm in Sources */,
 				1AF64DCF1DA3042B0081EB15 /* RLMSyncManager+ObjectServerTests.m in Sources */,
 				3F73BC911E3A877300FE80B6 /* RLMSyncSessionRefreshHandle+ObjectServerTests.m in Sources */,
@@ -2633,6 +2636,7 @@
 				3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */,
 				1AA5AEA11D98C99800ED8C27 /* SwiftObjectServerTests.swift in Sources */,
 				3FAF8D02227A05BD005F1DB6 /* SwiftPartialSyncTests.swift in Sources */,
+				3FAD40B9219E3F9200509E5B /* SwiftPermissionsAPITests.swift in Sources */,
 				3FB60BAD2040999300583735 /* SwiftPermissionsTests.swift in Sources */,
 				1AA5AE981D989BE400ED8C27 /* SwiftSyncTestCase.swift in Sources */,
 				3F558C8822C29A03002F0F30 /* TestUtils.mm in Sources */,
