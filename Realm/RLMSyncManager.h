@@ -76,10 +76,20 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 @property (nullable, nonatomic, copy) RLMSyncErrorReportingBlock errorHandler;
 
 /**
- A reverse-DNS string uniquely identifying this application. In most cases this is automatically set by the SDK, and
- does not have to be explicitly configured.
+ A reverse-DNS string uniquely identifying this application. In most cases this
+ is automatically set by the SDK, and does not have to be explicitly configured.
  */
 @property (nonatomic, copy) NSString *appID;
+
+/**
+ A string identifying this application which is included in the User-Agent
+ header of sync connections. By default, this will be the application's bundle
+ identifier.
+
+ This property must be set prior to opening a synchronized Realm for the first
+ time. Any modifications made after opening a Realm will be ignored.
+ */
+@property (nonatomic, copy) NSString *userAgent;
 
 /**
  The logging threshold which newly opened synced Realms will use. Defaults to

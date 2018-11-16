@@ -29,6 +29,10 @@
 #import "sync/sync_manager.hpp"
 #import "sync/sync_session.hpp"
 
+#if !defined(REALM_COCOA_VERSION)
+#import "RLMVersion.h"
+#endif
+
 using namespace realm;
 using Level = realm::util::Logger::Level;
 
@@ -111,6 +115,7 @@ static RLMSyncManager *s_sharedManager = nil;
         auto mode = should_encrypt ? SyncManager::MetadataMode::Encryption : SyncManager::MetadataMode::NoEncryption;
         rootDirectory = rootDirectory ?: [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
         SyncManager::shared().configure(rootDirectory.path.UTF8String, mode, "", none, true);
+        self.userAgent = self.appID;
         return self;
     }
     return nil;
@@ -121,6 +126,17 @@ static RLMSyncManager *s_sharedManager = nil;
         _appID = [[NSBundle mainBundle] bundleIdentifier] ?: @"(none)";
     }
     return _appID;
+}
+
+- (void)setUserAgent:(NSString *)userAgent {
+    bool isSwift = !!NSClassFromString(@"RealmSwiftObjectUtil");
+    auto fullUserAgent = [[NSMutableString alloc] initWithFormat:@"Realm %@/%@",
+                          isSwift ? @"Swift" : @"Objective C", REALM_COCOA_VERSION];
+    if (userAgent.length > 0) {
+        [fullUserAgent appendFormat:@" %@", userAgent];
+    }
+    SyncManager::shared().set_user_agent(RLMStringDataWithNSString(fullUserAgent));
+    _userAgent = userAgent;
 }
 
 #pragma mark - Passthrough properties
