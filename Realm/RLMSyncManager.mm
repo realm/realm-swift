@@ -114,8 +114,13 @@ static RLMSyncManager *s_sharedManager = nil;
         bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
         auto mode = should_encrypt ? SyncManager::MetadataMode::Encryption : SyncManager::MetadataMode::NoEncryption;
         rootDirectory = rootDirectory ?: [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
-        SyncManager::shared().configure(rootDirectory.path.UTF8String, mode, "", none, true);
-        self.userAgent = self.appID;
+        @autoreleasepool {
+            bool isSwift = !!NSClassFromString(@"RealmSwiftObjectUtil");
+            auto userAgent = [[NSMutableString alloc] initWithFormat:@"Realm%@/%@",
+                              isSwift ? @"Swift" : @"ObjectiveC", REALM_COCOA_VERSION];
+            SyncManager::shared().configure(rootDirectory.path.UTF8String, mode, RLMStringDataWithNSString(userAgent), none, true);
+            SyncManager::shared().set_user_agent(RLMStringDataWithNSString(self.appID));
+        }
         return self;
     }
     return nil;
@@ -129,13 +134,7 @@ static RLMSyncManager *s_sharedManager = nil;
 }
 
 - (void)setUserAgent:(NSString *)userAgent {
-    bool isSwift = !!NSClassFromString(@"RealmSwiftObjectUtil");
-    auto fullUserAgent = [[NSMutableString alloc] initWithFormat:@"Realm %@/%@",
-                          isSwift ? @"Swift" : @"Objective C", REALM_COCOA_VERSION];
-    if (userAgent.length > 0) {
-        [fullUserAgent appendFormat:@" %@", userAgent];
-    }
-    SyncManager::shared().set_user_agent(RLMStringDataWithNSString(fullUserAgent));
+    SyncManager::shared().set_user_agent(RLMStringDataWithNSString(userAgent));
     _userAgent = userAgent;
 }
 
