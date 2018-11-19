@@ -526,6 +526,7 @@ static NSURL *syncDirectoryForChildProcess() {
                            withIntermediateDirectories:YES attributes:nil error:&error];
     s_managerForTest = [[RLMSyncManager alloc] initWithCustomRootDirectory:clientDataRoot];
     [RLMSyncManager sharedManager].logLevel = RLMSyncLogLevelOff;
+    [RLMSyncManager sharedManager].userAgent = self.name;
 }
 
 - (void)tearDown {

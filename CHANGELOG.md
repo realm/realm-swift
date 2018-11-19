@@ -1,7 +1,12 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add a User-Agent header to HTTP requests made to the Realm Object Server. By
+  default, this contains information about the Realm library version and your
+  app's bundle ID. The application identifier can be customized by setting
+  `RLMSyncManager.sharedManager.userAgent`/`SyncManager.shared.userAgent` prior
+  to opening a synchronized Realm.
+  (PR: https://github.com/realm/realm-cocoa/pull/6007).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
