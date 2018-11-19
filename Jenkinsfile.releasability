@@ -1,8 +1,8 @@
-swiftVersions = ['3.2.3', '3.3', '4.0.3', '4.1', '4.1.2', '4.2']
+swiftVersions = ['3.2.3', '3.3', '3.3.2', '3.4', '3.4.1', 4.0.3', '4.1', '4.1.2', '4.2', '4.2.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS']
-carthageXcodeVersion = '9.4'
-carthageSwiftVersion = '3.3.2'
+carthageXcodeVersion = '10.1'
+carthageSwiftVersion = '3.4.1'
 
 def installationTest(platform, test, language) {
   return {

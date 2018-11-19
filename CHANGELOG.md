@@ -7,6 +7,7 @@ x.y.z Release notes (yyyy-MM-dd)
   `RLMSyncManager.sharedManager.userAgent`/`SyncManager.shared.userAgent` prior
   to opening a synchronized Realm.
   (PR: https://github.com/realm/realm-cocoa/pull/6007).
+* Add Xcode 10.1 binary to the prebuilt package.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)

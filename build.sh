@@ -1193,7 +1193,7 @@ EOM
 
     package-*-swift)
         PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        for version in 9.1 9.2 9.3 9.4 10.0; do
+        for version in 9.2 9.3 9.4 10.0 10.1; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1206,7 +1206,8 @@ EOM
         ln -s swift-4.1 swift-3.3
         ln -s swift-4.1.2 swift-3.3.2
         ln -s swift-4.2 swift-3.4
-        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-3.2.3 swift-3.3 swift-3.3.2 swift-3.4 swift-4.0.3 swift-4.1 swift-4.1.2 swift-4.2
+        ln -s swift-4.2.1 swift-3.4.1
+        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-3.2.3 swift-3.3 swift-3.3.2 swift-3.4 swift-3.4.1 swift-4.0.3 swift-4.1 swift-4.1.2 swift-4.2 swift-4.2.1
         ;;
 
     package-*-swift-3.2.3)
@@ -1239,6 +1240,14 @@ EOM
         cd build/$PLATFORM
         ln -s swift-4.2 swift-3.4
         zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.4.zip swift-3.4
+        ;;
+
+    package-*-swift-3.4.1)
+        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
+        mkdir -p build/$PLATFORM
+        cd build/$PLATFORM
+        ln -s swift-4.2.1 swift-3.4.1
+        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.4.1.zip swift-3.4.1
         ;;
 
     package-*-swift-*)
