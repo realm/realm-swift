@@ -32,6 +32,11 @@ public struct RLMIterator<Element: RealmCollectionValue>: IteratorProtocol {
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Element? {
         let next = generatorBase.next()
+        #if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
+        if next is NSNull {
+            return Element._nilValue()
+        }
+        #endif
         if let next = next as? Object? {
             if next == nil {
                 return nil as Element?
@@ -129,38 +134,80 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
     return from as! U
 }
 
+#if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
+/// A type which can be stored in a Realm List or Results.
+///
+/// Declaring additional types as conforming to this protocol will not make them
+/// actually work. Most of the logic for how to store values in Realm is not
+/// implemented in Swift and there is currently no extension mechanism for
+/// supporting more types.
+public protocol RealmCollectionValue: Equatable {
+    /// :nodoc:
+    static func _rlmArray() -> RLMArray<AnyObject>
+    /// :nodoc:
+    static func _nilValue() -> Self
+}
+#else
 /// A type which can be stored in a Realm List or Results
+///
+/// Declaring additional types as conforming to this protocol will not make them
+/// actually work. Most of the logic for how to store values in Realm is not
+/// implemented in Swift and there is currently no extension mechanism for
+/// supporting more types.
 public protocol RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     static func _rlmArray() -> RLMArray<AnyObject>
 }
+#endif
 
 extension RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .int, optional: false)
     }
-}
-
-extension Optional: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
-    public static func _rlmArray() -> RLMArray<AnyObject> {
-        switch Wrapped.self {
-        case is Int.Type, is Int8.Type, is Int16.Type, is Int32.Type, is Int64.Type:
-            return RLMArray(objectType: .int, optional: true)
-        case is Bool.Type:   return RLMArray(objectType: .bool, optional: true)
-        case is Float.Type:  return RLMArray(objectType: .float, optional: true)
-        case is Double.Type: return RLMArray(objectType: .double, optional: true)
-        case is String.Type: return RLMArray(objectType: .string, optional: true)
-        case is Data.Type:   return RLMArray(objectType: .data, optional: true)
-        case is Date.Type:   return RLMArray(objectType: .date, optional: true)
-        default: fatalError("Unsupported type for List: \(Wrapped.self)?")
-        }
+    public static func _nilValue() -> Self {
+        fatalError("unexpected NSNull for non-Optional type")
     }
 }
+
+private func arrayType<T>(_ type: T.Type) -> RLMArray<AnyObject> {
+    switch type {
+    case is Int.Type, is Int8.Type, is Int16.Type, is Int32.Type, is Int64.Type:
+        return RLMArray(objectType: .int, optional: true)
+    case is Bool.Type:   return RLMArray(objectType: .bool, optional: true)
+    case is Float.Type:  return RLMArray(objectType: .float, optional: true)
+    case is Double.Type: return RLMArray(objectType: .double, optional: true)
+    case is String.Type: return RLMArray(objectType: .string, optional: true)
+    case is Data.Type:   return RLMArray(objectType: .data, optional: true)
+    case is Date.Type:   return RLMArray(objectType: .date, optional: true)
+    default: fatalError("Unsupported type for List: \(T.self)?")
+    }
+}
+
+#if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
+extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue {
+    /// :nodoc:
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return arrayType(Wrapped.self)
+    }
+    /// :nodoc:
+    public static func _nilValue() -> Optional {
+        return nil
+    }
+}
+#else
+extension Optional: RealmCollectionValue {
+    /// :nodoc:
+    public static func _rlmArray() -> RLMArray<AnyObject> {
+        return arrayType(Wrapped.self)
+    }
+    /// :nodoc:
+    public static func _nilValue() -> Optional {
+        return nil
+    }
+}
+#endif
 
 extension Int: RealmCollectionValue {}
 extension Int8: RealmCollectionValue {}
@@ -169,21 +216,18 @@ extension Int32: RealmCollectionValue {}
 extension Int64: RealmCollectionValue {}
 extension Float: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .float, optional: false)
     }
 }
 extension Double: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .double, optional: false)
     }
 }
 extension Bool: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .bool, optional: false)
     }
@@ -191,21 +235,18 @@ extension Bool: RealmCollectionValue {
 
 extension String: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .string, optional: false)
     }
 }
 extension Date: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .date, optional: false)
     }
 }
 extension Data: RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectType: .data, optional: false)
     }

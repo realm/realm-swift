@@ -259,42 +259,16 @@ final class OptionalDateFactory: ValueFactory {
     }
 }
 
-
-class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
-    var realm: Realm?
-    var obj: SwiftListObject!
-    var array: List<V.T>!
-    var values: [V.T]!
-
-#if swift(>=4)
-    class func _defaultTestSuite() -> XCTestSuite {
-        return defaultTestSuite
+// Older versions of swift only support three version components in top-level
+// #if, so this check to be done outside the class...
+#if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
+class EquatableTestCase: TestCase {
+    func assertEqualTo<T: Equatable>(_ expected: T, _ actual: T, fileName: StaticString = #file, lineNumber: UInt = #line) {
+        XCTAssertEqual(expected, actual, file: fileName, line: lineNumber)
     }
+}
 #else
-    class func _defaultTestSuite() -> XCTestSuite {
-        return defaultTestSuite()
-    }
-#endif
-
-    override func setUp() {
-        obj = SwiftListObject()
-        if O.isManaged() {
-            let config = Realm.Configuration(inMemoryIdentifier: "test", objectTypes: [SwiftListObject.self])
-            realm = try! Realm(configuration: config)
-            realm!.beginWrite()
-            realm!.add(obj)
-        }
-        array = V.array(obj)
-        values = V.values()
-    }
-
-    override func tearDown() {
-        realm?.cancelWrite()
-        realm = nil
-        array = nil
-        obj = nil
-    }
-
+class EquatableTestCase: TestCase {
     // writing value as! Int? gives "cannot downcast from 'T' to a more optional type 'Optional<Int>'"
     // but doing this nonsense works
     func cast<T, U>(_ value: T) -> U {
@@ -460,6 +434,43 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
             return
         }
         assertEqualTo(expected, actual)
+    }
+}
+#endif
+
+class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: EquatableTestCase {
+    var realm: Realm?
+    var obj: SwiftListObject!
+    var array: List<V.T>!
+    var values: [V.T]!
+
+#if swift(>=4)
+    class func _defaultTestSuite() -> XCTestSuite {
+        return defaultTestSuite
+    }
+#else
+    class func _defaultTestSuite() -> XCTestSuite {
+        return defaultTestSuite()
+    }
+#endif
+
+    override func setUp() {
+        obj = SwiftListObject()
+        if O.isManaged() {
+            let config = Realm.Configuration(inMemoryIdentifier: "test", objectTypes: [SwiftListObject.self])
+            realm = try! Realm(configuration: config)
+            realm!.beginWrite()
+            realm!.add(obj)
+        }
+        array = V.array(obj)
+        values = V.values()
+    }
+
+    override func tearDown() {
+        realm?.cancelWrite()
+        realm = nil
+        array = nil
+        obj = nil
     }
 }
 

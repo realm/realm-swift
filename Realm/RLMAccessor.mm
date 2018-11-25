@@ -65,9 +65,9 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
 }
 
 template<typename Fn>
-void translateError(Fn&& fn) {
+auto translateError(Fn&& fn) {
     try {
-        fn();
+        return fn();
     }
     catch (std::exception const& e) {
         @throw RLMException(e);
@@ -108,8 +108,8 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
               __unsafe_unretained RLMObjectBase *const val) {
+    RLMVerifyInWriteTransaction(obj);
     if (!val) {
-        RLMVerifyInWriteTransaction(obj);
         obj->_row.nullify_link(colIndex);
         return;
     }
@@ -528,6 +528,7 @@ void RLMReplaceSharedSchemaMethod(Class accessorClass, RLMObjectSchema *schema) 
 }
 
 void RLMDynamicValidatedSet(RLMObjectBase *obj, NSString *propName, id val) {
+    RLMVerifyAttached(obj);
     RLMObjectSchema *schema = obj->_objectSchema;
     RLMProperty *prop = schema[propName];
     if (!prop) {
@@ -557,7 +558,9 @@ id RLMDynamicGet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretain
     realm::Object o(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
     RLMAccessorContext c(obj);
     c.currentProperty = prop;
-    return RLMCoerceToNil(o.get_property_value<id>(c, prop.columnName.UTF8String));
+    return translateError([&] {
+        return RLMCoerceToNil(o.get_property_value<id>(c, prop.columnName.UTF8String));
+    });
 }
 
 id RLMDynamicGetByName(__unsafe_unretained RLMObjectBase *const obj,
@@ -624,6 +627,11 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
         if (prop.array) {
             return static_cast<RLMListBase *>(object_getIvar(obj, prop.swiftIvar))._rlmArray;
         }
+        else if (prop.swiftIvar == RLMDummySwiftIvar) {
+            // FIXME: An invalid property which we're pretending is nil until 4.0
+            // https://github.com/realm/realm-cocoa/issues/5784
+            return NSNull.null;
+        }
         else { // optional
             value = RLMGetOptional(static_cast<RLMOptionalBase *>(object_getIvar(obj, prop.swiftIvar)));
         }
@@ -660,34 +668,34 @@ id RLMAccessorContext::box(realm::Results&& r) {
 }
 
 template<>
-realm::Timestamp RLMAccessorContext::unbox(__unsafe_unretained id const value, bool, bool) {
+realm::Timestamp RLMAccessorContext::unbox(__unsafe_unretained id const value, bool, bool, bool, size_t) {
     id v = RLMCoerceToNil(value);
     return RLMTimestampForNSDate(v);
 }
 
 template<>
-bool RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
+bool RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
     return [v boolValue];
 }
 template<>
-double RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
+double RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
     return [v doubleValue];
 }
 template<>
-float RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
+float RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
     return [v floatValue];
 }
 template<>
-long long RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
+long long RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
     return [v longLongValue];
 }
 template<>
-realm::BinaryData RLMAccessorContext::unbox(id v, bool, bool) {
+realm::BinaryData RLMAccessorContext::unbox(id v, bool, bool, bool, size_t) {
     v = RLMCoerceToNil(v);
     return RLMBinaryDataForNSData(v);
 }
 template<>
-realm::StringData RLMAccessorContext::unbox(id v, bool, bool) {
+realm::StringData RLMAccessorContext::unbox(id v, bool, bool, bool, size_t) {
     v = RLMCoerceToNil(v);
     return RLMStringDataWithNSString(v);
 }
@@ -699,24 +707,24 @@ static auto to_optional(__unsafe_unretained id const value, Fn&& fn) {
 }
 
 template<>
-realm::util::Optional<bool> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
+realm::util::Optional<bool> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
     return to_optional(v, [&](__unsafe_unretained id v) { return (bool)[v boolValue]; });
 }
 template<>
-realm::util::Optional<double> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
+realm::util::Optional<double> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v doubleValue]; });
 }
 template<>
-realm::util::Optional<float> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
+realm::util::Optional<float> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v floatValue]; });
 }
 template<>
-realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool) {
+realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v longLongValue]; });
 }
 
 template<>
-realm::RowExpr RLMAccessorContext::unbox(__unsafe_unretained id const v, bool create, bool update) {
+realm::RowExpr RLMAccessorContext::unbox(__unsafe_unretained id const v, bool create, bool update, bool, size_t) {
     RLMObjectBase *link = RLMDynamicCast<RLMObjectBase>(v);
     if (!link) {
         if (!create)
@@ -771,7 +779,7 @@ void RLMAccessorContext::did_change() {
 }
 
 RLMOptionalId RLMAccessorContext::value_for_property(__unsafe_unretained id const obj,
-                                                     std::string const&, size_t propIndex) {
+                                                     realm::Property const&, size_t propIndex) {
     auto prop = _info.rlmObjectSchema.properties[propIndex];
     id value = propertyValue(obj, propIndex, prop);
     if (value) {
@@ -793,9 +801,9 @@ RLMOptionalId RLMAccessorContext::value_for_property(__unsafe_unretained id cons
 }
 
 RLMOptionalId RLMAccessorContext::default_value_for_property(realm::ObjectSchema const&,
-                                                             std::string const& prop)
+                                                             realm::Property const& prop)
 {
-    return RLMOptionalId{defaultValue(@(prop.c_str()))};
+    return RLMOptionalId{defaultValue(@(prop.name.c_str()))};
 }
 
 bool RLMAccessorContext::is_same_list(realm::List const& list, __unsafe_unretained id const v) const noexcept {

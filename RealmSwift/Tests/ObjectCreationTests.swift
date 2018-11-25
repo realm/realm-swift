@@ -21,11 +21,14 @@ import RealmSwift
 import Realm.Private
 
 class ObjectWithPrivateOptionals: Object {
-    private var int: Int?
-    private var float: Float?
-    private var string: String?
+    private var nilInt: Int?
+    private var nilFloat: Float?
+    private var nilString: String?
+    private var int: Int? = 123
+    private var float: Float? = 1.23
+    private var string: String? = "123"
 
-    @objc dynamic var value = 0
+    @objc dynamic var value = 5
 }
 
 class ObjectCreationTests: TestCase {

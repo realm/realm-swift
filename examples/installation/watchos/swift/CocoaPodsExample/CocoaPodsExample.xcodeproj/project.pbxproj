@@ -213,7 +213,6 @@
 				E8645BA71C7913D600C241AA /* Frameworks */,
 				E8645BA81C7913D600C241AA /* Resources */,
 				2B0A7EAA6DD976230E6D0DC6 /* [CP] Embed Pods Frameworks */,
-				3A2635C065E1F421AECEE8DB /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -311,21 +310,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		3A2635C065E1F421AECEE8DB /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-CocoaPodsExample WatchKit Extension/Pods-CocoaPodsExample WatchKit Extension-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		F4B66E2D18C858408237A5D8 /* [CP] Check Pods Manifest.lock */ = {

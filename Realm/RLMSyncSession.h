@@ -24,12 +24,31 @@
  The current state of the session represented by a session object.
  */
 typedef NS_ENUM(NSUInteger, RLMSyncSessionState) {
-    /// The sync session is bound to the Realm Object Server and communicating with it.
+    /// The sync session is actively communicating or attempting to communicate
+    /// with the Realm Object Server. A session is considered Active even if
+    /// it is not currently connected. Check the connection state instead if you
+    /// wish to know if the connection is currently online.
     RLMSyncSessionStateActive,
-    /// The sync session is not currently communicating with the Realm Object Server.
+    /// The sync session is not attempting to communicate with the Realm Object
+    /// Server, due to the user logging out or synchronization being paused.
     RLMSyncSessionStateInactive,
     /// The sync session encountered a fatal error and is permanently invalid; it should be discarded.
     RLMSyncSessionStateInvalid
+};
+
+/**
+ The current state of a sync session's connection. Sessions which are not in
+ the Active state will always be Disconnected.
+ */
+typedef NS_ENUM(NSUInteger, RLMSyncConnectionState) {
+    /// The sync session is not connected to the server, and is not attempting
+    /// to connect, either because the session is inactive or because it is
+    /// waiting to retry after a failed connection.
+    RLMSyncConnectionStateDisconnected,
+    /// The sync session is attempting to connect to the Realm Object Server.
+    RLMSyncConnectionStateConnecting,
+    /// The sync session is currently connected to the Realm Object Server.
+    RLMSyncConnectionStateConnected,
 };
 
 /**
@@ -105,7 +124,16 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMSyncSession : NSObject
 
 /// The session's current state.
+///
+/// This property is not KVO-compliant.
 @property (nonatomic, readonly) RLMSyncSessionState state;
+
+/// The session's current connection state.
+///
+/// This property is KVO-compliant and can be observed to be notified of changes.
+/// Be warned that KVO observers for this property may be called on a background
+/// thread.
+@property (atomic, readonly) RLMSyncConnectionState connectionState;
 
 /// The Realm Object Server URL of the remote Realm this session corresponds to.
 @property (nullable, nonatomic, readonly) NSURL *realmURL;
@@ -118,6 +146,22 @@ NS_ASSUME_NONNULL_BEGIN
  associated with this session.
  */
 - (nullable RLMSyncConfiguration *)configuration;
+
+/**
+ Temporarily suspend syncronization and disconnect from the server.
+
+ The session will not attempt to connect to Realm Object Server until `resume`
+ is called or the Realm file is closed and re-opened.
+ */
+- (void)suspend;
+
+/**
+ Resume syncronization and reconnect to Realm Object Server after suspending.
+
+ This is a no-op if the session was already active or if the session is invalid.
+ Newly created sessions begin in the Active state and do not need to be resumed.
+ */
+- (void)resume;
 
 /**
  Register a progress notification block.

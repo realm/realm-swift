@@ -20,7 +20,7 @@
 
 #import "RLMRealm.h"
 
-@class RLMResults;
+@class RLMResults, RLMSyncSession;
 
 /**
  A callback used to vend the results of a partial sync fetch.
@@ -44,6 +44,12 @@ NS_ASSUME_NONNULL_BEGIN
 */
 - (void)subscribeToObjects:(Class)type where:(NSString *)query callback:(RLMPartialSyncFetchCallback)callback
 __deprecated_msg("Use -[RLMResults subscribe]");
+
+/**
+ Get the RLMSyncSession used by this Realm. Will be nil if this is not a
+ synchronized Realm.
+*/
+@property (nonatomic, nullable, readonly) RLMSyncSession *syncSession;
 
 @end
 

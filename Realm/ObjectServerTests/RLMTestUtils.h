@@ -21,6 +21,6 @@ void RLMSwapOutInstanceMethod(id classObject, SEL original, SEL swizzled);
 
 #ifndef CUSTOM_REALM_URL
 #define CUSTOM_REALM_URL(realm_identifier) \
-[NSURL URLWithString:[NSString stringWithFormat:@"realm://localhost:9080/~/%@%@", NSStringFromSelector(_cmd), realm_identifier]]
+[NSURL URLWithString:[NSString stringWithFormat:@"realm://127.0.0.1:9080/~/%@%@", NSStringFromSelector(_cmd), realm_identifier]]
 #define REALM_URL() CUSTOM_REALM_URL(@"")
 #endif

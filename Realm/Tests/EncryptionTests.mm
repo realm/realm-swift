@@ -79,7 +79,7 @@
         RLMAssertThrowsWithError([RLMRealm defaultRealm],
                                  @"Unable to open a realm at path",
                                  RLMErrorFileAccess,
-                                 @"Not a Realm file");
+                                 @"invalid mnemonic");
     }
 }
 

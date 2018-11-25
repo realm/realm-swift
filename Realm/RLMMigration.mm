@@ -78,7 +78,7 @@ using namespace realm;
     return self.realm.schema;
 }
 
-- (void)enumerateObjects:(NSString *)className block:(RLMObjectMigrationBlock)block {
+- (void)enumerateObjects:(NSString *)className block:(__attribute__((noescape)) RLMObjectMigrationBlock)block {
     RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm allObjects:className] : nil;
     RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm allObjects:className] : nil;
 

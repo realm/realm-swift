@@ -42,7 +42,6 @@ Usage: sh $0 command [argument]
 command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
-  download-object-server:  downloads and installs the Realm Object Server
   download-sync:        downloads sync library (binary version, core+sync)
   build:                builds all iOS  and OS X frameworks
   ios-static:           builds fat iOS static framework
@@ -124,6 +123,11 @@ xc() {
     fi
 }
 
+xctest() {
+  xc "$@" build
+  xc "$@" test
+}
+
 copy_bcsymbolmap() {
     find "$1" -name '*.bcsymbolmap' -type f -exec cp {} "$2" \;
 }
@@ -144,7 +148,11 @@ build_combined() {
         destination="iPhone 6"
     elif [[ "$os" == "watchos"  ]]; then
         os_name="$os"
-        destination="Apple Watch - 42mm"
+        if (( $(xcode_version_major) >= 10 )); then
+            destination="Apple Watch Series 3 - 42mm"
+        else
+            destination="Apple Watch - 42mm"
+        fi
     elif [[ "$os" == "appletvos"  ]]; then
         os_name="tvos"
         if (( $(xcode_version_major) >= 9 )); then
@@ -181,6 +189,8 @@ build_combined() {
     LIPO_OUTPUT="$out_path/$product_name/$module_name"
     xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
 
+    # Verify that the combined library has bitcode and we didn't accidentally
+    # remove it somewhere along the line
     if [[ "$destination" != "" && "$config" == "Release" ]]; then
         sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
     fi
@@ -304,26 +314,6 @@ fi
 # Downloading
 ######################################
 
-kill_object_server() {
-    set +e
-    # Based on build.sh conventions we always run ROS from a path ending in 'ros/bin/ros'.
-    pkill -f ros/bin/ros\ start
-    # 0 = process killed, 1 = no processes running, 2+ = error
-    local status=$?
-    if [ $status -gt 1 ]; then
-        exit $status
-    fi
-    set -e
-}
-
-download_object_server() {
-    rm -rf ./test-ros-instance
-    mkdir -p ./test-ros-instance/ros
-    chmod 777 ./test-ros-instance
-    /usr/local/bin/node /usr/local/bin/npm install --scripts-prepend-node-path=auto --prefix ./test-ros-instance/ros \
-        -g realm-object-server@${REALM_OBJECT_SERVER_VERSION}
-}
-
 download_common() {
     local download_type=$1 tries_left=3 version url error temp_dir temp_path tar_path
 
@@ -418,38 +408,6 @@ case "$COMMAND" in
     ######################################
     "clean")
         find . -type d -name build -exec rm -r "{}" +
-        exit 0
-        ;;
-
-    ######################################
-    # Object Server
-    ######################################
-    "download-object-server")
-        download_object_server
-        exit 0
-        ;;
-
-    "reset-ros-server-state")
-        rm -rf "./test-ros-instance/data"
-        rm -rf "./test-ros-instance/realm-object-server"
-        exit 0
-        ;;
-
-    "reset-ros-client-state")
-        rm -rf ~/Library/Application\ Support/xctest
-        rm -rf ~/Library/Application\ Support/io.realm.TestHost
-        rm -rf ~/Library/Application\ Support/xctest-child
-        exit 0
-        ;;
-
-    "reset-object-server")
-        kill_object_server
-        # Add a short delay, so file system doesn't complain about files in use
-        sleep 1
-        sh build.sh reset-ros-server-state
-        sh build.sh reset-ros-client-state
-        # Add another delay to ensure files are actually gone from file system
-        sleep 1
         exit 0
         ;;
 
@@ -678,7 +636,7 @@ case "$COMMAND" in
         else
             destination="Apple TV 1080p"
         fi
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination' test"
+        xctest "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination'"
         exit $?
         ;;
 
@@ -688,7 +646,7 @@ case "$COMMAND" in
         else
             destination="Apple TV 1080p"
         fi
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination' test"
+        xctest "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination'"
         exit $?
         ;;
 
@@ -701,17 +659,17 @@ case "$COMMAND" in
         if [[ "$CONFIGURATION" == "Debug" ]]; then
             COVERAGE_PARAMS="GCC_GENERATE_TEST_COVERAGE_FILES=YES GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES"
         fi
-        xc "-scheme Realm -configuration $CONFIGURATION test $COVERAGE_PARAMS"
+        xctest "-scheme Realm -configuration $CONFIGURATION $COVERAGE_PARAMS"
         exit 0
         ;;
 
     "test-osx-swift")
-        xc "-scheme RealmSwift -configuration $CONFIGURATION test"
+        xctest "-scheme RealmSwift -configuration $CONFIGURATION"
         exit 0
         ;;
 
     "test-osx-object-server")
-        xc "-scheme 'Object Server Tests' -configuration $CONFIGURATION -sdk macosx test"
+        xctest "-scheme 'Object Server Tests' -configuration $CONFIGURATION -sdk macosx"
         exit 0
         ;;
 
@@ -756,6 +714,8 @@ case "$COMMAND" in
           fi
         fi
 
+        # https://github.com/CocoaPods/CocoaPods/issues/7708
+        export EXPANDED_CODE_SIGN_IDENTITY=''
         cd examples/installation
         sh build.sh test-ios-objc-cocoapods
         sh build.sh test-ios-objc-cocoapods-dynamic
@@ -849,9 +809,7 @@ case "$COMMAND" in
         ;;
 
     "verify-osx-object-server")
-        sh build.sh download-object-server
         sh build.sh test-osx-object-server
-        sh build.sh reset-object-server
         exit 0
         ;;
 
@@ -1055,7 +1013,7 @@ EOM
           cp Realm/ObjectStore/src/util/*.hpp include/util
           cp Realm/ObjectStore/src/util/apple/*.hpp include/util/apple
 
-          touch Realm/RLMPlatform.h
+          echo '' > Realm/RLMPlatform.h
           if [ -n "$COCOAPODS_VERSION" ]; then
             # This variable is set for the prepare_command available
             # from the 1.0 prereleases, which requires a different
@@ -1079,6 +1037,8 @@ EOM
 
     "ci-pr")
         mkdir -p build/reports
+        export REALM_DISABLE_ANALYTICS=1
+        export REALM_DISABLE_UPDATE_CHECKER=1
         # FIXME: Re-enable once CI can properly unlock the keychain
         export REALM_DISABLE_METADATA_ENCRYPTION=1
 
@@ -1095,8 +1055,11 @@ EOM
         else
             export sha=$GITHUB_PR_SOURCE_BRANCH
             export CONFIGURATION=$configuration
-            export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO REALM_PREFIX_HEADER=Realm/RLMPrefix.h'
+            export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO'
             sh build.sh prelaunch-simulator
+
+            source $(brew --prefix nvm)/nvm.sh
+            export REALM_NODE_PATH="$(nvm which 8)"
 
             # Reset CoreSimulator.log
             mkdir -p ~/Library/Logs/CoreSimulator
@@ -1198,6 +1161,24 @@ EOM
         sh build.sh prelaunch-simulator
         sh build.sh watchos
 
+        # If we're building the obj-c library with an Xcode version older than
+        # 10, we need to also build the arm64_32 slice with Xcode 10 and lipo
+        # it in
+        if (( $(xcode_version_major) < 10 )); then
+            (
+                REALM_XCODE_VERSION=10.0
+                REALM_SWIFT_VERSION=
+                set_xcode_and_swift_versions
+                sh build.sh prelaunch-simulator
+                xc "-scheme Realm -configuration $CONFIGURATION -sdk watchos ARCHS='arm64_32'"
+                cp build/DerivedData/Realm/Build/Products/Release-watchos/Realm.framework/*.bcsymbolmap build/watchos/Realm.framework
+                xcrun lipo \
+                  -create build/watchos/Realm.framework/Realm build/DerivedData/Realm/Build/Products/Release-watchos/Realm.framework/Realm \
+                  -output build/watchos-tmp
+                mv build/watchos-tmp build/watchos/Realm.framework/Realm
+            )
+        fi
+
         cd build/watchos
         zip --symlinks -r realm-framework-watchos.zip Realm.framework
         ;;
@@ -1212,7 +1193,7 @@ EOM
 
     package-*-swift)
         PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        for version in 8.3.3 9.0 9.1 9.2 9.3; do
+        for version in 9.1 9.2 9.3 9.4 10.0; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1221,28 +1202,11 @@ EOM
         done
 
         cd build/$PLATFORM
-        ln -s swift-4.0 swift-3.2
-        ln -s swift-4.0.2 swift-3.2.2
-        ln -s swift-4.0.2 swift-3.2.3
-        ln -s swift-4.0.2 swift-4.0.3
+        ln -s swift-4.0.3 swift-3.2.3
         ln -s swift-4.1 swift-3.3
-        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-3.1 swift-3.2 swift-3.2.2 swift-3.2.3 swift-3.3 swift-4.0 swift-4.0.2 swift-4.0.3 swift-4.1
-        ;;
-
-    package-*-swift-3.2)
-        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        mkdir -p build/$PLATFORM
-        cd build/$PLATFORM
-        ln -s swift-4.0 swift-3.2
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.2.zip swift-3.2
-        ;;
-
-    package-*-swift-3.2.2)
-        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        mkdir -p build/$PLATFORM
-        cd build/$PLATFORM
-        ln -s swift-4.0.2 swift-3.2.2
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.2.2.zip swift-3.2.2
+        ln -s swift-4.1.2 swift-3.3.2
+        ln -s swift-4.2 swift-3.4
+        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-3.2.3 swift-3.3 swift-3.3.2 swift-3.4 swift-4.0.3 swift-4.1 swift-4.1.2 swift-4.2
         ;;
 
     package-*-swift-3.2.3)
@@ -1261,12 +1225,20 @@ EOM
         zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.3.zip swift-3.3
         ;;
 
-    package-*-swift-4.0.3)
+    package-*-swift-3.3.2)
         PLATFORM=$(echo $COMMAND | cut -d - -f 2)
         mkdir -p build/$PLATFORM
         cd build/$PLATFORM
-        ln -s swift-4.0.2 swift-4.0.3
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-4.0.3.zip swift-4.0.3
+        ln -s swift-4.1.2 swift-3.3.2
+        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.3.2.zip swift-3.3.2
+        ;;
+
+    package-*-swift-3.4)
+        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
+        mkdir -p build/$PLATFORM
+        cd build/$PLATFORM
+        ln -s swift-4.2 swift-3.4
+        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.4.zip swift-3.4
         ;;
 
     package-*-swift-*)
@@ -1457,20 +1429,21 @@ EOF
 
     "add-empty-changelog")
         empty_section=$(cat <<EOS
-x.x.x Release notes (yyyy-MM-dd)
+x.y.z Release notes (yyyy-MM-dd)
 =============================================================
-
-### Breaking Changes
-
-* None.
-
 ### Enhancements
-
 * None.
 
-### Bugfixes
-
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
 * None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.11.0 or later.
+* APIs are backwards compatible with all previous releases in the 3.x.y series.
 EOS)
         changelog=$(cat CHANGELOG.md)
         echo "$empty_section" > CHANGELOG.md

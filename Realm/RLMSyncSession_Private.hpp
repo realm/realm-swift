@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
     std::weak_ptr<realm::SyncSession> _session;
 } RLM_SYNC_UNINITIALIZABLE
 
-- (instancetype)initWithSyncSession:(std::shared_ptr<realm::SyncSession>)session;
+- (instancetype)initWithSyncSession:(std::shared_ptr<realm::SyncSession> const&)session;
 
 /// Wait for pending uploads to complete or the session to expire, and dispatch the callback onto the specified queue.
 - (BOOL)waitForUploadCompletionOnQueue:(nullable dispatch_queue_t)queue callback:(void(^)(NSError * _Nullable))callback;

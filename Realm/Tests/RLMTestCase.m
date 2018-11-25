@@ -83,9 +83,10 @@ static BOOL encryptTests() {
     // re-enabled and we need it enabled for performance tests
     RLMDisableSyncToDisk();
 #endif
-    [self preintializeSchema];
 
     if (!getenv("RLMProcessIsChild")) {
+        [self preinitializeSchema];
+
         // Clean up any potentially lingering Realm files from previous runs
         [NSFileManager.defaultManager removeItemAtPath:RLMRealmPathForFile(@"") error:nil];
     }
@@ -100,7 +101,7 @@ static BOOL encryptTests() {
 // so if an exception is thrown, it will kill the test process rather than
 // allowing hundreds of test cases to fail in strange ways
 // This is overridden by RLMMultiProcessTestCase to support testing the schema init
-+ (void)preintializeSchema {
++ (void)preinitializeSchema {
     [RLMSchema sharedSchema];
 }
 

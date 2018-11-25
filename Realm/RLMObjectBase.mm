@@ -247,7 +247,7 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
     NSMutableString *mString = [NSMutableString stringWithFormat:@"%@ {\n", baseClassName];
 
     for (RLMProperty *property in _objectSchema.properties) {
-        id object = _realm ? RLMDynamicGetByName(self, property.name, true) : [self valueForKey:property.name];
+        id object = [(id)self objectForKeyedSubscript:property.name];
         NSString *sub;
         if ([object respondsToSelector:@selector(descriptionWithMaxDepth:)]) {
             sub = [object descriptionWithMaxDepth:depth - 1];
@@ -411,7 +411,7 @@ void RLMObjectBaseSetObjectForKeyedSubscript(RLMObjectBase *object, NSString *ke
         return;
     }
 
-    if (object->_realm) {
+    if (object->_realm || object.class == object->_objectSchema.accessorClass) {
         RLMDynamicValidatedSet(object, key, obj);
     }
     else {

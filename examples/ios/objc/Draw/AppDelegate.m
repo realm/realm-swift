@@ -42,10 +42,7 @@
 
     if ([RLMSyncUser currentUser]) {
         NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", kIPAddress]];
-        RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:[RLMSyncUser currentUser] realmURL:syncURL];
-        RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
-        defaultConfig.syncConfiguration = syncConfig;
-        [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
+        RLMRealmConfiguration.defaultConfiguration = [RLMSyncUser.currentUser configurationWithURL:syncURL fullSynchronization:YES];
         self.window.rootViewController.view = [DrawView new];
     }
     else {
@@ -87,10 +84,7 @@
                                     // The `~` represents the Realm user ID. Since the user ID is not known until you
                                     // log in, the ~ is used as short-hand to represent this.
                                  NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", kIPAddress]];
-                                 RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user realmURL:syncURL];
-                                 RLMRealmConfiguration *defaultConfig = [RLMRealmConfiguration defaultConfiguration];
-                                 defaultConfig.syncConfiguration = syncConfig;
-                                 [RLMRealmConfiguration setDefaultConfiguration:defaultConfig];
+                                 RLMRealmConfiguration.defaultConfiguration = [RLMSyncUser.currentUser configurationWithURL:syncURL fullSynchronization:YES];
                                  
                                  self.window.rootViewController.view = [DrawView new];
                              }

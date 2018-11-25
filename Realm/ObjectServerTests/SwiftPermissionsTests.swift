@@ -50,8 +50,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
     // MARK: Helper functions
 
     func openRealm(_ url: URL, _ user: SyncUser) -> Realm {
-        let realm = try! Realm(configuration: Realm.Configuration(syncConfiguration:
-            SyncConfiguration(user: user, realmURL: url, isPartial: true)))
+        let realm = try! Realm(configuration: user.configuration(realmURL: url))
         waitForSync(realm)
         return realm
     }
@@ -78,7 +77,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         // Create a new Realm with an admin user
         let admin = createAdminUser(for: SwiftSyncTestCase.authServerURL(),
                                     username: UUID().uuidString + "-admin")
-        let url = URL(string: "realm://localhost:9080/\(name)")!
+        let url = URL(string: "realm://127.0.0.1:9080/\(name)")!
         let adminRealm = openRealm(url, admin)
         // FIXME: we currently need to add a subscription to get the permissions types sent to us
         subscribe(realm: adminRealm, type: SwiftSyncObject.self)

@@ -18,6 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "RLMRealmConfiguration.h"
 #import "RLMResults.h"
 #import "RLMSyncCredentials.h"
 #import "RLMSyncPermission.h"
@@ -96,6 +97,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, readonly) NSString *identity;
 
 /**
+ The user's refresh token used to access the Realm Object Server.
+
+ This is required to make HTTP requests to Realm Object Server's REST API
+ for functionality not exposed natively. It should be treated as sensitive data.
+ */
+@property (nullable, nonatomic, readonly) NSString *refreshToken;
+
+/**
  The URL of the authentication server this user will communicate with.
  */
 @property (nullable, nonatomic, readonly) NSURL *authenticationServer;
@@ -144,6 +153,64 @@ NS_ASSUME_NONNULL_BEGIN
                authServerURL:(NSURL *)authServerURL
                 onCompletion:(RLMUserCompletionBlock)completion
 NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
+
+
+/**
+ Returns the default configuration for the user. The default configuration
+ points to the default query-based Realm on the server the user authenticated against.
+ */
+- (RLMRealmConfiguration *)configuration NS_REFINED_FOR_SWIFT;
+
+/**
+ Create a query-based configuration instance for the given url.
+
+ @param url The unresolved absolute URL to the Realm on the Realm Object Server,
+            e.g. "realm://example.org/~/path/to/realm". "Unresolved" means the
+            path should contain the wildcard marker `~`, which will automatically
+            be filled in with the user identity by the Realm Object Server.
+ @return A default configuration object with the sync configuration set to use the given URL.
+ */
+- (RLMRealmConfiguration *)configurationWithURL:(nullable NSURL *)url NS_REFINED_FOR_SWIFT;
+
+/**
+ Create a configuration instance for the given url.
+
+ @param url The unresolved absolute URL to the Realm on the Realm Object Server,
+            e.g. "realm://example.org/~/path/to/realm". "Unresolved" means the
+            path should contain the wildcard marker `~`, which will automatically
+            be filled in with the user identity by the Realm Object Server.
+ @param fullSynchronization If YES, all objects in the server Realm are
+                            automatically synchronized, and the query subscription
+                            methods cannot be used.
+ @return A default configuration object with the sync configuration set to use
+         the given URL and options.
+ */
+- (RLMRealmConfiguration *)configurationWithURL:(nullable NSURL *)url
+                            fullSynchronization:(bool)fullSynchronization NS_REFINED_FOR_SWIFT;
+
+/**
+ Create a configuration instance for the given url.
+
+ @param url The unresolved absolute URL to the Realm on the Realm Object Server,
+            e.g. "realm://example.org/~/path/to/realm". "Unresolved" means the
+            path should contain the wildcard marker `~`, which will automatically
+            be filled in with the user identity by the Realm Object Server.
+ @param fullSynchronization If YES, all objects in the server Realm are
+                            automatically synchronized, and the query subscription
+                            methods cannot be used.
+ @param enableSSLValidation If NO, invalid SSL certificates for the server will
+                            not be rejected. THIS SHOULD NEVER BE USED IN
+                            PRODUCTION AND EXISTS ONLY FOR TESTING PURPOSES.
+ @param urlPrefix A prefix which is prepending to URLs constructed for
+                  the server. This should normally be `nil`, and customized only
+                  to match corresponding settings on the server.
+ @return A default configuration object with the sync configuration set to use
+         the given URL and options.
+ */
+- (RLMRealmConfiguration *)configurationWithURL:(nullable NSURL *)url
+                            fullSynchronization:(bool)fullSynchronization
+                            enableSSLValidation:(bool)enableSSLValidation
+                                      urlPrefix:(nullable NSString *)urlPrefix NS_REFINED_FOR_SWIFT;
 
 /**
  Log a user out, destroying their server state, unregistering them from the SDK,

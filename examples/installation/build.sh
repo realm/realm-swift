@@ -98,7 +98,11 @@ xctest() {
     else
         ACTION="build test"
     fi
-    xcodebuild $CMD -scheme $NAME clean $ACTION $DESTINATION CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
+    if [[ $PLATFORM == ios ]]; then
+        xcodebuild $CMD -scheme $NAME clean $ACTION $DESTINATION CODE_SIGN_IDENTITY=
+    else
+        xcodebuild $CMD -scheme $NAME clean $ACTION $DESTINATION CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
+    fi
 }
 
 source "$(dirname "$0")/../../scripts/swift-version.sh"

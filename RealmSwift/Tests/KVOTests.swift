@@ -103,50 +103,9 @@ class KVOTests: TestCase {
     func observeChange<T: Equatable>(_ obj: KVOObject, _ key: String, _ old: T?, _ new: T?,
                                      fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         let kvoOptions: NSKeyValueObservingOptions = [.old, .new]
-#if swift(>=3.2)
-        func observe<Value>(_ keyPath: KeyPath<KVOObject, Value>) -> NSKeyValueObservation {
-            return obj.observe(keyPath, options: kvoOptions) { _, change in
-                self.changeDictionary = [
-                    .oldKey: change.oldValue as? T as Any,
-                    .newKey: change.newValue as? T as Any
-                ]
-            }
-        }
-
-        let observation: NSKeyValueObservation?
-        switch key {
-        case "boolCol":      observation = observe(\.boolCol)
-        case "int8Col":      observation = observe(\.int8Col)
-        case "int16Col":     observation = observe(\.int16Col)
-        case "int32Col":     observation = observe(\.int32Col)
-        case "int64Col":     observation = observe(\.int64Col)
-        case "floatCol":     observation = observe(\.floatCol)
-        case "doubleCol":    observation = observe(\.doubleCol)
-        case "stringCol":    observation = observe(\.stringCol)
-        case "binaryCol":    observation = observe(\.binaryCol)
-        case "dateCol":      observation = observe(\.dateCol)
-        case "objectCol":    observation = observe(\.objectCol)
-        case "optStringCol": observation = observe(\.optStringCol)
-        case "optBinaryCol": observation = observe(\.optBinaryCol)
-        case "optDateCol":   observation = observe(\.optDateCol)
-        case "invalidated":  observation = observe(\.invalidated)
-        default:
-            // some properties don't support Swift Smart KeyPaths, fall back to legacy KVO API
-            observation = nil
-            obj.addObserver(self, forKeyPath: key, options: kvoOptions, context: nil)
-        }
-
-        block()
-        if let observation = observation {
-            observation.invalidate()
-        } else {
-            obj.removeObserver(self, forKeyPath: key)
-        }
-#else
         obj.addObserver(self, forKeyPath: key, options: kvoOptions, context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)
-#endif
 
         XCTAssert(changeDictionary != nil, "Did not get a notification", file: fileName, line: lineNumber)
         guard changeDictionary != nil else { return }
@@ -163,6 +122,32 @@ class KVOTests: TestCase {
 
         changeDictionary = nil
     }
+
+#if swift(>=3.2)
+    func observeChange<T: Equatable>(_ obj: KVOObject, _ keyPath: KeyPath<KVOObject, T>, _ old: Any?, _ new: Any?,
+                                     fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
+        let kvoOptions: NSKeyValueObservingOptions = [.old, .new]
+        var gotNotification = false
+        let observation = obj.observe(keyPath, options: kvoOptions) { _, change in
+            if let old = old {
+                XCTAssertEqual(change.oldValue, (old as! T), file: fileName, line: lineNumber)
+            } else {
+                XCTAssertNil(change.oldValue, file: fileName, line: lineNumber)
+            }
+            if let new = new {
+                XCTAssertEqual(change.newValue, (new as! T), file: fileName, line: lineNumber)
+            } else {
+                XCTAssertNil(change.newValue, file: fileName, line: lineNumber)
+            }
+            gotNotification = true
+        }
+
+        block()
+        observation.invalidate()
+
+        XCTAssertTrue(gotNotification, file: fileName, line: lineNumber)
+    }
+#endif
 
     func observeListChange(_ obj: NSObject, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet = NSIndexSet(index: 0),
                            fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
@@ -277,6 +262,48 @@ class KVOTests: TestCase {
             self.realm.delete(obj2)
         }
     }
+
+#if swift(>=3.2)
+    func testTypedObservation() {
+        let (obj, obs) = getObject(KVOObject())
+
+        observeChange(obs, \.boolCol, false, true) { obj.boolCol = true }
+
+        observeChange(obs, \.int8Col, 1 as Int8, 10 as Int8) { obj.int8Col = 10 }
+        observeChange(obs, \.int16Col, 2 as Int16, 10 as Int16) { obj.int16Col = 10 }
+        observeChange(obs, \.int32Col, 3 as Int32, 10 as Int32) { obj.int32Col = 10 }
+        observeChange(obs, \.int64Col, 4 as Int64, 10 as Int64) { obj.int64Col = 10 }
+        observeChange(obs, \.floatCol, 5 as Float, 10 as Float) { obj.floatCol = 10 }
+        observeChange(obs, \.doubleCol, 6 as Double, 10 as Double) { obj.doubleCol = 10 }
+        observeChange(obs, \.stringCol, "", "abc") { obj.stringCol = "abc" }
+
+        let data = "abc".data(using: String.Encoding.utf8, allowLossyConversion: false)!
+        observeChange(obs, \.binaryCol, Data(), data) { obj.binaryCol = data }
+
+        let date = Date(timeIntervalSince1970: 1)
+        observeChange(obs, \.dateCol, Date(timeIntervalSince1970: 0), date) { obj.dateCol = date }
+
+#if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
+        observeChange(obs, \.objectCol, nil, obj) { obj.objectCol = obj }
+
+        observeChange(obs, \.optStringCol, nil, "abc") { obj.optStringCol = "abc" }
+        observeChange(obs, \.optBinaryCol, nil, data) { obj.optBinaryCol = data }
+        observeChange(obs, \.optDateCol, nil, date) { obj.optDateCol = date }
+
+        observeChange(obs, \.optStringCol, "abc", nil) { obj.optStringCol = nil }
+        observeChange(obs, \.optBinaryCol, data, nil) { obj.optBinaryCol = nil }
+        observeChange(obs, \.optDateCol, date, nil) { obj.optDateCol = nil }
+#endif
+
+        if obs.realm == nil {
+            return
+        }
+
+        observeChange(obs, \.isInvalidated, false, true) {
+            self.realm.delete(obj)
+        }
+    }
+#endif
 
     func testReadSharedSchemaFromObservedObject() {
         let obj = KVOObject()

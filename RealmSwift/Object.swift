@@ -69,7 +69,6 @@ import Realm.Private
 @objc(RealmSwiftObject)
 open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
     /// :nodoc:
-    // swiftlint:disable:next identifier_name
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectClassName: className())
     }
@@ -369,6 +368,11 @@ public final class DynamicObject: Object {
         set(value) {
             RLMDynamicValidatedSet(self, key, value)
         }
+    }
+
+    /// :nodoc:
+    public override func dynamicList(_ propertyName: String) -> List<DynamicObject> {
+        return self[propertyName] as! List<DynamicObject>
     }
 
     /// :nodoc:

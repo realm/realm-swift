@@ -34,7 +34,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
-        let url = URL(string: "realm://localhost:9080/~/testBasicSync")!
+        let url = URL(string: "realm://127.0.0.1:9080/~/testBasicSync")!
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials(register: true), server: authURL)
             let realm = try synchronouslyOpenRealm(url: url, user: user)
@@ -97,6 +97,34 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
     }
+
+#if swift(>=3.2)
+    func testConnectionState() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials(register: true), server: authURL)
+        let realm = try! synchronouslyOpenRealm(url: realmURL, user: user)
+        let session = realm.syncSession!
+
+        func wait(forState desiredState: SyncSession.ConnectionState) {
+            let ex = expectation(description: "Wait for connection state: \(desiredState)")
+            let token = session.observe(\SyncSession.connectionState, options: .initial) { s, _ in
+                if s.connectionState == desiredState {
+                    ex.fulfill()
+                }
+            }
+            waitForExpectations(timeout: 2.0)
+            token.invalidate()
+        }
+
+        wait(forState: .connected)
+
+        session.suspend()
+        wait(forState: .disconnected)
+
+        session.resume()
+        wait(forState: .connecting)
+        wait(forState: .connected)
+    }
+#endif // Swift >= 3.2
 
     // MARK: - Client reset
 
@@ -169,7 +197,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             if isParent {
-                let session = user.session(for: realmURL)
+                let session = realm.syncSession
                 XCTAssertNotNil(session)
                 let ex = expectation(description: "streaming-downloads-expectation")
                 var hasBeenFulfilled = false
@@ -212,7 +240,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             var transferrable = 0
             let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
-            let session = user.session(for: realmURL)
+            let session = realm.syncSession
             XCTAssertNotNil(session)
             let ex = expectation(description: "streaming-uploads-expectation")
             var hasBeenFulfilled = false
@@ -251,7 +279,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 // Wait for the child process to upload everything.
                 executeChild()
                 let ex = expectation(description: "download-realm")
-                let config = Realm.Configuration(syncConfiguration: SyncConfiguration(user: user, realmURL: realmURL))
+                let config = user.configuration(realmURL: realmURL, fullSynchronization: true)
                 let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
                 XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
                 Realm.asyncOpen(configuration: config) { realm, error in
@@ -415,96 +443,185 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
 // Partial sync subscriptions are only available in Swift 3.2 and newer.
 #if swift(>=3.2)
-    func testPartialSync() {
+    func populateTestRealm(_ username: String) {
         autoreleasepool {
-            // Log in and populate the Realm.
-            autoreleasepool {
-                let credentials = SyncCredentials.usernamePassword(username: "Swift.testPartialSync", password: "a", register: true)
-                let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
-                let realm = try! synchronouslyOpenRealm(configuration: SyncConfiguration.automatic(user: user))
+            let credentials = SyncCredentials.usernamePassword(username: username, password: "a", register: true)
+            let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
+            let realm = try! synchronouslyOpenRealm(configuration: user.configuration())
 
-                try! realm.write {
-                    realm.add(SwiftPartialSyncObjectA(number: 0, string: "realm"))
-                    realm.add(SwiftPartialSyncObjectA(number: 1, string: ""))
-                    realm.add(SwiftPartialSyncObjectA(number: 2, string: ""))
-                    realm.add(SwiftPartialSyncObjectA(number: 3, string: ""))
-                    realm.add(SwiftPartialSyncObjectA(number: 4, string: "realm"))
-                    realm.add(SwiftPartialSyncObjectA(number: 5, string: "sync"))
-                    realm.add(SwiftPartialSyncObjectA(number: 6, string: "partial"))
-                    realm.add(SwiftPartialSyncObjectA(number: 7, string: "partial"))
-                    realm.add(SwiftPartialSyncObjectA(number: 8, string: "partial"))
-                    realm.add(SwiftPartialSyncObjectA(number: 9, string: "partial"))
-                    realm.add(SwiftPartialSyncObjectB(number: 0, firstString: "", secondString: ""))
-                    realm.add(SwiftPartialSyncObjectB(number: 1, firstString: "", secondString: ""))
-                    realm.add(SwiftPartialSyncObjectB(number: 2, firstString: "", secondString: ""))
-                    realm.add(SwiftPartialSyncObjectB(number: 3, firstString: "", secondString: ""))
-                    realm.add(SwiftPartialSyncObjectB(number: 4, firstString: "", secondString: ""))
-                    realm.add(SwiftPartialSyncObjectB(number: 5, firstString: "", secondString: ""))
-                    realm.add(SwiftPartialSyncObjectB(number: 6, firstString: "", secondString: ""))
-                    realm.add(SwiftPartialSyncObjectB(number: 7, firstString: "", secondString: ""))
-                    realm.add(SwiftPartialSyncObjectB(number: 8, firstString: "", secondString: ""))
-                    realm.add(SwiftPartialSyncObjectB(number: 9, firstString: "", secondString: ""))
-                }
-
-                waitForUploads(for: realm)
+            try! realm.write {
+                realm.add(SwiftPartialSyncObjectA(number: 0, string: "realm"))
+                realm.add(SwiftPartialSyncObjectA(number: 1, string: ""))
+                realm.add(SwiftPartialSyncObjectA(number: 2, string: ""))
+                realm.add(SwiftPartialSyncObjectA(number: 3, string: ""))
+                realm.add(SwiftPartialSyncObjectA(number: 4, string: "realm"))
+                realm.add(SwiftPartialSyncObjectA(number: 5, string: "sync"))
+                realm.add(SwiftPartialSyncObjectA(number: 6, string: "partial"))
+                realm.add(SwiftPartialSyncObjectA(number: 7, string: "partial"))
+                realm.add(SwiftPartialSyncObjectA(number: 8, string: "partial"))
+                realm.add(SwiftPartialSyncObjectA(number: 9, string: "partial"))
+                realm.add(SwiftPartialSyncObjectB(number: 0, firstString: "", secondString: ""))
+                realm.add(SwiftPartialSyncObjectB(number: 1, firstString: "", secondString: ""))
+                realm.add(SwiftPartialSyncObjectB(number: 2, firstString: "", secondString: ""))
+                realm.add(SwiftPartialSyncObjectB(number: 3, firstString: "", secondString: ""))
+                realm.add(SwiftPartialSyncObjectB(number: 4, firstString: "", secondString: ""))
+                realm.add(SwiftPartialSyncObjectB(number: 5, firstString: "", secondString: ""))
+                realm.add(SwiftPartialSyncObjectB(number: 6, firstString: "", secondString: ""))
+                realm.add(SwiftPartialSyncObjectB(number: 7, firstString: "", secondString: ""))
+                realm.add(SwiftPartialSyncObjectB(number: 8, firstString: "", secondString: ""))
+                realm.add(SwiftPartialSyncObjectB(number: 9, firstString: "", secondString: ""))
             }
-
-            // Log back in and do partial sync stuff.
-            autoreleasepool {
-                let credentials = SyncCredentials.usernamePassword(username: "Swift.testPartialSync", password: "a")
-                let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
-                let realm = try! synchronouslyOpenRealm(configuration: SyncConfiguration.automatic(user: user))
-
-                let ex = expectation(description: "Should be able to successfully complete a query")
-                let results = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5")
-                let subscription = results.subscribe(named: "query")
-                XCTAssertEqual(subscription.state, .creating)
-                waitUntilStateMatches(subscription, expectation: ex) { state in state == .complete }
-
-                // Verify that we got what we're looking for
-                XCTAssertEqual(results.count, 4)
-                for object in results {
-                    XCTAssertGreaterThan(object.number, 5)
-                    XCTAssertEqual(object.string, "partial")
-                }
-
-                // And that we didn't get anything else.
-                XCTAssertEqual(realm.objects(SwiftPartialSyncObjectA.self).count, results.count)
-                XCTAssertTrue(realm.objects(SwiftPartialSyncObjectB.self).isEmpty)
-
-                // Re-subscribing to an existing named query may not report the query's state immediately,
-                // but it should report it eventually.
-                let ex2 = expectation(description: "Re-subscribing should fire the state change callback")
-                let subscription2 = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5").subscribe(named: "query")
-                waitUntilStateMatches(subscription2, expectation: ex2) { state in state == .complete }
-
-                // Creating a subscription with the same name but different query should raise an error.
-                let ex3 = expectation(description: "Waiting for error")
-                let subscription3 = realm.objects(SwiftPartialSyncObjectA.self).filter("number < 5").subscribe(named: "query")
-                waitUntilStateMatches(subscription3, expectation: ex3) { state in
-                    if case .error(_) = state {
-                        return true
-                    }
-                    return false
-                }
-
-                // Unsubscribing should move the subscription to the invalidated state.
-                let ex4 = expectation(description: "Waiting for unsubscribe")
-                subscription.unsubscribe()
-                waitUntilStateMatches(subscription, expectation: ex4) { state in state == .invalidated }
-            }
+            waitForUploads(for: realm)
         }
     }
 
-    func waitUntilStateMatches<T>(_ subscription: SyncSubscription<T>, expectation: XCTestExpectation,
-                                  matcher: @escaping (SyncSubscriptionState) -> Bool) {
+    func testPartialSync() {
+        populateTestRealm(#function)
+
+        let credentials = SyncCredentials.usernamePassword(username: #function, password: "a")
+        let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
+        let realm = try! synchronouslyOpenRealm(configuration: user.configuration())
+
+        let results = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5")
+        let subscription = results.subscribe(named: "query")
+        XCTAssertEqual(subscription.state, .creating)
+        waitForState(subscription, .complete)
+
+        // Verify that we got what we're looking for
+        XCTAssertEqual(results.count, 4)
+        for object in results {
+            XCTAssertGreaterThan(object.number, 5)
+            XCTAssertEqual(object.string, "partial")
+        }
+
+        // And that we didn't get anything else.
+        XCTAssertEqual(realm.objects(SwiftPartialSyncObjectA.self).count, results.count)
+        XCTAssertTrue(realm.objects(SwiftPartialSyncObjectB.self).isEmpty)
+
+        // Re-subscribing to an existing named query may not report the query's state immediately,
+        // but it should report it eventually.
+        let subscription2 = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5").subscribe(named: "query")
+        waitForState(subscription2, .complete)
+
+        // Creating a subscription with the same name but different query should raise an error.
+        let subscription3 = realm.objects(SwiftPartialSyncObjectA.self).filter("number < 5").subscribe(named: "query")
+        waitForError(subscription3)
+
+        // Unsubscribing should move the subscription to the invalidated state.
+        subscription.unsubscribe()
+        waitForState(subscription, .invalidated)
+    }
+
+    func testPartialSyncLimit() {
+        populateTestRealm(#function)
+
+        let credentials = SyncCredentials.usernamePassword(username: #function, password: "a")
+        let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
+        let realm = try! synchronouslyOpenRealm(configuration: user.configuration())
+
+        let results = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5")
+        waitForState(results.subscribe(named: "query", limit: 1), .complete)
+        XCTAssertEqual(results.count, 1)
+        XCTAssertEqual(realm.objects(SwiftPartialSyncObjectA.self).count, 1)
+        if let object = results.first {
+            XCTAssertGreaterThan(object.number, 5)
+            XCTAssertEqual(object.string, "partial")
+        }
+
+        let results2 = realm.objects(SwiftPartialSyncObjectA.self).sorted(byKeyPath: "number", ascending: false)
+        waitForState(results2.subscribe(named: "query2", limit: 2), .complete)
+        XCTAssertEqual(results2.count, 3)
+        XCTAssertEqual(realm.objects(SwiftPartialSyncObjectA.self).count, 3)
+        for object in results2 {
+            XCTAssertTrue(object.number == 6 || object.number >= 8,
+                          "\(object.number) == 6 || \(object.number) >= 8")
+            XCTAssertEqual(object.string, "partial")
+        }
+    }
+
+    func waitForState<T>(_ subscription: SyncSubscription<T>, _ desiredState: SyncSubscriptionState) {
+        let ex = expectation(description: "Waiting for state \(desiredState)")
         let token = subscription.observe(\.state, options: .initial) { state in
-            if matcher(state) {
-                expectation.fulfill()
+            if state == desiredState {
+                ex.fulfill()
+            }
+        }
+        waitForExpectations(timeout: 20.0)
+        token.invalidate()
+    }
+
+    func waitForError<T>(_ subscription: SyncSubscription<T>) {
+        let ex = expectation(description: "Waiting for error state")
+        let token = subscription.observe(\.state, options: .initial) { state in
+            if case .error(_) = state {
+                ex.fulfill()
             }
         }
         waitForExpectations(timeout: 20.0)
         token.invalidate()
     }
 #endif // Swift >= 3.2
+
+    // MARK: - Certificate Pinning
+
+    func testSecureConnectionToLocalhostWithDefaultSecurity() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
+        let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
+                                        serverValidationPolicy: .system)
+
+        let ex = expectation(description: "Waiting for error handler to be called")
+        SyncManager.shared.errorHandler = { (error, session) in
+            ex.fulfill()
+        }
+
+        _ = try! Realm(configuration: config)
+        self.waitForExpectations(timeout: 4.0)
+    }
+
+    func testSecureConnectionToLocalhostWithValidationDisabled() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
+        let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
+                                        serverValidationPolicy: .none)
+        SyncManager.shared.errorHandler = { (error, session) in
+            XCTFail("Unexpected connection failure: \(error)")
+        }
+
+        let realm = try! Realm(configuration: config)
+        self.waitForUploads(for: realm)
+    }
+
+    func testSecureConnectionToLocalhostWithPinnedCertificate() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
+        let certURL = URL(string: #file)!
+            .deletingLastPathComponent()
+            .appendingPathComponent("certificates")
+            .appendingPathComponent("localhost.cer")
+
+        let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
+                                        serverValidationPolicy: .pinCertificate(path: certURL))
+        SyncManager.shared.errorHandler = { (error, session) in
+            XCTFail("Unexpected connection failure: \(error)")
+        }
+
+        let realm = try! Realm(configuration: config)
+        self.waitForUploads(for: realm)
+    }
+
+    func testSecureConnectionToLocalhostWithIncorrectPinnedCertificate() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
+        let certURL = URL(string: #file)!
+            .deletingLastPathComponent()
+            .appendingPathComponent("certificates")
+            .appendingPathComponent("localhost-other.cer")
+        let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
+                                        serverValidationPolicy: .pinCertificate(path: certURL))
+
+        let ex = expectation(description: "Waiting for error handler to be called")
+        SyncManager.shared.errorHandler = { (error, session) in
+            ex.fulfill()
+        }
+
+        _ = try! Realm(configuration: config)
+        self.waitForExpectations(timeout: 4.0)
+    }
 }
