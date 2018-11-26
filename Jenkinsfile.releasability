@@ -1,4 +1,4 @@
-swiftVersions = ['3.2.3', '3.3', '3.3.2', '3.4', '3.4.1', 4.0.3', '4.1', '4.1.2', '4.2', '4.2.1']
+swiftVersions = ['3.2.3', '3.3', '3.3.2', '3.4', '3.4.1', '4.0.3', '4.1', '4.1.2', '4.2', '4.2.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS']
 carthageXcodeVersion = '10.1'
