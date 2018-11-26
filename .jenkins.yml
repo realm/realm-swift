@@ -6,6 +6,7 @@ xcode_version:
   - 9.3
   - 9.4
   - 10.0
+  - 10.1
 target:
   - osx
   - docs
@@ -44,8 +45,11 @@ configuration:
 # | 9.4   | Debug        | X   |      |            |             |           |           |         |           |           |      |                |                   |                      |                       |                       |                        |             |
 # | 9.4   | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                      |                       |                       |                        |             |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
-# | 10.0  | Debug        | X   |      |            | X           | X         | X         | X       |           |           | X    |                |                   |                      |                       |                       |                        |             |
-# | 10.0  | Release      | X   | X    | X          | X           | X         | X         | X       | X         | X         | X    | X              | X                 |                      |                       | X                     |                        | X           |
+# | 10.0  | Debug        | X   |      |            |             |           |           |         |           |           |      |                |                   |                      |                       |                       |                        |             |
+# | 10.0  | Release      | X   |      | X          | X           | X         | X         | X       | X         |           | X    |                |                   |                      |                       |                       |                        |             |
+# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | --------- | --------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
+# | 10.1  | Debug        | X   |      |            | X           | X         | X         | X       |           |           | X    |                |                   |                      |                       |                       |                        |             |
+# | 10.1  | Release      | X   | X    | X          | X           | X         | X         | X       | X         | X         | X    | X              | X                 |                      |                       | X                     |                        | X           |
 # +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 exclude:
@@ -58,6 +62,8 @@ exclude:
   - xcode_version: 9.3
     target: docs
   - xcode_version: 9.4
+    target: docs
+  - xcode_version: 10.0
     target: docs
   - target: docs
     configuration: Debug
@@ -75,6 +81,9 @@ exclude:
   - xcode_version: 10.0
     target: ios-static
     configuration: Debug
+  - xcode_version: 10.1
+    target: ios-static
+    configuration: Debug
 
   ################
   # ios-dynamic
@@ -89,11 +98,14 @@ exclude:
   - xcode_version: 9.4
     target: ios-dynamic
     configuration: Debug
+  - xcode_version: 10.0
+    target: ios-dynamic
+    configuration: Debug
 
   ################
   # ios-swift
   ################
-  # Skip 9.2/9.3/9.4 Debug
+  # Skip 9.2/9.3/9.4/10.0 Debug
   - xcode_version: 9.2
     target: ios-swift
     configuration: Debug
@@ -101,13 +113,16 @@ exclude:
     target: ios-swift
     configuration: Debug
   - xcode_version: 9.4
+    target: ios-swift
+    configuration: Debug
+  - xcode_version: 10.0
     target: ios-swift
     configuration: Debug
 
   ################
   # osx-swift
   ################
-  # Skip 9.2/9.3/9.4 Debug
+  # Skip 9.2/9.3/9.4/10.0 Debug
   - xcode_version: 9.2
     target: osx-swift
     configuration: Debug
@@ -115,13 +130,16 @@ exclude:
     target: osx-swift
     configuration: Debug
   - xcode_version: 9.4
+    target: osx-swift
+    configuration: Debug
+  - xcode_version: 10.0
     target: osx-swift
     configuration: Debug
 
   ################
   # watchos
   ################
-  # Skip 9.2/9.3/9.4 Debug
+  # Skip 9.2/9.3/9.4/10.0 Debug
   - xcode_version: 9.2
     target: watchos
     configuration: Debug
@@ -129,6 +147,9 @@ exclude:
     target: watchos
     configuration: Debug
   - xcode_version: 9.4
+    target: watchos
+    configuration: Debug
+  - xcode_version: 10.0
     target: watchos
     configuration: Debug
 
@@ -142,12 +163,14 @@ exclude:
   ################
   # swiftlint
   ################
-  # Just run on 10.0 Release
+  # Just run on 10.1 Release
   - xcode_version: 9.2
     target: swiftlint
   - xcode_version: 9.3
     target: swiftlint
   - xcode_version: 9.4
+    target: swiftlint
+  - xcode_version: 10.0
     target: swiftlint
   - target: swiftlint
     configuration: Debug
@@ -155,7 +178,7 @@ exclude:
   ################
   # tvos
   ################
-  # Skip 9.2/9.3/9.4 Debug
+  # Skip 9.2/9.3/9.4/10.0 Debug
   - xcode_version: 9.2
     target: tvos
     configuration: Debug
@@ -165,14 +188,19 @@ exclude:
   - xcode_version: 9.4
     target: tvos
     configuration: Debug
+  - xcode_version: 10.0
+    target: tvos
+    configuration: Debug
 
   ################
   # osx-encryption
   ################
-  # Just run on 9.2/10.0 Release
+  # Just run on 9.2/10.1 Release
   - xcode_version: 9.3
     target: osx-encryption
   - xcode_version: 9.4
+    target: osx-encryption
+  - xcode_version: 10.0
     target: osx-encryption
   - target: osx-encryption
     configuration: Debug
@@ -180,10 +208,12 @@ exclude:
   ################
   # osx-object-server
   ################
-  # Just run on 9.2/10.0 Release
+  # Just run on 9.2/10.1 Release
   - xcode_version: 9.3
     target: osx-object-server
   - xcode_version: 9.4
+    target: osx-object-server
+  - xcode_version: 10.01
     target: osx-object-server
   - target: osx-object-server
     configuration: Debug
@@ -191,7 +221,7 @@ exclude:
   ################
   # ios-device-objc-ios8
   ################
-  # Just run on 9.2/9.4 Release
+  # Just run on 9.2/10.1 Release
   - xcode_version: 9.3
     target: ios-device-objc-ios8
   - xcode_version: 10.0
@@ -202,10 +232,12 @@ exclude:
   ################
   # ios-device-swift-ios8
   ################
-  # Just run on 9.2/10.0 Release
+  # Just run on 9.2/10.1 Release
   - xcode_version: 9.3
     target: ios-device-swift-ios8
   - xcode_version: 9.4
+    target: ios-device-swift-ios8
+  - xcode_version: 10.1
     target: ios-device-swift-ios8
   - target: ios-device-swift-ios8
     configuration: Debug
@@ -213,10 +245,12 @@ exclude:
   ################
   # ios-device-objc-ios10
   ################
-  # Just run on 9.2/10.0 Release
+  # Just run on 9.2/10.1 Release
   - xcode_version: 9.3
     target: ios-device-objc-ios10
   - xcode_version: 9.4
+    target: ios-device-objc-ios10
+  - xcode_version: 10.0
     target: ios-device-objc-ios10
   - target: ios-device-objc-ios10
     configuration: Debug
@@ -224,10 +258,12 @@ exclude:
   ################
   # ios-device-swift-ios10
   ################
-  # Just run on 9.2/10.0 Release
+  # Just run on 9.2/10.1 Release
   - xcode_version: 9.3
     target: ios-device-swift-ios10
   - xcode_version: 9.4
+    target: ios-device-swift-ios10
+  - xcode_version: 10.1
     target: ios-device-swift-ios10
   - target: ios-device-swift-ios10
     configuration: Debug
@@ -235,12 +271,14 @@ exclude:
   ################
   # tvos-device
   ################
-  # Just run on 10.0 Release
+  # Just run on 10.1 Release
   - xcode_version: 9.2
     target: tvos-device
   - xcode_version: 9.3
     target: tvos-device
   - xcode_version: 9.4
+    target: tvos-device
+  - xcode_version: 10.0
     target: tvos-device
   - target: tvos-device
     configuration: Debug
