@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.12.0 Release notes (2018-11-26)
 =============================================================
+
 ### Enhancements
+
 * Add a User-Agent header to HTTP requests made to the Realm Object Server. By
   default, this contains information about the Realm library version and your
   app's bundle ID. The application identifier can be customized by setting
@@ -9,16 +11,10 @@ x.y.z Release notes (yyyy-MM-dd)
   (PR: https://github.com/realm/realm-cocoa/pull/6007).
 * Add Xcode 10.1 binary to the prebuilt package.
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.11.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 
 3.11.2 Release notes (2018-11-15)
 =============================================================
