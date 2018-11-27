@@ -11,10 +11,19 @@
   (PR: https://github.com/realm/realm-cocoa/pull/6007).
 * Add Xcode 10.1 binary to the prebuilt package.
 
+### Fixed
+
+* None.
+
 ### Compatibility
 
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.11.0 or later.
+
+### Internal
+
+* None.
+
 
 3.11.2 Release notes (2018-11-15)
 =============================================================
@@ -42,8 +51,17 @@
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.11.0 or later.
 
+### Internal
+
+* None.
+
+
 3.11.1 Release notes (2018-10-19)
 =============================================================
+
+### Enhancements
+
+* None.
 
 ### Fixed
 
@@ -59,6 +77,11 @@
 
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.11.0 or later.
+
+### Internal
+
+* None.
+
 
 3.11.0 Release notes (2018-10-04)
 =============================================================
@@ -88,6 +111,7 @@
 
 ### Internal
 * Update to Sync 3.12.2.
+
 
 3.10.0 Release notes (2018-09-19)
 =============================================================
