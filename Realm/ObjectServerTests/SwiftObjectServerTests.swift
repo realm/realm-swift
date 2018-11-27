@@ -441,8 +441,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     // MARK: - Partial sync
 
-// Partial sync subscriptions are only available in Swift 3.2 and newer.
-#if swift(>=3.2)
     func populateTestRealm(_ username: String) {
         autoreleasepool {
             let credentials = SyncCredentials.usernamePassword(username: username, password: "a", register: true)
@@ -539,6 +537,32 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    func testPartialSyncSubscriptions() {
+        let credentials = SyncCredentials.usernamePassword(username: #function, password: "a", register: true)
+        let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
+        let realm = try! synchronouslyOpenRealm(configuration: user.configuration())
+
+        XCTAssertEqual(realm.subscriptions().count, 0)
+        XCTAssertNil(realm.subscription(named: "query"))
+
+        let subscription = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5").subscribe(named: "query")
+        XCTAssertEqual(realm.subscriptions().count, 0)
+        XCTAssertNil(realm.subscription(named: "query"))
+        waitForState(subscription, .complete)
+
+        XCTAssertEqual(realm.subscriptions().count, 1)
+        let sub2 = realm.subscriptions().first!
+        XCTAssertEqual(sub2.name, "query")
+        XCTAssertEqual(sub2.state, .complete)
+        let sub3 = realm.subscription(named: "query")!
+        XCTAssertEqual(sub3.name, "query")
+        XCTAssertEqual(sub3.state, .complete)
+
+        XCTAssertNil(realm.subscription(named: "not query"))
+    }
+
+// Partial sync subscriptions are only available in Swift 3.2 and newer.
+#if swift(>=3.2)
     func waitForState<T>(_ subscription: SyncSubscription<T>, _ desiredState: SyncSubscriptionState) {
         let ex = expectation(description: "Waiting for state \(desiredState)")
         let token = subscription.observe(\.state, options: .initial) { state in
@@ -559,6 +583,26 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         waitForExpectations(timeout: 20.0)
         token.invalidate()
+    }
+#else
+    func waitForState<T>(_ subscription: SyncSubscription<T>, _ desiredState: SyncSubscriptionState) {
+        for _ in 0..<20 {
+            if subscription.state == desiredState {
+                return
+            }
+            RunLoop.current.run(until: Date().addingTimeInterval(1.0))
+        }
+        XCTFail("waitForState(\(subscription), \(desiredState)) timed out")
+    }
+
+    func waitForError<T>(_ subscription: SyncSubscription<T>) {
+        for _ in 0..<20 {
+            if case .error(_) = subscription.state {
+                return
+            }
+            RunLoop.current.run(until: Date().addingTimeInterval(1.0))
+        }
+        XCTFail("waitForError(\(subscription)) timed out")
     }
 #endif // Swift >= 3.2
 
