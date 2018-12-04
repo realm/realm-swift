@@ -216,6 +216,9 @@ typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
 - (RLMSyncSubscription *)subscribeWithName:(nullable NSString *)subscriptionName limit:(NSUInteger)limit;
 @end
 
+/**
+ Support for managing existing subscriptions to object queries in a Realm.
+ */
 @interface RLMRealm (SyncSubscription)
 /**
  Get a list of the query-based sync subscriptions made for this Realm.
