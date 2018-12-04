@@ -36,16 +36,68 @@ using namespace realm;
 @end
 
 @implementation RLMSyncSubscription {
-    @public
-    NSString *_name;
+    partial_sync::SubscriptionNotificationToken _token;
+    util::Optional<partial_sync::Subscription> _subscription;
+    RLMRealm *_realm;
 }
 
-- (instancetype)initPrivate {
-    return (self = [super init]);
+- (instancetype)initWithName:(NSString *)name results:(Results const&)results realm:(RLMRealm *)realm {
+    if (!(self = [super init]))
+        return nil;
+
+    _name = [name copy];
+    _realm = realm;
+    try {
+        _subscription = partial_sync::subscribe(results, name ? util::make_optional<std::string>(name.UTF8String) : util::none);
+    }
+    catch (std::exception const& e) {
+        @throw RLMException(e);
+    }
+    self.state = (RLMSyncSubscriptionState)_subscription->state();
+    __weak auto weakSelf = self;
+    _token = _subscription->add_notification_callback([weakSelf] {
+        auto self = weakSelf;
+        if (!self)
+            return;
+
+        // Retrieve the current error and status. Update our properties only if the values have changed,
+        // since clients use KVO to observe these properties.
+
+        if (auto error = self->_subscription->error()) {
+            try {
+                std::rethrow_exception(error);
+            } catch (...) {
+                NSError *nsError;
+                RLMRealmTranslateException(&nsError);
+                if (!self.error || ![self.error isEqual:nsError])
+                    self.error = nsError;
+            }
+        }
+        else if (self.error) {
+            self.error = nil;
+        }
+
+        auto status = (RLMSyncSubscriptionState)self->_subscription->state();
+        if (status != self.state) {
+            if (status == RLMSyncSubscriptionStateCreating) {
+                // If a subscription is deleted without going through this
+                // object's unsubscribe() method the subscription will transition
+                // back to Creating rather than Invalidated since it doesn't
+                // have a good way to track that it previously existed
+                if (self.state != RLMSyncSubscriptionStateInvalidated)
+                    self.state = RLMSyncSubscriptionStateInvalidated;
+            }
+            else {
+                self.state = status;
+            }
+        }
+    });
+
+    return self;
 }
 
 - (void)unsubscribe {
-    __builtin_unreachable();
+    partial_sync::unsubscribe(*_subscription);
 }
 @end
 
@@ -131,75 +183,6 @@ using namespace realm;
 }
 @end
 
-@interface RLMNewSyncSubscription : RLMSyncSubscription
-@end
-
-@implementation RLMNewSyncSubscription {
-    partial_sync::SubscriptionNotificationToken _token;
-    util::Optional<partial_sync::Subscription> _subscription;
-    RLMRealm *_realm;
-}
-
-- (instancetype)initWithName:(NSString *)name results:(Results const&)results realm:(RLMRealm *)realm {
-    if (!(self = [super initPrivate]))
-        return nil;
-
-    _name = [name copy];
-    _realm = realm;
-    try {
-        _subscription = partial_sync::subscribe(results, name ? util::make_optional<std::string>(name.UTF8String) : util::none);
-    }
-    catch (std::exception const& e) {
-        @throw RLMException(e);
-    }
-    self.state = (RLMSyncSubscriptionState)_subscription->state();
-    __weak auto weakSelf = self;
-    _token = _subscription->add_notification_callback([weakSelf] {
-        auto self = weakSelf;
-        if (!self)
-            return;
-
-        // Retrieve the current error and status. Update our properties only if the values have changed,
-        // since clients use KVO to observe these properties.
-
-        if (auto error = self->_subscription->error()) {
-            try {
-                std::rethrow_exception(error);
-            } catch (...) {
-                NSError *nsError;
-                RLMRealmTranslateException(&nsError);
-                if (!self.error || ![self.error isEqual:nsError])
-                    self.error = nsError;
-            }
-        }
-        else if (self.error) {
-            self.error = nil;
-        }
-
-        auto status = (RLMSyncSubscriptionState)self->_subscription->state();
-        if (status != self.state) {
-            if (status == RLMSyncSubscriptionStateCreating) {
-                // If a subscription is deleted without going through this
-                // object's unsubscribe() method the subscription will transition
-                // back to Creating rather than Invalidated since it doesn't
-                // have a good way to track that it previously existed
-                if (self.state != RLMSyncSubscriptionStateInvalidated)
-                    self.state = RLMSyncSubscriptionStateInvalidated;
-            }
-            else {
-                self.state = status;
-            }
-        }
-    });
-
-    return self;
-}
-
-- (void)unsubscribe {
-    partial_sync::unsubscribe(*_subscription);
-}
-@end
-
 // RLMClassInfo stores pointers into the schema rather than owning the objects
 // it points to, so for a ClassInfo that's not part of the schema we need a
 // wrapper object that owns them
@@ -248,15 +231,15 @@ RLMClassInfo& RLMResultsSetInfo::get(__unsafe_unretained RLMRealm *const realm) 
 
 @implementation RLMResults (SyncSubscription)
 - (RLMSyncSubscription *)subscribe {
-    return [[RLMNewSyncSubscription alloc] initWithName:nil results:_results realm:self.realm];
+    return [[RLMSyncSubscription alloc] initWithName:nil results:_results realm:self.realm];
 }
 
 - (RLMSyncSubscription *)subscribeWithName:(NSString *)subscriptionName {
-    return [[RLMNewSyncSubscription alloc] initWithName:subscriptionName results:_results realm:self.realm];
+    return [[RLMSyncSubscription alloc] initWithName:subscriptionName results:_results realm:self.realm];
 }
 
 - (RLMSyncSubscription *)subscribeWithName:(NSString *)subscriptionName limit:(NSUInteger)limit {
-    return [[RLMNewSyncSubscription alloc] initWithName:subscriptionName results:_results.limit(limit) realm:self.realm];
+    return [[RLMSyncSubscription alloc] initWithName:subscriptionName results:_results.limit(limit) realm:self.realm];
 }
 @end
 
