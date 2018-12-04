@@ -913,6 +913,10 @@ public class SyncSubscription<T: RealmCollectionValue>: RealmCollectionValue {
         self.rlmSubscription = rlmSubscription
     }
 
+    public static func == (lhs: SyncSubscription, rhs: SyncSubscription) -> Bool {
+        return lhs.rlmSubscription == rhs.rlmSubscription
+    }
+
 // Partial sync subscriptions are only observable in Swift 3.2 and newer.
 #if swift(>=3.2)
 
