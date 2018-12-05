@@ -1055,7 +1055,7 @@ EOM
         else
             export sha=$GITHUB_PR_SOURCE_BRANCH
             export CONFIGURATION=$configuration
-            export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO'
+            export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
             sh build.sh prelaunch-simulator
 
             source $(brew --prefix nvm)/nvm.sh
