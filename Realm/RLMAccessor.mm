@@ -114,7 +114,7 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
         return;
     }
 
-    RLMAddObjectToRealm(val, obj->_realm, false);
+    RLMAddObjectToRealm(val, obj->_realm, RLMUpdatePolicyError);
 
     // make sure it is the correct type
     if (val->_row.get_table() != obj->_row.get_table()->get_link_target(colIndex)) {
@@ -724,12 +724,16 @@ realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id 
 }
 
 template<>
-realm::RowExpr RLMAccessorContext::unbox(__unsafe_unretained id const v, bool create, bool update, bool, size_t) {
+realm::RowExpr RLMAccessorContext::unbox(__unsafe_unretained id const v, bool create, bool update, bool diff, size_t) {
+    RLMUpdatePolicy policy = !update ? RLMUpdatePolicyError
+                           : !diff   ? RLMUpdatePolicyUpdateAll
+                           :           RLMUpdatePolicyUpdateChanged;
+
     RLMObjectBase *link = RLMDynamicCast<RLMObjectBase>(v);
     if (!link) {
         if (!create)
             return realm::RowExpr();
-        return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, v, update)->_row;
+        return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, v, policy)->_row;
     }
 
     if (link.isInvalidated) {
@@ -743,7 +747,7 @@ realm::RowExpr RLMAccessorContext::unbox(__unsafe_unretained id const v, bool cr
 
     if (![link->_objectSchema.className isEqualToString:_info.rlmObjectSchema.className]) {
         if (create && !_promote_existing)
-            return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, link, update)->_row;
+            return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, link, policy)->_row;
         return link->_row;
     }
 
@@ -751,13 +755,13 @@ realm::RowExpr RLMAccessorContext::unbox(__unsafe_unretained id const v, bool cr
         if (!create)
             return realm::RowExpr();
         if (!_promote_existing)
-            return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, link, update)->_row;
-        RLMAddObjectToRealm(link, _realm, update);
+            return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, link, policy)->_row;
+        RLMAddObjectToRealm(link, _realm, policy);
     }
     else if (link->_realm != _realm) {
         if (_promote_existing)
             @throw RLMException(@"Object is already managed by another Realm. Use create instead to copy it into this Realm.");
-        return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, v, update)->_row;
+        return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, v, policy)->_row;
     }
     return link->_row;
 }

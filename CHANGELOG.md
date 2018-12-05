@@ -1,7 +1,13 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add an option to only set the properties which have values different from the
+  existing ones when updating an existing object with
+  `Realm.create()`/`-[RLMObject createOrUpdateInRealm:withValue:]`. This makes
+  notifications report only the properties which have actually changed, and
+  improves Object Server performance by reducing the number of operations to
+  merge. (Issue: [#5970](https://github.com/realm/realm-cocoa/issues/5970),
+  PR: [#6149](https://github.com/realm/realm-cocoa/pulls/6149)).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)

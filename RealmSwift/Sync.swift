@@ -1683,7 +1683,7 @@ extension List where Element == Permission {
     */
     public func findOrCreate(forRoleNamed roleName: String) -> Permission {
         precondition(realm != nil, "Cannot be called on an unmanaged object")
-        return RLMPermissionForRole(_rlmArray, realm!.create(PermissionRole.self, value: [roleName], update: true)) as! Permission
+        return RLMPermissionForRole(_rlmArray, realm!.create(PermissionRole.self, value: [roleName], update: .changed)) as! Permission
     }
 
     /**
