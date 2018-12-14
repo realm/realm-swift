@@ -1,19 +1,17 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.13.0 Release notes (2018-12-14)
 =============================================================
+
 ### Enhancements
-* Add `Realm.subscriptions`/`-[RLMRealm subscriptions]` and
+
+* Add `Realm.subscriptions()`/`-[RLMRealm subscriptions]` and
   `Realm.subscription(named:)`/`-[RLMRealm subscriptionWithName:]` to enable
   looking up existing query-based sync subscriptions.
   (PR: https://github.com/realm/realm-cocoa/pull/6029).
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
-
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.11.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 
 3.12.0 Release notes (2018-11-26)
 =============================================================
