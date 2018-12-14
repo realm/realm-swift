@@ -83,11 +83,19 @@ extension Object {
 
 // MARK: CustomObjectiveCBridgeable
 
+fileprivate extension SyncSubscription {
+    fileprivate convenience init(_ rlmSubscription: Any) {
+        self.init(RLMCastToSyncSubscription(rlmSubscription as AnyObject))
+    }
+}
+
 internal func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
     if T.self == DynamicObject.self {
         return unsafeBitCast(x as AnyObject, to: T.self)
     } else if let bridgeableType = T.self as? CustomObjectiveCBridgeable.Type {
         return bridgeableType.bridging(objCValue: x) as! T
+    } else if T.self == SyncSubscription<Object>.self {
+        return SyncSubscription<Object>(x) as! T
     } else {
         return x as! T
     }

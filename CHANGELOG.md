@@ -1,13 +1,14 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add `Realm.subscriptions`/`-[RLMRealm subscriptions]` and
+  `Realm.subscription(named:)`/`-[RLMRealm subscriptionWithName:]` to enable
+  looking up existing query-based sync subscriptions.
+  (PR: https://github.com/realm/realm-cocoa/pull/6029).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
 * None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)

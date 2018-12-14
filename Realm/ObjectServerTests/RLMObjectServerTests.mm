@@ -60,6 +60,12 @@
 }
 @end
 
+@implementation PersonObject
++ (NSDictionary *)linkingObjectsProperties {
+    return @{@"parents": [RLMPropertyDescriptor descriptorWithClass:PersonObject.class propertyName:@"children"]};
+}
+@end
+
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
 
@@ -1783,6 +1789,10 @@
 
 #pragma mark - Partial sync
 
+- (void)waitForKeyPath:(NSString *)keyPath object:(id)object value:(id)value {
+    [self waitForExpectations:@[[[XCTKVOExpectation alloc] initWithKeyPath:keyPath object:object expectedValue:value]] timeout:20.0];
+}
+
 - (void)testPartialSync {
     // Make credentials.
     NSString *name = NSStringFromSelector(_cmd);
@@ -1833,8 +1843,7 @@
         RLMSyncSubscription *subscription = [objects subscribeWithName:@"query"];
 
         // Wait for the results to become available.
-        XCTestExpectation *ex = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription expectedValue:@(RLMSyncSubscriptionStateComplete)];
-        [self waitForExpectations:@[ex] timeout:20.0];
+        [self waitForKeyPath:@"state" object:subscription value:@(RLMSyncSubscriptionStateComplete)];
 
         // Verify that we got what we're looking for
         XCTAssertEqual(objects.count, 4U);
@@ -1853,15 +1862,153 @@
         RLMSyncSubscription *subscription2 = [objects2 subscribeWithName:@"query"];
 
         // Wait for the error to be reported.
-        XCTestExpectation *ex2 = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription2 expectedValue:@(RLMSyncSubscriptionStateError)];
-        [self waitForExpectations:@[ex2] timeout:20.0];
+        [self waitForKeyPath:@"state" object:subscription2 value:@(RLMSyncSubscriptionStateError)];
         XCTAssertNotNil(subscription2.error);
 
         // Unsubscribe from the query, and ensure that it correctly transitions to the invalidated state.
         [subscription unsubscribe];
-        XCTestExpectation *ex3 = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:subscription expectedValue:@(RLMSyncSubscriptionStateInvalidated)];
-        [self waitForExpectations:@[ex3] timeout:20.0];
+        [self waitForKeyPath:@"state" object:subscription value:@(RLMSyncSubscriptionStateInvalidated)];
     }
+}
+
+- (RLMRealm *)partialRealmWithName:(SEL)sel {
+    NSString *name = NSStringFromSelector(sel);
+    NSURL *server = [RLMObjectServerTests authServerURL];
+    RLMSyncCredentials *creds = [RLMObjectServerTests basicCredentialsWithName:name register:YES];
+    RLMSyncUser *user = [self logInUserForCredentials:creds server:server];
+    RLMRealmConfiguration *configuration = [user configuration];
+    return [self openRealmWithConfiguration:configuration];
+}
+
+- (void)testAllSubscriptionsReportsNewlyCreatedSubscription {
+    RLMRealm *realm = [self partialRealmWithName:_cmd];
+    XCTAssertEqual(0U, realm.subscriptions.count);
+
+    RLMSyncSubscription *subscription = [[PartialSyncObjectA objectsInRealm:realm where:@"number > 5"]
+                                         subscribeWithName:@"query"];
+    // Should still be 0 because the subscription is created asynchronously
+    XCTAssertEqual(0U, realm.subscriptions.count);
+
+    [self waitForKeyPath:@"state" object:subscription value:@(RLMSyncSubscriptionStateComplete)];
+    XCTAssertEqual(1U, realm.subscriptions.count);
+
+    RLMSyncSubscription *subscription2 = realm.subscriptions.firstObject;
+    XCTAssertEqualObjects(@"query", subscription2.name);
+    XCTAssertEqual(RLMSyncSubscriptionStateComplete, subscription2.state);
+    XCTAssertNil(subscription2.error);
+}
+
+- (void)testAllSubscriptionsDoesNotReportLocalError {
+    RLMRealm *realm = [self partialRealmWithName:_cmd];
+    RLMSyncSubscription *subscription1 = [[PartialSyncObjectA objectsInRealm:realm where:@"number > 5"]
+                                         subscribeWithName:@"query"];
+    [self waitForKeyPath:@"state" object:subscription1 value:@(RLMSyncSubscriptionStateComplete)];
+    RLMSyncSubscription *subscription2 = [[PartialSyncObjectA objectsInRealm:realm where:@"number > 6"]
+                                         subscribeWithName:@"query"];
+    [self waitForKeyPath:@"state" object:subscription2 value:@(RLMSyncSubscriptionStateError)];
+    XCTAssertEqual(1U, realm.subscriptions.count);
+}
+
+- (void)testAllSubscriptionsReportsServerError {
+    RLMRealm *realm = [self partialRealmWithName:_cmd];
+    RLMSyncSubscription *subscription = [[PersonObject objectsInRealm:realm where:@"SUBQUERY(parents, $p1, $p1.age < 31 AND SUBQUERY($p1.parents, $p2, $p2.age > 35 AND $p2.name == 'Michael').@count > 0).@count > 0"]
+                                          subscribeWithName:@"query"];
+    XCTAssertEqual(0U, realm.subscriptions.count);
+    [self waitForKeyPath:@"state" object:subscription value:@(RLMSyncSubscriptionStateError)];
+    XCTAssertEqual(1U, realm.subscriptions.count);
+
+    RLMSyncSubscription *subscription2 = realm.subscriptions.lastObject;
+    XCTAssertEqualObjects(@"query", subscription2.name);
+    XCTAssertEqual(RLMSyncSubscriptionStateError, subscription2.state);
+    XCTAssertNotNil(subscription2.error);
+}
+
+- (void)testUnsubscribeUsingOriginalSubscriptionObservingFetched {
+    RLMRealm *realm = [self partialRealmWithName:_cmd];
+    RLMSyncSubscription *original = [[PartialSyncObjectA allObjectsInRealm:realm] subscribeWithName:@"query"];
+    [self waitForKeyPath:@"state" object:original value:@(RLMSyncSubscriptionStateComplete)];
+    XCTAssertEqual(1U, realm.subscriptions.count);
+    RLMSyncSubscription *fetched = realm.subscriptions.firstObject;
+
+    [original unsubscribe];
+    [self waitForKeyPath:@"state" object:fetched value:@(RLMSyncSubscriptionStateInvalidated)];
+    XCTAssertEqual(0U, realm.subscriptions.count);
+    XCTAssertEqual(RLMSyncSubscriptionStateInvalidated, original.state);
+}
+
+- (void)testUnsubscribeUsingFetchedSubscriptionObservingFetched {
+    RLMRealm *realm = [self partialRealmWithName:_cmd];
+    RLMSyncSubscription *original = [[PartialSyncObjectA allObjectsInRealm:realm] subscribeWithName:@"query"];
+    [self waitForKeyPath:@"state" object:original value:@(RLMSyncSubscriptionStateComplete)];
+    XCTAssertEqual(1U, realm.subscriptions.count);
+    RLMSyncSubscription *fetched = realm.subscriptions.firstObject;
+
+    [fetched unsubscribe];
+    [self waitForKeyPath:@"state" object:fetched value:@(RLMSyncSubscriptionStateInvalidated)];
+    XCTAssertEqual(0U, realm.subscriptions.count);
+    XCTAssertEqual(RLMSyncSubscriptionStateInvalidated, original.state);
+}
+
+- (void)testUnsubscribeUsingFetchedSubscriptionObservingOriginal {
+    RLMRealm *realm = [self partialRealmWithName:_cmd];
+    RLMSyncSubscription *original = [[PartialSyncObjectA allObjectsInRealm:realm] subscribeWithName:@"query"];
+    [self waitForKeyPath:@"state" object:original value:@(RLMSyncSubscriptionStateComplete)];
+    XCTAssertEqual(1U, realm.subscriptions.count);
+    RLMSyncSubscription *fetched = realm.subscriptions.firstObject;
+
+    [fetched unsubscribe];
+    [self waitForKeyPath:@"state" object:original value:@(RLMSyncSubscriptionStateInvalidated)];
+    XCTAssertEqual(0U, realm.subscriptions.count);
+    XCTAssertEqual(RLMSyncSubscriptionStateInvalidated, fetched.state);
+}
+
+- (void)testSubscriptionWithName {
+    RLMRealm *realm = [self partialRealmWithName:_cmd];
+    XCTAssertNil([realm subscriptionWithName:@"query"]);
+
+    RLMSyncSubscription *subscription = [[PartialSyncObjectA allObjectsInRealm:realm] subscribeWithName:@"query"];
+    XCTAssertNil([realm subscriptionWithName:@"query"]);
+
+    [self waitForKeyPath:@"state" object:subscription value:@(RLMSyncSubscriptionStateComplete)];
+    XCTAssertNotNil([realm subscriptionWithName:@"query"]);
+    XCTAssertNil([realm subscriptionWithName:@"query2"]);
+
+    RLMSyncSubscription *subscription2 = [realm subscriptionWithName:@"query"];
+    XCTAssertEqualObjects(@"query", subscription2.name);
+    XCTAssertEqual(RLMSyncSubscriptionStateComplete, subscription2.state);
+    XCTAssertNil(subscription2.error);
+
+    [subscription unsubscribe];
+    XCTAssertNotNil([realm subscriptionWithName:@"query"]);
+
+    [self waitForKeyPath:@"state" object:subscription value:@(RLMSyncSubscriptionStateInvalidated)];
+    XCTAssertNil([realm subscriptionWithName:@"query"]);
+    XCTAssertEqual(RLMSyncSubscriptionStateInvalidated, subscription2.state);
+}
+
+- (void)testSortAndFilterSubscriptions {
+    RLMRealm *realm = [self partialRealmWithName:_cmd];
+
+    [self waitForKeyPath:@"state" object:[[PartialSyncObjectA allObjectsInRealm:realm] subscribeWithName:@"query 1"]
+                   value:@(RLMSyncSubscriptionStateComplete)];
+    [self waitForKeyPath:@"state" object:[[PartialSyncObjectA allObjectsInRealm:realm] subscribeWithName:@"query 2"]
+                   value:@(RLMSyncSubscriptionStateComplete)];
+    [self waitForKeyPath:@"state" object:[[PartialSyncObjectB allObjectsInRealm:realm] subscribeWithName:@"query 3"]
+                   value:@(RLMSyncSubscriptionStateComplete)];
+    RLMResults *unsupportedQuery = [PersonObject objectsInRealm:realm where:@"SUBQUERY(parents, $p1, $p1.age < 31 AND SUBQUERY($p1.parents, $p2, $p2.age > 35 AND $p2.name == 'Michael').@count > 0).@count > 0"];
+    [self waitForKeyPath:@"state" object:[unsupportedQuery subscribeWithName:@"query 4"]
+                   value:@(RLMSyncSubscriptionStateError)];
+
+    auto subscriptions = realm.subscriptions;
+    XCTAssertEqual(4U, subscriptions.count);
+    XCTAssertEqual(0U, ([subscriptions objectsWhere:@"name = %@", @"query 0"].count));
+    XCTAssertEqualObjects(@"query 1", ([subscriptions objectsWhere:@"name = %@", @"query 1"].firstObject.name));
+    XCTAssertEqual(3U, ([subscriptions objectsWhere:@"status = %@", @(RLMSyncSubscriptionStateComplete)].count));
+    XCTAssertEqual(1U, ([subscriptions objectsWhere:@"status = %@", @(RLMSyncSubscriptionStateError)].count));
+
+    XCTAssertThrows([subscriptions sortedResultsUsingKeyPath:@"name" ascending:NO]);
+    XCTAssertThrows([subscriptions sortedResultsUsingDescriptors:@[]]);
+    XCTAssertThrows([subscriptions distinctResultsUsingKeyPaths:@[@"name"]]);
 }
 
 #pragma mark - Certificate pinning
