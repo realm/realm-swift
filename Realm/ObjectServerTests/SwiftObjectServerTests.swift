@@ -557,6 +557,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let sub3 = realm.subscription(named: "query")!
         XCTAssertEqual(sub3.name, "query")
         XCTAssertEqual(sub3.state, .complete)
+        for sub in realm.subscriptions() {
+            XCTAssertEqual(sub.name, "query")
+            XCTAssertEqual(sub.state, .complete)
+        }
 
         XCTAssertNil(realm.subscription(named: "not query"))
     }
