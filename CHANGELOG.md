@@ -1,3 +1,20 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* Fix a crash when iterating over `Realm.subscriptions()` using for-in.
+  (Since 3.13.0, PR [#6050](https://github.com/realm/realm-cocoa/pull/6050)).
+
+### Compatibility
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.11.0 or later.
+* APIs are backwards compatible with all previous releases in the 3.x.y series.
+
+### Internal
+* None.
+
 3.13.0 Release notes (2018-12-14)
 =============================================================
 
