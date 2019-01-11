@@ -1,3 +1,17 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* Fix a memory leak whenever Realm makes a HTTP(s) request to the Realm Object
+  Server (since 3.8.0, Issue [#6058](https://github.com/realm/realm-cocoa/issues/6058)).
+
+### Compatibility
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.11.0 or later.
+* APIs are backwards compatible with all previous releases in the 3.x.y series.
+
 3.13.1 Release notes (2019-01-03)
 =============================================================
 
