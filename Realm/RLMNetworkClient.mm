@@ -425,6 +425,8 @@ didCompleteWithError:(NSError *)error
 
     // Add the request to a task and start it
     [[session dataTaskWithRequest:request] resume];
+    // Tell the session to destroy itself once it's done with the request
+    [session finishTasksAndInvalidate];
 }
 @end
 
