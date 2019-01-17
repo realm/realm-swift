@@ -19,12 +19,12 @@ Please see the detailed instructions in our docs to add [Realm Objective-C](http
 ### Realm Objective-C
 
 The documentation can be found at [realm.io/docs/objc/latest](https://realm.io/docs/objc/latest).  
-The API reference is located at [realm.io/docs/objc/latest/api](https://realm.io/docs/objc/latest/api/).
+The API reference is located at [realm.io/docs/objc/latest/api/](https://realm.io/docs/objc/latest/api/).
 
 ### Realm Swift
 
 The documentation can be found at [realm.io/docs/swift/latest](https://realm.io/docs/swift/latest).  
-The API reference is located at [realm.io/docs/swift/latest/api](https://realm.io/docs/swift/latest/api/).
+The API reference is located at [realm.io/docs/swift/latest/api/](https://realm.io/docs/swift/latest/api/).
 
 ## Getting Help
 
