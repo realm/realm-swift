@@ -82,7 +82,7 @@ static NSString *nodePath() {
     const NSInteger fakeDataSize = 1000000;
     HugeSyncObject *object = [[self alloc] init];
     char fakeData[fakeDataSize];
-    memset(fakeData, sizeof(fakeData), 16);
+    memset(fakeData, 16, sizeof(fakeData));
     object.dataProp = [NSData dataWithBytes:fakeData length:sizeof(fakeData)];
     return object;
 }

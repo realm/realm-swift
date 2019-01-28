@@ -29,6 +29,15 @@ NS_ASSUME_NONNULL_BEGIN
 #define RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(fully_qualified, _) NS_SWIFT_NAME(fully_qualified)
 #endif
 
+// Swift 5 considers NS_ENUM to be "open", meaning there could be values present
+// other than the defined cases (which allows adding more cases later without
+// it being a breaking change), while older versions consider it "closed".
+#ifdef NS_CLOSED_ENUM
+#define RLM_CLOSED_ENUM NS_CLOSED_ENUM
+#else
+#define RLM_CLOSED_ENUM NS_ENUM
+#endif
+
 #if __has_attribute(ns_error_domain) && (!defined(__cplusplus) || !__cplusplus || __cplusplus >= 201103L)
 #define RLM_ERROR_ENUM(type, name, domain) \
     _Pragma("clang diagnostic push") \
@@ -47,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  For more information, see [Realm Models](https://realm.io/docs/objc/latest/#models).
  */
-typedef NS_ENUM(int32_t, RLMPropertyType) {
+typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType) {
 
 #pragma mark - Primitive types
 

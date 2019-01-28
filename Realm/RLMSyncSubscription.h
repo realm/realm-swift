@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  `RLMSyncSubscriptionState` is an enumeration representing the possible state of a sync subscription.
  */
-typedef NS_ENUM(NSInteger, RLMSyncSubscriptionState) {
+typedef RLM_CLOSED_ENUM(NSInteger, RLMSyncSubscriptionState) {
     /**
      An error occurred while creating the subscription or while the server was processing it.
      */

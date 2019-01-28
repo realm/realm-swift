@@ -12,6 +12,9 @@ x.y.z Release notes (yyyy-MM-dd)
   after creating an object with a null int primary key in the same write
   transaction.
   ([PR #3227](https://github.com/realm/realm-core/pull/3227)).
+* Fix some new warnings when building with Xcode 10.2 beta.
+* Properly clean up sync sessions when the last Realm object using the session
+  is deallocated while the session is explicitly suspended (since 3.9.0).
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
@@ -20,11 +23,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Throw an exception rather than crashing with an assertion failure in more
-  cases when opening invalid Realm files. To make this useful for applications
-  more work is needed.
-  ([#3203](https://github.com/realm/realm-core/pull/3203)).
-* Properly clean up sync sessions when the last Realm object using the session
-  is deallocated while the session is explicitly suspended (since 3.9.0).
+  cases when opening invalid Realm files.
 * Upgraded to REALM_CORE_VERSION=5.14.0
 * Upgraded to REALM_SYNC_VERSION=3.15.1
 

@@ -57,7 +57,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncConnectionState) {
  Progress notification blocks can be registered on sessions if your app wishes to be informed
  how many bytes have been uploaded or downloaded, for example to show progress indicator UIs.
  */
-typedef NS_ENUM(NSUInteger, RLMSyncProgressDirection) {
+typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncProgressDirection) {
     /// For monitoring upload progress.
     RLMSyncProgressDirectionUpload,
     /// For monitoring download progress.
