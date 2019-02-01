@@ -76,12 +76,12 @@ class ListTests: TestCase {
         return super.defaultTestSuite
     }
 #else
-    override class func defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         // Don't run tests for the base class
         if isEqual(ListTests.self) {
             return XCTestSuite(name: "empty")
         }
-        return super.defaultTestSuite()
+        return super.defaultTestSuite
     }
 #endif
 
@@ -459,18 +459,18 @@ class ListTests: TestCase {
                 do {
                     let objects = realm.objects(SwiftObject.self)
 
-                    let properties = Array(objects.flatMap { $0.intCol })
+                    let properties = Array(objects.compactMap { $0.intCol })
                     let listsOfObjects = objects.value(forKeyPath: "intCol") as! [Int]
-                    let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+                    let kvcProperties = Array(listsOfObjects.compactMap { $0 })
 
                     XCTAssertEqual(properties, kvcProperties)
                 }
                 do {
                     let objects = realm.objects(SwiftObject.self)
 
-                    let properties = Array(objects.flatMap { $0.doubleCol })
+                    let properties = Array(objects.compactMap { $0.doubleCol })
                     let listsOfObjects = objects.value(forKeyPath: "doubleCol") as! [Double]
-                    let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+                    let kvcProperties = Array(listsOfObjects.compactMap { $0 })
 
                     XCTAssertEqual(properties, kvcProperties)
                 }
@@ -505,45 +505,45 @@ class ListTests: TestCase {
             do {
                 let objects = realm.objects(SwiftListOfSwiftOptionalObject.self)
 
-                let properties = Array(objects.flatMap { $0.array.flatMap { $0.optIntCol.value }})
+                let properties = Array(objects.flatMap { $0.array.compactMap { $0.optIntCol.value }})
                 let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftOptionalObject>]
-                let kvcProperties = Array(listsOfObjects.flatMap { $0.flatMap { $0.optIntCol.value }})
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.compactMap { $0.optIntCol.value }})
 
                 XCTAssertEqual(properties, kvcProperties)
             }
             do {
                 let objects = realm.objects(SwiftListOfSwiftOptionalObject.self)
 
-                let properties = Array(objects.flatMap { $0.array.flatMap { $0.optInt8Col.value }})
+                let properties = Array(objects.flatMap { $0.array.compactMap { $0.optInt8Col.value }})
                 let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftOptionalObject>]
-                let kvcProperties = Array(listsOfObjects.flatMap { $0.flatMap { $0.optInt8Col.value }})
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.compactMap { $0.optInt8Col.value }})
 
                 XCTAssertEqual(properties, kvcProperties)
             }
             do {
                 let objects = realm.objects(SwiftListOfSwiftOptionalObject.self)
 
-                let properties = Array(objects.flatMap { $0.array.flatMap { $0.optDoubleCol.value }})
+                let properties = Array(objects.flatMap { $0.array.compactMap { $0.optDoubleCol.value }})
                 let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftOptionalObject>]
-                let kvcProperties = Array(listsOfObjects.flatMap { $0.flatMap { $0.optDoubleCol.value }})
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.compactMap { $0.optDoubleCol.value }})
 
                 XCTAssertEqual(properties, kvcProperties)
             }
             do {
                 let objects = realm.objects(SwiftListOfSwiftOptionalObject.self)
 
-                let properties = Array(objects.flatMap { $0.array.flatMap { $0.optStringCol }})
+                let properties = Array(objects.flatMap { $0.array.compactMap { $0.optStringCol }})
                 let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftOptionalObject>]
-                let kvcProperties = Array(listsOfObjects.flatMap { $0.flatMap { $0.optStringCol }})
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.compactMap { $0.optStringCol }})
 
                 XCTAssertEqual(properties, kvcProperties)
             }
             do {
                 let objects = realm.objects(SwiftListOfSwiftOptionalObject.self)
 
-                let properties = Array(objects.flatMap { $0.array.flatMap { $0.optNSStringCol }})
+                let properties = Array(objects.flatMap { $0.array.compactMap { $0.optNSStringCol }})
                 let listsOfObjects = objects.value(forKeyPath: "array") as! [List<SwiftOptionalObject>]
-                let kvcProperties = Array(listsOfObjects.flatMap { $0.flatMap { $0.optNSStringCol }})
+                let kvcProperties = Array(listsOfObjects.flatMap { $0.compactMap { $0.optNSStringCol }})
 
                 XCTAssertEqual(properties, kvcProperties)
             }
@@ -551,31 +551,31 @@ class ListTests: TestCase {
             do {
                 let objects = realm.objects(SwiftOptionalObject.self)
 
-                let properties = Array(objects.flatMap { $0.optIntCol.value })
+                let properties = Array(objects.compactMap { $0.optIntCol.value })
                 let listsOfObjects = objects.value(forKeyPath: "optIntCol") as! [Int]
-                let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+                let kvcProperties = Array(listsOfObjects.compactMap { $0 })
 
                 XCTAssertEqual(properties, kvcProperties)
             }
             do {
                 let objects = realm.objects(SwiftOptionalObject.self)
 
-                let properties = Array(objects.flatMap { $0.optInt8Col.value })
+                let properties = Array(objects.compactMap { $0.optInt8Col.value })
 #if swift(>=3.1)
                 let listsOfObjects = objects.value(forKeyPath: "optInt8Col") as! [Int8]
 #else
                 let listsOfObjects = (objects.value(forKeyPath: "optInt8Col") as! [NSNumber]).map { $0.int8Value }
 #endif
-                let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+                let kvcProperties = Array(listsOfObjects.compactMap { $0 })
 
                 XCTAssertEqual(properties, kvcProperties)
             }
             do {
                 let objects = realm.objects(SwiftOptionalObject.self)
 
-                let properties = Array(objects.flatMap { $0.optDoubleCol.value })
+                let properties = Array(objects.compactMap { $0.optDoubleCol.value })
                 let listsOfObjects = objects.value(forKeyPath: "optDoubleCol") as! [Double]
-                let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+                let kvcProperties = Array(listsOfObjects.compactMap { $0 })
 
                 XCTAssertEqual(properties, kvcProperties)
             }
@@ -585,7 +585,7 @@ class ListTests: TestCase {
             do {
                 let objects = realm.objects(SwiftOptionalObject.self)
 
-                let properties = Array(objects.flatMap { $0.optStringCol })
+                let properties = Array(objects.compactMap { $0.optStringCol })
                 let listsOfObjects = objects.value(forKeyPath: "optStringCol") as! [String]
                 let kvcProperties = Array(listsOfObjects.flatMap { $0 })
 
@@ -595,9 +595,9 @@ class ListTests: TestCase {
             do {
                 let objects = realm.objects(SwiftOptionalObject.self)
 
-                let properties = Array(objects.flatMap { $0.optNSStringCol })
+                let properties = Array(objects.compactMap { $0.optNSStringCol })
                 let listsOfObjects = objects.value(forKeyPath: "optNSStringCol") as! [NSString]
-                let kvcProperties = Array(listsOfObjects.flatMap { $0 })
+                let kvcProperties = Array(listsOfObjects.compactMap { $0 })
 
                 XCTAssertEqual(properties, kvcProperties)
             }

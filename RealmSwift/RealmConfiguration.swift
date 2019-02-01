@@ -23,7 +23,7 @@ import Realm.Private
 #if !swift(>=4.1)
 fileprivate extension Sequence {
     func compactMap<T>(_ fn: (Self.Iterator.Element) throws -> T?) rethrows -> [T] {
-        return try flatMap(fn)
+        return try compactMap(fn)
     }
 }
 #endif

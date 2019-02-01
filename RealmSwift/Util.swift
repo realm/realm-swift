@@ -84,7 +84,7 @@ extension Object {
 // MARK: CustomObjectiveCBridgeable
 
 fileprivate extension SyncSubscription {
-    fileprivate convenience init(_ rlmSubscription: Any) {
+    convenience init(_ rlmSubscription: Any) {
         self.init(RLMCastToSyncSubscription(rlmSubscription as AnyObject))
     }
 }

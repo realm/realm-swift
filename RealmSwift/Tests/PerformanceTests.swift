@@ -47,10 +47,10 @@ class SwiftPerformanceTests: TestCase {
         return XCTestSuite(name: "SwiftPerformanceTests")
     }
 #else
-    override class func defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
 #if !DEBUG && os(iOS)
         if isRunningOnDevice {
-            return super.defaultTestSuite()
+            return super.defaultTestSuite
         }
 #endif
         return XCTestSuite(name: "SwiftPerformanceTests")
@@ -109,7 +109,10 @@ class SwiftPerformanceTests: TestCase {
         }
     }
 
-    override func measureMetrics(_ metrics: [String], automaticallyStartMeasuring: Bool, for block: @escaping () -> Void) {
+    override func measureMetrics(_ metrics: [XCTPerformanceMetric], automaticallyStartMeasuring: Bool, for block: @escaping () -> Void) {
+// Local variable inserted by Swift 4.2 migrator.
+let metrics = convertFromXCTPerformanceMetricArray(metrics)
+
         super.measureMetrics(metrics, automaticallyStartMeasuring: automaticallyStartMeasuring) {
             autoreleasepool {
                 block()
@@ -118,7 +121,7 @@ class SwiftPerformanceTests: TestCase {
     }
 
     func inMeasureBlock(block: @escaping () -> Void) {
-        measureMetrics(type(of: self).defaultPerformanceMetrics(), automaticallyStartMeasuring: false) {
+        measureMetrics(type(of: self).defaultPerformanceMetrics, automaticallyStartMeasuring: false) {
             _ = block()
         }
     }
@@ -513,7 +516,7 @@ class SwiftPerformanceTests: TestCase {
                 #if swift(>=4.2)
                     RunLoop.current.run(mode: RunLoop.Mode.default, before: Date.distantFuture)
                 #else
-                    RunLoop.current.run(mode: RunLoopMode.defaultRunLoopMode, before: Date.distantFuture)
+                    RunLoop.current.run(mode: RunLoop.Mode.default, before: Date.distantFuture)
                 #endif
             }
             queue.sync {}
@@ -607,4 +610,9 @@ class SwiftPerformanceTests: TestCase {
             _ = objects.value(forKeyPath: "optStringCol") as! [String]
         }
     }
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertFromXCTPerformanceMetricArray(_ input: [XCTPerformanceMetric]) -> [String] {
+	return input.map { key in key.rawValue }
 }

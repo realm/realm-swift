@@ -450,7 +450,7 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: EquatableTestCa
     }
 #else
     class func _defaultTestSuite() -> XCTestSuite {
-        return defaultTestSuite()
+        return defaultTestSuite
     }
 #endif
 
@@ -869,7 +869,7 @@ class UnmanagedPrimitiveListTests: TestCase {
         return _defaultTestSuite()
     }
 #else
-    override class func defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         return _defaultTestSuite()
     }
 #endif
@@ -908,7 +908,7 @@ class ManagedPrimitiveListTests: TestCase {
         return _defaultTestSuite()
     }
 #else
-    override class func defaultTestSuite() -> XCTestSuite {
+    override class var defaultTestSuite: XCTestSuite {
         return _defaultTestSuite()
     }
 #endif
