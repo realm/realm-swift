@@ -19,6 +19,10 @@ identifier_name:
     - to
 disabled_rules:
   - block_based_kvo
+  # SwiftLint considers 'Realm' and 'Realm.Private' to be duplicate imports
+  # because we're using submodules in an unsual way, and normally the parent
+  # module re-exports all of its children.
+  - duplicate_imports
   - file_length
   - force_cast
   - force_try
