@@ -1390,6 +1390,8 @@ public struct ObjectPrivileges: OptionSet, CustomDebugStringConvertible {
 }
 
 extension Realm {
+    // MARK: Sync
+    
     /**
     Returns the computed privileges which the current user has for this Realm.
 
