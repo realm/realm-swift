@@ -958,6 +958,8 @@ public class SyncSubscription<T: RealmCollectionValue>: RealmCollectionValue {
 }
 
 extension Results {
+    // MARK: Sync
+    
     /// Subscribe to the query represented by this `Results`
     ///
     /// Subscribing to a query asks the server to synchronize all objects to the
