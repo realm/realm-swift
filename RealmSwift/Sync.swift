@@ -1392,7 +1392,7 @@ public struct ObjectPrivileges: OptionSet, CustomDebugStringConvertible {
 }
 
 extension Realm {
-    // MARK: Sync
+    // MARK: Sync - Permissions
     
     /**
     Returns the computed privileges which the current user has for this Realm.
@@ -1517,6 +1517,8 @@ extension Realm {
     public var permissions: List<Permission> {
         return object(ofType: RealmPermission.self, forPrimaryKey: 0)!.permissions
     }
+    
+    // MARK: Sync - Subscriptions
 
     /**
     Returns this list of the query-based sync subscriptions made for this Realm.
