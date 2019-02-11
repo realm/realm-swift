@@ -93,6 +93,8 @@ public class ThreadSafeReference<Confined: ThreadConfined> {
 }
 
 extension Realm {
+    // MARK: Thread Safe Reference
+
     /**
      Returns the same object as the one referenced when the `ThreadSafeReference` was first
      created, but resolved for the current Realm for this thread. Returns `nil` if this object was
