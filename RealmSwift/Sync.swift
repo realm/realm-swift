@@ -959,7 +959,7 @@ public class SyncSubscription<T: RealmCollectionValue>: RealmCollectionValue {
 
 extension Results {
     // MARK: Sync
-    
+
     /// Subscribe to the query represented by this `Results`
     ///
     /// Subscribing to a query asks the server to synchronize all objects to the
@@ -1393,7 +1393,7 @@ public struct ObjectPrivileges: OptionSet, CustomDebugStringConvertible {
 
 extension Realm {
     // MARK: Sync - Permissions
-    
+
     /**
     Returns the computed privileges which the current user has for this Realm.
 
@@ -1517,7 +1517,7 @@ extension Realm {
     public var permissions: List<Permission> {
         return object(ofType: RealmPermission.self, forPrimaryKey: 0)!.permissions
     }
-    
+
     // MARK: Sync - Subscriptions
 
     /**

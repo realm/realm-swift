@@ -257,7 +257,7 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
 
     /**
      Returns a `Results` containing distinct objects based on the specified key paths
-     
+
      - parameter keyPaths:  The key paths used produce distinct results
      */
     public func distinct<S: Sequence>(by keyPaths: S) -> Results<Element>

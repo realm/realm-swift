@@ -269,7 +269,7 @@ open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
 
      Objects are considered the same if and only if they are both managed by the same
      Realm and point to the same underlying object in the database.
-     
+
      - note: Equality comparison is implemented by `isEqual(_:)`. If the object type
              is defined with a primary key, `isEqual(_:)` behaves identically to this
              method. If the object type is not defined with a primary key,
