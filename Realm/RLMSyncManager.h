@@ -50,6 +50,12 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel) {
     RLMSyncLogLevelAll
 };
 
+/// A log callback function which can be set on RLMSyncManager.
+///
+/// The log function may be called from multiple threads simultaneously, and is
+/// responsible for performing its own synchronization if any is required.
+typedef void (*RLMSyncLogFunction)(RLMSyncLogLevel level, NSString *_Nonnull message);
+
 NS_ASSUME_NONNULL_BEGIN
 
 /// A block type representing a block which can be used to report a sync-related error to the application. If the error
@@ -95,12 +101,23 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
  The logging threshold which newly opened synced Realms will use. Defaults to
  `RLMSyncLogLevelInfo`.
 
- Logging strings are output to Apple System Logger.
+ By default logging strings are output to Apple System Logger. Set `logger` to
+ perform custom logging logic instead.
 
  @warning This property must be set before any synced Realms are opened. Setting it after
           opening any synced Realm will do nothing.
  */
 @property (nonatomic) RLMSyncLogLevel logLevel;
+
+/**
+ The function which will be invoked whenever the sync client has a log message.
+
+ If nil, log strings are output to Apple System Logger instead.
+
+ @warning This property must be set before any synced Realms are opened. Setting
+ it after opening any synced Realm will do nothing.
+ */
+@property (nonatomic, nullable) RLMSyncLogFunction logger;
 
 /**
  The name of the HTTP header to send authorization data in when making requests to a Realm Object Server which has

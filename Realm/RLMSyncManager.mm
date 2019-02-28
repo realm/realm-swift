@@ -82,13 +82,35 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     }
 } s_syncLoggerFactory;
 
+struct CallbackLogger : public realm::util::RootLogger {
+    RLMSyncLogFunction logFn;
+    void do_log(Level level, std::string message) override {
+        @autoreleasepool {
+            logFn(logLevelForLevel(level), RLMStringDataToNSString(message));
+        }
+    }
+};
+struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
+    RLMSyncLogFunction logFn;
+    std::unique_ptr<realm::util::Logger> make_logger(realm::util::Logger::Level level) override {
+        auto logger = std::make_unique<CallbackLogger>();
+        logger->logFn = logFn;
+        logger->set_level_threshold(level);
+        return std::move(logger); // not a redundant move because it's a different type
+    }
+
+    CallbackLoggerFactory(RLMSyncLogFunction logFn) : logFn(logFn) { }
+};
+
 } // anonymous namespace
 
 @interface RLMSyncManager ()
 - (instancetype)initWithCustomRootDirectory:(nullable NSURL *)rootDirectory NS_DESIGNATED_INITIALIZER;
 @end
 
-@implementation RLMSyncManager
+@implementation RLMSyncManager {
+    std::unique_ptr<CallbackLoggerFactory> _loggerFactory;
+}
 
 static RLMSyncManager *s_sharedManager = nil;
 
@@ -150,6 +172,18 @@ static RLMSyncManager *s_sharedManager = nil;
             }
             session->update_configuration(std::move(config));
         }
+    }
+}
+
+- (void)setLogger:(RLMSyncLogFunction)logFn {
+    _logger = logFn;
+    if (_logger) {
+        _loggerFactory = std::make_unique<CallbackLoggerFactory>(logFn);
+        SyncManager::shared().set_logger_factory(*_loggerFactory);
+    }
+    else {
+        _loggerFactory = nullptr;
+        SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
     }
 }
 

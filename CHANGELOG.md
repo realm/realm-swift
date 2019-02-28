@@ -1,7 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add the ability to set a custom logger function on `RLMSyncManager` which is
+  called instead of the default NSLog-based logger.
 
 ### Fixed
 * Fix a crash when using value(forKey:) on a LinkingObjects property (including
