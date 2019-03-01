@@ -68,6 +68,8 @@ RLMSyncLogLevel logLevelForLevel(Level logLevel) {
     REALM_UNREACHABLE();    // Unrecognized log level.
 }
 
+#pragma mark - Loggers
+
 struct CocoaSyncLogger : public realm::util::RootLogger {
     void do_log(Level, std::string message) override {
         NSLog(@"Sync: %@", RLMStringDataToNSString(message));
@@ -104,8 +106,12 @@ struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
 
 } // anonymous namespace
 
-@interface RLMSyncManager ()
-- (instancetype)initWithCustomRootDirectory:(nullable NSURL *)rootDirectory NS_DESIGNATED_INITIALIZER;
+#pragma mark - RLMSyncManager
+
+@interface RLMSyncTimeoutOptions () {
+    @public
+    realm::SyncClientTimeouts _options;
+}
 @end
 
 @implementation RLMSyncManager {
@@ -118,7 +124,9 @@ static RLMSyncManager *s_sharedManager = nil;
     static std::once_flag flag;
     std::call_once(flag, [] {
         try {
-            s_sharedManager = [[RLMSyncManager alloc] initWithCustomRootDirectory:nil];
+            [RLMSyncUser _setUpBindingContextFactory];
+            s_sharedManager = [[RLMSyncManager alloc] init];
+            [s_sharedManager configureWithRootDirectory:nil];
         }
         catch (std::exception const& e) {
             @throw RLMException(e);
@@ -127,25 +135,23 @@ static RLMSyncManager *s_sharedManager = nil;
     return s_sharedManager;
 }
 
-- (instancetype)initWithCustomRootDirectory:(NSURL *)rootDirectory {
-    if (self = [super init]) {
-        [RLMSyncUser _setUpBindingContextFactory];
-
-        // Initialize the sync engine.
-        SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
-        bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
-        auto mode = should_encrypt ? SyncManager::MetadataMode::Encryption : SyncManager::MetadataMode::NoEncryption;
+- (void)configureWithRootDirectory:(NSURL *)rootDirectory {
+    SyncClientConfig config;
+    bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
+    config.logger_factory = &s_syncLoggerFactory;
+    config.metadata_mode = should_encrypt ? SyncManager::MetadataMode::Encryption
+                                          : SyncManager::MetadataMode::NoEncryption;
+    @autoreleasepool {
         rootDirectory = rootDirectory ?: [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
-        @autoreleasepool {
-            bool isSwift = !!NSClassFromString(@"RealmSwiftObjectUtil");
-            auto userAgent = [[NSMutableString alloc] initWithFormat:@"Realm%@/%@",
-                              isSwift ? @"Swift" : @"ObjectiveC", REALM_COCOA_VERSION];
-            SyncManager::shared().configure(rootDirectory.path.UTF8String, mode, RLMStringDataWithNSString(userAgent), none, true);
-            SyncManager::shared().set_user_agent(RLMStringDataWithNSString(self.appID));
-        }
-        return self;
+        config.base_file_path = rootDirectory.path.UTF8String;
+
+        bool isSwift = !!NSClassFromString(@"RealmSwiftObjectUtil");
+        config.user_agent_binding_info =
+            util::format("Realm%1/%2", isSwift ? "Swift" : "ObjectiveC",
+                         RLMStringDataWithNSString(REALM_COCOA_VERSION));
+        config.user_agent_application_info = RLMStringDataWithNSString(self.appID);
     }
-    return nil;
+    SyncManager::shared().configure(config);
 }
 
 - (NSString *)appID {
@@ -185,6 +191,11 @@ static RLMSyncManager *s_sharedManager = nil;
         _loggerFactory = nullptr;
         SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
     }
+}
+
+- (void)setTimeoutOptions:(RLMSyncTimeoutOptions *)timeoutOptions {
+    _timeoutOptions = timeoutOptions;
+    SyncManager::shared().set_timeouts(timeoutOptions->_options);
 }
 
 #pragma mark - Passthrough properties
@@ -272,6 +283,46 @@ static RLMSyncManager *s_sharedManager = nil;
     options.customHeaders = self.customRequestHeaders;
     options.pinnedCertificatePaths = self.pinnedCertificatePaths;
     return options;
+}
+
+@end
+
+#pragma mark - RLMSyncTimeoutOptions
+
+@implementation RLMSyncTimeoutOptions
+- (NSUInteger)connectTimeout {
+    return _options.connect_timeout;
+}
+- (void)setConnectTimeout:(NSUInteger)connectTimeout {
+    _options.connect_timeout = connectTimeout;
+}
+
+- (NSUInteger)connectLingerTime {
+    return _options.connection_linger_time;
+}
+- (void)setConnectionLingerTime:(NSUInteger)connectionLingerTime {
+    _options.connection_linger_time = connectionLingerTime;
+}
+
+- (NSUInteger)pingKeepalivePeriod {
+    return _options.ping_keepalive_period;
+}
+- (void)setPingKeepalivePeriod:(NSUInteger)pingKeepalivePeriod {
+    _options.ping_keepalive_period = pingKeepalivePeriod;
+}
+
+- (NSUInteger)pongKeepaliveTimeout {
+    return _options.pong_keepalive_timeout;
+}
+- (void)setPongKeepaliveTimeout:(NSUInteger)pongKeepaliveTimeout {
+    _options.pong_keepalive_timeout = pongKeepaliveTimeout;
+}
+
+- (NSUInteger)fastReconnectLimit {
+    return _options.fast_reconnect_limit;
+}
+- (void)setFastReconnectLimit:(NSUInteger)fastReconnectLimit {
+    _options.fast_reconnect_limit = fastReconnectLimit;
 }
 
 @end

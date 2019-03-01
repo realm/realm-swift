@@ -57,6 +57,13 @@ extension SyncManager {
 }
 
 /**
+ Options for configuring timeouts and intervals in the sync client.
+
+  - see: `RLMSyncTimeoutOptions`
+ */
+public typealias SyncTimeoutOptions = RLMSyncTimeoutOptions
+
+/**
  A session object which represents communication between the client and server for a specific
  Realm.
 
