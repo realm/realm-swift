@@ -30,6 +30,14 @@
 // A whole bunch of blocks don't use their RLMResults parameter
 #pragma clang diagnostic ignored "-Wunused-parameter"
 
+@interface ManualRefreshRealm : RLMRealm
+@end
+@implementation ManualRefreshRealm
+- (void)verifyNotificationsAreSupported:(__unused bool)isCollection {
+    // The normal implementation of this will reject realms with automatic change notifications disabled
+}
+@end
+
 @interface AsyncTests : RLMTestCase
 @end
 
@@ -583,7 +591,7 @@
     // Create ten RLMRealm instances, each with a different read version
     RLMRealm *realms[10];
     for (int i = 0; i < 10; ++i) {
-        RLMRealm *realm = realms[i] = [RLMRealm realmWithConfiguration:config error:nil];
+        RLMRealm *realm = realms[i] = [ManualRefreshRealm realmWithConfiguration:config error:nil];
         [realm transactionWithBlock:^{
             [IntObject createInRealm:realm withValue:@[@(i)]];
         }];
