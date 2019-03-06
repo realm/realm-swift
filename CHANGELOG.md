@@ -1,8 +1,65 @@
+3.15.0-beta.1 Release notes (2019-04-02)
+=============================================================
+
+### Enhancements
+
+* Improve query performance for chains of OR conditions (or an IN condition) on
+  an unindexed integer or integer property.
+  ([PR #2888](https://github.com/realm/realm-core/pull/2888) and [PR #3250](https://github.com/realm/realm-core/pull/3250)).
+* Improve query performance for equality conditions on indexed integer properties.
+  ([PR #3272](https://github.com/realm/realm-core/pull/3272)).
+* Adjust the file allocation algorithm to reduce fragmentation caused by large
+  numbers of small blocks.
+* Using `-[RLMRealm * asyncOpenWithConfiguration:callbackQueue:]`/`Realm.asyncOpen()` to open a
+  synchronized Realm which does not exist on the local device now uses an
+  optimized transfer method to download the initial data for the Realm, greatly
+  speeding up the first start time for applications which use full
+  synchronization. This is currently not applicable to query-based
+  synchronization.
+
+### Fixed
+
+* Fix a bug in queries on a string column with more than two "or" equality
+  conditions when the last condition also had an "and" clause. For example:
+  `first == "a" || (first == "b" && second == 1)` would be incorrectly
+  evaluated as `(first == "a" || first == "b")`.
+  ([PR #3271](https://github.com/realm/realm-core/pull/3271), since v5.17.0)
+* Making a query that compares two integer properties could cause a
+  segmentation fault on x86 (i.e. macOS only).
+  ([PR #3253](https://github.com/realm/realm-core/pull/3256)).
+* The `downloadable_bytes` parameter passed to sync progress callbacks reported
+  a value which correlated to the amount of data left to download, but not
+  actually the number of bytes which would be downloaded.
+
+### Compatibility
+
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 4.21.0 or later.
+
 3.14.0 Release notes (2019-03-27)
 =============================================================
 
 ### Enhancements
 
+* `Realm.asyncOpen()` and `-[RLMRealm asyncOpenWithConfiguration:]` now use an
+  optimized download system for fetching the initial state of a Realm from the
+  server which uses less bandwidth and CPU time on both the client and server
+  sides.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 4.0.0 or later.
+* APIs are backwards compatible with all previous releases in the 3.x.y series.
+
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
 * Reduce memory usage when committing write transactions.
 * Improve performance of compacting encrypted Realm files.
   ([PR #3221](https://github.com/realm/realm-core/pull/3221)).
