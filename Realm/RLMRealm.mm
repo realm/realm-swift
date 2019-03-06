@@ -186,64 +186,31 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 + (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                      callbackQueue:(dispatch_queue_t)callbackQueue
                           callback:(RLMAsyncOpenRealmCallback)callback {
-    RLMRealm *strongReferenceToSyncedRealm = nil;
-    if (configuration.config.sync_config) {
-        NSError *error = nil;
-        strongReferenceToSyncedRealm = [RLMRealm uncachedSchemalessRealmWithConfiguration:configuration error:&error];
-        if (error) {
-            dispatch_async(callbackQueue, ^{
-                callback(nil, error);
-            });
-            return;
-        }
-    }
     static dispatch_queue_t queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue", DISPATCH_QUEUE_CONCURRENT);
     dispatch_async(queue, ^{
         @autoreleasepool {
-            if (strongReferenceToSyncedRealm) {
-                // Sync behavior: get the raw session, then wait for it to download.
-                if (auto session = sync_session_for_realm(strongReferenceToSyncedRealm)) {
-                    // Wait for the session to download, then open it.
-                    session->wait_for_download_completion([=](std::error_code error_code) {
-                        dispatch_async(callbackQueue, ^{
-                            (void)strongReferenceToSyncedRealm;
-                            NSError *error = nil;
-                            if (error_code == std::error_code{}) {
-                                // Success
-                                @autoreleasepool {
-                                    // Try opening the Realm on the destination queue.
-                                    RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
-                                    callback(localRealm, error);
-                                }
-                            } else {
-                                // Failure
-                                callback(nil, make_sync_error(RLMSyncSystemErrorKindSession,
-                                                              @(error_code.message().c_str()),
-                                                              error_code.value(),
-                                                              nil));
-                            }
-                        });
-                    });
-                } else {
-                    dispatch_async(callbackQueue, ^{
-                        callback(nil, make_sync_error(RLMSyncSystemErrorKindSession,
-                                                      @"Cannot asynchronously open synced Realm, because the associated session previously experienced a fatal error",
-                                                      NSNotFound,
-                                                      nil));
-                    });
-                    return;
-                }
-            } else {
-                // Default behavior: just dispatch onto the destination queue and open the Realm.
+            Realm::Config& config = configuration.config;
+            realm::Realm::get_shared_realm(config, [=](std::shared_ptr<Realm> realm, std::exception_ptr err) {
                 dispatch_async(callbackQueue, ^{
                     @autoreleasepool {
-                        NSError *error = nil;
-                        RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
-                        callback(localRealm, error);
+                        if (realm) {
+                            NSError *error;
+                            RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
+                            callback(localRealm, error);
+                        }
+                        else {
+                            try {
+                                std::rethrow_exception(err);
+                            }
+                            catch (...) {
+                                NSError *error;
+                                RLMRealmTranslateException(&error);
+                                callback(nil, error);
+                            }
+                        }
                     }
                 });
-                return;
-            }
+            });
         }
     });
 }

@@ -8,6 +8,12 @@ x.y.z Release notes (yyyy-MM-dd)
   improves Object Server performance by reducing the number of operations to
   merge. (Issue: [#5970](https://github.com/realm/realm-cocoa/issues/5970),
   PR: [#6149](https://github.com/realm/realm-cocoa/pulls/6149)).
+* Using `-[RLMRealm * asyncOpenWithConfiguration:callbackQueue:]`/`Realm.asyncOpen()` to open a
+  synchronized Realm which does not exist on the local device now uses an
+  optimized transfer method to download the initial data for the Realm, greatly
+  speeding up the first start time for applications which use full
+  synchronization. This is currently not applicable to query-based
+  synchronization. (PR: [#6106](https://github.com/realm/realm-cocoa/pull/6106)).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
