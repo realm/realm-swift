@@ -1,18 +1,54 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.15.0-beta.2 Release notes (2019-04-05)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Improve file allocator logic to reduce fragmentation and improve commit
+  performance after many writes. ([PR #3278](https://github.com/realm/realm-core/pull/3278)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
+
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Compatibility
+
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Carthage release for Swift is built with Xcode 10.1.
+
+3.15.0-beta.1 Release notes (2019-04-02)
+=============================================================
+
+### Enhancements
+
+* Improve query performance for chains of OR conditions (or an IN condition) on
+  an unindexed integer or integer property.
+  ([PR #2888](https://github.com/realm/realm-core/pull/2888) and [PR #3250](https://github.com/realm/realm-core/pull/3250)).
+* Improve query performance for equality conditions on indexed integer properties.
+  ([PR #3272](https://github.com/realm/realm-core/pull/3272)).
+* Adjust the file allocation algorithm to reduce fragmentation caused by large
+  numbers of small blocks.
+* Using `-[RLMRealm * asyncOpenWithConfiguration:callbackQueue:]`/`Realm.asyncOpen()` to open a
+  synchronized Realm which does not exist on the local device now uses an
+  optimized transfer method to download the initial data for the Realm, greatly
+  speeding up the first start time for applications which use full
+  synchronization. This is currently not applicable to query-based
+  synchronization.
+
+### Fixed
+
+* Making a query that compares two integer properties could cause a
+  segmentation fault on x86 (i.e. macOS only).
+  ([PR #3253](https://github.com/realm/realm-core/pull/3256)).
+* The `downloadable_bytes` parameter passed to sync progress callbacks reported
+  a value which correlated to the amount of data left to download, but not
+  actually the number of bytes which would be downloaded.
 
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
-* Realm Object Server: 3.11.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
+* Realm Object Server: 3.21.0 or later.
+* Carthage release for Swift is built with Xcode 10.1.
 
 3.14.1 Release notes (2019-04-04)
 =============================================================
