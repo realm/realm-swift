@@ -3,14 +3,17 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * Reduce memory usage when committing write transactions.
 * Improve performance of compacting encrypted Realm files.
-* Throw an exception when opening a Realm file with an invalid top ref rather
-  than crashing with an assertion failure.
+  ([#3221](https://github.com/realm/realm-core/pull/3221)).
+* Throw an exception rather than crashing with an assertion failure in more
+  cases when opening invalid Realm files.
+  ([#3203](https://github.com/realm/realm-core/pull/3203)).
 
 ### Fixed
 * Fix a memory leak whenever Realm makes a HTTP(s) request to the Realm Object
   Server (since 3.8.0, Issue [#6058](https://github.com/realm/realm-cocoa/issues/6058)).
-* Fix an assertion failure when creating an object after creating an object
-  with a null int primary key in the same write transaction.
+* Fix an assertion failure when creating an object in a synchronized Realm
+  after creating an object with a null int primary key in the same write
+  transaction.
   ([#3227](https://github.com/realm/realm-core/pull/3227)).
 * Properly clean up sync sessions when the last Realm object using the session
   is deallocated while the session is explicitly suspended (since 3.9.0).
