@@ -3,25 +3,29 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * Reduce memory usage when committing write transactions.
 * Improve performance of compacting encrypted Realm files.
-  ([#3221](https://github.com/realm/realm-core/pull/3221)).
-* Throw an exception rather than crashing with an assertion failure in more
-  cases when opening invalid Realm files.
-  ([#3203](https://github.com/realm/realm-core/pull/3203)).
+  ([PR #3221](https://github.com/realm/realm-core/pull/3221)).
 
 ### Fixed
 * Fix a memory leak whenever Realm makes a HTTP(s) request to the Realm Object
-  Server (since 3.8.0, Issue [#6058](https://github.com/realm/realm-cocoa/issues/6058)).
+  Server (Issue [#6058](https://github.com/realm/realm-cocoa/issues/6058), since 3.8.0).
 * Fix an assertion failure when creating an object in a synchronized Realm
   after creating an object with a null int primary key in the same write
   transaction.
-  ([#3227](https://github.com/realm/realm-core/pull/3227)).
-* Properly clean up sync sessions when the last Realm object using the session
-  is deallocated while the session is explicitly suspended (since 3.9.0).
+  ([PR #3227](https://github.com/realm/realm-core/pull/3227)).
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.11.0 or later.
 * APIs are backwards compatible with all previous releases in the 3.x.y series.
+
+### Internal
+* Throw an exception rather than crashing with an assertion failure in more
+  cases when opening invalid Realm files. To make this useful for applications
+  more work is needed.
+  ([#3203](https://github.com/realm/realm-core/pull/3203)).
+* Properly clean up sync sessions when the last Realm object using the session
+  is deallocated while the session is explicitly suspended (since 3.9.0).
+
 
 3.13.1 Release notes (2019-01-03)
 =============================================================
