@@ -51,6 +51,11 @@
                BlueprintName = "Tests"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "InterprocessTest/testChangeInChildTriggersNotificationInParent">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>

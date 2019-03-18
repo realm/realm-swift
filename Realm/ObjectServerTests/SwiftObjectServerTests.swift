@@ -235,26 +235,24 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testStreamingUploadNotifier() {
         let bigObjectCount = 2
         do {
-            var callCount = 0
             var transferred = 0
             var transferrable = 0
             let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
             let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
             let session = realm.syncSession
             XCTAssertNotNil(session)
-            let ex = expectation(description: "streaming-uploads-expectation")
-            var hasBeenFulfilled = false
+            var ex = expectation(description: "initial upload")
             let token = session!.addProgressNotification(for: .upload, mode: .reportIndefinitely) { p in
-                callCount += 1
                 XCTAssert(p.transferredBytes >= transferred)
                 XCTAssert(p.transferrableBytes >= transferrable)
                 transferred = p.transferredBytes
                 transferrable = p.transferrableBytes
-                if p.transferredBytes > 0 && p.isTransferComplete && !hasBeenFulfilled {
+                if p.transferredBytes > 0 && p.isTransferComplete {
                     ex.fulfill()
-                    hasBeenFulfilled = true
                 }
             }
+            waitForExpectations(timeout: 10.0, handler: nil)
+            ex = expectation(description: "write transaction upload")
             try realm.write {
                 for _ in 0..<bigObjectCount {
                     realm.add(SwiftHugeSyncObject())
@@ -262,7 +260,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
             waitForExpectations(timeout: 10.0, handler: nil)
             token!.invalidate()
-            XCTAssert(callCount > 1)
             XCTAssert(transferred >= transferrable)
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -293,15 +290,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     }
                     return 0
                 }
-                let sizeBefore = fileSize(path: pathOnDisk)
-                autoreleasepool {
-                    // We have partial transaction logs but no data
-                    XCTAssertGreaterThan(sizeBefore, 0)
-                    XCTAssert(try! Realm(configuration: config).isEmpty)
-                }
                 XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
                 waitForExpectations(timeout: 10.0, handler: nil)
-                XCTAssertGreaterThan(fileSize(path: pathOnDisk), sizeBefore)
+                XCTAssertGreaterThan(fileSize(path: pathOnDisk), 0)
                 XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
             } else {
                 let realm = try synchronouslyOpenRealm(url: realmURL, user: user)

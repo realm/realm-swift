@@ -1779,10 +1779,16 @@
     assert(![manager fileExistsAtPath:fifoURL.path]);
     [manager createDirectoryAtPath:fifoURL.path withIntermediateDirectories:YES attributes:nil error:nil];
 
+    // Ensure that it doesn't try to fall back to putting it in the temp directory
+    auto oldTempDir = realm::SharedGroupOptions::get_sys_tmp_dir();
+    realm::SharedGroupOptions::set_sys_tmp_dir("");
+
     NSError *error;
     XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Should not have been able to open FIFO");
     XCTAssertNotNil(error);
     RLMValidateRealmError(error, RLMErrorFileAccess, @"Is a directory", nil);
+
+    realm::SharedGroupOptions::set_sys_tmp_dir(std::move(oldTempDir));
 }
 #endif
 
