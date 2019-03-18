@@ -1518,15 +1518,9 @@
 
             return 0;
         };
-        NSUInteger sizeBefore = fileSize(c.pathOnDisk);
-        @autoreleasepool {
-            // We have partial transaction logs but no data
-            XCTAssertGreaterThan(sizeBefore, 0U);
-            XCTAssertTrue([[RLMRealm realmWithConfiguration:c error:nil] isEmpty]);
-        }
         XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
         [self waitForExpectationsWithTimeout:10.0 handler:nil];
-        XCTAssertGreaterThan(fileSize(c.pathOnDisk), sizeBefore);
+        XCTAssertGreaterThan(fileSize(c.pathOnDisk), 0U);
         XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
     } else {
         RLMRealm *realm = [self openRealmForURL:url user:user];
@@ -1588,45 +1582,6 @@
     XCTAssertGreaterThan(fileSize(c.pathOnDisk), sizeBefore);
     XCTAssertNotNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
     CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
-}
-
-- (void)testDownloadWhileOpeningRealm {
-    const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
-    NSURL *url = REALM_URL();
-    // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
-                                               server:[RLMObjectServerTests authServerURL]];
-    if (self.isParent) {
-        // Wait for the child process to upload everything.
-        RLMRunChildAndWait();
-        XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-        RLMRealmConfiguration *c = [user configurationWithURL:url fullSynchronization:true];
-        XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
-        [RLMRealm asyncOpenWithConfiguration:c
-                               callbackQueue:dispatch_get_main_queue()
-                                    callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
-            XCTAssertNil(error);
-            CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
-            [ex fulfill];
-        }];
-        RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
-        CHECK_COUNT(0, HugeSyncObject, realm);
-        XCTAssertNotNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
-        [self waitForExpectationsWithTimeout:10.0 handler:nil];
-        CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
-        XCTAssertNotNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
-    } else {
-        RLMRealm *realm = [self openRealmForURL:url user:user];
-        // Write lots of data to the Realm, then wait for it to be uploaded.
-        [realm beginWriteTransaction];
-        for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
-            [realm addObject:[HugeSyncObject object]];
-        }
-        [realm commitWriteTransaction];
-        [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
-    }
 }
 
 - (void)testDownloadCancelsOnAuthError {
