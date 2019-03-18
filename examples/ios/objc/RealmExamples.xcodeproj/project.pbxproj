@@ -682,9 +682,9 @@
 			buildPhases = (
 				C0DC41C81A7072670067156A /* Sources */,
 				C0DC41C91A7072670067156A /* Frameworks */,
-				C06134E21A718BB800D22D12 /* Embed App Extensions */,
 				227D20831CB4E4B9008F641B /* Resources */,
 				3F336E871DA2F8A4006CB5A0 /* Embed Watch Content */,
+				C06134E21A718BB800D22D12 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
