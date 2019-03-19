@@ -330,8 +330,7 @@ download_common() {
         exit 1
     fi
 
-    echo "LOOK OVER HERE: ${url}"
-    echo "Downloading dependency: ${download_type} ${version}"
+    echo "Downloading dependency: ${download_type} ${version} from ${url}"
 
     if [ -z "$TMPDIR" ]; then
         TMPDIR='/tmp'
