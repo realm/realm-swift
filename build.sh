@@ -16,6 +16,8 @@ set -e
 source_root="$(dirname "$0")"
 
 # You can override the version of the core library
+: ${REALM_BASE_URL:="https://static.realm.io/downloads"} # set it if you need to use a remote repo
+
 : ${REALM_CORE_VERSION:=$(sed -n 's/^REALM_CORE_VERSION=\(.*\)$/\1/p' ${source_root}/dependencies.list)} # set to "current" to always use the current build
 
 : ${REALM_SYNC_VERSION:=$(sed -n 's/^REALM_SYNC_VERSION=\(.*\)$/\1/p' ${source_root}/dependencies.list)}
@@ -319,16 +321,16 @@ download_common() {
 
     if [ "$download_type" == "core" ]; then
         version=$REALM_CORE_VERSION
-        url="https://static.realm.io/downloads/core/realm-core-${version}.tar.xz"
+        url="${REALM_BASE_URL}/core/realm-core-${version}.tar.xz"
     elif [ "$download_type" == "sync" ]; then
         version=$REALM_SYNC_VERSION
-        url="https://static.realm.io/downloads/sync/realm-sync-cocoa-${version}.tar.xz"
+        url="${REALM_BASE_URL}/sync/realm-sync-cocoa-${version}.tar.xz"
     else
         echo "Unknown dowload_type: $download_type"
         exit 1
     fi
 
-    echo "Downloading dependency: ${download_type} ${version}"
+    echo "Downloading dependency: ${download_type} ${version} from ${url}"
 
     if [ -z "$TMPDIR" ]; then
         TMPDIR='/tmp'
