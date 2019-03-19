@@ -25,6 +25,8 @@ x.y.z Release notes (yyyy-MM-dd)
   ([#3203](https://github.com/realm/realm-core/pull/3203)).
 * Properly clean up sync sessions when the last Realm object using the session
   is deallocated while the session is explicitly suspended (since 3.9.0).
+* Upgraded to REALM_CORE_VERSION=5.14.0
+* Upgraded to REALM_SYNC_VERSION=3.15.1
 
 
 3.13.1 Release notes (2019-01-03)
