@@ -21,7 +21,7 @@ import WatchKit
 import RealmSwift
 
 class Counter: Object {
-    dynamic var count = 0
+    @objc dynamic var count = 0
 }
 
 class InterfaceController: WKInterfaceController {
