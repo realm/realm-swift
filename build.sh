@@ -1058,7 +1058,9 @@ EOM
             export sha=$GITHUB_PR_SOURCE_BRANCH
             export CONFIGURATION=$configuration
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
-            sh build.sh prelaunch-simulator
+            if [[ ${target} != *"osx"* ]];then
+                sh build.sh prelaunch-simulator
+            fi
 
             source $(brew --prefix nvm)/nvm.sh
             export REALM_NODE_PATH="$(nvm which 8)"
