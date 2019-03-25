@@ -514,8 +514,8 @@ case "$COMMAND" in
 
     "ios-swift")
         sh build.sh ios-dynamic
-        build_combined RealmSwift RealmSwift iphoneos iphonesimulator '' "/swift-$REALM_SWIFT_VERSION"
-        cp -R build/ios/Realm.framework build/ios/swift-$REALM_SWIFT_VERSION
+        build_combined RealmSwift RealmSwift iphoneos iphonesimulator '' "/swift-$REALM_XCODE_VERSION"
+        cp -R build/ios/Realm.framework build/ios/swift-$REALM_XCODE_VERSION
         exit 0
         ;;
 
@@ -526,8 +526,8 @@ case "$COMMAND" in
 
     "watchos-swift")
         sh build.sh watchos
-        build_combined RealmSwift RealmSwift watchos watchsimulator '' "/swift-$REALM_SWIFT_VERSION"
-        cp -R build/watchos/Realm.framework build/watchos/swift-$REALM_SWIFT_VERSION
+        build_combined RealmSwift RealmSwift watchos watchsimulator '' "/swift-$REALM_XCODE_VERSION"
+        cp -R build/watchos/Realm.framework build/watchos/swift-$REALM_XCODE_VERSION
         exit 0
         ;;
 
@@ -538,8 +538,8 @@ case "$COMMAND" in
 
     "tvos-swift")
         sh build.sh tvos
-        build_combined RealmSwift RealmSwift appletvos appletvsimulator '' "/swift-$REALM_SWIFT_VERSION"
-        cp -R build/tvos/Realm.framework build/tvos/swift-$REALM_SWIFT_VERSION
+        build_combined RealmSwift RealmSwift appletvos appletvsimulator '' "/swift-$REALM_XCODE_VERSION"
+        cp -R build/tvos/Realm.framework build/tvos/swift-$REALM_XCODE_VERSION
         exit 0
         ;;
 
@@ -552,7 +552,7 @@ case "$COMMAND" in
     "osx-swift")
         sh build.sh osx
         xc "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
-        destination="build/osx/swift-$REALM_SWIFT_VERSION"
+        destination="build/osx/swift-$REALM_XCODE_VERSION"
         clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
         cp -R build/osx/Realm.framework "$destination"
         exit 0
@@ -861,7 +861,7 @@ case "$COMMAND" in
         sh build.sh prelaunch-simulator
         workspace="examples/ios/swift/RealmExamples.xcworkspace"
         if [[ ! -d "$workspace" ]]; then
-            workspace="${workspace/swift/swift-$REALM_SWIFT_VERSION}"
+            workspace="${workspace/swift/swift-$REALM_XCODE_VERSION}"
         fi
 
         xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
@@ -893,7 +893,7 @@ case "$COMMAND" in
     "examples-tvos-swift")
         workspace="examples/tvos/swift/RealmExamples.xcworkspace"
         if [[ ! -d "$workspace" ]]; then
-            workspace="${workspace/swift/swift-$REALM_SWIFT_VERSION}"
+            workspace="${workspace/swift/swift-$REALM_XCODE_VERSION}"
         fi
 
         if (( $(xcode_version_major) >= 9 )); then
@@ -1197,7 +1197,7 @@ EOM
 
     package-*-swift)
         PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        for version in 9.2 9.3 9.4 10.0 10.1; do
+        for version in 9.2 9.3 9.4 10.0 10.1 10.2; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1206,65 +1206,20 @@ EOM
         done
 
         cd build/$PLATFORM
-        ln -s swift-4.0.3 swift-3.2.3
-        ln -s swift-4.1 swift-3.3
-        ln -s swift-4.1.2 swift-3.3.2
-        ln -s swift-4.2 swift-3.4
-        ln -s swift-4.2.1 swift-3.4.1
-        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-3.2.3 swift-3.3 swift-3.3.2 swift-3.4 swift-3.4.1 swift-4.0.3 swift-4.1 swift-4.1.2 swift-4.2 swift-4.2.1
-        ;;
-
-    package-*-swift-3.2.3)
-        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        mkdir -p build/$PLATFORM
-        cd build/$PLATFORM
-        ln -s swift-4.0.2 swift-3.2.3
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.2.3.zip swift-3.2.3
-        ;;
-
-    package-*-swift-3.3)
-        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        mkdir -p build/$PLATFORM
-        cd build/$PLATFORM
-        ln -s swift-4.1 swift-3.3
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.3.zip swift-3.3
-        ;;
-
-    package-*-swift-3.3.2)
-        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        mkdir -p build/$PLATFORM
-        cd build/$PLATFORM
-        ln -s swift-4.1.2 swift-3.3.2
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.3.2.zip swift-3.3.2
-        ;;
-
-    package-*-swift-3.4)
-        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        mkdir -p build/$PLATFORM
-        cd build/$PLATFORM
-        ln -s swift-4.2 swift-3.4
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.4.zip swift-3.4
-        ;;
-
-    package-*-swift-3.4.1)
-        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        mkdir -p build/$PLATFORM
-        cd build/$PLATFORM
-        ln -s swift-4.2.1 swift-3.4.1
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-3.4.1.zip swift-3.4.1
+        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-9.2 swift-9.2 swift-9.4 swift-10.0 swift-10.1 swift-10.2
         ;;
 
     package-*-swift-*)
         PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        REALM_SWIFT_VERSION=$(echo $COMMAND | cut -d - -f 4)
-        REALM_XCODE_VERSION=
+        REALM_XCODE_VERSION=$(echo $COMMAND | cut -d - -f 4)
+        REALM_SWIFT_VERSION=
 
         set_xcode_and_swift_versions
         sh build.sh prelaunch-simulator
         sh build.sh $PLATFORM-swift
 
         cd build/$PLATFORM
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-$REALM_SWIFT_VERSION.zip swift-$REALM_SWIFT_VERSION
+        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-$REALM_XCODE_VERSION.zip swift-$REALM_XCODE_VERSION
         ;;
 
     "package-release")
