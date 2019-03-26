@@ -89,7 +89,9 @@ xctest() {
     fi
     DESTINATION=""
     if [[ $PLATFORM == ios ]]; then
-        DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
+        simulator_id="$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
+        xcrun simctl boot $simulator_id
+        DESTINATION="-destination id=$simulator_id"
     fi
     CMD="-project $PROJECT"
     if [ -d $WORKSPACE ]; then
