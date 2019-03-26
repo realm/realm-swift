@@ -310,7 +310,7 @@ didCompleteWithError:(NSError *)error
         return;
     }
 
-    if (![self validateResponse:task.response data:_data error:&error]) {
+    if (NSError *error = [self validateResponse:task.response data:_data]) {
         _completionBlock(error, nil);
         return;
     }
@@ -330,11 +330,10 @@ didCompleteWithError:(NSError *)error
     _completionBlock(nil, (NSDictionary *)json);
 }
 
-- (BOOL)validateResponse:(NSURLResponse *)response data:(NSData *)data error:(NSError * __autoreleasing *)error {
+- (NSError *)validateResponse:(NSURLResponse *)response data:(NSData *)data {
     if (![response isKindOfClass:[NSHTTPURLResponse class]]) {
         // FIXME: Provide error message
-        *error = make_auth_error_bad_response();
-        return NO;
+        return make_auth_error_bad_response();
     }
 
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
@@ -353,28 +352,22 @@ didCompleteWithError:(NSError *)error
                 case RLMSyncAuthErrorExpiredPermissionOffer:
                 case RLMSyncAuthErrorAmbiguousPermissionOffer:
                 case RLMSyncAuthErrorFileCannotBeShared:
-                    *error = make_auth_error(responseModel);
-                    break;
+                    return make_auth_error(responseModel);
                 default:
                     // Right now we assume that any codes not described
                     // above are generic HTTP error codes.
-                    *error = make_auth_error_http_status(responseModel.status);
-                    break;
+                    return make_auth_error_http_status(responseModel.status);
             }
-        } else {
-            *error = make_auth_error_http_status(httpResponse.statusCode);
         }
-
-        return NO;
+        return make_auth_error_http_status(httpResponse.statusCode);
     }
 
     if (!data) {
         // FIXME: provide error message
-        *error = make_auth_error_bad_response();
-        return NO;
+        return make_auth_error_bad_response();
     }
 
-    return YES;
+    return nil;
 }
 
 - (RLMSyncErrorResponseModel *)responseModelFromData:(NSData *)data {

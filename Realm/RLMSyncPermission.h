@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import <Realm/RLMConstants.h>
 #import <Realm/RLMObject.h>
 
 @protocol RLMPermission, RLMPermissionUser;
@@ -362,7 +363,7 @@ FOUNDATION_EXTERN id RLMPermissionForRole(RLMArray *array, id role);
  access to a Realm can always read from that Realm, and users with
  administrative access can always read or write from the Realm.
  */
-typedef NS_ENUM(NSUInteger, RLMSyncAccessLevel) {
+typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncAccessLevel) {
     /// No access whatsoever.
     RLMSyncAccessLevelNone          = 0,
     /**

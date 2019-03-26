@@ -1940,7 +1940,7 @@
 				CLASSPREFIX = RLM;
 				LastSwiftUpdateCheck = 0710;
 				LastTestingUpgradeCheck = 0510;
-				LastUpgradeCheck = 1000;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					3F1A5E711992EB7400F45F4C = {
@@ -1956,14 +1956,14 @@
 					};
 					5D660FCB1BE98C560021E04F = {
 						CreatedOnToolsVersion = 7.1;
-						LastSwiftMigration = 1000;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 					};
 					5D660FD71BE98C7C0021E04F = {
 						CreatedOnToolsVersion = 7.1;
 						DevelopmentTeam = QX5CR2FTN2;
 						DevelopmentTeamName = "Realm ApS";
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 					};
 					5DD7557B1BE056DE002800DA = {
@@ -1974,7 +1974,7 @@
 						LastSwiftMigration = 0900;
 					};
 					E8267FB11D90B79000E001C7 = {
-						LastSwiftMigration = 1000;
+						LastSwiftMigration = 1020;
 					};
 					E83EAC791BED3D880085CCD2 = {
 						CreatedOnToolsVersion = 7.1;
@@ -1990,7 +1990,7 @@
 						CreatedOnToolsVersion = 6.0;
 						DevelopmentTeam = QX5CR2FTN2;
 						DevelopmentTeamName = "Realm ApS";
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1020;
 						ProvisioningStyle = Automatic;
 						TestTargetID = E8D89B971955FC6D00CF2B9A;
 					};
@@ -2001,6 +2001,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 				Base,
 			);

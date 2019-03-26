@@ -23,7 +23,7 @@
 @class RLMSyncSession;
 
 /// An enum representing different levels of sync-related logging that can be configured.
-typedef NS_ENUM(NSUInteger, RLMSyncLogLevel) {
+typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel) {
     /// Nothing will ever be logged.
     RLMSyncLogLevelOff,
     /// Only fatal errors will be logged.

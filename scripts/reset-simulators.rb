@@ -44,10 +44,10 @@ begin
     # CoreSimulatorService doesn't exit when sent SIGTERM
     system('pkill -9 Simulator 2>/dev/null')
   end
+  wait_for_core_simulator_service
   puts ' done!'
 
-  wait_for_core_simulator_service
-
+  print 'Shut down existing simulator devices...'
   # Shut down any running simulator devices. This may take multiple attempts if some
   # simulators are currently in the process of booting or being created.
   all_available_devices = []
@@ -68,6 +68,7 @@ begin
     shutdown_simulator_devices all_available_devices
     sleep shutdown_attempt if shutdown_attempt > 0
   end
+  puts ' done!'
 
   # Delete all simulators.
   print 'Deleting all simulators...'
@@ -103,6 +104,10 @@ begin
       end
     end
   end
+  puts ' done!'
+
+  print 'Booting iPhone 6 simulator...'
+  system("xcrun simctl boot 'iPhone 6'") or raise "Failed to boot iPhone 6 simulator"
   puts ' done!'
 
 rescue => e

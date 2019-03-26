@@ -18,12 +18,13 @@
 
 #import <Foundation/Foundation.h>
 
+#import <Realm/RLMConstants.h>
 #import <Realm/RLMThreadSafeReference.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class RLMRealm, RLMResults, RLMSortDescriptor, RLMNotificationToken, RLMCollectionChange;
-typedef NS_ENUM(int32_t, RLMPropertyType);
+typedef RLM_CLOSED_ENUM(int32_t, RLMPropertyType);
 
 /**
  A homogenous collection of Realm-managed objects. Examples of conforming types

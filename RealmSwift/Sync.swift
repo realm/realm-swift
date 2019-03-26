@@ -633,14 +633,14 @@ public extension SyncSession {
 
      - see: `RLMSyncSessionState`
      */
-    public typealias State = RLMSyncSessionState
+    typealias State = RLMSyncSessionState
 
     /**
      The current state of a sync session's connection.
 
      - see: `RLMSyncConnectionState`
      */
-    public typealias ConnectionState = RLMSyncConnectionState
+    typealias ConnectionState = RLMSyncConnectionState
 
     /**
      The transfer direction (upload or download) tracked by a given progress notification block.
@@ -648,7 +648,7 @@ public extension SyncSession {
      Progress notification blocks can be registered on sessions if your app wishes to be informed
      how many bytes have been uploaded or downloaded, for example to show progress indicator UIs.
      */
-    public enum ProgressDirection {
+    enum ProgressDirection {
         /// For monitoring upload progress.
         case upload
         /// For monitoring download progress.
@@ -661,7 +661,7 @@ public extension SyncSession {
      Progress notification blocks can be registered on sessions if your app wishes to be informed
      how many bytes have been uploaded or downloaded, for example to show progress indicator UIs.
      */
-    public enum ProgressMode {
+    enum ProgressMode {
         /**
          The block will be called forever, or until it is unregistered by calling
          `ProgressNotificationToken.invalidate()`.
@@ -688,12 +688,12 @@ public extension SyncSession {
      been automatically stopped, calling `invalidate()` does nothing. `invalidate()` should be called
      before the token is destroyed.
      */
-    public typealias ProgressNotificationToken = RLMProgressNotificationToken
+    typealias ProgressNotificationToken = RLMProgressNotificationToken
 
     /**
      A struct encapsulating progress information, as well as useful helper methods.
      */
-    public struct Progress {
+    struct Progress {
         /// The number of bytes that have been transferred.
         public let transferredBytes: Int
 
@@ -759,9 +759,9 @@ public extension SyncSession {
 
      - see: `ProgressDirection`, `Progress`, `ProgressNotificationToken`
      */
-    public func addProgressNotification(for direction: ProgressDirection,
-                                        mode: ProgressMode,
-                                        block: @escaping (Progress) -> Void) -> ProgressNotificationToken? {
+    func addProgressNotification(for direction: ProgressDirection,
+                                 mode: ProgressMode,
+                                 block: @escaping (Progress) -> Void) -> ProgressNotificationToken? {
         return __addProgressNotification(for: (direction == .upload ? .upload : .download),
                                          mode: (mode == .reportIndefinitely
                                             ? .reportIndefinitely

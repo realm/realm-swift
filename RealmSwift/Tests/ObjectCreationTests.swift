@@ -408,7 +408,7 @@ class ObjectCreationTests: TestCase {
         let realmA = realmWithTestPath()
         let realmB = try! Realm()
 
-        var realmAObject: SwiftListOfSwiftObject!
+        var realmAObject: SwiftListOfSwiftObject?
         try! realmA.write {
             let array = [SwiftObject(value: values), SwiftObject(value: values)]
             realmAObject = realmA.create(SwiftListOfSwiftObject.self, value: ["array": array])
@@ -416,7 +416,7 @@ class ObjectCreationTests: TestCase {
 
         var realmBObject: SwiftListOfSwiftObject!
         try! realmB.write {
-            realmBObject = realmB.create(SwiftListOfSwiftObject.self, value: realmAObject)
+            realmBObject = realmB.create(SwiftListOfSwiftObject.self, value: realmAObject!)
         }
 
         XCTAssertNotEqual(realmAObject, realmBObject)
