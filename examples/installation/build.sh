@@ -37,6 +37,9 @@ EOF
 
 COMMAND="$1"
 
+# https://github.com/CocoaPods/CocoaPods/issues/7708
+export EXPANDED_CODE_SIGN_IDENTITY=''
+
 download_zip_if_needed() {
     LANG="$1"
     DIRECTORY=realm-$LANG-latest
