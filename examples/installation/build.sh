@@ -37,6 +37,9 @@ EOF
 
 COMMAND="$1"
 
+# https://github.com/CocoaPods/CocoaPods/issues/7708
+export EXPANDED_CODE_SIGN_IDENTITY=''
+
 download_zip_if_needed() {
     LANG="$1"
     DIRECTORY=realm-$LANG-latest
@@ -86,7 +89,13 @@ xctest() {
     fi
     DESTINATION=""
     if [[ $PLATFORM == ios ]]; then
-        DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
+        simulator_id="$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
+        xcrun simctl boot $simulator_id
+        DESTINATION="-destination id=$simulator_id"
+    elif [[ $PLATFORM == watchos ]]; then
+        if xcrun simctl list devicetypes | grep -q 'iPhone Xs'; then
+            DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep 'iPhone Xs' | grep -m 1 -o '[0-9A-F\-]\{36\}')"
+        fi
     fi
     CMD="-project $PROJECT"
     if [ -d $WORKSPACE ]; then

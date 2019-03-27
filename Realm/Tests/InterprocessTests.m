@@ -378,7 +378,7 @@
     else {
         RLMRealm *realm = RLMRealm.defaultRealm;
         [realm beginWriteTransaction];
-        abort();
+        _Exit(1);
     }
 }
 
@@ -394,7 +394,7 @@
     else {
         RLMRealm *realm = RLMRealm.defaultRealm;
         [realm beginWriteTransaction];
-        abort();
+        _Exit(1);
     }
 }
 

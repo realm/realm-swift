@@ -41,7 +41,7 @@ base_examples = [
   "examples/tvos/swift",
 ]
 
-swift_versions = %w(3.1 3.2 3.2.2 3.2.3 3.3 4.0 4.0.2 4.0.3 4.1 4.1.2)
+xcode_versions = %w(9.2 9.3 9.4 10.0 10.1)
 
 # Remove reference to Realm.xcodeproj from all example workspaces.
 base_examples.each do |example|
@@ -51,8 +51,8 @@ end
 # Make a copy of each Swift example for each Swift version.
 base_examples.each do |example|
   if example =~ /\/swift$/
-    swift_versions.each do |swift_version|
-      FileUtils.cp_r example, "#{example}-#{swift_version}"
+    xcode_versions.each do |xcode_version|
+      FileUtils.cp_r example, "#{example}-#{xcode_version}"
     end
     FileUtils.rm_r example
   end
@@ -63,9 +63,9 @@ framework_directory_for_example = {
   'examples/osx/objc' => '../../../osx',
   'examples/tvos/objc' => '../../../tvos'
 }
-swift_versions.each do |swift_version|
-  framework_directory_for_example["examples/ios/swift-#{swift_version}"] = "../../../ios/swift-#{swift_version}"
-  framework_directory_for_example["examples/tvos/swift-#{swift_version}"] = "../../../tvos/swift-#{swift_version}"
+xcode_versions.each do |xcode_version|
+  framework_directory_for_example["examples/ios/swift-#{xcode_version}"] = "../../../ios/swift-#{xcode_version}"
+  framework_directory_for_example["examples/tvos/swift-#{xcode_version}"] = "../../../tvos/swift-#{xcode_version}"
 end
 
 # Update the paths to the prebuilt frameworks
@@ -78,8 +78,8 @@ end
 
 # Update Playground imports and instructions
 
-swift_versions.each do |swift_version|
-  playground_file = "examples/ios/swift-#{swift_version}/GettingStarted.playground/Contents.swift"
+xcode_versions.each do |xcode_version|
+  playground_file = "examples/ios/swift-#{xcode_version}/GettingStarted.playground/Contents.swift"
   replace_in_file(playground_file, 'choose RealmSwift', 'choose PlaygroundFrameworkWrapper')
   replace_in_file(playground_file,
                   "import Foundation\n",
