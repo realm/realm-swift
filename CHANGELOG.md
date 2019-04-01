@@ -1,3 +1,21 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
+* Fix "Cannot find interface declaration for 'RealmSwiftObject', superclass of
+  'MyRealmObjectClass'" errors when building for a simulator with Xcode 10.2
+  with "Install Objective-C Compatibility Header" enabled.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.11.0 or later.
+* APIs are backwards compatible with all previous releases in the 3.x.y series.
+
 3.14.0 Release notes (2019-03-27)
 =============================================================
 
