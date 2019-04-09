@@ -4,8 +4,8 @@ import PackageDescription
 let package = Package(
     name: "Realm",
     products: [
-        .library(name: "Realm", targets: ["Realm"])
-        .library(name: "RealmSwift", targets: ["RealmSwift"])
+        .library(name: "Realm", targets: ["Realm"]),
+        .library(name: "RealmSwift", targets: ["RealmSwift"]),
     ],
     targets: [
         .target(
