@@ -5,7 +5,7 @@ let package = Package(
     name: "Realm",
     products: [
         .library(name: "Realm", targets: ["Realm"]),
-        .library(name: "RealmSwift", targets: ["RealmSwift"]),
+        .library(name: "RealmSwift", targets: ["RealmSwift"])
     ],
     targets: [
         .target(
@@ -17,6 +17,6 @@ let package = Package(
             dependencies: ["Realm"],
             path: "RealmSwift",
             exclude: ["Tests"]
-        ),
+        )
     ]
 )
