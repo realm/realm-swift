@@ -10,12 +10,13 @@ let package = Package(
     targets: [
         .target(
             name: "Realm",
-            path: "Realm"
+            path: "Realm/Swift"
         ),
         .target(
             name: "RealmSwift",
             dependencies: ["Realm"],
-            path: "RealmSwift"
+            path: "RealmSwift",
+            exclude: ["Tests"]
         ),
     ]
 )
