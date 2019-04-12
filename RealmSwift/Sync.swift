@@ -109,7 +109,7 @@ extension SyncError {
      The recovery file path is the path to which the current copy of the Realm
      on disk will be saved once the client reset occurs.
 
-     @warning: Do not call `SyncSession.immediatelyHandleError(_:)` until you are
+     - warning: Do not call `SyncSession.immediatelyHandleError(_:)` until you are
                 sure that all references to the Realm and managed objects belonging
                 to the Realm have been nil'ed out, and that all autorelease pools
                 containing these references have been drained.
@@ -133,7 +133,7 @@ extension SyncError {
      permission denied error. The local copy of the Realm must be deleted before
      your application attempts to open the Realm again.
 
-     @warning: Do not call `SyncSession.immediatelyHandleError(_:)` until you are
+     - warning: Do not call `SyncSession.immediatelyHandleError(_:)` until you are
                 sure that all references to the Realm and managed objects belonging
                 to the Realm have been nil'ed out, and that all autorelease pools
                 containing these references have been drained.
@@ -188,7 +188,7 @@ public typealias Provider = RLMIdentityProvider
 public enum ServerValidationPolicy {
     /// Perform no validation and accept potentially invalid certificates.
     ///
-    /// @warning: DO NOT USE THIS OPTION IN PRODUCTION.
+    /// - warning: DO NOT USE THIS OPTION IN PRODUCTION.
     case none
 
     /// Use the default server trust evaluation based on the system-wide CA
@@ -219,7 +219,7 @@ public struct SyncConfiguration {
     /**
      The URL of the Realm on the Realm Object Server that this configuration should open.
 
-     @warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
+     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
                 `.realm`, `.realm.lock` or `.realm.management`.
      */
     public let realmURL: URL
@@ -238,7 +238,7 @@ public struct SyncConfiguration {
     /**
      Whether the SSL certificate of the Realm Object Server should be validated.
  
-     @warning: This has been deprecated. Use serverValidationPolicy instead.
+     - warning: This has been deprecated. Use serverValidationPolicy instead.
      */
     @available(*, deprecated, message: "Use serverValidationPolicy instead")
     public var enableSSLValidation: Bool {
@@ -251,7 +251,7 @@ public struct SyncConfiguration {
      Partial synchronization mode means that no objects are synchronized from the remote Realm
      except those matching queries that the user explicitly specifies.
 
-     @warning: This has been deprecated - use fullSyncronization instead.
+     - warning: This has been deprecated - use fullSyncronization instead.
      */
     @available(*, deprecated, message: "Use fullSynchronization instead")
     public var isPartial: Bool {
@@ -318,12 +318,12 @@ public struct SyncConfiguration {
      `enableSSLValidation` is true by default. It can be disabled for debugging
      purposes.
 
-     @warning: This has ben deprecated. Use SyncUser.configuration() instead.
+     - warning: This has ben deprecated. Use SyncUser.configuration() instead.
  
-     @warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
+     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
                 `.realm`, `.realm.lock` or `.realm.management`.
 
-     @warning: NEVER disable SSL validation for a system running in production.
+     - warning: NEVER disable SSL validation for a system running in production.
     */
     @available(*, deprecated, message: "Use SyncUser.configuration() instead")
     public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true, isPartial: Bool = false, urlPrefix: String? = nil) {
@@ -342,7 +342,7 @@ public struct SyncConfiguration {
 
      - requires: There be exactly one logged-in `SyncUser`
 
-     @warning: This has ben deprecated. Use SyncUser.configuration() instead.
+     - warning: This has ben deprecated. Use SyncUser.configuration() instead.
     */
     @available(*, deprecated, message: "Use SyncUser.configuration() instead")
     public static func automatic() -> Realm.Configuration {
@@ -470,7 +470,7 @@ extension SyncUser {
      The logged-in user. `nil` if none exists. Only use this property if your application expects
      no more than one logged-in user at any given time.
 
-     @warning: Throws an Objective-C exception if more than one logged-in user exists.
+     - warning: Throws an Objective-C exception if more than one logged-in user exists.
      */
     public static var current: SyncUser? {
         return __current()
@@ -484,7 +484,7 @@ extension SyncUser {
              out because its refresh token expired, or because the third party authentication
              service providing the user's identity has logged the user out.
 
-     @warning: Regardless of whether an error handler is defined, certain user errors
+     - warning: Regardless of whether an error handler is defined, certain user errors
                 will automatically cause the user to enter the logged out state.
      */
     @nonobjc public var errorHandler: ((SyncUser, SyncAuthError) -> Void)? {
@@ -509,9 +509,9 @@ extension SyncUser {
      Permissions are retrieved asynchronously and returned via the callback. The
      callback is run on the same thread that the method is invoked upon.
 
-     @warning: This method must be invoked on a thread with an active run loop.
+     - warning: This method must be invoked on a thread with an active run loop.
 
-     @warning: Do not pass the `Results` returned by the callback between threads.
+     - warning: Do not pass the `Results` returned by the callback between threads.
 
      - parameter callback: A callback providing either a `Results` containing the
                            permissions, or an error describing what went wrong.
@@ -569,10 +569,10 @@ extension SyncUser {
      `enableSSLValidation` is true by default. It can be disabled for debugging
      purposes.
 
-     @warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
+     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
      `.realm`, `.realm.lock` or `.realm.management`.
 
-     @warning: NEVER disable SSL validation for a system running in production.
+     - warning: NEVER disable SSL validation for a system running in production.
      */
     public func configuration(realmURL: URL? = nil, fullSynchronization: Bool = false,
                               enableSSLValidation: Bool = true, urlPrefix: String? = nil) -> Realm.Configuration {
@@ -593,10 +593,10 @@ extension SyncUser {
      `.pinCertificate` to pin a specific SSL certificate, or `.none` for
      debugging purposes.
 
-     @warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
+     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
      `.realm`, `.realm.lock` or `.realm.management`.
 
-     @warning: NEVER disable SSL validation for a system running in production.
+     - warning: NEVER disable SSL validation for a system running in production.
      */
     public func configuration(realmURL: URL? = nil, fullSynchronization: Bool = false,
                               serverValidationPolicy: ServerValidationPolicy,
@@ -785,7 +785,7 @@ extension Realm {
      The results will be returned asynchronously in the callback.
      Use `Results.observe(_:)` to be notified to changes to the set of synchronized objects.
 
-     @warning: Partial synchronization is a tech preview. Its APIs are subject to change.
+     - warning: Partial synchronization is a tech preview. Its APIs are subject to change.
      */
     @available(*, deprecated, message: "Use Results.subscribe()")
     public func subscribe<T: Object>(to objects: T.Type, where: String,
@@ -818,8 +818,8 @@ public typealias SyncPermissionResults = Results<SyncPermission>
  The raw value string can be used to construct predicates and queries
  manually.
 
- @warning: If building `NSPredicate`s using format strings including these
-           raw values, use `%K` instead of `%@` as the substitution
+ - warning: If building `NSPredicate`s using format strings including these
+            raw values, use `%K` instead of `%@` as the substitution
             parameter.
 
  - see: `RLMSyncPermissionSortProperty`
@@ -1566,8 +1566,8 @@ extension List where Element == Permission {
     the applicable Permission as it ensures that there is exactly one Permission
     for the given Role, merging duplicates and inserting new ones as needed.
 
-     @warning: This can only be called on a managed List<Permission>.
-     @warning: The managing Realm must be in a write transaction.
+     - warning: This can only be called on a managed List<Permission>.
+     - warning: The managing Realm must be in a write transaction.
 
      - parameter roleName: The name of the Role to obtain the Permission for.
      - returns: A Permission object contained in this List for the named Role.
@@ -1584,8 +1584,8 @@ extension List where Element == Permission {
     the applicable Permission as it ensures that there is exactly one Permission
     for the given Role, merging duplicates and inserting new ones as needed.
 
-     @warning: This can only be called on a managed List<Permission>.
-     @warning: The managing Realm must be in a write transaction.
+     - warning: This can only be called on a managed List<Permission>.
+     - warning: The managing Realm must be in a write transaction.
 
      - parameter roleName: The name of the Role to obtain the Permission for.
      - returns: A Permission object contained in this List for the named Role.
