@@ -138,6 +138,21 @@ static RLMSyncManager *s_sharedManager = nil;
     _userAgent = userAgent;
 }
 
+- (void)setCustomRequestHeaders:(NSDictionary<NSString *,NSString *> *)customRequestHeaders {
+    _customRequestHeaders = customRequestHeaders.copy;
+
+    for (auto&& user : SyncManager::shared().all_logged_in_users()) {
+        for (auto&& session : user->all_sessions()) {
+            auto config = session->config();
+            config.custom_http_headers.clear();;
+            for (NSString *key in customRequestHeaders) {
+                config.custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
+            }
+            session->update_configuration(std::move(config));
+        }
+    }
+}
+
 #pragma mark - Passthrough properties
 
 - (RLMSyncLogLevel)logLevel {

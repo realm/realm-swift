@@ -1,7 +1,9 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Updating `RLMSyncManager.customRequestHeaders` will immediately update all
+  currently active sync session with the new headers rather than requiring
+  manually closing the Realm and reopening it.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)

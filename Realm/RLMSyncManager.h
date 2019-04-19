@@ -110,6 +110,9 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 
 /**
  Extra HTTP headers to append to every request to a Realm Object Server.
+
+ Modifying this property while sync sessions are active will result in all
+ sessions disconnecting and reconnecting using the new headers.
  */
 @property (nullable, nonatomic, copy) NSDictionary<NSString *, NSString *> *customRequestHeaders;
 
