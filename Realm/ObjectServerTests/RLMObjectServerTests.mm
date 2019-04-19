@@ -2136,4 +2136,74 @@ static NSURL *certificateURL(NSString *filename) {
     [self verifyOpenFails:[user configurationWithURL:[NSURL URLWithString:@"realms://localhost:9443/~/default"]]];
 }
 
+#pragma mark - Custom request headers
+
+- (void)testLoginFailsWithoutCustomHeader {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"register user"];
+    [RLMSyncUser logInWithCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                       register:YES]
+                        authServerURL:[NSURL URLWithString:@"http://127.0.0.1:9081"]
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+                             XCTAssertNil(user);
+                             XCTAssertNotNil(error);
+                             XCTAssertEqualObjects(@400, error.userInfo[@"statusCode"]);
+                             [expectation fulfill];
+                         }];
+    [self waitForExpectationsWithTimeout:4.0 handler:nil];
+}
+
+- (void)testLoginUsesCustomHeader {
+    RLMSyncManager.sharedManager.customRequestHeaders = @{@"X-Allow-Connection": @"true"};
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                                       register:YES]
+                                               server:[NSURL URLWithString:@"http://127.0.0.1:9081"]];
+    XCTAssertNotNil(user);
+}
+
+- (void)testModifyCustomHeadersAfterOpeningRealm {
+    RLMSyncManager.sharedManager.customRequestHeaders = @{@"X-Allow-Connection": @"true"};
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                                       register:YES]
+                                               server:[NSURL URLWithString:@"http://127.0.0.1:9081"]];
+    XCTAssertNotNil(user);
+
+    RLMSyncManager.sharedManager.customRequestHeaders = nil;
+
+    NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"realm://127.0.0.1:9081/~/%@", NSStringFromSelector(_cmd)]];
+    auto c = [user configurationWithURL:url fullSynchronization:true];
+
+    // Should initially fail to connect due to the missing header
+    XCTestExpectation *ex1 = [self expectationWithDescription:@"connection failure"];
+    RLMSyncManager.sharedManager.errorHandler = ^(NSError *error, RLMSyncSession *) {
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(@400, [error.userInfo[@"underlying_error"] userInfo][@"statusCode"]);
+        [ex1 fulfill];
+    };
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
+    RLMSyncSession *syncSession = realm.syncSession;
+    [self waitForExpectationsWithTimeout:4.0 handler:nil];
+    XCTAssertEqual(syncSession.connectionState, RLMSyncConnectionStateDisconnected);
+
+    // Should successfully connect once the header is set
+    RLMSyncManager.sharedManager.errorHandler = nil;
+    auto ex2 = [[XCTKVOExpectation alloc] initWithKeyPath:@"connectionState"
+                                                   object:syncSession
+                                            expectedValue:@(RLMSyncConnectionStateConnected)];
+    RLMSyncManager.sharedManager.customRequestHeaders = @{@"X-Allow-Connection": @"true"};
+    [self waitForExpectations:@[ex2] timeout:4.0];
+
+    // Should disconnect and fail to reconnect when the wrong header is set
+    XCTestExpectation *ex3 = [self expectationWithDescription:@"reconnection failure"];
+    RLMSyncManager.sharedManager.errorHandler = ^(NSError *error, RLMSyncSession *) {
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(@400, [error.userInfo[@"underlying_error"] userInfo][@"statusCode"]);
+        [ex3 fulfill];
+    };
+    auto ex4 = [[XCTKVOExpectation alloc] initWithKeyPath:@"connectionState"
+                                                   object:syncSession
+                                            expectedValue:@(RLMSyncConnectionStateDisconnected)];
+    RLMSyncManager.sharedManager.customRequestHeaders = @{@"X-Other-Header": @"true"};
+    [self waitForExpectations:@[ex3, ex4] timeout:4.0];
+}
+
 @end
