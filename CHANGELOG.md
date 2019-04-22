@@ -13,6 +13,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.11.0 or later.
 * APIs are backwards compatible with all previous releases in the 3.x.y series.
+* Carthage release for Swift is built with Xcode 10.2.1.
 
 3.14.1 Release notes (2019-04-04)
 =============================================================

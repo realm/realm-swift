@@ -1228,7 +1228,7 @@ EOM
 
     package-*-swift)
         PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        for version in 9.2 9.3 9.4 10.0 10.1 10.2; do
+        for version in 9.2 9.3 9.4 10.0 10.1 10.2.1; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1237,7 +1237,7 @@ EOM
         done
 
         cd build/$PLATFORM
-        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-9.2 swift-9.2 swift-9.4 swift-10.0 swift-10.1 swift-10.2
+        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-9.2 swift-9.2 swift-9.4 swift-10.0 swift-10.1 swift-10.2.1
         ;;
 
     package-*-swift-*)
