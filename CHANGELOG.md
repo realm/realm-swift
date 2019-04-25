@@ -1,20 +1,16 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.14.2 Release notes (2019-04-25)
 =============================================================
+
 ### Enhancements
+
 * Updating `RLMSyncManager.customRequestHeaders` will immediately update all
   currently active sync session with the new headers rather than requiring
   manually closing the Realm and reopening it.
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.11.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 * Carthage release for Swift is built with Xcode 10.2.1.
 
 3.14.1 Release notes (2019-04-04)
@@ -30,6 +26,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.11.0 or later.
+* Carthage release for Swift is built with Xcode 10.2.
 
 3.14.0 Release notes (2019-03-27)
 =============================================================
