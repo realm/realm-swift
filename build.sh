@@ -157,11 +157,7 @@ build_combined() {
         fi
     elif [[ "$os" == "appletvos"  ]]; then
         os_name="tvos"
-        if (( $(xcode_version_major) >= 9 )); then
-            destination="Apple TV"
-        else
-            destination="Apple TV 1080p"
-        fi
+        destination="Apple TV"
     fi
 
     # Derive build paths
@@ -228,16 +224,6 @@ move_to_clean_dir() {
 test_ios_static() {
     destination="$1"
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' build"
-    if (( $(xcode_version_major) < 9 )); then
-        xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
-    fi
-
-    # Xcode's depending tracking is lacking and it doesn't realize that the Realm static framework's static library
-    # needs to be recreated when the active architectures change. Help Xcode out by removing the static library.
-    settings=$(xcode "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' -showBuildSettings")
-    path=$(echo "$settings" | awk '/CONFIGURATION_BUILD_DIR/ { cbd = $3; } /EXECUTABLE_PATH/ { ep = $3; } END { printf "%s/%s\n", cbd, ep; }')
-    rm "$path"
-
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test"
 }
 
@@ -613,18 +599,12 @@ case "$COMMAND" in
 
     "test-ios-dynamic")
         xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
-        if (( $(xcode_version_major) < 9 )); then
-            xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
-        fi
         xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
 
     "test-ios-swift")
         xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build"
-        if (( $(xcode_version_major) < 9 )); then
-            xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test 'ARCHS=\$(ARCHS_STANDARD_32_BIT)'"
-        fi
         xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
         exit 0
         ;;
@@ -648,21 +628,13 @@ case "$COMMAND" in
         ;;
 
     "test-tvos")
-        if (( $(xcode_version_major) >= 9 )); then
-            destination="Apple TV"
-        else
-            destination="Apple TV 1080p"
-        fi
+        destination="Apple TV"
         xctest "-scheme Realm -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination'"
         exit $?
         ;;
 
     "test-tvos-swift")
-        if (( $(xcode_version_major) >= 9 )); then
-            destination="Apple TV"
-        else
-            destination="Apple TV 1080p"
-        fi
+        destination="Apple TV"
         xctest "-scheme RealmSwift -configuration $CONFIGURATION -sdk appletvsimulator -destination 'name=$destination'"
         exit $?
         ;;
@@ -910,11 +882,7 @@ case "$COMMAND" in
 
     "examples-tvos")
         workspace="examples/tvos/objc/RealmExamples.xcworkspace"
-        if (( $(xcode_version_major) >= 9 )); then
-            destination="Apple TV"
-        else
-            destination="Apple TV 1080p"
-        fi
+        destination="Apple TV"
 
         xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
@@ -927,12 +895,7 @@ case "$COMMAND" in
             workspace="${workspace/swift/swift-$REALM_XCODE_VERSION}"
         fi
 
-        if (( $(xcode_version_major) >= 9 )); then
-            destination="Apple TV"
-        else
-            destination="Apple TV 1080p"
-        fi
-
+        destination="Apple TV"
         xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
         xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
         exit 0
