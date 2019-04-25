@@ -2,7 +2,7 @@ xcodeVersions = ['9.2', '9.3', '9.4', '10.0', '10.1', '10.2.1']
 platforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS']
 carthageXcodeVersion = '10.2.1'
-docsSwiftVersion = '5.0'
+docsSwiftVersion = '5.0.1'
 
 def installationTest(platform, test, language) {
   return {
