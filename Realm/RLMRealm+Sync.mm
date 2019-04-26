@@ -47,7 +47,7 @@ using namespace realm;
 
         Holder(partial_sync::Subscription&& s) : subscription(std::move(s)) { }
     };
-    auto state = std::make_shared<Holder>(partial_sync::subscribe(Results(_realm, std::move(q)), util::none));
+    auto state = std::make_shared<Holder>(partial_sync::subscribe(Results(_realm, std::move(q)), {}));
     state->token = state->subscription.add_notification_callback([=]() mutable {
         if (!callback) {
             return;

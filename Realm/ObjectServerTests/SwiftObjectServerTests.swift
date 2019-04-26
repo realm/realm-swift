@@ -98,7 +98,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-#if swift(>=3.2)
     func testConnectionState() {
         let user = try! synchronouslyLogInUser(for: basicCredentials(register: true), server: authURL)
         let realm = try! synchronouslyOpenRealm(url: realmURL, user: user)
@@ -124,7 +123,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(forState: .connecting)
         wait(forState: .connected)
     }
-#endif // Swift >= 3.2
 
     // MARK: - Client reset
 
@@ -429,177 +427,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             fatalError("Unexpected error: \(error)")
         }
     }
-
-    // MARK: - Partial sync
-
-    func populateTestRealm(_ username: String) {
-        autoreleasepool {
-            let credentials = SyncCredentials.usernamePassword(username: username, password: "a", register: true)
-            let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
-            let realm = try! synchronouslyOpenRealm(configuration: user.configuration())
-
-            try! realm.write {
-                realm.add(SwiftPartialSyncObjectA(number: 0, string: "realm"))
-                realm.add(SwiftPartialSyncObjectA(number: 1, string: ""))
-                realm.add(SwiftPartialSyncObjectA(number: 2, string: ""))
-                realm.add(SwiftPartialSyncObjectA(number: 3, string: ""))
-                realm.add(SwiftPartialSyncObjectA(number: 4, string: "realm"))
-                realm.add(SwiftPartialSyncObjectA(number: 5, string: "sync"))
-                realm.add(SwiftPartialSyncObjectA(number: 6, string: "partial"))
-                realm.add(SwiftPartialSyncObjectA(number: 7, string: "partial"))
-                realm.add(SwiftPartialSyncObjectA(number: 8, string: "partial"))
-                realm.add(SwiftPartialSyncObjectA(number: 9, string: "partial"))
-                realm.add(SwiftPartialSyncObjectB(number: 0, firstString: "", secondString: ""))
-                realm.add(SwiftPartialSyncObjectB(number: 1, firstString: "", secondString: ""))
-                realm.add(SwiftPartialSyncObjectB(number: 2, firstString: "", secondString: ""))
-                realm.add(SwiftPartialSyncObjectB(number: 3, firstString: "", secondString: ""))
-                realm.add(SwiftPartialSyncObjectB(number: 4, firstString: "", secondString: ""))
-                realm.add(SwiftPartialSyncObjectB(number: 5, firstString: "", secondString: ""))
-                realm.add(SwiftPartialSyncObjectB(number: 6, firstString: "", secondString: ""))
-                realm.add(SwiftPartialSyncObjectB(number: 7, firstString: "", secondString: ""))
-                realm.add(SwiftPartialSyncObjectB(number: 8, firstString: "", secondString: ""))
-                realm.add(SwiftPartialSyncObjectB(number: 9, firstString: "", secondString: ""))
-            }
-            waitForUploads(for: realm)
-        }
-    }
-
-    func testPartialSync() {
-        populateTestRealm(#function)
-
-        let credentials = SyncCredentials.usernamePassword(username: #function, password: "a")
-        let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
-        let realm = try! synchronouslyOpenRealm(configuration: user.configuration())
-
-        let results = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5")
-        let subscription = results.subscribe(named: "query")
-        XCTAssertEqual(subscription.state, .creating)
-        waitForState(subscription, .complete)
-
-        // Verify that we got what we're looking for
-        XCTAssertEqual(results.count, 4)
-        for object in results {
-            XCTAssertGreaterThan(object.number, 5)
-            XCTAssertEqual(object.string, "partial")
-        }
-
-        // And that we didn't get anything else.
-        XCTAssertEqual(realm.objects(SwiftPartialSyncObjectA.self).count, results.count)
-        XCTAssertTrue(realm.objects(SwiftPartialSyncObjectB.self).isEmpty)
-
-        // Re-subscribing to an existing named query may not report the query's state immediately,
-        // but it should report it eventually.
-        let subscription2 = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5").subscribe(named: "query")
-        waitForState(subscription2, .complete)
-
-        // Creating a subscription with the same name but different query should raise an error.
-        let subscription3 = realm.objects(SwiftPartialSyncObjectA.self).filter("number < 5").subscribe(named: "query")
-        waitForError(subscription3)
-
-        // Unsubscribing should move the subscription to the invalidated state.
-        subscription.unsubscribe()
-        waitForState(subscription, .invalidated)
-    }
-
-    func testPartialSyncLimit() {
-        populateTestRealm(#function)
-
-        let credentials = SyncCredentials.usernamePassword(username: #function, password: "a")
-        let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
-        let realm = try! synchronouslyOpenRealm(configuration: user.configuration())
-
-        let results = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5")
-        waitForState(results.subscribe(named: "query", limit: 1), .complete)
-        XCTAssertEqual(results.count, 1)
-        XCTAssertEqual(realm.objects(SwiftPartialSyncObjectA.self).count, 1)
-        if let object = results.first {
-            XCTAssertGreaterThan(object.number, 5)
-            XCTAssertEqual(object.string, "partial")
-        }
-
-        let results2 = realm.objects(SwiftPartialSyncObjectA.self).sorted(byKeyPath: "number", ascending: false)
-        waitForState(results2.subscribe(named: "query2", limit: 2), .complete)
-        XCTAssertEqual(results2.count, 3)
-        XCTAssertEqual(realm.objects(SwiftPartialSyncObjectA.self).count, 3)
-        for object in results2 {
-            XCTAssertTrue(object.number == 6 || object.number >= 8,
-                          "\(object.number) == 6 || \(object.number) >= 8")
-            XCTAssertEqual(object.string, "partial")
-        }
-    }
-
-    func testPartialSyncSubscriptions() {
-        let credentials = SyncCredentials.usernamePassword(username: #function, password: "a", register: true)
-        let user = try! synchronouslyLogInUser(for: credentials, server: authURL)
-        let realm = try! synchronouslyOpenRealm(configuration: user.configuration())
-
-        XCTAssertEqual(realm.subscriptions().count, 0)
-        XCTAssertNil(realm.subscription(named: "query"))
-
-        let subscription = realm.objects(SwiftPartialSyncObjectA.self).filter("number > 5").subscribe(named: "query")
-        XCTAssertEqual(realm.subscriptions().count, 0)
-        XCTAssertNil(realm.subscription(named: "query"))
-        waitForState(subscription, .complete)
-
-        XCTAssertEqual(realm.subscriptions().count, 1)
-        let sub2 = realm.subscriptions().first!
-        XCTAssertEqual(sub2.name, "query")
-        XCTAssertEqual(sub2.state, .complete)
-        let sub3 = realm.subscription(named: "query")!
-        XCTAssertEqual(sub3.name, "query")
-        XCTAssertEqual(sub3.state, .complete)
-        for sub in realm.subscriptions() {
-            XCTAssertEqual(sub.name, "query")
-            XCTAssertEqual(sub.state, .complete)
-        }
-
-        XCTAssertNil(realm.subscription(named: "not query"))
-    }
-
-// Partial sync subscriptions are only available in Swift 3.2 and newer.
-#if swift(>=3.2)
-    func waitForState<T>(_ subscription: SyncSubscription<T>, _ desiredState: SyncSubscriptionState) {
-        let ex = expectation(description: "Waiting for state \(desiredState)")
-        let token = subscription.observe(\.state, options: .initial) { state in
-            if state == desiredState {
-                ex.fulfill()
-            }
-        }
-        waitForExpectations(timeout: 20.0)
-        token.invalidate()
-    }
-
-    func waitForError<T>(_ subscription: SyncSubscription<T>) {
-        let ex = expectation(description: "Waiting for error state")
-        let token = subscription.observe(\.state, options: .initial) { state in
-            if case .error(_) = state {
-                ex.fulfill()
-            }
-        }
-        waitForExpectations(timeout: 20.0)
-        token.invalidate()
-    }
-#else
-    func waitForState<T>(_ subscription: SyncSubscription<T>, _ desiredState: SyncSubscriptionState) {
-        for _ in 0..<20 {
-            if subscription.state == desiredState {
-                return
-            }
-            RunLoop.current.run(until: Date().addingTimeInterval(1.0))
-        }
-        XCTFail("waitForState(\(subscription), \(desiredState)) timed out")
-    }
-
-    func waitForError<T>(_ subscription: SyncSubscription<T>) {
-        for _ in 0..<20 {
-            if case .error(_) = subscription.state {
-                return
-            }
-            RunLoop.current.run(until: Date().addingTimeInterval(1.0))
-        }
-        XCTFail("waitForError(\(subscription)) timed out")
-    }
-#endif // Swift >= 3.2
 
     // MARK: - Certificate Pinning
 

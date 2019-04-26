@@ -1944,6 +1944,7 @@
 - (void)testSortAndFilterSubscriptions {
     RLMRealm *realm = [self partialRealmWithName:_cmd];
 
+    NSDate *now = NSDate.date;
     [self waitForKeyPath:@"state" object:[[PartialSyncObjectA allObjectsInRealm:realm] subscribeWithName:@"query 1"]
                    value:@(RLMSyncSubscriptionStateComplete)];
     [self waitForKeyPath:@"state" object:[[PartialSyncObjectA allObjectsInRealm:realm] subscribeWithName:@"query 2"]
@@ -1961,9 +1962,41 @@
     XCTAssertEqual(3U, ([subscriptions objectsWhere:@"status = %@", @(RLMSyncSubscriptionStateComplete)].count));
     XCTAssertEqual(1U, ([subscriptions objectsWhere:@"status = %@", @(RLMSyncSubscriptionStateError)].count));
 
+    XCTAssertEqual(4U, ([subscriptions objectsWhere:@"createdAt >= %@", now]).count);
+    XCTAssertEqual(0U, ([subscriptions objectsWhere:@"createdAt < %@", now]).count);
+    XCTAssertEqual(4U, [subscriptions objectsWhere:@"expiresAt = nil"].count);
+    XCTAssertEqual(4U, [subscriptions objectsWhere:@"timeToLive = nil"].count);
+
     XCTAssertThrows([subscriptions sortedResultsUsingKeyPath:@"name" ascending:NO]);
     XCTAssertThrows([subscriptions sortedResultsUsingDescriptors:@[]]);
     XCTAssertThrows([subscriptions distinctResultsUsingKeyPaths:@[@"name"]]);
+}
+
+- (void)testIncludeLinkingObjectsErrorHandling {
+    RLMRealm *realm = [self partialRealmWithName:_cmd];
+
+    RLMResults *objects = [PersonObject allObjectsInRealm:realm];
+    RLMSyncSubscriptionOptions *opt = [RLMSyncSubscriptionOptions new];
+
+    opt.includeLinkingObjectProperties = @[@"nonexistent"];
+    RLMAssertThrowsWithReason([objects subscribeWithOptions:opt],
+                              @"Invalid LinkingObjects inclusion from key path 'nonexistent': property 'PersonObject.nonexistent' does not exist.");
+
+    opt.includeLinkingObjectProperties = @[@"name"];
+    RLMAssertThrowsWithReason([objects subscribeWithOptions:opt],
+                              @"Invalid LinkingObjects inclusion from key path 'name': property 'PersonObject.name' is of unsupported type 'string'.");
+
+    opt.includeLinkingObjectProperties = @[@"children.name"];
+    RLMAssertThrowsWithReason([objects subscribeWithOptions:opt],
+                              @"Invalid LinkingObjects inclusion from key path 'children.name': property 'PersonObject.name' is of unsupported type 'string'.");
+
+    opt.includeLinkingObjectProperties = @[@"children."];
+    RLMAssertThrowsWithReason([objects subscribeWithOptions:opt],
+                              @"Invalid LinkingObjects inclusion from key path 'children.': missing property name.");
+
+    opt.includeLinkingObjectProperties = @[@""];
+    RLMAssertThrowsWithReason([objects subscribeWithOptions:opt],
+                              @"Invalid LinkingObjects inclusion from key path '': missing property name.");
 }
 
 #pragma mark - Certificate pinning

@@ -1,7 +1,22 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add `createdAt`, `updatedAt`, `expiresAt` and `timeToLive` properties to
+  `RLMSyncSubscription`/`SyncSubscription`. This properties will be `nil` for
+  subscriptions created with older versions of Realm, but will be automatically
+  populated for newly-created subscriptions.
+* Add support for transient subscriptions by setting the `timeToLive` when
+  creating the subscription. The next time a subscription is created or updated
+  after that time has elapsed the subscription will be automatically removed.
+* Add support for updating existing subscriptions with a new query or limit.
+  This is done by passing `update: true` (in swift) or setting
+  `options.overwriteExisting = YES` (in obj-c) when creating the subscription,
+  which will make it update the existing subscription with the same name rather
+  than failing if one already exists with that name.
+* Add an option to include the objects from
+  `RLMLinkingObjects`/`LinkingObjects` properties in sync subscriptions,
+  similarly to how `RLMArray`/`List` automatically pull in the contained
+  objects.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)

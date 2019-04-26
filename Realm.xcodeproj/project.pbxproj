@@ -219,6 +219,7 @@
 		3FAB084C1E1EC3A2001BC8DA /* sync_metadata.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1A1536701DB0464800C0EC93 /* sync_metadata.hpp */; };
 		3FAB08881E1EC51F001BC8DA /* object_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAB08861E1EC51F001BC8DA /* object_notifier.cpp */; };
 		3FAB08891E1EC526001BC8DA /* object_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAB08861E1EC51F001BC8DA /* object_notifier.cpp */; };
+		3FAF8D02227A05BD005F1DB6 /* SwiftPartialSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FAF8D01227A05BD005F1DB6 /* SwiftPartialSyncTests.swift */; };
 		3FB4FA1719F5D2740020D53B /* SwiftTestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */; };
 		3FB4FA1819F5D2740020D53B /* SwiftArrayPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */; };
 		3FB4FA1919F5D2740020D53B /* SwiftArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */; };
@@ -797,6 +798,7 @@
 		3FAE25561B8CEBBE00D01405 /* object_schema.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object_schema.cpp; sourceTree = "<group>"; };
 		3FAE25571B8CEBBE00D01405 /* property.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = property.hpp; sourceTree = "<group>"; };
 		3FAE25581B8CEBBE00D01405 /* object_schema.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = object_schema.hpp; sourceTree = "<group>"; };
+		3FAF8D01227A05BD005F1DB6 /* SwiftPartialSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SwiftPartialSyncTests.swift; path = Realm/ObjectServerTests/SwiftPartialSyncTests.swift; sourceTree = "<group>"; };
 		3FB60BA9204095AF00583735 /* RLMPermissionsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMPermissionsTests.mm; path = Realm/ObjectServerTests/RLMPermissionsTests.mm; sourceTree = "<group>"; };
 		3FB60BAC2040999300583735 /* SwiftPermissionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftPermissionsTests.swift; path = Realm/ObjectServerTests/SwiftPermissionsTests.swift; sourceTree = "<group>"; };
 		3FBD05FA1B94E1C3004559CF /* index_set.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = index_set.cpp; sourceTree = "<group>"; };
@@ -1449,6 +1451,7 @@
 				3F73BC8A1E3A876600FE80B6 /* RLMTestUtils.h */,
 				3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */,
 				1AA5AE9F1D98C99500ED8C27 /* SwiftObjectServerTests.swift */,
+				3FAF8D01227A05BD005F1DB6 /* SwiftPartialSyncTests.swift */,
 				1A877BEE1EAE9F79001BEC40 /* SwiftPermissionsAPITests.swift */,
 				3FB60BAC2040999300583735 /* SwiftPermissionsTests.swift */,
 				1AA5AE961D989BE000ED8C27 /* SwiftSyncTestCase.swift */,
@@ -2469,6 +2472,7 @@
 				E86E61241D91E4E200DC2419 /* RLMTestCase.m in Sources */,
 				3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */,
 				1AA5AEA11D98C99800ED8C27 /* SwiftObjectServerTests.swift in Sources */,
+				3FAF8D02227A05BD005F1DB6 /* SwiftPartialSyncTests.swift in Sources */,
 				3FB60BAD2040999300583735 /* SwiftPermissionsTests.swift in Sources */,
 				1AA5AE981D989BE400ED8C27 /* SwiftSyncTestCase.swift in Sources */,
 			);
