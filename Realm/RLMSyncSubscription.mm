@@ -79,8 +79,8 @@ static std::vector<LinkPathPart> parseKeypath(StringData keypath, Group const& g
         objectSchema = &*schema.find(prop->object_type);
 
         if (prop->type == PropertyType::Object) {
-            check(begin != end, "property '%1.%2' of type 'object' cannot be the final property in the key path",
-                  objectSchema->name, key);
+            check(begin != end, "key path must end in a LinkingObjects property and '%1.%2' is of type '%3'",
+                  objectSchema->name, key, string_for_property_type(prop->type));
             ret.emplace_back(prop->table_column);
         }
         else {

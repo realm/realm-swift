@@ -1990,6 +1990,10 @@
     RLMAssertThrowsWithReason([objects subscribeWithOptions:opt],
                               @"Invalid LinkingObjects inclusion from key path 'children.name': property 'PersonObject.name' is of unsupported type 'string'.");
 
+    opt.includeLinkingObjectProperties = @[@"children"];
+    RLMAssertThrowsWithReason([objects subscribeWithOptions:opt],
+                              @"Invalid LinkingObjects inclusion from key path 'children': key path must end in a LinkingObjects property and 'PersonObject.children' is of type 'array'.");
+
     opt.includeLinkingObjectProperties = @[@"children."];
     RLMAssertThrowsWithReason([objects subscribeWithOptions:opt],
                               @"Invalid LinkingObjects inclusion from key path 'children.': missing property name.");
