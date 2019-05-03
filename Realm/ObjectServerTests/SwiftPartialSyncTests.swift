@@ -190,7 +190,7 @@ class SwiftPartialSyncTests: SwiftSyncTestCase {
         let objects = realm.objects(SwiftPartialSyncObjectA.self)
         let sub1 = objects.filter("number > 5").subscribe(named: "query")
         XCTAssertEqual(sub1.name, "query")
-        XCTAssertEqual(sub1.query, "")
+        XCTAssertNil(sub1.query)
         XCTAssertNotNil(sub1.createdAt)
         XCTAssertNotNil(sub1.updatedAt)
         XCTAssertEqual(sub1.createdAt, sub1.updatedAt)

@@ -100,8 +100,10 @@ typedef RLM_CLOSED_ENUM(NSInteger, RLMSyncSubscriptionState) {
  syntax, and is not guaranteed to remain consistent between versions of Realm.
  Any use of this other than manual inspection when debugging is likely to be
  incorrect.
+
+ This is `nil` while the subscription is in the Creating state.
  */
-@property (nonatomic, readonly) NSString *query;
+@property (nonatomic, readonly, nullable) NSString *query;
 
 /**
  When this subscription was first created.

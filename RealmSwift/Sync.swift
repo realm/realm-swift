@@ -917,8 +917,10 @@ public class SyncSubscription<T: RealmCollectionValue>: RealmCollectionValue {
      syntax, and is not guaranteed to remain consistent between versions of Realm.
      Any use of this other than manual inspection when debugging is likely to be
      incorrect.
+
+     This is `nil` while the subscription is in the Creating state.
      */
-    public var query: String { return rlmSubscription.query }
+    public var query: String? { return rlmSubscription.query }
 
     /**
      When this subscription was first created.

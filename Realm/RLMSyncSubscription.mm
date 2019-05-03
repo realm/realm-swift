@@ -96,7 +96,6 @@ static std::vector<LinkPathPart> parseKeypath(StringData keypath, Group const& g
         return nil;
 
     _name = [options.name copy];
-    _query = @"";
     _timeToLive = NAN;
     _realm = realm;
     _createdAt = _updatedAt = NSDate.date;
