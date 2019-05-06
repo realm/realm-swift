@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.15.0 Release notes (2019-05-06)
 =============================================================
 
 The minimum version of Realm Object Server has been increased to 3.21.0 and
