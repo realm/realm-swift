@@ -1,8 +1,15 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+The minimum version of Realm Object Server has been increased to 3.21.0 and
+attempting to connect to older versions will produce protocol mismatch errors.
+Realm Cloud has already been upgraded to this version, and users using that do
+not need to worry about this.
+
 ### Enhancements
+
 * Add `createdAt`, `updatedAt`, `expiresAt` and `timeToLive` properties to
-  `RLMSyncSubscription`/`SyncSubscription`. This properties will be `nil` for
+  `RLMSyncSubscription`/`SyncSubscription`. These properties will be `nil` for
   subscriptions created with older versions of Realm, but will be automatically
   populated for newly-created subscriptions.
 * Add support for transient subscriptions by setting the `timeToLive` when
@@ -17,17 +24,31 @@ x.y.z Release notes (yyyy-MM-dd)
   `RLMLinkingObjects`/`LinkingObjects` properties in sync subscriptions,
   similarly to how `RLMArray`/`List` automatically pull in the contained
   objects.
+* Improve query performance for chains of OR conditions (or an IN condition) on
+  an unindexed integer or string property.
+  ([Core PR #2888](https://github.com/realm/realm-core/pull/2888) and
+  [Core PR #3250](https://github.com/realm/realm-core/pull/3250)).
+* Improve query performance for equality conditions on indexed integer properties.
+  ([Core PR #3272](https://github.com/realm/realm-core/pull/3272)).
+* Adjust the file allocation algorithm to reduce fragmentation caused by large
+  numbers of small blocks.
+* Improve file allocator logic to reduce fragmentation and improve commit
+  performance after many writes. ([Core PR #3278](https://github.com/realm/realm-core/pull/3278)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Making a query that compares two integer properties could cause a
+  segmentation fault on x86 (i.e. macOS only).
+  ([Core PR #3253](https://github.com/realm/realm-core/pull/3256)).
+* The `downloadable_bytes` parameter passed to sync progress callbacks reported
+  a value which correlated to the amount of data left to download, but not
+  actually the number of bytes which would be downloaded.
 
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
-* Realm Object Server: 3.11.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
+* Realm Object Server: 3.21.0 or later.
+* Carthage release for Swift is built with Xcode 10.2.1.
 
 3.14.2 Release notes (2019-04-25)
 =============================================================
