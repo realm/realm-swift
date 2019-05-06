@@ -109,7 +109,9 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
         // No need to save the token as RLMSyncSession always outlives the
         // underlying SyncSession
         session->register_connection_change_callback([=](auto, auto newState) {
-            self.connectionState = convertConnectionState(newState);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.connectionState = convertConnectionState(newState);
+            });
         });
         return self;
     }

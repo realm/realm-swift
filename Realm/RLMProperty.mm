@@ -92,6 +92,10 @@ static bool rawTypeShouldBeTreatedAsComputedProperty(NSString *rawType) {
     if (is_array(prop.type)) {
         ret->_array = true;
     }
+    if (!prop.public_name.empty()) {
+        ret->_columnName = ret->_name;
+        ret->_name = @(prop.public_name.c_str());
+    }
     return ret;
 }
 
