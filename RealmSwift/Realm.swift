@@ -281,7 +281,7 @@ public final class Realm {
          to be written to the Realm file. If all of the properties are changing, it may be slower than .all (but
          will never result in *more* data being written).
          */
-        case changed = 1
+        case modified = 1
         /**
          Overwrite all properties in the existing object with the new values, even if they have not changed. This
          results in change notifications reporting all properties as changed, and influences the sync merge logic.
@@ -315,7 +315,7 @@ public final class Realm {
      - parameter update: If `true`, the Realm will try to find an existing copy of the object (with the same primary
                          key), and update it. Otherwise, the object will be added.
      */
-    @available(*, deprecated, message: "Pass .error, .changed or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
+    @available(*, deprecated, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
     public func add(_ object: Object, update: Bool) {
         add(object, update: update ? .all : .error)
     }
@@ -360,7 +360,7 @@ public final class Realm {
      - parameter objects: A sequence which contains objects to be added to the Realm.
      - parameter update: If `true`, objects that are already in the Realm will be updated instead of added anew.
      */
-    @available(*, deprecated, message: "Pass .error, .changed or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
+    @available(*, deprecated, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
     public func add<S: Sequence>(_ objects: S, update: Bool) where S.Iterator.Element: Object {
         for obj in objects {
             add(obj, update: update)
@@ -422,7 +422,7 @@ public final class Realm {
      - returns: The newly created object.
      */
     @discardableResult
-    @available(*, deprecated, message: "Pass .error, .changed or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
+    @available(*, deprecated, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
     public func create<T: Object>(_ type: T.Type, value: Any = [:], update: Bool) -> T {
         return create(type, value: value, update: update ? .all : .error)
     }
@@ -438,7 +438,7 @@ public final class Realm {
 
      If the object type does not have a primary key or no object with the specified primary key
      already exists, a new object is created in the Realm. If an object already exists in the Realm
-     with the specified primary key and the update policy is `.changed` or `.all`, the existing
+     with the specified primary key and the update policy is `.modified` or `.all`, the existing
      object will be updated and a reference to that object will be returned.
 
      If the object is being updated, all properties defined in its schema will be set by copying
@@ -507,7 +507,7 @@ public final class Realm {
      :nodoc:
      */
     @discardableResult
-    @available(*, deprecated, message: "Pass .error, .changed or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
+    @available(*, deprecated, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
     public func dynamicCreate(_ typeName: String, value: Any = [:], update: Bool) -> DynamicObject {
         return dynamicCreate(typeName, value: value, update: update ? .all : .error)
     }
@@ -528,7 +528,7 @@ public final class Realm {
 
      If the object type does not have a primary key or no object with the specified primary key
      already exists, a new object is created in the Realm. If an object already exists in the Realm
-     with the specified primary key and the update policy is `.changed` or `.all`, the existing
+     with the specified primary key and the update policy is `.modified` or `.all`, the existing
      object will be updated and a reference to that object will be returned.
 
      If the object is being updated, all properties defined in its schema will be set by copying

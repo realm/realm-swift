@@ -199,7 +199,7 @@ NS_ASSUME_NONNULL_BEGIN
  given property name (or getter name, if defined), that value will remain untouched.
  Nullable properties on the object can be set to nil by using `NSNull` as the updated value.
  Each property is set even if the existing value is the same as the new value being set, and
- notifications will report them all being changed. See `createOrUpdateChangedInDefaultRealmWithValue:`
+ notifications will report them all being changed. See `createOrUpdateModifiedInDefaultRealmWithValue:`
  for a version of this function which only sets the values which have changed.
 
  If the `value` argument is an array, all properties must be present, valid and in the same
@@ -218,7 +218,7 @@ NS_ASSUME_NONNULL_BEGIN
  an object with the same primary key value in the default Realm, its values are updated and the object
  is returned. Otherwise, this method creates and populates a new instance of the object in the default Realm.
 
- If nested objects are included in the argument, `createOrUpdateChangedInDefaultRealmWithValue:` will be
+ If nested objects are included in the argument, `createOrUpdateModifiedInDefaultRealmWithValue:` will be
  recursively called on them if they have primary keys, `createInDefaultRealmWithValue:` if they do not.
 
  The `value` argument is used to populate the object. It can be a Realm object, a key-value coding
@@ -253,7 +253,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @see   `defaultPropertyValues`, `primaryKey`
  */
-+ (instancetype)createOrUpdateChangedInDefaultRealmWithValue:(id)value;
++ (instancetype)createOrUpdateModifiedInDefaultRealmWithValue:(id)value;
 
 /**
  Creates or updates an Realm object within a specified Realm.
@@ -281,7 +281,7 @@ NS_ASSUME_NONNULL_BEGIN
  given property name (or getter name, if defined), that value will remain untouched.
  Nullable properties on the object can be set to nil by using `NSNull` as the updated value.
  Each property is set even if the existing value is the same as the new value being set, and
- notifications will report them all being changed. See `createOrUpdateChangedInRealm:withValue:`
+ notifications will report them all being changed. See `createOrUpdateModifiedInRealm:withValue:`
  for a version of this function which only sets the values which have changed.
 
  If the `value` argument is an array, all properties must be present, valid and in the same
@@ -337,7 +337,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @see   `defaultPropertyValues`, `primaryKey`
  */
-+ (instancetype)createOrUpdateChangedInRealm:(RLMRealm *)realm withValue:(id)value;
++ (instancetype)createOrUpdateModifiedInRealm:(RLMRealm *)realm withValue:(id)value;
 
 #pragma mark - Properties
 

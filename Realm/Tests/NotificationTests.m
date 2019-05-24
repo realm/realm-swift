@@ -1141,7 +1141,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
 
         [realm beginWriteTransaction];
         values[i] = _values[i];
-        [AllTypesWithPrimaryKey createOrUpdateChangedInRealm:realm withValue:values];
+        [AllTypesWithPrimaryKey createOrUpdateModifiedInRealm:realm withValue:values];
         [realm commitWriteTransaction];
 
         [self waitForExpectationsWithTimeout:2.0 handler:nil];

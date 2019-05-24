@@ -83,8 +83,8 @@
     return [self createOrUpdateInRealm:[RLMRealm defaultRealm] withValue:value];
 }
 
-+ (instancetype)createOrUpdateChangedInDefaultRealmWithValue:(id)value {
-    return [self createOrUpdateChangedInRealm:[RLMRealm defaultRealm] withValue:value];
++ (instancetype)createOrUpdateModifiedInDefaultRealmWithValue:(id)value {
+    return [self createOrUpdateModifiedInRealm:[RLMRealm defaultRealm] withValue:value];
 }
 
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value {
@@ -92,7 +92,7 @@
     return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMUpdatePolicyUpdateAll);
 }
 
-+ (instancetype)createOrUpdateChangedInRealm:(RLMRealm *)realm withValue:(id)value {
++ (instancetype)createOrUpdateModifiedInRealm:(RLMRealm *)realm withValue:(id)value {
     RLMVerifyHasPrimaryKey(self);
     return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMUpdatePolicyUpdateChanged);
 }

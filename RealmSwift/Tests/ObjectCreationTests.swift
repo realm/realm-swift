@@ -370,7 +370,7 @@ class ObjectCreationTests: TestCase {
         let standalone = SwiftPrimaryStringObject(value: ["primary", 11])
         try! Realm().beginWrite()
         let object = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["otherPrimary", ["primary", 12],
-                                                                                      [["primary", 12]]], update: .changed)
+                                                                                      [["primary", 12]]], update: .modified)
         try! Realm().commitWrite()
 
         let stringObjects = try! Realm().objects(SwiftPrimaryStringObject.self)
@@ -468,7 +468,7 @@ class ObjectCreationTests: TestCase {
 
         try! Realm().beginWrite()
         try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: ["primary", ["10", 10], [["11", 11]]])
-        let object = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: otherRealmObject, update: .changed)
+        let object = try! Realm().create(SwiftLinkToPrimaryStringObject.self, value: otherRealmObject, update: .modified)
         try! Realm().commitWrite()
 
         XCTAssertNotEqual(otherRealmObject, object) // the object from the other realm should be copied into this realm
@@ -603,12 +603,12 @@ class ObjectCreationTests: TestCase {
         realm.cancelWrite()
     }
 
-    func testCreateOrUpdateChangedNil() {
+    func testCreateOrUpdateModifiedNil() {
         let realm = try! Realm()
         realm.beginWrite()
 
         // Create with all fields nil
-        let object = realm.create(SwiftOptionalPrimaryObject.self, value: SwiftOptionalPrimaryObject(), update: .changed)
+        let object = realm.create(SwiftOptionalPrimaryObject.self, value: SwiftOptionalPrimaryObject(), update: .modified)
 
         XCTAssertNil(object.id.value)
         XCTAssertNil(object.optIntCol.value)
@@ -640,7 +640,7 @@ class ObjectCreationTests: TestCase {
         object2.optNSStringCol = ""
         object2.optBinaryCol = Data()
         object2.optObjectCol = SwiftBoolObject()
-        realm.create(SwiftOptionalPrimaryObject.self, value: object2, update: .changed)
+        realm.create(SwiftOptionalPrimaryObject.self, value: object2, update: .modified)
 
         XCTAssertNil(object.id.value)
         XCTAssertNotNil(object.optIntCol.value)
@@ -658,7 +658,7 @@ class ObjectCreationTests: TestCase {
         XCTAssertNotNil(object.optObjectCol)
 
         // Try to switch back to nil
-        realm.create(SwiftOptionalPrimaryObject.self, value: SwiftOptionalPrimaryObject(), update: .changed)
+        realm.create(SwiftOptionalPrimaryObject.self, value: SwiftOptionalPrimaryObject(), update: .modified)
 
         XCTAssertNil(object.id.value)
 
@@ -684,7 +684,7 @@ class ObjectCreationTests: TestCase {
         let unmanagedValue = SwiftOptionalPrimaryObject()
         // Shouldn't throw.
         realm.beginWrite()
-        _ = realm.create(type(of: unmanagedValue), value: unmanagedValue, update: .changed)
+        _ = realm.create(type(of: unmanagedValue), value: unmanagedValue, update: .modified)
         realm.cancelWrite()
     }
 
@@ -700,7 +700,7 @@ class ObjectCreationTests: TestCase {
         realm.cancelWrite()
     }
 
-    func testCreateOrUpdateChangedDynamicManagedType() {
+    func testCreateOrUpdateModifiedDynamicManagedType() {
         let realm = try! Realm()
         let managedValue = SwiftOptionalPrimaryObject()
         try! realm.write {
@@ -708,7 +708,7 @@ class ObjectCreationTests: TestCase {
         }
         // Shouldn't throw.
         realm.beginWrite()
-        _ = realm.create(type(of: managedValue), value: managedValue, update: .changed)
+        _ = realm.create(type(of: managedValue), value: managedValue, update: .modified)
         realm.cancelWrite()
     }
 
@@ -753,7 +753,7 @@ class ObjectCreationTests: TestCase {
 
         try! Realm().beginWrite()
         let object = SwiftLinkToPrimaryStringObject(value: ["primary", ["primary", 2], []])
-        try! Realm().add(object, update: .changed)
+        try! Realm().add(object, update: .modified)
         try! Realm().commitWrite()
 
         XCTAssertNotNil(object.realm)
@@ -863,7 +863,7 @@ class ObjectCreationTests: TestCase {
         realm.cancelWrite()
     }
 
-    func testAddOrUpdateChangedNil() {
+    func testAddOrUpdateModifiedNil() {
         let realm = try! Realm()
         realm.beginWrite()
 
@@ -901,7 +901,7 @@ class ObjectCreationTests: TestCase {
         object2.optNSStringCol = ""
         object2.optBinaryCol = Data()
         object2.optObjectCol = SwiftBoolObject()
-        realm.add(object2, update: .changed)
+        realm.add(object2, update: .modified)
 
         XCTAssertNil(object.id.value)
         XCTAssertNotNil(object.optIntCol.value)
@@ -920,7 +920,7 @@ class ObjectCreationTests: TestCase {
 
         // Try to switch back to nil
         let object3 = SwiftOptionalPrimaryObject()
-        realm.add(object3, update: .changed)
+        realm.add(object3, update: .modified)
 
         XCTAssertNil(object.id.value)
         XCTAssertNil(object.optIntCol.value)
