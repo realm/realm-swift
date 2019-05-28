@@ -867,7 +867,25 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
 
 @end
 
-// clang things the tests below have retain cycles because `_obj` could retain
+@interface AllTypesWithPrimaryKey : RLMObject
+@property BOOL          boolCol;
+@property int           intCol;
+@property float         floatCol;
+@property double        doubleCol;
+@property NSString     *stringCol;
+@property NSData       *binaryCol;
+@property NSDate       *dateCol;
+@property bool          cBoolCol;
+@property int64_t       longCol;
+@property StringObject *objectCol;
+
+@property (nonatomic) int pk;
+@end
+@implementation AllTypesWithPrimaryKey
++ (NSString *)primaryKey { return @"pk"; }
+@end
+
+// clang thinks the tests below have retain cycles because `_obj` could retain
 // the block passed to addNotificationBlock (but it doesn't)
 #pragma clang diagnostic ignored "-Warc-retain-cycles"
 
@@ -1085,6 +1103,51 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
     [token invalidate];
+}
+
+- (void)testDiffedUpdatesOnlyNotifyForPropertiesWhichActuallyChanged {
+    NSMutableArray *values = [_initialValues mutableCopy];
+    [values addObject:@1];
+
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+    [realm addObject:_values.lastObject];
+    AllTypesWithPrimaryKey *obj = [AllTypesWithPrimaryKey createInRealm:realm withValue:values];
+    [realm commitWriteTransaction];
+
+    __block NSUInteger i = 0;
+    __block XCTestExpectation *expectation = nil;
+    RLMNotificationToken *token = [obj addNotificationBlock:^(BOOL deleted, NSArray *changes, NSError *error) {
+        XCTAssertFalse(deleted);
+        XCTAssertNil(error);
+        XCTAssertEqual(changes.count, 1U);
+        RLMPropertyChange *prop = changes[0];
+        XCTAssertEqualObjects(prop.name, _propertyNames[i]);
+        XCTAssertNil(prop.previousValue);
+        if ([prop.name isEqualToString:@"objectCol"]) {
+            XCTAssertTrue([prop.value isEqualToObject:_values[i]],
+                          @"%d: %@ %@", (int)i, prop.value, _values[i]);
+        }
+        else {
+            XCTAssertEqualObjects(prop.value, _values[i]);
+        }
+
+        [expectation fulfill];
+    }];
+
+
+    for (i = 0; i < _values.count; ++i) {
+        expectation = [self expectationWithDescription:@""];
+
+        [realm beginWriteTransaction];
+        values[i] = _values[i];
+        [AllTypesWithPrimaryKey createOrUpdateModifiedInRealm:realm withValue:values];
+        [realm commitWriteTransaction];
+
+        [self waitForExpectationsWithTimeout:2.0 handler:nil];
+    }
+    [token invalidate];
+
 }
 
 @end

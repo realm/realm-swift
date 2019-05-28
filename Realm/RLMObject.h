@@ -194,10 +194,13 @@ NS_ASSUME_NONNULL_BEGIN
  argument's type is the same as the receiver, and the objects have identical values for
  their managed properties, this method does nothing.
 
- If the object is being updated, all properties defined in its schema will be set by copying from
+ If the object is being updated, each property defined in its schema will be set by copying from
  `value` using key-value coding. If the `value` argument does not respond to `valueForKey:` for a
  given property name (or getter name, if defined), that value will remain untouched.
  Nullable properties on the object can be set to nil by using `NSNull` as the updated value.
+ Each property is set even if the existing value is the same as the new value being set, and
+ notifications will report them all being changed. See `createOrUpdateModifiedInDefaultRealmWithValue:`
+ for a version of this function which only sets the values which have changed.
 
  If the `value` argument is an array, all properties must be present, valid and in the same
  order as the properties defined in the model.
@@ -207,6 +210,50 @@ NS_ASSUME_NONNULL_BEGIN
  @see   `defaultPropertyValues`, `primaryKey`
  */
 + (instancetype)createOrUpdateInDefaultRealmWithValue:(id)value;
+
+/**
+ Creates or updates a Realm object within the default Realm.
+
+ This method may only be called on Realm object types with a primary key defined. If there is already
+ an object with the same primary key value in the default Realm, its values are updated and the object
+ is returned. Otherwise, this method creates and populates a new instance of the object in the default Realm.
+
+ If nested objects are included in the argument, `createOrUpdateModifiedInDefaultRealmWithValue:` will be
+ recursively called on them if they have primary keys, `createInDefaultRealmWithValue:` if they do not.
+
+ The `value` argument is used to populate the object. It can be a Realm object, a key-value coding
+ compliant object, an array or dictionary returned from the methods in `NSJSONSerialization`, or an
+ array containing one element for each managed property.
+
+ If the object is being created, an exception will be thrown if any required properties
+ are not present and those properties were not defined with default values.
+
+ If the `value` argument is a Realm object already managed by the default Realm, the
+ argument's type is the same as the receiver, and the objects have identical values for
+ their managed properties, this method does nothing.
+
+ If the object is being updated, each property defined in its schema will be set by copying from
+ `value` using key-value coding. If the `value` argument does not respond to `valueForKey:` for a
+ given property name (or getter name, if defined), that value will remain untouched.
+ Nullable properties on the object can be set to nil by using `NSNull` as the updated value.
+ Unlike `createOrUpdateInDefaultRealmWithValue:`, only properties which have changed in value are
+ set, and any change notifications produced by this call will report only which properies have
+ actually changed.
+
+ Checking which properties have changed imposes a small amount of overhead, and so this method
+ may be slower when all or nearly all of the properties being set have changed. If most or all
+ of the properties being set have not changed, this method will be much faster than unconditionally
+ setting all of them, and will also reduce how much data has to be written to the Realm, saving
+ both i/o time and disk space.
+
+ If the `value` argument is an array, all properties must be present, valid and in the same
+ order as the properties defined in the model.
+
+ @param value    The value used to populate the object.
+
+ @see   `defaultPropertyValues`, `primaryKey`
+ */
++ (instancetype)createOrUpdateModifiedInDefaultRealmWithValue:(id)value;
 
 /**
  Creates or updates an Realm object within a specified Realm.
@@ -229,10 +276,13 @@ NS_ASSUME_NONNULL_BEGIN
  argument's type is the same as the receiver, and the objects have identical values for
  their managed properties, this method does nothing.
 
- If the object is being updated, all properties defined in its schema will be set by copying from
+ If the object is being updated, each property defined in its schema will be set by copying from
  `value` using key-value coding. If the `value` argument does not respond to `valueForKey:` for a
  given property name (or getter name, if defined), that value will remain untouched.
  Nullable properties on the object can be set to nil by using `NSNull` as the updated value.
+ Each property is set even if the existing value is the same as the new value being set, and
+ notifications will report them all being changed. See `createOrUpdateModifiedInRealm:withValue:`
+ for a version of this function which only sets the values which have changed.
 
  If the `value` argument is an array, all properties must be present, valid and in the same
  order as the properties defined in the model.
@@ -243,6 +293,51 @@ NS_ASSUME_NONNULL_BEGIN
  @see   `defaultPropertyValues`, `primaryKey`
  */
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value;
+
+/**
+ Creates or updates an Realm object within a specified Realm.
+
+ This method may only be called on Realm object types with a primary key defined. If there is already
+ an object with the same primary key value in the given Realm, its values are updated and the object
+ is returned. Otherwise this method creates and populates a new instance of this object in the given Realm.
+
+ If nested objects are included in the argument, `createOrUpdateInRealm:withValue:` will be
+ recursively called on them if they have primary keys, `createInRealm:withValue:` if they do not.
+
+ The `value` argument is used to populate the object. It can be a Realm object, a key-value coding
+ compliant object, an array or dictionary returned from the methods in `NSJSONSerialization`, or an
+ array containing one element for each managed property.
+
+ If the object is being created, an exception will be thrown if any required properties
+ are not present and those properties were not defined with default values.
+
+ If the `value` argument is a Realm object already managed by the given Realm, the
+ argument's type is the same as the receiver, and the objects have identical values for
+ their managed properties, this method does nothing.
+
+ If the object is being updated, each property defined in its schema will be set by copying from
+ `value` using key-value coding. If the `value` argument does not respond to `valueForKey:` for a
+ given property name (or getter name, if defined), that value will remain untouched.
+ Nullable properties on the object can be set to nil by using `NSNull` as the updated value.
+ Unlike `createOrUpdateInRealm:withValue:`, only properties which have changed in value are
+ set, and any change notifications produced by this call will report only which properies have
+ actually changed.
+
+ Checking which properties have changed imposes a small amount of overhead, and so this method
+ may be slower when all or nearly all of the properties being set have changed. If most or all
+ of the properties being set have not changed, this method will be much faster than unconditionally
+ setting all of them, and will also reduce how much data has to be written to the Realm, saving
+ both i/o time and disk space.
+
+ If the `value` argument is an array, all properties must be present, valid and in the same
+ order as the properties defined in the model.
+
+ @param realm    The Realm which should own the object.
+ @param value    The value used to populate the object.
+
+ @see   `defaultPropertyValues`, `primaryKey`
+ */
++ (instancetype)createOrUpdateModifiedInRealm:(RLMRealm *)realm withValue:(id)value;
 
 #pragma mark - Properties
 

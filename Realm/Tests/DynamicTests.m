@@ -78,10 +78,8 @@
 
 - (void)testDynamicSchemaMatchesRegularSchema {
     RLMSchema *expectedSchema = nil;
-    // Force create and close realm
     @autoreleasepool {
-        RLMRealm *realm = self.realmWithTestPath;
-        expectedSchema = realm.schema;
+        expectedSchema = self.realmWithTestPath.schema;
     }
     XCTAssertNotNil(expectedSchema);
 
@@ -98,6 +96,12 @@
             // Class overrides names, so the dynamic schema for it shoudn't match
             continue;
         }
+        if (expectedObjectSchema.primaryKeyProperty.index != 0) {
+            // The dynamic schema will always put the primary key first, so it
+            // won't match if the static schema doesn't have it there
+            continue;
+        }
+
         RLMObjectSchema *dynamicObjectSchema = dynamicSchema[expectedObjectSchema.className];
         XCTAssertEqual(dynamicObjectSchema.properties.count, expectedObjectSchema.properties.count);
         for (NSUInteger propertyIndex = 0; propertyIndex < expectedObjectSchema.properties.count; propertyIndex++) {

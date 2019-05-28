@@ -72,25 +72,29 @@
 #pragma mark - Class-based Object Creation
 
 + (instancetype)createInDefaultRealmWithValue:(id)value {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], value, false);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue([RLMRealm defaultRealm], [self className], value, RLMUpdatePolicyError);
 }
 
 + (instancetype)createInRealm:(RLMRealm *)realm withValue:(id)value {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, false);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMUpdatePolicyError);
 }
 
 + (instancetype)createOrUpdateInDefaultRealmWithValue:(id)value {
     return [self createOrUpdateInRealm:[RLMRealm defaultRealm] withValue:value];
 }
 
++ (instancetype)createOrUpdateModifiedInDefaultRealmWithValue:(id)value {
+    return [self createOrUpdateModifiedInRealm:[RLMRealm defaultRealm] withValue:value];
+}
+
 + (instancetype)createOrUpdateInRealm:(RLMRealm *)realm withValue:(id)value {
-    // verify primary key
-    RLMObjectSchema *schema = [self sharedSchema];
-    if (!schema.primaryKeyProperty) {
-        NSString *reason = [NSString stringWithFormat:@"'%@' does not have a primary key and can not be updated", schema.className];
-        @throw [NSException exceptionWithName:@"RLMExecption" reason:reason userInfo:nil];
-    }
-    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, true);
+    RLMVerifyHasPrimaryKey(self);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMUpdatePolicyUpdateAll);
+}
+
++ (instancetype)createOrUpdateModifiedInRealm:(RLMRealm *)realm withValue:(id)value {
+    RLMVerifyHasPrimaryKey(self);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue(realm, [self className], value, RLMUpdatePolicyUpdateChanged);
 }
 
 #pragma mark - Subscripting

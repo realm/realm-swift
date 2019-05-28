@@ -712,7 +712,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
 }
 
 - (void)addObject:(__unsafe_unretained RLMObject *const)object {
-    RLMAddObjectToRealm(object, self, false);
+    RLMAddObjectToRealm(object, self, RLMUpdatePolicyError);
 }
 
 - (void)addObjects:(id<NSFastEnumeration>)objects {
@@ -731,7 +731,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
         @throw RLMException(@"'%@' does not have a primary key and can not be updated", object.objectSchema.className);
     }
 
-    RLMAddObjectToRealm(object, self, true);
+    RLMAddObjectToRealm(object, self, RLMUpdatePolicyUpdateAll);
 }
 
 - (void)addOrUpdateObjects:(id<NSFastEnumeration>)objects {
@@ -837,7 +837,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
 }
 
 - (RLMObject *)createObject:(NSString *)className withValue:(id)value {
-    return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, value, false);
+    return (RLMObject *)RLMCreateObjectInRealmWithValue(self, className, value, RLMUpdatePolicyError);
 }
 
 - (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(NSData *)key error:(NSError **)error {

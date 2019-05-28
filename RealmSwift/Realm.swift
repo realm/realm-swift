@@ -264,31 +264,94 @@ public final class Realm {
     // MARK: Adding and Creating objects
 
     /**
-     Adds or updates an existing object into the Realm.
+     What to do when an object being added to or created in a Realm has a primary key that already exists.
+     */
+    public enum UpdatePolicy: Int {
+        /**
+         Throw an exception. This is the default when no policy is specified for `add()` or `create()`.
 
-     Only pass `true` to `update` if the object has a primary key. If no object exists in the Realm with the same
-     primary key value, the object is inserted. Otherwise, the existing object is updated with any changed values.
+         This behavior is the same as passing `update: false` to `add()` or `create()`.
+         */
+        case error = 0
+        /**
+         Overwrite only properties in the existing object which are different from the new values. This results
+         in change notifications reporting only the properties which changed, and influences the sync merge logic.
 
-     When added, all child relationships referenced by this object will also be added to the Realm if they are not
-     already in it. If the object or any related objects are already being managed by a different Realm an error will be
-     thrown. Instead, use one of the `create` functions to insert a copy of a managed object into a different Realm.
+         If few or no of the properties are changing this will be faster than .all and reduce how much data has
+         to be written to the Realm file. If all of the properties are changing, it may be slower than .all (but
+         will never result in *more* data being written).
+         */
+        case modified = 1
+        /**
+         Overwrite all properties in the existing object with the new values, even if they have not changed. This
+         results in change notifications reporting all properties as changed, and influences the sync merge logic.
 
-     The object to be added must be valid and cannot have been previously deleted from a Realm (i.e. `isInvalidated`
-     must be `false`).
+         This behavior is the same as passing `update: true` to `add()` or `create()`.
+         */
+        case all = 2
+    }
+
+    /**
+     Adds an unmanaged object to this Realm.
+
+     If `update` is `true` and an object with the same primary key already exists in this Realm, the existing object
+     will be overwritten by the newly added one. If `update` is `false` then it is instead a non-recoverable error
+     to add an object with a primary key that is already in use. `update` must be `false` for object types which
+     do not have a primary key.
+
+     Adding an object to a Realm will also add all child relationships referenced by that object (via `Object` and
+     `List<Object>` properties). Those objects must also be valid objects to add to this Realm, and the value of
+     the `update:` parameter is propagated to those adds.
+
+     The object to be added must either be an unmanaged object or a valid object which is already managed by this
+     Realm. Adding an object already managed by this Realm is a no-op, while adding an object which is managed by
+     another Realm or which has been deleted from any Realm (i.e. one where `isInvalidated` is `true`) is an error.
+
+     To copy a managed object from one Realm to another, use `create()` instead.
+
+     - warning: This method may only be called during a write transaction.
 
      - parameter object: The object to be added to this Realm.
      - parameter update: If `true`, the Realm will try to find an existing copy of the object (with the same primary
                          key), and update it. Otherwise, the object will be added.
      */
-    public func add(_ object: Object, update: Bool = false) {
-        if update && object.objectSchema.primaryKeyProperty == nil {
-            throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
-        }
-        RLMAddObjectToRealm(object, rlmRealm, update)
+    @available(*, deprecated, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
+    public func add(_ object: Object, update: Bool) {
+        add(object, update: update ? .all : .error)
     }
 
     /**
-     Adds or updates all the objects in a collection into the Realm.
+     Adds an unmanaged object to this Realm.
+
+     If an object with the same primary key already exists in this Realm, it is updated with the property values from
+     this object as specified by the `UpdatePolicy` selected. The update policy must be `.error` for objects with no
+     primary key.
+
+     Adding an object to a Realm will also add all child relationships referenced by that object (via `Object` and
+     `List<Object>` properties). Those objects must also be valid objects to add to this Realm, and the value of
+     the `update:` parameter is propagated to those adds.
+
+     The object to be added must either be an unmanaged object or a valid object which is already managed by this
+     Realm. Adding an object already managed by this Realm is a no-op, while adding an object which is managed by
+     another Realm or which has been deleted from any Realm (i.e. one where `isInvalidated` is `true`) is an error.
+
+     To copy a managed object from one Realm to another, use `create()` instead.
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter object: The object to be added to this Realm.
+     - parameter update: What to do if an object with the same primary key alredy exists. Must be `.error` for objects
+     without a primary key.
+     */
+    public func add(_ object: Object, update: UpdatePolicy = .error) {
+        if update != .error && object.objectSchema.primaryKeyProperty == nil {
+            throwRealmException("'\(object.objectSchema.className)' does not have a primary key and can not be updated")
+        }
+        RLMAddObjectToRealm(object, rlmRealm, RLMUpdatePolicy(rawValue: UInt(update.rawValue))!)
+    }
+
+    /**
+     Adds all the objects in a collection into the Realm.
 
      - see: `add(_:update:)`
 
@@ -297,7 +360,27 @@ public final class Realm {
      - parameter objects: A sequence which contains objects to be added to the Realm.
      - parameter update: If `true`, objects that are already in the Realm will be updated instead of added anew.
      */
-    public func add<S: Sequence>(_ objects: S, update: Bool = false) where S.Iterator.Element: Object {
+    @available(*, deprecated, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
+    public func add<S: Sequence>(_ objects: S, update: Bool) where S.Iterator.Element: Object {
+        for obj in objects {
+            add(obj, update: update)
+        }
+    }
+
+    /**
+     Adds all the objects in a collection into the Realm.
+
+     - see: `add(_:update:)`
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter objects: A sequence which contains objects to be added to the Realm.
+     - parameter update: How to handle
+     without a primary key.
+     - parameter update: How to handle objects in the collection with a primary key that alredy exists in this
+     Realm. Must be `.error` for object types without a primary key.
+     */
+    public func add<S: Sequence>(_ objects: S, update: UpdatePolicy = .error) where S.Iterator.Element: Object {
         for obj in objects {
             add(obj, update: update)
         }
@@ -339,12 +422,49 @@ public final class Realm {
      - returns: The newly created object.
      */
     @discardableResult
-    public func create<T: Object>(_ type: T.Type, value: Any = [:], update: Bool = false) -> T {
-        let typeName = (type as Object.Type).className()
-        if update && schema[typeName]?.primaryKeyProperty == nil {
-            throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
+    @available(*, deprecated, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
+    public func create<T: Object>(_ type: T.Type, value: Any = [:], update: Bool) -> T {
+        return create(type, value: value, update: update ? .all : .error)
+    }
+
+    /**
+     Creates a Realm object with a given value, adding it to the Realm and returning it.
+
+     The `value` argument can be a Realm object, a key-value coding compliant object, an array
+     or dictionary returned from the methods in `NSJSONSerialization`, or an `Array` containing
+     one element for each managed property. Do not pass in a `LinkingObjects` instance, either
+     by itself or as a member of a collection. If the `value` argument is an array, all properties
+     must be present, valid and in the same order as the properties defined in the model.
+
+     If the object type does not have a primary key or no object with the specified primary key
+     already exists, a new object is created in the Realm. If an object already exists in the Realm
+     with the specified primary key and the update policy is `.modified` or `.all`, the existing
+     object will be updated and a reference to that object will be returned.
+
+     If the object is being updated, all properties defined in its schema will be set by copying
+     from `value` using key-value coding. If the `value` argument does not respond to `value(forKey:)`
+     for a given property name (or getter name, if defined), that value will remain untouched.
+     Nullable properties on the object can be set to nil by using `NSNull` as the updated value,
+     or (if you are passing in an instance of an `Object` subclass) setting the corresponding
+     property on `value` to nil.
+
+     - warning: This method may only be called during a write transaction.
+
+     - parameter type:   The type of the object to create.
+     - parameter value:  The value used to populate the object.
+     - parameter update: What to do if an object with the same primary key alredy exists. Must be `.error` for object
+     types without a primary key.
+
+     - returns: The newly created object.
+     */
+    @discardableResult
+    public func create<T: Object>(_ type: T.Type, value: Any = [:], update: UpdatePolicy = .error) -> T {
+        if update != .error {
+            RLMVerifyHasPrimaryKey(T.self)
         }
-        return unsafeDowncast(RLMCreateObjectInRealmWithValue(rlmRealm, typeName, value, update), to: T.self)
+        let typeName = (type as Object.Type).className()
+        return unsafeDowncast(RLMCreateObjectInRealmWithValue(rlmRealm, typeName, value,
+                                                              RLMUpdatePolicy(rawValue: UInt(update.rawValue))!), to: T.self)
     }
 
     /**
@@ -387,11 +507,56 @@ public final class Realm {
      :nodoc:
      */
     @discardableResult
-    public func dynamicCreate(_ typeName: String, value: Any = [:], update: Bool = false) -> DynamicObject {
-        if update && schema[typeName]?.primaryKeyProperty == nil {
+    @available(*, deprecated, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
+    public func dynamicCreate(_ typeName: String, value: Any = [:], update: Bool) -> DynamicObject {
+        return dynamicCreate(typeName, value: value, update: update ? .all : .error)
+    }
+
+    /**
+     This method is useful only in specialized circumstances, for example, when building
+     components that integrate with Realm. If you are simply building an app on Realm, it is
+     recommended to use the typed method `create(_:value:update:)`.
+
+     Creates or updates an object with the given class name and adds it to the `Realm`, populating
+     the object with the given value.
+
+     The `value` argument can be a Realm object, a key-value coding compliant object, an array
+     or dictionary returned from the methods in `NSJSONSerialization`, or an `Array` containing
+     one element for each managed property. Do not pass in a `LinkingObjects` instance, either
+     by itself or as a member of a collection. If the `value` argument is an array, all properties
+     must be present, valid and in the same order as the properties defined in the model.
+
+     If the object type does not have a primary key or no object with the specified primary key
+     already exists, a new object is created in the Realm. If an object already exists in the Realm
+     with the specified primary key and the update policy is `.modified` or `.all`, the existing
+     object will be updated and a reference to that object will be returned.
+
+     If the object is being updated, all properties defined in its schema will be set by copying
+     from `value` using key-value coding. If the `value` argument does not respond to `value(forKey:)`
+     for a given property name (or getter name, if defined), that value will remain untouched.
+     Nullable properties on the object can be set to nil by using `NSNull` as the updated value,
+     or (if you are passing in an instance of an `Object` subclass) setting the corresponding
+     property on `value` to nil.
+
+
+     - warning: This method can only be called during a write transaction.
+
+     - parameter className:  The class name of the object to create.
+     - parameter value:      The value used to populate the object.
+     - parameter update:     What to do if an object with the same primary key alredy exists.
+     Must be `.error` for object types without a primary key.
+
+     - returns: The created object.
+
+     :nodoc:
+     */
+    @discardableResult
+    public func dynamicCreate(_ typeName: String, value: Any = [:], update: UpdatePolicy = .error) -> DynamicObject {
+        if update != .error && schema[typeName]?.primaryKeyProperty == nil {
             throwRealmException("'\(typeName)' does not have a primary key and can not be updated")
         }
-        return noWarnUnsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, typeName, value, update),
+        return noWarnUnsafeBitCast(RLMCreateObjectInRealmWithValue(rlmRealm, typeName, value,
+                                                                   RLMUpdatePolicy(rawValue: UInt(update.rawValue))!),
                                    to: DynamicObject.self)
     }
 
