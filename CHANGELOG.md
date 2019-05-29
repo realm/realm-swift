@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.16.0 Release notes (2019-05-29)
 =============================================================
+
 ### Enhancements
+
 * Add an option to only set the properties which have values different from the
   existing ones when updating an existing object with
   `Realm.create()`/`-[RLMObject createOrUpdateInRealm:withValue:]`. This makes
@@ -15,16 +17,10 @@ x.y.z Release notes (yyyy-MM-dd)
   synchronization. This is currently not applicable to query-based
   synchronization. (PR: [#6106](https://github.com/realm/realm-cocoa/pull/6106)).
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 * Carthage release for Swift is built with Xcode 10.2.1.
 
 3.15.0 Release notes (2019-05-06)
