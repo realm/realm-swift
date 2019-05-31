@@ -460,11 +460,11 @@ public final class Realm {
     @discardableResult
     public func create<T: Object>(_ type: T.Type, value: Any = [:], update: UpdatePolicy = .error) -> T {
         if update != .error {
-            RLMVerifyHasPrimaryKey(T.self)
+            RLMVerifyHasPrimaryKey(type)
         }
         let typeName = (type as Object.Type).className()
         return unsafeDowncast(RLMCreateObjectInRealmWithValue(rlmRealm, typeName, value,
-                                                              RLMUpdatePolicy(rawValue: UInt(update.rawValue))!), to: T.self)
+                                                              RLMUpdatePolicy(rawValue: UInt(update.rawValue))!), to: type)
     }
 
     /**

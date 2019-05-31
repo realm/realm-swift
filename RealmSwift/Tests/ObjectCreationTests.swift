@@ -498,7 +498,6 @@ class ObjectCreationTests: TestCase {
     }
 
     func testCreateWithObjcName() {
-
         let realm = try! Realm()
         try! realm.write {
             let object = realm.create(SwiftObjcRenamedObject.self)
@@ -513,7 +512,6 @@ class ObjectCreationTests: TestCase {
     }
 
     func testCreateWithDifferentObjcName() {
-
         let realm = try! Realm()
         try! realm.write {
             let object = realm.create(SwiftObjcArbitrarilyRenamedObject.self)
@@ -710,6 +708,17 @@ class ObjectCreationTests: TestCase {
         realm.beginWrite()
         _ = realm.create(type(of: managedValue), value: managedValue, update: .modified)
         realm.cancelWrite()
+    }
+
+    func testCreateOrUpdateWithMismatchedStaticAndDynamicTypes() {
+        let realm = try! Realm()
+        let obj: Object = SwiftOptionalPrimaryObject()
+        try! realm.write {
+            let obj2 = realm.create(type(of: obj), value: obj)
+            XCTAssertEqual(obj2.objectSchema.className, "SwiftOptionalPrimaryObject")
+            let obj3 = realm.create(type(of: obj), value: obj, update: .all)
+            XCTAssertEqual(obj3.objectSchema.className, "SwiftOptionalPrimaryObject")
+        }
     }
 
     // test null object
