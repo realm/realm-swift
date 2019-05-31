@@ -4,8 +4,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+* The static type passed at compile time to `realm.create()` was checked for a
+  primary key rather than the actual type passed at runtime, resulting in
+  exceptions like "''RealmSwiftObject' does not have a primary key and can not
+  be updated'" being thrown even if the object type being created has a primary
+  key. (since 3.16.0, [#6159](https://github.com/realm/realm-cocoa/issues/6159)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

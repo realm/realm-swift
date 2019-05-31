@@ -181,7 +181,7 @@ private func arrayType<T>(_ type: T.Type) -> RLMArray<AnyObject> {
     case is String.Type: return RLMArray(objectType: .string, optional: true)
     case is Data.Type:   return RLMArray(objectType: .data, optional: true)
     case is Date.Type:   return RLMArray(objectType: .date, optional: true)
-    default: fatalError("Unsupported type for List: \(T.self)?")
+    default: fatalError("Unsupported type for List: \(type)?")
     }
 }
 
