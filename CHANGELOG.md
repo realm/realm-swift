@@ -1,21 +1,18 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.16.1 Release notes (2019-05-31)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
+
 * The static type passed at compile time to `realm.create()` was checked for a
   primary key rather than the actual type passed at runtime, resulting in
   exceptions like "''RealmSwiftObject' does not have a primary key and can not
   be updated'" being thrown even if the object type being created has a primary
   key. (since 3.16.0, [#6159](https://github.com/realm/realm-cocoa/issues/6159)).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 * Carthage release for Swift is built with Xcode 10.2.1.
 
 3.16.0 Release notes (2019-05-29)
