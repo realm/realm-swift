@@ -26,7 +26,7 @@ x.y.z Release notes (yyyy-MM-dd)
   notifications report only the properties which have actually changed, and
   improves Object Server performance by reducing the number of operations to
   merge. (Issue: [#5970](https://github.com/realm/realm-cocoa/issues/5970),
-  PR: [#6149](https://github.com/realm/realm-cocoa/pulls/6149)).
+  PR: [#6149](https://github.com/realm/realm-cocoa/pull/6149)).
 * Using `-[RLMRealm * asyncOpenWithConfiguration:callbackQueue:]`/`Realm.asyncOpen()` to open a
   synchronized Realm which does not exist on the local device now uses an
   optimized transfer method to download the initial data for the Realm, greatly
