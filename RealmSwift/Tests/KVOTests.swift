@@ -299,9 +299,12 @@ class KVOTests: TestCase {
             return
         }
 
+        // FIXME: crashes xcode11b1 compiler even when disabled with #if
+        /*
         observeChange(obs, \.isInvalidated, false, true) {
             self.realm.delete(obj)
         }
+         */
     }
 #endif
 
