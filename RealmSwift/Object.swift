@@ -431,6 +431,12 @@ public class ObjectUtil: NSObject {
                 return name.substring(to: storageRange.lowerBound)
             #endif
         }
+        // Xcode 11 changed the name of the storage property to "$__lazy_storage_$_propName"
+        #if swift(>=4.0)
+            if let storageRange = name.range(of: "$__lazy_storage_$_", options: [.anchored]) {
+                return String(name[storageRange.upperBound...])
+            }
+        #endif
         return nil
     }
 
