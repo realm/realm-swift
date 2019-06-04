@@ -385,12 +385,18 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     }
 
     // Check if there's a storage ivar for a lazy property in this name. We don't honor
-    // @lazy in managed objects, but allow it for unmanaged objects.
+    // @lazy in managed objects, but allow it for unmanaged objects which are
+    // subclasses of RLMObject (but not RealmSwift.Object). It's unclear if there's a
+    // good reason for this difference.
     if (!readOnly && isComputed) {
+        // Xcode 10 and earlier
         NSString *backingPropertyName = [NSString stringWithFormat:@"%@.storage", name];
-        if (class_getInstanceVariable([obj class], backingPropertyName.UTF8String)) {
-            isComputed = false;
-        }
+        isComputed = !class_getInstanceVariable([obj class], backingPropertyName.UTF8String);
+    }
+    if (!readOnly && isComputed) {
+        // Xcode 11
+        NSString *backingPropertyName = [NSString stringWithFormat:@"$__lazy_storage_$_%@", name];
+        isComputed = !class_getInstanceVariable([obj class], backingPropertyName.UTF8String);
     }
 
     if (readOnly || isComputed) {
