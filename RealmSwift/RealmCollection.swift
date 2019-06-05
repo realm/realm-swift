@@ -252,21 +252,12 @@ extension Data: RealmCollectionValue {
     }
 }
 
-#if swift(>=3.2)
-// FIXME: When we drop support for Swift 3.1, change ElementType to Element
-// throughout the project (this is a non-breaking change). We use ElementType
-// only because of limitations in Swift 3.1's compiler.
 /// :nodoc:
 public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined where Element: RealmCollectionValue {
+    // This typealias was needed with Swift 3.1. It no longer is, but remains
+    // just in case someone was depending on it
     typealias ElementType = Element
 }
-#else
-/// :nodoc:
-public protocol RealmCollectionBase: RandomAccessCollection, LazyCollectionProtocol, CustomStringConvertible, ThreadConfined {
-    /// The type of the objects contained in the collection.
-    associatedtype ElementType: RealmCollectionValue
-}
-#endif
 
 /**
  A homogenous collection of `Object`s which can be retrieved, filtered, sorted, and operated upon.
@@ -300,7 +291,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter object: An object.
      */
-    func index(of object: ElementType) -> Int?
+    func index(of object: Element) -> Int?
 
     /**
      Returns the index of the first object matching the predicate, or `nil` if no objects match.
@@ -324,14 +315,14 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
      */
-    func filter(_ predicateFormat: String, _ args: Any...) -> Results<ElementType>
+    func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element>
 
     /**
      Returns a `Results` containing all objects matching the given predicate in the collection.
 
      - parameter predicate: The predicate to use to filter the objects.
      */
-    func filter(_ predicate: NSPredicate) -> Results<ElementType>
+    func filter(_ predicate: NSPredicate) -> Results<Element>
 
 
     // MARK: Sorting
@@ -349,7 +340,7 @@ public protocol RealmCollection: RealmCollectionBase {
      - parameter keyPath:   The key path to sort by.
      - parameter ascending: The direction to sort in.
      */
-    func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<ElementType>
+    func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element>
 
     /**
      Returns a `Results` containing the objects in the collection, but sorted.
@@ -361,7 +352,7 @@ public protocol RealmCollection: RealmCollectionBase {
 
      - parameter sortDescriptors: A sequence of `SortDescriptor`s to sort by.
      */
-    func sorted<S: Sequence>(by sortDescriptors: S) -> Results<ElementType> where S.Iterator.Element == SortDescriptor
+    func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor
 
     // MARK: Aggregate Operations
 
@@ -493,7 +484,7 @@ public protocol RealmCollection: RealmCollectionBase {
     func observe(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
     /// :nodoc:
-    func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<ElementType>>) -> Void) -> NotificationToken
+    func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 }
 
 /// :nodoc:
@@ -511,8 +502,6 @@ extension Optional: OptionalProtocol {
 }
 
 
-// FIXME: See the declaration of RealmCollectionBase for why this `#if` is required.
-#if swift(>=3.2)
 public extension RealmCollection where Element: MinMaxType {
     /**
      Returns the minimum (lowest) value of the collection, or `nil` if the collection is empty.
@@ -600,95 +589,6 @@ public extension RealmCollection where Element: OptionalProtocol, Element.Wrappe
         return sorted(byKeyPath: "self", ascending: ascending)
     }
 }
-#else
-public extension RealmCollection where ElementType: MinMaxType {
-    /**
-     Returns the minimum (lowest) value of the collection, or `nil` if the collection is empty.
-     */
-    public func min() -> ElementType? {
-        return min(ofProperty: "self")
-    }
-    /**
-     Returns the maximum (highest) value of the collection, or `nil` if the collection is empty.
-     */
-    public func max() -> ElementType? {
-        return max(ofProperty: "self")
-    }
-}
-
-public extension RealmCollection where ElementType: OptionalProtocol, ElementType.Wrapped: MinMaxType {
-    /**
-     Returns the minimum (lowest) value of the collection, or `nil` if the collection is empty.
-     */
-    public func min() -> ElementType.Wrapped? {
-        return min(ofProperty: "self")
-    }
-    /**
-     Returns the maximum (highest) value of the collection, or `nil` if the collection is empty.
-     */
-    public func max() -> ElementType.Wrapped? {
-        return max(ofProperty: "self")
-    }
-}
-
-public extension RealmCollection where ElementType: AddableType {
-    /**
-     Returns the sum of the values in the collection, or `nil` if the collection is empty.
-     */
-    public func sum() -> ElementType {
-        return sum(ofProperty: "self")
-    }
-    /**
-     Returns the average of all of the values in the collection.
-     */
-    public func average() -> Double? {
-        return average(ofProperty: "self")
-    }
-}
-
-public extension RealmCollection where ElementType: OptionalProtocol, ElementType.Wrapped: AddableType {
-    /**
-     Returns the sum of the values in the collection, or `nil` if the collection is empty.
-     */
-    public func sum() -> ElementType.Wrapped {
-        return sum(ofProperty: "self")
-    }
-    /**
-     Returns the average of all of the values in the collection.
-     */
-    public func average() -> Double? {
-        return average(ofProperty: "self")
-    }
-}
-
-public extension RealmCollection where ElementType: Comparable {
-    /**
-     Returns a `Results` containing the objects in the collection, but sorted.
-
-     Objects are sorted based on their values. For example, to sort a collection of `Date`s from
-     neweset to oldest based, you might call `dates.sorted(ascending: true)`.
-
-     - parameter ascending: The direction to sort in.
-     */
-    public func sorted(ascending: Bool = true) -> Results<ElementType> {
-        return sorted(byKeyPath: "self", ascending: ascending)
-    }
-}
-
-public extension RealmCollection where ElementType: OptionalProtocol, ElementType.Wrapped: Comparable {
-    /**
-     Returns a `Results` containing the objects in the collection, but sorted.
-
-     Objects are sorted based on their values. For example, to sort a collection of `Date`s from
-     neweset to oldest based, you might call `dates.sorted(ascending: true)`.
-
-     - parameter ascending: The direction to sort in.
-     */
-    public func sorted(ascending: Bool = true) -> Results<ElementType> {
-        return sorted(byKeyPath: "self", ascending: ascending)
-    }
-}
-#endif
 
 private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiveCBridgeable {
     typealias Wrapper = AnyRealmCollection<Element>
@@ -723,7 +623,7 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
 }
 
-private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.ElementType> {
+private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.Element> {
     let base: C
     init(base: C) {
         self.base = base
@@ -739,7 +639,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     // MARK: Index Retrieval
 
-    override func index(of object: C.ElementType) -> Int? { return base.index(of: object) }
+    override func index(of object: C.Element) -> Int? { return base.index(of: object) }
 
     override func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
 
@@ -749,20 +649,20 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     // MARK: Filtering
 
-    override func filter(_ predicateFormat: String, _ args: Any...) -> Results<C.ElementType> {
+    override func filter(_ predicateFormat: String, _ args: Any...) -> Results<C.Element> {
         return base.filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
     }
 
-    override func filter(_ predicate: NSPredicate) -> Results<C.ElementType> { return base.filter(predicate) }
+    override func filter(_ predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
 
     // MARK: Sorting
 
-    override func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<C.ElementType> {
+    override func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<C.Element> {
         return base.sorted(byKeyPath: keyPath, ascending: ascending)
     }
 
     override func sorted<S: Sequence>
-        (by sortDescriptors: S) -> Results<C.ElementType> where S.Iterator.Element == SortDescriptor {
+        (by sortDescriptors: S) -> Results<C.Element> where S.Iterator.Element == SortDescriptor {
         return base.sorted(by: sortDescriptors)
     }
 
@@ -788,12 +688,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     // MARK: Sequence Support
 
-    override subscript(position: Int) -> C.ElementType {
-        #if swift(>=3.2)
-            return base[position as! C.Index]
-        #else
-            return base[position as! C.Index] as! C.ElementType
-        #endif
+    override subscript(position: Int) -> C.Element {
+        return base[position as! C.Index]
     }
 
     override func makeIterator() -> RLMIterator<Element> {
@@ -862,7 +758,7 @@ public final class AnyRealmCollection<Element: RealmCollectionValue>: RealmColle
     }
 
     /// Creates an `AnyRealmCollection` wrapping `base`.
-    public init<C: RealmCollection>(_ base: C) where C.ElementType == Element {
+    public init<C: RealmCollection>(_ base: C) where C.Element == Element {
         self.base = _AnyRealmCollection(base: base)
     }
 
@@ -1155,7 +1051,7 @@ extension AnyRealmCollection: AssistedObjectiveCBridgeable {
 
 extension RealmCollection {
     @available(*, unavailable, renamed: "sorted(byKeyPath:ascending:)")
-    func sorted(byProperty property: String, ascending: Bool) -> Results<ElementType> { fatalError() }
+    func sorted(byProperty property: String, ascending: Bool) -> Results<Element> { fatalError() }
 
     @available(*, unavailable, renamed: "observe(_:)")
     public func addNotificationBlock(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken {
