@@ -173,39 +173,56 @@ build_combined() {
     xc "-scheme '$scheme' -configuration $config -sdk $os"
     xc "-scheme '$scheme' -configuration $config -sdk $simulator -destination 'name=$destination' ONLY_ACTIVE_ARCH=NO"
 
-    # Combine .swiftmodule
-    if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
-      cp $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
+    if (( $(xcode_version_major) < 11 )); then
+        # Combine .swiftmodule
+        if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
+          cp $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
+        fi
+
+        # Xcode 10.2 merges the generated headers together with ifdef guards for
+        # each of the target platforms. This doesn't handle merging
+        # device/simulator builds, so we need to take care of that ourselves.
+        # Currently all platforms have identical headers, so we just pick one and
+        # use that rather than merging, but this may change in the future.
+        if [ -f $os_path/Headers/$module_name-Swift.h ]; then
+          unique_headers=$(find $build_intermediates_path -name $module_name-Swift.h -exec shasum {} \; | cut -d' ' -f 1 | uniq | grep -c '^')
+          if [ $unique_headers != "1" ]; then
+            echo "Platform-specific Swift generated headers are not identical. Merging them is required and is not yet implemented."
+            exit 1
+          fi
+          find $build_intermediates_path -name $module_name-Swift.h -exec cp {} $os_path/Headers \; -quit
+        fi
+
+        # Copy *.bcsymbolmap to .framework for submitting app with bitcode
+        copy_bcsymbolmap "$build_products_path/$config-$os$scope_suffix" "$os_path"
+
+        # Retrieve build products
+        clean_retrieve $os_path $out_path $product_name
+
+        # Combine ar archives
+        LIPO_OUTPUT="$out_path/$product_name/$module_name"
+        xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
+
+        # Verify that the combined library has bitcode and we didn't accidentally
+        # remove it somewhere along the line
+        if [[ "$destination" != "" && "$config" == "Release" ]]; then
+            sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
+        fi
+    else
+        rm -rf "$out_path/$module_name.xcframework"
+        xcodebuild -create-xcframework \
+            -framework $simulator_path \
+            -framework $os_path \
+            -output "$out_path/$module_name.xcframework"
     fi
+}
 
-    # Xcode 10.2 merges the generated headers together with ifdef guards for
-    # each of the target platforms. This doesn't handle merging
-    # device/simulator builds, so we need to take care of that ourselves.
-    # Currently all platforms have identical headers, so we just pick one and
-    # use that rather than merging, but this may change in the future.
-    if [ -f $os_path/Headers/$module_name-Swift.h ]; then
-      unique_headers=$(find $build_intermediates_path -name $module_name-Swift.h -exec shasum {} \; | cut -d' ' -f 1 | uniq | grep -c '^')
-      if [ $unique_headers != "1" ]; then
-        echo "Platform-specific Swift generated headers are not identical. Merging them is required and is not yet implemented."
-        exit 1
-      fi
-      find $build_intermediates_path -name $module_name-Swift.h -exec cp {} $os_path/Headers \; -quit
-    fi
-
-    # Copy *.bcsymbolmap to .framework for submitting app with bitcode
-    copy_bcsymbolmap "$build_products_path/$config-$os$scope_suffix" "$os_path"
-
-    # Retrieve build products
-    clean_retrieve $os_path $out_path $product_name
-
-    # Combine ar archives
-    LIPO_OUTPUT="$out_path/$product_name/$module_name"
-    xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
-
-    # Verify that the combined library has bitcode and we didn't accidentally
-    # remove it somewhere along the line
-    if [[ "$destination" != "" && "$config" == "Release" ]]; then
-        sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
+copy_realm_framework() {
+    platform="$1"
+    if (( $(xcode_version_major) < 11 )); then
+        cp -R build/$platform/Realm.framework build/$platform/swift-$REALM_XCODE_VERSION
+    else
+        cp -R build/$platform/Realm.xcframework build/$platform/swift-$REALM_XCODE_VERSION
     fi
 }
 
@@ -516,7 +533,7 @@ case "$COMMAND" in
     "ios-swift")
         sh build.sh ios-dynamic
         build_combined RealmSwift RealmSwift iphoneos iphonesimulator '' "/swift-$REALM_XCODE_VERSION"
-        cp -R build/ios/Realm.framework build/ios/swift-$REALM_XCODE_VERSION
+        copy_realm_framework ios
         exit 0
         ;;
 
@@ -528,7 +545,7 @@ case "$COMMAND" in
     "watchos-swift")
         sh build.sh watchos
         build_combined RealmSwift RealmSwift watchos watchsimulator '' "/swift-$REALM_XCODE_VERSION"
-        cp -R build/watchos/Realm.framework build/watchos/swift-$REALM_XCODE_VERSION
+        copy_realm_framework watchos
         exit 0
         ;;
 
@@ -540,7 +557,7 @@ case "$COMMAND" in
     "tvos-swift")
         sh build.sh tvos
         build_combined RealmSwift RealmSwift appletvos appletvsimulator '' "/swift-$REALM_XCODE_VERSION"
-        cp -R build/tvos/Realm.framework build/tvos/swift-$REALM_XCODE_VERSION
+        copy_realm_framework tvos
         exit 0
         ;;
 
