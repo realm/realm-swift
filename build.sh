@@ -218,12 +218,13 @@ build_combined() {
 }
 
 copy_realm_framework() {
-    platform="$1"
+    local platform="$1"
+    local extension="xcframework"
     if (( $(xcode_version_major) < 11 )); then
-        cp -R build/$platform/Realm.framework build/$platform/swift-$REALM_XCODE_VERSION
-    else
-        cp -R build/$platform/Realm.xcframework build/$platform/swift-$REALM_XCODE_VERSION
+        extension="framework"
     fi
+    rm -rf build/$platform/swift-$REALM_XCODE_VERSION/Realm.$extension
+    cp -R build/$platform/Realm.$extension build/$platform/swift-$REALM_XCODE_VERSION
 }
 
 clean_retrieve() {
@@ -517,6 +518,17 @@ case "$COMMAND" in
         sh build.sh tvos-swift
         sh build.sh osx
         sh build.sh osx-swift
+
+        if (( $(xcode_version_major) >= 11 )); then
+            rm -rf "build/*.xcframework"
+            find build/DerivedData -name 'Realm.framework' \
+                | grep -v '\-static' \
+                | sed 's/.*/-framework &/' \
+                | xargs xcodebuild -create-xcframework -output build/Realm.xcframework
+            find build/DerivedData -name 'RealmSwift.framework' \
+                | sed 's/.*/-framework &/' \
+                | xargs xcodebuild -create-xcframework -output build/RealmSwift.xcframework
+        fi
         exit 0
         ;;
 
@@ -572,6 +584,7 @@ case "$COMMAND" in
         xc "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
         destination="build/osx/swift-$REALM_XCODE_VERSION"
         clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
+        rm -rf "$destination/Realm.framework"
         cp -R build/osx/Realm.framework "$destination"
         exit 0
         ;;
