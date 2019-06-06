@@ -418,3 +418,14 @@ extension Results: AssistedObjectiveCBridgeable {
         return (objectiveCValue: rlmResults, metadata: nil)
     }
 }
+
+// MARK: - Codable
+
+extension Results: Encodable where Element: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        for value in self {
+            try container.encode(value)
+        }
+    }
+}

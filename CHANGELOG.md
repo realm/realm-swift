@@ -2,6 +2,8 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add support for including Realm via Swift Package Manager.
+* Add Codable conformance to RealmOptional and List, and Encodable conformance to Results.
+  ([PR #6172](https://github.com/realm/realm-cocoa/pull/6172)).
 
 ### Fixed
 * Attempting to observe an unmanaged LinkingObjects object crashed rather than
