@@ -708,6 +708,27 @@ extension List: RangeReplaceableCollection {
 }
 #endif
 
+// MARK: - Codable
+
+extension List: Decodable where Element: Decodable {
+    public convenience init(from decoder: Decoder) throws {
+        self.init()
+        var container = try decoder.unkeyedContainer()
+        while !container.isAtEnd {
+            append(try container.decode(Element.self))
+        }
+    }
+}
+
+extension List: Encodable where Element: Encodable {
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.unkeyedContainer()
+        for value in self {
+            try container.encode(value)
+        }
+    }
+}
+
 // MARK: - AssistedObjectiveCBridgeable
 
 extension List: AssistedObjectiveCBridgeable {
