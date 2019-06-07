@@ -318,12 +318,6 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
             case 'R':
                 *readOnly = true;
                 break;
-            case 'N':
-                // nonatomic
-                break;
-            case 'D':
-                // dynamic
-                break;
             case 'G':
                 _getterName = @(attrs[i].value);
                 break;
@@ -332,6 +326,25 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
                 break;
             case 'V': // backing ivar name
                 *computed = false;
+                break;
+
+            case '&':
+                // retain/assign
+                break;
+            case 'C':
+                // copy
+                break;
+            case 'D':
+                // dynamic
+                break;
+            case 'N':
+                // nonatomic
+                break;
+            case 'P':
+                // GC'able
+                break;
+            case 'W':
+                // weak
                 break;
             default:
                 break;
@@ -364,12 +377,26 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     bool readOnly = false;
     bool isComputed = false;
     [self parseObjcProperty:property readOnly:&readOnly computed:&isComputed rawType:&rawType];
+
+    // Swift sometimes doesn't explicitly set the ivar name in the metadata, so check if
+    // there's an ivar with the same name as the property.
+    if (!readOnly && isComputed && class_getInstanceVariable([obj class], name.UTF8String)) {
+        isComputed = false;
+    }
+
+    // Check if there's a storage ivar for a lazy property in this name. We don't honor
+    // @lazy in managed objects, but allow it for unmanaged objects which are
+    // subclasses of RLMObject (but not RealmSwift.Object). It's unclear if there's a
+    // good reason for this difference.
     if (!readOnly && isComputed) {
-        // Check for lazy property.
+        // Xcode 10 and earlier
         NSString *backingPropertyName = [NSString stringWithFormat:@"%@.storage", name];
-        if (class_getInstanceVariable([obj class], backingPropertyName.UTF8String)) {
-            isComputed = false;
-        }
+        isComputed = !class_getInstanceVariable([obj class], backingPropertyName.UTF8String);
+    }
+    if (!readOnly && isComputed) {
+        // Xcode 11
+        NSString *backingPropertyName = [NSString stringWithFormat:@"$__lazy_storage_$_%@", name];
+        isComputed = !class_getInstanceVariable([obj class], backingPropertyName.UTF8String);
     }
 
     if (readOnly || isComputed) {

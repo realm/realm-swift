@@ -134,8 +134,8 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
     }
 
     func add(user: SyncUser, toRole roleName: String, inRealm realm: Realm) {
-        let user = realm.create(RealmSwift.PermissionUser.self, value: [user.identity!], update: true)
-        realm.create(PermissionRole.self, value: [roleName], update: true).users.append(user)
+        let user = realm.create(RealmSwift.PermissionUser.self, value: [user.identity!], update: .modified)
+        realm.create(PermissionRole.self, value: [roleName], update: .modified).users.append(user)
     }
 
 

@@ -123,7 +123,6 @@ class KVOTests: TestCase {
         changeDictionary = nil
     }
 
-#if swift(>=3.2)
     func observeChange<T: Equatable>(_ obj: KVOObject, _ keyPath: KeyPath<KVOObject, T>, _ old: Any?, _ new: Any?,
                                      fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         let kvoOptions: NSKeyValueObservingOptions = [.old, .new]
@@ -147,7 +146,6 @@ class KVOTests: TestCase {
 
         XCTAssertTrue(gotNotification, file: fileName, line: lineNumber)
     }
-#endif
 
     func observeListChange(_ obj: NSObject, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet = NSIndexSet(index: 0),
                            fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
@@ -177,17 +175,10 @@ class KVOTests: TestCase {
         let (obj, obs) = getObject(KVOObject())
 
         observeChange(obs, "boolCol", false, true) { obj.boolCol = true }
-#if swift(>=3.2)
         observeChange(obs, "int8Col", 1 as Int8, 10) { obj.int8Col = 10 }
         observeChange(obs, "int16Col", 2 as Int16, 10) { obj.int16Col = 10 }
         observeChange(obs, "int32Col", 3 as Int32, 10) { obj.int32Col = 10 }
         observeChange(obs, "int64Col", 4 as Int64, 10) { obj.int64Col = 10 }
-#else
-        observeChange(obs, "int8Col", 1, 10) { obj.int8Col = 10 }
-        observeChange(obs, "int16Col", 2, 10) { obj.int16Col = 10 }
-        observeChange(obs, "int32Col", 3, 10) { obj.int32Col = 10 }
-        observeChange(obs, "int64Col", 4, 10) { obj.int64Col = 10 }
-#endif
         observeChange(obs, "floatCol", 5 as Float, 10) { obj.floatCol = 10 }
         observeChange(obs, "doubleCol", 6 as Double, 10) { obj.doubleCol = 10 }
         observeChange(obs, "stringCol", "", "abc") { obj.stringCol = "abc" }
@@ -263,7 +254,6 @@ class KVOTests: TestCase {
         }
     }
 
-#if swift(>=3.2)
     func testTypedObservation() {
         let (obj, obs) = getObject(KVOObject())
 
@@ -299,11 +289,14 @@ class KVOTests: TestCase {
             return
         }
 
+        // FIXME: crashes xcode11b1 compiler even when disabled with #if
+        // FB6115674
+        /*
         observeChange(obs, \.isInvalidated, false, true) {
             self.realm.delete(obj)
         }
+         */
     }
-#endif
 
     func testReadSharedSchemaFromObservedObject() {
         let obj = KVOObject()

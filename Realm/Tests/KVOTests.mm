@@ -296,7 +296,7 @@ public:
 // remove it, and verify that there are no more notifications
 #define AssertIndexChange(kind, indexes) do { \
     if (NSDictionary *note = AssertNotification(r)) { \
-        XCTAssertEqual([note[NSKeyValueChangeKindKey] intValue], kind); \
+        XCTAssertEqual([note[NSKeyValueChangeKindKey] intValue], static_cast<int>(kind)); \
         XCTAssertEqualObjects(note[NSKeyValueChangeIndexesKey], indexes); \
     } \
     XCTAssertTrue(r.empty()); \

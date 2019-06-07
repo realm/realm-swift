@@ -235,14 +235,3 @@ class TestCase: XCTestCase {
         return directory.appendingPathComponent(fileName, isDirectory: false)
     }
 }
-
-#if !swift(>=3.2)
-func XCTAssertEqual<F: FloatingPoint>(_ expression1: F, _ expression2: F, accuracy: F,
-                                      file: StaticString = #file, line: UInt = #line) {
-    XCTAssertEqualWithAccuracy(expression1, expression2, accuracy: accuracy, file: file, line: line)
-}
-func XCTAssertNotEqual<F: FloatingPoint>(_ expression1: F, _ expression2: F, accuracy: F,
-                                         file: StaticString = #file, line: UInt = #line) {
-    XCTAssertNotEqualWithAccuracy(expression1, expression2, accuracy, file: file, line: line)
-}
-#endif

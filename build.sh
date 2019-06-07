@@ -147,7 +147,7 @@ build_combined() {
     local os_name=""
     if [[ "$os" == "iphoneos" ]]; then
         os_name="ios"
-        destination="iPhone 6"
+        destination="iPhone 8"
     elif [[ "$os" == "watchos"  ]]; then
         os_name="$os"
         if (( $(xcode_version_major) >= 10 )); then
@@ -173,40 +173,58 @@ build_combined() {
     xc "-scheme '$scheme' -configuration $config -sdk $os"
     xc "-scheme '$scheme' -configuration $config -sdk $simulator -destination 'name=$destination' ONLY_ACTIVE_ARCH=NO"
 
-    # Combine .swiftmodule
-    if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
-      cp $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
+    if (( $(xcode_version_major) < 11 )); then
+        # Combine .swiftmodule
+        if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
+          cp $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
+        fi
+
+        # Xcode 10.2 merges the generated headers together with ifdef guards for
+        # each of the target platforms. This doesn't handle merging
+        # device/simulator builds, so we need to take care of that ourselves.
+        # Currently all platforms have identical headers, so we just pick one and
+        # use that rather than merging, but this may change in the future.
+        if [ -f $os_path/Headers/$module_name-Swift.h ]; then
+          unique_headers=$(find $build_intermediates_path -name $module_name-Swift.h -exec shasum {} \; | cut -d' ' -f 1 | uniq | grep -c '^')
+          if [ $unique_headers != "1" ]; then
+            echo "Platform-specific Swift generated headers are not identical. Merging them is required and is not yet implemented."
+            exit 1
+          fi
+          find $build_intermediates_path -name $module_name-Swift.h -exec cp {} $os_path/Headers \; -quit
+        fi
+
+        # Copy *.bcsymbolmap to .framework for submitting app with bitcode
+        copy_bcsymbolmap "$build_products_path/$config-$os$scope_suffix" "$os_path"
+
+        # Retrieve build products
+        clean_retrieve $os_path $out_path $product_name
+
+        # Combine ar archives
+        LIPO_OUTPUT="$out_path/$product_name/$module_name"
+        xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
+
+        # Verify that the combined library has bitcode and we didn't accidentally
+        # remove it somewhere along the line
+        if [[ "$destination" != "" && "$config" == "Release" ]]; then
+            sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
+        fi
+    else
+        rm -rf "$out_path/$module_name.xcframework"
+        xcodebuild -create-xcframework \
+            -framework $simulator_path \
+            -framework $os_path \
+            -output "$out_path/$module_name.xcframework"
     fi
+}
 
-    # Xcode 10.2 merges the generated headers together with ifdef guards for
-    # each of the target platforms. This doesn't handle merging
-    # device/simulator builds, so we need to take care of that ourselves.
-    # Currently all platforms have identical headers, so we just pick one and
-    # use that rather than merging, but this may change in the future.
-    if [ -f $os_path/Headers/$module_name-Swift.h ]; then
-      unique_headers=$(find $build_intermediates_path -name $module_name-Swift.h -exec shasum {} \; | cut -d' ' -f 1 | uniq | grep -c '^')
-      if [ $unique_headers != "1" ]; then
-        echo "Platform-specific Swift generated headers are not identical. Merging them is required and is not yet implemented."
-        exit 1
-      fi
-      find $build_intermediates_path -name $module_name-Swift.h -exec cp {} $os_path/Headers \; -quit
+copy_realm_framework() {
+    local platform="$1"
+    local extension="xcframework"
+    if (( $(xcode_version_major) < 11 )); then
+        extension="framework"
     fi
-
-    # Copy *.bcsymbolmap to .framework for submitting app with bitcode
-    copy_bcsymbolmap "$build_products_path/$config-$os$scope_suffix" "$os_path"
-
-    # Retrieve build products
-    clean_retrieve $os_path $out_path $product_name
-
-    # Combine ar archives
-    LIPO_OUTPUT="$out_path/$product_name/$module_name"
-    xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
-
-    # Verify that the combined library has bitcode and we didn't accidentally
-    # remove it somewhere along the line
-    if [[ "$destination" != "" && "$config" == "Release" ]]; then
-        sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
-    fi
+    rm -rf build/$platform/swift-$REALM_XCODE_VERSION/Realm.$extension
+    cp -R build/$platform/Realm.$extension build/$platform/swift-$REALM_XCODE_VERSION
 }
 
 clean_retrieve() {
@@ -500,6 +518,17 @@ case "$COMMAND" in
         sh build.sh tvos-swift
         sh build.sh osx
         sh build.sh osx-swift
+
+        if (( $(xcode_version_major) >= 11 )); then
+            rm -rf "build/*.xcframework"
+            find build/DerivedData -name 'Realm.framework' \
+                | grep -v '\-static' \
+                | sed 's/.*/-framework &/' \
+                | xargs xcodebuild -create-xcframework -output build/Realm.xcframework
+            find build/DerivedData -name 'RealmSwift.framework' \
+                | sed 's/.*/-framework &/' \
+                | xargs xcodebuild -create-xcframework -output build/RealmSwift.xcframework
+        fi
         exit 0
         ;;
 
@@ -516,7 +545,7 @@ case "$COMMAND" in
     "ios-swift")
         sh build.sh ios-dynamic
         build_combined RealmSwift RealmSwift iphoneos iphonesimulator '' "/swift-$REALM_XCODE_VERSION"
-        cp -R build/ios/Realm.framework build/ios/swift-$REALM_XCODE_VERSION
+        copy_realm_framework ios
         exit 0
         ;;
 
@@ -528,7 +557,7 @@ case "$COMMAND" in
     "watchos-swift")
         sh build.sh watchos
         build_combined RealmSwift RealmSwift watchos watchsimulator '' "/swift-$REALM_XCODE_VERSION"
-        cp -R build/watchos/Realm.framework build/watchos/swift-$REALM_XCODE_VERSION
+        copy_realm_framework watchos
         exit 0
         ;;
 
@@ -540,7 +569,7 @@ case "$COMMAND" in
     "tvos-swift")
         sh build.sh tvos
         build_combined RealmSwift RealmSwift appletvos appletvsimulator '' "/swift-$REALM_XCODE_VERSION"
-        cp -R build/tvos/Realm.framework build/tvos/swift-$REALM_XCODE_VERSION
+        copy_realm_framework tvos
         exit 0
         ;;
 
@@ -555,6 +584,7 @@ case "$COMMAND" in
         xc "-scheme 'RealmSwift' -configuration $CONFIGURATION build"
         destination="build/osx/swift-$REALM_XCODE_VERSION"
         clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
+        rm -rf "$destination/Realm.framework"
         cp -R build/osx/Realm.framework "$destination"
         exit 0
         ;;
@@ -593,19 +623,19 @@ case "$COMMAND" in
         ;;
 
     "test-ios-static")
-        test_ios_static "name=iPhone 6"
+        test_ios_static "name=iPhone 8"
         exit 0
         ;;
 
     "test-ios-dynamic")
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build-for-testing"
-        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 8' build-for-testing"
+        xc "-scheme Realm -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 8' test"
         exit 0
         ;;
 
     "test-ios-swift")
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' build-for-testing"
-        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 6' test"
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 8' build-for-testing"
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -sdk iphonesimulator -destination 'name=iPhone 8' test"
         exit 0
         ;;
 
@@ -843,17 +873,17 @@ case "$COMMAND" in
         sh build.sh prelaunch-simulator
         workspace="examples/ios/objc/RealmExamples.xcworkspace"
         pod install --project-directory="$workspace/.." --no-repo-update
-        xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Migration -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Backlink -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme GroupedTableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme RACTableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Encryption -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Draw -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Migration -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Backlink -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme GroupedTableView -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme RACTableView -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Encryption -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Draw -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
 
         if [ ! -z "${JENKINS_HOME}" ]; then
-            xc "-workspace $workspace -scheme Extension -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
+            xc "-workspace $workspace -scheme Extension -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
         fi
 
         exit 0
@@ -866,12 +896,12 @@ case "$COMMAND" in
             workspace="${workspace/swift/swift-$REALM_XCODE_VERSION}"
         fi
 
-        xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Migration -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Encryption -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Backlink -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme GroupedTableView -configuration $CONFIGURATION -destination 'name=iPhone 6' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Migration -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Encryption -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme Backlink -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        xc "-workspace $workspace -scheme GroupedTableView -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
