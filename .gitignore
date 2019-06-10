@@ -19,7 +19,7 @@ core
 core-*
 
 # sync
-sync*
+/sync-*
 
 # sh build.sh config
 /Realm/config.mk
