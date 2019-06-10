@@ -18,8 +18,9 @@
 
 import XCTest
 import Realm
+import RealmTestSupport
 
-class SwiftRealmTests: RLMTestCase {
+class SwiftRLMRealmTests: RLMTestCase {
 
     // No models
 
@@ -40,26 +41,26 @@ class SwiftRealmTests: RLMTestCase {
     func testRealmAddAndRemoveObjects() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        _ = SwiftStringObject.create(in: realm, withValue: ["a"])
-        _ = SwiftStringObject.create(in: realm, withValue: ["b"])
-        _ = SwiftStringObject.create(in: realm, withValue: ["c"])
-        XCTAssertEqual(SwiftStringObject.allObjects(in: realm).count, UInt(3), "Expecting 3 objects")
+        _ = SwiftRLMStringObject.create(in: realm, withValue: ["a"])
+        _ = SwiftRLMStringObject.create(in: realm, withValue: ["b"])
+        _ = SwiftRLMStringObject.create(in: realm, withValue: ["c"])
+        XCTAssertEqual(SwiftRLMStringObject.allObjects(in: realm).count, UInt(3), "Expecting 3 objects")
         try! realm.commitWriteTransaction()
 
         // test again after write transaction
-        var objects = SwiftStringObject.allObjects(in: realm)
+        var objects = SwiftRLMStringObject.allObjects(in: realm)
         XCTAssertEqual(objects.count, UInt(3), "Expecting 3 objects")
-        XCTAssertEqual((objects[0] as! SwiftStringObject).stringCol, "a", "Expecting column to be 'a'")
+        XCTAssertEqual((objects[0] as! SwiftRLMStringObject).stringCol, "a", "Expecting column to be 'a'")
 
         realm.beginWriteTransaction()
-        realm.delete(objects[2] as! SwiftStringObject)
-        realm.delete(objects[0] as! SwiftStringObject)
-        XCTAssertEqual(SwiftStringObject.allObjects(in: realm).count, UInt(1), "Expecting 1 object")
+        realm.delete(objects[2] as! SwiftRLMStringObject)
+        realm.delete(objects[0] as! SwiftRLMStringObject)
+        XCTAssertEqual(SwiftRLMStringObject.allObjects(in: realm).count, UInt(1), "Expecting 1 object")
         try! realm.commitWriteTransaction()
 
-        objects = SwiftStringObject.allObjects(in: realm)
+        objects = SwiftRLMStringObject.allObjects(in: realm)
         XCTAssertEqual(objects.count, UInt(1), "Expecting 1 object")
-        XCTAssertEqual((objects[0] as! SwiftStringObject).stringCol, "b", "Expecting column to be 'b'")
+        XCTAssertEqual((objects[0] as! SwiftRLMStringObject).stringCol, "b", "Expecting column to be 'b'")
     }
 
     func testRealmIsUpdatedAfterBackgroundUpdate() {
@@ -75,22 +76,22 @@ class SwiftRealmTests: RLMTestCase {
         dispatchAsync {
             let realm = self.realmWithTestPath()
             realm.beginWriteTransaction()
-            _ = SwiftStringObject.create(in: realm, withValue: ["string"])
+            _ = SwiftRLMStringObject.create(in: realm, withValue: ["string"])
             try! realm.commitWriteTransaction()
         }
         waitForExpectations(timeout: 2.0, handler: nil)
         token.invalidate()
 
         // get object
-        let objects = SwiftStringObject.allObjects(in: realm)
+        let objects = SwiftRLMStringObject.allObjects(in: realm)
         XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type StringObject")
-        XCTAssertEqual((objects[0] as! SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
+        XCTAssertEqual((objects[0] as! SwiftRLMStringObject).stringCol, "string", "Value of first column should be 'string'")
     }
 
     func testRealmIgnoresProperties() {
         let realm = realmWithTestPath()
 
-        let object = SwiftIgnoredPropertiesObject()
+        let object = SwiftRLMIgnoredPropertiesObject()
         realm.beginWriteTransaction()
         object.name = "@fz"
         object.age = 31
@@ -102,9 +103,9 @@ class SwiftRealmTests: RLMTestCase {
         object.runtimeProperty = NSObject()
         try! realm.commitWriteTransaction()
 
-        let objects = SwiftIgnoredPropertiesObject.allObjects(in: realm)
-        XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type SwiftIgnoredPropertiesObject")
-        let retrievedObject = objects[0] as! SwiftIgnoredPropertiesObject
+        let objects = SwiftRLMIgnoredPropertiesObject.allObjects(in: realm)
+        XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type SwiftRLMIgnoredPropertiesObject")
+        let retrievedObject = objects[0] as! SwiftRLMIgnoredPropertiesObject
         XCTAssertNil(retrievedObject.runtimeProperty, "Ignored property should be nil")
         XCTAssertEqual(retrievedObject.name, "@fz", "Value of the name column doesn't match the assigned one.")
         XCTAssertEqual(retrievedObject.objectSchema.properties.count, 2, "Only 'name' and 'age' properties should be detected by Realm")
@@ -112,8 +113,8 @@ class SwiftRealmTests: RLMTestCase {
 
     func testUpdatingSortedArrayAfterBackgroundUpdate() {
         let realm = realmWithTestPath()
-        let objs = SwiftIntObject.allObjects(in: realm)
-        let objects = SwiftIntObject.allObjects(in: realm).sortedResults(usingKeyPath: "intCol", ascending: true)
+        let objs = SwiftRLMIntObject.allObjects(in: realm)
+        let objects = SwiftRLMIntObject.allObjects(in: realm).sortedResults(usingKeyPath: "intCol", ascending: true)
         let updateComplete = expectation(description: "background update complete")
 
         let token = realm.addNotificationBlock() { (_, _) in
@@ -126,11 +127,11 @@ class SwiftRealmTests: RLMTestCase {
         dispatchAsync {
             let realm = self.realmWithTestPath()
             try! realm.transaction {
-                var obj = SwiftIntObject()
+                var obj = SwiftRLMIntObject()
                 obj.intCol = 2;
                 realm.add(obj)
 
-                obj = SwiftIntObject()
+                obj = SwiftRLMIntObject()
                 obj.intCol = 1;
                 realm.add(obj)
             }
@@ -151,23 +152,23 @@ class SwiftRealmTests: RLMTestCase {
 
         dispatchAsync {
             let realm = self.realmWithTestPath()
-            let obj = SwiftStringObject(value: ["string"])
+            let obj = SwiftRLMStringObject(value: ["string"])
             realm.beginWriteTransaction()
             realm.add(obj)
             try! realm.commitWriteTransaction()
 
-            let objects = SwiftStringObject.allObjects(in: realm)
+            let objects = SwiftRLMStringObject.allObjects(in: realm)
             XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type StringObject")
-            XCTAssertEqual((objects[0] as! SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
+            XCTAssertEqual((objects[0] as! SwiftRLMStringObject).stringCol, "string", "Value of first column should be 'string'")
         }
 
         waitForExpectations(timeout: 2.0, handler: nil)
         token.invalidate()
 
         // get object
-        let objects = SwiftStringObject.allObjects(in: realm)
+        let objects = SwiftRLMStringObject.allObjects(in: realm)
         XCTAssertEqual(objects.count, UInt(1), "There should be 1 object of type RLMTestObject")
-        XCTAssertEqual((objects[0] as! SwiftStringObject).stringCol, "string", "Value of first column should be 'string'")
+        XCTAssertEqual((objects[0] as! SwiftRLMStringObject).stringCol, "string", "Value of first column should be 'string'")
     }
 
     // Objective-C models

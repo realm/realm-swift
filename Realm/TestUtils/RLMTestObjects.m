@@ -199,9 +199,9 @@
 @implementation ArrayPropertyObject
 @end
 
-#pragma mark DynamicObject
+#pragma mark DynamicTestObject
 
-@implementation DynamicObject
+@implementation DynamicTestObject
 @end
 
 #pragma mark AggregateObject

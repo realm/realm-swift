@@ -25,7 +25,7 @@ func nextPrimaryKey() -> Int {
     return pkCounter
 }
 
-class KVOObject: Object {
+class SwiftKVOObject: Object {
     @objc dynamic var pk = nextPrimaryKey() // primary key for equality
     @objc dynamic var ignored: Int = 0
 
@@ -39,8 +39,8 @@ class KVOObject: Object {
     @objc dynamic var stringCol: String = ""
     @objc dynamic var binaryCol: Data = Data()
     @objc dynamic var dateCol: Date = Date(timeIntervalSince1970: 0)
-    @objc dynamic var objectCol: KVOObject?
-    let arrayCol = List<KVOObject>()
+    @objc dynamic var objectCol: SwiftKVOObject?
+    let arrayCol = List<SwiftKVOObject>()
     let optIntCol = RealmOptional<Int>()
     let optFloatCol = RealmOptional<Float>()
     let optDoubleCol = RealmOptional<Double>()
@@ -100,7 +100,7 @@ class KVOTests: TestCase {
     }
 
     // swiftlint:disable:next cyclomatic_complexity
-    func observeChange<T: Equatable>(_ obj: KVOObject, _ key: String, _ old: T?, _ new: T?,
+    func observeChange<T: Equatable>(_ obj: SwiftKVOObject, _ key: String, _ old: T?, _ new: T?,
                                      fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         let kvoOptions: NSKeyValueObservingOptions = [.old, .new]
         obj.addObserver(self, forKeyPath: key, options: kvoOptions, context: nil)
@@ -123,7 +123,7 @@ class KVOTests: TestCase {
         changeDictionary = nil
     }
 
-    func observeChange<T: Equatable>(_ obj: KVOObject, _ keyPath: KeyPath<KVOObject, T>, _ old: Any?, _ new: Any?,
+    func observeChange<T: Equatable>(_ obj: SwiftKVOObject, _ keyPath: KeyPath<SwiftKVOObject, T>, _ old: Any?, _ new: Any?,
                                      fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         let kvoOptions: NSKeyValueObservingOptions = [.old, .new]
         var gotNotification = false
@@ -165,14 +165,14 @@ class KVOTests: TestCase {
         changeDictionary = nil
     }
 
-    func getObject(_ obj: KVOObject) -> (KVOObject, KVOObject) {
+    func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         return (obj, obj)
     }
 
     // Actual tests follow
 
     func testAllPropertyTypes() {
-        let (obj, obs) = getObject(KVOObject())
+        let (obj, obs) = getObject(SwiftKVOObject())
 
         observeChange(obs, "boolCol", false, true) { obj.boolCol = true }
         observeChange(obs, "int8Col", 1 as Int8, 10) { obj.int8Col = 10 }
@@ -248,14 +248,14 @@ class KVOTests: TestCase {
             self.realm.delete(obj)
         }
 
-        let (obj2, obs2) = getObject(KVOObject())
+        let (obj2, obs2) = getObject(SwiftKVOObject())
         observeChange(obs2, "arrayCol.invalidated", false, true) {
             self.realm.delete(obj2)
         }
     }
 
     func testTypedObservation() {
-        let (obj, obs) = getObject(KVOObject())
+        let (obj, obs) = getObject(SwiftKVOObject())
 
         observeChange(obs, \.boolCol, false, true) { obj.boolCol = true }
 
@@ -299,23 +299,23 @@ class KVOTests: TestCase {
     }
 
     func testReadSharedSchemaFromObservedObject() {
-        let obj = KVOObject()
+        let obj = SwiftKVOObject()
         obj.addObserver(self, forKeyPath: "boolCol", options: [.old, .new], context: nil)
-        XCTAssertEqual(type(of: obj).sharedSchema(), KVOObject.sharedSchema())
+        XCTAssertEqual(type(of: obj).sharedSchema(), SwiftKVOObject.sharedSchema())
         obj.removeObserver(self, forKeyPath: "boolCol")
     }
 }
 
 class KVOPersistedTests: KVOTests {
-    override func getObject(_ obj: KVOObject) -> (KVOObject, KVOObject) {
+    override func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         realm.add(obj)
         return (obj, obj)
     }
 }
 
 class KVOMultipleAccessorsTests: KVOTests {
-    override func getObject(_ obj: KVOObject) -> (KVOObject, KVOObject) {
+    override func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
         realm.add(obj)
-        return (obj, realm.object(ofType: KVOObject.self, forPrimaryKey: obj.pk)!)
+        return (obj, realm.object(ofType: SwiftKVOObject.self, forPrimaryKey: obj.pk)!)
     }
 }

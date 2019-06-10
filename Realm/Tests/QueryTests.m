@@ -1081,7 +1081,7 @@
     RLMAssertCount(StringObject, 0U, @"stringCol LIKE 'aabc'");
     RLMAssertCount(StringObject, 0U, @"stringCol LIKE 'b*bc'");
 
-    RLMAssertCount(StringObject, 1U, @"stringCol LIKE 'a??'");
+    RLMAssertCount(StringObject, 1U, @"stringCol LIKE 'a?" "?'");
     RLMAssertCount(StringObject, 1U, @"stringCol LIKE '?b?'");
     RLMAssertCount(StringObject, 1U, @"stringCol LIKE '*?c'");
     RLMAssertCount(StringObject, 1U, @"stringCol LIKE 'ab?'");

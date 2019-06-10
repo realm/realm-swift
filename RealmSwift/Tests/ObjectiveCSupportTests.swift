@@ -59,12 +59,10 @@ class ObjectiveCSupportTests: TestCase {
     }
 
     func testConfigurationSupport() {
-
         let realm = try! Realm()
 
         try! realm.write {
             realm.add(SwiftObject())
-            return
         }
 
         XCTAssertEqual(realm.configuration.fileURL,
@@ -75,9 +73,11 @@ class ObjectiveCSupportTests: TestCase {
                        ObjectiveCSupport.convert(object: realm.configuration).inMemoryIdentifier,
                        "Configuration.inMemoryIdentifier must be equal to RLMConfiguration.inMemoryIdentifier")
 
+        #if !SWIFT_PACKAGE
         XCTAssertEqual(realm.configuration.syncConfiguration?.realmURL,
                        ObjectiveCSupport.convert(object: realm.configuration).syncConfiguration?.realmURL,
                        "Configuration.syncConfiguration must be equal to RLMConfiguration.syncConfiguration")
+        #endif
 
         XCTAssertEqual(realm.configuration.encryptionKey,
                        ObjectiveCSupport.convert(object: realm.configuration).encryptionKey,

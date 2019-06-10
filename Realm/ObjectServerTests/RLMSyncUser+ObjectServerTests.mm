@@ -70,7 +70,3 @@ using namespace realm;
 }
 
 @end
-
-bool RLMHasCachedRealmForPath(NSString *path) {
-    return RLMGetAnyCachedRealmForPath(path.UTF8String);
-}

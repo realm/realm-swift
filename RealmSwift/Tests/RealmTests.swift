@@ -107,14 +107,14 @@ class RealmTests: TestCase {
         try! fileManager.setAttributes([FileAttributeKey.posixPermissions: permissions], ofItemAtPath: testRealmURL().path)
     }
 
-    #if DEBUG
+    #if !SWIFT_PACKAGE && DEBUG
     func testFileFormatUpgradeRequiredButDisabled() {
         var config = Realm.Configuration()
-        var bundledRealmPath = NSBundle(forClass: RealmTests.self).pathForResource("fileformat-pre-null.realm",
-                                                                                   ofType: nil)!
-        try! NSFileManager.defaultManager.copyItemAtPath(bundledRealmPath, toPath: config.path)
+        let bundledRealmPath = Bundle(for: RealmTests.self).path(forResource: "fileformat-pre-null.realm",
+                                                                 ofType: nil)!
+        try! FileManager.default.copyItem(atPath: bundledRealmPath, toPath: config.fileURL!.path)
         config.disableFormatUpgrade = true
-        assertFails(Error.FileFormatUpgradeRequired) {
+        assertFails(Realm.Error.fileFormatUpgradeRequired) {
             try Realm(configuration: config)
         }
     }

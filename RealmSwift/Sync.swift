@@ -904,7 +904,7 @@ public enum SyncSubscriptionState: Equatable {
 /// Changes to the state of the subscription can be observed using `SyncSubscription.observe(_:options:_:)`.
 ///
 /// Subscriptions are created using `Results.subscribe()` or `Results.subscribe(named:)`.
-public class SyncSubscription<T: RealmCollectionValue>: RealmCollectionValue {
+public final class SyncSubscription<T: RealmCollectionValue>: RealmCollectionValue {
     private let rlmSubscription: RLMSyncSubscription
 
     /// The name of the subscription.
@@ -1015,6 +1015,16 @@ public class SyncSubscription<T: RealmCollectionValue>: RealmCollectionValue {
     /// device is currently offline, the removal will not be processed until the device returns online.
     public func unsubscribe() {
         rlmSubscription.unsubscribe()
+    }
+}
+
+// :nodoc:
+extension SyncSubscription: CustomObjectiveCBridgeable {
+    static func bridging(objCValue: Any) -> SyncSubscription {
+        return ObjectiveCSupport.convert(object: RLMCastToSyncSubscription(objCValue)) as! SyncSubscription<T>
+    }
+    var objCValue: Any {
+        return 0
     }
 }
 

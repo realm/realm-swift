@@ -32,8 +32,6 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
-#import "RLMSyncManager_Private.h"
-#import "RLMSyncUtil_Private.hpp"
 #import "RLMThreadSafeReference_Private.hpp"
 #import "RLMUpdateChecker.hpp"
 #import "RLMUtil.hpp"
@@ -47,7 +45,12 @@
 #include <realm/util/scope_exit.hpp>
 #include <realm/version.hpp>
 
+#if REALM_ENABLE_SYNC
+#import "RLMSyncManager_Private.h"
+#import "RLMSyncUtil_Private.hpp"
+
 #import "sync/sync_session.hpp"
+#endif
 
 using namespace realm;
 using util::File;
@@ -189,6 +192,7 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 // causes issues for asyncOpen because it means that when our download completes
 // we don't actually have the full Realm state yet.
 static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
+#if REALM_ENABLE_SYNC
     auto realm = Realm::get_shared_realm(config);
     auto table = ObjectStore::table_for_object_type(realm->read_group(), "__ResultSets");
 
@@ -216,6 +220,9 @@ static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
         });
     });
     CFRunLoopRun();
+#else
+    static_cast<void>(config);
+#endif
 }
 
 + (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
@@ -886,6 +893,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
     return NO;
 }
 
+#if REALM_ENABLE_SYNC
 using Privilege = realm::ComputedPrivileges;
 static bool hasPrivilege(realm::ComputedPrivileges actual, realm::ComputedPrivileges expected) {
     return (static_cast<int>(actual) & static_cast<int>(expected)) == static_cast<int>(expected);
@@ -929,6 +937,7 @@ static bool hasPrivilege(realm::ComputedPrivileges actual, realm::ComputedPrivil
         .create = hasPrivilege(p, Privilege::Create),
     };
 }
+#endif
 
 - (void)registerEnumerator:(RLMFastEnumerator *)enumerator {
     if (!_collectionEnumerators) {

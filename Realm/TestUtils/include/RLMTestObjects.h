@@ -291,7 +291,7 @@ RLM_ARRAY_TYPE(CircleObject);
 
 #pragma mark DynamicObject
 
-@interface DynamicObject : RLMObject
+@interface DynamicTestObject : RLMObject
 
 @property NSString *stringCol;
 @property int intCol;

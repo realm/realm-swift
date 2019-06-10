@@ -550,47 +550,47 @@ class SwiftGenericPropsOrderingHelper: Object {
     @objc dynamic var second: SwiftGenericPropsOrderingObject?
 }
 
-class RenamedProperties1: Object {
+class SwiftRenamedProperties1: Object {
     @objc dynamic var propA = 0
     @objc dynamic var propB = ""
-    let linking1 = LinkingObjects(fromType: LinkToRenamedProperties1.self, property: "linkA")
-    let linking2 = LinkingObjects(fromType: LinkToRenamedProperties2.self, property: "linkD")
+    let linking1 = LinkingObjects(fromType: LinkToSwiftRenamedProperties1.self, property: "linkA")
+    let linking2 = LinkingObjects(fromType: LinkToSwiftRenamedProperties2.self, property: "linkD")
 
-    override class func _realmObjectName() -> String { return "Renamed Properties" }
+    override class func _realmObjectName() -> String { return "Swift Renamed Properties" }
     override class func _realmColumnNames() -> [String: String] {
         return ["propA": "prop 1", "propB": "prop 2"]
     }
 }
 
-class RenamedProperties2: Object {
+class SwiftRenamedProperties2: Object {
     @objc dynamic var propC = 0
     @objc dynamic var propD = ""
-    let linking1 = LinkingObjects(fromType: LinkToRenamedProperties1.self, property: "linkA")
-    let linking2 = LinkingObjects(fromType: LinkToRenamedProperties2.self, property: "linkD")
+    let linking1 = LinkingObjects(fromType: LinkToSwiftRenamedProperties1.self, property: "linkA")
+    let linking2 = LinkingObjects(fromType: LinkToSwiftRenamedProperties2.self, property: "linkD")
 
-    override class func _realmObjectName() -> String { return "Renamed Properties" }
+    override class func _realmObjectName() -> String { return "Swift Renamed Properties" }
     override class func _realmColumnNames() -> [String: String] {
         return ["propC": "prop 1", "propD": "prop 2"]
     }
 }
 
-class LinkToRenamedProperties1: Object {
-    @objc dynamic var linkA: RenamedProperties1?
-    @objc dynamic var linkB: RenamedProperties2?
-    let array1 = List<RenamedProperties1>()
+class LinkToSwiftRenamedProperties1: Object {
+    @objc dynamic var linkA: SwiftRenamedProperties1?
+    @objc dynamic var linkB: SwiftRenamedProperties2?
+    let array1 = List<SwiftRenamedProperties1>()
 
-    override class func _realmObjectName() -> String { return "Link To Renamed Properties" }
+    override class func _realmObjectName() -> String { return "Link To Swift Renamed Properties" }
     override class func _realmColumnNames() -> [String: String] {
         return ["linkA": "link 1", "linkB": "link 2", "array1": "array"]
     }
 }
 
-class LinkToRenamedProperties2: Object {
-    @objc dynamic var linkC: RenamedProperties1?
-    @objc dynamic var linkD: RenamedProperties2?
-    let array2 = List<RenamedProperties2>()
+class LinkToSwiftRenamedProperties2: Object {
+    @objc dynamic var linkC: SwiftRenamedProperties1?
+    @objc dynamic var linkD: SwiftRenamedProperties2?
+    let array2 = List<SwiftRenamedProperties2>()
 
-    override class func _realmObjectName() -> String { return "Link To Renamed Properties" }
+    override class func _realmObjectName() -> String { return "Link To Swift Renamed Properties" }
     override class func _realmColumnNames() -> [String: String] {
         return ["linkC": "link 1", "linkD": "link 2", "array2": "array"]
     }

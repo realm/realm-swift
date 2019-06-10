@@ -18,37 +18,38 @@
 
 import XCTest
 import Realm
+import RealmTestSupport
 
 let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 
-class SwiftUnicodeTests: RLMTestCase {
+class SwiftRLMUnicodeTests: RLMTestCase {
 
     // Swift models
 
     func testUTF8StringContents() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        _ = SwiftStringObject.create(in: realm, withValue: [utf8TestString])
+        _ = SwiftRLMStringObject.create(in: realm, withValue: [utf8TestString])
         try! realm.commitWriteTransaction()
 
-        let obj1 = SwiftStringObject.allObjects(in: realm).firstObject() as! SwiftStringObject
+        let obj1 = SwiftRLMStringObject.allObjects(in: realm).firstObject() as! SwiftRLMStringObject
         XCTAssertEqual(obj1.stringCol, utf8TestString, "Storing and retrieving a string with UTF8 content should work")
 
-        let obj2 = SwiftStringObject.objects(in: realm, where: "stringCol == %@", utf8TestString).firstObject() as! SwiftStringObject
+        let obj2 = SwiftRLMStringObject.objects(in: realm, where: "stringCol == %@", utf8TestString).firstObject() as! SwiftRLMStringObject
         XCTAssertTrue(obj1.isEqual(to: obj2), "Querying a realm searching for a string with UTF8 content should work")
     }
 
     func testUTF8PropertyWithUTF8StringContents() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        _ = SwiftUTF8Object.create(in: realm, withValue: [utf8TestString])
+        _ = SwiftRLMUTF8Object.create(in: realm, withValue: [utf8TestString])
         try! realm.commitWriteTransaction()
 
-        let obj1 = SwiftUTF8Object.allObjects(in: realm).firstObject() as! SwiftUTF8Object
+        let obj1 = SwiftRLMUTF8Object.allObjects(in: realm).firstObject() as! SwiftRLMUTF8Object
         XCTAssertEqual(obj1.柱колоéнǢкƱаم👍, utf8TestString, "Storing and retrieving a string with UTF8 content should work")
 
         // Test fails because of rdar://17735684
-//        let obj2 = SwiftUTF8Object.objectsInRealm(realm, "柱колоéнǢкƱаم👍 == %@", utf8TestString).firstObject() as SwiftUTF8Object
+//        let obj2 = SwiftRLMUTF8Object.objectsInRealm(realm, "柱колоéнǢкƱаم👍 == %@", utf8TestString).firstObject() as SwiftRLMUTF8Object
 //        XCTAssertEqual(obj1, obj2, "Querying a realm searching for a string with UTF8 content should work")
     }
 

@@ -19,41 +19,42 @@
 import XCTest
 import Realm
 import Realm.Private
+import RealmTestSupport
 
 class InitLinkedToClass: RLMObject {
-    @objc dynamic var value = SwiftIntObject(value: [0])
+    @objc dynamic var value: SwiftRLMIntObject! = SwiftRLMIntObject(value: [0])
 }
 
-class SwiftNonDefaultObject: RLMObject {
+class SwiftRLMNonDefaultObject: RLMObject {
     @objc dynamic var value = 0
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
 }
 
-class SwiftLinkedNonDefaultObject: RLMObject {
-    @objc dynamic var obj: SwiftNonDefaultObject?
+class SwiftRLMLinkedNonDefaultObject: RLMObject {
+    @objc dynamic var obj: SwiftRLMNonDefaultObject?
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
 }
 
-class SwiftNonDefaultArrayObject: RLMObject {
-    @objc dynamic var array = RLMArray<SwiftNonDefaultObject>(objectClassName: SwiftNonDefaultObject.className())
+class SwiftRLMNonDefaultArrayObject: RLMObject {
+    @objc dynamic var array = RLMArray<SwiftRLMNonDefaultObject>(objectClassName: SwiftRLMNonDefaultObject.className())
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
 }
 
-class SwiftMutualLink1Object: RLMObject {
-    @objc dynamic var object: SwiftMutualLink2Object?
+class SwiftRLMMutualLink1Object: RLMObject {
+    @objc dynamic var object: SwiftRLMMutualLink2Object?
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
 }
 
-class SwiftMutualLink2Object: RLMObject {
-    @objc dynamic var object: SwiftMutualLink1Object?
+class SwiftRLMMutualLink2Object: RLMObject {
+    @objc dynamic var object: SwiftRLMMutualLink1Object?
     public override class func shouldIncludeInDefaultSchema() -> Bool {
         return false
     }
@@ -61,18 +62,18 @@ class SwiftMutualLink2Object: RLMObject {
 
 class IgnoredLinkPropertyObject : RLMObject {
     @objc dynamic var value = 0
-    var obj = SwiftIntObject()
+    var obj = SwiftRLMIntObject()
 
     override class func ignoredProperties() -> [String] {
         return ["obj"]
     }
 }
 
-class SwiftRecursingSchemaTestObject : RLMObject {
-    @objc dynamic var propertyWithIllegalDefaultValue: SwiftIntObject? = {
+class SwiftRLMRecursingSchemaTestObject : RLMObject {
+    @objc dynamic var propertyWithIllegalDefaultValue: SwiftRLMIntObject? = {
         if mayAccessSchema {
             let realm = RLMRealm.default()
-            return SwiftIntObject.allObjects().firstObject() as! SwiftIntObject?
+            return SwiftRLMIntObject.allObjects().firstObject() as! SwiftRLMIntObject?
         } else {
             return nil
         }
@@ -82,24 +83,28 @@ class SwiftRecursingSchemaTestObject : RLMObject {
 }
 
 class InvalidArrayType: FakeObject {
-    @objc dynamic var array = RLMArray<SwiftIntObject>(objectClassName: "invalid class")
+    @objc dynamic var array = RLMArray<SwiftRLMIntObject>(objectClassName: "invalid class")
 }
 
 class InitAppendsToArrayProperty : RLMObject {
-    @objc dynamic var propertyWithIllegalDefaultValue: RLMArray<SwiftIntObject> = {
+    @objc dynamic var propertyWithIllegalDefaultValue: RLMArray<InitAppendsToArrayValue> = {
         if mayAppend {
-            let array = RLMArray<SwiftIntObject>(objectClassName: SwiftIntObject.className())
-            array.add(SwiftIntObject())
+            let array = RLMArray<InitAppendsToArrayValue>(objectClassName: InitAppendsToArrayValue.className())
+            array.add(InitAppendsToArrayValue())
             return array
         } else {
-            return RLMArray<SwiftIntObject>(objectClassName: SwiftIntObject.className())
+            return RLMArray<InitAppendsToArrayValue>(objectClassName: InitAppendsToArrayValue.className())
         }
     }()
 
     static var mayAppend = false
 }
 
-class SwiftSchemaTests: RLMMultiProcessTestCase {
+class InitAppendsToArrayValue : RLMObject {
+    @objc dynamic var value: Int = 0
+}
+
+class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
     func testWorksAtAll() {
         if isParent {
             XCTAssertEqual(0, runChildAndWait(), "Tests in child process failed")
@@ -128,9 +133,9 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         }
 
         // Object in default schema
-        _ = SwiftIntObject()
+        _ = SwiftRLMIntObject()
         // Object not in default schema
-        _ = SwiftNonDefaultObject()
+        _ = SwiftRLMNonDefaultObject()
     }
 
     func testCreateUnmanagedObjectWithNestedObjectWithUninitializedSchema() {
@@ -146,12 +151,12 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         _ = InitLinkedToClass()
         // Again with an object that links to an unintialized type
         // rather than creating one
-        _ = SwiftCompanyObject()
+        _ = SwiftRLMCompanyObject()
 
         // Objects not in default schema
-        _ = SwiftLinkedNonDefaultObject(value: [[1]])
-        _ = SwiftNonDefaultArrayObject(value: [[[1]]])
-        _ = SwiftMutualLink1Object(value: [[[:]]])
+        _ = SwiftRLMLinkedNonDefaultObject(value: [[1]])
+        _ = SwiftRLMNonDefaultArrayObject(value: [[[1]]])
+        _ = SwiftRLMMutualLink1Object(value: [[[:]]])
     }
 
     func testCreateUnmanagedObjectWhichCreatesAnotherClassViaInitWithValueDuringSchemaInit() {
@@ -161,7 +166,7 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
         }
 
         _ = InitLinkedToClass(value: [[0]])
-        _ = SwiftCompanyObject(value: [[["Jaden", 20, false]]])
+        _ = SwiftRLMCompanyObject(value: [[["Jaden", 20, false]]])
     }
 
     func testInitUnmanagedObjectNotInClassSubsetDuringSchemaInit() {
@@ -186,7 +191,7 @@ class SwiftSchemaTests: RLMMultiProcessTestCase {
             return
         }
 
-        SwiftRecursingSchemaTestObject.mayAccessSchema = true
+        SwiftRLMRecursingSchemaTestObject.mayAccessSchema = true
         assertThrowsWithReasonMatching(RLMSchema.shared(), ".*recursive.*")
     }
 

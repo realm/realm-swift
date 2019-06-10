@@ -1,5 +1,6 @@
 SUPPORTED_PLATFORMS = macosx iphonesimulator iphoneos appletvos appletvsimulator;
 
+CODE_SIGN_IDENTITY = "-";
 COPY_PHASE_STRIP = NO;
 LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks;
 INFOPLIST_FILE = Realm/Tests/TestHost/Info.plist;

@@ -396,11 +396,18 @@ public final class DynamicObject: Object {
 @objc(RealmSwiftObjectUtil)
 public class ObjectUtil: NSObject {
     @objc private class func swiftVersion() -> NSString {
+#if SWIFT_PACKAGE
+        return "5.1"
+#else
         return swiftLanguageVersion as NSString
+#endif
     }
 
     @objc private class func ignoredPropertiesForClass(_ type: AnyClass) -> NSArray? {
         if let type = type as? Object.Type {
+            return type.ignoredProperties() as NSArray?
+        }
+        if let type = type as? RLMObject.Type {
             return type.ignoredProperties() as NSArray?
         }
         return nil
@@ -410,10 +417,16 @@ public class ObjectUtil: NSObject {
         if let type = type as? Object.Type {
             return type.indexedProperties() as NSArray?
         }
+        if let type = type as? RLMObject.Type {
+            return type.indexedProperties() as NSArray?
+        }
         return nil
     }
 
     @objc private class func linkingObjectsPropertiesForClass(_ type: AnyClass) -> NSDictionary? {
+        if let type = type as? RLMObject.Type {
+            return type.linkingObjectsProperties() as NSDictionary?
+        }
         // Not used for Swift. getLinkingObjectsProperties(_:) is used instead.
         return nil
     }
@@ -460,6 +473,11 @@ public class ObjectUtil: NSObject {
             if let lazyBaseName = baseName(forLazySwiftProperty: label) {
                 if ignoredPropNames.contains(lazyBaseName) {
                     // Ignored lazy property.
+                    return false
+                }
+                if object is RLMObject {
+                    // Implicitly ignore lazy properties on RLMObject subclasses
+                    // FIXME: should align RLMObject/Object behavior in 4.0
                     return false
                 }
                 // Managed lazy property; not currently supported.

@@ -33,7 +33,11 @@ NSData *RLMGenerateKey(void);
 }
 #endif
 
-@interface RLMTestCase : XCTestCase
+@interface RLMTestCaseBase : XCTestCase
+- (void)resetRealmState;
+@end
+
+@interface RLMTestCase : RLMTestCaseBase
 
 - (RLMRealm *)realmWithTestPath;
 - (RLMRealm *)realmWithTestPathAndSchema:(nullable RLMSchema *)schema;
