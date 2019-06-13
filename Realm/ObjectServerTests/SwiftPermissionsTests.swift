@@ -77,7 +77,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         // Create a new Realm with an admin user
         let admin = createAdminUser(for: SwiftSyncTestCase.authServerURL(),
                                     username: UUID().uuidString + "-admin")
-        let url = URL(string: "realm://127.0.0.1:9080/\(name)")!
+        let url = URL(string: "realm://127.0.0.1:9080/\(name.replacingOccurrences(of: "()", with: ""))")!
         let adminRealm = openRealm(url, admin)
         // FIXME: we currently need to add a subscription to get the permissions types sent to us
         subscribe(realm: adminRealm, type: SwiftSyncObject.self)
@@ -140,6 +140,22 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
 
 
     // MARK: Tests
+
+    func testAsyncOpenWaitsForPermissions() {
+        let url = createRealm(name: #function) { realm in
+            createDefaultPermisisons(realm.permissions)
+            add(user: userA, toRole: "reader", inRealm: realm)
+        }
+
+        let ex = expectation(description: "asyncOpen")
+        Realm.asyncOpen(configuration: userA.configuration(realmURL: url)) { realm, error in
+            XCTAssertNil(error)
+            // Will crash if the __Class object for swiftSyncObject wasn't downloaded
+            _ = realm!.permissions(forType: SwiftSyncObject.self)
+            ex.fulfill()
+        }
+        waitForExpectations(timeout: 10.0, handler: nil)
+    }
 
     func testRealmRead() {
         let url = createRealm(name: "testRealmRead") { realm in

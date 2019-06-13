@@ -6,8 +6,12 @@ x.y.z Release notes (yyyy-MM-dd)
   ([PR #6164](https://github.com/realm/realm-cocoa/pull/6164)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+* Using asyncOpen on query-based Realms which didn't already exist on the local
+  device would fail with error 214.
+  ([#6178](https://github.com/realm/realm-cocoa/issues/6178), since 3.16.0).
+* asyncOpen on query-based Realms did not wait for the server-created
+  permission objects to be downloaded, resulting in crashes if modifications to
+  the permissions were made before creating a subscription for the first time (since 3.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
