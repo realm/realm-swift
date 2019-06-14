@@ -1,24 +1,29 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.16.2 Release notes (2019-06-14)
 =============================================================
+
 ### Enhancements
+
 * Add support for Xcode 11 Beta 1. Xcode betas are only supported when building
   from source, and not when using a prebuilt framework.
   ([PR #6164](https://github.com/realm/realm-cocoa/pull/6164)).
 
 ### Fixed
+
 * Using asyncOpen on query-based Realms which didn't already exist on the local
   device would fail with error 214.
   ([#6178](https://github.com/realm/realm-cocoa/issues/6178), since 3.16.0).
 * asyncOpen on query-based Realms did not wait for the server-created
   permission objects to be downloaded, resulting in crashes if modifications to
   the permissions were made before creating a subscription for the first time (since 3.0.0).
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* EINTR was not handled correctly in the notification worker, which may have
+  resulted in inconsistent and rare assertion failures in
+  `ExternalCommitHelper::listen()` when building with assertions enabled.
+  (PR: [#804](https://github.com/realm/realm-object-store/pull/804), since 0.91.0).
 
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 * Carthage release for Swift is built with Xcode 10.2.1.
 
 3.16.1 Release notes (2019-05-31)
