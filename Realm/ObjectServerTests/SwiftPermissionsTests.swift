@@ -148,13 +148,24 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         }
 
         let ex = expectation(description: "asyncOpen")
+        var subscription: SyncSubscription<SwiftSyncObject>!
+        var token: NotificationToken!
         Realm.asyncOpen(configuration: userA.configuration(realmURL: url)) { realm, error in
             XCTAssertNil(error)
             // Will crash if the __Class object for swiftSyncObject wasn't downloaded
             _ = realm!.permissions(forType: SwiftSyncObject.self)
-            ex.fulfill()
+
+            // Make sure that the dummy subscription we created hasn't interfered
+            // with adding new subscriptions.
+            subscription = realm!.objects(SwiftSyncObject.self).subscribe()
+            token = subscription.observe(\.state, options: .initial) { state in
+                if state == .complete {
+                    ex.fulfill()
+                }
+            }
         }
         waitForExpectations(timeout: 10.0, handler: nil)
+        token.invalidate()
     }
 
     func testRealmRead() {

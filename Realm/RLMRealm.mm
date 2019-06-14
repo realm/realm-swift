@@ -193,7 +193,15 @@ static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
     auto table = ObjectStore::table_for_object_type(realm->read_group(), "__ResultSets");
 
     realm->begin_transaction();
-    realm::sync::create_object(realm->read_group(), *table);
+    size_t row = realm::sync::create_object(realm->read_group(), *table);
+
+    // Set expires_at to time 0 so that this object will be cleaned up the first
+    // time the user creates a subscription
+    size_t expires_at_col = table->get_column_index("expires_at");
+    if (expires_at_col == npos) {
+        expires_at_col = table->add_column(type_Timestamp, "expires_at", true);
+    }
+    table->set_timestamp(expires_at_col, row, Timestamp(0, 0));
     realm->commit_transaction();
 
     NotificationToken token;
