@@ -230,17 +230,31 @@ static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
                 return;
             }
 
-            bool needsSubscriptions = realm->is_partial() && ObjectStore::table_for_object_type(realm->read_group(), "__ResultSets")->size() == 0;
-            dispatch_async(queue, ^{
-                @autoreleasepool {
-                    if (needsSubscriptions) {
-                        waitForPartialSyncSubscriptions(realm->config());
+            auto complete = ^{
+                dispatch_async(callbackQueue, ^{
+                    @autoreleasepool {
+                        NSError *error;
+                        RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
+                        callback(localRealm, error);
                     }
-                    NSError *error;
-                    RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
-                    callback(localRealm, error);
-                }
-            });
+                });
+            };
+
+            bool needsSubscriptions = realm->is_partial() && ObjectStore::table_for_object_type(realm->read_group(), "__ResultSets")->size() == 0;
+            if (needsSubscriptions) {
+                // We need to dispatch back to the work queue to wait for the
+                // subscriptions as we're currently running on the sync worker
+                // thread and blocking it to wait for subscriptions means no syncing
+                dispatch_async(queue, ^{
+                    @autoreleasepool {
+                        waitForPartialSyncSubscriptions(realm->config());
+                        complete();
+                    }
+                });
+            }
+            else {
+                complete();
+            }
         }
     };
 
