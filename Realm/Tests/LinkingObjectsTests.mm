@@ -82,6 +82,9 @@
     PersonObject *mark = [[PersonObject alloc] initWithValue:@[ @"Mark", @30, @[] ]];
     XCTAssertEqual(NSNotFound, [don.parents indexOfObject:mark]);
     XCTAssertEqual(NSNotFound, [don.parents indexOfObjectWhere:@"TRUEPREDICATE"]);
+
+    RLMAssertThrowsWithReason(([don.parents addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) { }]),
+                              @"Linking objects notifications are only supported on managed objects.");
 }
 
 - (void)testFilteredLinkingObjects {
