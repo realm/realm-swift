@@ -88,10 +88,10 @@ class SwiftRLMAggregateObject: RLMObject {
 }
 
 class SwiftRLMAllIntSizesObject: RLMObject {
-    @objc dynamic var int8  : Int8  = 0
-    @objc dynamic var int16 : Int16 = 0
-    @objc dynamic var int32 : Int32 = 0
-    @objc dynamic var int64 : Int64 = 0
+    @objc dynamic var int8: Int8  = 0
+    @objc dynamic var int16: Int16 = 0
+    @objc dynamic var int32: Int32 = 0
+    @objc dynamic var int64: Int64 = 0
 }
 
 class SwiftRLMEmployeeObject: RLMObject {
@@ -153,13 +153,13 @@ class SwiftRLMLinkTargetObject: RLMObject {
     }
 }
 
-class SwiftRLMLazyVarObject : RLMObject {
-    @objc dynamic lazy var lazyProperty : String = "hello world"
+class SwiftRLMLazyVarObject: RLMObject {
+    @objc dynamic lazy var lazyProperty: String = "hello world"
 }
 
-class SwiftRLMIgnoredLazyVarObject : RLMObject {
+class SwiftRLMIgnoredLazyVarObject: RLMObject {
     @objc dynamic var id = 0
-    @objc dynamic lazy var ignoredVar : String = "hello world"
+    @objc dynamic lazy var ignoredVar: String = "hello world"
     override class func ignoredProperties() -> [String] { return ["ignoredVar"] }
 }
 

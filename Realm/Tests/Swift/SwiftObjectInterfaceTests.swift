@@ -27,7 +27,7 @@ class OuterClass {
     }
 }
 
-class SwiftRLMStringObjectSubclass : SwiftRLMStringObject {
+class SwiftRLMStringObjectSubclass: SwiftRLMStringObject {
     @objc dynamic var stringCol2 = ""
 }
 
@@ -300,16 +300,16 @@ class SwiftRLMObjectInterfaceTests: RLMTestCase {
         let realm = RLMRealm.default()
         realm.beginWriteTransaction()
         _ = SwiftRLMPrimaryStringObject.createOrUpdateInDefaultRealm(withValue: ["string", 1])
-        let objects = SwiftRLMPrimaryStringObject.allObjects();
-        XCTAssertEqual(objects.count, UInt(1), "Should have 1 object");
-        XCTAssertEqual((objects[0] as! SwiftRLMPrimaryStringObject).intCol, 1, "Value should be 1");
+        let objects = SwiftRLMPrimaryStringObject.allObjects()
+        XCTAssertEqual(objects.count, UInt(1), "Should have 1 object")
+        XCTAssertEqual((objects[0] as! SwiftRLMPrimaryStringObject).intCol, 1, "Value should be 1")
 
         _ = SwiftRLMPrimaryStringObject.createOrUpdateInDefaultRealm(withValue: ["stringCol": "string2", "intCol": 2])
         XCTAssertEqual(objects.count, UInt(2), "Should have 2 objects")
 
         _ = SwiftRLMPrimaryStringObject.createOrUpdateInDefaultRealm(withValue: ["string", 3])
         XCTAssertEqual(objects.count, UInt(2), "Should have 2 objects")
-        XCTAssertEqual((objects[0] as! SwiftRLMPrimaryStringObject).intCol, 3, "Value should be 3");
+        XCTAssertEqual((objects[0] as! SwiftRLMPrimaryStringObject).intCol, 3, "Value should be 3")
 
         try! realm.commitWriteTransaction()
     }
