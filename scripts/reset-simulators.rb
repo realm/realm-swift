@@ -106,8 +106,8 @@ begin
   end
   puts ' done!'
 
-  print 'Booting iPhone 6 simulator...'
-  system("xcrun simctl boot 'iPhone 6'") or raise "Failed to boot iPhone 6 simulator"
+  print 'Booting iPhone 8 simulator...'
+  system("xcrun simctl boot 'iPhone 8'") or raise "Failed to boot iPhone 8 simulator"
   puts ' done!'
 
 rescue => e
