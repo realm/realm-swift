@@ -2904,6 +2904,7 @@
 			baseConfigurationReference = 5DD755E31BE05EA1002800DA /* Tests iOS static.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
+				DEFINES_MODULE = YES;
 				INFOPLIST_FILE = "$(SRCROOT)/Realm/Tests/RealmTests-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.Realm.RealmTestSupport;
