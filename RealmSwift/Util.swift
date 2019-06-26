@@ -83,6 +83,7 @@ extension Object {
 
 // MARK: CustomObjectiveCBridgeable
 
+/// :nodoc:
 public func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
     if T.self == DynamicObject.self {
         return unsafeBitCast(x as AnyObject, to: T.self)
@@ -93,6 +94,7 @@ public func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
     }
 }
 
+/// :nodoc:
 public func dynamicBridgeCast<T>(fromSwift x: T) -> Any {
     if let x = x as? CustomObjectiveCBridgeable {
         return x.objCValue
