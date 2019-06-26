@@ -19,6 +19,7 @@ Pod::Spec.new do |s|
 
   s.dependency 'Realm', "= #{s.version}"
   s.source_files = 'RealmSwift/*.swift'
+  s.exclude_files = 'RealmSwift/Nonsync.swift'
 
   s.prepare_command           = 'sh build.sh cocoapods-setup swift'
   s.preserve_paths            = %w(build.sh)
