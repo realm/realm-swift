@@ -1,11 +1,17 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.17.0 Release notes (2019-06-28)
 =============================================================
+
 ### Enhancements
-* Add support for including Realm via Swift Package Manager.
+
+* Add support for including Realm via Swift Package Manager. This currently
+  requires depending on the branch "master" rather than pinning to a version
+  (i.e. `.package(url: "https://github.com/realm/realm-cocoa", .branch("master"))`).
+  ([#6187](https://github.com/realm/realm-cocoa/pull/6187)).
 * Add Codable conformance to RealmOptional and List, and Encodable conformance to Results.
   ([PR #6172](https://github.com/realm/realm-cocoa/pull/6172)).
 
 ### Fixed
+
 * Attempting to observe an unmanaged LinkingObjects object crashed rather than
   throwing an approriate exception (since v0.100.0).
 * Opening an encrypted Realm could potentially report that a valid file was
@@ -15,12 +21,10 @@ x.y.z Release notes (yyyy-MM-dd)
   due to a `FileNotFound` exception being thrown on a background worker thread.
   (since 3.16.0, [ObjectStore #806](https://github.com/realm/realm-object-store/pull/806)).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 * Carthage release for Swift is built with Xcode 10.2.1.
 
 3.16.2 Release notes (2019-06-14)
