@@ -1632,7 +1632,9 @@
     // actually compacted
     auto config = [user configurationWithURL:url fullSynchronization:true];
     __block bool blockCalled = false;
-    config.shouldCompactOnLaunch = ^(NSUInteger, NSUInteger){
+    __block NSUInteger usedSize = 0;
+    config.shouldCompactOnLaunch = ^(NSUInteger, NSUInteger used) {
+        usedSize = used;
         blockCalled = true;
         return YES;
     };
@@ -1644,9 +1646,7 @@
 
     auto finalSize = [[fileManager attributesOfItemAtPath:path error:nil][NSFileSize] unsignedLongLongValue];
     XCTAssertLessThan(finalSize, initialSize);
-    // Immediately after compaction the file is two pages (8192 bytes), but it
-    // grows to three pages shortly later due to sync performing a write
-    XCTAssertLessThanOrEqual(finalSize, 12288U);
+    XCTAssertLessThanOrEqual(finalSize, usedSize + 4096U);
 }
 
 #pragma mark - Offline Client Reset
