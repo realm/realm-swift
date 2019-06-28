@@ -83,7 +83,7 @@ begin
 
   runtimes_by_platform = Hash.new { |hash, key| hash[key] = [] }
   runtimes.each do |runtime|
-    next unless runtime['availability'] == '(available)'
+    next unless runtime['availability'] == '(available)' || runtime['isAvailable'] == true
     runtimes_by_platform[platform_for_runtime(runtime)] << runtime
   end
 
@@ -106,8 +106,8 @@ begin
   end
   puts ' done!'
 
-  print 'Booting iPhone 6 simulator...'
-  system("xcrun simctl boot 'iPhone 6'") or raise "Failed to boot iPhone 6 simulator"
+  print 'Booting iPhone 8 simulator...'
+  system("xcrun simctl boot 'iPhone 8'") or raise "Failed to boot iPhone 8 simulator"
   puts ' done!'
 
 rescue => e

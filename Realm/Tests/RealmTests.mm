@@ -30,6 +30,7 @@
 #import <thread>
 
 #import <realm/util/file.hpp>
+#import <realm/group_shared_options.hpp>
 
 @interface RLMRealm ()
 + (BOOL)isCoreDebug;
@@ -204,6 +205,7 @@
         XCTAssertEqualObjects(oldData, newData); \
 } while (0)
 
+#ifndef REALM_SPM
 - (void)testFileFormatUpgradeRequiredDeleteRealmIfNeeded {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.deleteRealmIfMigrationNeeded = YES;
@@ -263,6 +265,7 @@
     XCTAssertEqualObjects([NSData dataWithContentsOfURL:bundledRealmURL],
                           [NSData dataWithContentsOfURL:config.fileURL]);
 }
+#endif // REALM_SPM
 
 #if TARGET_OS_IPHONE && (!TARGET_IPHONE_SIMULATOR || !TARGET_RT_64_BIT)
 - (void)testExceedingVirtualAddressSpace {
@@ -1690,6 +1693,7 @@
 
 #pragma mark - Assorted tests
 
+#ifndef REALM_SPM
 - (void)testCoreDebug {
 #if DEBUG
     XCTAssertTrue([RLMRealm isCoreDebug], @"Debug version of Realm should use librealm{-ios}-dbg");
@@ -1697,6 +1701,7 @@
     XCTAssertFalse([RLMRealm isCoreDebug], @"Release version of Realm should use librealm{-ios}");
 #endif
 }
+#endif
 
 - (void)testIsEmpty {
     RLMRealm *realm = [RLMRealm defaultRealm];

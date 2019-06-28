@@ -17,14 +17,16 @@ command:
   test-ios-objc-carthage:          tests iOS Objective-C Carthage example.
   test-ios-swift-dynamic:          tests iOS Swift dynamic example.
   test-ios-swift-cocoapods:        tests iOS Swift CocoaPods example.
-  test-ios-swift-carthage:         tests iOS Objective-C Carthage example.
+  test-ios-swift-carthage:         tests iOS Swift Carthage example.
+  test-ios-spm:                    tests iOS Swift Package Manager example.
 
-  test-osx-objc-dynamic:           tests OS X Objective-C dynamic example.
-  test-osx-objc-cocoapods:         tests OS X Objective-C CocoaPods example.
-  test-osx-objc-carthage:          tests OS X Objective-C Carthage example.
-  test-osx-swift-dynamic:          tests OS X Swift dynamic example.
-  test-osx-swift-cocoapods:        tests OS X Swift CocoaPods example.
-  test-osx-swift-carthage:         tests OS X Swift Carthage example.
+  test-osx-objc-dynamic:           tests macOS Objective-C dynamic example.
+  test-osx-objc-cocoapods:         tests macOS Objective-C CocoaPods example.
+  test-osx-objc-carthage:          tests macOS Objective-C Carthage example.
+  test-osx-swift-dynamic:          tests macOS Swift dynamic example.
+  test-osx-swift-cocoapods:        tests macOS Swift CocoaPods example.
+  test-osx-swift-carthage:         tests macOS Swift Carthage example.
+  test-osx-spm:                    tests macOS Swift Package Manager example.
 
   test-watchos-objc-dynamic:       tests watchOS Objective-C dynamic example.
   test-watchos-objc-cocoapods:     tests watchOS Objective-C CocoaPods example.
@@ -32,6 +34,9 @@ command:
   test-watchos-swift-dynamic:      tests watchOS Swift dynamic example.
   test-watchos-swift-cocoapods:    tests watchOS Swift CocoaPods example.
   test-watchos-swift-carthage:     tests watchOS Swift Carthage example.
+  test-watchos-spm:                tests watchOS Swift Package Manager example.
+
+  test-tvos-spm:                   tests tvOS Swift Package Manager example.
 EOF
 }
 
@@ -49,6 +54,10 @@ download_zip_if_needed() {
         rm $DIRECTORY.zip
         mv realm-$LANG-* $DIRECTORY
     fi
+}
+
+xcode_version_major() {
+    echo "${REALM_XCODE_VERSION%%.*}"
 }
 
 xctest() {
@@ -114,94 +123,52 @@ xctest() {
     fi
 }
 
+swiftpm() {
+    PLATFORM="$1"
+    cd SwiftPMExample
+    xcrun swift build
+}
+
 source "$(dirname "$0")/../../scripts/swift-version.sh"
 set_xcode_and_swift_versions # exports REALM_SWIFT_VERSION, REALM_XCODE_VERSION, and DEVELOPER_DIR variables if not already set
+
+PLATFORM=$(echo $COMMAND | cut -d - -f 2)
+LANGUAGE=$(echo $COMMAND | cut -d - -f 3)
 
 case "$COMMAND" in
     "test-all")
         for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage; do
             ./build.sh test-$target || exit 1
         done
+        if (( $(xcode_version_major) >= 11 )); then
+            for target in ios osx watchos tvos; do
+                ./build.sh test-$target-spm || exit 1
+            done
+        fi
         ;;
 
-    "test-ios-objc-static")
-        xctest ios objc StaticExample
+    test-*-*-static)
+        xctest $PLATFORM $LANGUAGE StaticExample
         ;;
 
-    "test-ios-objc-dynamic")
-        xctest ios objc DynamicExample
+    test-*-*-dynamic)
+        xctest $PLATFORM $LANGUAGE DynamicExample
         ;;
 
-    "test-ios-objc-cocoapods")
-        xctest ios objc CocoaPodsExample
+    test-*-*-cocoapods)
+        xctest $PLATFORM $LANGUAGE CocoaPodsExample
         ;;
 
-    "test-ios-objc-cocoapods-dynamic")
-        xctest ios objc CocoaPodsDynamicExample
+    test-*-*-cocoapods-dynamic)
+        xctest $PLATFORM $LANGUAGE CocoaPodsDynamicExample
         ;;
 
-    "test-ios-objc-carthage")
-        xctest ios objc CarthageExample
+    test-*-*-carthage)
+        xctest $PLATFORM $LANGUAGE CarthageExample
         ;;
 
-    "test-ios-swift-dynamic")
-        xctest ios swift DynamicExample
-        ;;
-
-    "test-ios-swift-cocoapods")
-        xctest ios swift CocoaPodsExample
-        ;;
-
-    "test-ios-swift-carthage")
-        xctest ios swift CarthageExample
-        ;;
-
-    "test-osx-objc-dynamic")
-        xctest osx objc DynamicExample
-        ;;
-
-    "test-osx-objc-cocoapods")
-        xctest osx objc CocoaPodsExample
-        ;;
-
-    "test-osx-objc-carthage")
-        xctest osx objc CarthageExample
-        ;;
-
-    "test-osx-swift-dynamic")
-        xctest osx swift DynamicExample
-        ;;
-
-    "test-osx-swift-cocoapods")
-        xctest osx swift CocoaPodsExample
-        ;;
-
-    "test-osx-swift-carthage")
-        xctest osx swift CarthageExample
-        ;;
-
-    "test-watchos-objc-dynamic")
-        xctest watchos objc DynamicExample
-        ;;
-
-    "test-watchos-objc-cocoapods")
-        xctest watchos objc CocoaPodsExample
-        ;;
-
-    "test-watchos-objc-carthage")
-        xctest watchos objc CarthageExample
-        ;;
-
-    "test-watchos-swift-dynamic")
-        xctest watchos swift DynamicExample
-        ;;
-
-    "test-watchos-swift-cocoapods")
-        xctest watchos swift CocoaPodsExample
-        ;;
-
-    "test-watchos-swift-carthage")
-        xctest watchos swift CarthageExample
+    test-*-spm)
+        swiftpm $PLATFORM
         ;;
 
     *)

@@ -20,7 +20,10 @@
 
 #import "RLMConstants.h"
 #import "RLMUtil.hpp"
+
+#ifndef REALM_COCOA_VERSION
 #import "RLMVersion.h"
+#endif
 
 #import "shared_realm.hpp"
 

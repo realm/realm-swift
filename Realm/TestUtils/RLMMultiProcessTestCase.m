@@ -93,14 +93,15 @@
 }
 
 - (NSString *)locateXCTest {
-    NSString *pathString = [NSProcessInfo processInfo].environment[@"PATH"];
+    NSProcessInfo *info = [NSProcessInfo processInfo];
+    NSString *pathString = info.environment[@"PATH"];
     NSFileManager *fileManager = [NSFileManager defaultManager];
     for (NSString *directory in [pathString componentsSeparatedByString:@":"]) {
         NSString *candidatePath = [directory stringByAppendingPathComponent:@"xctest"];
         if ([fileManager isExecutableFileAtPath:candidatePath])
             return candidatePath;
     }
-    return nil;
+    return info.arguments[0];
 }
 
 #if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR

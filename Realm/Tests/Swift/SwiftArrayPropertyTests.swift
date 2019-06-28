@@ -18,13 +18,14 @@
 
 import XCTest
 import Realm
+import RealmTestSupport
 
-class SwiftArrayPropertyTests: RLMTestCase {
+class SwiftRLMArrayPropertyTests: RLMTestCase {
 
     // Swift models
 
     func testBasicArray() {
-        let string = SwiftStringObject()
+        let string = SwiftRLMStringObject()
         string.stringCol = "string"
 
         let realm = realmWithTestPath()
@@ -32,9 +33,9 @@ class SwiftArrayPropertyTests: RLMTestCase {
         realm.add(string)
         try! realm.commitWriteTransaction()
 
-        XCTAssertEqual(SwiftStringObject.allObjects(in: realm).count, UInt(1), "There should be a single SwiftStringObject in the realm")
+        XCTAssertEqual(SwiftRLMStringObject.allObjects(in: realm).count, UInt(1), "There should be a single SwiftRLMStringObject in the realm")
 
-        let array = SwiftArrayPropertyObject()
+        let array = SwiftRLMArrayPropertyObject()
         array.name = "arrayObject"
         array.array.add(string)
         XCTAssertEqual(array.array.count, UInt(1))
@@ -45,9 +46,9 @@ class SwiftArrayPropertyTests: RLMTestCase {
         array.array.add(string)
         try! realm.commitWriteTransaction()
 
-        let arrayObjects = SwiftArrayPropertyObject.allObjects(in: realm) as! RLMResults<SwiftArrayPropertyObject>
+        let arrayObjects = SwiftRLMArrayPropertyObject.allObjects(in: realm) as! RLMResults<SwiftRLMArrayPropertyObject>
 
-        XCTAssertEqual(arrayObjects.count, UInt(1), "There should be a single SwiftStringObject in the realm")
+        XCTAssertEqual(arrayObjects.count, UInt(1), "There should be a single SwiftRLMStringObject in the realm")
         let cmp = arrayObjects.firstObject()!.array.firstObject()!
         XCTAssertTrue(string.isEqual(to: cmp), "First array object should be the string object we added")
     }
@@ -56,14 +57,14 @@ class SwiftArrayPropertyTests: RLMTestCase {
         let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
-        let array = SwiftArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []]);
+        let array = SwiftRLMArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []])
         XCTAssertNotNil(array.array, "Should be able to get an empty array")
         XCTAssertEqual(array.array.count, UInt(0), "Should start with no array elements")
 
-        let obj = SwiftStringObject()
+        let obj = SwiftRLMStringObject()
         obj.stringCol = "a"
         array.array.add(obj)
-        array.array.add(SwiftStringObject.create(in: realm, withValue: ["b"]))
+        array.array.add(SwiftRLMStringObject.create(in: realm, withValue: ["b"]))
         array.array.add(obj)
         try! realm.commitWriteTransaction()
 
@@ -80,15 +81,15 @@ class SwiftArrayPropertyTests: RLMTestCase {
     func testModifyDetatchedArray() {
         let realm = realmWithTestPath()
         realm.beginWriteTransaction()
-        let arObj = SwiftArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []])
+        let arObj = SwiftRLMArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []])
         XCTAssertNotNil(arObj.array, "Should be able to get an empty array")
         XCTAssertEqual(arObj.array.count, UInt(0), "Should start with no array elements")
 
-        let obj = SwiftStringObject()
+        let obj = SwiftRLMStringObject()
         obj.stringCol = "a"
         let array = arObj.array
         array.add(obj)
-        array.add(SwiftStringObject.create(in: realm, withValue: ["b"]))
+        array.add(SwiftRLMStringObject.create(in: realm, withValue: ["b"]))
         try! realm.commitWriteTransaction()
 
         XCTAssertEqual(array.count, UInt(2), "Should have two elements in array")
@@ -101,27 +102,27 @@ class SwiftArrayPropertyTests: RLMTestCase {
 
         realm.beginWriteTransaction()
 
-        let obj = SwiftArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []])
-        let child1 = SwiftStringObject.create(in: realm, withValue: ["a"])
-        let child2 = SwiftStringObject()
+        let obj = SwiftRLMArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []])
+        let child1 = SwiftRLMStringObject.create(in: realm, withValue: ["a"])
+        let child2 = SwiftRLMStringObject()
         child2.stringCol = "b"
         obj.array.addObjects([child2, child1] as NSArray)
         try! realm.commitWriteTransaction()
 
-        let children = SwiftStringObject.allObjects(in: realm)
-        XCTAssertEqual((children[0] as! SwiftStringObject).stringCol, "a", "First child should be 'a'")
-        XCTAssertEqual((children[1] as! SwiftStringObject).stringCol, "b", "Second child should be 'b'")
+        let children = SwiftRLMStringObject.allObjects(in: realm)
+        XCTAssertEqual((children[0] as! SwiftRLMStringObject).stringCol, "a", "First child should be 'a'")
+        XCTAssertEqual((children[1] as! SwiftRLMStringObject).stringCol, "b", "Second child should be 'b'")
     }
 
     // FIXME: Support unmanaged RLMArray's in Swift-defined models
     //    func testUnmanaged() {
     //        let realm = realmWithTestPath()
     //
-    //        let array = SwiftArrayPropertyObject()
+    //        let array = SwiftRLMArrayPropertyObject()
     //        array.name = "name"
     //        XCTAssertNotNil(array.array, "RLMArray property should get created on access")
     //
-    //        let obj = SwiftStringObject()
+    //        let obj = SwiftRLMStringObject()
     //        obj.stringCol = "a"
     //        array.array.addObject(obj)
     //        array.array.addObject(obj)
@@ -131,8 +132,8 @@ class SwiftArrayPropertyTests: RLMTestCase {
     //        try! realm.commitWriteTransaction()
     //
     //        XCTAssertEqual(array.array.count, UInt(2), "Should have two elements in array")
-    //        XCTAssertEqual((array.array[0] as SwiftStringObject).stringCol, "a", "First element should have property value 'a'")
-    //        XCTAssertEqual((array.array[1] as SwiftStringObject).stringCol, "a", "Second element should have property value 'a'")
+    //        XCTAssertEqual((array.array[0] as SwiftRLMStringObject).stringCol, "a", "First element should have property value 'a'")
+    //        XCTAssertEqual((array.array[1] as SwiftRLMStringObject).stringCol, "a", "Second element should have property value 'a'")
     //    }
 
     // Objective-C models
@@ -167,7 +168,7 @@ class SwiftArrayPropertyTests: RLMTestCase {
         let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
-        let array = ArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []]);
+        let array = ArrayPropertyObject.create(in: realm, withValue: ["arrayObject", [], []])
         XCTAssertNotNil(array.array, "Should be able to get an empty array")
         XCTAssertEqual(array.array.count, UInt(0), "Should start with no array elements")
 

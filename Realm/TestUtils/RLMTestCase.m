@@ -71,10 +71,7 @@ static BOOL encryptTests() {
     return encryptAll;
 }
 
-@implementation RLMTestCase {
-    dispatch_queue_t _bgQueue;
-}
-
+@implementation RLMTestCaseBase
 + (void)setUp {
     [super setUp];
 #if DEBUG || !TARGET_OS_IPHONE || TARGET_IPHONE_SIMULATOR
@@ -105,6 +102,16 @@ static BOOL encryptTests() {
     [RLMSchema sharedSchema];
 }
 
+// A hook point for subclasses to override the cleanup
+- (void)resetRealmState {
+    [RLMRealm resetRealmState];
+}
+@end
+
+@implementation RLMTestCase {
+    dispatch_queue_t _bgQueue;
+}
+
 - (void)deleteFiles {
     // Clear cache
     [self resetRealmState];
@@ -114,12 +121,7 @@ static BOOL encryptTests() {
     [self deleteRealmFileAtURL:RLMTestRealmURL()];
 }
 
-- (void)resetRealmState {
-    [RLMRealm resetRealmState];
-}
-
-- (void)deleteRealmFileAtURL:(NSURL *)fileURL
-{
+- (void)deleteRealmFileAtURL:(NSURL *)fileURL {
     deleteOrThrow(fileURL);
     deleteOrThrow([fileURL URLByAppendingPathExtension:@"lock"]);
     deleteOrThrow([fileURL URLByAppendingPathExtension:@"note"]);
@@ -146,8 +148,7 @@ static BOOL encryptTests() {
     }
 }
 
-- (RLMRealm *)realmWithTestPath
-{
+- (RLMRealm *)realmWithTestPath {
     return [RLMRealm realmWithURL:RLMTestRealmURL()];
 }
 
@@ -214,8 +215,7 @@ static BOOL encryptTests() {
     dispatch_sync(_bgQueue, ^{});
 }
 
-- (id)nonLiteralNil
-{
+- (id)nonLiteralNil {
     return nil;
 }
 

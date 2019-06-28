@@ -17,18 +17,36 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "TestUtils.h"
+#import "RLMAssertions.h"
 
 #import <Realm/Realm.h>
 #import <Realm/RLMSchema_Private.h>
 
 #import "RLMRealmUtil.hpp"
 
-// This ensures the shared schema is initialized outside of of a test case,
-// so if an exception is thrown, it will kill the test process rather than
-// allowing hundreds of test cases to fail in strange ways
-__attribute((constructor))
-static void initializeSharedSchema() {
-    [RLMSchema sharedSchema];
+void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
+                                            __attribute__((noescape)) dispatch_block_t block,
+                                            NSString *regexString, NSString *message,
+                                            NSString *fileName, NSUInteger lineNumber) {
+    BOOL didThrow = NO;
+    @try {
+        block();
+    }
+    @catch (NSException *e) {
+        didThrow = YES;
+        NSString *reason = e.reason;
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regexString options:(NSRegularExpressionOptions)0 error:nil];
+        if ([regex numberOfMatchesInString:reason options:(NSMatchingOptions)0 range:NSMakeRange(0, reason.length)] == 0) {
+            NSString *msg = [NSString stringWithFormat:@"The given expression threw an exception with reason '%@', but expected to match '%@'",
+                             reason, regexString];
+            [self recordFailureWithDescription:msg inFile:fileName atLine:lineNumber expected:NO];
+        }
+    }
+    if (!didThrow) {
+        NSString *prefix = @"The given expression failed to throw an exception";
+        message = message ? [NSString stringWithFormat:@"%@ (%@)",  prefix, message] : prefix;
+        [self recordFailureWithDescription:message inFile:fileName atLine:lineNumber expected:NO];
+    }
 }
 
 static void assertThrows(XCTestCase *self, dispatch_block_t block, NSString *message,
@@ -47,8 +65,8 @@ static void assertThrows(XCTestCase *self, dispatch_block_t block, NSString *mes
     }
 }
 
-void RLMAssertThrowsWithName(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block,
-                             NSString *name, NSString *message, NSString *fileName, NSUInteger lineNumber) {
+void (RLMAssertThrowsWithName)(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block,
+                               NSString *name, NSString *message, NSString *fileName, NSUInteger lineNumber) {
     assertThrows(self, block, message, fileName, lineNumber, ^NSString *(NSException *e) {
         if ([name isEqualToString:e.name]) {
             return nil;
@@ -58,8 +76,8 @@ void RLMAssertThrowsWithName(XCTestCase *self, __attribute__((noescape)) dispatc
     });
 }
 
-void RLMAssertThrowsWithReason(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block,
-                               NSString *expected, NSString *message, NSString *fileName, NSUInteger lineNumber) {
+void (RLMAssertThrowsWithReason)(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block,
+                                 NSString *expected, NSString *message, NSString *fileName, NSUInteger lineNumber) {
     assertThrows(self, block, message, fileName, lineNumber, ^NSString *(NSException *e) {
         if ([e.reason rangeOfString:expected].location != NSNotFound) {
             return nil;
@@ -69,9 +87,9 @@ void RLMAssertThrowsWithReason(XCTestCase *self, __attribute__((noescape)) dispa
     });
 }
 
-void RLMAssertThrowsWithReasonMatching(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block,
-                                       NSString *regexString, NSString *message,
-                                       NSString *fileName, NSUInteger lineNumber) {
+void (RLMAssertThrowsWithReasonMatching)(XCTestCase *self, __attribute__((noescape)) dispatch_block_t block,
+                                         NSString *regexString, NSString *message,
+                                         NSString *fileName, NSUInteger lineNumber) {
     auto regex = [NSRegularExpression regularExpressionWithPattern:regexString
                                                            options:(NSRegularExpressionOptions)0 error:nil];
     assertThrows(self, block, message, fileName, lineNumber, ^NSString *(NSException *e) {
@@ -84,8 +102,8 @@ void RLMAssertThrowsWithReasonMatching(XCTestCase *self, __attribute__((noescape
 }
 
 
-void RLMAssertMatches(XCTestCase *self, __attribute__((noescape)) NSString *(^block)(),
-                      NSString *regexString, NSString *message, NSString *fileName, NSUInteger lineNumber) {
+void (RLMAssertMatches)(XCTestCase *self, __attribute__((noescape)) NSString *(^block)(),
+                        NSString *regexString, NSString *message, NSString *fileName, NSUInteger lineNumber) {
     NSString *result = block();
     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:regexString options:(NSRegularExpressionOptions)0 error:nil];
     if ([regex numberOfMatchesInString:result options:(NSMatchingOptions)0 range:NSMakeRange(0, result.length)] == 0) {

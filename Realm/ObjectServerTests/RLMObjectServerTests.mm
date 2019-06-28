@@ -63,12 +63,6 @@
 }
 @end
 
-@implementation PersonObject
-+ (NSDictionary *)linkingObjectsProperties {
-    return @{@"parents": [RLMPropertyDescriptor descriptorWithClass:PersonObject.class propertyName:@"children"]};
-}
-@end
-
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
 

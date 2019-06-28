@@ -17,24 +17,25 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Realm
+import RealmTestSupport
 
-class SwiftStringObject: RLMObject {
+class SwiftRLMStringObject: RLMObject {
     @objc dynamic var stringCol = ""
 }
 
-class SwiftBoolObject: RLMObject {
+class SwiftRLMBoolObject: RLMObject {
     @objc dynamic var boolCol = false
 }
 
-class SwiftIntObject: RLMObject {
+class SwiftRLMIntObject: RLMObject {
     @objc dynamic var intCol = 0
 }
 
-class SwiftLongObject: RLMObject {
+class SwiftRLMLongObject: RLMObject {
     @objc dynamic var longCol: Int64 = 0
 }
 
-class SwiftObject: RLMObject {
+class SwiftRLMObject: RLMObject {
     @objc dynamic var boolCol = false
     @objc dynamic var intCol = 123
     @objc dynamic var floatCol = 1.23 as Float
@@ -42,19 +43,25 @@ class SwiftObject: RLMObject {
     @objc dynamic var stringCol = "a"
     @objc dynamic var binaryCol = "a".data(using: String.Encoding.utf8)
     @objc dynamic var dateCol = Date(timeIntervalSince1970: 1)
-    @objc dynamic var objectCol = SwiftBoolObject()
-    @objc dynamic var arrayCol = RLMArray<SwiftBoolObject>(objectClassName: SwiftBoolObject.className())
+    #if SWIFT_PACKAGE
+    // FIXME: we fail to check if an object property is actually optional unless
+    // RealmSwift happens to be loaded in the process
+    @objc dynamic var objectCol: SwiftRLMBoolObject! = SwiftRLMBoolObject()
+    #else
+    @objc dynamic var objectCol = SwiftRLMBoolObject()
+    #endif
+    @objc dynamic var arrayCol = RLMArray<SwiftRLMBoolObject>(objectClassName: SwiftRLMBoolObject.className())
 }
 
-class SwiftOptionalObject: RLMObject {
+class SwiftRLMOptionalObject: RLMObject {
     @objc dynamic var optStringCol: String?
     @objc dynamic var optNSStringCol: NSString?
     @objc dynamic var optBinaryCol: Data?
     @objc dynamic var optDateCol: Date?
-    @objc dynamic var optObjectCol: SwiftBoolObject?
+    @objc dynamic var optObjectCol: SwiftRLMBoolObject?
 }
 
-class SwiftPrimitiveArrayObject: RLMObject {
+class SwiftRLMPrimitiveArrayObject: RLMObject {
     @objc dynamic var stringCol = RLMArray<NSString>(objectType: .string, optional: false)
     @objc dynamic var optStringCol = RLMArray<NSObject>(objectType: .string, optional: true)
     @objc dynamic var dataCol = RLMArray<NSData>(objectType: .data, optional: false)
@@ -63,16 +70,16 @@ class SwiftPrimitiveArrayObject: RLMObject {
     @objc dynamic var optDateCol = RLMArray<NSObject>(objectType: .date, optional: true)
 }
 
-class SwiftDogObject: RLMObject {
+class SwiftRLMDogObject: RLMObject {
     @objc dynamic var dogName = ""
 }
 
-class SwiftOwnerObject: RLMObject {
+class SwiftRLMOwnerObject: RLMObject {
     @objc dynamic var name = ""
-    @objc dynamic var dog: SwiftDogObject? = SwiftDogObject()
+    @objc dynamic var dog: SwiftRLMDogObject? = SwiftRLMDogObject()
 }
 
-class SwiftAggregateObject: RLMObject {
+class SwiftRLMAggregateObject: RLMObject {
     @objc dynamic var intCol = 0
     @objc dynamic var floatCol = 0 as Float
     @objc dynamic var doubleCol = 0.0
@@ -80,39 +87,39 @@ class SwiftAggregateObject: RLMObject {
     @objc dynamic var dateCol = Date()
 }
 
-class SwiftAllIntSizesObject: RLMObject {
-    @objc dynamic var int8  : Int8  = 0
-    @objc dynamic var int16 : Int16 = 0
-    @objc dynamic var int32 : Int32 = 0
-    @objc dynamic var int64 : Int64 = 0
+class SwiftRLMAllIntSizesObject: RLMObject {
+    @objc dynamic var int8: Int8  = 0
+    @objc dynamic var int16: Int16 = 0
+    @objc dynamic var int32: Int32 = 0
+    @objc dynamic var int64: Int64 = 0
 }
 
-class SwiftEmployeeObject: RLMObject {
+class SwiftRLMEmployeeObject: RLMObject {
     @objc dynamic var name = ""
     @objc dynamic var age = 0
     @objc dynamic var hired = false
 }
 
-class SwiftCompanyObject: RLMObject {
-    @objc dynamic var employees = RLMArray<SwiftEmployeeObject>(objectClassName: SwiftEmployeeObject.className())
+class SwiftRLMCompanyObject: RLMObject {
+    @objc dynamic var employees = RLMArray<SwiftRLMEmployeeObject>(objectClassName: SwiftRLMEmployeeObject.className())
 }
 
-class SwiftArrayPropertyObject: RLMObject {
+class SwiftRLMArrayPropertyObject: RLMObject {
     @objc dynamic var name = ""
-    @objc dynamic var array = RLMArray<SwiftStringObject>(objectClassName: SwiftStringObject.className())
-    @objc dynamic var intArray = RLMArray<SwiftIntObject>(objectClassName: SwiftIntObject.className())
+    @objc dynamic var array = RLMArray<SwiftRLMStringObject>(objectClassName: SwiftRLMStringObject.className())
+    @objc dynamic var intArray = RLMArray<SwiftRLMIntObject>(objectClassName: SwiftRLMIntObject.className())
 }
 
-class SwiftDynamicObject: RLMObject {
+class SwiftRLMDynamicObject: RLMObject {
     @objc dynamic var stringCol = "a"
     @objc dynamic var intCol = 0
 }
 
-class SwiftUTF8Object: RLMObject {
+class SwiftRLMUTF8Object: RLMObject {
     @objc dynamic var 柱колоéнǢкƱаم👍 = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"
 }
 
-class SwiftIgnoredPropertiesObject: RLMObject {
+class SwiftRLMIgnoredPropertiesObject: RLMObject {
     @objc dynamic var name = ""
     @objc dynamic var age = 0
     @objc dynamic var runtimeProperty: AnyObject?
@@ -123,7 +130,7 @@ class SwiftIgnoredPropertiesObject: RLMObject {
     }
 }
 
-class SwiftPrimaryStringObject: RLMObject {
+class SwiftRLMPrimaryStringObject: RLMObject {
     @objc dynamic var stringCol = ""
     @objc dynamic var intCol = 0
 
@@ -132,31 +139,31 @@ class SwiftPrimaryStringObject: RLMObject {
     }
 }
 
-class SwiftLinkSourceObject: RLMObject {
+class SwiftRLMLinkSourceObject: RLMObject {
     @objc dynamic var id = 0
-    @objc dynamic var link: SwiftLinkTargetObject?
+    @objc dynamic var link: SwiftRLMLinkTargetObject?
 }
 
-class SwiftLinkTargetObject: RLMObject {
+class SwiftRLMLinkTargetObject: RLMObject {
     @objc dynamic var id = 0
-    @objc dynamic var backlinks: RLMLinkingObjects<SwiftLinkSourceObject>?
+    @objc dynamic var backlinks: RLMLinkingObjects<SwiftRLMLinkSourceObject>?
 
     override class func linkingObjectsProperties() -> [String : RLMPropertyDescriptor] {
-        return ["backlinks": RLMPropertyDescriptor(with: SwiftLinkSourceObject.self, propertyName: "link")]
+        return ["backlinks": RLMPropertyDescriptor(with: SwiftRLMLinkSourceObject.self, propertyName: "link")]
     }
 }
 
-class SwiftLazyVarObject : RLMObject {
-    @objc dynamic lazy var lazyProperty : String = "hello world"
+class SwiftRLMLazyVarObject: RLMObject {
+    @objc dynamic lazy var lazyProperty: String = "hello world"
 }
 
-class SwiftIgnoredLazyVarObject : RLMObject {
+class SwiftRLMIgnoredLazyVarObject: RLMObject {
     @objc dynamic var id = 0
-    @objc dynamic lazy var ignoredVar : String = "hello world"
+    @objc dynamic lazy var ignoredVar: String = "hello world"
     override class func ignoredProperties() -> [String] { return ["ignoredVar"] }
 }
 
-class SwiftObjectiveCTypesObject: RLMObject {
+class SwiftRLMObjectiveCTypesObject: RLMObject {
     @objc dynamic var stringCol: NSString?
     @objc dynamic var dateCol: NSDate?
     @objc dynamic var dataCol: NSData?

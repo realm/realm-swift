@@ -81,6 +81,7 @@ extension RLMCollection {
 
 // MARK: - Sync-related
 
+#if REALM_ENABLE_SYNC
 extension RLMSyncManager {
     public static var shared: RLMSyncManager {
         return __shared()
@@ -135,6 +136,7 @@ extension RLMSyncSession {
                                          block: block)
     }
 }
+#endif
 
 extension RLMNotificationToken {
     @available(*, unavailable, renamed: "invalidate()")

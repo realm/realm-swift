@@ -52,6 +52,7 @@ xcuserdata/
 project.xcworkspace
 *.xccheckout
 DerivedData
+/.build
 
 # AppCode
 .idea/
@@ -111,3 +112,7 @@ examples/ios/objc/Draw/Constants.h
 ## Sync testing
 test-ros-instance
 Realm/ObjectServerTests/node_modules
+
+## Swiftpm
+.swiftpm
+.build

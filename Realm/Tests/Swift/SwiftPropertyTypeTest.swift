@@ -18,8 +18,9 @@
 
 import XCTest
 import Realm
+import RealmTestSupport
 
-class SwiftPropertyTypeTest: RLMTestCase {
+class SwiftRLMPropertyTypeTest: RLMTestCase {
 
     func testLongType() {
         let longNumber: Int64 = 17179869184
@@ -30,22 +31,22 @@ class SwiftPropertyTypeTest: RLMTestCase {
         let realm = realmWithTestPath()
 
         realm.beginWriteTransaction()
-        _ = SwiftLongObject.create(in: realm, withValue: [NSNumber(value: longNumber)])
-        _ = SwiftLongObject.create(in: realm, withValue: [NSNumber(value: intNumber)])
-        _ = SwiftLongObject.create(in: realm, withValue: [NSNumber(value: negativeLongNumber)])
+        _ = SwiftRLMLongObject.create(in: realm, withValue: [NSNumber(value: longNumber)])
+        _ = SwiftRLMLongObject.create(in: realm, withValue: [NSNumber(value: intNumber)])
+        _ = SwiftRLMLongObject.create(in: realm, withValue: [NSNumber(value: negativeLongNumber)])
         try! realm.commitWriteTransaction()
 
-        let objects = SwiftLongObject.allObjects(in: realm)
+        let objects = SwiftRLMLongObject.allObjects(in: realm)
         XCTAssertEqual(objects.count, UInt(3), "3 rows expected")
-        XCTAssertEqual((objects[0] as! SwiftLongObject).longCol, longNumber, "2 ^ 34 expected")
-        XCTAssertEqual((objects[1] as! SwiftLongObject).longCol, intNumber, "2 ^ 31 - 1 expected")
-        XCTAssertEqual((objects[2] as! SwiftLongObject).longCol, negativeLongNumber, "-2 ^ 34 expected")
+        XCTAssertEqual((objects[0] as! SwiftRLMLongObject).longCol, longNumber, "2 ^ 34 expected")
+        XCTAssertEqual((objects[1] as! SwiftRLMLongObject).longCol, intNumber, "2 ^ 31 - 1 expected")
+        XCTAssertEqual((objects[2] as! SwiftRLMLongObject).longCol, negativeLongNumber, "-2 ^ 34 expected")
 
         realm.beginWriteTransaction()
-        (objects[0] as! SwiftLongObject).longCol = updatedLongNumber
+        (objects[0] as! SwiftRLMLongObject).longCol = updatedLongNumber
         try! realm.commitWriteTransaction()
 
-        XCTAssertEqual((objects[0] as! SwiftLongObject).longCol, updatedLongNumber, "After update: 2 ^ 33 expected")
+        XCTAssertEqual((objects[0] as! SwiftRLMLongObject).longCol, updatedLongNumber, "After update: 2 ^ 33 expected")
     }
 
     func testIntSizes() {
@@ -57,7 +58,7 @@ class SwiftPropertyTypeTest: RLMTestCase {
         // 1 << 40 doesn't auto-promote to Int64 on 32-bit platforms
         let v64 = Int64(1) << 40
         try! realm.transaction {
-            let obj = SwiftAllIntSizesObject()
+            let obj = SwiftRLMAllIntSizesObject()
 
             obj.int8  = v8
             XCTAssertEqual(obj.int8, v8)
@@ -71,7 +72,7 @@ class SwiftPropertyTypeTest: RLMTestCase {
             realm.add(obj)
         }
 
-        let obj = SwiftAllIntSizesObject.allObjects(in: realm)[0] as! SwiftAllIntSizesObject
+        let obj = SwiftRLMAllIntSizesObject.allObjects(in: realm)[0] as! SwiftRLMAllIntSizesObject
         XCTAssertEqual(obj.int8, v8)
         XCTAssertEqual(obj.int16, v16)
         XCTAssertEqual(obj.int32, v32)
@@ -107,7 +108,7 @@ class SwiftPropertyTypeTest: RLMTestCase {
     func testLazyVarProperties() {
         let realm = realmWithTestPath()
         let succeeded : Void? = try? realm.transaction {
-            realm.add(SwiftLazyVarObject())
+            realm.add(SwiftRLMLazyVarObject())
         }
         XCTAssertNotNil(succeeded, "Writing an NSObject-based object with an lazy property should work.")
     }
@@ -115,18 +116,18 @@ class SwiftPropertyTypeTest: RLMTestCase {
     func testIgnoredLazyVarProperties() {
         let realm = realmWithTestPath()
         let succeeded : Void? = try? realm.transaction {
-            realm.add(SwiftIgnoredLazyVarObject())
+            realm.add(SwiftRLMIgnoredLazyVarObject())
         }
         XCTAssertNotNil(succeeded, "Writing an object with an ignored lazy property should work.")
     }
 
     func testObjectiveCTypeProperties() {
         let realm = realmWithTestPath()
-        var object: SwiftObjectiveCTypesObject!
+        var object: SwiftRLMObjectiveCTypesObject!
         let now = NSDate()
         let data = "fizzbuzz".data(using: .utf8)! as Data as NSData
         try! realm.transaction {
-            object = SwiftObjectiveCTypesObject()
+            object = SwiftRLMObjectiveCTypesObject()
             realm.add(object)
             object.stringCol = "Hello world!"
             object.dateCol = now

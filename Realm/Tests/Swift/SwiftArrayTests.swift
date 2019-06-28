@@ -19,8 +19,9 @@
 import XCTest
 import Realm
 import Foundation
+import RealmTestSupport
 
-class SwiftArrayTests: RLMTestCase {
+class SwiftRLMArrayTests: RLMTestCase {
 
     // Swift models
 
@@ -32,26 +33,26 @@ class SwiftArrayTests: RLMTestCase {
         let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
 
-        _ = SwiftAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [10, 1.2 as Float, 0 as Double, true, dateMinInput])
 
         try! realm.commitWriteTransaction()
 
-        let result = SwiftAggregateObject.objects(in: realm, where: "intCol < %d", 100)
+        let result = SwiftRLMAggregateObject.objects(in: realm, where: "intCol < %d", 100)
         XCTAssertEqual(result.count, UInt(10), "10 objects added")
 
         var totalSum = 0
 
         for obj in result {
-            if let ao = obj as? SwiftAggregateObject {
+            if let ao = obj as? SwiftRLMAggregateObject {
                 totalSum += ao.intCol
             }
         }
@@ -67,21 +68,21 @@ class SwiftArrayTests: RLMTestCase {
         let dateMinInput = Date()
         let dateMaxInput = dateMinInput.addingTimeInterval(1000)
 
-        _ = SwiftAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
-        _ = SwiftAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [1, 0 as Float, 2.5 as Double, false, dateMaxInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
+        _ = SwiftRLMAggregateObject.create(in: realm, withValue: [0, 1.2 as Float, 0 as Double, true, dateMinInput])
 
         try! realm.commitWriteTransaction()
 
-        let noArray = SwiftAggregateObject.objects(in: realm, where: "boolCol == NO")
-        let yesArray = SwiftAggregateObject.objects(in: realm, where: "boolCol == YES")
+        let noArray = SwiftRLMAggregateObject.objects(in: realm, where: "boolCol == NO")
+        let yesArray = SwiftRLMAggregateObject.objects(in: realm, where: "boolCol == YES")
 
         // SUM ::::::::::::::::::::::::::::::::::::::::::::::
         // Test int sum
@@ -166,7 +167,7 @@ class SwiftArrayTests: RLMTestCase {
         realm.beginWriteTransaction()
 
         for _ in 0..<1012 {
-            let person = SwiftEmployeeObject()
+            let person = SwiftRLMEmployeeObject()
             person.name = "Mary"
             person.age = 24
             person.hired = true
@@ -175,7 +176,7 @@ class SwiftArrayTests: RLMTestCase {
 
         try! realm.commitWriteTransaction()
 
-        let description = SwiftEmployeeObject.allObjects(in: realm).description
+        let description = SwiftRLMEmployeeObject.allObjects(in: realm).description
 
         XCTAssertTrue((description as NSString).range(of: "name").location != Foundation.NSNotFound, "property names should be displayed when calling \"description\" on RLMArray")
         XCTAssertTrue((description as NSString).range(of: "Mary").location != Foundation.NSNotFound, "property values should be displayed when calling \"description\" on RLMArray")
@@ -191,17 +192,17 @@ class SwiftArrayTests: RLMTestCase {
 
         realm.beginWriteTransaction()
 
-        let po1 = SwiftEmployeeObject()
+        let po1 = SwiftRLMEmployeeObject()
         po1.age = 40
         po1.name = "Joe"
         po1.hired = true
 
-        let po2 = SwiftEmployeeObject()
+        let po2 = SwiftRLMEmployeeObject()
         po2.age = 30
         po2.name = "John"
         po2.hired = false
 
-        let po3 = SwiftEmployeeObject()
+        let po3 = SwiftRLMEmployeeObject()
         po3.age = 25
         po3.name = "Jill"
         po3.hired = true
@@ -210,9 +211,9 @@ class SwiftArrayTests: RLMTestCase {
         realm.add(po2)
         realm.add(po3)
 
-        let company = SwiftCompanyObject()
+        let company = SwiftRLMCompanyObject()
         realm.add(company)
-        company.employees.addObjects(SwiftEmployeeObject.allObjects(in: realm))
+        company.employees.addObjects(SwiftRLMEmployeeObject.allObjects(in: realm))
 
         try! realm.commitWriteTransaction()
 

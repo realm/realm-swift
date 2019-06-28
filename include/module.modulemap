@@ -1,0 +1,33 @@
+// This file should match Realm/Realm.modulemap, except for that it's "module
+// Realm" rather than "framework module Realm", and the paths below have the
+// Realm/ prefix (due to not being a framework module)
+module Realm {
+    umbrella header "Realm/Realm.h"
+    export *
+    module * { export * }
+
+    explicit module Private {
+        header "Realm/RLMAccessor.h"
+        header "Realm/RLMArray_Private.h"
+        header "Realm/RLMCollection_Private.h"
+        header "Realm/RLMListBase.h"
+        header "Realm/RLMObject_Private.h"
+        header "Realm/RLMObjectBase_Dynamic.h"
+        header "Realm/RLMObjectBase_Private.h"
+        header "Realm/RLMObjectSchema_Private.h"
+        header "Realm/RLMObjectStore.h"
+        header "Realm/RLMOptionalBase.h"
+        header "Realm/RLMProperty_Private.h"
+        header "Realm/RLMRealm_Private.h"
+        header "Realm/RLMRealmConfiguration_Private.h"
+        header "Realm/RLMResults_Private.h"
+        header "Realm/RLMSchema_Private.h"
+        header "Realm/RLMSyncConfiguration_Private.h"
+        header "Realm/RLMSyncUtil_Private.h"
+    }
+
+    explicit module Dynamic {
+        header "Realm/RLMRealm_Dynamic.h"
+        header "Realm/RLMObjectBase_Dynamic.h"
+    }
+}

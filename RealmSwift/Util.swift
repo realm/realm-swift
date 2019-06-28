@@ -83,19 +83,19 @@ extension Object {
 
 // MARK: CustomObjectiveCBridgeable
 
-internal func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
+/// :nodoc:
+public func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
     if T.self == DynamicObject.self {
         return unsafeBitCast(x as AnyObject, to: T.self)
     } else if let bridgeableType = T.self as? CustomObjectiveCBridgeable.Type {
         return bridgeableType.bridging(objCValue: x) as! T
-    } else if T.self == SyncSubscription<Object>.self {
-        return ObjectiveCSupport.convert(object: RLMCastToSyncSubscription(x)) as! T
     } else {
         return x as! T
     }
 }
 
-internal func dynamicBridgeCast<T>(fromSwift x: T) -> Any {
+/// :nodoc:
+public func dynamicBridgeCast<T>(fromSwift x: T) -> Any {
     if let x = x as? CustomObjectiveCBridgeable {
         return x.objCValue
     } else {

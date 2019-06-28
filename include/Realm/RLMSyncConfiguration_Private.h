@@ -1,0 +1,1 @@
+../../Realm/RLMSyncConfiguration_Private.h

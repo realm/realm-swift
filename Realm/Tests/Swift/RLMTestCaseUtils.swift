@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+import RealmTestSupport
+
 extension RLMTestCase {
     func assertThrowsWithReasonMatching<T>(_ block: @autoclosure @escaping () -> T, _ regexString: String,
         _ message: String? = nil, fileName: String = #file, lineNumber: UInt = #line) {

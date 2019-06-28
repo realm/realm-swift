@@ -328,7 +328,12 @@ const Ivar RLMDummySwiftIvar = []() {
                 // or it might be a String?, Data?, Date? or object field with
                 // a nil default value
                 else if (md.kind == RLMSwiftPropertyKindNilLiteralOptional) {
-                    propArray[existing].optional = true;
+                    RLMProperty *prop = propArray[existing];
+                    // RLMLinkingObjects properties on RLMObjects are allowed
+                    // to be optional as they'll be `nil` for unmanaged objects
+                    if (prop.type != RLMPropertyTypeLinkingObjects) {
+                        prop.optional = true;
+                    }
                 }
                 // or it may be some non-optional property which may have been
                 // previously marked as optional due to that being the default

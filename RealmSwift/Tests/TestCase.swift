@@ -19,6 +19,7 @@
 import Foundation
 import Realm
 import Realm.Dynamic
+import RealmTestSupport
 import RealmSwift
 import XCTest
 
@@ -26,7 +27,7 @@ func inMemoryRealm(_ inMememoryIdentifier: String) -> Realm {
     return try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: inMememoryIdentifier))
 }
 
-class TestCase: XCTestCase {
+class TestCase: RLMTestCaseBase {
     var exceptionThrown = false
     var testDir: String! = nil
 
@@ -37,22 +38,6 @@ class TestCase: XCTestCase {
         var configuration = configuration
         configuration.fileURL = testRealmURL()
         return try! Realm(configuration: configuration)
-    }
-
-    override class func setUp() {
-        super.setUp()
-#if DEBUG || arch(i386) || arch(x86_64)
-        // Disable actually syncing anything to the disk to greatly speed up the
-        // tests, but only when not running on device because it can't be
-        // re-enabled and we need it enabled for performance tests
-        RLMDisableSyncToDisk()
-#endif
-        do {
-            // Clean up any potentially lingering Realm files from previous runs
-            try FileManager.default.removeItem(atPath: RLMRealmPathForFile(""))
-        } catch {
-            // The directory might not actually already exist, so not an error
-        }
     }
 
     override class func tearDown() {
@@ -97,10 +82,6 @@ class TestCase: XCTestCase {
             XCTAssertNotEqual(url.pathExtension, "realm", "Lingering realm file at \(parentDir)/\(url)")
             assert(url.pathExtension != "realm")
         }
-    }
-
-    func resetRealmState() {
-        RLMRealm.resetRealmState()
     }
 
     func dispatchSyncNewThread(block: @escaping () -> Void) {
