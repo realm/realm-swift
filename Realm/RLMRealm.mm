@@ -280,7 +280,11 @@ static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
         @autoreleasepool {
             Realm::Config& config = configuration.config;
             if (config.sync_config) {
+#if REALM_ENABLE_SYNC
                 realm::Realm::get_synchronized_realm(config)->start(openCompletion);
+#else
+                @throw RLMException(@"Realm was not built with sync enabled");
+#endif
             }
             else {
                 try {

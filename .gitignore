@@ -116,3 +116,4 @@ Realm/ObjectServerTests/node_modules
 ## Swiftpm
 .swiftpm
 .build
+Package.resolved
