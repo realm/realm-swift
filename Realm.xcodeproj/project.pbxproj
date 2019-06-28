@@ -154,6 +154,8 @@
 		3F558C9422C29A03002F0F30 /* RLMMultiProcessTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C8522C29A03002F0F30 /* RLMMultiProcessTestCase.m */; };
 		3F558C9622C29A03002F0F30 /* RLMMultiProcessTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C8522C29A03002F0F30 /* RLMMultiProcessTestCase.m */; };
 		3F558CA022C29CAF002F0F30 /* RealmTestSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F558C9E22C29CAF002F0F30 /* RealmTestSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3F558C7922BC023A002F0F30 /* async_open_task.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C7622BC022A002F0F30 /* async_open_task.cpp */; };
+		3F558C7A22BC023B002F0F30 /* async_open_task.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F558C7622BC022A002F0F30 /* async_open_task.cpp */; };
 		3F572C941F2BDAAB00F6C9AB /* ThreadSafeReferenceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F572C911F2BDA9F00F6C9AB /* ThreadSafeReferenceTests.m */; };
 		3F572C951F2BDAAC00F6C9AB /* ThreadSafeReferenceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F572C911F2BDA9F00F6C9AB /* ThreadSafeReferenceTests.m */; };
 		3F572C961F2BDAB100F6C9AB /* PrimitiveArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F572C901F2BDA9F00F6C9AB /* PrimitiveArrayPropertyTests.m */; };
@@ -777,6 +779,9 @@
 		3F558C8622C29A03002F0F30 /* TestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestUtils.h; path = Realm/TestUtils/include/TestUtils.h; sourceTree = "<group>"; };
 		3F558C9C22C29CAF002F0F30 /* RealmTestSupport.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RealmTestSupport.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F558C9E22C29CAF002F0F30 /* RealmTestSupport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RealmTestSupport.h; path = Realm/TestUtils/RealmTestSupport.h; sourceTree = "<group>"; };
+		3F558C7622BC022A002F0F30 /* async_open_task.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = async_open_task.cpp; path = sync/async_open_task.cpp; sourceTree = "<group>"; };
+		3F558C7722BC022B002F0F30 /* async_open_task.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = async_open_task.hpp; path = sync/async_open_task.hpp; sourceTree = "<group>"; };
+		3F558C7822BC022B002F0F30 /* subscription_state.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = subscription_state.hpp; path = sync/subscription_state.hpp; sourceTree = "<group>"; };
 		3F572C901F2BDA9F00F6C9AB /* PrimitiveArrayPropertyTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PrimitiveArrayPropertyTests.m; sourceTree = "<group>"; };
 		3F572C911F2BDA9F00F6C9AB /* ThreadSafeReferenceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ThreadSafeReferenceTests.m; sourceTree = "<group>"; };
 		3F5B5D2E1E84230B00953B33 /* binding_callback_thread_observer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = binding_callback_thread_observer.cpp; sourceTree = "<group>"; };
@@ -1125,6 +1130,8 @@
 			isa = PBXGroup;
 			children = (
 				1A15366B1DB0460F00C0EC93 /* impl */,
+				3F558C7622BC022A002F0F30 /* async_open_task.cpp */,
+				3F558C7722BC022B002F0F30 /* async_open_task.hpp */,
 				1AD397D21F73032A002AA897 /* partial_sync.cpp */,
 				1AD397D31F73032A002AA897 /* partial_sync.hpp */,
 				3F558C7822BC022B002F0F30 /* subscription_state.hpp */,
@@ -2381,6 +2388,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F558C7922BC023A002F0F30 /* async_open_task.cpp in Sources */,
 				3F5B5D301E84230B00953B33 /* binding_callback_thread_observer.cpp in Sources */,
 				3F7A3FAE1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */,
 				3F9801AB1C8E4F6B000A8B07 /* collection_notifications.cpp in Sources */,
@@ -2529,6 +2537,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3F558C7A22BC023B002F0F30 /* async_open_task.cpp in Sources */,
 				3F5B5D321E84230E00953B33 /* binding_callback_thread_observer.cpp in Sources */,
 				3F7A3FAF1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */,
 				3F9801AC1C8E4F6F000A8B07 /* collection_notifications.cpp in Sources */,
