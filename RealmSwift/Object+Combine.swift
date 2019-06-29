@@ -22,7 +22,7 @@ import Combine
 
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Object {
-    public func asPublisher() -> AnyPublisher<ObjectChange, Error> {
+    public func asPublisher() -> AnyPublisher<[PropertyChange], Error> {
         let publisher = ObjectChangesPublisher(self)
         return publisher.eraseToAnyPublisher()
     }
@@ -33,13 +33,24 @@ class ObjectChangesSubscription: Subscription {
     var token: NotificationToken?
     var demand: Subscribers.Demand = .unlimited
     
-    init<S>(_ object: Object, subscriber: S) where S: Subscriber, Error == S.Failure, ObjectChange == S.Input {
+    init<S>(_ object: Object, subscriber: S) where S: Subscriber, Error == S.Failure, [PropertyChange] == S.Input {
         
         token = object.observe() {
             [weak self] in
-            if let s = self, s.demand != .none {
-                s.demand = subscriber.receive($0)
+            self?.dispatchObjectChange($0, to: subscriber)
+        }
+    }
+    
+    private func dispatchObjectChange<S>(_ objectChange: ObjectChange, to subscriber: S)  where S: Subscriber, Error == S.Failure, [PropertyChange] == S.Input {
+        switch(objectChange) {
+        case .change(let propertyChanges):
+            if self.demand != .none {
+                self.demand = subscriber.receive(propertyChanges)
             }
+        case .error(let error):
+            subscriber.receive(completion: .failure(error))
+        case .deleted:
+            subscriber.receive(completion: .finished)
         }
     }
     
@@ -57,7 +68,7 @@ class ObjectChangesSubscription: Subscription {
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 struct ObjectChangesPublisher: Publisher {
     
-    typealias Output = ObjectChange
+    typealias Output = [PropertyChange]
     typealias Failure = Error
     
     private let object: Object
@@ -65,7 +76,7 @@ struct ObjectChangesPublisher: Publisher {
     public init(_ object: Object) {
         self.object = object
     }
-    func receive<S>(subscriber: S) where S : Subscriber, Error == S.Failure, ObjectChange == S.Input {
+    func receive<S>(subscriber: S) where S : Subscriber, Error == S.Failure, [PropertyChange] == S.Input {
         subscriber.receive(subscription: ObjectChangesSubscription(object, subscriber: subscriber))
     }
     

@@ -37,7 +37,7 @@ class ObjectCombineTests: TestCase {
             object = realm.create(SwiftObject.self, value: [:])
         }
         let objectRef = ThreadSafeReference(to: object)
-        var objectChanges: [ObjectChange] = []
+        var objectChanges: [[PropertyChange]] = []
         let subscriber = object.asPublisher().sink() {
             objectChanges.append($0)
         }
@@ -54,6 +54,40 @@ class ObjectCombineTests: TestCase {
         realm.refresh()
 
         XCTAssertEqual(objectChanges.count, 1, "Value was not published")
+        XCTAssertEqual(objectChanges[0].count, 1, "Value was not published")
+        XCTAssertEqual(objectChanges[0][0].name, "stringCol", "Wrong property was reported")
+        XCTAssertEqual(objectChanges[0][0].newValue as! String, "abcd", "Wrong value was reported")
+        subscriber.cancel()
+    }
+    
+    func testAsPublisherCompletion() {
+        let exp = expectation(description: "")
+        
+        let realm = try! Realm()
+        var object: SwiftObject!
+        try! realm.write {
+            object = realm.create(SwiftObject.self, value: [:])
+        }
+        let objectRef = ThreadSafeReference(to: object)
+        
+        var receivedCompletion: Bool = false
+        var receivedValue: Bool = false
+        let subscriber = object.asPublisher().sink(receiveCompletion: {_ in receivedCompletion = true },
+                                                   receiveValue: {_ in receivedValue = true })
+        queue.async {
+            let realm = try! Realm()
+            let object = realm.resolve(objectRef)!
+            try! realm.write {
+                realm.delete(object)
+            }
+            exp.fulfill()
+        }
+        
+        waitForExpectations(timeout: 0.2)
+        realm.refresh()
+        
+        XCTAssertTrue(receivedCompletion)
+        XCTAssertFalse(receivedValue)
         subscriber.cancel()
     }
 
