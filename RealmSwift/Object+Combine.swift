@@ -45,7 +45,7 @@ fileprivate class ObjectChangesSubscription: Subscription {
 
     init<S>(_ object: Object, subscriber: S) where S: Subscriber, NSError == S.Failure, [PropertyChange] == S.Input {
 
-        token = object.observe() {
+        token = object.observe {
             [weak self] in
             self?.dispatchObjectChange($0, to: subscriber)
         }
@@ -87,7 +87,7 @@ fileprivate struct ObjectChangesPublisher: Publisher {
     public init(_ object: Object) {
         self.object = object
     }
-    func receive<S>(subscriber: S) where S : Subscriber, NSError == S.Failure, [PropertyChange] == S.Input {
+    func receive<S>(subscriber: S) where S: Subscriber, NSError == S.Failure, [PropertyChange] == S.Input {
         subscriber.receive(subscription: ObjectChangesSubscription(object, subscriber: subscriber))
     }
 

@@ -91,7 +91,7 @@ class ObjectCombineTests: TestCase {
 
     func testAsPublisherCancel() {
         let exp = expectation(description: "")
-        
+
         let realm = try! Realm()
         var object: SwiftObject!
         try! realm.write {
