@@ -20,16 +20,24 @@ import Foundation
 import Realm
 import Combine
 
+/**
+ Produces a Combine publisher for subscribing to changes to an object
+ 
+ This publisher will produce the following:
+ - a `[PropertyChange]` value whenever any object property changes
+ - an `NSError` when an observation error occurs
+ - a completion when the object is deleted
+ */
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension Object {
-    public func asPublisher() -> AnyPublisher<[PropertyChange], NSError> {
+public extension Object {
+    func asPublisher() -> AnyPublisher<[PropertyChange], NSError> {
         let publisher = ObjectChangesPublisher(self)
         return publisher.eraseToAnyPublisher()
     }
 }
 
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-class ObjectChangesSubscription: Subscription {
+fileprivate class ObjectChangesSubscription: Subscription {
     var token: NotificationToken?
     var demand: Subscribers.Demand = .unlimited
     
@@ -60,13 +68,14 @@ class ObjectChangesSubscription: Subscription {
     
     func cancel() {
         token?.invalidate()
+        token = nil
         demand = .none
     }
     
 }
 
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-struct ObjectChangesPublisher: Publisher {
+fileprivate struct ObjectChangesPublisher: Publisher {
     
     typealias Output = [PropertyChange]
     typealias Failure = NSError
