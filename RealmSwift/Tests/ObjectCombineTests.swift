@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#if compiler(>=5.1)
+
 import XCTest
 import RealmSwift
 import Foundation
@@ -120,3 +122,5 @@ class ObjectCombineTests: TestCase {
 
 
 }
+
+#endif

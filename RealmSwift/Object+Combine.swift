@@ -16,6 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#if compiler(>=5.1)
+
 import Foundation
 import Realm
 import Combine
@@ -90,3 +92,5 @@ fileprivate struct ObjectChangesPublisher: Publisher {
     }
 
 }
+
+#endif
