@@ -22,7 +22,7 @@ import Combine
 
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 extension Object {
-    public func asPublisher() -> AnyPublisher<[PropertyChange], Error> {
+    public func asPublisher() -> AnyPublisher<[PropertyChange], NSError> {
         let publisher = ObjectChangesPublisher(self)
         return publisher.eraseToAnyPublisher()
     }
@@ -33,7 +33,7 @@ class ObjectChangesSubscription: Subscription {
     var token: NotificationToken?
     var demand: Subscribers.Demand = .unlimited
     
-    init<S>(_ object: Object, subscriber: S) where S: Subscriber, Error == S.Failure, [PropertyChange] == S.Input {
+    init<S>(_ object: Object, subscriber: S) where S: Subscriber, NSError == S.Failure, [PropertyChange] == S.Input {
         
         token = object.observe() {
             [weak self] in
@@ -41,7 +41,7 @@ class ObjectChangesSubscription: Subscription {
         }
     }
     
-    private func dispatchObjectChange<S>(_ objectChange: ObjectChange, to subscriber: S)  where S: Subscriber, Error == S.Failure, [PropertyChange] == S.Input {
+    private func dispatchObjectChange<S>(_ objectChange: ObjectChange, to subscriber: S)  where S: Subscriber, NSError == S.Failure, [PropertyChange] == S.Input {
         switch(objectChange) {
         case .change(let propertyChanges):
             if self.demand != .none {
@@ -69,14 +69,14 @@ class ObjectChangesSubscription: Subscription {
 struct ObjectChangesPublisher: Publisher {
     
     typealias Output = [PropertyChange]
-    typealias Failure = Error
+    typealias Failure = NSError
     
     private let object: Object
     
     public init(_ object: Object) {
         self.object = object
     }
-    func receive<S>(subscriber: S) where S : Subscriber, Error == S.Failure, [PropertyChange] == S.Input {
+    func receive<S>(subscriber: S) where S : Subscriber, NSError == S.Failure, [PropertyChange] == S.Input {
         subscriber.receive(subscription: ObjectChangesSubscription(object, subscriber: subscriber))
     }
     

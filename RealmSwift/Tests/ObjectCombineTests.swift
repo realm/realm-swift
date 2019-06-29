@@ -24,10 +24,6 @@ import Foundation
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 class ObjectCombineTests: TestCase {
 
-    // init() Tests are in ObjectCreationTests.swift
-
-    // init(value:) tests are in ObjectCreationTests.swift
-
     func testAsPublisher() {
         let exp = expectation(description: "")
         
@@ -89,6 +85,37 @@ class ObjectCombineTests: TestCase {
         XCTAssertTrue(receivedCompletion)
         XCTAssertFalse(receivedValue)
         subscriber.cancel()
+    }
+
+    func testAsPublisherCancel() {
+        let exp = expectation(description: "")
+        
+        let realm = try! Realm()
+        var object: SwiftObject!
+        try! realm.write {
+            object = realm.create(SwiftObject.self, value: [:])
+        }
+        let objectRef = ThreadSafeReference(to: object)
+        
+        var valuePublished = false
+
+        let subscriber = object.asPublisher().sink() {
+            _ in valuePublished = true
+        }
+        subscriber.cancel()
+        queue.async {
+            let realm = try! Realm()
+            let object = realm.resolve(objectRef)!
+            try! realm.write {
+                object.stringCol = "abcd"
+            }
+            exp.fulfill()
+        }
+
+        waitForExpectations(timeout: 0.2)
+        realm.refresh()
+        
+        XCTAssertFalse(valuePublished, "Value was published after cancel.")
     }
 
     
