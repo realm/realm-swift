@@ -26,7 +26,7 @@ class ObjectCombineTests: TestCase {
 
     func testAsPublisher() {
         let exp = expectation(description: "")
-        
+
         let realm = try! Realm()
         var object: SwiftObject!
         try! realm.write {
@@ -34,7 +34,7 @@ class ObjectCombineTests: TestCase {
         }
         let objectRef = ThreadSafeReference(to: object)
         var objectChanges: [[PropertyChange]] = []
-        let subscriber = object.asPublisher().sink() {
+        let subscriber = object.asPublisher().sink {
             objectChanges.append($0)
         }
         queue.async {
@@ -55,17 +55,17 @@ class ObjectCombineTests: TestCase {
         XCTAssertEqual(objectChanges[0][0].newValue as! String, "abcd", "Wrong value was reported")
         subscriber.cancel()
     }
-    
+
     func testAsPublisherCompletion() {
         let exp = expectation(description: "")
-        
+
         let realm = try! Realm()
         var object: SwiftObject!
         try! realm.write {
             object = realm.create(SwiftObject.self, value: [:])
         }
         let objectRef = ThreadSafeReference(to: object)
-        
+
         var receivedCompletion: Bool = false
         var receivedValue: Bool = false
         let subscriber = object.asPublisher().sink(receiveCompletion: {_ in receivedCompletion = true },
@@ -78,10 +78,10 @@ class ObjectCombineTests: TestCase {
             }
             exp.fulfill()
         }
-        
+
         waitForExpectations(timeout: 0.2)
         realm.refresh()
-        
+
         XCTAssertTrue(receivedCompletion)
         XCTAssertFalse(receivedValue)
         subscriber.cancel()
@@ -96,11 +96,11 @@ class ObjectCombineTests: TestCase {
             object = realm.create(SwiftObject.self, value: [:])
         }
         let objectRef = ThreadSafeReference(to: object)
-        
+
         var valuePublished = false
 
-        let subscriber = object.asPublisher().sink() {
-            _ in valuePublished = true
+        let subscriber = object.asPublisher().sink { _ in
+            valuePublished = true
         }
         subscriber.cancel()
         queue.async {
@@ -114,9 +114,9 @@ class ObjectCombineTests: TestCase {
 
         waitForExpectations(timeout: 0.2)
         realm.refresh()
-        
+
         XCTAssertFalse(valuePublished, "Value was published after cancel.")
     }
 
-    
+
 }

@@ -40,17 +40,17 @@ public extension Object {
 fileprivate class ObjectChangesSubscription: Subscription {
     var token: NotificationToken?
     var demand: Subscribers.Demand = .unlimited
-    
+
     init<S>(_ object: Object, subscriber: S) where S: Subscriber, NSError == S.Failure, [PropertyChange] == S.Input {
-        
+
         token = object.observe() {
             [weak self] in
             self?.dispatchObjectChange($0, to: subscriber)
         }
     }
-    
+
     private func dispatchObjectChange<S>(_ objectChange: ObjectChange, to subscriber: S)  where S: Subscriber, NSError == S.Failure, [PropertyChange] == S.Input {
-        switch(objectChange) {
+        switch objectChange {
         case .change(let propertyChanges):
             if self.demand != .none {
                 self.demand = subscriber.receive(propertyChanges)
@@ -61,32 +61,32 @@ fileprivate class ObjectChangesSubscription: Subscription {
             subscriber.receive(completion: .finished)
         }
     }
-    
+
     func request(_ demand: Subscribers.Demand) {
         self.demand = demand
     }
-    
+
     func cancel() {
         token?.invalidate()
         token = nil
         demand = .none
     }
-    
+
 }
 
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 fileprivate struct ObjectChangesPublisher: Publisher {
-    
+
     typealias Output = [PropertyChange]
     typealias Failure = NSError
-    
+
     private let object: Object
-    
+
     public init(_ object: Object) {
         self.object = object
     }
     func receive<S>(subscriber: S) where S : Subscriber, NSError == S.Failure, [PropertyChange] == S.Input {
         subscriber.receive(subscription: ObjectChangesSubscription(object, subscriber: subscriber))
     }
-    
+
 }
