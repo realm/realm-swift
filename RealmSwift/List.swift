@@ -710,6 +710,7 @@ extension List: RangeReplaceableCollection {
 
 // MARK: - Codable
 
+#if swift(>=4.1)
 extension List: Decodable where Element: Decodable {
     public convenience init(from decoder: Decoder) throws {
         self.init()
@@ -728,6 +729,7 @@ extension List: Encodable where Element: Encodable {
         }
     }
 }
+#endif
 
 // MARK: - AssistedObjectiveCBridgeable
 
