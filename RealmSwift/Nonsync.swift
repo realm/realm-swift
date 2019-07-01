@@ -25,3 +25,25 @@ public struct SyncConfiguration {
 
 public struct SyncSubscription<T: Object> {
 }
+
+public struct SyncSession {
+    public struct Progress {
+        public let transferredBytes: Int
+        public let transferrableBytes: Int
+        public var fractionTransferred: Double {
+            if transferrableBytes == 0 {
+                return 1
+            }
+            let percentage = Double(transferredBytes) / Double(transferrableBytes)
+            return percentage > 1 ? 1 : percentage
+        }
+        public var isTransferComplete: Bool {
+            return transferredBytes >= transferrableBytes
+        }
+
+        internal init(transferred: UInt, transferrable: UInt) {
+            transferredBytes = Int(transferred)
+            transferrableBytes = Int(transferrable)
+        }
+    }
+}

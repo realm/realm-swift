@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 #import "RLMConstants.h"
 
-@class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference;
+@class RLMRealmConfiguration, RLMRealm, RLMObject, RLMSchema, RLMMigration, RLMNotificationToken, RLMThreadSafeReference, RLMAsyncOpenTask;
 struct RLMRealmPrivileges;
 struct RLMClassPrivileges;
 struct RLMObjectPrivileges;
@@ -121,7 +121,7 @@ NS_ASSUME_NONNULL_BEGIN
        thread, accessing the returned Realm outside the callback block (even if
        accessed from `callbackQueue`) is unsafe.
  */
-+ (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
++ (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                      callbackQueue:(dispatch_queue_t)callbackQueue
                           callback:(RLMAsyncOpenRealmCallback)callback;
 

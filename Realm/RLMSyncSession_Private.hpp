@@ -22,6 +22,7 @@
 #import <memory>
 
 namespace realm {
+class AsyncOpenTask;
 class SyncSession;
 }
 
@@ -46,6 +47,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (instancetype)initWithOriginalPath:(std::string)originalPath;
 
+@end
+
+@interface RLMAsyncOpenTask ()
+@property (nonatomic) std::shared_ptr<realm::AsyncOpenTask> task;
 @end
 
 NS_ASSUME_NONNULL_END
