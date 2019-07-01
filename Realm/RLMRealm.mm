@@ -48,6 +48,7 @@
 
 #if REALM_ENABLE_SYNC
 #import "RLMSyncManager_Private.h"
+#import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 
 #import "sync/async_open_task.hpp"
@@ -106,6 +107,13 @@ static void RLMAddSkipBackupAttributeToItemAtPath(std::string const& path) {
     }
 }
 @end
+
+#if !REALM_ENABLE_SYNC
+@interface RLMAsyncOpenTask : NSObject
+@end
+@implementation RLMAsyncOpenTask
+@end
+#endif
 
 static bool shouldForciblyDisableEncryption() {
     static bool disableEncryption = getenv("REALM_DISABLE_ENCRYPTION");
@@ -227,10 +235,15 @@ static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
 #endif
 }
 
-+ (void)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
-                     callbackQueue:(dispatch_queue_t)callbackQueue
-                          callback:(RLMAsyncOpenRealmCallback)callback {
-    static dispatch_queue_t queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue", DISPATCH_QUEUE_CONCURRENT);
+static dispatch_queue_t s_async_open_queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue",
+                                                                   DISPATCH_QUEUE_CONCURRENT);
+void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
+    s_async_open_queue = queue;
+}
+
++ (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
+                                   callbackQueue:(dispatch_queue_t)callbackQueue
+                                        callback:(RLMAsyncOpenRealmCallback)callback {
     auto openCompletion = [=](ThreadSafeReference<Realm> ref, std::exception_ptr err) {
         @autoreleasepool {
             if (err) {
@@ -263,7 +276,7 @@ static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
                 // We need to dispatch back to the work queue to wait for the
                 // subscriptions as we're currently running on the sync worker
                 // thread and blocking it to wait for subscriptions means no syncing
-                dispatch_async(queue, ^{
+                dispatch_async(s_async_open_queue, ^{
                     @autoreleasepool {
                         waitForPartialSyncSubscriptions(realm->config());
                         complete();
@@ -276,12 +289,15 @@ static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
         }
     };
 
-    dispatch_async(queue, ^{
+    RLMAsyncOpenTask *ret = [RLMAsyncOpenTask new];
+    dispatch_async(s_async_open_queue, ^{
         @autoreleasepool {
             Realm::Config& config = configuration.config;
             if (config.sync_config) {
 #if REALM_ENABLE_SYNC
-                realm::Realm::get_synchronized_realm(config)->start(openCompletion);
+                auto task = realm::Realm::get_synchronized_realm(config);
+                ret.task = task;
+                task->start(openCompletion);
 #else
                 @throw RLMException(@"Realm was not built with sync enabled");
 #endif
@@ -296,6 +312,7 @@ static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
             }
         }
     });
+    return ret;
 }
 
 // ARC tries to eliminate calls to autorelease when the value is then immediately

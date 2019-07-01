@@ -1379,66 +1379,66 @@
 
 #pragma mark - Progress Notifications
 
+static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
+
+- (void)populateDataForUser:(RLMSyncUser *)user url:(NSURL *)url {
+    RLMRealm *realm = [self openRealmForURL:url user:user];
+    [realm beginWriteTransaction];
+    for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
+        [realm addObject:[HugeSyncObject object]];
+    }
+    [realm commitWriteTransaction];
+    [self waitForUploadsForRealm:realm];
+    CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
+}
+
 - (void)testStreamingDownloadNotifier {
-    const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     NSURL *url = REALM_URL();
-    // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
+    if (!self.isParent) {
+        [self populateDataForUser:user url:url];
+        return;
+    }
+
     __block NSInteger callCount = 0;
     __block NSUInteger transferred = 0;
     __block NSUInteger transferrable = 0;
-    // Open the Realm
-    RLMRealm *realm = [self openRealmForURL:url user:user];
-    if (self.isParent) {
-        __block BOOL hasBeenFulfilled = NO;
-        // Register a notifier.
-        RLMSyncSession *session = [user sessionForURL:url];
-        XCTAssertNotNil(session);
-        XCTestExpectation *ex = [self expectationWithDescription:@"streaming-download-notifier"];
-        RLMProgressNotificationToken *token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionDownload
-                                                                                      mode:RLMSyncProgressModeReportIndefinitely
-                                                                                     block:^(NSUInteger xfr, NSUInteger xfb) {
-            // Make sure the values are increasing, and update our stored copies.
-            XCTAssert(xfr >= transferred);
-            XCTAssert(xfb >= transferrable);
-            transferred = xfr;
-            transferrable = xfb;
-            callCount++;
-            if (transferrable > 0 && transferred >= transferrable && !hasBeenFulfilled) {
-                [ex fulfill];
-                hasBeenFulfilled = YES;
-            }
-        }];
-        // Wait for the child process to upload everything.
-        RLMRunChildAndWait();
-        [self waitForExpectationsWithTimeout:10.0 handler:nil];
-        [token invalidate];
-        // The notifier should have been called at least twice: once at the beginning and at least once
-        // to report progress.
-        XCTAssert(callCount > 1);
-        XCTAssert(transferred >= transferrable,
-                  @"Transferred (%@) needs to be greater than or equal to transferrable (%@)",
-                  @(transferred), @(transferrable));
-    } else {
-        // Write lots of data to the Realm, then wait for it to be uploaded.
-        [realm beginWriteTransaction];
-        for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
-            [realm addObject:[HugeSyncObject object]];
-        }
-        [realm commitWriteTransaction];
-        [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
-    }
+    __block BOOL hasBeenFulfilled = NO;
+    // Register a notifier.
+    [self openRealmForURL:url user:user];
+    RLMSyncSession *session = [user sessionForURL:url];
+    XCTAssertNotNil(session);
+    XCTestExpectation *ex = [self expectationWithDescription:@"streaming-download-notifier"];
+    id token = [session addProgressNotificationForDirection:RLMSyncProgressDirectionDownload
+                                                       mode:RLMSyncProgressModeReportIndefinitely
+                                                      block:^(NSUInteger xfr, NSUInteger xfb) {
+                                                          // Make sure the values are increasing, and update our stored copies.
+                                                          XCTAssert(xfr >= transferred);
+                                                          XCTAssert(xfb >= transferrable);
+                                                          transferred = xfr;
+                                                          transferrable = xfb;
+                                                          callCount++;
+                                                          if (transferrable > 0 && transferred >= transferrable && !hasBeenFulfilled) {
+                                                              [ex fulfill];
+                                                              hasBeenFulfilled = YES;
+                                                          }
+                                                      }];
+    // Wait for the child process to upload everything.
+    RLMRunChildAndWait();
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [token invalidate];
+    // The notifier should have been called at least twice: once at the beginning and at least once
+    // to report progress.
+    XCTAssert(callCount > 1);
+    XCTAssert(transferred >= transferrable,
+              @"Transferred (%@) needs to be greater than or equal to transferrable (%@)",
+              @(transferred), @(transferrable));
 }
 
 - (void)testStreamingUploadNotifier {
-    const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     NSURL *url = REALM_URL();
-    // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
     __block NSInteger callCount = 0;
     __block NSUInteger transferred = 0;
@@ -1487,64 +1487,47 @@
 - (void)testDownloadRealm {
     const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     NSURL *url = REALM_URL();
-    // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
-    if (self.isParent) {
-        // Wait for the child process to upload everything.
-        RLMRunChildAndWait();
-        XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-        RLMRealmConfiguration *c = [user configurationWithURL:url fullSynchronization:true];
-        XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
-        [RLMRealm asyncOpenWithConfiguration:c
-                               callbackQueue:dispatch_get_main_queue()
-                                    callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
-            XCTAssertNil(error);
-            CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
-            [ex fulfill];
-        }];
-        NSUInteger (^fileSize)(NSString *) = ^NSUInteger(NSString *path) {
-            NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
-            if (attributes)
-                return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
-
-            return 0;
-        };
-        XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
-        [self waitForExpectationsWithTimeout:10.0 handler:nil];
-        XCTAssertGreaterThan(fileSize(c.pathOnDisk), 0U);
-        XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
-    } else {
-        RLMRealm *realm = [self openRealmForURL:url user:user];
-        // Write lots of data to the Realm, then wait for it to be uploaded.
-        [realm beginWriteTransaction];
-        for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
-            [realm addObject:[HugeSyncObject object]];
-        }
-        [realm commitWriteTransaction];
-        [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
+    if (!self.isParent) {
+        [self populateDataForUser:user url:url];
+        return;
     }
+
+    // Wait for the child process to upload everything.
+    RLMRunChildAndWait();
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
+    RLMRealmConfiguration *c = [user configurationWithURL:url fullSynchronization:true];
+    XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
+                                    XCTAssertNil(error);
+                                    CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
+                                    [ex fulfill];
+                                }];
+    NSUInteger (^fileSize)(NSString *) = ^NSUInteger(NSString *path) {
+        NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+        if (attributes)
+            return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
+
+        return 0;
+    };
+    XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    XCTAssertGreaterThan(fileSize(c.pathOnDisk), 0U);
+    XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
 }
 
 - (void)testDownloadAlreadyOpenRealm {
     const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     NSURL *url = REALM_URL();
     // Log in the user.
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
     if (!self.isParent) {
-        RLMRealm *realm = [self openRealmForURL:url user:user];
-        // Write lots of data to the Realm, then wait for it to be uploaded.
-        [realm beginWriteTransaction];
-        for (NSInteger i = 0; i < NUMBER_OF_BIG_OBJECTS; i++) {
-            [realm addObject:[HugeSyncObject object]];
-        }
-        [realm commitWriteTransaction];
-        [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
+        [self populateDataForUser:user url:url];
         return;
     }
 
@@ -1584,8 +1567,7 @@
 }
 
 - (void)testDownloadCancelsOnAuthError {
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]
                                                server:[RLMObjectServerTests authServerURL]];
     auto c = [user configurationWithURL:[NSURL URLWithString:@"realm://127.0.0.1:9080/invalid"] fullSynchronization:true];
     auto ex = [self expectationWithDescription:@"async open"];
@@ -1594,6 +1576,70 @@
                                     XCTAssertNil(realm);
                                     XCTAssertNotNil(error);
                                     [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+- (void)testCancelDownload {
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+    if (!self.isParent) {
+        [self populateDataForUser:user url:url];
+        return;
+    }
+
+    // Wait for the child process to upload everything.
+    RLMRunChildAndWait();
+
+    // Use a serial queue for asyncOpen to ensure that the first one adds
+    // the completion block before the second one cancels it
+    RLMSetAsyncOpenQueue(dispatch_queue_create("io.realm.asyncOpen", 0));
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
+    RLMRealmConfiguration *c = [user configurationWithURL:url fullSynchronization:true];
+
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *error) {
+                                    XCTAssertNil(realm);
+                                    XCTAssertNotNil(error);
+                                    [ex fulfill];
+                                }];
+    [[RLMRealm asyncOpenWithConfiguration:c
+                            callbackQueue:dispatch_get_main_queue()
+                                 callback:^(RLMRealm *, NSError *) {
+                                     XCTFail(@"Cancelled callback got called");
+                                 }] cancel];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+}
+
+- (void)testAsyncOpenProgressNotifications {
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]
+                                               server:[RLMObjectServerTests authServerURL]];
+    if (!self.isParent) {
+        [self populateDataForUser:user url:url];
+        return;
+    }
+
+    RLMRunChildAndWait();
+
+    XCTestExpectation *ex1 = [self expectationWithDescription:@"async open"];
+    XCTestExpectation *ex2 = [self expectationWithDescription:@"download progress complete"];
+    RLMRealmConfiguration *c = [user configurationWithURL:url fullSynchronization:true];
+
+    auto task = [RLMRealm asyncOpenWithConfiguration:c
+                                       callbackQueue:dispatch_get_main_queue()
+                                            callback:^(RLMRealm *realm, NSError *error) {
+                                                XCTAssertNil(error);
+                                                XCTAssertNotNil(realm);
+                                                [ex1 fulfill];
+                                            }];
+    [task addProgressNotificationBlock:^(NSUInteger transferredBytes, NSUInteger transferrableBytes) {
+        if (transferrableBytes > 0 && transferredBytes == transferrableBytes) {
+            [ex2 fulfill];
+        }
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
