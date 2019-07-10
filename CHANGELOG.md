@@ -3,12 +3,18 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * Add support for canceling asynchronous opens using a new AsyncOpenTask
   returned from the asyncOpen() call. ([PR #6913](https://github.com/realm/realm-cocoa/pull/6187)).
+* Importing the Realm SPM package can now be done by pinning to a version
+  rather than a branch.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Queries on a List/RLMArray which checked an indexed int property would
+  sometimes give incorrect results.
+  ([#6154](https://github.com/realm/realm-cocoa/issues/6154)), since v3.15.0)
+* Queries involving an indexed int property had a memory leak if run multiple
+  times. ([#6186](https://github.com/realm/realm-cocoa/issues/6186)), since v3.15.0)
+* Creating a subscription with `includeLinkingObjects:` performed unneccesary
+  comparisons, making it extremely slow when large numbers of objects were
+  involved. ([Core #3311](https://github.com/realm/realm-core/issues/3311), since v3.15.0)
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)

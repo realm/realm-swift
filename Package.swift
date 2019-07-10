@@ -3,7 +3,7 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "5.22.0"
+let coreVersionStr = "5.23.1"
 let cocoaVersionStr = "3.17.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
@@ -38,7 +38,7 @@ let package = Package(
             targets: ["Realm", "RealmSwift"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/realm/realm-core", .branch("master")),
+        .package(url: "https://github.com/realm/realm-core", .exact(Version(coreVersionStr)!)),
     ],
     targets: [
       .target(
