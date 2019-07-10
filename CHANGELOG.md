@@ -1,12 +1,15 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.17.1 Release notes (2019-07-10)
 =============================================================
+
 ### Enhancements
+
 * Add support for canceling asynchronous opens using a new AsyncOpenTask
   returned from the asyncOpen() call. ([PR #6913](https://github.com/realm/realm-cocoa/pull/6187)).
 * Importing the Realm SPM package can now be done by pinning to a version
   rather than a branch.
 
 ### Fixed
+
 * Queries on a List/RLMArray which checked an indexed int property would
   sometimes give incorrect results.
   ([#6154](https://github.com/realm/realm-cocoa/issues/6154)), since v3.15.0)
@@ -17,9 +20,9 @@ x.y.z Release notes (yyyy-MM-dd)
   involved. ([Core #3311](https://github.com/realm/realm-core/issues/3311), since v3.15.0)
 
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 * Carthage release for Swift is built with Xcode 10.2.1.
 
 3.17.0 Release notes (2019-06-28)
