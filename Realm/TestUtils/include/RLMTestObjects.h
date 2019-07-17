@@ -459,5 +459,5 @@ RLM_ARRAY_TYPE(RenamedProperties2)
 
 #pragma mark FakeObject
 
-@interface FakeObject : NSObject
+@interface FakeObject : RLMObject
 @end

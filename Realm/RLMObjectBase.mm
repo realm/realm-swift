@@ -225,12 +225,11 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
     }
 }
 
-+ (Class)objectUtilClass:(BOOL)isSwift {
-    return RLMObjectUtilClass(isSwift);
++ (nullable NSArray<RLMProperty *> *)_getPropertiesWithInstance:(__unused id)obj {
+    return nil;
 }
 
-- (NSString *)description
-{
+- (NSString *)description {
     if (self.isInvalidated) {
         return @"[invalid object]";
     }
@@ -316,6 +315,10 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
 
 + (NSDictionary *)_realmColumnNames {
     return nil;
+}
+
++ (bool)_realmIgnoreClass {
+    return false;
 }
 
 - (id)mutableArrayValueForKey:(NSString *)key {
@@ -458,85 +461,3 @@ id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {
         @throw;
     }
 }
-
-Class RLMObjectUtilClass(BOOL isSwift) {
-    static Class objectUtilObjc = [RLMObjectUtil class];
-    static Class objectUtilSwift = NSClassFromString(@"RealmSwiftObjectUtil");
-    return isSwift && objectUtilSwift ? objectUtilSwift : objectUtilObjc;
-}
-
-@implementation RLMObjectUtil
-
-+ (NSArray *)ignoredPropertiesForClass:(Class)cls {
-    return [cls ignoredProperties];
-}
-
-+ (NSArray *)indexedPropertiesForClass:(Class)cls {
-    return [cls indexedProperties];
-}
-
-+ (NSDictionary *)linkingObjectsPropertiesForClass:(Class)cls {
-    return [cls linkingObjectsProperties];
-}
-
-+ (NSDictionary *)linkingObjectProperties:(__unused id)object {
-    return nil;
-}
-
-+ (NSArray *)getSwiftProperties:(__unused id)obj {
-    return nil;
-}
-
-+ (NSDictionary *)getOptionalProperties:(__unused id)obj {
-    return nil;
-}
-
-+ (NSArray *)requiredPropertiesForClass:(Class)cls {
-    return [cls requiredProperties];
-}
-
-@end
-
-@implementation RLMSwiftPropertyMetadata
-
-+ (instancetype)metadataForOtherProperty:(NSString *)propertyName {
-    RLMSwiftPropertyMetadata *md = [RLMSwiftPropertyMetadata new];
-    md.propertyName = propertyName;
-    md.kind = RLMSwiftPropertyKindOther;
-    return md;
-}
-
-+ (instancetype)metadataForListProperty:(NSString *)propertyName {
-    RLMSwiftPropertyMetadata *md = [RLMSwiftPropertyMetadata new];
-    md.propertyName = propertyName;
-    md.kind = RLMSwiftPropertyKindList;
-    return md;
-}
-
-+ (instancetype)metadataForLinkingObjectsProperty:(NSString *)propertyName
-                                        className:(NSString *)className
-                               linkedPropertyName:(NSString *)linkedPropertyName {
-    RLMSwiftPropertyMetadata *md = [RLMSwiftPropertyMetadata new];
-    md.propertyName = propertyName;
-    md.className = className;
-    md.linkedPropertyName = linkedPropertyName;
-    md.kind = RLMSwiftPropertyKindLinkingObjects;
-    return md;
-}
-
-+ (instancetype)metadataForOptionalProperty:(NSString *)propertyName type:(RLMPropertyType)type {
-    RLMSwiftPropertyMetadata *md = [RLMSwiftPropertyMetadata new];
-    md.propertyName = propertyName;
-    md.propertyType = type;
-    md.kind = RLMSwiftPropertyKindOptional;
-    return md;
-}
-
-+ (instancetype)metadataForNilLiteralOptionalProperty:(NSString *)propertyName {
-    RLMSwiftPropertyMetadata *md = [RLMSwiftPropertyMetadata new];
-    md.propertyName = propertyName;
-    md.kind = RLMSwiftPropertyKindNilLiteralOptional;
-    return md;
-}
-
-@end

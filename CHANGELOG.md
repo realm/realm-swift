@@ -1,5 +1,13 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version
+* The schema discovery logic for RealmSwift.Object subclasses has been
+  rewritten in Swift. This should not have any effect on valid class
+  definitions, but there may be types of invalid definitions which previously
+  worked by coincidence and no longer do.
+
+
 ### Enhancements
 * None.
 
@@ -7,7 +15,6 @@ x.y.z Release notes (yyyy-MM-dd)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)

@@ -43,13 +43,7 @@ class SwiftRLMObject: RLMObject {
     @objc dynamic var stringCol = "a"
     @objc dynamic var binaryCol = "a".data(using: String.Encoding.utf8)
     @objc dynamic var dateCol = Date(timeIntervalSince1970: 1)
-    #if SWIFT_PACKAGE
-    // FIXME: we fail to check if an object property is actually optional unless
-    // RealmSwift happens to be loaded in the process
-    @objc dynamic var objectCol: SwiftRLMBoolObject! = SwiftRLMBoolObject()
-    #else
     @objc dynamic var objectCol = SwiftRLMBoolObject()
-    #endif
     @objc dynamic var arrayCol = RLMArray<SwiftRLMBoolObject>(objectClassName: SwiftRLMBoolObject.className())
 }
 

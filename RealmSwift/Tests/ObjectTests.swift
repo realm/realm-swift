@@ -469,12 +469,10 @@ class ObjectTests: TestCase {
             object.stringCol = "Hello world!"
             object.dateCol = now
             object.dataCol = data
-            object.numCol = 42
         }
         XCTAssertEqual("Hello world!", object.stringCol)
         XCTAssertEqual(now, object.dateCol)
         XCTAssertEqual(data, object.dataCol)
-        XCTAssertEqual(42, object.numCol)
     }
 
     func testDeleteObservedObject() {
