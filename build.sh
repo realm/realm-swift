@@ -152,11 +152,7 @@ build_combined() {
         destination="iPhone 8"
     elif [[ "$os" == "watchos"  ]]; then
         os_name="$os"
-        if (( $(xcode_version_major) >= 10 )); then
-            destination="Apple Watch Series 3 - 42mm"
-        else
-            destination="Apple Watch - 42mm"
-        fi
+        destination="Apple Watch Series 3 - 42mm"
     elif [[ "$os" == "appletvos"  ]]; then
         os_name="tvos"
         destination="Apple TV"
@@ -393,18 +389,13 @@ download_sync() {
 COMMAND="$1"
 
 # Use Debug config if command ends with -debug, otherwise default to Release
-# Set IS_RUNNING_PACKAGING when running packaging steps to avoid running iOS static tests with Xcode 8.3.3
 case "$COMMAND" in
     *-debug)
         COMMAND="${COMMAND%-debug}"
         CONFIGURATION="Debug"
         ;;
-    package-*)
-        IS_RUNNING_PACKAGING=1
-        ;;
 esac
 export CONFIGURATION=${CONFIGURATION:-Release}
-export IS_RUNNING_PACKAGING=${IS_RUNNING_PACKAGING:-0}
 
 # Pre-choose Xcode and Swift versions for those operations that do not set them
 REALM_XCODE_VERSION=${xcode_version:-$REALM_XCODE_VERSION}
@@ -972,9 +963,7 @@ case "$COMMAND" in
         ;;
 
     "verify-swiftpm")
-        if (( $(xcode_version_major) >= 10 )); then
-            sh build.sh test-swiftpm
-        fi
+        sh build.sh test-swiftpm
         exit 0
         ;;
 
@@ -1325,24 +1314,6 @@ EOM
         sh build.sh prelaunch-simulator
         sh build.sh watchos
 
-        # If we're building the obj-c library with an Xcode version older than
-        # 10, we need to also build the arm64_32 slice with Xcode 10 and lipo
-        # it in
-        if (( $(xcode_version_major) < 10 )); then
-            (
-                REALM_XCODE_VERSION=10.0
-                REALM_SWIFT_VERSION=
-                set_xcode_and_swift_versions
-                sh build.sh prelaunch-simulator
-                xc "-scheme Realm -configuration $CONFIGURATION -sdk watchos ARCHS='arm64_32'"
-                cp build/DerivedData/Realm/Build/Products/Release-watchos/Realm.framework/*.bcsymbolmap build/watchos/Realm.framework
-                xcrun lipo \
-                  -create build/watchos/Realm.framework/Realm build/DerivedData/Realm/Build/Products/Release-watchos/Realm.framework/Realm \
-                  -output build/watchos-tmp
-                mv build/watchos-tmp build/watchos/Realm.framework/Realm
-            )
-        fi
-
         cd build/watchos
         zip --symlinks -r realm-framework-watchos.zip Realm.framework
         ;;
@@ -1357,7 +1328,7 @@ EOM
 
     package-*-swift)
         PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        for version in 9.4 10.0 10.1 10.2.1 10.3; do
+        for version in 10.0 10.1 10.2.1 10.3; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1366,7 +1337,7 @@ EOM
         done
 
         cd build/$PLATFORM
-        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-9.4 swift-10.0 swift-10.1 swift-10.2.1 swift-10.3
+        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-10.0 swift-10.1 swift-10.2.1 swift-10.3
         ;;
 
     package-*-swift-*)

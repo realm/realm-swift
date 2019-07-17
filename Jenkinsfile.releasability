@@ -1,4 +1,4 @@
-xcodeVersions = ['9.4', '10.0', '10.1', '10.2.1', '10.3']
+xcodeVersions = ['10.0', '10.1', '10.2.1', '10.3']
 platforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS']
 carthageXcodeVersion = '10.3'
@@ -234,7 +234,7 @@ def doBuild() {
           deleteDir()
           unstash 'source'
 
-          sh 'XCMODE=xcpretty IS_RUNNING_PACKAGING=1 sh build.sh test-ios-static'
+          sh 'XCMODE=xcpretty sh build.sh test-ios-static'
         }
       },
 

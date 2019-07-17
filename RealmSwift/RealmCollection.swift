@@ -32,11 +32,9 @@ public struct RLMIterator<Element: RealmCollectionValue>: IteratorProtocol {
     /// Advance to the next element and return it, or `nil` if no next element exists.
     public mutating func next() -> Element? {
         let next = generatorBase.next()
-        #if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
         if next is NSNull {
             return Element._nilValue()
         }
-        #endif
         if let next = next as? Object? {
             if next == nil {
                 return nil as Element?
@@ -134,7 +132,6 @@ private func forceCast<A, U>(_ from: A, to type: U.Type) -> U {
     return from as! U
 }
 
-#if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
 /// A type which can be stored in a Realm List or Results.
 ///
 /// Declaring additional types as conforming to this protocol will not make them
@@ -147,18 +144,6 @@ public protocol RealmCollectionValue: Equatable {
     /// :nodoc:
     static func _nilValue() -> Self
 }
-#else
-/// A type which can be stored in a Realm List or Results
-///
-/// Declaring additional types as conforming to this protocol will not make them
-/// actually work. Most of the logic for how to store values in Realm is not
-/// implemented in Swift and there is currently no extension mechanism for
-/// supporting more types.
-public protocol RealmCollectionValue {
-    /// :nodoc:
-    static func _rlmArray() -> RLMArray<AnyObject>
-}
-#endif
 
 extension RealmCollectionValue {
     /// :nodoc:
@@ -185,7 +170,6 @@ private func arrayType<T>(_ type: T.Type) -> RLMArray<AnyObject> {
     }
 }
 
-#if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
 extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
@@ -196,18 +180,6 @@ extension Optional: RealmCollectionValue where Wrapped: RealmCollectionValue {
         return nil
     }
 }
-#else
-extension Optional: RealmCollectionValue {
-    /// :nodoc:
-    public static func _rlmArray() -> RLMArray<AnyObject> {
-        return arrayType(Wrapped.self)
-    }
-    /// :nodoc:
-    public static func _nilValue() -> Optional {
-        return nil
-    }
-}
-#endif
 
 extension Int: RealmCollectionValue {}
 extension Int8: RealmCollectionValue {}

@@ -2,7 +2,6 @@
 # https://wiki.jenkins-ci.org/display/JENKINS/Yaml+Axis+Plugin
 
 xcode_version:
-  - 9.4
   - 10.0
   - 10.1
   - 10.2.1
@@ -41,11 +40,8 @@ configuration:
 # +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 # | Configuration Matrix | osx | docs | ios-static | ios-dynamic | ios-swift | osx-swift | watchos | cocoapods-ios | cocoapods-osx | cocoapods-watchos | swiftlint | swiftpm | tvos | osx-encryption | osx-object-server | ios-device-objc-ios8 | ios-device-swift-ios8 | ios-device-objc-ios10 | ios-device-swift-ios10 | tvos-device |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | ------------- | ------------- | ----------------- | --------- | ------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
-# | 9.4   | Debug        | X   |      | X          |             |           |           |         |               |               |                   |           |         |      |                |                   |                      |                       |                       |                        |             |
-# | 9.4   | Release      | X   |      | X          | X           | X         | X         | X       | X             | X             | X                 |           |         | X    | X              | X                 | X                    |                       | X                     |                        |             |
-# | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | ------------- | ------------- | ----------------- | --------- | ------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
-# | 10.0  | Debug        | X   |      |            |             |           |           |         |               |               |                   |           |         |      |                |                   |                      |                       |                       |                        |             |
-# | 10.0  | Release      | X   |      | X          | X           | X         | X         | X       | X             | X             | X                 |           |         | X    |                |                   |                      |                       |                       |                        |             |
+# | 10.0  | Debug        | X   |      | X          |             |           |           |         |               |               |                   |           |         |      |                |                   |                      |                       |                       |                        |             |
+# | 10.0  | Release      | X   |      | X          | X           | X         | X         | X       | X             | X             | X                 |           |         | X    | X              | X                 | X                    |                       | X                     |                        |             |
 # | -------------------- | --- | ---- | ---------- | ----------- | --------- | --------- | ------- | ------------- | ------------- | ----------------- | --------- | ------- | ---- | -------------- | ----------------- | -------------------- | --------------------- | --------------------- | ---------------------- | ----------- |
 # | 10.1  | Debug        | X   |      |            |             |           |           |         |               |               |                   |           |         |      |                |                   |                      |                       |                       |                        |             |
 # | 10.1  | Release      | X   |      | X          | X           | X         | X         | X       | X             | X             | X                 |           |         | X    |                |                   |                      |                       |                       |                        |             |
@@ -61,9 +57,7 @@ exclude:
   ################
   # docs
   ################
-  # Just run on 10.4 Release
-  - xcode_version: 9.4
-    target: docs
+  # Just run on 10.3 Release
   - xcode_version: 10.0
     target: docs
   - xcode_version: 10.1
@@ -76,10 +70,7 @@ exclude:
   ################
   # ios-static
   ################
-  # Skip Debug on everything but 9.4
-  - xcode_version: 10.0
-    target: ios-static
-    configuration: Debug
+  # Skip Debug on everything but 10.0
   - xcode_version: 10.1
     target: ios-static
     configuration: Debug
@@ -94,9 +85,6 @@ exclude:
   # ios-dynamic
   ################
   # Skip Debug on everything but 10.3
-  - xcode_version: 9.4
-    target: ios-dynamic
-    configuration: Debug
   - xcode_version: 10.0
     target: ios-dynamic
     configuration: Debug
@@ -111,9 +99,6 @@ exclude:
   # ios-swift
   ################
   # Skip Debug on everything but 10.3
-  - xcode_version: 9.4
-    target: ios-swift
-    configuration: Debug
   - xcode_version: 10.0
     target: ios-swift
     configuration: Debug
@@ -128,9 +113,6 @@ exclude:
   # osx-swift
   ################
   # Skip Debug on everything but 10.3
-  - xcode_version: 9.4
-    target: osx-swift
-    configuration: Debug
   - xcode_version: 10.0
     target: osx-swift
     configuration: Debug
@@ -145,9 +127,6 @@ exclude:
   # watchos
   ################
   # Skip Debug on everything but 10.3
-  - xcode_version: 9.4
-    target: watchos
-    configuration: Debug
   - xcode_version: 10.0
     target: watchos
     configuration: Debug
@@ -173,8 +152,6 @@ exclude:
   # swiftlint
   ################
   # Just run on 10.3 Release
-  - xcode_version: 9.4
-    target: swiftlint
   - xcode_version: 10.0
     target: swiftlint
   - xcode_version: 10.1
@@ -187,12 +164,12 @@ exclude:
   ################
   # swiftpm
   ################
-  # Just run on 10.2/10.3 Release
-  - xcode_version: 9.4
-    target: swiftpm
+  # Just run on 10.3 Release
   - xcode_version: 10.0
     target: swiftpm
   - xcode_version: 10.1
+    target: swiftpm
+  - xcode_version: 10.2.1
     target: swiftpm
   - target: swiftpm
     configuration: Debug
@@ -201,9 +178,6 @@ exclude:
   # tvos
   ################
   # Skip Debug on everything but 10.3
-  - xcode_version: 9.4
-    target: tvos
-    configuration: Debug
   - xcode_version: 10.0
     target: tvos
     configuration: Debug
@@ -217,9 +191,7 @@ exclude:
   ################
   # osx-encryption
   ################
-  # Just run on 9.4/10.3 Release
-  - xcode_version: 10.0
-    target: osx-encryption
+  # Just run on 10.0/10.3 Release
   - xcode_version: 10.1
     target: osx-encryption
   - xcode_version: 10.2.1
@@ -230,9 +202,7 @@ exclude:
   ################
   # osx-object-server
   ################
-  # Just run on 9.4/10.3 Release
-  - xcode_version: 10.0
-    target: osx-object-server
+  # Just run on 10.0/10.3 Release
   - xcode_version: 10.1
     target: osx-object-server
   - xcode_version: 10.2.1
@@ -243,9 +213,7 @@ exclude:
   ################
   # ios-device-objc-ios8
   ################
-  # Just run on 9.4/10.3 Release
-  - xcode_version: 10.0
-    target: ios-device-objc-ios8
+  # Just run on 10.0/10.3 Release
   - xcode_version: 10.1
     target: ios-device-objc-ios8
   - xcode_version: 10.2.1
@@ -256,9 +224,7 @@ exclude:
   ################
   # ios-device-swift-ios8
   ################
-  # Just run on 9.4/10.3 Release
-  - xcode_version: 10.0
-    target: ios-device-swift-ios8
+  # Just run on 10.0/10.3 Release
   - xcode_version: 10.1
     target: ios-device-swift-ios8
   - xcode_version: 10.2.1
@@ -269,7 +235,7 @@ exclude:
   ################
   # ios-device-objc-ios10
   ################
-  # Just run on 9.3/10.3 Release
+  # Just run on 10.0/10.3 Release
   - xcode_version: 10.0
     target: ios-device-objc-ios10
   - xcode_version: 10.1
@@ -282,7 +248,7 @@ exclude:
   ################
   # ios-device-swift-ios10
   ################
-  # Just run on 9.4/10.3 Release
+  # Just run on 10.0/10.3 Release
   - xcode_version: 10.0
     target: ios-device-swift-ios10
   - xcode_version: 10.1
@@ -295,9 +261,7 @@ exclude:
   ################
   # tvos-device
   ################
-  # Just run on 10.2 Release
-  - xcode_version: 9.4
-    target: tvos-device
+  # Just run on 10.3 Release
   - xcode_version: 10.0
     target: tvos-device
   - xcode_version: 10.1
