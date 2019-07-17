@@ -519,67 +519,6 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     return self;
 }
 
-- (instancetype)initSwiftListPropertyWithName:(NSString *)name
-                                     instance:(id)object {
-    self = [super init];
-    if (!self) {
-        return nil;
-    }
-    _name = name;
-    _array = true;
-    _swiftIvar = class_getInstanceVariable([object class], name.UTF8String);
-
-    RLMArray *array = [object_getIvar(object, _swiftIvar) _rlmArray];
-    _type = array.type;
-    _optional = array.optional;
-    _objectClassName = array.objectClassName;
-
-    // no obj-c property for generic lists, and thus no getter/setter names
-
-    return self;
-}
-
-- (instancetype)initSwiftOptionalPropertyWithName:(NSString *)name
-                                          indexed:(BOOL)indexed
-                                             ivar:(Ivar)ivar
-                                     propertyType:(RLMPropertyType)propertyType {
-    self = [super init];
-    if (!self) {
-        return nil;
-    }
-
-    _name = name;
-    _type = propertyType;
-    _indexed = indexed;
-    _swiftIvar = ivar;
-    _optional = true;
-
-    // no obj-c property for generic optionals, and thus no getter/setter names
-
-    return self;
-}
-
-- (instancetype)initSwiftLinkingObjectsPropertyWithName:(NSString *)name
-                                                   ivar:(Ivar)ivar
-                                        objectClassName:(NSString *)objectClassName
-                                 linkOriginPropertyName:(NSString *)linkOriginPropertyName {
-    self = [super init];
-    if (!self) {
-        return nil;
-    }
-
-    _name = name;
-    _type = RLMPropertyTypeLinkingObjects;
-    _array = true;
-    _objectClassName = objectClassName;
-    _linkOriginPropertyName = linkOriginPropertyName;
-    _swiftIvar = ivar;
-
-    // no obj-c property for generic linking objects properties, and thus no getter/setter names
-
-    return self;
-}
-
 - (id)copyWithZone:(NSZone *)zone {
     RLMProperty *prop = [[RLMProperty allocWithZone:zone] init];
     prop->_name = _name;
@@ -596,7 +535,6 @@ static realm::util::Optional<RLMPropertyType> typeFromProtocolString(const char 
     prop->_swiftIvar = _swiftIvar;
     prop->_optional = _optional;
     prop->_linkOriginPropertyName = _linkOriginPropertyName;
-
     return prop;
 }
 

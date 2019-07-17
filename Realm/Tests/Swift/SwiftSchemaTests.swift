@@ -208,9 +208,7 @@ class SwiftRLMSchemaTests: RLMMultiProcessTestCase {
     }
 
     func testInvalidObjectTypeForRLMArray() {
-        RLMSetTreatFakeObjectAsRLMObject(true)
         assertThrowsWithReasonMatching(RLMObjectSchema(forObjectClass: InvalidArrayType.self),
                                        "RLMArray\\<invalid class\\>")
-        RLMSetTreatFakeObjectAsRLMObject(false)
     }
 }

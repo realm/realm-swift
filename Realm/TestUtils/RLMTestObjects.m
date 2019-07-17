@@ -383,15 +383,7 @@
 #pragma mark FakeObject
 
 @implementation FakeObject
-+ (Class)objectUtilClass:(BOOL)isSwift { return RLMObjectUtilClass(isSwift); }
-+ (NSArray *)ignoredProperties { return nil; }
-+ (NSArray *)indexedProperties { return nil; }
-+ (NSString *)primaryKey { return nil; }
-+ (NSArray *)requiredProperties { return nil; }
-+ (NSDictionary *)linkingObjectsProperties { return nil; }
-+ (BOOL)shouldIncludeInDefaultSchema { return NO; }
-+ (NSString *)_realmObjectName { return nil; }
-+ (NSDictionary *)_realmColumnNames { return nil; }
++ (bool)_realmIgnoreClass { return true; }
 @end
 
 #pragma mark ComputedPropertyNotExplicitlyIgnoredObject

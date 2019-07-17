@@ -226,6 +226,14 @@ static std::vector<LinkPathPart> parseKeypath(StringData keypath, Group const& g
     Object _obj;
 }
 
++ (NSString *)primaryKey {
+    return nil;
+}
+
++ (NSDictionary *)defaultPropertyValues {
+    return nil;
+}
+
 - (NSString *)name {
     return _row.is_attached() ? RLMStringDataToNSString(_row.get_string(_row.get_column_index("name"))) : nil;
 }

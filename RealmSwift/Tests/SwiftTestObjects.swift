@@ -463,7 +463,6 @@ class SwiftObjectiveCTypesObject: Object {
     @objc dynamic var stringCol: NSString?
     @objc dynamic var dateCol: NSDate?
     @objc dynamic var dataCol: NSData?
-    @objc dynamic var numCol: NSNumber? = 0
 }
 
 class SwiftComputedPropertyNotIgnoredObject: Object {
