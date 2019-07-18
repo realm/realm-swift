@@ -25,10 +25,10 @@ protocol ObjectFactory {
     static func isManaged() -> Bool
 }
 
-final class ManagedObjectFactory: ObjectFactory {
+struct ManagedObjectFactory: ObjectFactory {
     static func isManaged() -> Bool { return true }
 }
-final class UnmanagedObjectFactory: ObjectFactory {
+struct UnmanagedObjectFactory: ObjectFactory {
     static func isManaged() -> Bool { return false }
 }
 
@@ -39,7 +39,7 @@ protocol ValueFactory {
     static func values() -> [T]
 }
 
-final class IntFactory: ValueFactory {
+struct IntFactory: ValueFactory {
     static func array(_ obj: SwiftListObject) -> List<Int> {
         return obj.int
     }
@@ -49,7 +49,7 @@ final class IntFactory: ValueFactory {
     }
 }
 
-final class Int8Factory: ValueFactory {
+struct Int8Factory: ValueFactory {
     static func array(_ obj: SwiftListObject) -> List<Int8> {
         return obj.int8
     }
@@ -59,7 +59,7 @@ final class Int8Factory: ValueFactory {
     }
 }
 
-final class Int16Factory: ValueFactory {
+struct Int16Factory: ValueFactory {
     static func array(_ obj: SwiftListObject) -> List<Int16> {
         return obj.int16
     }
@@ -69,7 +69,7 @@ final class Int16Factory: ValueFactory {
     }
 }
 
-final class Int32Factory: ValueFactory {
+struct Int32Factory: ValueFactory {
     static func array(_ obj: SwiftListObject) -> List<Int32> {
         return obj.int32
     }
@@ -79,7 +79,7 @@ final class Int32Factory: ValueFactory {
     }
 }
 
-final class Int64Factory: ValueFactory {
+struct Int64Factory: ValueFactory {
     static func array(_ obj: SwiftListObject) -> List<Int64> {
         return obj.int64
     }
@@ -89,7 +89,7 @@ final class Int64Factory: ValueFactory {
     }
 }
 
-final class FloatFactory: ValueFactory {
+struct FloatFactory: ValueFactory {
     static func array(_ obj: SwiftListObject) -> List<Float> {
         return obj.float
     }
@@ -99,7 +99,7 @@ final class FloatFactory: ValueFactory {
     }
 }
 
-final class DoubleFactory: ValueFactory {
+struct DoubleFactory: ValueFactory {
     static func array(_ obj: SwiftListObject) -> List<Double> {
         return obj.double
     }
@@ -109,7 +109,7 @@ final class DoubleFactory: ValueFactory {
     }
 }
 
-final class StringFactory: ValueFactory {
+struct StringFactory: ValueFactory {
     static func array(_ obj: SwiftListObject) -> List<String> {
         return obj.string
     }
@@ -119,7 +119,7 @@ final class StringFactory: ValueFactory {
     }
 }
 
-final class DataFactory: ValueFactory {
+struct DataFactory: ValueFactory {
     static func array(_ obj: SwiftListObject) -> List<Data> {
         return obj.data
     }
@@ -129,7 +129,7 @@ final class DataFactory: ValueFactory {
     }
 }
 
-final class DateFactory: ValueFactory {
+struct DateFactory: ValueFactory {
     static func array(_ obj: SwiftListObject) -> List<Date> {
         return obj.date
     }
@@ -139,7 +139,7 @@ final class DateFactory: ValueFactory {
     }
 }
 
-final class OptionalIntFactory: ValueFactory {
+struct OptionalIntFactory: ValueFactory {
     typealias W = Int
 
     static func array(_ obj: SwiftListObject) -> List<Int?> {
@@ -151,7 +151,7 @@ final class OptionalIntFactory: ValueFactory {
     }
 }
 
-final class OptionalInt8Factory: ValueFactory {
+struct OptionalInt8Factory: ValueFactory {
     typealias W = Int8
 
     static func array(_ obj: SwiftListObject) -> List<Int8?> {
@@ -163,7 +163,7 @@ final class OptionalInt8Factory: ValueFactory {
     }
 }
 
-final class OptionalInt16Factory: ValueFactory {
+struct OptionalInt16Factory: ValueFactory {
     typealias W = Int16
 
     static func array(_ obj: SwiftListObject) -> List<Int16?> {
@@ -175,7 +175,7 @@ final class OptionalInt16Factory: ValueFactory {
     }
 }
 
-final class OptionalInt32Factory: ValueFactory {
+struct OptionalInt32Factory: ValueFactory {
     typealias W = Int32
 
     static func array(_ obj: SwiftListObject) -> List<Int32?> {
@@ -187,7 +187,7 @@ final class OptionalInt32Factory: ValueFactory {
     }
 }
 
-final class OptionalInt64Factory: ValueFactory {
+struct OptionalInt64Factory: ValueFactory {
     typealias W = Int64
 
     static func array(_ obj: SwiftListObject) -> List<Int64?> {
@@ -199,7 +199,7 @@ final class OptionalInt64Factory: ValueFactory {
     }
 }
 
-final class OptionalFloatFactory: ValueFactory {
+struct OptionalFloatFactory: ValueFactory {
     typealias W = Float
 
     static func array(_ obj: SwiftListObject) -> List<Float?> {
@@ -211,7 +211,7 @@ final class OptionalFloatFactory: ValueFactory {
     }
 }
 
-final class OptionalDoubleFactory: ValueFactory {
+struct OptionalDoubleFactory: ValueFactory {
     typealias W = Double
 
     static func array(_ obj: SwiftListObject) -> List<Double?> {
@@ -223,7 +223,7 @@ final class OptionalDoubleFactory: ValueFactory {
     }
 }
 
-final class OptionalStringFactory: ValueFactory {
+struct OptionalStringFactory: ValueFactory {
     typealias W = String
 
     static func array(_ obj: SwiftListObject) -> List<String?> {
@@ -235,7 +235,7 @@ final class OptionalStringFactory: ValueFactory {
     }
 }
 
-final class OptionalDataFactory: ValueFactory {
+struct OptionalDataFactory: ValueFactory {
     typealias W = Data
 
     static func array(_ obj: SwiftListObject) -> List<Data?> {
@@ -247,7 +247,7 @@ final class OptionalDataFactory: ValueFactory {
     }
 }
 
-final class OptionalDateFactory: ValueFactory {
+struct OptionalDateFactory: ValueFactory {
     typealias W = Date
 
     static func array(_ obj: SwiftListObject) -> List<Date?> {
@@ -259,13 +259,7 @@ final class OptionalDateFactory: ValueFactory {
     }
 }
 
-class EquatableTestCase: TestCase {
-    func assertEqualTo<T: Equatable>(_ expected: T, _ actual: T, fileName: StaticString = #file, lineNumber: UInt = #line) {
-        XCTAssertEqual(expected, actual, file: fileName, line: lineNumber)
-    }
-}
-
-class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: EquatableTestCase {
+class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
     var realm: Realm?
     var obj: SwiftListObject!
     var array: List<V.T>!
@@ -314,11 +308,11 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         XCTAssertNil(array.index(of: values[0]))
 
         array.append(values[0])
-        assertEqualTo(0, array.index(of: values[0]))
+        XCTAssertEqual(0, array.index(of: values[0]))
 
         array.append(values[1])
-        assertEqualTo(0, array.index(of: values[0]))
-        assertEqualTo(1, array.index(of: values[1]))
+        XCTAssertEqual(0, array.index(of: values[0]))
+        XCTAssertEqual(1, array.index(of: values[1]))
     }
 
     // FIXME: Not yet implemented
@@ -326,17 +320,17 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         XCTAssertNil(array.index(matching: "self = %@", values[0]))
 
         array.append(values[0])
-        assertEqualTo(0, array.index(matching: "self = %@", values[0]))
+        XCTAssertEqual(0, array.index(matching: "self = %@", values[0]))
 
         array.append(values[1])
-        assertEqualTo(0, array.index(matching: "self = %@", values[0]))
-        assertEqualTo(1, array.index(matching: "self = %@", values[1]))
+        XCTAssertEqual(0, array.index(matching: "self = %@", values[0]))
+        XCTAssertEqual(1, array.index(matching: "self = %@", values[1]))
     }
 
     func testSubscript() {
         array.append(objectsIn: values)
         for i in 0..<values.count {
-            assertEqualTo(array[i], values[i])
+            XCTAssertEqual(array[i], values[i])
         }
         assertThrows(array[values.count], reason: "Index 3 is out of bounds")
         assertThrows(array[-1], reason: "negative value")
@@ -344,23 +338,23 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
     func testFirst() {
         array.append(objectsIn: values)
-        assertEqualTo(array.first, values.first)
+        XCTAssertEqual(array.first, values.first)
         array.removeAll()
         XCTAssertNil(array.first)
     }
 
     func testLast() {
         array.append(objectsIn: values)
-        assertEqualTo(array.last, values.last)
+        XCTAssertEqual(array.last, values.last)
         array.removeAll()
         XCTAssertNil(array.last)
 
     }
 
     func testValueForKey() {
-        assertEqualTo(array.value(forKey: "self").count, 0)
+        XCTAssertEqual(array.value(forKey: "self").count, 0)
         array.append(objectsIn: values)
-        assertEqualTo(values!, array.value(forKey: "self").map { dynamicBridgeCast(fromObjectiveC: $0) as V.T })
+        XCTAssertEqual(values!, array.value(forKey: "self").map { dynamicBridgeCast(fromObjectiveC: $0) as V.T })
 
         assertThrows(array.value(forKey: "not self"), named: "NSUnknownKeyException")
     }
@@ -376,22 +370,22 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
     }
 
     func testInsert() {
-        assertEqualTo(Int(0), array.count)
+        XCTAssertEqual(Int(0), array.count)
 
         array.insert(values[0], at: 0)
-        assertEqualTo(Int(1), array.count)
-        assertEqualTo(values[0], array[0])
+        XCTAssertEqual(Int(1), array.count)
+        XCTAssertEqual(values[0], array[0])
 
         array.insert(values[1], at: 0)
-        assertEqualTo(Int(2), array.count)
-        assertEqualTo(values[1], array[0])
-        assertEqualTo(values[0], array[1])
+        XCTAssertEqual(Int(2), array.count)
+        XCTAssertEqual(values[1], array[0])
+        XCTAssertEqual(values[0], array[1])
 
         array.insert(values[2], at: 2)
-        assertEqualTo(Int(3), array.count)
-        assertEqualTo(values[1], array[0])
-        assertEqualTo(values[0], array[1])
-        assertEqualTo(values[2], array[2])
+        XCTAssertEqual(Int(3), array.count)
+        XCTAssertEqual(values[1], array[0])
+        XCTAssertEqual(values[0], array[1])
+        XCTAssertEqual(values[2], array[2])
 
         assertThrows(_ = array.insert(values[0], at: 4))
         assertThrows(_ = array.insert(values[0], at: -1))
@@ -404,19 +398,19 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         array.append(objectsIn: values)
 
         assertThrows(array.remove(at: -1))
-        assertEqualTo(values[0], array[0])
-        assertEqualTo(values[1], array[1])
-        assertEqualTo(values[2], array[2])
+        XCTAssertEqual(values[0], array[0])
+        XCTAssertEqual(values[1], array[1])
+        XCTAssertEqual(values[2], array[2])
         assertThrows(array[3])
 
         array.remove(at: 0)
-        assertEqualTo(values[1], array[0])
-        assertEqualTo(values[2], array[1])
+        XCTAssertEqual(values[1], array[0])
+        XCTAssertEqual(values[2], array[1])
         assertThrows(array[2])
         assertThrows(array.remove(at: 2))
 
         array.remove(at: 1)
-        assertEqualTo(values[1], array[0])
+        XCTAssertEqual(values[1], array[0])
         assertThrows(array[1])
     }
 
@@ -426,19 +420,19 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         array.append(objectsIn: values)
         array.removeLast()
 
-        assertEqualTo(array.count, 2)
-        assertEqualTo(values[0], array[0])
-        assertEqualTo(values[1], array[1])
+        XCTAssertEqual(array.count, 2)
+        XCTAssertEqual(values[0], array[0])
+        XCTAssertEqual(values[1], array[1])
 
         array.removeLast(2)
-        assertEqualTo(array.count, 0)
+        XCTAssertEqual(array.count, 0)
     }
 
     func testRemoveAll() {
         array.removeAll()
         array.append(objectsIn: values)
         array.removeAll()
-        assertEqualTo(array.count, 0)
+        XCTAssertEqual(array.count, 0)
     }
 
     func testReplace() {
@@ -447,9 +441,9 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
         array.append(objectsIn: values)
         array.replace(index: 1, object: values[0])
-        assertEqualTo(array[0], values[0])
-        assertEqualTo(array[1], values[0])
-        assertEqualTo(array[2], values[2])
+        XCTAssertEqual(array[0], values[0])
+        XCTAssertEqual(array[1], values[0])
+        XCTAssertEqual(array[2], values[2])
 
         assertThrows(array.replace(index: 3, object: values[0]),
                      reason: "Index 3 is out of bounds")
@@ -468,15 +462,15 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
         array.replaceSubrange(0..<0, with: [values[0]])
         XCTAssertEqual(array.count, 1)
-        assertEqualTo(array[0], values[0])
+        XCTAssertEqual(array[0], values[0])
 
         array.replaceSubrange(0..<1, with: values)
         XCTAssertEqual(array.count, 3)
 
         array.replaceSubrange(1..<2, with: [])
         XCTAssertEqual(array.count, 2)
-        assertEqualTo(array[0], values[0])
-        assertEqualTo(array[1], values[2])
+        XCTAssertEqual(array[0], values[0])
+        XCTAssertEqual(array[1], values[2])
     }
 
     func testMove() {
@@ -484,9 +478,9 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
         array.append(objectsIn: values)
         array.move(from: 2, to: 0)
-        assertEqualTo(array[0], values[2])
-        assertEqualTo(array[1], values[0])
-        assertEqualTo(array[2], values[1])
+        XCTAssertEqual(array[0], values[2])
+        XCTAssertEqual(array[1], values[0])
+        XCTAssertEqual(array[2], values[1])
 
         assertThrows(array.move(from: 3, to: 0), reason: "Index 3 is out of bounds")
         assertThrows(array.move(from: 0, to: 3), reason: "Index 3 is out of bounds")
@@ -499,9 +493,9 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
 
         array.append(objectsIn: values)
         array.swapAt(0, 2)
-        assertEqualTo(array[0], values[2])
-        assertEqualTo(array[1], values[1])
-        assertEqualTo(array[2], values[0])
+        XCTAssertEqual(array[0], values[2])
+        XCTAssertEqual(array[1], values[1])
+        XCTAssertEqual(array[2], values[0])
 
         assertThrows(array.swapAt(3, 0), reason: "Index 3 is out of bounds")
         assertThrows(array.swapAt(0, 3), reason: "Index 3 is out of bounds")
@@ -514,13 +508,13 @@ class MinMaxPrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveList
     func testMin() {
         XCTAssertNil(array.min())
         array.append(objectsIn: values.reversed())
-        assertEqualTo(array.min(), values.first)
+        XCTAssertEqual(array.min(), values.first)
     }
 
     func testMax() {
         XCTAssertNil(array.max())
         array.append(objectsIn: values.reversed())
-        assertEqualTo(array.max(), values.last)
+        XCTAssertEqual(array.max(), values.last)
     }
 }
 
@@ -535,20 +529,20 @@ class OptionalMinMaxPrimitiveListTests<O: ObjectFactory, V: ValueFactory>: Primi
         XCTAssertNil(array2.min())
         array.append(objectsIn: values.reversed())
         let expected = values[1] as! V.W
-        assertEqualTo(array2.min(), expected)
+        XCTAssertEqual(array2.min(), expected)
     }
 
     func testMax() {
         XCTAssertNil(array2.max())
         array.append(objectsIn: values.reversed())
         let expected = values[2] as! V.W
-        assertEqualTo(array2.max(), expected)
+        XCTAssertEqual(array2.max(), expected)
     }
 }
 
 class AddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsBase<O, V> where V.T: AddableType {
     func testSum() {
-        assertEqualTo(array.sum(), V.T())
+        XCTAssertEqual(array.sum(), V.T())
         array.append(objectsIn: values)
 
         // Expressing "can be added and converted to a floating point type" as
@@ -575,7 +569,7 @@ class OptionalAddablePrimitiveListTests<O: ObjectFactory, V: ValueFactory>: Prim
     }
 
     func testSum() {
-        assertEqualTo(array2.sum(), V.W())
+        XCTAssertEqual(array2.sum(), V.W())
         array.append(objectsIn: values)
 
         var nonNil = values!

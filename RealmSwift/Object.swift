@@ -392,87 +392,107 @@ public final class DynamicObject: Object {
 
 // A type which can be a managed property on a Realm object
 internal protocol ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     func _rlmProperty(_ prop: RLMProperty)
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty)
+    // swiftlint:disable:next identifier_name
     static func _rlmRequireObjc() -> Bool
 }
 extension ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     func _rlmProperty(_ prop: RLMProperty) { }
+    // swiftlint:disable:next identifier_name
     static func _rlmRequireObjc() -> Bool { return true }
 }
 
 extension Int: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .int
     }
 }
 extension Int8: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .int
     }
 }
 extension Int16: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .int
     }
 }
 extension Int32: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .int
     }
 }
 extension Int64: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .int
     }
 }
 extension Float: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .float
     }
 }
 extension Double: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .double
     }
 }
 extension Bool: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .bool
     }
 }
 extension String: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .string
     }
 }
 extension NSString: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .string
     }
 }
 extension Data: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .data
     }
 }
 extension NSData: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .data
     }
 }
 extension Date: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .date
     }
 }
 extension NSDate: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .date
     }
 }
 
 extension Object: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         if !prop.optional && !prop.array {
             throwRealmException("Object property '\(prop.name)' must be marked as optional.")
@@ -486,26 +506,32 @@ extension Object: ManagedPropertyType {
 }
 
 extension List: ManagedPropertyType where Element: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.array = true
         Element._rlmProperty(prop)
     }
+    // swiftlint:disable:next identifier_name
     static func _rlmRequireObjc() -> Bool { return false }
 }
 
 extension LinkingObjects: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.array = true
         prop.type = .linkingObjects
         prop.objectClassName = Element.className()
     }
+    // swiftlint:disable:next identifier_name
     func _rlmProperty(_ prop: RLMProperty) {
         prop.linkOriginPropertyName = self.propertyName
     }
+    // swiftlint:disable:next identifier_name
     static func _rlmRequireObjc() -> Bool { return false }
 }
 
 extension Optional: ManagedPropertyType where Wrapped: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.optional = true
         Wrapped._rlmProperty(prop)
@@ -513,15 +539,27 @@ extension Optional: ManagedPropertyType where Wrapped: ManagedPropertyType {
 }
 
 extension RealmOptional: ManagedPropertyType where Value: ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.optional = true
         Value._rlmProperty(prop)
     }
+    // swiftlint:disable:next identifier_name
     static func _rlmRequireObjc() -> Bool { return false }
 }
 
 /// :nodoc:
 internal class ObjectUtil {
+    private static let runOnce: Void = {
+        RLMSwiftAsFastEnumeration = { (obj: Any) -> Any? in
+            // Intermediate cast to AnyObject due to https://bugs.swift.org/browse/SR-8651
+            if let collection = obj as AnyObject as? _RealmCollectionEnumerator {
+                return collection._asNSFastEnumerator()
+            }
+            return nil
+        }
+    }()
+
     private class func swiftVersion() -> NSString {
 #if SWIFT_PACKAGE
         return "5.1"
@@ -581,6 +619,8 @@ internal class ObjectUtil {
     }
 
     internal class func getSwiftProperties(_ object: RLMObjectBase) -> [RLMProperty] {
+        _ = ObjectUtil.runOnce
+
         let cls = type(of: object)
 
         var indexedProperties: Set<String>!

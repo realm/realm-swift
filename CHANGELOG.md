@@ -8,6 +8,16 @@ x.y.z Release notes (yyyy-MM-dd)
   worked by coincidence and no longer do.
 * `SyncSubscription` no longer has a generic type parameter, as the type was
   not actually used for anything.
+* The following Swift types have changed from `final class` to `struct`:
+    - AnyRealmCollection
+    - LinkingObjects
+    - ObjectiveCSupport
+    - Realm
+    - Results
+    - SyncSubscription
+    - ThreadSafeReference
+  There is no intended change in semantics from this, but certain edge cases
+  may behave differently.
 
 
 ### Enhancements

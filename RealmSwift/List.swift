@@ -483,6 +483,12 @@ extension List: RealmCollection {
         return RLMIterator(collection: _rlmArray)
     }
 
+    /// :nodoc:
+    // swiftlint:disable:next identifier_name
+    public func _asNSFastEnumerator() -> Any {
+        return _rlmArray
+    }
+
 #if swift(>=4)
     /**
      Replace the given `subRange` of elements with `newElements`.

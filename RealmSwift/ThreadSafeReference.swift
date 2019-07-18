@@ -61,7 +61,7 @@ public protocol ThreadConfined {
  - see: `ThreadConfined`
  - see: `Realm.resolve(_:)`
  */
-public class ThreadSafeReference<Confined: ThreadConfined> {
+public struct ThreadSafeReference<Confined: ThreadConfined> {
     private let swiftMetadata: Any?
 
     /**

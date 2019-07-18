@@ -97,6 +97,8 @@ static inline T RLMCoerceToNil(__unsafe_unretained T obj) {
     return RLMCoerceToNil(static_cast<id>(obj));
 }
 
+id<NSFastEnumeration> RLMAsFastEnumeration(id obj);
+
 // String conversion utilities
 static inline NSString * RLMStringDataToNSString(realm::StringData stringData) {
     static_assert(sizeof(NSUInteger) >= sizeof(size_t),
