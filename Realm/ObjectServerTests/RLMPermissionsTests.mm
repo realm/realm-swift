@@ -96,14 +96,10 @@
 }
 
 - (NSError *)subscribeToRealm:(RLMRealm *)realm type:(Class)cls where:(NSString *)pred {
-    __block NSError *error;
-    XCTestExpectation *ex = [self expectationWithDescription:@"Should be able to successfully complete a query"];
-    [realm subscribeToObjects:cls where:pred callback:^(__unused RLMResults *results, NSError *err) {
-        error = err;
-        [ex fulfill];
-    }];
+    RLMSyncSubscription *sub = [[cls objectsInRealm:realm where:pred] subscribe];
+    id ex = [[XCTKVOExpectation alloc] initWithKeyPath:@"state" object:sub expectedValue:@(RLMSyncSubscriptionStateComplete)];
     [self waitForExpectations:@[ex] timeout:20.0];
-    return error;
+    return sub.error;
 }
 
 - (NSURL *)createRealmWithName:(SEL)sel permissions:(void (^)(RLMRealm *realm))block {

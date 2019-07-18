@@ -235,27 +235,16 @@ public struct SyncConfiguration {
      */
     public let serverValidationPolicy: ServerValidationPolicy
 
-    /**
-     Whether the SSL certificate of the Realm Object Server should be validated.
- 
-     - warning: This has been deprecated. Use serverValidationPolicy instead.
-     */
-    @available(*, deprecated, message: "Use serverValidationPolicy instead")
+    /// :nodoc:
+    @available(*, unavailable, message: "Use serverValidationPolicy instead")
     public var enableSSLValidation: Bool {
-        if case .none = serverValidationPolicy { return true }
-        return false
+        fatalError()
     }
 
-    /**
-     Whether this Realm should be opened in 'partial synchronization' mode.
-     Partial synchronization mode means that no objects are synchronized from the remote Realm
-     except those matching queries that the user explicitly specifies.
-
-     - warning: This has been deprecated - use fullSyncronization instead.
-     */
-    @available(*, deprecated, message: "Use fullSynchronization instead")
+    /// :nodoc:
+    @available(*, unavailable, message: "Use fullSynchronization instead")
     public var isPartial: Bool {
-        return !fullSynchronization
+        fatalError()
     }
 
     /**
@@ -309,54 +298,22 @@ public struct SyncConfiguration {
                                     certificatePath: certificate)
     }
 
-    /**
-     Initialize a sync configuration with a user and a Realm URL.
-
-     Additional settings can be optionally specified. Descriptions of these
-     settings follow.
-
-     `enableSSLValidation` is true by default. It can be disabled for debugging
-     purposes.
-
-     - warning: This has ben deprecated. Use SyncUser.configuration() instead.
- 
-     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
-                `.realm`, `.realm.lock` or `.realm.management`.
-
-     - warning: NEVER disable SSL validation for a system running in production.
-    */
-    @available(*, deprecated, message: "Use SyncUser.configuration() instead")
+    /// :nodoc:
+    @available(*, unavailable, message: "Use SyncUser.configuration() instead")
     public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true, isPartial: Bool = false, urlPrefix: String? = nil) {
-        self.user = user
-        self.realmURL = realmURL
-        self.stopPolicy = .afterChangesUploaded
-        self.serverValidationPolicy = enableSSLValidation ? .system : .none
-        self.fullSynchronization = !isPartial
-        self.urlPrefix = urlPrefix
+        fatalError()
     }
 
-    /**
-     Return a Realm configuration for syncing with the default Realm of the currently logged-in sync user.
-
-     Query based synchronization is enabled in the returned configuration.
-
-     - requires: There be exactly one logged-in `SyncUser`
-
-     - warning: This has ben deprecated. Use SyncUser.configuration() instead.
-    */
-    @available(*, deprecated, message: "Use SyncUser.configuration() instead")
+    /// :nodoc:
+    @available(*, unavailable, message: "Use SyncUser.configuration() instead")
     public static func automatic() -> Realm.Configuration {
-        return ObjectiveCSupport.convert(object: RLMSyncConfiguration.automaticConfiguration())
+        fatalError()
     }
 
-    /**
-     Return a Realm configuration for syncing with the default Realm of the given sync user.
-
-     Partial synchronization is enabled in the returned configuration.
-    */
-    @available(*, deprecated, message: "Use SyncUser.configuration() instead")
+    /// :nodoc:
+    @available(*, unavailable, message: "Use SyncUser.configuration() instead")
     public static func automatic(user: SyncUser) -> Realm.Configuration {
-        return ObjectiveCSupport.convert(object: RLMSyncConfiguration.automaticConfiguration(for: user))
+        fatalError()
     }
 }
 
@@ -784,21 +741,11 @@ public extension SyncSession {
 }
 
 extension Realm {
-    /**
-     If the Realm is a partially synchronized Realm, fetch and synchronize the objects
-     of a given object type that match the given query (in string format).
-
-     The results will be returned asynchronously in the callback.
-     Use `Results.observe(_:)` to be notified to changes to the set of synchronized objects.
-
-     - warning: Partial synchronization is a tech preview. Its APIs are subject to change.
-     */
-    @available(*, deprecated, message: "Use Results.subscribe()")
+    /// :nodoc:
+    @available(*, unavailable, message: "Use Results.subscribe()")
     public func subscribe<T: Object>(to objects: T.Type, where: String,
                                      completion: @escaping (Results<T>?, Swift.Error?) -> Void) {
-        rlmRealm.subscribe(toObjects: objects, where: `where`) { (results, error) in
-            completion(results.map { Results<T>($0) }, error)
-        }
+        fatalError()
     }
 
     /**

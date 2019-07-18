@@ -1761,52 +1761,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertNil(error);
 }
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated"
-- (void)testAutomaticSyncConfiguration {
-    NSURL *server = [RLMObjectServerTests authServerURL];
-
-    // Automatic configuration should throw when there are no logged-in users.
-    XCTAssertThrows([RLMSyncConfiguration automaticConfiguration]);
-
-    RLMSyncCredentials *credsA = [RLMObjectServerTests basicCredentialsWithName:@"a" register:YES];
-    RLMSyncUser *userA = [self logInUserForCredentials:credsA server:server];
-
-    // Now that there's a logged-in user, we should be able to retrieve the configuration.
-    RLMRealmConfiguration *configuration = [RLMSyncConfiguration automaticConfiguration];
-    XCTAssert(configuration);
-
-    @autoreleasepool {
-        // And open it successfully.
-        RLMRealm *realm = [self openRealmWithConfiguration:configuration];
-        [self waitForDownloadsForRealm:realm];
-    }
-
-
-    RLMSyncCredentials *credsB = [RLMObjectServerTests basicCredentialsWithName:@"b" register:YES];
-    RLMSyncUser *userB = [self logInUserForCredentials:credsB server:server];
-
-    // Automatic configuration should throw since there's more than one logged-in user.
-    XCTAssertThrows([RLMSyncConfiguration automaticConfiguration]);
-
-    // It should still be possible to explicitly retrieve an automatic configuration for a user.
-    RLMRealmConfiguration *configurationA = [RLMSyncConfiguration automaticConfigurationForUser:userA];
-    XCTAssert(configurationA);
-    XCTAssertEqualObjects(configuration.syncConfiguration, configurationA.syncConfiguration);
-
-    RLMRealmConfiguration *configurationB = [RLMSyncConfiguration automaticConfigurationForUser:userB];
-    XCTAssert(configurationB);
-    XCTAssertNotEqualObjects(configuration.syncConfiguration, configurationB.syncConfiguration);
-
-
-    [userB logOut];
-
-    // Now that we're back to a single logged-in user, we should be able to retrieve the configuration.
-    configuration = [RLMSyncConfiguration automaticConfiguration];
-    XCTAssert(configuration);
-}
-#pragma clang diagnostic pop
-
 #pragma mark - Partial sync
 
 - (void)waitForKeyPath:(NSString *)keyPath object:(id)object value:(id)value {
