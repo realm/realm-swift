@@ -449,7 +449,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let fileURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent(fileName)
         try! FileManager.default.copyItem(at: sourceFileURL, to: fileURL)
 
-        let syncConfig = RLMSyncConfiguration(user: user, realmURL: realmURL)
+        let syncConfig = ObjectiveCSupport.convert(object: user.configuration(realmURL: realmURL, fullSynchronization: true).syncConfiguration!)
         syncConfig.customFileURL = fileURL
         let config = Realm.Configuration(syncConfiguration: ObjectiveCSupport.convert(object: syncConfig))
         do {
