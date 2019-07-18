@@ -186,7 +186,8 @@ id RLMCreateManagedAccessor(Class cls, __unsafe_unretained RLMRealm *realm, RLMC
     value = RLMCoerceToNil(value);
     RLMProperty *property = _objectSchema[key];
     if (Ivar ivar = property.swiftIvar) {
-        if (property.array && (!value || [value conformsToProtocol:@protocol(NSFastEnumeration)])) {
+        if (property.array) {
+            value = RLMAsFastEnumeration(value);
             RLMArray *array = [object_getIvar(self, ivar) _rlmArray];
             [array removeAllObjects];
 

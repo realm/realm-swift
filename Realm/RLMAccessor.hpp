@@ -72,7 +72,8 @@ public:
 
     template<typename Func>
     void enumerate_list(__unsafe_unretained const id v, Func&& func) {
-        for (id value in v) {
+        id enumerable = RLMAsFastEnumeration(v) ?: v;
+        for (id value in enumerable) {
             func(value);
         }
     }

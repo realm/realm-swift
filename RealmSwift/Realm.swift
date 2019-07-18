@@ -37,7 +37,7 @@ import Realm.Private
  that you must construct a new instance in each block which is dispatched, as a queue is not guaranteed to
  run all of its blocks on the same thread.
  */
-public final class Realm {
+public struct Realm {
 
     // MARK: Properties
 
@@ -63,7 +63,7 @@ public final class Realm {
 
      - throws: An `NSError` if the Realm could not be initialized.
      */
-    public convenience init() throws {
+    public init() throws {
         let rlmRealm = try RLMRealm(configuration: RLMRealmConfiguration.default())
         self.init(rlmRealm)
     }
@@ -75,7 +75,7 @@ public final class Realm {
 
      - throws: An `NSError` if the Realm could not be initialized.
      */
-    public convenience init(configuration: Configuration) throws {
+    public init(configuration: Configuration) throws {
         let rlmRealm = try RLMRealm(configuration: configuration.rlmConfiguration)
         self.init(rlmRealm)
     }
@@ -87,7 +87,7 @@ public final class Realm {
 
      - throws: An `NSError` if the Realm could not be initialized.
      */
-    public convenience init(fileURL: URL) throws {
+    public init(fileURL: URL) throws {
         var configuration = Configuration.defaultConfiguration
         configuration.fileURL = fileURL
         try self.init(configuration: configuration)
@@ -829,7 +829,7 @@ public final class Realm {
         get {
             return rlmRealm.autorefresh
         }
-        set {
+        nonmutating set {
             rlmRealm.autorefresh = newValue
         }
     }

@@ -78,22 +78,13 @@ extension Int64: AddableType {}
 
  Results instances cannot be directly instantiated.
  */
-public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnumeration {
+public struct Results<Element: RealmCollectionValue>: Equatable {
 
     internal let rlmResults: RLMResults<AnyObject>
 
     /// A human-readable description of the objects represented by the results.
-    public override var description: String {
+    public var description: String {
         return RLMDescriptionWithMaxDepth("Results", rlmResults, RLMDescriptionMaxDepth)
-    }
-
-    // MARK: Fast Enumeration
-
-    /// :nodoc:
-    public func countByEnumerating(with state: UnsafeMutablePointer<NSFastEnumerationState>,
-                                   objects buffer: AutoreleasingUnsafeMutablePointer<AnyObject?>,
-                                   count len: Int) -> Int {
-        return Int(rlmResults.countByEnumerating(with: state, objects: buffer, count: UInt(len)))
     }
 
     /// The type of the objects described by the results.
@@ -174,7 +165,7 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
 
      - parameter key: The name of the property whose values are desired.
      */
-    public override func value(forKey key: String) -> Any? {
+    public func value(forKey key: String) -> Any? {
         return value(forKeyPath: key)
     }
 
@@ -183,7 +174,7 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
 
      - parameter keyPath: The key path to the property whose values are desired.
      */
-    public override func value(forKeyPath keyPath: String) -> Any? {
+    public func value(forKeyPath keyPath: String) -> Any? {
         return rlmResults.value(forKeyPath: keyPath)
     }
 
@@ -196,7 +187,7 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
      - parameter value: The object value.
      - parameter key:   The name of the property whose value should be set on each object.
      */
-    public override func setValue(_ value: Any?, forKey key: String) {
+    public func setValue(_ value: Any?, forKey key: String) {
         return rlmResults.setValue(value, forKeyPath: key)
     }
 
@@ -381,6 +372,13 @@ extension Results: RealmCollection {
     /// Returns a `RLMIterator` that yields successive elements in the results.
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: rlmResults)
+    }
+
+    /// :nodoc:
+    // swiftlint:disable:next identifier_name
+    public func _asNSFastEnumerator() -> Any {
+        return rlmResults
+
     }
 
     // MARK: Collection Support
