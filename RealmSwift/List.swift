@@ -749,9 +749,3 @@ extension List: AssistedObjectiveCBridgeable {
         return (objectiveCValue: _rlmArray, metadata: nil)
     }
 }
-// MARK: - Unavailable
-
-extension List {
-    @available(*, unavailable, renamed: "remove(at:)")
-    public func remove(objectAtIndex: Int) { fatalError() }
-}

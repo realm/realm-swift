@@ -708,21 +708,3 @@ extension Object: AssistedObjectiveCBridgeable {
         return (objectiveCValue: unsafeCastToRLMObject(), metadata: nil)
     }
 }
-
-// MARK: - Migration assistance
-
-extension Object {
-    /// :nodoc:
-    @available(*, unavailable, renamed: "observe()")
-    public func addNotificationBlock(_ block: @escaping (ObjectChange) -> Void) -> NotificationToken {
-        fatalError()
-    }
-
-#if os(OSX)
-#else
-    /// :nodoc:
-    @available(*, unavailable, renamed: "isSameObject(as:)") public func isEqual(to object: Any?) -> Bool {
-        fatalError()
-    }
-#endif
-}
