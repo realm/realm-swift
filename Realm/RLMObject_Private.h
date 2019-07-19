@@ -60,18 +60,6 @@ typedef NS_ENUM(int32_t, RLMPropertyType);
 
 @end
 
-// A reference to an object's row that doesn't keep the object accessor alive.
-// Used by some Swift property types, such as LinkingObjects, to avoid retain cycles
-// with their containing object.
-@interface RLMWeakObjectHandle : NSObject<NSCopying>
-
-- (instancetype)initWithObject:(RLMObjectBase *)object;
-
-// Consumes the row, so can only usefully be called once.
-@property (nonatomic, readonly) RLMObjectBase *object;
-
-@end
-
 // Calls valueForKey: and re-raises NSUndefinedKeyExceptions
 FOUNDATION_EXTERN id _Nullable RLMValidatedValueForProperty(id object, NSString *key, NSString *className);
 
@@ -91,5 +79,10 @@ FOUNDATION_EXTERN BOOL RLMIsObjectOrSubclass(Class klass);
 FOUNDATION_EXTERN BOOL RLMIsObjectSubclass(Class klass);
 
 FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
+
+@interface RLMManagedPropertyAccessor : NSObject
++ (void)initializeObject:(void *)object parent:(RLMObjectBase *)parent property:(RLMProperty *)property;
++ (id)get:(void *)pointer;
+@end
 
 NS_ASSUME_NONNULL_END

@@ -582,7 +582,6 @@ extension List: MutableCollection {
         guard number <= count else {
             throwRealmException("It is not possible to remove more objects (\(number)) from a list"
                 + " than it already contains (\(count)).")
-            return
         }
         for _ in 0..<number {
             _rlmArray.removeObject(at: 0)
@@ -600,7 +599,6 @@ extension List: MutableCollection {
         guard number <= count else {
             throwRealmException("It is not possible to remove more objects (\(number)) from a list"
                 + " than it already contains (\(count)).")
-            return
         }
         for _ in 0..<number {
             _rlmArray.removeLastObject()
