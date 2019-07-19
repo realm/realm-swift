@@ -564,20 +564,12 @@ id RLMDynamicGet(__unsafe_unretained RLMObjectBase *const obj, __unsafe_unretain
 }
 
 id RLMDynamicGetByName(__unsafe_unretained RLMObjectBase *const obj,
-                       __unsafe_unretained NSString *const propName, bool asList) {
+                       __unsafe_unretained NSString *const propName) {
     RLMProperty *prop = obj->_objectSchema[propName];
     if (!prop) {
         @throw RLMException(@"Invalid property name '%@' for class '%@'.",
                             propName, obj->_objectSchema.className);
     }
-    if (asList && prop.array && prop.swiftIvar) {
-        RLMListBase *list = object_getIvar(obj, prop.swiftIvar);
-        if (prop.type != RLMPropertyTypeLinkingObjects && !list._rlmArray) {
-            list._rlmArray = RLMDynamicGet(obj, prop);
-        }
-        return list;
-    }
-
     return RLMDynamicGet(obj, prop);
 }
 
@@ -808,3 +800,9 @@ RLMOptionalId RLMAccessorContext::default_value_for_property(realm::ObjectSchema
 bool RLMAccessorContext::is_same_list(realm::List const& list, __unsafe_unretained id const v) const noexcept {
     return [v respondsToSelector:@selector(isBackedByList:)] && [v isBackedByList:list];
 }
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wincomplete-implementation"
+@implementation RLMManagedPropertyAccessor
+@end
+#pragma clang diagnostic pop

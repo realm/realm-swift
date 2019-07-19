@@ -42,11 +42,6 @@
 
 using namespace realm;
 
-@interface LinkingObjectsBase : NSObject
-@property (nonatomic, nullable) RLMWeakObjectHandle *object;
-@property (nonatomic, nullable) RLMProperty *property;
-@end
-
 void RLMRealmCreateAccessors(RLMSchema *schema) {
     const size_t bufferSize = sizeof("RLM:Managed  ") // includes null terminator
                             + std::numeric_limits<unsigned long long>::digits10
@@ -92,16 +87,17 @@ void RLMInitializeSwiftAccessorGenerics(__unsafe_unretained RLMObjectBase *const
     }
 
     for (RLMProperty *prop in object->_objectSchema.swiftGenericProperties) {
-        id ivar = object_getIvar(object, prop.swiftIvar);
         if (prop.type == RLMPropertyTypeLinkingObjects) {
-            [ivar setObject:(id)[[RLMWeakObjectHandle alloc] initWithObject:object]];
-            [ivar setProperty:prop];
+            [prop.swiftAccessor initializeObject:(char *)(__bridge void *)object + ivar_getOffset(prop.swiftIvar)
+                                          parent:object property:prop];
         }
         else if (prop.array) {
+            id ivar = object_getIvar(object, prop.swiftIvar);
             RLMArray *array = [[RLMManagedArray alloc] initWithParent:object property:prop];
             [ivar set_rlmArray:array];
         }
         else {
+            id ivar = object_getIvar(object, prop.swiftIvar);
             RLMInitializeManagedOptional(ivar, object, prop);
         }
     }

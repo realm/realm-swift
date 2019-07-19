@@ -24,7 +24,7 @@
 #import "RLMObjectBase_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
-#import "RLMProperty.h"
+#import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
@@ -229,45 +229,11 @@
 }
 
 - (id)valueForUndefinedKey:(NSString *)key {
-    return RLMDynamicGetByName(self, key, false);
+    return RLMDynamicGetByName(self, key);
 }
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
     RLMDynamicValidatedSet(self, key, value);
-}
-
-@end
-
-@implementation RLMWeakObjectHandle {
-    realm::Row _row;
-    RLMClassInfo *_info;
-    Class _objectClass;
-}
-
-- (instancetype)initWithObject:(RLMObjectBase *)object {
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    _row = object->_row;
-    _info = object->_info;
-    _objectClass = object.class;
-
-    return self;
-}
-
-- (RLMObjectBase *)object {
-    RLMObjectBase *object = RLMCreateManagedAccessor(_objectClass, _info->realm, _info);
-    object->_row = std::move(_row);
-    return object;
-}
-
-- (id)copyWithZone:(__unused NSZone *)zone {
-    RLMWeakObjectHandle *copy = [[RLMWeakObjectHandle alloc] init];
-    copy->_row = _row;
-    copy->_info = _info;
-    copy->_objectClass = _objectClass;
-    return copy;
 }
 
 @end

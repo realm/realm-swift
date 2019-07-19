@@ -177,7 +177,7 @@ open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
             if realm == nil {
                 return value(forKey: key)
             }
-            return RLMDynamicGetByName(self, key, true)
+            return dynamicGet(key: key)
         }
         set(value) {
             if realm == nil {
@@ -186,6 +186,20 @@ open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
                 RLMDynamicValidatedSet(self, key, value)
             }
         }
+    }
+
+    private func dynamicGet(key: String) -> Any? {
+        let objectSchema = RLMObjectBaseObjectSchema(self)!
+        guard let prop = objectSchema[key] else {
+            throwRealmException("Invalid property name '\(key) for class \(objectSchema.className)")
+        }
+        if let accessor = prop.swiftAccessor {
+            return accessor.get(Unmanaged.passUnretained(self).toOpaque() + ivar_getOffset(prop.swiftIvar!))
+        }
+        if let ivar = prop.swiftIvar, prop.array {
+            return object_getIvar(self, ivar)
+        }
+        return RLMDynamicGet(self, prop)
     }
 
     // MARK: Notifications
@@ -258,7 +272,7 @@ open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
      :nodoc:
      */
     public func dynamicList(_ propertyName: String) -> List<DynamicObject> {
-        return noWarnUnsafeBitCast(RLMDynamicGetByName(self, propertyName, true) as! RLMListBase,
+        return noWarnUnsafeBitCast(dynamicGet(key: propertyName) as! RLMListBase,
                                    to: List<DynamicObject>.self)
     }
 
@@ -358,7 +372,7 @@ public enum ObjectChange {
 public final class DynamicObject: Object {
     public override subscript(key: String) -> Any? {
         get {
-            let value = RLMDynamicGetByName(self, key, false)
+            let value = RLMDynamicGetByName(self, key)
             if let array = value as? RLMArray<AnyObject> {
                 return List<DynamicObject>(rlmArray: array)
             }
@@ -515,12 +529,23 @@ extension List: ManagedPropertyType where Element: ManagedPropertyType {
     static func _rlmRequireObjc() -> Bool { return false }
 }
 
+class LinkingObjectsAccessor<Element: Object>: RLMManagedPropertyAccessor {
+    @objc override class func initializeObject(_ ptr: UnsafeMutableRawPointer,
+                                               parent: RLMObjectBase, property: RLMProperty) {
+        ptr.assumingMemoryBound(to: LinkingObjects.self).pointee.handle = RLMLinkingObjectsHandle(object: parent, property: property)
+    }
+    @objc override class func get(_ ptr: UnsafeMutableRawPointer) -> Any {
+        return ptr.assumingMemoryBound(to: LinkingObjects<Element>.self).pointee
+    }
+}
+
 extension LinkingObjects: ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     static func _rlmProperty(_ prop: RLMProperty) {
         prop.array = true
         prop.type = .linkingObjects
         prop.objectClassName = Element.className()
+        prop.swiftAccessor = LinkingObjectsAccessor<Element>.self
     }
     // swiftlint:disable:next identifier_name
     func _rlmProperty(_ prop: RLMProperty) {

@@ -403,7 +403,7 @@ id RLMObjectBaseObjectForKeyedSubscript(RLMObjectBase *object, NSString *key) {
     }
 
     if (object->_realm) {
-        return RLMDynamicGetByName(object, key, false);
+        return RLMDynamicGetByName(object, key);
     }
     else {
         return [object valueForKey:key];
