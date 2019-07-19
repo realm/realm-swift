@@ -6,6 +6,8 @@ x.y.z Release notes (yyyy-MM-dd)
   rewritten in Swift. This should not have any effect on valid class
   definitions, but there may be types of invalid definitions which previously
   worked by coincidence and no longer do.
+* `SyncSubscription` no longer has a generic type parameter, as the type was
+  not actually used for anything.
 
 
 ### Enhancements

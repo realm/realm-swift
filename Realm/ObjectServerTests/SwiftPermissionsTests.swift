@@ -148,7 +148,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         }
 
         let ex = expectation(description: "asyncOpen")
-        var subscription: SyncSubscription<SwiftSyncObject>!
+        var subscription: SyncSubscription!
         var token: NotificationToken!
         Realm.asyncOpen(configuration: userA.configuration(realmURL: url)) { realm, error in
             XCTAssertNil(error)
