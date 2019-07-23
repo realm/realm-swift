@@ -62,7 +62,7 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
                         repository.name = item["name"] as? String
                         repository.avatarURL = item["owner"]!["avatar_url"] as? String;
 
-                        realm.add(repository, update: true)
+                        realm.add(repository, update: .modified)
                     }
                 }
             } catch {
