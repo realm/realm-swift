@@ -1236,7 +1236,7 @@ EOM
 
     package-*-swift)
         PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        for version in 9.2 9.3 9.4 10.0 10.1 10.2.1; do
+        for version in 9.4 10.0 10.1 10.2.1 10.3; do
             REALM_XCODE_VERSION=$version
             REALM_SWIFT_VERSION=
             set_xcode_and_swift_versions
@@ -1245,7 +1245,7 @@ EOM
         done
 
         cd build/$PLATFORM
-        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-9.2 swift-9.2 swift-9.4 swift-10.0 swift-10.1 swift-10.2.1
+        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-9.4 swift-10.0 swift-10.1 swift-10.2.1 swift-10.3
         ;;
 
     package-*-swift-*)
@@ -1451,7 +1451,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * APIs are backwards compatible with all previous releases in the 3.x.y series.
-* Carthage release for Swift is built with Xcode 10.2.1.
+* Carthage release for Swift is built with Xcode 10.3.
 EOS)
         changelog=$(cat CHANGELOG.md)
         echo "$empty_section" > CHANGELOG.md
