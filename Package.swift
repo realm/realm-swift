@@ -1,4 +1,4 @@
-// swift-tools-version:5.0
+// swift-tools-version:5.1
 
 import PackageDescription
 import Foundation
@@ -29,6 +29,7 @@ let cxxSettings: [CXXSetting] = [
 
 let package = Package(
     name: "Realm",
+    platforms: [.macOS(.v10_15)],
     products: [
         .library(
             name: "Realm",

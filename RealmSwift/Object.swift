@@ -19,6 +19,65 @@
 import Foundation
 import Realm
 import Realm.Private
+import Combine
+import SwiftUI
+
+public protocol _RealmSubscriptionObservable {
+    func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Self
+}
+
+public struct RealmPublisher<OutputType: _RealmSubscriptionObservable> {
+    public typealias Output = OutputType
+    public typealias Failure = Never
+
+    let parent: OutputType
+    init(_ parent: OutputType) {
+        self.parent = parent
+    }
+}
+
+@available(OSXApplicationExtension 10.15, *)
+extension RealmPublisher: Publisher {
+    public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+        subscriber.receive(subscription: RealmObjectSubscription(object: parent, subscriber: subscriber))
+    }
+}
+
+@available(OSXApplicationExtension 10.15, *)
+public struct RealmObjectSubscription<SubscriberType: Subscriber>: Subscription where SubscriberType.Input: _RealmSubscriptionObservable {
+    public var combineIdentifier: CombineIdentifier {
+        return CombineIdentifier(token)
+    }
+
+    public func request(_ demand: Subscribers.Demand) { }
+
+    public func cancel() {
+        token.invalidate()
+    }
+
+    private var token: NotificationToken
+
+    init(object: SubscriberType.Input, subscriber: SubscriberType) {
+        self.token = object.observe(subscriber)
+    }
+}
+
+extension Object: _RealmSubscriptionObservable {
+    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Self {
+        return observe { change in
+            switch change {
+            case .change(_):
+                _ = subscriber.receive(self)
+                break
+            case .deleted:
+                subscriber.receive(completion: .finished)
+                break
+            default:
+                break
+            }
+        }
+    }
+}
 
 /**
  `Object` is a class used to define Realm model objects.
@@ -67,7 +126,26 @@ import Realm.Private
  See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
  */
 @objc(RealmSwiftObject)
-open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
+open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue, BindableObject {
+    public var willChange: RealmPublisher<Object> {
+        return RealmPublisher(self)
+    }
+
+    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber {
+        return observe { change in
+            switch change {
+            case .change(_):
+                _ = subscriber.receive(self)
+                break
+            case .deleted:
+                subscriber.receive(completion: .finished)
+                break
+            default:
+                break
+            }
+        }
+    }
+
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectClassName: className())
