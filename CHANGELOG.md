@@ -19,7 +19,8 @@ x.y.z Release notes (yyyy-MM-dd)
     - ThreadSafeReference
   There is no intended change in semantics from this, but certain edge cases
   may behave differently.
-
+* The designated initializers defined by RLMObject and Object other than
+  zero-argument `init` have been replaced with convenience initializers.
 
 ### Enhancements
 * None.

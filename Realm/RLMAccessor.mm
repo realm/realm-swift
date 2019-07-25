@@ -143,7 +143,7 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
     if (list.get_type() == realm::PropertyType::Object) {
         info = &obj->_info->linkTargetType(prop.index);
     }
-    RLMAccessorContext ctx(obj->_realm, *info);
+    RLMAccessorContext ctx(*info);
     translateError([&] { list.assign(ctx, value, false); });
 }
 
@@ -580,8 +580,8 @@ RLMAccessorContext::RLMAccessorContext(RLMAccessorContext& parent, realm::Proper
 {
 }
 
-RLMAccessorContext::RLMAccessorContext(RLMRealm *realm, RLMClassInfo& info, bool promote)
-: _realm(realm), _info(info), _promote_existing(promote)
+RLMAccessorContext::RLMAccessorContext(RLMClassInfo& info, bool promote)
+: _realm(info.realm), _info(info), _promote_existing(promote)
 {
 }
 
@@ -634,18 +634,18 @@ id RLMAccessorContext::propertyValue(__unsafe_unretained id const obj, size_t pr
 id RLMAccessorContext::box(realm::List&& l) {
     REALM_ASSERT(_parentObject);
     REALM_ASSERT(currentProperty);
-    return [[RLMManagedArray alloc] initWithList:std::move(l) realm:_realm
+    return [[RLMManagedArray alloc] initWithList:std::move(l)
                                       parentInfo:_parentObject->_info
                                         property:currentProperty];
 }
 
 id RLMAccessorContext::box(realm::Object&& o) {
     REALM_ASSERT(currentProperty);
-    return RLMCreateObjectAccessor(_realm, _info.linkTargetType(currentProperty.index), o.row());
+    return RLMCreateObjectAccessor(_info.linkTargetType(currentProperty.index), o.row());
 }
 
 id RLMAccessorContext::box(realm::RowExpr r) {
-    return RLMCreateObjectAccessor(_realm, _info, r);
+    return RLMCreateObjectAccessor(_info, r);
 }
 
 id RLMAccessorContext::box(realm::Results&& r) {

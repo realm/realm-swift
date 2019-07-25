@@ -54,44 +54,42 @@ static const int RLMEnumerationBufferSize = 16;
 
 - (instancetype)initWithList:(realm::List&)list
                   collection:(id)collection
-                       realm:(RLMRealm *)realm
                    classInfo:(RLMClassInfo&)info
 {
     self = [super init];
     if (self) {
-        if (realm.inWriteTransaction) {
+        _info = &info;
+        _realm = _info->realm;
+        if (_realm.inWriteTransaction) {
             _snapshot = list.snapshot();
         }
         else {
             _snapshot = list.as_results();
             _collection = collection;
-            [realm registerEnumerator:self];
+            [_realm registerEnumerator:self];
         }
         _results = &_snapshot;
-        _realm = realm;
-        _info = &info;
     }
     return self;
 }
 
 - (instancetype)initWithResults:(realm::Results&)results
                      collection:(id)collection
-                          realm:(RLMRealm *)realm
                       classInfo:(RLMClassInfo&)info
 {
     self = [super init];
     if (self) {
-        if (realm.inWriteTransaction) {
+        _info = &info;
+        _realm = _info->realm;
+        if (_realm.inWriteTransaction) {
             _snapshot = results.snapshot();
             _results = &_snapshot;
         }
         else {
             _results = &results;
             _collection = collection;
-            [realm registerEnumerator:self];
+            [_realm registerEnumerator:self];
         }
-        _realm = realm;
-        _info = &info;
     }
     return self;
 }
@@ -124,7 +122,7 @@ static const int RLMEnumerationBufferSize = 16;
     NSUInteger batchCount = 0, count = state->extra[1];
 
     @autoreleasepool {
-        RLMAccessorContext ctx(_realm, *_info);
+        RLMAccessorContext ctx(*_info);
         for (NSUInteger index = state->state; index < count && batchCount < len; ++index) {
             _strongBuffer[batchCount] = _results->get(ctx, index);
             batchCount++;
@@ -168,8 +166,7 @@ NSUInteger RLMFastEnumerate(NSFastEnumerationState *state, NSUInteger len, id<RL
 }
 
 template<typename Collection>
-NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key,
-                                  RLMRealm *realm, RLMClassInfo& info) {
+NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key, RLMClassInfo& info) {
     size_t count = collection.size();
     if (count == 0) {
         return @[];
@@ -177,7 +174,7 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key,
 
     NSMutableArray *array = [NSMutableArray arrayWithCapacity:count];
     if ([key isEqualToString:@"self"]) {
-        RLMAccessorContext context(realm, info);
+        RLMAccessorContext context(info);
         for (size_t i = 0; i < count; ++i) {
             [array addObject:collection.get(context, i) ?: NSNull.null];
         }
@@ -185,14 +182,14 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key,
     }
 
     if (collection.get_type() != realm::PropertyType::Object) {
-        RLMAccessorContext context(realm, info);
+        RLMAccessorContext context(info);
         for (size_t i = 0; i < count; ++i) {
             [array addObject:[collection.get(context, i) valueForKey:key] ?: NSNull.null];
         }
         return array;
     }
 
-    RLMObject *accessor = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, realm, &info);
+    RLMObject *accessor = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
 
     // List properties need to be handled specially since we need to create a
     // new List each time
@@ -203,13 +200,13 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key,
             // so that we can make instances of the List without creating a new
             // object accessor each time
             Class cls = [object_getIvar(accessor, prop.swiftIvar) class];
-            RLMAccessorContext context(realm, info);
+            RLMAccessorContext context(info);
             for (size_t i = 0; i < count; ++i) {
                 RLMListBase *list = [[cls alloc] init];
-                list._rlmArray = [[RLMManagedArray alloc] initWithList:realm::List(realm->_realm, *info.table(),
+                list._rlmArray = [[RLMManagedArray alloc] initWithList:realm::List(info.realm->_realm, *info.table(),
                                                                                    info.tableColumn(prop),
                                                                                    collection.get(i).get_index())
-                                                                 realm:realm parentInfo:&info
+                                                            parentInfo:&info
                                                               property:prop];
                 [array addObject:list];
             }
@@ -225,8 +222,8 @@ NSArray *RLMCollectionValueForKey(Collection& collection, NSString *key,
     return array;
 }
 
-template NSArray *RLMCollectionValueForKey(realm::Results&, NSString *, RLMRealm *, RLMClassInfo&);
-template NSArray *RLMCollectionValueForKey(realm::List&, NSString *, RLMRealm *, RLMClassInfo&);
+template NSArray *RLMCollectionValueForKey(realm::Results&, NSString *, RLMClassInfo&);
+template NSArray *RLMCollectionValueForKey(realm::List&, NSString *, RLMClassInfo&);
 
 void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key, id value) {
     realm::TableView tv = [collection tableView];
@@ -234,9 +231,8 @@ void RLMCollectionSetValueForKey(id<RLMFastEnumerable> collection, NSString *key
         return;
     }
 
-    RLMRealm *realm = collection.realm;
     RLMClassInfo *info = collection.objectInfo;
-    RLMObject *accessor = RLMCreateManagedAccessor(info->rlmObjectSchema.accessorClass, realm, info);
+    RLMObject *accessor = RLMCreateManagedAccessor(info->rlmObjectSchema.accessorClass, info);
     for (size_t i = 0; i < tv.size(); i++) {
         accessor->_row = tv[i];
         RLMInitializeSwiftAccessorGenerics(accessor);

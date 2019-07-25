@@ -23,6 +23,8 @@ NS_ASSUME_NONNULL_BEGIN
 @class RLMProperty, RLMArray;
 typedef NS_ENUM(int32_t, RLMPropertyType);
 
+FOUNDATION_EXTERN void RLMInitializeWithValue(RLMObjectBase *, id, RLMSchema *);
+
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
 @public
@@ -30,29 +32,11 @@ typedef NS_ENUM(int32_t, RLMPropertyType);
     __unsafe_unretained RLMObjectSchema *_objectSchema;
 }
 
-// unmanaged initializer
-- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema NS_DESIGNATED_INITIALIZER;
-
-// live accessor initializer
-- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
-                       schema:(RLMObjectSchema *)schema NS_DESIGNATED_INITIALIZER;
-
 // shared schema for this class
 + (nullable RLMObjectSchema *)sharedSchema;
 
 + (nullable NSArray<RLMProperty *> *)_getPropertiesWithInstance:(id)obj;
 + (bool)_realmIgnoreClass;
-
-@end
-
-@interface RLMObject ()
-
-// unmanaged initializer
-- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema NS_DESIGNATED_INITIALIZER;
-
-// live accessor initializer
-- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
-                       schema:(RLMObjectSchema *)schema NS_DESIGNATED_INITIALIZER;
 
 @end
 

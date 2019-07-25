@@ -55,18 +55,14 @@
     return [super init];
 }
 
-- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
-    return [super initWithValue:value schema:schema];
-}
-
-- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm schema:(RLMObjectSchema *)schema {
-    return [super initWithRealm:realm schema:schema];
-}
-
 #pragma mark - Convenience Initializers
 
 - (instancetype)initWithValue:(id)value {
-    return [super initWithValue:value schema:RLMSchema.partialPrivateSharedSchema];
+    if (!(self = [self init])) {
+        return nil;
+    }
+    RLMInitializeWithValue(self, value, RLMSchema.partialPrivateSharedSchema);
+    return self;
 }
 
 #pragma mark - Class-based Object Creation
@@ -224,6 +220,10 @@
 
 @implementation RLMDynamicObject
 
++ (bool)_realmIgnoreClass {
+    return true;
+}
+
 + (BOOL)shouldIncludeInDefaultSchema {
     return NO;
 }
@@ -234,6 +234,10 @@
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
     RLMDynamicValidatedSet(self, key, value);
+}
+
++ (RLMObjectSchema *)sharedSchema {
+    return nil;
 }
 
 @end
