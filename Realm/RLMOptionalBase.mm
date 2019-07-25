@@ -66,7 +66,7 @@ public:
     : _realm(obj->_realm)
     , _object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row)
     , _propertyName(prop.name.UTF8String)
-    , _ctx(obj->_realm, *obj->_info)
+    , _ctx(*obj->_info)
     {
     }
 

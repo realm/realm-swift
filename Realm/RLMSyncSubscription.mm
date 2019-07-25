@@ -432,7 +432,7 @@ RLMClassInfo& RLMResultsSetInfo::get(__unsafe_unretained RLMRealm *const realm) 
     if (row == npos) {
         return nil;
     }
-    RLMObjectBase *acc = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, self, &info);
+    RLMObjectBase *acc = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
     acc->_row = info.table()->get(row);
     return (RLMSyncSubscription *)acc;
 }

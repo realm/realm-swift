@@ -90,7 +90,7 @@ public:
 
     // Internal API
     RLMAccessorContext(RLMObjectBase *parentObject, const realm::Property *property = nullptr);
-    RLMAccessorContext(RLMRealm *realm, RLMClassInfo& info, bool promote=true);
+    RLMAccessorContext(RLMClassInfo& info, bool promote=true);
 
     // The property currently being accessed; needed for KVO things for boxing
     // List and Results

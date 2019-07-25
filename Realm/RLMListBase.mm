@@ -111,8 +111,7 @@
 }
 
 - (RLMObjectBase *)parent {
-    auto realm = _realm ?: _results.realm;
-    RLMObjectBase *obj = RLMCreateManagedAccessor(_info->rlmObjectSchema.accessorClass, realm, _info);
+    RLMObjectBase *obj = RLMCreateManagedAccessor(_info->rlmObjectSchema.accessorClass, _info);
     obj->_row = _row;
     return obj;
 }

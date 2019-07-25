@@ -101,8 +101,9 @@ open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
 
      - parameter value:  The value used to populate the object.
      */
-    public init(value: Any) {
-        super.init(value: value, schema: .partialPrivateShared())
+    public convenience init(value: Any) {
+        self.init()
+        RLMInitializeWithValue(self, value, .partialPrivateShared())
     }
 
 
@@ -294,26 +295,6 @@ open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
      */
     public func isSameObject(as object: Object?) -> Bool {
         return RLMObjectBaseAreEqual(self, object)
-    }
-
-    // MARK: Private functions
-
-    // FIXME: None of these functions should be exposed in the public interface.
-
-    /**
-    WARNING: This is an internal initializer not intended for public use.
-    :nodoc:
-    */
-    public override required init(realm: RLMRealm, schema: RLMObjectSchema) {
-        super.init(realm: realm, schema: schema)
-    }
-
-    /**
-    WARNING: This is an internal initializer not intended for public use.
-    :nodoc:
-    */
-    public override required init(value: Any, schema: RLMSchema) {
-        super.init(value: value, schema: schema)
     }
 }
 
