@@ -19,6 +19,91 @@
 import Foundation
 import Realm
 import Realm.Private
+import SwiftUI
+import Combine
+
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public struct RealmListPublisher<Element: RealmCollectionValue>: Publisher {
+    public typealias Output = List<Element>
+    public typealias Failure = Never
+
+    let parent: List<Element>
+    init(_ parent: List<Element>) {
+        self.parent = parent
+    }
+
+    public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, List<Element> == S.Input {
+        subscriber.receive(subscription: RealmListSubscription(object: parent, subscriber: subscriber))
+    }
+}
+
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public struct RealmListSubscription<SubscriberType: Subscriber, Element: RealmCollectionValue>: Subscription where SubscriberType.Input == List<Element> {
+    public var combineIdentifier: CombineIdentifier {
+        return CombineIdentifier(token)
+    }
+
+    public func request(_ demand: Subscribers.Demand) { }
+
+    public func cancel() {
+        token.invalidate()
+    }
+
+    private var token: NotificationToken
+
+    init(object: SubscriberType.Input, subscriber: SubscriberType) {
+        self.token = object.observe(subscriber)
+    }
+}
+
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+extension List: BindableObject {
+    public var willChange: RealmListPublisher<Element> {
+        return RealmListPublisher(self)
+    }
+
+    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == List<Element> {
+        return observe { change in
+            switch change {
+            case .update(_, deletions: _, insertions: _, modifications: _):
+                _ = subscriber.receive(self)
+                break
+            default:
+                break
+            }
+        }
+    }
+}
+
+struct IdentifierWrapper: Identifiable {
+    var id: ObjectIdentifier
+
+    
+}
+
+//extension ForEach where Data : RandomAccessCollection, Content : View, Data.Element : Identifiable {
+//    public init(_ data: Data, ctent: @escaping (Data.Element) -> Content) {
+//        self.init(data, content: ctent)
+//    }
+//}
+
+//extension SwiftUI.List where Selection == Never {
+//    public init<Data, Element, ID, RowContent>(_ data: Data, rowContent: @escaping (Element) -> RowContent)
+//        where Data: List<Element>, RowContent : View, Element : Identifiable, Content == ForEach<IdentifierValuePairs<Data, ID>, HStack<RowContent>>  {
+////            self.init(data, id: \.self, rowContent: rowContent)
+//            self.init(content: {
+//                ForEach<Data, RowContent>.init(data, id: \.self, content: rowContent)
+//            })
+////            self.init(content: {
+////                ForEach<Data, RowContent>.init(data, content: { flerp in
+////                    rowContent(flerp)
+////            })
+////        })
+//    }
+//}
 
 /// :nodoc:
 /// Internal class. Do not use directly.

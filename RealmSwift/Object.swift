@@ -22,29 +22,29 @@ import Realm.Private
 import Combine
 import SwiftUI
 
-public protocol _RealmSubscriptionObservable {
-    func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Self
+public protocol RealmObservable {
+    associatedtype Output
 }
 
-public struct RealmPublisher<OutputType: _RealmSubscriptionObservable> {
-    public typealias Output = OutputType
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public struct RealmObjectPublisher<T : Object>: Publisher {
+    public typealias Output = T
     public typealias Failure = Never
 
-    let parent: OutputType
-    init(_ parent: OutputType) {
+    let parent: T
+    public init(_ parent: T) {
         self.parent = parent
     }
-}
 
-@available(OSXApplicationExtension 10.15, *)
-extension RealmPublisher: Publisher {
-    public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+    public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, T == S.Input {
         subscriber.receive(subscription: RealmObjectSubscription(object: parent, subscriber: subscriber))
     }
 }
 
+@available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-public struct RealmObjectSubscription<SubscriberType: Subscriber>: Subscription where SubscriberType.Input: _RealmSubscriptionObservable {
+public struct RealmObjectSubscription<SubscriberType: Subscriber, T: Object>: Subscription where SubscriberType.Input == T {
     public var combineIdentifier: CombineIdentifier {
         return CombineIdentifier(token)
     }
@@ -62,12 +62,30 @@ public struct RealmObjectSubscription<SubscriberType: Subscriber>: Subscription 
     }
 }
 
-extension Object: _RealmSubscriptionObservable {
-    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Self {
+extension BindableObject where Self : Object {
+    public var willChange: RealmObjectPublisher<Self> {
+        return RealmObjectPublisher(self)
+    }
+}
+
+public protocol Bindable : Object, BindableObject  {
+    var willChange: RealmObjectPublisher<Self> { get }
+}
+
+extension Bindable {
+    public var willChange: RealmObjectPublisher<Self> {
+        return RealmObjectPublisher(self)
+    }
+}
+
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+extension Object {
+    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input: Object {
         return observe { change in
             switch change {
             case .change(_):
-                _ = subscriber.receive(self)
+                _ = subscriber.receive(self as! S.Input)
                 break
             case .deleted:
                 subscriber.receive(completion: .finished)
@@ -126,25 +144,7 @@ extension Object: _RealmSubscriptionObservable {
  See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
  */
 @objc(RealmSwiftObject)
-open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue, BindableObject {
-    public var willChange: RealmPublisher<Object> {
-        return RealmPublisher(self)
-    }
-
-    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber {
-        return observe { change in
-            switch change {
-            case .change(_):
-                _ = subscriber.receive(self)
-                break
-            case .deleted:
-                subscriber.receive(completion: .finished)
-                break
-            default:
-                break
-            }
-        }
-    }
+open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
 
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {

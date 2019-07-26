@@ -529,6 +529,13 @@
 			remoteGlobalIDString = 3FE5818822C2CA2E00BA10E7;
 			remoteInfo = "RealmTestSupport static";
 		};
+		49C8A43222EA07E900C2F263 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 49C8A42E22EA07E900C2F263 /* SwiftUITest.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 494B831822E929A2008FDFBA;
+			remoteInfo = SwiftUITest;
+		};
 		5D6157011BE0A3A100A4BD3F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -857,6 +864,7 @@
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
 		3FF2A9F21F4F3BEB00678BC0 /* primitive_list_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = primitive_list_notifier.hpp; sourceTree = "<group>"; };
 		3FF2A9F31F4F3BEB00678BC0 /* primitive_list_notifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive_list_notifier.cpp; sourceTree = "<group>"; };
+		49C8A42E22EA07E900C2F263 /* SwiftUITest.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SwiftUITest.xcodeproj; path = ../SwiftUITest/SwiftUITest.xcodeproj; sourceTree = "<group>"; };
 		5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupport.swift; sourceTree = "<group>"; };
 		5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupportTests.swift; sourceTree = "<group>"; };
 		5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PredicateUtilTests.mm; sourceTree = "<group>"; };
@@ -1306,6 +1314,14 @@
 			path = impl;
 			sourceTree = "<group>";
 		};
+		49C8A42F22EA07E900C2F263 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				49C8A43322EA07E900C2F263 /* SwiftUITest.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		5D274C511D6D16BA006FEBB1 /* apple */ = {
 			isa = PBXGroup;
 			children = (
@@ -1538,6 +1554,7 @@
 		E8D89B8E1955FC6D00CF2B9A = {
 			isa = PBXGroup;
 			children = (
+				49C8A42E22EA07E900C2F263 /* SwiftUITest.xcodeproj */,
 				5D660FB71BE98B770021E04F /* Configuration */,
 				1A7B82361D51254600750296 /* Frameworks */,
 				E81A1FB41955FCE000FDED82 /* LICENSE */,
@@ -2134,6 +2151,12 @@
 			mainGroup = E8D89B8E1955FC6D00CF2B9A;
 			productRefGroup = E8D89B991955FC6D00CF2B9A /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 49C8A42F22EA07E900C2F263 /* Products */;
+					ProjectRef = 49C8A42E22EA07E900C2F263 /* SwiftUITest.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				5D659E7D1BE04556006515A0 /* Realm */,
@@ -2152,6 +2175,16 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		49C8A43322EA07E900C2F263 /* SwiftUITest.app */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.application;
+			path = SwiftUITest.app;
+			remoteRef = 49C8A43222EA07E900C2F263 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		2973CCF81C175AAA00FEA0FA /* Resources */ = {
@@ -2954,7 +2987,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
 		};
@@ -2962,7 +2997,9 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
 		};
