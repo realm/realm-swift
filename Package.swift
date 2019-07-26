@@ -29,7 +29,7 @@ let cxxSettings: [CXXSetting] = [
 
 let package = Package(
     name: "Realm",
-    platforms: [.macOS(.v10_15)],
+    platforms: [.macOS(.v10_15), .iOS(.v13)],
     products: [
         .library(
             name: "Realm",
