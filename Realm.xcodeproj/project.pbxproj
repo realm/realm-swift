@@ -529,12 +529,12 @@
 			remoteGlobalIDString = 3FE5818822C2CA2E00BA10E7;
 			remoteInfo = "RealmTestSupport static";
 		};
-		49C8A43222EA07E900C2F263 /* PBXContainerItemProxy */ = {
+		49DF6D5A22EB9E2F003BA24F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 49C8A42E22EA07E900C2F263 /* SwiftUITest.xcodeproj */;
+			containerPortal = 49C8A42E22EA07E900C2F263 /* pokerealm.xcodeproj */;
 			proxyType = 2;
 			remoteGlobalIDString = 494B831822E929A2008FDFBA;
-			remoteInfo = SwiftUITest;
+			remoteInfo = pokerealm;
 		};
 		5D6157011BE0A3A100A4BD3F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -864,7 +864,7 @@
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
 		3FF2A9F21F4F3BEB00678BC0 /* primitive_list_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = primitive_list_notifier.hpp; sourceTree = "<group>"; };
 		3FF2A9F31F4F3BEB00678BC0 /* primitive_list_notifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive_list_notifier.cpp; sourceTree = "<group>"; };
-		49C8A42E22EA07E900C2F263 /* SwiftUITest.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = SwiftUITest.xcodeproj; path = ../SwiftUITest/SwiftUITest.xcodeproj; sourceTree = "<group>"; };
+		49C8A42E22EA07E900C2F263 /* pokerealm.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = pokerealm.xcodeproj; path = ../SwiftUITest/pokerealm.xcodeproj; sourceTree = "<group>"; };
 		5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupport.swift; sourceTree = "<group>"; };
 		5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupportTests.swift; sourceTree = "<group>"; };
 		5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PredicateUtilTests.mm; sourceTree = "<group>"; };
@@ -1314,10 +1314,10 @@
 			path = impl;
 			sourceTree = "<group>";
 		};
-		49C8A42F22EA07E900C2F263 /* Products */ = {
+		49DF6D5722EB9E2C003BA24F /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				49C8A43322EA07E900C2F263 /* SwiftUITest.app */,
+				49DF6D5B22EB9E2F003BA24F /* pokerealm.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1554,7 +1554,7 @@
 		E8D89B8E1955FC6D00CF2B9A = {
 			isa = PBXGroup;
 			children = (
-				49C8A42E22EA07E900C2F263 /* SwiftUITest.xcodeproj */,
+				49C8A42E22EA07E900C2F263 /* pokerealm.xcodeproj */,
 				5D660FB71BE98B770021E04F /* Configuration */,
 				1A7B82361D51254600750296 /* Frameworks */,
 				E81A1FB41955FCE000FDED82 /* LICENSE */,
@@ -2153,8 +2153,8 @@
 			projectDirPath = "";
 			projectReferences = (
 				{
-					ProductGroup = 49C8A42F22EA07E900C2F263 /* Products */;
-					ProjectRef = 49C8A42E22EA07E900C2F263 /* SwiftUITest.xcodeproj */;
+					ProductGroup = 49DF6D5722EB9E2C003BA24F /* Products */;
+					ProjectRef = 49C8A42E22EA07E900C2F263 /* pokerealm.xcodeproj */;
 				},
 			);
 			projectRoot = "";
@@ -2177,11 +2177,11 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		49C8A43322EA07E900C2F263 /* SwiftUITest.app */ = {
+		49DF6D5B22EB9E2F003BA24F /* pokerealm.app */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.application;
-			path = SwiftUITest.app;
-			remoteRef = 49C8A43222EA07E900C2F263 /* PBXContainerItemProxy */;
+			path = pokerealm.app;
+			remoteRef = 49DF6D5A22EB9E2F003BA24F /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
 /* End PBXReferenceProxy section */
@@ -2966,6 +2966,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
@@ -2978,6 +2979,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				SWIFT_VERSION = 3.0;
 			};

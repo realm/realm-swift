@@ -22,10 +22,7 @@ import Realm.Private
 import Combine
 import SwiftUI
 
-public protocol RealmObservable {
-    associatedtype Output
-}
-
+@available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
 public struct RealmObjectPublisher<T : Object>: Publisher {
@@ -42,6 +39,7 @@ public struct RealmObjectPublisher<T : Object>: Publisher {
     }
 }
 
+@available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
 public struct RealmObjectSubscription<SubscriberType: Subscriber, T: Object>: Subscription where SubscriberType.Input == T {
@@ -62,22 +60,26 @@ public struct RealmObjectSubscription<SubscriberType: Subscriber, T: Object>: Su
     }
 }
 
+@available(iOS 13.0, *)
 extension BindableObject where Self : Object {
     public var willChange: RealmObjectPublisher<Self> {
         return RealmObjectPublisher(self)
     }
 }
 
+@available(iOS 13.0, *)
 public protocol Bindable : Object, BindableObject  {
     var willChange: RealmObjectPublisher<Self> { get }
 }
 
+@available(iOS 13.0, *)
 extension Bindable {
     public var willChange: RealmObjectPublisher<Self> {
         return RealmObjectPublisher(self)
     }
 }
 
+@available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
 extension Object {

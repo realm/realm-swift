@@ -22,6 +22,7 @@ import Realm.Private
 import SwiftUI
 import Combine
 
+@available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
 public struct RealmListPublisher<Element: RealmCollectionValue>: Publisher {
@@ -38,6 +39,7 @@ public struct RealmListPublisher<Element: RealmCollectionValue>: Publisher {
     }
 }
 
+@available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
 public struct RealmListSubscription<SubscriberType: Subscriber, Element: RealmCollectionValue>: Subscription where SubscriberType.Input == List<Element> {
@@ -58,6 +60,7 @@ public struct RealmListSubscription<SubscriberType: Subscriber, Element: RealmCo
     }
 }
 
+@available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
 extension List: BindableObject {
