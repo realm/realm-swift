@@ -18,6 +18,8 @@
 
 import Foundation
 import Realm
+import SwiftUI
+import Combine
 
 // MARK: MinMaxType
 
@@ -57,6 +59,73 @@ extension Int8: AddableType {}
 extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
+
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public struct RealmResultsPublisher<V, T : Results<V>>: Publisher {
+    public typealias Output = T
+    public typealias Failure = Never
+
+    let parent: T
+    public init(_ parent: T) {
+        self.parent = parent
+    }
+
+    public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, T == S.Input {
+        subscriber.receive(subscription: RealmResultsSubscription(object: parent, subscriber: subscriber))
+    }
+}
+
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public struct RealmResultsSubscription<SubscriberType: Subscriber, V, T: Results<V>>: Subscription where SubscriberType.Input == T {
+    public var combineIdentifier: CombineIdentifier {
+        return CombineIdentifier(token)
+    }
+
+    public func request(_ demand: Subscribers.Demand) { }
+
+    public func cancel() {
+        token.invalidate()
+    }
+
+    private var token: NotificationToken
+
+    init(object: SubscriberType.Input, subscriber: SubscriberType) {
+        self.token = object.observe(subscriber)
+    }
+}
+
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+extension Results : BindableObject {
+    public var willChange: RealmResultsPublisher<Element, Results<Element>> {
+        return RealmResultsPublisher(self)
+    }
+}
+
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+extension Results {
+    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input: Results<Element> {
+        return observe { change in
+            switch change {
+            case .initial(_):
+                subscriber.receive(self as! S.Input)
+            case .update(let results, _, _, _):
+                _ = subscriber.receive(results as! S.Input)
+                break
+            default:
+                break
+            }
+        }
+    }
+}
+
 
 /**
  `Results` is an auto-updating container type in Realm returned from object queries.
