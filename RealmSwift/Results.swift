@@ -60,6 +60,7 @@ extension Int16: AddableType {}
 extension Int32: AddableType {}
 extension Int64: AddableType {}
 
+@available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
@@ -77,6 +78,7 @@ public struct RealmResultsPublisher<V, T : Results<V>>: Publisher {
     }
 }
 
+@available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
@@ -98,6 +100,7 @@ public struct RealmResultsSubscription<SubscriberType: Subscriber, V, T: Results
     }
 }
 
+@available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
@@ -107,6 +110,7 @@ extension Results : ObservableObject, Identifiable {
     }
 }
 
+@available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)

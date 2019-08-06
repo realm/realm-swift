@@ -22,6 +22,7 @@ import Realm.Private
 import SwiftUI
 import Combine
 
+@available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
@@ -39,6 +40,7 @@ public struct RealmListPublisher<Element: RealmCollectionValue>: Publisher {
     }
 }
 
+@available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
@@ -60,6 +62,7 @@ public struct RealmListSubscription<SubscriberType: Subscriber, Element: RealmCo
     }
 }
 
+@available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
@@ -80,33 +83,6 @@ extension List: Combine.ObservableObject {
         }
     }
 }
-
-struct IdentifierWrapper: Identifiable {
-    var id: ObjectIdentifier
-
-    
-}
-
-//extension ForEach where Data : RandomAccessCollection, Content : View, Data.Element : Identifiable {
-//    public init(_ data: Data, ctent: @escaping (Data.Element) -> Content) {
-//        self.init(data, content: ctent)
-//    }
-//}
-
-//extension SwiftUI.List where Selection == Never {
-//    public init<Data, Element, ID, RowContent>(_ data: Data, rowContent: @escaping (Element) -> RowContent)
-//        where Data: List<Element>, RowContent : View, Element : Identifiable, Content == ForEach<IdentifierValuePairs<Data, ID>, HStack<RowContent>>  {
-////            self.init(data, id: \.self, rowContent: rowContent)
-//            self.init(content: {
-//                ForEach<Data, RowContent>.init(data, id: \.self, content: rowContent)
-//            })
-////            self.init(content: {
-////                ForEach<Data, RowContent>.init(data, content: { flerp in
-////                    rowContent(flerp)
-////            })
-////        })
-//    }
-//}
 
 /// :nodoc:
 /// Internal class. Do not use directly.
