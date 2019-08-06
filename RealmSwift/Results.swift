@@ -101,8 +101,8 @@ public struct RealmResultsSubscription<SubscriberType: Subscriber, V, T: Results
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-extension Results : BindableObject {
-    public var willChange: RealmResultsPublisher<Element, Results<Element>> {
+extension Results : ObservableObject, Identifiable {
+    public var objectWillChange: RealmResultsPublisher<Element, Results<Element>> {
         return RealmResultsPublisher(self)
     }
 }

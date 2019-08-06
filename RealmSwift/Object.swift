@@ -60,17 +60,17 @@ public struct RealmObjectSubscription<SubscriberType: Subscriber, T: Object>: Su
     }
 }
 
-@available(iOS 13.0, *)
-extension BindableObject where Self : Object {
-    public var willChange: RealmObjectPublisher<Self> {
-        return RealmObjectPublisher(self)
-    }
-}
-
-@available(iOS 13.0, *)
-public protocol Bindable : Object, BindableObject  {
-    var willChange: RealmObjectPublisher<Self> { get }
-}
+//@available(iOS 13.0, *)
+//extension BindableObject where Self : Object {
+//    public var willChange: RealmObjectPublisher<Self> {
+//        return RealmObjectPublisher(self)
+//    }
+//}
+//
+//@available(iOS 13.0, *)
+//public protocol Bindable : Object, BindableObject  {
+//    var willChange: RealmObjectPublisher<Self> { get }
+//}
 
 @available(iOS 13.0, *)
 extension Bindable {
@@ -82,7 +82,12 @@ extension Bindable {
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-extension Object {
+extension Object : Combine.ObservableObject, Identifiable {
+
+    public var objectWillChange: RealmObjectPublisher<Self> {
+        return RealmObjectPublisher(self as! Self)
+    }
+    
     public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input: Object {
         return observe { change in
             switch change {

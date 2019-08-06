@@ -63,7 +63,7 @@ public struct RealmListSubscription<SubscriberType: Subscriber, Element: RealmCo
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-extension List: BindableObject {
+extension List: Combine.ObservableObject {
     public var willChange: RealmListPublisher<Element> {
         return RealmListPublisher(self)
     }
