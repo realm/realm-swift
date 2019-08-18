@@ -19,74 +19,13 @@
 import Foundation
 import Realm
 import Realm.Private
-import Combine
+#if canImport(SwiftUI)
 import SwiftUI
+#endif
+#if canImport(Combine)
+import Combine
+#endif
 
-@available(watchOS 6.0, *)
-@available(iOS 13.0, *)
-@available(iOSApplicationExtension 13.0, *)
-@available(OSXApplicationExtension 10.15, *)
-public struct RealmObjectPublisher<T : Object>: Publisher {
-    public typealias Output = T
-    public typealias Failure = Never
-
-    let parent: T
-    public init(_ parent: T) {
-        self.parent = parent
-    }
-
-    public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, T == S.Input {
-        subscriber.receive(subscription: RealmObjectSubscription(object: parent, subscriber: subscriber))
-    }
-}
-
-@available(watchOS 6.0, *)
-@available(iOS 13.0, *)
-@available(iOSApplicationExtension 13.0, *)
-@available(OSXApplicationExtension 10.15, *)
-public struct RealmObjectSubscription<SubscriberType: Subscriber, T: Object>: Subscription where SubscriberType.Input == T {
-    public var combineIdentifier: CombineIdentifier {
-        return CombineIdentifier(token)
-    }
-
-    public func request(_ demand: Subscribers.Demand) { }
-
-    public func cancel() {
-        token.invalidate()
-    }
-
-    private var token: NotificationToken
-
-    init(object: SubscriberType.Input, subscriber: SubscriberType) {
-        self.token = object.observe(subscriber)
-    }
-}
-
-@available(watchOS 6.0, *)
-@available(iOS 13.0, *)
-@available(iOSApplicationExtension 13.0, *)
-@available(OSXApplicationExtension 10.15, *)
-extension Object : Combine.ObservableObject, Identifiable {
-
-    public var objectWillChange: RealmObjectPublisher<Self> {
-        return RealmObjectPublisher(self as! Self)
-    }
-    
-    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input: Object {
-        return observe { change in
-            switch change {
-            case .change(_):
-                _ = subscriber.receive(self as! S.Input)
-                break
-            case .deleted:
-                subscriber.receive(completion: .finished)
-                break
-            default:
-                break
-            }
-        }
-    }
-}
 
 /**
  `Object` is a class used to define Realm model objects.
@@ -652,4 +591,73 @@ extension Object {
         fatalError()
     }
 #endif
+}
+
+// MARK: - SwiftUI extensions
+
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public struct RealmObjectPublisher<T : Object>: Publisher {
+    public typealias Output = T
+    public typealias Failure = Never
+
+    let parent: T
+    
+    public init(_ parent: T) {
+        self.parent = parent
+    }
+
+    public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, T == S.Input {
+        subscriber.receive(subscription: RealmObjectSubscription(object: parent, subscriber: subscriber))
+    }
+}
+
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public struct RealmObjectSubscription<SubscriberType: Subscriber, T: Object>: Subscription where SubscriberType.Input == T {
+    private var token: NotificationToken
+
+    public var combineIdentifier: CombineIdentifier {
+        return CombineIdentifier(token)
+    }
+
+    init(object: SubscriberType.Input, subscriber: SubscriberType) {
+        self.token = object.observe(subscriber)
+    }
+
+    public func request(_ demand: Subscribers.Demand) { }
+
+    public func cancel() {
+        token.invalidate()
+    }
+}
+
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+extension Object : Combine.ObservableObject, Identifiable {
+    public var objectWillChange: RealmObjectPublisher<Self> {
+        return RealmObjectPublisher(self as! Self)
+    }
+
+    /// Allows a subscriber to hook into Realm Changes.
+    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input: Object {
+        return observe { change in
+            switch change {
+            case .change(_):
+                _ = subscriber.receive(self as! S.Input)
+                break
+            case .deleted:
+                subscriber.receive(completion: .finished)
+                break
+            default:
+                break
+            }
+        }
+    }
 }

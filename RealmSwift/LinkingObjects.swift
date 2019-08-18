@@ -18,6 +18,13 @@
 
 import Foundation
 import Realm
+#if canImport(SwiftUI)
+import SwiftUI
+#endif
+#if canImport(Combine)
+import Combine
+#endif
+
 
 /// :nodoc:
 /// Internal class. Do not use directly. Used for reflection and initialization
@@ -439,6 +446,73 @@ internal enum LinkingObjectsBridgingMetadata {
         switch self {
         case .uncached(let property):   return property.name
         case .cached(let propertyName): return propertyName
+        }
+    }
+}
+
+// MARK: - SwiftUI extensions
+
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public struct RealmLinkingObjectsPublisher<Element: Object>: Publisher {
+    public typealias Output = LinkingObjects<Element>
+    public typealias Failure = Never
+
+    let parent: Output
+
+    init(_ parent: Output) {
+        self.parent = parent
+    }
+
+    public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
+        subscriber.receive(subscription: RealmLinkingObjectsSubscription(object: parent, subscriber: subscriber))
+    }
+}
+
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public struct RealmLinkingObjectsSubscription<SubscriberType: Subscriber, Element: Object>: Subscription where SubscriberType.Input == LinkingObjects<Element> {
+    private var token: NotificationToken
+
+    public var combineIdentifier: CombineIdentifier {
+        return CombineIdentifier(token)
+    }
+
+    init(object: SubscriberType.Input, subscriber: SubscriberType) {
+        self.token = object.observe(subscriber)
+    }
+
+    public func request(_ demand: Subscribers.Demand) { }
+
+    public func cancel() {
+        token.invalidate()
+    }
+}
+
+/// Compliance to ObservableObject protocol.
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+extension LinkingObjects: Combine.ObservableObject {
+    public var willChange: RealmLinkingObjectsPublisher<Element> {
+        return RealmLinkingObjectsPublisher(self)
+    }
+
+    /// Allows a subscriber to hook into Realm Changes.
+    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == LinkingObjects {
+        return observe { change in
+            switch change {
+            case .update(_, deletions: _, insertions: _, modifications: _):
+                _ = subscriber.receive(self)
+                break
+            default:
+                break
+            }
         }
     }
 }
