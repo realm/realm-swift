@@ -418,6 +418,7 @@ public struct SyncCredentials {
     }
 
     /// Initialize new credentials using a nickname.
+    @available(*, deprecated, message: "Use usernamePassword instead.")
     public static func nickname(_ nickname: String, isAdmin: Bool = false) -> SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(nickname: nickname, isAdmin: isAdmin))
     }
