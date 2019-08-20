@@ -248,7 +248,7 @@ def doBuild() {
       }
     ]
 
-    for (def platform in ["osx", "ios"]) {
+    for (def platform in ["osx", "ios", "watchos"]) {
       def platformName = platformNames[platform]
       for (def test in ["dynamic", "cocoapods", "carthage"]) {
         parallelBuilds["Installation - ${platformName} Obj-C ${test}"] = installationTest(platform, test, 'objc')
@@ -258,7 +258,7 @@ def doBuild() {
     parallelBuilds["Installation - iOS Obj-C static"] = installationTest('ios', 'static', 'objc')
     parallelBuilds["Installation - iOS Obj-C CocoaPods dynamic"] = installationTest('ios', 'cocoapods-dynamic', 'objc')
 
-    for (def platform in ["osx", "ios"]) {
+    for (def platform in ["osx", "ios", "watchos"]) {
       def platformName = platformNames[platform]
       for (def test in ["cocoapods", "carthage"]) {
         parallelBuilds["Installation - ${platformName} Swift ${test}"] = installationTest(platform, test, 'swift')

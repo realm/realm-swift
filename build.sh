@@ -45,7 +45,7 @@ command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
   download-sync:        downloads sync library (binary version, core+sync)
-  build:                builds all iOS  and macOS frameworks
+  build:                builds all iOS and macOS frameworks
   ios-static:           builds fat iOS static framework
   ios-dynamic:          builds iOS dynamic frameworks
   ios-swift:            builds RealmSwift frameworks for iOS
@@ -55,6 +55,7 @@ command:
   tvos-swift:           builds RealmSwift framework for tvOS
   osx:                  builds macOS framework
   osx-swift:            builds RealmSwift framework for macOS
+  xcframework [plats]:  builds xcframeworks for Realm and RealmSwift for given platforms
   analyze-osx:          analyzes macOS framework
   test:                 tests all iOS and macOS frameworks
   test-all:             tests all iOS and macOS frameworks in both Debug and Release configurations
@@ -174,58 +175,46 @@ build_combined() {
     xc "-scheme '$scheme' -configuration $config -sdk $os"
     xc "-scheme '$scheme' -configuration $config -sdk $simulator -destination 'name=$destination' ONLY_ACTIVE_ARCH=NO"
 
-    if (( $(xcode_version_major) < 11 )); then
-        # Combine .swiftmodule
-        if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
-          cp $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
-        fi
+    # Combine .swiftmodule
+    if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
+      cp $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
+    fi
 
-        # Xcode 10.2 merges the generated headers together with ifdef guards for
-        # each of the target platforms. This doesn't handle merging
-        # device/simulator builds, so we need to take care of that ourselves.
-        # Currently all platforms have identical headers, so we just pick one and
-        # use that rather than merging, but this may change in the future.
-        if [ -f $os_path/Headers/$module_name-Swift.h ]; then
-          unique_headers=$(find $build_intermediates_path -name $module_name-Swift.h -exec shasum {} \; | cut -d' ' -f 1 | uniq | grep -c '^')
-          if [ $unique_headers != "1" ]; then
-            echo "Platform-specific Swift generated headers are not identical. Merging them is required and is not yet implemented."
-            exit 1
-          fi
-          find $build_intermediates_path -name $module_name-Swift.h -exec cp {} $os_path/Headers \; -quit
-        fi
+    # Xcode 10.2 merges the generated headers together with ifdef guards for
+    # each of the target platforms. This doesn't handle merging
+    # device/simulator builds, so we need to take care of that ourselves.
+    # Currently all platforms have identical headers, so we just pick one and
+    # use that rather than merging, but this may change in the future.
+    if [ -f $os_path/Headers/$module_name-Swift.h ]; then
+      unique_headers=$(find $build_intermediates_path -name $module_name-Swift.h -exec shasum {} \; | cut -d' ' -f 1 | uniq | grep -c '^')
+      if [ $unique_headers != "1" ]; then
+        echo "Platform-specific Swift generated headers are not identical. Merging them is required and is not yet implemented."
+        exit 1
+      fi
+      find $build_intermediates_path -name $module_name-Swift.h -exec cp {} $os_path/Headers \; -quit
+    fi
 
-        # Copy *.bcsymbolmap to .framework for submitting app with bitcode
-        copy_bcsymbolmap "$build_products_path/$config-$os$scope_suffix" "$os_path"
+    # Copy *.bcsymbolmap to .framework for submitting app with bitcode
+    copy_bcsymbolmap "$build_products_path/$config-$os$scope_suffix" "$os_path"
 
-        # Retrieve build products
-        clean_retrieve $os_path $out_path $product_name
+    # Retrieve build products
+    clean_retrieve $os_path $out_path $product_name
 
-        # Combine ar archives
-        LIPO_OUTPUT="$out_path/$product_name/$module_name"
-        xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
+    # Combine ar archives
+    LIPO_OUTPUT="$out_path/$product_name/$module_name"
+    xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
 
-        # Verify that the combined library has bitcode and we didn't accidentally
-        # remove it somewhere along the line
-        if [[ "$destination" != "" && "$config" == "Release" ]]; then
-            sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
-        fi
-    else
-        rm -rf "$out_path/$module_name.xcframework"
-        xcodebuild -create-xcframework \
-            -framework $simulator_path \
-            -framework $os_path \
-            -output "$out_path/$module_name.xcframework"
+    # Verify that the combined library has bitcode and we didn't accidentally
+    # remove it somewhere along the line
+    if [[ "$destination" != "" && "$config" == "Release" ]]; then
+        sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
     fi
 }
 
 copy_realm_framework() {
     local platform="$1"
-    local extension="xcframework"
-    if (( $(xcode_version_major) < 11 )); then
-        extension="framework"
-    fi
-    rm -rf build/$platform/swift-$REALM_XCODE_VERSION/Realm.$extension
-    cp -R build/$platform/Realm.$extension build/$platform/swift-$REALM_XCODE_VERSION
+    rm -rf build/$platform/swift-$REALM_XCODE_VERSION/Realm.framework
+    cp -R build/$platform/Realm.framework build/$platform/swift-$REALM_XCODE_VERSION
 }
 
 clean_retrieve() {
@@ -244,6 +233,10 @@ test_ios_static() {
     destination="$1"
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' build-for-testing"
     xc "-scheme 'Realm iOS static' -configuration $CONFIGURATION -sdk iphonesimulator -destination '$destination' test"
+}
+
+plist_get() {
+    /usr/libexec/PlistBuddy -c "Print :$2" $1 2> /dev/null
 }
 
 ######################################
@@ -511,24 +504,17 @@ case "$COMMAND" in
     ######################################
     "build")
         sh build.sh ios-static
-        sh build.sh ios-dynamic
-        sh build.sh ios-swift
-        sh build.sh watchos
-        sh build.sh watchos-swift
-        sh build.sh tvos
-        sh build.sh tvos-swift
-        sh build.sh osx
-        sh build.sh osx-swift
-
         if (( $(xcode_version_major) >= 11 )); then
-            rm -rf "build/*.xcframework"
-            find build/DerivedData -name 'Realm.framework' \
-                | grep -v '\-static' \
-                | sed 's/.*/-framework &/' \
-                | xargs xcodebuild -create-xcframework -output build/Realm.xcframework
-            find build/DerivedData -name 'RealmSwift.framework' \
-                | sed 's/.*/-framework &/' \
-                | xargs xcodebuild -create-xcframework -output build/RealmSwift.xcframework
+            sh build.sh xcframework
+        else
+            sh build.sh ios-dynamic
+            sh build.sh ios-swift
+            sh build.sh watchos
+            sh build.sh watchos-swift
+            sh build.sh tvos
+            sh build.sh tvos-swift
+            sh build.sh osx
+            sh build.sh osx-swift
         fi
         exit 0
         ;;
@@ -587,6 +573,146 @@ case "$COMMAND" in
         clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
         rm -rf "$destination/Realm.framework"
         cp -R build/osx/Realm.framework "$destination"
+        exit 0
+        ;;
+
+    "xcframework")
+        if (( $(xcode_version_major) < 11 )); then
+            echo 'Building a xcframework requires Xcode 11'
+        fi
+
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS BUILD_LIBRARY_FOR_DISTRIBUTION=YES REALM_OBJC_MACH_O_TYPE=staticlib"
+
+        # Build all of the requested frameworks
+        shift
+        PLATFORMS="${*:-osx ios watchos tvos}"
+        for platform in $PLATFORMS; do
+            sh build.sh $platform-swift
+        done
+
+        # Assemble them into xcframeworks
+        rm -rf build/*.xcframework
+        find build/DerivedData/Realm/Build/Products -name 'Realm.framework' \
+            | grep -v '\-static' \
+            | sed 's/.*/-framework &/' \
+            | xargs xcodebuild -create-xcframework -output build/Realm.xcframework
+        find build/DerivedData/Realm/Build/Products -name 'RealmSwift.framework' \
+            | sed 's/.*/-framework &/' \
+            | xargs xcodebuild -create-xcframework -output build/RealmSwift.xcframework
+
+        # strip-frameworks.sh isn't needed with xcframeworks since we don't
+        # lipo together device/simulator libs
+        find build/Realm.xcframework -name 'strip-frameworks.sh' -delete
+        find build/RealmSwift.xcframework -name 'strip-frameworks.sh' -delete
+
+        # swiftinterface files currently have incorrect name resolution which
+        # results in the RealmSwift.Realm class name clashing with the Realm
+        # module name. Work around this by renaming the Realm module to
+        # RealmObjc. This is safe to do with a pre-built library because the
+        # module name is unrelated to what symbols are exported by an obj-c
+        # library, and we're statically linking the obj-c library into the
+        # swift library so it doesn't need to be loaded at runtime.
+        cd build
+        cp -R Realm.xcframework RealmObjc.xcframework
+        find RealmObjc.xcframework -name 'Realm.framework' \
+            -execdir mv {} RealmObjc.framework \; || true 2> /dev/null
+        find RealmObjc.xcframework -name '*.h' \
+            -exec sed -i '' 's/Realm\//RealmObjc\//' {} \;
+        find RealmObjc.xcframework -name 'module.modulemap' \
+            -exec sed -i '' 's/module Realm/module RealmObjc/' {} \;
+        sed -i '' 's/Realm.framework/RealmObjc.framework/' RealmObjc.xcframework/Info.plist
+
+        find RealmSwift.xcframework -name '*.swiftinterface' \
+            -exec sed -i '' 's/import Realm/import RealmObjc/' {} \;
+        find RealmSwift.xcframework -name '*.swiftinterface' \
+            -exec sed -i '' 's/Realm.RLM/RealmObjc.RLM/g' {} \;
+
+        # Realm is statically linked into RealmSwift so we no longer actually
+        # need the obj-c static library, and just need the framework shell.
+        # Remove everything but placeholder.o so that there's still a library
+        # to link against that just doesn't define any symbols.
+        find RealmObjc.xcframework -name 'Realm' | while read file; do
+            (
+                cd $(dirname $file)
+                if readlink Realm > /dev/null; then
+                    ln -sf Versions/Current/RealmObjc Realm
+                elif lipo -info Realm | grep -q 'Non-fat'; then
+                    ar -t Realm | grep -v placeholder | tr '\n' '\0' | xargs -0 ar -d Realm >/dev/null 2>&1
+                    ranlib Realm >/dev/null 2>&1
+                else
+                    for arch in $(lipo -info Realm | cut -f3 -d':'); do
+                        lipo Realm -thin $arch -output tmp.a
+                        ar -t tmp.a | grep -v placeholder | tr '\n' '\0' | xargs -0 ar -d tmp.a >/dev/null 2>&1
+                        ranlib tmp.a >/dev/null 2>&1
+                        lipo Realm -replace $arch tmp.a -output Realm
+                        rm tmp.a
+                    done
+                fi
+                mv Realm RealmObjc
+            )
+        done
+
+        # We built Realm.framework as a static framework so that we could link
+        # it into RealmSwift.framework and not have to deal with the runtime
+        # implications of renaming the shared library, but we want the end
+        # result to be that Realm.xcframework is a dynamic framework. Our build
+        # system isn't really set up to build both static and dynamic versions
+        # of it, so instead just turn each of the static libraries in
+        # Realm.xcframework into a shared library.
+        cd Realm.xcframework
+        i=0
+        while plist_get Info.plist "AvailableLibraries:$i" > /dev/null; do
+            arch_dir_name="$(plist_get Info.plist "AvailableLibraries:$i:LibraryIdentifier")"
+            platform="$(plist_get Info.plist "AvailableLibraries:$i:SupportedPlatform")"
+            variant="$(plist_get Info.plist "AvailableLibraries:$i:SupportedPlatformVariant" 2> /dev/null || echo 'os')"
+            deployment_target_name="$platform"
+            install_name='@rpath/Realm.framework/Realm'
+            bitcode_flag='-fembed-bitcode'
+            if [ "$variant" = 'simulator' ]; then
+                bitcode_flag=''
+            fi
+            case "$platform" in
+              "macos")   sdk='macosx'; install_name='@rpath/Realm.framework/Versions/A/Realm'; bitcode_flag='';;
+              "ios")     sdk="iphone$variant"; deployment_target_name='iphoneos';;
+              "watchos") sdk="watch$variant";;
+              "tvos")    sdk="appletv$variant";;
+            esac
+            deployment_target=$(grep -i "$deployment_target_name.*_DEPLOYMENT_TARGET" ../../Configuration/Base.xcconfig \
+                                | sed 's/.*= \(.*\);/\1/')
+            architectures=""
+            j=0
+            while plist_get Info.plist "AvailableLibraries:$i:SupportedArchitectures:$j" > /dev/null; do
+                architectures="${architectures} -arch $(plist_get Info.plist "AvailableLibraries:$i:SupportedArchitectures:$j")"
+                j=$(($j + 1))
+            done
+
+            (
+                cd $arch_dir_name/Realm.framework
+                realm_lib=$(readlink Realm || echo 'Realm')
+                # feature_token.cpp.o depends on PKey, which isn't actually
+                # present in the macOS build of the sync library. This normally
+                # works fine because we never reference any symbols from
+                # feature_token.cpp.o so it doesn't get pulled in at all, but
+                # -all_load makes every object file in the input get linked
+                # into the shared library.
+                ar -d $realm_lib feature_token.cpp.o 2> /dev/null || true
+                clang++ -shared $architectures \
+                    -target ${platform}${deployment_target} \
+                    -isysroot $(xcrun --sdk ${sdk} --show-sdk-path) \
+                    -install_name "$install_name" \
+                    -compatibility_version 1 -current_version 1 \
+                    -fapplication-extension \
+                    $bitcode_flag \
+                    -Wl,-all_load \
+                    -Wl,-unexported_symbol,'__Z*' \
+                    -o realm.dylib \
+                    Realm -lz
+                mv realm.dylib $realm_lib
+            )
+
+            i=$(($i + 1))
+        done
+
         exit 0
         ;;
 
@@ -948,8 +1074,7 @@ case "$COMMAND" in
     # Versioning
     ######################################
     "get-version")
-        version_file="Realm/Realm-Info.plist"
-        echo "$(PlistBuddy -c "Print :CFBundleShortVersionString" "$version_file")"
+        echo "$(plist_get 'Realm/Realm-Info.plist' 'CFBundleShortVersionString')"
         exit 0
         ;;
 
