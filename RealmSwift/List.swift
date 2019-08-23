@@ -19,12 +19,6 @@
 import Foundation
 import Realm
 import Realm.Private
-#if canImport(SwiftUI)
-import SwiftUI
-#endif
-#if canImport(Combine)
-import Combine
-#endif
 
 /// :nodoc:
 /// Internal class. Do not use directly.
@@ -756,65 +750,30 @@ extension List {
     public func remove(objectAtIndex: Int) { fatalError() }
 }
 
-// MARK: - SwiftUI Extensions
+// MARK: - Combine
+
+#if canImport(Combine)
+import Combine
 
 @available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-public struct RealmListPublisher<Element: RealmCollectionValue>: Publisher {
-    public typealias Output = List<Element>
-    public typealias Failure = Never
-
-    let parent: List<Element>
-
-    init(_ parent: List<Element>) {
-        self.parent = parent
-    }
-
-    public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, List<Element> == S.Input {
-        subscriber.receive(subscription: RealmListSubscription(object: parent, subscriber: subscriber))
-    }
-}
-
-@available(watchOS 6.0, *)
-@available(iOS 13.0, *)
-@available(iOSApplicationExtension 13.0, *)
-@available(OSXApplicationExtension 10.15, *)
-public struct RealmListSubscription<SubscriberType: Subscriber, Element: RealmCollectionValue>: Subscription where SubscriberType.Input == List<Element> {
-    private var token: NotificationToken
-
-    public var combineIdentifier: CombineIdentifier {
-        return CombineIdentifier(token)
-    }
-
-    init(object: SubscriberType.Input, subscriber: SubscriberType) {
-        self.token = object.observe(subscriber)
-    }
-
-    public func request(_ demand: Subscribers.Demand) { }
-
-    public func cancel() {
-        token.invalidate()
-    }
-}
-
-/// Compliance to ObservableObject protocol.
-@available(watchOS 6.0, *)
-@available(iOS 13.0, *)
-@available(iOSApplicationExtension 13.0, *)
-@available(OSXApplicationExtension 10.15, *)
-extension List: Combine.ObservableObject {
-    public var willChange: RealmListPublisher<Element> {
-        return RealmListPublisher(self)
-    }
-
+extension List {
     /// Allows a subscriber to hook into Realm Changes.
-    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == List<Element> {
+    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Element? {
         return observe { change in
             switch change {
-            case .update(_, deletions: _, insertions: _, modifications: _):
-                _ = subscriber.receive(self)
+            case .update(_, let deletions, let insertions, let modifications):
+                deletions.forEach { _ in
+                    subscriber.receive(nil)
+                }
+                insertions.forEach {
+                    subscriber.receive(self[$0])
+                }
+                modifications.forEach {
+                    subscriber.receive(self[$0])
+                }
                 break
             default:
                 break
@@ -822,3 +781,119 @@ extension List: Combine.ObservableObject {
         }
     }
 }
+
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public struct ListSubscription: Subscription {
+    private var token: NotificationToken
+
+    public var combineIdentifier: CombineIdentifier {
+        return CombineIdentifier(token)
+    }
+
+    init<S: Subscriber, V, L: List<V>>(object: L, subscriber: S) where S.Input == V? {
+        self.token = object.observe(subscriber)
+    }
+
+    public func request(_ demand: Subscribers.Demand) {
+        print("Received request: \(demand.description) .. \(demand.max)")
+    }
+
+    public func cancel() {
+        token.invalidate()
+    }
+}
+
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public class ListPublisher<V, T: List<V>>: Publisher where V: ObservableObject {
+    public typealias Output = V?
+
+    public typealias Failure = Never
+
+    let collection: T
+    var subscribers = [AnySubscriber<Output, Never>]()
+
+    init(collection: T) {
+        self.collection = collection
+    }
+
+    public func receive<S>(subscriber: S) where S : Subscriber, S.Failure == Never, Output == S.Input {
+        subscribers.append(AnySubscriber(subscriber))
+        subscriber.receive(subscription: ListSubscription(object: self.collection, subscriber: subscriber))
+    }
+}
+
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+extension List: ObservableObject, Publisher where Element: ObservableObject, Element: Identifiable {
+
+//    public var objectWillChange: List {
+//        print ("!!fetching publisher!!")
+//        return self
+//    }
+    public typealias Output = Element?
+
+    public typealias Failure = Never
+
+    public var objectWillChange: ListPublisher<Element, List<Element>> {
+        return ListPublisher.init(collection: self)
+    }
+
+
+    public func receive<S>(subscriber: S) where S : Subscriber, S.Failure == Never, Output == S.Input {
+        forEach { _ in
+            subscriber.receive(subscription: ListSubscription(object: self, subscriber: subscriber))
+        }
+//        subscriber.receive(subscription: ListSubscription(object: self, subscriber: subscriber))
+    }
+
+    public func remove(atOffsets offsets: IndexSet) {
+        let suffixStart = halfStablePartition { index, _ in
+            return offsets.contains(index)
+        }
+
+        removeSubrange(suffixStart...)
+    }
+
+    func move(fromOffsets source: IndexSet, toOffset destination: Int) {
+        let suffixStart = halfStablePartition { index, _ in
+            return source.contains(index)
+        }
+        let suffix = self[suffixStart...]
+        removeSubrange(suffixStart...)
+        insert(contentsOf: suffix, at: destination)
+    }
+
+    func halfStablePartition(isSuffixElement predicate: (Index, Element) -> Bool) -> Index {
+        guard var i = firstIndex(where: predicate) else {
+            return endIndex
+        }
+
+        var j = index(after: i)
+        while j != endIndex {
+            if !predicate(j, self[j]) {
+                swapAt(i, j)
+                formIndex(after: &i)
+            }
+            formIndex(after: &j)
+        }
+        return i
+    }
+
+    func firstIndex(where predicate: (Index, Element) -> Bool) -> Index? {
+        for (index, element) in self.enumerated() {
+            if predicate(index, element) {
+                return index
+            }
+        }
+        return nil
+    }
+}
+#endif

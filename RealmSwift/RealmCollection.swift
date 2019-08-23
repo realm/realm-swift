@@ -1058,3 +1058,96 @@ extension RealmCollection {
         fatalError()
     }
 }
+
+// MARK: Combine
+#if canImport(Combine)
+import Combine
+
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+extension RealmCollection where Index == Int {
+    /// Allows a subscriber to hook into Realm Changes.
+    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Self.Elements.Element? {
+        return observe { change in
+            switch change {
+            case .update(_, let deletions, let insertions, let modifications):
+                deletions.forEach { _ in
+                    subscriber.receive(nil)
+                }
+                insertions.forEach {
+                    subscriber.receive(self[$0])
+                }
+                modifications.forEach {
+                    subscriber.receive(self[$0])
+                }
+                break
+            default:
+                break
+            }
+        }
+    }
+}
+
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public struct RealmCollectionSubscription: Subscription {
+    private var token: NotificationToken
+
+    public var combineIdentifier: CombineIdentifier {
+        return CombineIdentifier(token)
+    }
+
+    init<S: Subscriber, Collection: RealmCollection>(object: Collection, subscriber: S) where S.Input == Collection.Element?, Collection.Index == Int {
+        self.token = object.observe(subscriber)
+    }
+
+    public func request(_ demand: Subscribers.Demand) {
+        print("Received request!")
+    }
+
+    public func cancel() {
+        token.invalidate()
+    }
+}
+
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+public class RealmCollectionPublisher<Collection: RealmCollection>: Publisher where Collection.Element: ObservableObject, Collection: ObservableObject {
+    public typealias Output = Collection.Element
+
+    public typealias Failure = Never
+
+    let collection: Collection
+    var cancellables = [AnyCancellable]()
+
+    init(collection: Collection) {
+        self.collection = collection
+    }
+
+    public func receive<S>(subscriber: S) where S : Subscriber, S.Failure == Never, Output == S.Input {
+//        self.collection.forEach({
+//            let c = $0.objectWillChange.sink(receiveValue: { item in item.send() })
+//
+//            // Important: You have to keep the returned value allocated,
+//            // otherwise the sink subscription gets cancelled
+//            self.cancellables.append(c)
+//        })
+//        subscriber.receive(subscription: RealmCollectionSubscription(object: self, subscriber: subscriber))
+    }
+}
+//@available(watchOS 6.0, *)
+//@available(iOS 13.0, *)
+//@available(iOSApplicationExtension 13.0, *)
+//@available(OSXApplicationExtension 10.15, *)
+//extension RealmCollection where Self: ObservableObject, Self: Publisher {
+//    public typealias Output = Element
+//
+//    public typealias Failure = Error
+//}
+#endif

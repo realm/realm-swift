@@ -450,69 +450,18 @@ internal enum LinkingObjectsBridgingMetadata {
     }
 }
 
-// MARK: - SwiftUI extensions
+// MARK: - Combine
 
 @available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-public struct RealmLinkingObjectsPublisher<Element: Object>: Publisher {
-    public typealias Output = LinkingObjects<Element>
-    public typealias Failure = Never
+extension LinkingObjects: Combine.ObservableObject, Identifiable {
 
-    let parent: Output
-
-    init(_ parent: Output) {
-        self.parent = parent
-    }
-
-    public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
-        subscriber.receive(subscription: RealmLinkingObjectsSubscription(object: parent, subscriber: subscriber))
-    }
-}
-
-@available(watchOS 6.0, *)
-@available(iOS 13.0, *)
-@available(iOSApplicationExtension 13.0, *)
-@available(OSXApplicationExtension 10.15, *)
-public struct RealmLinkingObjectsSubscription<SubscriberType: Subscriber, Element: Object>: Subscription where SubscriberType.Input == LinkingObjects<Element> {
-    private var token: NotificationToken
-
-    public var combineIdentifier: CombineIdentifier {
-        return CombineIdentifier(token)
-    }
-
-    init(object: SubscriberType.Input, subscriber: SubscriberType) {
-        self.token = object.observe(subscriber)
-    }
-
-    public func request(_ demand: Subscribers.Demand) { }
-
-    public func cancel() {
-        token.invalidate()
-    }
-}
-
-/// Compliance to ObservableObject protocol.
-@available(watchOS 6.0, *)
-@available(iOS 13.0, *)
-@available(iOSApplicationExtension 13.0, *)
-@available(OSXApplicationExtension 10.15, *)
-extension LinkingObjects: Combine.ObservableObject {
-    public var willChange: RealmLinkingObjectsPublisher<Element> {
-        return RealmLinkingObjectsPublisher(self)
-    }
-
-    /// Allows a subscriber to hook into Realm Changes.
-    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == LinkingObjects {
-        return observe { change in
-            switch change {
-            case .update(_, deletions: _, insertions: _, modifications: _):
-                _ = subscriber.receive(self)
-                break
-            default:
-                break
-            }
-        }
-    }
+//    public func receive<S>(subscriber: S) where S : Subscriber, LinkingObjects.Failure == S.Failure, LinkingObjects.Output == S.Input {
+//        subscriber.receive(subscription: RealmCollectionSubscription(object: self, subscriber: subscriber))
+//    }
+//
+//    public typealias Output = LinkingObjects<Element>
+//    public typealias Failure = Never
 }

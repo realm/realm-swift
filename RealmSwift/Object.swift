@@ -19,13 +19,6 @@
 import Foundation
 import Realm
 import Realm.Private
-#if canImport(SwiftUI)
-import SwiftUI
-#endif
-#if canImport(Combine)
-import Combine
-#endif
-
 
 /**
  `Object` is a class used to define Realm model objects.
@@ -593,7 +586,9 @@ extension Object {
 #endif
 }
 
-// MARK: - SwiftUI extensions
+// MARK: - Combine
+#if canImport(Combine)
+import Combine
 
 @available(watchOS 6.0, *)
 @available(iOS 13.0, *)
@@ -661,3 +656,4 @@ extension Object : Combine.ObservableObject, Identifiable {
         }
     }
 }
+#endif
