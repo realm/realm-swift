@@ -20,8 +20,9 @@ def installationTest(platform, test, language) {
 
       if [[ -f \$archive ]]; then
         mv \$archive .
-        unzip realm-${language}-*zip
-        find . -name 'realm-${language}-*' -print0 | xargs -J% mv % realm-${language}-latest
+        unzip realm-${language}-*.zip
+        rm realm-${language}-*.zip
+        mv realm-${language}-* realm-${language}-latest
       fi
 
       export REALM_XCODE_VERSION=${carthageXcodeVersion}
