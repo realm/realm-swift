@@ -1072,16 +1072,8 @@ extension RealmCollection where Index == Int {
     public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Self.Elements.Element? {
         return observe { change in
             switch change {
-            case .update(_, let deletions, let insertions, let modifications):
-                deletions.forEach { _ in
-                    subscriber.receive(nil)
-                }
-                insertions.forEach {
-                    subscriber.receive(self[$0])
-                }
-                modifications.forEach {
-                    subscriber.receive(self[$0])
-                }
+            case .update(_, deletions: _, insertions: _, modifications: _):
+                subscriber.receive(nil)
                 break
             default:
                 break
@@ -1118,8 +1110,8 @@ public struct RealmCollectionSubscription: Subscription {
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-public class RealmCollectionPublisher<Collection: RealmCollection>: Publisher where Collection.Element: ObservableObject, Collection: ObservableObject {
-    public typealias Output = Collection.Element
+public class RealmCollectionPublisher<Collection: RealmCollection>: Publisher {
+    public typealias Output = Collection.Element?
 
     public typealias Failure = Never
 
@@ -1138,7 +1130,7 @@ public class RealmCollectionPublisher<Collection: RealmCollection>: Publisher wh
 //            // otherwise the sink subscription gets cancelled
 //            self.cancellables.append(c)
 //        })
-//        subscriber.receive(subscription: RealmCollectionSubscription(object: self, subscriber: subscriber))
+        subscriber.receive(subscription: RealmCollectionSubscription(object: self.collection, subscriber: subscriber))
     }
 }
 //@available(watchOS 6.0, *)
