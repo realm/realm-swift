@@ -1067,13 +1067,13 @@ import Combine
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-extension RealmCollection where Index == Int {
+extension RealmCollection {
     /// Allows a subscriber to hook into Realm Changes.
     public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Self.Elements.Element? {
         return observe { change in
             switch change {
             case .update(_, deletions: _, insertions: _, modifications: _):
-                subscriber.receive(nil)
+                _ = subscriber.receive(nil)
                 break
             default:
                 break
@@ -1093,7 +1093,7 @@ public struct RealmCollectionSubscription: Subscription {
         return CombineIdentifier(token)
     }
 
-    init<S: Subscriber, Collection: RealmCollection>(object: Collection, subscriber: S) where S.Input == Collection.Element?, Collection.Index == Int {
+    init<S: Subscriber, Collection: RealmCollection>(object: Collection, subscriber: S) where S.Input == Collection.Element? {
         self.token = object.observe(subscriber)
     }
 
