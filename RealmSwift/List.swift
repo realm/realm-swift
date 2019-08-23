@@ -438,6 +438,9 @@ public final class List<Element: RealmCollectionValue>: ListBase {
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
     }
+
+    @available(iOSApplicationExtension 13.0, *)
+    public lazy var objectWillChange: ListPublisher<Element, List<Element>> = ListPublisher(self)
 }
 
 extension List where Element: MinMaxType {
@@ -761,19 +764,11 @@ import Combine
 @available(OSXApplicationExtension 10.15, *)
 extension List {
     /// Allows a subscriber to hook into Realm Changes.
-    public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == Element? {
+    public func observe<S, V, L: List<V>>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == L {
         return observe { change in
             switch change {
-            case .update(_, let deletions, let insertions, let modifications):
-                deletions.forEach { _ in
-                    subscriber.receive(nil)
-                }
-                insertions.forEach {
-                    subscriber.receive(self[$0])
-                }
-                modifications.forEach {
-                    subscriber.receive(self[$0])
-                }
+            case .update(_, deletions: _, insertions: _, modifications: _):
+                _ = subscriber.receive(self as! L)
                 break
             default:
                 break
@@ -786,19 +781,24 @@ extension List {
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-public struct ListSubscription: Subscription {
+public struct ListSubscription<V, L: List<V>>: Subscription {
     private var token: NotificationToken
 
     public var combineIdentifier: CombineIdentifier {
         return CombineIdentifier(token)
     }
 
-    init<S: Subscriber, V, L: List<V>>(object: L, subscriber: S) where S.Input == V? {
+    let s: AnySubscriber<L, Never>
+    let l: L
+
+    init<S: Subscriber>(object: L, subscriber: S) where S.Input == L, S.Failure == Never {
         self.token = object.observe(subscriber)
+        self.s = AnySubscriber(subscriber)
+        self.l = object
     }
 
     public func request(_ demand: Subscribers.Demand) {
-        print("Received request: \(demand.description) .. \(demand.max)")
+//        _ = s.receive(l)
     }
 
     public func cancel() {
@@ -810,21 +810,21 @@ public struct ListSubscription: Subscription {
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-public class ListPublisher<V, T: List<V>>: Publisher where V: ObservableObject {
-    public typealias Output = V?
+public class ListPublisher<V, L: List<V>>: Publisher  {
+    public typealias Output = L
 
     public typealias Failure = Never
 
-    let collection: T
+    let collection: L
     var subscribers = [AnySubscriber<Output, Never>]()
 
-    init(collection: T) {
+    init(_ collection: L) {
         self.collection = collection
     }
 
     public func receive<S>(subscriber: S) where S : Subscriber, S.Failure == Never, Output == S.Input {
-        subscribers.append(AnySubscriber(subscriber))
         subscriber.receive(subscription: ListSubscription(object: self.collection, subscriber: subscriber))
+        subscribers.append(AnySubscriber(subscriber))
     }
 }
 
@@ -832,29 +832,20 @@ public class ListPublisher<V, T: List<V>>: Publisher where V: ObservableObject {
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-extension List: ObservableObject, Publisher where Element: ObservableObject, Element: Identifiable {
+extension List: ObservableObject where Element: ObservableObject, Element: Identifiable {
 
-//    public var objectWillChange: List {
-//        print ("!!fetching publisher!!")
-//        return self
-//    }
-    public typealias Output = Element?
+    public typealias Output = List
 
     public typealias Failure = Never
 
-    public var objectWillChange: ListPublisher<Element, List<Element>> {
-        return ListPublisher.init(collection: self)
-    }
-
-
     public func receive<S>(subscriber: S) where S : Subscriber, S.Failure == Never, Output == S.Input {
-        forEach { _ in
-            subscriber.receive(subscription: ListSubscription(object: self, subscriber: subscriber))
-        }
-//        subscriber.receive(subscription: ListSubscription(object: self, subscriber: subscriber))
+        subscriber.receive(subscription: ListSubscription(object: self, subscriber: subscriber))
     }
 
     public func remove(atOffsets offsets: IndexSet) {
+        defer {
+            objectWillChange.subscribers.forEach { _ = $0.receive(self) }
+        }
         let suffixStart = halfStablePartition { index, _ in
             return offsets.contains(index)
         }
@@ -896,4 +887,44 @@ extension List: ObservableObject, Publisher where Element: ObservableObject, Ele
         return nil
     }
 }
+
+import SwiftUI
+
+//@available(watchOS 6.0, *)
+//@available(iOS 13.0, *)
+//@available(iOSApplicationExtension 13.0, *)
+//@available(OSXApplicationExtension 10.15, *)
+//@propertyWrapper public struct RealmState<V, T: List<V>> : DynamicProperty {
+//    private var _wrappedValue: T
+//
+//    /// Initialize with the provided initial value.
+//    public init(wrappedValue value: T) {
+//        self._wrappedValue = value
+//        self._wrappedValue.observe { change in
+//            switch change {
+//            case .update(_,  deletions: _, insertions: _, modifications: _):
+//                self.update()
+//            default:
+//                break
+//            }
+//        }
+//    }
+//
+//    /// The current state value.
+//    public var wrappedValue: T {
+//        get {
+//            return _wrappedValue
+//        }
+//        set {
+//            _wrappedValue = newValue
+//        }
+//    }
+//
+//    /// Produces the binding referencing this state value
+////    public var projectedValue: Binding<T> {
+////        get {
+////
+////        }
+////    }
+//}
 #endif
