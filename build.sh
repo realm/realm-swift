@@ -1260,12 +1260,11 @@ EOM
         zip --symlinks -r realm-examples.zip examples -x "examples/installation/*"
         ;;
 
-    "package-test-examples")
+    "package-test-examples-objc")
         if ! VERSION=$(echo realm-objc-*.zip | egrep -o '\d*\.\d*\.\d*-[a-z]*(\.\d*)?'); then
             VERSION=$(echo realm-objc-*.zip | egrep -o '\d*\.\d*\.\d*')
         fi
         OBJC="realm-objc-${VERSION}"
-        SWIFT="realm-swift-${VERSION}"
         unzip ${OBJC}.zip
 
         cp $0 ${OBJC}
@@ -1276,7 +1275,13 @@ EOM
         sh build.sh examples-osx
         cd ..
         rm -rf ${OBJC}
+        ;;
 
+    "package-test-examples-swift")
+        if ! VERSION=$(echo realm-swift-*.zip | egrep -o '\d*\.\d*\.\d*-[a-z]*(\.\d*)?'); then
+            VERSION=$(echo realm-swift-*.zip | egrep -o '\d*\.\d*\.\d*')
+        fi
+        SWIFT="realm-swift-${VERSION}"
         unzip ${SWIFT}.zip
 
         cp $0 ${SWIFT}
@@ -1296,53 +1301,8 @@ EOM
         zip --symlinks -r realm-framework-ios-static.zip Realm.framework
         ;;
 
-    "package-ios")
-        sh build.sh prelaunch-simulator
-        sh build.sh ios-dynamic
-        cd build/ios
-        zip --symlinks -r realm-framework-ios.zip Realm.framework
-        ;;
-
-    "package-osx")
-        sh build.sh osx
-
-        cd build/DerivedData/Realm/Build/Products/Release
-        zip --symlinks -r realm-framework-osx.zip Realm.framework
-        ;;
-
-    "package-watchos")
-        sh build.sh prelaunch-simulator
-        sh build.sh watchos
-
-        cd build/watchos
-        zip --symlinks -r realm-framework-watchos.zip Realm.framework
-        ;;
-
-    "package-tvos")
-        sh build.sh prelaunch-simulator
-        sh build.sh tvos
-
-        cd build/tvos
-        zip --symlinks -r realm-framework-tvos.zip Realm.framework
-        ;;
-
-    package-*-swift)
-        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        for version in 10.0 10.1 10.2.1 10.3; do
-            REALM_XCODE_VERSION=$version
-            REALM_SWIFT_VERSION=
-            set_xcode_and_swift_versions
-            sh build.sh prelaunch-simulator
-            sh build.sh $PLATFORM-swift
-        done
-
-        cd build/$PLATFORM
-        zip --symlinks -r realm-swift-framework-$PLATFORM.zip swift-10.0 swift-10.1 swift-10.2.1 swift-10.3
-        ;;
-
-    package-*-swift-*)
-        PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-        REALM_XCODE_VERSION=$(echo $COMMAND | cut -d - -f 4)
+    "package")
+        PLATFORM="$2"
         REALM_SWIFT_VERSION=
 
         set_xcode_and_swift_versions
@@ -1350,7 +1310,7 @@ EOM
         sh build.sh $PLATFORM-swift
 
         cd build/$PLATFORM
-        zip --symlinks -r realm-swift-framework-$PLATFORM-swift-$REALM_XCODE_VERSION.zip swift-$REALM_XCODE_VERSION
+        zip --symlinks -r realm-framework-$PLATFORM-$REALM_XCODE_VERSION.zip swift-$REALM_XCODE_VERSION
         ;;
 
     "package-release")
@@ -1368,58 +1328,20 @@ EOM
             mkdir -p ${FOLDER}/ios/dynamic
             mkdir -p ${FOLDER}/Swift
 
-            (
-                cd ${FOLDER}/osx
-                unzip ${WORKSPACE}/realm-framework-osx.zip
-            )
+            unzip ${WORKSPACE}/realm-framework-ios-static.zip -d ${FOLDER}/ios/static
+            for platform in osx ios watchos tvos; do
+                unzip ${WORKSPACE}/realm-framework-${platform}-${REALM_XCODE_VERSION}.zip -d ${FOLDER}/${platform}
+                mv ${FOLDER}/${platform}/swift-*/Realm.framework ${FOLDER}/${platform}
+                rm -r ${FOLDER}/${platform}/swift-*
+            done
 
-            (
-                cd ${FOLDER}/ios/static
-                unzip ${WORKSPACE}/realm-framework-ios-static.zip
-            )
-
-            (
-                cd ${FOLDER}/ios/dynamic
-                unzip ${WORKSPACE}/realm-framework-ios.zip
-            )
-
-            (
-                cd ${FOLDER}/watchos
-                unzip ${WORKSPACE}/realm-framework-watchos.zip
-            )
-
-            (
-                cd ${FOLDER}/tvos
-                unzip ${WORKSPACE}/realm-framework-tvos.zip
-            )
+            mv ${FOLDER}/ios/Realm.framework ${FOLDER}/ios/dynamic
         else
-            (
-                cd ${FOLDER}/osx
-                for f in ${WORKSPACE}/realm-swift-framework-osx-swift-*.zip; do
-                    unzip "$f"
-                done
-            )
-
-            (
-                cd ${FOLDER}/ios
-                for f in ${WORKSPACE}/realm-swift-framework-ios-swift-*.zip; do
-                    unzip "$f"
-                done
-            )
-
-            (
-                cd ${FOLDER}/watchos
-                for f in ${WORKSPACE}/realm-swift-framework-watchos-swift-*.zip; do
-                    unzip "$f"
-                done
-            )
-
-            (
-                cd ${FOLDER}/tvos
-                for f in ${WORKSPACE}/realm-swift-framework-tvos-swift-*.zip; do
-                    unzip "$f"
-                done
-            )
+            for platform in osx ios watchos tvos; do
+                find ${WORKSPACE} -name "realm-framework-$platform-*.zip" \
+                                  -maxdepth 1 \
+                                  -exec unzip {} -d ${FOLDER}/${platform} \;
+            done
         fi
 
         (
@@ -1482,40 +1404,33 @@ EOF
 
         echo 'Packaging iOS'
         sh build.sh package-ios-static
-        cp build/ios-static/realm-framework-ios-static.zip ..
-        sh build.sh package-ios
-        cp build/ios/realm-framework-ios.zip ..
-        sh build.sh package-ios-swift
-        cp build/ios/realm-swift-framework-ios.zip ..
+        cp build/ios-static/realm-framework-ios-static.zip .
+        sh build.sh package ios
+        cp build/ios/realm-framework-ios-$REALM_XCODE_VERSION.zip .
 
         echo 'Packaging macOS'
-        sh build.sh package-osx
-        cp build/DerivedData/Realm/Build/Products/Release/realm-framework-osx.zip ..
-        sh build.sh package-osx-swift
-        cp build/osx/realm-swift-framework-osx.zip ..
+        sh build.sh package osx
+        cp build/osx/realm-framework-osx-$REALM_XCODE_VERSION.zip .
 
         echo 'Packaging watchOS'
-        sh build.sh package-watchos
-        cp build/watchos/realm-framework-watchos.zip ..
-        sh build.sh package-watchos-swift
-        cp build/watchos/realm-swift-framework-watchos.zip ..
+        sh build.sh package watchos
+        cp build/watchos/realm-framework-watchos-$REALM_XCODE_VERSION.zip .
 
         echo 'Packaging tvOS'
-        sh build.sh package-tvos
-        cp build/tvos/realm-framework-tvos.zip ..
-        sh build.sh package-tvos-swift
-        cp build/tvos/realm-swift-framework-tvos.zip ..
+        sh build.sh package tvos
+        cp build/tvos/realm-framework-tvos-$REALM_XCODE_VERSION.zip .
 
         echo 'Packaging examples'
         sh build.sh package-examples
-        cp realm-examples.zip ..
 
         echo 'Building final release packages'
+        export WORKSPACE="${WORKSPACE}/realm-cocoa"
         sh build.sh package-release objc
         sh build.sh package-release swift
 
         echo 'Testing packaged examples'
-        sh build.sh package-test-examples
+        sh build.sh package-test-examples-objc
+        sh build.sh package-test-examples-swift
         ;;
 
     "github-release")
