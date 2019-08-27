@@ -19,6 +19,7 @@
 import Foundation
 import Realm
 import Realm.Private
+import Combine
 
 /// :nodoc:
 /// Internal class. Do not use directly.
@@ -34,7 +35,7 @@ public class ListBase: RLMListBase {
     @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
         return RLMDescriptionWithMaxDepth("List", _rlmArray, depth)
     }
-
+    
     /// Returns the number of objects in this List.
     public var count: Int { return Int(_rlmArray.count) }
 }
@@ -440,7 +441,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     }
 
     @available(iOSApplicationExtension 13.0, *)
-    public lazy var objectWillChange: ListPublisher<Element, List<Element>> = ListPublisher(self)
+    public lazy var objectWillChange = RealmCollectionPublisher.init(collection: self)
 }
 
 extension List where Element: MinMaxType {
@@ -781,71 +782,8 @@ extension List {
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-public struct ListSubscription<V, L: List<V>>: Subscription {
-    private var token: NotificationToken
-
-    public var combineIdentifier: CombineIdentifier {
-        return CombineIdentifier(token)
-    }
-
-    let s: AnySubscriber<L, Never>
-    let l: L
-
-    init<S: Subscriber>(object: L, subscriber: S) where S.Input == L, S.Failure == Never {
-        self.token = object.observe(subscriber)
-        self.s = AnySubscriber(subscriber)
-        self.l = object
-    }
-
-    public func request(_ demand: Subscribers.Demand) {
-//        _ = s.receive(l)
-    }
-
-    public func cancel() {
-        token.invalidate()
-    }
-}
-
-@available(watchOS 6.0, *)
-@available(iOS 13.0, *)
-@available(iOSApplicationExtension 13.0, *)
-@available(OSXApplicationExtension 10.15, *)
-public class ListPublisher<V, L: List<V>>: Publisher  {
-    public typealias Output = L
-
-    public typealias Failure = Never
-
-    let collection: L
-    var subscribers = [AnySubscriber<Output, Never>]()
-
-    init(_ collection: L) {
-        self.collection = collection
-    }
-
-    public func receive<S>(subscriber: S) where S : Subscriber, S.Failure == Never, Output == S.Input {
-        subscriber.receive(subscription: ListSubscription(object: self.collection, subscriber: subscriber))
-        subscribers.append(AnySubscriber(subscriber))
-    }
-}
-
-@available(watchOS 6.0, *)
-@available(iOS 13.0, *)
-@available(iOSApplicationExtension 13.0, *)
-@available(OSXApplicationExtension 10.15, *)
-extension List: ObservableObject where Element: ObservableObject, Element: Identifiable {
-
-    public typealias Output = List
-
-    public typealias Failure = Never
-
-    public func receive<S>(subscriber: S) where S : Subscriber, S.Failure == Never, Output == S.Input {
-        subscriber.receive(subscription: ListSubscription(object: self, subscriber: subscriber))
-    }
-
+extension List: ObservableObject {
     public func remove(atOffsets offsets: IndexSet) {
-        defer {
-            objectWillChange.subscribers.forEach { _ = $0.receive(self) }
-        }
         let suffixStart = halfStablePartition { index, _ in
             return offsets.contains(index)
         }
@@ -853,7 +791,7 @@ extension List: ObservableObject where Element: ObservableObject, Element: Ident
         removeSubrange(suffixStart...)
     }
 
-    func move(fromOffsets source: IndexSet, toOffset destination: Int) {
+    public func move(fromOffsets source: IndexSet, toOffset destination: Int) {
         let suffixStart = halfStablePartition { index, _ in
             return source.contains(index)
         }
@@ -888,43 +826,4 @@ extension List: ObservableObject where Element: ObservableObject, Element: Ident
     }
 }
 
-import SwiftUI
-
-//@available(watchOS 6.0, *)
-//@available(iOS 13.0, *)
-//@available(iOSApplicationExtension 13.0, *)
-//@available(OSXApplicationExtension 10.15, *)
-//@propertyWrapper public struct RealmState<V, T: List<V>> : DynamicProperty {
-//    private var _wrappedValue: T
-//
-//    /// Initialize with the provided initial value.
-//    public init(wrappedValue value: T) {
-//        self._wrappedValue = value
-//        self._wrappedValue.observe { change in
-//            switch change {
-//            case .update(_,  deletions: _, insertions: _, modifications: _):
-//                self.update()
-//            default:
-//                break
-//            }
-//        }
-//    }
-//
-//    /// The current state value.
-//    public var wrappedValue: T {
-//        get {
-//            return _wrappedValue
-//        }
-//        set {
-//            _wrappedValue = newValue
-//        }
-//    }
-//
-//    /// Produces the binding referencing this state value
-////    public var projectedValue: Binding<T> {
-////        get {
-////
-////        }
-////    }
-//}
 #endif

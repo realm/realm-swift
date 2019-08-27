@@ -21,12 +21,22 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
 
         // Use a UIHostingController as window root view controller
+        Realm.Configuration.defaultConfiguration = {
+           var config = Realm.Configuration.defaultConfiguration
+
+           // Set the new schema version. This must be greater than the previously used
+           // version (if you've never set a schema version before, the version is 0).
+//           config.schemaVersion = 0
+            config.deleteRealmIfMigrationNeeded = true
+            return config
+       }()
+
         if let windowScene = scene as? UIWindowScene {
             let window = UIWindow(windowScene: windowScene)
 
             window.rootViewController = UIHostingController(
-                rootView: ContentView(recipes: Recipes.shared.recipes))
-                    //.environmentObject(ContentViewState()))
+                rootView: ContentView(recipes: Recipes.shared.recipes)
+            )
             
             self.window = window
             window.makeKeyAndVisible()

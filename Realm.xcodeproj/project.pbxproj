@@ -2085,7 +2085,7 @@
 						ProvisioningStyle = Automatic;
 					};
 					5D659E7D1BE04556006515A0 = {
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1100;
 						ProvisioningStyle = Automatic;
 					};
 					5D660FCB1BE98C560021E04F = {
@@ -3029,6 +3029,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E01BE05C19002800DA /* Tests.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				INFOPLIST_FILE = "Realm/ObjectServerTests/ObjectServerTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Realm/ObjectServerTests/Object-Server-Tests-Bridging-Header.h";
@@ -3039,6 +3040,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E01BE05C19002800DA /* Tests.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				INFOPLIST_FILE = "Realm/ObjectServerTests/ObjectServerTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Realm/ObjectServerTests/Object-Server-Tests-Bridging-Header.h";

@@ -4,8 +4,12 @@ import RealmSwift
 final class Ingredient: Object {
     @objc dynamic var name: String? = nil
     let recipes = LinkingObjects(fromType: Recipe.self, property: "ingredients")
+    @objc dynamic private var _foodType: String = "food"
+    var foodType: FoodType? {
+        FoodType(rawValue: _foodType)
+    }
 
-    class func new(name: String) -> Ingredient {
+    class func new(name: String, foodType: FoodType) -> Ingredient {
         let ingredient = Ingredient()
         ingredient.name = name
         return ingredient
@@ -13,7 +17,7 @@ final class Ingredient: Object {
 }
 
 final class Recipe: Object {
-    @objc dynamic var id = UUID.init().uuidString
+    @objc dynamic var id: String = ""
     @objc dynamic var name: String? = nil
     let ingredients = RealmSwift.List<Ingredient>()
 
@@ -25,6 +29,7 @@ final class Recipe: Object {
         let recipe = Recipe()
         recipe.name = name
         recipe.ingredients.append(objectsIn: ingredients)
+        recipe.id = UUID.init().uuidString
         return recipe
     }
 }
@@ -36,9 +41,11 @@ final class Recipes: Object {
     static let shared: Recipes = ({
         let realm = try! Realm.init(configuration: .init(deleteRealmIfMigrationNeeded: true))
 
-        guard let recipes = realm.object(ofType: Recipes.self, forPrimaryKey: UIDevice.current.identifierForVendor!.uuidString) else {
+        guard let uuid = UIDevice.current.identifierForVendor,
+            let recipes = realm.object(ofType: Recipes.self, forPrimaryKey: uuid.uuidString) else {
             let recipes = Recipes()
-            recipes.id = UIDevice.current.identifierForVendor!.uuidString
+            let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            recipes.id = UIDevice.current.identifierForVendor?.uuidString ?? String((0..<36).map{ _ in letters.randomElement()! })
             try! realm.write {
                 realm.add(recipes)
             }
@@ -54,17 +61,16 @@ final class Recipes: Object {
 }
 
 struct RecipeRow: View {
-    let recipe: Recipe
+    var recipe: Recipe
     @EnvironmentObject var state: ContentViewState
 
     init(_ recipe: Recipe) {
-        print("Initializing RecipeRow")
         self.recipe = recipe
     }
 
     var body: some View {
-        print("constructing recipe row")
-        return VStack(alignment: .leading) {
+        HStack {
+        VStack(alignment: .leading) {
             Text(recipe.name!).onTapGesture {
                 self.state.sectionState[self.recipe] = !self.isExpanded(self.recipe)
             }.animation(.interactiveSpring())
@@ -73,6 +79,8 @@ struct RecipeRow: View {
                     Text("- \(ingredient.name ?? "")").padding(.leading, 5)
                 }.animation(.interactiveSpring())
             }
+        }
+            Spacer()
         }
     }
 
@@ -88,7 +96,7 @@ struct SearchBar: View {
         ZStack {
             HStack {
                 Image(systemName: "magnifyingglass")
-                TextField("recipe or ingredient", text: $text)
+                TextField("recipe or ingredient", text: $text).scaledToFill()
             }.padding()
             RoundedRectangle(cornerRadius: 10)
                 .stroke(Color(red: 0.9,
@@ -103,65 +111,103 @@ final class ContentViewState: ObservableObject {
     @Published var sectionState: [Recipe: Bool] = [:]
 }
 
+struct RecipeFormView: View {
+    @State var recipeName: String = ""
+    @State private var selectedImage = 0
+    var ingredients: [Ingredient] = []
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("recipe name")) {
+                    TextField("", text: self.$recipeName)
+                }
+                Section(header: Text("ingredients")) {
+                    VStack {
+                        ForEach(self.ingredients,  id: \.self) { ingredient in
+                            HStack {
+                                Image("")
+                                Text(ingredient.name!)
+                            }
+                        }
+
+                        Section {
+                            Picker(selection: $selectedImage, label: Text("add ingredient")) {
+                                ForEach(0 ..< FoodType.allCases.count) { (idx: Int) in
+                                    VStack {
+                                        URLImage(FoodType.allCases[idx].imgUrl)
+                                        Text(FoodType.allCases[idx].rawValue)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }.navigationBarTitle("make recipe")
+        }
+    }
+}
+
 struct ContentView: View {
     @ObservedObject var recipes: RealmSwift.List<Recipe>
     @State private var searchTerm: String = ""
     @State var state: ContentViewState = ContentViewState()
+    @State var inRecipeFormView: Bool = false
 
     var body: some View {
-        print("count: \(recipes.count)")
-        return NavigationView {
+        NavigationView {
             List {
                 Section(header:
                     HStack {
                         SearchBar(text: self.$searchTerm)
-                        Button("add") {
-                            let realm = try! Realm()
-                            try! realm.write {
-                                self.recipes.append(
-                                    Recipe.new(name: "cake",
-                                               ingredients: Ingredient.new(name: "sugar")))
-                            }
-                        }
+                            .frame(width: 300, alignment: .leading)
+                            .padding(5)
+                        NavigationLink(destination: RecipeFormView(),
+                                       isActive: self.$inRecipeFormView,
+                                       label: { Button("add recipe")  {
+                            self.inRecipeFormView = true
+                                        }})
                 }) {
-                    ForEach(self.recipes.map { $0 }, id: \.id) { recipe in
+                    ForEach(filteredCollection(), id: \.id) { recipe in
                         RecipeRow(recipe).environmentObject(self.state)
                     }.onDelete(perform: self.delete)
+                        .onMove(perform: self.move)
+
             }
         }.listStyle(GroupedListStyle())
                 .navigationBarTitle("recipes", displayMode: .large)
                 .navigationBarBackButtonHidden(true)
                 .navigationBarHidden(false)
+                .navigationBarItems(trailing: EditButton())
+        }
+    }
+
+    func filteredCollection() -> Array<Recipe> {
+        if (self.searchTerm.isEmpty) {
+            return Array(recipes)
+        } else {
+            return Array(recipes.filter("name CONTAINS '\(searchTerm)'"))
         }
     }
 
     func delete(at offsets: IndexSet) {
-        print("deleting row \(offsets.first!)")
         try! Realm().write {
-            print("write block!")
-            recipes.remove(atOffsets: offsets)
-            print("done writing")
+            self.recipes.remove(atOffsets: offsets)
         }
     }
+
+    func move(fromOffsets offsets: IndexSet, toOffset offset: Int) {
+        try! Realm().write {
+            self.recipes.move(from: offsets.first!,
+                              to: offset == 0 ? 0 : offset - 1)
+        }
+    }
+    
 }
 
 #if DEBUG
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        //        try! realm.write {
-        ////            realm.deleteAll()
-        //
-        //            let recipe = Recipe()
-        //            recipe.name = "cake"
-        //            let ig1 = Ingredient()
-        //            ig1.name = "sugar"
-        //            recipe.ingredients.append(ig1)
-        //
-        //            realm.add(recipes)
-        //
-        //            recipes.recipes.append(recipe)
-        //        }
-
         return ContentView(recipes: Recipes.shared.recipes)
     }
 }
