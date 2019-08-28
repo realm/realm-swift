@@ -18,7 +18,7 @@
 
 import Foundation
 import RealmSwift
-import Realm
+import RealmObjc
 
 class SwiftStringObject: Object {
     @objc dynamic var stringCol = ""

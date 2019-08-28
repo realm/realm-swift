@@ -16,8 +16,8 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm
-import Realm.Private
+import RealmObjc
+import RealmObjc.Private
 
 /**
  An object representing a Realm Object Server user.

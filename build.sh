@@ -540,6 +540,7 @@ case "$COMMAND" in
 
     "ios-dynamic")
         build_combined Realm Realm iphoneos iphonesimulator
+        find build -name '*.h' -exec sed -i '' 's/Realm\//RealmObjc\//' {} \;
         exit 0
         ;;
 
@@ -552,6 +553,7 @@ case "$COMMAND" in
 
     "watchos")
         build_combined Realm Realm watchos watchsimulator
+        find build -name '*.h' -exec sed -i '' 's/Realm\//RealmObjc\//' {} \;
         exit 0
         ;;
 

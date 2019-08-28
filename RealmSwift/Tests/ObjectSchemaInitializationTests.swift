@@ -18,7 +18,7 @@
 
 import XCTest
 import RealmSwift
-import Realm.Dynamic
+import RealmObjc.Dynamic
 import Foundation
 
 class ObjectSchemaInitializationTests: TestCase {

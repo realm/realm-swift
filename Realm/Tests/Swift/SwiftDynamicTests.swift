@@ -18,8 +18,8 @@
 
 import XCTest
 import Foundation
-import Realm.Private
-import Realm.Dynamic
+import RealmObjc.Private
+import RealmObjc.Dynamic
 import RealmTestSupport
 
 class SwiftRLMDynamicTests: RLMTestCase {

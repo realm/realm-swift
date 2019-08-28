@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
+import RealmObjc
 
 /**
  A `SortDescriptor` stores a key path and a sort order for use with `sorted(sortDescriptors:)`. It is similar to

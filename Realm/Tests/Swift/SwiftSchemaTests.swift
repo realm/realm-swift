@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
-import Realm
-import Realm.Private
+import RealmObjc
+import RealmObjc.Private
 import RealmTestSupport
 
 class InitLinkedToClass: RLMObject {

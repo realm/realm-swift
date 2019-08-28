@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
-import Realm.Private
+import RealmObjc
+import RealmObjc.Private
 
 /**
  `Object` is a class used to define Realm model objects.

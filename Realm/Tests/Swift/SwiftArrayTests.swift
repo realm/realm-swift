@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
-import Realm
+import RealmObjc
 import Foundation
 import RealmTestSupport
 

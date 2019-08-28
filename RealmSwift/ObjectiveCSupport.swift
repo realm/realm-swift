@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm
+import RealmObjc
 
 /**
  `ObjectiveCSupport` is a class providing methods for Swift/Objective-C interoperability.

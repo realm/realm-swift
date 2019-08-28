@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm
+import RealmObjc
 import RealmTestSupport
 
 class SwiftRLMStringObject: RLMObject {

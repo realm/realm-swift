@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
-import Realm.Private
+import RealmObjc
+import RealmObjc.Private
 
 #if !swift(>=4.1)
 fileprivate extension Sequence {

@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm
+import RealmObjc
 
 /// A protocol describing types that can parameterize a `RealmOptional`.
 public protocol RealmOptionalType {

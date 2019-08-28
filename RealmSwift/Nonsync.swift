@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm.Private
+import RealmObjc.Private
 
 public struct SyncConfiguration {
     func asConfig() -> RLMSyncConfiguration? { return nil }

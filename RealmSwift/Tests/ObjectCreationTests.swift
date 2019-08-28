@@ -18,7 +18,7 @@
 
 import XCTest
 import RealmSwift
-import Realm.Private
+import RealmObjc.Private
 
 class ObjectWithPrivateOptionals: Object {
     private var nilInt: Int?

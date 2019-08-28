@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
+import RealmObjc
 
 /**
  `Schema` instances represent collections of model object schemas managed by a Realm.

@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
-import Realm.Dynamic
+import RealmObjc
+import RealmObjc.Dynamic
 import RealmTestSupport
 import RealmSwift
 import XCTest

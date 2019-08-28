@@ -18,8 +18,8 @@
 
 import XCTest
 import RealmSwift
-import Realm
-import Realm.Dynamic
+import RealmObjc
+import RealmObjc.Dynamic
 import Foundation
 
 @discardableResult

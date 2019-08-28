@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
+import RealmObjc
 
 /**
  This class represents Realm model object schemas.

@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
-import Realm.Private
+import RealmObjc
+import RealmObjc.Private
 
 /**
  A `Realm` instance (also referred to as "a Realm") represents a Realm database.

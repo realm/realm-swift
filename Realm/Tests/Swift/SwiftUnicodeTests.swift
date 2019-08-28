@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
-import Realm
+import RealmObjc
 import RealmTestSupport
 
 let utf8TestString = "值значен™👍☞⎠‱௹♣︎☐▼❒∑⨌⧭иеمرحبا"

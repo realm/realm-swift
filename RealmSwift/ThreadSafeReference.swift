@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-import Realm
+import RealmObjc
 
 /**
  Objects of types which conform to `ThreadConfined` can be managed by a Realm, which will make

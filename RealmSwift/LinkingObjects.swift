@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
+import RealmObjc
 
 /// :nodoc:
 /// Internal class. Do not use directly. Used for reflection and initialization

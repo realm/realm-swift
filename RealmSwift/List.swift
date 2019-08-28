@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
-import Realm.Private
+import RealmObjc
+import RealmObjc.Private
 
 /// :nodoc:
 /// Internal class. Do not use directly.

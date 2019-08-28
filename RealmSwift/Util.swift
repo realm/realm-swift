@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
+import RealmObjc
 
 #if BUILDING_REALM_SWIFT_TESTS
 import RealmSwift

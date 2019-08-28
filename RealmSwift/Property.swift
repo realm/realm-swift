@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import Foundation
-import Realm
+import RealmObjc
 
 /**
  `Property` instances represent properties managed by a Realm in the context of an object schema. Such properties may be
