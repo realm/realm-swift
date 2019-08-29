@@ -303,6 +303,14 @@ open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
     public override required init(value: Any, schema: RLMSchema) {
         super.init(value: value, schema: schema)
     }
+
+    #if canImport(Combine)
+    @available(watchOS 6.0, *)
+    @available(iOS 13.0, *)
+    @available(iOSApplicationExtension 13.0, *)
+    @available(OSXApplicationExtension 10.15, *)
+    public lazy var objectWillChange = RealmObjectPublisher.init(self)
+    #endif
 }
 
 /**
@@ -636,10 +644,6 @@ public struct RealmObjectSubscription<SubscriberType: Subscriber, T: Object>: Su
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
 extension Object : Combine.ObservableObject, Identifiable {
-    public var objectWillChange: RealmObjectPublisher<Self> {
-        return RealmObjectPublisher(self as! Self)
-    }
-
     /// Allows a subscriber to hook into Realm Changes.
     public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input: Object {
         return observe { change in

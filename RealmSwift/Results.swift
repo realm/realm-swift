@@ -373,6 +373,14 @@ public final class Results<Element: RealmCollectionValue>: NSObject, NSFastEnume
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
     }
+
+    #if canImport(Combine)
+    @available(watchOS 6.0, *)
+    @available(iOS 13.0, *)
+    @available(iOSApplicationExtension 13.0, *)
+    @available(OSXApplicationExtension 10.15, *)
+    public lazy var objectWillChange = RealmCollectionPublisher.init(collection: self)
+    #endif
 }
 
 extension Results: RealmCollection {
@@ -441,6 +449,5 @@ import Combine
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
 extension Results : Combine.ObservableObject, Identifiable {
-    
 }
 #endif

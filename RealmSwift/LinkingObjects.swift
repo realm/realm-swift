@@ -369,6 +369,14 @@ public final class LinkingObjects<Element: Object>: LinkingObjectsBase {
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
     }
+
+    #if canImport(Combine)
+    @available(watchOS 6.0, *)
+    @available(iOS 13.0, *)
+    @available(iOSApplicationExtension 13.0, *)
+    @available(OSXApplicationExtension 10.15, *)
+    public lazy var objectWillChange = RealmCollectionPublisher.init(collection: self)
+    #endif
 }
 
 extension LinkingObjects: RealmCollection {
@@ -457,11 +465,4 @@ internal enum LinkingObjectsBridgingMetadata {
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
 extension LinkingObjects: Combine.ObservableObject, Identifiable {
-
-//    public func receive<S>(subscriber: S) where S : Subscriber, LinkingObjects.Failure == S.Failure, LinkingObjects.Output == S.Input {
-//        subscriber.receive(subscription: RealmCollectionSubscription(object: self, subscriber: subscriber))
-//    }
-//
-//    public typealias Output = LinkingObjects<Element>
-//    public typealias Failure = Never
 }

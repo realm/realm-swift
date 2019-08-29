@@ -1,12 +1,21 @@
 import Foundation
 import SwiftUI
+import Combine
 
-private class _URLImageState: ObservableObject {
-    static let cache  = NSCache<NSString, UIImage>.init()
+private let cache: NSCache<NSString, NSData>  = {
+    let _cache = NSCache<NSString, NSData>.init()
+    _cache.countLimit = 100
+    return _cache
+}()
 
-    var uiImage = UIImage()
-    init() {
-        _URLImageState.cache.countLimit = 100
+
+private final class _URLImageState: ObservableObject {
+    var data: Data? {
+        didSet {
+            DispatchQueue.main.async {
+                self.objectWillChange.send(self.data!)
+            }
+        }
     }
 
     private var _url: String? = nil
@@ -16,24 +25,25 @@ private class _URLImageState: ObservableObject {
         }
         set {
             _url = newValue
-            if let obj = _URLImageState.cache.object(forKey: NSString.init(string: _url!)) {
-                self.uiImage = obj
-                self.objectWillChange.send()
+        }
+    }
+
+    public var objectWillChange = PassthroughSubject<Data,Never>()
+
+
+    func load() {
+        if let data = cache.object(forKey: NSString.init(string: _url!)) {
+            self.data = data as Data
+            return
+        }
+        URLSession(configuration: .default).dataTask(with: URL(string: url!)!) { data,_,_ in
+            guard let data = data else {
                 return
             }
-            URLSession(configuration: .default).dataTask(with: URL(string: newValue!)!) { data,_,_ in
-                guard let data = data else {
-                    return
-                }
 
-                guard let uiImage = UIImage(data: data) else {
-                    return
-                }
-                _URLImageState.cache.setObject(uiImage, forKey: NSString.init(string: self._url!))
-                self.uiImage = uiImage
-                self.objectWillChange.send()
-            }.resume()
-        }
+            cache.setObject(data as NSData, forKey: NSString.init(string: self._url!))
+            self.data = data
+        }.resume()
     }
 }
 
@@ -42,9 +52,14 @@ struct URLImage: View {
 
     init(_ url: String) {
         state.url = url
+        state.load()
     }
 
     var body: some View {
-        Image(uiImage: state.uiImage)
+        state.data.flatMap {
+            UIImage(data: $0).flatMap {
+                Image(uiImage: $0).renderingMode(.original)
+            }
+        }
     }
 }

@@ -439,9 +439,14 @@ public final class List<Element: RealmCollectionValue>: ListBase {
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
     }
-
+    
+    #if canImport(Combine)
+    @available(watchOS 6.0, *)
+    @available(iOS 13.0, *)
     @available(iOSApplicationExtension 13.0, *)
+    @available(OSXApplicationExtension 10.15, *)
     public lazy var objectWillChange = RealmCollectionPublisher.init(collection: self)
+    #endif
 }
 
 extension List where Element: MinMaxType {
