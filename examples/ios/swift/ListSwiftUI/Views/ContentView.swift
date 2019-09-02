@@ -33,9 +33,6 @@ struct RecipeRow: View {
     }
 }
 
-
-
-
 final class ContentViewState: ObservableObject {
     @Published var sectionState: [Recipe: Bool] = [:]
 }
@@ -83,7 +80,7 @@ struct ContentView: View {
 
     func delete(at offsets: IndexSet) {
         try! Realm().write {
-            self.recipes.remove(atOffsets: offsets)
+            self.recipes.remove(at: offsets.first!)
         }
     }
 
