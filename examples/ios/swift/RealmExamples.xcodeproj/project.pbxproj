@@ -29,6 +29,8 @@
 		49DBDE0223167E9F003DD65E /* IngredientFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DBDE0123167E9F003DD65E /* IngredientFormView.swift */; };
 		49E693AF2317FC6800189AAE /* Ingredient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E693AE2317FC6800189AAE /* Ingredient.swift */; };
 		49E693B12317FC9200189AAE /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E693B02317FC9200189AAE /* Recipe.swift */; };
+		49F64C5B231D80FD0014E813 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F64C5A231D80FD0014E813 /* SearchBar.swift */; };
+		49F64C5D231D857D0014E813 /* RecipeFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F64C5C231D857D0014E813 /* RecipeFormView.swift */; };
 		C07E5D7A1B15003B00ED625C /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
 		C07E5D7B1B15003B00ED625C /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C07E5D7C1B15004800ED625C /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
@@ -184,6 +186,8 @@
 		49DBDE0123167E9F003DD65E /* IngredientFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientFormView.swift; sourceTree = "<group>"; };
 		49E693AE2317FC6800189AAE /* Ingredient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ingredient.swift; sourceTree = "<group>"; };
 		49E693B02317FC9200189AAE /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
+		49F64C5A231D80FD0014E813 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
+		49F64C5C231D857D0014E813 /* RecipeFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeFormView.swift; sourceTree = "<group>"; };
 		9C318E8C1CA42C7800879076 /* GettingStarted.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = GettingStarted.playground; sourceTree = "<group>"; };
 		C07E5D791B15001500ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -313,11 +317,10 @@
 		493759A5230D8CA60078C28E /* ListSwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				49E693AD2317FC5200189AAE /* Models */,
 				49E693B22317FD3100189AAE /* Views */,
 				493759A6230D8CA60078C28E /* AppDelegate.swift */,
 				493759A8230D8CA60078C28E /* SceneDelegate.swift */,
-				49E693AD2317FC5200189AAE /* Models */,
-				49B527702315567300131B4A /* URLImage.swift */,
 				493759AC230D8CAA0078C28E /* Assets.xcassets */,
 				493759B1230D8CAA0078C28E /* LaunchScreen.storyboard */,
 				493759B4230D8CAA0078C28E /* Info.plist */,
@@ -356,8 +359,11 @@
 		49E693B22317FD3100189AAE /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				49B527702315567300131B4A /* URLImage.swift */,
 				49DBDE0123167E9F003DD65E /* IngredientFormView.swift */,
 				493759AA230D8CA60078C28E /* ContentView.swift */,
+				49F64C5C231D857D0014E813 /* RecipeFormView.swift */,
+				49F64C5A231D80FD0014E813 /* SearchBar.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -772,9 +778,11 @@
 			files = (
 				493759A7230D8CA60078C28E /* AppDelegate.swift in Sources */,
 				49DBDE0223167E9F003DD65E /* IngredientFormView.swift in Sources */,
+				49F64C5D231D857D0014E813 /* RecipeFormView.swift in Sources */,
 				49E693AF2317FC6800189AAE /* Ingredient.swift in Sources */,
 				49B527612315355300131B4A /* FoodType.swift in Sources */,
 				493759A9230D8CA60078C28E /* SceneDelegate.swift in Sources */,
+				49F64C5B231D80FD0014E813 /* SearchBar.swift in Sources */,
 				49B527712315567300131B4A /* URLImage.swift in Sources */,
 				493759AB230D8CA60078C28E /* ContentView.swift in Sources */,
 				49E693B12317FC9200189AAE /* Recipe.swift in Sources */,

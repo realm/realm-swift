@@ -18,9 +18,6 @@
 
 import Foundation
 import Realm
-#if canImport(SwiftUI)
-import SwiftUI
-#endif
 #if canImport(Combine)
 import Combine
 #endif

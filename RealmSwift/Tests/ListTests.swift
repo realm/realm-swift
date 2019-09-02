@@ -806,37 +806,3 @@ class ListRRCMethodsTests: XCTestCase {
         compare(array: array, with: list)
     }
 }
-
-#if canImport(Combine)
-class TestObject: Object {
-    private static func createListObject(_ values: [Int] = [0, 1, 2, 3, 4, 5, 6]) -> List<Int> {
-        let list = List<Int>()
-        list.append(objectsIn: values)
-        return list
-    }
-
-    let list = TestObject.createListObject()
-}
-
-@available(iOS 13.0, *)
-class ListCombineTests: ListTests {
-
-
-    private var testObject = TestObject()
-
-
-
-    func testObjectWillChange() {
-        let exp = XCTestExpectation.init(description: "sink will receive objects")
-
-        var newList = [Int]()
-
-        let cancellable = testObject.list.objectWillChange.sink {
-            XCTAssertEqual(self.testObject.list, $0)
-            exp.fulfill()
-        }
-
-        wait(for: [exp], timeout: 10)
-    }
-}
-#endif

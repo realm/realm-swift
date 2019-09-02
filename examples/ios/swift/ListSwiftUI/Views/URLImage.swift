@@ -8,7 +8,6 @@ private let cache: NSCache<NSString, NSData>  = {
     return _cache
 }()
 
-
 private final class _URLImageState: ObservableObject {
     var data: Data? {
         didSet {

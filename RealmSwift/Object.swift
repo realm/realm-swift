@@ -19,6 +19,9 @@
 import Foundation
 import Realm
 import Realm.Private
+#if canImport(Combine)
+import Combine
+#endif
 
 /**
  `Object` is a class used to define Realm model objects.
@@ -596,7 +599,6 @@ extension Object {
 
 // MARK: - Combine
 #if canImport(Combine)
-import Combine
 
 @available(watchOS 6.0, *)
 @available(iOS 13.0, *)

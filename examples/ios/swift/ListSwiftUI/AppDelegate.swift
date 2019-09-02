@@ -1,11 +1,3 @@
-//
-//  AppDelegate.swift
-//  ListSwiftUI
-//
-//  Created by Jason Flax on 21/08/2019.
-//  Copyright © 2019 Realm. All rights reserved.
-//
-
 import UIKit
 
 @UIApplicationMain

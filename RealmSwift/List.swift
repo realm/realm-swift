@@ -19,7 +19,9 @@
 import Foundation
 import Realm
 import Realm.Private
+#if canImport(Combine)
 import Combine
+#endif
 
 /// :nodoc:
 /// Internal class. Do not use directly.
@@ -764,6 +766,7 @@ extension List {
 #if canImport(Combine)
 import Combine
 
+@available(OSX 10.15, *)
 @available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
@@ -783,6 +786,7 @@ extension List {
     }
 }
 
+@available(OSX 10.15, *)
 @available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)

@@ -1,7 +1,10 @@
 import SwiftUI
 
 struct RadioGrid<Data, ID, Content>: View, DynamicViewContent where Data : RandomAccessCollection,
-Data.Index == Int, Content : View, ID: Hashable, Data.Element: Equatable {
+    Data.Index == Int,
+    Content : View, ID: Hashable,
+    Data.Element: Equatable {
+
     private var content: (Data.Element) -> Content
     private var columns: Int
     var data: Data

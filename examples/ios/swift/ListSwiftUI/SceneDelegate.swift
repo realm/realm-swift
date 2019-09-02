@@ -1,11 +1,3 @@
-//
-//  SceneDelegate.swift
-//  ListSwiftUI
-//
-//  Created by Jason Flax on 21/08/2019.
-//  Copyright © 2019 Realm. All rights reserved.
-//
-
 import UIKit
 import SwiftUI
 import RealmSwift
@@ -26,7 +18,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
            // Set the new schema version. This must be greater than the previously used
            // version (if you've never set a schema version before, the version is 0).
-//           config.schemaVersion = 0
             config.deleteRealmIfMigrationNeeded = true
             return config
        }()
