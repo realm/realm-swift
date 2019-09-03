@@ -896,12 +896,9 @@ extension Realm {
         /**
          This notification is posted when the data in a Realm has changed.
 
-         `didChange` is posted after a Realm has been refreshed to reflect a write transaction, This can happen when 
-         `refresh()` is called, after an implicit refresh from `write(_:)`/`beginWrite()`, or after
+         `didChange` is posted after a Realm has been refreshed to reflect a write transaction, This can happen when an
+         autorefresh occurs, `refresh()` is called, after an implicit refresh from `write(_:)`/`beginWrite()`, or after
          a local write transaction is committed.
-         
-         This notification is only ever sent for Realms with autorefresh disabled.
-         In response to this notification, you can safely call `refresh()` to advance the Realm to its latest state.
          */
         case didChange = "RLMRealmDidChangeNotification"
 
