@@ -173,12 +173,15 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMError, RLMErrorDomain) {
 typedef NSString * RLMNotification RLM_EXTENSIBLE_STRING_ENUM;
 
 /**
- This notification is posted by a Realm when the data in that Realm has changed.
+ This notification is posted when a write transaction has been committed to a Realm on a different thread for
+ the same file.
 
- More specifically, this notification is posted after a Realm has been refreshed to
- reflect a write transaction. This can happen when an autorefresh occurs, when
- `-[RLMRealm refresh]` is called, after an implicit refresh from `-[RLMRealm beginWriteTransaction]`,
- or after a local write transaction is completed.
+ It is not posted if `autorefresh` is enabled, or if the Realm is refreshed before the notification has a chance
+ to run.
+
+ Realms with autorefresh disabled should normally install a handler for this notification which calls
+ `-[RLMRealm refresh]` after doing some work. Refreshing the Realm is optional, but not refreshing the Realm may lead to
+ large Realm files. This is because an extra copy of the data must be kept for the stale Realm.
  */
 extern RLMNotification const RLMRealmRefreshRequiredNotification
 RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(RLMRealmRefreshRequiredNotification, RefreshRequired);
