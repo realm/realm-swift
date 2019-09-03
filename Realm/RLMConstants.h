@@ -176,9 +176,15 @@ typedef NSString * RLMNotification RLM_EXTENSIBLE_STRING_ENUM;
  This notification is posted by a Realm when the data in that Realm has changed.
 
  More specifically, this notification is posted after a Realm has been refreshed to
- reflect a write transaction. This can happen when an autorefresh occurs, when
+ reflect a write transaction. This can happen when
  `-[RLMRealm refresh]` is called, after an implicit refresh from `-[RLMRealm beginWriteTransaction]`,
  or after a local write transaction is completed.
+ 
+ A RLMRealmRefreshRequiredNotification notification is only ever sent for Realms
+ with autorefresh disabled.
+ 
+ In response to this notification, you can safely call `-[RLMRealm refresh]` to advance the Realm
+ to its latest state.
  */
 extern RLMNotification const RLMRealmRefreshRequiredNotification
 RLM_EXTENSIBLE_STRING_ENUM_CASE_SWIFT_NAME(RLMRealmRefreshRequiredNotification, RefreshRequired);
