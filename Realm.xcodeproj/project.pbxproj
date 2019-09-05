@@ -211,8 +211,6 @@
 		3F9026131C625C63006AE98E /* list.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F90260F1C625C5D006AE98E /* list.cpp */; };
 		3F9182441CD1713E00A50120 /* fileformat-old-date.realm in Resources */ = {isa = PBXBuildFile; fileRef = 3F9182421CD1712F00A50120 /* fileformat-old-date.realm */; };
 		3F9182451CD1713F00A50120 /* fileformat-old-date.realm in Resources */ = {isa = PBXBuildFile; fileRef = 3F9182421CD1712F00A50120 /* fileformat-old-date.realm */; };
-		3F92F62B222F3125008B2333 /* fifo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F92F629222F311C008B2333 /* fifo.cpp */; };
-		3F92F62C222F3126008B2333 /* fifo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F92F629222F311C008B2333 /* fifo.cpp */; };
 		3F9801A41C8E4F55000A8B07 /* collection_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F98019E1C8E4F55000A8B07 /* collection_notifier.cpp */; };
 		3F9801A51C8E4F55000A8B07 /* list_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F98019F1C8E4F55000A8B07 /* list_notifier.cpp */; };
 		3F9801A61C8E4F5A000A8B07 /* collection_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F98019E1C8E4F55000A8B07 /* collection_notifier.cpp */; };
@@ -810,10 +808,8 @@
 		3F90260F1C625C5D006AE98E /* list.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = list.cpp; sourceTree = "<group>"; };
 		3F9026101C625C5D006AE98E /* list.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = list.hpp; sourceTree = "<group>"; };
 		3F9182421CD1712F00A50120 /* fileformat-old-date.realm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "fileformat-old-date.realm"; sourceTree = "<group>"; };
-		3F92F626222F311B008B2333 /* fifo.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = fifo.hpp; sourceTree = "<group>"; };
 		3F92F627222F311B008B2333 /* event_loop_dispatcher.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = event_loop_dispatcher.hpp; sourceTree = "<group>"; };
 		3F92F628222F311C008B2333 /* tagged_bool.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = tagged_bool.hpp; sourceTree = "<group>"; };
-		3F92F629222F311C008B2333 /* fifo.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = fifo.cpp; sourceTree = "<group>"; };
 		3F92F62A222F311C008B2333 /* aligned_union.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = aligned_union.hpp; sourceTree = "<group>"; };
 		3F98019A1C8E4F55000A8B07 /* collection_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = collection_notifier.hpp; sourceTree = "<group>"; };
 		3F98019B1C8E4F55000A8B07 /* list_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = list_notifier.hpp; sourceTree = "<group>"; };
@@ -1427,8 +1423,6 @@
 				5DB591A61D063DF8001D8F93 /* atomic_shared_ptr.hpp */,
 				3F92F627222F311B008B2333 /* event_loop_dispatcher.hpp */,
 				5D274C4F1D6D16A8006FEBB1 /* event_loop_signal.hpp */,
-				3F92F629222F311C008B2333 /* fifo.cpp */,
-				3F92F626222F311B008B2333 /* fifo.hpp */,
 				3F92F628222F311C008B2333 /* tagged_bool.hpp */,
 				1AABD4001E9552BA00115A75 /* uuid.cpp */,
 				1AABD4011E9552BA00115A75 /* uuid.hpp */,
@@ -2394,7 +2388,6 @@
 				3F9801AB1C8E4F6B000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A41C8E4F55000A8B07 /* collection_notifier.cpp in Sources */,
 				5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */,
-				3F92F62B222F3125008B2333 /* fifo.cpp in Sources */,
 				5D659E821BE04556006515A0 /* index_set.cpp in Sources */,
 				1A64CA8B1D8763B400BC0F9B /* keychain_helper.cpp in Sources */,
 				3F9026111C625C5D006AE98E /* list.cpp in Sources */,
@@ -2543,7 +2536,6 @@
 				3F9801AC1C8E4F6F000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A61C8E4F5A000A8B07 /* collection_notifier.cpp in Sources */,
 				5DD7557F1BE056DE002800DA /* external_commit_helper.cpp in Sources */,
-				3F92F62C222F3126008B2333 /* fifo.cpp in Sources */,
 				5DD755801BE056DE002800DA /* index_set.cpp in Sources */,
 				E8FD2E381D93345100569F10 /* keychain_helper.cpp in Sources */,
 				3F9026131C625C63006AE98E /* list.cpp in Sources */,

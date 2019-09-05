@@ -253,6 +253,7 @@ BOOL isValidRealmURL(NSURL *url) {
         _config->bind_session_handler = std::move(bindHandler);
         _config->error_handler = std::move(errorHandler);
         _config->is_partial = isPartial;
+        _config->client_resync_mode = realm::ClientResyncMode::Manual;
 
         if (NSString *authorizationHeaderName = [RLMSyncManager sharedManager].authorizationHeaderName) {
             _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);
