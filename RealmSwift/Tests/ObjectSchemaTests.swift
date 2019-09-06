@@ -40,6 +40,11 @@ class ObjectSchemaTests: TestCase {
         XCTAssertEqual(objectSchema.className, "SwiftObject")
     }
 
+    func testObjectClass() {
+        let objectSchema = swiftObjectSchema
+        XCTAssertTrue(objectSchema.objectClass === SwiftObject.self)
+    }
+
     func testPrimaryKeyProperty() {
         let objectSchema = swiftObjectSchema
         XCTAssertNil(objectSchema.primaryKeyProperty)
