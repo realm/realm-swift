@@ -563,9 +563,39 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "catalyst")
+        if (( $(xcode_version_major) < 11 )); then
+            echo 'Building for Catalyst requires Xcode 11'
+            exit 1
+        fi
+
+        xc "-scheme Realm -configuration $CONFIGURATION REALM_CATALYST_FLAGS='-target x86_64-apple-ios13.0-macabi' REALM_PLATFORM_SUFFIX='maccatalyst'"
+        clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/Realm.framework" "build/catalyst" "Realm.framework"
+        ;;
+
+    "catalyst-swift")
+        if (( $(xcode_version_major) < 11 )); then
+            echo 'Building for Catalyst requires Xcode 11'
+            exit 1
+        fi
+
+        sh build.sh catalyst
+        # FIXME: change this to just "-destination variant='Mac Catalyst'" once the CI machines are running 10.15
+        xc "-scheme 'RealmSwift' -configuration $CONFIGURATION build \
+            REALM_CATALYST_FLAGS='-target x86_64-apple-ios13.0-macabi' \
+            REALM_PLATFORM_SUFFIX='maccatalyst' \
+            SWIFT_DEPLOYMENT_TARGET='13.0-macabi' \
+            SWIFT_PLATFORM_TARGET_PREFIX='ios'"
+        destination="build/catalyst/swift-$REALM_XCODE_VERSION"
+        clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
+        rm -rf "$destination/Realm.framework"
+        cp -R build/catalyst/Realm.framework "$destination"
+        ;;
+
     "xcframework")
         if (( $(xcode_version_major) < 11 )); then
             echo 'Building a xcframework requires Xcode 11'
+            exit 1
         fi
 
         export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS BUILD_LIBRARY_FOR_DISTRIBUTION=YES REALM_OBJC_MACH_O_TYPE=staticlib"
