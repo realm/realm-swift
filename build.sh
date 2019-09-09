@@ -504,18 +504,14 @@ case "$COMMAND" in
     ######################################
     "build")
         sh build.sh ios-static
-        if (( $(xcode_version_major) >= 11 )); then
-            sh build.sh xcframework
-        else
-            sh build.sh ios-dynamic
-            sh build.sh ios-swift
-            sh build.sh watchos
-            sh build.sh watchos-swift
-            sh build.sh tvos
-            sh build.sh tvos-swift
-            sh build.sh osx
-            sh build.sh osx-swift
-        fi
+        sh build.sh ios-dynamic
+        sh build.sh ios-swift
+        sh build.sh watchos
+        sh build.sh watchos-swift
+        sh build.sh tvos
+        sh build.sh tvos-swift
+        sh build.sh osx
+        sh build.sh osx-swift
         exit 0
         ;;
 
