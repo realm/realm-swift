@@ -36,17 +36,33 @@ exclude:
     target: docs
     configuration: Debug
 
+  - xcode_version: 10.0
+    target: docs
+    configuration: Release
+
   - xcode_version: 10.1
     target: docs
     configuration: Debug
+
+  - xcode_version: 10.1
+    target: docs
+    configuration: Release
 
   - xcode_version: 10.2.1
     target: docs
     configuration: Debug
 
+  - xcode_version: 10.2.1
+    target: docs
+    configuration: Release
+
   - xcode_version: 10.3
     target: docs
     configuration: Debug
+
+  - xcode_version: 10.3
+    target: docs
+    configuration: Release
 
   - xcode_version: 11.0
     target: docs
@@ -56,17 +72,33 @@ exclude:
     target: swiftlint
     configuration: Debug
 
+  - xcode_version: 10.0
+    target: swiftlint
+    configuration: Release
+
   - xcode_version: 10.1
     target: swiftlint
     configuration: Debug
+
+  - xcode_version: 10.1
+    target: swiftlint
+    configuration: Release
 
   - xcode_version: 10.2.1
     target: swiftlint
     configuration: Debug
 
+  - xcode_version: 10.2.1
+    target: swiftlint
+    configuration: Release
+
   - xcode_version: 10.3
     target: swiftlint
     configuration: Debug
+
+  - xcode_version: 10.3
+    target: swiftlint
+    configuration: Release
 
   - xcode_version: 11.0
     target: swiftlint
