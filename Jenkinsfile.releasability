@@ -1,6 +1,7 @@
 xcodeVersions = ['10.0', '10.1', '10.2.1', '10.3', '11.0']
-platforms = ['osx', 'ios', 'watchos', 'tvos']
-platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS']
+platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
+carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
+platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
 carthageXcodeVersion = '10.3'
 objcXcodeVersion = '10.1'
 docsSwiftVersion = '5.1'
@@ -94,7 +95,7 @@ def doBuild() {
       }
     ]
 
-    for (def p in platforms) {
+    for (def p in carthagePlatforms) {
       def platform = p
       def platformName = platformNames[platform]
       parallelBuilds["${platformName} Carthage"] = {
@@ -178,7 +179,7 @@ def doBuild() {
         node('osx') {
           deleteDir()
 
-          for (def platform in platforms) {
+          for (def platform in carthagePlatforms) {
             unstash "${platform}-carthage"
           }
 

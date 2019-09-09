@@ -602,7 +602,7 @@ case "$COMMAND" in
 
         # Build all of the requested frameworks
         shift
-        PLATFORMS="${*:-osx ios watchos tvos}"
+        PLATFORMS="${*:-osx ios watchos tvos catalyst}"
         for platform in $PLATFORMS; do
             sh build.sh $platform-swift
         done
@@ -1340,8 +1340,13 @@ EOM
         REALM_SWIFT_VERSION=
 
         set_xcode_and_swift_versions
-        sh build.sh prelaunch-simulator
-        sh build.sh $PLATFORM-swift
+
+        if [[ "$PLATFORM" = "catalyst" ]] && (( $(xcode_version_major) < 11 )); then
+            mkdir -p build/catalyst/swift-$REALM_XCODE_VERSION
+        else
+            sh build.sh prelaunch-simulator
+            sh build.sh $PLATFORM-swift
+        fi
 
         cd build/$PLATFORM
         zip --symlinks -r realm-framework-$PLATFORM-$REALM_XCODE_VERSION.zip swift-$REALM_XCODE_VERSION
@@ -1363,7 +1368,7 @@ EOM
             mkdir -p ${FOLDER}/Swift
 
             unzip ${WORKSPACE}/realm-framework-ios-static.zip -d ${FOLDER}/ios/static
-            for platform in osx ios watchos tvos; do
+            for platform in osx ios watchos tvos catalyst; do
                 unzip ${WORKSPACE}/realm-framework-${platform}-${REALM_XCODE_VERSION}.zip -d ${FOLDER}/${platform}
                 mv ${FOLDER}/${platform}/swift-*/Realm.framework ${FOLDER}/${platform}
                 rm -r ${FOLDER}/${platform}/swift-*
@@ -1371,7 +1376,7 @@ EOM
 
             mv ${FOLDER}/ios/Realm.framework ${FOLDER}/ios/dynamic
         else
-            for platform in osx ios watchos tvos; do
+            for platform in osx ios watchos tvos catalyst; do
                 find ${WORKSPACE} -name "realm-framework-$platform-*.zip" \
                                   -maxdepth 1 \
                                   -exec unzip {} -d ${FOLDER}/${platform} \;
@@ -1453,6 +1458,10 @@ EOF
         echo 'Packaging tvOS'
         sh build.sh package tvos
         cp build/tvos/realm-framework-tvos-$REALM_XCODE_VERSION.zip .
+
+        echo 'Packaging Catalyst'
+        sh build.sh package catalyst
+        cp build/catalyst/realm-framework-catalyst-$REALM_XCODE_VERSION.zip .
 
         echo 'Packaging examples'
         sh build.sh package-examples

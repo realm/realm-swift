@@ -1666,7 +1666,6 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_LDFLAGS = (
 					"-lz",
-					"-all_load",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Draw;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1692,7 +1691,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_LDFLAGS = (
 					"-lz",
-					"-all_load",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Draw;
 				PRODUCT_NAME = "$(TARGET_NAME)";
