@@ -1,11 +1,28 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+The file format for synchronized Realms has changed. Old Realms will be
+automatically upgraded when they are opened. Once upgraded, the files will not
+be openable by older versions of Realm. The upgrade should not take a
+significant amount of time to run or run any risk of errors.
+
+This does not effect non-synchronized Realms.
+
 ### Enhancements
-* None.
+* Improve performance of queries on Date properties
+  ([Core #3344](https://github.com/realm/realm-core/pull/3344), [Core #3351](https://github.com/realm/realm-core/pull/3351)).
+* Syncronized Realms are now more aggressive about trimming local history that
+  is no longer needed. This should reduce file size growth in write-heavy
+  workloads. ([Sync #3007](https://github.com/realm/realm-sync/issues/3007)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+* If a signal interrupted a msync() call, Realm would throw an exception and
+  the write transaction would fail. This behavior has new been changed to retry
+  the system call instead. ([Core #3352](https://github.com/realm/realm-core/issues/3352))
+* Queries on the sum or average of an integer property would sometimes give
+  incorrect results. ([Core #3356](https://github.com/realm/realm-core/pull/3356)).
+* Opening query-based synchronized Realms with a small number of subscriptions
+  performed an unneccesary write transaction. ([ObjectStore #815](https://github.com/realm/realm-object-store/pull/815)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
