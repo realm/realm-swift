@@ -946,8 +946,12 @@ case "$COMMAND" in
 
     "verify-tvos")
         sh build.sh test-tvos
-        sh build.sh test-tvos-swift
         sh build.sh examples-tvos
+        exit 0
+        ;;
+
+    "verify-tvos-swift")
+        sh build.sh test-tvos-swift
         sh build.sh examples-tvos-swift
         exit 0
         ;;
