@@ -14,6 +14,9 @@ This does not effect non-synchronized Realms.
 * Syncronized Realms are now more aggressive about trimming local history that
   is no longer needed. This should reduce file size growth in write-heavy
   workloads. ([Sync #3007](https://github.com/realm/realm-sync/issues/3007)).
+* Add support for building Realm as an xcframework. Prebuilt xcframeworks will
+  be added to the release package once Xcode 11 is out of beta.
+  ([PR #6237](https://github.com/realm/realm-cocoa/pull/6237)).
 
 ### Fixed
 * If a signal interrupted a msync() call, Realm would throw an exception and
