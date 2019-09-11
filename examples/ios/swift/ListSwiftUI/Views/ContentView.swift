@@ -55,7 +55,7 @@ struct ContentView: View {
                         NavigationLink(destination: RecipeFormView(showRecipeFormView: self.$showRecipeFormView),
                                        isActive: self.$showRecipeFormView,
                                        label: {
-                                        Button("add recipe")  {
+                                        Button("add recipe") {
                                             self.showRecipeFormView = true
                                         }
                         })
