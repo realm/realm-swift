@@ -1065,6 +1065,17 @@ extension RealmCollection {
 #if canImport(Combine)
 import Combine
 
+@available(OSX 10.15, *)
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+extension AnyRealmCollection: ObservableObject {
+    public var objectWillChange: RealmCollectionPublisher<AnyRealmCollection> {
+        RealmCollectionPublisher(collection: self)
+    }
+}
+
 @available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
@@ -1076,7 +1087,6 @@ extension RealmCollection {
             switch change {
             case .update(_, deletions: _, insertions: _, modifications: _):
                 _ = subscriber.receive(self)
-                break
             default:
                 break
             }
@@ -1111,7 +1121,7 @@ public struct RealmCollectionSubscription: Subscription {
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-public final class RealmCollectionPublisher<Collection: RealmCollection>: Publisher {
+public struct RealmCollectionPublisher<Collection: RealmCollection>: Publisher {
     public typealias Output = Collection
     public typealias Failure = Never
 
@@ -1121,7 +1131,7 @@ public final class RealmCollectionPublisher<Collection: RealmCollection>: Publis
         self.collection = collection
     }
 
-    public func receive<S>(subscriber: S) where S : Subscriber, S.Failure == Never, Output == S.Input {
+    public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
         subscriber.receive(subscription: RealmCollectionSubscription(object: self.collection, subscriber: subscriber))
     }
 }

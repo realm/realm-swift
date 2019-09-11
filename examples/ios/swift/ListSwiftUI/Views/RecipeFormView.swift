@@ -13,7 +13,7 @@ struct RecipeFormView: View {
             }
             Section(header: Text("ingredients")) {
                 VStack {
-                    ForEach(Array(self.draftRecipe.ingredients),  id: \.self) { ingredient in
+                    ForEach(Array(self.draftRecipe.ingredients), id: \.self) { ingredient in
                         HStack {
                             URLImage(ingredient.foodType!.imgUrl)
                             Text(ingredient.name!)
@@ -39,7 +39,7 @@ struct RecipeFormView: View {
     }
 }
 
-struct RecipeFormView_Previews: PreviewProvider {
+struct RecipeFormViewPreviews: PreviewProvider {
     static var previews: some View {
         RecipeFormView(showRecipeFormView: .constant(true))
     }

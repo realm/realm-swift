@@ -1,6 +1,7 @@
 import Foundation
 import RealmSwift
 
+/// A type of rood associated with an `Ingredient`.
 enum FoodType: String, CaseIterable {
     case food, foodTruck, organicFood, noFood, deliverFood, veganFood, foodService, healthyFood, fishFood, naturalFood, vegetarianFood
     case foodAndWine, nonVegetarianFoodSymbol, realFoodForMeals, healthyFoodCaloriesCalculator, mcdonalds, noShellfish, noCelery
@@ -14,6 +15,7 @@ enum FoodType: String, CaseIterable {
     case plum, eggplant, naan, yearOfGoat, radish, broccoli, cucumber
     case sugarCubes, sugarCube, grill, beet, brezel
 
+    /// A url associated with an icon for a given food type.
     var imgUrl: String {
         String(format: "https://img.icons8.com/color/48/000000/%@.png", self.rawValue.unicodeScalars.reduce("") {
             if CharacterSet.uppercaseLetters.contains($1) {

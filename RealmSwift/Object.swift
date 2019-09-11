@@ -306,14 +306,6 @@ open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
     public override required init(value: Any, schema: RLMSchema) {
         super.init(value: value, schema: schema)
     }
-
-    #if canImport(Combine)
-    @available(watchOS 6.0, *)
-    @available(iOS 13.0, *)
-    @available(iOSApplicationExtension 13.0, *)
-    @available(OSXApplicationExtension 10.15, *)
-    public lazy var objectWillChange = RealmObjectPublisher.init(self)
-    #endif
 }
 
 /**
@@ -599,17 +591,16 @@ extension Object {
 
 // MARK: - Combine
 #if canImport(Combine)
-
 @available(watchOS 6.0, *)
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-public struct RealmObjectPublisher<T : Object>: Publisher {
+public struct RealmObjectPublisher<T: Object>: Publisher {
     public typealias Output = T
     public typealias Failure = Never
 
     let parent: T
-    
+
     public init(_ parent: T) {
         self.parent = parent
     }
@@ -645,17 +636,19 @@ public struct RealmObjectSubscription<SubscriberType: Subscriber, T: Object>: Su
 @available(iOS 13.0, *)
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
-extension Object : Combine.ObservableObject, Identifiable {
+extension Object: Combine.ObservableObject, Identifiable {
+    public var objectWillChange: RealmObjectPublisher<Self> {
+        RealmObjectPublisher(self as! Self)
+    }
+
     /// Allows a subscriber to hook into Realm Changes.
     public func observe<S>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input: Object {
         return observe { change in
             switch change {
-            case .change(_):
+            case .change:
                 _ = subscriber.receive(self as! S.Input)
-                break
             case .deleted:
                 subscriber.receive(completion: .finished)
-                break
             default:
                 break
             }

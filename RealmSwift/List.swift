@@ -37,7 +37,7 @@ public class ListBase: RLMListBase {
     @objc private func descriptionWithMaxDepth(_ depth: UInt) -> String {
         return RLMDescriptionWithMaxDepth("List", _rlmArray, depth)
     }
-    
+
     /// Returns the number of objects in this List.
     public var count: Int { return Int(_rlmArray.count) }
 }
@@ -441,14 +441,6 @@ public final class List<Element: RealmCollectionValue>: ListBase {
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
     }
-    
-    #if canImport(Combine)
-    @available(watchOS 6.0, *)
-    @available(iOS 13.0, *)
-    @available(iOSApplicationExtension 13.0, *)
-    @available(OSXApplicationExtension 10.15, *)
-    public lazy var objectWillChange = RealmCollectionPublisher.init(collection: self)
-    #endif
 }
 
 extension List where Element: MinMaxType {
@@ -778,7 +770,6 @@ extension List {
             switch change {
             case .update(_, deletions: _, insertions: _, modifications: _):
                 _ = subscriber.receive(self as! L)
-                break
             default:
                 break
             }
@@ -792,6 +783,8 @@ extension List {
 @available(iOSApplicationExtension 13.0, *)
 @available(OSXApplicationExtension 10.15, *)
 extension List: ObservableObject {
+    public var objectWillChange: RealmCollectionPublisher<List> {
+        RealmCollectionPublisher(collection: self)
+    }
 }
-
 #endif

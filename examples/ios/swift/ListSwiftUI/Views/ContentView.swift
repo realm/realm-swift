@@ -34,6 +34,7 @@ struct RecipeRow: View {
 }
 
 final class ContentViewState: ObservableObject {
+    /// This dict will allow us to store state on the expansion and contraction of rows.
     @Published var sectionState: [Recipe: Bool] = [:]
 }
 
@@ -53,14 +54,15 @@ struct ContentView: View {
                             .padding(5)
                         NavigationLink(destination: RecipeFormView(showRecipeFormView: self.$showRecipeFormView),
                                        isActive: self.$showRecipeFormView,
-                                       label: { Button("add recipe")  {
-                                        self.showRecipeFormView = true
-                                        }})
+                                       label: {
+                                        Button("add recipe")  {
+                                            self.showRecipeFormView = true
+                                        }
+                        })
                 }) {
                     ForEach(filteredCollection(), id: \.id) { recipe in
                         RecipeRow(recipe).environmentObject(self.state)
-                    }.onDelete(perform: self.delete)
-                        .onMove(perform: self.move)
+                    }
                 }
             }.listStyle(GroupedListStyle())
                 .navigationBarTitle("recipes", displayMode: .large)
@@ -70,11 +72,11 @@ struct ContentView: View {
         }
     }
 
-    func filteredCollection() -> Array<Recipe> {
-        if (self.searchTerm.isEmpty) {
-            return Array(self.recipes)
+    func filteredCollection() -> AnyRealmCollection<Recipe> {
+        if self.searchTerm.isEmpty {
+            return AnyRealmCollection(self.recipes)
         } else {
-            return Array(self.recipes.filter("name CONTAINS '\(searchTerm)'"))
+            return AnyRealmCollection(self.recipes.filter("name CONTAINS '%@'", searchTerm))
         }
     }
 
@@ -93,7 +95,7 @@ struct ContentView: View {
 }
 
 #if DEBUG
-struct ContentView_Previews: PreviewProvider {
+struct ContentViewPreviews: PreviewProvider {
     static var previews: some View {
         return ContentView()
     }

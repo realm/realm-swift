@@ -1,20 +1,15 @@
 import SwiftUI
 
-struct RadioGrid<Data, ID, Content>: View, DynamicViewContent where Data : RandomAccessCollection,
-    Data.Index == Int,
-    Content : View, ID: Hashable,
-    Data.Element: Equatable {
+struct RadioGrid<Data, ID, Content>: View, DynamicViewContent where Data: RandomAccessCollection,
+    Data.Index == Int, Content: View, ID: Hashable, Data.Element: Equatable {
 
     private var content: (Data.Element) -> Content
     private var columns: Int
-    var data: Data
-    @Binding var selection: Data.Element?
 
-    public init(_ data: Data,
-                id: KeyPath<Data.Element, ID>,
-                columns: Int,
-                selection: Binding<Data.Element?>,
-                @ViewBuilder builder: @escaping (Data.Element) -> Content) {
+    @Binding var selection: Data.Element?
+    var data: Data
+
+    public init(_ data: Data, id: KeyPath<Data.Element, ID>, columns: Int, selection: Binding<Data.Element?>, @ViewBuilder builder: @escaping (Data.Element) -> Content) {
         self.data = data
         self.columns = columns
         self.content = builder
@@ -27,7 +22,7 @@ struct RadioGrid<Data, ID, Content>: View, DynamicViewContent where Data : Rando
 
     private func radioButton(_ row: Int, _ column: Int) -> RadioButton {
         RadioButton(
-        isSelected: selection == self.data[row * self.columns + column])
+            isSelected: selection == self.data[row * self.columns + column])
     }
 
     var body: some View {
@@ -72,7 +67,7 @@ struct IngredientFormView: View {
     @Binding var recipe: Recipe
     @Binding var showIngredientForm: Bool
     @State var ingredientName: String = ""
-    @State var selection: FoodType? = nil
+    @State var selection: FoodType?
 
     var body: some View {
         Form {
@@ -81,8 +76,7 @@ struct IngredientFormView: View {
                 Spacer()
                 Button("save") {
                     self.recipe.ingredients.append(
-                        Ingredient.new(name: self.ingredientName,
-                                       foodType: self.selection!)
+                        Ingredient(name: self.ingredientName, foodType: self.selection!)
                     )
                     self.ingredientName = ""
                     self.selection = nil
@@ -100,16 +94,14 @@ struct IngredientFormView: View {
                 }
             }
         }.navigationBarTitle("ingredient").navigationBarItems(trailing: Button("save") {
-            self.recipe.ingredients.append(Ingredient.new(name: self.ingredientName,
-                                                     foodType: self.selection!))
+            self.recipe.ingredients.append(Ingredient(name: self.ingredientName, foodType: self.selection!))
             self.showIngredientForm = false
         }).edgesIgnoringSafeArea(.top)
     }
 }
 
-struct IngredientFormView_Previews: PreviewProvider {
+struct IngredientFormViewPreviews: PreviewProvider {
     static var previews: some View {
         IngredientFormView(recipe: .constant(Recipe()), showIngredientForm: .constant(true))
     }
 }
-
