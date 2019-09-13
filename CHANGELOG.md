@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.18.0 Release notes (2019-08-13)
 =============================================================
 
 The file format for synchronized Realms has changed. Old Realms will be
@@ -9,6 +9,7 @@ significant amount of time to run or run any risk of errors.
 This does not effect non-synchronized Realms.
 
 ### Enhancements
+
 * Improve performance of queries on Date properties
   ([Core #3344](https://github.com/realm/realm-core/pull/3344), [Core #3351](https://github.com/realm/realm-core/pull/3351)).
 * Syncronized Realms are now more aggressive about trimming local history that
@@ -22,6 +23,7 @@ This does not effect non-synchronized Realms.
   ([PR #6248](https://github.com/realm/realm-cocoa/pull/6248)).
 
 ### Fixed
+
 * If a signal interrupted a msync() call, Realm would throw an exception and
   the write transaction would fail. This behavior has new been changed to retry
   the system call instead. ([Core #3352](https://github.com/realm/realm-core/issues/3352))
@@ -30,15 +32,14 @@ This does not effect non-synchronized Realms.
 * Opening query-based synchronized Realms with a small number of subscriptions
   performed an unneccesary write transaction. ([ObjectStore #815](https://github.com/realm/realm-object-store/pull/815)).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 * Carthage release for Swift is built with Xcode 11.0
 
 ### Deprecations
+
 * `RLMIdentityProviderNickname` has been deprecated in favor of `RLMIdentityProviderUsernamePassword`.
 * `+[RLMIdentityProvider credentialsWithNickname]` has been deprecated in favor of `+[RLMIdentityProvider credentialsWithUsername]`.
 * `Sync.nickname(String, Bool)` has been deprecated in favor of `Sync.usernamePassword(String, String, Bool)`.
