@@ -107,6 +107,10 @@ def doBuild() {
           . ./scripts/swift-version.sh
           set_xcode_and_swift_versions
 
+          if [ "${platform}" != osx ]; then
+            ./scripts/reset-simulators.rb
+          fi
+
           carthage build --no-skip-current --platform ${platform}
           carthage archive --output Carthage-${platform}.framework.zip
           """
