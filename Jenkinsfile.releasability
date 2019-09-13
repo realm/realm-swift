@@ -152,6 +152,11 @@ def doBuild() {
             unstash "${platform}-${objcXcodeVersion}"
           }
 
+          // The 10.x builds don't actually have a framework for catalyst, so
+          // use the 11.0 version instead
+          unstash 'catalyst-11.0'
+          sh "mv realm-framework-catalyst-11.0.zip realm-framework-catalyst-${objcXcodeVersion}.zip"
+
           unstash 'ios-static'
           unstash 'examples'
           unstash 'source'
