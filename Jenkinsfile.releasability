@@ -2,7 +2,7 @@ xcodeVersions = ['10.0', '10.1', '10.2.1', '10.3', '11.0']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
-carthageXcodeVersion = '10.3'
+carthageXcodeVersion = '11.0'
 objcXcodeVersion = '10.1'
 docsSwiftVersion = '5.1'
 
