@@ -34,7 +34,7 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
         super.viewDidLoad()
 
         let realm = try! Realm()
-        token = realm.observe { [weak self] notification, realm in
+        token = realm.observe { [weak self] _, _ in
             self?.reloadData()
         }
 
@@ -44,7 +44,7 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
             URLQueryItem(name: "sort", value: "stars"),
             URLQueryItem(name: "order", value: "desc")
         ]
-        URLSession.shared.dataTask(with: URLRequest(url: components.url!)) { data, response, error in
+        URLSession.shared.dataTask(with: URLRequest(url: components.url!)) { data, _, error in
             if let error = error {
                 print(error)
                 return
@@ -60,7 +60,7 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
                         let repository = Repository()
                         repository.identifier = String(item["id"] as! Int)
                         repository.name = item["name"] as? String
-                        repository.avatarURL = item["owner"]!["avatar_url"] as? String;
+                        repository.avatarURL = item["owner"]!["avatar_url"] as? String
 
                         realm.add(repository, update: .modified)
                     }
@@ -77,10 +77,10 @@ class RepositoriesViewController: UICollectionViewController, UITextFieldDelegat
 
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! RepositoryCell
-        let repository = results![indexPath.item];
+        let repository = results![indexPath.item]
         cell.titleLabel.text = repository.name
 
-        URLSession.shared.dataTask(with: URLRequest(url: URL(string: repository.avatarURL!)!)) { (data, response, error) -> Void in
+        URLSession.shared.dataTask(with: URLRequest(url: URL(string: repository.avatarURL!)!)) { (data, _, error) -> Void in
             if let error = error {
                 print(error.localizedDescription)
                 return

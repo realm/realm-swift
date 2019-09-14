@@ -2,6 +2,11 @@ included:
   - Realm/ObjectServerTests
   - RealmSwift
   - Realm/Swift
+  - examples/installation/watchos/swift
+  - examples/installation/osx/swift
+  - examples/installation/ios/swift
+  - examples/ios/swift
+  - examples/tvos/swift
 identifier_name:
   min_length: # not possible to disable this partial rule, so set it to zero
     warning: 0

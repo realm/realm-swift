@@ -62,7 +62,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.rootViewController = UIViewController()
         window?.makeKeyAndVisible()
@@ -93,7 +93,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
                 }
             }
             if oldSchemaVersion < 2 {
-                migration.enumerateObjects(ofType: Person.className()) { oldObject, newObject in
+                migration.enumerateObjects(ofType: Person.className()) { _, newObject in
                     // give JP a dog
                     if newObject?["fullName"] as? String == "JP McDonald" {
                         let jpsDog = migration.create(Pet.className(), value: ["Jimbo", "dog"])

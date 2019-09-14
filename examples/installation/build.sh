@@ -108,7 +108,9 @@ xctest() {
         xcrun simctl boot $simulator_id
         DESTINATION="-destination id=$simulator_id"
     elif [[ $PLATFORM == watchos ]]; then
-        if xcrun simctl list devicetypes | grep -q 'iPhone Xs'; then
+        if xcrun simctl list devicetypes | grep -q 'iPhone 11 Pro Max'; then
+            DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep 'iPhone 11 Pro Max' | grep -m 1 -o '[0-9A-F\-]\{36\}')"
+        elif xcrun simctl list devicetypes | grep -q 'iPhone Xs'; then
             DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep 'iPhone Xs' | grep -m 1 -o '[0-9A-F\-]\{36\}')"
         fi
     fi

@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-// swiftlint:disable type_name identifier_name statement_position cyclomatic_complexity
+// swiftlint:disable type_name identifier_name cyclomatic_complexity
 
 import XCTest
 import RealmSwift
@@ -259,184 +259,11 @@ final class OptionalDateFactory: ValueFactory {
     }
 }
 
-// Older versions of swift only support three version components in top-level
-// #if, so this check to be done outside the class...
-#if swift(>=3.4) && (swift(>=4.1.50) || !swift(>=4))
 class EquatableTestCase: TestCase {
     func assertEqualTo<T: Equatable>(_ expected: T, _ actual: T, fileName: StaticString = #file, lineNumber: UInt = #line) {
         XCTAssertEqual(expected, actual, file: fileName, line: lineNumber)
     }
 }
-#else
-class EquatableTestCase: TestCase {
-    // writing value as! Int? gives "cannot downcast from 'T' to a more optional type 'Optional<Int>'"
-    // but doing this nonsense works
-    func cast<T, U>(_ value: T) -> U {
-        return value as! U
-    }
-
-    // No conditional conformance means that Optional<T: Equatable> can't
-    // itself conform to Equatable
-    func assertEqualTo<T>(_ expected: T, _ actual: T, fileName: StaticString = #file, lineNumber: UInt = #line) {
-        if T.self is Int.Type {
-            XCTAssertEqual(expected as! Int, actual as! Int, file: fileName, line: lineNumber)
-        }
-        else if T.self is Float.Type {
-            XCTAssertEqual(expected as! Float, actual as! Float, file: fileName, line: lineNumber)
-        }
-        else if T.self is Double.Type {
-            XCTAssertEqual(expected as! Double, actual as! Double, file: fileName, line: lineNumber)
-        }
-        else if T.self is Bool.Type {
-            XCTAssertEqual(expected as! Bool, actual as! Bool, file: fileName, line: lineNumber)
-        }
-        else if T.self is Int8.Type {
-            XCTAssertEqual(expected as! Int8, actual as! Int8, file: fileName, line: lineNumber)
-        }
-        else if T.self is Int16.Type {
-            XCTAssertEqual(expected as! Int16, actual as! Int16, file: fileName, line: lineNumber)
-        }
-        else if T.self is Int32.Type {
-            XCTAssertEqual(expected as! Int32, actual as! Int32, file: fileName, line: lineNumber)
-        }
-        else if T.self is Int64.Type {
-            XCTAssertEqual(expected as! Int64, actual as! Int64, file: fileName, line: lineNumber)
-        }
-        else if T.self is String.Type {
-            XCTAssertEqual(expected as! String, actual as! String, file: fileName, line: lineNumber)
-        }
-        else if T.self is Data.Type {
-            XCTAssertEqual(expected as! Data, actual as! Data, file: fileName, line: lineNumber)
-        }
-        else if T.self is Date.Type {
-            XCTAssertEqual(expected as! Date, actual as! Date, file: fileName, line: lineNumber)
-        }
-        else if T.self is [Int].Type {
-            XCTAssertEqual(expected as! [Int], actual as! [Int], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Float].Type {
-            XCTAssertEqual(expected as! [Float], actual as! [Float], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Double].Type {
-            XCTAssertEqual(expected as! [Double], actual as! [Double], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Bool].Type {
-            XCTAssertEqual(expected as! [Bool], actual as! [Bool], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Int8].Type {
-            XCTAssertEqual(expected as! [Int8], actual as! [Int8], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Int16].Type {
-            XCTAssertEqual(expected as! [Int16], actual as! [Int16], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Int32].Type {
-            XCTAssertEqual(expected as! [Int32], actual as! [Int32], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Int64].Type {
-            XCTAssertEqual(expected as! [Int64], actual as! [Int64], file: fileName, line: lineNumber)
-        }
-        else if T.self is [String].Type {
-            XCTAssertEqual(expected as! [String], actual as! [String], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Data].Type {
-            XCTAssertEqual(expected as! [Data], actual as! [Data], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Date].Type {
-            XCTAssertEqual(expected as! [Date], actual as! [Date], file: fileName, line: lineNumber)
-        }
-        else if T.self is Int?.Type {
-            XCTAssertEqual(cast(expected) as Int?, cast(actual) as Int?, file: fileName, line: lineNumber)
-        }
-        else if T.self is Float?.Type {
-            XCTAssertEqual(cast(expected) as Float?, cast(actual) as Float?, file: fileName, line: lineNumber)
-        }
-        else if T.self is Double?.Type {
-            XCTAssertEqual(cast(expected) as Double?, cast(actual) as Double?, file: fileName, line: lineNumber)
-        }
-        else if T.self is Bool?.Type {
-            XCTAssertEqual(cast(expected) as Bool?, cast(actual) as Bool?, file: fileName, line: lineNumber)
-        }
-        else if T.self is Int8?.Type {
-            XCTAssertEqual(cast(expected) as Int8?, cast(actual) as Int8?, file: fileName, line: lineNumber)
-        }
-        else if T.self is Int16?.Type {
-            XCTAssertEqual(cast(expected) as Int16?, cast(actual) as Int16?, file: fileName, line: lineNumber)
-        }
-        else if T.self is Int32?.Type {
-            XCTAssertEqual(cast(expected) as Int32?, cast(actual) as Int32?, file: fileName, line: lineNumber)
-        }
-        else if T.self is Int64?.Type {
-            XCTAssertEqual(cast(expected) as Int64?, cast(actual) as Int64?, file: fileName, line: lineNumber)
-        }
-        else if T.self is String?.Type {
-            XCTAssertEqual(cast(expected) as String?, cast(actual) as String?, file: fileName, line: lineNumber)
-        }
-        else if T.self is Data?.Type {
-            XCTAssertEqual(cast(expected) as Data?, cast(actual) as Data?, file: fileName, line: lineNumber)
-        }
-        else if T.self is Date?.Type {
-            XCTAssertEqual(cast(expected) as Date?, cast(actual) as Date?, file: fileName, line: lineNumber)
-        }
-        else if T.self is [Int?].Type {
-            assertEqual(cast(expected) as [Int?], cast(actual) as [Int?], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Float?].Type {
-            assertEqual(cast(expected) as [Float?], cast(actual) as [Float?], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Double?].Type {
-            assertEqual(cast(expected) as [Double?], cast(actual) as [Double?], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Bool?].Type {
-            assertEqual(cast(expected) as [Bool?], cast(actual) as [Bool?], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Int8?].Type {
-            assertEqual(cast(expected) as [Int8?], cast(actual) as [Int8?], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Int16?].Type {
-            assertEqual(cast(expected) as [Int16?], cast(actual) as [Int16?], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Int32?].Type {
-            assertEqual(cast(expected) as [Int32?], cast(actual) as [Int32?], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Int64?].Type {
-            assertEqual(cast(expected) as [Int64?], cast(actual) as [Int64?], file: fileName, line: lineNumber)
-        }
-        else if T.self is [String?].Type {
-            assertEqual(cast(expected) as [String?], cast(actual) as [String?], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Data?].Type {
-            assertEqual(cast(expected) as [Data?], cast(actual) as [Data?], file: fileName, line: lineNumber)
-        }
-        else if T.self is [Date?].Type {
-            assertEqual(cast(expected) as [Date?], cast(actual) as [Date?], file: fileName, line: lineNumber)
-        }
-        else {
-            XCTFail("unsupported type \(T.self)", file: fileName, line: lineNumber)
-            fatalError("unsupported type \(T.self)")
-        }
-    }
-
-    func assertEqualTo<T>(_ expected: T?, _ actual: T?, fileName: StaticString = #file, lineNumber: UInt = #line) {
-        if expected == nil {
-            XCTAssertNil(actual, file: fileName, line: lineNumber)
-        }
-        else if actual == nil {
-            XCTFail("nil")
-        }
-        else {
-            assertEqualTo(expected!, actual!, fileName: fileName, lineNumber: lineNumber)
-        }
-    }
-
-    func assertEqualTo<T>(_ expected: T, _ actual: T?) {
-        guard let actual = actual else {
-            XCTFail("nil")
-            return
-        }
-        assertEqualTo(expected, actual)
-    }
-}
-#endif
 
 class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: EquatableTestCase {
     var realm: Realm?
