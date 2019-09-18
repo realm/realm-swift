@@ -15,7 +15,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * APIs are backwards compatible with all previous releases in the 3.x.y series.
 * Carthage release for Swift is built with Xcode 11.0.
 
-3.18.0 Release notes (2019-08-13)
+3.18.0 Release notes (2019-09-13)
 =============================================================
 
 The file format for synchronized Realms has changed. Old Realms will be
@@ -33,7 +33,7 @@ This does not effect non-synchronized Realms.
   is no longer needed. This should reduce file size growth in write-heavy
   workloads. ([Sync #3007](https://github.com/realm/realm-sync/issues/3007)).
 * Add support for building Realm as an xcframework.
-  ([PR #6237](https://github.com/realm/realm-cocoa/pull/6237)).
+  ([PR #6238](https://github.com/realm/realm-cocoa/pull/6238)).
 * Add prebuilt libraries for Xcode 11 to the release package.
   ([PR #6248](https://github.com/realm/realm-cocoa/pull/6248)).
 * Add a prebuilt library for Catalyst/UIKit For Mac to the release package
@@ -80,7 +80,7 @@ This does not effect non-synchronized Realms.
 ### Enhancements
 
 * Add support for canceling asynchronous opens using a new AsyncOpenTask
-  returned from the asyncOpen() call. ([PR #6913](https://github.com/realm/realm-cocoa/pull/6187)).
+  returned from the asyncOpen() call. ([PR #6193](https://github.com/realm/realm-cocoa/pull/6193)).
 * Importing the Realm SPM package can now be done by pinning to a version
   rather than a branch.
 
