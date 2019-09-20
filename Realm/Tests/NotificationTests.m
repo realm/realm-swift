@@ -174,9 +174,9 @@
         XCTFail(@"should not have been called");
     }];
 
-    [realm transactionWithBlock:^{
+    [realm transactionWithoutNotifying:@[token] block:^{
         [realm deleteAllObjects];
-    } withoutNotifying:@[token] error:nil];
+    } error:nil];
 
     // local realm notifications are called synchronously so no need to wait for anything
     [token invalidate];

@@ -674,10 +674,10 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
 }
 
 - (BOOL)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block error:(NSError **)outError {
-    return [self transactionWithBlock:block withoutNotifying:@[] error:outError];
+    return [self transactionWithoutNotifying:@[] block:block error:outError];
 }
 
-- (BOOL)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block withoutNotifying:(NSArray<RLMNotificationToken *> *)tokens error:(NSError **)error {
+- (BOOL)transactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens block:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error {
     [self beginWriteTransaction];
     block();
     if (_realm->is_in_transaction()) {
