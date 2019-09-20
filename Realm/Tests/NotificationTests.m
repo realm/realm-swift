@@ -176,7 +176,7 @@
 
     [realm transactionWithoutNotifying:@[token] block:^{
         [realm deleteAllObjects];
-    } error:nil];
+    }];
 
     // local realm notifications are called synchronously so no need to wait for anything
     [token invalidate];

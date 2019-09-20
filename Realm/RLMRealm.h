@@ -340,6 +340,13 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 /**
  Performs actions contained within the given block inside a write transaction.
 
+ @see `[RLMRealm transactionWithoutNotifying:block:error:]`
+ */
+- (void)transactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens block:(__attribute__((noescape)) void(^)(void))block;
+
+/**
+ Performs actions contained within the given block inside a write transaction.
+
  Write transactions cannot be nested, and trying to execute a write transaction
  on a Realm which is already participating in a write transaction will throw an
  exception. Calls to `transactionWithBlock:` from `RLMRealm` instances in other
