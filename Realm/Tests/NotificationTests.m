@@ -168,6 +168,20 @@
     [token invalidate];
 }
 
+- (void)testSuppressRealmNotificationInTransactionWithBlock {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMNotificationToken *token = [realm addNotificationBlock:^(__unused RLMNotification notification, __unused RLMRealm *realm) {
+        XCTFail(@"should not have been called");
+    }];
+
+    [realm transactionWithoutNotifying:@[token] block:^{
+        [realm deleteAllObjects];
+    }];
+
+    // local realm notifications are called synchronously so no need to wait for anything
+    [token invalidate];
+}
+
 - (void)testSuppressRealmNotificationForWrongRealm {
     RLMRealm *otherRealm = [self realmWithTestPath];
     RLMNotificationToken *token = [otherRealm addNotificationBlock:^(__unused RLMNotification notification, __unused RLMRealm *realm) {

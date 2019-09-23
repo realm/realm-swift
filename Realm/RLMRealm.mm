@@ -647,15 +647,8 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
     [self commitWriteTransaction:nil];
 }
 
-- (BOOL)commitWriteTransaction:(NSError **)outError {
-    try {
-        _realm->commit_transaction();
-        return YES;
-    }
-    catch (...) {
-        RLMRealmTranslateException(outError);
-        return NO;
-    }
+- (BOOL)commitWriteTransaction:(NSError **)error {
+    return [self commitWriteTransactionWithoutNotifying:@[] error:error];
 }
 
 - (BOOL)commitWriteTransactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens error:(NSError **)error {
@@ -681,10 +674,18 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
 }
 
 - (BOOL)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block error:(NSError **)outError {
+    return [self transactionWithoutNotifying:@[] block:block error:outError];
+}
+
+- (void)transactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens block:(__attribute__((noescape)) void(^)(void))block {
+    [self transactionWithoutNotifying:tokens block:block error:nil];
+}
+
+- (BOOL)transactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens block:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error {
     [self beginWriteTransaction];
     block();
     if (_realm->is_in_transaction()) {
-        return [self commitWriteTransaction:outError];
+        return [self commitWriteTransactionWithoutNotifying:tokens error:error];
     }
     return YES;
 }

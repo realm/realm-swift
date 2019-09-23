@@ -215,6 +215,20 @@ class RealmTests: TestCase {
         XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 1)
     }
 
+    func testWriteWithoutNotifying() {
+        let realm = try! Realm()
+        let token = realm.observe { _, _ in
+            XCTFail("should not have been called")
+        }
+
+        try! realm.write(withoutNotifying: [token]) {
+            realm.deleteAll()
+        }
+
+        // local realm notifications are called synchronously so no need to wait for anything
+        token.invalidate()
+    }
+
     func testDynamicWriteSubscripting() {
         try! Realm().beginWrite()
         let object = try! Realm().dynamicCreate("SwiftStringObject", value: ["1"])

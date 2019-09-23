@@ -326,9 +326,23 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 /**
  Performs actions contained within the given block inside a write transaction.
 
- @see `[RLMRealm transactionWithBlock:error:]`
+ @see `[RLMRealm transactionWithoutNotifying:block:error:]`
  */
 - (void)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block NS_SWIFT_UNAVAILABLE("");
+
+/**
+ Performs actions contained within the given block inside a write transaction.
+
+ @see `[RLMRealm transactionWithoutNotifying:block:error:]`
+ */
+- (BOOL)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
+
+/**
+ Performs actions contained within the given block inside a write transaction.
+
+ @see `[RLMRealm transactionWithoutNotifying:block:error:]`
+ */
+- (void)transactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens block:(__attribute__((noescape)) void(^)(void))block;
 
 /**
  Performs actions contained within the given block inside a write transaction.
@@ -343,6 +357,19 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  generates notifications if applicable. This has no effect if the Realm
  was already up to date.
 
+ You can skip notifiying specific notification blocks about the changes made
+ in this write transaction by passing in their associated notification tokens.
+ This is primarily useful when the write transaction is saving changes already
+ made in the UI and you do not want to have the notification block attempt to
+ re-apply the same changes.
+
+ The tokens passed to this method must be for notifications for this specific
+ `RLMRealm` instance. Notifications for different threads cannot be skipped
+ using this method.
+
+ @param tokens An array of notification tokens which were returned from adding
+               callbacks which you do not want to be notified for the changes
+               made in this write transaction.
  @param block The block containing actions to perform.
  @param error If an error occurs, upon return contains an `NSError` object
               that describes the problem. If you are not interested in
@@ -350,7 +377,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  @return Whether the transaction succeeded.
  */
-- (BOOL)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
+- (BOOL)transactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens block:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
 
 /**
  Updates the Realm and outstanding objects managed by the Realm to point to the

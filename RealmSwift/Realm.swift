@@ -187,12 +187,27 @@ public final class Realm {
      and generates notifications if applicable. This has no effect if the Realm
      was already up to date.
 
+     You can skip notifiying specific notification blocks about the changes made
+     in this write transaction by passing in their associated notification
+     tokens. This is primarily useful when the write transaction is saving
+     changes already made in the UI and you do not want to have the notification
+     block attempt to re-apply the same changes.
+
+     The tokens passed to this function must be for notifications for this Realm
+     which were added on the same thread as the write transaction is being
+     performed on. Notifications for different threads cannot be skipped using
+     this method.
+
+     - parameter tokens: An array of notification tokens which were returned
+                         from adding callbacks which you do not want to be
+                         notified for the changes made in this write transaction.
+
      - parameter block: The block containing actions to perform.
 
      - throws: An `NSError` if the transaction could not be completed successfully.
                If `block` throws, the function throws the propagated `ErrorType` instead.
      */
-    public func write(_ block: (() throws -> Void)) throws {
+    public func write(withoutNotifying tokens: [NotificationToken] = [], _ block: (() throws -> Void)) throws {
         beginWrite()
         do {
             try block()
@@ -200,7 +215,7 @@ public final class Realm {
             if isInWriteTransaction { cancelWrite() }
             throw error
         }
-        if isInWriteTransaction { try commitWrite() }
+        if isInWriteTransaction { try commitWrite(withoutNotifying: tokens) }
     }
 
     /**
@@ -249,6 +264,10 @@ public final class Realm {
      this method.
 
      - warning: This method may only be called during a write transaction.
+
+     - parameter tokens: An array of notification tokens which were returned
+                         from adding callbacks which you do not want to be
+                         notified for the changes made in this write transaction.
 
      - throws: An `NSError` if the transaction could not be written due to
                running out of disk space or other i/o errors.
