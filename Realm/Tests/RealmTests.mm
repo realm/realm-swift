@@ -1925,15 +1925,82 @@
         @autoreleasepool { [RLMRealm defaultRealm]; }
     }];
 
-//    NSURL *fileURL = RLMRealmConfiguration.defaultConfiguration.fileURL;
-//    for (NSString *pathExtension in @[@"management", @"lock", @"note"]) {
-//        NSNumber *attribute = nil;
-//        NSError *error = nil;
-//        BOOL success = [[fileURL URLByAppendingPathExtension:pathExtension] getResourceValue:&attribute forKey:NSURLIsExcludedFromBackupKey error:&error];
-//        XCTAssertTrue(success);
-//        XCTAssertNil(error);
-//        XCTAssertTrue(attribute.boolValue);
-//    }
+    NSURL *fileURL = RLMRealmConfiguration.defaultConfiguration.fileURL;
+#if !TARGET_OS_TV
+    for (NSString *pathExtension in @[@"management", @"lock", @"note"]) {
+#else
+    for (NSString *pathExtension in @[@"management", @"lock"]) {
+#endif
+        NSNumber *attribute = nil;
+        NSError *error = nil;
+        BOOL success = [[fileURL URLByAppendingPathExtension:pathExtension] getResourceValue:&attribute forKey:NSURLIsExcludedFromBackupKey error:&error];
+        XCTAssertTrue(success);
+        XCTAssertNil(error);
+        XCTAssertTrue(attribute.boolValue);
+    }
+}
+
+- (void)testRealmExists {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    XCTAssertFalse([RLMRealm fileExistsForConfiguration:config]);
+    @autoreleasepool { [RLMRealm realmWithConfiguration:config error:nil]; }
+    XCTAssertTrue([RLMRealm fileExistsForConfiguration:config]);
+    [RLMRealm deleteFilesForConfiguration:config error:nil];
+    XCTAssertFalse([RLMRealm fileExistsForConfiguration:config]);
+}
+
+- (void)testDeleteNonexistentRealmFile {
+    NSError *error;
+    XCTAssertFalse([RLMRealm deleteFilesForConfiguration:RLMRealmConfiguration.defaultConfiguration error:&error]);
+    XCTAssertNil(error);
+}
+
+- (void)testDeleteClosedRealmFile {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    @autoreleasepool { [RLMRealm realmWithConfiguration:config error:nil]; }
+
+    NSError *error;
+    XCTAssertTrue([RLMRealm deleteFilesForConfiguration:config error:&error]);
+    XCTAssertNil(error);
+
+    NSFileManager *fm = NSFileManager.defaultManager;
+    XCTAssertTrue([fm fileExistsAtPath:[config.fileURL.path stringByAppendingPathExtension:@"lock"]]);
+    XCTAssertFalse([fm fileExistsAtPath:[config.fileURL.path stringByAppendingPathExtension:@"management"]]);
+#if !TARGET_OS_TV
+    XCTAssertFalse([fm fileExistsAtPath:[config.fileURL.path stringByAppendingPathExtension:@"note"]]);
+#endif
+}
+
+- (void)testDeleteRealmFileWithMissingManagementFiles {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    [NSFileManager.defaultManager createFileAtPath:config.fileURL.path contents:nil attributes:nil];
+
+    NSError *error;
+    XCTAssertTrue([RLMRealm deleteFilesForConfiguration:config error:&error]);
+    XCTAssertNil(error);
+}
+
+- (void)testDeleteRealmFileWithReadOnlyManagementFiles {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    NSFileManager *fm = NSFileManager.defaultManager;
+    [fm createFileAtPath:config.fileURL.path contents:nil attributes:nil];
+    NSString *notificationPipe = [config.fileURL.path stringByAppendingPathExtension:@"note"];
+    [fm createFileAtPath:notificationPipe contents:nil attributes:@{NSFileImmutable: @YES}];
+
+    NSError *error;
+    XCTAssertTrue([RLMRealm deleteFilesForConfiguration:config error:&error]);
+    XCTAssertEqual(error.code, NSFileWriteNoPermissionError);
+    [fm setAttributes:@{NSFileImmutable: @NO} ofItemAtPath:notificationPipe error:nil];
+}
+
+- (void)testDeleteOpenRealmFile {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+
+    NSError *error;
+    XCTAssertFalse([RLMRealm deleteFilesForConfiguration:config error:&error]);
+    XCTAssertEqual(error.code, RLMErrorAlreadyOpen);
+    XCTAssertTrue([NSFileManager.defaultManager fileExistsAtPath:config.fileURL.path]);
 }
 
 @end

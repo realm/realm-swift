@@ -845,4 +845,13 @@ class RealmTests: TestCase {
             XCTFail("Failed to brigde RLMError to Realm.Error")
         }
     }
+
+    func testExists() {
+        let config = Realm.Configuration()
+        XCTAssertFalse(Realm.fileExists(for: config))
+        autoreleasepool { _ = try! Realm(configuration: config) }
+        XCTAssertTrue(Realm.fileExists(for: config))
+        XCTAssertTrue(try! Realm.deleteFiles(for: config))
+        XCTAssertFalse(Realm.fileExists(for: config))
+    }
 }
