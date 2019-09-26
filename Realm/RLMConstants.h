@@ -161,6 +161,10 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMError, RLMErrorDomain) {
      If you wish to migrate any data from the backup Realm, you can open it using the provided Realm configuration.
      */
     RLMErrorIncompatibleSyncedFile = 11,
+    /**
+     Denotates an error where an operation was requested which cannot be performed on an open file.
+     */
+    RLMErrorAlreadyOpen = 12,
 };
 
 #pragma mark - Constants

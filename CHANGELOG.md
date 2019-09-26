@@ -1,7 +1,10 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add `-[RLMRealm fileExistsForConfiguration:]`/`Realm.fileExists(for:)`,
+  which checks if a local Realm file exists for the given configuration.
+* Add `-[RLMRealm deleteFilesForConfiguration:]`/`Realm.deleteFiles(for:)`
+  to delete the Realm file and all auxiliary files for the given configuration.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)

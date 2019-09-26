@@ -928,6 +928,44 @@ REALM_NOINLINE static void translateSharedGroupOpenException(RLMRealmConfigurati
     return NO;
 }
 
++ (BOOL)fileExistsForConfiguration:(RLMRealmConfiguration *)config {
+    return [NSFileManager.defaultManager fileExistsAtPath:config.pathOnDisk];
+}
+
++ (BOOL)deleteFilesForConfiguration:(RLMRealmConfiguration *)config error:(NSError **)error {
+    auto& path = config.config.path;
+    bool anyDeleted = false;
+    NSError *localError;
+    bool didCall = SharedGroup::call_with_lock(path, [&](auto const& path) {
+        NSURL *url = [NSURL fileURLWithPath:@(path.c_str())];
+        NSFileManager *fm = NSFileManager.defaultManager;
+
+        anyDeleted = [fm removeItemAtURL:url error:&localError];
+        if (localError && localError.code != NSFileNoSuchFileError) {
+            return;
+        }
+
+        [fm removeItemAtURL:[url URLByAppendingPathExtension:@"management"] error:&localError];
+        if (localError && localError.code != NSFileNoSuchFileError) {
+            return;
+        }
+
+        [fm removeItemAtURL:[url URLByAppendingPathExtension:@"note"] error:&localError];
+    });
+    if (error && localError && localError.code != NSFileNoSuchFileError) {
+        *error = localError;
+    }
+    else if (!didCall) {
+        if (error) {
+            NSString *msg = [NSString stringWithFormat:@"Realm file at path %s cannot be deleted because it is currently opened.", path.c_str()];
+            *error = [NSError errorWithDomain:RLMErrorDomain
+                                         code:RLMErrorAlreadyOpen
+                                     userInfo:@{NSLocalizedDescriptionKey: msg}];
+        }
+    }
+    return anyDeleted;
+}
+
 #if REALM_ENABLE_SYNC
 using Privilege = realm::ComputedPrivileges;
 static bool hasPrivilege(realm::ComputedPrivileges actual, realm::ComputedPrivileges expected) {
