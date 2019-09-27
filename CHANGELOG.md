@@ -1,9 +1,16 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.19.0 Release notes (2019-09-27)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Expose ObjectSchema.objectClass in Swift as looking up the class via
+  NSClassFromString() can be complicated for Swift types.
+  ([PR #6244](https://github.com/realm/realm-cocoa/pull/6244)).
+* Add support for suppressing notifications using closure-based write/transaction methods.
+  ([PR #6252](https://github.com/realm/realm-cocoa/pull/6252)).
 
 ### Fixed
+
 * IN or chained OR equals queries on an unindexed string column would fail to
   match some results if any of the strings were 64 bytes or longer.
   ([Core #3386](https://github.com/realm/realm-core/pull/3386), since 3.14.2).
@@ -12,12 +19,13 @@ x.y.z Release notes (yyyy-MM-dd)
   ([Core #3389](https://github.com/realm/realm-core/pull/3388), since 3.17.3).
 
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 * Carthage release for Swift is built with Xcode 11.0.
 
 ### Internal
+
 * Upgrade to REALM_CORE_VERSION=5.23.5
 * Upgrade to REALM_SYNC_VERSION=4.7.8
 

@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "5.23.3"
-let cocoaVersionStr = "3.18.0"
+let coreVersionStr = "5.23.5"
+let cocoaVersionStr = "3.19.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let cxxSettings: [CXXSetting] = [
