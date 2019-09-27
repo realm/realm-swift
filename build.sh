@@ -1502,6 +1502,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * Realm Object Server: 3.21.0 or later.
 * APIs are backwards compatible with all previous releases in the 3.x.y series.
 * Carthage release for Swift is built with Xcode 11.0.
+
+### Internal
+Upgraded to realm-core from ? to ?
+Upgraded to realm-sync from ? to ?
+
 EOS)
         changelog=$(cat CHANGELOG.md)
         echo "$empty_section" > CHANGELOG.md
