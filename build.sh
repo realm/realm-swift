@@ -889,6 +889,10 @@ case "$COMMAND" in
         sh build.sh verify-swiftlint
         sh build.sh verify-swiftpm
         sh build.sh verify-osx-object-server
+        if (( $(xcode_version_major) >= 11 )); then
+            sh build.sh verify-catalyst
+            sh build.sh verify-catalyst-swift
+        fi
         ;;
 
     "verify-cocoapods")
@@ -1032,6 +1036,16 @@ case "$COMMAND" in
 
     "verify-osx-object-server")
         sh build.sh test-osx-object-server
+        exit 0
+        ;;
+
+    "verify-catalyst")
+        sh build.sh test-catalyst
+        exit 0
+        ;;
+
+    "verify-catalyst-swift")
+        sh build.sh test-catalyst-swift
         exit 0
         ;;
 
