@@ -263,12 +263,10 @@ static const NSTimeInterval RLMRefreshBuffer = 10;
     RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         [weakSelf _onRefreshCompletionWithError:error json:json];
     };
-    [RLMNetworkClient sendRequestToEndpoint:[RLMSyncAuthEndpoint endpoint]
-                                     server:self.authServerURL
-                                       JSON:json
-                                    timeout:60
-                                    options:[[RLMSyncManager sharedManager] networkRequestOptions]
-                                 completion:handler];
+    [RLMSyncAuthEndpoint sendRequestToServer:self.authServerURL
+                                        JSON:json
+                                     timeout:60.0
+                                  completion:handler];
 }
 
 @end
