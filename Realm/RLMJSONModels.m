@@ -97,6 +97,7 @@ static const NSString *const kRLMSyncValueKey           = @"value";
 
 @property (nonatomic, readwrite) RLMTokenModel *accessToken;
 @property (nonatomic, readwrite) RLMTokenModel *refreshToken;
+@property (nonatomic, readwrite) NSString *urlPrefix;
 
 @end
 
@@ -118,6 +119,7 @@ static const NSString *const kRLMSyncValueKey           = @"value";
         } else {
             RLM_SYNC_PARSE_OPTIONAL_MODEL(jsonDictionary, kRLMSyncRefreshTokenKey, RLMTokenModel, refreshToken);
         }
+        self.urlPrefix = jsonDictionary[@"sync_worker"][@"path"];
         return self;
     }
     return nil;
