@@ -8,6 +8,8 @@ TEMPORARY_FILE="${TARGET_TEMP_DIR}/RLMPlatform.h"
 
 if [ -n "${REALM_PLATFORM_SUFFIX}" ]; then
   PLATFORM_NAME="${REALM_PLATFORM_SUFFIX}"
+elif [ "$IS_MACCATALYST" = "YES" ]; then
+  PLATFORM_NAME=maccatalyst
 fi
 
 unifdef -B -DREALM_BUILDING_FOR_$(echo ${PLATFORM_NAME} | tr "[:lower:]" "[:upper:]") < "${SOURCE_FILE}" | sed -e "s/''/'/" > "${TEMPORARY_FILE}"

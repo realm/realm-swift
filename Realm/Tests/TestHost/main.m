@@ -14,20 +14,20 @@
 int main(int argc, const char *argv[]) {
 }
 
-#elif TARGET_OS_IPHONE || TARGET_OS_TV
+#elif TARGET_OS_IPHONE || TARGET_OS_TV || TARGET_OS_MACCATALYST
 
 #import <UIKit/UIKit.h>
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate>
+@interface RLMAppDelegate : UIResponder <UIApplicationDelegate>
 @property (strong, nonatomic) UIWindow *window;
 @end
 
-@implementation AppDelegate
+@implementation RLMAppDelegate
 @end
 
 int main(int argc, char *argv[]) {
     @autoreleasepool {
-        return UIApplicationMain(argc, argv, nil, NSStringFromClass([AppDelegate class]));
+        return UIApplicationMain(argc, argv, NSStringFromClass([UIApplication class]), NSStringFromClass([RLMAppDelegate class]));
     }
 }
 
