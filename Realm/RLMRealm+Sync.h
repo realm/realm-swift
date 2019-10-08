@@ -32,6 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 ///
 @interface RLMRealm (Sync)
 
+/// :nodoc:
 - (void)subscribeToObjects:(Class)type where:(NSString *)query callback:(RLMPartialSyncFetchCallback)callback
 __attribute__((unavailable("Use -[RLMResults subscribe]")));
 

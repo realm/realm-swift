@@ -382,7 +382,12 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncAccessLevel) {
     RLMSyncAccessLevelAdmin         = 3,
 };
 
+/// Get a string representing a sync acces level
 FOUNDATION_EXTERN NSString *RLMSyncAccessLevelToString(RLMSyncAccessLevel);
+
+/// Get a sync access level for the given string.
+///
+/// Throws an exception if the string is not a valid access level.
 FOUNDATION_EXTERN RLMSyncAccessLevel RLMSyncAccessLevelFromString(NSString *);
 
 /**
