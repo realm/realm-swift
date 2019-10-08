@@ -62,6 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic) BOOL enableSSLValidation;
 
+/// :nodoc:
 @property (nonatomic) BOOL isPartial __attribute__((unavailable("Use 'fullSynchronization' instead.")));
 
 /**
