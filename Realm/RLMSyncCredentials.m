@@ -32,6 +32,7 @@ RLMIdentityProvider const RLMIdentityProviderCloudKit               = @"cloudkit
 RLMIdentityProvider const RLMIdentityProviderJWT                    = @"jwt";
 RLMIdentityProvider const RLMIdentityProviderAnonymous              = @"anonymous";
 RLMIdentityProvider const RLMIdentityProviderNickname               = @"nickname";
+RLMIdentityProvider const RLMIdentityProviderCustomRefreshToken     = @"customrefreshtoken";
 
 @interface RLMSyncCredentials ()
 
@@ -93,6 +94,17 @@ RLMIdentityProvider const RLMIdentityProviderNickname               = @"nickname
     return [[self alloc] initWithCustomToken:accessToken
                                     provider:RLMIdentityProviderAccessToken
                                     userInfo:@{kRLMSyncIdentityKey: identity}];
+}
+
++ (instancetype)credentialsWithCustomRefreshToken:(NSString *)token identity:(NSString *)identity isAdmin:(BOOL)isAdmin {
+    NSDictionary *userInfo = @{
+        kRLMSyncIdentityKey: identity,
+        kRLMSyncIsAdminKey: @(isAdmin)
+    };
+    return [[self alloc] initWithCustomToken:token
+                                    provider:RLMIdentityProviderCustomRefreshToken
+                                    userInfo:userInfo];
+
 }
 
 - (BOOL)isEqual:(id)object {

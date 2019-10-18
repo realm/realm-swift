@@ -122,6 +122,24 @@ extern RLMIdentityProvider const RLMIdentityProviderNickname __deprecated_msg("U
 + (instancetype)credentialsWithAccessToken:(RLMServerToken)accessToken identity:(NSString *)identity;
 
 /**
+ Construct and return special credentials representing a token issued by an external entity
+ that will be used instead of a ROS refresh token.
+
+ @discussion Unlike other types of credentials, CustomRefreshToken credentials do not
+             participate in the regular login flow, because they take place of the refresh tokens login produces.
+             Instead, the token will be used to authorize each server operation such as opening a Realm or
+             editing permissions. When the token expires the SyncUser object will still be valid, but server operations will
+             fail until the token is updated.
+
+ @remark ROS must be configured to accept the external issuing identity as a refresh token validator.
+
+ @warning The values of @c identity and @c isAdmin are used for client-side validation only.
+          The server will compute their values based on the token string and the token validator configuration,
+          but it's important for  correct functioning that the values here match the server.
+ */
++ (instancetype)credentialsWithCustomRefreshToken:(NSString *)token identity:(NSString *)identity isAdmin:(BOOL)isAdmin;
+
+/**
  Construct and return credentials with a custom token string, identity provider string, and optional user info. In most
  cases, the convenience initializers should be used instead.
  */
