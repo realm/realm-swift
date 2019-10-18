@@ -1,7 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for custom refresh token authentication. This allows a user to be authorized with an externally-issued refresh token
+  when ROS is configured to recognize the external issuer as a refresh token validator.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)

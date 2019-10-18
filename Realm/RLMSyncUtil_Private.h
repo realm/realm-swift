@@ -45,6 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern RLMIdentityProvider const RLMIdentityProviderAccessToken;
 extern RLMIdentityProvider const RLMIdentityProviderRealm;
+extern RLMIdentityProvider const RLMIdentityProviderCustomRefreshToken;
 
 extern NSString *const kRLMSyncAppIDKey;
 extern NSString *const kRLMSyncDataKey;

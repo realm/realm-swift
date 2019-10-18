@@ -95,6 +95,24 @@
     XCTAssertTrue(user.isAdmin);
 }
 
+- (void)testCustomRefreshTokenAuthentication {
+    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithCustomRefreshToken:@"token" identity:@"custom_identity1" isAdmin:NO];
+    XCTAssertNotNil(credentials);
+
+    RLMSyncUser *user = [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
+    XCTAssertEqualObjects(user.refreshToken, @"token");
+    XCTAssertEqualObjects(user.identity, @"custom_identity1");
+    XCTAssertFalse(user.isAdmin);
+
+    credentials = [RLMSyncCredentials credentialsWithCustomRefreshToken:@"token" identity:@"custom_identity2" isAdmin:YES];
+    XCTAssertNotNil(credentials);
+
+    user = [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
+    XCTAssertEqualObjects(user.refreshToken, @"token");
+    XCTAssertEqualObjects(user.identity, @"custom_identity2");
+    XCTAssertTrue(user.isAdmin);
+}
+
 /// An invalid username/password credential should not be able to log in a user and a corresponding error should be generated.
 - (void)testInvalidPasswordAuthentication {
     [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd) register:YES]
