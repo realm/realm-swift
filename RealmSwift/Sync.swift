@@ -430,7 +430,7 @@ public struct SyncCredentials {
 
     /// Initialize new credentials using an externally-issued refresh token
     public static func customRefreshToken(_ token: String, identity: String, isAdmin: Bool = false) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(customRefreshToken:token, identity: identity, isAdmin: isAdmin));
+        return SyncCredentials(RLMSyncCredentials(customRefreshToken: token, identity: identity, isAdmin: isAdmin))
     }
 }
 
