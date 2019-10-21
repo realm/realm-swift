@@ -1,20 +1,18 @@
-x.y.z Release notes (yyyy-MM-dd)
+3.20.0 Release notes (2019-10-21)
 =============================================================
+
 ### Enhancements
-* Add support for custom refresh token authentication. This allows a user to be authorized with an externally-issued refresh token
-  when ROS is configured to recognize the external issuer as a refresh token validator.
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Add support for custom refresh token authentication. This allows a user to be
+  authorized with an externally-issued refresh token when ROS is configured to
+  recognize the external issuer as a refresh token validator.
+  ([PR #6311](https://github.com/realm/realm-cocoa/pull/6311)).
 
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
-* Carthage release for Swift is built with Xcode 11.0.
+* Carthage release for Swift is built with Xcode 11.
 
 3.19.1 Release notes (2019-10-17)
 =============================================================
