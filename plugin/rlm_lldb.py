@@ -34,7 +34,7 @@ if __name__ == '__main__':
 
     # Copy the file into place
     try:
-        os.makedirs(destination, 0744)
+        os.makedirs(destination, 0o744)
     except os.error as e:
         # It's fine if the directory already exists
         if e.errno != errno.EEXIST:
