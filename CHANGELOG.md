@@ -11,6 +11,13 @@ x.y.z Release notes (yyyy-MM-dd)
 * The sync client would fail to reconnect after failing to integrate a
   changeset. The bug would lead to further corruption of the client’s Realm
   file. ([RSYNC-48](https://jira.mongodb.org/browse/RSYNC-48), since v3.2.0).
+* The UpdatePolicy passed to `realm.add()` or `realm.create()` was not properly
+  propagated when adding objects within a `List`, which could result in
+  spurious change notifications when using `.modified`.
+  ([#6321](https://github.com/realm/realm-cocoa/issues/6321), since v3.16.0)
+* Fix a rare deadlock when a Realm collection or object was observed, then
+  `refresh()` was explicitly called, and then the NotificationToken from the
+  observation was destroyed on a different thread (since 0.98.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

@@ -42,6 +42,10 @@
 
 using namespace realm;
 
+static_assert(RLMUpdatePolicyError == static_cast<int>(CreatePolicy::ForceCreate), "");
+static_assert(RLMUpdatePolicyUpdateAll == static_cast<int>(CreatePolicy::UpdateAll), "");
+static_assert(RLMUpdatePolicyUpdateChanged == static_cast<int>(CreatePolicy::UpdateModified), "");
+
 void RLMRealmCreateAccessors(RLMSchema *schema) {
     const size_t bufferSize = sizeof("RLM:Managed  ") // includes null terminator
                             + std::numeric_limits<unsigned long long>::digits10
@@ -139,8 +143,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     object->_objectSchema = info.rlmObjectSchema;
     try {
         realm::Object::create(c, realm->_realm, *info.objectSchema, (id)object,
-                              updatePolicy != RLMUpdatePolicyError,
-                              updatePolicy == RLMUpdatePolicyUpdateChanged,
+                              static_cast<CreatePolicy>(updatePolicy),
                               -1, &object->_row);
     }
     catch (std::exception const& e) {
@@ -176,9 +179,8 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     RLMAccessorContext c{info, false};
     RLMObjectBase *object = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
     try {
-        object->_row = realm::Object::create(c, realm->_realm, *info.objectSchema,
-                                             (id)value, updatePolicy != RLMUpdatePolicyError,
-                                             updatePolicy == RLMUpdatePolicyUpdateChanged).row();
+        object->_row = realm::Object::create(c, realm->_realm, *info.objectSchema, (id)value,
+                                             static_cast<realm::CreatePolicy>(updatePolicy)).row();
     }
     catch (std::exception const& e) {
         @throw RLMException(e);

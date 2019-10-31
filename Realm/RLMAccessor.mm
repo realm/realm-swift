@@ -144,7 +144,9 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
         info = &obj->_info->linkTargetType(prop.index);
     }
     RLMAccessorContext ctx(*info);
-    translateError([&] { list.assign(ctx, value, false); });
+    translateError([&] {
+        list.assign(ctx, value, realm::CreatePolicy::ForceCreate);
+    });
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
@@ -550,7 +552,7 @@ void RLMDynamicSet(__unsafe_unretained RLMObjectBase *const obj,
     realm::Object o(obj->_info->realm->_realm, *obj->_info->objectSchema, obj->_row);
     RLMAccessorContext c(obj);
     translateError([&] {
-        o.set_property_value(c, prop.columnName.UTF8String, val ?: NSNull.null, false);
+        o.set_property_value(c, prop.columnName.UTF8String, val ?: NSNull.null);
     });
 }
 
@@ -655,34 +657,34 @@ id RLMAccessorContext::box(realm::Results&& r) {
 }
 
 template<>
-realm::Timestamp RLMAccessorContext::unbox(__unsafe_unretained id const value, bool, bool, bool, size_t) {
+realm::Timestamp RLMAccessorContext::unbox(__unsafe_unretained id const value, realm::CreatePolicy, size_t) {
     id v = RLMCoerceToNil(value);
     return RLMTimestampForNSDate(v);
 }
 
 template<>
-bool RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
+bool RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
     return [v boolValue];
 }
 template<>
-double RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
+double RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
     return [v doubleValue];
 }
 template<>
-float RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
+float RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
     return [v floatValue];
 }
 template<>
-long long RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
+long long RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
     return [v longLongValue];
 }
 template<>
-realm::BinaryData RLMAccessorContext::unbox(id v, bool, bool, bool, size_t) {
+realm::BinaryData RLMAccessorContext::unbox(id v, realm::CreatePolicy, size_t) {
     v = RLMCoerceToNil(v);
     return RLMBinaryDataForNSData(v);
 }
 template<>
-realm::StringData RLMAccessorContext::unbox(id v, bool, bool, bool, size_t) {
+realm::StringData RLMAccessorContext::unbox(id v, realm::CreatePolicy, size_t) {
     v = RLMCoerceToNil(v);
     return RLMStringDataWithNSString(v);
 }
@@ -694,28 +696,26 @@ static auto to_optional(__unsafe_unretained id const value, Fn&& fn) {
 }
 
 template<>
-realm::util::Optional<bool> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
+realm::util::Optional<bool> RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
     return to_optional(v, [&](__unsafe_unretained id v) { return (bool)[v boolValue]; });
 }
 template<>
-realm::util::Optional<double> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
+realm::util::Optional<double> RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v doubleValue]; });
 }
 template<>
-realm::util::Optional<float> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
+realm::util::Optional<float> RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v floatValue]; });
 }
 template<>
-realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id const v, bool, bool, bool, size_t) {
+realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v longLongValue]; });
 }
 
 template<>
-realm::RowExpr RLMAccessorContext::unbox(__unsafe_unretained id const v, bool create, bool update, bool diff, size_t) {
-    RLMUpdatePolicy policy = !update ? RLMUpdatePolicyError
-                           : !diff   ? RLMUpdatePolicyUpdateAll
-                           :           RLMUpdatePolicyUpdateChanged;
-
+realm::RowExpr RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy createPolicy, size_t) {
+    bool create = createPolicy != realm::CreatePolicy::Skip;
+    auto policy = static_cast<RLMUpdatePolicy>(createPolicy);
     RLMObjectBase *link = RLMDynamicCast<RLMObjectBase>(v);
     if (!link) {
         if (!create)

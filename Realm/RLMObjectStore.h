@@ -25,8 +25,8 @@ extern "C" {
 @class RLMRealm, RLMSchema, RLMObjectBase, RLMResults, RLMProperty;
 
 typedef NS_ENUM(NSUInteger, RLMUpdatePolicy) {
-    RLMUpdatePolicyError = 0,
-    RLMUpdatePolicyUpdateChanged = 1,
+    RLMUpdatePolicyError = 1,
+    RLMUpdatePolicyUpdateChanged = 3,
     RLMUpdatePolicyUpdateAll = 2,
 };
 
