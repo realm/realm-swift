@@ -23,7 +23,7 @@ x.y.z Release notes (yyyy-MM-dd)
   zero-argument `init` have been replaced with convenience initializers.
 
 ### Enhancements
-* None.
+* Improve performance of initializing Realm objects with List properties.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
@@ -33,7 +33,6 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 3.x.y series.
 * Carthage release for Swift is built with Xcode 11.2.
 
 3.21.0 Release notes (2019-11-04)

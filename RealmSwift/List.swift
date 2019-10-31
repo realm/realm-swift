@@ -69,7 +69,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
 
     /// Creates a `List` that holds Realm model objects of type `Element`.
     public override init() {
-        super.init(array: Element._rlmArray())
+        super.init()
     }
 
     internal init(rlmArray: RLMArray<AnyObject>) {
@@ -437,6 +437,11 @@ public final class List<Element: RealmCollectionValue>: ListBase {
         return _rlmArray.addNotificationBlock { _, change, error in
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
+    }
+
+    // swiftlint:disable:next identifier_name
+    @objc class func _unmanagedArray() -> RLMArray<AnyObject> {
+        return Element._rlmArray()
     }
 }
 

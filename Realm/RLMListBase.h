@@ -27,6 +27,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMListBase : NSObject <NSFastEnumeration>
 @property (nonatomic, strong) RLMArray *_rlmArray;
 
+- (instancetype)init;
 - (instancetype)initWithArray:(RLMArray *)array;
 @end
 
