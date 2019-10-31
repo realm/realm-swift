@@ -33,6 +33,14 @@
     std::unique_ptr<RLMObservationInfo> _observationInfo;
 }
 
++ (RLMArray *)_unmanagedArray {
+    return nil;
+}
+
+- (instancetype)init {
+    return self = [super init];
+}
+
 - (instancetype)initWithArray:(RLMArray *)array {
     self = [super init];
     if (self) {
@@ -41,27 +49,36 @@
     return self;
 }
 
+- (RLMArray *)_rlmArray {
+    if (!__rlmArray) {
+        __rlmArray = self.class._unmanagedArray;
+    }
+    return __rlmArray;
+}
+
 - (id)valueForKey:(NSString *)key {
-    return [__rlmArray valueForKey:key];
+    return [self._rlmArray valueForKey:key];
 }
 
 - (id)valueForKeyPath:(NSString *)keyPath {
-    return [__rlmArray valueForKeyPath:keyPath];
+    return [self._rlmArray valueForKeyPath:keyPath];
 }
 
-- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained [])buffer count:(NSUInteger)len {
-    return [__rlmArray countByEnumeratingWithState:state objects:buffer count:len];
+- (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state
+                                  objects:(id __unsafe_unretained [])buffer
+                                    count:(NSUInteger)len {
+    return [self._rlmArray countByEnumeratingWithState:state objects:buffer count:len];
 }
 
 - (NSArray *)objectsAtIndexes:(NSIndexSet *)indexes {
-    return [__rlmArray objectsAtIndexes:indexes];
+    return [self._rlmArray objectsAtIndexes:indexes];
 }
 
 - (void)addObserver:(id)observer
          forKeyPath:(NSString *)keyPath
             options:(NSKeyValueObservingOptions)options
             context:(void *)context {
-    RLMEnsureArrayObservationInfo(_observationInfo, keyPath, __rlmArray, self);
+    RLMEnsureArrayObservationInfo(_observationInfo, keyPath, self._rlmArray, self);
     [super addObserver:observer forKeyPath:keyPath options:options context:context];
 }
 
