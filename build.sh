@@ -933,7 +933,7 @@ case "$COMMAND" in
         ;;
 
     "verify-ios-static")
-        sh build.sh test-ios-static
+        REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/objc/RealmExamples.xcworkspace" sh build.sh test-ios-static
         sh build.sh examples-ios
         ;;
 
@@ -942,7 +942,7 @@ case "$COMMAND" in
         ;;
 
     "verify-ios-swift")
-        sh build.sh test-ios-swift
+        REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/swift/RealmExamples.xcworkspace" sh build.sh test-ios-swift
         sh build.sh examples-ios-swift
         ;;
 
