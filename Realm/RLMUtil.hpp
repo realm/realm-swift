@@ -177,3 +177,6 @@ id RLMMixedToObjc(realm::Mixed const& value);
 // Given a bundle identifier, return the base directory on the disk within which Realm database and support files should
 // be stored.
 NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier);
+
+// Get a NSDateFormatter for ISO8601-formatted strings
+NSDateFormatter *RLMISO8601Formatter();

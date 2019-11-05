@@ -431,3 +431,12 @@ NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier) {
     return path;
 #endif
 }
+
+NSDateFormatter *RLMISO8601Formatter() {
+    // note: NSISO8601DateFormatter can't be used as it doesn't support milliseconds
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    dateFormatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    dateFormatter.calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+    return dateFormatter;
+}
