@@ -480,15 +480,6 @@ NSError *checkUser(std::shared_ptr<SyncUser> const& user, NSString *msg) {
      completion:callback];
 }
 
-static id ISO8601Formatter() {
-    // note: NSISO8601DateFormatter can't be used as it doesn't support milliseconds
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
-    dateFormatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-    dateFormatter.calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
-    return dateFormatter;
-}
-
 - (void)createOfferForRealmAtURL:(NSURL *)url
                      accessLevel:(RLMSyncAccessLevel)accessLevel
                       expiration:(NSDate *)expirationDate
@@ -506,7 +497,7 @@ static id ISO8601Formatter() {
     [RLMSyncOfferPermissionsEndpoint
      sendRequestToServer:self.authenticationServer
      JSON:@{kRLMSyncTokenKey: self.refreshToken,
-            @"expiresAt": expirationDate ? [ISO8601Formatter() stringFromDate:expirationDate] : NSNull.null,
+            @"expiresAt": expirationDate ? [RLMISO8601Formatter() stringFromDate:expirationDate] : NSNull.null,
             @"realmPath": url.path,
             @"accessLevel": RLMSyncAccessLevelToString(accessLevel)}
      timeout:60.0
@@ -560,7 +551,7 @@ static id ISO8601Formatter() {
             return callback(nil, error);
         }
         NSMutableArray *offers = [NSMutableArray new];
-        NSDateFormatter *formatter = ISO8601Formatter();
+        NSDateFormatter *formatter = RLMISO8601Formatter();
         for (NSDictionary *offer in json[@"offers"]) {
             NSString *expiresAt = RLMCoerceToNil(offer[@"expiresAt"]);
             NSString *createdAt = RLMCoerceToNil(offer[@"createdAt"]);
