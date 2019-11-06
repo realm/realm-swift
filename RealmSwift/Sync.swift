@@ -155,13 +155,6 @@ extension SyncError {
 public typealias SyncAuthError = RLMSyncAuthError
 
 /**
- An error associated with retrieving or modifying user permissions to access a synchronized Realm.
-
- - see: `RLMSyncPermissionError`
- */
-public typealias SyncPermissionError = RLMSyncPermissionError
-
-/**
  An enum which can be used to specify the level of logging.
 
  - see: `RLMSyncLogLevel`
@@ -466,31 +459,6 @@ extension SyncUser {
     }
 
     /**
-     Retrieve permissions for this user. Permissions describe which synchronized
-     Realms this user has access to and what they are allowed to do with them.
-
-     Permissions are retrieved asynchronously and returned via the callback. The
-     callback is run on the same thread that the method is invoked upon.
-
-     - warning: This method must be invoked on a thread with an active run loop.
-
-     - warning: Do not pass the `Results` returned by the callback between threads.
-
-     - parameter callback: A callback providing either a `Results` containing the
-                           permissions, or an error describing what went wrong.
-     */
-    public func retrievePermissions(callback: @escaping (SyncPermissionResults?, SyncPermissionError?) -> Void) {
-        self.__retrievePermissions { (results, error) in
-            guard let results = results else {
-                callback(nil, error as! SyncPermissionError?)
-                return
-            }
-            let upcasted: RLMResults<SyncPermission> = results
-            callback(Results(upcasted as! RLMResults<AnyObject>), nil)
-        }
-    }
-
-    /**
      Create a permission offer for a Realm.
 
      A permission offer is used to grant access to a Realm this user manages to another
@@ -513,14 +481,8 @@ extension SyncUser {
     public func createOfferForRealm(at url: URL,
                                     accessLevel: SyncAccessLevel,
                                     expiration: Date? = nil,
-                                    callback: @escaping (String?, SyncPermissionError?) -> Void) {
-        self.__createOfferForRealm(at: url, accessLevel: accessLevel, expiration: expiration) { (token, error) in
-            guard let token = token else {
-                callback(nil, error as! SyncPermissionError?)
-                return
-            }
-            callback(token, nil)
-        }
+                                    callback: @escaping (String?, Error?) -> Void) {
+        self.__createOfferForRealm(at: url, accessLevel: accessLevel, expiration: expiration, callback: callback)
     }
 
     /**
@@ -762,44 +724,9 @@ extension Realm {
 extension SyncPermission: RealmCollectionValue { }
 
 /**
- A `Results` collection containing sync permission results.
+ An array containing sync permission results.
  */
-public typealias SyncPermissionResults = Results<SyncPermission>
-
-/**
- A property upon which a `SyncPermissionResults` can be sorted or queried.
- The raw value string can be used to construct predicates and queries
- manually.
-
- - warning: If building `NSPredicate`s using format strings including these
-            raw values, use `%K` instead of `%@` as the substitution
-            parameter.
-
- - see: `RLMSyncPermissionSortProperty`
- */
-public typealias SyncPermissionSortProperty = RLMSyncPermissionSortProperty
-
-extension SortDescriptor {
-    /**
-     Construct a sort descriptor using a `SyncPermissionSortProperty`.
-     */
-    public init(sortProperty: SyncPermissionSortProperty, ascending: Bool = true) {
-        self.init(keyPath: sortProperty.rawValue, ascending: ascending)
-    }
-}
-
-extension Results where Element == SyncPermission {
-    /**
-     Return a `Results<SyncPermissionValue>` containing the objects represented
-     by the results, but sorted on the specified property.
-
-     - see: `sorted(byKeyPath:, ascending:)`
-     */
-    public func sorted(bySortProperty sortProperty: SyncPermissionSortProperty,
-                       ascending: Bool = true) -> Results<Element> {
-        return sorted(by: [SortDescriptor(sortProperty: sortProperty, ascending: ascending)])
-    }
-}
+public typealias SyncPermissionResults = [SyncPermission]
 
 // MARK: - Partial sync subscriptions
 

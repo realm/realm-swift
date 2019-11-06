@@ -19,11 +19,10 @@
 #import <Foundation/Foundation.h>
 
 #import "RLMRealmConfiguration.h"
-#import "RLMResults.h"
 #import "RLMSyncCredentials.h"
 #import "RLMSyncPermission.h"
 
-@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncPermission, RLMSyncSession, RLMRealm;
+@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncPermission, RLMSyncSession, RLMRealm, RLMSyncPermissionOffer;
 
 /**
  The state of the user object.
@@ -56,7 +55,11 @@ typedef void(^RLMPermissionOfferResponseStatusBlock)(NSURL * _Nullable, NSError 
 
 /// A block type used to asynchronously report results of a permissions get operation.
 /// Exactly one of the two arguments will be populated.
-typedef void(^RLMPermissionResultsBlock)(RLMResults<RLMSyncPermission *> * _Nullable, NSError * _Nullable);
+typedef void(^RLMPermissionResultsBlock)(NSArray<RLMSyncPermission *> * _Nullable, NSError * _Nullable);
+
+/// A block type used to asynchronously report results of a permission offerss get operation.
+/// Exactly one of the two arguments will be populated.
+typedef void(^RLMPermissionOfferResultsBlock)(NSArray<RLMSyncPermissionOffer *> * _Nullable, NSError * _Nullable);
 
 /// A block type used to asynchronously report results of a user info retrieval.
 /// Exactly one of the two arguments will be populated.
@@ -391,13 +394,9 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  Asynchronously retrieve all permissions associated with the user calling this method.
 
  The results will be returned through the callback block, or an error if the operation failed.
- The callback block will be run on the same thread the method was called on.
-
- @warning This method must be called from a thread with a currently active run loop. Unless
-          you have manually configured a run loop on a side thread, this will usually be the
-          main thread.
+ The callback block will be run on a background thread and not the calling thread.
  */
-- (void)retrievePermissionsWithCallback:(RLMPermissionResultsBlock)callback NS_REFINED_FOR_SWIFT;
+- (void)retrievePermissionsWithCallback:(RLMPermissionResultsBlock)callback;
 
 /**
  Apply a given permission.
@@ -409,17 +408,6 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  @see `RLMSyncPermission`
  */
 - (void)applyPermission:(RLMSyncPermission *)permission callback:(RLMPermissionStatusBlock)callback;
-
-/**
- Revoke a given permission.
-
- The operation will take place asynchronously, and the callback will be used to report whether
- the permission change succeeded or failed. The user calling this method must have the right
- to grant the given permission, or else the operation will fail.
-
- @see `RLMSyncPermission`
- */
-- (void)revokePermission:(RLMSyncPermission *)permission callback:(RLMPermissionStatusBlock)callback;
 
 /**
  Create a permission offer for a Realm.
@@ -461,6 +449,28 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  */
 - (void)acceptOfferForToken:(NSString *)token
                    callback:(RLMPermissionOfferResponseStatusBlock)callback;
+
+/**
+ Revoke a permission offer.
+
+ Pass in a token representing a permission offer which was created by this
+ user. The operation will take place asynchronously. If the operation succeeds,
+ the callback will be passed the URL of the Realm for which the offer was
+ revoked. After this operation completes, the token can no longer be accepted
+ by the recipient.
+
+ @see `createOfferForRealmAtURL:accessLevel:expiration:callback:`
+ */
+- (void)invalidateOfferForToken:(NSString *)token
+                       callback:(RLMPermissionStatusBlock)callback;
+
+/**
+ Asynchronously retrieve all pending permission offers created by the calling user.
+
+ The results will be returned through the callback block, or an error if the operation failed.
+ The callback block will be run on a background thread and not the calling thread.
+ */
+- (void)retrievePermissionOffersWithCallback:(RLMPermissionOfferResultsBlock)callback;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));

@@ -188,35 +188,4 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncAuthError, RLMSyncAuthErrorDomain) {
     RLMSyncAuthErrorFileCannotBeShared              = 703,
 };
 
-/**
- An error related to the permissions subsystem.
- */
-typedef RLM_ERROR_ENUM(NSInteger, RLMSyncPermissionError, RLMSyncPermissionErrorDomain) {
-    /**
-     An error that indicates a permission change operation failed. The `userInfo`
-     dictionary contains the underlying error code and a message (if any).
-     */
-    RLMSyncPermissionErrorChangeFailed          = 1,
-
-    /**
-     An error that indicates that attempting to retrieve permissions failed.
-     */
-    RLMSyncPermissionErrorGetFailed             = 2,
-
-    /**
-     An error that indicates that trying to create a permission offer failed.
-     */
-    RLMSyncPermissionErrorOfferFailed           = 3,
-
-    /**
-     An error that indicates that trying to accept a permission offer failed.
-     */
-    RLMSyncPermissionErrorAcceptOfferFailed     = 4,
-
-    /**
-     An error that indicates that an internal error occurred.
-     */
-    RLMSyncPermissionErrorInternal              = 5,
-};
-
 NS_ASSUME_NONNULL_END
