@@ -1504,8 +1504,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.2.
 
 ### Internal
-Upgraded to realm-core from ? to ?
-Upgraded to realm-sync from ? to ?
+Upgraded realm-core from ? to ?
+Upgraded realm-sync from ? to ?
 
 EOS)
         changelog=$(cat CHANGELOG.md)
