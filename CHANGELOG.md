@@ -1,7 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+4.0.0 Release notes (2019-11-08)
 =============================================================
 
 ### Breaking Changes
+
 * All previously deprecated functionality has now been removed entirely.
 * The schema discovery logic for RealmSwift.Object subclasses has been
   rewritten in Swift. This should not have any effect on valid class
@@ -33,13 +34,15 @@ x.y.z Release notes (yyyy-MM-dd)
   SyncAuthErrors.
 
 ### Enhancements
+
 * Improve performance of initializing Realm objects with List properties.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
+
 * None.
 
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Carthage release for Swift is built with Xcode 11.2.
