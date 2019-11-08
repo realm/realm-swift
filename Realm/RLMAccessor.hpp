@@ -72,7 +72,8 @@ public:
 
     template<typename Func>
     void enumerate_list(__unsafe_unretained const id v, Func&& func) {
-        for (id value in v) {
+        id enumerable = RLMAsFastEnumeration(v) ?: v;
+        for (id value in enumerable) {
             func(value);
         }
     }
@@ -89,7 +90,7 @@ public:
 
     // Internal API
     RLMAccessorContext(RLMObjectBase *parentObject, const realm::Property *property = nullptr);
-    RLMAccessorContext(RLMRealm *realm, RLMClassInfo& info, bool promote=true);
+    RLMAccessorContext(RLMClassInfo& info, bool promote=true);
 
     // The property currently being accessed; needed for KVO things for boxing
     // List and Results

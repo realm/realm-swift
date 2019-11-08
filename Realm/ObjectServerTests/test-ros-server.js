@@ -112,6 +112,12 @@ server.start({
         }),
     ],
     autoKeyGen: true,
+
+    // Disable the legacy Realm-based permissions service
+    permissionServiceConfigOverride: (config) => {
+        config.enableManagementRealmReflection = false;
+        config.enablePermissionRealmReflection = false;
+    },
 }).then(() => {
     console.log('started');
     fs.closeSync(1);

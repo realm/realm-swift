@@ -24,7 +24,7 @@
 #import "RLMObjectBase_Private.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
-#import "RLMProperty.h"
+#import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
@@ -55,18 +55,14 @@
     return [super init];
 }
 
-- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema {
-    return [super initWithValue:value schema:schema];
-}
-
-- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm schema:(RLMObjectSchema *)schema {
-    return [super initWithRealm:realm schema:schema];
-}
-
 #pragma mark - Convenience Initializers
 
 - (instancetype)initWithValue:(id)value {
-    return [super initWithValue:value schema:RLMSchema.partialPrivateSharedSchema];
+    if (!(self = [self init])) {
+        return nil;
+    }
+    RLMInitializeWithValue(self, value, RLMSchema.partialPrivateSharedSchema);
+    return self;
 }
 
 #pragma mark - Class-based Object Creation
@@ -216,89 +212,42 @@
     return @[];
 }
 
++ (bool)_realmIgnoreClass {
+    return false;
+}
+
 @end
 
 @implementation RLMDynamicObject
+
++ (bool)_realmIgnoreClass {
+    return true;
+}
 
 + (BOOL)shouldIncludeInDefaultSchema {
     return NO;
 }
 
 - (id)valueForUndefinedKey:(NSString *)key {
-    return RLMDynamicGetByName(self, key, false);
+    return RLMDynamicGetByName(self, key);
 }
 
 - (void)setValue:(id)value forUndefinedKey:(NSString *)key {
     RLMDynamicValidatedSet(self, key, value);
 }
 
-@end
-
-@implementation RLMWeakObjectHandle {
-    realm::Row _row;
-    RLMClassInfo *_info;
-    Class _objectClass;
-}
-
-- (instancetype)initWithObject:(RLMObjectBase *)object {
-    if (!(self = [super init])) {
-        return nil;
-    }
-
-    _row = object->_row;
-    _info = object->_info;
-    _objectClass = object.class;
-
-    return self;
-}
-
-- (RLMObjectBase *)object {
-    RLMObjectBase *object = RLMCreateManagedAccessor(_objectClass, _info->realm, _info);
-    object->_row = std::move(_row);
-    return object;
-}
-
-- (id)copyWithZone:(__unused NSZone *)zone {
-    RLMWeakObjectHandle *copy = [[RLMWeakObjectHandle alloc] init];
-    copy->_row = _row;
-    copy->_info = _info;
-    copy->_objectClass = _objectClass;
-    return copy;
++ (RLMObjectSchema *)sharedSchema {
+    return nil;
 }
 
 @end
-
-static bool treatFakeObjectAsRLMObject = false;
-void RLMSetTreatFakeObjectAsRLMObject(BOOL flag) {
-    treatFakeObjectAsRLMObject = flag;
-}
 
 BOOL RLMIsObjectOrSubclass(Class klass) {
-    if (RLMIsKindOfClass(klass, RLMObjectBase.class)) {
-        return YES;
-    }
-
-    if (treatFakeObjectAsRLMObject) {
-        static Class FakeObjectClass = NSClassFromString(@"FakeObject");
-        return RLMIsKindOfClass(klass, FakeObjectClass);
-    }
-    return NO;
+    return RLMIsKindOfClass(klass, RLMObjectBase.class);
 }
 
 BOOL RLMIsObjectSubclass(Class klass) {
-    auto isSubclass = [](Class class1, Class class2) {
-        class1 = class_getSuperclass(class1);
-        return RLMIsKindOfClass(class1, class2);
-    };
-    if (isSubclass(class_getSuperclass(klass), RLMObjectBase.class)) {
-        return YES;
-    }
-
-    if (treatFakeObjectAsRLMObject) {
-        static Class FakeObjectClass = NSClassFromString(@"FakeObject");
-        return isSubclass(klass, FakeObjectClass);
-    }
-    return NO;
+    return RLMIsKindOfClass(class_getSuperclass(class_getSuperclass(klass)), RLMObjectBase.class);
 }
 
 @interface RLMObjectNotificationToken : RLMCancellationToken

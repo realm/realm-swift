@@ -20,8 +20,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMProperty, RLMArray, RLMSwiftPropertyMetadata;
+@class RLMProperty, RLMArray;
 typedef NS_ENUM(int32_t, RLMPropertyType);
+
+FOUNDATION_EXTERN void RLMInitializeWithValue(RLMObjectBase *, id, RLMSchema *);
 
 // RLMObject accessor and read/write realm
 @interface RLMObjectBase () {
@@ -30,45 +32,15 @@ typedef NS_ENUM(int32_t, RLMPropertyType);
     __unsafe_unretained RLMObjectSchema *_objectSchema;
 }
 
-// unmanaged initializer
-- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema NS_DESIGNATED_INITIALIZER;
-
-// live accessor initializer
-- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
-                       schema:(RLMObjectSchema *)schema NS_DESIGNATED_INITIALIZER;
-
 // shared schema for this class
 + (nullable RLMObjectSchema *)sharedSchema;
 
-// provide injection point for alternative Swift object util class
-+ (Class)objectUtilClass:(BOOL)isSwift;
-
-@end
-
-@interface RLMObject ()
-
-// unmanaged initializer
-- (instancetype)initWithValue:(id)value schema:(RLMSchema *)schema NS_DESIGNATED_INITIALIZER;
-
-// live accessor initializer
-- (instancetype)initWithRealm:(__unsafe_unretained RLMRealm *const)realm
-                       schema:(RLMObjectSchema *)schema NS_DESIGNATED_INITIALIZER;
++ (nullable NSArray<RLMProperty *> *)_getPropertiesWithInstance:(id)obj;
++ (bool)_realmIgnoreClass;
 
 @end
 
 @interface RLMDynamicObject : RLMObject
-
-@end
-
-// A reference to an object's row that doesn't keep the object accessor alive.
-// Used by some Swift property types, such as LinkingObjects, to avoid retain cycles
-// with their containing object.
-@interface RLMWeakObjectHandle : NSObject<NSCopying>
-
-- (instancetype)initWithObject:(RLMObjectBase *)object;
-
-// Consumes the row, so can only usefully be called once.
-@property (nonatomic, readonly) RLMObjectBase *object;
 
 @end
 
@@ -90,58 +62,11 @@ FOUNDATION_EXTERN BOOL RLMIsObjectOrSubclass(Class klass);
 // Returns whether the class is an indirect descendant of RLMObjectBase
 FOUNDATION_EXTERN BOOL RLMIsObjectSubclass(Class klass);
 
-// For unit testing purposes, allow an Objective-C class named FakeObject to also be used
-// as the base class of managed objects. This allows for testing invalid schemas.
-FOUNDATION_EXTERN void RLMSetTreatFakeObjectAsRLMObject(BOOL flag);
-
-// Get ObjectUil class for objc or swift
-FOUNDATION_EXTERN Class RLMObjectUtilClass(BOOL isSwift);
-
 FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 
-@interface RLMObjectUtil : NSObject
-
-+ (nullable NSArray<NSString *> *)ignoredPropertiesForClass:(Class)cls;
-+ (nullable NSArray<NSString *> *)indexedPropertiesForClass:(Class)cls;
-+ (nullable NSDictionary<NSString *, NSDictionary<NSString *, NSString *> *> *)linkingObjectsPropertiesForClass:(Class)cls;
-
-// Precondition: these must be returned in ascending order.
-+ (nullable NSArray<RLMSwiftPropertyMetadata *> *)getSwiftProperties:(id)obj;
-
-+ (nullable NSDictionary<NSString *, NSNumber *> *)getOptionalProperties:(id)obj;
-+ (nullable NSArray<NSString *> *)requiredPropertiesForClass:(Class)cls;
-
-@end
-
-typedef NS_ENUM(NSUInteger, RLMSwiftPropertyKind) {
-    RLMSwiftPropertyKindList,
-    RLMSwiftPropertyKindLinkingObjects,
-    RLMSwiftPropertyKindOptional,
-    RLMSwiftPropertyKindNilLiteralOptional,   // For Swift optional properties that reflect as nil
-    RLMSwiftPropertyKindOther,
-};
-
-// Metadata that describes a Swift generic property.
-@interface RLMSwiftPropertyMetadata : NSObject
-
-@property (nonatomic, strong) NSString *propertyName;
-@property (nullable, nonatomic, strong) NSString *className;
-@property (nullable, nonatomic, strong) NSString *linkedPropertyName;
-@property (nonatomic) RLMPropertyType propertyType;
-@property (nonatomic) RLMSwiftPropertyKind kind;
-
-+ (instancetype)metadataForOtherProperty:(NSString *)propertyName;
-
-+ (instancetype)metadataForListProperty:(NSString *)propertyName;
-
-+ (instancetype)metadataForLinkingObjectsProperty:(NSString *)propertyName
-                                        className:(NSString *)className
-                               linkedPropertyName:(NSString *)linkedPropertyName;
-
-+ (instancetype)metadataForOptionalProperty:(NSString *)propertyName type:(RLMPropertyType)type;
-
-+ (instancetype)metadataForNilLiteralOptionalProperty:(NSString *)propertyName;
-
+@interface RLMManagedPropertyAccessor : NSObject
++ (void)initializeObject:(void *)object parent:(RLMObjectBase *)parent property:(RLMProperty *)property;
++ (id)get:(void *)pointer;
 @end
 
 NS_ASSUME_NONNULL_END

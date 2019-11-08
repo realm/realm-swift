@@ -58,7 +58,7 @@ class SwiftPartialSyncTests: SwiftSyncTestCase {
         }
     }
 
-    func waitForState<T>(_ subscription: SyncSubscription<T>, _ desiredState: SyncSubscriptionState) {
+    func waitForState(_ subscription: SyncSubscription, _ desiredState: SyncSubscriptionState) {
         let ex = expectation(description: "Waiting for state \(desiredState)")
         let token = subscription.observe(\.state, options: .initial) { state in
             if state == desiredState {
@@ -69,7 +69,7 @@ class SwiftPartialSyncTests: SwiftSyncTestCase {
         token.invalidate()
     }
 
-    func waitForError<T>(_ subscription: SyncSubscription<T>) {
+    func waitForError(_ subscription: SyncSubscription) {
         let ex = expectation(description: "Waiting for error state")
         let token = subscription.observe(\.state, options: .initial) { state in
             if case .error(_) = state {

@@ -29,7 +29,6 @@
 
 #import "shared_realm.hpp"
 
-#import "sync/sync_permission.hpp"
 #import "sync/sync_user.hpp"
 
 RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
@@ -73,21 +72,6 @@ uint8_t RLMGetComputedPermissions(RLMRealm *realm, id _Nullable object) {
 
 #pragma mark - C++ APIs
 
-namespace {
-
-NSError *make_permission_error(NSString *description, util::Optional<NSInteger> code, RLMSyncPermissionError type) {
-    NSMutableDictionary *userInfo = [NSMutableDictionary dictionary];
-    if (description) {
-        userInfo[NSLocalizedDescriptionKey] = description;
-    }
-    if (code) {
-        userInfo[kRLMSyncErrorStatusCodeKey] = @(*code);
-    }
-    return [NSError errorWithDomain:RLMSyncPermissionErrorDomain code:type userInfo:userInfo];
-}
-
-}
-
 SyncSessionStopPolicy translateStopPolicy(RLMSyncStopPolicy stopPolicy) {
     switch (stopPolicy) {
         case RLMSyncStopPolicyImmediately:              return SyncSessionStopPolicy::Immediately;
@@ -106,32 +90,6 @@ RLMSyncStopPolicy translateStopPolicy(SyncSessionStopPolicy stop_policy) {
     REALM_UNREACHABLE();
 }
 
-NSError *translateSyncExceptionPtrToError(std::exception_ptr ptr, RLMPermissionActionType type) {
-    NSError *error = nil;
-    try {
-        std::rethrow_exception(ptr);
-    } catch (PermissionActionException const& ex) {
-        switch (type) {
-            case RLMPermissionActionTypeGet:
-                error = make_permission_error_get(@(ex.what()), ex.code);
-                break;
-            case RLMPermissionActionTypeChange:
-                error = make_permission_error_change(@(ex.what()), ex.code);
-                break;
-            case RLMPermissionActionTypeOffer:
-                error = make_permission_error_offer(@(ex.what()), ex.code);
-                break;
-            case RLMPermissionActionTypeAcceptOffer:
-                error = make_permission_error_accept_offer(@(ex.what()), ex.code);
-                break;
-        }
-    }
-    catch (const std::exception &exp) {
-        RLMSetErrorOrThrow(RLMMakeError(RLMErrorFail, exp), &error);
-    }
-    return error;
-}
-
 std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
     Realm::Config realmConfig = realm.configuration.config;
     if (auto config = realmConfig.sync_config) {
@@ -146,34 +104,6 @@ std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
 CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user)
 {
     return *std::static_pointer_cast<CocoaSyncUserContext>(user->binding_context());
-}
-
-AccessLevel accessLevelForObjCAccessLevel(RLMSyncAccessLevel level) {
-    switch (level) {
-        case RLMSyncAccessLevelNone:
-            return AccessLevel::None;
-        case RLMSyncAccessLevelRead:
-            return AccessLevel::Read;
-        case RLMSyncAccessLevelWrite:
-            return AccessLevel::Write;
-        case RLMSyncAccessLevelAdmin:
-            return AccessLevel::Admin;
-    }
-    REALM_UNREACHABLE();
-}
-
-RLMSyncAccessLevel objCAccessLevelForAccessLevel(AccessLevel level) {
-    switch (level) {
-        case AccessLevel::None:
-            return RLMSyncAccessLevelNone;
-        case AccessLevel::Read:
-            return RLMSyncAccessLevelRead;
-        case AccessLevel::Write:
-            return RLMSyncAccessLevelWrite;
-        case AccessLevel::Admin:
-            return RLMSyncAccessLevelAdmin;
-    }
-    REALM_UNREACHABLE();
 }
 
 NSError *make_auth_error_bad_response(NSDictionary *json) {
@@ -203,22 +133,6 @@ NSError *make_auth_error(RLMSyncErrorResponseModel *model) {
         [userInfo setObject:hint forKey:NSLocalizedRecoverySuggestionErrorKey];
     }
     return [NSError errorWithDomain:RLMSyncAuthErrorDomain code:model.code userInfo:userInfo];
-}
-
-NSError *make_permission_error_get(NSString *description, util::Optional<NSInteger> code) {
-    return make_permission_error(description, std::move(code), RLMSyncPermissionErrorGetFailed);
-}
-
-NSError *make_permission_error_change(NSString *description, util::Optional<NSInteger> code) {
-    return make_permission_error(description, std::move(code), RLMSyncPermissionErrorChangeFailed);
-}
-
-NSError *make_permission_error_offer(NSString *description, util::Optional<NSInteger> code) {
-    return make_permission_error(description, std::move(code), RLMSyncPermissionErrorOfferFailed);
-}
-
-NSError *make_permission_error_accept_offer(NSString *description, util::Optional<NSInteger> code) {
-    return make_permission_error(description, std::move(code), RLMSyncPermissionErrorAcceptOfferFailed);
 }
 
 NSError *make_sync_error(RLMSyncSystemErrorKind kind, NSString *description, NSInteger code, NSDictionary *custom) {

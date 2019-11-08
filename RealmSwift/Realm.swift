@@ -37,7 +37,7 @@ import Realm.Private
  that you must construct a new instance in each block which is dispatched, as a queue is not guaranteed to
  run all of its blocks on the same thread.
  */
-public final class Realm {
+public struct Realm {
 
     // MARK: Properties
 
@@ -63,7 +63,7 @@ public final class Realm {
 
      - throws: An `NSError` if the Realm could not be initialized.
      */
-    public convenience init() throws {
+    public init() throws {
         let rlmRealm = try RLMRealm(configuration: RLMRealmConfiguration.default())
         self.init(rlmRealm)
     }
@@ -75,7 +75,7 @@ public final class Realm {
 
      - throws: An `NSError` if the Realm could not be initialized.
      */
-    public convenience init(configuration: Configuration) throws {
+    public init(configuration: Configuration) throws {
         let rlmRealm = try RLMRealm(configuration: configuration.rlmConfiguration)
         self.init(rlmRealm)
     }
@@ -87,7 +87,7 @@ public final class Realm {
 
      - throws: An `NSError` if the Realm could not be initialized.
      */
-    public convenience init(fileURL: URL) throws {
+    public init(fileURL: URL) throws {
         var configuration = Configuration.defaultConfiguration
         configuration.fileURL = fileURL
         try self.init(configuration: configuration)
@@ -353,33 +353,10 @@ public final class Realm {
         case all = 2
     }
 
-    /**
-     Adds an unmanaged object to this Realm.
-
-     If `update` is `true` and an object with the same primary key already exists in this Realm, the existing object
-     will be overwritten by the newly added one. If `update` is `false` then it is instead a non-recoverable error
-     to add an object with a primary key that is already in use. `update` must be `false` for object types which
-     do not have a primary key.
-
-     Adding an object to a Realm will also add all child relationships referenced by that object (via `Object` and
-     `List<Object>` properties). Those objects must also be valid objects to add to this Realm, and the value of
-     the `update:` parameter is propagated to those adds.
-
-     The object to be added must either be an unmanaged object or a valid object which is already managed by this
-     Realm. Adding an object already managed by this Realm is a no-op, while adding an object which is managed by
-     another Realm or which has been deleted from any Realm (i.e. one where `isInvalidated` is `true`) is an error.
-
-     To copy a managed object from one Realm to another, use `create()` instead.
-
-     - warning: This method may only be called during a write transaction.
-
-     - parameter object: The object to be added to this Realm.
-     - parameter update: If `true`, the Realm will try to find an existing copy of the object (with the same primary
-                         key), and update it. Otherwise, the object will be added.
-     */
-    @available(*, deprecated, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
+    /// :nodoc:
+    @available(*, unavailable, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
     public func add(_ object: Object, update: Bool) {
-        add(object, update: update ? .all : .error)
+        fatalError()
     }
 
     /**
@@ -412,21 +389,10 @@ public final class Realm {
         RLMAddObjectToRealm(object, rlmRealm, RLMUpdatePolicy(rawValue: UInt(update.rawValue))!)
     }
 
-    /**
-     Adds all the objects in a collection into the Realm.
-
-     - see: `add(_:update:)`
-
-     - warning: This method may only be called during a write transaction.
-
-     - parameter objects: A sequence which contains objects to be added to the Realm.
-     - parameter update: If `true`, objects that are already in the Realm will be updated instead of added anew.
-     */
-    @available(*, deprecated, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
+    /// :nodoc:
+    @available(*, unavailable, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
     public func add<S: Sequence>(_ objects: S, update: Bool) where S.Iterator.Element: Object {
-        for obj in objects {
-            add(obj, update: update)
-        }
+        fatalError()
     }
 
     /**
@@ -448,45 +414,11 @@ public final class Realm {
         }
     }
 
-    /**
-     Creates or updates a Realm object with a given value, adding it to the Realm and returning it.
-
-     You may only pass `true` to `update` if the object has a primary key. If no object exists
-     in the Realm with the same primary key value, the object is inserted. Otherwise, the
-     existing object is updated with any changed values.
-
-     The `value` argument can be a Realm object, a key-value coding compliant object, an array
-     or dictionary returned from the methods in `NSJSONSerialization`, or an `Array` containing
-     one element for each managed property. Do not pass in a `LinkingObjects` instance, either
-     by itself or as a member of a collection.
-
-     If the object is being created, all required properties that were not defined with default
-     values must be given initial values through the `value` argument. Otherwise, an Objective-C
-     exception will be thrown.
-
-     If the object is being updated, all properties defined in its schema will be set by copying
-     from `value` using key-value coding. If the `value` argument does not respond to `value(forKey:)`
-     for a given property name (or getter name, if defined), that value will remain untouched.
-     Nullable properties on the object can be set to nil by using `NSNull` as the updated value,
-     or (if you are passing in an instance of an `Object` subclass) setting the corresponding
-     property on `value` to nil.
-
-     If the `value` argument is an array, all properties must be present, valid and in the same
-     order as the properties defined in the model.
-
-     - warning: This method may only be called during a write transaction.
-
-     - parameter type:   The type of the object to create.
-     - parameter value:  The value used to populate the object.
-     - parameter update: If `true`, the Realm will try to find an existing copy of the object (with the same primary
-                         key), and update it. Otherwise, the object will be added.
-
-     - returns: The newly created object.
-     */
+    /// :nodoc:
     @discardableResult
-    @available(*, deprecated, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
+    @available(*, unavailable, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
     public func create<T: Object>(_ type: T.Type, value: Any = [:], update: Bool) -> T {
-        return create(type, value: value, update: update ? .all : .error)
+        fatalError()
     }
 
     /**
@@ -529,49 +461,11 @@ public final class Realm {
                                                               RLMUpdatePolicy(rawValue: UInt(update.rawValue))!), to: type)
     }
 
-    /**
-     This method is useful only in specialized circumstances, for example, when building
-     components that integrate with Realm. If you are simply building an app on Realm, it is
-     recommended to use the typed method `create(_:value:update:)`.
-
-     Creates or updates an object with the given class name and adds it to the `Realm`, populating
-     the object with the given value.
-
-     You may only pass `true` to `update` if the object has a primary key. If no object exists
-     in the Realm with the same primary key value, the object is inserted. Otherwise, the
-     existing object is updated with any changed values.
-
-     The `value` argument can be a Realm object, a key-value coding compliant object, an array
-     or dictionary returned from the methods in `NSJSONSerialization`, or an `Array` containing
-     one element for each managed property. Do not pass in a `LinkingObjects` instance, either
-     by itself or as a member of a collection.
-
-     If the object is being created, all required properties that were not defined with default
-     values must be given initial values through the `value` argument. Otherwise, an Objective-C
-     exception will be thrown.
-
-     If the object is being updated, all properties defined in its schema will be set by copying
-     from `value` using key-value coding. If the `value` argument does not respond to `value(forKey:)`
-     for a given property name (or getter name, if defined), that value will remain untouched.
-     Nullable properties on the object can be set to nil by using `NSNull` as the updated value.
-
-     If the `value` argument is an array, all properties must be present, valid and in the same
-     order as the properties defined in the model.
-
-     - warning: This method can only be called during a write transaction.
-
-     - parameter className:  The class name of the object to create.
-     - parameter value:      The value used to populate the object.
-     - parameter update:     If true will try to update existing objects with the same primary key.
-
-     - returns: The created object.
-
-     :nodoc:
-     */
+    /// :nodoc:
     @discardableResult
-    @available(*, deprecated, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
+    @available(*, unavailable, message: "Pass .error, .modified or .all rather than a boolean. .error is equivalent to false and .all is equivalent to true.")
     public func dynamicCreate(_ typeName: String, value: Any = [:], update: Bool) -> DynamicObject {
-        return dynamicCreate(typeName, value: value, update: update ? .all : .error)
+        fatalError()
     }
 
     /**
@@ -829,7 +723,7 @@ public final class Realm {
         get {
             return rlmRealm.autorefresh
         }
-        set {
+        nonmutating set {
             rlmRealm.autorefresh = newValue
         }
     }

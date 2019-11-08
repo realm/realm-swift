@@ -842,8 +842,8 @@ void QueryBuilder::add_link_constraint(NSPredicateOperatorType, const ColumnRefe
 // one and ORing them together
 template<typename Func>
 void process_or_group(Query &query, id array, Func&& func) {
-    RLMPrecondition([array conformsToProtocol:@protocol(NSFastEnumeration)],
-                    @"Invalid value", @"IN clause requires an array of items");
+    array = RLMAsFastEnumeration(array);
+    RLMPrecondition(array, @"Invalid value", @"IN clause requires an array of items");
 
     query.group();
 

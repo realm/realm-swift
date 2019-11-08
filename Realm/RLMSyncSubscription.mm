@@ -226,6 +226,14 @@ static std::vector<LinkPathPart> parseKeypath(StringData keypath, Group const& g
     Object _obj;
 }
 
++ (NSString *)primaryKey {
+    return nil;
+}
+
++ (NSDictionary *)defaultPropertyValues {
+    return nil;
+}
+
 - (NSString *)name {
     return _row.is_attached() ? RLMStringDataToNSString(_row.get_string(_row.get_column_index("name"))) : nil;
 }
@@ -424,7 +432,7 @@ RLMClassInfo& RLMResultsSetInfo::get(__unsafe_unretained RLMRealm *const realm) 
     if (row == npos) {
         return nil;
     }
-    RLMObjectBase *acc = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, self, &info);
+    RLMObjectBase *acc = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
     acc->_row = info.table()->get(row);
     return (RLMSyncSubscription *)acc;
 }

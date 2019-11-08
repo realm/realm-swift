@@ -438,16 +438,6 @@ class SwiftCustomInitializerObject: Object {
         stringCol = ""
         super.init()
     }
-
-    required init(realm: RLMRealm, schema: RLMObjectSchema) {
-        stringCol = ""
-        super.init(realm: realm, schema: schema)
-    }
-
-    required init(value: Any, schema: RLMSchema) {
-        stringCol = ""
-        super.init(value: value, schema: schema)
-    }
 }
 
 class SwiftConvenienceInitializerObject: Object {
@@ -463,7 +453,6 @@ class SwiftObjectiveCTypesObject: Object {
     @objc dynamic var stringCol: NSString?
     @objc dynamic var dateCol: NSDate?
     @objc dynamic var dataCol: NSData?
-    @objc dynamic var numCol: NSNumber? = 0
 }
 
 class SwiftComputedPropertyNotIgnoredObject: Object {

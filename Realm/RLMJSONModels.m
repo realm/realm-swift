@@ -46,7 +46,6 @@ static const NSString *const kRLMSyncValueKey           = @"value";
 @property (nonatomic, readwrite) NSString *path;
 @property (nonatomic, readwrite) NSTimeInterval expires;
 @property (nonatomic, readwrite) BOOL isAdmin;
-//@property (nonatomic, readwrite) NSArray *access;
 
 @end
 

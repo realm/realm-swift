@@ -105,6 +105,9 @@ static void RLMRegisterClassLocalNames(Class *classes, NSUInteger count) {
         if (!RLMIsObjectSubclass(cls)) {
             continue;
         }
+        if ([cls _realmIgnoreClass]) {
+            continue;
+        }
 
         NSString *className = NSStringFromClass(cls);
         if ([className hasPrefix:@"RLM:"] || [className hasPrefix:@"NSKVONotifying"]) {

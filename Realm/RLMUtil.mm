@@ -108,6 +108,20 @@ static inline bool checkArrayType(__unsafe_unretained RLMArray *const array,
         && (type != RLMPropertyTypeObject || [array.objectClassName isEqualToString:objectClassName]);
 }
 
+id (*RLMSwiftAsFastEnumeration)(id);
+id<NSFastEnumeration> RLMAsFastEnumeration(__unsafe_unretained id obj) {
+    if (!obj) {
+        return nil;
+    }
+    if ([obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
+        return obj;
+    }
+    if (RLMSwiftAsFastEnumeration) {
+        return RLMSwiftAsFastEnumeration(obj);
+    }
+    return nil;
+}
+
 BOOL RLMValidateValue(__unsafe_unretained id const value,
                       RLMPropertyType type, bool optional, bool array,
                       __unsafe_unretained NSString *const objectClassName) {
@@ -118,9 +132,9 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
         if (auto rlmArray = asRLMArray(value)) {
             return checkArrayType(rlmArray, type, optional, objectClassName);
         }
-        if ([value conformsToProtocol:@protocol(NSFastEnumeration)]) {
+        if (id enumeration = RLMAsFastEnumeration(value)) {
             // check each element for compliance
-            for (id el in (id<NSFastEnumeration>)value) {
+            for (id el in enumeration) {
                 if (!RLMValidateValue(el, type, optional, false, objectClassName)) {
                     return NO;
                 }
@@ -196,7 +210,8 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
         if (!obj || obj == NSNull.null) {
             return;
         }
-        if (![obj conformsToProtocol:@protocol(NSFastEnumeration)]) {
+        id enumeration = RLMAsFastEnumeration(obj);
+        if (!enumeration) {
             @throw RLMException(@"Invalid value (%@) for '%@%s' array property '%@.%@': value is not enumerable.",
                                 obj, prop.objectClassName ?: RLMTypeToString(prop.type), prop.optional ? "?" : "",
                                 objectSchema.className, prop.name);
@@ -215,7 +230,7 @@ void RLMValidateValueForProperty(__unsafe_unretained id const obj,
             return;
         }
 
-        for (id value in obj) {
+        for (id value in enumeration) {
             if (!RLMValidateValue(value, prop.type, prop.optional, false, prop.objectClassName)) {
                 RLMThrowTypeError(value, objectSchema, prop);
             }
@@ -415,4 +430,13 @@ NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier) {
     }
     return path;
 #endif
+}
+
+NSDateFormatter *RLMISO8601Formatter() {
+    // note: NSISO8601DateFormatter can't be used as it doesn't support milliseconds
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    dateFormatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+    dateFormatter.calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
+    return dateFormatter;
 }

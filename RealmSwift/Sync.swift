@@ -155,13 +155,6 @@ extension SyncError {
 public typealias SyncAuthError = RLMSyncAuthError
 
 /**
- An error associated with retrieving or modifying user permissions to access a synchronized Realm.
-
- - see: `RLMSyncPermissionError`
- */
-public typealias SyncPermissionError = RLMSyncPermissionError
-
-/**
  An enum which can be used to specify the level of logging.
 
  - see: `RLMSyncLogLevel`
@@ -235,27 +228,16 @@ public struct SyncConfiguration {
      */
     public let serverValidationPolicy: ServerValidationPolicy
 
-    /**
-     Whether the SSL certificate of the Realm Object Server should be validated.
- 
-     - warning: This has been deprecated. Use serverValidationPolicy instead.
-     */
-    @available(*, deprecated, message: "Use serverValidationPolicy instead")
+    /// :nodoc:
+    @available(*, unavailable, message: "Use serverValidationPolicy instead")
     public var enableSSLValidation: Bool {
-        if case .none = serverValidationPolicy { return true }
-        return false
+        fatalError()
     }
 
-    /**
-     Whether this Realm should be opened in 'partial synchronization' mode.
-     Partial synchronization mode means that no objects are synchronized from the remote Realm
-     except those matching queries that the user explicitly specifies.
-
-     - warning: This has been deprecated - use fullSyncronization instead.
-     */
-    @available(*, deprecated, message: "Use fullSynchronization instead")
+    /// :nodoc:
+    @available(*, unavailable, message: "Use fullSynchronization instead")
     public var isPartial: Bool {
-        return !fullSynchronization
+        fatalError()
     }
 
     /**
@@ -309,54 +291,22 @@ public struct SyncConfiguration {
                                     certificatePath: certificate)
     }
 
-    /**
-     Initialize a sync configuration with a user and a Realm URL.
-
-     Additional settings can be optionally specified. Descriptions of these
-     settings follow.
-
-     `enableSSLValidation` is true by default. It can be disabled for debugging
-     purposes.
-
-     - warning: This has ben deprecated. Use SyncUser.configuration() instead.
- 
-     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
-                `.realm`, `.realm.lock` or `.realm.management`.
-
-     - warning: NEVER disable SSL validation for a system running in production.
-    */
-    @available(*, deprecated, message: "Use SyncUser.configuration() instead")
+    /// :nodoc:
+    @available(*, unavailable, message: "Use SyncUser.configuration() instead")
     public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true, isPartial: Bool = false, urlPrefix: String? = nil) {
-        self.user = user
-        self.realmURL = realmURL
-        self.stopPolicy = .afterChangesUploaded
-        self.serverValidationPolicy = enableSSLValidation ? .system : .none
-        self.fullSynchronization = !isPartial
-        self.urlPrefix = urlPrefix
+        fatalError()
     }
 
-    /**
-     Return a Realm configuration for syncing with the default Realm of the currently logged-in sync user.
-
-     Query based synchronization is enabled in the returned configuration.
-
-     - requires: There be exactly one logged-in `SyncUser`
-
-     - warning: This has ben deprecated. Use SyncUser.configuration() instead.
-    */
-    @available(*, deprecated, message: "Use SyncUser.configuration() instead")
+    /// :nodoc:
+    @available(*, unavailable, message: "Use SyncUser.configuration() instead")
     public static func automatic() -> Realm.Configuration {
-        return ObjectiveCSupport.convert(object: RLMSyncConfiguration.automaticConfiguration())
+        fatalError()
     }
 
-    /**
-     Return a Realm configuration for syncing with the default Realm of the given sync user.
-
-     Partial synchronization is enabled in the returned configuration.
-    */
-    @available(*, deprecated, message: "Use SyncUser.configuration() instead")
+    /// :nodoc:
+    @available(*, unavailable, message: "Use SyncUser.configuration() instead")
     public static func automatic(user: SyncUser) -> Realm.Configuration {
-        return ObjectiveCSupport.convert(object: RLMSyncConfiguration.automaticConfiguration(for: user))
+        fatalError()
     }
 }
 
@@ -509,31 +459,6 @@ extension SyncUser {
     }
 
     /**
-     Retrieve permissions for this user. Permissions describe which synchronized
-     Realms this user has access to and what they are allowed to do with them.
-
-     Permissions are retrieved asynchronously and returned via the callback. The
-     callback is run on the same thread that the method is invoked upon.
-
-     - warning: This method must be invoked on a thread with an active run loop.
-
-     - warning: Do not pass the `Results` returned by the callback between threads.
-
-     - parameter callback: A callback providing either a `Results` containing the
-                           permissions, or an error describing what went wrong.
-     */
-    public func retrievePermissions(callback: @escaping (SyncPermissionResults?, SyncPermissionError?) -> Void) {
-        self.__retrievePermissions { (results, error) in
-            guard let results = results else {
-                callback(nil, error as! SyncPermissionError?)
-                return
-            }
-            let upcasted: RLMResults<SyncPermission> = results
-            callback(Results(upcasted as! RLMResults<AnyObject>), nil)
-        }
-    }
-
-    /**
      Create a permission offer for a Realm.
 
      A permission offer is used to grant access to a Realm this user manages to another
@@ -556,14 +481,8 @@ extension SyncUser {
     public func createOfferForRealm(at url: URL,
                                     accessLevel: SyncAccessLevel,
                                     expiration: Date? = nil,
-                                    callback: @escaping (String?, SyncPermissionError?) -> Void) {
-        self.__createOfferForRealm(at: url, accessLevel: accessLevel, expiration: expiration) { (token, error) in
-            guard let token = token else {
-                callback(nil, error as! SyncPermissionError?)
-                return
-            }
-            callback(token, nil)
-        }
+                                    callback: @escaping (String?, Error?) -> Void) {
+        self.__createOfferForRealm(at: url, accessLevel: accessLevel, expiration: expiration, callback: callback)
     }
 
     /**
@@ -784,21 +703,11 @@ public extension SyncSession {
 }
 
 extension Realm {
-    /**
-     If the Realm is a partially synchronized Realm, fetch and synchronize the objects
-     of a given object type that match the given query (in string format).
-
-     The results will be returned asynchronously in the callback.
-     Use `Results.observe(_:)` to be notified to changes to the set of synchronized objects.
-
-     - warning: Partial synchronization is a tech preview. Its APIs are subject to change.
-     */
-    @available(*, deprecated, message: "Use Results.subscribe()")
+    /// :nodoc:
+    @available(*, unavailable, message: "Use Results.subscribe()")
     public func subscribe<T: Object>(to objects: T.Type, where: String,
                                      completion: @escaping (Results<T>?, Swift.Error?) -> Void) {
-        rlmRealm.subscribe(toObjects: objects, where: `where`) { (results, error) in
-            completion(results.map { Results<T>($0) }, error)
-        }
+        fatalError()
     }
 
     /**
@@ -815,44 +724,9 @@ extension Realm {
 extension SyncPermission: RealmCollectionValue { }
 
 /**
- A `Results` collection containing sync permission results.
+ An array containing sync permission results.
  */
-public typealias SyncPermissionResults = Results<SyncPermission>
-
-/**
- A property upon which a `SyncPermissionResults` can be sorted or queried.
- The raw value string can be used to construct predicates and queries
- manually.
-
- - warning: If building `NSPredicate`s using format strings including these
-            raw values, use `%K` instead of `%@` as the substitution
-            parameter.
-
- - see: `RLMSyncPermissionSortProperty`
- */
-public typealias SyncPermissionSortProperty = RLMSyncPermissionSortProperty
-
-extension SortDescriptor {
-    /**
-     Construct a sort descriptor using a `SyncPermissionSortProperty`.
-     */
-    public init(sortProperty: SyncPermissionSortProperty, ascending: Bool = true) {
-        self.init(keyPath: sortProperty.rawValue, ascending: ascending)
-    }
-}
-
-extension Results where Element == SyncPermission {
-    /**
-     Return a `Results<SyncPermissionValue>` containing the objects represented
-     by the results, but sorted on the specified property.
-
-     - see: `sorted(byKeyPath:, ascending:)`
-     */
-    public func sorted(bySortProperty sortProperty: SyncPermissionSortProperty,
-                       ascending: Bool = true) -> Results<Element> {
-        return sorted(by: [SortDescriptor(sortProperty: sortProperty, ascending: ascending)])
-    }
-}
+public typealias SyncPermissionResults = [SyncPermission]
 
 // MARK: - Partial sync subscriptions
 
@@ -910,7 +784,7 @@ public enum SyncSubscriptionState: Equatable {
 /// Changes to the state of the subscription can be observed using `SyncSubscription.observe(_:options:_:)`.
 ///
 /// Subscriptions are created using `Results.subscribe()` or `Results.subscribe(named:)`.
-public final class SyncSubscription<T: RealmCollectionValue>: RealmCollectionValue {
+public struct SyncSubscription: RealmCollectionValue {
     private let rlmSubscription: RLMSyncSubscription
 
     /// The name of the subscription.
@@ -1027,7 +901,7 @@ public final class SyncSubscription<T: RealmCollectionValue>: RealmCollectionVal
 // :nodoc:
 extension SyncSubscription: CustomObjectiveCBridgeable {
     static func bridging(objCValue: Any) -> SyncSubscription {
-        return ObjectiveCSupport.convert(object: RLMCastToSyncSubscription(objCValue)) as! SyncSubscription<T>
+        return ObjectiveCSupport.convert(object: RLMCastToSyncSubscription(objCValue))
     }
     var objCValue: Any {
         return 0
@@ -1118,7 +992,7 @@ extension Results {
     /// - returns: The subscription.
     public func subscribe(named subscriptionName: String? = nil, limit: Int? = nil,
                           update: Bool = false, timeToLive: TimeInterval? = nil,
-                          includingLinkingObjects: [String] = []) -> SyncSubscription<Element> {
+                          includingLinkingObjects: [String] = []) -> SyncSubscription {
         let options = RLMSyncSubscriptionOptions()
         options.name = subscriptionName
         options.overwriteExisting = update
@@ -1145,12 +1019,6 @@ internal class KeyValueObservationNotificationToken: NotificationToken {
         self.observation = nil
     }
 }
-
-// MARK: - Migration assistance
-
-/// :nodoc:
-@available(*, unavailable, renamed: "SyncPermission")
-public final class SyncPermissionValue { }
 
 // MARK: - Permissions
 
@@ -1662,7 +1530,7 @@ extension Realm {
 
      - requires: This must only be called on a Realm using query-based sync.
     */
-    public func subscriptions() -> Results<SyncSubscription<Object>> {
+    public func subscriptions() -> Results<SyncSubscription> {
         return Results(rlmRealm.subscriptions() as! RLMResults<AnyObject>)
     }
 
@@ -1676,7 +1544,7 @@ extension Realm {
 
      - requires: This must only be called on a Realm using query-based sync.
     */
-    public func subscription(named: String) -> SyncSubscription<Object>? {
+    public func subscription(named: String) -> SyncSubscription? {
         return rlmRealm.subscription(withName: named).map(SyncSubscription.init)
     }
 }

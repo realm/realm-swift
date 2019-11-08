@@ -382,20 +382,13 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncAccessLevel) {
     RLMSyncAccessLevelAdmin         = 3,
 };
 
-/**
- A property on which a `RLMResults<RLMSyncPermission *>` can be queried or filtered.
+/// Get a string representing a sync acces level
+FOUNDATION_EXTERN NSString *RLMSyncAccessLevelToString(RLMSyncAccessLevel);
 
- @warning If building `NSPredicate`s using format strings including these string
-          constants, use %K instead of %@ as the substitution parameter.
- */
-typedef NSString * RLMSyncPermissionSortProperty NS_STRING_ENUM;
-
-/// Sort by the Realm Object Server path to the Realm to which the permission applies.
-extern RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyPath;
-/// Sort by the identity of the user to whom the permission applies.
-extern RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUserID;
-/// Sort by the date the permissions were last updated.
-extern RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated;
+/// Get a sync access level for the given string.
+///
+/// Throws an exception if the string is not a valid access level.
+FOUNDATION_EXTERN RLMSyncAccessLevel RLMSyncAccessLevelFromString(NSString *);
 
 /**
  A value representing a permission granted to the specified user(s) to access the specified Realm(s).
@@ -497,6 +490,38 @@ extern RLMSyncPermissionSortProperty const RLMSyncPermissionSortPropertyUpdated;
                       accessLevel:(RLMSyncAccessLevel)accessLevel
 __attribute__((unavailable("Renamed to `-initWithRealmPath:identity:accessLevel:`")));
 
+@end
+
+/**
+ A pending offer to grant permissions on a Realm path.
+
+ This type is immutable and can be safely read from any thread.
+
+ @see -[RLMSyncUser retrievePermissionOffersWithCallback:]
+ */
+@interface RLMSyncPermissionOffer : NSObject
+/// The Realm Object Server path to the Realm to which this permission applies (e.g. "/path/to/realm").
+@property (nonatomic, readonly) NSString *realmPath;
+/// The token which can be used to aceept or revoke this offer.
+@property (nonatomic, readonly) NSString *token;
+/// The date when this offer will expire, or nil for a non-expiring offer.
+@property (nonatomic, nullable, readonly) NSDate *expiresAt;
+/// The date when this offer was created.
+@property (nonatomic, nullable, readonly) NSDate *createdAt;
+/// The access level which this offer grants.
+@property (nonatomic, readonly) RLMSyncAccessLevel accessLevel;
+
+/// :nodoc:
+- (instancetype)init __attribute__((unavailable("Use the designated initializer")));
+/// :nodoc:
++ (instancetype)new __attribute__((unavailable("Use the designated initializer")));
+
+/// :nodoc:
+- (instancetype)initWithRealmPath:(NSString *)path
+                            token:(NSString *)token
+                        expiresAt:(NSDate *)expiresAt
+                        createdAt:(NSDate *)createdAt
+                      accessLevel:(RLMSyncAccessLevel)accessLevel;
 @end
 
 NS_ASSUME_NONNULL_END
