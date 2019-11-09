@@ -25,6 +25,7 @@ target:
  - tvos-swift
  - cocoapods-osx
  - cocoapods-ios
+ - cocoapods-ios-dynamic
  - cocoapods-watchos
  - swiftpm
 configuration: 
@@ -387,6 +388,30 @@ exclude:
 
   - xcode_version: 11.2
     target: cocoapods-ios
+    configuration: Debug
+
+  - xcode_version: 10.0
+    target: cocoapods-ios-dynamic
+    configuration: Debug
+
+  - xcode_version: 10.1
+    target: cocoapods-ios-dynamic
+    configuration: Debug
+
+  - xcode_version: 10.2.1
+    target: cocoapods-ios-dynamic
+    configuration: Debug
+
+  - xcode_version: 10.3
+    target: cocoapods-ios-dynamic
+    configuration: Debug
+
+  - xcode_version: 11.1
+    target: cocoapods-ios-dynamic
+    configuration: Debug
+
+  - xcode_version: 11.2
+    target: cocoapods-ios-dynamic
     configuration: Debug
 
   - xcode_version: 10.0
