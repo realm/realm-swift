@@ -30,7 +30,8 @@ class ObjectSchemaTests: TestCase {
         let objectSchema = swiftObjectSchema
         let propertyNames = objectSchema.properties.map { $0.name }
         XCTAssertEqual(propertyNames,
-            ["boolCol", "intCol", "floatCol", "doubleCol", "stringCol", "binaryCol", "dateCol", "objectCol", "arrayCol"]
+            ["boolCol", "intCol", "intEnumCol", "floatCol", "doubleCol",
+             "stringCol", "binaryCol", "dateCol", "objectCol", "arrayCol"]
         )
     }
 
@@ -65,6 +66,15 @@ class ObjectSchemaTests: TestCase {
             "        optional = NO;\n" +
             "    }\n" +
             "    intCol {\n" +
+            "        type = int;\n" +
+            "        objectClassName = (null);\n" +
+            "        linkOriginPropertyName = (null);\n" +
+            "        indexed = NO;\n" +
+            "        isPrimary = NO;\n" +
+            "        array = NO;\n" +
+            "        optional = NO;\n" +
+            "    }\n" +
+            "    intEnumCol {\n" +
             "        type = int;\n" +
             "        objectClassName = (null);\n" +
             "        linkOriginPropertyName = (null);\n" +

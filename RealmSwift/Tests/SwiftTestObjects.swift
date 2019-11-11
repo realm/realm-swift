@@ -36,9 +36,15 @@ class SwiftLongObject: Object {
     @objc dynamic var longCol: Int64 = 0
 }
 
+@objc enum IntEnum: Int, RealmEnum {
+    case value1 = 1
+    case value2 = 3
+}
+
 class SwiftObject: Object {
     @objc dynamic var boolCol = false
     @objc dynamic var intCol = 123
+    @objc dynamic var intEnumCol = IntEnum.value1
     @objc dynamic var floatCol = 1.23 as Float
     @objc dynamic var doubleCol = 12.3
     @objc dynamic var stringCol = "a"
@@ -75,6 +81,7 @@ class SwiftOptionalObject: Object {
     let optFloatCol = RealmOptional<Float>()
     let optDoubleCol = RealmOptional<Double>()
     let optBoolCol = RealmOptional<Bool>()
+    let optEnumCol = RealmOptional<IntEnum>()
     @objc dynamic var optObjectCol: SwiftBoolObject?
 }
 

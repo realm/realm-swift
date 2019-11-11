@@ -3,6 +3,9 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * Improve performance of queries over a link where the final target property
   has an index.
+* Restore support for storing `@objc enum` properties on RealmSwift.Object
+  subclasses (broken in 4.0.0), and add support for storing them in
+  RealmOptional properties.
 
 ### Fixed
 * The sync client would fail to reconnect after failing to integrate a
