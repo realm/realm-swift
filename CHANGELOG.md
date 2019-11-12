@@ -1,11 +1,13 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Improve performance of queries over a link where the final target property
+  has an index.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+* The sync client would fail to reconnect after failing to integrate a
+  changeset. The bug would lead to further corruption of the client’s Realm
+  file. ([RSYNC-48](https://jira.mongodb.org/browse/RSYNC-48), since v3.2.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -16,8 +18,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.2.
 
 ### Internal
-Upgraded realm-core from ? to ?
-Upgraded realm-sync from ? to ?
+* Upgraded realm-core from 5.23.5 to 5.23.6.
+* Upgraded realm-sync from 4.7.11 to 4.8.2
 
 4.0.0 Release notes (2019-11-08)
 =============================================================
