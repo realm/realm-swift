@@ -417,7 +417,7 @@ public protocol RealmEnum: RealmOptionalType, _ManagedPropertyType {
 // MARK: - Implementation
 
 /// :nodoc:
-public extension RealmEnum where Self: RawRepresentable, RawValue: _ManagedPropertyType {
+public extension RealmEnum where Self: RawRepresentable, Self.RawValue: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     static func _rlmToRawValue(_ value: Any) -> Any {
         return (value as! Self).rawValue
