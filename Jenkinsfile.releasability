@@ -17,9 +17,13 @@ def installationTest(platform, test, language) {
       }
 
       sh """
-      archive=\$(echo \$PWD/realm-${language}-*.zip)
+      export REALM_XCODE_VERSION=${carthageXcodeVersion}
+      if [ "${platform}" != osx ]; then
+        ./scripts/reset-simulators.sh
+      fi
       cd examples/installation
 
+      archive=\$(echo \$PWD/realm-${language}-*.zip)
       if [[ -f \$archive ]]; then
         mv \$archive .
         unzip realm-${language}-*.zip
@@ -27,7 +31,6 @@ def installationTest(platform, test, language) {
         mv realm-${language}-* realm-${language}-latest
       fi
 
-      export REALM_XCODE_VERSION=${carthageXcodeVersion}
       ./build.sh test-${platform}-${language}-${test}
       """
     }
