@@ -64,9 +64,14 @@ class ObjectAccessorTests: TestCase {
 
         object.objectCol = SwiftBoolObject(value: [true])
         XCTAssertEqual(object.objectCol!.boolCol, true)
+
+        object.intEnumCol = .value1
+        XCTAssertEqual(object.intEnumCol, .value1)
+        object.intEnumCol = .value2
+        XCTAssertEqual(object.intEnumCol, .value2)
     }
 
-    func testStandaloneAccessors() {
+    func testUnmanagedAccessors() {
         let object = SwiftObject()
         setAndTestAllProperties(object)
 
@@ -74,7 +79,7 @@ class ObjectAccessorTests: TestCase {
         setAndTestAllOptionalProperties(optionalObject)
     }
 
-    func testPersistedAccessors() {
+    func testManagedAccessors() {
         let realm = try! Realm()
         realm.beginWrite()
         let object = realm.create(SwiftObject.self)
@@ -328,6 +333,13 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(object.optObjectCol!.boolCol, true)
         object.optObjectCol = nil
         XCTAssertNil(object.optObjectCol)
+
+        object.optEnumCol.value = .value1
+        XCTAssertEqual(object.optEnumCol.value, .value1)
+        object.optEnumCol.value = .value2
+        XCTAssertEqual(object.optEnumCol.value, .value2)
+        object.optEnumCol.value = nil
+        XCTAssertNil(object.optEnumCol.value)
     }
 
     func testLinkingObjectsDynamicGet() {

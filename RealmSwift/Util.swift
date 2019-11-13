@@ -90,6 +90,8 @@ public func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
         return unsafeBitCast(x as AnyObject, to: T.self)
     } else if let bridgeableType = T.self as? CustomObjectiveCBridgeable.Type {
         return bridgeableType.bridging(objCValue: x) as! T
+    } else if let bridgeableType = T.self as? RealmEnum.Type {
+        return bridgeableType._rlmFromRawValue(x) as! T
     } else {
         return x as! T
     }
@@ -99,6 +101,8 @@ public func dynamicBridgeCast<T>(fromObjectiveC x: Any) -> T {
 public func dynamicBridgeCast<T>(fromSwift x: T) -> Any {
     if let x = x as? CustomObjectiveCBridgeable {
         return x.objCValue
+    } else if let bridgeableType = T.self as? RealmEnum.Type {
+        return bridgeableType._rlmToRawValue(x)
     } else {
         return x
     }

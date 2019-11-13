@@ -27,6 +27,7 @@ targets = {
 
   'cocoapods-osx' => release_only,
   'cocoapods-ios' => release_only,
+  'cocoapods-ios-dynamic' => release_only,
   'cocoapods-watchos' => release_only,
 
   'swiftpm' => ->(v, c) { c == 'Release' && (v == '10.3' or v == xcode_versions.last) }
