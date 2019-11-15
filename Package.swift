@@ -7,6 +7,7 @@ let coreVersionStr = "6.0.0-alpha.27"
 let cocoaVersionStr = "5.0.0-alpha.1"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
+let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
 let cxxSettings: [CXXSetting] = [
     .headerSearchPath("."),
     .headerSearchPath("include"),
@@ -22,8 +23,8 @@ let cxxSettings: [CXXSetting] = [
 
     .define("REALM_VERSION_MAJOR", to: String(coreVersionPieces[0])),
     .define("REALM_VERSION_MINOR", to: String(coreVersionPieces[1])),
-    .define("REALM_VERSION_PATCH", to: String(coreVersionPieces[2])),
-    .define("REALM_VERSION_EXTRA", to: "\"\""),
+    .define("REALM_VERSION_PATCH", to: String(coreVersionExtra[0])),
+    .define("REALM_VERSION_EXTRA", to: "\"\(coreVersionExtra.count > 1 ? String(coreVersionExtra[1]) : "")\""),
     .define("REALM_VERSION_STRING", to: "\"\(coreVersionStr)\""),
 ]
 
