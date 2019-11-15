@@ -334,7 +334,7 @@ public struct Realm {
 
          This behavior is the same as passing `update: false` to `add()` or `create()`.
          */
-        case error = 0
+        case error = 1
         /**
          Overwrite only properties in the existing object which are different from the new values. This results
          in change notifications reporting only the properties which changed, and influences the sync merge logic.
@@ -343,7 +343,7 @@ public struct Realm {
          to be written to the Realm file. If all of the properties are changing, it may be slower than .all (but
          will never result in *more* data being written).
          */
-        case modified = 1
+        case modified = 3
         /**
          Overwrite all properties in the existing object with the new values, even if they have not changed. This
          results in change notifications reporting all properties as changed, and influences the sync merge logic.

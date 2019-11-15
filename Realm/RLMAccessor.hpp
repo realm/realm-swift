@@ -79,7 +79,7 @@ public:
     }
 
     template<typename T>
-    T unbox(id v, bool create = false, bool update = false, bool = false, size_t = 0);
+    T unbox(id v, realm::CreatePolicy = realm::CreatePolicy::Skip, size_t = 0);
 
     bool is_null(id v) { return v == NSNull.null; }
     id null_value() { return NSNull.null; }

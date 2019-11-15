@@ -75,7 +75,7 @@ public:
     }
 
     void set(__unsafe_unretained id const value) override {
-        _object.set_property_value(_ctx, _propertyName, value ?: NSNull.null, false);
+        _object.set_property_value(_ctx, _propertyName, value ?: NSNull.null);
     }
 
 private:
