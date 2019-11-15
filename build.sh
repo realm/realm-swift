@@ -842,6 +842,8 @@ case "$COMMAND" in
             SANITIZER="--sanitize $SANITIZER"
             export ASAN_OPTIONS='check_initialization_order=true:detect_stack_use_after_return=true'
         fi
+        xcrun swift package resolve
+        find .build -name views.cpp -delete
         xcrun swift test --configuration $(echo $CONFIGURATION | tr "[:upper:]" "[:lower:]") $SANITIZER
         exit 0
         ;;
