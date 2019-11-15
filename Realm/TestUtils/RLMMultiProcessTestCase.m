@@ -18,6 +18,8 @@
 
 #import "RLMMultiProcessTestCase.h"
 
+#include <mach-o/dyld.h>
+
 @interface RLMMultiProcessTestCase ()
 @property (nonatomic) bool isParent;
 @property (nonatomic, strong) NSString *testName;
@@ -110,6 +112,16 @@
     NSMutableDictionary *env = [NSProcessInfo.processInfo.environment mutableCopy];
     env[@"RLMProcessIsChild"] = @"true";
     env[@"RLMParentProcessBundleID"] = [NSBundle mainBundle].bundleIdentifier;
+
+    // If we're running with address sanitizer or thread sanitizer we need to
+    // explicitly tell dyld to inject the appropriate runtime library into
+    // the child process
+    for (int  i = 0, count = _dyld_image_count(); i < count; i++) {
+        const char *imageName = _dyld_get_image_name(i);
+        if (imageName && strstr(imageName, "libclang_rt")) {
+            env[@"DYLD_INSERT_LIBRARIES"] = @(imageName);
+        }
+    }
 
     // Don't inherit the config file in the subprocess, as multiple XCTest
     // processes talking to a single Xcode instance doesn't work at all

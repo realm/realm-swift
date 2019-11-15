@@ -836,8 +836,13 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "test-swiftpm")
-        xcrun swift test --configuration $(echo $CONFIGURATION | tr "[:upper:]" "[:lower:]")
+    test-swiftpm*)
+        SANITIZER=$(echo $COMMAND | cut -d - -f 3)
+        if [ -n "$SANITIZER" ]; then
+            SANITIZER="--sanitize $SANITIZER"
+            export ASAN_OPTIONS='check_initialization_order=true:detect_stack_use_after_return=true'
+        fi
+        xcrun swift test --configuration $(echo $CONFIGURATION | tr "[:upper:]" "[:lower:]") $SANITIZER
         exit 0
         ;;
 
@@ -1002,8 +1007,8 @@ case "$COMMAND" in
         exit 0
         ;;
 
-    "verify-swiftpm")
-        sh build.sh test-swiftpm
+    verify-swiftpm*)
+        sh build.sh test-$(echo $COMMAND | cut -d - -f 2-)
         exit 0
         ;;
 
