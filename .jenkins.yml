@@ -28,6 +28,8 @@ target:
  - cocoapods-ios-dynamic
  - cocoapods-watchos
  - swiftpm
+ - swiftpm-address
+ - swiftpm-thread
 configuration: 
  - Debug
  - Release
@@ -476,4 +478,92 @@ exclude:
 
   - xcode_version: 11.2
     target: swiftpm
+    configuration: Debug
+
+  - xcode_version: 10.0
+    target: swiftpm-address
+    configuration: Debug
+
+  - xcode_version: 10.0
+    target: swiftpm-address
+    configuration: Release
+
+  - xcode_version: 10.1
+    target: swiftpm-address
+    configuration: Debug
+
+  - xcode_version: 10.1
+    target: swiftpm-address
+    configuration: Release
+
+  - xcode_version: 10.2.1
+    target: swiftpm-address
+    configuration: Debug
+
+  - xcode_version: 10.2.1
+    target: swiftpm-address
+    configuration: Release
+
+  - xcode_version: 10.3
+    target: swiftpm-address
+    configuration: Debug
+
+  - xcode_version: 10.3
+    target: swiftpm-address
+    configuration: Release
+
+  - xcode_version: 11.1
+    target: swiftpm-address
+    configuration: Debug
+
+  - xcode_version: 11.1
+    target: swiftpm-address
+    configuration: Release
+
+  - xcode_version: 11.2
+    target: swiftpm-address
+    configuration: Debug
+
+  - xcode_version: 10.0
+    target: swiftpm-thread
+    configuration: Debug
+
+  - xcode_version: 10.0
+    target: swiftpm-thread
+    configuration: Release
+
+  - xcode_version: 10.1
+    target: swiftpm-thread
+    configuration: Debug
+
+  - xcode_version: 10.1
+    target: swiftpm-thread
+    configuration: Release
+
+  - xcode_version: 10.2.1
+    target: swiftpm-thread
+    configuration: Debug
+
+  - xcode_version: 10.2.1
+    target: swiftpm-thread
+    configuration: Release
+
+  - xcode_version: 10.3
+    target: swiftpm-thread
+    configuration: Debug
+
+  - xcode_version: 10.3
+    target: swiftpm-thread
+    configuration: Release
+
+  - xcode_version: 11.1
+    target: swiftpm-thread
+    configuration: Debug
+
+  - xcode_version: 11.1
+    target: swiftpm-thread
+    configuration: Release
+
+  - xcode_version: 11.2
+    target: swiftpm-thread
     configuration: Debug
