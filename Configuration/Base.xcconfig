@@ -46,6 +46,7 @@ SWIFT_COMPILATION_MODE = wholemodule;
 SWIFT_OPTIMIZATION_LEVEL = -Owholemodule;
 WARNING_CFLAGS = -Wmismatched-tags -Wunused-private-field -Wpartial-availability;
 OTHER_CFLAGS = -fvisibility-inlines-hidden $(REALM_CATALYST_FLAGS);
+OTHER_CFLAGS[arch=armv7] = -fvisibility-inlines-hidden -fno-aligned-new $(REALM_CATALYST_FLAGS);
 OTHER_LDFLAGS = $(REALM_CATALYST_FLAGS);
 OTHER_SWIFT_FLAGS = $(REALM_CATALYST_FLAGS);
 
