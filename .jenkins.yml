@@ -9,7 +9,7 @@ xcode_version:
  - 10.2.1
  - 10.3
  - 11.1
- - 11.2
+ - 11.2.1
 target: 
  - docs
  - swiftlint
@@ -76,7 +76,7 @@ exclude:
     target: docs
     configuration: Release
 
-  - xcode_version: 11.2
+  - xcode_version: 11.2.1
     target: docs
     configuration: Debug
 
@@ -120,7 +120,7 @@ exclude:
     target: swiftlint
     configuration: Release
 
-  - xcode_version: 11.2
+  - xcode_version: 11.2.1
     target: swiftlint
     configuration: Debug
 
@@ -160,7 +160,7 @@ exclude:
     target: osx-encryption
     configuration: Release
 
-  - xcode_version: 11.2
+  - xcode_version: 11.2.1
     target: osx-encryption
     configuration: Debug
 
@@ -200,7 +200,7 @@ exclude:
     target: osx-object-server
     configuration: Release
 
-  - xcode_version: 11.2
+  - xcode_version: 11.2.1
     target: osx-object-server
     configuration: Debug
 
@@ -364,7 +364,7 @@ exclude:
     target: cocoapods-osx
     configuration: Debug
 
-  - xcode_version: 11.2
+  - xcode_version: 11.2.1
     target: cocoapods-osx
     configuration: Debug
 
@@ -388,7 +388,7 @@ exclude:
     target: cocoapods-ios
     configuration: Debug
 
-  - xcode_version: 11.2
+  - xcode_version: 11.2.1
     target: cocoapods-ios
     configuration: Debug
 
@@ -412,7 +412,7 @@ exclude:
     target: cocoapods-ios-dynamic
     configuration: Debug
 
-  - xcode_version: 11.2
+  - xcode_version: 11.2.1
     target: cocoapods-ios-dynamic
     configuration: Debug
 
@@ -436,7 +436,7 @@ exclude:
     target: cocoapods-watchos
     configuration: Debug
 
-  - xcode_version: 11.2
+  - xcode_version: 11.2.1
     target: cocoapods-watchos
     configuration: Debug
 
@@ -476,7 +476,7 @@ exclude:
     target: swiftpm
     configuration: Release
 
-  - xcode_version: 11.2
+  - xcode_version: 11.2.1
     target: swiftpm
     configuration: Debug
 
@@ -520,7 +520,7 @@ exclude:
     target: swiftpm-address
     configuration: Release
 
-  - xcode_version: 11.2
+  - xcode_version: 11.2.1
     target: swiftpm-address
     configuration: Debug
 
@@ -564,6 +564,6 @@ exclude:
     target: swiftpm-thread
     configuration: Release
 
-  - xcode_version: 11.2
+  - xcode_version: 11.2.1
     target: swiftpm-thread
     configuration: Debug
