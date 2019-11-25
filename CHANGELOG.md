@@ -1,7 +1,41 @@
+5.0.0-alpha.2 Release notes (yyyy-MM-dd)
+=============================================================
+
+Based on 4.1.1 and also includes all changes since 4.1.0.
+
+### Enhancements
+* String primary keys no longer require a separate index, improving insertion
+  and deletion performance without hurting lookup performance.
+
+### Fixed
+* Fix an error when a table-backed Results was accessed immediately after
+  deleting the object previously at the index being accessed (since
+  5.0.0-alpha.1).
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* APIs are backwards compatible with all previous releases in the 4.x.y series.
+* Carthage release for Swift is built with Xcode 11.2.1.
+
+### Internal
+* Upgraded realm-core from v6.0.0-alpha.24 to v6.0.0-alpha.27.
+* Upgraded realm-sync from 4.7.1-core6.5 to 4.7.6-core6.0.
+
 5.0.0-alpha.1 Release notes (2019-11-14)
 =============================================================
+
+Based on 4.1.0.
+
 ### Enhancements
 * None.
+
+* Add `-[RLMRealm fileExistsForConfiguration:]`/`Realm.fileExists(for:)`,
+  which checks if a local Realm file exists for the given configuration.
+* Add `-[RLMRealm deleteFilesForConfiguration:]`/`Realm.deleteFiles(for:)`
+  to delete the Realm file and all auxiliary files for the given configuration.
 
 NOTE: This version bumps the Realm file format to version 10. It is not
 possible to downgrade version 9 or earlier. Files created with older versions
@@ -23,7 +57,6 @@ alpha version.
 * APIs are backwards compatible with all previous releases in the 4.x.y series.
 * Carthage release for Swift is built with Xcode 11.3.
 * Carthage release for Swift is built with Xcode 11.2.1.
-* Carthage release for Swift is built with Xcode 11.2.
 
 ### Internal
 
