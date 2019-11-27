@@ -277,17 +277,17 @@ private:
     template<typename Func>
     Table const& walk_link_chain(Func&& func) const
     {
-        auto table = m_query->get_table();
+        auto table = m_query->get_table().unchecked_ptr();
         for (const auto& link : m_links) {
             if (link.type != RLMPropertyTypeLinkingObjects) {
                 auto index = table->get_column_key(link.columnName.UTF8String);
                 func(*table, index, link.type);
-                table = table->get_link_target(index);
+                table = table->get_link_target(index).unchecked_ptr();
             }
             else {
                 with_link_origin(link, [&](Table& link_origin_table, ColKey link_origin_column) {
                     func(link_origin_table, link_origin_column, link.type);
-                    table = ConstTableRef(&link_origin_table);
+                    table = &link_origin_table;
                 });
             }
         }
@@ -783,7 +783,7 @@ void QueryBuilder::add_link_constraint(NSPredicateOperatorType operatorType,
         // exist from the target table
         struct FakeObj : public ConstObj {
             FakeObj(ColumnReference const& column) {
-                m_table = &::get_table(column.group(), column.link_target_object_schema());
+                m_table = TableRef::unsafe_create(&::get_table(column.group(), column.link_target_object_schema()));
             }
         } fake(column);
         add_bool_constraint(operatorType, column.resolve<Link>(), fake);

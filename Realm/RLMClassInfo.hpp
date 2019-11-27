@@ -18,13 +18,14 @@
 
 #import <Foundation/Foundation.h>
 
+#import <realm/table_ref.hpp>
+
 #import <unordered_map>
 #import <vector>
 
 namespace realm {
     class ObjectSchema;
     class Schema;
-    class Table;
     struct Property;
     struct ColKey;
 }
@@ -64,7 +65,7 @@ public:
 
     // Get the table for this object type. Will return nullptr only if it's a
     // read-only Realm that is missing the table entirely.
-    realm::Table *_Nullable table() const;
+    realm::TableRef const& table() const;
 
     // Get the RLMProperty for a given table column, or `nil` if it is a column
     // not used by the current schema
@@ -88,7 +89,7 @@ public:
     void releaseTable() { m_table = nullptr; }
 
 private:
-    mutable realm::Table *_Nullable m_table = nullptr;
+    mutable realm::TableRef m_table = nullptr;
     std::vector<RLMClassInfo *> m_linkTargets;
 };
 
