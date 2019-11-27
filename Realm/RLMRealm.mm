@@ -224,7 +224,7 @@ static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
     realm->commit_transaction();
 
     NotificationToken token;
-    Results results(realm, *table);
+    Results results(realm, table);
     CFRunLoopRef runLoop = CFRunLoopGetCurrent();
     CFRunLoopPerformBlock(runLoop, kCFRunLoopDefaultMode, [&]() mutable {
         token = results.add_notification_callback([&](CollectionChangeSet const&, std::exception_ptr) mutable {
@@ -911,7 +911,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
     auto& path = config.config.path;
     bool anyDeleted = false;
     NSError *localError;
-    bool didCall = SharedGroup::call_with_lock(path, [&](auto const& path) {
+    bool didCall = DB::call_with_lock(path, [&](auto const& path) {
         NSURL *url = [NSURL fileURLWithPath:@(path.c_str())];
         NSFileManager *fm = NSFileManager.defaultManager;
 

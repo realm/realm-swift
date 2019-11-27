@@ -669,6 +669,7 @@ id RLMAccessorContext::box(realm::Results&& r) {
 }
 
 using realm::ObjKey;
+using realm::CreatePolicy;
 
 template<>
 realm::Timestamp RLMAccessorContext::unbox(__unsafe_unretained id const value, CreatePolicy, ObjKey) {
@@ -727,7 +728,7 @@ realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id 
 }
 
 template<>
-Obj RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy createPolicy, ObjKey) {
+realm::Obj RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy createPolicy, ObjKey) {
     bool create = createPolicy != CreatePolicy::Skip;
     auto policy = static_cast<RLMUpdatePolicy>(createPolicy);
     RLMObjectBase *link = RLMDynamicCast<RLMObjectBase>(v);

@@ -38,7 +38,7 @@ RLMClassInfo::RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
                              const realm::ObjectSchema *objectSchema)
 : realm(realm), rlmObjectSchema(rlmObjectSchema), objectSchema(objectSchema) { }
 
-realm::Table *RLMClassInfo::table() const {
+realm::TableRef const& RLMClassInfo::table() const {
     if (!m_table) {
         m_table = ObjectStore::table_for_object_type(realm.group, objectSchema->name);
     }

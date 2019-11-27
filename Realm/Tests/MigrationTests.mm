@@ -46,7 +46,8 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
         for (RLMProperty *property in objectSchema.properties) {
             auto column = info.tableColumn(property);
             XCTAssertEqual(column, table->get_column_key(RLMStringDataWithNSString(property.columnName)));
-            XCTAssertEqual(property.indexed || property.isPrimary, table->has_search_index(column));
+            bool indexed = (property.indexed || property.isPrimary) && !(property.isPrimary && property.type == RLMPropertyTypeString);
+            XCTAssertEqual(indexed, table->has_search_index(column));
         }
     }
 }
@@ -269,7 +270,9 @@ RLM_ARRAY_TYPE(MigrationTestObject);
     RLMProperty *afterProperty = schema.properties.firstObject;
     RLMProperty *beforeProperty = [afterProperty copyWithNewName:@"before_stringCol"];
     schema.properties = @[beforeProperty];
-    if (transform1) { transform1(schema, beforeProperty, afterProperty); }
+    if (transform1) {
+        transform1(schema, beforeProperty, afterProperty);
+    }
 
     [self createTestRealmWithSchema:@[schema] block:^(RLMRealm *realm) {
         if (errorMessage == nil) {
@@ -278,10 +281,14 @@ RLM_ARRAY_TYPE(MigrationTestObject);
     }];
 
     schema.properties = @[afterProperty];
-    if (transform2) { transform2(schema, beforeProperty, afterProperty); }
+    if (transform2) {
+        transform2(schema, beforeProperty, afterProperty);
+    }
 
-    RLMRealmConfiguration *config = [self renameConfigurationWithObjectSchemas:@[schema] className:StringObject.className
-                                                                       oldName:beforeProperty.name newName:afterProperty.name];
+    auto config = [self renameConfigurationWithObjectSchemas:@[schema]
+                                                   className:StringObject.className
+                                                     oldName:beforeProperty.name
+                                                     newName:afterProperty.name];
 
     if (errorMessage) {
         NSError *error;
@@ -1520,7 +1527,7 @@ RLM_ARRAY_TYPE(MigrationTestObject);
 
 - (void)testMigrationRenamePropertySetPrimaryKey {
     [self assertPropertyRenameError:nil firstSchemaTransform:nil
-                     secondSchemaTransform:^(RLMObjectSchema *schema, __unused RLMProperty *beforeProperty, RLMProperty *afterProperty) {
+              secondSchemaTransform:^(RLMObjectSchema *schema, RLMProperty *, RLMProperty *afterProperty) {
         schema.primaryKeyProperty = afterProperty;
     }];
 }
