@@ -237,7 +237,7 @@ RLMResults *RLMGetObjects(__unsafe_unretained RLMRealm *const realm,
     }
 
     return [RLMResults resultsWithObjectInfo:info
-                                     results:realm::Results(realm->_realm, *info.table())];
+                                     results:realm::Results(realm->_realm, info.table())];
 }
 
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
