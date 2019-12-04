@@ -58,7 +58,7 @@ static const NSTimeInterval RLMRefreshBuffer = 10;
     std::shared_ptr<SyncSession> _strongSession;
 }
 
-@property (nonatomic) NSTimer *timer;
+@property (nonatomic) dispatch_source_t timer;
 
 @property (nonatomic) NSURL *realmURL;
 @property (nonatomic) NSURL *authServerURL;
@@ -86,19 +86,26 @@ static const NSTimeInterval RLMRefreshBuffer = 10;
         _session = _strongSession;
         _user = user;
         // Immediately fire off the network request.
-        [self _timerFired:nil];
+        [self _timerFired];
         return self;
     }
     return nil;
 }
 
 - (void)dealloc {
-    [self.timer invalidate];
+    [self cancelTimer];
 }
 
 - (void)invalidate {
     _strongSession = nullptr;
-    [self.timer invalidate];
+    [self cancelTimer];
+}
+
+- (void)cancelTimer {
+    if (self.timer) {
+        dispatch_source_cancel(self.timer);
+        self.timer = nil;
+    }
 }
 
 + (NSDate *)fireDateForTokenExpirationDate:(NSDate *)date nowDate:(NSDate *)nowDate {
@@ -108,43 +115,30 @@ static const NSTimeInterval RLMRefreshBuffer = 10;
 }
 
 - (void)scheduleRefreshTimer:(NSDate *)dateWhenTokenExpires {
-    // Schedule the timer on the main queue.
-    // It's very likely that this method will be run on a side thread, for example
-    // on the thread that runs `NSURLSession`'s completion blocks. We can't be
-    // guaranteed that there's an existing runloop on those threads, and we don't want
-    // to create and start a new one if one doesn't already exist.
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self.timer invalidate];
-        NSDate *fireDate = [RLMSyncSessionRefreshHandle fireDateForTokenExpirationDate:dateWhenTokenExpires
-                                                                               nowDate:[NSDate date]];
-        if (!fireDate) {
-            unregisterRefreshHandle(_user, _path);
-            return;
-        }
-        self.timer = [[NSTimer alloc] initWithFireDate:fireDate
-                                              interval:0
-                                                target:self
-                                              selector:@selector(_timerFired:)
-                                              userInfo:nil
-                                               repeats:NO];
-        [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSDefaultRunLoopMode];
-    });
+    [self cancelTimer];
+
+    NSDate *fireDate = [RLMSyncSessionRefreshHandle fireDateForTokenExpirationDate:dateWhenTokenExpires
+                                                                           nowDate:[NSDate date]];
+    if (!fireDate) {
+        unregisterRefreshHandle(_user, _path);
+        return;
+    }
+
+    NSTimeInterval timeToExpiration = [fireDate timeIntervalSinceNow];
+    self.timer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
+    dispatch_source_set_timer(self.timer, dispatch_time(DISPATCH_TIME_NOW, timeToExpiration * NSEC_PER_SEC),
+                              /* interval */ DISPATCH_TIME_FOREVER,
+                              /* leeway */ NSEC_PER_SEC * (timeToExpiration / 10));
+    dispatch_source_set_event_handler(self.timer, ^{ [self _timerFired]; });
+    dispatch_resume(self.timer);
 }
 
 /// Handler for network requests whose responses successfully parse into an auth response model.
-- (BOOL)_handleSuccessfulRequest:(RLMAuthResponseModel *)model {
-    std::shared_ptr<SyncSession> session = _session.lock();
-    if (!session) {
-        // The session is dead or in a fatal error state.
-        unregisterRefreshHandle(_user, _path);
-        [self invalidate];
-        return NO;
-    }
-
+- (BOOL)_handleSuccessfulRequest:(RLMAuthResponseModel *)model session:(SyncSession&)session {
     // Realm Cloud will give us a url prefix in the auth response that we need
     // to pass onto objectstore to have it connect to the proper sync worker
     if (model.urlPrefix) {
-        session->set_url_prefix(model.urlPrefix.UTF8String);
+        session.set_url_prefix(model.urlPrefix.UTF8String);
     }
 
     // Calculate the resolved path.
@@ -159,7 +153,7 @@ static const NSTimeInterval RLMRefreshBuffer = 10;
         @throw RLMException(@"Resolved path returned from the server was invalid (%@).", resolvedPath);
     }
     // Pass the token and resolved path to the underlying sync subsystem.
-    session->refresh_access_token([model.accessToken.token UTF8String], {resolvedURLString.UTF8String});
+    session.refresh_access_token([model.accessToken.token UTF8String], {resolvedURLString.UTF8String});
 
     // Schedule a refresh. If we're successful we must already have `bind()`ed the session
     // initially, so we can null out the strong pointer.
@@ -225,16 +219,23 @@ static const NSTimeInterval RLMRefreshBuffer = 10;
 
 /// Callback handler for network requests.
 - (BOOL)_onRefreshCompletionWithError:(NSError *)error json:(NSDictionary *)json {
+    std::shared_ptr<SyncSession> session = _session.lock();
+    if (!session) {
+        // The session is dead or in a fatal error state.
+        unregisterRefreshHandle(_user, _path);
+        [self invalidate];
+        return NO;
+    }
+
     if (json && !error) {
         RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithDictionary:json
                                                                     requireAccessToken:YES
                                                                    requireRefreshToken:NO];
         if (model) {
-            return [self _handleSuccessfulRequest:model];
+            return [self _handleSuccessfulRequest:model session:*session];
         }
         // Otherwise, malformed JSON
         unregisterRefreshHandle(_user, _path);
-        [self.timer invalidate];
         NSError *error = make_sync_error(make_auth_error_bad_response(json));
         if (self.completionBlock) {
             self.completionBlock(error);
@@ -247,14 +248,13 @@ static const NSTimeInterval RLMRefreshBuffer = 10;
     return NO;
 }
 
-- (void)_timerFired:(__unused NSTimer *)timer {
+- (void)_timerFired {
     RLMServerToken refreshToken = nil;
     if (auto user = _user.lock()) {
         refreshToken = @(user->refresh_token().c_str());
     }
     if (!refreshToken) {
         unregisterRefreshHandle(_user, _path);
-        [self.timer invalidate];
         return;
     }
 
