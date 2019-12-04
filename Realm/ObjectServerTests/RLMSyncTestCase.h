@@ -24,7 +24,7 @@ typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncManager ()
-- (void)setSessionCompletionNotifier:(RLMSyncBasicErrorReportingBlock)sessionCompletionNotifier;
+- (void)setSessionCompletionNotifier:(nullable RLMSyncBasicErrorReportingBlock)sessionCompletionNotifier;
 @end
 
 @interface SyncObject : RLMObject
@@ -37,8 +37,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface RLMSyncTestCase : RLMMultiProcessTestCase
-
-+ (RLMSyncManager *)managerForCurrentTest;
 
 + (NSURL *)authServerURL;
 + (NSURL *)secureAuthServerURL;

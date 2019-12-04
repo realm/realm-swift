@@ -219,10 +219,11 @@
     __block XCTestExpectation *ex;
     [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:YES
                                         blockOnRefreshCompletion:^(BOOL success) {
-                                            XCTAssertTrue(success);
-                                            refreshCount++;
-                                            [ex fulfill];
-                                        }];
+        XCTAssertTrue(success);
+        if (refreshCount++ == 3) { // arbitrary choice; refreshes every second
+            [ex fulfill];
+        }
+    }];
     // Open the Realm.
     NSURL *url = REALM_URL();
     RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
@@ -232,7 +233,7 @@
     ex = [self expectationWithDescription:@"Timer fired"];
     [self waitForExpectationsWithTimeout:10 handler:nil];
     XCTAssertTrue(errorCount == 0);
-    XCTAssertTrue(refreshCount > 0);
+    XCTAssertTrue(refreshCount >= 4);
 }
 
 #pragma mark - Users

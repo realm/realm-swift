@@ -120,12 +120,16 @@ struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
 
 static RLMSyncManager *s_sharedManager = nil;
 
+- (instancetype)initPrivate {
+    return self = [super init];
+}
+
 + (instancetype)sharedManager {
     static std::once_flag flag;
     std::call_once(flag, [] {
         try {
             [RLMSyncUser _setUpBindingContextFactory];
-            s_sharedManager = [[RLMSyncManager alloc] init];
+            s_sharedManager = [[RLMSyncManager alloc] initPrivate];
             [s_sharedManager configureWithRootDirectory:nil];
         }
         catch (std::exception const& e) {
@@ -274,6 +278,16 @@ static RLMSyncManager *s_sharedManager = nil;
 }
 
 + (void)resetForTesting {
+    RLMSyncManager *manager = self.sharedManager;
+    manager->_errorHandler = nil;
+    manager->_appID = nil;
+    manager->_userAgent = nil;
+    manager->_logger = nil;
+    manager->_authorizationHeaderName = nil;
+    manager->_customRequestHeaders = nil;
+    manager->_pinnedCertificatePaths = nil;
+    manager->_timeoutOptions = nil;
+
     SyncManager::shared().reset_for_testing();
 }
 
