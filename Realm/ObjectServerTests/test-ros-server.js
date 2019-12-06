@@ -85,6 +85,26 @@ class HeaderValidationProxy {
     }
 }
 
+// A proxy which sits in front of ROS and takes a long time to establish connections
+class SlowConnectingProxy {
+    constructor(listenPort, targetPort) {
+        this.proxy = httpProxy.createProxyServer({target: `http://127.0.0.1:${targetPort}`, ws: true});
+        this.proxy.on('error', e => {
+            console.log('proxy error', e);
+        });
+        this.server = http.createServer((req, res) => {
+            setTimeout(() => this.proxy.web(req, res), 2000);
+        });
+        this.server.on('upgrade', this.proxy.ws.bind(this.proxy));
+        this.server.listen(listenPort);
+    }
+
+    stop() {
+        this.server.close();
+        this.proxy.close();
+    }
+}
+
 
 const server = new ROS.BasicServer();
 server.start({
@@ -125,3 +145,4 @@ server.start({
     console.error(`Error starting Realm Object Server: ${err.message}`)
 });
 new HeaderValidationProxy(9081, 9080);
+new SlowConnectingProxy(9082, 9080);

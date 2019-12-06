@@ -131,7 +131,7 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
                 onCompletion:(RLMUserCompletionBlock)completion {
     [self logInWithCredentials:credential
                  authServerURL:authServerURL
-                       timeout:30
+                       timeout:0 // use timeout from RLMSyncManager
                  callbackQueue:dispatch_get_main_queue()
                   onCompletion:completion];
 }
