@@ -85,6 +85,15 @@ NS_ASSUME_NONNULL_BEGIN
 */
 @property (nonatomic, nullable, copy) NSString *urlPrefix;
 
+/**
+ Whether nonfatal connection errors should cancel async opens.
+
+ By default, if a nonfatal connection error such as a connection timing out occurs, any currently pending asyncOpen operations will ignore the error and continue to retry until it succeeds. If this is set to true, the open will instead fail and report the error.
+
+  FIXME: This should probably be true by default in the next major version.
+ */
+@property (nonatomic) bool cancelAsyncOpenOnNonFatalErrors;
+
 /// :nodoc:
 - (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url __attribute__((unavailable("Use [RLMSyncUser configurationWithURL:] instead")));
 

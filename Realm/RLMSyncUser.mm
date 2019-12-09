@@ -231,8 +231,7 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
                                                         realmURL:url ?: self.defaultRealmURL
                                                    customFileURL:nil
                                                        isPartial:!fullSynchronization
-                                                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-                                                    errorHandler:nullptr];
+                                                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
     syncConfig.urlPrefix = urlPrefix;
     syncConfig.enableSSLValidation = enableSSLValidation;
     syncConfig.pinnedCertificateURL = RLMSyncManager.sharedManager.pinnedCertificatePaths[syncConfig.realmURL.host];

@@ -73,6 +73,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     var task: Process?
 
     let authURL: URL = URL(string: "http://127.0.0.1:9080")!
+    let slowConnectAuthURL: URL = URL(string: "http://127.0.0.1:9083")!
     let realmURL: URL = URL(string: "realm://127.0.0.1:9080/~/testBasicSync")!
 
     /// For testing, make a unique Realm URL of the form "realm://127.0.0.1:9080/~/X",

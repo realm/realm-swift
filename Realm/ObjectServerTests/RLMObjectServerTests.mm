@@ -1748,33 +1748,31 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testAsyncOpenConnectionTimeout {
-    // First create the user, talking directly to ROS
     NSString *userName = NSStringFromSelector(_cmd);
-    @autoreleasepool {
-        RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:YES];
-        RLMSyncUser *user = [self logInUserForCredentials:credentials server:[NSURL URLWithString:@"http://127.0.0.1:9080"]];
-        [user logOut];
-    }
-
-    // 9082 is a proxy which delays responding to requests
-    NSURL *authURL = [NSURL URLWithString:@"http://127.0.0.1:9082"];
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userName register:NO]
+    // 9083 is a proxy which delays responding to requests
+    NSURL *authURL = [NSURL URLWithString:@"http://127.0.0.1:9083"];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userName register:YES]
                                                server:authURL];
     RLMRealmConfiguration *c = [user configuration];
+    RLMSyncConfiguration *syncConfig = c.syncConfiguration;
+    syncConfig.cancelAsyncOpenOnNonFatalErrors = true;
+    c.syncConfiguration = syncConfig;
 
     RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
     timeoutOptions.connectTimeout = 1000.0;
     RLMSyncManager.sharedManager.timeoutOptions = timeoutOptions;
 
-    XCTestExpectation *ex1 = [self expectationWithDescription:@"async open"];
+    XCTestExpectation *ex = [self expectationWithDescription:@"async open"];
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
         XCTAssertNotNil(error);
+        XCTAssertEqual(error.code, ETIMEDOUT);
+        XCTAssertEqual(error.domain, NSPOSIXErrorDomain);
         XCTAssertNil(realm);
-        [ex1 fulfill];
+        [ex fulfill];
     }];
-    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
 }
 
 #pragma mark - Compact on Launch
@@ -2265,8 +2263,6 @@ static NSURL *certificateURL(NSString *filename) {
 }
 
 - (void)verifyOpenFails:(RLMRealmConfiguration *)config {
-    [self openRealmWithConfiguration:config];
-
     XCTestExpectation *expectation = [self expectationWithDescription:@"wait for error"];
     RLMSyncManager.sharedManager.errorHandler = ^(NSError *error, __unused RLMSyncSession *session) {
         XCTAssertTrue([error.domain isEqualToString:RLMSyncErrorDomain]);
@@ -2274,6 +2270,7 @@ static NSURL *certificateURL(NSString *filename) {
         [expectation fulfill];
     };
 
+    [self openRealmWithConfiguration:config];
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
 }
 

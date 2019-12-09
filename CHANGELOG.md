@@ -5,6 +5,9 @@ x.y.z Release notes (yyyy-MM-dd)
   called instead of the default NSLog-based logger.
 * Expose configuration options for the various types of sync connection
   timeouts and heartbeat intervals on `RLMSyncManager`.
+* Add an option to have `Realm.asyncOpen()` report an error if the connection
+  times out rather than swallowing the error and attempting to reconnect until
+  it succeeds.
 
 ### Fixed
 * Fix a crash when using value(forKey:) on a LinkingObjects property (including

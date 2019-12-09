@@ -513,6 +513,15 @@ static NSURL *syncDirectoryForChildProcess() {
     REALM_ASSERT(RLMSyncManager.sharedManager._allUsers.count == 0);
     [RLMSyncManager resetForTesting];
 
+    [self setupSyncManager];
+}
+
+- (void)tearDown {
+    [self resetSyncManager];
+    [super tearDown];
+}
+
+- (void)setupSyncManager {
     NSURL *clientDataRoot;
     if (self.isParent) {
         [RealmObjectServer.sharedServer launch];
@@ -532,11 +541,10 @@ static NSURL *syncDirectoryForChildProcess() {
     syncManager.userAgent = self.name;
 }
 
-- (void)tearDown {
+- (void)resetSyncManager {
     [RLMSyncManager.sharedManager._allUsers makeObjectsPerformSelector:@selector(logOut)];
     [RLMSyncManager resetForTesting];
     [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:NO blockOnRefreshCompletion:nil];
-    [super tearDown];
 }
 
 @end

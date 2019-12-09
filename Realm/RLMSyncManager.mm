@@ -222,53 +222,6 @@ static RLMSyncManager *s_sharedManager = nil;
     });
 }
 
-- (void)_fireErrorWithCode:(int)errorCode
-                   message:(NSString *)message
-                   isFatal:(BOOL)fatal
-                   session:(RLMSyncSession *)session
-                  userInfo:(NSDictionary *)userInfo
-                errorClass:(RLMSyncSystemErrorKind)errorClass {
-    NSError *error = nil;
-    BOOL shouldMakeError = YES;
-    NSDictionary *custom = nil;
-    // Note that certain types of errors are 'interactive'; users have several options
-    // as to how to proceed after the error is reported.
-    switch (errorClass) {
-        case RLMSyncSystemErrorKindClientReset: {
-            std::string path = [userInfo[@(realm::SyncError::c_original_file_path_key)] UTF8String];
-            custom = @{kRLMSyncPathOfRealmBackupCopyKey:
-                           userInfo[@(realm::SyncError::c_recovery_file_path_key)],
-                       kRLMSyncErrorActionTokenKey:
-                           [[RLMSyncErrorActionToken alloc] initWithOriginalPath:std::move(path)]
-                       };;
-            break;
-        }
-        case RLMSyncSystemErrorKindPermissionDenied: {
-            std::string path = [userInfo[@(realm::SyncError::c_original_file_path_key)] UTF8String];
-            custom = @{kRLMSyncErrorActionTokenKey:
-                           [[RLMSyncErrorActionToken alloc] initWithOriginalPath:std::move(path)]
-                       };
-            break;
-        }
-        case RLMSyncSystemErrorKindUser:
-        case RLMSyncSystemErrorKindSession:
-            break;
-        case RLMSyncSystemErrorKindConnection:
-        case RLMSyncSystemErrorKindClient:
-        case RLMSyncSystemErrorKindUnknown:
-            // Report the error. There's nothing the user can do about it, though.
-            shouldMakeError = fatal;
-            break;
-    }
-    error = shouldMakeError ? make_sync_error(errorClass, message, errorCode, custom) : nil;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (!self.errorHandler || !error) {
-            return;
-        }
-        self.errorHandler(error, session);
-    });
-}
-
 - (NSArray<RLMSyncUser *> *)_allUsers {
     NSMutableArray<RLMSyncUser *> *buffer = [NSMutableArray array];
     for (auto user : SyncManager::shared().all_logged_in_users()) {

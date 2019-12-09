@@ -123,6 +123,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// Manually set the refresh token for a user. Used for testing invalid token conditions.
 - (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue;
 
+- (void)setupSyncManager;
+- (void)resetSyncManager;
+
 @end
 
 NS_ASSUME_NONNULL_END
