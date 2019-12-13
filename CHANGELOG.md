@@ -1,13 +1,23 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Reduce the encrypted page reclaimer's impact on battery life when encryption
+  is used. ([Core #3461](https://github.com/realm/realm-core/pull/3461)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* macOS binaries were built with the incorrect deployment target (10.14 rather
+  than 10.9), resulting in linker warnings. ([#6299](https://github.com/realm/realm-cocoa/issues/6299), since 3.18.0).
+* An internal datastructure for List properties could be double-deleted if the
+  last reference was released from a thread other than the one which the List
+  was created on at the wrong time. This would typically manifest as
+  "pthread_mutex_destroy() failed", but could also result in other kinds of
+  crashes. ([#6333](https://github.com/realm/realm-cocoa/issues/6333)).
+* Sorting on float or double properties containing NaN values had inconsistent
+  results and would sometimes crash due to out-of-bounds memory accesses.
+  ([#6357](https://github.com/realm/realm-cocoa/issues/6357)).
+* A NOT query on a `List<Object>` which happened to have the objects in a
+  different order than the underlying table would sometimes include the object
+  immediately before an object which matches the query. ([#6289](https://github.com/realm/realm-cocoa/issues/6289), since 0.90.0).
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
@@ -16,8 +26,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.3.
 
 ### Internal
-Upgraded realm-core from ? to ?
-Upgraded realm-sync from ? to ?
+* Upgraded realm-core from 5.23.6 to 5.23.8.
+* Upgraded realm-sync from 4.9.0 to 4.9.4.
 
 4.3.0 Release notes (2019-12-19)
 =============================================================
