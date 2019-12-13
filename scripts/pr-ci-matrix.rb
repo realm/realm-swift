@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # A script to generate the .jenkins.yml file for the CI pull request job
-xcode_versions = %w(10.0 10.1 10.2.1 10.3 11.1 11.2.1)
+xcode_versions = %w(10.0 10.1 10.3 11.1 11.2.1 11.3)
 configurations = %w(Debug Release)
 
 default = ->(v, c) { c == 'Release' or v == xcode_versions.last }
