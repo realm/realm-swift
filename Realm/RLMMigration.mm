@@ -79,8 +79,8 @@ using namespace realm;
 }
 
 - (void)enumerateObjects:(NSString *)className block:(__attribute__((noescape)) RLMObjectMigrationBlock)block {
-    RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm allObjects:className] : nil;
-    RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm allObjects:className] : nil;
+    RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm allObjects:className].snapshot : nil;
+    RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm allObjects:className].snapshot : nil;
 
     // For whatever reason if this is a newly added table we enumerate the
     // objects in it, while in all other cases we enumerate only the existing
