@@ -65,6 +65,7 @@ def doBuild() {
           unstash 'source'
           sh """
           export REALM_SWIFT_VERSION=${docsSwiftVersion}
+          export PATH='/Users/realm/.rbenv/bin:/Users/realm/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/realm/.gems/bin'
           ./scripts/reset-simulators.sh
           ./build.sh docs
           cd docs
