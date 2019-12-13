@@ -487,6 +487,13 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
     });
 }
 
+- (RLMResults *)snapshot {
+    return translateRLMResultsErrors([&] {
+        return [self subresultsWithResults:_results.snapshot()];
+    });
+}
+
+
 // The compiler complains about the method's argument type not matching due to
 // it not having the generic type attached, but it doesn't seem to be possible
 // to actually include the generic type
@@ -502,8 +509,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 }
 #pragma clang diagnostic pop
 
-- (BOOL)isAttached
-{
+- (BOOL)isAttached {
     return !!_realm;
 }
 
