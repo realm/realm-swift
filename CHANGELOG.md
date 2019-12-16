@@ -1,26 +1,22 @@
-x.y.z Release notes (yyyy-MM-dd)
+4.2.0 Release notes (2019-12-16)
 =============================================================
+
 ### Enhancements
+
 * Add `-[RLMRealm fileExistsForConfiguration:]`/`Realm.fileExists(for:)`,
   which checks if a local Realm file exists for the given configuration.
 * Add `-[RLMRealm deleteFilesForConfiguration:]`/`Realm.deleteFiles(for:)`
   to delete the Realm file and all auxiliary files for the given configuration.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
+
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 4.x.y series.
 * Carthage release for Swift is built with Xcode 11.3.
-
-### Internal
-Upgraded realm-core from ? to ?
-Upgraded realm-sync from ? to ?
 
 4.1.1 Release notes (2019-11-18)
 =============================================================
