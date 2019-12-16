@@ -180,7 +180,11 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 
 // Generic Swift properties can't be dynamic, so KVO doesn't work for them by default
 - (id)valueForUndefinedKey:(NSString *)key {
-    if (Ivar ivar = _objectSchema[key].swiftIvar) {
+    RLMProperty *prop = _objectSchema[key];
+    if (Class accessor = prop.swiftAccessor) {
+        return [accessor get:(char *)(__bridge void *)self + ivar_getOffset(prop.swiftIvar)];
+    }
+    if (Ivar ivar = prop.swiftIvar) {
         return RLMCoerceToNil(object_getIvar(self, ivar));
     }
     return [super valueForUndefinedKey:key];

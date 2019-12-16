@@ -7,8 +7,9 @@ x.y.z Release notes (yyyy-MM-dd)
   to delete the Realm file and all auxiliary files for the given configuration.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+* Fix a crash when using value(forKey:) on a LinkingObjects property (including
+  when doing so indirectly, such as by querying on that property).
+  ([#6366](https://github.com/realm/realm-cocoa/issues/6366), since 4.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
