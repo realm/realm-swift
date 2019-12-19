@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+4.2.0 Release notes (2019-12-19)
 =============================================================
+
 ### Enhancements
+
 * Add the ability to set a custom logger function on `RLMSyncManager` which is
   called instead of the default NSLog-based logger.
 * Expose configuration options for the various types of sync connection
@@ -10,22 +12,21 @@ x.y.z Release notes (yyyy-MM-dd)
   it succeeds.
 
 ### Fixed
+
 * Fix a crash when using value(forKey:) on a LinkingObjects property (including
   when doing so indirectly, such as by querying on that property).
   ([#6366](https://github.com/realm/realm-cocoa/issues/6366), since 4.0.0).
 * Fix a rare crash in `ClientHistoryImpl::integrate_server_changesets()` which
   would only happen in Debug builds (since v3.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 4.x.y series.
 * Carthage release for Swift is built with Xcode 11.3.
 
 ### Internal
-* Upgraded realm-core from ? to ?
+
 * Upgraded realm-sync from 4.8.2 to 4.9.0.
 
 4.2.0 Release notes (2019-12-16)
