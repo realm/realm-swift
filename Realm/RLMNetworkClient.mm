@@ -42,8 +42,6 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     return NSMakeRange(type*100, kHTTPCodeRange);
 }
 
-static std::atomic<NSTimeInterval> g_defaultTimeout{60.0};
-
 #pragma mark Network client
 
 @interface RLMSessionDelegate <NSURLSessionDelegate> : NSObject
@@ -71,7 +69,7 @@ static std::atomic<NSTimeInterval> g_defaultTimeout{60.0};
 + (void)sendRequestToServer:(NSURL *)serverURL
                        JSON:(NSDictionary *)jsonDictionary
                  completion:(void (^)(NSError *))completionBlock {
-    [self sendRequestToServer:serverURL JSON:jsonDictionary timeout:g_defaultTimeout.load()
+    [self sendRequestToServer:serverURL JSON:jsonDictionary timeout:0
                    completion:^(NSError *error, NSDictionary *) {
         completionBlock(error);
     }];
@@ -80,6 +78,14 @@ static std::atomic<NSTimeInterval> g_defaultTimeout{60.0};
                        JSON:(NSDictionary *)jsonDictionary
                     timeout:(NSTimeInterval)timeout
                  completion:(void (^)(NSError *, NSDictionary *))completionBlock {
+    // If the timeout isn't set then use the timeout set on the sync manager,
+    // or 60 seconds if it isn't set there either.
+    RLMSyncManager *syncManager = RLMSyncManager.sharedManager;
+    if (timeout < 1)
+        timeout = syncManager.timeoutOptions.connectTimeout / 1000.0;
+    if (timeout < 1)
+        timeout = 60.0;
+
     // Create the request
     NSError *localError = nil;
     NSURL *requestURL = [self urlForAuthServer:serverURL payload:jsonDictionary];
@@ -92,8 +98,8 @@ static std::atomic<NSTimeInterval> g_defaultTimeout{60.0};
             return;
         }
     }
-    request.timeoutInterval = MAX(timeout, 10);
-    RLMNetworkRequestOptions *options = RLMSyncManager.sharedManager.networkRequestOptions;
+    request.timeoutInterval = timeout;
+    RLMNetworkRequestOptions *options = syncManager.networkRequestOptions;
     NSDictionary<NSString *, NSString *> *headers = [self httpHeadersForPayload:jsonDictionary options:options];
     for (NSString *key in headers) {
         [request addValue:headers[key] forHTTPHeaderField:key];

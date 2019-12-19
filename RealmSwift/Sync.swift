@@ -57,6 +57,13 @@ extension SyncManager {
 }
 
 /**
+ Options for configuring timeouts and intervals in the sync client.
+
+  - see: `RLMSyncTimeoutOptions`
+ */
+public typealias SyncTimeoutOptions = RLMSyncTimeoutOptions
+
+/**
  A session object which represents communication between the client and server for a specific
  Realm.
 
@@ -259,6 +266,14 @@ public struct SyncConfiguration {
      */
     public let urlPrefix: String?
 
+    /**
+     By default, Realm.asyncOpen() swallows non-fatal connection errors such as
+     a connection attempt timing out and simply retries until it succeeds. If
+     this is set to `true`, instead the error will be reported to the callback
+     and the async open will be cancelled.
+     */
+    public let cancelAsyncOpenOnNonFatalErrors: Bool
+
     internal init(config: RLMSyncConfiguration) {
         self.user = config.user
         self.realmURL = config.realmURL
@@ -270,6 +285,7 @@ public struct SyncConfiguration {
         }
         self.fullSynchronization = config.fullSynchronization
         self.urlPrefix = config.urlPrefix
+        self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
     }
 
     func asConfig() -> RLMSyncConfiguration {
@@ -283,12 +299,14 @@ public struct SyncConfiguration {
         case .pinCertificate(let path):
             certificate = path
         }
-        return RLMSyncConfiguration(user: user, realmURL: realmURL,
-                                    isPartial: !fullSynchronization,
-                                    urlPrefix: urlPrefix,
-                                    stopPolicy: stopPolicy,
-                                    enableSSLValidation: validateSSL,
-                                    certificatePath: certificate)
+        let c = RLMSyncConfiguration(user: user, realmURL: realmURL,
+                                     isPartial: !fullSynchronization,
+                                     urlPrefix: urlPrefix,
+                                     stopPolicy: stopPolicy,
+                                     enableSSLValidation: validateSSL,
+                                     certificatePath: certificate)
+        c.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
+        return c
     }
 
     /// :nodoc:
@@ -500,7 +518,7 @@ extension SyncUser {
      - warning: NEVER disable SSL validation for a system running in production.
      */
     public func configuration(realmURL: URL? = nil, fullSynchronization: Bool = false,
-                              enableSSLValidation: Bool = true, urlPrefix: String? = nil) -> Realm.Configuration {
+                              enableSSLValidation: Bool, urlPrefix: String? = nil) -> Realm.Configuration {
         let config = self.__configuration(with: realmURL,
                                           fullSynchronization: fullSynchronization,
                                           enableSSLValidation: enableSSLValidation,
@@ -511,24 +529,36 @@ extension SyncUser {
     /**
      Create a sync configuration instance.
 
-     Additional settings can be optionally specified. Descriptions of these
-     settings follow.
-
-     `serverValidationPolicy` defaults to `.system`. It can be set to
-     `.pinCertificate` to pin a specific SSL certificate, or `.none` for
-     debugging purposes.
-
-     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
-     `.realm`, `.realm.lock` or `.realm.management`.
+     - parameter realmURL: The URL to connect to. If not set, the default Realm
+     derived from the authentication URL is used. The URL must be absolute (e.g.
+     `realms://example.com/~/foo`), and cannot end with `.realm`, `.realm.lock`
+     or `.realm.management`.
+     - parameter serverValidationPolicy: How the SSL certificate of the Realm Object
+     Server should be validated. By default the system SSL validation is used,
+     but it can be set to `.pinCertificate` to pin a specific SSL certificate,
+     or `.none` for debugging.
+     - parameter fullSynchronization: Whether this Realm should be a fully
+     synchronized or a query-based Realm.
+     - parameter urlPrefix: The prefix that is prepended to the path in the HTTP
+     request that initiates a sync connection. The value specified must match
+     with the server's expectation, and this parameter only needs to be set if
+     you have changed the configuration of the server.
+     - parameter cancelAsyncOpenOnNonFatalErrors: By default, Realm.asyncOpen()
+     swallows non-fatal connection errors such as a connection attempt timing
+     out and simply retries until it succeeds. If this is set to `true`, instead
+     the error will be reported to the callback and the async open will be
+     cancelled.
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
     public func configuration(realmURL: URL? = nil, fullSynchronization: Bool = false,
-                              serverValidationPolicy: ServerValidationPolicy,
-                              urlPrefix: String? = nil) -> Realm.Configuration {
+                              serverValidationPolicy: ServerValidationPolicy = .system,
+                              urlPrefix: String? = nil,
+                              cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
         let config = self.__configuration(with: realmURL, fullSynchronization: fullSynchronization)
         let syncConfig = config.syncConfiguration!
         syncConfig.urlPrefix = urlPrefix
+        syncConfig.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         switch serverValidationPolicy {
         case .none:
             syncConfig.enableSSLValidation = false

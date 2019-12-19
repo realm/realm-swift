@@ -73,6 +73,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     var task: Process?
 
     let authURL: URL = URL(string: "http://127.0.0.1:9080")!
+    let slowConnectAuthURL: URL = URL(string: "http://127.0.0.1:9083")!
     let realmURL: URL = URL(string: "realm://127.0.0.1:9080/~/testBasicSync")!
 
     /// For testing, make a unique Realm URL of the form "realm://127.0.0.1:9080/~/X",
@@ -110,6 +111,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         SyncManager.shared.setSessionCompletionNotifier(basicBlock)
         let realm = try Realm(configuration: configuration)
         let result = semaphore.wait(timeout: .now() + DispatchTimeInterval.seconds(20))
+        SyncManager.shared.setSessionCompletionNotifier(nil)
         XCTAssertEqual(result, .success)
         return realm
     }

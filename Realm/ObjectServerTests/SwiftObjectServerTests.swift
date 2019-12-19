@@ -354,6 +354,48 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         waitForExpectations(timeout: 10.0, handler: nil)
     }
 
+    func testAsyncOpenTimeout() {
+        let syncTimeoutOptions = SyncTimeoutOptions()
+        syncTimeoutOptions.connectTimeout = 3000
+        SyncManager.shared.timeoutOptions = syncTimeoutOptions
+
+        // The server proxy adds a 2 second delay, so a 3 second timeout should succeed
+        autoreleasepool {
+            let user = try! synchronouslyLogInUser(for: basicCredentials(register: true), server: slowConnectAuthURL)
+            let config = user.configuration(cancelAsyncOpenOnNonFatalErrors: true)
+            let ex = expectation(description: "async open")
+            Realm.asyncOpen(configuration: config) { _, error in
+                XCTAssertNil(error)
+                ex.fulfill()
+            }
+            waitForExpectations(timeout: 10.0, handler: nil)
+            user.logOut()
+        }
+
+        self.resetSyncManager()
+        self.setupSyncManager()
+
+        // and a 1 second timeout should fail
+        autoreleasepool {
+            let user = try! synchronouslyLogInUser(for: basicCredentials(register: true), server: slowConnectAuthURL)
+            let config = user.configuration(cancelAsyncOpenOnNonFatalErrors: true)
+
+            syncTimeoutOptions.connectTimeout = 1000
+            SyncManager.shared.timeoutOptions = syncTimeoutOptions
+
+            let ex = expectation(description: "async open")
+            Realm.asyncOpen(configuration: config) { _, error in
+                XCTAssertNotNil(error)
+                if let error = error as NSError? {
+                    XCTAssertEqual(error.code, Int(ETIMEDOUT))
+                    XCTAssertEqual(error.domain, NSPOSIXErrorDomain)
+                }
+                ex.fulfill()
+            }
+            waitForExpectations(timeout: 4.0, handler: nil)
+        }
+    }
+
     // MARK: - Administration
 
     func testRetrieveUserInfo() {

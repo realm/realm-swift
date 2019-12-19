@@ -219,10 +219,11 @@
     __block XCTestExpectation *ex;
     [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:YES
                                         blockOnRefreshCompletion:^(BOOL success) {
-                                            XCTAssertTrue(success);
-                                            refreshCount++;
-                                            [ex fulfill];
-                                        }];
+        XCTAssertTrue(success);
+        if (refreshCount++ == 3) { // arbitrary choice; refreshes every second
+            [ex fulfill];
+        }
+    }];
     // Open the Realm.
     NSURL *url = REALM_URL();
     RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
@@ -232,7 +233,91 @@
     ex = [self expectationWithDescription:@"Timer fired"];
     [self waitForExpectationsWithTimeout:10 handler:nil];
     XCTAssertTrue(errorCount == 0);
-    XCTAssertTrue(refreshCount > 0);
+    XCTAssertTrue(refreshCount >= 4);
+}
+
+- (void)testLoginConnectionTimeoutFromManager {
+    // First create the user, talking directly to ROS
+    NSString *userName = NSStringFromSelector(_cmd);
+    @autoreleasepool {
+        RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:YES];
+        RLMSyncUser *user = [self logInUserForCredentials:credentials server:[NSURL URLWithString:@"http://127.0.0.1:9080"]];
+        [user logOut];
+    }
+
+    RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
+
+    // 9082 is a proxy which delays responding to requests
+    NSURL *authURL = [NSURL URLWithString:@"http://127.0.0.1:9082"];
+
+    // Login attempt should time out
+    timeoutOptions.connectTimeout = 1000.0;
+    RLMSyncManager.sharedManager.timeoutOptions = timeoutOptions;
+
+    RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:NO];
+    XCTestExpectation *ex = [self expectationWithDescription:@"Login should time out"];
+    [RLMSyncUser logInWithCredentials:credentials authServerURL:authURL
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNil(user);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, NSURLErrorDomain);
+        XCTAssertEqual(error.code, NSURLErrorTimedOut);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Login attempt should succeeed
+    timeoutOptions.connectTimeout = 3000.0;
+    RLMSyncManager.sharedManager.timeoutOptions = timeoutOptions;
+
+    ex = [self expectationWithDescription:@"Login should succeed"];
+    [RLMSyncUser logInWithCredentials:credentials authServerURL:authURL
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+        [user logOut];
+        XCTAssertNotNil(user);
+        XCTAssertNil(error);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:3.0 handler:nil];
+}
+
+- (void)testLoginConnectionTimeoutDirect {
+    // First create the user, talking directly to ROS
+    NSString *userName = NSStringFromSelector(_cmd);
+    @autoreleasepool {
+        RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:YES];
+        RLMSyncUser *user = [self logInUserForCredentials:credentials server:[NSURL URLWithString:@"http://127.0.0.1:9080"]];
+        [user logOut];
+    }
+
+    // 9082 is a proxy which delays responding to requests
+    NSURL *authURL = [NSURL URLWithString:@"http://127.0.0.1:9082"];
+
+    // Login attempt should time out
+    RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:NO];
+    XCTestExpectation *ex = [self expectationWithDescription:@"Login should time out"];
+    [RLMSyncUser logInWithCredentials:credentials authServerURL:authURL
+                              timeout:1.0 callbackQueue:dispatch_get_main_queue()
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNil(user);
+        XCTAssertNotNil(error);
+        XCTAssertEqualObjects(error.domain, NSURLErrorDomain);
+        XCTAssertEqual(error.code, NSURLErrorTimedOut);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
+    // Login attempt should succeeed
+    ex = [self expectationWithDescription:@"Login should succeed"];
+    [RLMSyncUser logInWithCredentials:credentials authServerURL:authURL
+                              timeout:3.0 callbackQueue:dispatch_get_main_queue()
+                         onCompletion:^(RLMSyncUser *user, NSError *error) {
+        [user logOut];
+        XCTAssertNotNil(user);
+        XCTAssertNil(error);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:3.0 handler:nil];
 }
 
 #pragma mark - Users
@@ -1662,6 +1747,34 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 
+- (void)testAsyncOpenConnectionTimeout {
+    NSString *userName = NSStringFromSelector(_cmd);
+    // 9083 is a proxy which delays responding to requests
+    NSURL *authURL = [NSURL URLWithString:@"http://127.0.0.1:9083"];
+    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:userName register:YES]
+                                               server:authURL];
+    RLMRealmConfiguration *c = [user configuration];
+    RLMSyncConfiguration *syncConfig = c.syncConfiguration;
+    syncConfig.cancelAsyncOpenOnNonFatalErrors = true;
+    c.syncConfiguration = syncConfig;
+
+    RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
+    timeoutOptions.connectTimeout = 1000.0;
+    RLMSyncManager.sharedManager.timeoutOptions = timeoutOptions;
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"async open"];
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.code, ETIMEDOUT);
+        XCTAssertEqual(error.domain, NSPOSIXErrorDomain);
+        XCTAssertNil(realm);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+}
+
 #pragma mark - Compact on Launch
 
 - (void)testCompactOnLaunch {
@@ -2150,8 +2263,6 @@ static NSURL *certificateURL(NSString *filename) {
 }
 
 - (void)verifyOpenFails:(RLMRealmConfiguration *)config {
-    [self openRealmWithConfiguration:config];
-
     XCTestExpectation *expectation = [self expectationWithDescription:@"wait for error"];
     RLMSyncManager.sharedManager.errorHandler = ^(NSError *error, __unused RLMSyncSession *session) {
         XCTAssertTrue([error.domain isEqualToString:RLMSyncErrorDomain]);
@@ -2159,6 +2270,7 @@ static NSURL *certificateURL(NSString *filename) {
         [expectation fulfill];
     };
 
+    [self openRealmWithConfiguration:config];
     [self waitForExpectationsWithTimeout:20.0 handler:nil];
 }
 

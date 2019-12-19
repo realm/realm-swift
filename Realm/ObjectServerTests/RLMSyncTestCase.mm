@@ -24,7 +24,7 @@
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration_Private.h"
-#import "RLMSyncManager+ObjectServerTests.h"
+#import "RLMSyncManager_Private.h"
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncConfiguration_Private.h"
 #import "RLMUtil.hpp"
@@ -53,7 +53,8 @@ static NSString *nodePath() {
 
 @interface RLMSyncManager ()
 + (void)_setCustomBundleID:(NSString *)customBundleID;
-- (instancetype)initWithCustomRootDirectory:(NSURL *)rootDirectory;
+- (void)configureWithRootDirectory:(NSURL *)rootDirectory;
+- (NSArray<RLMSyncUser *> *)_allUsers;
 @end
 
 @interface RLMSyncTestCase ()
@@ -90,7 +91,6 @@ static NSString *nodePath() {
 @end
 
 static NSTask *s_task;
-static RLMSyncManager *s_managerForTest;
 
 static NSURL *syncDirectoryForChildProcess() {
     NSString *path = NSSearchPathForDirectoriesInDomains(NSApplicationSupportDirectory, NSUserDomainMask, YES)[0];
@@ -240,10 +240,6 @@ static NSURL *syncDirectoryForChildProcess() {
 
 @implementation RLMSyncTestCase
 
-+ (RLMSyncManager *)managerForCurrentTest {
-    return s_managerForTest;
-}
-
 #pragma mark - Helper methods
 
 - (BOOL)isPartial {
@@ -323,6 +319,7 @@ static NSURL *syncDirectoryForChildProcess() {
     // Wait for login to succeed or fail.
     XCTAssert(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0,
               @"Timed out while trying to asynchronously open Realm for URL: %@", url);
+    RLMSyncManager.sharedManager.sessionCompletionNotifier = nil;
     return realm;
 }
 
@@ -512,6 +509,19 @@ static NSURL *syncDirectoryForChildProcess() {
 - (void)setUp {
     [super setUp];
     self.continueAfterFailure = NO;
+
+    REALM_ASSERT(RLMSyncManager.sharedManager._allUsers.count == 0);
+    [RLMSyncManager resetForTesting];
+
+    [self setupSyncManager];
+}
+
+- (void)tearDown {
+    [self resetSyncManager];
+    [super tearDown];
+}
+
+- (void)setupSyncManager {
     NSURL *clientDataRoot;
     if (self.isParent) {
         [RealmObjectServer.sharedServer launch];
@@ -520,21 +530,21 @@ static NSURL *syncDirectoryForChildProcess() {
     else {
         clientDataRoot = syncDirectoryForChildProcess();
     }
+
     NSError *error;
     [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:&error];
     [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
                            withIntermediateDirectories:YES attributes:nil error:&error];
-    s_managerForTest = [[RLMSyncManager alloc] initWithCustomRootDirectory:clientDataRoot];
-    [RLMSyncManager sharedManager].logLevel = RLMSyncLogLevelOff;
-    [RLMSyncManager sharedManager].userAgent = self.name;
+    RLMSyncManager *syncManager = RLMSyncManager.sharedManager;
+    [syncManager configureWithRootDirectory:clientDataRoot];
+    syncManager.logLevel = RLMSyncLogLevelOff;
+    syncManager.userAgent = self.name;
 }
 
-- (void)tearDown {
-    [s_managerForTest prepareForDestruction];
-    s_managerForTest = nil;
+- (void)resetSyncManager {
+    [RLMSyncManager.sharedManager._allUsers makeObjectsPerformSelector:@selector(logOut)];
+    [RLMSyncManager resetForTesting];
     [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:NO blockOnRefreshCompletion:nil];
-
-    [super tearDown];
 }
 
 @end

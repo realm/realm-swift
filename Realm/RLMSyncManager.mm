@@ -68,6 +68,8 @@ RLMSyncLogLevel logLevelForLevel(Level logLevel) {
     REALM_UNREACHABLE();    // Unrecognized log level.
 }
 
+#pragma mark - Loggers
+
 struct CocoaSyncLogger : public realm::util::RootLogger {
     void do_log(Level, std::string message) override {
         NSLog(@"Sync: %@", RLMStringDataToNSString(message));
@@ -82,21 +84,53 @@ struct CocoaSyncLoggerFactory : public realm::SyncLoggerFactory {
     }
 } s_syncLoggerFactory;
 
+struct CallbackLogger : public realm::util::RootLogger {
+    RLMSyncLogFunction logFn;
+    void do_log(Level level, std::string message) override {
+        @autoreleasepool {
+            logFn(logLevelForLevel(level), RLMStringDataToNSString(message));
+        }
+    }
+};
+struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
+    RLMSyncLogFunction logFn;
+    std::unique_ptr<realm::util::Logger> make_logger(realm::util::Logger::Level level) override {
+        auto logger = std::make_unique<CallbackLogger>();
+        logger->logFn = logFn;
+        logger->set_level_threshold(level);
+        return std::move(logger); // not a redundant move because it's a different type
+    }
+
+    CallbackLoggerFactory(RLMSyncLogFunction logFn) : logFn(logFn) { }
+};
+
 } // anonymous namespace
 
-@interface RLMSyncManager ()
-- (instancetype)initWithCustomRootDirectory:(nullable NSURL *)rootDirectory NS_DESIGNATED_INITIALIZER;
+#pragma mark - RLMSyncManager
+
+@interface RLMSyncTimeoutOptions () {
+    @public
+    realm::SyncClientTimeouts _options;
+}
 @end
 
-@implementation RLMSyncManager
+@implementation RLMSyncManager {
+    std::unique_ptr<CallbackLoggerFactory> _loggerFactory;
+}
 
 static RLMSyncManager *s_sharedManager = nil;
+
+- (instancetype)initPrivate {
+    return self = [super init];
+}
 
 + (instancetype)sharedManager {
     static std::once_flag flag;
     std::call_once(flag, [] {
         try {
-            s_sharedManager = [[RLMSyncManager alloc] initWithCustomRootDirectory:nil];
+            [RLMSyncUser _setUpBindingContextFactory];
+            s_sharedManager = [[RLMSyncManager alloc] initPrivate];
+            [s_sharedManager configureWithRootDirectory:nil];
         }
         catch (std::exception const& e) {
             @throw RLMException(e);
@@ -105,25 +139,23 @@ static RLMSyncManager *s_sharedManager = nil;
     return s_sharedManager;
 }
 
-- (instancetype)initWithCustomRootDirectory:(NSURL *)rootDirectory {
-    if (self = [super init]) {
-        [RLMSyncUser _setUpBindingContextFactory];
-
-        // Initialize the sync engine.
-        SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
-        bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
-        auto mode = should_encrypt ? SyncManager::MetadataMode::Encryption : SyncManager::MetadataMode::NoEncryption;
+- (void)configureWithRootDirectory:(NSURL *)rootDirectory {
+    SyncClientConfig config;
+    bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
+    config.logger_factory = &s_syncLoggerFactory;
+    config.metadata_mode = should_encrypt ? SyncManager::MetadataMode::Encryption
+                                          : SyncManager::MetadataMode::NoEncryption;
+    @autoreleasepool {
         rootDirectory = rootDirectory ?: [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
-        @autoreleasepool {
-            bool isSwift = !!NSClassFromString(@"RealmSwiftObjectUtil");
-            auto userAgent = [[NSMutableString alloc] initWithFormat:@"Realm%@/%@",
-                              isSwift ? @"Swift" : @"ObjectiveC", REALM_COCOA_VERSION];
-            SyncManager::shared().configure(rootDirectory.path.UTF8String, mode, RLMStringDataWithNSString(userAgent), none, true);
-            SyncManager::shared().set_user_agent(RLMStringDataWithNSString(self.appID));
-        }
-        return self;
+        config.base_file_path = rootDirectory.path.UTF8String;
+
+        bool isSwift = !!NSClassFromString(@"RealmSwiftObjectUtil");
+        config.user_agent_binding_info =
+            util::format("Realm%1/%2", isSwift ? "Swift" : "ObjectiveC",
+                         RLMStringDataWithNSString(REALM_COCOA_VERSION));
+        config.user_agent_application_info = RLMStringDataWithNSString(self.appID);
     }
-    return nil;
+    SyncManager::shared().configure(config);
 }
 
 - (NSString *)appID {
@@ -153,6 +185,23 @@ static RLMSyncManager *s_sharedManager = nil;
     }
 }
 
+- (void)setLogger:(RLMSyncLogFunction)logFn {
+    _logger = logFn;
+    if (_logger) {
+        _loggerFactory = std::make_unique<CallbackLoggerFactory>(logFn);
+        SyncManager::shared().set_logger_factory(*_loggerFactory);
+    }
+    else {
+        _loggerFactory = nullptr;
+        SyncManager::shared().set_logger_factory(s_syncLoggerFactory);
+    }
+}
+
+- (void)setTimeoutOptions:(RLMSyncTimeoutOptions *)timeoutOptions {
+    _timeoutOptions = timeoutOptions;
+    SyncManager::shared().set_timeouts(timeoutOptions->_options);
+}
+
 #pragma mark - Passthrough properties
 
 - (RLMSyncLogLevel)logLevel {
@@ -173,53 +222,6 @@ static RLMSyncManager *s_sharedManager = nil;
     });
 }
 
-- (void)_fireErrorWithCode:(int)errorCode
-                   message:(NSString *)message
-                   isFatal:(BOOL)fatal
-                   session:(RLMSyncSession *)session
-                  userInfo:(NSDictionary *)userInfo
-                errorClass:(RLMSyncSystemErrorKind)errorClass {
-    NSError *error = nil;
-    BOOL shouldMakeError = YES;
-    NSDictionary *custom = nil;
-    // Note that certain types of errors are 'interactive'; users have several options
-    // as to how to proceed after the error is reported.
-    switch (errorClass) {
-        case RLMSyncSystemErrorKindClientReset: {
-            std::string path = [userInfo[@(realm::SyncError::c_original_file_path_key)] UTF8String];
-            custom = @{kRLMSyncPathOfRealmBackupCopyKey:
-                           userInfo[@(realm::SyncError::c_recovery_file_path_key)],
-                       kRLMSyncErrorActionTokenKey:
-                           [[RLMSyncErrorActionToken alloc] initWithOriginalPath:std::move(path)]
-                       };;
-            break;
-        }
-        case RLMSyncSystemErrorKindPermissionDenied: {
-            std::string path = [userInfo[@(realm::SyncError::c_original_file_path_key)] UTF8String];
-            custom = @{kRLMSyncErrorActionTokenKey:
-                           [[RLMSyncErrorActionToken alloc] initWithOriginalPath:std::move(path)]
-                       };
-            break;
-        }
-        case RLMSyncSystemErrorKindUser:
-        case RLMSyncSystemErrorKindSession:
-            break;
-        case RLMSyncSystemErrorKindConnection:
-        case RLMSyncSystemErrorKindClient:
-        case RLMSyncSystemErrorKindUnknown:
-            // Report the error. There's nothing the user can do about it, though.
-            shouldMakeError = fatal;
-            break;
-    }
-    error = shouldMakeError ? make_sync_error(errorClass, message, errorCode, custom) : nil;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (!self.errorHandler || !error) {
-            return;
-        }
-        self.errorHandler(error, session);
-    });
-}
-
 - (NSArray<RLMSyncUser *> *)_allUsers {
     NSMutableArray<RLMSyncUser *> *buffer = [NSMutableArray array];
     for (auto user : SyncManager::shared().all_logged_in_users()) {
@@ -229,6 +231,16 @@ static RLMSyncManager *s_sharedManager = nil;
 }
 
 + (void)resetForTesting {
+    RLMSyncManager *manager = self.sharedManager;
+    manager->_errorHandler = nil;
+    manager->_appID = nil;
+    manager->_userAgent = nil;
+    manager->_logger = nil;
+    manager->_authorizationHeaderName = nil;
+    manager->_customRequestHeaders = nil;
+    manager->_pinnedCertificatePaths = nil;
+    manager->_timeoutOptions = nil;
+
     SyncManager::shared().reset_for_testing();
 }
 
@@ -238,6 +250,46 @@ static RLMSyncManager *s_sharedManager = nil;
     options.customHeaders = self.customRequestHeaders;
     options.pinnedCertificatePaths = self.pinnedCertificatePaths;
     return options;
+}
+
+@end
+
+#pragma mark - RLMSyncTimeoutOptions
+
+@implementation RLMSyncTimeoutOptions
+- (NSUInteger)connectTimeout {
+    return _options.connect_timeout;
+}
+- (void)setConnectTimeout:(NSUInteger)connectTimeout {
+    _options.connect_timeout = connectTimeout;
+}
+
+- (NSUInteger)connectLingerTime {
+    return _options.connection_linger_time;
+}
+- (void)setConnectionLingerTime:(NSUInteger)connectionLingerTime {
+    _options.connection_linger_time = connectionLingerTime;
+}
+
+- (NSUInteger)pingKeepalivePeriod {
+    return _options.ping_keepalive_period;
+}
+- (void)setPingKeepalivePeriod:(NSUInteger)pingKeepalivePeriod {
+    _options.ping_keepalive_period = pingKeepalivePeriod;
+}
+
+- (NSUInteger)pongKeepaliveTimeout {
+    return _options.pong_keepalive_timeout;
+}
+- (void)setPongKeepaliveTimeout:(NSUInteger)pongKeepaliveTimeout {
+    _options.pong_keepalive_timeout = pongKeepaliveTimeout;
+}
+
+- (NSUInteger)fastReconnectLimit {
+    return _options.fast_reconnect_limit;
+}
+- (void)setFastReconnectLimit:(NSUInteger)fastReconnectLimit {
+    _options.fast_reconnect_limit = fastReconnectLimit;
 }
 
 @end
