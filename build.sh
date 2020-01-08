@@ -571,7 +571,10 @@ case "$COMMAND" in
             exit 1
         fi
 
-        xc "-scheme Realm -configuration $CONFIGURATION REALM_CATALYST_FLAGS='-target x86_64-apple-ios13.0-macabi' REALM_PLATFORM_SUFFIX='maccatalyst'"
+        xc "-scheme Realm -configuration $CONFIGURATION \
+            REALM_CATALYST_FLAGS='-target x86_64-apple-ios13.0-macabi' \
+            REALM_PLATFORM_SUFFIX='maccatalyst' \
+            IS_MACCATALYST=YES"
         clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/Realm.framework" "build/catalyst" "Realm.framework"
         ;;
 
@@ -587,7 +590,8 @@ case "$COMMAND" in
             REALM_CATALYST_FLAGS='-target x86_64-apple-ios13.0-macabi' \
             REALM_PLATFORM_SUFFIX='maccatalyst' \
             SWIFT_DEPLOYMENT_TARGET='13.0-macabi' \
-            SWIFT_PLATFORM_TARGET_PREFIX='ios'"
+            SWIFT_PLATFORM_TARGET_PREFIX='ios' \
+            IS_MACCATALYST=YES"
         destination="build/catalyst/swift-$REALM_XCODE_VERSION"
         clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
         rm -rf "$destination/Realm.framework"
