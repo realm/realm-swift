@@ -25,7 +25,7 @@
 static const NSString *const kRLMSyncAccessTokenKey     = @"access_token";
 static const NSString *const kRLMSyncAccountsKey        = @"accounts";
 static const NSString *const kRLMSyncErrorCodeKey       = @"code";
-static const NSString *const kRLMSyncExpiresKey         = @"expires";
+static const NSString *const kRLMSyncExpiresKey         = @"exp";
 static const NSString *const kRLMSyncErrorHintKey       = @"hint";
 static const NSString *const kRLMSyncIdKey              = @"id";
 static const NSString *const kRLMSyncKeyKey             = @"key";
@@ -36,7 +36,49 @@ static const NSString *const kRLMSyncErrorTitleKey      = @"title";
 static const NSString *const kRLMSyncTokenDataKey       = @"token_data";
 static const NSString *const kRLMSyncUserKey            = @"user";
 static const NSString *const kRLMSyncValueKey           = @"value";
+static const NSString *const kRLMSyncIssuedAtKey        = @"iat";
+static const NSString *const kRLMSyncUserDataKey        = @"user_data";
 
+@implementation RLMJwt
+
++(NSArray<NSString *>*)splitToken:(NSString *)jwt {
+    NSArray* parts = [jwt componentsSeparatedByString:@"."];
+    if ([parts count] != 3) {
+        @throw [[NSError alloc] initWithDomain:NSCocoaErrorDomain code:-1 userInfo:@{}];
+    }
+    return parts;
+}
+
+-(instancetype)initWithEncodedJWT:(NSString *)encodedJWT {
+    if (self = [super init]) {
+        NSArray<NSString *> *parts = [RLMJwt splitToken:encodedJWT];
+
+        NSString *secondPart = parts[1];
+
+        NSUInteger secondPartLength = [secondPart length];
+        NSInteger extraCharacters = secondPartLength % 4;
+
+        if (extraCharacters != 0) {
+            secondPart = [secondPart
+                          stringByPaddingToLength:secondPartLength + 4 - extraCharacters
+                          withString:@"="
+                          startingAtIndex:0];
+        }
+
+        NSData *json = [[NSData alloc] initWithBase64EncodedString:secondPart options:0];
+
+        NSDictionary *token = [NSJSONSerialization JSONObjectWithData:json options:0 error:nil];
+
+        self.token = encodedJWT;
+        self.expires  = [token[kRLMSyncExpiresKey] doubleValue];
+        self.issuedAt = [token[kRLMSyncIssuedAtKey] doubleValue];
+        self.userData = token[kRLMSyncUserDataKey];
+
+        return self;
+    }
+    return nil;
+}
+@end
 #pragma mark - RLMTokenDataModel
 
 @interface RLMTokenDataModel ()
@@ -51,14 +93,10 @@ static const NSString *const kRLMSyncValueKey           = @"value";
 
 @implementation RLMTokenDataModel
 
-- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary {
+- (instancetype)initWithJWT:(RLMJwt *)jwt {
     if (self = [super init]) {
         self.isAdmin = NO;
-        RLM_SYNC_PARSE_STRING_OR_ABORT(jsonDictionary, kRLMSyncIdentityKey, identity);
-        RLM_SYNC_PARSE_OPTIONAL_STRING(jsonDictionary, kRLMSyncAppIDKey, appID);
-        RLM_SYNC_PARSE_OPTIONAL_STRING(jsonDictionary, kRLMSyncPathKey, path);
-        RLM_SYNC_PARSE_OPTIONAL_BOOL(jsonDictionary, kRLMSyncIsAdminKey, isAdmin);
-        RLM_SYNC_PARSE_DOUBLE_OR_ABORT(jsonDictionary, kRLMSyncExpiresKey, expires);
+        self.expires = jwt.expires;
         return self;
     }
     return nil;
@@ -78,11 +116,10 @@ static const NSString *const kRLMSyncValueKey           = @"value";
 
 @implementation RLMTokenModel
 
-- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary {
+- (instancetype)initWithJWT:(RLMJwt *)jwt {
     if (self = [super init]) {
-        RLM_SYNC_PARSE_STRING_OR_ABORT(jsonDictionary, kRLMSyncTokenKey, token);
-        RLM_SYNC_PARSE_OPTIONAL_STRING(jsonDictionary, kRLMSyncPathKey, path);
-        RLM_SYNC_PARSE_MODEL_OR_ABORT(jsonDictionary, kRLMSyncTokenDataKey, RLMTokenDataModel, tokenData);
+        self.token = jwt.token;
+        self.tokenData = [[RLMTokenDataModel alloc] initWithJWT:jwt];
         return self;
     }
     return nil;
@@ -107,18 +144,11 @@ static const NSString *const kRLMSyncValueKey           = @"value";
                requireRefreshToken:(BOOL)requireRefreshToken {
     if (self = [super init]) {
         // Get the access token.
-        if (requireAccessToken) {
-            RLM_SYNC_PARSE_MODEL_OR_ABORT(jsonDictionary, kRLMSyncAccessTokenKey, RLMTokenModel, accessToken);
-        } else {
-            RLM_SYNC_PARSE_OPTIONAL_MODEL(jsonDictionary, kRLMSyncAccessTokenKey, RLMTokenModel, accessToken);
-        }
-        // Get the refresh token.
-        if (requireRefreshToken) {
-            RLM_SYNC_PARSE_MODEL_OR_ABORT(jsonDictionary, kRLMSyncRefreshTokenKey, RLMTokenModel, refreshToken);
-        } else {
-            RLM_SYNC_PARSE_OPTIONAL_MODEL(jsonDictionary, kRLMSyncRefreshTokenKey, RLMTokenModel, refreshToken);
-        }
-        self.urlPrefix = jsonDictionary[@"sync_worker"][@"path"];
+        self.accessToken = [[RLMTokenModel alloc] initWithJWT:[[RLMJwt alloc] initWithEncodedJWT: jsonDictionary[kRLMSyncAccessTokenKey]]];
+        self.refreshToken = [[RLMTokenModel alloc] initWithJWT:[[RLMJwt alloc] initWithEncodedJWT: jsonDictionary[kRLMSyncRefreshTokenKey]]];
+//        // Get the refresh token.
+
+//        self.urlPrefix = jsonDictionary[@"sync_worker"][@"path"];
         return self;
     }
     return nil;

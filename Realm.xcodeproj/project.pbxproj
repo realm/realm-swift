@@ -251,6 +251,8 @@
 		3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */; };
 		3FF2A9F51F4F3BEB00678BC0 /* primitive_list_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FF2A9F31F4F3BEB00678BC0 /* primitive_list_notifier.cpp */; };
 		3FF3FFAF1F0D6D6400B84599 /* KVOTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FFF1BE98D880021E04F /* KVOTests.swift */; };
+		49C7971523C4BC3E00E802D9 /* RealmClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7971423C4BC3E00E802D9 /* RealmClientTests.swift */; };
+		49C7971723C6799200E802D9 /* RealmApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7971623C6799200E802D9 /* RealmApp.swift */; };
 		5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */; };
 		5D03FB1F1E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
 		5D03FB201E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
@@ -844,6 +846,8 @@
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
 		3FF2A9F21F4F3BEB00678BC0 /* primitive_list_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = primitive_list_notifier.hpp; sourceTree = "<group>"; };
 		3FF2A9F31F4F3BEB00678BC0 /* primitive_list_notifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive_list_notifier.cpp; sourceTree = "<group>"; };
+		49C7971423C4BC3E00E802D9 /* RealmClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmClientTests.swift; sourceTree = "<group>"; };
+		49C7971623C6799200E802D9 /* RealmApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmApp.swift; sourceTree = "<group>"; };
 		5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupport.swift; sourceTree = "<group>"; };
 		5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupportTests.swift; sourceTree = "<group>"; };
 		5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PredicateUtilTests.mm; sourceTree = "<group>"; };
@@ -1347,6 +1351,7 @@
 				5D660FE81BE98D670021E04F /* Optional.swift */,
 				5D660FE91BE98D670021E04F /* Property.swift */,
 				5D660FEA1BE98D670021E04F /* Realm.swift */,
+				49C7971623C6799200E802D9 /* RealmApp.swift */,
 				1AB605D21D495927007F53DE /* RealmCollection.swift */,
 				5D660FEC1BE98D670021E04F /* RealmConfiguration.swift */,
 				5D660FED1BE98D670021E04F /* Results.swift */,
@@ -1381,6 +1386,7 @@
 				5D6610091BE98D880021E04F /* RealmCollectionTypeTests.swift */,
 				5D66100A1BE98D880021E04F /* RealmConfigurationTests.swift */,
 				5D66100C1BE98D880021E04F /* RealmTests.swift */,
+				49C7971423C4BC3E00E802D9 /* RealmClientTests.swift */,
 				5D66100D1BE98D880021E04F /* SchemaTests.swift */,
 				5D66100E1BE98D880021E04F /* SortDescriptorTests.swift */,
 				5D66100F1BE98D880021E04F /* SwiftLinkTests.swift */,
@@ -2451,6 +2457,7 @@
 				5D660FF11BE98D670021E04F /* Aliases.swift in Sources */,
 				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
 				5D1534B81CCFF545008976D7 /* LinkingObjects.swift in Sources */,
+				49C7971723C6799200E802D9 /* RealmApp.swift in Sources */,
 				5D660FF21BE98D670021E04F /* List.swift in Sources */,
 				5D660FF31BE98D670021E04F /* Migration.swift in Sources */,
 				5D660FF41BE98D670021E04F /* Object.swift in Sources */,
@@ -2494,6 +2501,7 @@
 				3F8825071E5E335000586B35 /* RealmConfigurationTests.swift in Sources */,
 				3F8825081E5E335000586B35 /* RealmTests.swift in Sources */,
 				3F558C9622C29A03002F0F30 /* RLMMultiProcessTestCase.m in Sources */,
+				49C7971523C4BC3E00E802D9 /* RealmClientTests.swift in Sources */,
 				3F558C9222C29A03002F0F30 /* RLMTestCase.m in Sources */,
 				3F558C8E22C29A03002F0F30 /* RLMTestObjects.m in Sources */,
 				3F8825091E5E335000586B35 /* SchemaTests.swift in Sources */,

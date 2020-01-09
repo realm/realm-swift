@@ -68,6 +68,8 @@ typedef void(^RLMRetrieveUserBlock)(RLMSyncUserInfo * _Nullable, NSError * _Null
 /// A block type used to report an error related to a specific user.
 typedef void(^RLMUserErrorReportingBlock)(RLMSyncUser * _Nonnull, NSError * _Nonnull);
 
+typedef void(^RLMFunctionCompletionBlock)(NSDictionary * _Nullable, NSError * _Nullable);
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -106,6 +108,8 @@ NS_ASSUME_NONNULL_BEGIN
  for functionality not exposed natively. It should be treated as sensitive data.
  */
 @property (nullable, nonatomic, readonly) NSString *refreshToken;
+
+@property (nullable, nonatomic, readonly) NSString *accessToken;
 
 /**
  The URL of the authentication server this user will communicate with.
@@ -157,6 +161,12 @@ NS_ASSUME_NONNULL_BEGIN
                 onCompletion:(RLMUserCompletionBlock)completion
 NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
 
++ (void)callFunction:(NSString *)name
+           arguments:(NSArray *)arguments
+             timeout:(NSTimeInterval)timeout
+       authServerURL:(NSURL *)authServerURL
+       callbackQueue:(dispatch_queue_t)callbackQueue
+        onCompletion:(RLMFunctionCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
 /**
  Returns the default configuration for the user. The default configuration

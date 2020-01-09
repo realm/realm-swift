@@ -149,7 +149,8 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
         [headers addEntriesFromDictionary:customHeaders];
     }
     if (NSString *authToken = [json objectForKey:kRLMSyncTokenKey]) {
-        headers[options.authorizationHeaderName ?: @"Authorization"] = authToken;
+        headers[options.authorizationHeaderName ?: @"Authorization"] =
+            [[NSString alloc] initWithFormat:@"Bearer %@", authToken];
     }
 
     return headers;
@@ -359,11 +360,15 @@ didCompleteWithError:(NSError *)error
 
 #pragma mark - Endpoint Implementations
 
+#pragma mark Auth Impl
+
 @implementation RLMSyncAuthEndpoint
 + (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"auth"];
+    return [authServerURL URLByAppendingPathComponent:@"login"];
 }
 @end
+
+#pragma mark Change Password Impl
 
 @implementation RLMSyncChangePasswordEndpoint
 + (NSString *)httpMethod {
@@ -375,11 +380,15 @@ didCompleteWithError:(NSError *)error
 }
 @end
 
+#pragma mark Update Account Impl
+
 @implementation RLMSyncUpdateAccountEndpoint
 + (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
     return [authServerURL URLByAppendingPathComponent:@"auth/password/updateAccount"];
 }
 @end
+
+#pragma mark Get User Info Impl
 
 @implementation RLMSyncGetUserInfoEndpoint
 + (NSString *)httpMethod {
@@ -403,6 +412,8 @@ didCompleteWithError:(NSError *)error
 }
 @end
 
+#pragma mark Get Permissions Impl
+
 @implementation RLMSyncGetPermissionsEndpoint
 + (NSString *)httpMethod {
     return @"GET";
@@ -411,6 +422,8 @@ didCompleteWithError:(NSError *)error
     return [authServerURL URLByAppendingPathComponent:@"permissions"];
 }
 @end
+
+#pragma mark Get Permission Offers Impl
 
 @implementation RLMSyncGetPermissionOffersEndpoint
 + (NSString *)httpMethod {
@@ -421,11 +434,15 @@ didCompleteWithError:(NSError *)error
 }
 @end
 
+#pragma mark Apply Permissions Impl
+
 @implementation RLMSyncApplyPermissionsEndpoint
 + (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
     return [authServerURL URLByAppendingPathComponent:@"permissions/apply"];
 }
 @end
+
+#pragma mark Offer Permissions Impl
 
 @implementation RLMSyncOfferPermissionsEndpoint
 + (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
@@ -433,11 +450,15 @@ didCompleteWithError:(NSError *)error
 }
 @end
 
+#pragma mark Accept Permission Offer Impl
+
 @implementation RLMSyncAcceptPermissionOfferEndpoint
 + (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
     return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"permissions/offers/%@/accept", json[@"offerToken"]]];
 }
 @end
+
+#pragma mark Invalidate Permission Offer Impl
 
 @implementation RLMSyncInvalidatePermissionOfferEndpoint
 + (NSString *)httpMethod {
@@ -445,5 +466,14 @@ didCompleteWithError:(NSError *)error
 }
 + (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
     return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"permissions/offers/%@", json[@"offerToken"]]];
+}
+@end
+
+@implementation RLMAppFunctionEndpoint
++ (NSString *)httpMethod {
+    return @"POST";
+}
++ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
+    return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"functions/call"]];
 }
 @end

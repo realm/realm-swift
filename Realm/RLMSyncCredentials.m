@@ -30,7 +30,7 @@ RLMIdentityProvider const RLMIdentityProviderTwitter                = @"twitter"
 RLMIdentityProvider const RLMIdentityProviderGoogle                 = @"google";
 RLMIdentityProvider const RLMIdentityProviderCloudKit               = @"cloudkit";
 RLMIdentityProvider const RLMIdentityProviderJWT                    = @"jwt";
-RLMIdentityProvider const RLMIdentityProviderAnonymous              = @"anonymous";
+RLMIdentityProvider const RLMIdentityProviderAnonymous              = @"anon-user";
 RLMIdentityProvider const RLMIdentityProviderNickname               = @"nickname";
 RLMIdentityProvider const RLMIdentityProviderCustomRefreshToken     = @"customrefreshtoken";
 

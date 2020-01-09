@@ -24,6 +24,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMTokenDataModel, RLMSyncUserAccountInfo;
 
+@interface RLMJwt : NSObject
+
+@property (nonatomic, readwrite) NSString *token;
+@property (nonatomic, readwrite) NSTimeInterval expires;
+@property (nonatomic, readwrite) NSTimeInterval issuedAt;
+@property (nonatomic, readwrite) NSDictionary *userData;
+
+@end
+
 #pragma mark - RLMTokenModel
 
 @interface RLMTokenModel : NSObject RLM_SYNC_UNINITIALIZABLE
@@ -32,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable, readonly) NSString *path;
 @property (nonatomic, readonly) RLMTokenDataModel *tokenData;
 
-- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;
+- (instancetype)initWithJWT:(RLMJwt *)jwt;
 
 @end
 
@@ -46,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSTimeInterval expires;
 @property (nonatomic, readonly) BOOL isAdmin;
 
-- (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary;
+- (instancetype)initWithJWT:(RLMJwt *)jwt;
 
 @end
 

@@ -175,16 +175,18 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
         }
 
         RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithDictionary:json
-                                                                    requireAccessToken:NO
+                                                                    requireAccessToken:YES
                                                                    requireRefreshToken:YES];
         if (!model) {
             // Malformed JSON
             return completion(nil, make_auth_error_bad_response(json));
         }
 
-        SyncUserIdentifier identity{model.refreshToken.tokenData.identity.UTF8String,
-            authServerURL.absoluteString.UTF8String};
-        auto sync_user = SyncManager::shared().get_user(identity , [model.refreshToken.token UTF8String]);
+        SyncUserIdentifier identity{
+            ((NSString *)json[@"user_id"]).UTF8String,
+            authServerURL.absoluteString.UTF8String
+        };
+        auto sync_user = SyncManager::shared().get_user(identity , [model.refreshToken.token UTF8String], [model.accessToken.token UTF8String]);
         if (!sync_user) {
             return completion(nil, make_auth_error_client_issue());
         }
@@ -198,6 +200,28 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
                                   completion:^(NSError *error, NSDictionary *dictionary) {
         dispatch_async(callbackQueue, ^{
             handler(error, dictionary);
+        });
+    }];
+}
+
++ (void)callFunction:(NSString *)name
+           arguments:(NSArray *)arguments
+             timeout:(NSTimeInterval)timeout
+       authServerURL:(NSURL *)authServerURL
+       callbackQueue:(dispatch_queue_t)callbackQueue
+        onCompletion:(RLMFunctionCompletionBlock)completion {
+    NSDictionary *json = @{
+        @"name": name,
+        @"arguments": arguments,
+        kRLMSyncTokenKey: RLMSyncUser.allUsers.allValues.lastObject.accessToken,
+    };
+
+    [RLMAppFunctionEndpoint sendRequestToServer:authServerURL
+                                           JSON:json
+                                        timeout:timeout
+                                     completion:^(NSError *error, NSDictionary *dictionary) {
+        dispatch_async(callbackQueue, ^{
+            completion(dictionary, error);
         });
     }];
 }
@@ -330,6 +354,7 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
 
 #pragma mark - Passwords
 
+#pragma mark Change Password
 - (void)changePassword:(NSString *)newPassword completion:(RLMPasswordChangeStatusBlock)completion {
     [self changePassword:newPassword forUserID:self.identity completion:completion];
 }
@@ -602,6 +627,13 @@ NSError *checkUser(std::shared_ptr<SyncUser> const& user, NSString *msg) {
     return @(_user->refresh_token().c_str());
 }
 
+- (NSString *)accessToken {
+    if (!_user) {
+        return nil;
+    }
+    return @(_user->access_token().c_str());
+}
+
 - (std::shared_ptr<SyncUser>)_syncUser {
     return _user;
 }
@@ -653,7 +685,9 @@ NSError *checkUser(std::shared_ptr<SyncUser> const& user, NSString *msg) {
     NSString *identity = credentials.userInfo[kRLMSyncIdentityKey];
     SyncUserIdentifier identifier{identity.UTF8String, serverURL.absoluteString.UTF8String};
 
-    std::shared_ptr<SyncUser> sync_user = SyncManager::shared().get_user(std::move(identifier), credentials.token.UTF8String);
+    std::shared_ptr<SyncUser> sync_user = SyncManager::shared().get_user(std::move(identifier),
+                                                                         credentials.token.UTF8String,
+                                                                         credentials.token.UTF8String);
     if (!sync_user) {
         completion(nil, make_auth_error_client_issue());
         return;

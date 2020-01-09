@@ -93,6 +93,26 @@ public struct Realm {
         try self.init(configuration: configuration)
     }
 
+    public static func open() throws -> Realm {
+        return try Realm()
+    }
+
+    public static func open(configuration: Configuration) throws -> Realm {
+        return try Realm(configuration: configuration)
+    }
+
+    public static func open(fileURL: URL) throws -> Realm {
+        return try Realm(fileURL: fileURL)
+    }
+
+    public static func open(app: RealmApp) throws -> Realm {
+        var url = FileManager.default.urls(for: .documentDirectory,
+                                           in: .userDomainMask).first!
+        url.appendPathComponent(app.appId)
+        return try Realm(
+            configuration: Configuration.init(fileURL: url))
+    }
+
     // MARK: Async
 
     /**

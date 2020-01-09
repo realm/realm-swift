@@ -62,4 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMSyncInvalidatePermissionOfferEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
 @end
 
+@interface RLMAppFunctionEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
+@end
+
 NS_ASSUME_NONNULL_END
