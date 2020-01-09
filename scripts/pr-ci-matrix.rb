@@ -3,7 +3,6 @@
 XCODE_VERSIONS = %w(10.0 10.1 10.3 11.1 11.2.1 11.3)
 CONFIGURATIONS = %w(Debug Release)
 
-default = ->(v, c) { c == 'Release' or v == XCODE_VERSIONS.last }
 release_only = ->(v, c) { c == 'Release' }
 latest_only = ->(v, c) { c == 'Release' and v == XCODE_VERSIONS.last }
 oldest_and_latest = ->(v, c) { c == 'Release' and (v == XCODE_VERSIONS.first or v == XCODE_VERSIONS.last) }
@@ -20,22 +19,22 @@ targets = {
   'osx-encryption' => oldest_and_latest,
   'osx-object-server' => oldest_and_latest,
 
-  'ios-static' => default,
-  'ios-dynamic' => default,
-  'watchos' => default,
-  'tvos' => default,
+  'ios-static' => oldest_and_latest,
+  'ios-dynamic' => oldest_and_latest,
+  'watchos' => oldest_and_latest,
+  'tvos' => oldest_and_latest,
 
-  'ios-swift' => default,
-  'osx-swift' => default,
-  'tvos-swift' => default,
+  'osx-swift' => ->(v, c) { true },
+  'ios-swift' => oldest_and_latest,
+  'tvos-swift' => oldest_and_latest,
 
   'catalyst' => minimum_version(11),
   'catalyst-swift' => minimum_version(11),
 
   'cocoapods-osx' => release_only,
-  'cocoapods-ios' => release_only,
-  'cocoapods-ios-dynamic' => release_only,
-  'cocoapods-watchos' => release_only,
+  'cocoapods-ios' => oldest_and_latest,
+  'cocoapods-ios-dynamic' => oldest_and_latest,
+  'cocoapods-watchos' => oldest_and_latest,
 
   'swiftpm' => minimum_version(11),
   'swiftpm-address' => latest_only,
