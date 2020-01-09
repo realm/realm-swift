@@ -305,11 +305,6 @@ RLM_ARRAY_TYPE(NotARealClass)
 
 @implementation SchemaTests
 
-- (void)tearDown {
-    RLMSetTreatFakeObjectAsRLMObject(NO);
-    [super tearDown];
-}
-
 - (void)testNoSchemaForUnmanagedObjectClasses {
     RLMSchema *schema = [RLMSchema sharedSchema];
     XCTAssertNil([schema schemaForClassName:@"RLMObject"]);
@@ -720,7 +715,6 @@ RLM_ARRAY_TYPE(NotARealClass)
 }
 
 - (void)testClassWithInvalidLinkingObjectsPropertyMissingSourcePropertyOfLink {
-    RLMSetTreatFakeObjectAsRLMObject(YES);
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertyMissingSourcePropertyOfLink.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
@@ -728,7 +722,6 @@ RLM_ARRAY_TYPE(NotARealClass)
 }
 
 - (void)testClassWithInvalidLinkingObjectsPropertySourcePropertyNotALink {
-    RLMSetTreatFakeObjectAsRLMObject(YES);
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyNotALink.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
@@ -736,7 +729,6 @@ RLM_ARRAY_TYPE(NotARealClass)
 }
 
 - (void)testClassWithInvalidLinkingObjectsPropertySourcePropertysLinkElsewhere {
-    RLMSetTreatFakeObjectAsRLMObject(YES);
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.customSchema = [RLMSchema schemaWithObjectClasses:@[ InvalidLinkingObjectsPropertySourcePropertyLinksElsewhere.class, IntObject.class ]];
     RLMAssertThrowsWithReasonMatching([RLMRealm realmWithConfiguration:config error:nil],
@@ -744,7 +736,6 @@ RLM_ARRAY_TYPE(NotARealClass)
 }
 
 - (void)testMixedIsRejected {
-    RLMSetTreatFakeObjectAsRLMObject(YES);
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     RLMAssertThrowsWithReasonMatching(config.objectClasses = @[[MixedProperty class]],
                                       @"Property 'mixed' is declared as 'id'.*");

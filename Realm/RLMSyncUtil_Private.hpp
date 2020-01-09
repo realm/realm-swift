@@ -40,33 +40,12 @@ std::shared_ptr<realm::SyncSession> sync_session_for_realm(RLMRealm *realm);
 
 CocoaSyncUserContext& context_for(const std::shared_ptr<realm::SyncUser>& user);
 
-#pragma mark - Access level conversion
-
-realm::AccessLevel accessLevelForObjCAccessLevel(RLMSyncAccessLevel level);
-RLMSyncAccessLevel objCAccessLevelForAccessLevel(realm::AccessLevel level);
-
-#pragma mark - Error conversion
-
-typedef enum : NSUInteger {
-    RLMPermissionActionTypeGet,
-    RLMPermissionActionTypeChange,
-    RLMPermissionActionTypeOffer,
-    RLMPermissionActionTypeAcceptOffer,
-} RLMPermissionActionType;
-
-NSError *translateSyncExceptionPtrToError(std::exception_ptr ptr, RLMPermissionActionType type);
-
 #pragma mark - Error construction
 
 NSError *make_auth_error_bad_response(NSDictionary *json=nil);
 NSError *make_auth_error_http_status(NSInteger status);
 NSError *make_auth_error_client_issue();
 NSError *make_auth_error(RLMSyncErrorResponseModel *responseModel);
-
-NSError *make_permission_error_get(NSString *description, realm::util::Optional<NSInteger> code=none);
-NSError *make_permission_error_change(NSString *description, realm::util::Optional<NSInteger> code=none);
-NSError *make_permission_error_offer(NSString *description, realm::util::Optional<NSInteger> code=none);
-NSError *make_permission_error_accept_offer(NSString *description, realm::util::Optional<NSInteger> code=none);
 
 // Set 'code' to NSNotFound to not actually have an error code.
 NSError *make_sync_error(RLMSyncSystemErrorKind kind, NSString *description, NSInteger code, NSDictionary *custom);

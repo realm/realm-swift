@@ -56,15 +56,15 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
     }
 
     func subscribe<T: Object>(realm: Realm, type: T.Type, _ filter: String = "TRUEPREDICATE") {
-        let ex = expectation(description: "Add partial sync query")
-        realm.subscribe(to: type, where: filter) { _, err in
-            if let err = err {
-                XCTFail("Partial sync subsription failed: \(err)")
-            } else {
+        let subscription = realm.objects(type).filter(filter).subscribe()
+        let ex = expectation(description: "Waiting for subscription completion")
+        let token = subscription.observe(\.state, options: .initial) { state in
+            if state == .complete {
                 ex.fulfill()
             }
         }
-        waitForExpectations(timeout: 2.0, handler: nil)
+        waitForExpectations(timeout: 20.0)
+        token.invalidate()
     }
 
     func waitForSync(_ realm: Realm) {
@@ -148,7 +148,7 @@ class SwiftPermissionsAPITests: SwiftSyncTestCase {
         }
 
         let ex = expectation(description: "asyncOpen")
-        var subscription: SyncSubscription<SwiftSyncObject>!
+        var subscription: SyncSubscription!
         var token: NotificationToken!
         Realm.asyncOpen(configuration: userA.configuration(realmURL: url)) { realm, error in
             XCTAssertNil(error)

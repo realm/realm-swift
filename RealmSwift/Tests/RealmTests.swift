@@ -215,6 +215,20 @@ class RealmTests: TestCase {
         XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 1)
     }
 
+    func testWriteWithoutNotifying() {
+        let realm = try! Realm()
+        let token = realm.observe { _, _ in
+            XCTFail("should not have been called")
+        }
+
+        try! realm.write(withoutNotifying: [token]) {
+            realm.deleteAll()
+        }
+
+        // local realm notifications are called synchronously so no need to wait for anything
+        token.invalidate()
+    }
+
     func testDynamicWriteSubscripting() {
         try! Realm().beginWrite()
         let object = try! Realm().dynamicCreate("SwiftStringObject", value: ["1"])
@@ -830,5 +844,14 @@ class RealmTests: TestCase {
         } catch {
             XCTFail("Failed to brigde RLMError to Realm.Error")
         }
+    }
+
+    func testExists() {
+        let config = Realm.Configuration()
+        XCTAssertFalse(Realm.fileExists(for: config))
+        autoreleasepool { _ = try! Realm(configuration: config) }
+        XCTAssertTrue(Realm.fileExists(for: config))
+        XCTAssertTrue(try! Realm.deleteFiles(for: config))
+        XCTAssertFalse(Realm.fileExists(for: config))
     }
 }

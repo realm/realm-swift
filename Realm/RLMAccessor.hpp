@@ -72,13 +72,14 @@ public:
 
     template<typename Func>
     void enumerate_list(__unsafe_unretained const id v, Func&& func) {
-        for (id value in v) {
+        id enumerable = RLMAsFastEnumeration(v) ?: v;
+        for (id value in enumerable) {
             func(value);
         }
     }
 
     template<typename T>
-    T unbox(id v, bool create = false, bool update = false, bool = false, size_t = 0);
+    T unbox(id v, realm::CreatePolicy = realm::CreatePolicy::Skip, size_t = 0);
 
     bool is_null(id v) { return v == NSNull.null; }
     id null_value() { return NSNull.null; }
@@ -89,7 +90,7 @@ public:
 
     // Internal API
     RLMAccessorContext(RLMObjectBase *parentObject, const realm::Property *property = nullptr);
-    RLMAccessorContext(RLMRealm *realm, RLMClassInfo& info, bool promote=true);
+    RLMAccessorContext(RLMClassInfo& info, bool promote=true);
 
     // The property currently being accessed; needed for KVO things for boxing
     // List and Results

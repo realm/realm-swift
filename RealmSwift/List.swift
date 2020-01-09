@@ -72,7 +72,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
 
     /// Creates a `List` that holds Realm model objects of type `Element`.
     public override init() {
-        super.init(array: Element._rlmArray())
+        super.init()
     }
 
     internal init(rlmArray: RLMArray<AnyObject>) {
@@ -441,6 +441,11 @@ public final class List<Element: RealmCollectionValue>: ListBase {
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
     }
+
+    // swiftlint:disable:next identifier_name
+    @objc class func _unmanagedArray() -> RLMArray<AnyObject> {
+        return Element._rlmArray()
+    }
 }
 
 extension List where Element: MinMaxType {
@@ -484,6 +489,12 @@ extension List: RealmCollection {
     /// Returns a `RLMIterator` that yields successive elements in the `List`.
     public func makeIterator() -> RLMIterator<Element> {
         return RLMIterator(collection: _rlmArray)
+    }
+
+    /// :nodoc:
+    // swiftlint:disable:next identifier_name
+    public func _asNSFastEnumerator() -> Any {
+        return _rlmArray
     }
 
 #if swift(>=4)
@@ -579,7 +590,6 @@ extension List: MutableCollection {
         guard number <= count else {
             throwRealmException("It is not possible to remove more objects (\(number)) from a list"
                 + " than it already contains (\(count)).")
-            return
         }
         for _ in 0..<number {
             _rlmArray.removeObject(at: 0)
@@ -597,7 +607,6 @@ extension List: MutableCollection {
         guard number <= count else {
             throwRealmException("It is not possible to remove more objects (\(number)) from a list"
                 + " than it already contains (\(count)).")
-            return
         }
         for _ in 0..<number {
             _rlmArray.removeLastObject()
@@ -745,12 +754,6 @@ extension List: AssistedObjectiveCBridgeable {
     internal var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (objectiveCValue: _rlmArray, metadata: nil)
     }
-}
-// MARK: - Unavailable
-
-extension List {
-    @available(*, unavailable, renamed: "remove(at:)")
-    public func remove(objectAtIndex: Int) { fatalError() }
 }
 
 // MARK: - Combine

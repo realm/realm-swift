@@ -68,8 +68,4 @@ private:
 + (void)_setUpBindingContextFactory;
 @end
 
-using PermissionChangeCallback = std::function<void(std::exception_ptr)>;
-
-PermissionChangeCallback RLMWrapPermissionStatusCallback(RLMPermissionStatusBlock callback);
-
 NS_ASSUME_NONNULL_END

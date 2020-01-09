@@ -46,7 +46,6 @@ static const NSString *const kRLMSyncValueKey           = @"value";
 @property (nonatomic, readwrite) NSString *path;
 @property (nonatomic, readwrite) NSTimeInterval expires;
 @property (nonatomic, readwrite) BOOL isAdmin;
-//@property (nonatomic, readwrite) NSArray *access;
 
 @end
 
@@ -97,6 +96,7 @@ static const NSString *const kRLMSyncValueKey           = @"value";
 
 @property (nonatomic, readwrite) RLMTokenModel *accessToken;
 @property (nonatomic, readwrite) RLMTokenModel *refreshToken;
+@property (nonatomic, readwrite) NSString *urlPrefix;
 
 @end
 
@@ -118,6 +118,7 @@ static const NSString *const kRLMSyncValueKey           = @"value";
         } else {
             RLM_SYNC_PARSE_OPTIONAL_MODEL(jsonDictionary, kRLMSyncRefreshTokenKey, RLMTokenModel, refreshToken);
         }
+        self.urlPrefix = jsonDictionary[@"sync_worker"][@"path"];
         return self;
     }
     return nil;

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2017 Realm Inc.
+// Copyright 2014 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,14 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncPermission.h"
+#import "AppDelegate.h"
 
-#import "sync/sync_permission.hpp"
+@implementation MyModel
+@end
 
-@interface RLMSyncPermission ()
+@implementation AppDelegate
 
-- (instancetype)initWithPermission:(realm::Permission)permission;
-
-- (realm::Permission)rawPermission;
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    return YES;
+}
 
 @end

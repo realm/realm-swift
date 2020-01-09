@@ -20,7 +20,9 @@
 
 #import "RLMSyncUtil.h"
 
-@class RLMSyncSession;
+@class RLMSyncSession, RLMSyncTimeoutOptions;
+
+NS_ASSUME_NONNULL_BEGIN
 
 /// An enum representing different levels of sync-related logging that can be configured.
 typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel) {
@@ -50,7 +52,11 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncLogLevel) {
     RLMSyncLogLevelAll
 };
 
-NS_ASSUME_NONNULL_BEGIN
+/// A log callback function which can be set on RLMSyncManager.
+///
+/// The log function may be called from multiple threads simultaneously, and is
+/// responsible for performing its own synchronization if any is required.
+typedef void (*RLMSyncLogFunction)(RLMSyncLogLevel level, NSString *message);
 
 /// A block type representing a block which can be used to report a sync-related error to the application. If the error
 /// pertains to a specific session, that session will also be passed into the block.
@@ -95,12 +101,23 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
  The logging threshold which newly opened synced Realms will use. Defaults to
  `RLMSyncLogLevelInfo`.
 
- Logging strings are output to Apple System Logger.
+ By default logging strings are output to Apple System Logger. Set `logger` to
+ perform custom logging logic instead.
 
  @warning This property must be set before any synced Realms are opened. Setting it after
           opening any synced Realm will do nothing.
  */
 @property (nonatomic) RLMSyncLogLevel logLevel;
+
+/**
+ The function which will be invoked whenever the sync client has a log message.
+
+ If nil, log strings are output to Apple System Logger instead.
+
+ @warning This property must be set before any synced Realms are opened. Setting
+ it after opening any synced Realm will do nothing.
+ */
+@property (nonatomic, nullable) RLMSyncLogFunction logger;
 
 /**
  The name of the HTTP header to send authorization data in when making requests to a Realm Object Server which has
@@ -141,6 +158,16 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
  */
 @property (nullable, nonatomic, copy) NSDictionary<NSString *, NSURL *> *pinnedCertificatePaths;
 
+/**
+ Options for the assorted types of connection timeouts for sync connections.
+
+ If nil default values for all timeouts are used instead.
+
+ @warning This property must be set before any synced Realms are opened. Setting
+ it after opening any synced Realm will do nothing.
+ */
+@property (nullable, nonatomic, copy) RLMSyncTimeoutOptions *timeoutOptions;
+
 /// The sole instance of the singleton.
 + (instancetype)sharedManager NS_REFINED_FOR_SWIFT;
 
@@ -150,6 +177,69 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 /// :nodoc:
 + (instancetype)new __attribute__((unavailable("RLMSyncManager cannot be created directly")));
 
-NS_ASSUME_NONNULL_END
-
 @end
+
+/**
+  Options for configuring timeouts and intervals in the sync client.
+ */
+@interface RLMSyncTimeoutOptions : NSObject
+/// The maximum number of milliseconds to allow for a connection to
+/// become fully established. This includes the time to resolve the
+/// network address, the TCP connect operation, the SSL handshake, and
+/// the WebSocket handshake.
+///
+/// Defaults to 2 minutes.
+@property (nonatomic) NSUInteger connectTimeout;
+
+/// The number of milliseconds to keep a connection open after all
+/// sessions have been abandoned.
+///
+/// After all synchronized Realms have been closed for a given server, the
+/// connection is kept open until the linger time has expire to avoid the
+/// overhead of reestablishing the connection when Realms are being closed and
+/// reopened.
+///
+/// Defaults to 30 seconds.
+@property (nonatomic) NSUInteger connectionLingerTime;
+
+/// The number of milliseconds between each heartbeat ping message.
+///
+/// The client periodically sends ping messages to the server to check if the
+/// connection is still alive. Shorter periods make connection state change
+/// notifications more responsive at the cost of battery life (as the antenna
+/// will have to wake up more often).
+///
+/// Defaults to 1 minute.
+@property (nonatomic) NSUInteger pingKeepalivePeriod;
+
+/// How long in milliseconds to wait for a reponse to a heartbeat ping before
+/// concluding that the connection has dropped.
+///
+/// Shorter values will make connection state change notifications more
+/// responsive as it will only change to `disconnected` after this much time has
+/// elapsed, but overly short values may result in spurious disconnection
+/// notifications when the server is simply taking a long time to respond.
+///
+/// Defaults to 2 minutes.
+@property (nonatomic) NSUInteger pongKeepaliveTimeout;
+
+/// The maximum amount of time, in milliseconds, since the loss of a
+/// prior connection, for a new connection to be considered a "fast
+/// reconnect".
+///
+/// When a client first connects to the server, it defers uploading any local
+/// changes until it has downloaded all changesets from the server. This
+/// typically reduces the total amount of merging that has to be done, and is
+/// particularly beneficial the first time that a specific client ever connects
+/// to the server.
+///
+/// When an existing client disconnects and then reconnects within the "fact
+/// reconnect" time this is skipped and any local changes are uploaded
+/// immediately without waiting for downloads, just as if the client was online
+/// the whole time.
+///
+/// Defaults to 1 minute.
+@property (nonatomic) NSUInteger fastReconnectLimit;
+@end
+
+NS_ASSUME_NONNULL_END

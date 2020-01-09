@@ -66,7 +66,7 @@ public:
     : _realm(obj->_realm)
     , _object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row)
     , _propertyName(prop.name.UTF8String)
-    , _ctx(obj->_realm, *obj->_info)
+    , _ctx(*obj->_info)
     {
     }
 
@@ -75,7 +75,7 @@ public:
     }
 
     void set(__unsafe_unretained id const value) override {
-        _object.set_property_value(_ctx, _propertyName, value ?: NSNull.null, false);
+        _object.set_property_value(_ctx, _propertyName, value ?: NSNull.null);
     }
 
 private:

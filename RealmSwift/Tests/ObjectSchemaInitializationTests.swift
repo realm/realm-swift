@@ -18,6 +18,7 @@
 
 import XCTest
 import RealmSwift
+import Realm.Private
 import Realm.Dynamic
 import Foundation
 
@@ -141,15 +142,6 @@ class ObjectSchemaInitializationTests: TestCase {
             "Should throw when not ignoring a property of a type we can't persist")
         assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNonOptionalLinkProperty.self),
             "Should throw when not marking a link property as optional")
-
-        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithNSNumber.self),
-                     reason: "Can't persist NSNumber without default value: use a Swift-native number type " +
-                             "or provide a default value.",
-                     "Should throw when using not providing default value for NSNumber property on Swift model")
-        assertThrows(RLMObjectSchema(forObjectClass: SwiftObjectWithOptionalNSNumber.self),
-                     reason: "Can't persist NSNumber without default value: use a Swift-native number type " +
-                             "or provide a default value.",
-                     "Should throw when using not providing default value for NSNumber property on Swift model")
     }
 
     func testPrimaryKey() {
@@ -178,12 +170,6 @@ class ObjectSchemaInitializationTests: TestCase {
         XCTAssertFalse(SwiftIndexedPropertiesObject().objectSchema["floatCol"]!.isIndexed)
         XCTAssertFalse(SwiftIndexedPropertiesObject().objectSchema["doubleCol"]!.isIndexed)
         XCTAssertFalse(SwiftIndexedPropertiesObject().objectSchema["dataCol"]!.isIndexed)
-
-        let unindexibleSchema = RLMObjectSchema(forObjectClass: SwiftObjectWithUnindexibleProperties.self)
-        for propName in SwiftObjectWithUnindexibleProperties.indexedProperties() {
-            XCTAssertFalse(unindexibleSchema[propName]!.indexed,
-                "Shouldn't mark unindexible property '\(propName)' as indexed")
-        }
     }
 
     func testOptionalProperties() {
@@ -218,13 +204,8 @@ class ObjectSchemaInitializationTests: TestCase {
     }
 }
 
-class SwiftFakeObject: NSObject {
-    @objc class func objectUtilClass(_ isSwift: Bool) -> AnyClass { return ObjectUtil.self }
-    @objc class func primaryKey() -> String? { return nil }
-    @objc class func ignoredProperties() -> [String] { return [] }
-    @objc class func indexedProperties() -> [String] { return [] }
-    @objc class func _realmObjectName() -> String? { return nil }
-    @objc class func _realmColumnNames() -> [String: String]? { return nil }
+class SwiftFakeObject: Object {
+    override class func _realmIgnoreClass() -> Bool { return true }
 }
 
 class SwiftObjectWithNSURL: SwiftFakeObject {
@@ -264,31 +245,8 @@ class SwiftObjectWithDatePrimaryKey: SwiftFakeObject {
     }
 }
 
-class SwiftObjectWithNSNumber: SwiftFakeObject {
-    @objc dynamic var number = NSNumber()
-}
-
-class SwiftObjectWithOptionalNSNumber: SwiftFakeObject {
-    @objc dynamic var number: NSNumber? = NSNumber()
-}
-
 class SwiftFakeObjectSubclass: SwiftFakeObject {
     @objc dynamic var dateCol = Date()
-}
-
-class SwiftObjectWithUnindexibleProperties: SwiftFakeObject {
-    @objc dynamic var boolCol = false
-    @objc dynamic var intCol = 123
-    @objc dynamic var floatCol = 1.23 as Float
-    @objc dynamic var doubleCol = 12.3
-    @objc dynamic var binaryCol = "a".data(using: String.Encoding.utf8)!
-    @objc dynamic var dateCol = Date(timeIntervalSince1970: 1)
-    @objc dynamic var objectCol: SwiftBoolObject? = SwiftBoolObject()
-    let arrayCol = List<SwiftBoolObject>()
-
-    dynamic override class func indexedProperties() -> [String] {
-        return ["boolCol", "intCol", "floatCol", "doubleCol", "binaryCol", "dateCol", "objectCol", "arrayCol"]
-    }
 }
 
 // swiftlint:disable:next type_name

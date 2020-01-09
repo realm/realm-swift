@@ -82,7 +82,7 @@ class ViewController: UIViewController {
     }
 
     func log(text: String) {
-        textView.text = textView.text + text + "\n\n"
+        textView.text += "\(text)\n\n"
     }
 
     func getKey() -> NSData {

@@ -149,6 +149,61 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) BOOL isEmpty;
 
+#pragma mark - File Management
+
+/**
+ Writes a compacted and optionally encrypted copy of the Realm to the given local URL.
+
+ The destination file cannot already exist.
+
+ Note that if this method is called from within a write transaction, the
+ *current* data is written, not the data from the point when the previous write
+ transaction was committed.
+
+ @param fileURL Local URL to save the Realm to.
+ @param key     Optional 64-byte encryption key to encrypt the new file with.
+ @param error   If an error occurs, upon return contains an `NSError` object
+ that describes the problem. If you are not interested in
+ possible errors, pass in `NULL`.
+
+ @return `YES` if the Realm was successfully written to disk, `NO` if an error occurred.
+ */
+- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
+
+/**
+ Checks if the Realm file for the given configuration exists locally on disk.
+
+ For non-synchronized, non-in-memory Realms, this is equivalent to
+ `-[NSFileManager.defaultManager fileExistsAtPath:config.path]`. For
+ synchronized Realms, it takes care of computing the actual path on disk based
+ on the server, virtual path, and user as is done when opening the Realm.
+
+ @param config A Realm configuration to check the existence of.
+ @return YES if the Realm file for the given configuration exists on disk, NO otherwise.
+ */
++ (BOOL)fileExistsForConfiguration:(RLMRealmConfiguration *)config;
+
+/**
+ Deletes the local Realm file and associated temporary files for the given configuration.
+
+ This deletes the ".realm", ".note" and ".management" files which would be
+ created by opening the Realm with the given configuration. It does not delete
+ the ".lock" file (which contains no persisted data and is recreated from
+ scratch every time the Realm file is opened).
+
+ The Realm must not be currently open on any thread or in another process. If
+ it is, this will return NO and report the error RLMErrorAlreadyOpen. Attempting to open
+ the Realm on another thread while the deletion is happening will block (and
+ then create a new Realm and open that afterwards).
+
+ If the Realm already does not exist this will return `NO` and report the error NSFileNoSuchFileError;
+
+ @param config A Realm configuration identifying the Realm to be deleted.
+ @return YES if any files were deleted, NO otherwise.
+ */
++ (BOOL)deleteFilesForConfiguration:(RLMRealmConfiguration *)config error:(NSError **)error
+ __attribute__((swift_error(nonnull_error)));
+
 #pragma mark - Notifications
 
 /**
@@ -188,9 +243,6 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
          receiving change notifications.
  */
 - (RLMNotificationToken *)addNotificationBlock:(RLMNotificationBlock)block __attribute__((warn_unused_result));
-
-#pragma mark - Transactions
-
 
 #pragma mark - Writing to a Realm
 
@@ -326,9 +378,23 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 /**
  Performs actions contained within the given block inside a write transaction.
 
- @see `[RLMRealm transactionWithBlock:error:]`
+ @see `[RLMRealm transactionWithoutNotifying:block:error:]`
  */
 - (void)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block NS_SWIFT_UNAVAILABLE("");
+
+/**
+ Performs actions contained within the given block inside a write transaction.
+
+ @see `[RLMRealm transactionWithoutNotifying:block:error:]`
+ */
+- (BOOL)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
+
+/**
+ Performs actions contained within the given block inside a write transaction.
+
+ @see `[RLMRealm transactionWithoutNotifying:block:error:]`
+ */
+- (void)transactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens block:(__attribute__((noescape)) void(^)(void))block;
 
 /**
  Performs actions contained within the given block inside a write transaction.
@@ -343,6 +409,19 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  generates notifications if applicable. This has no effect if the Realm
  was already up to date.
 
+ You can skip notifiying specific notification blocks about the changes made
+ in this write transaction by passing in their associated notification tokens.
+ This is primarily useful when the write transaction is saving changes already
+ made in the UI and you do not want to have the notification block attempt to
+ re-apply the same changes.
+
+ The tokens passed to this method must be for notifications for this specific
+ `RLMRealm` instance. Notifications for different threads cannot be skipped
+ using this method.
+
+ @param tokens An array of notification tokens which were returned from adding
+               callbacks which you do not want to be notified for the changes
+               made in this write transaction.
  @param block The block containing actions to perform.
  @param error If an error occurs, upon return contains an `NSError` object
               that describes the problem. If you are not interested in
@@ -350,7 +429,7 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
 
  @return Whether the transaction succeeded.
  */
-- (BOOL)transactionWithBlock:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
+- (BOOL)transactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens block:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error;
 
 /**
  Updates the Realm and outstanding objects managed by the Realm to point to the
@@ -397,25 +476,6 @@ typedef void (^RLMNotificationBlock)(RLMNotification notification, RLMRealm *rea
  Defaults to `YES`.
  */
 @property (nonatomic) BOOL autorefresh;
-
-/**
- Writes a compacted and optionally encrypted copy of the Realm to the given local URL.
-
- The destination file cannot already exist.
-
- Note that if this method is called from within a write transaction, the
- *current* data is written, not the data from the point when the previous write
- transaction was committed.
-
- @param fileURL Local URL to save the Realm to.
- @param key     Optional 64-byte encryption key to encrypt the new file with.
- @param error   If an error occurs, upon return contains an `NSError` object
-                that describes the problem. If you are not interested in
-                possible errors, pass in `NULL`.
-
- @return `YES` if the Realm was successfully written to disk, `NO` if an error occurred.
-*/
-- (BOOL)writeCopyToURL:(NSURL *)fileURL encryptionKey:(nullable NSData *)key error:(NSError **)error;
 
 /**
  Invalidates all `RLMObject`s, `RLMResults`, `RLMLinkingObjects`, and `RLMArray`s managed by the Realm.

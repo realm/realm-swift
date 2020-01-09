@@ -115,8 +115,10 @@ class ObjectCreationTests: TestCase {
 
     func testInitWithArray() {
         // array with all values specified
-        let baselineValues: [Any] = [true, 1, 1.1 as Float, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
-            Date(timeIntervalSince1970: 2), ["boolCol": true], [[true], [false]]]
+        let baselineValues: [Any] = [true, 1, IntEnum.value1.rawValue, 1.1 as Float,
+                                     11.1, "b", "b".data(using: String.Encoding.utf8)!,
+                                     Date(timeIntervalSince1970: 2), ["boolCol": true],
+                                     [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -277,7 +279,7 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithArray() {
         // array with all values specified
-        let baselineValues: [Any] = [true, 1, 1.1 as Float, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
+        let baselineValues: [Any] = [true, 1, IntEnum.value1.rawValue, 1.1 as Float, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
             Date(timeIntervalSince1970: 2), ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
@@ -1002,11 +1004,12 @@ class ObjectCreationTests: TestCase {
                                                    boolObjectListValues: [Bool]) {
         XCTAssertEqual(object.boolCol, (array[0] as! Bool))
         XCTAssertEqual(object.intCol, (array[1] as! Int))
-        //XCTAssertEqual(object.floatCol, (array[2] as! Float)) // FIXME: crashes with swift 3.2
-        XCTAssertEqual(object.doubleCol, (array[3] as! Double))
-        XCTAssertEqual(object.stringCol, (array[4] as! String))
-        XCTAssertEqual(object.binaryCol, (array[5] as! Data))
-        XCTAssertEqual(object.dateCol, (array[6] as! Date))
+        XCTAssertEqual(object.intEnumCol, IntEnum(rawValue: array[2] as! Int))
+        XCTAssertEqual(object.floatCol, (array[3] as! NSNumber).floatValue)
+        XCTAssertEqual(object.doubleCol, (array[4] as! Double))
+        XCTAssertEqual(object.stringCol, (array[5] as! String))
+        XCTAssertEqual(object.binaryCol, (array[6] as! Data))
+        XCTAssertEqual(object.dateCol, (array[7] as! Date))
         XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
         for i in 0..<boolObjectListValues.count {

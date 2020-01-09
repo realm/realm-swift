@@ -48,29 +48,17 @@ class PasswordEmailHandler {
     }
 }
 
-// A simple proxy server that runs in front of ROS and validates custom headers
-class HeaderValidationProxy {
+class Proxy {
     constructor(listenPort, targetPort) {
         this.proxy = httpProxy.createProxyServer({target: `http://127.0.0.1:${targetPort}`, ws: true});
         this.proxy.on('error', e => {
             console.log('proxy error', e);
         });
         this.server = http.createServer((req, res) => {
-            if (this.validate(req)) {
-                this.proxy.web(req, res);
-            }
-            else {
-                res.writeHead(400);
-                res.end('Missing X-Allow-Connection header');
-            }
+            this.web(req, res);
         });
         this.server.on('upgrade', (req, socket, head) => {
-            if (this.validate(req)) {
-                this.proxy.ws(req, socket, head);
-            }
-            else {
-                socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
-            }
+            this.ws(req, socket, head);
         });
         this.server.listen(listenPort);
     }
@@ -80,11 +68,50 @@ class HeaderValidationProxy {
         this.proxy.close();
     }
 
+    web(req, res) {
+        this.proxy.web(req, res);
+    }
+
+    ws(req, socket, head) {
+        this.proxy.ws(req, socket, head);
+    }
+}
+
+// A simple proxy server that runs in front of ROS and validates custom headers
+class HeaderValidationProxy extends Proxy {
+    web(req, res) {
+        if (this.validate(req)) {
+            this.proxy.web(req, res);
+        }
+        else {
+            res.writeHead(400);
+            res.end('Missing X-Allow-Connection header');
+        }
+    }
+    ws(req, socket, head) {
+        if (this.validate(req)) {
+            this.proxy.ws(req, socket, head);
+        }
+        else {
+            socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+        }
+    }
     validate(req) {
         return !!req.headers['x-allow-connection'];
     }
 }
 
+// A proxy which sits in front of ROS and takes a long time to establish connections
+class SlowConnectingWebProxy extends Proxy {
+    web(req, res) {
+        setTimeout(() => this.proxy.web(req, res), 2000);
+    }
+}
+class SlowConnectingWsProxy extends Proxy {
+    ws(req, socket, head) {
+        setTimeout(() => this.proxy.ws(req, socket, head), 2000);
+    }
+}
 
 const server = new ROS.BasicServer();
 server.start({
@@ -112,6 +139,12 @@ server.start({
         }),
     ],
     autoKeyGen: true,
+
+    // Disable the legacy Realm-based permissions service
+    permissionServiceConfigOverride: (config) => {
+        config.enableManagementRealmReflection = false;
+        config.enablePermissionRealmReflection = false;
+    },
 }).then(() => {
     console.log('started');
     fs.closeSync(1);
@@ -119,3 +152,5 @@ server.start({
     console.error(`Error starting Realm Object Server: ${err.message}`)
 });
 new HeaderValidationProxy(9081, 9080);
+new SlowConnectingWebProxy(9082, 9080);
+new SlowConnectingWsProxy(9083, 9080);

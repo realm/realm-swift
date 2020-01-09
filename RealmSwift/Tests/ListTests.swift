@@ -569,11 +569,7 @@ class ListTests: TestCase {
                 let objects = realm.objects(SwiftOptionalObject.self)
 
                 let properties = Array(objects.compactMap { $0.optInt8Col.value })
-#if swift(>=3.1)
                 let listsOfObjects = objects.value(forKeyPath: "optInt8Col") as! [Int8]
-#else
-                let listsOfObjects = (objects.value(forKeyPath: "optInt8Col") as! [NSNumber]).map { $0.int8Value }
-#endif
                 let kvcProperties = Array(listsOfObjects.compactMap { $0 })
 
                 XCTAssertEqual(properties, kvcProperties)
@@ -587,9 +583,6 @@ class ListTests: TestCase {
 
                 XCTAssertEqual(properties, kvcProperties)
             }
-#if swift(>=4)
-            // this test crashes xcode 9 beta 1's compiler
-#else
             do {
                 let objects = realm.objects(SwiftOptionalObject.self)
 
@@ -599,12 +592,11 @@ class ListTests: TestCase {
 
                 XCTAssertEqual(properties, kvcProperties)
             }
-#endif
             do {
                 let objects = realm.objects(SwiftOptionalObject.self)
 
                 let properties = Array(objects.compactMap { $0.optNSStringCol })
-                let listsOfObjects = objects.value(forKeyPath: "optNSStringCol") as! [NSString]
+                let listsOfObjects = objects.value(forKeyPath: "optNSStringCol") as! [NSString?]
                 let kvcProperties = Array(listsOfObjects.compactMap { $0 })
 
                 XCTAssertEqual(properties, kvcProperties)

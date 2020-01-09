@@ -11,7 +11,8 @@ DEFINES_MODULE = YES;
 DYLIB_COMPATIBILITY_VERSION = 1;
 DYLIB_CURRENT_VERSION = 1;
 DYLIB_INSTALL_NAME_BASE = @rpath;
-MACH_O_TYPE = mh_dylib;
+REALM_OBJC_MACH_O_TYPE = mh_dylib;
+MACH_O_TYPE = $(REALM_OBJC_MACH_O_TYPE);
 FRAMEWORK_VERSION = A;
 
 APPLICATION_EXTENSION_API_ONLY = YES;
@@ -27,8 +28,9 @@ LD_RUNPATH_SEARCH_PATHS[sdk=iphone*] = $(inherited) @executable_path/Frameworks 
 LD_RUNPATH_SEARCH_PATHS[sdk=watch*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 LD_RUNPATH_SEARCH_PATHS[sdk=appletv*] = $(inherited) @executable_path/Frameworks @loader_path/Frameworks;
 
-OTHER_LDFLAGS[sdk=macosx*] = -lrealm$(REALM_LIBRARY_SUFFIX);
-OTHER_LIBTOOLFLAGS[sdk=macosx*] = -lrealm$(REALM_LIBRARY_SUFFIX);
+REALM_PLATFORM_SUFFIX = $(PLATFORM_NAME);
+OTHER_LDFLAGS[sdk=macosx*] = -lrealm-$(REALM_PLATFORM_SUFFIX)$(REALM_LIBRARY_SUFFIX) $(REALM_CATALYST_FLAGS);
+OTHER_LIBTOOLFLAGS[sdk=macosx*] = -lrealm-$(REALM_PLATFORM_SUFFIX)$(REALM_LIBRARY_SUFFIX) $(REALM_CATALYST_FLAGS);
 OTHER_LDFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
 OTHER_LIBTOOLFLAGS[sdk=iphone*] = -lrealm-ios$(REALM_LIBRARY_SUFFIX);
 OTHER_LDFLAGS[sdk=watch*] = -lrealm-watchos$(REALM_LIBRARY_SUFFIX);
