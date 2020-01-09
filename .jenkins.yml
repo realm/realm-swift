@@ -526,23 +526,15 @@ exclude:
     target: swiftpm
     configuration: Debug
 
+  - xcode_version: 10.3
+    target: swiftpm
+    configuration: Release
+
   - xcode_version: 11.1
     target: swiftpm
     configuration: Debug
 
-  - xcode_version: 11.1
-    target: swiftpm
-    configuration: Release
-
   - xcode_version: 11.2.1
-    target: swiftpm
-    configuration: Debug
-
-  - xcode_version: 11.2.1
-    target: swiftpm
-    configuration: Release
-
-  - xcode_version: 11.3
     target: swiftpm
     configuration: Debug
 

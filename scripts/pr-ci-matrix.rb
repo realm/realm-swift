@@ -37,7 +37,7 @@ targets = {
   'cocoapods-ios-dynamic' => release_only,
   'cocoapods-watchos' => release_only,
 
-  'swiftpm' => ->(v, c) { c == 'Release' && (v == '10.3' or v == XCODE_VERSIONS.last) },
+  'swiftpm' => minimum_version(11),
   'swiftpm-address' => latest_only,
   'swiftpm-thread' => latest_only,
 
