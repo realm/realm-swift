@@ -399,13 +399,13 @@ extension LinkingObjects: AssistedObjectiveCBridgeable {
 // MARK: - Combine
 
 #if canImport(Combine)
-@available(watchOS 6.0, *)
-@available(iOS 13.0, *)
-@available(iOSApplicationExtension 13.0, *)
-@available(OSXApplicationExtension 10.15, *)
-extension LinkingObjects: Combine.ObservableObject, Identifiable {
-    public var objectWillChange: RealmCollectionPublisher<LinkingObjects> {
-        RealmCollectionPublisher(collection: self)
-    }
-}
+//@available(watchOS 6.0, *)
+//@available(iOS 13.0, *)
+//@available(iOSApplicationExtension 13.0, *)
+//@available(OSXApplicationExtension 10.15, *)
+//extension LinkingObjects: Identifiable {
+//    public var id: ObjectIdentifier {
+//
+//    }
+//}
 #endif

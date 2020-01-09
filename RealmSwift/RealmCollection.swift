@@ -1042,16 +1042,16 @@ extension AnyRealmCollection: AssistedObjectiveCBridgeable {
 #if canImport(Combine)
 import Combine
 
-@available(OSX 10.15, *)
-@available(watchOS 6.0, *)
-@available(iOS 13.0, *)
-@available(iOSApplicationExtension 13.0, *)
-@available(OSXApplicationExtension 10.15, *)
-extension AnyRealmCollection: ObservableObject {
-    public var objectWillChange: RealmCollectionPublisher<AnyRealmCollection> {
-        RealmCollectionPublisher(collection: self)
-    }
-}
+//@available(OSX 10.15, *)
+//@available(watchOS 6.0, *)
+//@available(iOS 13.0, *)
+//@available(iOSApplicationExtension 13.0, *)
+//@available(OSXApplicationExtension 10.15, *)
+//extension RealmCollection: ObservableObject where Self == LinkingObjects {
+//    public var objectWillChange: RealmCollectionPublisher<AnyRealmCollection<Element>> {
+//        RealmCollectionPublisher(collection: self)
+//    }
+//}
 
 @available(watchOS 6.0, *)
 @available(iOS 13.0, *)
