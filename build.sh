@@ -70,6 +70,8 @@ command:
   test-tvos-devices:    tests ObjC & Swift tvOS frameworks on all attached tvOS devices
   test-osx:             tests macOS framework
   test-osx-swift:       tests RealmSwift macOS framework
+  test-catalyst:        tests Mac Catalyst framework
+  test-catalyst-swift:  tests RealmSwift Mac Catalyst framework
   test-swiftpm:         tests ObjC and Swift macOS frameworks via SwiftPM
   verify:               verifies docs, osx, osx-swift, ios-static, ios-dynamic, ios-swift, ios-device in both Debug and Release configurations, swiftlint
   verify-osx-object-server:  downloads the Realm Object Server and runs the Objective-C and Swift integration tests
@@ -569,7 +571,10 @@ case "$COMMAND" in
             exit 1
         fi
 
-        xc "-scheme Realm -configuration $CONFIGURATION REALM_CATALYST_FLAGS='-target x86_64-apple-ios13.0-macabi' REALM_PLATFORM_SUFFIX='maccatalyst'"
+        xc "-scheme Realm -configuration $CONFIGURATION \
+            REALM_CATALYST_FLAGS='-target x86_64-apple-ios13.0-macabi' \
+            REALM_PLATFORM_SUFFIX='maccatalyst' \
+            IS_MACCATALYST=YES"
         clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/Realm.framework" "build/catalyst" "Realm.framework"
         ;;
 
@@ -585,7 +590,8 @@ case "$COMMAND" in
             REALM_CATALYST_FLAGS='-target x86_64-apple-ios13.0-macabi' \
             REALM_PLATFORM_SUFFIX='maccatalyst' \
             SWIFT_DEPLOYMENT_TARGET='13.0-macabi' \
-            SWIFT_PLATFORM_TARGET_PREFIX='ios'"
+            SWIFT_PLATFORM_TARGET_PREFIX='ios' \
+            IS_MACCATALYST=YES"
         destination="build/catalyst/swift-$REALM_XCODE_VERSION"
         clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
         rm -rf "$destination/Realm.framework"
@@ -755,6 +761,10 @@ case "$COMMAND" in
         sh build.sh test-tvos-devices || failed=1
         sh build.sh test-osx || failed=1
         sh build.sh test-osx-swift || failed=1
+        if (( $(xcode_version_major) >= 11 )); then
+            sh build.sh test-catalyst || failed=1
+            sh build.sh test-catalyst-swift || failed=1
+        fi
         exit $failed
         ;;
 
@@ -846,6 +856,20 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    "test-catalyst")
+        export REALM_SDKROOT=iphoneos
+        xc "-scheme Realm -configuration $CONFIGURATION -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY='' build-for-testing"
+        xc "-scheme Realm -configuration $CONFIGURATION -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY='' test"
+        exit 0
+        ;;
+
+    "test-catalyst-swift")
+        export REALM_SDKROOT=iphoneos
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY='' build-for-testing"
+        xc "-scheme RealmSwift -configuration $CONFIGURATION -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY='' test"
+        exit 0
+        ;;
+
     ######################################
     # Full verification
     ######################################
@@ -871,6 +895,10 @@ case "$COMMAND" in
         sh build.sh verify-swiftlint
         sh build.sh verify-swiftpm
         sh build.sh verify-osx-object-server
+        if (( $(xcode_version_major) >= 11 )); then
+            sh build.sh verify-catalyst
+            sh build.sh verify-catalyst-swift
+        fi
         ;;
 
     "verify-cocoapods")
@@ -1014,6 +1042,16 @@ case "$COMMAND" in
 
     "verify-osx-object-server")
         sh build.sh test-osx-object-server
+        exit 0
+        ;;
+
+    "verify-catalyst")
+        sh build.sh test-catalyst
+        exit 0
+        ;;
+
+    "verify-catalyst-swift")
+        sh build.sh test-catalyst-swift
         exit 0
         ;;
 
@@ -1256,7 +1294,7 @@ EOM
                 sh build.sh prelaunch-simulator
             fi
 
-            source $(brew --prefix nvm)/nvm.sh
+            source $(brew --prefix nvm)/nvm.sh --no-use
             export REALM_NODE_PATH="$(nvm which 8)"
 
             # Reset CoreSimulator.log

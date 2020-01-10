@@ -742,7 +742,7 @@ RLM_ARRAY_TYPE(NotARealClass)
 }
 
 // Can't spawn child processes on iOS
-#if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
+#if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR && !TARGET_OS_MACCATALYST
 - (void)testPartialSharedSchemaInit {
     if (self.isParent) {
         RLMRunChildAndWait();

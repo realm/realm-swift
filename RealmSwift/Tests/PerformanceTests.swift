@@ -48,7 +48,7 @@ class SwiftPerformanceTests: TestCase {
     }
 #else
     override class func defaultTestSuite() -> XCTestSuite {
-#if !DEBUG && os(iOS)
+#if !DEBUG && os(iOS) && !TARGET_OS_MACCATALYST
         if isRunningOnDevice {
             return super.defaultTestSuite()
         }

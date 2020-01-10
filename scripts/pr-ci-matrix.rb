@@ -1,12 +1,15 @@
 #!/usr/bin/env ruby
 # A script to generate the .jenkins.yml file for the CI pull request job
-xcode_versions = %w(10.0 10.1 10.3 11.1 11.2.1 11.3)
-configurations = %w(Debug Release)
+XCODE_VERSIONS = %w(10.0 10.1 10.3 11.1 11.2.1 11.3)
+CONFIGURATIONS = %w(Debug Release)
 
-default = ->(v, c) { c == 'Release' or v == xcode_versions.last }
 release_only = ->(v, c) { c == 'Release' }
-latest_only = ->(v, c) { c == 'Release' and v == xcode_versions.last }
-oldest_and_latest = ->(v, c) { c == 'Release' and (v == xcode_versions.first or v == xcode_versions.last) }
+latest_only = ->(v, c) { c == 'Release' and v == XCODE_VERSIONS.last }
+oldest_and_latest = ->(v, c) { c == 'Release' and (v == XCODE_VERSIONS.first or v == XCODE_VERSIONS.last) }
+
+def minimum_version(major)
+  ->(v, c) { v.split('.').first.to_i >= major and (c == 'Release' or v == XCODE_VERSIONS.last) }
+end
 
 targets = {
   'docs' => latest_only,
@@ -16,21 +19,24 @@ targets = {
   'osx-encryption' => oldest_and_latest,
   'osx-object-server' => oldest_and_latest,
 
-  'ios-static' => default,
-  'ios-dynamic' => default,
-  'watchos' => default,
-  'tvos' => default,
+  'ios-static' => oldest_and_latest,
+  'ios-dynamic' => oldest_and_latest,
+  'watchos' => oldest_and_latest,
+  'tvos' => oldest_and_latest,
 
-  'ios-swift' => default,
-  'osx-swift' => default,
-  'tvos-swift' => default,
+  'osx-swift' => ->(v, c) { true },
+  'ios-swift' => oldest_and_latest,
+  'tvos-swift' => oldest_and_latest,
+
+  'catalyst' => minimum_version(11),
+  'catalyst-swift' => minimum_version(11),
 
   'cocoapods-osx' => release_only,
-  'cocoapods-ios' => release_only,
-  'cocoapods-ios-dynamic' => release_only,
-  'cocoapods-watchos' => release_only,
+  'cocoapods-ios' => oldest_and_latest,
+  'cocoapods-ios-dynamic' => oldest_and_latest,
+  'cocoapods-watchos' => oldest_and_latest,
 
-  'swiftpm' => ->(v, c) { c == 'Release' && (v == '10.3' or v == xcode_versions.last) },
+  'swiftpm' => minimum_version(11),
   'swiftpm-address' => latest_only,
   'swiftpm-thread' => latest_only,
 
@@ -48,15 +54,15 @@ output_file = """
 # https://wiki.jenkins-ci.org/display/JENKINS/Yaml+Axis+Plugin
 # This is a generated file produced by scripts/pr-ci-matrix.rb.
 
-xcode_version: #{xcode_versions.map { |v| "\n - #{v}" }.join()}
+xcode_version: #{XCODE_VERSIONS.map { |v| "\n - #{v}" }.join()}
 target: #{targets.map { |k, v| "\n - #{k}" }.join()}
-configuration: #{configurations.map { |v| "\n - #{v}" }.join()}
+configuration: #{CONFIGURATIONS.map { |v| "\n - #{v}" }.join()}
 
 exclude:
 """
 targets.each { |name, filter|
-  xcode_versions.each { |version|
-    configurations.each { |configuration|
+  XCODE_VERSIONS.each { |version|
+    CONFIGURATIONS.each { |configuration|
       if not filter.call(version, configuration)
         output_file << """
   - xcode_version: #{version}
