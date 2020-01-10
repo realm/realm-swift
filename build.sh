@@ -857,12 +857,14 @@ case "$COMMAND" in
         ;;
 
     "test-catalyst")
+        export REALM_SDKROOT=iphoneos
         xc "-scheme Realm -configuration $CONFIGURATION -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY='' build-for-testing"
         xc "-scheme Realm -configuration $CONFIGURATION -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY='' test"
         exit 0
         ;;
 
     "test-catalyst-swift")
+        export REALM_SDKROOT=iphoneos
         xc "-scheme RealmSwift -configuration $CONFIGURATION -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY='' build-for-testing"
         xc "-scheme RealmSwift -configuration $CONFIGURATION -destination 'platform=macOS,variant=Mac Catalyst' CODE_SIGN_IDENTITY='' test"
         exit 0
