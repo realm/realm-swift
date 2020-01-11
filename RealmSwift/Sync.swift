@@ -364,9 +364,9 @@ public struct SyncCredentials {
     }
 
     /// Initialize new credentials using a CloudKit account token.
-    public static func cloudKit(token: Token) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(cloudKitToken: token))
-    }
+//    public static func cloudKit(token: Token) -> SyncCredentials {
+//        return SyncCredentials(RLMSyncCredentials(cloudKitToken: token))
+//    }
 
     /// Initialize new credentials using a Realm Object Server username and password.
     public static func usernamePassword(username: String,
@@ -385,21 +385,15 @@ public struct SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(jwt: token))
     }
 
-    /// Initialize new credentials using a nickname.
-    @available(*, deprecated, message: "Use usernamePassword instead.")
-    public static func nickname(_ nickname: String, isAdmin: Bool = false) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(nickname: nickname, isAdmin: isAdmin))
-    }
-
     /// Initialize new credentials anonymously
     public static func anonymous() -> SyncCredentials {
         return SyncCredentials(RLMSyncCredentials.anonymous())
     }
 
     /// Initialize new credentials using an externally-issued refresh token
-    public static func customRefreshToken(_ token: String, identity: String, isAdmin: Bool = false) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(customRefreshToken: token, identity: identity, isAdmin: isAdmin))
-    }
+//    public static func customRefreshToken(_ token: String, identity: String, isAdmin: Bool = false) -> SyncCredentials {
+//        return SyncCredentials(RLMSyncCredentials(customRefreshToken: token, identity: identity, isAdmin: isAdmin))
+//    }
 }
 
 extension RLMSyncCredentials {

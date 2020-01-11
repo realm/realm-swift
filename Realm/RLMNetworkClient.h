@@ -45,6 +45,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncAuthEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
 @end
+@interface RLMSyncResetPasswordEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
+@end
 @interface RLMSyncChangePasswordEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
 @end
 @interface RLMSyncUpdateAccountEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE

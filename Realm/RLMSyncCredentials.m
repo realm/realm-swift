@@ -22,17 +22,17 @@
 /// A Twitter account as an identity provider.
 //extern RLMIdentityProvider const RLMIdentityProviderTwitter;
 
-RLMIdentityProvider const RLMIdentityProviderDebug                  = @"debug";
-RLMIdentityProvider const RLMIdentityProviderRealm                  = @"realm";
-RLMIdentityProvider const RLMIdentityProviderUsernamePassword       = @"password";
-RLMIdentityProvider const RLMIdentityProviderFacebook               = @"facebook";
-RLMIdentityProvider const RLMIdentityProviderTwitter                = @"twitter";
-RLMIdentityProvider const RLMIdentityProviderGoogle                 = @"google";
-RLMIdentityProvider const RLMIdentityProviderCloudKit               = @"cloudkit";
-RLMIdentityProvider const RLMIdentityProviderJWT                    = @"jwt";
+//RLMIdentityProvider const RLMIdentityProviderDebug                  = @"debug";
+//RLMIdentityProvider const RLMIdentityProviderRealm                  = @"realm";
+RLMIdentityProvider const RLMIdentityProviderUsernamePassword       = @"local-userpass";
+RLMIdentityProvider const RLMIdentityProviderFacebook               = @"oauth2-facebook";
+//RLMIdentityProvider const RLMIdentityProviderTwitter                = @"twitter";
+RLMIdentityProvider const RLMIdentityProviderGoogle                 = @"oauth2-google";
+//RLMIdentityProvider const RLMIdentityProviderCloudKit               = @"cloudkit";
+RLMIdentityProvider const RLMIdentityProviderJWT                    = @"custom-token";
 RLMIdentityProvider const RLMIdentityProviderAnonymous              = @"anon-user";
-RLMIdentityProvider const RLMIdentityProviderNickname               = @"nickname";
-RLMIdentityProvider const RLMIdentityProviderCustomRefreshToken     = @"customrefreshtoken";
+//RLMIdentityProvider const RLMIdentityProviderNickname               = @"nickname";
+//RLMIdentityProvider const RLMIdentityProviderCustomRefreshToken     = @"customrefreshtoken";
 
 @interface RLMSyncCredentials ()
 
@@ -56,9 +56,9 @@ RLMIdentityProvider const RLMIdentityProviderCustomRefreshToken     = @"customre
     return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderGoogle userInfo:nil];
 }
 
-+ (instancetype)credentialsWithCloudKitToken:(RLMSyncCredentialsToken)token {
-    return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderCloudKit userInfo:nil];
-}
+//+ (instancetype)credentialsWithCloudKitToken:(RLMSyncCredentialsToken)token {
+//    return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderCloudKit userInfo:nil];
+//}
 
 + (instancetype)credentialsWithUsername:(NSString *)username
                                password:(NSString *)password
@@ -77,18 +77,18 @@ RLMIdentityProvider const RLMIdentityProviderCustomRefreshToken     = @"customre
     return [[self alloc] initWithCustomToken:@"" provider:RLMIdentityProviderAnonymous userInfo:nil];
 }
     
-+ (instancetype)credentialsWithNickname:(NSString *)nickname isAdmin:(BOOL)isAdmin {
-    return [[self alloc] initWithCustomToken:nickname
-                                    provider:RLMIdentityProviderNickname
-                                    userInfo:@{kRLMSyncIsAdminKey: @(isAdmin), kRLMSyncDataKey: nickname}];
-}
+//+ (instancetype)credentialsWithNickname:(NSString *)nickname isAdmin:(BOOL)isAdmin {
+//    return [[self alloc] initWithCustomToken:nickname
+//                                    provider:RLMIdentityProviderNickname
+//                                    userInfo:@{kRLMSyncIsAdminKey: @(isAdmin), kRLMSyncDataKey: nickname}];
+//}
 
 /// Intended only for testing use. Will only work if the ROS is started with the `debug` provider enabled.
-+ (instancetype)credentialsWithDebugUserID:(NSString *)userID isAdmin:(BOOL)isAdmin {
-    return [[self alloc] initWithCustomToken:userID
-                                    provider:RLMIdentityProviderDebug
-                                    userInfo:@{kRLMSyncIsAdminKey: @(isAdmin)}];
-}
+//+ (instancetype)credentialsWithDebugUserID:(NSString *)userID isAdmin:(BOOL)isAdmin {
+//    return [[self alloc] initWithCustomToken:userID
+//                                    provider:RLMIdentityProviderDebug
+//                                    userInfo:@{kRLMSyncIsAdminKey: @(isAdmin)}];
+//}
 
 + (instancetype)credentialsWithAccessToken:(RLMServerToken)accessToken identity:(NSString *)identity {
     return [[self alloc] initWithCustomToken:accessToken
@@ -96,16 +96,16 @@ RLMIdentityProvider const RLMIdentityProviderCustomRefreshToken     = @"customre
                                     userInfo:@{kRLMSyncIdentityKey: identity}];
 }
 
-+ (instancetype)credentialsWithCustomRefreshToken:(NSString *)token identity:(NSString *)identity isAdmin:(BOOL)isAdmin {
-    NSDictionary *userInfo = @{
-        kRLMSyncIdentityKey: identity,
-        kRLMSyncIsAdminKey: @(isAdmin)
-    };
-    return [[self alloc] initWithCustomToken:token
-                                    provider:RLMIdentityProviderCustomRefreshToken
-                                    userInfo:userInfo];
-
-}
+//+ (instancetype)credentialsWithCustomRefreshToken:(NSString *)token identity:(NSString *)identity isAdmin:(BOOL)isAdmin {
+//    NSDictionary *userInfo = @{
+//        kRLMSyncIdentityKey: identity,
+//        kRLMSyncIsAdminKey: @(isAdmin)
+//    };
+//    return [[self alloc] initWithCustomToken:token
+//                                    provider:RLMIdentityProviderCustomRefreshToken
+//                                    userInfo:userInfo];
+//
+//}
 
 - (BOOL)isEqual:(id)object {
     if (![object isKindOfClass:[RLMSyncCredentials class]]) {

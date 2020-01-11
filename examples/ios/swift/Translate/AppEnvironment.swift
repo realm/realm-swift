@@ -49,6 +49,7 @@ class AppEnvironment: ObservableObject {
 
      - parameter state: whether or not the language is being
                         translated `to` or `from`
+     - returns: the language for the given state
      */
     func language(_ state: LanguageState) -> Language {
         switch state {
@@ -125,6 +126,12 @@ class AppEnvironment: ObservableObject {
         }
     }
 
+    /**
+     Toggle whether or not to save (or "favourite")
+     a given translation.
+
+     - parameter translation: the translation to toggle save on
+     */
     func toggleSave(for translation: Translation) {
         guard let configuration = app.auth.currentUser?.configuration() else {
             print("Not logged in")

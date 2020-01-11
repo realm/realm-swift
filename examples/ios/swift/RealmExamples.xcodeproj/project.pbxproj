@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -14,18 +14,12 @@
 		227D20F61CB609A1008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.xib */; };
 		227D20F71CB609A1008F641B /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 227D20F11CB609A1008F641B /* LaunchScreen.xib */; };
 		3FC898FF1A1414110067CBEC /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FC898FE1A1414110067CBEC /* ViewController.swift */; };
-		493759A7230D8CA60078C28E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 493759A6230D8CA60078C28E /* AppDelegate.swift */; };
-		493759A9230D8CA60078C28E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 493759A8230D8CA60078C28E /* SceneDelegate.swift */; };
-		493759AB230D8CA60078C28E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 493759AA230D8CA60078C28E /* ContentView.swift */; };
-		493759AD230D8CAA0078C28E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 493759AC230D8CAA0078C28E /* Assets.xcassets */; };
-		493759B0230D8CAA0078C28E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 493759AF230D8CAA0078C28E /* Preview Assets.xcassets */; };
-		493759B3230D8CAA0078C28E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 493759B1230D8CAA0078C28E /* LaunchScreen.storyboard */; };
 		493759BA230D9F9A0078C28E /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 493759B9230D9F9A0078C28E /* Realm.framework */; };
 		493759BB230D9F9A0078C28E /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 493759B9230D9F9A0078C28E /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		493759BE230D9F9D0078C28E /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 493759BD230D9F9D0078C28E /* RealmSwift.framework */; };
 		493759BF230D9F9D0078C28E /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 493759BD230D9F9D0078C28E /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		49B527612315355300131B4A /* FoodType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B527602315355300131B4A /* FoodType.swift */; };
-		49B527712315567300131B4A /* URLImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49B527702315567300131B4A /* URLImage.swift */; };
+		49AE086D23CA2C2100E08BB9 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49AE084423CA298700E08BB9 /* RealmSwift.framework */; };
+		49AE086E23CA2C2100E08BB9 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 49AE084423CA298700E08BB9 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		49C7973C23C75DDF00E802D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7973B23C75DDF00E802D9 /* AppDelegate.swift */; };
 		49C7973E23C75DDF00E802D9 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7973D23C75DDF00E802D9 /* SceneDelegate.swift */; };
 		49C7974023C75DDF00E802D9 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7973F23C75DDF00E802D9 /* ContentView.swift */; };
@@ -35,13 +29,6 @@
 		49C7975423C8D0AE00E802D9 /* MultilineTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7975323C8D0AE00E802D9 /* MultilineTextField.swift */; };
 		49C7975623C93E0500E802D9 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7975523C93E0500E802D9 /* Language.swift */; };
 		49C7975C23C9431900E802D9 /* AppEnvironment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7975B23C9431900E802D9 /* AppEnvironment.swift */; };
-		49C7975F23C943A800E802D9 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 49C7975D23C943A800E802D9 /* RealmSwift.framework */; platformFilter = maccatalyst; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		49C7976323C94F3300E802D9 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49C7976223C94F3300E802D9 /* RealmSwift.framework */; };
-		49DBDE0223167E9F003DD65E /* IngredientFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49DBDE0123167E9F003DD65E /* IngredientFormView.swift */; };
-		49E693AF2317FC6800189AAE /* Ingredient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E693AE2317FC6800189AAE /* Ingredient.swift */; };
-		49E693B12317FC9200189AAE /* Recipe.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49E693B02317FC9200189AAE /* Recipe.swift */; };
-		49F64C5B231D80FD0014E813 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F64C5A231D80FD0014E813 /* SearchBar.swift */; };
-		49F64C5D231D857D0014E813 /* RecipeFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49F64C5C231D857D0014E813 /* RecipeFormView.swift */; };
 		C07E5D7A1B15003B00ED625C /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
 		C07E5D7B1B15003B00ED625C /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C07E5D7C1B15004800ED625C /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
@@ -99,13 +86,13 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		49C7976023C943A800E802D9 /* Embed Frameworks */ = {
+		49AE086F23CA2C2100E08BB9 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				49C7975F23C943A800E802D9 /* RealmSwift.framework in Embed Frameworks */,
+				49AE086E23CA2C2100E08BB9 /* RealmSwift.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -194,17 +181,19 @@
 		227D20F11CB609A1008F641B /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 		3FC898FE1A1414110067CBEC /* ViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		493759A4230D8CA60078C28E /* ListSwiftUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ListSwiftUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		493759A6230D8CA60078C28E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		493759A8230D8CA60078C28E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		493759AA230D8CA60078C28E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		493759AC230D8CAA0078C28E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		493759AF230D8CAA0078C28E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		493759B2230D8CAA0078C28E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		493759B4230D8CAA0078C28E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		493759B9230D9F9A0078C28E /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		493759BD230D9F9D0078C28E /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		49B527602315355300131B4A /* FoodType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodType.swift; sourceTree = "<group>"; };
-		49B527702315567300131B4A /* URLImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLImage.swift; sourceTree = "<group>"; };
+		49AE083523CA260400E08BB9 /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		49AE083823CA273100E08BB9 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../build/osx/swift-11.3/Realm.framework"; sourceTree = "<group>"; };
+		49AE083923CA273100E08BB9 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = "../../../build/osx/swift-11.3/RealmSwift.framework"; sourceTree = "<group>"; };
+		49AE083E23CA285800E08BB9 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/catalyst/Realm.framework; sourceTree = "<group>"; };
+		49AE084123CA286200E08BB9 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = "../../../build/ios/swift-11.3/RealmSwift.framework"; sourceTree = "<group>"; };
+		49AE084423CA298700E08BB9 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = "../../../build/catalyst/swift-11.3/RealmSwift.framework"; sourceTree = "<group>"; };
+		49AE084B23CA299800E08BB9 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../build/catalyst/swift-11.3/Realm.framework"; sourceTree = "<group>"; };
+		49AE084E23CA29A400E08BB9 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = "../../../build/ios/swift-11.3/Realm.framework"; sourceTree = "<group>"; };
+		49AE086123CA2BE900E08BB9 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = ../../../build/DerivedData/Realm/Build/Products/Release/RealmSwift.framework; sourceTree = "<group>"; };
+		49AE086823CA2C0000E08BB9 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../build/DerivedData/Realm/Build/Products/Release/Realm.framework; sourceTree = "<group>"; };
+		49AE086923CA2C0000E08BB9 /* Realm.framework.dSYM */ = {isa = PBXFileReference; lastKnownFileType = wrapper.dsym; name = Realm.framework.dSYM; path = ../../../build/DerivedData/Realm/Build/Products/Release/Realm.framework.dSYM; sourceTree = "<group>"; };
 		49C7973923C75DDF00E802D9 /* Translate.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Translate.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		49C7973B23C75DDF00E802D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		49C7973D23C75DDF00E802D9 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -220,11 +209,6 @@
 		49C7976123C94E4300E802D9 /* Translate.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Translate.entitlements; sourceTree = "<group>"; };
 		49C7976223C94F3300E802D9 /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		49C7976423C9507D00E802D9 /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		49DBDE0123167E9F003DD65E /* IngredientFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientFormView.swift; sourceTree = "<group>"; };
-		49E693AE2317FC6800189AAE /* Ingredient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ingredient.swift; sourceTree = "<group>"; };
-		49E693B02317FC9200189AAE /* Recipe.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Recipe.swift; sourceTree = "<group>"; };
-		49F64C5A231D80FD0014E813 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
-		49F64C5C231D857D0014E813 /* RecipeFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecipeFormView.swift; sourceTree = "<group>"; };
 		9C318E8C1CA42C7800879076 /* GettingStarted.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = GettingStarted.playground; sourceTree = "<group>"; };
 		C07E5D791B15001500ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -272,7 +256,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				49C7976323C94F3300E802D9 /* RealmSwift.framework in Frameworks */,
+				49AE086D23CA2C2100E08BB9 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -359,32 +343,20 @@
 			path = Common;
 			sourceTree = "<group>";
 		};
-		493759A5230D8CA60078C28E /* ListSwiftUI */ = {
-			isa = PBXGroup;
-			children = (
-				49E693AD2317FC5200189AAE /* Models */,
-				49E693B22317FD3100189AAE /* Views */,
-				493759A6230D8CA60078C28E /* AppDelegate.swift */,
-				493759A8230D8CA60078C28E /* SceneDelegate.swift */,
-				493759AC230D8CAA0078C28E /* Assets.xcassets */,
-				493759B1230D8CAA0078C28E /* LaunchScreen.storyboard */,
-				493759B4230D8CAA0078C28E /* Info.plist */,
-				493759AE230D8CAA0078C28E /* Preview Content */,
-			);
-			path = ListSwiftUI;
-			sourceTree = "<group>";
-		};
-		493759AE230D8CAA0078C28E /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				493759AF230D8CAA0078C28E /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
 		493759B8230D9F9A0078C28E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				49AE086823CA2C0000E08BB9 /* Realm.framework */,
+				49AE086923CA2C0000E08BB9 /* Realm.framework.dSYM */,
+				49AE086123CA2BE900E08BB9 /* RealmSwift.framework */,
+				49AE084B23CA299800E08BB9 /* Realm.framework */,
+				49AE084E23CA29A400E08BB9 /* Realm.framework */,
+				49AE084123CA286200E08BB9 /* RealmSwift.framework */,
+				49AE084423CA298700E08BB9 /* RealmSwift.framework */,
+				49AE083823CA273100E08BB9 /* Realm.framework */,
+				49AE083E23CA285800E08BB9 /* Realm.framework */,
+				49AE083923CA273100E08BB9 /* RealmSwift.framework */,
+				49AE083523CA260400E08BB9 /* RealmSwift.framework */,
 				49C7976423C9507D00E802D9 /* Realm.framework */,
 				49C7976223C94F3300E802D9 /* RealmSwift.framework */,
 				49C7975D23C943A800E802D9 /* RealmSwift.framework */,
@@ -420,28 +392,6 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		49E693AD2317FC5200189AAE /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				49B527602315355300131B4A /* FoodType.swift */,
-				49E693AE2317FC6800189AAE /* Ingredient.swift */,
-				49E693B02317FC9200189AAE /* Recipe.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		49E693B22317FD3100189AAE /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				49B527702315567300131B4A /* URLImage.swift */,
-				49DBDE0123167E9F003DD65E /* IngredientFormView.swift */,
-				493759AA230D8CA60078C28E /* ContentView.swift */,
-				49F64C5C231D857D0014E813 /* RecipeFormView.swift */,
-				49F64C5A231D80FD0014E813 /* SearchBar.swift */,
-			);
-			path = Views;
-			sourceTree = "<group>";
-		};
 		E805758C19BA55E600376620 = {
 			isa = PBXGroup;
 			children = (
@@ -453,7 +403,6 @@
 				E886FB621A12A73E00CB2D0B /* GroupedTableView */,
 				E8CB088419BA6AF70018434A /* Migration */,
 				E8F14D0B1CF8FD0C00564AF5 /* PlaygroundFrameworkWrapper */,
-				493759A5230D8CA60078C28E /* ListSwiftUI */,
 				49C7973A23C75DDF00E802D9 /* Translate */,
 				E805759619BA55E600376620 /* Products */,
 				0295B90519D103180036D6C3 /* RealmSwift */,
@@ -578,7 +527,7 @@
 				49C7973523C75DDF00E802D9 /* Sources */,
 				49C7973623C75DDF00E802D9 /* Frameworks */,
 				49C7973723C75DDF00E802D9 /* Resources */,
-				49C7976023C943A800E802D9 /* Embed Frameworks */,
+				49AE086F23CA2C2100E08BB9 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -816,9 +765,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				493759B3230D8CAA0078C28E /* LaunchScreen.storyboard in Resources */,
-				493759B0230D8CAA0078C28E /* Preview Assets.xcassets in Resources */,
-				493759AD230D8CAA0078C28E /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -886,16 +832,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				493759A7230D8CA60078C28E /* AppDelegate.swift in Sources */,
-				49DBDE0223167E9F003DD65E /* IngredientFormView.swift in Sources */,
-				49F64C5D231D857D0014E813 /* RecipeFormView.swift in Sources */,
-				49E693AF2317FC6800189AAE /* Ingredient.swift in Sources */,
-				49B527612315355300131B4A /* FoodType.swift in Sources */,
-				493759A9230D8CA60078C28E /* SceneDelegate.swift in Sources */,
-				49F64C5B231D80FD0014E813 /* SearchBar.swift in Sources */,
-				49B527712315567300131B4A /* URLImage.swift in Sources */,
-				493759AB230D8CA60078C28E /* ContentView.swift in Sources */,
-				49E693B12317FC9200189AAE /* Recipe.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -974,14 +910,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		493759B1230D8CAA0078C28E /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				493759B2230D8CAA0078C28E /* Base */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
 		49C7974623C75DE300E802D9 /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -1011,10 +939,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = ListSwiftUI/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.ListSwiftUI;
@@ -1044,10 +969,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = ListSwiftUI/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.ListSwiftUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1068,6 +990,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = Translate/Translate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Translate/Preview Content\"";
@@ -1076,14 +999,13 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = Translate/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Translate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_VERSION = 5.0;
@@ -1104,6 +1026,7 @@
 				CODE_SIGN_ENTITLEMENTS = Translate/Translate.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 2;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"Translate/Preview Content\"";
@@ -1112,13 +1035,12 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = Translate/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 1.1;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.Translate;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphonesimulator iphoneos";
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1223,8 +1145,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -1242,10 +1163,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = GroupedTableView;
 			};
@@ -1258,10 +1176,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/GroupedTableView/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = GroupedTableView;
 			};
@@ -1277,10 +1192,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Encryption/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1292,10 +1204,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				INFOPLIST_FILE = Encryption/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1311,10 +1220,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Migration/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1326,10 +1232,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				INFOPLIST_FILE = Migration/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1345,10 +1248,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = TableView/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1360,10 +1260,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				INFOPLIST_FILE = TableView/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1379,10 +1276,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Simple/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1394,10 +1288,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				INFOPLIST_FILE = Simple/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1413,10 +1304,7 @@
 				);
 				INFOPLIST_FILE = Backlink/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1428,10 +1316,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Backlink/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1451,11 +1336,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = PlaygroundFrameworkWrapper/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.PlaygroundFrameworkWrapper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1480,11 +1361,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = PlaygroundFrameworkWrapper/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = io.realm.PlaygroundFrameworkWrapper;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

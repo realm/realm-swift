@@ -380,6 +380,14 @@ didCompleteWithError:(NSError *)error
 }
 @end
 
+# pragma mark Reset Password Impl
+
+@implementation RLMSyncResetPasswordEndpoint
++ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
+    return [authServerURL URLByAppendingPathComponent:@"reset"];
+}
+@end
+
 #pragma mark Change Password Impl
 
 @implementation RLMSyncChangePasswordEndpoint
@@ -480,6 +488,8 @@ didCompleteWithError:(NSError *)error
     return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"permissions/offers/%@", json[@"offerToken"]]];
 }
 @end
+
+#pragma mark App Function Impl
 
 @implementation RLMAppFunctionEndpoint
 + (NSString *)httpMethod {

@@ -30,7 +30,7 @@ typedef NSString *RLMIdentityProvider RLM_EXTENSIBLE_STRING_ENUM;
 
 /// The debug identity provider, which accepts any token string and creates a user associated with that token if one
 /// does not yet exist. Not enabled for Realm Object Server configured for production.
-extern RLMIdentityProvider const RLMIdentityProviderDebug;
+//extern RLMIdentityProvider const RLMIdentityProviderDebug;
 
 /// The username/password identity provider. User accounts are handled by the Realm Object Server directly without the
 /// involvement of a third-party identity provider.
@@ -43,7 +43,7 @@ extern RLMIdentityProvider const RLMIdentityProviderFacebook;
 extern RLMIdentityProvider const RLMIdentityProviderGoogle;
 
 /// A CloudKit account as an identity provider.
-extern RLMIdentityProvider const RLMIdentityProviderCloudKit;
+//extern RLMIdentityProvider const RLMIdentityProviderCloudKit;
 
 /// A JSON Web Token as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderJWT;
@@ -52,7 +52,7 @@ extern RLMIdentityProvider const RLMIdentityProviderJWT;
 extern RLMIdentityProvider const RLMIdentityProviderAnonymous;
 
 /// A Nickname account as an identity provider.
-extern RLMIdentityProvider const RLMIdentityProviderNickname __deprecated_msg("Use RLMIdentityProviderUsernamePassword instead");
+//extern RLMIdentityProvider const RLMIdentityProviderNickname __deprecated_msg("Use RLMIdentityProviderUsernamePassword instead");
 
 /**
  Opaque credentials representing a specific Realm Object Server user.
@@ -81,7 +81,7 @@ extern RLMIdentityProvider const RLMIdentityProviderNickname __deprecated_msg("U
 /**
  Construct and return credentials from an CloudKit account token.
  */
-+ (instancetype)credentialsWithCloudKitToken:(RLMSyncCredentialsToken)token;
+//+ (instancetype)credentialsWithCloudKitToken:(RLMSyncCredentialsToken)token;
 
 /**
  Construct and return credentials from a Realm Object Server username and password.
@@ -103,7 +103,7 @@ extern RLMIdentityProvider const RLMIdentityProviderNickname __deprecated_msg("U
 /**
  Construct and return credentials from a nickname
  */
-+ (instancetype)credentialsWithNickname:(NSString *)nickname isAdmin:(BOOL)isAdmin __deprecated_msg("Use +credentialsWithUsername instead");
+//+ (instancetype)credentialsWithNickname:(NSString *)nickname isAdmin:(BOOL)isAdmin __deprecated_msg("Use +credentialsWithUsername instead");
 
 /**
  Construct and return special credentials representing a token that can
@@ -137,7 +137,7 @@ extern RLMIdentityProvider const RLMIdentityProviderNickname __deprecated_msg("U
           The server will compute their values based on the token string and the token validator configuration,
           but it's important for  correct functioning that the values here match the server.
  */
-+ (instancetype)credentialsWithCustomRefreshToken:(NSString *)token identity:(NSString *)identity isAdmin:(BOOL)isAdmin;
+//+ (instancetype)credentialsWithCustomRefreshToken:(NSString *)token identity:(NSString *)identity isAdmin:(BOOL)isAdmin;
 
 /**
  Construct and return credentials with a custom token string, identity provider string, and optional user info. In most

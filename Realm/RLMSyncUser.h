@@ -68,6 +68,8 @@ typedef void(^RLMRetrieveUserBlock)(RLMSyncUserInfo * _Nullable, NSError * _Null
 /// A block type used to report an error related to a specific user.
 typedef void(^RLMUserErrorReportingBlock)(RLMSyncUser * _Nonnull, NSError * _Nonnull);
 
+/// A block type used to asynchronously report results of a remote function call.
+/// Data is returned raw as function results are of arbitrary shape.
 typedef void(^RLMFunctionCompletionBlock)(NSData * _Nullable, NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
@@ -102,13 +104,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, readonly) NSString *identity;
 
 /**
- The user's refresh token used to access the Realm Object Server.
-
- This is required to make HTTP requests to Realm Object Server's REST API
- for functionality not exposed natively. It should be treated as sensitive data.
+ The user's refresh token used to refresh their access token.
  */
 @property (nullable, nonatomic, readonly) NSString *refreshToken;
 
+/**
+ The user's access token used to access the Realm App Server.
+
+ This is required to make HTTP requests to Realm App Server's REST API
+ for functionality not exposed natively. It should be treated as sensitive data.
+
+ Expires every 30 minutes.
+ */
 @property (nullable, nonatomic, readonly) NSString *accessToken;
 
 /**

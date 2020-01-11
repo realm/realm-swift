@@ -1006,9 +1006,8 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
-        -> NotificationToken {
-            return base._observe(block)
+    public func observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void) -> NotificationToken {
+        return base._observe(block)
     }
 
     /// :nodoc:
@@ -1041,17 +1040,6 @@ extension AnyRealmCollection: AssistedObjectiveCBridgeable {
 // MARK: Combine
 #if canImport(Combine)
 import Combine
-
-//@available(OSX 10.15, *)
-//@available(watchOS 6.0, *)
-//@available(iOS 13.0, *)
-//@available(iOSApplicationExtension 13.0, *)
-//@available(OSXApplicationExtension 10.15, *)
-//extension RealmCollection: ObservableObject where Self == LinkingObjects {
-//    public var objectWillChange: RealmCollectionPublisher<AnyRealmCollection<Element>> {
-//        RealmCollectionPublisher(collection: self)
-//    }
-//}
 
 @available(watchOS 6.0, *)
 @available(iOS 13.0, *)

@@ -64,8 +64,6 @@ public final class RealmFunctions {
                     } catch let error {
                         completionHandler(.failure(error))
                     }
-
-
             }
         }
     }
@@ -103,7 +101,7 @@ public final class RealmAuth {
     }
 
     public func switchUser(id: String) {
-        SyncUser.all[id]
+
     }
 }
 

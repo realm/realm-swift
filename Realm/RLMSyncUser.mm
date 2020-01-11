@@ -144,12 +144,12 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
                                            completionBlock:completion];
         return;
     }
-    if (credentials.provider == RLMIdentityProviderCustomRefreshToken) {
-        [self _performLoginForCustomRefreshTokenCredentials:credentials
-                                              authServerURL:authServerURL
-                                            completionBlock:completion];
-        return;
-    }
+//    if (credentials.provider == RLMIdentityProviderCustomRefreshToken) {
+//        [self _performLoginForCustomRefreshTokenCredentials:credentials
+//                                              authServerURL:authServerURL
+//                                            completionBlock:completion];
+//        return;
+//    }
     if (!authServerURL) {
         @throw RLMException(@"A user cannot be logged in without specifying an authentication server URL.");
     }
@@ -351,6 +351,7 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
 #pragma mark - Passwords
 
 #pragma mark Change Password
+
 - (void)changePassword:(NSString *)newPassword completion:(RLMPasswordChangeStatusBlock)completion {
     [self changePassword:newPassword forUserID:self.identity completion:completion];
 }
