@@ -1,6 +1,13 @@
 import Foundation
 import RealmSwift
 
+class UserSettings: Object {
+    @objc dynamic var lastLangFrom: String = Locale.current.identifier
+    @objc dynamic var lastLangTo: String = "fr"
+
+    let translations: RealmSwift.List<Translation> = RealmSwift.List()
+}
+
 class AppEnvironment: ObservableObject {
     @Published var tableOfContents: TableOfContents? = .translateView
     @Published var isShowingLanguageSelectionToPage: Bool = false
