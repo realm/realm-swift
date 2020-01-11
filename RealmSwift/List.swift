@@ -19,6 +19,9 @@
 import Foundation
 import Realm
 import Realm.Private
+#if canImport(Combine)
+import Combine
+#endif
 
 /// :nodoc:
 /// Internal class. Do not use directly.
@@ -752,3 +755,39 @@ extension List: AssistedObjectiveCBridgeable {
         return (objectiveCValue: _rlmArray, metadata: nil)
     }
 }
+
+// MARK: - Combine
+
+#if canImport(Combine)
+import Combine
+
+@available(OSX 10.15, *)
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+extension List {
+    /// Allows a subscriber to hook into Realm Changes.
+    public func observe<S, V, L: List<V>>(_ subscriber: S) -> NotificationToken where S: Subscriber, S.Input == L {
+        return observe { change in
+            switch change {
+            case .update(_, deletions: _, insertions: _, modifications: _):
+                _ = subscriber.receive(self as! L)
+            default:
+                break
+            }
+        }
+    }
+}
+
+@available(OSX 10.15, *)
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+extension List: ObservableObject {
+    public var objectWillChange: RealmCollectionPublisher<List> {
+        RealmCollectionPublisher(collection: self)
+    }
+}
+#endif

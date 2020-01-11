@@ -230,6 +230,13 @@ static RLMSyncManager *s_sharedManager = nil;
     return buffer;
 }
 
+- (RLMSyncUser *)_currentUser {
+    if (auto user = SyncManager::shared().get_current_user()) {
+        return [[RLMSyncUser alloc] initWithSyncUser: std::move(user)];
+    }
+    return nil;
+}
+
 + (void)resetForTesting {
     RLMSyncManager *manager = self.sharedManager;
     manager->_errorHandler = nil;

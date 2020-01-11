@@ -28,8 +28,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy) NSDictionary<NSString *, NSURL *> *pinnedCertificatePaths;
 @end
 
+
 /// An abstract class representing a server endpoint.
-@interface RLMSyncServerEndpoint : NSObject RLM_SYNC_UNINITIALIZABLE
+@interface RLMSyncServerEndpoint<ObjectType> : NSObject RLM_SYNC_UNINITIALIZABLE
 + (void)sendRequestToServer:(NSURL *)serverURL
                        JSON:(NSDictionary *)jsonDictionary
                  completion:(void (^)(NSError *))completionBlock;
@@ -37,32 +38,34 @@ NS_ASSUME_NONNULL_BEGIN
 + (void)sendRequestToServer:(NSURL *)serverURL
                        JSON:(NSDictionary *)jsonDictionary
                     timeout:(NSTimeInterval)timeout
-                 completion:(void (^)(NSError *, NSDictionary *))completionBlock;
+                 completion:(void (^)(NSError *, ObjectType))completionBlock;
+
++ (ObjectType)decode:(NSData *)data error:(NSError *) error;
 @end
 
-@interface RLMSyncAuthEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
+@interface RLMSyncAuthEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
 @end
-@interface RLMSyncChangePasswordEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
+@interface RLMSyncChangePasswordEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
 @end
-@interface RLMSyncUpdateAccountEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
+@interface RLMSyncUpdateAccountEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
 @end
-@interface RLMSyncGetUserInfoEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
-@end
-
-@interface RLMSyncGetPermissionsEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
-@end
-@interface RLMSyncGetPermissionOffersEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
-@end
-@interface RLMSyncApplyPermissionsEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
-@end
-@interface RLMSyncOfferPermissionsEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
-@end
-@interface RLMSyncAcceptPermissionOfferEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
-@end
-@interface RLMSyncInvalidatePermissionOfferEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
+@interface RLMSyncGetUserInfoEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
 @end
 
-@interface RLMAppFunctionEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
+@interface RLMSyncGetPermissionsEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
+@end
+@interface RLMSyncGetPermissionOffersEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
+@end
+@interface RLMSyncApplyPermissionsEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
+@end
+@interface RLMSyncOfferPermissionsEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
+@end
+@interface RLMSyncAcceptPermissionOfferEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
+@end
+@interface RLMSyncInvalidatePermissionOfferEndpoint : RLMSyncServerEndpoint<NSDictionary *> RLM_SYNC_UNINITIALIZABLE
+@end
+
+@interface RLMAppFunctionEndpoint : RLMSyncServerEndpoint<NSData *> RLM_SYNC_UNINITIALIZABLE
 @end
 
 NS_ASSUME_NONNULL_END

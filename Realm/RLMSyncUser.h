@@ -68,7 +68,7 @@ typedef void(^RLMRetrieveUserBlock)(RLMSyncUserInfo * _Nullable, NSError * _Null
 /// A block type used to report an error related to a specific user.
 typedef void(^RLMUserErrorReportingBlock)(RLMSyncUser * _Nonnull, NSError * _Nonnull);
 
-typedef void(^RLMFunctionCompletionBlock)(NSDictionary * _Nullable, NSError * _Nullable);
+typedef void(^RLMFunctionCompletionBlock)(NSData * _Nullable, NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
 

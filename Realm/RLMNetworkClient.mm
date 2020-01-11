@@ -46,6 +46,7 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 
 @interface RLMSessionDelegate <NSURLSessionDelegate> : NSObject
 + (instancetype)delegateWithCertificatePaths:(NSDictionary *)paths
+                                    decoder:(id (^)(NSData *, NSError *))decoder
                                   completion:(void (^)(NSError *, NSDictionary *))completion;
 @end
 
@@ -62,6 +63,8 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 /// The HTTP headers to be added to the request, if any.
 + (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(NSDictionary *)json
                                                         options:(nullable RLMNetworkRequestOptions *)options;
+
++ (id)decode:(NSData *)data error:(NSError *)error;
 @end
 
 @implementation RLMSyncServerEndpoint
@@ -77,7 +80,7 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 + (void)sendRequestToServer:(NSURL *)serverURL
                        JSON:(NSDictionary *)jsonDictionary
                     timeout:(NSTimeInterval)timeout
-                 completion:(void (^)(NSError *, NSDictionary *))completionBlock {
+                 completion:(void (^)(NSError *, id))completionBlock {
     // If the timeout isn't set then use the timeout set on the sync manager,
     // or 60 seconds if it isn't set there either.
     RLMSyncManager *syncManager = RLMSyncManager.sharedManager;
@@ -104,7 +107,13 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     for (NSString *key in headers) {
         [request addValue:headers[key] forHTTPHeaderField:key];
     }
+
+    id (^decoder)(NSData *, NSError *) = ^(NSData *data, NSError* error) {
+        return [self decode: data error: error];
+    };
+
     id delegate = [RLMSessionDelegate delegateWithCertificatePaths:options.pinnedCertificatePaths
+                                                          decoder:decoder
                                                         completion:completionBlock];
     auto session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration
                                                  delegate:delegate delegateQueue:nil];
@@ -113,6 +122,11 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     [[session dataTaskWithRequest:request] resume];
     // Tell the session to destroy itself once it's done with the request
     [session finishTasksAndInvalidate];
+}
+
++ (id)decode:(NSData *)data error:(NSError *) error {
+    id json = [NSJSONSerialization JSONObjectWithData:data options:(NSJSONReadingOptions)0 error:&error];
+    return json;
 }
 
 + (NSString *)httpMethod {
@@ -160,14 +174,17 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 @implementation RLMSessionDelegate {
     NSDictionary<NSString *, NSURL *> *_certificatePaths;
     NSData *_data;
-    void (^_completionBlock)(NSError *, NSDictionary *);
+    id (^_decoder)(NSData *, NSError *);
+    void (^_completionBlock)(NSError *, id);
 }
 
 + (instancetype)delegateWithCertificatePaths:(NSDictionary *)paths
+                                    decoder:(id (^)(NSData *, NSError *))decoder
                                   completion:(void (^)(NSError *, NSDictionary *))completion {
     RLMSessionDelegate *delegate = [RLMSessionDelegate new];
     delegate->_certificatePaths = paths;
     delegate->_completionBlock = completion;
+    delegate->_decoder = decoder;
     return delegate;
 }
 
@@ -285,19 +302,14 @@ didCompleteWithError:(NSError *)error
         return;
     }
 
-    id json = [NSJSONSerialization JSONObjectWithData:_data
-                                              options:(NSJSONReadingOptions)0
-                                                error:&error];
+    id json = _decoder(_data, error);
+
     if (!json) {
         _completionBlock(error, nil);
         return;
     }
-    if (![json isKindOfClass:[NSDictionary class]]) {
-        _completionBlock(make_auth_error_bad_response(json), nil);
-        return;
-    }
-
-    _completionBlock(nil, (NSDictionary *)json);
+    
+    _completionBlock(nil, json);
 }
 
 - (NSError *)validateResponse:(NSURLResponse *)response data:(NSData *)data {
@@ -473,7 +485,10 @@ didCompleteWithError:(NSError *)error
 + (NSString *)httpMethod {
     return @"POST";
 }
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
++ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
     return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"functions/call"]];
+}
++ (id)decode:(NSData *)data error:(__unused NSError *) error {
+    return data;
 }
 @end

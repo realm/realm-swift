@@ -846,6 +846,7 @@
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
 		3FF2A9F21F4F3BEB00678BC0 /* primitive_list_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = primitive_list_notifier.hpp; sourceTree = "<group>"; };
 		3FF2A9F31F4F3BEB00678BC0 /* primitive_list_notifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive_list_notifier.cpp; sourceTree = "<group>"; };
+		49006C8922EBC64000BE5843 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		49C7971423C4BC3E00E802D9 /* RealmClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmClientTests.swift; sourceTree = "<group>"; };
 		49C7971623C6799200E802D9 /* RealmApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmApp.swift; sourceTree = "<group>"; };
 		5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupport.swift; sourceTree = "<group>"; };
@@ -1525,6 +1526,7 @@
 		E8D89B8E1955FC6D00CF2B9A = {
 			isa = PBXGroup;
 			children = (
+				49006C8922EBC64000BE5843 /* Package.swift */,
 				5D660FB71BE98B770021E04F /* Configuration */,
 				1A7B82361D51254600750296 /* Frameworks */,
 				E81A1FB41955FCE000FDED82 /* LICENSE */,
@@ -2068,7 +2070,7 @@
 						ProvisioningStyle = Automatic;
 					};
 					5D659E7D1BE04556006515A0 = {
-						LastSwiftMigration = 0900;
+						LastSwiftMigration = 1130;
 						ProvisioningStyle = Automatic;
 					};
 					5D660FCB1BE98C560021E04F = {
@@ -3009,6 +3011,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E01BE05C19002800DA /* Tests.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				INFOPLIST_FILE = "Realm/ObjectServerTests/ObjectServerTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Realm/ObjectServerTests/Object-Server-Tests-Bridging-Header.h";
@@ -3019,6 +3022,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E01BE05C19002800DA /* Tests.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				INFOPLIST_FILE = "Realm/ObjectServerTests/ObjectServerTests-Info.plist";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Realm/ObjectServerTests/Object-Server-Tests-Bridging-Header.h";

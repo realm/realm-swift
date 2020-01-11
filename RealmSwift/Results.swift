@@ -18,6 +18,9 @@
 
 import Foundation
 import Realm
+#if canImport(Combine)
+import Combine
+#endif
 
 // MARK: MinMaxType
 
@@ -428,4 +431,19 @@ extension Results: Encodable where Element: Encodable {
         }
     }
 }
+#endif
+
+// MARK: - Combine
+
+#if canImport(Combine)
+//@available(OSX 10.15, *)
+//@available(watchOS 6.0, *)
+//@available(iOS 13.0, *)
+//@available(iOSApplicationExtension 13.0, *)
+//@available(OSXApplicationExtension 10.15, *)
+//extension Results: Combine.ObservableObject, Identifiable {
+//    public var objectWillChange: RealmCollectionPublisher<Results> {
+//        RealmCollectionPublisher(collection: self)
+//    }
+//}
 #endif

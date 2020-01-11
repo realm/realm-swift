@@ -32,8 +32,6 @@ public final class RealmServices {
     fileprivate init(appId: String) {
         self.appId = appId
     }
-
-    
 }
 
 @dynamicMemberLookup
@@ -55,15 +53,19 @@ public final class RealmFunctions {
                 arguments: args,
                 timeout: 30,
                 authServerURL: url!,
-                callbackQueue: DispatchQueue.main) { dictionary, error in
-                    guard let dict = dictionary else {
+                callbackQueue: DispatchQueue.main) { data, error in
+                    guard let data = data else {
                         completionHandler(.failure(error ?? NSError()))
                         return
                     }
 
-                    completionHandler(.success(try! JSONDecoder().decode(T.self,
-                                                                from: try! JSONSerialization.data(withJSONObject: dict,
-                                                                           options: .fragmentsAllowed))))
+                    do {
+                        completionHandler(.success(try JSONDecoder().decode(T.self, from: data)))
+                    } catch let error {
+                        completionHandler(.failure(error))
+                    }
+
+
             }
         }
     }
@@ -72,8 +74,12 @@ public final class RealmFunctions {
 public final class RealmAuth {
     private let appId: String
 
-    public var user: SyncUser? {
+    public var currentUser: SyncUser? {
         SyncUser.current
+    }
+
+    public var allUsers: [String: SyncUser] {
+        SyncUser.all
     }
 
     fileprivate init(appId: String) {
@@ -88,15 +94,28 @@ public final class RealmAuth {
             string: String.init(format: RealmApp.defaultBaseURL + RealmApp.authProviderRoute,
                                 self.appId, credentials.provider.rawValue))
 
-        return SyncUser.__logIn(with: RLMSyncCredentials(credentials),
-                                authServerURL: url!,
-                                timeout: timeout,
-                                callbackQueue: queue,
-                                onCompletion: completion)
+        return SyncUser.__logIn(
+            with: RLMSyncCredentials(credentials),
+            authServerURL: url!,
+            timeout: timeout,
+            callbackQueue: queue,
+            onCompletion: completion)
+    }
+
+    public func switchUser(id: String) {
+        SyncUser.all[id]
     }
 }
 
 public final class RealmApp {
+    public struct Configuration {
+        let baseURL: String
+
+        public static let defaultConfiguration: Configuration = {
+            Configuration(baseURL: "https://stitch.mongodb.com")
+        }()
+    }
+
     static let defaultBaseURL = "https://stitch.mongodb.com"
     static let baseRoute = "/api/client/v2.0"
     static let appRoute = baseRoute + "/app/%@"
@@ -116,7 +135,7 @@ public final class RealmApp {
     public lazy var auth      = RealmAuth(appId: appId)
     public lazy var functions = RealmFunctions(appId: appId)
 
-    private init(appId: String) {
+    public init(appId: String, configuration: RealmApp.Configuration = .defaultConfiguration) {
         self.appId = appId
     }
 
@@ -126,8 +145,11 @@ public final class RealmApp {
      - parameter appId: id of the application
      - parameter configuration: the configuration to use for the default
      */
-    public class func configure(appId: String, configuration: SyncConfiguration) {
-
+    public func configuration() -> Realm.Configuration {
+        var url = FileManager.default.urls(for: .documentDirectory,
+                                           in: .userDomainMask).first!
+        url.appendPathComponent(appId)
+        return Realm.Configuration(fileURL: url)
     }
 
 

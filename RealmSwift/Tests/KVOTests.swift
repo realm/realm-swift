@@ -313,3 +313,106 @@ class KVOMultipleAccessorsTests: KVOTests {
         return (obj, realm.object(ofType: SwiftKVOObject.self, forPrimaryKey: obj.pk)!)
     }
 }
+
+#if canImport(Combine)
+class KVOBackLink: Object {
+    let list = List<KVOLinked>()
+}
+class KVOLinked: Object {
+    let link = LinkingObjects(fromType: KVOBackLink.self, property: "list")
+}
+
+@available(OSX 10.15, *)
+@available(watchOS 6.0, *)
+@available(iOS 13.0, *)
+@available(iOSApplicationExtension 13.0, *)
+@available(OSXApplicationExtension 10.15, *)
+class KVOCombineTests: TestCase {
+    var realm: Realm! = nil
+
+    override func setUp() {
+        super.setUp()
+        realm = try! Realm(configuration: Realm.Configuration(inMemoryIdentifier: "test"))
+        realm.beginWrite()
+    }
+
+    override func tearDown() {
+        realm = nil
+        super.tearDown()
+    }
+
+     func getObject(_ obj: SwiftKVOObject) -> (SwiftKVOObject, SwiftKVOObject) {
+        realm.add(obj)
+        try! realm.commitWrite()
+        return (obj, obj)
+    }
+
+    func testObjectWillChange() {
+        let exp = XCTestExpectation(description: "sink will receive objects")
+        let (obj, _) = getObject(SwiftKVOObject())
+
+        let cancellable = obj.objectWillChange.sink {
+            XCTAssertEqual(obj, $0)
+            exp.fulfill()
+        }
+
+        try! realm.write { obj.boolCol = false }
+
+        wait(for: [exp], timeout: 10)
+        cancellable.cancel()
+    }
+
+    func testListWillChange() {
+        let exp = XCTestExpectation(description: "sink will receive objects")
+        let (obj, _) = getObject(SwiftKVOObject())
+
+        let cancellable = obj.arrayBool.objectWillChange.sink {
+            XCTAssertEqual(obj.arrayBool, $0)
+            exp.fulfill()
+        }
+
+        try! realm.write { obj.arrayBool.append(false) }
+
+        wait(for: [exp], timeout: 10)
+        cancellable.cancel()
+    }
+
+    func testResultsWillChange() {
+        let exp = XCTestExpectation(description: "sink will receive objects")
+
+        let (obj, _) = getObject(SwiftKVOObject())
+        let results = obj.arrayCol.filter("int64Col == 4")
+
+        let cancellable = results.objectWillChange.sink {
+            XCTAssertEqual(obj.arrayCol[0], $0[0])
+            exp.fulfill()
+        }
+
+        try! realm.write { obj.arrayCol.append(SwiftKVOObject()) }
+
+        wait(for: [exp], timeout: 10)
+        cancellable.cancel()
+    }
+
+    func testLinkingObjectsWillChange() {
+        let exp = XCTestExpectation(description: "sink will receive objects")
+
+        let kvoBackLink = KVOBackLink()
+        let kvoLinked = KVOLinked()
+
+        kvoBackLink.list.append(kvoLinked)
+        realm.add(kvoBackLink)
+        try! realm.commitWrite()
+
+        let cancellable = kvoLinked.link.objectWillChange.sink {
+            XCTAssertEqual(kvoLinked.link, $0)
+            exp.fulfill()
+        }
+
+        try! realm.write { kvoBackLink.list.append(KVOLinked()) }
+
+        wait(for: [exp], timeout: 10)
+        cancellable.cancel()
+    }
+}
+#endif

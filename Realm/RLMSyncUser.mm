@@ -102,11 +102,7 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
 }
 
 + (RLMSyncUser *)currentUser {
-    NSArray *allUsers = [[RLMSyncManager sharedManager] _allUsers];
-    if (allUsers.count > 1 && [NSSet setWithArray:[allUsers valueForKey:@"identity"]].count > 1) {
-        @throw RLMException(@"+currentUser cannot be called if more that one valid, logged-in user exists.");
-    }
-    return allUsers.firstObject;
+    return [[RLMSyncManager sharedManager] _currentUser];
 }
 
 #pragma mark - API
@@ -219,9 +215,9 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     [RLMAppFunctionEndpoint sendRequestToServer:authServerURL
                                            JSON:json
                                         timeout:timeout
-                                     completion:^(NSError *error, NSDictionary *dictionary) {
+                                     completion:^(NSError *error, NSData *data) {
         dispatch_async(callbackQueue, ^{
-            completion(dictionary, error);
+            completion(data, error);
         });
     }];
 }
