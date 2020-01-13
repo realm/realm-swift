@@ -1,3 +1,23 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* Fix compilation when using CocoaPods targeting iOS versions older than 11 (since 5.0.0-alpha).
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* APIs are backwards compatible with all previous releases in the 4.x.y series.
+* Carthage release for Swift is built with Xcode 11.3.
+
+### Internal
+Upgraded realm-core from ? to ?
+Upgraded realm-sync from ? to ?
+
 5.0.0-beta.1 Release notes (2019-12-13)
 =============================================================
 

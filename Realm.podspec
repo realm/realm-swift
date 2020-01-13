@@ -90,6 +90,7 @@ Pod::Spec.new do |s|
                                 'CLANG_CXX_LANGUAGE_STANDARD' => 'c++17',
                                 'CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF' => 'NO',
                                 'OTHER_CPLUSPLUSFLAGS' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden',
+                                'OTHER_CPLUSPLUSFLAGS[arch=armv7]' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden -fno-aligned-new',
                                 'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"',
                               }
   s.preserve_paths          = %w(build.sh include)
