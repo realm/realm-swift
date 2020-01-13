@@ -302,22 +302,4 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
     return nil;
 }
 
-+ (RLMRealmConfiguration *)automaticConfiguration {
-    if (RLMSyncUser.allUsers.count != 1)
-        @throw RLMException(@"The automatic configuration requires there be exactly one logged-in sync user.");
-
-    return [RLMSyncConfiguration automaticConfigurationForUser:RLMSyncUser.currentUser];
-}
-
-+ (RLMRealmConfiguration *)automaticConfigurationForUser:(RLMSyncUser *)user {
-    RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user
-                                                                         realmURL:user.defaultRealmURL
-                                                                    customFileURL:nil
-                                                                        isPartial:YES
-                                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
-    RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
-    config.syncConfiguration = syncConfig;
-    return config;
-}
-
 @end

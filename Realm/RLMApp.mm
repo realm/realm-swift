@@ -13,14 +13,36 @@
 #import "sync/sync_session.hpp"
 #import "sync/sync_user.hpp"
 
-@implementation RLMFunctions {
+@implementation RLMPush {
     NSURL *_route;
 }
 
-- (instancetype) initWithRoute:(NSURL *)route {
+- (void)register:(NSString *)token {
+
+}
+
+- (void)deregister {
+
+}
+
+- (void)sendMessage:(NSString *)target
+            request:(RLMPushSendMessageRequest *)request
+       onCompletion:(RLMPushCompletionBlock)completion {
+    
+}
+
+@end
+
+@implementation RLMFunctions {
+    RLMApp *_app;
+    NSURL *_route;
+}
+
+- (instancetype) initWithApp:(RLMApp *)app
+                       route:(NSURL *)route {
     if (!(self = [super init]))
         return nil;
-
+    _app = app;
     _route = route;
     return self;
 }
@@ -33,7 +55,7 @@
     NSDictionary *json = @{
         @"name": name,
         @"arguments": arguments,
-        @"token": RLMSyncUser.allUsers.allValues.lastObject.accessToken,
+        @"token": [[_app auth] currentUser].accessToken,
     };
 
     [RLMAppFunctionEndpoint sendRequestToServer:_route
@@ -123,6 +145,10 @@
     }];
 }
 
+- (void)switchUser:(NSString *)userId {
+
+}
+
 @end
 
 @implementation RLMApp {
@@ -145,7 +171,8 @@ static NSMutableDictionary<NSString *, RLMApp *> *_allApps;
                                             [[NSString alloc] initWithFormat:[appRoute stringByAppendingString:@"/auth"],
                                              appID]]];
 
-    _functions = [[RLMFunctions alloc] initWithRoute:[[NSURL alloc] initWithString: [[NSString alloc] initWithFormat:appRoute, appID]]];
+    _functions = [[RLMFunctions alloc] initWithApp: self
+                                             route: [[NSURL alloc] initWithString: [[NSString alloc] initWithFormat:appRoute, appID]]];
     return self;
 }
 

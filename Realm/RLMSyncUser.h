@@ -80,18 +80,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMSyncUser : NSObject
 
 /**
- A dictionary of all valid, logged-in user identities corresponding to their user objects.
- */
-+ (NSDictionary<NSString *, RLMSyncUser *> *)allUsers NS_REFINED_FOR_SWIFT;
-
-/**
- The logged-in user. `nil` if none exists.
-
- @warning Throws an exception if more than one logged-in user exists.
- */
-+ (nullable RLMSyncUser *)currentUser NS_REFINED_FOR_SWIFT;
-
-/**
  The unique Realm Object Server user ID string identifying this user.
  */
 @property (nullable, nonatomic, readonly) NSString *identity;

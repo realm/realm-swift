@@ -98,12 +98,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url __attribute__((unavailable("Use [RLMSyncUser configurationWithURL:] instead")));
 
 /// :nodoc:
-+ (RLMRealmConfiguration *)automaticConfiguration __attribute__((unavailable("Use [RLMSyncUser configuration] instead")));
-
-/// :nodoc:
-+ (RLMRealmConfiguration *)automaticConfigurationForUser:(RLMSyncUser *)user __attribute__((unavailable("Use [RLMSyncUser configuration] instead")));
-
-/// :nodoc:
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly")));
 
 /// :nodoc:

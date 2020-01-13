@@ -9,8 +9,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                willConnectTo session: UISceneSession,
                options connectionOptions: UIScene.ConnectionOptions) {
 
+        RealmApp("translate-utwuv").auth.logIn(with: .anonymous(), onCompletion: { user,_ in
+            user
+        })
         let contentView = ContentView()
-            .environmentObject(AppEnvironment(app: RealmApp("translate-utwuv")))
+            .environmentObject(AppEnvironment(app: app))
 
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {
