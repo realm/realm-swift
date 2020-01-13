@@ -251,6 +251,20 @@
 		3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */; };
 		3FF2A9F51F4F3BEB00678BC0 /* primitive_list_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FF2A9F31F4F3BEB00678BC0 /* primitive_list_notifier.cpp */; };
 		3FF3FFAF1F0D6D6400B84599 /* KVOTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FFF1BE98D880021E04F /* KVOTests.swift */; };
+		496C8CBE23CC98F700005B5D /* RLMAuth.h in Headers */ = {isa = PBXBuildFile; fileRef = 496C8CBC23CC98F700005B5D /* RLMAuth.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		496C8CBF23CC98F700005B5D /* RLMAuth.mm in Sources */ = {isa = PBXBuildFile; fileRef = 496C8CBD23CC98F700005B5D /* RLMAuth.mm */; };
+		496C8CC223CC9AB800005B5D /* RLMFunctions.h in Headers */ = {isa = PBXBuildFile; fileRef = 496C8CC023CC9AB800005B5D /* RLMFunctions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		496C8CC323CC9AB800005B5D /* RLMFunctions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 496C8CC123CC9AB800005B5D /* RLMFunctions.mm */; };
+		496C8CC523CC9EAE00005B5D /* RLMFunctions_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 496C8CC423CC9E1C00005B5D /* RLMFunctions_Private.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		496C8CC723CC9FE800005B5D /* RLMAuth_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 496C8CC623CC9FE800005B5D /* RLMAuth_Private.h */; };
+		496C8CCA23CCA0AB00005B5D /* RLMMongoDBService.h in Headers */ = {isa = PBXBuildFile; fileRef = 496C8CC823CCA0AB00005B5D /* RLMMongoDBService.h */; };
+		496C8CCB23CCA0AB00005B5D /* RLMMongoDBService.m in Sources */ = {isa = PBXBuildFile; fileRef = 496C8CC923CCA0AB00005B5D /* RLMMongoDBService.m */; };
+		496C8CCE23CCA0FE00005B5D /* RLMServices.h in Headers */ = {isa = PBXBuildFile; fileRef = 496C8CCC23CCA0FE00005B5D /* RLMServices.h */; };
+		496C8CCF23CCA0FE00005B5D /* RLMServices.m in Sources */ = {isa = PBXBuildFile; fileRef = 496C8CCD23CCA0FE00005B5D /* RLMServices.m */; };
+		496C8CD223CCA1B600005B5D /* RLMTwilioService.h in Headers */ = {isa = PBXBuildFile; fileRef = 496C8CD023CCA1B600005B5D /* RLMTwilioService.h */; };
+		496C8CD323CCA1B600005B5D /* RLMTwilioService.m in Sources */ = {isa = PBXBuildFile; fileRef = 496C8CD123CCA1B600005B5D /* RLMTwilioService.m */; };
+		496C8CD623CCA20600005B5D /* RLMPush.h in Headers */ = {isa = PBXBuildFile; fileRef = 496C8CD423CCA20600005B5D /* RLMPush.h */; };
+		496C8CD723CCA20600005B5D /* RLMPush.m in Sources */ = {isa = PBXBuildFile; fileRef = 496C8CD523CCA20600005B5D /* RLMPush.m */; };
 		49C7971523C4BC3E00E802D9 /* RealmAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7971423C4BC3E00E802D9 /* RealmAppTests.swift */; };
 		49C7971723C6799200E802D9 /* RealmApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 49C7971623C6799200E802D9 /* RealmApp.swift */; };
 		49F8A80F23CB4BAF00F73081 /* RLMApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 49F8A80D23CB4BAF00F73081 /* RLMApp.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -849,6 +863,20 @@
 		3FF2A9F21F4F3BEB00678BC0 /* primitive_list_notifier.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = primitive_list_notifier.hpp; sourceTree = "<group>"; };
 		3FF2A9F31F4F3BEB00678BC0 /* primitive_list_notifier.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = primitive_list_notifier.cpp; sourceTree = "<group>"; };
 		49006C8922EBC64000BE5843 /* Package.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
+		496C8CBC23CC98F700005B5D /* RLMAuth.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAuth.h; sourceTree = "<group>"; };
+		496C8CBD23CC98F700005B5D /* RLMAuth.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAuth.mm; sourceTree = "<group>"; };
+		496C8CC023CC9AB800005B5D /* RLMFunctions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMFunctions.h; sourceTree = "<group>"; };
+		496C8CC123CC9AB800005B5D /* RLMFunctions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMFunctions.mm; sourceTree = "<group>"; };
+		496C8CC423CC9E1C00005B5D /* RLMFunctions_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMFunctions_Private.h; sourceTree = "<group>"; };
+		496C8CC623CC9FE800005B5D /* RLMAuth_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAuth_Private.h; sourceTree = "<group>"; };
+		496C8CC823CCA0AB00005B5D /* RLMMongoDBService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMMongoDBService.h; sourceTree = "<group>"; };
+		496C8CC923CCA0AB00005B5D /* RLMMongoDBService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RLMMongoDBService.m; sourceTree = "<group>"; };
+		496C8CCC23CCA0FE00005B5D /* RLMServices.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMServices.h; sourceTree = "<group>"; };
+		496C8CCD23CCA0FE00005B5D /* RLMServices.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RLMServices.m; sourceTree = "<group>"; };
+		496C8CD023CCA1B600005B5D /* RLMTwilioService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMTwilioService.h; sourceTree = "<group>"; };
+		496C8CD123CCA1B600005B5D /* RLMTwilioService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RLMTwilioService.m; sourceTree = "<group>"; };
+		496C8CD423CCA20600005B5D /* RLMPush.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMPush.h; sourceTree = "<group>"; };
+		496C8CD523CCA20600005B5D /* RLMPush.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RLMPush.m; sourceTree = "<group>"; };
 		49C7971423C4BC3E00E802D9 /* RealmAppTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmAppTests.swift; sourceTree = "<group>"; };
 		49C7971623C6799200E802D9 /* RealmApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmApp.swift; sourceTree = "<group>"; };
 		49F8A80D23CB4BAF00F73081 /* RLMApp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMApp.h; sourceTree = "<group>"; };
@@ -1199,6 +1227,22 @@
 				1AD3870E1D4A827C00479110 /* Private */,
 				3F73BC931E3A878500FE80B6 /* NSError+RLMSync.h */,
 				3F73BC941E3A878500FE80B6 /* NSError+RLMSync.m */,
+				49F8A80D23CB4BAF00F73081 /* RLMApp.h */,
+				49F8A80E23CB4BAF00F73081 /* RLMApp.mm */,
+				496C8CBC23CC98F700005B5D /* RLMAuth.h */,
+				496C8CC623CC9FE800005B5D /* RLMAuth_Private.h */,
+				496C8CBD23CC98F700005B5D /* RLMAuth.mm */,
+				496C8CC023CC9AB800005B5D /* RLMFunctions.h */,
+				496C8CC423CC9E1C00005B5D /* RLMFunctions_Private.h */,
+				496C8CC123CC9AB800005B5D /* RLMFunctions.mm */,
+				496C8CC823CCA0AB00005B5D /* RLMMongoDBService.h */,
+				496C8CC923CCA0AB00005B5D /* RLMMongoDBService.m */,
+				496C8CD423CCA20600005B5D /* RLMPush.h */,
+				496C8CD523CCA20600005B5D /* RLMPush.m */,
+				496C8CCC23CCA0FE00005B5D /* RLMServices.h */,
+				496C8CCD23CCA0FE00005B5D /* RLMServices.m */,
+				496C8CD023CCA1B600005B5D /* RLMTwilioService.h */,
+				496C8CD123CCA1B600005B5D /* RLMTwilioService.m */,
 				1AD397CD1F72FFC6002AA897 /* RLMRealm+Sync.h */,
 				1AD397CC1F72FFC5002AA897 /* RLMRealm+Sync.mm */,
 				1ABF256D1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.h */,
@@ -1221,8 +1265,6 @@
 				5D5FA91820379BAD00E92B76 /* RLMSyncSubscription.h */,
 				5D5FA91720379BAD00E92B76 /* RLMSyncSubscription.mm */,
 				1ABDCDAD1D792FEB003489E3 /* RLMSyncUser.h */,
-				49F8A80D23CB4BAF00F73081 /* RLMApp.h */,
-				49F8A80E23CB4BAF00F73081 /* RLMApp.mm */,
 				1ABDCDAF1D793008003489E3 /* RLMSyncUser.mm */,
 				1A33C42A1DAEB9C4001E87AA /* RLMSyncUser_Private.hpp */,
 				1A4FFC971D35A71000B4B65C /* RLMSyncUtil.h */,
@@ -1720,8 +1762,11 @@
 				5D659EA51BE04556006515A0 /* Realm.h in Headers */,
 				49F8A80F23CB4BAF00F73081 /* RLMApp.h in Headers */,
 				5D659EA71BE04556006515A0 /* RLMAccessor.h in Headers */,
+				496C8CBE23CC98F700005B5D /* RLMAuth.h in Headers */,
 				5D659EA91BE04556006515A0 /* RLMArray.h in Headers */,
 				5D659EAA1BE04556006515A0 /* RLMArray_Private.h in Headers */,
+				496C8CC723CC9FE800005B5D /* RLMAuth_Private.h in Headers */,
+				496C8CC223CC9AB800005B5D /* RLMFunctions.h in Headers */,
 				5D659EAB1BE04556006515A0 /* RLMCollection.h in Headers */,
 				5D1BF1FF1EF987AD00B7DC87 /* RLMCollection_Private.h in Headers */,
 				5D659EAC1BE04556006515A0 /* RLMConstants.h in Headers */,
@@ -1735,6 +1780,7 @@
 				E8F992BE1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */,
 				5D659EB51BE04556006515A0 /* RLMObjectSchema.h in Headers */,
 				5D659EB61BE04556006515A0 /* RLMObjectSchema_Private.h in Headers */,
+				496C8CD223CCA1B600005B5D /* RLMTwilioService.h in Headers */,
 				5D659EB81BE04556006515A0 /* RLMObjectStore.h in Headers */,
 				5D659EBA1BE04556006515A0 /* RLMOptionalBase.h in Headers */,
 				5D659EBC1BE04556006515A0 /* RLMProperty.h in Headers */,
@@ -1746,6 +1792,7 @@
 				1ABF256F1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.h in Headers */,
 				5D659EC21BE04556006515A0 /* RLMRealmConfiguration.h in Headers */,
 				5D659EC31BE04556006515A0 /* RLMRealmConfiguration_Private.h in Headers */,
+				496C8CC523CC9EAE00005B5D /* RLMFunctions_Private.h in Headers */,
 				5D659EC51BE04556006515A0 /* RLMResults.h in Headers */,
 				5D659EC61BE04556006515A0 /* RLMResults_Private.h in Headers */,
 				5D659EC71BE04556006515A0 /* RLMSchema.h in Headers */,
@@ -1756,11 +1803,14 @@
 				1AAF4D211D66585B00058FAD /* RLMSyncCredentials.h in Headers */,
 				1AF7EA961D340AF70001A9B5 /* RLMSyncManager.h in Headers */,
 				5D44AAE61F709794007BA84C /* RLMSyncPermission.h in Headers */,
+				496C8CD623CCA20600005B5D /* RLMPush.h in Headers */,
 				1AD3870C1D4A7FBB00479110 /* RLMSyncSession.h in Headers */,
 				5D5FA91A20379BAE00E92B76 /* RLMSyncSubscription.h in Headers */,
 				1ABDCDAE1D792FEB003489E3 /* RLMSyncUser.h in Headers */,
+				496C8CCA23CCA0AB00005B5D /* RLMMongoDBService.h in Headers */,
 				1A4FFC991D35A71000B4B65C /* RLMSyncUtil.h in Headers */,
 				E8C6EAF51DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */,
+				496C8CCE23CCA0FE00005B5D /* RLMServices.h in Headers */,
 				3F67DB3C1E26D69C0024533D /* RLMThreadSafeReference.h in Headers */,
 				5DEAA36720212AF00024A6BE /* work_queue.hpp in Headers */,
 			);
@@ -2386,6 +2436,7 @@
 				3F7A3FAE1CC6EB7300301A17 /* collection_change_builder.cpp in Sources */,
 				3F9801AB1C8E4F6B000A8B07 /* collection_notifications.cpp in Sources */,
 				3F9801A41C8E4F55000A8B07 /* collection_notifier.cpp in Sources */,
+				496C8CD323CCA1B600005B5D /* RLMTwilioService.m in Sources */,
 				5D659E811BE04556006515A0 /* external_commit_helper.cpp in Sources */,
 				5D659E821BE04556006515A0 /* index_set.cpp in Sources */,
 				1A64CA8B1D8763B400BC0F9B /* keychain_helper.cpp in Sources */,
@@ -2405,11 +2456,13 @@
 				5D659E851BE04556006515A0 /* RLMAccessor.mm in Sources */,
 				5D659E861BE04556006515A0 /* RLMAnalytics.mm in Sources */,
 				5D659E871BE04556006515A0 /* RLMArray.mm in Sources */,
+				496C8CCB23CCA0AB00005B5D /* RLMMongoDBService.m in Sources */,
 				3F9863BB1D36876B00641C98 /* RLMClassInfo.mm in Sources */,
 				3FBEF67B1C63D66100F6935B /* RLMCollection.mm in Sources */,
 				5D659E891BE04556006515A0 /* RLMConstants.m in Sources */,
 				1A6921D41D779774004C3232 /* RLMJSONModels.m in Sources */,
 				5D659E8A1BE04556006515A0 /* RLMListBase.mm in Sources */,
+				496C8CC323CC9AB800005B5D /* RLMFunctions.mm in Sources */,
 				5D659E881BE04556006515A0 /* RLMManagedArray.mm in Sources */,
 				5D659E8B1BE04556006515A0 /* RLMMigration.mm in Sources */,
 				1AF7EA9C1D340E700001A9B5 /* RLMNetworkClient.mm in Sources */,
@@ -2427,6 +2480,7 @@
 				1ABF25701D52AB6200BAC441 /* RLMRealmConfiguration+Sync.mm in Sources */,
 				5D659E951BE04556006515A0 /* RLMRealmConfiguration.mm in Sources */,
 				5D659E961BE04556006515A0 /* RLMRealmUtil.mm in Sources */,
+				496C8CBF23CC98F700005B5D /* RLMAuth.mm in Sources */,
 				5D659E971BE04556006515A0 /* RLMResults.mm in Sources */,
 				5D659E981BE04556006515A0 /* RLMSchema.mm in Sources */,
 				5D659E991BE04556006515A0 /* RLMSwiftSupport.m in Sources */,
@@ -2449,12 +2503,14 @@
 				1A1536721DB0464800C0EC93 /* sync_file.cpp in Sources */,
 				1A1536581DB045B500C0EC93 /* sync_manager.cpp in Sources */,
 				1A1536741DB0464800C0EC93 /* sync_metadata.cpp in Sources */,
+				496C8CCF23CCA0FE00005B5D /* RLMServices.m in Sources */,
 				1A15365C1DB045B500C0EC93 /* sync_session.cpp in Sources */,
 				1A15365E1DB045B500C0EC93 /* sync_user.cpp in Sources */,
 				C2CAAE771E9BB5760025454C /* system_configuration.cpp in Sources */,
 				1AB2D36E1E16EB91007D0A3F /* thread_safe_reference.cpp in Sources */,
 				5D659E9E1BE04556006515A0 /* transact_log_handler.cpp in Sources */,
 				1AABD4021E9552BA00115A75 /* uuid.cpp in Sources */,
+				496C8CD723CCA20600005B5D /* RLMPush.m in Sources */,
 				5D274C4D1D6D15D2006FEBB1 /* weak_realm_notifier.cpp in Sources */,
 				5DEAA36620212AF00024A6BE /* work_queue.cpp in Sources */,
 			);
