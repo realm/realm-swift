@@ -53,7 +53,7 @@ export EXPANDED_CODE_SIGN_IDENTITY=''
 
 download_zip_if_needed() {
     LANG="$1"
-    DIRECTORY=realm-$LANG-latest
+    local DIRECTORY=realm-$LANG-latest
     if [ ! -d $DIRECTORY ]; then
         curl -o $DIRECTORY.zip -L https://static.realm.io/downloads/$LANG/latest
         unzip $DIRECTORY.zip
@@ -67,15 +67,13 @@ xcode_version_major() {
 }
 
 xctest() {
-    PLATFORM="$1"
-    LANG="$2"
-    NAME="$3"
-    DIRECTORY="$PLATFORM/$LANG/$NAME"
+    local PLATFORM="$1"
+    local LANG="$2"
+    local NAME="$3"
+    local DIRECTORY="$PLATFORM/$LANG/$NAME"
     if [[ ! -d "$DIRECTORY" ]]; then
         DIRECTORY="${DIRECTORY/swift/swift-$REALM_SWIFT_VERSION}"
     fi
-    PROJECT="$DIRECTORY/$NAME.xcodeproj"
-    WORKSPACE="$DIRECTORY/$NAME.xcworkspace"
     if [[ $PLATFORM == ios ]]; then
         sh "$(dirname "$0")/../../scripts/reset-simulators.sh"
     fi
@@ -102,7 +100,7 @@ xctest() {
     else
         download_zip_if_needed $LANG
     fi
-    DESTINATION=""
+    local DESTINATION=""
     if [[ $PLATFORM == ios ]]; then
         simulator_id="$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
         xcrun simctl boot $simulator_id
@@ -114,20 +112,21 @@ xctest() {
             DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep 'iPhone Xs' | grep -m 1 -o '[0-9A-F\-]\{36\}')"
         fi
     fi
-    CMD="-project $PROJECT"
+
+    local PROJECT="-project $DIRECTORY/$NAME.xcodeproj"
+    local WORKSPACE="$DIRECTORY/$NAME.xcworkspace"
     if [ -d $WORKSPACE ]; then
-        CMD="-workspace $WORKSPACE"
+        PROJECT="-workspace $WORKSPACE"
     fi
-    ACTION=""
-    if [[ $PLATFORM == watchos ]]; then
-        ACTION="build"
-    else
-        ACTION="build test"
+    xcodebuild $PROJECT -scheme $NAME clean build $DESTINATION CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
+    if [[ $PLATFORM != watchos ]]; then
+        xcodebuild $PROJECT -scheme $NAME test $DESTINATION CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
     fi
-    if [[ $PLATFORM == ios ]]; then
-        xcodebuild $CMD -scheme $NAME clean $ACTION $DESTINATION CODE_SIGN_IDENTITY=
-    else
-        xcodebuild $CMD -scheme $NAME clean $ACTION $DESTINATION CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
+
+    if [[ $NAME == CocoaPods* ]] && [[ $PLATFORM != osx ]]; then
+        [[ $PLATFORM == 'ios' ]] && SDK=iphoneos || SDK=$PLATFORM
+        [[ $LANG == 'swift' ]] && SCHEME=RealmSwift || SCHEME=Realm
+        xcodebuild $PROJECT -scheme $SCHEME -sdk $SDK ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= build
     fi
 }
 
