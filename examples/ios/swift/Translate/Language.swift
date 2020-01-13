@@ -15,7 +15,7 @@ class Language: Object, Codable {
         language.name = (Locale.current as NSLocale).displayName(forKey: NSLocale.Key.identifier,
                                                                  value: Locale.current.languageCode!)!
         language.nativeName = language.name
-        language.languageCode = Locale.current.languageCode!
+        language.languageCode = "en"
         return language
     }()
 

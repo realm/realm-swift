@@ -3,10 +3,14 @@ import RealmSwift
 import XCTest
 
 class RealmAppTests: XCTestCase {
-    func testApp() throws {
-        let app = RealmApp.app(appId: "translate-utwuv")
+    struct M: Codable {
 
-        var exp = expectation(description: "should login")
+    }
+    func testApp() throws {
+        let app = RealmApp(appID: "translate-utwuv")
+
+        let exp = expectation(description: "should login")
+
         app.auth.logIn(with: SyncCredentials.anonymous(), onCompletion: { user, error in
             if user == nil {
                 XCTFail(error?.localizedDescription ?? "unknown failure")

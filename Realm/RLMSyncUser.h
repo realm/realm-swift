@@ -36,9 +36,6 @@ typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
     RLMSyncUserStateError,
 };
 
-/// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
-typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
-
 /// A block type used to report the status of a password change operation.
 /// If the `NSError` argument is nil, the operation succeeded.
 typedef void(^RLMPasswordChangeStatusBlock)(NSError * _Nullable);
@@ -67,10 +64,6 @@ typedef void(^RLMRetrieveUserBlock)(RLMSyncUserInfo * _Nullable, NSError * _Null
 
 /// A block type used to report an error related to a specific user.
 typedef void(^RLMUserErrorReportingBlock)(RLMSyncUser * _Nonnull, NSError * _Nonnull);
-
-/// A block type used to asynchronously report results of a remote function call.
-/// Data is returned raw as function results are of arbitrary shape.
-typedef void(^RLMFunctionCompletionBlock)(NSData * _Nullable, NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -135,45 +128,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) RLMSyncUserState state;
 
 #pragma mark - Lifecycle
-
-/**
- Create, log in, and asynchronously return a new user object, specifying a custom
- timeout for the network request and a custom queue to run the callback upon.
- Credentials identifying the user must be passed in. The user becomes available in
- the completion block, at which point it is ready for use.
- */
-+ (void)logInWithCredentials:(RLMSyncCredentials *)credentials
-               authServerURL:(NSURL *)authServerURL
-                     timeout:(NSTimeInterval)timeout
-               callbackQueue:(dispatch_queue_t)callbackQueue
-                onCompletion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
-
-/**
- Create, log in, and asynchronously return a new user object.
-
- If the login completes successfully, the completion block will invoked with
- a `RLMSyncUser` object representing the logged-in user. This object can be
- used to open synchronized Realms. If the login fails, the completion block
- will be invoked with an error.
-
- The completion block always runs on the main queue.
-
- @param credentials     A credentials value identifying the user to be logged in.
- @param authServerURL   The URL of the authentication server (e.g. "http://realm.example.org:9080").
- @param completion      A callback block that returns a user object or an error,
-                        indicating the completion of the login operation.
- */
-+ (void)logInWithCredentials:(RLMSyncCredentials *)credentials
-               authServerURL:(NSURL *)authServerURL
-                onCompletion:(RLMUserCompletionBlock)completion
-NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
-
-+ (void)callFunction:(NSString *)name
-           arguments:(NSArray *)arguments
-             timeout:(NSTimeInterval)timeout
-       authServerURL:(NSURL *)authServerURL
-       callbackQueue:(dispatch_queue_t)callbackQueue
-        onCompletion:(RLMFunctionCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
 /**
  Returns the default configuration for the user. The default configuration

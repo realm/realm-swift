@@ -376,7 +376,10 @@ didCompleteWithError:(NSError *)error
 
 @implementation RLMSyncAuthEndpoint
 + (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"login"];
+    NSString *provider = json[kRLMSyncProviderKey];
+    NSAssert(provider, @"provider must not be nil");
+
+    return [authServerURL URLByAppendingPathComponent:[[NSString alloc] initWithFormat: @"providers/%@/login", provider]];
 }
 @end
 

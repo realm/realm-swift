@@ -22,17 +22,12 @@
 /// A Twitter account as an identity provider.
 //extern RLMIdentityProvider const RLMIdentityProviderTwitter;
 
-//RLMIdentityProvider const RLMIdentityProviderDebug                  = @"debug";
-//RLMIdentityProvider const RLMIdentityProviderRealm                  = @"realm";
 RLMIdentityProvider const RLMIdentityProviderUsernamePassword       = @"local-userpass";
 RLMIdentityProvider const RLMIdentityProviderFacebook               = @"oauth2-facebook";
-//RLMIdentityProvider const RLMIdentityProviderTwitter                = @"twitter";
 RLMIdentityProvider const RLMIdentityProviderGoogle                 = @"oauth2-google";
-//RLMIdentityProvider const RLMIdentityProviderCloudKit               = @"cloudkit";
+RLMIdentityProvider const RLMIdentityProviderApple                  = @"oauth2-apple";
 RLMIdentityProvider const RLMIdentityProviderJWT                    = @"custom-token";
 RLMIdentityProvider const RLMIdentityProviderAnonymous              = @"anon-user";
-//RLMIdentityProvider const RLMIdentityProviderNickname               = @"nickname";
-//RLMIdentityProvider const RLMIdentityProviderCustomRefreshToken     = @"customrefreshtoken";
 
 @interface RLMSyncCredentials ()
 
@@ -76,36 +71,10 @@ RLMIdentityProvider const RLMIdentityProviderAnonymous              = @"anon-use
 + (instancetype)anonymousCredentials {
     return [[self alloc] initWithCustomToken:@"" provider:RLMIdentityProviderAnonymous userInfo:nil];
 }
-    
-//+ (instancetype)credentialsWithNickname:(NSString *)nickname isAdmin:(BOOL)isAdmin {
-//    return [[self alloc] initWithCustomToken:nickname
-//                                    provider:RLMIdentityProviderNickname
-//                                    userInfo:@{kRLMSyncIsAdminKey: @(isAdmin), kRLMSyncDataKey: nickname}];
-//}
 
-/// Intended only for testing use. Will only work if the ROS is started with the `debug` provider enabled.
-//+ (instancetype)credentialsWithDebugUserID:(NSString *)userID isAdmin:(BOOL)isAdmin {
-//    return [[self alloc] initWithCustomToken:userID
-//                                    provider:RLMIdentityProviderDebug
-//                                    userInfo:@{kRLMSyncIsAdminKey: @(isAdmin)}];
-//}
-
-+ (instancetype)credentialsWithAccessToken:(RLMServerToken)accessToken identity:(NSString *)identity {
-    return [[self alloc] initWithCustomToken:accessToken
-                                    provider:RLMIdentityProviderAccessToken
-                                    userInfo:@{kRLMSyncIdentityKey: identity}];
++ (instancetype)credentialsWithAppleToken:(RLMSyncCredentialsToken)token {
+    return [[self alloc] initWithCustomToken:token provider:RLMIdentityProviderApple userInfo:@{@"id_token": token}];
 }
-
-//+ (instancetype)credentialsWithCustomRefreshToken:(NSString *)token identity:(NSString *)identity isAdmin:(BOOL)isAdmin {
-//    NSDictionary *userInfo = @{
-//        kRLMSyncIdentityKey: identity,
-//        kRLMSyncIsAdminKey: @(isAdmin)
-//    };
-//    return [[self alloc] initWithCustomToken:token
-//                                    provider:RLMIdentityProviderCustomRefreshToken
-//                                    userInfo:userInfo];
-//
-//}
 
 - (BOOL)isEqual:(id)object {
     if (![object isKindOfClass:[RLMSyncCredentials class]]) {

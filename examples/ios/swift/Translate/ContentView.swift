@@ -223,6 +223,6 @@ struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView().environmentObject(
             AppEnvironment(
-                app: RealmApp(appId: "translate-utwuv")))
+                app: RealmApp("translate-utwuv")))
     }
 }

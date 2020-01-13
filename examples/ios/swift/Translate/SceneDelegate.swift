@@ -10,7 +10,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                options connectionOptions: UIScene.ConnectionOptions) {
 
         let contentView = ContentView()
-            .environmentObject(AppEnvironment(app: RealmApp(appId: "translate-utwuv")))
+            .environmentObject(AppEnvironment(app: RealmApp("translate-utwuv")))
 
         // Use a UIHostingController as window root view controller.
         if let windowScene = scene as? UIWindowScene {

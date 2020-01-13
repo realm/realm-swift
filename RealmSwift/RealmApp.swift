@@ -20,139 +20,57 @@ import Foundation
 import Realm
 import Realm.Private
 
-public final class RealmMDBService {
-
-}
-
-public final class RealmServices {
-    private let appId: String
-
-    public lazy var mongoDb = RealmMDBService()
-
-    fileprivate init(appId: String) {
-        self.appId = appId
-    }
-}
 
 @dynamicMemberLookup
-public final class RealmFunctions {
-    private let appId: String
-
-    fileprivate init(appId: String) {
-        self.appId = appId
-    }
-
+public final class RealmFunctions: RLMFunctions {
     public typealias FunctionSignature<T: Decodable> = ([Any], T.Type, (@escaping (Result<T, Error>) -> Void)) -> Void
 
-    public subscript<T>(dynamicMember string: String) -> FunctionSignature<T> {
-        return { (args, type, completionHandler) in
-            let url = URL.init(string: String.init(format: RealmApp.defaultBaseURL + RealmApp.appRoute,
-                                                   self.appId))
-            SyncUser.__callFunction(
-                string,
-                arguments: args,
-                timeout: 30,
-                authServerURL: url!,
-                callbackQueue: DispatchQueue.main) { data, error in
-                    guard let data = data else {
-                        completionHandler(.failure(error ?? NSError()))
-                        return
-                    }
+    public subscript<T>(dynamicMember name: String) -> FunctionSignature<T> {
+        return { (arguments, type, completionHandler) in
+            self.__callFunction(name, arguments: arguments, timeout: 30, callbackQueue: DispatchQueue.main) { data, error in
+                guard let data = data else {
+                    completionHandler(.failure(error ?? NSError()))
+                    return
+                }
 
-                    do {
-                        completionHandler(.success(try JSONDecoder().decode(T.self, from: data)))
-                    } catch let error {
-                        completionHandler(.failure(error))
-                    }
+                do {
+                    completionHandler(.success(try JSONDecoder().decode(T.self, from: data)))
+                } catch let error {
+                    completionHandler(.failure(error))
+                }
             }
         }
     }
 }
 
-public final class RealmAuth {
-    private let appId: String
-
-    public var currentUser: SyncUser? {
-        SyncUser.current
-    }
-
-    public var allUsers: [String: SyncUser] {
-        SyncUser.all
-    }
-
-    fileprivate init(appId: String) {
-        self.appId = appId
-    }
-
-    public func logIn(with credentials: SyncCredentials,
-                      timeout: TimeInterval = 30,
-                      callbackQueue queue: DispatchQueue = DispatchQueue.main,
-                      onCompletion completion: @escaping UserCompletionBlock) {
-        let url = URL.init(
-            string: String.init(format: RealmApp.defaultBaseURL + RealmApp.authProviderRoute,
-                                self.appId, credentials.provider.rawValue))
-
-        return SyncUser.__logIn(
-            with: RLMSyncCredentials(credentials),
-            authServerURL: url!,
-            timeout: timeout,
-            callbackQueue: queue,
-            onCompletion: completion)
-    }
-
-    public func switchUser(id: String) {
-
+public final class RealmApp: RLMApp<RealmFunctions> {
+    public func configuration() -> Realm.Configuration {
+        return Realm.Configuration.fromRLMRealmConfiguration(self.__configuration())
     }
 }
 
-public final class RealmApp {
-    public struct Configuration {
-        let baseURL: String
-
-        public static let defaultConfiguration: Configuration = {
-            Configuration(baseURL: "https://stitch.mongodb.com")
-        }()
-    }
-
-    static let defaultBaseURL = "https://stitch.mongodb.com"
-    static let baseRoute = "/api/client/v2.0"
-    static let appRoute = baseRoute + "/app/%@"
-    static let appMetadataRoute = appRoute + "/location"
-    static let functionCallRoute = appRoute + "/functions/call"
-    static let baseAuthRoute = baseRoute + "/auth"
-    static let baseAppAuthRoute = appRoute + "/auth"
-
-    static let sessionRoute = baseAuthRoute + "/session"
-    static let profileRoute = baseAuthRoute + "/profile"
-    static let authProviderRoute = baseAppAuthRoute + "/providers/%@"
-    static let authProviderLoginRoute = authProviderRoute + "/login"
-    static let authProviderLinkRoute = authProviderLoginRoute + "?link=true"
-
-    internal let appId: String
-
-    public lazy var auth      = RealmAuth(appId: appId)
-    public lazy var functions = RealmFunctions(appId: appId)
-
-    public init(appId: String, configuration: RealmApp.Configuration = .defaultConfiguration) {
-        self.appId = appId
-    }
-
+public typealias RealmAuth = RLMAuth
+public extension RealmAuth {
     /**
-     Configure the default application.
+     Log in a user and asynchronously retrieve a user object.
 
-     - parameter appId: id of the application
-     - parameter configuration: the configuration to use for the default
+     If the log in completes successfully, the completion block will be called, and a
+     `SyncUser` representing the logged-in user will be passed to it. This user object
+     can be used to open `Realm`s and retrieve `SyncSession`s. Otherwise, the
+     completion block will be called with an error.
+
+     - parameter credentials: A `SyncCredentials` object representing the user to log in.
+     - parameter timeout: How long the network client should wait, in seconds, before timing out.
+     - parameter callbackQueue: The dispatch queue upon which the callback should run. Defaults to the main queue.
+     - parameter completion: A callback block to be invoked once the log in completes.
      */
-    public func configuration() -> Realm.Configuration {
-        var url = FileManager.default.urls(for: .documentDirectory,
-                                           in: .userDomainMask).first!
-        url.appendPathComponent(appId)
-        return Realm.Configuration(fileURL: url)
-    }
-
-
-
-    public class func app(appId: String) -> RealmApp {
-        return RealmApp(appId: appId)
+    func logIn(with credentials: SyncCredentials,
+               timeout: TimeInterval = 30,
+               callbackQueue queue: DispatchQueue = DispatchQueue.main,
+               onCompletion completion: @escaping UserCompletionBlock) {
+        return self.__logIn(with: RLMSyncCredentials(credentials),
+                            timeout: timeout,
+                            callbackQueue: queue,
+                            onCompletion: completion)
     }
 }

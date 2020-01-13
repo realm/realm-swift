@@ -363,21 +363,11 @@ public struct SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(googleToken: token))
     }
 
-    /// Initialize new credentials using a CloudKit account token.
-//    public static func cloudKit(token: Token) -> SyncCredentials {
-//        return SyncCredentials(RLMSyncCredentials(cloudKitToken: token))
-//    }
-
     /// Initialize new credentials using a Realm Object Server username and password.
     public static func usernamePassword(username: String,
                                         password: String,
                                         register: Bool = false) -> SyncCredentials {
         return SyncCredentials(RLMSyncCredentials(username: username, password: password, register: register))
-    }
-
-    /// Initialize new credentials using a Realm Object Server access token.
-    public static func accessToken(_ accessToken: String, identity: String) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(accessToken: accessToken, identity: identity))
     }
 
     /// Initialize new credentials using a JSON Web Token.
@@ -390,10 +380,10 @@ public struct SyncCredentials {
         return SyncCredentials(RLMSyncCredentials.anonymous())
     }
 
-    /// Initialize new credentials using an externally-issued refresh token
-//    public static func customRefreshToken(_ token: String, identity: String, isAdmin: Bool = false) -> SyncCredentials {
-//        return SyncCredentials(RLMSyncCredentials(customRefreshToken: token, identity: identity, isAdmin: isAdmin))
-//    }
+    /// Initialize new credentials using a Google account token.
+    public static func apple(idToken: Token) -> SyncCredentials {
+        return SyncCredentials(RLMSyncCredentials(appleToken: idToken))
+    }
 }
 
 extension RLMSyncCredentials {
@@ -403,47 +393,6 @@ extension RLMSyncCredentials {
 }
 
 extension SyncUser {
-    /**
-     Log in a user and asynchronously retrieve a user object.
-
-     If the log in completes successfully, the completion block will be called, and a
-     `SyncUser` representing the logged-in user will be passed to it. This user object
-     can be used to open `Realm`s and retrieve `SyncSession`s. Otherwise, the
-     completion block will be called with an error.
-
-     - parameter credentials: A `SyncCredentials` object representing the user to log in.
-     - parameter authServerURL: The URL of the authentication server (e.g. "http://realm.example.org:9080").
-     - parameter timeout: How long the network client should wait, in seconds, before timing out.
-     - parameter callbackQueue: The dispatch queue upon which the callback should run. Defaults to the main queue.
-     - parameter completion: A callback block to be invoked once the log in completes.
-     */
-    public static func logIn(with credentials: SyncCredentials,
-                             server authServerURL: URL,
-                             timeout: TimeInterval = 30,
-                             callbackQueue queue: DispatchQueue = DispatchQueue.main,
-                             onCompletion completion: @escaping UserCompletionBlock) {
-        return SyncUser.__logIn(with: RLMSyncCredentials(credentials),
-                                authServerURL: authServerURL,
-                                timeout: timeout,
-                                callbackQueue: queue,
-                                onCompletion: completion)
-    }
-
-    /// A dictionary of all valid, logged-in user identities corresponding to their `SyncUser` objects.
-    public static var all: [String: SyncUser] {
-        return __allUsers()
-    }
-
-    /**
-     The logged-in user. `nil` if none exists. Only use this property if your application expects
-     no more than one logged-in user at any given time.
-
-     - warning: Throws an Objective-C exception if more than one logged-in user exists.
-     */
-    public static var current: SyncUser? {
-        return __current()
-    }
-
     /**
      An optional error handler which can be set to notify the host application when
      the user encounters an error.
