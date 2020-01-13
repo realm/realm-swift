@@ -1,22 +1,18 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.0.0-beta.2 Release notes (2020-01-13)
 =============================================================
-### Enhancements
-* None.
+
+Based on 4.3.0 and also includes all changes since 4.1.1.
 
 ### Fixed
+
 * Fix compilation when using CocoaPods targeting iOS versions older than 11 (since 5.0.0-alpha).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
-* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
-* Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 4.x.y series.
-* Carthage release for Swift is built with Xcode 11.3.
 
-### Internal
-Upgraded realm-core from ? to ?
-Upgraded realm-sync from ? to ?
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 11.3.
 
 5.0.0-beta.1 Release notes (2019-12-13)
 =============================================================
@@ -73,7 +69,6 @@ NOTE: This version bumps the Realm file format to version 10. It is not possible
 Based on 4.1.0.
 
 ### Enhancements
-* None.
 
 * Add `-[RLMRealm fileExistsForConfiguration:]`/`Realm.fileExists(for:)`,
   which checks if a local Realm file exists for the given configuration.
