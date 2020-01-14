@@ -14,6 +14,11 @@ Based on 4.3.0 and also includes all changes since 4.1.1.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.3.
 
+### Internal
+
+* Upgraded realm-core from v6.0.0-beta.2 to v6.0.0-beta.3
+* Upgraded realm-sync from v5.0.0-beta.1 to v5.0.0-beta.2
+
 5.0.0-beta.1 Release notes (2019-12-13)
 =============================================================
 
