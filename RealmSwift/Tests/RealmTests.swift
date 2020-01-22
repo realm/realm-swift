@@ -249,6 +249,14 @@ class RealmTests: TestCase {
         XCTAssertEqual(try! Realm().objects(SwiftStringObject.self).count, 1)
     }
 
+    func testWriteReturning() {
+        let realm = try! Realm()
+        let object = try! realm.write {
+            return realm.create(SwiftStringObject.self, value: ["1"])
+        }
+        XCTAssertEqual(object.stringCol, "1")
+    }
+
     func testCommitWrite() {
         try! Realm().beginWrite()
         try! Realm().create(SwiftStringObject.self, value: ["1"])

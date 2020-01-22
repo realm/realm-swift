@@ -194,7 +194,7 @@ class MigrationTests: TestCase {
             XCTAssertEqual(count, 1)
         }
 
-        autoreleasepool {
+        _ = autoreleasepool {
             try! Realm().write {
                 try! Realm().create(SwiftArrayPropertyObject.self, value: ["string", [["array"]], [[2]]])
             }
