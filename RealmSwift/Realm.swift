@@ -203,19 +203,23 @@ public struct Realm {
                          notified for the changes made in this write transaction.
 
      - parameter block: The block containing actions to perform.
+     - returns: The value returned from the block, if any.
 
      - throws: An `NSError` if the transaction could not be completed successfully.
                If `block` throws, the function throws the propagated `ErrorType` instead.
      */
-    public func write(withoutNotifying tokens: [NotificationToken] = [], _ block: (() throws -> Void)) throws {
+    @discardableResult
+    public func write<Result>(withoutNotifying tokens: [NotificationToken] = [], _ block: (() throws -> Result)) throws -> Result {
         beginWrite()
+        var ret: Result!
         do {
-            try block()
+            ret = try block()
         } catch let error {
             if isInWriteTransaction { cancelWrite() }
             throw error
         }
         if isInWriteTransaction { try commitWrite(withoutNotifying: tokens) }
+        return ret
     }
 
     /**
