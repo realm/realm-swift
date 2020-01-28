@@ -90,7 +90,6 @@ public:
 
 private:
     mutable realm::TableRef m_table = nullptr;
-    std::vector<RLMClassInfo *> m_linkTargets;
 };
 
 // A per-RLMRealm object schema map which stores RLMClassInfo keyed on the name

@@ -68,14 +68,7 @@ realm::ColKey RLMClassInfo::tableColumn(RLMProperty *property) const {
 }
 
 RLMClassInfo &RLMClassInfo::linkTargetType(size_t propertyIndex) {
-    if (propertyIndex < m_linkTargets.size() && m_linkTargets[propertyIndex]) {
-        return *m_linkTargets[propertyIndex];
-    }
-    if (m_linkTargets.size() <= propertyIndex) {
-        m_linkTargets.resize(propertyIndex + 1);
-    }
-    m_linkTargets[propertyIndex] = &realm->_info[rlmObjectSchema.properties[propertyIndex].objectClassName];
-    return *m_linkTargets[propertyIndex];
+    return realm->_info[rlmObjectSchema.properties[propertyIndex].objectClassName];
 }
 
 RLMClassInfo &RLMClassInfo::linkTargetType(realm::Property const& property) {
