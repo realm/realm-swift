@@ -65,7 +65,7 @@ public:
 
     // Get the table for this object type. Will return nullptr only if it's a
     // read-only Realm that is missing the table entirely.
-    realm::TableRef const& table() const;
+    realm::TableRef table() const;
 
     // Get the RLMProperty for a given table column, or `nil` if it is a column
     // not used by the current schema
@@ -85,11 +85,6 @@ public:
 
     // Get the info for the target of the given property
     RLMClassInfo &linkTargetType(realm::Property const& property);
-
-    void releaseTable() { m_table = nullptr; }
-
-private:
-    mutable realm::TableRef m_table = nullptr;
 };
 
 // A per-RLMRealm object schema map which stores RLMClassInfo keyed on the name

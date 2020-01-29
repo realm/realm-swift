@@ -35,14 +35,14 @@
 using namespace realm;
 
 RLMClassInfo::RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
-                             const realm::ObjectSchema *objectSchema)
+                           const realm::ObjectSchema *objectSchema)
 : realm(realm), rlmObjectSchema(rlmObjectSchema), objectSchema(objectSchema) { }
 
-realm::TableRef const& RLMClassInfo::table() const {
-    if (!m_table) {
-        m_table = ObjectStore::table_for_object_type(realm.group, objectSchema->name);
+realm::TableRef RLMClassInfo::table() const {
+    if (auto key = objectSchema->table_key) {
+        return realm.group.get_table(objectSchema->table_key);
     }
-    return m_table;
+    return nullptr;
 }
 
 RLMProperty *RLMClassInfo::propertyForTableColumn(ColKey col) const noexcept {

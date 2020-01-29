@@ -122,6 +122,8 @@
 		29EDB8E41A7708E700458D80 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E8839B2D19E31FD90047B1A8 /* main.m */; };
 		3F0543EC1C56F71500AA5322 /* realm_coordinator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */; };
 		3F0543ED1C56F71900AA5322 /* realm_coordinator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */; };
+		3F0C6AD023E11FAD00F03A4F /* object_changeset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0C6ACE23E11FAD00F03A4F /* object_changeset.cpp */; };
+		3F0C6AD123E11FAD00F03A4F /* object_changeset.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 3F0C6ACF23E11FAD00F03A4F /* object_changeset.hpp */; };
 		3F1F47821B9612B300CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F1F47831B9656B900CD99A3 /* KVOTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */; };
 		3F222C4E1E26F51300CA0713 /* ThreadSafeReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */; };
@@ -732,6 +734,8 @@
 		3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = realm_coordinator.cpp; sourceTree = "<group>"; };
 		3F0543F61C56F78300AA5322 /* external_commit_helper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = external_commit_helper.hpp; sourceTree = "<group>"; };
 		3F0C129220926CAD00D0D6C8 /* test-ros-server.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "test-ros-server.js"; path = "Realm/ObjectServerTests/test-ros-server.js"; sourceTree = "<group>"; };
+		3F0C6ACE23E11FAD00F03A4F /* object_changeset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object_changeset.cpp; sourceTree = "<group>"; };
+		3F0C6ACF23E11FAD00F03A4F /* object_changeset.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = object_changeset.hpp; sourceTree = "<group>"; };
 		3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = KVOTests.mm; sourceTree = "<group>"; };
 		3F0F02AC1B6FFF3D0046A4D5 /* RLMObservation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMObservation.hpp; sourceTree = "<group>"; };
 		3F0F02AD1B6FFF3D0046A4D5 /* RLMObservation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMObservation.mm; sourceTree = "<group>"; };
@@ -1084,6 +1088,8 @@
 				3FAB08441E1EC382001BC8DA /* object.cpp */,
 				3FAB08431E1EC382001BC8DA /* object.hpp */,
 				3FAB08421E1EC382001BC8DA /* object_accessor.hpp */,
+				3F0C6ACE23E11FAD00F03A4F /* object_changeset.cpp */,
+				3F0C6ACF23E11FAD00F03A4F /* object_changeset.hpp */,
 				3FAE25561B8CEBBE00D01405 /* object_schema.cpp */,
 				3FAE25581B8CEBBE00D01405 /* object_schema.hpp */,
 				3FAE25511B8CEBBE00D01405 /* object_store.cpp */,
@@ -1686,6 +1692,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3F73BC951E3A878500FE80B6 /* NSError+RLMSync.h in Headers */,
+				3F0C6AD123E11FAD00F03A4F /* object_changeset.hpp in Headers */,
 				5D659EA51BE04556006515A0 /* Realm.h in Headers */,
 				5D659EA71BE04556006515A0 /* RLMAccessor.h in Headers */,
 				5D659EA91BE04556006515A0 /* RLMArray.h in Headers */,
@@ -2357,6 +2364,7 @@
 				C281E9301E8BC7AC0015BA4A /* network_reachability_observer.cpp in Sources */,
 				3F73BC961E3A878500FE80B6 /* NSError+RLMSync.m in Sources */,
 				3FAB08481E1EC382001BC8DA /* object.cpp in Sources */,
+				3F0C6AD023E11FAD00F03A4F /* object_changeset.cpp in Sources */,
 				3FAB08881E1EC51F001BC8DA /* object_notifier.cpp in Sources */,
 				5D659E831BE04556006515A0 /* object_schema.cpp in Sources */,
 				5D659E841BE04556006515A0 /* object_store.cpp in Sources */,

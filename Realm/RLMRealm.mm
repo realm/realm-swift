@@ -694,7 +694,6 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
         for (RLMObservationInfo *info : objectInfo.second.observedObjects) {
             info->didChange(RLMInvalidatedKey);
         }
-        objectInfo.second.releaseTable();
     }
 }
 
