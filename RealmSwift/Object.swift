@@ -741,6 +741,7 @@ internal class ObjectUtil {
                     let attr = attrs[i]
                     switch attr.name[0] {
                     case Int8(UInt8(ascii: "R")): // Read only
+                        attrs.deallocate()
                         return nil
                     case Int8(UInt8(ascii: "V")): // Ivar name
                         computed = false
@@ -757,8 +758,11 @@ internal class ObjectUtil {
                 // the property then this is a computed property and we should
                 // implicitly ignore it
                 if computed && class_getInstanceVariable(cls, label) == nil {
+                    attrs.deallocate()
                     return nil
                 }
+
+                attrs.deallocate()
             } else if valueType._rlmRequireObjc() {
                 // Implicitly ignore non-@objc dynamic properties
                 return nil
