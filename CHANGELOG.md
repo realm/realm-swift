@@ -20,6 +20,20 @@ x.y.z Release notes (yyyy-MM-dd)
 Upgraded realm-core from ? to ?
 Upgraded realm-sync from ? to ?
 
+4.3.2 Release notes (2020-02-04)
+=============================================================
+### Enhancements
+* Fix for memory leak caused by `property_copyAttributeList`
+
+### Fixed
+* property_copyAttributeList was not being released after being assigned to a local variable. 
+  We must call `free()` after using this method.
+
+### Compatibility
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Carthage release for Swift is built with Xcode 11.3.
+
 4.3.1 Release notes (2020-01-16)
 =============================================================
 
