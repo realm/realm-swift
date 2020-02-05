@@ -5,7 +5,10 @@ x.y.z Release notes (yyyy-MM-dd)
   the block passed to it returns. Returning `Void` from the block is still allowed.
 
 ### Fixed
-* Fix a memory leak attributed to `property_copyAttributeList` the first time a Realm is opened when using Realm Swift. (#6409, since 4.0.0).
+* Fix a memory leak attributed to `property_copyAttributeList` the first time a
+  Realm is opened when using Realm Swift. ([#6409](https://github.com/realm/realm-cocoa/issues/6409), since 4.0.0).
+* Connecting to a `realms:` sync URL would crash at runtime on iOS 11 (and no
+  other iOS versions) inside the SSL validation code. (Since 4.3.1).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -16,8 +19,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.3.
 
 ### Internal
-Upgraded realm-core from ? to ?
-Upgraded realm-sync from ? to ?
+* Upgraded realm-sync from 4.9.4 to 4.9.5.
 
 4.3.1 Release notes (2020-01-16)
 =============================================================
