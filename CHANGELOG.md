@@ -5,8 +5,7 @@ x.y.z Release notes (yyyy-MM-dd)
   the block passed to it returns. Returning `Void` from the block is still allowed.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+* Fix a memory leak attributed to `property_copyAttributeList` the first time a Realm is opened when using Realm Swift. (#6409, since 4.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -19,20 +18,6 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Internal
 Upgraded realm-core from ? to ?
 Upgraded realm-sync from ? to ?
-
-4.3.2 Release notes (2020-02-04)
-=============================================================
-### Enhancements
-* Fix for memory leak caused by `property_copyAttributeList`
-
-### Fixed
-* property_copyAttributeList was not being released after being assigned to a local variable. 
-  We must call `free()` after using this method.
-
-### Compatibility
-* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
-* Realm Object Server: 3.21.0 or later.
-* Carthage release for Swift is built with Xcode 11.3.
 
 4.3.1 Release notes (2020-01-16)
 =============================================================
