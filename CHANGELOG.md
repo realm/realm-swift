@@ -5,8 +5,7 @@ x.y.z Release notes (yyyy-MM-dd)
   the block passed to it returns. Returning `Void` from the block is still allowed.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+* Fix a memory leak attributed to `property_copyAttributeList` the first time a Realm is opened when using Realm Swift. (#6409, since 4.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
