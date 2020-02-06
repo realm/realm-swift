@@ -1164,6 +1164,8 @@ case "$COMMAND" in
         sed -i '' "s/^VERSION=.*/VERSION=$realm_version/" dependencies.list
         sed -i '' "s/^let coreVersionStr =.*/let coreVersionStr = \"$REALM_CORE_VERSION\"/" Package.swift
         sed -i '' "s/^let cocoaVersionStr =.*/let cocoaVersionStr = \"$realm_version\"/" Package.swift
+        sed -i '' "s/x.y.z Release notes (yyyy-MM-dd)/$realm_version Release notes ($(date '+%Y-%m-%d'))/" CHANGELOG.md
+
         exit 0
         ;;
 
