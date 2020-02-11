@@ -463,6 +463,26 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
 
     /// :nodoc:
     func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
+
+    // MARK: Frozen Objects
+
+    /// Returns if this collection is frozen
+    var isFrozen: Bool { get }
+
+    /**
+     Returns a frozen (immutable) snapshot of this collection.
+
+     The frozen copy is an immutable collection which contains the same data as this collection
+    currently contains, but will not update when writes are made to the containing Realm. Unlike
+    live collections, frozen collections can be accessed from any thread.
+
+     - warning: This method cannot be called during a write transaction, or when the containing
+    Realm is read-only.
+     - warning: Holding onto a frozen collection for an extended period while performing write
+     transaction on the Realm may result in the Realm file growing to large sizes. See
+     `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+    */
+    func freeze() -> Self
 }
 
 public extension RealmCollection {
@@ -620,6 +640,8 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
     // swiftlint:disable:next identifier_name
     func _asNSFastEnumerator() -> Any { fatalError() }
+    var isFrozen: Bool { fatalError() }
+    func freeze() -> AnyRealmCollection<T> { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.Element> {
@@ -729,6 +751,14 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     override var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (base as! AssistedObjectiveCBridgeable).bridged
+    }
+
+    override var isFrozen: Bool {
+        return base.isFrozen
+    }
+
+    override func freeze() -> AnyRealmCollection<Element> {
+        return AnyRealmCollection(base.freeze())
     }
 }
 
@@ -1005,6 +1035,26 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
     /// :nodoc:
     public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
         -> NotificationToken { return base._observe(block) }
+
+    // MARK: Frozen Objects
+
+    /// Returns if this collection is frozen.
+    public var isFrozen: Bool { return base.isFrozen }
+
+    /**
+     Returns a frozen (immutable) snapshot of this collection.
+
+     The frozen copy is an immutable collection which contains the same data as this collection
+    currently contains, but will not update when writes are made to the containing Realm. Unlike
+    live collections, frozen collections can be accessed from any thread.
+
+     - warning: This method cannot be called during a write transaction, or when the containing
+    Realm is read-only.
+     - warning: Holding onto a frozen collection for an extended period while performing write
+     transaction on the Realm may result in the Realm file growing to large sizes. See
+     `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+    */
+    public func freeze() -> AnyRealmCollection { return base.freeze() }
 }
 
 // MARK: AssistedObjectiveCBridgeable

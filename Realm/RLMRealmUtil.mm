@@ -27,6 +27,7 @@
 #import <Realm/RLMSchema.h>
 
 #import "binding_context.hpp"
+#import "shared_realm.hpp"
 
 #import <map>
 #import <mutex>
@@ -36,8 +37,9 @@
 #import <unistd.h>
 
 // Global realm state
-static std::mutex& s_realmCacheMutex = *new std::mutex();
-static std::map<std::string, NSMapTable *>& s_realmsPerPath = *new std::map<std::string, NSMapTable *>();
+static auto& s_realmCacheMutex = *new std::mutex();
+static auto& s_realmsPerPath = *new std::map<std::string, NSMapTable *>();
+static auto& s_frozenRealms = *new std::map<std::string, NSMapTable *>();
 
 void RLMCacheRealm(std::string const& path, __unsafe_unretained RLMRealm *const realm) {
     std::lock_guard<std::mutex> lock(s_realmCacheMutex);
@@ -62,6 +64,25 @@ RLMRealm *RLMGetThreadLocalCachedRealmForPath(std::string const& path) {
 void RLMClearRealmCache() {
     std::lock_guard<std::mutex> lock(s_realmCacheMutex);
     s_realmsPerPath.clear();
+    s_frozenRealms.clear();
+}
+
+RLMRealm *RLMGetFrozenRealmForSourceRealm(__unsafe_unretained RLMRealm *const sourceRealm) {
+    std::lock_guard<std::mutex> lock(s_realmCacheMutex);
+    auto& r = *sourceRealm->_realm;
+    auto& path = r.config().path;
+    NSMapTable *realms = s_realmsPerPath[path];
+    if (!realms) {
+        s_realmsPerPath[path] = realms = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsIntegerPersonality|NSPointerFunctionsOpaqueMemory
+                                                               valueOptions:NSPointerFunctionsWeakMemory];
+    }
+    auto version = reinterpret_cast<void *>(r.transaction().get_version_of_current_transaction().version);
+    RLMRealm *realm = [realms objectForKey:(__bridge id)version];
+    if (!realm) {
+        realm = [sourceRealm frozenCopy];
+        [realms setObject:realm forKey:(__bridge id)version];
+    }
+    return realm;
 }
 
 bool RLMIsInRunLoop() {

@@ -54,6 +54,8 @@ void RLMRealmTranslateException(NSError **error);
 - (void)verifyThread;
 - (void)verifyNotificationsAreSupported:(bool)isCollection;
 
+- (RLMRealm *)frozenCopy NS_RETURNS_RETAINED;
+
 @end
 
 NS_ASSUME_NONNULL_END

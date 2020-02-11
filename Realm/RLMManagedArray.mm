@@ -503,6 +503,24 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     });
 }
 
+- (BOOL)isFrozen {
+    return _realm.isFrozen;
+}
+
+- (instancetype)freeze {
+    if (self.frozen) {
+        return self;
+    }
+
+    RLMRealm *frozenRealm = [_realm freeze];
+    auto& parentInfo = _ownerInfo->freeze(frozenRealm);
+    return translateRLMResultsErrors([&] {
+        return [[self.class alloc] initWithList:_backingList.freeze(frozenRealm->_realm)
+                                     parentInfo:&parentInfo
+                                       property:parentInfo.rlmObjectSchema[_key]];
+    });
+}
+
 // The compiler complains about the method's argument type not matching due to
 // it not having the generic type attached, but it doesn't seem to be possible
 // to actually include the generic type

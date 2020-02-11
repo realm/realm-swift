@@ -70,6 +70,11 @@ static inline void RLMVerifyRealmRead(__unsafe_unretained RLMRealm *const realm)
         @throw RLMException(@"Realm must not be nil");
     }
     [realm verifyThread];
+    if (realm->_realm->is_closed()) {
+        // This message may seem overly specific, but frozen Realms are currently
+        // the only ones which we outright close.
+        @throw RLMException(@"Cannot read from a frozen Realm which has been invalidated.");
+    }
 }
 
 static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm) {

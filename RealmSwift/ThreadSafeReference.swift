@@ -42,6 +42,30 @@ public protocol ThreadConfined {
 
     /// Indicates if the object can no longer be accessed because it is now invalid.
     var isInvalidated: Bool { get }
+
+    /**
+    Indicates if the object is frozen.
+
+    Frozen objects are not confined to their source thread. Forming a `ThreadSafeReference` to a
+    frozen object is allowed, but is unlikely to be useful.
+    */
+    var isFrozen: Bool { get }
+
+    /**
+     Returns a frozen snapshot of this object.
+
+     Unlike normal Realm live objects, the frozen copy can be read from any thread, and the values
+     read will never update to reflect new writes to the Realm. Frozen collections can be queried
+     like any other Realm collection. Frozen objects cannot be mutated, and cannot be observed for
+     change notifications.
+
+     Unmanaged Realm objects cannot be frozen.
+
+     - warning: Holding onto a frozen object for an extended period while performing write
+     transaction on the Realm may result in the Realm file growing to large sizes. See
+     `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+    */
+    func freeze() -> Self
 }
 
 /**

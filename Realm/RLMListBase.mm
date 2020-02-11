@@ -108,6 +108,17 @@
     return self;
 }
 
+- (instancetype)freeze {
+    RLMLinkingObjectsHandle *frozen = [[self.class alloc] init];
+    frozen->_tableKey = _tableKey;
+    frozen->_objKey = _objKey;
+    frozen->_info = _info;
+    frozen->_realm = _realm;
+    frozen->_property = _property;
+    frozen->_results = [[self results] freeze];
+    return frozen;
+}
+
 - (RLMResults *)results {
     if (_results) {
         return _results;

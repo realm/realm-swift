@@ -159,6 +159,10 @@
     return [object isKindOfClass:RLMObject.class] && RLMObjectBaseAreEqual(self, object);
 }
 
+- (instancetype)freeze {
+    return RLMObjectFreeze(self);
+}
+
 - (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block {
     return RLMObjectAddNotificationBlock(self, ^(NSArray<NSString *> *propertyNames,
                                                  NSArray *oldValues, NSArray *newValues, NSError *error) {

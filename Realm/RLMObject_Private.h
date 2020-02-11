@@ -64,6 +64,8 @@ FOUNDATION_EXTERN BOOL RLMIsObjectSubclass(Class klass);
 
 FOUNDATION_EXTERN const NSUInteger RLMDescriptionMaxDepth;
 
+FOUNDATION_EXTERN id RLMObjectFreeze(RLMObjectBase *obj) NS_RETURNS_RETAINED;
+
 @interface RLMManagedPropertyAccessor : NSObject
 + (void)initializeObject:(void *)object parent:(RLMObjectBase *)parent property:(RLMProperty *)property;
 + (id)get:(void *)pointer;

@@ -91,6 +91,15 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
+/**
+ Indicates if the array is frozen.
+
+ Frozen arrays are immutable and can be accessed from any thread. Frozen arrays
+ are created by calling `-freeze` on a managed live array. Unmanaged arrays are
+ never frozen.
+ */
+@property (nonatomic, readonly, getter = isFrozen) BOOL frozen;
+
 #pragma mark - Accessing Objects from an Array
 
 /**
@@ -356,7 +365,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @warning This method cannot be called during a write transaction, or when the
           containing Realm is read-only.
- @warning This method may only be called on a managed array.
+ @warning This method may only be called on a non-frozen managed array.
 
  @param block The block to be called each time the array changes.
  @return A token which must be held for as long as you want updates to be delivered.
@@ -423,6 +432,25 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (nullable NSNumber *)averageOfProperty:(NSString *)property;
 
+#pragma mark - Freeze
+
+/**
+ Returns a frozen (immutable) snapshot of this array.
+
+ The frozen copy is an immutable array which contains the same data as this
+ array currently contains, but will not update when writes are made to the
+ containing Realm. Unlike live arrays, frozen arrays can be accessed from any
+ thread.
+
+ @warning This method cannot be called during a write transaction, or when the
+          containing Realm is read-only.
+ @warning This method may only be called on a managed array.
+ @warning Holding onto a frozen array for an extended period while performing
+          write transaction on the Realm may result in the Realm file growing
+          to large sizes. See `RLMRealmConfiguration.maximumNumberOfActiveVersions`
+          for more information.
+ */
+- (instancetype)freeze;
 
 #pragma mark - Unavailable Methods
 

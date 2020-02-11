@@ -420,6 +420,16 @@ public final class List<Element: RealmCollectionValue>: ListBase {
         }
     }
 
+    // MARK: Frozen Objects
+
+    public var isFrozen: Bool {
+        return _rlmArray.isFrozen
+    }
+
+    public func freeze() -> List {
+        return List(rlmArray: _rlmArray.freeze())
+    }
+
     // swiftlint:disable:next identifier_name
     @objc class func _unmanagedArray() -> RLMArray<AnyObject> {
         return Element._rlmArray()

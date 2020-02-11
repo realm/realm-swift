@@ -51,12 +51,12 @@ NS_ASSUME_NONNULL_BEGIN
  the Realm within an `@autoreleasepool {}` and ensure you have no other
  strong references to it.
 
- @warning `RLMRealm` instances are not thread safe and cannot be shared across
- threads or dispatch queues. Trying to do so will cause an exception to be thrown.
- You must call this method on each thread you want
- to interact with the Realm on. For dispatch queues, this means that you must
- call it in each block which is dispatched, as a queue is not guaranteed to run
- all of its blocks on the same thread.
+ @warning Non-frozen `RLMRealm` instances are thread-confined and cannot be
+ shared across threads or dispatch queues. Trying to do so will cause an
+ exception to be thrown. You must call this method on each thread you want to
+ interact with the Realm on. For dispatch queues, this means that you must call
+ it in each block which is dispatched, as a queue is not guaranteed to run all
+ of its blocks on the same thread.
  */
 
 @interface RLMRealm : NSObject
@@ -69,8 +69,8 @@ NS_ASSUME_NONNULL_BEGIN
  The default Realm is used by the `RLMObject` class methods
  which do not take an `RLMRealm` parameter, but is otherwise not special. The
  default Realm is persisted as *default.realm* under the *Documents* directory of
- your Application on iOS, and in your application's *Application Support*
- directory on OS X.
+ your Application on iOS, in your application's *Application Support*
+ directory on macOS, and in the *Cache* directory on tvOS.
 
  The default Realm is created using the default `RLMRealmConfiguration`, which
  can be changed via `+[RLMRealmConfiguration setDefaultConfiguration:]`.
@@ -148,6 +148,26 @@ NS_ASSUME_NONNULL_BEGIN
  Indicates if this Realm contains any objects.
  */
 @property (nonatomic, readonly) BOOL isEmpty;
+
+/**
+ Indicates if this Realm is frozen.
+
+ @see `-[RLMRealm freeze]`
+ */
+@property (nonatomic, readonly, getter=isFrozen) BOOL frozen;
+
+/**
+ Returns a frozen (immutable) snapshot of this Realm.
+
+ A frozen Realm is an immutable snapshot view of a particular version of a
+ Realm's data. Unlike normal RLMRealm instances, it does not live-update to
+ reflect writes made to the Realm, and can be accessed from any thread. Writing
+ to a frozen Realm is not allowed, and attempting to begin a write transaction
+ will throw an exception.
+
+ All objects and collections read from a frozen Realm will also be frozen.
+ */
+- (RLMRealm *)freeze NS_RETURNS_RETAINED;
 
 #pragma mark - File Management
 

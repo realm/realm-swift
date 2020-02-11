@@ -359,6 +359,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
+/**
+ Indicates if this object is frozen.
+
+ @see `-[RLMObject freeze]`
+ */
+@property (nonatomic, readonly, getter = isFrozen) BOOL frozen;
+
 
 #pragma mark - Customizing your Objects
 
@@ -584,14 +591,31 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
  Returns YES if another Realm object instance points to the same object as the receiver in the Realm managing
  the receiver.
 
- For object types with a primary, key, `isEqual:` is overridden to use the same logic as this
- method (along with a corresponding implementation for `hash`).
+ For frozen objects and object types with a primary key, `isEqual:` is
+ overridden to use the same logic as this method (along with a corresponding
+ implementation for `hash`). Non-frozen objects without primary keys use
+ pointer identity for `isEqual:` and `hash`.
 
  @param object  The object to compare the receiver to.
 
  @return    Whether the object represents the same object as the receiver.
  */
 - (BOOL)isEqualToObject:(RLMObject *)object;
+
+/**
+ Returns a frozen (immutable) snapshot of this object.
+
+ The frozen copy is an immutable object which contains the same data as this
+ object currently contains, but will not update when writes are made to the
+ containing Realm. Unlike live objects, frozen objects can be accessed from any
+ thread.
+
+ - warning: Holding onto a frozen object for an extended period while performing write
+ transaction on the Realm may result in the Realm file growing to large sizes. See
+ `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+ - warning: This method can only be called on a managed object.
+ */
+- (instancetype)freeze NS_RETURNS_RETAINED;
 
 #pragma mark - Dynamic Accessors
 

@@ -68,7 +68,7 @@ import Realm.Private
  See our [Cocoa guide](http://realm.io/docs/cocoa) for more details.
  */
 @objc(RealmSwiftObject)
-open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
+open class Object: RLMObjectBase, RealmCollectionValue {
     /// :nodoc:
     public static func _rlmArray() -> RLMArray<AnyObject> {
         return RLMArray(objectClassName: className())
@@ -297,7 +297,36 @@ open class Object: RLMObjectBase, ThreadConfined, RealmCollectionValue {
     public func isSameObject(as object: Object?) -> Bool {
         return RLMObjectBaseAreEqual(self, object)
     }
+
+
 }
+
+extension Object: ThreadConfined {
+    /**
+     Indicates if this object is frozen.
+
+     - see: `Object.freeze()`
+     */
+    public var isFrozen: Bool { return realm?.isFrozen ?? false }
+
+    /**
+     Returns a frozen (immutable) snapshot of this object.
+
+     The frozen copy is an immutable object which contains the same data as this
+     object currently contains, but will not update when writes are made to the
+     containing Realm. Unlike live objects, frozen objects can be accessed from any
+     thread.
+
+     - warning: Holding onto a frozen object for an extended period while performing write
+     transaction on the Realm may result in the Realm file growing to large sizes. See
+     `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+     - warning: This method can only be called on a managed object.
+     */
+    public func freeze() -> Self {
+        return realm!.freeze(self)
+    }
+}
+
 
 /**
  Information about a specific property which changed in an `Object` change notification.
