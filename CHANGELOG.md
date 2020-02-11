@@ -1,3 +1,27 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+
+Based on 4.3.2 and also includes all changes since 4.3.0.
+
+### Enhancements
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* APIs are backwards compatible with all previous releases in the 4.x.y series.
+* Carthage release for Swift is built with Xcode 11.3.
+
+### Internal
+* Upgraded realm-core from v6.0.0-beta.3 to v6.0.0
+* Upgraded realm-sync from v5.0.0-beta.2 to v5.0.0
+
 5.0.0-beta.2 Release notes (2020-01-13)
 =============================================================
 
