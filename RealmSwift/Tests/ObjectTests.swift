@@ -751,6 +751,17 @@ class ObjectTests: TestCase {
         XCTAssertTrue(testObject.isSameObject(as: retrievedObject))
     }
 
+    func testEqualityForFrozenObjectTypeWithoutPrimaryKey() {
+        let realm = try! Realm()
+        let testObject = try! realm.write {
+            realm.create(SwiftStringObject.self)
+        }
+
+        let frozen = testObject.freeze()
+        let retrievedObject = realm.objects(SwiftStringObject.self).first!.freeze()
+        XCTAssertEqual(frozen, retrievedObject)
+    }
+
     func testRetrievingObjectWithRuntimeType() {
         let realm = try! Realm()
 
@@ -791,5 +802,29 @@ class ObjectTests: TestCase {
 
         // Shouldn't throw when using type(of:).
         XCTAssertEqual(realm.objects(type(of: managedStringObject)).count, 1)
+    }
+
+    func testIsFrozen() {
+        let obj = SwiftStringObject()
+        XCTAssertFalse(obj.isFrozen)
+
+        let realm = try! Realm()
+        try! realm.write { realm.add(obj) }
+        XCTAssertFalse(obj.isFrozen)
+
+        let frozen = obj.freeze()
+        XCTAssertFalse(obj.isFrozen)
+        XCTAssertTrue(frozen.isFrozen)
+    }
+
+    func testFreezeDynamicObject() {
+        let realm = try! Realm()
+        try! realm.write {
+            realm.create(SwiftObject.self, value: ["arrayCol": [[true]]])
+        }
+        let obj = realm.dynamicObjects("SwiftObject").first!.freeze()
+        XCTAssertTrue(obj.isFrozen)
+        XCTAssertTrue(obj.dynamicList("arrayCol").isFrozen)
+        XCTAssertTrue(obj.dynamicList("arrayCol").first!.isFrozen)
     }
 }

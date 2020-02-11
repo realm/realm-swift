@@ -36,4 +36,6 @@ void RLMClearRealmCache();
 // Check if the current thread is currently within a running CFRunLoop
 bool RLMIsInRunLoop();
 
+RLMRealm *RLMGetFrozenRealmForSourceRealm(RLMRealm *realm);
+
 std::unique_ptr<realm::BindingContext> RLMCreateBindingContext(RLMRealm *realm);

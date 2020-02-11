@@ -188,7 +188,12 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 }
 
 - (void)setAutorefresh:(BOOL)autorefresh {
-    _realm->set_auto_refresh(autorefresh);
+    try {
+        _realm->set_auto_refresh(autorefresh);
+    }
+    catch (std::exception const& e) {
+        @throw RLMException(e);
+    }
 }
 
 + (instancetype)defaultRealm {
@@ -542,7 +547,10 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
 - (void)verifyNotificationsAreSupported:(bool)isCollection {
     [self verifyThread];
     if (_realm->config().immutable()) {
-        @throw RLMException(@"Read-only Realms do not change and do not have change notifications");
+        @throw RLMException(@"Read-only Realms do not change and do not have change notifications.");
+    }
+    if (_realm->is_frozen()) {
+        @throw RLMException(@"Frozen Realms do not change and do not have change notifications.");
     }
     if (!_realm->can_deliver_notifications()) {
         @throw RLMException(@"Can only add notification blocks from within runloops.");
@@ -610,11 +618,17 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
 }
 
 - (void)beginWriteTransaction {
+    [self beginWriteTransactionWithError:nil];
+}
+
+- (BOOL)beginWriteTransactionWithError:(NSError **)error {
     try {
         _realm->begin_transaction();
+        return YES;
     }
-    catch (std::exception &ex) {
-        @throw RLMException(ex);
+    catch (...) {
+        RLMRealmTranslateException(error);
+        return NO;
     }
 }
 
@@ -657,7 +671,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
 }
 
 - (BOOL)transactionWithoutNotifying:(NSArray<RLMNotificationToken *> *)tokens block:(__attribute__((noescape)) void(^)(void))block error:(NSError **)error {
-    [self beginWriteTransaction];
+    [self beginWriteTransactionWithError:error];
     block();
     if (_realm->is_in_transaction()) {
         return [self commitWriteTransactionWithoutNotifying:tokens error:error];
@@ -694,6 +708,10 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
         for (RLMObservationInfo *info : objectInfo.second.observedObjects) {
             info->didChange(RLMInvalidatedKey);
         }
+    }
+
+    if (_realm->is_frozen()) {
+        _realm->close();
     }
 }
 
@@ -938,6 +956,29 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
         }
     }
     return anyDeleted;
+}
+
+- (BOOL)isFrozen {
+    return _realm->is_frozen();
+}
+
+- (RLMRealm *)freeze {
+    return self.isFrozen ? self : RLMGetFrozenRealmForSourceRealm(self);
+}
+
+- (RLMRealm *)frozenCopy {
+    try {
+        RLMRealm *realm = [[RLMRealm alloc] initPrivate];
+        realm->_realm = _realm->freeze();
+        realm->_realm->read_group();
+        realm->_dynamic = _dynamic;
+        realm->_schema = _schema;
+        realm->_info = RLMSchemaInfo(realm);
+        return realm;
+    }
+    catch (std::exception const& e) {
+        @throw RLMException(e);
+    }
 }
 
 #if REALM_ENABLE_SYNC

@@ -344,6 +344,16 @@ public struct Results<Element: RealmCollectionValue>: Equatable {
             block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
         }
     }
+
+    // MARK: Frozen Objects
+
+    public var isFrozen: Bool {
+        return rlmResults.isFrozen
+    }
+
+    public func freeze() -> Results {
+        return Results(rlmResults.freeze())
+    }
 }
 
 extension Results: RealmCollection {

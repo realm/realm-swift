@@ -295,7 +295,7 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 
 - (BOOL)isEqual:(id)object {
     if (RLMObjectBase *other = RLMDynamicCast<RLMObjectBase>(object)) {
-        if (_objectSchema.primaryKeyProperty) {
+        if (_objectSchema.primaryKeyProperty || _realm.isFrozen) {
             return RLMObjectBaseAreEqual(self, other);
         }
     }
@@ -304,12 +304,22 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
 
 - (NSUInteger)hash {
     if (_objectSchema.primaryKeyProperty) {
+        // If we have a primary key property, that's an immutable value which we
+        // can use as the identity of the object.
         id primaryProperty = [self valueForKey:_objectSchema.primaryKeyProperty.name];
 
         // modify the hash of our primary key value to avoid potential (although unlikely) collisions
         return [primaryProperty hash] ^ 1;
     }
+    else if (_realm.isFrozen) {
+        // The object key can never change for frozen objects, so that's usable
+        // for objects without primary keys
+        return _row.get_key().value;
+    }
     else {
+        // Non-frozen objects without primary keys don't have any immutable
+        // concept of identity that we can hash so we have to fall back to
+        // pointer equality
         return [super hash];
     }
 }
@@ -446,6 +456,20 @@ BOOL RLMObjectBaseAreEqual(RLMObjectBase *o1, RLMObjectBase *o2) {
     // if table and index are the same
     return o1->_row.get_table() == o2->_row.get_table()
         && o1->_row.get_key() == o2->_row.get_key();
+}
+
+id RLMObjectFreeze(RLMObjectBase *obj) {
+    if (!obj->_realm && !obj.isInvalidated) {
+        @throw RLMException(@"Unmanaged objects cannot be frozen.");
+    }
+    RLMVerifyAttached(obj);
+    if (obj->_realm.frozen) {
+        return obj;
+    }
+    RLMRealm *frozenRealm = [obj->_realm freeze];
+    RLMObjectBase *frozen = RLMCreateManagedAccessor(obj.class, &frozenRealm->_info[obj->_info->rlmObjectSchema.className]);
+    frozen->_row = frozenRealm->_realm->transaction().import_copy_of(obj->_row);
+    return frozen;
 }
 
 id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {

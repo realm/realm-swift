@@ -59,9 +59,9 @@ class CTTStringList: Object {
 }
 
 class RealmCollectionTypeTests: TestCase {
-    var str1: CTTNullableStringObjectWithLink?
-    var str2: CTTNullableStringObjectWithLink?
-    var collection: AnyRealmCollection<CTTNullableStringObjectWithLink>?
+    var str1: CTTNullableStringObjectWithLink!
+    var str2: CTTNullableStringObjectWithLink!
+    var collection: AnyRealmCollection<CTTNullableStringObjectWithLink>!
 
     func getCollection() -> AnyRealmCollection<CTTNullableStringObjectWithLink> {
         fatalError("Abstract method. Try running tests using Control-U.")
@@ -164,24 +164,15 @@ class RealmCollectionTypeTests: TestCase {
 #endif
 
     func testRealm() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         XCTAssertEqual(collection.realm!.configuration.fileURL, realmWithTestPath().configuration.fileURL)
     }
 
     func testDescription() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         // swiftlint:disable:next line_length
         assertMatches(collection.description, "Results<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
     }
 
     func testCount() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         XCTAssertEqual(2, collection.count)
         XCTAssertEqual(1, collection.filter("stringCol = '1'").count)
         XCTAssertEqual(1, collection.filter("stringCol = '2'").count)
@@ -189,9 +180,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testIndexOfObject() {
-        guard let collection = collection, let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failed")
-        }
         XCTAssertEqual(0, collection.index(of: str1)!)
         XCTAssertEqual(1, collection.index(of: str2)!)
 
@@ -201,9 +189,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testIndexOfPredicate() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         let pred1 = NSPredicate(format: "stringCol = '1'")
         let pred2 = NSPredicate(format: "stringCol = '2'")
         let pred3 = NSPredicate(format: "stringCol = '3'")
@@ -214,9 +199,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testIndexOfFormat() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         XCTAssertEqual(0, collection.index(matching: "stringCol = '1'")!)
         XCTAssertEqual(0, collection.index(matching: "stringCol = %@", "1")!)
         XCTAssertEqual(1, collection.index(matching: "stringCol = %@", "2")!)
@@ -224,9 +206,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testSubscript() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         assertEqual(str1, collection[0])
         assertEqual(str2, collection[1])
 
@@ -235,27 +214,18 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testFirst() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         assertEqual(str1, collection.first!)
         assertEqual(str2, collection.filter("stringCol = '2'").first!)
         XCTAssertNil(collection.filter("stringCol = '3'").first)
     }
 
     func testLast() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         assertEqual(str2, collection.last!)
         assertEqual(str2, collection.filter("stringCol = '2'").last!)
         XCTAssertNil(collection.filter("stringCol = '3'").last)
     }
 
     func testValueForKey() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         let expected = Array(collection.map { $0.stringCol })
         let actual = collection.value(forKey: "stringCol") as! [String]?
         XCTAssertEqual(expected as! [String], actual!)
@@ -264,9 +234,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testSetValueForKey() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         try! realmWithTestPath().write {
             collection.setValue("hi there!", forKey: "stringCol")
         }
@@ -276,9 +243,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testFilterFormat() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         XCTAssertEqual(1, collection.filter("stringCol = '1'").count)
         XCTAssertEqual(1, collection.filter("stringCol = %@", "1").count)
         XCTAssertEqual(1, collection.filter("stringCol = %@", "2").count)
@@ -286,9 +250,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testFilterWithAnyVarags() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         let firstCriterion: String? = "1"
         let secondCriterion: String = "2"
         let thirdCriterion: String? = nil
@@ -320,9 +281,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testFilterPredicate() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         let pred1 = NSPredicate(format: "stringCol = '1'")
         let pred2 = NSPredicate(format: "stringCol = '2'")
         let pred3 = NSPredicate(format: "stringCol = '3'")
@@ -333,9 +291,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testSortWithProperty() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         var sorted = collection.sorted(byKeyPath: "stringCol", ascending: true)
         XCTAssertEqual("1", sorted[0].stringCol)
         XCTAssertEqual("2", sorted[1].stringCol)
@@ -458,10 +413,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testFastEnumeration() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
-
         var str = ""
         for obj in collection {
             str += obj.stringCol!
@@ -471,10 +422,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testFastEnumerationWithMutation() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
-
         let realm = realmWithTestPath()
         try! realm.write {
             for obj in collection {
@@ -498,10 +445,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testObserve() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
-
         var theExpectation = expectation(description: "")
         let token = collection.observe { (changes: RealmCollectionChange) in
             switch changes {
@@ -538,10 +481,6 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testValueForKeyPath() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
-
         XCTAssertEqual(["1", "2"], collection.value(forKeyPath: "@unionOfObjects.stringCol") as! NSArray?)
 
         let theCollection = getAggregateableCollection()
@@ -553,13 +492,42 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testInvalidate() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
-
         XCTAssertFalse(collection.isInvalidated)
         realmWithTestPath().invalidate()
         XCTAssertTrue(collection.realm == nil || collection.isInvalidated)
+    }
+
+    func testIsFrozen() {
+        XCTAssertFalse(collection.isFrozen)
+        XCTAssertTrue(collection.freeze().isFrozen)
+    }
+
+    func testFreezeFromWrongThread() {
+        dispatchSyncNewThread {
+            self.assertThrows(self.collection.freeze(), reason: "Realm accessed from incorrect thread")
+        }
+    }
+
+    func testAccessFrozenCollectionFromDifferentThread() {
+        let frozen = collection.freeze()
+        dispatchSyncNewThread {
+            XCTAssertEqual(frozen[0].stringCol, "1")
+            XCTAssertEqual(frozen[1].stringCol, "2")
+        }
+    }
+
+    func testObserveFrozenCollection() {
+        let frozen = collection.freeze()
+        assertThrows(frozen.observe({ _ in }),
+                     reason: "Frozen Realms do not change and do not have change notifications.")
+    }
+
+    func testQueryFrozenCollection() {
+        let frozen = collection.freeze()
+        XCTAssertEqual(frozen.filter("stringCol = '1'").count, 1)
+        XCTAssertEqual(frozen.filter("stringCol = '2'").count, 1)
+        XCTAssertEqual(frozen.filter("stringCol = '3'").count, 0)
+        XCTAssertTrue(frozen.filter("stringCol = '3'").isFrozen)
     }
 }
 
@@ -777,11 +745,7 @@ class ResultsFromTableViewTests: ResultsTests {
 }
 
 class ResultsFromLinkViewTests: ResultsTests {
-
     override func collectionBaseInWriteTransaction() -> Results<CTTNullableStringObjectWithLink> {
-        guard let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failed")
-        }
         let array = realmWithTestPath().create(CTTStringList.self, value: [[str1, str2]])
         return array.array.filter(NSPredicate(value: true))
     }
@@ -851,9 +815,6 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
     }
 
     override func testDescription() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         // swiftlint:disable:next line_length
         assertMatches(collection.description, "List<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = \\(null\\);\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = \\(null\\);\n\t\\}\n\\)")
     }
@@ -899,9 +860,6 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
 
 class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func collectionBaseInWriteTransaction() -> List<CTTNullableStringObjectWithLink> {
-        guard let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failed")
-        }
         return CTTStringList(value: [[str1, str2]]).array
     }
 
@@ -910,23 +868,14 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     }
 
     override func testRealm() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         XCTAssertNil(collection.realm)
     }
 
     override func testCount() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         XCTAssertEqual(2, collection.count)
     }
 
     override func testIndexOfObject() {
-        guard let collection = collection, let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failed")
-        }
         XCTAssertEqual(0, collection.index(of: str1)!)
         XCTAssertEqual(1, collection.index(of: str2)!)
     }
@@ -943,41 +892,26 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     }
 
     override func testFirst() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         XCTAssertEqual(str1, collection.first!)
     }
 
     override func testLast() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         XCTAssertEqual(str2, collection.last!)
     }
 
     // MARK: Things not implemented in standalone
 
     override func testSortWithProperty() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         assertThrows(collection.sorted(byKeyPath: "stringCol", ascending: true))
         assertThrows(collection.sorted(byKeyPath: "noSuchCol", ascending: true))
     }
 
     override func testFilterFormat() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         assertThrows(collection.filter("stringCol = '1'"))
         assertThrows(collection.filter("noSuchCol = '1'"))
     }
 
     override func testFilterPredicate() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         let pred1 = NSPredicate(format: "stringCol = '1'")
         let pred2 = NSPredicate(format: "noSuchCol = '2'")
 
@@ -990,16 +924,10 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     }
 
     override func testArrayAggregateWithSwiftObjectDoesntThrow() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         assertThrows(collection.filter("ANY stringListCol == %@", CTTNullableStringObjectWithLink()))
     }
 
     override func testObserve() {
-        guard let collection = collection else {
-            fatalError("Test precondition failed")
-        }
         assertThrows(collection.observe { _ in })
     }
 
@@ -1007,13 +935,31 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         let collection = collectionBase()
         assertThrows(collection.observe { _ in })
     }
+
+    func testFreeze() {
+        assertThrows(collection.freeze(),
+                     reason: "This method may only be called on RLMArray instances retrieved from an RLMRealm")
+    }
+
+    override func testIsFrozen() {
+        XCTAssertFalse(collection.isFrozen)
+    }
+
+    override func testFreezeFromWrongThread() {
+    }
+
+    override func testAccessFrozenCollectionFromDifferentThread() {
+    }
+
+    override func testObserveFrozenCollection() {
+    }
+
+    override func testQueryFrozenCollection() {
+    }
 }
 
 class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func collectionBaseInWriteTransaction() -> List<CTTNullableStringObjectWithLink> {
-        guard let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failure - a property was unexpectedly nil")
-        }
         let array = CTTStringList(value: [[str1, str2]])
         realmWithTestPath().add(array)
         return array.array
@@ -1031,9 +977,6 @@ class ListNewlyAddedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
 class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func collectionBaseInWriteTransaction() -> List<CTTNullableStringObjectWithLink> {
-        guard let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failure - a property was unexpectedly nil")
-        }
         let array = realmWithTestPath().create(CTTStringList.self, value: [[str1, str2]])
         return array.array
     }
@@ -1050,9 +993,6 @@ class ListNewlyCreatedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
 
 class ListRetrievedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func collectionBaseInWriteTransaction() -> List<CTTNullableStringObjectWithLink> {
-        guard let str1 = str1, let str2 = str2 else {
-            fatalError("Test precondition failure - a property was unexpectedly nil")
-        }
         _ = realmWithTestPath().create(CTTStringList.self, value: [[str1, str2]])
         let array = realmWithTestPath().objects(CTTStringList.self).first!
         return array.array
@@ -1103,9 +1043,6 @@ class LinkingObjectsCollectionTypeTests: RealmCollectionTypeTests {
     }
 
     override func testDescription() {
-        guard let collection = collection else {
-            fatalError("Test precondition failure - a property was unexpectedly nil")
-        }
         // swiftlint:disable:next line_length
         assertMatches(collection.description, "LinkingObjects<CTTNullableStringObjectWithLink> <0x[0-9a-f]+> \\(\n\t\\[0\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 1;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 0;\n\t\t\\};\n\t\\},\n\t\\[1\\] CTTNullableStringObjectWithLink \\{\n\t\tstringCol = 2;\n\t\tlinkCol = CTTLinkTarget \\{\n\t\t\tid = 0;\n\t\t\\};\n\t\\}\n\\)")
     }
