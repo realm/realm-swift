@@ -18,14 +18,11 @@
 
 #import <Realm/RLMProviderClient.h>
 
-@class RLMUserAPIKey;
+@class RLMUserAPIKey, RLMObjectId;
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMUserAPIKeyProviderClient : RLMProviderClient
-
-//temp
-typedef id RLMObjectId;
 
 typedef void(^RLMOptionalUserAPIKeyBlock)(RLMUserAPIKey * _Nullable, NSError * _Nullable);
 
@@ -46,7 +43,7 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
   @param objectId The ObjectId of the API key to fetch.
   @param completion A callback to be invoked once the call is complete.
  */
-- (void)fetchApiKey:(RLMObjectId)objectId
+- (void)fetchApiKey:(RLMObjectId *)objectId
          completion:(RLMOptionalUserAPIKeyBlock)completion;
 
 /**

@@ -51,21 +51,25 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSString            *stringCol;
 @property NSData              *binaryCol;
 @property NSDate              *dateCol;
+@property RLMObjectId         *objectIdCol;
+@property RLMDecimal128       *decimal128Col;
 @property KVOObject           *objectCol;
 
-@property RLMArray<RLMBool>   *boolArray;
-@property RLMArray<RLMInt>    *intArray;
-@property RLMArray<RLMFloat>  *floatArray;
-@property RLMArray<RLMDouble> *doubleArray;
-@property RLMArray<RLMString> *stringArray;
-@property RLMArray<RLMData>   *dataArray;
-@property RLMArray<RLMDate>   *dateArray;
-@property RLMArray<KVOObject> *objectArray;
+@property RLMArray<RLMBool>       *boolArray;
+@property RLMArray<RLMInt>        *intArray;
+@property RLMArray<RLMFloat>      *floatArray;
+@property RLMArray<RLMDouble>     *doubleArray;
+@property RLMArray<RLMString>     *stringArray;
+@property RLMArray<RLMData>       *dataArray;
+@property RLMArray<RLMDate>       *dateArray;
+@property RLMArray<RLMObjectId>   *objectIdArray;
+@property RLMArray<RLMDecimal128> *decimal128Array;
+@property RLMArray<KVOObject>     *objectArray;
 
-@property NSNumber<RLMInt> *optIntCol;
-@property NSNumber<RLMFloat> *optFloatCol;
+@property NSNumber<RLMInt>    *optIntCol;
+@property NSNumber<RLMFloat>  *optFloatCol;
 @property NSNumber<RLMDouble> *optDoubleCol;
-@property NSNumber<RLMBool> *optBoolCol;
+@property NSNumber<RLMBool>   *optBoolCol;
 @end
 @implementation KVOObject
 + (NSString *)primaryKey {
@@ -112,6 +116,8 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSData         *binaryCol;
 @property NSDate         *dateCol;
 @property PlainKVOObject *objectCol;
+@property RLMObjectId    *objectIdCol;
+@property RLMDecimal128  *decimal128Col;
 
 @property NSMutableArray *boolArray;
 @property NSMutableArray *intArray;
@@ -121,6 +127,8 @@ RLM_ARRAY_TYPE(KVOLinkObject1)
 @property NSMutableArray *dataArray;
 @property NSMutableArray *dateArray;
 @property NSMutableArray *objectArray;
+@property NSMutableArray *objectIdArray;
+@property NSMutableArray *decimal128Array;
 
 @property NSNumber<RLMInt> *optIntCol;
 @property NSNumber<RLMFloat> *optFloatCol;
@@ -344,6 +352,8 @@ public:
     obj.stringArray = [NSMutableArray array];
     obj.dataArray = [NSMutableArray array];
     obj.dateArray = [NSMutableArray array];
+    obj.objectIdArray = [NSMutableArray array];
+    obj.decimal128Array = [NSMutableArray array];
     obj.objectArray = [NSMutableArray array];
     return obj;
 }
@@ -674,6 +684,24 @@ public:
     }
 
     {
+        KVORecorder r(self, obj, @"objectIdCol");
+        RLMObjectId *objectId = [RLMObjectId objectId];
+        obj.objectIdCol = objectId;
+        AssertChanged(r, NSNull.null, objectId);
+        obj.objectIdCol = nil;
+        AssertChanged(r, objectId, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"decimal128Col");
+        RLMDecimal128 *decimal128 = [[RLMDecimal128 alloc] initWithNumber:@1];
+        obj.decimal128Col = decimal128;
+        AssertChanged(r, NSNull.null, decimal128);
+        obj.decimal128Col = nil;
+        AssertChanged(r, decimal128, NSNull.null);
+    }
+
+    {
         KVORecorder r(self, obj, @"objectCol");
         obj.objectCol = obj;
         AssertChanged(r, NSNull.null, [self observableForObject:obj]);
@@ -726,6 +754,20 @@ public:
     {
         KVORecorder r(self, obj, @"dateArray");
         obj.dateArray = obj.dateArray;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"objectIdArray");
+        obj.objectIdArray = obj.objectIdArray;
+        r.refresh();
+        r.pop_front(); // asserts that there's something to pop
+    }
+
+    {
+        KVORecorder r(self, obj, @"decimal128Array");
+        obj.decimal128Array = obj.decimal128Array;
         r.refresh();
         r.pop_front(); // asserts that there's something to pop
     }
@@ -839,6 +881,24 @@ public:
         AssertChanged(r, [NSDate dateWithTimeIntervalSinceReferenceDate:0], date);
         [obj setValue:nil forKey:@"dateCol"];
         AssertChanged(r, date, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"objectIdCol");
+        RLMObjectId *objectId = [RLMObjectId objectId];
+        [obj setValue:objectId forKey:@"objectIdCol"];
+        AssertChanged(r, NSNull.null, objectId);
+        [obj setValue:nil forKey:@"objectIdCol"];
+        AssertChanged(r, objectId, NSNull.null);
+    }
+
+    {
+        KVORecorder r(self, obj, @"decimal128Col");
+        RLMDecimal128 *decimal128 = [[RLMDecimal128 alloc] initWithNumber:@1];
+        [obj setValue:decimal128 forKey:@"decimal128Col"];
+        AssertChanged(r, NSNull.null, decimal128);
+        [obj setValue:nil forKey:@"decimal128Col"];
+        AssertChanged(r, decimal128, NSNull.null);
     }
 
     {

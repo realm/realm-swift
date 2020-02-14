@@ -49,7 +49,7 @@
     });
 }
 
-- (void)fetchApiKey:(RLMObjectId)objectId
+- (void)fetchApiKey:(RLMObjectId *)objectId
          completion:(RLMOptionalUserAPIKeyBlock)completion {
     self.client.fetch_api_key(nil, self.currentUser,
                               ^(Optional<realm::app::App::UserAPIKey> userAPIKey,

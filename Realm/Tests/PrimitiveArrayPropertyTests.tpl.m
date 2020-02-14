@@ -18,6 +18,46 @@
 
 #import "RLMTestCase.h"
 
+static NSDate *date(int i) {
+    return [NSDate dateWithTimeIntervalSince1970:i];
+}
+static NSData *data(int i) {
+    return [NSData dataWithBytesNoCopy:calloc(i, 1) length:i freeWhenDone:YES];
+}
+static RLMDecimal128 *decimal128(int i) {
+    return [RLMDecimal128 decimalWithNumber:@(i)];
+}
+static NSMutableArray *objectIds;
+static RLMObjectId *objectId(NSUInteger i) {
+    if (!objectIds) {
+        objectIds = [NSMutableArray new];
+    }
+    while (i >= objectIds.count) {
+        [objectIds addObject:RLMObjectId.objectId];
+    }
+    return objectIds[i];
+}
+static void count(NSArray *values, double *sum, NSUInteger *count) {
+    for (id value in values) {
+        if (value != NSNull.null) {
+            ++*count;
+            *sum += [value doubleValue];
+        }
+    }
+}
+static double sum(NSArray *values) {
+    double sum = 0;
+    NSUInteger c = 0;
+    count(values, &sum, &c);
+    return sum;
+}
+static double average(NSArray *values) {
+    double sum = 0;
+    NSUInteger c = 0;
+    count(values, &sum, &c);
+    return sum / c;
+}
+
 @interface PrimitiveArrayPropertyTests : RLMTestCase
 @end
 
@@ -130,13 +170,6 @@
 
 - (void)testDeleteObjectsInRealm {
     RLMAssertThrowsWithReason([realm deleteObjects:$array], @"Cannot delete objects from RLMArray");
-}
-
-static NSDate *date(int i) {
-    return [NSDate dateWithTimeIntervalSince1970:i];
-}
-static NSData *data(int i) {
-    return [NSData dataWithBytesNoCopy:calloc(i, 1) length:i freeWhenDone:YES];
 }
 
 - (void)testObjectAtIndex {
@@ -401,7 +434,7 @@ static NSData *data(int i) {
 
     %sum [$array addObjects:$values];
 
-    %sum XCTAssertEqualObjects([$array sumOfProperty:@"self"], @($s0 + $s1));
+    %sum XCTAssertEqualWithAccuracy([$array sumOfProperty:@"self"].doubleValue, sum($values), .001);
 }
 
 - (void)testAverage {
@@ -412,7 +445,7 @@ static NSData *data(int i) {
 
     %avg [$array addObjects:$values];
 
-    %avg XCTAssertEqualWithAccuracy([$array averageOfProperty:@"self"].doubleValue, ($s0 + $s1) / 2.0, .001);
+    %avg XCTAssertEqualWithAccuracy([$array averageOfProperty:@"self"].doubleValue, average($values), .001);
 }
 
 - (void)testFastEnumeration {
@@ -441,8 +474,8 @@ static NSData *data(int i) {
 
     %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@min.self"], $v0);
     %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@max.self"], $v1);
-    %sum XCTAssertEqualObjects([$array valueForKeyPath:@"@sum.self"], @($s0 + $s1));
-    %avg XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@avg.self"] doubleValue], ($s0 + $s1) / 2.0, .001);
+    %sum XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@sum.self"] doubleValue], sum($values), .001);
+    %avg XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@avg.self"] doubleValue], average($values), .001);
 }
 
 - (void)testValueForKeyLength {
@@ -479,6 +512,12 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                         return 0;
                     }
                     return result < 0 ? -1 : 1;
+                }
+
+                if ([a isKindOfClass:[RLMObjectId class]]) {
+                    int64_t idx1 = [objectIds indexOfObject:a];
+                    int64_t idx2 = [objectIds indexOfObject:b];
+                    return idx1 - idx2;
                 }
 
                 return [a compare:b];

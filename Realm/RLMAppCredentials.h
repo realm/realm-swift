@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 typedef NSString *RLMAppCredentialsToken;
 
 /// A type representing the unique identifier of a Realm Object Server identity provider.
-typedef NSString *RLMIdentityProvider RLM_EXTENSIBLE_STRING_ENUM;
+typedef NSString *RLMIdentityProvider NS_EXTENSIBLE_STRING_ENUM;
 
 /// The username/password identity provider. User accounts are handled by the Realm Object Server directly without the
 /// involvement of a third-party identity provider.

@@ -18,13 +18,11 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Realm/NSError+RLMSync.h>
-#import <Realm/RLMApp.h>
-#import <Realm/RLMAppCredentials.h>
 #import <Realm/RLMArray.h>
+#import <Realm/RLMDecimal128.h>
 #import <Realm/RLMMigration.h>
-#import <Realm/RLMNetworkTransport.h>
 #import <Realm/RLMObject.h>
+#import <Realm/RLMObjectId.h>
 #import <Realm/RLMObjectSchema.h>
 #import <Realm/RLMPlatform.h>
 #import <Realm/RLMProperty.h>
@@ -35,6 +33,12 @@
 #import <Realm/RLMRealmConfiguration.h>
 #import <Realm/RLMResults.h>
 #import <Realm/RLMSchema.h>
+
+#import <Realm/RLMApp.h>
+#import <Realm/RLMAppCredentials.h>
+#import <Realm/RLMNetworkTransport.h>
+#import <Realm/RLMRealm+Sync.h>
+#import <Realm/RLMRealmConfiguration+Sync.h>
 #import <Realm/RLMSyncConfiguration.h>
 #import <Realm/RLMSyncManager.h>
 #import <Realm/RLMSyncSession.h>
@@ -43,3 +47,4 @@
 #import <Realm/RLMUserAPIKey.h>
 #import <Realm/RLMUserAPIKeyProviderClient.h>
 #import <Realm/RLMUsernamePasswordProviderClient.h>
+#import <Realm/NSError+RLMSync.h>

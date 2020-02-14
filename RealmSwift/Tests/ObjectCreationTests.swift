@@ -77,6 +77,8 @@ class ObjectCreationTests: TestCase {
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
+            "decimalCol": 3 as Decimal128,
+            "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
            ]
@@ -117,8 +119,8 @@ class ObjectCreationTests: TestCase {
         // array with all values specified
         let baselineValues: [Any] = [true, 1, IntEnum.value1.rawValue, 1.1 as Float,
                                      11.1, "b", "b".data(using: String.Encoding.utf8)!,
-                                     Date(timeIntervalSince1970: 2), ["boolCol": true],
-                                     [[true], [false]]]
+                                     Date(timeIntervalSince1970: 2), Decimal128(number: 123),
+                                     ObjectId.generate(), ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -231,6 +233,8 @@ class ObjectCreationTests: TestCase {
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
+            "decimalCol": 3 as Decimal128,
+            "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
         ]
@@ -279,8 +283,10 @@ class ObjectCreationTests: TestCase {
 
     func testCreateWithArray() {
         // array with all values specified
-        let baselineValues: [Any] = [true, 1, IntEnum.value1.rawValue, 1.1 as Float, 11.1, "b", "b".data(using: String.Encoding.utf8)!,
-            Date(timeIntervalSince1970: 2), ["boolCol": true], [[true], [false]]]
+        let baselineValues: [Any] = [true, 1, IntEnum.value1.rawValue, 1.1 as Float,
+                                     11.1, "b", "b".data(using: String.Encoding.utf8)!,
+                                     Date(timeIntervalSince1970: 2), Decimal128(number: 123),
+                                     ObjectId.generate(), ["boolCol": true], [[true], [false]]]
 
         // test with valid dictionary literals
         let props = try! Realm().schema["SwiftObject"]!.properties
@@ -397,6 +403,8 @@ class ObjectCreationTests: TestCase {
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
+            "decimalCol": 3 as Decimal128,
+            "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
         ]
@@ -423,6 +431,8 @@ class ObjectCreationTests: TestCase {
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
+            "decimalCol": 3 as Decimal128,
+            "objectIdCol": ObjectId.generate(),
             "objectCol": SwiftBoolObject(value: [true]),
             "arrayCol": [SwiftBoolObject(value: [true]), SwiftBoolObject()]
         ]
@@ -490,6 +500,8 @@ class ObjectCreationTests: TestCase {
             "stringCol": "b",
             "binaryCol": "b".data(using: String.Encoding.utf8)!,
             "dateCol": Date(timeIntervalSince1970: 2),
+            "decimalCol": 3 as Decimal128,
+            "objectIdCol": ObjectId.generate(),
             "objectCol": NSNull(),
             "arrayCol": NSNull()
         ]
@@ -1013,6 +1025,8 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.stringCol, (array[5] as! String))
         XCTAssertEqual(object.binaryCol, (array[6] as! Data))
         XCTAssertEqual(object.dateCol, (array[7] as! Date))
+        XCTAssertEqual(object.decimalCol, Decimal128(value: array[8]))
+        XCTAssertEqual(object.objectIdCol, (array[9] as! ObjectId))
         XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
         for i in 0..<boolObjectListValues.count {
@@ -1024,11 +1038,13 @@ class ObjectCreationTests: TestCase {
                                                         boolObjectValue: Bool, boolObjectListValues: [Bool]) {
         XCTAssertEqual(object.boolCol, (dictionary["boolCol"] as! Bool))
         XCTAssertEqual(object.intCol, (dictionary["intCol"] as! Int))
-        //XCTAssertEqual(object.floatCol, (dictionary["floatCol"] as! Float)) // FIXME: crashes with swift 3.2
+        XCTAssertEqual(object.floatCol, (dictionary["floatCol"] as! NSNumber).floatValue)
         XCTAssertEqual(object.doubleCol, (dictionary["doubleCol"] as! Double))
         XCTAssertEqual(object.stringCol, (dictionary["stringCol"] as! String))
         XCTAssertEqual(object.binaryCol, (dictionary["binaryCol"] as! Data))
         XCTAssertEqual(object.dateCol, (dictionary["dateCol"] as! Date))
+        XCTAssertEqual(object.decimalCol, Decimal128(value: dictionary["decimalCol"]!))
+        XCTAssertEqual(object.objectIdCol, (dictionary["objectIdCol"] as! ObjectId))
         XCTAssertEqual(object.objectCol!.boolCol, boolObjectValue)
         XCTAssertEqual(object.arrayCol.count, boolObjectListValues.count)
         for i in 0..<boolObjectListValues.count {
@@ -1054,6 +1070,8 @@ class ObjectCreationTests: TestCase {
         XCTAssertEqual(object.optNSStringCol, (dictionary["optNSStringCol"] as! NSString))
         XCTAssertEqual(object.optBinaryCol, (dictionary["optBinaryCol"] as! Data?))
         XCTAssertEqual(object.optDateCol, (dictionary["optDateCol"] as! Date?))
+        XCTAssertEqual(object.optDecimalCol, (dictionary["optDecimalCol"] as! Decimal128?))
+        XCTAssertEqual(object.optObjectIdCol, (dictionary["optObjectIdCol"] as! ObjectId?))
         XCTAssertEqual(object.optObjectCol?.boolCol, boolObjectValue)
     }
 
@@ -1066,7 +1084,6 @@ class ObjectCreationTests: TestCase {
     }
 
     // return an array of valid values that can be used to initialize each type
-    // swiftlint:disable:next cyclomatic_complexity
     private func validValuesForSwiftObjectType(_ type: PropertyType, _ array: Bool) -> [Any] {
         try! Realm().beginWrite()
         let persistedObject = try! Realm().create(SwiftBoolObject.self, value: [true])
@@ -1088,13 +1105,13 @@ class ObjectCreationTests: TestCase {
         case .data:     return ["b".data(using: String.Encoding.utf8, allowLossyConversion: false)!]
         case .date:     return [Date(timeIntervalSince1970: 2)]
         case .object:   return [[true], ["boolCol": true], SwiftBoolObject(value: [true]), persistedObject]
-        case .any: XCTFail("not supported")
-        case .linkingObjects: XCTFail("not supported")
+        case .objectId: return [ObjectId("1234567890ab1234567890ab")]
+        case .decimal128: return [1, "2", Decimal128(number: 3)]
+        case .any: fatalError("not supported")
+        case .linkingObjects: fatalError("not supported")
         }
-        return []
     }
 
-    // swiftlint:disable:next cyclomatic_complexity
     private func invalidValuesForSwiftObjectType(_ type: PropertyType, _ array: Bool) -> [Any] {
         try! Realm().beginWrite()
         let persistedObject = try! Realm().create(SwiftIntObject.self)
@@ -1111,9 +1128,10 @@ class ObjectCreationTests: TestCase {
         case .data:     return ["invalid"]
         case .date:     return ["invalid"]
         case .object:   return ["invalid", ["a"], ["boolCol": "a"], SwiftIntObject()]
-        case .any: XCTFail("not supported")
-        case .linkingObjects: XCTFail("not supported")
+        case .objectId: return ["invalid", 123]
+        case .decimal128: return ["invalid"]
+        case .any: fatalError("not supported")
+        case .linkingObjects: fatalError("not supported")
         }
-        return []
     }
 }

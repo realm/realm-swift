@@ -69,6 +69,22 @@ class ObjectAccessorTests: TestCase {
         XCTAssertEqual(object.intEnumCol, .value1)
         object.intEnumCol = .value2
         XCTAssertEqual(object.intEnumCol, .value2)
+
+        object.decimalCol = "inf"
+        XCTAssertEqual(object.decimalCol, "inf")
+        object.decimalCol = "-inf"
+        XCTAssertEqual(object.decimalCol, "-inf")
+        object.decimalCol = "0"
+        XCTAssertEqual(object.decimalCol, "0")
+        object.decimalCol = "nan"
+        XCTAssertTrue(object.decimalCol.isNaN)
+
+        let oid1 = ObjectId("1234567890ab1234567890ab")
+        let oid2 = ObjectId("abcdef123456abcdef123456")
+        object.objectIdCol = oid1
+        XCTAssertEqual(object.objectIdCol, oid1)
+        object.objectIdCol = oid2
+        XCTAssertEqual(object.objectIdCol, oid2)
     }
 
     func testUnmanagedAccessors() {

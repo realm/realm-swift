@@ -1418,8 +1418,11 @@ RLM_ARRAY_TYPE(MigrationTestObject);
     NSArray *afterProperties = objectSchema.properties;
     objectSchema.properties = beforeProperties;
 
-    NSDate *now = [NSDate dateWithTimeIntervalSince1970:100000];
-    id inputValue = @[@YES, @1, @1.1f, @1.11, @"string", [NSData dataWithBytes:"a" length:1], now, @YES, @11, @[@"a"]];
+    NSDictionary *valueDictionary = [AllTypesObject values:1 stringObject:(id)@[@"a"]];
+    NSMutableArray *inputValue = [NSMutableArray arrayWithCapacity:valueDictionary.count];
+    for (NSString *key in [afterProperties valueForKey:@"name"]) {
+        [inputValue addObject:valueDictionary[key]];
+    }
 
     [self createTestRealmWithSchema:@[objectSchema, stringObjectSchema, linkingObjectsSchema] block:^(RLMRealm *realm) {
         [AllTypesObject createInRealm:realm withValue:inputValue];
@@ -1434,8 +1437,9 @@ RLM_ARRAY_TYPE(MigrationTestObject);
             [migration enumerateObjects:AllTypesObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
                 XCTAssertNotNil(oldObject[[beforeProperties[idx] name]]);
                 RLMAssertThrowsWithReasonMatching(newObject[[beforeProperties[idx] name]], @"Invalid property name");
-                if (![property.objectClassName isEqualToString:@""]) { return; }
-                XCTAssertEqualObjects(oldObject[[beforeProperties[idx] name]], newObject[property.name]);
+                if ([property.objectClassName isEqualToString:@""]) {
+                    XCTAssertEqualObjects(oldObject[[beforeProperties[idx] name]], newObject[property.name]);
+                }
             }];
         }];
         [migration enumerateObjects:AllTypesObject.className block:^(RLMObject *oldObject, RLMObject *newObject) {
@@ -1461,7 +1465,9 @@ RLM_ARRAY_TYPE(MigrationTestObject);
     XCTAssertEqualObjects(inputValue[6], obj.dateCol);
     XCTAssertEqualObjects(inputValue[7], @(obj.cBoolCol));
     XCTAssertEqualObjects(inputValue[8], @(obj.longCol));
-    XCTAssertEqualObjects(inputValue[9], @[obj.objectCol.stringCol]);
+    XCTAssertEqualObjects(inputValue[9], obj.decimalCol);
+    XCTAssertEqualObjects(inputValue[10], obj.objectIdCol);
+    XCTAssertEqualObjects(inputValue[11], @[obj.objectCol.stringCol]);
 }
 
 - (void)testMultipleMigrationRenameProperty {
