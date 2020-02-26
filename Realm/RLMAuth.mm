@@ -30,6 +30,8 @@
 #import "sync/sync_session.hpp"
 #import "sync/sync_user.hpp"
 
+#import "app.hpp"
+
 @implementation RLMAuth {
     NSURL *_route;
 }
@@ -56,56 +58,11 @@
                      timeout:(NSTimeInterval)timeout
                callbackQueue:(dispatch_queue_t)callbackQueue
                 onCompletion:(RLMUserCompletionBlock)completion {
-    // Prepare login network request
-    NSMutableDictionary *json = [@{
-        kRLMSyncProviderKey: credentials.provider
-    } mutableCopy];
 
-
-    if (credentials.userInfo.count) {
-        // Munge user info into the JSON request.
-        [json addEntriesFromDictionary:credentials.userInfo];
-    }
-
-    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
-        if (error) {
-            return completion(nil, error);
-        }
-
-        RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithDictionary:json
-                                                                    requireAccessToken:YES
-                                                                   requireRefreshToken:YES];
-        if (!model) {
-            // Malformed JSON
-            return completion(nil, make_auth_error_bad_response(json));
-        }
-
-        realm::SyncUserIdentifier identity{
-            ((NSString *)json[@"user_id"]).UTF8String,
-            _route.absoluteString.UTF8String
-        };
-        auto sync_user = realm::SyncManager::shared().get_user(identity ,
-                                                               [model.refreshToken.token UTF8String],
-                                                               [model.accessToken.token UTF8String]);
-        if (!sync_user) {
-            return completion(nil, make_auth_error_client_issue());
-        }
-        sync_user->set_is_admin(model.refreshToken.tokenData.isAdmin);
-        return completion([[RLMSyncUser alloc] initWithSyncUser:std::move(sync_user)], nil);
-    };
-
-    [RLMSyncAuthEndpoint sendRequestToServer:_route
-                                        JSON:json
-                                     timeout:timeout
-                                  completion:^(NSError *error, NSDictionary *dictionary) {
-        dispatch_async(callbackQueue, ^{
-            handler(error, dictionary);
-        });
-    }];
 }
 
 - (void)switchUser:(NSString *)userId {
-
+    
 }
 
 @end

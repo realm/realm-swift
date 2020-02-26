@@ -28,10 +28,6 @@ typedef NSString *RLMSyncCredentialsToken;
 /// A type representing the unique identifier of a Realm Object Server identity provider.
 typedef NSString *RLMIdentityProvider RLM_EXTENSIBLE_STRING_ENUM;
 
-/// The debug identity provider, which accepts any token string and creates a user associated with that token if one
-/// does not yet exist. Not enabled for Realm Object Server configured for production.
-//extern RLMIdentityProvider const RLMIdentityProviderDebug;
-
 /// The username/password identity provider. User accounts are handled by the Realm Object Server directly without the
 /// involvement of a third-party identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderUsernamePassword;
@@ -96,14 +92,6 @@ extern RLMIdentityProvider const RLMIdentityProviderApple;
 Construct and return credentials from an Apple account token.
 */
 + (instancetype)credentialsWithAppleToken:(RLMSyncCredentialsToken)token;
-
-/**
- Construct and return credentials with a custom token string, identity provider string, and optional user info. In most
- cases, the convenience initializers should be used instead.
- */
-- (instancetype)initWithCustomToken:(RLMSyncCredentialsToken)token
-                           provider:(RLMIdentityProvider)provider
-                           userInfo:(nullable NSDictionary *)userInfo NS_DESIGNATED_INITIALIZER;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncCredentials cannot be created directly")));

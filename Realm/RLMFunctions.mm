@@ -47,14 +47,14 @@
         @"token": [[_app auth] currentUser].accessToken,
     };
 
-    [RLMAppFunctionEndpoint sendRequestToServer:_route
-                                           JSON:json
-                                        timeout:timeout
-                                     completion:^(NSError *error, NSData *data) {
-        dispatch_async(callbackQueue, ^{
-            completion(data, error);
-        });
-    }];
+//    [RLMAppFunctionEndpoint sendRequestToServer:_route
+//                                           JSON:json
+//                                        timeout:timeout
+//                                     completion:^(NSError *error, NSData *data) {
+//        dispatch_async(callbackQueue, ^{
+//            completion(data, error);
+//        });
+//    }];
 }
 
 @end

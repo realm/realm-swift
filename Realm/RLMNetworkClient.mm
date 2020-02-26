@@ -16,14 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMNetworkClient.h"
+#import "RLMNetworkClient.hpp"
 
 #import "RLMRealmConfiguration.h"
 #import "RLMJSONModels.h"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMSyncManager_Private.h"
 #import "RLMUtil.hpp"
-
+#import "app.hpp"
 #import <realm/util/scope_exit.hpp>
 
 typedef void(^RLMServerURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
@@ -47,40 +47,30 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 @interface RLMSessionDelegate <NSURLSessionDelegate> : NSObject
 + (instancetype)delegateWithCertificatePaths:(NSDictionary *)paths
                                     decoder:(id (^)(NSData *, NSError *))decoder
-                                  completion:(void (^)(NSError *, NSDictionary *))completion;
+                                  completion:(realm::completion_block)completion;
 @end
 
-@interface RLMSyncServerEndpoint ()
-/// The HTTP method the endpoint expects. Defaults to POST.
-+ (NSString *)httpMethod;
+static NSData* httpBodyForPayload(const char* json, NSError **error) {
+    NSError *localError = nil;
 
-/// The URL to which the request should be made. Must be implemented.
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json;
-
-/// The body for the request, if any.
-+ (NSData *)httpBodyForPayload:(NSDictionary *)json error:(NSError **)error;
-
-/// The HTTP headers to be added to the request, if any.
-+ (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(NSDictionary *)json
-                                                        options:(nullable RLMNetworkRequestOptions *)options;
-
-+ (id)decode:(NSData *)data error:(NSError *)error;
-@end
-
-@implementation RLMSyncServerEndpoint
-
-+ (void)sendRequestToServer:(NSURL *)serverURL
-                       JSON:(NSDictionary *)jsonDictionary
-                 completion:(void (^)(NSError *))completionBlock {
-    [self sendRequestToServer:serverURL JSON:jsonDictionary timeout:0
-                   completion:^(NSError *error, NSDictionary *) {
-        completionBlock(error);
-    }];
+    NSData *jsonData = [[NSData alloc] initWithBytes:json length:strlen(json)];
+    if (jsonData && !localError) {
+        return jsonData;
+    }
+    assert(("If there isn't a converted data object there must be an error.", localError));
+    if (error) {
+        *error = localError;
+    }
+    return nil;
 }
-+ (void)sendRequestToServer:(NSURL *)serverURL
-                       JSON:(NSDictionary *)jsonDictionary
-                    timeout:(NSTimeInterval)timeout
-                 completion:(void (^)(NSError *, id))completionBlock {
+
+void RLMAppNetworkClient::sendRequestToServer(const char* url,
+                                              const char* httpMethod,
+                                              realm::GenericNetworkHeaders headers,
+                                              const char *data,
+                                              int timeout,
+                                              realm::completion_block completionBlock)
+{
     // If the timeout isn't set then use the timeout set on the sync manager,
     // or 60 seconds if it isn't set there either.
     RLMSyncManager *syncManager = RLMSyncManager.sharedManager;
@@ -91,29 +81,27 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 
     // Create the request
     NSError *localError = nil;
-    NSURL *requestURL = [self urlForAuthServer:serverURL payload:jsonDictionary];
+
+    NSURL *requestURL = [[NSURL alloc] initWithString:[[NSString alloc] initWithUTF8String:url]];
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:requestURL];
-    request.HTTPMethod = [self httpMethod];
+    request.HTTPMethod = [[NSString alloc] initWithUTF8String: httpMethod];
     if (![request.HTTPMethod isEqualToString:@"GET"]) {
-        request.HTTPBody = [self httpBodyForPayload:jsonDictionary error:&localError];
+        request.HTTPBody = httpBodyForPayload(data, &localError);
         if (localError) {
-            completionBlock(localError, nil);
+            //                completionBlock(localError, nil);
             return;
         }
     }
     request.timeoutInterval = timeout;
     RLMNetworkRequestOptions *options = syncManager.networkRequestOptions;
-    NSDictionary<NSString *, NSString *> *headers = [self httpHeadersForPayload:jsonDictionary options:options];
-    for (NSString *key in headers) {
-        [request addValue:headers[key] forHTTPHeaderField:key];
+
+    for (size_t i = 0; i < headers.count; i++) {
+        [request addValue:[[NSString alloc] initWithUTF8String: headers.values[i]]
+       forHTTPHeaderField:[[NSString alloc] initWithUTF8String: headers.keys[i]]];
     }
 
-    id (^decoder)(NSData *, NSError *) = ^(NSData *data, NSError* error) {
-        return [self decode: data error: error];
-    };
-
     id delegate = [RLMSessionDelegate delegateWithCertificatePaths:options.pinnedCertificatePaths
-                                                          decoder:decoder
+                                                           decoder:nil // # TODO
                                                         completion:completionBlock];
     auto session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration
                                                  delegate:delegate delegateQueue:nil];
@@ -124,67 +112,17 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
     [session finishTasksAndInvalidate];
 }
 
-+ (id)decode:(NSData *)data error:(NSError *) error {
-    id json = [NSJSONSerialization JSONObjectWithData:data options:(NSJSONReadingOptions)0 error:&error];
-    return json;
-}
-
-+ (NSString *)httpMethod {
-    return @"POST";
-}
-
-+ (NSURL *)urlForAuthServer:(__unused NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    NSAssert(NO, @"This method must be overriden by concrete subclasses.");
-    return nil;
-}
-
-+ (NSData *)httpBodyForPayload:(NSDictionary *)json error:(NSError **)error {
-    NSError *localError = nil;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:json
-                                                       options:(NSJSONWritingOptions)0
-                                                         error:&localError];
-    if (jsonData && !localError) {
-        return jsonData;
-    }
-    NSAssert(localError, @"If there isn't a converted data object there must be an error.");
-    if (error) {
-        *error = localError;
-    }
-    return nil;
-}
-
-+ (NSDictionary<NSString *, NSString *> *)httpHeadersForPayload:(NSDictionary *)json
-                                                        options:(nullable RLMNetworkRequestOptions *)options {
-    NSMutableDictionary<NSString *, NSString *> *headers = [[NSMutableDictionary alloc] init];
-    headers[@"Content-Type"] = @"application/json;charset=utf-8";
-    headers[@"Accept"] = @"application/json";
-
-    if (NSDictionary<NSString *, NSString *> *customHeaders = options.customHeaders) {
-        [headers addEntriesFromDictionary:customHeaders];
-    }
-    if (NSString *authToken = [json objectForKey:kRLMSyncTokenKey]) {
-        headers[options.authorizationHeaderName ?: @"Authorization"] =
-            [[NSString alloc] initWithFormat:@"Bearer %@", authToken];
-    }
-
-    return headers;
-}
-@end
-
 @implementation RLMSessionDelegate {
     NSDictionary<NSString *, NSURL *> *_certificatePaths;
     NSData *_data;
-    id (^_decoder)(NSData *, NSError *);
-    void (^_completionBlock)(NSError *, id);
+    realm::completion_block _completionBlock;
 }
 
 + (instancetype)delegateWithCertificatePaths:(NSDictionary *)paths
-                                    decoder:(id (^)(NSData *, NSError *))decoder
-                                  completion:(void (^)(NSError *, NSDictionary *))completion {
+                                  completion:(realm::completion_block)completion {
     RLMSessionDelegate *delegate = [RLMSessionDelegate new];
     delegate->_certificatePaths = paths;
     delegate->_completionBlock = completion;
-    delegate->_decoder = decoder;
     return delegate;
 }
 
@@ -218,9 +156,9 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
             CFRelease(items);
         }
         if (error) {
-            _completionBlock(error, nil);
+//            _completionBlock(error, nil);
             // Don't also report errors about the connection itself failing later
-            _completionBlock = ^(NSError *, id) { };
+//            _completionBlock = ^(NSError *, id) { };
             completionHandler(NSURLSessionAuthChallengeRejectProtectionSpace, nil);
         }
     });
@@ -293,23 +231,16 @@ static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
 didCompleteWithError:(NSError *)error
 {
     if (error) {
-        _completionBlock(error, nil);
+//        _completionBlock(error, nil);
         return;
     }
 
     if (NSError *error = [self validateResponse:task.response data:_data]) {
-        _completionBlock(error, nil);
-        return;
-    }
-
-    id json = _decoder(_data, error);
-
-    if (!json) {
-        _completionBlock(error, nil);
+//        _completionBlock(error, nil);
         return;
     }
     
-    _completionBlock(nil, json);
+    _completionBlock(realm::GenericNetworkError { static_cast<int>(error.code) }, (const char*)_data.bytes);
 }
 
 - (NSError *)validateResponse:(NSURLResponse *)response data:(NSData *)data {
@@ -356,6 +287,8 @@ didCompleteWithError:(NSError *)error
     if (data.length == 0) {
         return nil;
     }
+
+    NSLog([[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     id json = [NSJSONSerialization JSONObjectWithData:data
                                               options:(NSJSONReadingOptions)0
                                                 error:nil];
@@ -370,138 +303,125 @@ didCompleteWithError:(NSError *)error
 @implementation RLMNetworkRequestOptions
 @end
 
-#pragma mark - Endpoint Implementations
-
-#pragma mark Auth Impl
-
-@implementation RLMSyncAuthEndpoint
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    NSString *provider = json[kRLMSyncProviderKey];
-    NSAssert(provider, @"provider must not be nil");
-
-    return [authServerURL URLByAppendingPathComponent:[[NSString alloc] initWithFormat: @"providers/%@/login", provider]];
-}
-@end
-
 # pragma mark Reset Password Impl
-
-@implementation RLMSyncResetPasswordEndpoint
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"reset"];
-}
-@end
-
-#pragma mark Change Password Impl
-
-@implementation RLMSyncChangePasswordEndpoint
-+ (NSString *)httpMethod {
-    return @"PUT";
-}
-
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"auth/password"];
-}
-@end
-
-#pragma mark Update Account Impl
-
-@implementation RLMSyncUpdateAccountEndpoint
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"auth/password/updateAccount"];
-}
-@end
-
-#pragma mark Get User Info Impl
-
-@implementation RLMSyncGetUserInfoEndpoint
-+ (NSString *)httpMethod {
-    return @"GET";
-}
-
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
-    NSString *provider = json[kRLMSyncProviderKey];
-    NSString *providerID = json[kRLMSyncProviderIDKey];
-    NSAssert([provider isKindOfClass:[NSString class]] && [providerID isKindOfClass:[NSString class]],
-             @"malformed request; this indicates a logic error in the binding.");
-    NSCharacterSet *allowed = [NSCharacterSet URLQueryAllowedCharacterSet];
-    NSString *pathComponent = [NSString stringWithFormat:@"auth/users/%@/%@",
-                               [provider stringByAddingPercentEncodingWithAllowedCharacters:allowed],
-                               [providerID stringByAddingPercentEncodingWithAllowedCharacters:allowed]];
-    return [authServerURL URLByAppendingPathComponent:pathComponent];
-}
-
-+ (NSData *)httpBodyForPayload:(__unused NSDictionary *)json error:(__unused NSError **)error {
-    return nil;
-}
-@end
-
-#pragma mark Get Permissions Impl
-
-@implementation RLMSyncGetPermissionsEndpoint
-+ (NSString *)httpMethod {
-    return @"GET";
-}
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"permissions"];
-}
-@end
-
-#pragma mark Get Permission Offers Impl
-
-@implementation RLMSyncGetPermissionOffersEndpoint
-+ (NSString *)httpMethod {
-    return @"GET";
-}
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"permissions/offers"];
-}
-@end
-
-#pragma mark Apply Permissions Impl
-
-@implementation RLMSyncApplyPermissionsEndpoint
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"permissions/apply"];
-}
-@end
-
-#pragma mark Offer Permissions Impl
-
-@implementation RLMSyncOfferPermissionsEndpoint
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"permissions/offers"];
-}
-@end
-
-#pragma mark Accept Permission Offer Impl
-
-@implementation RLMSyncAcceptPermissionOfferEndpoint
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"permissions/offers/%@/accept", json[@"offerToken"]]];
-}
-@end
-
-#pragma mark Invalidate Permission Offer Impl
-
-@implementation RLMSyncInvalidatePermissionOfferEndpoint
-+ (NSString *)httpMethod {
-    return @"DELETE";
-}
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"permissions/offers/%@", json[@"offerToken"]]];
-}
-@end
-
-#pragma mark App Function Impl
-
-@implementation RLMAppFunctionEndpoint
-+ (NSString *)httpMethod {
-    return @"POST";
-}
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"functions/call"]];
-}
-+ (id)decode:(NSData *)data error:(__unused NSError *) error {
-    return data;
-}
-@end
+//
+//@implementation RLMSyncResetPasswordEndpoint
+//+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
+//    return [authServerURL URLByAppendingPathComponent:@"reset"];
+//}
+//@end
+//
+//#pragma mark Change Password Impl
+//
+//@implementation RLMSyncChangePasswordEndpoint
+//+ (NSString *)httpMethod {
+//    return @"PUT";
+//}
+//
+//+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
+//    return [authServerURL URLByAppendingPathComponent:@"auth/password"];
+//}
+//@end
+//
+//#pragma mark Update Account Impl
+//
+//@implementation RLMSyncUpdateAccountEndpoint
+//+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
+//    return [authServerURL URLByAppendingPathComponent:@"auth/password/updateAccount"];
+//}
+//@end
+//
+//#pragma mark Get User Info Impl
+//
+//@implementation RLMSyncGetUserInfoEndpoint
+//+ (NSString *)httpMethod {
+//    return @"GET";
+//}
+//
+//+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
+//    NSString *provider = json[kRLMSyncProviderKey];
+//    NSString *providerID = json[kRLMSyncProviderIDKey];
+//    NSAssert([provider isKindOfClass:[NSString class]] && [providerID isKindOfClass:[NSString class]],
+//             @"malformed request; this indicates a logic error in the binding.");
+//    NSCharacterSet *allowed = [NSCharacterSet URLQueryAllowedCharacterSet];
+//    NSString *pathComponent = [NSString stringWithFormat:@"auth/users/%@/%@",
+//                               [provider stringByAddingPercentEncodingWithAllowedCharacters:allowed],
+//                               [providerID stringByAddingPercentEncodingWithAllowedCharacters:allowed]];
+//    return [authServerURL URLByAppendingPathComponent:pathComponent];
+//}
+//
+//+ (NSData *)httpBodyForPayload:(__unused NSDictionary *)json error:(__unused NSError **)error {
+//    return nil;
+//}
+//@end
+//
+//#pragma mark Get Permissions Impl
+//
+//@implementation RLMSyncGetPermissionsEndpoint
+//+ (NSString *)httpMethod {
+//    return @"GET";
+//}
+//+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
+//    return [authServerURL URLByAppendingPathComponent:@"permissions"];
+//}
+//@end
+//
+//#pragma mark Get Permission Offers Impl
+//
+//@implementation RLMSyncGetPermissionOffersEndpoint
+//+ (NSString *)httpMethod {
+//    return @"GET";
+//}
+//+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
+//    return [authServerURL URLByAppendingPathComponent:@"permissions/offers"];
+//}
+//@end
+//
+//#pragma mark Apply Permissions Impl
+//
+//@implementation RLMSyncApplyPermissionsEndpoint
+//+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
+//    return [authServerURL URLByAppendingPathComponent:@"permissions/apply"];
+//}
+//@end
+//
+//#pragma mark Offer Permissions Impl
+//
+//@implementation RLMSyncOfferPermissionsEndpoint
+//+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
+//    return [authServerURL URLByAppendingPathComponent:@"permissions/offers"];
+//}
+//@end
+//
+//#pragma mark Accept Permission Offer Impl
+//
+//@implementation RLMSyncAcceptPermissionOfferEndpoint
+//+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
+//    return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"permissions/offers/%@/accept", json[@"offerToken"]]];
+//}
+//@end
+//
+//#pragma mark Invalidate Permission Offer Impl
+//
+//@implementation RLMSyncInvalidatePermissionOfferEndpoint
+//+ (NSString *)httpMethod {
+//    return @"DELETE";
+//}
+//+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
+//    return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"permissions/offers/%@", json[@"offerToken"]]];
+//}
+//@end
+//
+//#pragma mark App Function Impl
+//
+//@implementation RLMAppFunctionEndpoint
+//+ (NSString *)httpMethod {
+//    return @"POST";
+//}
+//+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
+//    return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"functions/call"]];
+//}
+//+ (id)decode:(NSData *)data error:(__unused NSError *) error {
+//    return data;
+//}
+//@end

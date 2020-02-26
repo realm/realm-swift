@@ -20,6 +20,56 @@ import Foundation
 import Realm
 import Realm.Private
 
+public final class RealmApp: RLMApp<RealmFunctions> {
+    /**
+     Log in a user and asynchronously retrieve a user object.
+
+     If the log in completes successfully, the completion block will be called, and a
+     `SyncUser` representing the logged-in user will be passed to it. This user object
+     can be used to open `Realm`s and retrieve `SyncSession`s. Otherwise, the
+     completion block will be called with an error.
+
+     - parameter credentials: A `SyncCredentials` object representing the user to log in.
+     - parameter timeout: How long the network client should wait, in seconds, before timing out.
+     - parameter callbackQueue: The dispatch queue upon which the callback should run. Defaults to the main queue.
+     - parameter completion: A callback block to be invoked once the log in completes.
+     */
+    public func logIn(with credentials: SyncCredentials,
+               timeout: TimeInterval = 30,
+               callbackQueue queue: DispatchQueue = DispatchQueue.main,
+               onCompletion completion: @escaping UserCompletionBlock) {
+        return self.__logIn(with: credentials.credentials!,
+                            timeout: timeout,
+                            callbackQueue: queue,
+                            onCompletion: completion)
+    }
+}
+
+public typealias RealmAuth = RLMAuth
+public extension RealmAuth {
+    /**
+     Log in a user and asynchronously retrieve a user object.
+
+     If the log in completes successfully, the completion block will be called, and a
+     `SyncUser` representing the logged-in user will be passed to it. This user object
+     can be used to open `Realm`s and retrieve `SyncSession`s. Otherwise, the
+     completion block will be called with an error.
+
+     - parameter credentials: A `SyncCredentials` object representing the user to log in.
+     - parameter timeout: How long the network client should wait, in seconds, before timing out.
+     - parameter callbackQueue: The dispatch queue upon which the callback should run. Defaults to the main queue.
+     - parameter completion: A callback block to be invoked once the log in completes.
+     */
+    func logIn(with credentials: SyncCredentials,
+               timeout: TimeInterval = 30,
+               callbackQueue queue: DispatchQueue = DispatchQueue.main,
+               onCompletion completion: @escaping UserCompletionBlock) {
+        return self.__logIn(with: credentials.credentials!,
+                            timeout: timeout,
+                            callbackQueue: queue,
+                            onCompletion: completion)
+    }
+}
 
 @dynamicMemberLookup
 public final class RealmFunctions: RLMFunctions {
@@ -43,34 +93,7 @@ public final class RealmFunctions: RLMFunctions {
     }
 }
 
-public final class RealmApp: RLMApp<RealmFunctions> {
-    public func configuration() -> Realm.Configuration {
-        return Realm.Configuration.fromRLMRealmConfiguration(self.__configuration())
-    }
-}
-
-public typealias RealmAuth = RLMAuth
-public extension RealmAuth {
-    /**
-     Log in a user and asynchronously retrieve a user object.
-
-     If the log in completes successfully, the completion block will be called, and a
-     `SyncUser` representing the logged-in user will be passed to it. This user object
-     can be used to open `Realm`s and retrieve `SyncSession`s. Otherwise, the
-     completion block will be called with an error.
-
-     - parameter credentials: A `SyncCredentials` object representing the user to log in.
-     - parameter timeout: How long the network client should wait, in seconds, before timing out.
-     - parameter callbackQueue: The dispatch queue upon which the callback should run. Defaults to the main queue.
-     - parameter completion: A callback block to be invoked once the log in completes.
-     */
-    func logIn(with credentials: SyncCredentials,
-               timeout: TimeInterval = 30,
-               callbackQueue queue: DispatchQueue = DispatchQueue.main,
-               onCompletion completion: @escaping UserCompletionBlock) {
-        return self.__logIn(with: RLMSyncCredentials(credentials),
-                            timeout: timeout,
-                            callbackQueue: queue,
-                            onCompletion: completion)
-    }
-}
+public typealias RealmServices = RLMServices
+public typealias RealmPush = RLMPush
+public typealias RealmMongoDBService = RLMMongoDBService
+public typealias RealmTwilioService = RLMTwilioService

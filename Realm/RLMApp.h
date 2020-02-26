@@ -20,7 +20,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMSyncCredentials, RLMSyncUser, RLMRealmConfiguration, RLMFunctions, RLMAuth, RLMPush;
+@class RLMSyncCredentials, RLMSyncUser, RLMRealmConfiguration, RLMFunctions, RLMAuth, RLMPush, RLMServices;
+
+/// A block type used for auth APIs which asynchronously vend an `RLMSyncUser`.
+typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
 
 /**
  The `RLMApp` has the fundamental set of methods for communicating with a MongoDB
@@ -44,16 +47,31 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface RLMApp<Functions: RLMFunctions*> : NSObject
 
-/// All applications registered on this device
-@property (class, nonatomic, readonly) NSDictionary<NSString*, RLMApp*> *allApps;
-
 @property (nonatomic, readonly) RLMAuth *auth;
 @property (nonatomic, readonly) Functions functions;
 @property (nonatomic, readonly) RLMPush *push;
+@property (nonatomic, readonly) RLMServices *services;
 
 + (instancetype)app:(NSString *)appID;
 
-- (RLMRealmConfiguration *) configuration NS_REFINED_FOR_SWIFT;
+/**
+ Log in a user and asynchronously retrieve a user object.
+
+ If the log in completes successfully, the completion block will be called, and a
+ `SyncUser` representing the logged-in user will be passed to it. This user object
+ can be used to open `Realm`s and retrieve `SyncSession`s. Otherwise, the
+ completion block will be called with an error.
+
+ - parameter credentials: A `SyncCredentials` object representing the user to log in.
+ - parameter timeout: How long the network client should wait, in seconds, before timing out.
+ - parameter callbackQueue: The dispatch queue upon which the callback should run. Defaults to the main queue.
+ - parameter completion: A callback block to be invoked once the log in completes.
+ */
+- (void)logInWithCredentials:(RLMSyncCredentials *)credentials
+                     timeout:(NSTimeInterval)timeout
+               callbackQueue:(dispatch_queue_t)callbackQueue
+                onCompletion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
+
 
 @end
 

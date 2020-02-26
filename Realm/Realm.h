@@ -40,3 +40,9 @@
 #import <Realm/RLMSyncUtil.h>
 #import <Realm/NSError+RLMSync.h>
 #import <Realm/RLMApp.h>
+#import <Realm/RLMAuth.h>
+#import <Realm/RLMFunctions.h>
+#import <Realm/RLMServices.h>
+#import <Realm/RLMPush.h>
+#import <Realm/RLMMongoDBService.h>
+#import <Realm/RLMTwilioService.h>

@@ -337,6 +337,8 @@ public struct SyncCredentials {
     internal var provider: Provider
     internal var userInfo: [String: Any]
 
+    internal var credentials: RLMSyncCredentials?
+
     /**
      Initialize new credentials using a custom token, authentication provider, and user information
      dictionary. In most cases, the convenience initializers should be used instead.
@@ -348,6 +350,7 @@ public struct SyncCredentials {
     }
 
     internal init(_ credentials: RLMSyncCredentials) {
+        self.credentials = credentials
         self.token = credentials.token
         self.provider = credentials.provider
         self.userInfo = credentials.userInfo
@@ -386,11 +389,11 @@ public struct SyncCredentials {
     }
 }
 
-extension RLMSyncCredentials {
-    internal convenience init(_ credentials: SyncCredentials) {
-        self.init(customToken: credentials.token, provider: credentials.provider, userInfo: credentials.userInfo)
-    }
-}
+//extension RLMSyncCredentials {
+//    internal convenience init(_ credentials: SyncCredentials) {
+//        self.init(credentials.credentials!)
+//    }
+//}
 
 extension SyncUser {
     /**

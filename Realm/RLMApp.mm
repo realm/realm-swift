@@ -22,57 +22,49 @@
 #import "RLMFunctions.h"
 #import "RLMFunctions_Private.h"
 #import "RLMRealmConfiguration.h"
+#import "RLMNetworkClient.hpp"
+#import "RLMSyncCredentials_Private.hpp"
+#import "RLMSyncUser_Private.hpp"
+
+#import "app.hpp"
 
 @implementation RLMApp {
-    NSString *_appID;
+    realm::RealmApp *_app;
 }
-
-static NSString *defaultBaseURL = @"https://stitch.mongodb.com";
-static NSString *baseRoute = @"/api/client/v2.0";
-static NSMutableDictionary<NSString *, RLMApp *> *_allApps;
 
 - (instancetype)initWithAppID:(NSString *)appID {
     if (!(self = [super init]))
         return nil;
 
-    _appID = appID;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        std::unique_ptr<realm::GenericNetworkClient> (*factory)() = []{
+            return std::unique_ptr<realm::GenericNetworkClient>(new RLMAppNetworkClient);
+        };
+        realm::GenericNetworkClient::set_network_client_factory(factory);
+    });
 
-    NSString *appRoute = [[defaultBaseURL stringByAppendingString:baseRoute] stringByAppendingString:@"/app/%@"];
+    _app = realm::RealmApp::app(appID.UTF8String);
 
-    _auth = [[RLMAuth alloc] initWithRoute:[[NSURL alloc] initWithString:
-                                            [[NSString alloc] initWithFormat:[appRoute stringByAppendingString:@"/auth"],
-                                             appID]]];
-
-    _functions = [[RLMFunctions alloc] initWithApp: self
-                                             route: [[NSURL alloc] initWithString: [[NSString alloc] initWithFormat:appRoute, appID]]];
     return self;
 }
 
-+ (NSDictionary<NSString *,RLMApp *> *)allApps {
-    static dispatch_once_t oncePredicate;
-
-    dispatch_once(&oncePredicate, ^{
-        _allApps = [NSMutableDictionary new];
-    });
-
-    return _allApps;
-}
-
 + (instancetype)app:(NSString *)appID {
-    if (auto app = [RLMApp.allApps valueForKey:appID]) {
-        return app;
-    }
-
-    RLMApp *app = [[RLMApp alloc] initWithAppID: appID];
-    [((NSMutableDictionary *)RLMApp.allApps) setObject:app forKey:appID];
-    return app;
+    return [[RLMApp alloc] initWithAppID: appID];
 }
 
-- (RLMRealmConfiguration *)configuration {
-    NSURL *url = [[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask].firstObject;
-    url = [url URLByAppendingPathComponent:_appID];
-    auto config = [[RLMRealmConfiguration alloc] init];
-    config.fileURL = url;
-    return config;
+- (void)logInWithCredentials:(RLMSyncCredentials *)credentials
+                     timeout:(NSTimeInterval)timeout
+               callbackQueue:(dispatch_queue_t)callbackQueue
+                onCompletion:(RLMUserCompletionBlock)completion {
+    _app->loginWithCredential(*credentials.appCredentials,
+                              timeout,
+                              ^(realm::GenericNetworkError error, std::shared_ptr<realm::SyncUser> user){
+        dispatch_async(callbackQueue, ^{
+            completion([[RLMSyncUser alloc] initWithSyncUser: std::move(user)],
+                       [[NSError alloc] initWithDomain:NSCocoaErrorDomain code:error.code userInfo:nil]);
+        });
+    });
 }
+
 @end

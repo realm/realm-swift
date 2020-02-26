@@ -24,7 +24,7 @@ import Realm
 public extension ObjectiveCSupport {
     /// Convert a `SyncCredentials` to a `RLMSyncCredentials`.
     static func convert(object: SyncCredentials) -> RLMSyncCredentials {
-        return RLMSyncCredentials(object)
+        return object.credentials!
     }
 
     /// Convert a `RLMSyncCredentials` to a `SyncCredentials`.
