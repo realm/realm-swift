@@ -1,26 +1,41 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.0.0-beta.3 Release notes (2020-02-26)
 =============================================================
 
 Based on 4.3.2 and also includes all changes since 4.3.0.
 
 ### Enhancements
-* None.
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+* Add support for frozen objects. `Realm`, `Results`, `List` and `Object` now
+  have `freeze()` methods which return a frozen copy of the object. These
+  objects behave similarly to creating unmanaged deep copies of the source
+  objects. They can be read from any thread and do not update when writes are
+  made to the Realm, but creating frozen objects does not actually copy data
+  out of the Realm and so can be much faster and use less memory. Frozen
+  objects cannot be mutated or observed for changes (as they never change).
+  ([PR #6427](https://github.com/realm/realm-cocoa/pull/6427)).
+* Add the `isFrozen` property to `Realm`, `Results`, `List` and `Object`.
+* Add `Realm.Configuration.maxNumberOfActiveVersions`. Each time a write
+  transaction is performed, a new version is created inside the Realm, and then
+  any versions which are no longer in use are cleaned up. If too many versions
+  are kept alive while performing writes (either due to a background thread
+  performing a long operation that doesn't let the Realm on that thread
+  refresh, or due to holding onto frozen versions for a long time) the Realm
+  file will grow in size, potentially to the point where it is too large to be
+  opened. Setting this configuration option will make write transactions which
+  would cause the live version count to exceed the limit to instead fail.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
 ### Compatibility
-* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 4.x.y series.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.3.
 
 ### Internal
-* Upgraded realm-core from v6.0.0-beta.3 to v6.0.0
-* Upgraded realm-sync from v5.0.0-beta.2 to v5.0.0
+
+* Upgraded realm-core from v6.0.0-beta.3 to v6.0.3
+* Upgraded realm-sync from v5.0.0-beta.2 to v5.0.1
 
 5.0.0-beta.2 Release notes (2020-01-13)
 =============================================================
