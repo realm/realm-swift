@@ -41,9 +41,4 @@ public extension ObjectiveCSupport {
     static func convert(object: RLMSyncConfiguration) -> SyncConfiguration {
         return SyncConfiguration(config: object)
     }
-
-    /// Convert a `RLMSyncSubscription` to a `SyncSubscription`.
-    static func convert(object: RLMSyncSubscription) -> SyncSubscription {
-        return SyncSubscription(object)
-    }
 }
