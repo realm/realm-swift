@@ -157,6 +157,7 @@
 		3F572C971F2BDAB100F6C9AB /* PrimitiveArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F572C901F2BDA9F00F6C9AB /* PrimitiveArrayPropertyTests.m */; };
 		3F5B5D301E84230B00953B33 /* binding_callback_thread_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F5B5D2E1E84230B00953B33 /* binding_callback_thread_observer.cpp */; };
 		3F5B5D321E84230E00953B33 /* binding_callback_thread_observer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F5B5D2E1E84230B00953B33 /* binding_callback_thread_observer.cpp */; };
+		3F5FE2AA2407637600C2DFF5 /* object_changeset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F0C6ACE23E11FAD00F03A4F /* object_changeset.cpp */; };
 		3F6468371E3A9363007BD064 /* thread_safe_reference.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1AB2D36C1E16EB91007D0A3F /* thread_safe_reference.cpp */; };
 		3F67DB3C1E26D69C0024533D /* RLMThreadSafeReference.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F67DB391E26D69C0024533D /* RLMThreadSafeReference.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3F67DB3E1E26D69C0024533D /* RLMThreadSafeReference.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F67DB3B1E26D69C0024533D /* RLMThreadSafeReference.mm */; };
@@ -2510,6 +2511,7 @@
 				C281E9291E8A9CC90015BA4A /* network_reachability_observer.cpp in Sources */,
 				3F73BC981E3A879E00FE80B6 /* NSError+RLMSync.m in Sources */,
 				3FAB08491E1EC385001BC8DA /* object.cpp in Sources */,
+				3F5FE2AA2407637600C2DFF5 /* object_changeset.cpp in Sources */,
 				3FAB08891E1EC526001BC8DA /* object_notifier.cpp in Sources */,
 				5DD755811BE056DE002800DA /* object_schema.cpp in Sources */,
 				5DD755821BE056DE002800DA /* object_store.cpp in Sources */,
