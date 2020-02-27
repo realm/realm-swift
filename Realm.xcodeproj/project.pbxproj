@@ -221,9 +221,6 @@
 		3FAB084C1E1EC3A2001BC8DA /* sync_metadata.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 1A1536701DB0464800C0EC93 /* sync_metadata.hpp */; };
 		3FAB08881E1EC51F001BC8DA /* object_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAB08861E1EC51F001BC8DA /* object_notifier.cpp */; };
 		3FAB08891E1EC526001BC8DA /* object_notifier.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3FAB08861E1EC51F001BC8DA /* object_notifier.cpp */; };
-		3FAD40B7219E3F8700509E5B /* RLMPermissionsAPITests.m in Sources */ = {isa = PBXBuildFile; fileRef = 1AD6E7A51E8C2BDF00D4C8B4 /* RLMPermissionsAPITests.m */; };
-		3FAD40B9219E3F9200509E5B /* SwiftPermissionsAPITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A877BEE1EAE9F79001BEC40 /* SwiftPermissionsAPITests.swift */; };
-		3FAF8D02227A05BD005F1DB6 /* SwiftPartialSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FAF8D01227A05BD005F1DB6 /* SwiftPartialSyncTests.swift */; };
 		3FB4FA1719F5D2740020D53B /* SwiftTestObjects.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8F8D90B196CB8DD00475368 /* SwiftTestObjects.swift */; };
 		3FB4FA1819F5D2740020D53B /* SwiftArrayPropertyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60A195632F20043A3C3 /* SwiftArrayPropertyTests.swift */; };
 		3FB4FA1919F5D2740020D53B /* SwiftArrayTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E82FA60B195632F20043A3C3 /* SwiftArrayTests.swift */; };
@@ -233,8 +230,6 @@
 		3FB4FA1E19F5D2740020D53B /* SwiftPropertyTypeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26F3CA681986CC86004623E1 /* SwiftPropertyTypeTest.swift */; };
 		3FB4FA1F19F5D2740020D53B /* SwiftRealmTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FD01955FE0100FDED82 /* SwiftRealmTests.swift */; };
 		3FB4FA2019F5D2740020D53B /* SwiftUnicodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E891759A197A1B600068ACC6 /* SwiftUnicodeTests.swift */; };
-		3FB60BAB204095B500583735 /* RLMPermissionsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FB60BA9204095AF00583735 /* RLMPermissionsTests.mm */; };
-		3FB60BAD2040999300583735 /* SwiftPermissionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB60BAC2040999300583735 /* SwiftPermissionsTests.swift */; };
 		3FBEF67B1C63D66100F6935B /* RLMCollection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FBEF6791C63D66100F6935B /* RLMCollection.mm */; };
 		3FBEF67C1C63D66400F6935B /* RLMCollection.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FBEF6791C63D66100F6935B /* RLMCollection.mm */; };
 		3FCB1A7522A9B0A2003807FB /* CodableTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FCB1A7422A9B0A2003807FB /* CodableTests.swift */; };
@@ -674,7 +669,6 @@
 		1A7B82391D51259F00750296 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		1A7DE7021D38460B0029F0AE /* Sync.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Sync.swift; sourceTree = "<group>"; };
 		1A84132E1D4BCCE600C5326F /* RLMSyncUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSyncUtil.mm; sourceTree = "<group>"; };
-		1A877BEE1EAE9F79001BEC40 /* SwiftPermissionsAPITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftPermissionsAPITests.swift; path = Realm/ObjectServerTests/SwiftPermissionsAPITests.swift; sourceTree = "<group>"; };
 		1AA5AE961D989BE000ED8C27 /* SwiftSyncTestCase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; name = SwiftSyncTestCase.swift; path = Realm/ObjectServerTests/SwiftSyncTestCase.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		1AA5AE9A1D98A1B000ED8C27 /* Object-Server-Tests-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Object-Server-Tests-Bridging-Header.h"; path = "Realm/ObjectServerTests/Object-Server-Tests-Bridging-Header.h"; sourceTree = "<group>"; };
 		1AA5AE9B1D98A68E00ED8C27 /* RLMSyncTestCase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMSyncTestCase.mm; path = Realm/ObjectServerTests/RLMSyncTestCase.mm; sourceTree = "<group>"; };
@@ -696,7 +690,6 @@
 		1AD3870B1D4A7FBB00479110 /* RLMSyncSession.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSyncSession.mm; sourceTree = "<group>"; };
 		1AD397CC1F72FFC5002AA897 /* RLMRealm+Sync.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "RLMRealm+Sync.mm"; sourceTree = "<group>"; };
 		1AD397CD1F72FFC6002AA897 /* RLMRealm+Sync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "RLMRealm+Sync.h"; sourceTree = "<group>"; };
-		1AD6E7A51E8C2BDF00D4C8B4 /* RLMPermissionsAPITests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMPermissionsAPITests.m; path = Realm/ObjectServerTests/RLMPermissionsAPITests.m; sourceTree = "<group>"; };
 		1ADE093B1E897EE9008AB1D3 /* RLMSyncPermission.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncPermission.h; sourceTree = "<group>"; };
 		1ADE093C1E897EE9008AB1D3 /* RLMSyncPermission.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSyncPermission.mm; sourceTree = "<group>"; };
 		1ADE09421E89DDB9008AB1D3 /* object_accessor_impl.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = object_accessor_impl.hpp; sourceTree = "<group>"; };
@@ -807,9 +800,6 @@
 		3FAE25561B8CEBBE00D01405 /* object_schema.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object_schema.cpp; sourceTree = "<group>"; };
 		3FAE25571B8CEBBE00D01405 /* property.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = property.hpp; sourceTree = "<group>"; };
 		3FAE25581B8CEBBE00D01405 /* object_schema.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = object_schema.hpp; sourceTree = "<group>"; };
-		3FAF8D01227A05BD005F1DB6 /* SwiftPartialSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SwiftPartialSyncTests.swift; path = Realm/ObjectServerTests/SwiftPartialSyncTests.swift; sourceTree = "<group>"; };
-		3FB60BA9204095AF00583735 /* RLMPermissionsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = RLMPermissionsTests.mm; path = Realm/ObjectServerTests/RLMPermissionsTests.mm; sourceTree = "<group>"; };
-		3FB60BAC2040999300583735 /* SwiftPermissionsTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwiftPermissionsTests.swift; path = Realm/ObjectServerTests/SwiftPermissionsTests.swift; sourceTree = "<group>"; };
 		3FBD05FA1B94E1C3004559CF /* index_set.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = index_set.cpp; sourceTree = "<group>"; };
 		3FBD05FB1B94E1C3004559CF /* index_set.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = index_set.hpp; sourceTree = "<group>"; };
 		3FBEF6781C63D66100F6935B /* RLMCollection_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMCollection_Private.hpp; sourceTree = "<group>"; };
@@ -1454,8 +1444,6 @@
 				1AA5AEA21D98CA5300ED8C27 /* Utility */,
 				1A2713D51E3BBAC4001F6BFC /* RLMAncillaryObjectServerTests.m */,
 				E8267FF01D90B8E700E001C7 /* RLMObjectServerTests.mm */,
-				1AD6E7A51E8C2BDF00D4C8B4 /* RLMPermissionsAPITests.m */,
-				3FB60BA9204095AF00583735 /* RLMPermissionsTests.mm */,
 				3F73BC881E3A876600FE80B6 /* RLMSyncSessionRefreshHandle+ObjectServerTests.h */,
 				3F73BC891E3A876600FE80B6 /* RLMSyncSessionRefreshHandle+ObjectServerTests.m */,
 				1AA5AE9D1D98A6D800ED8C27 /* RLMSyncTestCase.h */,
@@ -1463,9 +1451,6 @@
 				3F73BC8A1E3A876600FE80B6 /* RLMTestUtils.h */,
 				3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */,
 				1AA5AE9F1D98C99500ED8C27 /* SwiftObjectServerTests.swift */,
-				3FAF8D01227A05BD005F1DB6 /* SwiftPartialSyncTests.swift */,
-				1A877BEE1EAE9F79001BEC40 /* SwiftPermissionsAPITests.swift */,
-				3FB60BAC2040999300583735 /* SwiftPermissionsTests.swift */,
 				1AA5AE961D989BE000ED8C27 /* SwiftSyncTestCase.swift */,
 				3F0C129220926CAD00D0D6C8 /* test-ros-server.js */,
 			);
@@ -2543,8 +2528,6 @@
 				1A2713D71E3BBAC8001F6BFC /* RLMAncillaryObjectServerTests.m in Sources */,
 				3F558C9422C29A03002F0F30 /* RLMMultiProcessTestCase.m in Sources */,
 				E8267FF11D90B8E700E001C7 /* RLMObjectServerTests.mm in Sources */,
-				3FAD40B7219E3F8700509E5B /* RLMPermissionsAPITests.m in Sources */,
-				3FB60BAB204095B500583735 /* RLMPermissionsTests.mm in Sources */,
 				3F73BC911E3A877300FE80B6 /* RLMSyncSessionRefreshHandle+ObjectServerTests.m in Sources */,
 				1AA5AE9C1D98A68E00ED8C27 /* RLMSyncTestCase.mm in Sources */,
 				1A1536481DB0408A00C0EC93 /* RLMSyncUser+ObjectServerTests.mm in Sources */,
@@ -2552,9 +2535,6 @@
 				3F558C8C22C29A03002F0F30 /* RLMTestObjects.m in Sources */,
 				3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */,
 				1AA5AEA11D98C99800ED8C27 /* SwiftObjectServerTests.swift in Sources */,
-				3FAF8D02227A05BD005F1DB6 /* SwiftPartialSyncTests.swift in Sources */,
-				3FAD40B9219E3F9200509E5B /* SwiftPermissionsAPITests.swift in Sources */,
-				3FB60BAD2040999300583735 /* SwiftPermissionsTests.swift in Sources */,
 				1AA5AE981D989BE400ED8C27 /* SwiftSyncTestCase.swift in Sources */,
 				3F558C8822C29A03002F0F30 /* TestUtils.mm in Sources */,
 			);

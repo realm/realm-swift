@@ -40,6 +40,12 @@
 #error These tests can only be run on a macOS host.
 #endif
 
+#define REALM_ENABLE_OBJECT_SERVER_TESTS 0
+
+#if !REALM_ENABLE_OBJECT_SERVER_TESTS
+#warning These tests will not pass until they are migrated to use new Realm Cloud.
+#endif
+
 static NSString *nodePath() {
     static NSString *path = [] {
         NSDictionary *environment = NSProcessInfo.processInfo.environment;
@@ -360,7 +366,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                     user:(RLMSyncUser *)user
                            encryptionKey:(NSData *)encryptionKey
                               stopPolicy:(RLMSyncStopPolicy)stopPolicy {
-    auto c = [user configurationWithURL:url fullSynchronization:!self.isPartial];
+    auto c = [user configurationWithURL:url];
     c.encryptionKey = encryptionKey;
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;
@@ -373,17 +379,8 @@ static NSURL *syncDirectoryForChildProcess() {
     NSString *process = self.isParent ? @"parent" : @"child";
     __block RLMSyncUser *theUser = nil;
     XCTestExpectation *expectation = [self expectationWithDescription:@"Should log in the user properly"];
-    [RLMSyncUser logInWithCredentials:credentials
-                        authServerURL:url
-                         onCompletion:^(RLMSyncUser *user, NSError *error) {
-                             XCTAssertTrue(NSThread.isMainThread);
-                             XCTAssertNil(error,
-                                          @"Error when trying to log in a user: %@ (process: %@)",
-                                          error, process);
-                             XCTAssertNotNil(user);
-                             theUser = user;
-                             [expectation fulfill];
-                         }];
+    // FIXME: [realmapp] This should use the new login
+    REALM_UNREACHABLE();
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
     XCTAssertTrue(theUser.state == RLMSyncUserStateActive,
                   @"User should have been valid, but wasn't. (process: %@)", process);
