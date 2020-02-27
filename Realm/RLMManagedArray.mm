@@ -430,7 +430,7 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 - (id)averageOfProperty:(NSString *)property {
     auto column = [self columnForProperty:property];
     auto value = translateErrors(self, [&] { return _backingList.average(column); }, @"averageOfProperty");
-    return value ? @(*value) : nil;
+    return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (void)deleteObjectsFromRealm {

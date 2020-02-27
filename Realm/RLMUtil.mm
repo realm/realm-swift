@@ -406,8 +406,16 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
             return RLMTimestampToNSDate(mixed.get_timestamp());
         case realm::type_Binary:
             return RLMBinaryDataToNSData(mixed.get<realm::BinaryData>());
+        case realm::type_Decimal:
+            REALM_UNREACHABLE();
+        case realm::type_ObjectId:
+            REALM_UNREACHABLE();
         case realm::type_Link:
         case realm::type_LinkList:
+        case realm::type_OldMixed:
+        case realm::type_OldTable:
+        case realm::type_OldDateTime:
+            REALM_UNREACHABLE();
         default:
             @throw RLMException(@"Invalid data type for RLMPropertyTypeAny property.");
     }
