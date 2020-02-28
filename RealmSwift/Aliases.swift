@@ -57,3 +57,6 @@ public typealias PropertyType = RLMPropertyType
  - see: `Realm.observe(_:)`
  */
 public typealias NotificationToken = RLMNotificationToken
+
+/// :nodoc:
+public typealias ObjectBase = RLMObjectBase

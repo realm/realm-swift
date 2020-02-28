@@ -41,6 +41,10 @@ class ListTests: TestCase {
         fatalError("abstract")
     }
 
+    func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+        fatalError("abstract")
+    }
+
     override func setUp() {
         super.setUp()
 
@@ -510,6 +514,50 @@ class ListTests: TestCase {
         testProperty("optDecimalCol") { $0.optDecimalCol }
         testProperty("optObjectCol") { $0.optObjectCol }
     }
+
+    func testAppendEmbedded() {
+        let list = createEmbeddedArray()
+
+        list.realm?.beginWrite()
+        for i in 0..<10 {
+            list.append(EmbeddedTreeObject(value: [i]))
+        }
+        XCTAssertEqual(10, list.count)
+
+        for (i, object) in list.enumerated() {
+            XCTAssertEqual(i, object.value)
+            XCTAssertEqual(list.realm, object.realm)
+        }
+
+        if list.realm != nil {
+            assertThrows(list.append(list[0]),
+                         reason: "Cannot add an existing managed embedded object to a List.")
+        }
+
+        list.realm?.cancelWrite()
+    }
+
+    func testSetEmbedded() {
+        let list = createEmbeddedArray()
+
+        list.realm?.beginWrite()
+        list.append(EmbeddedTreeObject(value: [0]))
+
+        let oldObj = list[0]
+        let obj = EmbeddedTreeObject(value: [1])
+        list[0] = obj
+        XCTAssertTrue(list[0].isSameObject(as: obj))
+        XCTAssertEqual(obj.value, 1)
+        XCTAssertEqual(obj.realm, list.realm)
+
+        if list.realm != nil {
+            XCTAssertTrue(oldObj.isInvalidated)
+            assertThrows(list[0] = obj,
+                         reason: "Cannot add an existing managed embedded object to a List.")
+        }
+
+        list.realm?.cancelWrite()
+    }
 }
 
 class ListStandaloneTests: ListTests {
@@ -523,6 +571,10 @@ class ListStandaloneTests: ListTests {
         let array = SwiftListOfSwiftObject()
         XCTAssertNil(array.realm)
         return array
+    }
+
+    override func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+        return List<EmbeddedTreeObject>()
     }
 }
 
@@ -545,6 +597,14 @@ class ListNewlyAddedTests: ListTests {
         XCTAssertNotNil(array.realm)
         return array
     }
+
+    override func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+        let parent = EmbeddedParentObject()
+        let list = parent.array
+        let realm = try! Realm()
+        try! realm.write { realm.add(parent) }
+        return list
+    }
 }
 
 class ListNewlyCreatedTests: ListTests {
@@ -566,6 +626,13 @@ class ListNewlyCreatedTests: ListTests {
 
         XCTAssertNotNil(array.realm)
         return array
+    }
+
+    override func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+        let realm = try! Realm()
+        return try! realm.write {
+            realm.create(EmbeddedParentObject.self, value: []).array
+        }
     }
 }
 
@@ -590,6 +657,14 @@ class ListRetrievedTests: ListTests {
 
         XCTAssertNotNil(array.realm)
         return array
+    }
+
+    override func createEmbeddedArray() -> List<EmbeddedTreeObject> {
+        let realm = try! Realm()
+        try! realm.write {
+            realm.create(EmbeddedParentObject.self, value: [])
+        }
+        return realm.objects(EmbeddedParentObject.self).first!.array
     }
 }
 

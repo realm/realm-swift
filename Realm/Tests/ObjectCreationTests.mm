@@ -1249,9 +1249,12 @@
     auto realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    auto dog = [DogObject createInRealm:realm withValue:@[@"name", @1]];
+    id dog = [DogObject createInRealm:realm withValue:@[@"name", @1]];
+    id dog2 = [DogObject allObjectsInRealm:realm].firstObject;
     [realm deleteObject:dog];
     RLMAssertThrowsWithReason([realm addObject:dog],
+                              @"Adding a deleted or invalidated");
+    RLMAssertThrowsWithReason([realm addObject:dog2],
                               @"Adding a deleted or invalidated");
 
     [realm cancelWriteTransaction];

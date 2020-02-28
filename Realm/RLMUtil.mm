@@ -128,6 +128,12 @@ id<NSFastEnumeration> RLMAsFastEnumeration(__unsafe_unretained id obj) {
     return nil;
 }
 
+bool RLMIsSwiftObjectClass(Class cls) {
+    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwiftObject");
+    static Class s_swiftEmbeddedObjectClass = NSClassFromString(@"RealmSwiftEmbeddedObject");
+    return [cls isSubclassOfClass:s_swiftObjectClass] || [cls isSubclassOfClass:s_swiftEmbeddedObjectClass];
+}
+
 BOOL RLMValidateValue(__unsafe_unretained id const value,
                       RLMPropertyType type, bool optional, bool array,
                       __unsafe_unretained NSString *const objectClassName) {
