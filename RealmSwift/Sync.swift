@@ -310,84 +310,48 @@ public struct SyncConfiguration {
     }
 }
 
-/// A `SyncCredentials` represents data that uniquely identifies a Realm Object Server user.
-public struct SyncCredentials {
+/// A `AppCredentials` represents data that uniquely identifies a Realm Object Server user.
+public struct AppCredentials {
     /// An account token serialized as a string
     public typealias Token = String
 
-    internal var token: Token
-    internal var provider: Provider
-    internal var userInfo: [String: Any]
+    internal let credentials: RLMAppCredentials
 
-    /**
-     Initialize new credentials using a custom token, authentication provider, and user information
-     dictionary. In most cases, the convenience initializers should be used instead.
-     */
-    public init(customToken token: Token, provider: Provider, userInfo: [String: Any] = [:]) {
-        self.token = token
-        self.provider = provider
-        self.userInfo = userInfo
-    }
-
-    internal init(_ credentials: RLMSyncCredentials) {
-        self.token = credentials.token
-        self.provider = credentials.provider
-        self.userInfo = credentials.userInfo
+    internal init(_ credentials: RLMAppCredentials) {
+        self.credentials = credentials
     }
 
     /// Initialize new credentials using a Facebook account token.
-    public static func facebook(token: Token) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(facebookToken: token))
+    public static func facebook(token: Token) -> AppCredentials {
+        return AppCredentials(RLMAppCredentials(facebookToken: token))
     }
 
     /// Initialize new credentials using a Google account token.
-    public static func google(token: Token) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(googleToken: token))
-    }
-
-    /// Initialize new credentials using a CloudKit account token.
-    public static func cloudKit(token: Token) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(cloudKitToken: token))
+    public static func google(token: Token) -> AppCredentials {
+        return AppCredentials(RLMAppCredentials(googleToken: token))
     }
 
     /// Initialize new credentials using a Realm Object Server username and password.
     public static func usernamePassword(username: String,
-                                        password: String,
-                                        register: Bool = false) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(username: username, password: password, register: register))
-    }
-
-    /// Initialize new credentials using a Realm Object Server access token.
-    public static func accessToken(_ accessToken: String, identity: String) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(accessToken: accessToken, identity: identity))
+                                        password: String) -> AppCredentials {
+        return AppCredentials(RLMAppCredentials(username: username, password: password))
     }
 
     /// Initialize new credentials using a JSON Web Token.
-    public static func jwt(_ token: Token) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(jwt: token))
-    }
-
-    /// Initialize new credentials using a nickname.
-    @available(*, deprecated, message: "Use usernamePassword instead.")
-    public static func nickname(_ nickname: String, isAdmin: Bool = false) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(nickname: nickname, isAdmin: isAdmin))
+    public static func jwt(_ token: Token) -> AppCredentials {
+        return AppCredentials(RLMAppCredentials(jwt: token))
     }
 
     /// Initialize new credentials anonymously
-    public static func anonymous() -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials.anonymous())
-    }
-
-    /// Initialize new credentials using an externally-issued refresh token
-    public static func customRefreshToken(_ token: String, identity: String, isAdmin: Bool = false) -> SyncCredentials {
-        return SyncCredentials(RLMSyncCredentials(customRefreshToken: token, identity: identity, isAdmin: isAdmin))
+    public static func anonymous() -> AppCredentials {
+        return AppCredentials(RLMAppCredentials.anonymous())
     }
 }
 
-extension RLMSyncCredentials {
-    internal convenience init(_ credentials: SyncCredentials) {
-        self.init(customToken: credentials.token, provider: credentials.provider, userInfo: credentials.userInfo)
-    }
+extension RLMAppCredentials {
+//    internal convenience init(_ credentials: AppCredentials) {
+//        self.init(credentials: credentials.credentials)
+//    }
 }
 
 extension SyncUser {

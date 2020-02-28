@@ -67,7 +67,7 @@ static NSString *nodePath() {
 @property (nonatomic) NSTask *task;
 @end
 
-@interface RLMSyncCredentials ()
+@interface RLMAppCredentials ()
 + (instancetype)credentialsWithDebugUserID:(NSString *)userID isAdmin:(BOOL)isAdmin;
 @end
 
@@ -260,10 +260,9 @@ static NSURL *syncDirectoryForChildProcess() {
     return [NSURL URLWithString:@"https://localhost:9443"];
 }
 
-+ (RLMSyncCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
-    return [RLMSyncCredentials credentialsWithUsername:name
-                                              password:@"a"
-                                              register:shouldRegister];
++ (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
+    return [RLMAppCredentials credentialsWithUsername:name
+                                              password:@"a"];
 }
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm {
@@ -374,7 +373,7 @@ static NSURL *syncDirectoryForChildProcess() {
     return [RLMRealm realmWithConfiguration:c error:nil];
 }
 
-- (RLMSyncUser *)logInUserForCredentials:(RLMSyncCredentials *)credentials
+- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials
                                   server:(NSURL *)url {
     NSString *process = self.isParent ? @"parent" : @"child";
     __block RLMSyncUser *theUser = nil;
@@ -388,7 +387,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMSyncUser *)createAdminUserForURL:(NSURL *)url username:(NSString *)username {
-    return [self logInUserForCredentials:[RLMSyncCredentials credentialsWithDebugUserID:username isAdmin:YES]
+    return [self logInUserForCredentials:[RLMAppCredentials credentialsWithDebugUserID:username isAdmin:YES]
                                   server:url];
 }
 

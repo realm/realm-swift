@@ -20,7 +20,7 @@
 
 #import <Realm/RLMProperty.h>
 #import <Realm/RLMRealmConfiguration.h>
-#import <Realm/RLMSyncCredentials.h>
+#import <Realm/RLMAppCredentials.h>
 
 typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
     // Specific

@@ -405,7 +405,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let server = SwiftObjectServerTests.authServerURL()
 
         // Create a non-admin user.
-        _ = logInUser(for: .init(username: nonAdminUsername, password: password, register: true),
+        _ = logInUser(for: .init(username: nonAdminUsername, password: password),
                       server: server)
         // Create an admin user.
         let adminUser = createAdminUser(for: server, username: adminUsername)
@@ -431,13 +431,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testInvalidCredentials() {
         do {
             let username = "testInvalidCredentialsUsername"
-            let credentials = SyncCredentials.usernamePassword(username: username,
-                                                               password: "THIS_IS_A_PASSWORD",
-                                                               register: true)
+            let credentials = AppCredentials.usernamePassword(username: username,
+                                                               password: "THIS_IS_A_PASSWORD")
             _ = try synchronouslyLogInUser(for: credentials, server: authURL)
             // Now log in the same user, but with a bad password.
             let ex = expectation(description: "wait for user login")
-            let credentials2 = SyncCredentials.usernamePassword(username: username, password: "NOT_A_VALID_PASSWORD")
+            let credentials2 = AppCredentials.usernamePassword(username: username, password: "NOT_A_VALID_PASSWORD")
 
             // FIXME: [realmapp] This should call the new login method with invalid credentials
             fatalError("test not implemented")

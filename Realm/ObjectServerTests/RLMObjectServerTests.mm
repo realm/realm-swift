@@ -85,22 +85,13 @@
     XCTAssertEqualObjects(firstUser.authenticationServer, [RLMSyncTestCase authServerURL]);
 }
 
-/// A valid admin token should be able to log in a user.
-- (void)testAdminTokenAuthentication {
-    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:self.adminToken identity:@"test"];
-    XCTAssertNotNil(credentials);
-
-    RLMSyncUser *user = [self logInUserForCredentials:credentials server:[RLMObjectServerTests authServerURL]];
-}
-
 /// An invalid username/password credential should not be able to log in a user and a corresponding error should be generated.
 - (void)testInvalidPasswordAuthentication {
     [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd) register:YES]
                           server:[RLMSyncTestCase authServerURL]];
 
-    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithUsername:NSStringFromSelector(_cmd)
-                                                                         password:@"INVALID_PASSWORD"
-                                                                         register:NO];
+    RLMAppCredentials *credentials = [RLMAppCredentials credentialsWithUsername:NSStringFromSelector(_cmd)
+                                                                         password:@"INVALID_PASSWORD"];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
     // FIXME: [realmapp] This should use the new login
@@ -110,8 +101,8 @@
 
 /// A non-existsing user should not be able to log in and a corresponding error should be generated.
 - (void)testNonExistingUsernameAuthentication {
-    RLMSyncCredentials *credentials = [RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                       register:NO];
+    RLMAppCredentials *credentials = [RLMAppCredentials credentialsWithUsername:@"INVALID_USERNAME"
+    password:@"INVALID_PASSWORD"];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
     // FIXME: [realmapp] This should use the new login
@@ -121,7 +112,7 @@
 
 /// Registering a user with existing username should return corresponding error.
 - (void)testExistingUsernameRegistration {
-    RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
+    RLMAppCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                             register:YES];
 
     [self logInUserForCredentials:credentials server:[RLMSyncTestCase authServerURL]];
@@ -193,7 +184,7 @@
     // First create the user, talking directly to ROS
     NSString *userName = NSStringFromSelector(_cmd);
     @autoreleasepool {
-        RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:YES];
+        RLMAppCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:YES];
         RLMSyncUser *user = [self logInUserForCredentials:credentials server:[NSURL URLWithString:@"http://127.0.0.1:9080"]];
         [user logOut];
     }
@@ -207,7 +198,7 @@
     timeoutOptions.connectTimeout = 1000.0;
     RLMSyncManager.sharedManager.timeoutOptions = timeoutOptions;
 
-    RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:NO];
+    RLMAppCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:NO];
     XCTestExpectation *ex = [self expectationWithDescription:@"Login should time out"];
     // FIXME: [realmapp] This should use the new login
     REALM_UNREACHABLE();
@@ -227,7 +218,7 @@
     // First create the user, talking directly to ROS
     NSString *userName = NSStringFromSelector(_cmd);
     @autoreleasepool {
-        RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:YES];
+        RLMAppCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:YES];
         RLMSyncUser *user = [self logInUserForCredentials:credentials server:[NSURL URLWithString:@"http://127.0.0.1:9080"]];
         [user logOut];
     }
@@ -236,7 +227,7 @@
     NSURL *authURL = [NSURL URLWithString:@"http://127.0.0.1:9082"];
 
     // Login attempt should time out
-    RLMSyncCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:NO];
+    RLMAppCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:userName register:NO];
     XCTestExpectation *ex = [self expectationWithDescription:@"Login should time out"];
     // FIXME: [realmapp] This should use the new login
     REALM_UNREACHABLE();
@@ -316,8 +307,7 @@
     // Successfully create user, change its password, log out,
     // then fail to change password again due to being logged out.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:firstPassword
-                                                                       register:YES];
+        RLMAppCredentials *creds = [RLMAppCredentials credentialsWithUsername:userName password:firstPassword];
         RLMSyncUser *user = [self logInUserForCredentials:creds
                                                    server:[RLMObjectServerTests authServerURL]];
         XCTestExpectation *ex = [self expectationWithDescription:@"change password callback invoked"];
@@ -336,8 +326,7 @@
     }
     // Fail to log in with original password.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:firstPassword
-                                                                       register:NO];
+        RLMAppCredentials *creds = [RLMAppCredentials credentialsWithUsername:userName password:firstPassword];
 
         XCTestExpectation *ex = [self expectationWithDescription:@"login callback invoked"];
         // FIXME: [realmapp] This should use the new login
@@ -346,8 +335,7 @@
     }
     // Successfully log in with new password.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:secondPassword
-                                                                       register:NO];
+        RLMAppCredentials *creds = [RLMAppCredentials credentialsWithUsername:userName password:secondPassword];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
         XCTAssertNotNil(user);
         XCTAssertEqualObjects(RLMSyncUser.currentUser, user);
@@ -368,9 +356,8 @@
     NSString *nonAdminUserID = nil;
     // Successfully create user.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:username
-                                                                       password:firstPassword
-                                                                       register:YES];
+        RLMAppCredentials *creds = [RLMAppCredentials credentialsWithUsername:username
+                                                                       password:firstPassword];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:url];
         nonAdminUserID = user.identity;
         [user logOut];
@@ -378,9 +365,8 @@
     // Fail to change password from non-admin user.
     {
         NSString *username2 = [NSString stringWithFormat:@"%@_2", username];
-        RLMSyncCredentials *creds2 = [RLMSyncCredentials credentialsWithUsername:username2
-                                                                             password:@"a"
-                                                                             register:YES];
+        RLMAppCredentials *creds2 = [RLMAppCredentials credentialsWithUsername:username2
+                                                                             password:@"a"];
         RLMSyncUser *user2 = [self logInUserForCredentials:creds2 server:url];
         XCTestExpectation *ex = [self expectationWithDescription:@"change password callback invoked"];
         [user2 changePassword:@"foobar" forUserID:nonAdminUserID completion:^(NSError *error) {
@@ -400,9 +386,8 @@
     }
     // Fail to log in with original password.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:username
-                                                                       password:firstPassword
-                                                                       register:NO];
+        RLMAppCredentials *creds = [RLMAppCredentials credentialsWithUsername:username
+                                                                       password:firstPassword];
 
         XCTestExpectation *ex = [self expectationWithDescription:@"login callback invoked"];
         // FIXME: [realmapp] This should use the new login
@@ -411,9 +396,8 @@
     }
     // Successfully log in with new password.
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:username
-                                                                       password:secondPassword
-                                                                       register:NO];
+        RLMAppCredentials *creds = [RLMAppCredentials credentialsWithUsername:username
+                                                                       password:secondPassword];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
         XCTAssertNotNil(user);
         [user logOut];
@@ -422,7 +406,7 @@
 
 - (void)testRequestPasswordResetForRegisteredUser {
     NSString *userName = [NSStringFromSelector(_cmd) stringByAppendingString:@"@example.com"];
-    RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:@"a" register:YES];
+    RLMAppCredentials *creds = [RLMAppCredentials credentialsWithUsername:userName password:@"a"];
     [[self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]] logOut];
 
     XCTestExpectation *ex = [self expectationWithDescription:@"callback invoked"];
@@ -446,9 +430,8 @@
 
     // Should now be able to log in with the new password
     {
-        RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName
-                                                                       password:@"new password"
-                                                                       register:NO];
+        RLMAppCredentials *creds = [RLMAppCredentials credentialsWithUsername:userName
+                                                                       password:@"new password"];
         RLMSyncUser *user = [self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]];
         XCTAssertNotNil(user);
         [user logOut];
@@ -494,7 +477,7 @@
 
 - (void)testRequestConfirmEmailForRegisteredUser {
     NSString *userName = [NSStringFromSelector(_cmd) stringByAppendingString:@"@example.com"];
-    RLMSyncCredentials *creds = [RLMSyncCredentials credentialsWithUsername:userName password:@"a" register:YES];
+    RLMAppCredentials *creds = [RLMAppCredentials credentialsWithUsername:userName password:@"a"];
     [[self logInUserForCredentials:creds server:[RLMObjectServerTests authServerURL]] logOut];
 
     // This token is sent by ROS upon user registration
@@ -557,7 +540,7 @@
     NSURL *server = [RLMObjectServerTests authServerURL];
 
     // Create a non-admin user.
-    RLMSyncCredentials *c1 = [RLMSyncCredentials credentialsWithUsername:nonAdminUsername password:pw register:YES];
+    RLMAppCredentials *c1 = [RLMAppCredentials credentialsWithUsername:nonAdminUsername password:pw];
     RLMSyncUser *nonAdminUser = [self logInUserForCredentials:c1 server:server];
 
     // Create an admin user.
@@ -629,17 +612,15 @@
     // Make global queue
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
-    RLMSyncCredentials *c1 = [RLMSyncCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
-                                                                password:@"p"
-                                                                register:YES];
+    RLMAppCredentials *c1 = [RLMAppCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
+                                                                password:@"p"];
     XCTestExpectation *ex1 = [self expectationWithDescription:@"User logs in successfully on background queue"];
     // FIXME: [realmapp] This should use the new login
     REALM_UNREACHABLE();
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    RLMSyncCredentials *c2 = [RLMSyncCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
-                                                                password:@"p"
-                                                                register:YES];
+    RLMAppCredentials *c2 = [RLMAppCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
+                                                                password:@"p"];
     XCTestExpectation *ex2 = [self expectationWithDescription:@"User logs in successfully on main queue"];
 
     // FIXME: [realmapp] This should use the new login
@@ -652,17 +633,15 @@
     // Make global queue
     dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 
-    RLMSyncCredentials *c1 = [RLMSyncCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
-                                                                password:@"p"
-                                                                register:NO];
+    RLMAppCredentials *c1 = [RLMAppCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
+                                                                password:@"p"];
     XCTestExpectation *ex1 = [self expectationWithDescription:@"Error returned on background queue"];
     // FIXME: [realmapp] This should use the new login
     REALM_UNREACHABLE();
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
-    RLMSyncCredentials *c2 = [RLMSyncCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
-                                                                password:@"p"
-                                                                register:NO];
+    RLMAppCredentials *c2 = [RLMAppCredentials credentialsWithUsername:[[NSUUID UUID] UUIDString]
+                                                                password:@"p"];
     XCTestExpectation *ex2 = [self expectationWithDescription:@"Error returned on main queue"];
     // FIXME: [realmapp] This should use the new login
     REALM_UNREACHABLE();
@@ -671,9 +650,8 @@
 
 - (void)testUserExpirationCallback {
     NSString *username = NSStringFromSelector(_cmd);
-    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithUsername:username
-                                                                         password:@"a"
-                                                                         register:YES];
+    RLMAppCredentials *credentials = [RLMAppCredentials credentialsWithUsername:username
+                                                                         password:@"a"];
     RLMSyncUser *user = [self logInUserForCredentials:credentials
                                                server:[RLMObjectServerTests authServerURL]];
 
@@ -698,22 +676,6 @@
 }
 
 #pragma mark - Basic Sync
-
-/// It should be possible to successfully open a Realm configured for sync with an access token.
-- (void)testOpenRealmWithAdminToken {
-    // FIXME (tests): opening a Realm with the access token, then opening a Realm at the same virtual path
-    // with normal credentials, causes Realms to fail to bind with a "bad virtual path" error.
-    RLMSyncCredentials *credentials = [RLMSyncCredentials credentialsWithAccessToken:self.adminToken identity:@"test"];
-    XCTAssertNotNil(credentials);
-    RLMSyncUser *user = [self logInUserForCredentials:credentials
-                                               server:[RLMObjectServerTests authServerURL]];
-    NSURL *url = [NSURL URLWithString:@"realm://127.0.0.1:9080/testSyncWithAdminToken"];
-    RLMRealmConfiguration *c = [user configurationWithURL:url];
-    NSError *error = nil;
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:&error];
-    XCTAssertNil(error);
-    XCTAssertTrue(realm.isEmpty);
-}
 
 /// It should be possible to successfully open a Realm configured for sync with a normal user.
 - (void)testOpenRealmWithNormalCredentials {
@@ -1712,7 +1674,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 - (void)attemptLoginWithUsername:(NSString *)userName callback:(void (^)(RLMSyncUser *, NSError *))callback {
     NSURL *url = [RLMObjectServerTests secureAuthServerURL];
-    RLMSyncCredentials *creds = [RLMObjectServerTests basicCredentialsWithName:userName register:YES];
+    RLMAppCredentials *creds = [RLMObjectServerTests basicCredentialsWithName:userName register:YES];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"HTTP login"];
     // FIXME: [realmapp] This should use the new login

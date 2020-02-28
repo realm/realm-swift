@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSURL *)authServerURL;
 + (NSURL *)secureAuthServerURL;
 
-+ (RLMSyncCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
++ (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm;
 
@@ -87,7 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
                               stopPolicy:(RLMSyncStopPolicy)stopPolicy;
 
 /// Synchronously create, log in, and return a user.
-- (RLMSyncUser *)logInUserForCredentials:(RLMSyncCredentials *)credentials
+- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials
                                   server:(NSURL *)url;
 
 /// Create and log in an admin user.

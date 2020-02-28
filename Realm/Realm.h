@@ -31,7 +31,7 @@
 #import <Realm/RLMResults.h>
 #import <Realm/RLMSchema.h>
 #import <Realm/RLMSyncConfiguration.h>
-#import <Realm/RLMSyncCredentials.h>
+#import <Realm/RLMAppCredentials.h>
 #import <Realm/RLMSyncManager.h>
 #import <Realm/RLMSyncPermission.h>
 #import <Realm/RLMSyncSession.h>

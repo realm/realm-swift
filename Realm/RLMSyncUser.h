@@ -19,10 +19,10 @@
 #import <Foundation/Foundation.h>
 
 #import "RLMRealmConfiguration.h"
-#import "RLMSyncCredentials.h"
+#import "RLMAppCredentials.h"
 #import "RLMSyncPermission.h"
 
-@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncPermission, RLMSyncSession, RLMRealm, RLMSyncPermissionOffer;
+@class RLMSyncUser, RLMSyncUserInfo, RLMAppCredentials, RLMSyncPermission, RLMSyncSession, RLMRealm, RLMSyncPermissionOffer;
 
 /**
  The state of the user object.
