@@ -10,6 +10,9 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Breaking Changes
 * Remove support for Query-based sync, including the configuration parameters
   and the `RLMSyncSubscription` and `SyncSubscription` types ([#6437](https://github.com/realm/realm-cocoa/pull/6437)).
+* Primary key properties are no longer marked as being indexed. This reflects
+  an internal change to how primary keys are handled that should not have any
+  other visible effects. ([#6440](https://github.com/realm/realm-cocoa/pull/6440)).
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
