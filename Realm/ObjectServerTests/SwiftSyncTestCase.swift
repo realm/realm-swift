@@ -128,16 +128,8 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         var theUser: SyncUser?
         var theError: Error?
         let ex = expectation(description: "Should log in the user properly")
-        SyncUser.logIn(with: credentials, server: url) { user, error in
-            XCTAssertNotNil(user, file: file, line: line)
-            XCTAssertNil(error,
-                         "Error when trying to log in a user: \(error!) (process: \(process))",
-                         file: file,
-                         line: line)
-            theUser = user
-            theError = error
-            ex.fulfill()
-        }
+        // FIXME: [realmapp] This should use the new login
+        fatalError("test not implemented")
         waitForExpectations(timeout: 10, handler: nil)
         XCTAssertNotNil(theUser, file: file, line: line)
         XCTAssertEqual(theUser?.state, .active,

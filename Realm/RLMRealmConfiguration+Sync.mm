@@ -52,7 +52,7 @@
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
     } else {
         self.config.path = SyncManager::shared().path_for_realm(*[user _syncUser],
-                                                                self.config.sync_config->realm_url());
+                                                                self.config.sync_config->realm_url);
     }
 
     if (!self.config.encryption_key.empty()) {

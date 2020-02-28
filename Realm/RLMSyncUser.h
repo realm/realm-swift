@@ -113,50 +113,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, readonly) NSURL *authenticationServer;
 
 /**
- Whether the user is a Realm Object Server administrator. Value reflects the
- state at the time of the last successful login of this user.
- */
-@property (nonatomic, readonly) BOOL isAdmin;
-
-/**
  The current state of the user.
  */
 @property (nonatomic, readonly) RLMSyncUserState state;
 
 #pragma mark - Lifecycle
-
-/**
- Create, log in, and asynchronously return a new user object, specifying a custom
- timeout for the network request and a custom queue to run the callback upon.
- Credentials identifying the user must be passed in. The user becomes available in
- the completion block, at which point it is ready for use.
- */
-+ (void)logInWithCredentials:(RLMSyncCredentials *)credentials
-               authServerURL:(NSURL *)authServerURL
-                     timeout:(NSTimeInterval)timeout
-               callbackQueue:(dispatch_queue_t)callbackQueue
-                onCompletion:(RLMUserCompletionBlock)completion NS_REFINED_FOR_SWIFT;
-
-/**
- Create, log in, and asynchronously return a new user object.
-
- If the login completes successfully, the completion block will invoked with
- a `RLMSyncUser` object representing the logged-in user. This object can be
- used to open synchronized Realms. If the login fails, the completion block
- will be invoked with an error.
-
- The completion block always runs on the main queue.
-
- @param credentials     A credentials value identifying the user to be logged in.
- @param authServerURL   The URL of the authentication server (e.g. "http://realm.example.org:9080").
- @param completion      A callback block that returns a user object or an error,
-                        indicating the completion of the login operation.
- */
-+ (void)logInWithCredentials:(RLMSyncCredentials *)credentials
-               authServerURL:(NSURL *)authServerURL
-                onCompletion:(RLMUserCompletionBlock)completion
-NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
-
 
 /**
  Returns the default configuration for the user. The default configuration
@@ -182,25 +143,6 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
             e.g. "realm://example.org/~/path/to/realm". "Unresolved" means the
             path should contain the wildcard marker `~`, which will automatically
             be filled in with the user identity by the Realm Object Server.
- @param fullSynchronization If YES, all objects in the server Realm are
-                            automatically synchronized, and the query subscription
-                            methods cannot be used.
- @return A default configuration object with the sync configuration set to use
-         the given URL and options.
- */
-- (RLMRealmConfiguration *)configurationWithURL:(nullable NSURL *)url
-                            fullSynchronization:(bool)fullSynchronization NS_REFINED_FOR_SWIFT;
-
-/**
- Create a configuration instance for the given url.
-
- @param url The unresolved absolute URL to the Realm on the Realm Object Server,
-            e.g. "realm://example.org/~/path/to/realm". "Unresolved" means the
-            path should contain the wildcard marker `~`, which will automatically
-            be filled in with the user identity by the Realm Object Server.
- @param fullSynchronization If YES, all objects in the server Realm are
-                            automatically synchronized, and the query subscription
-                            methods cannot be used.
  @param enableSSLValidation If NO, invalid SSL certificates for the server will
                             not be rejected. THIS SHOULD NEVER BE USED IN
                             PRODUCTION AND EXISTS ONLY FOR TESTING PURPOSES.
@@ -211,7 +153,6 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
          the given URL and options.
  */
 - (RLMRealmConfiguration *)configurationWithURL:(nullable NSURL *)url
-                            fullSynchronization:(bool)fullSynchronization
                             enableSSLValidation:(bool)enableSSLValidation
                                       urlPrefix:(nullable NSString *)urlPrefix NS_REFINED_FOR_SWIFT;
 
@@ -520,11 +461,6 @@ NS_SWIFT_UNAVAILABLE("Use the full version of this API.");
  Metadata about this user stored on the Realm Object Server.
  */
 @property (nonatomic, readonly) NSDictionary<NSString *, NSString *> *metadata;
-
-/**
- Whether the user is flagged on the Realm Object Server as an administrator.
- */
-@property (nonatomic, readonly) BOOL isAdmin;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUserInfo cannot be created directly")));

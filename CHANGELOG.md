@@ -19,6 +19,19 @@ x.y.z Release notes (yyyy-MM-dd)
 Upgraded realm-core from ? to ?
 Upgraded realm-sync from ? to ?
 
+10.0.0-alpha.1 Release notes (2020-02-28)
+=============================================================
+
+### Breaking Changes
+
+* Remove all references to SyncSubscription
+* Remove differentiators between full and partial sync
+
+### Internal
+
+* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.1
+* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.1
+
 5.0.0-beta.3 Release notes (2020-02-26)
 =============================================================
 

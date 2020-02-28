@@ -126,112 +126,24 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     return _user == ((RLMSyncUser *)object)->_user;
 }
 
-+ (void)logInWithCredentials:(RLMSyncCredentials *)credential
-               authServerURL:(NSURL *)authServerURL
-                onCompletion:(RLMUserCompletionBlock)completion {
-    [self logInWithCredentials:credential
-                 authServerURL:authServerURL
-                       timeout:0 // use timeout from RLMSyncManager
-                 callbackQueue:dispatch_get_main_queue()
-                  onCompletion:completion];
-}
-
-+ (void)logInWithCredentials:(RLMSyncCredentials *)credentials
-               authServerURL:(NSURL *)authServerURL
-                     timeout:(NSTimeInterval)timeout
-               callbackQueue:(dispatch_queue_t)callbackQueue
-                onCompletion:(RLMUserCompletionBlock)completion {
-    // Special credential login should be treated differently.
-    if (credentials.provider == RLMIdentityProviderAccessToken) {
-        [self _performLoginForDirectAccessTokenCredentials:credentials
-                                             authServerURL:authServerURL
-                                           completionBlock:completion];
-        return;
-    }
-    if (credentials.provider == RLMIdentityProviderCustomRefreshToken) {
-        [self _performLoginForCustomRefreshTokenCredentials:credentials
-                                              authServerURL:authServerURL
-                                            completionBlock:completion];
-        return;
-    }
-    if (!authServerURL) {
-        @throw RLMException(@"A user cannot be logged in without specifying an authentication server URL.");
-    }
-
-    // Prepare login network request
-    NSMutableDictionary *json = [@{
-        kRLMSyncProviderKey: credentials.provider,
-        kRLMSyncDataKey: credentials.token,
-        kRLMSyncAppIDKey: RLMSyncManager.sharedManager.appID,
-    } mutableCopy];
-    if (credentials.userInfo.count) {
-        // Munge user info into the JSON request.
-        json[@"user_info"] = credentials.userInfo;
-    }
-
-    RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
-        if (error) {
-            return completion(nil, error);
-        }
-
-        RLMAuthResponseModel *model = [[RLMAuthResponseModel alloc] initWithDictionary:json
-                                                                    requireAccessToken:NO
-                                                                   requireRefreshToken:YES];
-        if (!model) {
-            // Malformed JSON
-            return completion(nil, make_auth_error_bad_response(json));
-        }
-
-        SyncUserIdentifier identity{model.refreshToken.tokenData.identity.UTF8String,
-            authServerURL.absoluteString.UTF8String};
-        auto sync_user = SyncManager::shared().get_user(identity , [model.refreshToken.token UTF8String]);
-        if (!sync_user) {
-            return completion(nil, make_auth_error_client_issue());
-        }
-        sync_user->set_is_admin(model.refreshToken.tokenData.isAdmin);
-        return completion([[RLMSyncUser alloc] initWithSyncUser:std::move(sync_user)], nil);
-    };
-
-    [RLMSyncAuthEndpoint sendRequestToServer:authServerURL
-                                        JSON:json
-                                     timeout:timeout
-                                  completion:^(NSError *error, NSDictionary *dictionary) {
-        dispatch_async(callbackQueue, ^{
-            handler(error, dictionary);
-        });
-    }];
-}
-
 - (RLMRealmConfiguration *)configuration {
     return [self configurationWithURL:nil
-                  fullSynchronization:NO
                   enableSSLValidation:YES
                             urlPrefix:nil];
 }
 
 - (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url {
     return [self configurationWithURL:url
-                  fullSynchronization:NO
-                  enableSSLValidation:YES
-                            urlPrefix:nil];
-}
-
-- (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url fullSynchronization:(bool)fullSynchronization {
-    return [self configurationWithURL:url
-                  fullSynchronization:fullSynchronization
                   enableSSLValidation:YES
                             urlPrefix:nil];
 }
 
 - (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url
-                            fullSynchronization:(bool)fullSynchronization
                             enableSSLValidation:(bool)enableSSLValidation
                                       urlPrefix:(NSString * _Nullable)urlPrefix {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                         realmURL:url ?: self.defaultRealmURL
-                                                   customFileURL:nil
-                                                       isPartial:!fullSynchronization
-                                                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
+                                                   customFileURL:nil stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
     syncConfig.urlPrefix = urlPrefix;
     syncConfig.enableSSLValidation = enableSSLValidation;
     syncConfig.pinnedCertificateURL = RLMSyncManager.sharedManager.pinnedCertificatePaths[syncConfig.realmURL.host];
@@ -315,17 +227,10 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
 }
 
 - (NSURL *)authenticationServer {
-    if (!_user || _user->token_type() == SyncUser::TokenType::Admin) {
+    if (!_user) {
         return nil;
     }
     return [NSURL URLWithString:@(_user->server_url().c_str())];
-}
-
-- (BOOL)isAdmin {
-    if (!_user) {
-        return NO;
-    }
-    return _user->is_admin();
 }
 
 #pragma mark - Passwords
@@ -604,64 +509,6 @@ NSError *checkUser(std::shared_ptr<SyncUser> const& user, NSString *msg) {
 
 - (std::shared_ptr<SyncUser>)_syncUser {
     return _user;
-}
-
-+ (void)_performLoginForDirectAccessTokenCredentials:(RLMSyncCredentials *)credentials
-                                       authServerURL:(NSURL *)serverURL
-                                     completionBlock:(nonnull RLMUserCompletionBlock)completion {
-    NSString *identity = credentials.userInfo[kRLMSyncIdentityKey];
-    std::shared_ptr<SyncUser> sync_user;
-    if (serverURL) {
-        NSString *scheme = serverURL.scheme;
-        if (![scheme isEqualToString:@"http"] && ![scheme isEqualToString:@"https"]) {
-            @throw RLMException(@"The Realm Object Server authentication URL provided for this user, \"%@\", "
-                                @" is invalid. It must begin with http:// or https://.", serverURL);
-        }
-        // Retrieve the user based on the auth server URL.
-        util::Optional<std::string> identity_string;
-        if (identity) {
-            identity_string = std::string(identity.UTF8String);
-        }
-        sync_user = SyncManager::shared().get_admin_token_user([serverURL absoluteString].UTF8String,
-                                                               credentials.token.UTF8String,
-                                                               std::move(identity_string));
-    } else {
-        // Retrieve the user based on the identity.
-        if (!identity) {
-            @throw RLMException(@"A direct access credential must specify either an identity, a server URL, or both.");
-        }
-        sync_user = SyncManager::shared().get_admin_token_user_from_identity(identity.UTF8String,
-                                                                             none,
-                                                                             credentials.token.UTF8String);
-    }
-    if (!sync_user) {
-        completion(nil, make_auth_error_client_issue());
-        return;
-    }
-    completion([[RLMSyncUser alloc] initWithSyncUser:std::move(sync_user)], nil);
-}
-
-+ (void)_performLoginForCustomRefreshTokenCredentials:(RLMSyncCredentials *)credentials
-                                        authServerURL:(NSURL *)serverURL
-                                      completionBlock:(nonnull RLMUserCompletionBlock)completion {
-    NSString *scheme = serverURL.scheme;
-    if (![scheme isEqualToString:@"http"] && ![scheme isEqualToString:@"https"]) {
-        @throw RLMException(@"The Realm Object Server authentication URL provided for this user, \"%@\", "
-                            @" is invalid. It must begin with http:// or https://.", serverURL);
-    }
-
-    NSString *identity = credentials.userInfo[kRLMSyncIdentityKey];
-    SyncUserIdentifier identifier{identity.UTF8String, serverURL.absoluteString.UTF8String};
-
-    std::shared_ptr<SyncUser> sync_user = SyncManager::shared().get_user(std::move(identifier), credentials.token.UTF8String);
-    if (!sync_user) {
-        completion(nil, make_auth_error_client_issue());
-        return;
-    }
-
-    NSNumber *isAdmin = credentials.userInfo[kRLMSyncIsAdminKey];
-    sync_user->set_is_admin(isAdmin.boolValue);
-    completion([[RLMSyncUser alloc] initWithSyncUser:std::move(sync_user)], nil);
 }
 
 @end

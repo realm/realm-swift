@@ -206,45 +206,6 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     return [RLMRealm realmWithConfiguration:configuration error:nil];
 }
 
-// The server doesn't send us the subscriptions for permission types until the
-// first subscription is created. This is fine for synchronous opens (if we're
-// creating a new Realm we create the permission objects ourselves), but it
-// causes issues for asyncOpen because it means that when our download completes
-// we don't actually have the full Realm state yet.
-static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
-#if REALM_ENABLE_SYNC
-    auto realm = Realm::get_shared_realm(config);
-    auto table = ObjectStore::table_for_object_type(realm->read_group(), "__ResultSets");
-
-    realm->begin_transaction();
-    auto row = realm::sync::create_object(realm->transaction(), *table);
-
-    // Set expires_at to time 0 so that this object will be cleaned up the first
-    // time the user creates a subscription
-    auto expires_at_col = table->get_column_key("expires_at");
-    if (!expires_at_col) {
-        expires_at_col = table->add_column(type_Timestamp, "expires_at", true);
-    }
-    row.set(expires_at_col, Timestamp(0, 0));
-    realm->commit_transaction();
-
-    NotificationToken token;
-    Results results(realm, table);
-    CFRunLoopRef runLoop = CFRunLoopGetCurrent();
-    CFRunLoopPerformBlock(runLoop, kCFRunLoopDefaultMode, [&]() mutable {
-        token = results.add_notification_callback([&](CollectionChangeSet const&, std::exception_ptr) mutable {
-            if (table->size() > 1) {
-                token = {};
-                CFRunLoopStop(runLoop);
-            }
-        });
-    });
-    CFRunLoopRun();
-#else
-    static_cast<void>(config);
-#endif
-}
-
 static dispatch_queue_t s_async_open_queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue",
                                                                    DISPATCH_QUEUE_CONCURRENT);
 void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
@@ -254,7 +215,7 @@ void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                                    callbackQueue:(dispatch_queue_t)callbackQueue
                                         callback:(RLMAsyncOpenRealmCallback)callback {
-    auto openCompletion = [=](ThreadSafeReference ref, std::exception_ptr err) {
+    auto openCompletion = [=](ThreadSafeReference, std::exception_ptr err) {
         @autoreleasepool {
             if (err) {
                 try {
@@ -270,32 +231,13 @@ void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
                 return;
             }
 
-            auto complete = ^{
-                dispatch_async(callbackQueue, ^{
-                    @autoreleasepool {
-                        NSError *error;
-                        RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
-                        callback(localRealm, error);
-                    }
-                });
-            };
-
-            auto realm = Realm::get_shared_realm(std::move(ref));
-            bool needsSubscriptions = realm->is_partial() && ObjectStore::table_for_object_type(realm->read_group(), "__ResultSets")->size() == 0;
-            if (needsSubscriptions) {
-                // We need to dispatch back to the work queue to wait for the
-                // subscriptions as we're currently running on the sync worker
-                // thread and blocking it to wait for subscriptions means no syncing
-                dispatch_async(s_async_open_queue, ^{
-                    @autoreleasepool {
-                        waitForPartialSyncSubscriptions(realm->config());
-                        complete();
-                    }
-                });
-            }
-            else {
-                complete();
-            }
+            dispatch_async(callbackQueue, ^{
+                @autoreleasepool {
+                    NSError *error;
+                    RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
+                    callback(localRealm, error);
+                }
+            });
         }
     };
 

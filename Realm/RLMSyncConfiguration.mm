@@ -67,7 +67,6 @@ BOOL isValidRealmURL(NSURL *url) {
 - (instancetype)initWithUser:(RLMSyncUser *)user
                     realmURL:(NSURL *)url
                customFileURL:(nullable NSURL *)customFileURL
-                   isPartial:(BOOL)isPartial
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy;
 @end
 
@@ -89,8 +88,7 @@ BOOL isValidRealmURL(NSURL *url) {
     RLMSyncConfiguration *that = (RLMSyncConfiguration *)object;
     return [self.realmURL isEqual:that.realmURL]
         && [self.user isEqual:that.user]
-        && self.stopPolicy == that.stopPolicy
-        && self.fullSynchronization == that.fullSynchronization;
+        && self.stopPolicy == that.stopPolicy;
 }
 
 - (void)setEnableSSLValidation:(BOOL)enableSSLValidation {
@@ -99,14 +97,6 @@ BOOL isValidRealmURL(NSURL *url) {
 
 - (BOOL)enableSSLValidation {
     return (BOOL)_config->client_validate_ssl;
-}
-
-- (void)setIsPartial:(BOOL)isPartial {
-    _config->is_partial = (bool)isPartial;
-}
-
-- (BOOL)isPartial {
-    return (BOOL)_config->is_partial;
 }
 
 - (NSURL *)pinnedCertificateURL {
@@ -128,14 +118,6 @@ BOOL isValidRealmURL(NSURL *url) {
     else {
         _config->ssl_trust_certificate_path = util::none;
     }
-}
-
-- (void)setFullSynchronization:(BOOL)fullSynchronization {
-    _config->is_partial = !(bool)fullSynchronization;
-}
-
-- (BOOL)fullSynchronization {
-    return !(BOOL)_config->is_partial;
 }
 
 - (realm::SyncConfig&)rawConfiguration {
@@ -178,7 +160,7 @@ BOOL isValidRealmURL(NSURL *url) {
 }
 
 - (NSURL *)realmURL {
-    NSString *rawStringURL = @(_config->reference_realm_url.c_str());
+    NSString *rawStringURL = @(_config->realm_url.c_str());
     return [NSURL URLWithString:rawStringURL];
 }
 
@@ -186,13 +168,11 @@ BOOL isValidRealmURL(NSURL *url) {
     return [self initWithUser:user
                      realmURL:url
                 customFileURL:nil
-                    isPartial:NO
                    stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
 }
 
 - (instancetype)initWithUser:(RLMSyncUser *)user
                     realmURL:(NSURL *)url
-                   isPartial:(BOOL)isPartial
                    urlPrefix:(NSString *)urlPrefix
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
          enableSSLValidation:(BOOL)enableSSLValidation
@@ -200,7 +180,6 @@ BOOL isValidRealmURL(NSURL *url) {
     auto config = [self initWithUser:user
                             realmURL:url
                        customFileURL:nil
-                           isPartial:isPartial
                           stopPolicy:stopPolicy];
     config.urlPrefix = urlPrefix;
     config.enableSSLValidation = enableSSLValidation;
@@ -210,7 +189,7 @@ BOOL isValidRealmURL(NSURL *url) {
 
 static void bindHandler(std::string const&, SyncConfig const& config, std::shared_ptr<SyncSession> session) {
     const std::shared_ptr<SyncUser>& user = config.user;
-    NSURL *realmURL = [NSURL URLWithString:@(config.realm_url().c_str())];
+    NSURL *realmURL = [NSURL URLWithString:@(config.realm_url.c_str())];
     NSString *path = [realmURL path];
     REALM_ASSERT(realmURL && path);
     auto handle = [[RLMSyncSessionRefreshHandle alloc] initWithRealmURL:realmURL
@@ -270,7 +249,6 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
 - (instancetype)initWithUser:(RLMSyncUser *)user
                     realmURL:(NSURL *)url
                customFileURL:(nullable NSURL *)customFileURL
-                   isPartial:(BOOL)isPartial
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     if (self = [super init]) {
         if (!isValidRealmURL(url)) {
@@ -284,7 +262,6 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
         _config->stop_policy = translateStopPolicy(stopPolicy);
         _config->bind_session_handler = bindHandler;
         _config->error_handler = errorHandler;
-        _config->is_partial = isPartial;
         _config->client_resync_mode = realm::ClientResyncMode::Manual;
 
         if (NSString *authorizationHeaderName = [RLMSyncManager sharedManager].authorizationHeaderName) {
@@ -312,9 +289,7 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
 + (RLMRealmConfiguration *)automaticConfigurationForUser:(RLMSyncUser *)user {
     RLMSyncConfiguration *syncConfig = [[RLMSyncConfiguration alloc] initWithUser:user
                                                                          realmURL:user.defaultRealmURL
-                                                                    customFileURL:nil
-                                                                        isPartial:YES
-                                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
+                                                                    customFileURL:nil stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = syncConfig;
     return config;

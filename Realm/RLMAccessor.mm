@@ -768,6 +768,20 @@ realm::Obj RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolic
     return link->_row;
 }
 
+template<>
+realm::ObjectId RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
+
+template<>
+realm::Decimal128 RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
+
+id RLMAccessorContext::unbox_embedded(id, realm::CreatePolicy, realm::Obj, realm::ColKey, size_t) {
+    REALM_UNREACHABLE();
+}
+
 void RLMAccessorContext::will_change(realm::Obj const& row, realm::Property const& prop) {
     _observationInfo = RLMGetObservationInfo(nullptr, row.get_key(), _info);
     if (_observationInfo) {
@@ -814,6 +828,10 @@ RLMOptionalId RLMAccessorContext::default_value_for_property(realm::ObjectSchema
 
 bool RLMAccessorContext::is_same_list(realm::List const& list, __unsafe_unretained id const v) const noexcept {
     return [v respondsToSelector:@selector(isBackedByList:)] && [v isBackedByList:list];
+}
+
+bool RLMAccessorContext::is_embedded() {
+    REALM_UNREACHABLE();
 }
 
 #pragma clang diagnostic push

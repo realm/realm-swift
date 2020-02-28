@@ -453,7 +453,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
         column = _info->tableColumn(property);
     }
     auto value = translateRLMResultsErrors([&] { return _results.average(column); }, @"averageOfProperty");
-    return value ? @(*value) : nil;
+    return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (void)deleteObjectsFromRealm {

@@ -69,6 +69,7 @@ public:
                                              realm::Property const& prop);
 
     bool is_same_list(realm::List const& list, id v) const noexcept;
+    bool is_embedded();
 
     template<typename Func>
     void enumerate_list(__unsafe_unretained const id v, Func&& func) {
@@ -80,6 +81,8 @@ public:
 
     template<typename T>
     T unbox(id v, realm::CreatePolicy = realm::CreatePolicy::Skip, realm::ObjKey = {});
+
+    id unbox_embedded(id v, realm::CreatePolicy = realm::CreatePolicy::Skip, realm::Obj = {}, realm::ColKey = {}, size_t = 0);
 
     bool is_null(id v) { return v == NSNull.null; }
     id null_value() { return NSNull.null; }
