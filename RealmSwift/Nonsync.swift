@@ -23,9 +23,6 @@ public struct SyncConfiguration {
     init?(config: RLMSyncConfiguration) { return nil }
 }
 
-public struct SyncSubscription<T: Object> {
-}
-
 public struct SyncSession {
     public struct Progress {
         public let transferredBytes: Int

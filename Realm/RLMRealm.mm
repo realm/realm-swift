@@ -215,7 +215,7 @@ void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
                                    callbackQueue:(dispatch_queue_t)callbackQueue
                                         callback:(RLMAsyncOpenRealmCallback)callback {
-    auto openCompletion = [=](ThreadSafeReference ref, std::exception_ptr err) {
+    auto openCompletion = [=](ThreadSafeReference, std::exception_ptr err) {
         @autoreleasepool {
             if (err) {
                 try {
@@ -231,18 +231,13 @@ void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
                 return;
             }
 
-            auto complete = ^{
-                dispatch_async(callbackQueue, ^{
-                    @autoreleasepool {
-                        NSError *error;
-                        RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
-                        callback(localRealm, error);
-                    }
-                });
-            };
-
-            auto realm = Realm::get_shared_realm(std::move(ref));
-            complete();
+            dispatch_async(callbackQueue, ^{
+                @autoreleasepool {
+                    NSError *error;
+                    RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
+                    callback(localRealm, error);
+                }
+            });
         }
     };
 
