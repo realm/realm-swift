@@ -28,6 +28,8 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSyncUtil_Private.h"
 #import "shared_realm.hpp"
+#import "RLMApp.h"
+#import "RLMAppCredentials.h"
 
 #pragma mark - Test objects
 
@@ -69,6 +71,17 @@
 @implementation RLMObjectServerTests
 
 #pragma mark - Authentication and Tokens
+
+- (void)testAnonymousAuthentication {
+    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration: nil];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completionHandler:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
 
 /// Valid username/password credentials should be able to log in a user. Using the same credentials should return the
 /// same user object.

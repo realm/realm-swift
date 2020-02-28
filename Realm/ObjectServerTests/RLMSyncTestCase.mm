@@ -507,13 +507,13 @@ static NSURL *syncDirectoryForChildProcess() {
     self.continueAfterFailure = NO;
 
     REALM_ASSERT(RLMSyncManager.sharedManager._allUsers.count == 0);
-    [RLMSyncManager resetForTesting];
+//    [RLMSyncManager resetForTesting];
 
-    [self setupSyncManager];
+//    [self setupSyncManager];
 }
 
 - (void)tearDown {
-    [self resetSyncManager];
+//    [self resetSyncManager];
     [super tearDown];
 }
 

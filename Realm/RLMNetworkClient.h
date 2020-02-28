@@ -28,16 +28,78 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy) NSDictionary<NSString *, NSURL *> *pinnedCertificatePaths;
 @end
 
-/// An abstract class representing a server endpoint.
-@interface RLMSyncServerEndpoint : NSObject RLM_SYNC_UNINITIALIZABLE
-+ (void)sendRequestToServer:(NSURL *)serverURL
-                       JSON:(NSDictionary *)jsonDictionary
-                 completion:(void (^)(NSError *))completionBlock;
+typedef enum RLMHTTPMethod {
+    GET, POST, PUT, PATCH, DELETE
+} RLMHTTPMethod;
 
-+ (void)sendRequestToServer:(NSURL *)serverURL
-                       JSON:(NSDictionary *)jsonDictionary
-                    timeout:(NSTimeInterval)timeout
-                 completion:(void (^)(NSError *, NSDictionary *))completionBlock;
+@interface RLMRequest : NSObject
+/**
+ * The HTTP method of this request.
+ */
+@property RLMHTTPMethod method;
+
+/**
+ * The URL to which this request will be made.
+ */
+@property NSString* url;
+
+/**
+ * The number of milliseconds that the underlying transport should spend on an HTTP round trip before failing with an
+ * error.
+ */
+@property NSUInteger timeoutMS;
+
+/**
+ * The HTTP headers of this request.
+ */
+@property NSDictionary<NSString *, NSString *>* headers;
+
+/**
+ * The body of the request.
+ */
+@property NSString* body;
+
+@end
+
+@interface RLMResponse : NSObject
+
+/**
+ * The status code of the HTTP response.
+ */
+@property NSInteger httpStatusCode;
+
+/**
+ * A custom status code provided by the language binding.
+ */
+@property NSInteger customStatusCode;
+
+/**
+ * The headers of the HTTP response.
+ */
+@property NSDictionary<NSString *, NSString *>* headers;
+
+/**
+ * The body of the HTTP response.
+ */
+@property NSString* body;
+
+@end
+
+typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
+
+@protocol RLMNetworkTransporting <NSObject>
+
+-(void) sendRequestToServer:(RLMRequest *) request
+                 completion:(RLMNetworkTransportCompletionBlock)completionBlock;
+
+@end
+
+/// An abstract class representing a server endpoint.
+@interface RLMNetworkTransport : NSObject<RLMNetworkTransporting>
+
+-(void) sendRequestToServer:(RLMRequest *) request
+                 completion:(RLMNetworkTransportCompletionBlock)completionBlock;
+
 @end
 
 NS_ASSUME_NONNULL_END

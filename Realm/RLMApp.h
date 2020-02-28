@@ -1,3 +1,5 @@
+#import "RLMNetworkClient.h"
+
 #ifndef RLMApp_h
 #define RLMApp_h
 
@@ -9,6 +11,7 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
 @interface RLMAppConfiguration : NSObject
 
 @property NSString* _Nullable  baseURL;
+@property (nonatomic, strong) id <RLMNetworkTransporting> _Nullable transport;
 
 @end
 
