@@ -61,7 +61,7 @@
                                                     @"\t\ttype = string;\n"
                                                     @"\t\tobjectClassName = (null);\n"
                                                     @"\t\tlinkOriginPropertyName = (null);\n"
-                                                    @"\t\tindexed = YES;\n"
+                                                    @"\t\tindexed = NO;\n"
                                                     @"\t\tisPrimary = YES;\n"
                                                     @"\t\tarray = NO;\n"
                                                     @"\t\toptional = NO;\n"

@@ -831,7 +831,7 @@ bool RLMAccessorContext::is_same_list(realm::List const& list, __unsafe_unretain
 }
 
 bool RLMAccessorContext::is_embedded() {
-    REALM_UNREACHABLE();
+    return false;
 }
 
 #pragma clang diagnostic push

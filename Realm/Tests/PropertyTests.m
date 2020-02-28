@@ -93,7 +93,7 @@
                                                                      type:RLMPropertyTypeString
                                                           objectClassName:nil
                                                    linkOriginPropertyName:nil
-                                                                  indexed:YES
+                                                                  indexed:NO
                                                                  optional:NO];
         expectedProperty.isPrimary = YES;
         XCTAssertEqualObjects(stringProperty, expectedProperty);
