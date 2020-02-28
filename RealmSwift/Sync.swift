@@ -397,33 +397,6 @@ extension SyncUser {
     }
 
     /**
-     Create a permission offer for a Realm.
-
-     A permission offer is used to grant access to a Realm this user manages to another
-     user. Creating a permission offer produces a string token which can be passed to the
-     recepient in any suitable way (for example, via e-mail).
-
-     The operation will take place asynchronously. The token can be accepted by the recepient
-     using the `SyncUser.acceptOffer(forToken:, callback:)` method.
-
-     - parameter url: The URL of the Realm for which the permission offer should pertain. This
-                      may be the URL of any Realm which this user is allowed to manage. If the URL
-                      has a `~` wildcard it will be replaced with this user's user identity.
-     - parameter accessLevel: What access level to grant to whoever accepts the token.
-     - parameter expiration: Optionally, a date which indicates when the offer expires. If the
-                             recepient attempts to accept the offer after the date it will be rejected.
-                             If nil, the offer will never expire.
-     - parameter callback: A callback indicating whether the operation succeeded or failed. If it
-                           succeeded the token will be passed in as a string.
-     */
-    public func createOfferForRealm(at url: URL,
-                                    accessLevel: SyncAccessLevel,
-                                    expiration: Date? = nil,
-                                    callback: @escaping (String?, Error?) -> Void) {
-        self.__createOfferForRealm(at: url, accessLevel: accessLevel, expiration: expiration, callback: callback)
-    }
-
-    /**
      Create a sync configuration instance.
 
      Additional settings can be optionally specified. Descriptions of these

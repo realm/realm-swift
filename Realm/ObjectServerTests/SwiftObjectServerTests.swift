@@ -396,36 +396,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    // MARK: - Administration
-
-    func testRetrieveUserInfo() {
-        let adminUsername = "jyaku.swift"
-        let nonAdminUsername = "meela.swift@realm.example.org"
-        let password = "p"
-        let server = SwiftObjectServerTests.authServerURL()
-
-        // Create a non-admin user.
-        _ = logInUser(for: .init(username: nonAdminUsername, password: password),
-                      server: server)
-        // Create an admin user.
-        let adminUser = createAdminUser(for: server, username: adminUsername)
-
-        // Look up information about the non-admin user from the admin user.
-        let ex = expectation(description: "Should be able to look up user information")
-        adminUser.retrieveInfo(forUser: nonAdminUsername, identityProvider: .usernamePassword) { (userInfo, err) in
-            XCTAssertNil(err)
-            XCTAssertNotNil(userInfo)
-            guard let userInfo = userInfo else {
-                return
-            }
-            let account = userInfo.accounts.first!
-            XCTAssertEqual(account.providerUserIdentity, nonAdminUsername)
-            XCTAssertEqual(account.provider, Provider.usernamePassword)
-            ex.fulfill()
-        }
-        waitForExpectations(timeout: 10.0, handler: nil)
-    }
-
     // MARK: - Authentication
 
     func testInvalidCredentials() {

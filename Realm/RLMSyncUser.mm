@@ -246,228 +246,32 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
                                    userInfo:nil]);
         return;
     }
-    [RLMSyncChangePasswordEndpoint sendRequestToServer:self.authenticationServer
-                                       JSON:@{kRLMSyncTokenKey: self.refreshToken,
-                                              kRLMSyncUserIDKey: userID,
-                                              kRLMSyncDataKey: @{kRLMSyncNewPasswordKey: newPassword}}
-                                 completion:completion];
+    REALM_UNREACHABLE();
 }
 
 + (void)requestPasswordResetForAuthServer:(NSURL *)serverURL
                                 userEmail:(NSString *)email
                                completion:(RLMPasswordChangeStatusBlock)completion {
-    [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
-                                                 JSON:@{@"provider_id": email, @"data": @{@"action": @"reset_password"}}
-                                           completion:completion];
+    REALM_UNREACHABLE();
 }
 
 + (void)completePasswordResetForAuthServer:(NSURL *)serverURL
                                      token:(NSString *)token
                                   password:(NSString *)newPassword
                                 completion:(RLMPasswordChangeStatusBlock)completion {
-    [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
-                                                 JSON:@{@"data": @{@"action": @"complete_reset",
-                                                                   @"token": token,
-                                                                   @"new_password": newPassword}}
-                                           completion:completion];
+    REALM_UNREACHABLE();
 }
 
 + (void)requestEmailConfirmationForAuthServer:(NSURL *)serverURL
                                     userEmail:(NSString *)email
                                    completion:(RLMPasswordChangeStatusBlock)completion {
-    [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
-                                                 JSON:@{@"provider_id": email,
-                                                        @"data": @{@"action": @"request_email_confirmation"}}
-                                           completion:completion];
+    REALM_UNREACHABLE();
 }
 
 + (void)confirmEmailForAuthServer:(NSURL *)serverURL
                             token:(NSString *)token
                        completion:(RLMPasswordChangeStatusBlock)completion {
-    [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
-                                                 JSON:@{@"data": @{@"action": @"confirm_email",
-                                                                   @"token": token}}
-                                           completion:completion];
-}
-
-#pragma mark - Administrator API
-
-- (void)retrieveInfoForUser:(NSString *)providerUserIdentity
-           identityProvider:(RLMIdentityProvider)provider
-                 completion:(RLMRetrieveUserBlock)completion {
-    [RLMSyncGetUserInfoEndpoint sendRequestToServer:self.authenticationServer
-                                               JSON:@{kRLMSyncProviderKey: provider,
-                                                      kRLMSyncProviderIDKey: providerUserIdentity,
-                                                      kRLMSyncTokenKey: self.refreshToken}
-                                            timeout:60
-                                         completion:^(NSError *error, NSDictionary *json) {
-        if (error) {
-            return completion(nil, error);
-        }
-        RLMUserResponseModel *model = [[RLMUserResponseModel alloc] initWithDictionary:json];
-        if (!model) {
-            return completion(nil, make_auth_error_bad_response(json));
-        }
-        completion([RLMSyncUserInfo syncUserInfoWithModel:model], nil);
-    }];
-}
-
-#pragma mark - Permissions API
-
-namespace {
-NSError *checkUser(std::shared_ptr<SyncUser> const& user, NSString *msg) {
-    if (user && user->state() != SyncUser::State::Error) {
-        return nil;
-    }
-    msg = [NSString stringWithFormat:@"Permissions cannot be %@ using an invalid user.", msg];
-    return [NSError errorWithDomain:RLMSyncPermissionErrorDomain code:RLMSyncAuthErrorInvalidParameters
-                           userInfo:@{NSLocalizedFailureReasonErrorKey: msg}];
-}
-}
-
-- (void)retrievePermissionsWithCallback:(RLMPermissionResultsBlock)callback {
-    if (NSError *error = checkUser(_user, @"retrieved")) {
-        callback(nullptr, error);
-        return;
-    }
-
-    [RLMSyncGetPermissionsEndpoint
-     sendRequestToServer:self.authenticationServer
-     JSON:@{kRLMSyncTokenKey: self.refreshToken}
-     timeout:60.0
-     completion:^(NSError *error, NSDictionary *json) {
-        if (error) {
-            return callback(nil, error);
-        }
-        // FIXME: ROS currently gives duplicated results for 'all' due to an incorrect query
-        NSMutableSet *permissions = [NSMutableSet new];
-        for (NSDictionary *permission in json[@"permissions"]) {
-            // ROS reports the permission for __wildcardpermissions, which we
-            // don't want to include
-            if ([permission[@"path"] hasPrefix:@"/__"]) {
-                continue;
-            }
-
-            // Wildcard permissions are reported as a null userId
-            id userId = permission[@"userId"];
-            if (userId == NSNull.null) {
-                userId = @"*";
-            }
-
-            [permissions addObject:[[RLMSyncPermission alloc]
-                                    initWithRealmPath:permission[@"path"]
-                                    identity:userId
-                                    accessLevel:RLMSyncAccessLevelFromString(permission[@"accessLevel"])]];
-        }
-        callback(permissions.allObjects, nil);
-    }];
-}
-
-- (void)applyPermission:(RLMSyncPermission *)permission callback:(RLMPermissionStatusBlock)callback {
-    if (NSError *error = checkUser(_user, @"applied")) {
-        callback(error);
-        return;
-    }
-    id condition;
-    if (permission.identity) {
-        condition = @{@"userId": permission.identity};
-    }
-    else {
-        condition = @{@"metadataKey": permission.key, @"metadataValue": permission.value};
-    }
-    [RLMSyncApplyPermissionsEndpoint
-     sendRequestToServer:self.authenticationServer
-     JSON:@{kRLMSyncTokenKey: self.refreshToken,
-            @"condition": condition,
-            @"realmPath": permission.path,
-            @"accessLevel": RLMSyncAccessLevelToString(permission.accessLevel)}
-     completion:callback];
-}
-
-- (void)createOfferForRealmAtURL:(NSURL *)url
-                     accessLevel:(RLMSyncAccessLevel)accessLevel
-                      expiration:(NSDate *)expirationDate
-                        callback:(RLMPermissionOfferStatusBlock)callback {
-    if (NSError *error = checkUser(_user, @"offered")) {
-        callback(nil, error);
-        return;
-    }
-
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.locale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
-    dateFormatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZZZZZ";
-    dateFormatter.calendar = [NSCalendar calendarWithIdentifier:NSCalendarIdentifierGregorian];
-
-    [RLMSyncOfferPermissionsEndpoint
-     sendRequestToServer:self.authenticationServer
-     JSON:@{kRLMSyncTokenKey: self.refreshToken,
-            @"expiresAt": expirationDate ? [RLMISO8601Formatter() stringFromDate:expirationDate] : NSNull.null,
-            @"realmPath": url.path,
-            @"accessLevel": RLMSyncAccessLevelToString(accessLevel)}
-     timeout:60.0
-     completion:^(NSError *error, NSDictionary *json) {
-        callback(json[@"token"], error);
-    }];
-}
-
-- (void)acceptOfferForToken:(NSString *)token
-                   callback:(RLMPermissionOfferResponseStatusBlock)callback {
-    if (NSError *error = checkUser(_user, @"accepted")) {
-        callback(nil, error);
-        return;
-    }
-    [RLMSyncAcceptPermissionOfferEndpoint
-     sendRequestToServer:self.authenticationServer
-     JSON:@{kRLMSyncTokenKey: self.refreshToken, @"offerToken": token}
-     timeout:60.0
-     completion:^(NSError *error, NSDictionary *json) {
-        callback([self urlForPath:json[@"path"]], error);
-    }];
-}
-
-- (void)invalidateOfferForToken:(NSString *)token
-                       callback:(RLMPermissionStatusBlock)callback {
-    if (NSError *error = checkUser(_user, @"invalidated")) {
-        callback(error);
-        return;
-    }
-    [RLMSyncInvalidatePermissionOfferEndpoint
-     sendRequestToServer:self.authenticationServer
-     JSON:@{kRLMSyncTokenKey: self.refreshToken, @"offerToken": token}
-     timeout:60.0
-     completion:^(NSError *error, NSDictionary *) {
-        callback(error);
-    }];
-}
-
-- (void)retrievePermissionOffersWithCallback:(RLMPermissionOfferResultsBlock)callback {
-    if (NSError *error = checkUser(_user, @"retrieved")) {
-        callback(nullptr, error);
-        return;
-    }
-
-    [RLMSyncGetPermissionOffersEndpoint
-     sendRequestToServer:self.authenticationServer
-     JSON:@{kRLMSyncTokenKey: self.refreshToken}
-     timeout:60.0
-     completion:^(NSError *error, NSDictionary *json) {
-        if (error) {
-            return callback(nil, error);
-        }
-        NSMutableArray *offers = [NSMutableArray new];
-        NSDateFormatter *formatter = RLMISO8601Formatter();
-        for (NSDictionary *offer in json[@"offers"]) {
-            NSString *expiresAt = RLMCoerceToNil(offer[@"expiresAt"]);
-            NSString *createdAt = RLMCoerceToNil(offer[@"createdAt"]);
-            [offers addObject:[[RLMSyncPermissionOffer alloc]
-                               initWithRealmPath:offer[@"realmPath"]
-                               token:offer[@"token"]
-                               expiresAt:expiresAt ? [formatter dateFromString:expiresAt] : nil
-                               createdAt:createdAt ? [formatter dateFromString:createdAt] : nil
-                               accessLevel:RLMSyncAccessLevelFromString(offer[@"accessLevel"])]];
-        }
-        callback(offers, nil);
-    }];
+    REALM_UNREACHABLE();
 }
 
 #pragma mark - Private API

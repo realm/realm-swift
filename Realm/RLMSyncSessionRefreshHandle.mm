@@ -269,10 +269,11 @@ static const NSTimeInterval RLMRefreshBuffer = 10;
     RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         [weakSelf _onRefreshCompletionWithError:error json:json];
     };
-    [RLMSyncAuthEndpoint sendRequestToServer:self.authServerURL
-                                        JSON:json
-                                     timeout:60.0
-                                  completion:handler];
+// FIXME: [realmapp]
+//    [RLMSyncAuthEndpoint sendRequestToServer:self.authServerURL
+//                                        JSON:json
+//                                     timeout:60.0
+//                                  completion:handler];
 }
 
 @end
