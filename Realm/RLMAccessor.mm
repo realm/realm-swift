@@ -782,6 +782,12 @@ id RLMAccessorContext::unbox_embedded(id, realm::CreatePolicy, realm::Obj, realm
     REALM_UNREACHABLE();
 }
 
+template<>
+realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox<realm::util::Optional<realm::ObjectId> >(id, realm::CreatePolicy, realm::ObjKey) {
+    REALM_UNREACHABLE();
+}
+
+
 void RLMAccessorContext::will_change(realm::Obj const& row, realm::Property const& prop) {
     _observationInfo = RLMGetObservationInfo(nullptr, row.get_key(), _info);
     if (_observationInfo) {

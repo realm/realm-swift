@@ -57,7 +57,7 @@ extern RLMIdentityProvider const RLMIdentityProviderAnonymous;
 @interface RLMAppCredentials : NSObject
 
 /// The name of the identity provider which generated the credentials token.
-@property (nonatomic, readonly) RLMIdentityProvider provider;
+@property (nonatomic) RLMIdentityProvider provider;
 
 /**
  Construct and return credentials from a Facebook account token.

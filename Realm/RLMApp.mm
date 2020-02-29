@@ -10,8 +10,7 @@
 #import "RLMApp.h"
 
 #import "sync/app.hpp"
-#import "RLMAppCredentials.h"
-#import "RLMAppCredentials_Private.h"
+#import "RLMAppCredentials_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMNetworkClient.h"
 
@@ -22,8 +21,6 @@ using namespace realm;
 
 @interface RLMApp() {
     std::shared_ptr<app::App> _app;
-    NSMutableDictionary<NSNumber *, id>* _blocks;
-    NSNumber *_idx;
 }
 @end
 
@@ -73,21 +70,21 @@ id <RLMNetworkTransporting> CocoaNetworkTransport::transport = [RLMNetworkTransp
 
 -(instancetype) initWithAppId:(NSString *) appId configuration:(RLMAppConfiguration *)configuration {
     if (self = [super init]) {
-        Optional<app::App::Config> boundConfiguration = util::none;
-        CocoaNetworkTransport::transport = [RLMNetworkTransport new];
+        app::App::Config boundConfiguration = {
+            .app_id = [appId cStringUsingEncoding:NSUTF8StringEncoding]
+        };
+        boundConfiguration.transport_generator = []{
+            return std::unique_ptr<app::GenericNetworkTransport>(new CocoaNetworkTransport);
+        };
         if (configuration) {
-            boundConfiguration = app::App::Config();
-            boundConfiguration->base_url = util::Optional<std::string>([configuration.baseURL cStringUsingEncoding:NSUTF8StringEncoding]);
+            if (configuration.baseURL) {
+                boundConfiguration.base_url = util::Optional<std::string>([configuration.baseURL cStringUsingEncoding:NSUTF8StringEncoding]);
+            }
             if (configuration.transport) {
                 CocoaNetworkTransport::transport = configuration.transport;
             }
         }
-        std::unique_ptr<app::GenericNetworkTransport> (*factory)() = []{
-            return std::unique_ptr<app::GenericNetworkTransport>(new CocoaNetworkTransport);
-        };
-        app::GenericNetworkTransport::set_network_transport_factory(factory);
-        self->_app = app::App::app([appId cStringUsingEncoding: NSUTF8StringEncoding],
-                                   boundConfiguration);
+        self->_app = std::make_shared<app::App>(boundConfiguration);
         return self;
     }
     return nil;
@@ -97,17 +94,19 @@ id <RLMNetworkTransporting> CocoaNetworkTransport::transport = [RLMNetworkTransp
     return [[RLMApp alloc] initWithAppId:appId configuration:configuration];
 }
 
-static std::function<void (std::shared_ptr<SyncUser>, std::unique_ptr<app::error::AppError>)> block;
+static NSError* appErrorToNSError(const app::AppError& appError) {
+    return [[NSError alloc] initWithDomain:@(appError.error_code.category().name())
+                                      code:appError.error_code.value()
+                                  userInfo:@{
+        @(appError.error_code.category().name()) : @(appError.error_code.message().data())
+    }];
+}
 
 -(void) loginWithCredential:(RLMAppCredentials *)credentials
           completionHandler:(RLMUserCompletionBlock)completionHandler {
-    self->_app->login_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, std::unique_ptr<app::error::AppError> error) {
-        if (error && error->code()) {
-            return completionHandler(nil,
-                                     [[NSError alloc] initWithDomain:RLMSyncAuthErrorDomain
-                                                                code:error->code()
-                                                            userInfo:
-                                      @{@(error->category().data()): @(error->message().data())}]);
+    self->_app->login_with_credentials(*credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
+        if (error && error->error_code) {
+            return completionHandler(nil, appErrorToNSError(*error));
         }
 
         completionHandler([[RLMSyncUser alloc] initWithSyncUser:user], nil);

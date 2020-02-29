@@ -1,5 +1,5 @@
-#ifndef RLMAppCredentials_Private_h
-#define RLMAppCredentials_Private_h
+#ifndef RLMAppCredentials_Private_hpp
+#define RLMAppCredentials_Private_hpp
 
 #import "RLMAppCredentials.h"
 #import "sync/app_credentials.hpp"

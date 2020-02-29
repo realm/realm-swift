@@ -252,46 +252,6 @@ didCompleteWithError:(NSError *)error
     _completionBlock(response);
 }
 
-- (NSError *)validateResponse:(NSURLResponse *)response data:(NSData *)data {
-    if (![response isKindOfClass:[NSHTTPURLResponse class]]) {
-        // FIXME: Provide error message
-        return make_auth_error_bad_response();
-    }
-
-    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-    BOOL badResponse = (NSLocationInRange(httpResponse.statusCode, rangeForErrorType(ClientError))
-                        || NSLocationInRange(httpResponse.statusCode, rangeForErrorType(ServerError)));
-    if (badResponse) {
-        if (RLMSyncErrorResponseModel *responseModel = [self responseModelFromData:data]) {
-            switch (responseModel.code) {
-                case RLMSyncAuthErrorInvalidParameters:
-                case RLMSyncAuthErrorMissingPath:
-                case RLMSyncAuthErrorInvalidCredential:
-                case RLMSyncAuthErrorUserDoesNotExist:
-                case RLMSyncAuthErrorUserAlreadyExists:
-                case RLMSyncAuthErrorAccessDeniedOrInvalidPath:
-                case RLMSyncAuthErrorInvalidAccessToken:
-                case RLMSyncAuthErrorExpiredPermissionOffer:
-                case RLMSyncAuthErrorAmbiguousPermissionOffer:
-                case RLMSyncAuthErrorFileCannotBeShared:
-                    return make_auth_error(responseModel);
-                default:
-                    // Right now we assume that any codes not described
-                    // above are generic HTTP error codes.
-                    return make_auth_error_http_status(responseModel.status);
-            }
-        }
-        return make_auth_error_http_status(httpResponse.statusCode);
-    }
-
-    if (!data) {
-        // FIXME: provide error message
-        return make_auth_error_bad_response();
-    }
-
-    return nil;
-}
-
 - (RLMSyncErrorResponseModel *)responseModelFromData:(NSData *)data {
     if (data.length == 0) {
         return nil;

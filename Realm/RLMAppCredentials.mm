@@ -16,34 +16,26 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMAppCredentials.h"
-#import "RLMAppCredentials_Private.h"
+#import "RLMAppCredentials_Private.hpp"
 #import "RLMSyncUtil_Private.h"
-#import "sync/app_credentials.hpp"
 #import "RLMUtil.hpp"
-
-RLMIdentityProvider const RLMIdentityProviderDebug                  = @"debug";
-RLMIdentityProvider const RLMIdentityProviderUsernamePassword       = @"password";
-RLMIdentityProvider const RLMIdentityProviderFacebook               = @"facebook";
-RLMIdentityProvider const RLMIdentityProviderGoogle                 = @"google";
-RLMIdentityProvider const RLMIdentityProviderJWT                    = @"jwt";
-RLMIdentityProvider const RLMIdentityProviderAnonymous              = @"anonymous";
 
 using namespace realm;
 
-@interface RLMAppCredentials ()
+@interface RLMAppCredentials () {
+    
+}
 
-- (instancetype)initWithAppCredentials:(std::shared_ptr<app::AppCredentials>)credentials NS_DESIGNATED_INITIALIZER;
-
-@property (nonatomic, readwrite) RLMIdentityProvider provider;
+- (instancetype) initWithAppCredentials:(const app::AppCredentials&)credentials NS_DESIGNATED_INITIALIZER;
 
 @end
 
 @implementation RLMAppCredentials
 
-- (instancetype)initWithAppCredentials:(std::shared_ptr<realm::app::AppCredentials>)credentials {
+- (instancetype)initWithAppCredentials:(const app::AppCredentials&)credentials {
     if (self = [super init]) {
-        self.appCredentials = std::move(credentials);
+        self->_appCredentials = std::make_shared<app::AppCredentials>(credentials);
+        self.provider = @(credentials.provider_as_string().data());
         return self;
     }
     return nil;
@@ -76,7 +68,7 @@ using namespace realm;
     }
     RLMAppCredentials *that = (RLMAppCredentials *)object;
     return ([self.provider isEqualToString:that.provider]
-            && self.appCredentials == that.appCredentials);
+            && self.appCredentials->serialize_as_json() == that.appCredentials->serialize_as_json());
 }
 
 @end
