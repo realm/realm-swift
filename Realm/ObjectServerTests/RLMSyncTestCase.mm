@@ -509,10 +509,12 @@ static NSURL *syncDirectoryForChildProcess() {
     REALM_ASSERT(RLMSyncManager.sharedManager._allUsers.count == 0);
     [RLMSyncManager resetForTesting];
 
+    // FIXME: Figure out why this is broken
 //    [self setupSyncManager];
 }
 
 - (void)tearDown {
+    // FIXME: Figure out why this is broken
 //    [self resetSyncManager];
     [super tearDown];
 }
