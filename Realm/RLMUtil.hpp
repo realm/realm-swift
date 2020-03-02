@@ -28,6 +28,9 @@
 
 namespace realm {
     class Mixed;
+    namespace util {
+        class Any;
+    }
 }
 
 @class RLMObjectSchema;
@@ -172,6 +175,7 @@ static inline NSUInteger RLMConvertNotFound(size_t index) {
     return index == realm::not_found ? NSNotFound : index;
 }
 
+id RLMAnyToObjc(realm::util::Any const& any);
 id RLMMixedToObjc(realm::Mixed const& value);
 
 // Given a bundle identifier, return the base directory on the disk within which Realm database and support files should

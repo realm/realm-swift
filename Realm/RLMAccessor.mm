@@ -768,20 +768,24 @@ realm::Obj RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolic
     return link->_row;
 }
 
+// FIXME: Implement stub
 template<>
 realm::ObjectId RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
     REALM_UNREACHABLE();
 }
 
+// FIXME: Implement stub
 template<>
 realm::Decimal128 RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
     REALM_UNREACHABLE();
 }
 
+// FIXME: Implement stub
 id RLMAccessorContext::unbox_embedded(id, realm::CreatePolicy, realm::Obj, realm::ColKey, size_t) {
     REALM_UNREACHABLE();
 }
 
+// FIXME: Implement stub
 template<>
 realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox<realm::util::Optional<realm::ObjectId> >(id, realm::CreatePolicy, realm::ObjKey) {
     REALM_UNREACHABLE();

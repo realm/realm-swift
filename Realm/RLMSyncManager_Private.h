@@ -19,7 +19,7 @@
 #import <Realm/RLMSyncManager.h>
 
 #import "RLMSyncUtil_Private.h"
-#import "RLMNetworkClient.h"
+#import "RLMNetworkTransporting.h"
 
 @class RLMSyncUser, RLMSyncConfiguration;
 
@@ -35,6 +35,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)_fireError:(NSError *)error;
 
 - (NSArray<RLMSyncUser *> *)_allUsers;
+
+- (RLMSyncUser *)_currentUser;
 
 + (void)resetForTesting;
 

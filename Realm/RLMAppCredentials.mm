@@ -22,9 +22,7 @@
 
 using namespace realm;
 
-@interface RLMAppCredentials () {
-    
-}
+@interface RLMAppCredentials ()
 
 - (instancetype) initWithAppCredentials:(const app::AppCredentials&)credentials NS_DESIGNATED_INITIALIZER;
 
@@ -46,6 +44,7 @@ using namespace realm;
 }
 
 + (instancetype)credentialsWithGoogleToken:(RLMAppCredentialsToken)token {
+    // FIXME: Implement once available in the object store
     REALM_UNREACHABLE();
 }
 
@@ -55,6 +54,7 @@ using namespace realm;
 }
 
 + (instancetype)credentialsWithJWT:(NSString *)token {
+    // FIXME: Implement once available in the object store
     REALM_UNREACHABLE();
 }
     

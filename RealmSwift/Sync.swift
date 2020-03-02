@@ -348,28 +348,7 @@ public struct AppCredentials {
     }
 }
 
-extension RLMAppCredentials {
-//    internal convenience init(_ credentials: AppCredentials) {
-//        self.init(credentials: credentials.credentials)
-//    }
-}
-
 extension SyncUser {
-    /// A dictionary of all valid, logged-in user identities corresponding to their `SyncUser` objects.
-    public static var all: [String: SyncUser] {
-        return __allUsers()
-    }
-
-    /**
-     The logged-in user. `nil` if none exists. Only use this property if your application expects
-     no more than one logged-in user at any given time.
-
-     - warning: Throws an Objective-C exception if more than one logged-in user exists.
-     */
-    public static var current: SyncUser? {
-        return __current()
-    }
-
     /**
      An optional error handler which can be set to notify the host application when
      the user encounters an error.

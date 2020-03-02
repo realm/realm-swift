@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMNetworkClient.h"
+#import "RLMNetworkTransporting.h"
 
 #import "RLMRealmConfiguration.h"
 #import "RLMJSONModels.h"
@@ -32,21 +32,7 @@ using namespace realm;
 
 typedef void(^RLMServerURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
 
-static NSUInteger const kHTTPCodeRange = 100;
-
-typedef enum : NSUInteger {
-    Informational       = 1, // 1XX
-    Success             = 2, // 2XX
-    Redirection         = 3, // 3XX
-    ClientError         = 4, // 4XX
-    ServerError         = 5, // 5XX
-} RLMServerHTTPErrorCodeType;
-
-static NSRange rangeForErrorType(RLMServerHTTPErrorCodeType type) {
-    return NSMakeRange(type*100, kHTTPCodeRange);
-}
-
-#pragma mark Network client
+#pragma mark RLMSessionDelegate
 
 @interface RLMSessionDelegate <NSURLSessionDelegate> : NSObject
 + (instancetype)delegateWithCertificatePaths:(NSDictionary *)paths
@@ -60,17 +46,6 @@ NSString * const RLMHTTPMethod_toString[] = {
     [PATCH] = @"PATCH",
     [DELETE] = @"DELETE"
 };
-
-static NSString* errorToString(NSError *error) {
-    NSError * err;
-    NSData *errorJSON = [NSJSONSerialization dataWithJSONObject:error.userInfo options:0 error:&err];
-
-    if (!err) {
-        return [[NSString alloc] initWithData:errorJSON encoding:NSUTF8StringEncoding];
-    } else {
-        return error.domain;
-    }
-}
 
 @implementation RLMRequest
 @end
@@ -109,6 +84,8 @@ static NSString* errorToString(NSError *error) {
 }
 
 @end
+
+#pragma mark RLMSessionDelegate
 
 @implementation RLMSessionDelegate {
     NSDictionary<NSString *, NSURL *> *_certificatePaths;
@@ -243,7 +220,7 @@ didCompleteWithError:(NSError *)error
     response.httpStatusCode = httpResponse.statusCode;
 
     if (error) {
-        response.body = errorToString(error);
+        response.body = [error localizedDescription];
         return _completionBlock(response);
     }
 

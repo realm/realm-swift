@@ -16,16 +16,18 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef RLMAppCredentials_Private_hpp
-#define RLMAppCredentials_Private_hpp
+#ifndef RLMApp_Private_h
+#define RLMApp_Private_h
 
-#import "RLMAppCredentials.h"
-#import "sync/app_credentials.hpp"
+#include "RLMApp.h"
+#import "sync/app.hpp"
 
-@interface RLMAppCredentials()
+@interface RLMApp() {
+    std::shared_ptr<realm::app::App> _app;
+}
 
-@property std::shared_ptr<realm::app::AppCredentials> appCredentials;
++(NSMutableDictionary<NSString*, RLMApp*>*) apps;
 
 @end
 
-#endif /* RLMAppCredentials_Private_hpp */
+#endif /* RLMApp_Private_h */

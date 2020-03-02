@@ -369,7 +369,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 ex.fulfill()
             }
             waitForExpectations(timeout: 10.0, handler: nil)
-            user.logOut()
+            // FIXME: [realmapp] add logout
+            // user.logOut()
         }
 
         self.resetSyncManager()

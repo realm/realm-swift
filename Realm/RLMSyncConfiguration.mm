@@ -18,6 +18,7 @@
 
 #import "RLMSyncConfiguration_Private.hpp"
 
+#import "RLMApp_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncSession_Private.hpp"
@@ -280,10 +281,11 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
 }
 
 + (RLMRealmConfiguration *)automaticConfiguration {
-    if (RLMSyncUser.allUsers.count != 1)
+    RLMApp *app = [[RLMApp apps].allValues lastObject];
+    if (!app || !app.currentUser)
         @throw RLMException(@"The automatic configuration requires there be exactly one logged-in sync user.");
 
-    return [RLMSyncConfiguration automaticConfigurationForUser:RLMSyncUser.currentUser];
+    return [RLMSyncConfiguration automaticConfigurationForUser:app.currentUser];
 }
 
 + (RLMRealmConfiguration *)automaticConfigurationForUser:(RLMSyncUser *)user {

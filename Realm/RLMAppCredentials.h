@@ -28,10 +28,6 @@ typedef NSString *RLMAppCredentialsToken;
 /// A type representing the unique identifier of a Realm Object Server identity provider.
 typedef NSString *RLMIdentityProvider RLM_EXTENSIBLE_STRING_ENUM;
 
-/// The debug identity provider, which accepts any token string and creates a user associated with that token if one
-/// does not yet exist. Not enabled for Realm Object Server configured for production.
-extern RLMIdentityProvider const RLMIdentityProviderDebug;
-
 /// The username/password identity provider. User accounts are handled by the Realm Object Server directly without the
 /// involvement of a third-party identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderUsernamePassword;
@@ -42,9 +38,6 @@ extern RLMIdentityProvider const RLMIdentityProviderFacebook;
 /// A Google account as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderGoogle;
 
-/// A CloudKit account as an identity provider.
-extern RLMIdentityProvider const RLMIdentityProviderCloudKit;
-
 /// A JSON Web Token as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderJWT;
 
@@ -52,7 +45,7 @@ extern RLMIdentityProvider const RLMIdentityProviderJWT;
 extern RLMIdentityProvider const RLMIdentityProviderAnonymous;
 
 /**
- Opaque credentials representing a specific Realm Object Server user.
+ Opaque credentials representing a specific Realm App user.
  */
 @interface RLMAppCredentials : NSObject
 

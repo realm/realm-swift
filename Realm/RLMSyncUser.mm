@@ -19,7 +19,7 @@
 #import "RLMSyncUser_Private.hpp"
 
 #import "RLMJSONModels.h"
-#import "RLMNetworkClient.h"
+#import "RLMNetworkTransporting.h"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
@@ -93,22 +93,6 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
 
 @implementation RLMSyncUser
 
-#pragma mark - static API
-
-+ (NSDictionary *)allUsers {
-    NSArray *allUsers = [[RLMSyncManager sharedManager] _allUsers];
-    return [NSDictionary dictionaryWithObjects:allUsers
-                                       forKeys:[allUsers valueForKey:@"identity"]];
-}
-
-+ (RLMSyncUser *)currentUser {
-    NSArray *allUsers = [[RLMSyncManager sharedManager] _allUsers];
-    if (allUsers.count > 1 && [NSSet setWithArray:[allUsers valueForKey:@"identity"]].count > 1) {
-        @throw RLMException(@"+currentUser cannot be called if more that one valid, logged-in user exists.");
-    }
-    return allUsers.firstObject;
-}
-
 #pragma mark - API
 
 - (instancetype)initWithSyncUser:(std::shared_ptr<SyncUser>)user {
@@ -158,6 +142,20 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     }
     _user->log_out();
     context_for(_user).invalidate_all_handles();
+}
+#import "RLMAccessor.h"
+
+- (NSDictionary*)customData {
+    if (!_user || !_user->custom_data()) {
+        return @{};
+    }
+
+    NSMutableDictionary *dictionary = [NSMutableDictionary new];
+    for (auto value : *_user->custom_data()) {
+        dictionary[@(value.first.data())] = RLMAnyToObjc(value.second);
+    }
+
+    return dictionary;
 }
 
 - (void)invalidate {
@@ -233,47 +231,6 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     return [NSURL URLWithString:@(_user->server_url().c_str())];
 }
 
-#pragma mark - Passwords
-
-- (void)changePassword:(NSString *)newPassword completion:(RLMPasswordChangeStatusBlock)completion {
-    [self changePassword:newPassword forUserID:self.identity completion:completion];
-}
-
-- (void)changePassword:(NSString *)newPassword forUserID:(NSString *)userID completion:(RLMPasswordChangeStatusBlock)completion {
-    if (self.state != RLMSyncUserStateActive) {
-        completion([NSError errorWithDomain:RLMSyncErrorDomain
-                                       code:RLMSyncErrorClientSessionError
-                                   userInfo:nil]);
-        return;
-    }
-    REALM_UNREACHABLE();
-}
-
-+ (void)requestPasswordResetForAuthServer:(NSURL *)serverURL
-                                userEmail:(NSString *)email
-                               completion:(RLMPasswordChangeStatusBlock)completion {
-    REALM_UNREACHABLE();
-}
-
-+ (void)completePasswordResetForAuthServer:(NSURL *)serverURL
-                                     token:(NSString *)token
-                                  password:(NSString *)newPassword
-                                completion:(RLMPasswordChangeStatusBlock)completion {
-    REALM_UNREACHABLE();
-}
-
-+ (void)requestEmailConfirmationForAuthServer:(NSURL *)serverURL
-                                    userEmail:(NSString *)email
-                                   completion:(RLMPasswordChangeStatusBlock)completion {
-    REALM_UNREACHABLE();
-}
-
-+ (void)confirmEmailForAuthServer:(NSURL *)serverURL
-                            token:(NSString *)token
-                       completion:(RLMPasswordChangeStatusBlock)completion {
-    REALM_UNREACHABLE();
-}
-
 #pragma mark - Private API
 
 - (NSURL *)urlForPath:(nullable NSString *)path {
@@ -309,6 +266,13 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
         return nil;
     }
     return @(_user->refresh_token().c_str());
+}
+
+- (NSString *)accessToken {
+    if (!_user) {
+        return nil;
+    }
+    return @(_user->access_token().c_str());
 }
 
 - (std::shared_ptr<SyncUser>)_syncUser {

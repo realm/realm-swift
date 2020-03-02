@@ -32,69 +32,61 @@ typedef enum RLMHTTPMethod {
     GET, POST, PUT, PATCH, DELETE
 } RLMHTTPMethod;
 
+/// An HTTP request that can be made to an arbitrary server.
 @interface RLMRequest : NSObject
-/**
- * The HTTP method of this request.
- */
-@property RLMHTTPMethod method;
 
-/**
- * The URL to which this request will be made.
- */
-@property NSString* url;
+/// The HTTP method of this request.
+@property (nonatomic, assign) RLMHTTPMethod method;
 
-/**
- * The number of milliseconds that the underlying transport should spend on an HTTP round trip before failing with an
- * error.
- */
-@property NSUInteger timeoutMS;
+/// The URL to which this request will be made.
+@property (nonatomic, strong) NSString* url;
 
-/**
- * The HTTP headers of this request.
- */
-@property NSDictionary<NSString *, NSString *>* headers;
+/// The number of milliseconds that the underlying transport should spend on an
+/// HTTP round trip before failing with an error.
+@property (nonatomic, assign) NSUInteger timeoutMS;
 
-/**
- * The body of the request.
- */
-@property NSString* body;
+/// The HTTP headers of this request.
+@property (nonatomic, strong) NSDictionary<NSString *, NSString *>* headers;
+
+/// The body of the request.
+@property (nonatomic, strong) NSString* body;
 
 @end
 
+/// The contents of an HTTP response.
 @interface RLMResponse : NSObject
 
-/**
- * The status code of the HTTP response.
- */
-@property NSInteger httpStatusCode;
+/// The status code of the HTTP response.
+@property (nonatomic, assign) NSInteger httpStatusCode;
 
-/**
- * A custom status code provided by the language binding.
- */
-@property NSInteger customStatusCode;
+/// A custom status code provided by the language binding.
+@property (nonatomic, assign) NSInteger customStatusCode;
 
-/**
- * The headers of the HTTP response.
- */
-@property NSDictionary<NSString *, NSString *>* headers;
+/// The headers of the HTTP response.
+@property (nonatomic, strong) NSDictionary<NSString *, NSString *>* headers;
 
-/**
- * The body of the HTTP response.
- */
-@property NSString* body;
+/// The body of the HTTP response.
+@property (nonatomic, strong) NSString* body;
 
 @end
 
 typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
 
+/// Transporting protocol for foreign interfaces. Allows for custom
+/// request/response handling.
 @protocol RLMNetworkTransporting <NSObject>
 
+/**
+ Sends a request to a given endpoint.
+
+ @param request The request to send.
+ @param completionBlock A callback invoked on completion of the request.
+*/
 -(void) sendRequestToServer:(RLMRequest *) request
                  completion:(RLMNetworkTransportCompletionBlock)completionBlock;
 
 @end
 
-/// An abstract class representing a server endpoint.
 @interface RLMNetworkTransport : NSObject<RLMNetworkTransporting>
 
 -(void) sendRequestToServer:(RLMRequest *) request
