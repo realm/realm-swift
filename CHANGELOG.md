@@ -13,6 +13,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Primary key properties are no longer marked as being indexed. This reflects
   an internal change to how primary keys are handled that should not have any
   other visible effects. ([#6440](https://github.com/realm/realm-cocoa/pull/6440)).
+* Remove everything related to sync permissions, including both the path-based
+  permission system and the object-level privileges for query-based sync. ([#6445](https://github.com/realm/realm-cocoa/pulls/6445))
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
@@ -22,7 +24,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Internal
 * Upgraded realm-core from v6.0.3 to v10.0.0-alpha.1
-* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.1
+* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.3
 
 5.0.0-beta.3 Release notes (2020-02-26)
 =============================================================

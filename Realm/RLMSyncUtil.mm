@@ -35,7 +35,6 @@ RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
 
 NSString *const RLMSyncErrorDomain = @"io.realm.sync";
 NSString *const RLMSyncAuthErrorDomain = @"io.realm.sync.auth";
-NSString *const RLMSyncPermissionErrorDomain = @"io.realm.sync.permission";
 
 NSString *const kRLMSyncPathOfRealmBackupCopyKey            = @"recovered_realm_location_path";
 NSString *const kRLMSyncErrorActionTokenKey                 = @"error_action_token";
@@ -55,20 +54,6 @@ NSString *const kRLMSyncRegisterKey             = @"register";
 NSString *const kRLMSyncTokenKey                = @"token";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
 NSString *const kRLMSyncUserIDKey               = @"user_id";
-
-uint8_t RLMGetComputedPermissions(RLMRealm *realm, id _Nullable object) {
-    if (!object) {
-        return static_cast<unsigned char>(realm->_realm->get_privileges());
-    }
-    if ([object isKindOfClass:[NSString class]]) {
-        return static_cast<unsigned char>(realm->_realm->get_privileges([object UTF8String]));
-    }
-    if (auto obj = RLMDynamicCast<RLMObjectBase>(object)) {
-        RLMVerifyAttached(obj);
-        return static_cast<unsigned char>(realm->_realm->get_privileges(obj->_row));
-    }
-    return 0;
-}
 
 #pragma mark - C++ APIs
 

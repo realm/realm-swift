@@ -20,9 +20,8 @@
 
 #import "RLMRealmConfiguration.h"
 #import "RLMSyncCredentials.h"
-#import "RLMSyncPermission.h"
 
-@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncPermission, RLMSyncSession, RLMRealm, RLMSyncPermissionOffer;
+@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncSession, RLMRealm;
 
 /**
  The state of the user object.
@@ -42,24 +41,6 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
 /// A block type used to report the status of a password change operation.
 /// If the `NSError` argument is nil, the operation succeeded.
 typedef void(^RLMPasswordChangeStatusBlock)(NSError * _Nullable);
-
-/// A block type used to report the status of a permission apply or revoke operation.
-/// If the `NSError` argument is nil, the operation succeeded.
-typedef void(^RLMPermissionStatusBlock)(NSError * _Nullable);
-
-/// A block type used to report the status of a permission offer operation.
-typedef void(^RLMPermissionOfferStatusBlock)(NSString * _Nullable, NSError * _Nullable);
-
-/// A block type used to report the status of a permission offer response operation.
-typedef void(^RLMPermissionOfferResponseStatusBlock)(NSURL * _Nullable, NSError * _Nullable);
-
-/// A block type used to asynchronously report results of a permissions get operation.
-/// Exactly one of the two arguments will be populated.
-typedef void(^RLMPermissionResultsBlock)(NSArray<RLMSyncPermission *> * _Nullable, NSError * _Nullable);
-
-/// A block type used to asynchronously report results of a permission offerss get operation.
-/// Exactly one of the two arguments will be populated.
-typedef void(^RLMPermissionOfferResultsBlock)(NSArray<RLMSyncPermissionOffer *> * _Nullable, NSError * _Nullable);
 
 /// A block type used to asynchronously report results of a user info retrieval.
 /// Exactly one of the two arguments will be populated.
@@ -328,96 +309,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)retrieveInfoForUser:(NSString *)providerUserIdentity
            identityProvider:(RLMIdentityProvider)provider
                  completion:(RLMRetrieveUserBlock)completion;
-
-#pragma mark - Permissions
-
-/**
- Asynchronously retrieve all permissions associated with the user calling this method.
-
- The results will be returned through the callback block, or an error if the operation failed.
- The callback block will be run on a background thread and not the calling thread.
- */
-- (void)retrievePermissionsWithCallback:(RLMPermissionResultsBlock)callback;
-
-/**
- Apply a given permission.
-
- The operation will take place asynchronously, and the callback will be used to report whether
- the permission change succeeded or failed. The user calling this method must have the right
- to grant the given permission, or else the operation will fail.
-
- @see `RLMSyncPermission`
- */
-- (void)applyPermission:(RLMSyncPermission *)permission callback:(RLMPermissionStatusBlock)callback;
-
-/**
- Create a permission offer for a Realm.
-
- A permission offer is used to grant access to a Realm this user manages to another
- user. Creating a permission offer produces a string token which can be passed to the
- recepient in any suitable way (for example, via e-mail).
-
- The operation will take place asynchronously. The token can be accepted by the recepient
- using the `-[RLMSyncUser acceptOfferForToken:callback:]` method.
-
- @param url             The URL of the Realm for which the permission offer should pertain. This
-                        may be the URL of any Realm which this user is allowed to manage. If the URL
-                        has a `~` wildcard it will be replaced with this user's user identity.
- @param accessLevel     What access level to grant to whoever accepts the token.
- @param expirationDate  Optionally, a date which indicates when the offer expires. If the
-                        recepient attempts to accept the offer after the date it will be rejected.
- @param callback        A callback indicating whether the operation succeeded or failed. If it
-                        succeeded the token will be passed in as a string.
-
- @see `acceptOfferForToken:callback:`
- */
-- (void)createOfferForRealmAtURL:(NSURL *)url
-                     accessLevel:(RLMSyncAccessLevel)accessLevel
-                      expiration:(nullable NSDate *)expirationDate
-                        callback:(RLMPermissionOfferStatusBlock)callback NS_REFINED_FOR_SWIFT;
-
-/**
- Accept a permission offer.
-
- Pass in a token representing a permission offer. The operation will take place asynchronously.
- If the operation succeeds, the callback will be passed the URL of the Realm for which the
- offer applied, so the Realm can be opened.
-
- The token this method accepts can be created by the offering user through the
- `-[RLMSyncUser createOfferForRealmAtURL:accessLevel:expiration:callback:]` method.
-
- @see `createOfferForRealmAtURL:accessLevel:expiration:callback:`
- */
-- (void)acceptOfferForToken:(NSString *)token
-                   callback:(RLMPermissionOfferResponseStatusBlock)callback;
-
-/**
- Revoke a permission offer.
-
- Pass in a token representing a permission offer which was created by this
- user. The operation will take place asynchronously. If the operation succeeds,
- the callback will be passed the URL of the Realm for which the offer was
- revoked. After this operation completes, the token can no longer be accepted
- by the recipient.
-
- @see `createOfferForRealmAtURL:accessLevel:expiration:callback:`
- */
-- (void)invalidateOfferForToken:(NSString *)token
-                       callback:(RLMPermissionStatusBlock)callback;
-
-/**
- Asynchronously retrieve all pending permission offers created by the calling user.
-
- The results will be returned through the callback block, or an error if the operation failed.
- The callback block will be run on a background thread and not the calling thread.
- */
-- (void)retrievePermissionOffersWithCallback:(RLMPermissionOfferResultsBlock)callback;
-
-/// :nodoc:
-- (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));
-/// :nodoc:
-+ (instancetype)new __attribute__((unavailable("RLMSyncUser cannot be created directly")));
-
 @end
 
 #pragma mark - User info classes
