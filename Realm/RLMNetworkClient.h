@@ -49,17 +49,4 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMSyncGetUserInfoEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
 @end
 
-@interface RLMSyncGetPermissionsEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
-@end
-@interface RLMSyncGetPermissionOffersEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
-@end
-@interface RLMSyncApplyPermissionsEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
-@end
-@interface RLMSyncOfferPermissionsEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
-@end
-@interface RLMSyncAcceptPermissionOfferEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
-@end
-@interface RLMSyncInvalidatePermissionOfferEndpoint : RLMSyncServerEndpoint RLM_SYNC_UNINITIALIZABLE
-@end
-
 NS_ASSUME_NONNULL_END

@@ -318,8 +318,6 @@ didCompleteWithError:(NSError *)error
                 case RLMSyncAuthErrorUserAlreadyExists:
                 case RLMSyncAuthErrorAccessDeniedOrInvalidPath:
                 case RLMSyncAuthErrorInvalidAccessToken:
-                case RLMSyncAuthErrorExpiredPermissionOffer:
-                case RLMSyncAuthErrorAmbiguousPermissionOffer:
                 case RLMSyncAuthErrorFileCannotBeShared:
                     return make_auth_error(responseModel);
                 default:
@@ -400,50 +398,5 @@ didCompleteWithError:(NSError *)error
 
 + (NSData *)httpBodyForPayload:(__unused NSDictionary *)json error:(__unused NSError **)error {
     return nil;
-}
-@end
-
-@implementation RLMSyncGetPermissionsEndpoint
-+ (NSString *)httpMethod {
-    return @"GET";
-}
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"permissions"];
-}
-@end
-
-@implementation RLMSyncGetPermissionOffersEndpoint
-+ (NSString *)httpMethod {
-    return @"GET";
-}
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"permissions/offers"];
-}
-@end
-
-@implementation RLMSyncApplyPermissionsEndpoint
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"permissions/apply"];
-}
-@end
-
-@implementation RLMSyncOfferPermissionsEndpoint
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(__unused NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:@"permissions/offers"];
-}
-@end
-
-@implementation RLMSyncAcceptPermissionOfferEndpoint
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"permissions/offers/%@/accept", json[@"offerToken"]]];
-}
-@end
-
-@implementation RLMSyncInvalidatePermissionOfferEndpoint
-+ (NSString *)httpMethod {
-    return @"DELETE";
-}
-+ (NSURL *)urlForAuthServer:(NSURL *)authServerURL payload:(NSDictionary *)json {
-    return [authServerURL URLByAppendingPathComponent:[NSString stringWithFormat:@"permissions/offers/%@", json[@"offerToken"]]];
 }
 @end

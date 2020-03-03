@@ -774,6 +774,11 @@ realm::ObjectId RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePo
 }
 
 template<>
+realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
+
+template<>
 realm::Decimal128 RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
     REALM_UNREACHABLE();
 }
