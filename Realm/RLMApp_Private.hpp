@@ -22,12 +22,6 @@
 #include "RLMApp.h"
 #import "sync/app.hpp"
 
-@interface RLMApp() {
-    std::shared_ptr<realm::app::App> _app;
-}
-
-+(NSMutableDictionary<NSString*, RLMApp*>*) apps;
-
-@end
+static NSMutableDictionary<NSString *, RLMApp *>* apps= [NSMutableDictionary new];
 
 #endif /* RLMApp_Private_h */

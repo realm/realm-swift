@@ -391,25 +391,6 @@ BOOL RLMIsRunningInPlayground() {
     return [[NSBundle mainBundle].bundleIdentifier hasPrefix:@"com.apple.dt.playground."];
 }
 
-std::map<size_t, id(^)(realm::util::Any const&)> cppToObjC_Mappings = {
-    {
-
-        typeid(std::string).hash_code(), ^(realm::util::Any const& any) {
-            NSString *value = @(realm::util::any_cast<std::string>(any).data());
-            return value;
-        }
-    },
-    {
-        typeid(int).hash_code(), ^(realm::util::Any const& any) {
-            return @(realm::util::any_cast<int>(any));
-        }
-    }
-};
-
-id RLMAnyToObjc(realm::util::Any const& any) {
-    return cppToObjC_Mappings[any.type().hash_code()](any);
-}
-
 id RLMMixedToObjc(realm::Mixed const& mixed) {
     switch (mixed.get_type()) {
         case realm::type_String:

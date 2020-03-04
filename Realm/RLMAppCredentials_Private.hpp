@@ -24,7 +24,7 @@
 
 @interface RLMAppCredentials()
 
-@property std::shared_ptr<realm::app::AppCredentials> appCredentials;
+@property (nonatomic) realm::app::AppCredentials& appCredentials;
 
 @end
 

@@ -16,10 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMNetworkTransporting.h"
+#import "RLMNetworkTransport.h"
 
-#ifndef RLMApp_h
-#define RLMApp_h
+NS_ASSUME_NONNULL_BEGIN
 
 @class RLMSyncUser, RLMAppCredentials;
 
@@ -33,30 +32,30 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
 @interface RLMAppConfiguration : NSObject
 
 /// A custom base URL to request against.
-@property (nonatomic, strong) NSString* _Nullable baseURL;
+@property (nonatomic, strong, nullable) NSString* baseURL;
 
 /// A transport for customizing network handling.
-@property (nonatomic, strong) id <RLMNetworkTransporting> _Nullable transport;
+@property (nonatomic, strong, nullable) id <RLMNetworkTransport> transport;
 
 /// A custom app name.
-@property (nonatomic, strong) NSString* _Nullable localAppName;
+@property (nonatomic, strong, nullable) NSString *localAppName;
 
 /// A custom app version.
-@property (nonatomic, strong) NSString* _Nullable localAppVersion;
+@property (nonatomic, strong, nullable) NSString *localAppVersion;
 
 /// The default timeout for network requests.
 @property (nonatomic, assign) NSUInteger defaultRequestTimeoutMS;
 
--(instancetype _Nonnull) initWithBaseURL:(NSString* _Nullable) baseURL
-                               transport:(id<RLMNetworkTransporting> _Nullable)transport
-                            localAppName:(NSString* _Nullable) localAppName
-                         localAppVersion:(NSString* _Nullable)localAppVersion;
+- (instancetype)initWithBaseURL:(nullable NSString *)baseURL
+                      transport:(nullable id<RLMNetworkTransport>)transport
+                   localAppName:(nullable NSString *) localAppName
+                localAppVersion:(nullable NSString *)localAppVersion;
 
--(instancetype _Nonnull) initWithBaseURL:(NSString* _Nullable) baseURL
-                               transport:(id<RLMNetworkTransporting> _Nullable)transport
-                            localAppName:(NSString* _Nullable) localAppName
-                         localAppVersion:(NSString* _Nullable)localAppVersion
-                 defaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS;
+- (instancetype)initWithBaseURL:(nullable NSString *) baseURL
+                      transport:(nullable id<RLMNetworkTransport>)transport
+                   localAppName:(nullable NSString *) localAppName
+                localAppVersion:(nullable NSString *)localAppVersion
+        defaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS;
 
 @end
 
@@ -67,7 +66,7 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
  application backend.
 
  This interface provides access to login and authentication.
-*/
+ */
 @interface RLMApp : NSObject
 
 /**
@@ -76,12 +75,12 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
  @param appId The unique identifier of your Realm app.
  @param configuration A configuration object to configure this client.
  */
-+(_Nonnull instancetype) app:(NSString * _Nonnull) appId
-               configuration:(RLMAppConfiguration * _Nullable)configuration;
++ (instancetype)app:(NSString *) appId
+      configuration:(nullable RLMAppConfiguration *)configuration;
 
-- (NSDictionary * _Nonnull)allUsers;
+- (NSDictionary<NSString *, RLMSyncUser *> *)allUsers;
 
-- (RLMSyncUser * _Nullable)currentUser;
+- (nullable RLMSyncUser *)currentUser;
 
 /**
  Login to a user for the Realm app.
@@ -89,9 +88,9 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
  @param credentials The credentials identifying the user.
  @param completionHandler A callback invoked after completion.
  */
--(void) loginWithCredential:(RLMAppCredentials * _Nonnull)credentials
-          completionHandler:(RLMUserCompletionBlock _Nonnull)completionHandler;
+- (void)loginWithCredential:(RLMAppCredentials *)credentials
+          completionHandler:(RLMUserCompletionBlock)completionHandler;
 
 @end
 
-#endif /* RLMApp_h */
+NS_ASSUME_NONNULL_END

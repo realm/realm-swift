@@ -19,7 +19,7 @@
 #import <Realm/RLMSyncManager.h>
 
 #import "RLMSyncUtil_Private.h"
-#import "RLMNetworkTransporting.h"
+#import "RLMNetworkTransport.h"
 
 @class RLMSyncUser, RLMSyncConfiguration;
 

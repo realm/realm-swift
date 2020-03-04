@@ -67,10 +67,6 @@ static NSString *nodePath() {
 @property (nonatomic) NSTask *task;
 @end
 
-@interface RLMAppCredentials ()
-+ (instancetype)credentialsWithDebugUserID:(NSString *)userID isAdmin:(BOOL)isAdmin;
-@end
-
 @interface RLMSyncSession ()
 - (BOOL)waitForUploadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback;
 - (BOOL)waitForDownloadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback;
@@ -384,11 +380,6 @@ static NSURL *syncDirectoryForChildProcess() {
     XCTAssertTrue(theUser.state == RLMSyncUserStateActive,
                   @"User should have been valid, but wasn't. (process: %@)", process);
     return theUser;
-}
-
-- (RLMSyncUser *)createAdminUserForURL:(NSURL *)url username:(NSString *)username {
-    return [self logInUserForCredentials:[RLMAppCredentials credentialsWithDebugUserID:username isAdmin:YES]
-                                  server:url];
 }
 
 - (NSString *)adminToken {

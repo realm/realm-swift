@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2020 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,9 +28,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy) NSDictionary<NSString *, NSURL *> *pinnedCertificatePaths;
 @end
 
-typedef enum RLMHTTPMethod {
-    GET, POST, PUT, PATCH, DELETE
-} RLMHTTPMethod;
+typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
+    RLMHTTPMethodGET    = 0,
+    RLMHTTPMethodPOST   = 1,
+    RLMHTTPMethodPUT    = 2,
+    RLMHTTPMethodPATCH  = 3,
+    RLMHTTPMethodDELETE = 4
+};
 
 /// An HTTP request that can be made to an arbitrary server.
 @interface RLMRequest : NSObject
@@ -39,11 +43,11 @@ typedef enum RLMHTTPMethod {
 @property (nonatomic, assign) RLMHTTPMethod method;
 
 /// The URL to which this request will be made.
-@property (nonatomic, strong) NSString* url;
+@property (nonatomic, strong) NSString *url;
 
 /// The number of milliseconds that the underlying transport should spend on an
 /// HTTP round trip before failing with an error.
-@property (nonatomic, assign) NSUInteger timeoutMS;
+@property (nonatomic, assign) NSTimeInterval timeout;
 
 /// The HTTP headers of this request.
 @property (nonatomic, strong) NSDictionary<NSString *, NSString *>* headers;
@@ -66,7 +70,7 @@ typedef enum RLMHTTPMethod {
 @property (nonatomic, strong) NSDictionary<NSString *, NSString *>* headers;
 
 /// The body of the HTTP response.
-@property (nonatomic, strong) NSString* body;
+@property (nonatomic, strong) NSString *body;
 
 @end
 
@@ -74,7 +78,7 @@ typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
 
 /// Transporting protocol for foreign interfaces. Allows for custom
 /// request/response handling.
-@protocol RLMNetworkTransporting <NSObject>
+@protocol RLMNetworkTransport <NSObject>
 
 /**
  Sends a request to a given endpoint.
@@ -82,14 +86,14 @@ typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
  @param request The request to send.
  @param completionBlock A callback invoked on completion of the request.
 */
--(void) sendRequestToServer:(RLMRequest *) request
+- (void)sendRequestToServer:(RLMRequest *) request
                  completion:(RLMNetworkTransportCompletionBlock)completionBlock;
 
 @end
 
-@interface RLMNetworkTransport : NSObject<RLMNetworkTransporting>
+@interface RLMNetworkTransport : NSObject<RLMNetworkTransport>
 
--(void) sendRequestToServer:(RLMRequest *) request
+- (void)sendRequestToServer:(RLMRequest *) request
                  completion:(RLMNetworkTransportCompletionBlock)completionBlock;
 
 @end

@@ -19,7 +19,7 @@
 #import "RLMSyncSessionRefreshHandle.hpp"
 
 #import "RLMJSONModels.h"
-#import "RLMNetworkTransporting.h"
+#import "RLMNetworkTransport.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"

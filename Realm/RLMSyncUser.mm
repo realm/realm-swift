@@ -19,7 +19,7 @@
 #import "RLMSyncUser_Private.hpp"
 
 #import "RLMJSONModels.h"
-#import "RLMNetworkTransporting.h"
+#import "RLMNetworkTransport.h"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
@@ -142,20 +142,6 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     }
     _user->log_out();
     context_for(_user).invalidate_all_handles();
-}
-#import "RLMAccessor.h"
-
-- (NSDictionary*)customData {
-    if (!_user || !_user->custom_data()) {
-        return @{};
-    }
-
-    NSMutableDictionary *dictionary = [NSMutableDictionary new];
-    for (auto value : *_user->custom_data()) {
-        dictionary[@(value.first.data())] = RLMAnyToObjc(value.second);
-    }
-
-    return dictionary;
 }
 
 - (void)invalidate {

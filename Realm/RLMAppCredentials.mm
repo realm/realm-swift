@@ -32,7 +32,7 @@ using namespace realm;
 
 - (instancetype)initWithAppCredentials:(const app::AppCredentials&)credentials {
     if (self = [super init]) {
-        self->_appCredentials = std::make_shared<app::AppCredentials>(credentials);
+        _appCredentials = std::move(credentials);
         self.provider = @(credentials.provider_as_string().data());
         return self;
     }
@@ -68,7 +68,7 @@ using namespace realm;
     }
     RLMAppCredentials *that = (RLMAppCredentials *)object;
     return ([self.provider isEqualToString:that.provider]
-            && self.appCredentials->serialize_as_json() == that.appCredentials->serialize_as_json());
+            && self.appCredentials.serialize_as_json() == that.appCredentials.serialize_as_json());
 }
 
 @end

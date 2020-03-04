@@ -71,7 +71,7 @@ typedef void(^RLMUserErrorReportingBlock)(RLMSyncUser * _Nonnull, NSError * _Non
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A `RLMSyncUser` instance represents a single Realm Object Server user account.
+ A `RLMSyncUser` instance represents a single Realm App user account.
 
  A user may have one or more credentials associated with it. These credentials
  uniquely identify the user to the authentication provider, and are used to sign
@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The user's refresh token used to access the Realm Applcation.
 
- This is required to make HTTP requests to Realm Object Server's REST API
+ This is required to make HTTP requests to the Realm App's REST API
  for functionality not exposed natively. It should be treated as sensitive data.
  */
 @property (nullable, nonatomic, readonly) NSString *refreshToken;

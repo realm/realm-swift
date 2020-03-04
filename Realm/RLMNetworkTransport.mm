@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2020 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMNetworkTransporting.h"
+#import "RLMNetworkTransport.h"
 
 #import "RLMRealmConfiguration.h"
 #import "RLMJSONModels.h"
@@ -39,12 +39,12 @@ typedef void(^RLMServerURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSE
                                   completion:(RLMNetworkTransportCompletionBlock)completion;
 @end
 
-NSString * const RLMHTTPMethod_toString[] = {
-    [GET] = @"GET",
-    [POST] = @"POST",
-    [PUT] = @"PUT",
-    [PATCH] = @"PATCH",
-    [DELETE] = @"DELETE"
+NSString * const RLMHTTPMethodToNSString[] = {
+    [RLMHTTPMethodGET] = @"GET",
+    [RLMHTTPMethodPOST] = @"POST",
+    [RLMHTTPMethodPUT] = @"PUT",
+    [RLMHTTPMethodPATCH] = @"PATCH",
+    [RLMHTTPMethodDELETE] = @"DELETE"
 };
 
 @implementation RLMRequest
@@ -55,16 +55,16 @@ NSString * const RLMHTTPMethod_toString[] = {
 
 @implementation RLMNetworkTransport
 
--(void) sendRequestToServer:(RLMRequest *) request
+- (void)sendRequestToServer:(RLMRequest *) request
                  completion:(RLMNetworkTransportCompletionBlock)completionBlock; {
     // Create the request
     NSURL *requestURL = [[NSURL alloc] initWithString: request.url];
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:requestURL];
-    urlRequest.HTTPMethod = RLMHTTPMethod_toString[request.method];
+    urlRequest.HTTPMethod = RLMHTTPMethodToNSString[request.method];
     if (![urlRequest.HTTPMethod isEqualToString:@"GET"]) {
         urlRequest.HTTPBody = [request.body dataUsingEncoding:NSUTF8StringEncoding];
     }
-    urlRequest.timeoutInterval = request.timeoutMS / 1000;
+    urlRequest.timeoutInterval = request.timeout;
 
     RLMSyncManager *syncManager = RLMSyncManager.sharedManager;
     RLMNetworkRequestOptions *options = syncManager.networkRequestOptions;
@@ -101,7 +101,8 @@ NSString * const RLMHTTPMethod_toString[] = {
     return delegate;
 }
 
-- (void)URLSession:(__unused NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+- (void)URLSession:(__unused NSURLSession *)session
+didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
  completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler {
     auto protectionSpace = challenge.protectionSpace;
 

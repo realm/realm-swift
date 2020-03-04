@@ -281,7 +281,7 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
 }
 
 + (RLMRealmConfiguration *)automaticConfiguration {
-    RLMApp *app = [[RLMApp apps].allValues lastObject];
+    RLMApp *app = [apps.allValues lastObject];
     if (!app || !app.currentUser)
         @throw RLMException(@"The automatic configuration requires there be exactly one logged-in sync user.");
 
