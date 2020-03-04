@@ -63,7 +63,7 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
 /// The status code of the HTTP response.
 @property (nonatomic, assign) NSInteger httpStatusCode;
 
-/// A custom status code provided by the language binding.
+/// A custom status code provided by the SDK.
 @property (nonatomic, assign) NSInteger customStatusCode;
 
 /// The headers of the HTTP response.
