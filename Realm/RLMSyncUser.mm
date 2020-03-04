@@ -27,7 +27,6 @@
 #import "RLMSyncConfiguration.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.h"
-#import "RLMSyncPermission.h"
 #import "RLMSyncSessionRefreshHandle.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"

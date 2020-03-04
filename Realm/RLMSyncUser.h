@@ -20,9 +20,8 @@
 
 #import "RLMRealmConfiguration.h"
 #import "RLMAppCredentials.h"
-#import "RLMSyncPermission.h"
 
-@class RLMSyncUser, RLMSyncUserInfo, RLMAppCredentials, RLMSyncPermission, RLMSyncSession, RLMRealm, RLMSyncPermissionOffer;
+@class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncSession, RLMRealm;
 
 /**
  The state of the user object.
@@ -42,24 +41,6 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
 /// A block type used to report the status of a password change operation.
 /// If the `NSError` argument is nil, the operation succeeded.
 typedef void(^RLMPasswordChangeStatusBlock)(NSError * _Nullable);
-
-/// A block type used to report the status of a permission apply or revoke operation.
-/// If the `NSError` argument is nil, the operation succeeded.
-typedef void(^RLMPermissionStatusBlock)(NSError * _Nullable);
-
-/// A block type used to report the status of a permission offer operation.
-typedef void(^RLMPermissionOfferStatusBlock)(NSString * _Nullable, NSError * _Nullable);
-
-/// A block type used to report the status of a permission offer response operation.
-typedef void(^RLMPermissionOfferResponseStatusBlock)(NSURL * _Nullable, NSError * _Nullable);
-
-/// A block type used to asynchronously report results of a permissions get operation.
-/// Exactly one of the two arguments will be populated.
-typedef void(^RLMPermissionResultsBlock)(NSArray<RLMSyncPermission *> * _Nullable, NSError * _Nullable);
-
-/// A block type used to asynchronously report results of a permission offerss get operation.
-/// Exactly one of the two arguments will be populated.
-typedef void(^RLMPermissionOfferResultsBlock)(NSArray<RLMSyncPermissionOffer *> * _Nullable, NSError * _Nullable);
 
 /// A block type used to asynchronously report results of a user info retrieval.
 /// Exactly one of the two arguments will be populated.
@@ -103,11 +84,6 @@ NS_ASSUME_NONNULL_BEGIN
  for functionality not exposed natively. It should be treated as sensitive data.
  */
 @property (nullable, nonatomic, readonly) NSString *accessToken;
-
-/**
- The URL of the authentication server this user will communicate with.
- */
-@property (nullable, nonatomic, readonly) NSURL *authenticationServer;
 
 /**
  The current state of the user.

@@ -7,7 +7,14 @@ x.y.z Release notes (yyyy-MM-dd)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+* Remove support for Query-based sync, including the configuration parameters
+  and the `RLMSyncSubscription` and `SyncSubscription` types ([#6437](https://github.com/realm/realm-cocoa/pull/6437)).
+* Primary key properties are no longer marked as being indexed. This reflects
+  an internal change to how primary keys are handled that should not have any
+  other visible effects. ([#6440](https://github.com/realm/realm-cocoa/pull/6440)).
+* Remove everything related to sync permissions, including both the path-based
+  permission system and the object-level privileges for query-based sync. ([#6445](https://github.com/realm/realm-cocoa/pulls/6445))
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
@@ -16,21 +23,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.3.
 
 ### Internal
-Upgraded realm-core from ? to ?
-Upgraded realm-sync from ? to ?
-
-10.0.0-alpha.1 Release notes (2020-02-28)
-=============================================================
-
-### Breaking Changes
-
-* Remove all references to SyncSubscription
-* Remove differentiators between full and partial sync
-
-### Internal
-
 * Upgraded realm-core from v6.0.3 to v10.0.0-alpha.1
-* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.1
+* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.3
 
 5.0.0-beta.3 Release notes (2020-02-26)
 =============================================================

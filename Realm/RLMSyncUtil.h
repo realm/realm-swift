@@ -43,12 +43,6 @@ extern NSString *const RLMSyncErrorDomain;
 extern NSString *const RLMSyncAuthErrorDomain;
 
 /**
- The error domain string for all SDK errors related to the permissions
- system and APIs.
- */
-extern NSString *const RLMSyncPermissionErrorDomain;
-
-/**
  An error related to a problem that might be reported by the synchronization manager
  error handler, or a callback on a sync-related API that performs asynchronous work.
  */
@@ -177,12 +171,6 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncAuthError, RLMSyncAuthErrorDomain) {
 
     /// An error that indicates the refresh token was invalid.
     RLMSyncAuthErrorInvalidAccessToken              = 615,
-
-    /// An error that indicates the permission offer is expired.
-    RLMSyncAuthErrorExpiredPermissionOffer          = 701,
-
-    /// An error that indicates the permission offer is ambiguous.
-    RLMSyncAuthErrorAmbiguousPermissionOffer        = 702,
 
     /// An error that indicates the file at the given path can't be shared.
     RLMSyncAuthErrorFileCannotBeShared              = 703,

@@ -118,8 +118,6 @@
                                                      server:[RLMSyncTestCase authServerURL]];
     // Two users created with the same credential should resolve to the same actual user.
     XCTAssertTrue([firstUser.identity isEqualToString:secondUser.identity]);
-    // Authentication server property should be properly set.
-    XCTAssertEqualObjects(firstUser.authenticationServer, [RLMSyncTestCase authServerURL]);
 }
 
 /// An invalid username/password credential should not be able to log in a user and a corresponding error should be generated.

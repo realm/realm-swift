@@ -776,6 +776,11 @@ realm::ObjectId RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePo
 
 // FIXME: Implement stub
 template<>
+realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
+    REALM_UNREACHABLE();
+}
+
+template<>
 realm::Decimal128 RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
     REALM_UNREACHABLE();
 }
@@ -784,13 +789,6 @@ realm::Decimal128 RLMAccessorContext::unbox(__unsafe_unretained id const, Create
 id RLMAccessorContext::unbox_embedded(id, realm::CreatePolicy, realm::Obj, realm::ColKey, size_t) {
     REALM_UNREACHABLE();
 }
-
-// FIXME: Implement stub
-template<>
-realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox<realm::util::Optional<realm::ObjectId> >(id, realm::CreatePolicy, realm::ObjKey) {
-    REALM_UNREACHABLE();
-}
-
 
 void RLMAccessorContext::will_change(realm::Obj const& row, realm::Property const& prop) {
     _observationInfo = RLMGetObservationInfo(nullptr, row.get_key(), _info);
@@ -841,7 +839,7 @@ bool RLMAccessorContext::is_same_list(realm::List const& list, __unsafe_unretain
 }
 
 bool RLMAccessorContext::is_embedded() {
-    REALM_UNREACHABLE();
+    return false;
 }
 
 #pragma clang diagnostic push
