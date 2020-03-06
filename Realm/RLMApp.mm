@@ -107,22 +107,22 @@ namespace {
 - (instancetype)initWithAppId:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
     if (self = [super init]) {
         app::App::Config boundConfiguration = {
-            .app_id = [appId cStringUsingEncoding:NSUTF8StringEncoding]
+            .app_id = appId.UTF8String
         };
         boundConfiguration.transport_generator = [configuration]{
             return std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
         };
         if (configuration) {
             if (configuration.baseURL) {
-                boundConfiguration.base_url = util::Optional<std::string>([configuration.baseURL cStringUsingEncoding:NSUTF8StringEncoding]);
+                boundConfiguration.base_url = util::Optional<std::string>(configuration.baseURL.UTF8String);
             }
             if (configuration.transport) {
                 boundConfiguration.transport_generator = [configuration]{
                     return std::make_unique<CocoaNetworkTransport>(configuration.transport);
                 };
             }
-            boundConfiguration.local_app_name = std::string([configuration.localAppName cStringUsingEncoding:NSUTF8StringEncoding]);
-            boundConfiguration.local_app_version = std::string([configuration.localAppVersion cStringUsingEncoding:NSUTF8StringEncoding]);
+            boundConfiguration.local_app_name = std::string(configuration.localAppName.UTF8String);
+            boundConfiguration.local_app_version = std::string(configuration.localAppVersion.UTF8String);
             boundConfiguration.default_request_timeout_ms = (uint64_t)configuration.defaultRequestTimeoutMS;
         }
         _app = realm::app::App(boundConfiguration);
@@ -149,7 +149,7 @@ namespace {
 /**
  Convert an object store AppError to an NSError.
  */
-static NSError* RLMAppErrorToNSError(const app::AppError& appError) {
+static NSError* AppErrorToNSError(const app::AppError& appError) {
     return [[NSError alloc] initWithDomain:@(appError.error_code.category().name())
                                       code:appError.error_code.value()
                                   userInfo:@{
@@ -161,7 +161,7 @@ static NSError* RLMAppErrorToNSError(const app::AppError& appError) {
           completionHandler:(RLMUserCompletionBlock)completionHandler {
     _app.login_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
-            return completionHandler(nil, RLMAppErrorToNSError(*error));
+            return completionHandler(nil, AppErrorToNSError(*error));
         }
 
         completionHandler([[RLMSyncUser alloc] initWithSyncUser:user], nil);

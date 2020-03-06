@@ -17,8 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-
-#import "RLMSyncUtil_Private.h"
+#import "RLMConstants.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

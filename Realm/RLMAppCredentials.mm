@@ -40,7 +40,7 @@ using namespace realm;
 }
 
 + (instancetype)credentialsWithFacebookToken:(RLMAppCredentialsToken)token {
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::facebook([token cStringUsingEncoding: NSUTF8StringEncoding])];
+    return [[self alloc] initWithAppCredentials: app::AppCredentials::facebook(token.UTF8String)];
 }
 
 + (instancetype)credentialsWithGoogleToken:(RLMAppCredentialsToken)token {
@@ -50,7 +50,8 @@ using namespace realm;
 
 + (instancetype)credentialsWithUsername:(NSString *)username
                                password:(NSString *)password {
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::username_password([username cStringUsingEncoding: NSUTF8StringEncoding], [password cStringUsingEncoding: NSUTF8StringEncoding])];
+    return [[self alloc] initWithAppCredentials: app::AppCredentials::username_password(username.UTF8String,
+                                                                                        password.UTF8String)];
 }
 
 + (instancetype)credentialsWithJWT:(NSString *)token {
