@@ -52,7 +52,7 @@ OTHER_SWIFT_FLAGS = $(REALM_CATALYST_FLAGS);
 
 OTHER_CPLUSPLUSFLAGS = $(inherited) -isystem core/include -isystem Realm/ObjectStore/external/json;
 HEADER_SEARCH_PATHS = $(inherited) Realm/ObjectStore/src;
-SYSTEM_HEADER_SEARCH_PATHS = $(SRCROOT)/Realm/ObjectStore/external/json;
+
 CODE_SIGN_IDENTITY[sdk=iphone*] = iPhone Developer;
 CODE_SIGNING_REQUIRED[sdk=macosx] = NO;
 
