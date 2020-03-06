@@ -19,7 +19,7 @@
 #import "RLMSyncUser_Private.hpp"
 
 #import "RLMJSONModels.h"
-#import "RLMNetworkClient.h"
+#import "RLMNetworkTransport.h"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
@@ -91,22 +91,6 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
 @end
 
 @implementation RLMSyncUser
-
-#pragma mark - static API
-
-+ (NSDictionary *)allUsers {
-    NSArray *allUsers = [[RLMSyncManager sharedManager] _allUsers];
-    return [NSDictionary dictionaryWithObjects:allUsers
-                                       forKeys:[allUsers valueForKey:@"identity"]];
-}
-
-+ (RLMSyncUser *)currentUser {
-    NSArray *allUsers = [[RLMSyncManager sharedManager] _allUsers];
-    if (allUsers.count > 1 && [NSSet setWithArray:[allUsers valueForKey:@"identity"]].count > 1) {
-        @throw RLMException(@"+currentUser cannot be called if more that one valid, logged-in user exists.");
-    }
-    return allUsers.firstObject;
-}
 
 #pragma mark - API
 
@@ -232,85 +216,6 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     return [NSURL URLWithString:@(_user->server_url().c_str())];
 }
 
-#pragma mark - Passwords
-
-- (void)changePassword:(NSString *)newPassword completion:(RLMPasswordChangeStatusBlock)completion {
-    [self changePassword:newPassword forUserID:self.identity completion:completion];
-}
-
-- (void)changePassword:(NSString *)newPassword forUserID:(NSString *)userID completion:(RLMPasswordChangeStatusBlock)completion {
-    if (self.state != RLMSyncUserStateActive) {
-        completion([NSError errorWithDomain:RLMSyncErrorDomain
-                                       code:RLMSyncErrorClientSessionError
-                                   userInfo:nil]);
-        return;
-    }
-    [RLMSyncChangePasswordEndpoint sendRequestToServer:self.authenticationServer
-                                       JSON:@{kRLMSyncTokenKey: self.refreshToken,
-                                              kRLMSyncUserIDKey: userID,
-                                              kRLMSyncDataKey: @{kRLMSyncNewPasswordKey: newPassword}}
-                                 completion:completion];
-}
-
-+ (void)requestPasswordResetForAuthServer:(NSURL *)serverURL
-                                userEmail:(NSString *)email
-                               completion:(RLMPasswordChangeStatusBlock)completion {
-    [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
-                                                 JSON:@{@"provider_id": email, @"data": @{@"action": @"reset_password"}}
-                                           completion:completion];
-}
-
-+ (void)completePasswordResetForAuthServer:(NSURL *)serverURL
-                                     token:(NSString *)token
-                                  password:(NSString *)newPassword
-                                completion:(RLMPasswordChangeStatusBlock)completion {
-    [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
-                                                 JSON:@{@"data": @{@"action": @"complete_reset",
-                                                                   @"token": token,
-                                                                   @"new_password": newPassword}}
-                                           completion:completion];
-}
-
-+ (void)requestEmailConfirmationForAuthServer:(NSURL *)serverURL
-                                    userEmail:(NSString *)email
-                                   completion:(RLMPasswordChangeStatusBlock)completion {
-    [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
-                                                 JSON:@{@"provider_id": email,
-                                                        @"data": @{@"action": @"request_email_confirmation"}}
-                                           completion:completion];
-}
-
-+ (void)confirmEmailForAuthServer:(NSURL *)serverURL
-                            token:(NSString *)token
-                       completion:(RLMPasswordChangeStatusBlock)completion {
-    [RLMSyncUpdateAccountEndpoint sendRequestToServer:serverURL
-                                                 JSON:@{@"data": @{@"action": @"confirm_email",
-                                                                   @"token": token}}
-                                           completion:completion];
-}
-
-#pragma mark - Administrator API
-
-- (void)retrieveInfoForUser:(NSString *)providerUserIdentity
-           identityProvider:(RLMIdentityProvider)provider
-                 completion:(RLMRetrieveUserBlock)completion {
-    [RLMSyncGetUserInfoEndpoint sendRequestToServer:self.authenticationServer
-                                               JSON:@{kRLMSyncProviderKey: provider,
-                                                      kRLMSyncProviderIDKey: providerUserIdentity,
-                                                      kRLMSyncTokenKey: self.refreshToken}
-                                            timeout:60
-                                         completion:^(NSError *error, NSDictionary *json) {
-        if (error) {
-            return completion(nil, error);
-        }
-        RLMUserResponseModel *model = [[RLMUserResponseModel alloc] initWithDictionary:json];
-        if (!model) {
-            return completion(nil, make_auth_error_bad_response(json));
-        }
-        completion([RLMSyncUserInfo syncUserInfoWithModel:model], nil);
-    }];
-}
-
 #pragma mark - Private API
 
 - (NSURL *)urlForPath:(nullable NSString *)path {
@@ -346,6 +251,13 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
         return nil;
     }
     return @(_user->refresh_token().c_str());
+}
+
+- (NSString *)accessToken {
+    if (!_user) {
+        return nil;
+    }
+    return @(_user->access_token().c_str());
 }
 
 - (std::shared_ptr<SyncUser>)_syncUser {

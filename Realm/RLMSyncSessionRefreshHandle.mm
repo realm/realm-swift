@@ -19,7 +19,7 @@
 #import "RLMSyncSessionRefreshHandle.hpp"
 
 #import "RLMJSONModels.h"
-#import "RLMNetworkClient.h"
+#import "RLMNetworkTransport.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
@@ -41,7 +41,8 @@ void reportInvalidAccessToken(const std::weak_ptr<SyncUser>& user, NSError *erro
     if (auto strong_user = user.lock()) {
         if (RLMUserErrorReportingBlock block = context_for(strong_user).error_handler()) {
             RLMSyncUser *theUser = [[RLMSyncUser alloc] initWithSyncUser:std::move(strong_user)];
-            [theUser logOut];
+            // FIXME: [realmapp] logout the user
+            // [theUser logOut];
             block(theUser, error);
         }
     }
@@ -269,10 +270,12 @@ static const NSTimeInterval RLMRefreshBuffer = 10;
     RLMSyncCompletionBlock handler = ^(NSError *error, NSDictionary *json) {
         [weakSelf _onRefreshCompletionWithError:error json:json];
     };
-    [RLMSyncAuthEndpoint sendRequestToServer:self.authServerURL
-                                        JSON:json
-                                     timeout:60.0
-                                  completion:handler];
+// FIXME: [realmapp] This still potentially has use. It is unclear at the moment
+// FIXME: if this should be handled in the OS or at this layer.
+//    [RLMSyncAuthEndpoint sendRequestToServer:self.authServerURL
+//                                        JSON:json
+//                                     timeout:60.0
+//                                  completion:handler];
 }
 
 @end

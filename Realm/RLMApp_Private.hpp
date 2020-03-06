@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2020 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,32 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMSyncManager.h>
+#import "RLMApp.h"
+#import "sync/app.hpp"
 
-#import "RLMSyncUtil_Private.h"
-#import "RLMNetworkTransport.h"
-
-@class RLMSyncUser, RLMSyncConfiguration;
-
-// All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
-// called very infrequently, this should pose no issues.
-
-NS_ASSUME_NONNULL_BEGIN
-
-@interface RLMSyncManager ()
-
-@property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock sessionCompletionNotifier;
-
-- (void)_fireError:(NSError *)error;
-
-- (NSArray<RLMSyncUser *> *)_allUsers;
-
-- (RLMSyncUser *)_currentUser;
-
-+ (void)resetForTesting;
-
-- (RLMNetworkRequestOptions *)networkRequestOptions;
-
-NS_ASSUME_NONNULL_END
-
-@end
+static NSMutableDictionary<NSString *, RLMApp *>* apps= [NSMutableDictionary new];

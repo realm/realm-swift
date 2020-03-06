@@ -22,14 +22,14 @@ import Realm
  :nodoc:
  **/
 public extension ObjectiveCSupport {
-    /// Convert a `SyncCredentials` to a `RLMSyncCredentials`.
-    static func convert(object: SyncCredentials) -> RLMSyncCredentials {
-        return RLMSyncCredentials(object)
+    /// Convert a `AppCredentials` to a `RLMAppCredentials`.
+    static func convert(object: AppCredentials) -> RLMAppCredentials {
+        return object.credentials
     }
 
-    /// Convert a `RLMSyncCredentials` to a `SyncCredentials`.
-    static func convert(object: RLMSyncCredentials) -> SyncCredentials {
-        return SyncCredentials(object)
+    /// Convert a `RLMAppCredentials` to a `AppCredentials`.
+    static func convert(object: RLMAppCredentials) -> AppCredentials {
+        return AppCredentials(object)
     }
 
     /// Convert a `SyncConfiguration` to a `RLMSyncConfiguration`.

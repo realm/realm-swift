@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 
 #import "RLMRealmConfiguration.h"
-#import "RLMSyncCredentials.h"
+#import "RLMAppCredentials.h"
 
 @class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncSession, RLMRealm;
 
@@ -52,7 +52,7 @@ typedef void(^RLMUserErrorReportingBlock)(RLMSyncUser * _Nonnull, NSError * _Non
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A `RLMSyncUser` instance represents a single Realm Object Server user account.
+ A `RLMSyncUser` instance represents a single Realm App user account.
 
  A user may have one or more credentials associated with it. These credentials
  uniquely identify the user to the authentication provider, and are used to sign
@@ -64,34 +64,26 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMSyncUser : NSObject
 
 /**
- A dictionary of all valid, logged-in user identities corresponding to their user objects.
- */
-+ (NSDictionary<NSString *, RLMSyncUser *> *)allUsers NS_REFINED_FOR_SWIFT;
-
-/**
- The logged-in user. `nil` if none exists.
-
- @warning Throws an exception if more than one logged-in user exists.
- */
-+ (nullable RLMSyncUser *)currentUser NS_REFINED_FOR_SWIFT;
-
-/**
  The unique Realm Object Server user ID string identifying this user.
  */
 @property (nullable, nonatomic, readonly) NSString *identity;
 
 /**
- The user's refresh token used to access the Realm Object Server.
+ The user's refresh token used to access the Realm Applcation.
 
- This is required to make HTTP requests to Realm Object Server's REST API
+ This is required to make HTTP requests to the Realm App's REST API
  for functionality not exposed natively. It should be treated as sensitive data.
  */
 @property (nullable, nonatomic, readonly) NSString *refreshToken;
 
+
 /**
- The URL of the authentication server this user will communicate with.
+ The user's refresh token used to access the Realm Application.
+
+ This is required to make HTTP requests to Realm Object Server's REST API
+ for functionality not exposed natively. It should be treated as sensitive data.
  */
-@property (nullable, nonatomic, readonly) NSURL *authenticationServer;
+@property (nullable, nonatomic, readonly) NSString *accessToken;
 
 /**
  The current state of the user.
@@ -138,19 +130,6 @@ NS_ASSUME_NONNULL_BEGIN
                                       urlPrefix:(nullable NSString *)urlPrefix NS_REFINED_FOR_SWIFT;
 
 /**
- Log a user out, destroying their server state, unregistering them from the SDK,
- and removing any synced Realms associated with them from on-disk storage on
- next app launch. If the user is already logged out or in an error state, this
- method does nothing.
-
- This method should be called whenever the application is committed to not using
- a user again unless they are recreated.
- Failing to call this method may result in unused files and metadata needlessly
- taking up space.
- */
-- (void)logOut;
-
-/**
  An optional error handler which can be set to notify the host application when
  the user encounters an error. Errors reported by this error handler are always
  `RLMSyncAuthError`s.
@@ -178,137 +157,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (NSArray<RLMSyncSession *> *)allSessions;
 
-#pragma mark - Passwords
+/// :nodoc:
+- (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));
+/// :nodoc:
++ (instancetype)new __attribute__((unavailable("RLMSyncUser cannot be created directly")));
 
-/**
- Change this user's password asynchronously.
-
- @warning Changing a user's password using an authentication server that doesn't
-          use HTTPS is a major security flaw, and should only be done while
-          testing.
-
- @param newPassword The user's new password.
- @param completion  Completion block invoked when login has completed or failed.
-                    The callback will be invoked on a background queue provided
-                    by `NSURLSession`.
- */
-- (void)changePassword:(NSString *)newPassword completion:(RLMPasswordChangeStatusBlock)completion;
-
-/**
- Change an arbitrary user's password asynchronously.
-
- @note    The current user must be an admin user for this operation to succeed.
-
- @warning Changing a user's password using an authentication server that doesn't
-          use HTTPS is a major security flaw, and should only be done while
-          testing.
-
- @param newPassword The user's new password.
- @param userID      The identity of the user whose password should be changed.
- @param completion  Completion block invoked when login has completed or failed.
-                    The callback will be invoked on a background queue provided
-                    by `NSURLSession`.
- */
-- (void)changePassword:(NSString *)newPassword forUserID:(NSString *)userID completion:(RLMPasswordChangeStatusBlock)completion;
-
-/**
- Ask the server to send a password reset email to the given email address.
-
- If `email` is an email address which is associated with a user account that was
- registered using the "password" authentication service, the server will send an
- email to that address with a password reset token. No error is reported if the
- email address is invalid or not associated with an account.
-
- @param serverURL  The authentication server URL for the user.
- @param email      The email address to send the email to.
- @param completion A block which will be called when the request completes or
-                   fails. The callback will be invoked on a background queue
-                   provided by `NSURLSession`, and not on the calling queue.
- */
-+ (void)requestPasswordResetForAuthServer:(NSURL *)serverURL
-                                userEmail:(NSString *)email
-                               completion:(RLMPasswordChangeStatusBlock)completion;
-
-/**
- Change a user's password using a one-time password reset token.
-
- By default, the password reset email sent by ROS will link to a web site where
- the user can select a new password, and the app will not need to call this
- method. If you wish to instead handle this within your native app, you must
- change the `baseURL` in the server configuration for `PasswordAuthProvider` to
- a scheme registered for your app, extract the token from the URL, and call this
- method after prompting the user for a new password.
-
- @warning Changing a user's password using an authentication server that doesn't
-          use HTTPS is a major security flaw, and should only be done while
-          testing.
-
- @param serverURL   The authentication server URL for the user.
- @param token       The one-time use token from the URL.
- @param newPassword The user's new password.
- @param completion  A block which will be called when the request completes or
-                    fails. The callback will be invoked on a background queue
-                    provided by `NSURLSession`, and not on the calling queue.
- */
-+ (void)completePasswordResetForAuthServer:(NSURL *)serverURL
-                                     token:(NSString *)token
-                                  password:(NSString *)newPassword
-                                completion:(RLMPasswordChangeStatusBlock)completion;
-
-/**
- Ask the server to send a confirmation email to the given email address.
-
- If `email` is an email address which is associated with a user account that was
- registered using the "password" authentication service, the server will send an
- email to that address with a confirmation token. No error is reported if the
- email address is invalid or not associated with an account.
-
- @param serverURL  The authentication server URL for the user.
- @param email      The email address to send the email to.
- @param completion A block which will be called when the request completes or
-                   fails. The callback will be invoked on a background queue
-                   provided by `NSURLSession`, and not on the calling queue.
- */
-+ (void)requestEmailConfirmationForAuthServer:(NSURL *)serverURL
-                                    userEmail:(NSString *)email
-                                   completion:(RLMPasswordChangeStatusBlock)completion;
-
-/**
- Confirm a user's email using a one-time confirmation token.
-
- By default, the confirmation email sent by ROS will link to a web site with
- a generic "thank you for confirming your email" message, and the app will not
- need to call this method. If you wish to instead handle this within your native
- app, you must change the `baseURL` in the server configuration for
- `PasswordAuthProvider` to a scheme registered for your app, extract the token
- from the URL, and call this method.
-
- @param serverURL   The authentication server URL for the user.
- @param token       The one-time use token from the URL.
- @param completion  A block which will be called when the request completes or
-                    fails. The callback will be invoked on a background queue
-                    provided by `NSURLSession`, and not on the calling queue.
- */
-+ (void)confirmEmailForAuthServer:(NSURL *)serverURL
-                            token:(NSString *)token
-                       completion:(RLMPasswordChangeStatusBlock)completion;
-
-#pragma mark - Administrator
-
-/**
- Given a Realm Object Server authentication provider and a provider identifier for a user
- (for example, a username), look up and return user information for that user.
-
- @param providerUserIdentity    The username or identity of the user as issued by the authentication provider.
-                                In most cases this is different from the Realm Object Server-issued identity.
- @param provider                The authentication provider that manages the user whose information is desired.
- @param completion              Completion block invoked when request has completed or failed.
-                                The callback will be invoked on a background queue provided
-                                by `NSURLSession`.
- */
-- (void)retrieveInfoForUser:(NSString *)providerUserIdentity
-           identityProvider:(RLMIdentityProvider)provider
-                 completion:(RLMRetrieveUserBlock)completion;
 @end
 
 #pragma mark - User info classes

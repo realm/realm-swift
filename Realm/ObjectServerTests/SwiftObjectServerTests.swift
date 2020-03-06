@@ -369,7 +369,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 ex.fulfill()
             }
             waitForExpectations(timeout: 10.0, handler: nil)
-            user.logOut()
+            // FIXME: [realmapp] add logout
+            // user.logOut()
         }
 
         self.resetSyncManager()
@@ -396,48 +397,17 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-    // MARK: - Administration
-
-    func testRetrieveUserInfo() {
-        let adminUsername = "jyaku.swift"
-        let nonAdminUsername = "meela.swift@realm.example.org"
-        let password = "p"
-        let server = SwiftObjectServerTests.authServerURL()
-
-        // Create a non-admin user.
-        _ = logInUser(for: .init(username: nonAdminUsername, password: password, register: true),
-                      server: server)
-        // Create an admin user.
-        let adminUser = createAdminUser(for: server, username: adminUsername)
-
-        // Look up information about the non-admin user from the admin user.
-        let ex = expectation(description: "Should be able to look up user information")
-        adminUser.retrieveInfo(forUser: nonAdminUsername, identityProvider: .usernamePassword) { (userInfo, err) in
-            XCTAssertNil(err)
-            XCTAssertNotNil(userInfo)
-            guard let userInfo = userInfo else {
-                return
-            }
-            let account = userInfo.accounts.first!
-            XCTAssertEqual(account.providerUserIdentity, nonAdminUsername)
-            XCTAssertEqual(account.provider, Provider.usernamePassword)
-            ex.fulfill()
-        }
-        waitForExpectations(timeout: 10.0, handler: nil)
-    }
-
     // MARK: - Authentication
 
     func testInvalidCredentials() {
         do {
             let username = "testInvalidCredentialsUsername"
-            let credentials = SyncCredentials.usernamePassword(username: username,
-                                                               password: "THIS_IS_A_PASSWORD",
-                                                               register: true)
+            let credentials = AppCredentials.usernamePassword(username: username,
+                                                               password: "THIS_IS_A_PASSWORD")
             _ = try synchronouslyLogInUser(for: credentials, server: authURL)
             // Now log in the same user, but with a bad password.
             let ex = expectation(description: "wait for user login")
-            let credentials2 = SyncCredentials.usernamePassword(username: username, password: "NOT_A_VALID_PASSWORD")
+            let credentials2 = AppCredentials.usernamePassword(username: username, password: "NOT_A_VALID_PASSWORD")
 
             // FIXME: [realmapp] This should call the new login method with invalid credentials
             fatalError("test not implemented")

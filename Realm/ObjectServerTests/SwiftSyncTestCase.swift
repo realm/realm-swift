@@ -89,9 +89,9 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     func basicCredentials(register: Bool = true,
                           usernameSuffix: String = "",
                           file: StaticString = #file,
-                          line: UInt = #line) -> SyncCredentials {
+                          line: UInt = #line) -> AppCredentials {
         let filename = URL(fileURLWithPath: String(describing: file)).deletingPathExtension().lastPathComponent
-        return .usernamePassword(username: "\(filename)\(line)\(usernameSuffix)", password: "a", register: register)
+        return .usernamePassword(username: "\(filename)\(line)\(usernameSuffix)", password: "a")
     }
 
     func synchronouslyOpenRealm(url: URL, user: SyncUser, file: StaticString = #file, line: UInt = #line) throws -> Realm {
@@ -120,7 +120,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return try Realm(configuration: user.configuration(realmURL: url, fullSynchronization: true))
     }
 
-    func synchronouslyLogInUser(for credentials: SyncCredentials,
+    func synchronouslyLogInUser(for credentials: AppCredentials,
                                 server url: URL,
                                 file: StaticString = #file,
                                 line: UInt = #line) throws -> SyncUser {

@@ -106,7 +106,7 @@ extension RLMSyncUser {
         }
     }
 
-    public static func logIn(with credentials: RLMSyncCredentials,
+    public static func logIn(with credentials: RLMAppCredentials,
                              server authServerURL: URL,
                              timeout: TimeInterval = 30,
                              callbackQueue queue: DispatchQueue = DispatchQueue.main,
