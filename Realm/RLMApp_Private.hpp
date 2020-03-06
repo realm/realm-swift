@@ -16,12 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef RLMApp_Private_h
-#define RLMApp_Private_h
-
 #import "RLMApp.h"
 #import "sync/app.hpp"
 
 static NSMutableDictionary<NSString *, RLMApp *>* apps= [NSMutableDictionary new];
-
-#endif /* RLMApp_Private_h */
