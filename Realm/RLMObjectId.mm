@@ -38,9 +38,8 @@
 
 - (instancetype)initWithString:(NSString *)string error:(NSError **)error {
     if ((self = [self init])) {
-        auto str = string.UTF8String;
-        auto len = strlen(str);
-        if (len != 24 || !std::all_of(str, str + len, [](unsigned char c) { return std::isxdigit(c); })) {
+        const char *str = string.UTF8String;
+        if (!realm::ObjectId::is_valid_str(str)) {
             if (error) {
                 NSString *msg = [NSString stringWithFormat:@"Invalid Object ID string '%@': must be 24 hex digits", string];
                 *error = [NSError errorWithDomain:RLMErrorDomain
