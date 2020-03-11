@@ -22,6 +22,19 @@
 
 #import <realm/object_id.hpp>
 
+// Swift's obj-c bridging does not support making an obj-c defined class conform
+// to Decodable, so we need a Swift-defined subclass for that. This means that
+// when Realm Swift is being used, we need to produce objects of that type rather
+// than our obj-c defined type. objc_runtime_visible marks the type as being
+// visbile only to the obj-c runtime and not the linker, which means that it'll
+// be `nil` at runtime rather than being a linker error if it's not defined, and
+// valid if it happens to be defined by some other library (i.e. Realm Swift).
+//
+// At the point where the objects are being allocated we generally don't have
+// any good way of knowing whether or not it's going to end up being used by
+// Swift, so we just switch to the subclass unconditionally if the subclass
+// exists. This shouldn't have any impact on obj-c code other than a small
+// performance hit.
 [[clang::objc_runtime_visible]]
 @interface RealmSwiftObjectId : RLMObjectId
 @end
