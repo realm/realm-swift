@@ -885,7 +885,6 @@ Decimal128 convert<Decimal128>(id value) {
 
 template <>
 ObjectId convert<ObjectId>(id value) {
-    // FIXME: extract this somewhere and share with object creation
     if (auto objectId = RLMDynamicCast<RLMObjectId>(value)) {
         return objectId.value;
     }

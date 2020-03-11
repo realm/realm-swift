@@ -45,9 +45,6 @@ public final class Decimal128: RLMDecimal128, Decodable {
     public override required init(value: Any) {
         super.init(value: value)
     }
-    public override required init(nsDecimal: NSDecimalNumber) {
-        super.init(nsDecimal: nsDecimal)
-    }
     public override required init(number: NSNumber) {
         super.init(number: number)
     }

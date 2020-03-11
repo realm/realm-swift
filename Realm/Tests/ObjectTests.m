@@ -334,13 +334,13 @@ RLM_ARRAY_TYPE(CycleObject)
     AllTypesObject *o = [[AllTypesObject alloc] initWithValue:row1];
     o.floatCol = NAN;
     o.doubleCol = NAN;
-//    o.decimalCol = [RLMDecimal128 decimalWithNumber:[NSDecimalNumber notANumber]];
+    o.decimalCol = [RLMDecimal128 decimalWithNumber:[NSDecimalNumber notANumber]];
     [realm transactionWithBlock:^{
         [realm addObject:o];
     }];
     XCTAssertTrue(isnan(o.floatCol));
     XCTAssertTrue(isnan(o.doubleCol));
-//    XCTAssertEqualObjects(o.decimalCol, [NSDecimalNumber notANumber]);
+    XCTAssertTrue(o.decimalCol.isNaN);
 }
 
 - (void)testObjectSubclass {

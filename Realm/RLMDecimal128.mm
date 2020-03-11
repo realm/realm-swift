@@ -68,17 +68,7 @@
 
 - (instancetype)initWithNumber:(NSNumber *)number {
     if ((self = [self init])) {
-        auto type = number.objCType[0];
-        // FIXME: NSDecimalNumber
-        if (type == *@encode(double) || type == *@encode(float)) {
-            _value = realm::Decimal128(number.doubleValue);
-        }
-        else if (std::isupper(type)) {
-            _value = realm::Decimal128(number.unsignedLongLongValue);
-        }
-        else {
-            _value = realm::Decimal128(number.longLongValue);
-        }
+        _value = RLMObjcToDecimal128(number);
     }
     return self;
 }
@@ -94,13 +84,6 @@
             }
             return nil;
         }
-    }
-    return self;
-}
-
-- (instancetype)initWithNSDecimal:(NSDecimalNumber *)number {
-    if ((self = [self init])) {
-        _value = realm::Decimal128(number.stringValue.UTF8String);
     }
     return self;
 }

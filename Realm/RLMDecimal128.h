@@ -24,11 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init;
 - (instancetype)initWithValue:(id)value;
 - (instancetype)initWithNumber:(NSNumber *)number;
-- (instancetype)initWithNSDecimal:(NSDecimalNumber *)number;
 - (nullable instancetype)initWithString:(NSString *)string error:(NSError *_Nullable*)error;
 
 + (instancetype)decimalWithNumber:(NSNumber *)number;
-+ (instancetype)decimalWithNSDecimal:(NSDecimalNumber *)number;
 
 @property (nonatomic, readonly) double doubleValue;
 @property (nonatomic, readonly) NSDecimal decimalValue;

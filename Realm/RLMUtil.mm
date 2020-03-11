@@ -440,11 +440,21 @@ realm::Decimal128 RLMObjcToDecimal128(__unsafe_unretained id const value) {
         if (auto string = RLMDynamicCast<NSString>(value)) {
             return realm::Decimal128(string.UTF8String);
         }
-        if (auto number = RLMDynamicCast<NSNumber>(value)) {
-            return realm::Decimal128(number.doubleValue);
+        if (auto decimal = RLMDynamicCast<NSDecimalNumber>(value)) {
+            return realm::Decimal128(decimal.stringValue.UTF8String);
         }
-        // FIXME: int64_t
-        // FIXME: NSDecimalNumber
+        if (auto number = RLMDynamicCast<NSNumber>(value)) {
+            auto type = number.objCType[0];
+            if (type == *@encode(double) || type == *@encode(float)) {
+                return realm::Decimal128(number.doubleValue);
+            }
+            else if (std::isupper(type)) {
+                return realm::Decimal128(number.unsignedLongLongValue);
+            }
+            else {
+                return realm::Decimal128(number.longLongValue);
+            }
+        }
     }
     catch (std::exception const& e) {
         @throw RLMException(@"Cannot convert value '%@' of type '%@' to decimal128: %s",
