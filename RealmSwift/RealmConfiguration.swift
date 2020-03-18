@@ -112,11 +112,10 @@ extension Realm {
 
         /**
          A configuration value used to configure a Realm for synchronization with the Realm Object Server. Mutually
-         exclusive with `inMemoryIdentifier` and `fileURL`.
+         exclusive with `inMemoryIdentifier`.
          */
         public var syncConfiguration: SyncConfiguration? {
             set {
-                _path = nil
                 _inMemoryIdentifier = nil
                 _syncConfiguration = newValue
             }
@@ -127,11 +126,10 @@ extension Realm {
 
         private var _syncConfiguration: SyncConfiguration?
 
-        /// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier` and `syncConfiguration`.
+        /// The local URL of the Realm file. Mutually exclusive with `inMemoryIdentifier`.
         public var fileURL: URL? {
             set {
                 _inMemoryIdentifier = nil
-                _syncConfiguration = nil
                 _path = newValue?.path
             }
             get {
@@ -221,10 +219,11 @@ extension Realm {
                 configuration.fileURL = fileURL
             } else if let inMemoryIdentifier = inMemoryIdentifier {
                 configuration.inMemoryIdentifier = inMemoryIdentifier
-            } else if let syncConfiguration = syncConfiguration {
-                configuration.syncConfiguration = syncConfiguration.asConfig()
-            } else {
+            } else if syncConfiguration == nil {
                 fatalError("A Realm Configuration must specify a path or an in-memory identifier.")
+            }
+            if let syncConfiguration = syncConfiguration {
+                configuration.syncConfiguration = syncConfiguration.asConfig()
             }
             configuration.encryptionKey = self.encryptionKey
             configuration.readOnly = self.readOnly
