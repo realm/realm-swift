@@ -79,7 +79,7 @@ std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
     Realm::Config realmConfig = realm.configuration.config;
     if (auto config = realmConfig.sync_config) {
         std::shared_ptr<SyncUser> user = config->user;
-        if (user && user->state() != SyncUser::State::Error) {
+        if (user && user->state() != SyncUser::State::Removed) {
             return user->session_for_on_disk_path(realmConfig.path);
         }
     }

@@ -468,7 +468,8 @@ id RLMObjectFreeze(RLMObjectBase *obj) {
     }
     RLMRealm *frozenRealm = [obj->_realm freeze];
     RLMObjectBase *frozen = RLMCreateManagedAccessor(obj.class, &frozenRealm->_info[obj->_info->rlmObjectSchema.className]);
-    frozen->_row = frozenRealm->_realm->transaction().import_copy_of(obj->_row);
+    //FIXME: v10
+    //frozen->_row = frozenRealm->_realm->transaction().import_copy_of(obj->_row);
     return frozen;
 }
 

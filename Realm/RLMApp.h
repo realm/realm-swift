@@ -25,6 +25,9 @@ NS_ASSUME_NONNULL_BEGIN
 /// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
 
+/// A block type used to report an error
+typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
+
 #pragma mark RLMAppConfiguration
 
 /// Properties representing the configuration of a client
@@ -90,6 +93,23 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
  */
 - (void)loginWithCredential:(RLMAppCredentials *)credentials
           completionHandler:(RLMUserCompletionBlock)completionHandler;
+
+
+/**
+ Switch to a specified user. If the user is no longer valid e.g Removed then an error will be thrown
+ 
+ @param syncUser The user you would like to switch to
+ @returns The user you intend to switch to
+ */
+- (RLMSyncUser *)switchUser:(RLMSyncUser *)syncUser;
+
+/**
+ Removes a specified user
+
+ @param syncUser The user you would like to remove
+ @param completionHandler A callback invoked on completion
+*/
+-(void)removeUser:(RLMSyncUser *)syncUser completionHandler:(RLMOptionalErrorBlock)completionHandler;
 
 @end
 

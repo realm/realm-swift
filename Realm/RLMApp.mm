@@ -159,12 +159,28 @@ static NSError* AppErrorToNSError(const app::AppError& appError) {
 
 - (void)loginWithCredential:(RLMAppCredentials *)credentials
           completionHandler:(RLMUserCompletionBlock)completionHandler {
-    _app.login_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
+    _app.log_in_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
             return completionHandler(nil, AppErrorToNSError(*error));
         }
 
         completionHandler([[RLMSyncUser alloc] initWithSyncUser:user], nil);
+    });
+}
+
+- (RLMSyncUser *)switchUser:(RLMSyncUser *)syncUser
+{
+    return [[RLMSyncUser alloc] initWithSyncUser:_app.switch_user(syncUser._syncUser)];
+}
+
+- (void)removeUser:(RLMSyncUser *)syncUser completionHandler:(RLMOptionalErrorBlock)completionHandler
+{
+    _app.remove_user(syncUser._syncUser, ^(Optional<app::AppError> error) {
+        if (error && error->error_code) {
+            return completionHandler(AppErrorToNSError(*error));
+        }
+
+        completionHandler(nil);
     });
 }
 

@@ -173,7 +173,7 @@ static RLMSyncManager *s_sharedManager = nil;
 - (void)setCustomRequestHeaders:(NSDictionary<NSString *,NSString *> *)customRequestHeaders {
     _customRequestHeaders = customRequestHeaders.copy;
 
-    for (auto&& user : SyncManager::shared().all_logged_in_users()) {
+    for (auto&& user : SyncManager::shared().all_users()) {
         for (auto&& session : user->all_sessions()) {
             auto config = session->config();
             config.custom_http_headers.clear();;
@@ -224,7 +224,7 @@ static RLMSyncManager *s_sharedManager = nil;
 
 - (NSArray<RLMSyncUser *> *)_allUsers {
     NSMutableArray<RLMSyncUser *> *buffer = [NSMutableArray array];
-    for (auto user : SyncManager::shared().all_logged_in_users()) {
+    for (auto user : SyncManager::shared().all_users()) {
         [buffer addObject:[[RLMSyncUser alloc] initWithSyncUser:std::move(user)]];
     }
     return buffer;

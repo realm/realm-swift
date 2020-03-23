@@ -200,11 +200,11 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
         return RLMSyncUserStateError;
     }
     switch (_user->state()) {
-        case SyncUser::State::Active:
+        case SyncUser::State::LoggedIn:
             return RLMSyncUserStateActive;
         case SyncUser::State::LoggedOut:
             return RLMSyncUserStateLoggedOut;
-        case SyncUser::State::Error:
+        case SyncUser::State::Removed:
             return RLMSyncUserStateError;
     }
 }
@@ -213,7 +213,7 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     if (!_user) {
         return nil;
     }
-    return [NSURL URLWithString:@(_user->server_url().c_str())];
+    return [NSURL URLWithString:@(_user->provider_type().c_str())];
 }
 
 #pragma mark - Private API

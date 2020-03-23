@@ -76,7 +76,8 @@ static const NSTimeInterval RLMRefreshBuffer = 10;
     if (self = [super init]) {
         NSString *path = [realmURL path];
         _path = [path UTF8String];
-        self.authServerURL = [NSURL URLWithString:@(user->server_url().c_str())];
+        //FIXME: v10 what should actually replace this?
+        self.authServerURL = [NSURL URLWithString:@(user->provider_type().c_str())];
         if (!self.authServerURL) {
             @throw RLMException(@"User object isn't configured with an auth server URL.");
         }
