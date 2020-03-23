@@ -215,15 +215,15 @@ extension Realm {
 
         internal var rlmConfiguration: RLMRealmConfiguration {
             let configuration = RLMRealmConfiguration()
+            if let syncConfiguration = syncConfiguration {
+                configuration.syncConfiguration = syncConfiguration.asConfig()
+            }
             if let fileURL = fileURL {
                 configuration.fileURL = fileURL
             } else if let inMemoryIdentifier = inMemoryIdentifier {
                 configuration.inMemoryIdentifier = inMemoryIdentifier
             } else if syncConfiguration == nil {
                 fatalError("A Realm Configuration must specify a path or an in-memory identifier.")
-            }
-            if let syncConfiguration = syncConfiguration {
-                configuration.syncConfiguration = syncConfiguration.asConfig()
             }
             configuration.encryptionKey = self.encryptionKey
             configuration.readOnly = self.readOnly

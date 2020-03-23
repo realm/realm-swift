@@ -301,7 +301,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertGreaterThan(fileSize(path: pathOnDisk), 0)
         XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
     }
-    
+
     func testDownloadRealmToCustomPath() {
         let user = try! synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
         if !isParent {
@@ -613,7 +613,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         _ = try! Realm(configuration: config)
         self.waitForExpectations(timeout: 4.0)
     }
-    
+
     private func realmURLForFile(_ fileName: String) -> URL {
         let testDir = RLMRealmPathForFile("realm-object-server")
         let directory = URL(fileURLWithPath: testDir, isDirectory: true)

@@ -59,6 +59,8 @@
     } else if (self.config.path.compare(defaultRealmURL.path.UTF8String) == 0) {
         self.config.path = SyncManager::shared().path_for_realm(*[user _syncUser],
                                                                 self.config.sync_config->realm_url());
+    } else {
+        self.config.path = self.fileURL.path.UTF8String;
     }
 
     if (!self.config.encryption_key.empty()) {
