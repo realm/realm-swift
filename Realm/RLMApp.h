@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
+#import "RLMUsernamePasswordProviderClient.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -97,7 +98,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 
 /**
  Switch to a specified user. If the user is no longer valid e.g Removed then an error will be thrown
- 
+ This call does not invoke any network calls
  @param syncUser The user you would like to switch to
  @returns The user you intend to switch to
  */
@@ -109,7 +110,27 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
  @param syncUser The user you would like to remove
  @param completionHandler A callback invoked on completion
 */
--(void)removeUser:(RLMSyncUser *)syncUser completionHandler:(RLMOptionalErrorBlock)completionHandler;
+- (void)removeUser:(RLMSyncUser *)syncUser completionHandler:(RLMOptionalErrorBlock)completionHandler;
+
+/**
+ Logs out the current user
+ @param completionHandler A callback invoked on completion
+*/
+- (void)log_out:(RLMOptionalErrorBlock)completionHandler;
+
+/**
+ Logs out a specific user
+ @param syncUser The user to log out
+ @param completionHandler A callback invoked on completion
+*/
+- (void)log_out:(RLMSyncUser *)syncUser completionHandler:(RLMOptionalErrorBlock)completionHandler;
+
+/**
+  A client for the username/password authentication provider which
+  can be used to obtain a credential for logging in,
+  and to perform requests specifically related to the username/password provider.
+*/
+- (RLMUsernamePasswordProviderClient *)usernamePasswordProviderClient;
 
 @end
 

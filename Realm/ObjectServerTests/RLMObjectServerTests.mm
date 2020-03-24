@@ -107,6 +107,46 @@
 //    XCTAssert([currentUser.accessToken isEqualTo: syncUser.accessToken]);
 }
 
+//FIXME: This test will fail as current user is not being set in OS
+- (void)testLogoutCurrentUser {
+    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    __block RLMSyncUser *syncUser;
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completionHandler:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+        
+        [app log_out:^(NSError * _Nullable error) {
+            XCTAssert(!error);
+            XCTAssert([syncUser state] == RLMSyncUserStateRemoved);
+            [expectation fulfill];
+        }];
+    }];
+    
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
+//FIXME: This test will fail as current user is not being set in OS
+- (void)testLogoutSpecificUser {
+    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    __block RLMSyncUser *syncUser;
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completionHandler:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+        
+        [app log_out:syncUser completionHandler:^(NSError * _Nullable) {
+            XCTAssert(!error);
+            XCTAssert([syncUser state] == RLMSyncUserStateRemoved);
+            [expectation fulfill];
+        }];
+    }];
+    
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
 /// Valid username/password credentials should be able to log in a user. Using the same credentials should return the
 /// same user object.
 - (void)testUsernamePasswordAuthentication {

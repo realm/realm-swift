@@ -377,7 +377,7 @@ static NSURL *syncDirectoryForChildProcess() {
     // FIXME: [realmapp] This should use the new login
     REALM_UNREACHABLE();
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
-    XCTAssertTrue(theUser.state == RLMSyncUserStateActive,
+    XCTAssertTrue(theUser.state == RLMSyncUserStateLoggedIn,
                   @"User should have been valid, but wasn't. (process: %@)", process);
     return theUser;
 }

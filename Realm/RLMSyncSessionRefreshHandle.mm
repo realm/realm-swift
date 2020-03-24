@@ -62,7 +62,6 @@ static const NSTimeInterval RLMRefreshBuffer = 10;
 @property (nonatomic) dispatch_source_t timer;
 
 @property (nonatomic) NSURL *realmURL;
-@property (nonatomic) NSURL *authServerURL;
 @property (nonatomic, copy) RLMSyncBasicErrorReportingBlock completionBlock;
 
 @end
@@ -76,11 +75,6 @@ static const NSTimeInterval RLMRefreshBuffer = 10;
     if (self = [super init]) {
         NSString *path = [realmURL path];
         _path = [path UTF8String];
-        //FIXME: v10 what should actually replace this?
-        self.authServerURL = [NSURL URLWithString:@(user->provider_type().c_str())];
-        if (!self.authServerURL) {
-            @throw RLMException(@"User object isn't configured with an auth server URL.");
-        }
         self.completionBlock = completionBlock;
         self.realmURL = realmURL;
         // For the initial bind, we want to prolong the session's lifetime.

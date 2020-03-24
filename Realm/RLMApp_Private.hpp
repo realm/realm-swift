@@ -20,3 +20,7 @@
 #import "sync/app.hpp"
 
 static NSMutableDictionary<NSString *, RLMApp *>* apps= [NSMutableDictionary new];
+
+@interface RLMApp ()
+- (realm::app::App)_realmApp;
+@end

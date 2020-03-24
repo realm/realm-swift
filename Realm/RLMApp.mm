@@ -136,6 +136,10 @@ namespace {
     return [[RLMApp alloc] initWithAppId:appId configuration:configuration];
 }
 
+- (realm::app::App)_realmApp {
+    return _app;
+}
+
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers {
     NSArray *allUsers = [[RLMSyncManager sharedManager] _allUsers];
     return [NSDictionary dictionaryWithObjects:allUsers
@@ -184,4 +188,32 @@ static NSError* AppErrorToNSError(const app::AppError& appError) {
     });
 }
 
+- (void)log_out:(RLMOptionalErrorBlock)completionHandler
+{
+    _app.log_out(^(Optional<app::AppError> error) {
+        if (error && error->error_code) {
+            return completionHandler(AppErrorToNSError(*error));
+        }
+
+        completionHandler(nil);
+    });
+}
+
+- (void)log_out:(RLMSyncUser *)syncUser completionHandler:(RLMOptionalErrorBlock)completionHandler
+{
+    _app.log_out(syncUser._syncUser, ^(Optional<app::AppError> error) {
+        if (error && error->error_code) {
+            return completionHandler(AppErrorToNSError(*error));
+        }
+
+        completionHandler(nil);
+    });
+}
+
+- (RLMUsernamePasswordProviderClient *)usernamePasswordProviderClient {
+    return [[RLMUsernamePasswordProviderClient alloc] init: self];
+}
+
 @end
+
+
