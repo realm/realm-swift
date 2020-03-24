@@ -156,9 +156,9 @@
 		3F73BC911E3A877300FE80B6 /* RLMSyncSessionRefreshHandle+ObjectServerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC891E3A876600FE80B6 /* RLMSyncSessionRefreshHandle+ObjectServerTests.m */; };
 		3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */; };
 		3F73BC951E3A878500FE80B6 /* NSError+RLMSync.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F73BC931E3A878500FE80B6 /* NSError+RLMSync.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3F73BC961E3A878500FE80B6 /* NSError+RLMSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC941E3A878500FE80B6 /* NSError+RLMSync.mm */; };
+		3F73BC961E3A878500FE80B6 /* NSError+RLMSync.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC941E3A878500FE80B6 /* NSError+RLMSync.m */; };
 		3F73BC971E3A879700FE80B6 /* NSError+RLMSync.h in Headers */ = {isa = PBXBuildFile; fileRef = 3F73BC931E3A878500FE80B6 /* NSError+RLMSync.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3F73BC981E3A879E00FE80B6 /* NSError+RLMSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC941E3A878500FE80B6 /* NSError+RLMSync.mm */; };
+		3F73BC981E3A879E00FE80B6 /* NSError+RLMSync.m in Sources */ = {isa = PBXBuildFile; fileRef = 3F73BC941E3A878500FE80B6 /* NSError+RLMSync.m */; };
 		3F75566B1BE94CCC0058BC7E /* results.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556691BE94CCC0058BC7E /* results.cpp */; };
 		3F75566D1BE94CEA0058BC7E /* results.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556691BE94CCC0058BC7E /* results.cpp */; };
 		3F7556751BE95A0C0058BC7E /* AsyncTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3F7556731BE95A050058BC7E /* AsyncTests.mm */; };
@@ -779,7 +779,7 @@
 		3F73BC8A1E3A876600FE80B6 /* RLMTestUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = RLMTestUtils.h; path = Realm/ObjectServerTests/RLMTestUtils.h; sourceTree = "<group>"; };
 		3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = RLMTestUtils.m; path = Realm/ObjectServerTests/RLMTestUtils.m; sourceTree = "<group>"; };
 		3F73BC931E3A878500FE80B6 /* NSError+RLMSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSError+RLMSync.h"; sourceTree = "<group>"; };
-		3F73BC941E3A878500FE80B6 /* NSError+RLMSync.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSError+RLMSync.mm"; sourceTree = "<group>"; };
+		3F73BC941E3A878500FE80B6 /* NSError+RLMSync.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSError+RLMSync.m"; sourceTree = "<group>"; };
 		3F7556691BE94CCC0058BC7E /* results.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = results.cpp; sourceTree = "<group>"; };
 		3F75566A1BE94CCC0058BC7E /* results.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = results.hpp; sourceTree = "<group>"; };
 		3F7556731BE95A050058BC7E /* AsyncTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = AsyncTests.mm; sourceTree = "<group>"; };
@@ -1191,7 +1191,7 @@
 				CF6E047D242A13CB00DB7F14 /* ProviderClients */,
 				1AD3870E1D4A827C00479110 /* Private */,
 				3F73BC931E3A878500FE80B6 /* NSError+RLMSync.h */,
-				3F73BC941E3A878500FE80B6 /* NSError+RLMSync.mm */,
+				3F73BC941E3A878500FE80B6 /* NSError+RLMSync.m */,
 				4993220624129DCD00A0EC8E /* RLMApp_Private.hpp */,
 				4993220724129DCE00A0EC8E /* RLMApp.h */,
 				4993220524129DCD00A0EC8E /* RLMApp.mm */,
@@ -2386,7 +2386,7 @@
 				3F9801A51C8E4F55000A8B07 /* list_notifier.cpp in Sources */,
 				C281E9301E8BC7AC0015BA4A /* network_reachability_observer.cpp in Sources */,
 				4993221624129E6600A0EC8E /* RLMNetworkTransport.mm in Sources */,
-				3F73BC961E3A878500FE80B6 /* NSError+RLMSync.mm in Sources */,
+				3F73BC961E3A878500FE80B6 /* NSError+RLMSync.m in Sources */,
 				3FAB08481E1EC382001BC8DA /* object.cpp in Sources */,
 				3F0C6AD023E11FAD00F03A4F /* object_changeset.cpp in Sources */,
 				3FAB08881E1EC51F001BC8DA /* object_notifier.cpp in Sources */,
@@ -2533,7 +2533,7 @@
 				3F9801A71C8E4F5A000A8B07 /* list_notifier.cpp in Sources */,
 				C281E9291E8A9CC90015BA4A /* network_reachability_observer.cpp in Sources */,
 				4993221724129E6600A0EC8E /* RLMNetworkTransport.mm in Sources */,
-				3F73BC981E3A879E00FE80B6 /* NSError+RLMSync.mm in Sources */,
+				3F73BC981E3A879E00FE80B6 /* NSError+RLMSync.m in Sources */,
 				3FAB08491E1EC385001BC8DA /* object.cpp in Sources */,
 				3F5FE2AA2407637600C2DFF5 /* object_changeset.cpp in Sources */,
 				3FAB08891E1EC526001BC8DA /* object_notifier.cpp in Sources */,

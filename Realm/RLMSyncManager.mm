@@ -245,7 +245,7 @@ static RLMSyncManager *s_sharedManager = nil;
     manager->_pinnedCertificatePaths = nil;
     manager->_timeoutOptions = nil;
 
-    SyncManager::shared().reset_for_testing();
+    //SyncManager::shared().reset_for_testing();
 }
 
 - (RLMNetworkRequestOptions *)networkRequestOptions {

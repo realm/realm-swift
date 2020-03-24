@@ -20,7 +20,7 @@ static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
 }
 
 - (void)registerEmail:(NSString *)email
-              tokenId:(NSString *)password
+             password:(NSString *)password
     completionHandler:(RLMOptionalErrorBlock)completionHandler {
     self.app._realmApp.provider_client<realm::app::App::UsernamePasswordProviderClient>().
     register_email(email.UTF8String, password.UTF8String, ^(Optional<realm::app::AppError> error) {
@@ -79,9 +79,13 @@ static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
 }
 
 - (void)callResetPasswordFunction:(NSString *)email
-                            token:(NSString *)password
-                          tokenId:(NSString *)args
+                         password:(NSString *)password
+                             args:(NSString *)args
                 completionHandler:(RLMOptionalErrorBlock)completionHandler {
+    
+    if (!args.length) {
+        args = @"{}";
+    }
     self.app._realmApp.provider_client<realm::app::App::UsernamePasswordProviderClient>().
     call_reset_password_function(email.UTF8String, password.UTF8String, args.UTF8String, ^(Optional<realm::app::AppError> error) {
         if (error && error->error_code) {

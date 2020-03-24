@@ -95,7 +95,6 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 - (void)loginWithCredential:(RLMAppCredentials *)credentials
           completionHandler:(RLMUserCompletionBlock)completionHandler;
 
-
 /**
  Switch to a specified user. If the user is no longer valid e.g Removed then an error will be thrown
  This call does not invoke any network calls

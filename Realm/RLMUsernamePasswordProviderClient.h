@@ -31,7 +31,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 */
 
 - (void)registerEmail:(NSString *)email
-              tokenId:(NSString *)password
+             password:(NSString *)password
     completionHandler:(RLMOptionalErrorBlock)completionHandler;
 
 /**
@@ -91,8 +91,8 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
  @param completionHandler A callback to be invoked once the call is complete.
 */
 - (void)callResetPasswordFunction:(NSString *)email
-                            token:(NSString *)password
-                          tokenId:(NSString *)args
+                         password:(NSString *)password
+                             args:(NSString *)args
                 completionHandler:(RLMOptionalErrorBlock)completionHandler;
 
 @end
