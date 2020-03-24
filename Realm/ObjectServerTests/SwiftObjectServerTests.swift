@@ -302,6 +302,41 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
     }
 
+    func testDownloadRealmToCustomPath() {
+        let user = try! synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
+        if !isParent {
+            populateRealm(user: user, url: realmURL)
+            return
+        }
+
+        // Wait for the child process to upload everything.
+        executeChild()
+
+        let ex = expectation(description: "download-realm")
+        let customFileURL = realmURLForFile("copy")
+        var config = user.configuration(realmURL: realmURL, fullSynchronization: true)
+        config.fileURL = customFileURL
+        let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
+        XCTAssertEqual(pathOnDisk, customFileURL.path)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
+        Realm.asyncOpen(configuration: config) { realm, error in
+            XCTAssertNil(error)
+            self.checkCount(expected: self.bigObjectCount, realm!, SwiftHugeSyncObject.self)
+            ex.fulfill()
+        }
+        func fileSize(path: String) -> Int {
+            if let attr = try? FileManager.default.attributesOfItem(atPath: path) {
+                return attr[.size] as! Int
+            }
+            return 0
+        }
+        XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
+        waitForExpectations(timeout: 10.0, handler: nil)
+        XCTAssertGreaterThan(fileSize(path: pathOnDisk), 0)
+        XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
+    }
+
+
     func testCancelDownloadRealm() {
         let user = try! synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
         if !isParent {
@@ -577,5 +612,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         _ = try! Realm(configuration: config)
         self.waitForExpectations(timeout: 4.0)
+    }
+
+    private func realmURLForFile(_ fileName: String) -> URL {
+        let testDir = RLMRealmPathForFile("realm-object-server")
+        let directory = URL(fileURLWithPath: testDir, isDirectory: true)
+        return directory.appendingPathComponent(fileName, isDirectory: false)
     }
 }

@@ -33,6 +33,10 @@
 #pragma mark - API
 
 - (void)setSyncConfiguration:(RLMSyncConfiguration *)syncConfiguration {
+    if (syncConfiguration == nil) {
+        self.config.sync_config = nullptr;
+        return;
+    }
     if (self.config.should_compact_on_launch_function) {
         @throw RLMException(@"Cannot set `syncConfiguration` when `shouldCompactOnLaunch` is set.");
     }
@@ -48,11 +52,15 @@
     self.config.sync_config = std::make_shared<realm::SyncConfig>([syncConfiguration rawConfiguration]);
     self.config.schema_mode = realm::SchemaMode::Additive;
 
+    static NSURL *defaultRealmURL = [NSURL fileURLWithPath:RLMRealmPathForFile(@"default.realm")];
+
     if (syncConfiguration.customFileURL) {
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
-    } else {
+    } else if (self.config.path.compare(defaultRealmURL.path.UTF8String) == 0) {
         self.config.path = SyncManager::shared().path_for_realm(*[user _syncUser],
                                                                 self.config.sync_config->realm_url());
+    } else {
+        self.config.path = self.fileURL.path.UTF8String;
     }
 
     if (!self.config.encryption_key.empty()) {
