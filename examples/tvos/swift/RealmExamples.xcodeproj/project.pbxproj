@@ -36,8 +36,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				14835E481BFE5F5900B9A267 /* RealmSwift.framework in Embed Frameworks */,
 				14835E461BFE5F5900B9A267 /* Realm.framework in Embed Frameworks */,
+				14835E481BFE5F5900B9A267 /* RealmSwift.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -48,8 +48,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				14AACA9D1BFE7D0A0046BD85 /* RealmSwift.framework in Embed Frameworks */,
 				14AACA9B1BFE7D0A0046BD85 /* Realm.framework in Embed Frameworks */,
+				14AACA9D1BFE7D0A0046BD85 /* RealmSwift.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -82,8 +82,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14835E471BFE5F5900B9A267 /* RealmSwift.framework in Frameworks */,
 				14835E451BFE5F5900B9A267 /* Realm.framework in Frameworks */,
+				14835E471BFE5F5900B9A267 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -91,8 +91,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14AACA9C1BFE7D0A0046BD85 /* RealmSwift.framework in Frameworks */,
 				14AACA9A1BFE7D0A0046BD85 /* Realm.framework in Frameworks */,
+				14AACA9C1BFE7D0A0046BD85 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,8 +104,8 @@
 			children = (
 				14835E191BFE5E4000B9A267 /* DownloadCache */,
 				14AACA871BFE7B740046BD85 /* PreloadedData */,
-				14835E511BFE5FBD00B9A267 /* RealmSwift */,
 				14835E031BFE5E0B00B9A267 /* Products */,
+				14835E511BFE5FBD00B9A267 /* RealmSwift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -122,12 +122,12 @@
 			isa = PBXGroup;
 			children = (
 				14835E1A1BFE5E4000B9A267 /* AppDelegate.swift */,
-				14835E1C1BFE5E4000B9A267 /* RepositoriesViewController.swift */,
-				14835E521BFE603300B9A267 /* RepositoryCell.swift */,
-				14835E541BFE605000B9A267 /* Repository.swift */,
-				14835E1E1BFE5E4000B9A267 /* Main.storyboard */,
 				14835E211BFE5E4100B9A267 /* Assets.xcassets */,
 				14835E231BFE5E4100B9A267 /* Info.plist */,
+				14835E1E1BFE5E4000B9A267 /* Main.storyboard */,
+				14835E1C1BFE5E4000B9A267 /* RepositoriesViewController.swift */,
+				14835E541BFE605000B9A267 /* Repository.swift */,
+				14835E521BFE603300B9A267 /* RepositoryCell.swift */,
 			);
 			path = DownloadCache;
 			sourceTree = "<group>";
@@ -144,13 +144,13 @@
 		14AACA871BFE7B740046BD85 /* PreloadedData */ = {
 			isa = PBXGroup;
 			children = (
+				14AACA991BFE7C450046BD85 /* Seed Data */,
 				14AACA881BFE7B740046BD85 /* AppDelegate.swift */,
-				14AACA8A1BFE7B740046BD85 /* PlacesViewController.swift */,
-				14AACA951BFE7C260046BD85 /* Place.swift */,
-				14AACA8C1BFE7B740046BD85 /* Main.storyboard */,
 				14AACA8F1BFE7B740046BD85 /* Assets.xcassets */,
 				14AACA911BFE7B740046BD85 /* Info.plist */,
-				14AACA991BFE7C450046BD85 /* Seed Data */,
+				14AACA8C1BFE7B740046BD85 /* Main.storyboard */,
+				14AACA951BFE7C260046BD85 /* Place.swift */,
+				14AACA8A1BFE7B740046BD85 /* PlacesViewController.swift */,
 			);
 			path = PreloadedData;
 			sourceTree = "<group>";
@@ -210,12 +210,12 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0720;
-				LastUpgradeCheck = 1030;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					14835E171BFE5E4000B9A267 = {
 						CreatedOnToolsVersion = 7.2;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 1130;
 					};
 					14AACA851BFE7B740046BD85 = {
 						CreatedOnToolsVersion = 7.2;
@@ -224,10 +224,9 @@
 			};
 			buildConfigurationList = 14835DFD1BFE5E0B00B9A267 /* Build configuration list for PBXProject "RealmExamples" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				Base,
 			);
@@ -286,10 +285,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14835E531BFE603300B9A267 /* RepositoryCell.swift in Sources */,
-				14835E1D1BFE5E4000B9A267 /* RepositoriesViewController.swift in Sources */,
 				14835E1B1BFE5E4000B9A267 /* AppDelegate.swift in Sources */,
+				14835E1D1BFE5E4000B9A267 /* RepositoriesViewController.swift in Sources */,
 				14835E551BFE605000B9A267 /* Repository.swift in Sources */,
+				14835E531BFE603300B9A267 /* RepositoryCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -297,9 +296,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				14AACA891BFE7B740046BD85 /* AppDelegate.swift in Sources */,
 				14AACA961BFE7C260046BD85 /* Place.swift in Sources */,
 				14AACA8B1BFE7B740046BD85 /* PlacesViewController.swift in Sources */,
-				14AACA891BFE7B740046BD85 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -329,18 +328,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -376,18 +384,27 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;

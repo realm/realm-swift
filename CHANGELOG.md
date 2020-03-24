@@ -1,9 +1,13 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+Swift 4.0 and Xcode 10.3 are now the minimum supported versions.
+
 ### Enhancements
 * Allow setting the `fileUrl` for synchronized Realms. An appropriate local
   path based on the sync URL will still be used if it is not overridden.
   ([PR #6454](https://github.com/realm/realm-cocoa/pull/6454)).
+* Add Xcode 11.4 binaries to the release package.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
@@ -15,7 +19,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * APIs are backwards compatible with all previous releases in the 4.x.y series.
-* Carthage release for Swift is built with Xcode 11.3.
+* Carthage release for Swift is built with Xcode 11.4.
 
 ### Internal
 Upgraded realm-core from ? to ?
