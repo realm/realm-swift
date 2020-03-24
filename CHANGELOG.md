@@ -1,7 +1,9 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Allow setting the `fileUrl` for synchronized Realms. An appropriate local
+  path based on the sync URL will still be used if it is not overridden.
+  ([PR #6454](https://github.com/realm/realm-cocoa/pull/6454)).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
