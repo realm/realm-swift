@@ -154,7 +154,7 @@ build_combined() {
         destination="iPhone 8"
     elif [[ "$os" == "watchos"  ]]; then
         os_name="$os"
-        destination="Apple Watch Series 3 - 42mm"
+        destination="Apple Watch Series 4 - 40mm"
     elif [[ "$os" == "appletvos"  ]]; then
         os_name="tvos"
         destination="Apple TV"
