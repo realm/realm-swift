@@ -56,7 +56,7 @@ FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
 ({ \
     NSException *caughtException = nil; \
     @try { \
-        (expression); \
+        (void)(expression); \
     } \
     @catch (id exception) { \
         caughtException = exception; \
