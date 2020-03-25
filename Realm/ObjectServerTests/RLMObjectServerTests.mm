@@ -283,6 +283,70 @@
 
 #pragma mark - UserAPIKeyProviderClient
 
+- (void)testUserAPIKeyProviderClientFlow {
+    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should try call reset password function and fail"];
+    __block RLMSyncUser *syncUser;
+    __block BOOL registerComplete = NO;
+    __block BOOL userAPIKeyACreated = NO;
+    __block BOOL userAPIKeyBCreated = NO;
+    __block RLMUserAPIKey *userAPIKeyA;
+    __block RLMUserAPIKey *userAPIKeyB;
+
+    NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
+    NSString *randomPassword = [self generateRandomString:10];
+    
+    [[app usernamePasswordProviderClient] registerEmail:randomEmail password:randomPassword completionHandler:^(NSError * _Nullable error) {
+        XCTAssert(!error);
+        registerComplete = YES;
+    }];
+
+    while (!registerComplete) { }
+    
+    [app loginWithCredential:[RLMAppCredentials credentialsWithUsername:randomEmail password:randomPassword]
+           completionHandler:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+    }];
+    
+    while (!syncUser) { }
+    
+    [[app userAPIKeyProviderClient] createApiKey:@"apiKeyName1" completionHandler:^(RLMUserAPIKey * _Nullable userAPIKey, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName1"]);
+        userAPIKeyA = userAPIKey;
+        userAPIKeyACreated = YES;
+    }];
+    
+    while (!userAPIKeyACreated) { }
+    
+    [[app userAPIKeyProviderClient] createApiKey:@"apiKeyName2" completionHandler:^(RLMUserAPIKey * _Nullable userAPIKey, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName2"]);
+        userAPIKeyB = userAPIKey;
+        userAPIKeyBCreated = YES;
+    }];
+    
+    while (!userAPIKeyBCreated) { }
+    
+    [[app userAPIKeyProviderClient] fetchApiKeys:^(NSArray<RLMUserAPIKey *> * _Nonnull apiKeys, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(apiKeys.count == 2);
+        [expectation fulfill];
+    }];
+    
+    //These tests require an ObjectId
+    /*
+    [[app userAPIKeyProviderClient] disableApiKey:userAPIKeyA completionHandler:^(NSError * _Nullable error) {
+        XCTAssert(!error);
+        [expectation fulfill];
+    }];
+     */
+
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
 #pragma mark - Username Password
 
 /// Valid username/password credentials should be able to log in a user. Using the same credentials should return the
