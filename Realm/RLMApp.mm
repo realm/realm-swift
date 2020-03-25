@@ -214,6 +214,10 @@ static NSError* AppErrorToNSError(const app::AppError& appError) {
     return [[RLMUsernamePasswordProviderClient alloc] init: self];
 }
 
+- (RLMUserAPIKeyProviderClient *)userAPIKeyProviderClient {
+    return [[RLMUserAPIKeyProviderClient alloc] init: self];
+}
+
 @end
 
 

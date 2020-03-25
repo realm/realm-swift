@@ -281,6 +281,7 @@
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 }
 
+#pragma mark - UserAPIKeyProviderClient
 
 #pragma mark - Username Password
 

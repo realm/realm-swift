@@ -16,6 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 #import "RLMUsernamePasswordProviderClient.h"
+#import "RLMUserAPIKeyProviderClient.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -130,6 +131,13 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
   and to perform requests specifically related to the username/password provider.
 */
 - (RLMUsernamePasswordProviderClient *)usernamePasswordProviderClient;
+
+/**
+  A client for the user API key authentication provider which
+  can be used to create and modify user API keys. This
+  client should only be used by an authenticated user.
+*/
+- (RLMUserAPIKeyProviderClient *)userAPIKeyProviderClient;
 
 @end
 
