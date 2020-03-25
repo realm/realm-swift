@@ -19,8 +19,11 @@
 #import "RLMApp.h"
 #import "sync/app.hpp"
 
+using namespace realm;
+using namespace app;
+
 static NSMutableDictionary<NSString *, RLMApp *>* apps= [NSMutableDictionary new];
 
 @interface RLMApp ()
-- (realm::app::App)_realmApp;
+- (App)_realmApp;
 @end
