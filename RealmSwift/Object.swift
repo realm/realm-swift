@@ -777,11 +777,11 @@ private func forceCastToInferred<T, V>(_ x: T) -> V {
 }
 
 extension Object: AssistedObjectiveCBridgeable {
-    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
+    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
         return forceCastToInferred(objectiveCValue)
     }
 
-    var bridged: (objectiveCValue: Any, metadata: Any?) {
+    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (objectiveCValue: unsafeCastToRLMObject(), metadata: nil)
     }
 }

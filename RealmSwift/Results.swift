@@ -408,11 +408,11 @@ extension Results: RealmCollection {
 // MARK: AssistedObjectiveCBridgeable
 
 extension Results: AssistedObjectiveCBridgeable {
-    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Results {
+    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Results {
         return Results(objectiveCValue as! RLMResults)
     }
 
-    var bridged: (objectiveCValue: Any, metadata: Any?) {
+    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (objectiveCValue: rlmResults, metadata: nil)
     }
 }
