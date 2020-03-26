@@ -49,7 +49,7 @@
 // the response when an API key is first created.
 - (NSString *)key {
     if (_userAPIKey.key) {
-        return [NSString stringWithUTF8String:_userAPIKey.key.value().c_str()];
+        return @(_userAPIKey.name.c_str());
     }
     
     return nil;

@@ -80,7 +80,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
  @param appId The unique identifier of your Realm app.
  @param configuration A configuration object to configure this client.
  */
-+ (instancetype)app:(NSString *) appId
++ (instancetype)app:(NSString *)appId
       configuration:(nullable RLMAppConfiguration *)configuration;
 
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers;

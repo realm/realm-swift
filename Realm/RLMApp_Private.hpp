@@ -19,14 +19,11 @@
 #import "RLMApp.h"
 #import "sync/app.hpp"
 
-using namespace realm;
-using namespace app;
-
-static NSMutableDictionary<NSString *, RLMApp *>* apps= [NSMutableDictionary new];
+static NSMutableDictionary<NSString *, RLMApp *> *apps= [NSMutableDictionary new];
 
 @interface RLMApp ()
 
-- (App)_realmApp;
+- (realm::app::App)_realmApp;
 
 /**
 Convert an object store AppError to an NSError.
