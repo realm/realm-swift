@@ -21,87 +21,60 @@
 
 @implementation RLMUsernamePasswordProviderClient
 
-static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
-    return [[NSError alloc] initWithDomain:@(appError.error_code.category().name())
-                                      code:appError.error_code.value()
-                                  userInfo:@{
-                                      @(appError.error_code.category().name()) : @(appError.error_code.message().data())
-                                  }];
-}
-
 - (void)registerEmail:(NSString *)email
              password:(NSString *)password
-    completionHandler:(RLMOptionalErrorBlock)completionHandler {
+           completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UsernamePasswordProviderClient>().
     register_email(email.UTF8String, password.UTF8String, ^(Optional<realm::app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(AppErrorToNSError(*error));
-        }
-        completionHandler(nil);
+        [self.app handleResponse:error completion:completion];
     });
 }
 
 - (void)confirmUser:(NSString *)token
             tokenId:(NSString *)tokenId
-  completionHandler:(RLMOptionalErrorBlock)completionHandler {
+         completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UsernamePasswordProviderClient>().
     confirm_user(token.UTF8String, tokenId.UTF8String, ^(Optional<realm::app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(AppErrorToNSError(*error));
-        }
-        completionHandler(nil);
+        [self.app handleResponse:error completion:completion];
     });
 }
 
 - (void)resendConfirmationEmail:(NSString *)email
-              completionHandler:(RLMOptionalErrorBlock)completionHandler {
+                     completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UsernamePasswordProviderClient>().
     resend_confirmation_email(email.UTF8String, ^(Optional<realm::app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(AppErrorToNSError(*error));
-        }
-        completionHandler(nil);
+        [self.app handleResponse:error completion:completion];
     });
 }
 
 - (void)sendResetPasswordEmail:(NSString *)email
-             completionHandler:(RLMOptionalErrorBlock)completionHandler {
+                    completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UsernamePasswordProviderClient>().
     send_reset_password_email(email.UTF8String, ^(Optional<realm::app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(AppErrorToNSError(*error));
-        }
-        completionHandler(nil);
+        [self.app handleResponse:error completion:completion];
     });
 }
 
-- (void)resetPassword:(NSString *)password
-                token:(NSString *)token
-              tokenId:(NSString *)tokenId
-    completionHandler:(RLMOptionalErrorBlock)completionHandler {
+- (void)resetPasswordTo:(NSString *)password
+                  token:(NSString *)token
+                tokenId:(NSString *)tokenId
+             completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UsernamePasswordProviderClient>().
     reset_password(password.UTF8String, token.UTF8String, tokenId.UTF8String, ^(Optional<realm::app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(AppErrorToNSError(*error));
-        }
-        completionHandler(nil);
+        [self.app handleResponse:error completion:completion];
     });
 }
 
 - (void)callResetPasswordFunction:(NSString *)email
                          password:(NSString *)password
                              args:(NSString *)args
-                completionHandler:(RLMOptionalErrorBlock)completionHandler {
-    
+                       completion:(RLMOptionalErrorBlock)completion {
     if (!args.length) {
         args = @"{}";
     }
     self.app._realmApp.provider_client<realm::app::App::UsernamePasswordProviderClient>().
     call_reset_password_function(email.UTF8String, password.UTF8String, args.UTF8String, ^(Optional<realm::app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(AppErrorToNSError(*error));
-        }
-        completionHandler(nil);
+        [self.app handleResponse:error completion:completion];
     });
 }
 

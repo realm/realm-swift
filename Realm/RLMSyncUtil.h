@@ -43,6 +43,12 @@ extern NSString *const RLMSyncErrorDomain;
 extern NSString *const RLMSyncAuthErrorDomain;
 
 /**
+The error domain string for all SDK errors related to the MongoDB Realm
+endpoint.
+*/
+extern NSString *const RLMAppErrorDomain;
+
+/**
  An error related to a problem that might be reported by the synchronization manager
  error handler, or a callback on a sync-related API that performs asynchronous work.
  */
@@ -175,5 +181,18 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMSyncAuthError, RLMSyncAuthErrorDomain) {
     /// An error that indicates the file at the given path can't be shared.
     RLMSyncAuthErrorFileCannotBeShared              = 703,
 };
+
+/// An error which is related to authentication to a Realm Object Server.
+typedef RLM_ERROR_ENUM(NSInteger, RLMAppError, RLMAppErrorDomain) {
+    /// An unknown error has occured
+    RLMAppErrorUnknown                        = -1,
+    
+    /// An error that indicates that the request sent to the server was invalid
+    RLMAppErrorBadRequest                     = 48,
+    
+    /// An error that indicates the user cannot be found
+    RLMAppErrorUserNotFound                   = 45
+};
+
 
 NS_ASSUME_NONNULL_END

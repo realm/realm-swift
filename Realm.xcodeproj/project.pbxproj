@@ -428,10 +428,10 @@
 		CF6E0482242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0480242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF6E0483242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */; };
 		CF6E0486242A321200DB7F14 /* RLMProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0484242A321200DB7F14 /* RLMProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CF6E0487242A321200DB7F14 /* RLMProviderClient.m in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0485242A321200DB7F14 /* RLMProviderClient.m */; };
+		CF6E0487242A321200DB7F14 /* RLMProviderClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0485242A321200DB7F14 /* RLMProviderClient.mm */; };
 		CF6E0488242A4B5A00DB7F14 /* RLMJSONModels.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A6921D11D779774004C3232 /* RLMJSONModels.h */; };
 		CF6E0489242A4B5B00DB7F14 /* RLMJSONModels.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A6921D11D779774004C3232 /* RLMJSONModels.h */; };
-		CF6E048A242A4B6D00DB7F14 /* RLMProviderClient.m in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0485242A321200DB7F14 /* RLMProviderClient.m */; };
+		CF6E048A242A4B6D00DB7F14 /* RLMProviderClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0485242A321200DB7F14 /* RLMProviderClient.mm */; };
 		CF6E048B242A4B6F00DB7F14 /* RLMProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0484242A321200DB7F14 /* RLMProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF6E048C242A4B7100DB7F14 /* RLMUsernamePasswordProviderClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */; };
 		CF6E048D242A4B7400DB7F14 /* RLMUsernamePasswordProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0480242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -925,7 +925,7 @@
 		CF6E0480242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMUsernamePasswordProviderClient.h; sourceTree = "<group>"; };
 		CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUsernamePasswordProviderClient.mm; sourceTree = "<group>"; };
 		CF6E0484242A321200DB7F14 /* RLMProviderClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMProviderClient.h; sourceTree = "<group>"; };
-		CF6E0485242A321200DB7F14 /* RLMProviderClient.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RLMProviderClient.m; sourceTree = "<group>"; };
+		CF6E0485242A321200DB7F14 /* RLMProviderClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMProviderClient.mm; sourceTree = "<group>"; };
 		CFAEF75F242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMUserAPIKeyProviderClient.h; sourceTree = "<group>"; };
 		CFAEF760242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUserAPIKeyProviderClient.mm; sourceTree = "<group>"; };
 		CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMUserAPIKey.h; sourceTree = "<group>"; };
@@ -1444,7 +1444,7 @@
 				CF6E0480242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h */,
 				CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */,
 				CF6E0484242A321200DB7F14 /* RLMProviderClient.h */,
-				CF6E0485242A321200DB7F14 /* RLMProviderClient.m */,
+				CF6E0485242A321200DB7F14 /* RLMProviderClient.mm */,
 				CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */,
 				CFAEF764242B672700EAF721 /* RLMUserAPIKey.mm */,
 				CFAEF767242B7F8900EAF721 /* RLMUserAPIKey_Private.hpp */,
@@ -2461,7 +2461,7 @@
 				1A15365E1DB045B500C0EC93 /* sync_user.cpp in Sources */,
 				C2CAAE771E9BB5760025454C /* system_configuration.cpp in Sources */,
 				1AB2D36E1E16EB91007D0A3F /* thread_safe_reference.cpp in Sources */,
-				CF6E0487242A321200DB7F14 /* RLMProviderClient.m in Sources */,
+				CF6E0487242A321200DB7F14 /* RLMProviderClient.mm in Sources */,
 				CF6E0483242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm in Sources */,
 				5D659E9E1BE04556006515A0 /* transact_log_handler.cpp in Sources */,
 				1AABD4021E9552BA00115A75 /* uuid.cpp in Sources */,
@@ -2577,7 +2577,7 @@
 				5DD7558C1BE056DE002800DA /* RLMObjectSchema.mm in Sources */,
 				5DD7558D1BE056DE002800DA /* RLMObjectStore.mm in Sources */,
 				5DD7558E1BE056DE002800DA /* RLMObservation.mm in Sources */,
-				CF6E048A242A4B6D00DB7F14 /* RLMProviderClient.m in Sources */,
+				CF6E048A242A4B6D00DB7F14 /* RLMProviderClient.mm in Sources */,
 				5DD7558F1BE056DE002800DA /* RLMOptionalBase.mm in Sources */,
 				5D3E1A301C1FD1CF002913BA /* RLMPredicateUtil.mm in Sources */,
 				5DD755901BE056DE002800DA /* RLMProperty.mm in Sources */,

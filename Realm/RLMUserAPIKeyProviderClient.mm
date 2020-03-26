@@ -30,50 +30,50 @@ static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
                                   }];
 }
 
-- (void)createApiKey:(NSString *)name
-   completionHandler:(RLMOptionalUserAPIKeyBlock)completionHandler {
+- (void)createApiKeyWithName:(NSString *)name
+                  completion:(RLMOptionalUserAPIKeyBlock)completion {
     
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
     .create_api_key(name.UTF8String, ^(Optional<realm::app::App::UserAPIKey> userAPIKey,
                                        Optional<realm::app::AppError> error) {
         
         if (error && error->error_code) {
-            return completionHandler(nil, AppErrorToNSError(*error));
+            return completion(nil, AppErrorToNSError(*error));
         }
         
         if (userAPIKey) {
-            return completionHandler([[RLMUserAPIKey alloc] initWithUserAPIKey:userAPIKey.value()], nil);
+            return completion([[RLMUserAPIKey alloc] initWithUserAPIKey:userAPIKey.value()], nil);
         }
         
-        return completionHandler(nil, nil);
+        return completion(nil, nil);
     });
 }
 
 - (void)fetchApiKey:(RLMObjectId)objectId
-  completionHandler:(RLMOptionalUserAPIKeyBlock)completionHandler {
+         completion:(RLMOptionalUserAPIKeyBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
     .fetch_api_key(nil, ^(Optional<realm::app::App::UserAPIKey> userAPIKey,
                                        Optional<realm::app::AppError> error) {
         
         if (error && error->error_code) {
-            return completionHandler(nil, AppErrorToNSError(*error));
+            return completion(nil, AppErrorToNSError(*error));
         }
         
         if (userAPIKey) {
-            return completionHandler([[RLMUserAPIKey alloc] initWithUserAPIKey:userAPIKey.value()], nil);
+            return completion([[RLMUserAPIKey alloc] initWithUserAPIKey:userAPIKey.value()], nil);
         }
         
-        return completionHandler(nil, nil);
+        return completion(nil, nil);
     });
 }
 
-- (void)fetchApiKeys:(RLMUserAPIKeysBlock)completionHandler {
+- (void)fetchApiKeysWithCompletion:(RLMUserAPIKeysBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
     .fetch_api_keys(^(const std::vector<realm::app::App::UserAPIKey>& userAPIKeys,
                       Optional<realm::app::AppError> error) {
         
         if (error && error->error_code) {
-            return completionHandler(@[], AppErrorToNSError(*error));
+            return completion(nil, AppErrorToNSError(*error));
         }
         
         NSMutableArray *apiKeys = [[NSMutableArray alloc] init];
@@ -81,40 +81,31 @@ static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
             [apiKeys addObject:[[RLMUserAPIKey alloc] initWithUserAPIKey: userAPIKey]];
         }
                 
-        return completionHandler(apiKeys, nil);
+        return completion(apiKeys, nil);
     });
 }
 
 - (void)deleteApiKey:(RLMUserAPIKey *)apiKey
-   completionHandler:(RLMOptionalErrorBlock)completionHandler {
+   completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
     .delete_api_key(apiKey._apiKey, ^(Optional<realm::app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(AppErrorToNSError(*error));
-        }
-        completionHandler(nil);
+        [self.app handleResponse:error completion:completion];
     });
 }
 
 - (void)enableApiKey:(RLMUserAPIKey *)apiKey
-   completionHandler:(RLMOptionalErrorBlock)completionHandler {
+   completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
     .enable_api_key(apiKey._apiKey, ^(Optional<realm::app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(AppErrorToNSError(*error));
-        }
-        completionHandler(nil);
+        [self.app handleResponse:error completion:completion];
     });
 }
 
 - (void)disableApiKey:(RLMUserAPIKey *)apiKey
-    completionHandler:(RLMOptionalErrorBlock)completionHandler {
+    completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
     .disable_api_key(apiKey._apiKey, ^(Optional<realm::app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(AppErrorToNSError(*error));
-        }
-        completionHandler(nil);
+        [self.app handleResponse:error completion:completion];
     });
 }
 

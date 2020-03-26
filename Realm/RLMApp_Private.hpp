@@ -25,5 +25,15 @@ using namespace app;
 static NSMutableDictionary<NSString *, RLMApp *>* apps= [NSMutableDictionary new];
 
 @interface RLMApp ()
+
 - (App)_realmApp;
+
+/**
+Convert an object store AppError to an NSError.
+*/
+- (NSError*)AppErrorToNSError:(const realm::app::AppError&)appError;
+
+- (void)handleResponse:(Optional<realm::app::AppError>)error
+            completion:(RLMOptionalErrorBlock)completion;
+
 @end

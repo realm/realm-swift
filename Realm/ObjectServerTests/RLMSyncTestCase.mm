@@ -531,7 +531,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)resetSyncManager {
-    [RLMSyncManager.sharedManager._allUsers makeObjectsPerformSelector:@selector(logOut)];
+    [RLMSyncManager.sharedManager._allUsers makeObjectsPerformSelector:@selector(logOutWithCompletion)];
     [RLMSyncManager resetForTesting];
     [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:NO blockOnRefreshCompletion:nil];
 }

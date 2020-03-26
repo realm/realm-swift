@@ -18,15 +18,7 @@
 
 #import "sync/app.hpp"
 
-using namespace realm;
-using namespace app;
-
-#ifndef RLMUserAPIKey_Private_h
-#define RLMUserAPIKey_Private_h
-
 @interface RLMUserAPIKey ()
-- (App::UserAPIKey)_apiKey;
-- (instancetype)initWithUserAPIKey:(App::UserAPIKey)userAPIKey;
+- (realm::app::App::UserAPIKey)_apiKey;
+- (instancetype)initWithUserAPIKey:(realm::app::App::UserAPIKey)userAPIKey;
 @end
-
-#endif /* RLMUserAPIKey_Private_h */

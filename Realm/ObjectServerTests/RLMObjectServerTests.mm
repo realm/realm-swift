@@ -99,7 +99,7 @@
     RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
     __block RLMSyncUser *syncUser;
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completionHandler:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert(user);
         syncUser = user;
@@ -109,21 +109,21 @@
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 
     RLMSyncUser *currentUser = [app currentUser];
-    XCTAssert([currentUser.identity isEqualTo: syncUser.identity]);
-    XCTAssert([currentUser.refreshToken isEqualTo: syncUser.refreshToken]);
-    XCTAssert([currentUser.accessToken isEqualTo: syncUser.accessToken]);
+    XCTAssert([currentUser.identity isEqualToString:syncUser.identity]);
+    XCTAssert([currentUser.refreshToken isEqualToString:syncUser.refreshToken]);
+    XCTAssert([currentUser.accessToken isEqualToString:syncUser.accessToken]);
 }
 
 - (void)testLogoutCurrentUser {
     RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should log out current user"];
     __block RLMSyncUser *syncUser;
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completionHandler:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert(user);
         syncUser = user;
         
-        [app log_out:^(NSError * _Nullable error) {
+        [app logOutWithCompletion:^(NSError * _Nullable error) {
             XCTAssert(!error);
             XCTAssert(syncUser.state == RLMSyncUserStateRemoved);
             [expectation fulfill];
@@ -137,12 +137,12 @@
     RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should log out specific user"];
     __block RLMSyncUser *syncUser;
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completionHandler:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert(user);
         syncUser = user;
         
-        [app log_out:syncUser completionHandler:^(NSError * _Nullable) {
+        [app logOut:syncUser completion:^(NSError * _Nullable) {
             XCTAssert(!error);
             XCTAssert(syncUser.state == RLMSyncUserStateRemoved);
             [expectation fulfill];
@@ -154,59 +154,68 @@
 
 - (void)testSwitchUser {
     RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
-    XCTestExpectation *expectation = [self expectationWithDescription:@"should switch user"];
+    
+    XCTestExpectation *loginExpectationA = [self expectationWithDescription:@"should login user A"];
+    XCTestExpectation *loginExpectationB = [self expectationWithDescription:@"should login user B"];
+
     __block RLMSyncUser *syncUserA;
     __block RLMSyncUser *syncUserB;
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completionHandler:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert(user);
         syncUserA = user;
+        [loginExpectationA fulfill];
     }];
     
-    while(!syncUserA) { }
-    
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completionHandler:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+    [self waitForExpectations:@[loginExpectationA] timeout:60.0];
+
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert(user);
         syncUserB = user;
+        [loginExpectationB fulfill];
     }];
     
-    while(!syncUserB) { }
-    
-    XCTAssert([[app switchUser:syncUserA].identity isEqualToString:syncUserA.identity]);
-    [expectation fulfill];
+    [self waitForExpectations:@[loginExpectationB] timeout:60.0];
 
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    XCTAssert([[app switchToUser:syncUserA].identity isEqualToString:syncUserA.identity]);
+
 }
 
 - (void)testRemoveUser {
     RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
-    XCTestExpectation *expectation = [self expectationWithDescription:@"should remove user"];
+    XCTestExpectation *loginExpectationA = [self expectationWithDescription:@"should login user A"];
+    XCTestExpectation *loginExpectationB = [self expectationWithDescription:@"should login user B"];
+    XCTestExpectation *removeUserExpectation = [self expectationWithDescription:@"should remove user"];
+
     __block RLMSyncUser *syncUserA;
     __block RLMSyncUser *syncUserB;
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completionHandler:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+    
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert(user);
         syncUserA = user;
+        [loginExpectationA fulfill];
     }];
     
-    while(!syncUserA) { }
-    
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completionHandler:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+    [self waitForExpectations:@[loginExpectationA] timeout:60.0];
+
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert(user);
         syncUserB = user;
+        [loginExpectationB fulfill];
     }];
     
-    while(!syncUserB) { }
-    
+    [self waitForExpectations:@[loginExpectationB] timeout:60.0];
+
     XCTAssert([[app currentUser].identity isEqualToString:syncUserB.identity]);
     
-    [app removeUser:syncUserB completionHandler:^(NSError * _Nullable error) {
+    [app removeUser:syncUserB completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert([app allUsers].count == 1);
         XCTAssert([[app currentUser].identity isEqualToString:syncUserA.identity]);
-        [expectation fulfill];
+        [removeUserExpectation fulfill];
     }];
 
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
@@ -221,7 +230,7 @@
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
     NSString *randomPassword = [self generateRandomString:10];
 
-    [[app usernamePasswordProviderClient] registerEmail:randomEmail password:randomPassword completionHandler:^(NSError * _Nullable error) {
+    [[app usernamePasswordProviderClient] registerEmail:randomEmail password:randomPassword completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
         [expectation fulfill];
     }];
@@ -235,8 +244,8 @@
 
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
     
-    [[app usernamePasswordProviderClient] confirmUser:randomEmail tokenId:@"a_token" completionHandler:^(NSError * _Nullable error) {
-        XCTAssert(error.code == 48);
+    [[app usernamePasswordProviderClient] confirmUser:randomEmail tokenId:@"a_token" completion:^(NSError * _Nullable error) {
+        XCTAssertEqual(error.code, RLMAppErrorBadRequest);
         [expectation fulfill];
     }];
 
@@ -249,8 +258,8 @@
 
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
     
-    [[app usernamePasswordProviderClient] resendConfirmationEmail:randomEmail completionHandler:^(NSError * _Nullable error) {
-        XCTAssert(error.code == 45);
+    [[app usernamePasswordProviderClient] resendConfirmationEmail:randomEmail completion:^(NSError * _Nullable error) {
+        XCTAssertEqual(error.code, RLMAppErrorUserNotFound);
         [expectation fulfill];
     }];
 
@@ -261,8 +270,8 @@
     RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try reset password and fail"];
 
-    [[app usernamePasswordProviderClient] resetPassword:@"APassword123" token:@"a_token" tokenId:@"a_token_id" completionHandler:^(NSError * _Nullable error) {
-        XCTAssert(error.code == 48);
+    [[app usernamePasswordProviderClient] resetPasswordTo:@"APassword123" token:@"a_token" tokenId:@"a_token_id" completion:^(NSError * _Nullable error) {
+        XCTAssertEqual(error.code, RLMAppErrorBadRequest);
         [expectation fulfill];
     }];
 
@@ -273,8 +282,8 @@
     RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try call reset password function and fail"];
 
-    [[app usernamePasswordProviderClient] callResetPasswordFunction:@"test@mongodb.com" password:@"aPassword123" args:@"" completionHandler:^(NSError * _Nullable error) {
-        XCTAssert(error.code == -1);
+    [[app usernamePasswordProviderClient] callResetPasswordFunction:@"test@mongodb.com" password:@"aPassword123" args:@"" completion:^(NSError * _Nullable error) {
+        XCTAssertEqual(error.code, RLMAppErrorUnknown);
         [expectation fulfill];
     }];
 
@@ -285,57 +294,63 @@
 
 - (void)testUserAPIKeyProviderClientFlow {
     RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
-    XCTestExpectation *expectation = [self expectationWithDescription:@"should try call reset password function and fail"];
+    
+    XCTestExpectation *registerExpectation = [self expectationWithDescription:@"should try register"];
+    XCTestExpectation *loginExpectation = [self expectationWithDescription:@"should try login"];
+    XCTestExpectation *createAPIKeyExpectationA = [self expectationWithDescription:@"should try create an api key"];
+    XCTestExpectation *createAPIKeyExpectationB = [self expectationWithDescription:@"should try create an api key"];
+    XCTestExpectation *fetchAPIKeysExpectation = [self expectationWithDescription:@"should try call fetch api keys"];
+    
     __block RLMSyncUser *syncUser;
-    __block BOOL registerComplete = NO;
-    __block BOOL userAPIKeyACreated = NO;
-    __block BOOL userAPIKeyBCreated = NO;
     __block RLMUserAPIKey *userAPIKeyA;
     __block RLMUserAPIKey *userAPIKeyB;
 
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
     NSString *randomPassword = [self generateRandomString:10];
     
-    [[app usernamePasswordProviderClient] registerEmail:randomEmail password:randomPassword completionHandler:^(NSError * _Nullable error) {
+    [[app usernamePasswordProviderClient] registerEmail:randomEmail password:randomPassword completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
-        registerComplete = YES;
+        [registerExpectation fulfill];
     }];
 
-    while (!registerComplete) { }
-    
+    [self waitForExpectations:@[registerExpectation] timeout:60.0];
+
     [app loginWithCredential:[RLMAppCredentials credentialsWithUsername:randomEmail password:randomPassword]
-           completionHandler:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+           completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert(user);
         syncUser = user;
+        [loginExpectation fulfill];
     }];
     
-    while (!syncUser) { }
-    
-    [[app userAPIKeyProviderClient] createApiKey:@"apiKeyName1" completionHandler:^(RLMUserAPIKey * _Nullable userAPIKey, NSError * _Nullable error) {
+    [self waitForExpectations:@[loginExpectation] timeout:60.0];
+
+    [[app userAPIKeyProviderClient] createApiKeyWithName:@"apiKeyName1" completion:^(RLMUserAPIKey * _Nullable userAPIKey, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName1"]);
         userAPIKeyA = userAPIKey;
-        userAPIKeyACreated = YES;
+        [createAPIKeyExpectationA fulfill];
     }];
     
-    while (!userAPIKeyACreated) { }
-    
-    [[app userAPIKeyProviderClient] createApiKey:@"apiKeyName2" completionHandler:^(RLMUserAPIKey * _Nullable userAPIKey, NSError * _Nullable error) {
+    [self waitForExpectations:@[createAPIKeyExpectationA] timeout:60.0];
+
+    [[app userAPIKeyProviderClient] createApiKeyWithName:@"apiKeyName2" completion:^(RLMUserAPIKey * _Nullable userAPIKey, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName2"]);
         userAPIKeyB = userAPIKey;
-        userAPIKeyBCreated = YES;
+        [createAPIKeyExpectationB fulfill];
     }];
     
-    while (!userAPIKeyBCreated) { }
-    
-    [[app userAPIKeyProviderClient] fetchApiKeys:^(NSArray<RLMUserAPIKey *> * _Nonnull apiKeys, NSError * _Nullable error) {
+    [self waitForExpectations:@[createAPIKeyExpectationB] timeout:60.0];
+
+    [[app userAPIKeyProviderClient] fetchApiKeysWithCompletion:^(NSArray<RLMUserAPIKey *> * _Nonnull apiKeys, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert(apiKeys.count == 2);
-        [expectation fulfill];
+        [fetchAPIKeysExpectation fulfill];
     }];
     
+    [self waitForExpectations:@[fetchAPIKeysExpectation] timeout:60.0];
+
     //These tests require an ObjectId
     /*
     [[app userAPIKeyProviderClient] disableApiKey:userAPIKeyA completionHandler:^(NSError * _Nullable error) {
@@ -343,8 +358,6 @@
         [expectation fulfill];
     }];
      */
-
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
 }
 
 #pragma mark - Username Password

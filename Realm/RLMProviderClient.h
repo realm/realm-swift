@@ -23,9 +23,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMProviderClient : NSObject
 
+/// A block type used to report an error
+typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
+
 @property (nonatomic, weak) RLMApp *app;
 
-- (instancetype)init:(RLMApp *)app;
+- (instancetype)initWithApp:(RLMApp *)app;
 
 @end
 

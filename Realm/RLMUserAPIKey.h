@@ -26,11 +26,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BOOL disabled;
 
 // The name of the key.
-@property (nonatomic, readonly) NSString* name;
+@property (nonatomic, readonly) NSString *name;
 
 // The actual key. Will only be included in
 // the response when an API key is first created.
-@property (nonatomic, readonly, nullable) NSString* key;
+@property (nonatomic, readonly, nullable) NSString *key;
 
 @property (nonatomic, readonly) id objectId;
 

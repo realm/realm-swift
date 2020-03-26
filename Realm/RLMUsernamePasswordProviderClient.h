@@ -28,9 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 */
 @interface RLMUsernamePasswordProviderClient : RLMProviderClient
 
-/// A block type used to report an error
-typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
-
 /**
  Registers a new email identity with the username/password provider,
  and sends a confirmation email to the provided address.
@@ -42,7 +39,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 
 - (void)registerEmail:(NSString *)email
              password:(NSString *)password
-    completionHandler:(RLMOptionalErrorBlock)completionHandler;
+           completion:(RLMOptionalErrorBlock)completionHandler;
 
 /**
  Confirms an email identity with the username/password provider.
@@ -53,7 +50,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 */
 - (void)confirmUser:(NSString *)token
             tokenId:(NSString *)tokenId
-  completionHandler:(RLMOptionalErrorBlock)completionHandler;
+         completion:(RLMOptionalErrorBlock)completionHandler;
 
 /**
  Re-sends a confirmation email to a user that has registered but
@@ -63,7 +60,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
  @param completionHandler A callback to be invoked once the call is complete.
 */
 - (void)resendConfirmationEmail:(NSString *)email
-              completionHandler:(RLMOptionalErrorBlock)completionHandler;
+                     completion:(RLMOptionalErrorBlock)completionHandler;
 
 /**
  Sends a password reset email to the given email address.
@@ -72,21 +69,21 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
  @param completionHandler A callback to be invoked once the call is complete.
 */
 - (void)sendResetPasswordEmail:(NSString *)email
-             completionHandler:(RLMOptionalErrorBlock)completionHandler;
+                    completion:(RLMOptionalErrorBlock)completionHandler;
 
 /**
  Resets the password of an email identity using the
  password reset token emailed to a user.
 
- @param password The desired new password.
+ @param password The new password.
  @param token The password reset token that was emailed to the user.
  @param tokenId The password reset token id that was emailed to the user.
  @param completionHandler A callback to be invoked once the call is complete.
 */
-- (void)resetPassword:(NSString *)password
-                token:(NSString *)token
-              tokenId:(NSString *)tokenId
-    completionHandler:(RLMOptionalErrorBlock)completionHandler;
+- (void)resetPasswordTo:(NSString *)password
+                  token:(NSString *)token
+                tokenId:(NSString *)tokenId
+      completion:(RLMOptionalErrorBlock)completionHandler;
 
 /**
  Resets the password of an email identity using the
@@ -103,7 +100,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 - (void)callResetPasswordFunction:(NSString *)email
                          password:(NSString *)password
                              args:(NSString *)args
-                completionHandler:(RLMOptionalErrorBlock)completionHandler;
+                       completion:(RLMOptionalErrorBlock)completionHandler;
 
 @end
 

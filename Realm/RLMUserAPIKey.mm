@@ -42,7 +42,7 @@
 
 // The name of the key.
 - (NSString *)name {
-    return [NSString stringWithUTF8String:_userAPIKey.name.c_str()];
+    return @(_userAPIKey.name.c_str());
 }
 
 // The actual key. Will only be included in
@@ -59,7 +59,7 @@
     return nil;
 }
 
-- (App::UserAPIKey)_apiKey {
+- (realm::app::App::UserAPIKey)_apiKey {
     return _userAPIKey;
 }
 

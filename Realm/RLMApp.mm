@@ -150,72 +150,60 @@ namespace {
     return [[RLMSyncManager sharedManager] _currentUser];
 }
 
-/**
- Convert an object store AppError to an NSError.
- */
-static NSError* AppErrorToNSError(const app::AppError& appError) {
+- (NSError*)AppErrorToNSError:(const realm::app::AppError&)appError {
     return [[NSError alloc] initWithDomain:@(appError.error_code.category().name())
                                       code:appError.error_code.value()
                                   userInfo:@{
                                       @(appError.error_code.category().name()) : @(appError.error_code.message().data())
                                   }];
 }
-
 - (void)loginWithCredential:(RLMAppCredentials *)credentials
-          completionHandler:(RLMUserCompletionBlock)completionHandler {
+          completion:(RLMUserCompletionBlock)completionHandler {
     _app.log_in_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
-            return completionHandler(nil, AppErrorToNSError(*error));
+            return completionHandler(nil, [self AppErrorToNSError:*error]);
         }
 
         completionHandler([[RLMSyncUser alloc] initWithSyncUser:user], nil);
     });
 }
 
-- (RLMSyncUser *)switchUser:(RLMSyncUser *)syncUser
-{
+- (RLMSyncUser *)switchToUser:(RLMSyncUser *)syncUser {
     return [[RLMSyncUser alloc] initWithSyncUser:_app.switch_user(syncUser._syncUser)];
 }
 
-- (void)removeUser:(RLMSyncUser *)syncUser completionHandler:(RLMOptionalErrorBlock)completionHandler
-{
+- (void)removeUser:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
     _app.remove_user(syncUser._syncUser, ^(Optional<app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(AppErrorToNSError(*error));
-        }
-
-        completionHandler(nil);
+        [self handleResponse:error completion:completion];
     });
 }
 
-- (void)log_out:(RLMOptionalErrorBlock)completionHandler
-{
+- (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
     _app.log_out(^(Optional<app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(AppErrorToNSError(*error));
-        }
-
-        completionHandler(nil);
+        [self handleResponse:error completion:completion];
     });
 }
 
-- (void)log_out:(RLMSyncUser *)syncUser completionHandler:(RLMOptionalErrorBlock)completionHandler
-{
+- (void)logOut:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completionHandler {
     _app.log_out(syncUser._syncUser, ^(Optional<app::AppError> error) {
-        if (error && error->error_code) {
-            return completionHandler(AppErrorToNSError(*error));
-        }
-
-        completionHandler(nil);
+        [self handleResponse:error completion:completionHandler];
     });
 }
 
 - (RLMUsernamePasswordProviderClient *)usernamePasswordProviderClient {
-    return [[RLMUsernamePasswordProviderClient alloc] init: self];
+    return [[RLMUsernamePasswordProviderClient alloc] initWithApp: self];
 }
 
 - (RLMUserAPIKeyProviderClient *)userAPIKeyProviderClient {
-    return [[RLMUserAPIKeyProviderClient alloc] init: self];
+    return [[RLMUserAPIKeyProviderClient alloc] initWithApp: self];
+}
+
+- (void)handleResponse:(Optional<realm::app::AppError>)error
+            completion:(RLMOptionalErrorBlock)completion {
+    if (error && error->error_code) {
+        return completion([self AppErrorToNSError:*error]);
+    }
+    completion(nil);
 }
 
 @end
