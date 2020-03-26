@@ -30,6 +30,10 @@
 #import "shared_realm.hpp"
 #import "RLMApp_Private.hpp"
 #import "RLMAppCredentials.h"
+#import "RLMUserAPIKey.h"
+#import "RLMProviderClient.h"
+#import "RLMUsernamePasswordProviderClient.h"
+#import "RLMUserAPIKeyProviderClient.h"
 
 #pragma mark - Test objects
 

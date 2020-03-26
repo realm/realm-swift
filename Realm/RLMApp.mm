@@ -23,6 +23,9 @@
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncManager_Private.h"
 
+#import "RLMUsernamePasswordProviderClient.h"
+#import "RLMUserAPIKeyProviderClient.h"
+
 using namespace realm;
 
 namespace {

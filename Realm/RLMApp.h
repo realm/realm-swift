@@ -15,14 +15,12 @@
 // limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
-#import "RLMUsernamePasswordProviderClient.h"
-#import "RLMUserAPIKeyProviderClient.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol RLMNetworkTransport;
 
-@class RLMSyncUser, RLMAppCredentials;
+@class RLMSyncUser, RLMAppCredentials, RLMUsernamePasswordProviderClient, RLMUserAPIKeyProviderClient;
 
 /// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
