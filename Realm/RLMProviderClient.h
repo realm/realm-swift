@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// A block type used to report an error
 typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 
-@property (nonatomic, weak) RLMApp *app;
+@property (nonatomic, strong) RLMApp *app;
 
 - (instancetype)initWithApp:(RLMApp *)app;
 
