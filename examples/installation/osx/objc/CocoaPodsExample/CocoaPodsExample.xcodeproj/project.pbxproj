@@ -93,9 +93,9 @@
 			children = (
 				E8AA50FA1B015B2B00C6A3F9 /* CocoaPodsExample */,
 				E8AA51111B015B2B00C6A3F9 /* CocoaPodsExampleTests */,
-				E8AA50F91B015B2B00C6A3F9 /* Products */,
-				4BE6B3BAD4790C0E6B17EFAA /* Pods */,
 				BDEF7ACC398E86B23E1E3E0E /* Frameworks */,
+				4BE6B3BAD4790C0E6B17EFAA /* Pods */,
+				E8AA50F91B015B2B00C6A3F9 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -111,13 +111,13 @@
 		E8AA50FA1B015B2B00C6A3F9 /* CocoaPodsExample */ = {
 			isa = PBXGroup;
 			children = (
+				E8AA50FB1B015B2B00C6A3F9 /* Supporting Files */,
 				E8AA50FD1B015B2B00C6A3F9 /* AppDelegate.h */,
 				E8AA50FE1B015B2B00C6A3F9 /* AppDelegate.m */,
-				E8AA51021B015B2B00C6A3F9 /* ViewController.h */,
-				E8AA51031B015B2B00C6A3F9 /* ViewController.m */,
 				E8AA51051B015B2B00C6A3F9 /* Images.xcassets */,
 				E8AA51071B015B2B00C6A3F9 /* Main.storyboard */,
-				E8AA50FB1B015B2B00C6A3F9 /* Supporting Files */,
+				E8AA51021B015B2B00C6A3F9 /* ViewController.h */,
+				E8AA51031B015B2B00C6A3F9 /* ViewController.m */,
 			);
 			path = CocoaPodsExample;
 			sourceTree = "<group>";
@@ -134,8 +134,8 @@
 		E8AA51111B015B2B00C6A3F9 /* CocoaPodsExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				E8AA51141B015B2B00C6A3F9 /* CocoaPodsExampleTests.m */,
 				E8AA51121B015B2B00C6A3F9 /* Supporting Files */,
+				E8AA51141B015B2B00C6A3F9 /* CocoaPodsExampleTests.m */,
 			);
 			path = CocoaPodsExampleTests;
 			sourceTree = "<group>";
@@ -288,9 +288,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8AA51041B015B2B00C6A3F9 /* ViewController.m in Sources */,
-				E8AA51011B015B2B00C6A3F9 /* main.m in Sources */,
 				E8AA50FF1B015B2B00C6A3F9 /* AppDelegate.m in Sources */,
+				E8AA51011B015B2B00C6A3F9 /* main.m in Sources */,
+				E8AA51041B015B2B00C6A3F9 /* ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

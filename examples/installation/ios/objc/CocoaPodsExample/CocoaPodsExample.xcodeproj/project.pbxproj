@@ -84,9 +84,9 @@
 			children = (
 				E83EBA801AFAB18F0026370F /* CocoaPodsExample */,
 				E83EBA9A1AFAB18F0026370F /* CocoaPodsExampleTests */,
-				E83EBA7F1AFAB18F0026370F /* Products */,
-				F5851B9C26D003816745FF6A /* Pods */,
 				C2B55A3F564B4A7B9B9EB9A2 /* Frameworks */,
+				F5851B9C26D003816745FF6A /* Pods */,
+				E83EBA7F1AFAB18F0026370F /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -102,14 +102,14 @@
 		E83EBA801AFAB18F0026370F /* CocoaPodsExample */ = {
 			isa = PBXGroup;
 			children = (
+				E83EBA811AFAB18F0026370F /* Supporting Files */,
 				E83EBA851AFAB18F0026370F /* AppDelegate.h */,
 				E83EBA861AFAB18F0026370F /* AppDelegate.m */,
-				E83EBA881AFAB18F0026370F /* ViewController.h */,
-				E83EBA891AFAB18F0026370F /* ViewController.m */,
-				E83EBA8B1AFAB18F0026370F /* Main.storyboard */,
 				E83EBA8E1AFAB18F0026370F /* Images.xcassets */,
 				E83EBA901AFAB18F0026370F /* LaunchScreen.xib */,
-				E83EBA811AFAB18F0026370F /* Supporting Files */,
+				E83EBA8B1AFAB18F0026370F /* Main.storyboard */,
+				E83EBA881AFAB18F0026370F /* ViewController.h */,
+				E83EBA891AFAB18F0026370F /* ViewController.m */,
 			);
 			path = CocoaPodsExample;
 			sourceTree = "<group>";
@@ -126,8 +126,8 @@
 		E83EBA9A1AFAB18F0026370F /* CocoaPodsExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				E83EBA9D1AFAB18F0026370F /* CocoaPodsExampleTests.m */,
 				E83EBA9B1AFAB18F0026370F /* Supporting Files */,
+				E83EBA9D1AFAB18F0026370F /* CocoaPodsExampleTests.m */,
 			);
 			path = CocoaPodsExampleTests;
 			sourceTree = "<group>";
@@ -233,9 +233,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E83EBA8D1AFAB18F0026370F /* Main.storyboard in Resources */,
-				E83EBA921AFAB18F0026370F /* LaunchScreen.xib in Resources */,
 				E83EBA8F1AFAB18F0026370F /* Images.xcassets in Resources */,
+				E83EBA921AFAB18F0026370F /* LaunchScreen.xib in Resources */,
+				E83EBA8D1AFAB18F0026370F /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -292,9 +292,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E83EBA8A1AFAB18F0026370F /* ViewController.m in Sources */,
 				E83EBA871AFAB18F0026370F /* AppDelegate.m in Sources */,
 				E83EBA841AFAB18F0026370F /* main.m in Sources */,
+				E83EBA8A1AFAB18F0026370F /* ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

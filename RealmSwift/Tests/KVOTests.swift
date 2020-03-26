@@ -123,20 +123,36 @@ class KVOTests: TestCase {
         changeDictionary = nil
     }
 
-    func observeChange<T: Equatable>(_ obj: SwiftKVOObject, _ keyPath: KeyPath<SwiftKVOObject, T>, _ old: Any?, _ new: Any?,
+    func observeChange<T: Equatable>(_ obj: SwiftKVOObject, _ keyPath: KeyPath<SwiftKVOObject, T>, _ old: T, _ new: T,
                                      fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
         let kvoOptions: NSKeyValueObservingOptions = [.old, .new]
         var gotNotification = false
         let observation = obj.observe(keyPath, options: kvoOptions) { _, change in
-            if let old = old {
-                XCTAssertEqual(change.oldValue, (old as! T), file: fileName, line: lineNumber)
+            XCTAssertEqual(change.oldValue, old, file: fileName, line: lineNumber)
+            XCTAssertEqual(change.newValue, new, file: fileName, line: lineNumber)
+            gotNotification = true
+        }
+
+        block()
+        observation.invalidate()
+
+        XCTAssertTrue(gotNotification, file: fileName, line: lineNumber)
+    }
+
+    func observeChange<T: Equatable>(_ obj: SwiftKVOObject, _ keyPath: KeyPath<SwiftKVOObject, T?>, _ old: T?, _ new: T?,
+                                     fileName: StaticString = #file, lineNumber: UInt = #line, _ block: () -> Void) {
+        let kvoOptions: NSKeyValueObservingOptions = [.old, .new]
+        var gotNotification = false
+        let observation = obj.observe(keyPath, options: kvoOptions) { _, change in
+            if let oldValue = change.oldValue {
+                XCTAssertEqual(oldValue, old, file: fileName, line: lineNumber)
             } else {
-                XCTAssertNil(change.oldValue, file: fileName, line: lineNumber)
+                XCTAssertNil(old, file: fileName, line: lineNumber)
             }
-            if let new = new {
-                XCTAssertEqual(change.newValue, (new as! T), file: fileName, line: lineNumber)
+            if let newValue = change.newValue {
+                XCTAssertEqual(newValue, new, file: fileName, line: lineNumber)
             } else {
-                XCTAssertNil(change.newValue, file: fileName, line: lineNumber)
+                XCTAssertNil(new, file: fileName, line: lineNumber)
             }
             gotNotification = true
         }

@@ -650,18 +650,12 @@ internal class ObjectUtil {
         // one named 'x', and another that is optional and is named 'x.storage'. Note
         // that '.' is illegal in either a Swift or Objective-C property name.
         if let storageRange = name.range(of: ".storage", options: [.anchored, .backwards]) {
-            #if swift(>=4.0)
-                return String(name[..<storageRange.lowerBound])
-            #else
-                return name.substring(to: storageRange.lowerBound)
-            #endif
+            return String(name[..<storageRange.lowerBound])
         }
         // Xcode 11 changed the name of the storage property to "$__lazy_storage_$_propName"
-        #if swift(>=4.0)
-            if let storageRange = name.range(of: "$__lazy_storage_$_", options: [.anchored]) {
-                return String(name[storageRange.upperBound...])
-            }
-        #endif
+        if let storageRange = name.range(of: "$__lazy_storage_$_", options: [.anchored]) {
+            return String(name[storageRange.upperBound...])
+        }
         return nil
     }
 
@@ -783,11 +777,11 @@ private func forceCastToInferred<T, V>(_ x: T) -> V {
 }
 
 extension Object: AssistedObjectiveCBridgeable {
-    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
+    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self {
         return forceCastToInferred(objectiveCValue)
     }
 
-    var bridged: (objectiveCValue: Any, metadata: Any?) {
+    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (objectiveCValue: unsafeCastToRLMObject(), metadata: nil)
     }
 }

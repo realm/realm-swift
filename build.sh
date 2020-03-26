@@ -154,7 +154,7 @@ build_combined() {
         destination="iPhone 8"
     elif [[ "$os" == "watchos"  ]]; then
         os_name="$os"
-        destination="Apple Watch Series 3 - 42mm"
+        destination="Apple Watch Series 4 - 40mm"
     elif [[ "$os" == "appletvos"  ]]; then
         os_name="tvos"
         destination="Apple TV"
@@ -175,21 +175,7 @@ build_combined() {
 
     # Combine .swiftmodule
     if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
-      cp $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
-    fi
-
-    # Xcode 10.2 merges the generated headers together with ifdef guards for
-    # each of the target platforms. This doesn't handle merging
-    # device/simulator builds, so we need to take care of that ourselves.
-    # Currently all platforms have identical headers, so we just pick one and
-    # use that rather than merging, but this may change in the future.
-    if [ -f $os_path/Headers/$module_name-Swift.h ]; then
-      unique_headers=$(find $build_intermediates_path -name $module_name-Swift.h -exec shasum {} \; | cut -d' ' -f 1 | uniq | grep -c '^')
-      if [ $unique_headers != "1" ]; then
-        echo "Platform-specific Swift generated headers are not identical. Merging them is required and is not yet implemented."
-        exit 1
-      fi
-      find $build_intermediates_path -name $module_name-Swift.h -exec cp {} $os_path/Headers \; -quit
+      cp -R $simulator_path/Modules/$module_name.swiftmodule/* $os_path/Modules/$module_name.swiftmodule/
     fi
 
     # Copy *.bcsymbolmap to .framework for submitting app with bitcode
@@ -201,6 +187,13 @@ build_combined() {
     # Combine ar archives
     LIPO_OUTPUT="$out_path/$product_name/$module_name"
     xcrun lipo -create "$simulator_path/$binary_path" "$os_path/$binary_path" -output "$LIPO_OUTPUT"
+
+    # The generated headers for Swift libraries have #ifdef checks to only
+    # define symbols for the applicable platforms, so we need to merge them as
+    # well.
+    if [ -f "$out_path/$product_name/Headers/$module_name-Swift.h" ]; then
+        cat "$simulator_path/Headers/$module_name-Swift.h" >> "$out_path/$product_name/Headers/$module_name-Swift.h"
+    fi
 
     # Verify that the combined library has bitcode and we didn't accidentally
     # remove it somewhere along the line
@@ -1552,7 +1545,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * APIs are backwards compatible with all previous releases in the 4.x.y series.
-* Carthage release for Swift is built with Xcode 11.3.
+* Carthage release for Swift is built with Xcode 11.4.
 
 ### Internal
 Upgraded realm-core from ? to ?

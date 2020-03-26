@@ -35,8 +35,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E8D052221B3CCDC7007A482B /* RealmSwift.framework in Embed Frameworks */,
 				E8D052201B3CCDC7007A482B /* Realm.framework in Embed Frameworks */,
+				E8D052221B3CCDC7007A482B /* RealmSwift.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -80,11 +80,11 @@
 		E8D051F01B3CCCC8007A482B = {
 			isa = PBXGroup;
 			children = (
-				E8D0521B1B3CCCE5007A482B /* Realm.framework */,
-				E8D0521C1B3CCCE5007A482B /* RealmSwift.framework */,
 				E8D051FB1B3CCCC9007A482B /* DynamicExample */,
 				E8D0520E1B3CCCC9007A482B /* DynamicExampleTests */,
 				E8D051FA1B3CCCC9007A482B /* Products */,
+				E8D0521B1B3CCCE5007A482B /* Realm.framework */,
+				E8D0521C1B3CCCE5007A482B /* RealmSwift.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -100,11 +100,11 @@
 		E8D051FB1B3CCCC9007A482B /* DynamicExample */ = {
 			isa = PBXGroup;
 			children = (
+				E8D051FC1B3CCCC9007A482B /* Supporting Files */,
 				E8D051FE1B3CCCC9007A482B /* AppDelegate.swift */,
-				E8D052001B3CCCC9007A482B /* ViewController.swift */,
 				E8D052021B3CCCC9007A482B /* Images.xcassets */,
 				E8D052041B3CCCC9007A482B /* Main.storyboard */,
-				E8D051FC1B3CCCC9007A482B /* Supporting Files */,
+				E8D052001B3CCCC9007A482B /* ViewController.swift */,
 			);
 			path = DynamicExample;
 			sourceTree = "<group>";
@@ -120,8 +120,8 @@
 		E8D0520E1B3CCCC9007A482B /* DynamicExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				E8D052111B3CCCC9007A482B /* DynamicExampleTests.swift */,
 				E8D0520F1B3CCCC9007A482B /* Supporting Files */,
+				E8D052111B3CCCC9007A482B /* DynamicExampleTests.swift */,
 			);
 			path = DynamicExampleTests;
 			sourceTree = "<group>";
@@ -237,8 +237,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8D052011B3CCCC9007A482B /* ViewController.swift in Sources */,
 				E8D051FF1B3CCCC9007A482B /* AppDelegate.swift in Sources */,
+				E8D052011B3CCCC9007A482B /* ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

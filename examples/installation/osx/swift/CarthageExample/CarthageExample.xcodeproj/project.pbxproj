@@ -35,8 +35,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E802DBE51B3CD5410047225A /* RealmSwift.framework in Embed Frameworks */,
 				E802DBE31B3CD5410047225A /* Realm.framework in Embed Frameworks */,
+				E802DBE51B3CD5410047225A /* RealmSwift.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -62,8 +62,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E802DBE41B3CD5410047225A /* RealmSwift.framework in Frameworks */,
 				E802DBE21B3CD5410047225A /* Realm.framework in Frameworks */,
+				E802DBE41B3CD5410047225A /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -80,11 +80,11 @@
 		E8219DC71B3CD4A2006F2638 = {
 			isa = PBXGroup;
 			children = (
-				E802DBE01B3CD5410047225A /* Realm.framework */,
-				E802DBE11B3CD5410047225A /* RealmSwift.framework */,
 				E8219DD21B3CD4A2006F2638 /* CarthageExample */,
 				E8219DE51B3CD4A2006F2638 /* CarthageExampleTests */,
 				E8219DD11B3CD4A2006F2638 /* Products */,
+				E802DBE01B3CD5410047225A /* Realm.framework */,
+				E802DBE11B3CD5410047225A /* RealmSwift.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -100,11 +100,11 @@
 		E8219DD21B3CD4A2006F2638 /* CarthageExample */ = {
 			isa = PBXGroup;
 			children = (
+				E8219DD31B3CD4A2006F2638 /* Supporting Files */,
 				E8219DD51B3CD4A2006F2638 /* AppDelegate.swift */,
-				E8219DD71B3CD4A2006F2638 /* ViewController.swift */,
 				E8219DD91B3CD4A2006F2638 /* Images.xcassets */,
 				E8219DDB1B3CD4A2006F2638 /* Main.storyboard */,
-				E8219DD31B3CD4A2006F2638 /* Supporting Files */,
+				E8219DD71B3CD4A2006F2638 /* ViewController.swift */,
 			);
 			path = CarthageExample;
 			sourceTree = "<group>";
@@ -120,8 +120,8 @@
 		E8219DE51B3CD4A2006F2638 /* CarthageExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				E8219DE81B3CD4A2006F2638 /* CarthageExampleTests.swift */,
 				E8219DE61B3CD4A2006F2638 /* Supporting Files */,
+				E8219DE81B3CD4A2006F2638 /* CarthageExampleTests.swift */,
 			);
 			path = CarthageExampleTests;
 			sourceTree = "<group>";
@@ -237,8 +237,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8219DD81B3CD4A2006F2638 /* ViewController.swift in Sources */,
 				E8219DD61B3CD4A2006F2638 /* AppDelegate.swift in Sources */,
+				E8219DD81B3CD4A2006F2638 /* ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

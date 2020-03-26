@@ -145,7 +145,6 @@ class RealmCollectionTypeTests: TestCase {
         super.tearDown()
     }
 
-#if swift(>=4)
     override class var defaultTestSuite: XCTestSuite {
         // Don't run tests for the base class
         if isEqual(RealmCollectionTypeTests.self) {
@@ -153,15 +152,6 @@ class RealmCollectionTypeTests: TestCase {
         }
         return super.defaultTestSuite
     }
-#else
-    override class func defaultTestSuite() -> XCTestSuite {
-        // Don't run tests for the base class
-        if isEqual(RealmCollectionTypeTests.self) {
-            return XCTestSuite(name: "empty")
-        }
-        return super.defaultTestSuite()
-    }
-#endif
 
     func testRealm() {
         guard let collection = collection else {
@@ -566,7 +556,6 @@ class RealmCollectionTypeTests: TestCase {
 // MARK: Results
 
 class ResultsTests: RealmCollectionTypeTests {
-#if swift(>=4)
     override class var defaultTestSuite: XCTestSuite {
         // Don't run tests for the base class
         if isEqual(ResultsTests.self) {
@@ -574,15 +563,6 @@ class ResultsTests: RealmCollectionTypeTests {
         }
         return super.defaultTestSuite
     }
-#else
-    override class func defaultTestSuite() -> XCTestSuite {
-        // Don't run tests for the base class
-        if isEqual(ResultsTests.self) {
-            return XCTestSuite(name: "empty")
-        }
-        return super.defaultTestSuite()
-    }
-#endif
 
     func collectionBaseInWriteTransaction() -> Results<CTTNullableStringObjectWithLink> {
         fatalError("abstract")
@@ -808,7 +788,6 @@ class ResultsFromLinkViewTests: ResultsTests {
 // MARK: List
 
 class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
-#if swift(>=4)
     override class var defaultTestSuite: XCTestSuite {
         // Don't run tests for the base class
         if isEqual(ListRealmCollectionTypeTests.self) {
@@ -816,15 +795,6 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         }
         return super.defaultTestSuite
     }
-#else
-    override class func defaultTestSuite() -> XCTestSuite {
-        // Don't run tests for the base class
-        if isEqual(ListRealmCollectionTypeTests.self) {
-            return XCTestSuite(name: "empty")
-        }
-        return super.defaultTestSuite()
-    }
-#endif
 
     func collectionBaseInWriteTransaction() -> List<CTTNullableStringObjectWithLink> {
         fatalError("abstract")

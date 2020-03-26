@@ -1022,12 +1022,12 @@ private struct AnyRealmCollectionBridgingMetadata<T: RealmCollectionValue> {
 }
 
 extension AnyRealmCollection: AssistedObjectiveCBridgeable {
-    static func bridging(from objectiveCValue: Any, with metadata: Any?) -> AnyRealmCollection {
+    internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> AnyRealmCollection {
         guard let metadata = metadata as? AnyRealmCollectionBridgingMetadata<Element> else { preconditionFailure() }
         return AnyRealmCollection(base: metadata.baseType.bridging(from: objectiveCValue, with: metadata.baseMetadata))
     }
 
-    var bridged: (objectiveCValue: Any, metadata: Any?) {
+    internal var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (
             objectiveCValue: base.bridged.objectiveCValue,
             metadata: AnyRealmCollectionBridgingMetadata(baseMetadata: base.bridged.metadata, baseType: type(of: base))

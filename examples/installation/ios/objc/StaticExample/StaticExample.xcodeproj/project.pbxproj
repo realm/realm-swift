@@ -62,8 +62,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E85A7EEC1AFAAFBF005C839C /* Realm.framework in Frameworks */,
 				E85A7EED1AFAAFC2005C839C /* libc++.dylib in Frameworks */,
+				E85A7EEC1AFAAFBF005C839C /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -73,11 +73,11 @@
 		E88ABBA61AFA9DE300FA1E1D = {
 			isa = PBXGroup;
 			children = (
-				E88ABBDC1AFAA5E000FA1E1D /* libc++.dylib */,
-				E88ABBDA1AFAA5D600FA1E1D /* Realm.framework */,
+				E88ABBB01AFA9DE300FA1E1D /* Products */,
 				E88ABBB11AFA9DE300FA1E1D /* StaticExample */,
 				E88ABBCB1AFA9DE400FA1E1D /* StaticExampleTests */,
-				E88ABBB01AFA9DE300FA1E1D /* Products */,
+				E88ABBDC1AFAA5E000FA1E1D /* libc++.dylib */,
+				E88ABBDA1AFAA5D600FA1E1D /* Realm.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -93,14 +93,14 @@
 		E88ABBB11AFA9DE300FA1E1D /* StaticExample */ = {
 			isa = PBXGroup;
 			children = (
+				E88ABBB21AFA9DE300FA1E1D /* Supporting Files */,
 				E88ABBB61AFA9DE300FA1E1D /* AppDelegate.h */,
 				E88ABBB71AFA9DE300FA1E1D /* AppDelegate.m */,
-				E88ABBB91AFA9DE300FA1E1D /* ViewController.h */,
-				E88ABBBA1AFA9DE300FA1E1D /* ViewController.m */,
-				E88ABBBC1AFA9DE300FA1E1D /* Main.storyboard */,
 				E88ABBBF1AFA9DE300FA1E1D /* Images.xcassets */,
 				E88ABBC11AFA9DE300FA1E1D /* LaunchScreen.xib */,
-				E88ABBB21AFA9DE300FA1E1D /* Supporting Files */,
+				E88ABBBC1AFA9DE300FA1E1D /* Main.storyboard */,
+				E88ABBB91AFA9DE300FA1E1D /* ViewController.h */,
+				E88ABBBA1AFA9DE300FA1E1D /* ViewController.m */,
 			);
 			path = StaticExample;
 			sourceTree = "<group>";
@@ -117,8 +117,8 @@
 		E88ABBCB1AFA9DE400FA1E1D /* StaticExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				E88ABBCE1AFA9DE400FA1E1D /* StaticExampleTests.m */,
 				E88ABBCC1AFA9DE400FA1E1D /* Supporting Files */,
+				E88ABBCE1AFA9DE400FA1E1D /* StaticExampleTests.m */,
 			);
 			path = StaticExampleTests;
 			sourceTree = "<group>";
@@ -211,9 +211,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E88ABBBE1AFA9DE300FA1E1D /* Main.storyboard in Resources */,
-				E88ABBC31AFA9DE300FA1E1D /* LaunchScreen.xib in Resources */,
 				E88ABBC01AFA9DE300FA1E1D /* Images.xcassets in Resources */,
+				E88ABBC31AFA9DE300FA1E1D /* LaunchScreen.xib in Resources */,
+				E88ABBBE1AFA9DE300FA1E1D /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -231,9 +231,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E88ABBBB1AFA9DE300FA1E1D /* ViewController.m in Sources */,
 				E88ABBB81AFA9DE300FA1E1D /* AppDelegate.m in Sources */,
 				E88ABBB51AFA9DE300FA1E1D /* main.m in Sources */,
+				E88ABBBB1AFA9DE300FA1E1D /* ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

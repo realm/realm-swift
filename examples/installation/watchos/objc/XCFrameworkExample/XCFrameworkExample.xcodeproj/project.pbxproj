@@ -105,20 +105,20 @@
 		E8645B7B1C7913D600C241AA = {
 			isa = PBXGroup;
 			children = (
-				3FDA0A342319A8330099B474 /* Realm.xcframework */,
+				E8645B851C7913D600C241AA /* Products */,
 				E8645B861C7913D600C241AA /* XCFrameworkExample */,
 				E8645B9F1C7913D600C241AA /* XCFrameworkExample WatchKit App */,
 				E8645BAE1C7913D600C241AA /* XCFrameworkExample WatchKit Extension */,
-				E8645B851C7913D600C241AA /* Products */,
+				3FDA0A342319A8330099B474 /* Realm.xcframework */,
 			);
 			sourceTree = "<group>";
 		};
 		E8645B851C7913D600C241AA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E8645B841C7913D600C241AA /* XCFrameworkExample.app */,
 				E8645B9B1C7913D600C241AA /* XCFrameworkExample WatchKit App.app */,
 				E8645BAA1C7913D600C241AA /* XCFrameworkExample WatchKit Extension.appex */,
+				E8645B841C7913D600C241AA /* XCFrameworkExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -126,8 +126,8 @@
 		E8645B861C7913D600C241AA /* XCFrameworkExample */ = {
 			isa = PBXGroup;
 			children = (
-				E8645B881C7913D600C241AA /* main.m */,
 				E8645B981C7913D600C241AA /* Info.plist */,
+				E8645B881C7913D600C241AA /* main.m */,
 			);
 			path = XCFrameworkExample;
 			sourceTree = "<group>";
@@ -135,8 +135,8 @@
 		E8645B9F1C7913D600C241AA /* XCFrameworkExample WatchKit App */ = {
 			isa = PBXGroup;
 			children = (
-				E8645BA01C7913D600C241AA /* Interface.storyboard */,
 				E8645BA51C7913D600C241AA /* Info.plist */,
+				E8645BA01C7913D600C241AA /* Interface.storyboard */,
 			);
 			path = "XCFrameworkExample WatchKit App";
 			sourceTree = "<group>";
@@ -144,9 +144,9 @@
 		E8645BAE1C7913D600C241AA /* XCFrameworkExample WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
+				E8645BB71C7913D600C241AA /* Info.plist */,
 				E8645BAF1C7913D600C241AA /* InterfaceController.h */,
 				E8645BB01C7913D600C241AA /* InterfaceController.m */,
-				E8645BB71C7913D600C241AA /* Info.plist */,
 			);
 			path = "XCFrameworkExample WatchKit Extension";
 			sourceTree = "<group>";

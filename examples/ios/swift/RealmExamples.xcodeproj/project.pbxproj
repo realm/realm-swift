@@ -262,8 +262,6 @@
 		E805758C19BA55E600376620 = {
 			isa = PBXGroup;
 			children = (
-				9C318E8C1CA42C7800879076 /* GettingStarted.playground */,
-				0A73D4411B1443A700E1E8EE /* README.md */,
 				E8D3F2751A11766A00620884 /* Backlink */,
 				227D20F01CB609A1008F641B /* Common */,
 				E8CB087F19BA6AEE0018434A /* Encryption */,
@@ -274,6 +272,8 @@
 				0295B90519D103180036D6C3 /* RealmSwift */,
 				E8CB088F19BA6B000018434A /* Simple */,
 				E8CB089419BA6B080018434A /* TableView */,
+				9C318E8C1CA42C7800879076 /* GettingStarted.playground */,
+				0A73D4411B1443A700E1E8EE /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -284,9 +284,9 @@
 				E8CB07EF19BA6AB60018434A /* Encryption.app */,
 				E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */,
 				E8CB081419BA6ABD0018434A /* Migration.app */,
+				E8F14D0A1CF8FD0C00564AF5 /* PlaygroundFrameworkWrapper.framework */,
 				E8CB085E19BA6ACA0018434A /* Simple.app */,
 				E8CB083919BA6AC60018434A /* TableView.app */,
-				E8F14D0A1CF8FD0C00564AF5 /* PlaygroundFrameworkWrapper.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -520,7 +520,7 @@
 					};
 					E8D3F2521A11765200620884 = {
 						CreatedOnToolsVersion = 6.1;
-						LastSwiftMigration = 0800;
+						LastSwiftMigration = 1130;
 					};
 					E8F14D091CF8FD0C00564AF5 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -590,9 +590,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				E8CB088B19BA6AF70018434A /* default-v0.realm in Resources */,
-				227D20F51CB609A1008F641B /* LaunchScreen.xib in Resources */,
 				E8CB088C19BA6AF70018434A /* default-v1.realm in Resources */,
 				E8CB088D19BA6AF70018434A /* default-v2.realm in Resources */,
+				227D20F51CB609A1008F641B /* LaunchScreen.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
