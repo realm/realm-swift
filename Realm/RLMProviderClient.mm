@@ -31,7 +31,7 @@
 - (void)handleResponse:(Optional<realm::app::AppError>)error
             completion:(RLMOptionalErrorBlock)completion {
     if (error && error->error_code) {
-        return completion([_app AppErrorToNSError:*error]);
+        return completion([self.app AppErrorToNSError:*error]);
     }
     completion(nil);
 }
