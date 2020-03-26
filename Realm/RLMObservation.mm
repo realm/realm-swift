@@ -389,8 +389,7 @@ void RLMTrackDeletions(__unsafe_unretained RLMRealm *const realm, dispatch_block
 
                 // Check each observed object to see if it's in the deleted rows
                 for (auto info : *table) {
-                    auto it = std::lower_bound(begin, end, Row{currentTableKey, info->getRow().get_key()});
-                    if (it != end) {
+                    if (std::binary_search(begin, end, Row{currentTableKey, info->getRow().get_key()})) {
                         invalidated.push_back(info);
                     }
                 }
