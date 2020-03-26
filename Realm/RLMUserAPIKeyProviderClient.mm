@@ -34,8 +34,10 @@ static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
                   completion:(RLMOptionalUserAPIKeyBlock)completion {
     
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
-    .create_api_key(name.UTF8String, ^(Optional<realm::app::App::UserAPIKey> userAPIKey,
-                                       Optional<realm::app::AppError> error) {
+    .create_api_key(name.UTF8String,
+                    self.app._realmApp.current_user(),
+                    ^(Optional<realm::app::App::UserAPIKey> userAPIKey,
+                    Optional<realm::app::AppError> error) {
         
         if (error && error->error_code) {
             return completion(nil, AppErrorToNSError(*error));
@@ -52,8 +54,10 @@ static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
 - (void)fetchApiKey:(RLMObjectId)objectId
          completion:(RLMOptionalUserAPIKeyBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
-    .fetch_api_key(nil, ^(Optional<realm::app::App::UserAPIKey> userAPIKey,
-                                       Optional<realm::app::AppError> error) {
+    .fetch_api_key(nil,
+                   self.app._realmApp.current_user(),
+                   ^(Optional<realm::app::App::UserAPIKey> userAPIKey,
+                     Optional<realm::app::AppError> error) {
         
         if (error && error->error_code) {
             return completion(nil, AppErrorToNSError(*error));
@@ -69,7 +73,8 @@ static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
 
 - (void)fetchApiKeysWithCompletion:(RLMUserAPIKeysBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
-    .fetch_api_keys(^(const std::vector<realm::app::App::UserAPIKey>& userAPIKeys,
+    .fetch_api_keys(self.app._realmApp.current_user(),
+                    ^(const std::vector<realm::app::App::UserAPIKey>& userAPIKeys,
                       Optional<realm::app::AppError> error) {
         
         if (error && error->error_code) {
@@ -80,31 +85,37 @@ static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
         for(auto &userAPIKey : userAPIKeys) {
             [apiKeys addObject:[[RLMUserAPIKey alloc] initWithUserAPIKey: userAPIKey]];
         }
-                
+        
         return completion(apiKeys, nil);
     });
 }
 
 - (void)deleteApiKey:(RLMUserAPIKey *)apiKey
-   completion:(RLMOptionalErrorBlock)completion {
+          completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
-    .delete_api_key(apiKey._apiKey, ^(Optional<realm::app::AppError> error) {
+    .delete_api_key(apiKey._apiKey.id,
+                    self.app._realmApp.current_user(),
+                    ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
 
 - (void)enableApiKey:(RLMUserAPIKey *)apiKey
-   completion:(RLMOptionalErrorBlock)completion {
+          completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
-    .enable_api_key(apiKey._apiKey, ^(Optional<realm::app::AppError> error) {
+    .enable_api_key(apiKey._apiKey.id,
+                    self.app._realmApp.current_user(),
+                    ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
 
 - (void)disableApiKey:(RLMUserAPIKey *)apiKey
-    completion:(RLMOptionalErrorBlock)completion {
+           completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
-    .disable_api_key(apiKey._apiKey, ^(Optional<realm::app::AppError> error) {
+    .disable_api_key(apiKey._apiKey.id,
+                     self.app._realmApp.current_user(),
+                     ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
