@@ -22,14 +22,6 @@
 
 @implementation RLMUserAPIKeyProviderClient
 
-static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
-    return [[NSError alloc] initWithDomain:@(appError.error_code.category().name())
-                                      code:appError.error_code.value()
-                                  userInfo:@{
-                                      @(appError.error_code.category().name()) : @(appError.error_code.message().data())
-                                  }];
-}
-
 - (void)createApiKeyWithName:(NSString *)name
                   completion:(RLMOptionalUserAPIKeyBlock)completion {
     
@@ -40,7 +32,7 @@ static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
                     Optional<realm::app::AppError> error) {
         
         if (error && error->error_code) {
-            return completion(nil, AppErrorToNSError(*error));
+            return completion(nil, [self.app AppErrorToNSError:*error]);
         }
         
         if (userAPIKey) {
@@ -60,7 +52,7 @@ static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
                      Optional<realm::app::AppError> error) {
         
         if (error && error->error_code) {
-            return completion(nil, AppErrorToNSError(*error));
+            return completion(nil, [self.app AppErrorToNSError:*error]);
         }
         
         if (userAPIKey) {
@@ -78,7 +70,7 @@ static NSError* AppErrorToNSError(const realm::app::AppError& appError) {
                       Optional<realm::app::AppError> error) {
         
         if (error && error->error_code) {
-            return completion(nil, AppErrorToNSError(*error));
+            return completion(nil, [self.app AppErrorToNSError:*error]);
         }
         
         NSMutableArray *apiKeys = [[NSMutableArray alloc] init];
