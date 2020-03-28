@@ -62,7 +62,7 @@
 		1403AF771BFDC8D300C1FBB4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		1403AF791BFDC8D300C1FBB4 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1403AF7B1BFDC8D300C1FBB4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1403AF811BFDCA8200C1FBB4 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		1403AF811BFDCA8200C1FBB4 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1403AF8C1BFDDDCE00C1FBB4 /* Repository.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Repository.h; sourceTree = "<group>"; };
 		1403AF8D1BFDDDCE00C1FBB4 /* Repository.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Repository.m; sourceTree = "<group>"; };
 		1403AF8F1BFDDE0B00C1FBB4 /* RepositoryCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RepositoryCell.h; sourceTree = "<group>"; };
@@ -106,8 +106,8 @@
 			children = (
 				1403AF6C1BFDC8D300C1FBB4 /* DownloadCache */,
 				149391181BFE50930036B420 /* PreloadedData */,
-				1403AF881BFDCAC800C1FBB4 /* Realm */,
 				1403AF491BFDC60A00C1FBB4 /* Products */,
+				1403AF881BFDCAC800C1FBB4 /* Realm */,
 			);
 			sourceTree = "<group>";
 		};
@@ -123,18 +123,18 @@
 		1403AF6C1BFDC8D300C1FBB4 /* DownloadCache */ = {
 			isa = PBXGroup;
 			children = (
+				1403AF6D1BFDC8D300C1FBB4 /* Supporting Files */,
 				1403AF701BFDC8D300C1FBB4 /* AppDelegate.h */,
 				1403AF711BFDC8D300C1FBB4 /* AppDelegate.m */,
-				1403AF731BFDC8D300C1FBB4 /* RepositoriesViewController.h */,
-				1403AF741BFDC8D300C1FBB4 /* RepositoriesViewController.m */,
-				1403AF8F1BFDDE0B00C1FBB4 /* RepositoryCell.h */,
-				1403AF901BFDDE0B00C1FBB4 /* RepositoryCell.m */,
-				1403AF8C1BFDDDCE00C1FBB4 /* Repository.h */,
-				1403AF8D1BFDDDCE00C1FBB4 /* Repository.m */,
-				1403AF761BFDC8D300C1FBB4 /* Main.storyboard */,
 				1403AF791BFDC8D300C1FBB4 /* Assets.xcassets */,
 				1403AF7B1BFDC8D300C1FBB4 /* Info.plist */,
-				1403AF6D1BFDC8D300C1FBB4 /* Supporting Files */,
+				1403AF761BFDC8D300C1FBB4 /* Main.storyboard */,
+				1403AF731BFDC8D300C1FBB4 /* RepositoriesViewController.h */,
+				1403AF741BFDC8D300C1FBB4 /* RepositoriesViewController.m */,
+				1403AF8C1BFDDDCE00C1FBB4 /* Repository.h */,
+				1403AF8D1BFDDDCE00C1FBB4 /* Repository.m */,
+				1403AF8F1BFDDE0B00C1FBB4 /* RepositoryCell.h */,
+				1403AF901BFDDE0B00C1FBB4 /* RepositoryCell.m */,
 			);
 			path = DownloadCache;
 			sourceTree = "<group>";
@@ -167,17 +167,17 @@
 		149391181BFE50930036B420 /* PreloadedData */ = {
 			isa = PBXGroup;
 			children = (
-				1493911C1BFE50940036B420 /* AppDelegate.h */,
-				1493911D1BFE50940036B420 /* AppDelegate.m */,
-				1493911F1BFE50940036B420 /* PlacesViewController.h */,
-				149391201BFE50940036B420 /* PlacesViewController.m */,
-				14835DF61BFE5D4100B9A267 /* Place.h */,
-				14835DF71BFE5D4100B9A267 /* Place.m */,
-				149391221BFE50940036B420 /* Main.storyboard */,
-				149391251BFE50940036B420 /* Assets.xcassets */,
-				149391271BFE50940036B420 /* Info.plist */,
 				14835DF11BFE582C00B9A267 /* Seed Data */,
 				149391191BFE50940036B420 /* Supporting Files */,
+				1493911C1BFE50940036B420 /* AppDelegate.h */,
+				1493911D1BFE50940036B420 /* AppDelegate.m */,
+				149391251BFE50940036B420 /* Assets.xcassets */,
+				149391271BFE50940036B420 /* Info.plist */,
+				149391221BFE50940036B420 /* Main.storyboard */,
+				14835DF61BFE5D4100B9A267 /* Place.h */,
+				14835DF71BFE5D4100B9A267 /* Place.m */,
+				1493911F1BFE50940036B420 /* PlacesViewController.h */,
+				149391201BFE50940036B420 /* PlacesViewController.m */,
 			);
 			path = PreloadedData;
 			sourceTree = "<group>";
@@ -237,7 +237,7 @@
 		1403AF401BFDC60A00C1FBB4 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					1403AF6A1BFDC8D300C1FBB4 = {
@@ -250,7 +250,7 @@
 			};
 			buildConfigurationList = 1403AF431BFDC60A00C1FBB4 /* Build configuration list for PBXProject "RealmExamples" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
@@ -325,11 +325,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1403AF751BFDC8D300C1FBB4 /* RepositoriesViewController.m in Sources */,
 				1403AF721BFDC8D300C1FBB4 /* AppDelegate.m in Sources */,
-				1403AF911BFDDE0B00C1FBB4 /* RepositoryCell.m in Sources */,
 				1403AF6F1BFDC8D300C1FBB4 /* main.m in Sources */,
+				1403AF751BFDC8D300C1FBB4 /* RepositoriesViewController.m in Sources */,
 				1403AF8E1BFDDDCF00C1FBB4 /* Repository.m in Sources */,
+				1403AF911BFDDE0B00C1FBB4 /* RepositoryCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -337,10 +337,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				149391211BFE50940036B420 /* PlacesViewController.m in Sources */,
 				1493911E1BFE50940036B420 /* AppDelegate.m in Sources */,
 				1493911B1BFE50940036B420 /* main.m in Sources */,
 				14835DF81BFE5D4100B9A267 /* Place.m in Sources */,
+				149391211BFE50940036B420 /* PlacesViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -370,17 +370,28 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
@@ -413,17 +424,28 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;

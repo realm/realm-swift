@@ -65,11 +65,11 @@
 		E8FA5D291B3CD3320095EF19 = {
 			isa = PBXGroup;
 			children = (
-				E8FA5D571B3CD3A10095EF19 /* Realm.framework */,
-				E8FA5D581B3CD3A10095EF19 /* RealmSwift.framework */,
 				E8FA5D341B3CD3320095EF19 /* CarthageExample */,
 				E8FA5D4A1B3CD3320095EF19 /* CarthageExampleTests */,
 				E8FA5D331B3CD3320095EF19 /* Products */,
+				E8FA5D571B3CD3A10095EF19 /* Realm.framework */,
+				E8FA5D581B3CD3A10095EF19 /* RealmSwift.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -85,12 +85,12 @@
 		E8FA5D341B3CD3320095EF19 /* CarthageExample */ = {
 			isa = PBXGroup;
 			children = (
+				E8FA5D351B3CD3320095EF19 /* Supporting Files */,
 				E8FA5D371B3CD3320095EF19 /* AppDelegate.swift */,
-				E8FA5D391B3CD3320095EF19 /* ViewController.swift */,
-				E8FA5D3B1B3CD3320095EF19 /* Main.storyboard */,
 				E8FA5D3E1B3CD3320095EF19 /* Images.xcassets */,
 				E8FA5D401B3CD3320095EF19 /* LaunchScreen.xib */,
-				E8FA5D351B3CD3320095EF19 /* Supporting Files */,
+				E8FA5D3B1B3CD3320095EF19 /* Main.storyboard */,
+				E8FA5D391B3CD3320095EF19 /* ViewController.swift */,
 			);
 			path = CarthageExample;
 			sourceTree = "<group>";
@@ -106,8 +106,8 @@
 		E8FA5D4A1B3CD3320095EF19 /* CarthageExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				E8FA5D4D1B3CD3320095EF19 /* CarthageExampleTests.swift */,
 				E8FA5D4B1B3CD3320095EF19 /* Supporting Files */,
+				E8FA5D4D1B3CD3320095EF19 /* CarthageExampleTests.swift */,
 			);
 			path = CarthageExampleTests;
 			sourceTree = "<group>";
@@ -204,9 +204,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8FA5D3D1B3CD3320095EF19 /* Main.storyboard in Resources */,
-				E8FA5D421B3CD3320095EF19 /* LaunchScreen.xib in Resources */,
 				E8FA5D3F1B3CD3320095EF19 /* Images.xcassets in Resources */,
+				E8FA5D421B3CD3320095EF19 /* LaunchScreen.xib in Resources */,
+				E8FA5D3D1B3CD3320095EF19 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -243,8 +243,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8FA5D3A1B3CD3320095EF19 /* ViewController.swift in Sources */,
 				E8FA5D381B3CD3320095EF19 /* AppDelegate.swift in Sources */,
+				E8FA5D3A1B3CD3320095EF19 /* ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

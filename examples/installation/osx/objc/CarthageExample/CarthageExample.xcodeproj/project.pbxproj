@@ -79,10 +79,10 @@
 		E81D29331B015EFE009EDD76 = {
 			isa = PBXGroup;
 			children = (
-				E887530B1B01605F00DD2234 /* Realm.framework */,
 				E81D293E1B015EFE009EDD76 /* CarthageExample */,
 				E81D29551B015EFF009EDD76 /* CarthageExampleTests */,
 				E81D293D1B015EFE009EDD76 /* Products */,
+				E887530B1B01605F00DD2234 /* Realm.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -98,13 +98,13 @@
 		E81D293E1B015EFE009EDD76 /* CarthageExample */ = {
 			isa = PBXGroup;
 			children = (
+				E81D293F1B015EFE009EDD76 /* Supporting Files */,
 				E81D29411B015EFF009EDD76 /* AppDelegate.h */,
 				E81D29421B015EFF009EDD76 /* AppDelegate.m */,
-				E81D29461B015EFF009EDD76 /* ViewController.h */,
-				E81D29471B015EFF009EDD76 /* ViewController.m */,
 				E81D29491B015EFF009EDD76 /* Images.xcassets */,
 				E81D294B1B015EFF009EDD76 /* Main.storyboard */,
-				E81D293F1B015EFE009EDD76 /* Supporting Files */,
+				E81D29461B015EFF009EDD76 /* ViewController.h */,
+				E81D29471B015EFF009EDD76 /* ViewController.m */,
 			);
 			path = CarthageExample;
 			sourceTree = "<group>";
@@ -121,8 +121,8 @@
 		E81D29551B015EFF009EDD76 /* CarthageExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				E81D29581B015EFF009EDD76 /* CarthageExampleTests.m */,
 				E81D29561B015EFF009EDD76 /* Supporting Files */,
+				E81D29581B015EFF009EDD76 /* CarthageExampleTests.m */,
 			);
 			path = CarthageExampleTests;
 			sourceTree = "<group>";
@@ -235,9 +235,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E81D29481B015EFF009EDD76 /* ViewController.m in Sources */,
-				E81D29451B015EFF009EDD76 /* main.m in Sources */,
 				E81D29431B015EFF009EDD76 /* AppDelegate.m in Sources */,
+				E81D29451B015EFF009EDD76 /* main.m in Sources */,
+				E81D29481B015EFF009EDD76 /* ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

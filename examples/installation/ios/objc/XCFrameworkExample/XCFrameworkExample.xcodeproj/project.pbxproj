@@ -81,10 +81,10 @@
 		E8561AB41AFB1518006E087E = {
 			isa = PBXGroup;
 			children = (
-				3FDA0A3023199C600099B474 /* Realm.xcframework */,
+				E8561ABE1AFB1518006E087E /* Products */,
 				E8561ABF1AFB1518006E087E /* XCFrameworkExample */,
 				E8561AD91AFB1518006E087E /* XCFrameworkExampleTests */,
-				E8561ABE1AFB1518006E087E /* Products */,
+				3FDA0A3023199C600099B474 /* Realm.xcframework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -100,14 +100,14 @@
 		E8561ABF1AFB1518006E087E /* XCFrameworkExample */ = {
 			isa = PBXGroup;
 			children = (
+				E8561AC01AFB1518006E087E /* Supporting Files */,
 				E8561AC41AFB1518006E087E /* AppDelegate.h */,
 				E8561AC51AFB1518006E087E /* AppDelegate.m */,
-				E8561AC71AFB1518006E087E /* ViewController.h */,
-				E8561AC81AFB1518006E087E /* ViewController.m */,
-				E8561ACA1AFB1518006E087E /* Main.storyboard */,
 				E8561ACD1AFB1518006E087E /* Images.xcassets */,
 				E8561ACF1AFB1518006E087E /* LaunchScreen.xib */,
-				E8561AC01AFB1518006E087E /* Supporting Files */,
+				E8561ACA1AFB1518006E087E /* Main.storyboard */,
+				E8561AC71AFB1518006E087E /* ViewController.h */,
+				E8561AC81AFB1518006E087E /* ViewController.m */,
 			);
 			path = XCFrameworkExample;
 			sourceTree = "<group>";
@@ -124,8 +124,8 @@
 		E8561AD91AFB1518006E087E /* XCFrameworkExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				E8561ADC1AFB1518006E087E /* XCFrameworkExampleTests.m */,
 				E8561ADA1AFB1518006E087E /* Supporting Files */,
+				E8561ADC1AFB1518006E087E /* XCFrameworkExampleTests.m */,
 			);
 			path = XCFrameworkExampleTests;
 			sourceTree = "<group>";
@@ -219,9 +219,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8561ACC1AFB1518006E087E /* Main.storyboard in Resources */,
-				E8561AD11AFB1518006E087E /* LaunchScreen.xib in Resources */,
 				E8561ACE1AFB1518006E087E /* Images.xcassets in Resources */,
+				E8561AD11AFB1518006E087E /* LaunchScreen.xib in Resources */,
+				E8561ACC1AFB1518006E087E /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -239,9 +239,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8561AC91AFB1518006E087E /* ViewController.m in Sources */,
 				E8561AC61AFB1518006E087E /* AppDelegate.m in Sources */,
 				E8561AC31AFB1518006E087E /* main.m in Sources */,
+				E8561AC91AFB1518006E087E /* ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

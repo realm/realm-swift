@@ -121,18 +121,18 @@
 				E8645B861C7913D600C241AA /* CocoaPodsExample */,
 				E8645B9F1C7913D600C241AA /* CocoaPodsExample WatchKit App */,
 				E8645BAE1C7913D600C241AA /* CocoaPodsExample WatchKit Extension */,
-				E8645B851C7913D600C241AA /* Products */,
-				7109EA92DB1087B4447E838F /* Pods */,
 				C37AE0E9D90B6BAE7A91280A /* Frameworks */,
+				7109EA92DB1087B4447E838F /* Pods */,
+				E8645B851C7913D600C241AA /* Products */,
 			);
 			sourceTree = "<group>";
 		};
 		E8645B851C7913D600C241AA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E8645B841C7913D600C241AA /* CocoaPodsExample.app */,
 				E8645B9B1C7913D600C241AA /* CocoaPodsExample WatchKit App.app */,
 				E8645BAA1C7913D600C241AA /* CocoaPodsExample WatchKit Extension.appex */,
+				E8645B841C7913D600C241AA /* CocoaPodsExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -140,8 +140,8 @@
 		E8645B861C7913D600C241AA /* CocoaPodsExample */ = {
 			isa = PBXGroup;
 			children = (
-				E8645B881C7913D600C241AA /* main.m */,
 				E8645B981C7913D600C241AA /* Info.plist */,
+				E8645B881C7913D600C241AA /* main.m */,
 			);
 			path = CocoaPodsExample;
 			sourceTree = "<group>";
@@ -149,8 +149,8 @@
 		E8645B9F1C7913D600C241AA /* CocoaPodsExample WatchKit App */ = {
 			isa = PBXGroup;
 			children = (
-				E8645BA01C7913D600C241AA /* Interface.storyboard */,
 				E8645BA51C7913D600C241AA /* Info.plist */,
+				E8645BA01C7913D600C241AA /* Interface.storyboard */,
 			);
 			path = "CocoaPodsExample WatchKit App";
 			sourceTree = "<group>";
@@ -158,8 +158,8 @@
 		E8645BAE1C7913D600C241AA /* CocoaPodsExample WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
-				E806E9891C7921FE00C5C9A8 /* InterfaceController.swift */,
 				E8645BB71C7913D600C241AA /* Info.plist */,
+				E806E9891C7921FE00C5C9A8 /* InterfaceController.swift */,
 			);
 			path = "CocoaPodsExample WatchKit Extension";
 			sourceTree = "<group>";

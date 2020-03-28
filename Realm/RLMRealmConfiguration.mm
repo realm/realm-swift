@@ -146,7 +146,7 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 }
 
 - (NSURL *)fileURL {
-    if (_config.in_memory || _config.sync_config) {
+    if (_config.in_memory) {
         return nil;
     }
     return [NSURL fileURLWithPath:@(_config.path.c_str())];
@@ -157,7 +157,6 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
     if (path.length == 0) {
         @throw RLMException(@"Realm path must not be empty");
     }
-    _config.sync_config = nullptr;
 
     RLMNSStringToStdString(_config.path, path);
     _config.in_memory = false;

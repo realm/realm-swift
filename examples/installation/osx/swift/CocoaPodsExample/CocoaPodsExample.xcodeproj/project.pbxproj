@@ -89,9 +89,9 @@
 			children = (
 				E8F1864B1CEEC441008F5767 /* CocoaPodsExample */,
 				E8F1865D1CEEC442008F5767 /* CocoaPodsExampleTests */,
-				E8F1864A1CEEC441008F5767 /* Products */,
-				02655C095E5F483C939F0C74 /* Pods */,
 				94C8D94B82E9073B5728D6AF /* Frameworks */,
+				02655C095E5F483C939F0C74 /* Pods */,
+				E8F1864A1CEEC441008F5767 /* Products */,
 			);
 			sourceTree = "<group>";
 		};
@@ -108,10 +108,10 @@
 			isa = PBXGroup;
 			children = (
 				E8F1864C1CEEC442008F5767 /* AppDelegate.swift */,
-				E8F1864E1CEEC442008F5767 /* ViewController.swift */,
 				E8F186501CEEC442008F5767 /* Assets.xcassets */,
-				E8F186521CEEC442008F5767 /* Main.storyboard */,
 				E8F186551CEEC442008F5767 /* Info.plist */,
+				E8F186521CEEC442008F5767 /* Main.storyboard */,
+				E8F1864E1CEEC442008F5767 /* ViewController.swift */,
 			);
 			path = CocoaPodsExample;
 			sourceTree = "<group>";
@@ -310,8 +310,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8F1864F1CEEC442008F5767 /* ViewController.swift in Sources */,
 				E8F1864D1CEEC442008F5767 /* AppDelegate.swift in Sources */,
+				E8F1864F1CEEC442008F5767 /* ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -84,8 +84,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8F651881C79248400D8E330 /* RealmSwift.framework in Frameworks */,
 				E82D95AC1C791A58000717F3 /* Realm.framework in Frameworks */,
+				E8F651881C79248400D8E330 /* RealmSwift.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,21 +95,21 @@
 		E8645B7B1C7913D600C241AA = {
 			isa = PBXGroup;
 			children = (
-				E82D95A71C7919D9000717F3 /* Realm.framework */,
-				E8F651861C79234200D8E330 /* RealmSwift.framework */,
 				E8645B861C7913D600C241AA /* CarthageExample */,
 				E8645B9F1C7913D600C241AA /* CarthageExample WatchKit App */,
 				E8645BAE1C7913D600C241AA /* CarthageExample WatchKit Extension */,
 				E8645B851C7913D600C241AA /* Products */,
+				E82D95A71C7919D9000717F3 /* Realm.framework */,
+				E8F651861C79234200D8E330 /* RealmSwift.framework */,
 			);
 			sourceTree = "<group>";
 		};
 		E8645B851C7913D600C241AA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E8645B841C7913D600C241AA /* CarthageExample.app */,
 				E8645B9B1C7913D600C241AA /* CarthageExample WatchKit App.app */,
 				E8645BAA1C7913D600C241AA /* CarthageExample WatchKit Extension.appex */,
+				E8645B841C7913D600C241AA /* CarthageExample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -117,8 +117,8 @@
 		E8645B861C7913D600C241AA /* CarthageExample */ = {
 			isa = PBXGroup;
 			children = (
-				E8645B881C7913D600C241AA /* main.m */,
 				E8645B981C7913D600C241AA /* Info.plist */,
+				E8645B881C7913D600C241AA /* main.m */,
 			);
 			path = CarthageExample;
 			sourceTree = "<group>";
@@ -126,8 +126,8 @@
 		E8645B9F1C7913D600C241AA /* CarthageExample WatchKit App */ = {
 			isa = PBXGroup;
 			children = (
-				E8645BA01C7913D600C241AA /* Interface.storyboard */,
 				E8645BA51C7913D600C241AA /* Info.plist */,
+				E8645BA01C7913D600C241AA /* Interface.storyboard */,
 			);
 			path = "CarthageExample WatchKit App";
 			sourceTree = "<group>";
@@ -135,8 +135,8 @@
 		E8645BAE1C7913D600C241AA /* CarthageExample WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
-				E806E9891C7921FE00C5C9A8 /* InterfaceController.swift */,
 				E8645BB71C7913D600C241AA /* Info.plist */,
+				E806E9891C7921FE00C5C9A8 /* InterfaceController.swift */,
 			);
 			path = "CarthageExample WatchKit Extension";
 			sourceTree = "<group>";

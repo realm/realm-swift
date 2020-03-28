@@ -13,7 +13,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * APIs are backwards compatible with all previous releases in the 4.x.y series.
-* Carthage release for Swift is built with Xcode 11.3.
+* Carthage release for Swift is built with Xcode 11.4.
 
 ### Internal
 Upgraded realm-core from ? to ?
@@ -169,6 +169,28 @@ alpha version.
 
 * Upgraded realm-core from 5.23.6 to v6.0.0-alpha.24.
 * Upgraded realm-sync from 4.8.2 to 4.7.1-core6.5.
+
+4.4.0 Release notes (2020-03-26)
+=============================================================
+
+Swift 4.0 and Xcode 10.3 are now the minimum supported versions.
+
+### Enhancements
+
+* Allow setting the `fileUrl` for synchronized Realms. An appropriate local
+  path based on the sync URL will still be used if it is not overridden.
+  ([PR #6454](https://github.com/realm/realm-cocoa/pull/6454)).
+* Add Xcode 11.4 binaries to the release package.
+
+### Fixed
+
+* None.
+
+### Compatibility
+
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Carthage release for Swift is built with Xcode 11.4.
 
 4.3.2 Release notes (2020-02-06)
 =============================================================
