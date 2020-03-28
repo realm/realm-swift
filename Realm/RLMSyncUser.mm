@@ -125,7 +125,7 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
                             enableSSLValidation:(bool)enableSSLValidation
                                       urlPrefix:(NSString * _Nullable)urlPrefix {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
-                                                        realmURL:url ?: self.defaultRealmURL
+                                                        realmURL:url
                                                    customFileURL:nil stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
     syncConfig.urlPrefix = urlPrefix;
     syncConfig.enableSSLValidation = enableSSLValidation;

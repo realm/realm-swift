@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMUserAPIKeyProviderClient.h"
+
 #import "RLMApp_Private.hpp"
 #import "RLMUserAPIKey_Private.hpp"
 
@@ -26,8 +27,7 @@
                   completion:(RLMOptionalUserAPIKeyBlock)completion {
     
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
-    .create_api_key(name.UTF8String,
-                    self.app._realmApp.current_user(),
+    .create_api_key(name.UTF8String, self.app._realmApp.current_user(),
                     ^(Optional<realm::app::App::UserAPIKey> userAPIKey,
                     Optional<realm::app::AppError> error) {
         
@@ -46,11 +46,9 @@
 - (void)fetchApiKey:(RLMObjectId)objectId
          completion:(RLMOptionalUserAPIKeyBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
-    .fetch_api_key(nil,
-                   self.app._realmApp.current_user(),
+    .fetch_api_key(nil, self.app._realmApp.current_user(),
                    ^(Optional<realm::app::App::UserAPIKey> userAPIKey,
                      Optional<realm::app::AppError> error) {
-        
         if (error && error->error_code) {
             return completion(nil, [self.app AppErrorToNSError:*error]);
         }
@@ -95,8 +93,7 @@
 - (void)enableApiKey:(RLMUserAPIKey *)apiKey
           completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
-    .enable_api_key(apiKey._apiKey.id,
-                    self.app._realmApp.current_user(),
+    .enable_api_key(apiKey._apiKey.id, self.app._realmApp.current_user(),
                     ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
@@ -105,8 +102,7 @@
 - (void)disableApiKey:(RLMUserAPIKey *)apiKey
            completion:(RLMOptionalErrorBlock)completion {
     self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>()
-    .disable_api_key(apiKey._apiKey.id,
-                     self.app._realmApp.current_user(),
+    .disable_api_key(apiKey._apiKey.id, self.app._realmApp.current_user(),
                      ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });

@@ -56,7 +56,6 @@ using namespace realm;
 
 @implementation RLMMigration {
     realm::Schema *_schema;
-    std::unordered_map<NSString *, realm::IndexSet> _deletedObjectIndices;
 }
 
 - (instancetype)initWithRealm:(RLMRealm *)realm oldRealm:(RLMRealm *)oldRealm schema:(realm::Schema &)schema {
@@ -79,34 +78,37 @@ using namespace realm;
 }
 
 - (void)enumerateObjects:(NSString *)className block:(__attribute__((noescape)) RLMObjectMigrationBlock)block {
-    RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm allObjects:className].snapshot : nil;
-    RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm allObjects:className].snapshot : nil;
+    RLMResults *objects = [_realm.schema schemaForClassName:className] ? [_realm allObjects:className] : nil;
+    RLMResults *oldObjects = [_oldRealm.schema schemaForClassName:className] ? [_oldRealm allObjects:className] : nil;
 
     // For whatever reason if this is a newly added table we enumerate the
     // objects in it, while in all other cases we enumerate only the existing
     // objects. It's unclear how this could be useful, but changing it would
     // also be a pointless breaking change and it's unlikely to be hurting anyone.
     if (objects && !oldObjects) {
-        for (auto i = objects.count; i > 0; --i) {
+        for (RLMObject *object in objects) {
             @autoreleasepool {
-                block(nil, objects[i - 1]);
+                block(nil, object);
             }
         }
         return;
     }
 
-    auto count = oldObjects.count;
-    if (count == 0) {
+    if (oldObjects.count == 0 || objects.count == 0) {
         return;
     }
-    auto deletedObjects = _deletedObjectIndices.find(className);
-    for (auto i = count; i > 0; --i) {
-        auto index = i - 1;
-        if (deletedObjects != _deletedObjectIndices.end() && deletedObjects->second.contains(index)) {
-            continue;
-        }
+
+    auto& info = _realm->_info[className];
+    for (RLMObject *oldObject in oldObjects) {
         @autoreleasepool {
-            block(oldObjects[index], objects[index]);
+            Obj newObj;
+            try {
+                newObj = info.table()->get_object(oldObject->_row.get_key());
+            }
+            catch (KeyNotFound const&) {
+                continue;
+            }
+            block(oldObject, (id)RLMCreateObjectAccessor(info, std::move(newObj)));
         }
     }
 }
@@ -124,8 +126,6 @@ using namespace realm;
 
         block(self, _oldRealm->_realm->schema_version());
 
-        [self deleteObjectsMarkedForDeletion];
-
         _oldRealm = nil;
         _realm = nil;
     }
@@ -140,27 +140,7 @@ using namespace realm;
 }
 
 - (void)deleteObject:(RLMObject *)object {
-    _deletedObjectIndices[object.objectSchema.className].add(object->_row.get_key().value);
-}
-
-- (void)deleteObjectsMarkedForDeletion {
-    for (auto& objectType : _deletedObjectIndices) {
-        TableRef table = ObjectStore::table_for_object_type(_realm.group, objectType.first.UTF8String);
-        if (!table) {
-            continue;
-        }
-
-        auto& indices = objectType.second;
-        // Just clear the table if we're removing all of the rows
-        if (table->size() == indices.count()) {
-            table->clear();
-        }
-        else {
-            for (auto key : indices.as_indexes()) {
-                table->remove_object(realm::ObjKey(key));
-            }
-        }
-    }
+    [_realm deleteObject:object];
 }
 
 - (BOOL)deleteDataForClassName:(NSString *)name {
@@ -172,9 +152,11 @@ using namespace realm;
     if (!table) {
         return false;
     }
-    _deletedObjectIndices[name].set(table->size());
-    if (![_realm.schema schemaForClassName:name]) {
-        realm::ObjectStore::delete_data_for_object(_realm.group, name.UTF8String);
+    if ([_realm.schema schemaForClassName:name]) {
+        table->clear();
+    }
+    else {
+        _realm.group.remove_table(table->get_key());
     }
 
     return true;
