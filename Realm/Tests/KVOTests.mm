@@ -1298,6 +1298,31 @@ public:
     // should not crash
 }
 
+- (void)testDeleteMultipleObservedObjects {
+    KVOObject *obj1 = [self createObject];
+    KVOObject *obj2 = [self createObject];
+    KVOObject *obj3 = [self createObject];
+
+    KVORecorder r1(self, obj1, RLMInvalidatedKey);
+    KVORecorder r2(self, obj2, RLMInvalidatedKey);
+    KVORecorder r3(self, obj3, RLMInvalidatedKey);
+
+    [self.realm deleteObject:obj2];
+    AssertChanged(r2, @NO, @YES);
+    XCTAssertTrue(r1.empty());
+    XCTAssertTrue(r3.empty());
+
+    [self.realm deleteObject:obj3];
+    AssertChanged(r3, @NO, @YES);
+    XCTAssertTrue(r1.empty());
+    XCTAssertTrue(r2.empty());
+
+    [self.realm deleteObject:obj1];
+    AssertChanged(r1, @NO, @YES);
+    XCTAssertTrue(r2.empty());
+    XCTAssertTrue(r3.empty());
+}
+
 - (void)testDeleteMiddleOfKeyPath {
     KVOLinkObject2 *obj = [self createLinkObject];
     KVORecorder r(self, obj, @"obj.obj.boolCol");

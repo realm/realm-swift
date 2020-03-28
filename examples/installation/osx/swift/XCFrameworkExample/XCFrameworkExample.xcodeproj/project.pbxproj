@@ -58,8 +58,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3FDA0A392319ACBC0099B474 /* RealmSwift.xcframework in Frameworks */,
 				3FDA0A3A2319ACBC0099B474 /* RealmObjc.xcframework in Frameworks */,
+				3FDA0A392319ACBC0099B474 /* RealmSwift.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -76,11 +76,11 @@
 		E8D051F01B3CCCC8007A482B = {
 			isa = PBXGroup;
 			children = (
-				3FDA0A382319ACBC0099B474 /* RealmObjc.xcframework */,
-				3FDA0A372319ACBC0099B474 /* RealmSwift.xcframework */,
+				E8D051FA1B3CCCC9007A482B /* Products */,
 				E8D051FB1B3CCCC9007A482B /* XCFrameworkExample */,
 				E8D0520E1B3CCCC9007A482B /* XCFrameworkExampleTests */,
-				E8D051FA1B3CCCC9007A482B /* Products */,
+				3FDA0A382319ACBC0099B474 /* RealmObjc.xcframework */,
+				3FDA0A372319ACBC0099B474 /* RealmSwift.xcframework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -96,11 +96,11 @@
 		E8D051FB1B3CCCC9007A482B /* XCFrameworkExample */ = {
 			isa = PBXGroup;
 			children = (
+				E8D051FC1B3CCCC9007A482B /* Supporting Files */,
 				E8D051FE1B3CCCC9007A482B /* AppDelegate.swift */,
-				E8D052001B3CCCC9007A482B /* ViewController.swift */,
 				E8D052021B3CCCC9007A482B /* Images.xcassets */,
 				E8D052041B3CCCC9007A482B /* Main.storyboard */,
-				E8D051FC1B3CCCC9007A482B /* Supporting Files */,
+				E8D052001B3CCCC9007A482B /* ViewController.swift */,
 			);
 			path = XCFrameworkExample;
 			sourceTree = "<group>";
@@ -116,8 +116,8 @@
 		E8D0520E1B3CCCC9007A482B /* XCFrameworkExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				E8D052111B3CCCC9007A482B /* XCFrameworkExampleTests.swift */,
 				E8D0520F1B3CCCC9007A482B /* Supporting Files */,
+				E8D052111B3CCCC9007A482B /* XCFrameworkExampleTests.swift */,
 			);
 			path = XCFrameworkExampleTests;
 			sourceTree = "<group>";
@@ -233,8 +233,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8D052011B3CCCC9007A482B /* ViewController.swift in Sources */,
 				E8D051FF1B3CCCC9007A482B /* AppDelegate.swift in Sources */,
+				E8D052011B3CCCC9007A482B /* ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

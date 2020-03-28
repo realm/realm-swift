@@ -45,9 +45,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E85A517119BA76B7006C63CB /* Realm.framework in Frameworks */,
-				E823C35319BA4B8600D2FF5F /* libc++.dylib in Frameworks */,
 				E823C33D19BA4A5F00D2FF5F /* Foundation.framework in Frameworks */,
+				E823C35319BA4B8600D2FF5F /* libc++.dylib in Frameworks */,
+				E85A517119BA76B7006C63CB /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,10 +68,10 @@
 		E8F1E81419BA4A3800FAD64E = {
 			isa = PBXGroup;
 			children = (
-				0ADF47111B1578CF00F67B16 /* README.md */,
-				E823C34819BA4A7600D2FF5F /* JSONImport */,
 				E8F1E81F19BA4A3800FAD64E /* Frameworks */,
+				E823C34819BA4A7600D2FF5F /* JSONImport */,
 				E8F1E81E19BA4A3800FAD64E /* Products */,
+				0ADF47111B1578CF00F67B16 /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
@@ -86,9 +86,9 @@
 		E8F1E81F19BA4A3800FAD64E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E85A517019BA76B7006C63CB /* Realm.framework */,
-				E823C35219BA4B8600D2FF5F /* libc++.dylib */,
 				E8F1E82019BA4A3800FAD64E /* Foundation.framework */,
+				E823C35219BA4B8600D2FF5F /* libc++.dylib */,
+				E85A517019BA76B7006C63CB /* Realm.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -144,8 +144,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E823C34E19BA4A7600D2FF5F /* Person.m in Sources */,
 				E823C34D19BA4A7600D2FF5F /* main.m in Sources */,
+				E823C34E19BA4A7600D2FF5F /* Person.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

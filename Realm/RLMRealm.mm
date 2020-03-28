@@ -29,6 +29,7 @@
 #import "RLMProperty.h"
 #import "RLMProperty_Private.h"
 #import "RLMQueryUtil.hpp"
+#import "RLMRealmConfiguration+Sync.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealmUtil.hpp"
 #import "RLMSchema_Private.hpp"
