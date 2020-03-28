@@ -18,8 +18,8 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMRealmConfiguration.h"
-#import "RLMAppCredentials.h"
+#import <Realm/RLMAppCredentials.h>
+#import <Realm/RLMRealmConfiguration.h>
 
 @class RLMSyncUser, RLMSyncUserInfo, RLMSyncCredentials, RLMSyncSession, RLMRealm;
 

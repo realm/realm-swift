@@ -15,11 +15,15 @@
 // limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
+
 #import "RLMProviderClient.h"
+
 #import "RLMApp_Private.hpp"
+#import "sync/app.hpp"
+
+#import <realm/util/optional.hpp>
 
 @implementation RLMProviderClient
-
 - (instancetype)initWithApp:(RLMApp *)app {
     self = [super init];
     if (self) {
@@ -28,12 +32,11 @@
     return self;
 }
 
-- (void)handleResponse:(Optional<realm::app::AppError>)error
+- (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
             completion:(RLMOptionalErrorBlock)completion {
     if (error && error->error_code) {
-        return completion([self.app AppErrorToNSError:*error]);
+        return completion(RLMAppErrorToNSError(*error));
     }
     completion(nil);
 }
-
 @end

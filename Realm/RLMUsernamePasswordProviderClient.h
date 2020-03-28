@@ -16,8 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import "RLMProviderClient.h"
+#import <Realm/RLMProviderClient.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
