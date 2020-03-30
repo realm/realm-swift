@@ -262,35 +262,35 @@ static RLMSyncManager *s_sharedManager = nil;
 
 @implementation RLMSyncTimeoutOptions
 - (NSUInteger)connectTimeout {
-    return _options.connect_timeout;
+    return static_cast<NSUInteger>(_options.connect_timeout);
 }
 - (void)setConnectTimeout:(NSUInteger)connectTimeout {
     _options.connect_timeout = connectTimeout;
 }
 
 - (NSUInteger)connectLingerTime {
-    return _options.connection_linger_time;
+    return static_cast<NSUInteger>(_options.connection_linger_time);
 }
 - (void)setConnectionLingerTime:(NSUInteger)connectionLingerTime {
     _options.connection_linger_time = connectionLingerTime;
 }
 
 - (NSUInteger)pingKeepalivePeriod {
-    return _options.ping_keepalive_period;
+    return static_cast<NSUInteger>(_options.ping_keepalive_period);
 }
 - (void)setPingKeepalivePeriod:(NSUInteger)pingKeepalivePeriod {
     _options.ping_keepalive_period = pingKeepalivePeriod;
 }
 
 - (NSUInteger)pongKeepaliveTimeout {
-    return _options.pong_keepalive_timeout;
+    return static_cast<NSUInteger>(_options.pong_keepalive_timeout);
 }
 - (void)setPongKeepaliveTimeout:(NSUInteger)pongKeepaliveTimeout {
     _options.pong_keepalive_timeout = pongKeepaliveTimeout;
 }
 
 - (NSUInteger)fastReconnectLimit {
-    return _options.fast_reconnect_limit;
+    return static_cast<NSUInteger>(_options.fast_reconnect_limit);
 }
 - (void)setFastReconnectLimit:(NSUInteger)fastReconnectLimit {
     _options.fast_reconnect_limit = fastReconnectLimit;

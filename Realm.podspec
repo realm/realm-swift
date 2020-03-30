@@ -111,7 +111,7 @@ Pod::Spec.new do |s|
   s.osx.deployment_target   = '10.14'
   s.osx.vendored_library    = 'core/librealmcore-macosx.a'
 
-  s.watchos.deployment_target = '6.0'
+  s.watchos.deployment_target = '5.0'
   s.watchos.vendored_library  = 'core/librealmcore-watchos.a'
 
   s.tvos.deployment_target = '12.0'

@@ -2,6 +2,6 @@ use_frameworks!
 branch = ENV['sha']
 
 target 'CocoaPodsExample WatchKit Extension' do
-  platform :watchos, '2.0'
+  platform :watchos, '5.0'
   pod 'Realm', git: 'https://github.com/realm/realm-cocoa.git', branch: branch, submodules: true
 end
