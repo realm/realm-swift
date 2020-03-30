@@ -77,10 +77,10 @@
 		E8358B541AFB172C00DE7F8C = {
 			isa = PBXGroup;
 			children = (
-				3FDA0A2E231997980099B474 /* Realm.xcframework */,
+				E8358B5E1AFB172C00DE7F8C /* Products */,
 				E8358B5F1AFB172C00DE7F8C /* XCFrameworkExample */,
 				E8358B761AFB172C00DE7F8C /* XCFrameworkExampleTests */,
-				E8358B5E1AFB172C00DE7F8C /* Products */,
+				3FDA0A2E231997980099B474 /* Realm.xcframework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -96,13 +96,13 @@
 		E8358B5F1AFB172C00DE7F8C /* XCFrameworkExample */ = {
 			isa = PBXGroup;
 			children = (
+				E8358B601AFB172C00DE7F8C /* Supporting Files */,
 				E8358B621AFB172C00DE7F8C /* AppDelegate.h */,
 				E8358B631AFB172C00DE7F8C /* AppDelegate.m */,
-				E8358B671AFB172C00DE7F8C /* ViewController.h */,
-				E8358B681AFB172C00DE7F8C /* ViewController.m */,
 				E8358B6A1AFB172C00DE7F8C /* Images.xcassets */,
 				E8358B6C1AFB172C00DE7F8C /* Main.storyboard */,
-				E8358B601AFB172C00DE7F8C /* Supporting Files */,
+				E8358B671AFB172C00DE7F8C /* ViewController.h */,
+				E8358B681AFB172C00DE7F8C /* ViewController.m */,
 			);
 			path = XCFrameworkExample;
 			sourceTree = "<group>";
@@ -119,8 +119,8 @@
 		E8358B761AFB172C00DE7F8C /* XCFrameworkExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				E8358B791AFB172C00DE7F8C /* XCFrameworkExampleTests.m */,
 				E8358B771AFB172C00DE7F8C /* Supporting Files */,
+				E8358B791AFB172C00DE7F8C /* XCFrameworkExampleTests.m */,
 			);
 			path = XCFrameworkExampleTests;
 			sourceTree = "<group>";
@@ -233,9 +233,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8358B691AFB172C00DE7F8C /* ViewController.m in Sources */,
-				E8358B661AFB172C00DE7F8C /* main.m in Sources */,
 				E8358B641AFB172C00DE7F8C /* AppDelegate.m in Sources */,
+				E8358B661AFB172C00DE7F8C /* main.m in Sources */,
+				E8358B691AFB172C00DE7F8C /* ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

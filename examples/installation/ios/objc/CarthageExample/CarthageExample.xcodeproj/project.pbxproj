@@ -66,10 +66,10 @@
 		E8F8D98B1B0177C10098F6CD = {
 			isa = PBXGroup;
 			children = (
-				E8F8D9BD1B01783C0098F6CD /* Realm.framework */,
 				E8F8D9961B0177C10098F6CD /* CarthageExample */,
 				E8F8D9B01B0177C10098F6CD /* CarthageExampleTests */,
 				E8F8D9951B0177C10098F6CD /* Products */,
+				E8F8D9BD1B01783C0098F6CD /* Realm.framework */,
 			);
 			sourceTree = "<group>";
 		};
@@ -85,14 +85,14 @@
 		E8F8D9961B0177C10098F6CD /* CarthageExample */ = {
 			isa = PBXGroup;
 			children = (
+				E8F8D9971B0177C10098F6CD /* Supporting Files */,
 				E8F8D99B1B0177C10098F6CD /* AppDelegate.h */,
 				E8F8D99C1B0177C10098F6CD /* AppDelegate.m */,
-				E8F8D99E1B0177C10098F6CD /* ViewController.h */,
-				E8F8D99F1B0177C10098F6CD /* ViewController.m */,
-				E8F8D9A11B0177C10098F6CD /* Main.storyboard */,
 				E8F8D9A41B0177C10098F6CD /* Images.xcassets */,
 				E8F8D9A61B0177C10098F6CD /* LaunchScreen.xib */,
-				E8F8D9971B0177C10098F6CD /* Supporting Files */,
+				E8F8D9A11B0177C10098F6CD /* Main.storyboard */,
+				E8F8D99E1B0177C10098F6CD /* ViewController.h */,
+				E8F8D99F1B0177C10098F6CD /* ViewController.m */,
 			);
 			path = CarthageExample;
 			sourceTree = "<group>";
@@ -109,8 +109,8 @@
 		E8F8D9B01B0177C10098F6CD /* CarthageExampleTests */ = {
 			isa = PBXGroup;
 			children = (
-				E8F8D9B31B0177C10098F6CD /* CarthageExampleTests.m */,
 				E8F8D9B11B0177C10098F6CD /* Supporting Files */,
+				E8F8D9B31B0177C10098F6CD /* CarthageExampleTests.m */,
 			);
 			path = CarthageExampleTests;
 			sourceTree = "<group>";
@@ -204,9 +204,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8F8D9A31B0177C10098F6CD /* Main.storyboard in Resources */,
-				E8F8D9A81B0177C10098F6CD /* LaunchScreen.xib in Resources */,
 				E8F8D9A51B0177C10098F6CD /* Images.xcassets in Resources */,
+				E8F8D9A81B0177C10098F6CD /* LaunchScreen.xib in Resources */,
+				E8F8D9A31B0177C10098F6CD /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -241,9 +241,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E8F8D9A01B0177C10098F6CD /* ViewController.m in Sources */,
 				E8F8D99D1B0177C10098F6CD /* AppDelegate.m in Sources */,
 				E8F8D99A1B0177C10098F6CD /* main.m in Sources */,
+				E8F8D9A01B0177C10098F6CD /* ViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

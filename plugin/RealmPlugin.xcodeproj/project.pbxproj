@@ -48,10 +48,10 @@
 		2263AAAD19B0A1E5007240D9 = {
 			isa = PBXGroup;
 			children = (
-				22B78F1319B0A47600968525 /* Templates */,
-				2263AABD19B0A1E6007240D9 /* RealmPlugin */,
 				2263AAB819B0A1E6007240D9 /* Frameworks */,
 				2263AAB719B0A1E6007240D9 /* Products */,
+				2263AABD19B0A1E6007240D9 /* RealmPlugin */,
+				22B78F1319B0A47600968525 /* Templates */,
 			);
 			sourceTree = "<group>";
 		};
@@ -75,11 +75,11 @@
 		2263AABD19B0A1E6007240D9 /* RealmPlugin */ = {
 			isa = PBXGroup;
 			children = (
+				2263AABE19B0A1E6007240D9 /* Supporting Files */,
 				2263AAC319B0A1E6007240D9 /* RLMPRealmPlugin.h */,
 				2263AAC419B0A1E6007240D9 /* RLMPRealmPlugin.m */,
 				3CF8FC5B1B494F3B0066DC23 /* RLMPSimulatorManager.h */,
 				3CF8FC5C1B494F3B0066DC23 /* RLMPSimulatorManager.m */,
-				2263AABE19B0A1E6007240D9 /* Supporting Files */,
 			);
 			path = RealmPlugin;
 			sourceTree = "<group>";
@@ -87,8 +87,8 @@
 		2263AABE19B0A1E6007240D9 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				2263AABF19B0A1E6007240D9 /* RealmPlugin-Info.plist */,
 				2263AAC019B0A1E6007240D9 /* InfoPlist.strings */,
+				2263AABF19B0A1E6007240D9 /* RealmPlugin-Info.plist */,
 				2263AAC619B0A1E6007240D9 /* RealmPlugin-Prefix.pch */,
 			);
 			name = "Supporting Files";

@@ -485,7 +485,6 @@ extension List: RealmCollection {
         return _rlmArray
     }
 
-#if swift(>=4)
     /**
      Replace the given `subRange` of elements with `newElements`.
 
@@ -502,23 +501,6 @@ extension List: RealmCollection {
                 insert(x, at: subrange.lowerBound)
             }
     }
-#else
-    /**
-     Replace the given `subRange` of elements with `newElements`.
-
-     - parameter subrange:    The range of elements to be replaced.
-     - parameter newElements: The new elements to be inserted into the List.
-     */
-    public func replaceSubrange<C: Collection>(_ subrange: Range<Int>, with newElements: C)
-        where C.Iterator.Element == Element {
-            for _ in subrange.lowerBound..<subrange.upperBound {
-                remove(at: subrange.lowerBound)
-            }
-            for x in newElements.reversed() {
-                insert(x, at: subrange.lowerBound)
-            }
-    }
-#endif
 
     /// The position of the first element in a non-empty collection.
     /// Identical to endIndex in an empty collection.
@@ -541,7 +523,6 @@ extension List: RealmCollection {
     }
 }
 
-#if swift(>=4.0)
 // MARK: - MutableCollection conformance, range replaceable collection emulation
 extension List: MutableCollection {
 #if swift(>=4.1)
@@ -691,24 +672,6 @@ extension List: MutableCollection {
     }
 #endif
 }
-#else
-// MARK: - RangeReplaceableCollection support
-extension List: RangeReplaceableCollection {
-    /**
-     Removes the last object in the list. The object is not removed from the Realm that manages it.
-
-     - warning: This method may only be called during a write transaction.
-     */
-    public func removeLast() {
-        guard _rlmArray.count > 0 else {
-            throwRealmException("It is not possible to remove an object from an empty list.")
-            return
-        }
-        _rlmArray.removeLastObject()
-    }
-
-}
-#endif
 
 // MARK: - Codable
 

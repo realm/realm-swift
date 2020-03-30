@@ -33,6 +33,10 @@
 #pragma mark - API
 
 - (void)setSyncConfiguration:(RLMSyncConfiguration *)syncConfiguration {
+    if (syncConfiguration == nil) {
+        self.config.sync_config = nullptr;
+        return;
+    }
     if (self.config.should_compact_on_launch_function) {
         @throw RLMException(@"Cannot set `syncConfiguration` when `shouldCompactOnLaunch` is set.");
     }

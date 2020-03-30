@@ -75,7 +75,6 @@ class ListTests: TestCase {
         super.tearDown()
     }
 
-#if swift(>=4)
     override class var defaultTestSuite: XCTestSuite {
         // Don't run tests for the base class
         if isEqual(ListTests.self) {
@@ -83,15 +82,6 @@ class ListTests: TestCase {
         }
         return super.defaultTestSuite
     }
-#else
-    override class func defaultTestSuite() -> XCTestSuite {
-        // Don't run tests for the base class
-        if isEqual(ListTests.self) {
-            return XCTestSuite(name: "empty")
-        }
-        return super.defaultTestSuite()
-    }
-#endif
 
     func testPrimitive() {
         let obj = SwiftListObject()
@@ -723,7 +713,6 @@ class ListRRCMethodsTests: TestCase {
         array = makeArray(from: list)
     }
 
-#if swift(>=4.0)
     func testSubscript() {
         list[0] = SwiftIntObject(value: [5])
         list[1..<4] = createListObject([10, 11, 12]).intArray[0..<2]
@@ -743,7 +732,6 @@ class ListRRCMethodsTests: TestCase {
         list.removeSubrange(list.indices)
         XCTAssertTrue(list.isEmpty)
     }
-#endif
 
     func testRemoveFirst() {
         list.removeFirst()

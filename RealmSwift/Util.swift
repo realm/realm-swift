@@ -117,55 +117,55 @@ internal protocol CustomObjectiveCBridgeable {
 // FIXME: needed with swift 3.2
 // Double isn't though?
 extension Float: CustomObjectiveCBridgeable {
-    static func bridging(objCValue: Any) -> Float {
+    internal static func bridging(objCValue: Any) -> Float {
         return (objCValue as! NSNumber).floatValue
     }
-    var objCValue: Any {
+    internal var objCValue: Any {
         return NSNumber(value: self)
     }
 }
 
 extension Int8: CustomObjectiveCBridgeable {
-    static func bridging(objCValue: Any) -> Int8 {
+    internal static func bridging(objCValue: Any) -> Int8 {
         return (objCValue as! NSNumber).int8Value
     }
-    var objCValue: Any {
+    internal var objCValue: Any {
         return NSNumber(value: self)
     }
 }
 extension Int16: CustomObjectiveCBridgeable {
-    static func bridging(objCValue: Any) -> Int16 {
+    internal static func bridging(objCValue: Any) -> Int16 {
         return (objCValue as! NSNumber).int16Value
     }
-    var objCValue: Any {
+    internal var objCValue: Any {
         return NSNumber(value: self)
     }
 }
 extension Int32: CustomObjectiveCBridgeable {
-    static func bridging(objCValue: Any) -> Int32 {
+    internal static func bridging(objCValue: Any) -> Int32 {
         return (objCValue as! NSNumber).int32Value
     }
-    var objCValue: Any {
+    internal var objCValue: Any {
         return NSNumber(value: self)
     }
 }
 extension Int64: CustomObjectiveCBridgeable {
-    static func bridging(objCValue: Any) -> Int64 {
+    internal static func bridging(objCValue: Any) -> Int64 {
         return (objCValue as! NSNumber).int64Value
     }
-    var objCValue: Any {
+    internal var objCValue: Any {
         return NSNumber(value: self)
     }
 }
 extension Optional: CustomObjectiveCBridgeable {
-    static func bridging(objCValue: Any) -> Optional {
+    internal static func bridging(objCValue: Any) -> Optional {
         if objCValue is NSNull {
             return nil
         } else {
             return .some(dynamicBridgeCast(fromObjectiveC: objCValue))
         }
     }
-    var objCValue: Any {
+    internal var objCValue: Any {
         if let value = self {
             return dynamicBridgeCast(fromSwift: value)
         } else {

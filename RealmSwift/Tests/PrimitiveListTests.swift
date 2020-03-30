@@ -265,15 +265,9 @@ class PrimitiveListTestsBase<O: ObjectFactory, V: ValueFactory>: TestCase {
     var array: List<V.T>!
     var values: [V.T]!
 
-#if swift(>=4)
     class func _defaultTestSuite() -> XCTestSuite {
         return defaultTestSuite
     }
-#else
-    class func _defaultTestSuite() -> XCTestSuite {
-        return defaultTestSuite()
-    }
-#endif
 
     override func setUp() {
         obj = SwiftListObject()
@@ -685,15 +679,9 @@ class UnmanagedPrimitiveListTests: TestCase {
         return suite
     }
 
-#if swift(>=4)
     override class var defaultTestSuite: XCTestSuite {
         return _defaultTestSuite()
     }
-#else
-    override class func defaultTestSuite() -> XCTestSuite {
-        return _defaultTestSuite()
-    }
-#endif
 }
 
 class ManagedPrimitiveListTests: TestCase {
@@ -724,13 +712,7 @@ class ManagedPrimitiveListTests: TestCase {
         return suite
     }
 
-#if swift(>=4)
     override class var defaultTestSuite: XCTestSuite {
         return _defaultTestSuite()
     }
-#else
-    override class func defaultTestSuite() -> XCTestSuite {
-        return _defaultTestSuite()
-    }
-#endif
 }
