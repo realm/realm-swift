@@ -20,22 +20,51 @@ import Foundation
 import Realm
 
 /**
- A unique object identifier.
+ A 12-byte (probably) unique object identifier.
 
- This type is similar to a GUID or UUID.
+ ObjectIds are similar to a GUID or a UUID, and can be used to uniquely identify objects without a centralized ID generator. An ObjectID consists of:
+
+ 1. A 4 byte timestamp measuring the creation time of the ObjectId in seconds since the Unix epoch.
+ 2. A 5 byte random value
+ 3. A 3 byte counter, initialized to a random value.
+
+ ObjectIds are intended to be fast to generate. Sorting by an ObjectId field will typically result in the objects being sorted in creation order.
  */
 @objc(RealmSwiftObjectId)
 public final class ObjectId: RLMObjectId, Decodable {
     // MARK: Initializers
+
+    /// Creates a new zero-initialized ObjectId.
     public override required init() {
         super.init()
     }
+
+    /// Creates a new randomly-initialized ObjectId.
+    public override class func generate() -> ObjectId {
+        return unsafeDowncast(super.generate(), to: ObjectId.self)
+    }
+
+    /// Creates a new ObjectId from the given 24-byte hexadecimal string.
+    ///
+    /// Throws if the string is not 24 characters or contains any characters other than 0-9a-fA-F.
+    /// - Parameter string: The string to parse.
     public override required init(string: String) throws {
         try super.init(string: string)
     }
+
+    /// Creates a new ObjectId from the given 24-byte hexadecimal static string.
+    ///
+    /// Aborts if the string is not 24 characters or contains any characters other than 0-9a-fA-F. Use the initializer which takes a String to handle invalid strings at runtime.
     public required init(_ str: StaticString) {
         try! super.init(string: str.withUTF8Buffer { String(decoding: $0, as: UTF8.self) })
     }
+
+    /// Creates a new ObjectId by decoding from the given decoder.
+    ///
+    /// This initializer throws an error if reading from the decoder fails, or
+    /// if the data read is corrupted or otherwise invalid.
+    ///
+    /// - Parameter decoder: The decoder to read data from.
     public required init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
         try super.init(string: container.decode(String.self))
@@ -43,6 +72,11 @@ public final class ObjectId: RLMObjectId, Decodable {
 }
 
 extension ObjectId: Encodable {
+    /// Encodes this ObjectId into the given encoder.
+    ///
+    /// This function throws an error if the given encoder is unable to encode a string.
+    ///
+    /// - Parameter encoder: The encoder to write data to.
     public func encode(to encoder: Encoder) throws {
         try self.stringValue.encode(to: encoder)
     }

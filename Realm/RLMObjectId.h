@@ -20,12 +20,36 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/**
+ A 12-byte (probably) unique object identifier.
+
+ ObjectIds are similar to a GUID or a UUID, and can be used to uniquely identify
+ objects without a centralized ID generator. An ObjectID consists of:
+
+ 1. A 4 byte timestamp measuring the creation time of the ObjectId in seconds
+    since the Unix epoch.
+ 2. A 5 byte random value
+ 3. A 3 byte counter, initialized to a random value.
+
+ ObjectIds are intended to be fast to generate. Sorting by an ObjectId field
+ will typically result in the objects being sorted in creation order.
+ */
 @interface RLMObjectId : NSObject
+/// Creates a new randomly-initialized ObjectId.
 + (nonnull instancetype)objectId NS_SWIFT_NAME(generate());
 
+/// Creates a new zero-initialized ObjectId.
 - (instancetype)init;
+
+/// Creates a new ObjectId from the given 24-byte hexadecimal string.
+///
+/// Returns `nil` and sets `error` if the string is not 24 characters long or
+/// contains any characters other than 0-9a-fA-F.
+///
+/// @param string The string to parse.
 - (nullable instancetype)initWithString:(NSString *)string error:(NSError **)error;
 
+/// Get the ObjectId as a 24-character hexadecimal string.
 @property (nonatomic, readonly) NSString *stringValue;
 @end
 
