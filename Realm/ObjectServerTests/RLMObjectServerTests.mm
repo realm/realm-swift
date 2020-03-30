@@ -364,6 +364,49 @@
      */
 }
 
+#pragma mark - Link user
+
+- (void)testLinkUser {
+    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+
+    XCTestExpectation *registerExpectation = [self expectationWithDescription:@"should try register"];
+    XCTestExpectation *loginExpectation = [self expectationWithDescription:@"should try login"];
+    XCTestExpectation *linkExpectation = [self expectationWithDescription:@"should try link and fail"];
+
+    __block RLMSyncUser *syncUser;
+
+    NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
+    NSString *randomPassword = [self generateRandomString:10];
+    
+    [[app usernamePasswordProviderClient] registerEmail:randomEmail password:randomPassword completion:^(NSError * _Nullable error) {
+        XCTAssert(!error);
+        [registerExpectation fulfill];
+    }];
+
+    [self waitForExpectations:@[registerExpectation] timeout:60.0];
+
+    [app loginWithCredential:[RLMAppCredentials credentialsWithUsername:randomEmail password:randomPassword]
+           completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+        [loginExpectation fulfill];
+    }];
+    
+    [self waitForExpectations:@[loginExpectation] timeout:60.0];
+    
+    [app linkUser:syncUser
+      credentials:[RLMAppCredentials credentialsWithFacebookToken:@"a_token"]
+       completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!user);
+        XCTAssertEqual(error.code, RLMAppErrorInvalidSession);
+        [linkExpectation fulfill];
+    }];
+    
+    [self waitForExpectations:@[linkExpectation] timeout:60.0];
+
+}
+
 #pragma mark - Username Password
 
 /// Valid username/password credentials should be able to log in a user. Using the same credentials should return the

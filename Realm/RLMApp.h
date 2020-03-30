@@ -140,6 +140,21 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
     completion:(RLMOptionalErrorBlock)completion;
 
 /**
+ Links the currently authenticated user with a new identity, where the identity is defined by the credential
+ specified as a parameter. This will only be successful if this `RLMSyncUser` is the currently authenticated
+ with the client from which it was created. On success a new user will be returned with the new linked credentials.
+ 
+ @param syncUser The user which will have the credentials linked to, the user must be logged in
+ @param credentials The `RLMAppCredentials` used to link the user to a new identity.
+ @param completion The completion handler to call when the linking is complete.
+                   If the operation is  successful, the result will contain a new
+                   `RLMSyncUser` object representing the currently logged in user.
+*/
+- (void)linkUser:(RLMSyncUser *)syncUser
+     credentials:(RLMAppCredentials *)credentials
+      completion:(RLMUserCompletionBlock)completion;
+
+/**
   A client for the username/password authentication provider which
   can be used to obtain a credential for logging in.
  

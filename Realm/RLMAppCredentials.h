@@ -38,6 +38,9 @@ extern RLMIdentityProvider const RLMIdentityProviderFacebook;
 /// A Google account as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderGoogle;
 
+/// An Apple account as an identity provider.
+extern RLMIdentityProvider const RLMIdentityProviderApple;
+
 /// A JSON Web Token as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderJWT;
 
@@ -61,6 +64,11 @@ extern RLMIdentityProvider const RLMIdentityProviderAnonymous;
  Construct and return credentials from a Google account token.
  */
 + (instancetype)credentialsWithGoogleToken:(RLMAppCredentialsToken)token;
+
+/**
+ Construct and return credentials from an Apple account token.
+ */
++ (instancetype)credentialsWithAppleToken:(RLMAppCredentialsToken)token;
 
 /**
  Construct and return credentials from a Realm Object Server username and password.

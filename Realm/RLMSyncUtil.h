@@ -187,6 +187,9 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMAppError, RLMAppErrorDomain) {
     /// An unknown error has occured
     RLMAppErrorUnknown                        = -1,
     
+    /// An error that indicates that the session is invalid
+    RLMAppErrorInvalidSession                 = 2,
+    
     /// An error that indicates that the request sent to the server was invalid
     RLMAppErrorBadRequest                     = 48,
     

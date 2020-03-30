@@ -187,9 +187,22 @@ namespace {
     });
 }
 
-- (void)logOut:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completionHandler {
+- (void)logOut:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
     _app.log_out(syncUser._syncUser, ^(Optional<app::AppError> error) {
-        [self handleResponse:error completion:completionHandler];
+        [self handleResponse:error completion:completion];
+    });
+}
+
+- (void)linkUser:(RLMSyncUser *)syncUser
+     credentials:(RLMAppCredentials *)credentials
+      completion:(RLMUserCompletionBlock)completion {
+    _app.link_user(syncUser._syncUser, credentials.appCredentials,
+                   ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
+        if (error && error->error_code) {
+            return completion(nil, [self AppErrorToNSError:*error]);
+        }
+        
+        completion([[RLMSyncUser alloc] initWithSyncUser:user], nil);
     });
 }
 
