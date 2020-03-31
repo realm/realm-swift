@@ -21,19 +21,15 @@
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 
+#import "RLMAppCredentials.h"
 #import "RLMRealm+Sync.h"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMRealmUtil.hpp"
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSyncUtil_Private.h"
+
 #import "shared_realm.hpp"
-#import "RLMApp_Private.hpp"
-#import "RLMAppCredentials.h"
-#import "RLMUserAPIKey.h"
-#import "RLMProviderClient.h"
-#import "RLMUsernamePasswordProviderClient.h"
-#import "RLMUserAPIKeyProviderClient.h"
 
 #pragma mark - Test objects
 

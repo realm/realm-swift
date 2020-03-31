@@ -1,7 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* The memory mapping scheme for Realm files has changed to better support
+  opening very large files.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
@@ -15,6 +16,11 @@ x.y.z Release notes (yyyy-MM-dd)
   other visible effects. ([#6440](https://github.com/realm/realm-cocoa/pull/6440)).
 * Remove everything related to sync permissions, including both the path-based
   permission system and the object-level privileges for query-based sync. ([#6445](https://github.com/realm/realm-cocoa/pulls/6445))
+* Primary key uniqueness is now enforced when creating new objects during
+  migrations, rather than only at the end of migrations. Previously new objects
+  could be created with duplicate primary keys during a migration as long as
+  the property was changed to a unique value before the end of the migration,
+  but now a unique value must be supplied when creating the object.
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
@@ -23,8 +29,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.4.
 
 ### Internal
-* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.1
-* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.3
+* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.3
+* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.5
 
 5.0.0-beta.3 Release notes (2020-02-26)
 =============================================================

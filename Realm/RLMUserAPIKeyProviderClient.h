@@ -16,9 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import "RLMProviderClient.h"
-#import "RLMUserAPIKey.h"
+#import <Realm/RLMProviderClient.h>
+
+@class RLMUserAPIKey;
 
 NS_ASSUME_NONNULL_BEGIN
 

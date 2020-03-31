@@ -906,6 +906,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
 }
 
 - (RLMRealm *)freeze {
+    [self verifyThread];
     return self.isFrozen ? self : RLMGetFrozenRealmForSourceRealm(self);
 }
 

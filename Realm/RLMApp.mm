@@ -16,15 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 #import "RLMApp_Private.hpp"
 
 #import "RLMAppCredentials_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncManager_Private.h"
-
 #import "RLMUsernamePasswordProviderClient.h"
 #import "RLMUserAPIKeyProviderClient.h"
+#import "sync/app.hpp"
 
 using namespace realm;
 
@@ -100,6 +99,14 @@ namespace {
 }
 @end
 
+NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
+    return [[NSError alloc] initWithDomain:@(appError.error_code.category().name())
+                                      code:appError.error_code.value()
+                                  userInfo:@{
+                                      @(appError.error_code.category().name()) : @(appError.error_code.message().data())
+                                  }];
+}
+
 @interface RLMApp() {
     realm::app::App _app;
 }
@@ -129,7 +136,6 @@ namespace {
             boundConfiguration.default_request_timeout_ms = (uint64_t)configuration.defaultRequestTimeoutMS;
         }
         _app = realm::app::App(boundConfiguration);
-        apps[appId] = self;
         return self;
     }
     return nil;
@@ -139,7 +145,7 @@ namespace {
     return [[RLMApp alloc] initWithAppId:appId configuration:configuration];
 }
 
-- (realm::app::App)_realmApp {
+- (realm::app::App&)_realmApp {
     return _app;
 }
 
@@ -153,18 +159,11 @@ namespace {
     return [[RLMSyncManager sharedManager] _currentUser];
 }
 
-- (NSError*)AppErrorToNSError:(const realm::app::AppError&)appError {
-    return [[NSError alloc] initWithDomain:@(appError.error_code.category().name())
-                                      code:appError.error_code.value()
-                                  userInfo:@{
-                                      @(appError.error_code.category().name()) : @(appError.error_code.message().data())
-                                  }];
-}
 - (void)loginWithCredential:(RLMAppCredentials *)credentials
           completion:(RLMUserCompletionBlock)completionHandler {
     _app.log_in_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
-            return completionHandler(nil, [self AppErrorToNSError:*error]);
+            return completionHandler(nil, RLMAppErrorToNSError(*error));
         }
 
         completionHandler([[RLMSyncUser alloc] initWithSyncUser:user], nil);
@@ -199,7 +198,7 @@ namespace {
     _app.link_user(syncUser._syncUser, credentials.appCredentials,
                    ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
-            return completion(nil, [self AppErrorToNSError:*error]);
+            return completion(nil, RLMAppErrorToNSError(*error));
         }
         
         completion([[RLMSyncUser alloc] initWithSyncUser:user], nil);
@@ -217,7 +216,7 @@ namespace {
 - (void)handleResponse:(Optional<realm::app::AppError>)error
             completion:(RLMOptionalErrorBlock)completion {
     if (error && error->error_code) {
-        return completion([self AppErrorToNSError:*error]);
+        return completion(RLMAppErrorToNSError(*error));
     }
     completion(nil);
 }

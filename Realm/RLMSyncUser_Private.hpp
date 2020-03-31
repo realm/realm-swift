@@ -63,7 +63,6 @@ private:
 
 @interface RLMSyncUser ()
 - (instancetype)initWithSyncUser:(std::shared_ptr<SyncUser>)user;
-- (NSURL *)defaultRealmURL;
 - (std::shared_ptr<SyncUser>)_syncUser;
 + (void)_setUpBindingContextFactory;
 @end

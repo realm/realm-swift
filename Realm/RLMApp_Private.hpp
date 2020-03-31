@@ -16,21 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMApp.h"
-#import "sync/app.hpp"
+#import <Realm/RLMApp.h>
 
-static NSMutableDictionary<NSString *, RLMApp *> *apps= [NSMutableDictionary new];
+namespace realm {
+namespace app {
+class App;
+struct AppError;
+}
+namespace util {
+template<typename T>
+class Optional;
+}
+}
 
 @interface RLMApp ()
+- (realm::app::App&)_realmApp;
 
-- (realm::app::App)_realmApp;
-
-/**
-Convert an object store AppError to an NSError.
-*/
-- (NSError*)AppErrorToNSError:(const realm::app::AppError&)appError;
-
-- (void)handleResponse:(Optional<realm::app::AppError>)error
+- (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
             completion:(RLMOptionalErrorBlock)completion;
-
 @end
+
+NSError *RLMAppErrorToNSError(realm::app::AppError const& appError);

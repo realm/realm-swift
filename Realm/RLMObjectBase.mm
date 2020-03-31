@@ -314,7 +314,7 @@ id RLMCreateManagedAccessor(Class cls, RLMClassInfo *info) {
     else if (_realm.isFrozen) {
         // The object key can never change for frozen objects, so that's usable
         // for objects without primary keys
-        return _row.get_key().value;
+        return static_cast<NSUInteger>(_row.get_key().value);
     }
     else {
         // Non-frozen objects without primary keys don't have any immutable
