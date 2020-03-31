@@ -16,21 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMApp.h"
-#import "sync/app.hpp"
+#import <Foundation/Foundation.h>
 
-static NSMutableDictionary<NSString *, RLMApp *> *apps= [NSMutableDictionary new];
+NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMApp ()
+@interface RLMUserAPIKey : NSObject
 
-- (realm::app::App)_realmApp;
+// Indicates if the API key is disabled or not
+@property (nonatomic, readonly) BOOL disabled;
 
-/**
-Convert an object store AppError to an NSError.
-*/
-- (NSError*)AppErrorToNSError:(const realm::app::AppError&)appError;
+// The name of the key.
+@property (nonatomic, readonly) NSString *name;
 
-- (void)handleResponse:(Optional<realm::app::AppError>)error
-            completion:(RLMOptionalErrorBlock)completion;
+// The actual key. Will only be included in
+// the response when an API key is first created.
+@property (nonatomic, readonly, nullable) NSString *key;
+
+@property (nonatomic, readonly) id objectId;
 
 @end
+
+NS_ASSUME_NONNULL_END

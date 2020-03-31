@@ -15,22 +15,25 @@
 // limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
+#import "RLMProviderClient.h"
+#import "RLMApp_Private.hpp"
 
-#import "RLMApp.h"
-#import "sync/app.hpp"
+@implementation RLMProviderClient
 
-static NSMutableDictionary<NSString *, RLMApp *> *apps= [NSMutableDictionary new];
-
-@interface RLMApp ()
-
-- (realm::app::App)_realmApp;
-
-/**
-Convert an object store AppError to an NSError.
-*/
-- (NSError*)AppErrorToNSError:(const realm::app::AppError&)appError;
+- (instancetype)initWithApp:(RLMApp *)app {
+    self = [super init];
+    if (self) {
+        _app = app;
+    }
+    return self;
+}
 
 - (void)handleResponse:(Optional<realm::app::AppError>)error
-            completion:(RLMOptionalErrorBlock)completion;
+            completion:(RLMOptionalErrorBlock)completion {
+    if (error && error->error_code) {
+        return completion([self.app AppErrorToNSError:*error]);
+    }
+    completion(nil);
+}
 
 @end

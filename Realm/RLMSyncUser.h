@@ -30,9 +30,9 @@ typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
     /// The user is logged out. Call `logInWithCredentials:...` with valid credentials to log the user back in.
     RLMSyncUserStateLoggedOut,
     /// The user is logged in, and any Realms associated with it are syncing with the Realm Object Server.
-    RLMSyncUserStateActive,
-    /// The user has encountered a fatal error state, and cannot be used.
-    RLMSyncUserStateError,
+    RLMSyncUserStateLoggedIn,
+    /// The user has been removed, and cannot be used.
+    RLMSyncUserStateRemoved,
 };
 
 /// A block type used for APIs which asynchronously vend an `RLMSyncUser`.

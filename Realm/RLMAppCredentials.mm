@@ -44,8 +44,11 @@ using namespace realm;
 }
 
 + (instancetype)credentialsWithGoogleToken:(RLMAppCredentialsToken)token {
-    // FIXME: Implement once available in the object store
-    REALM_UNREACHABLE();
+    return [[self alloc] initWithAppCredentials: app::AppCredentials::google(token.UTF8String)];
+}
+
++ (instancetype)credentialsWithAppleToken:(RLMAppCredentialsToken)token {
+    return [[self alloc] initWithAppCredentials: app::AppCredentials::apple(token.UTF8String)];
 }
 
 + (instancetype)credentialsWithUsername:(NSString *)username
@@ -55,8 +58,7 @@ using namespace realm;
 }
 
 + (instancetype)credentialsWithJWT:(NSString *)token {
-    // FIXME: Implement once available in the object store
-    REALM_UNREACHABLE();
+    return [[self alloc] initWithAppCredentials: app::AppCredentials::custom(token.UTF8String)];
 }
     
 + (instancetype)anonymousCredentials {

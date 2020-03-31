@@ -16,21 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMApp.h"
 #import "sync/app.hpp"
 
-static NSMutableDictionary<NSString *, RLMApp *> *apps= [NSMutableDictionary new];
-
-@interface RLMApp ()
-
-- (realm::app::App)_realmApp;
-
-/**
-Convert an object store AppError to an NSError.
-*/
-- (NSError*)AppErrorToNSError:(const realm::app::AppError&)appError;
-
-- (void)handleResponse:(Optional<realm::app::AppError>)error
-            completion:(RLMOptionalErrorBlock)completion;
-
+@interface RLMUserAPIKey ()
+- (realm::app::App::UserAPIKey)_apiKey;
+- (instancetype)initWithUserAPIKey:(realm::app::App::UserAPIKey)userAPIKey;
 @end

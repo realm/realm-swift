@@ -197,48 +197,19 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
 
 - (RLMSyncUserState)state {
     if (!_user) {
-        return RLMSyncUserStateError;
+        return RLMSyncUserStateRemoved;
     }
     switch (_user->state()) {
-        case SyncUser::State::Active:
-            return RLMSyncUserStateActive;
+        case SyncUser::State::LoggedIn:
+            return RLMSyncUserStateLoggedIn;
         case SyncUser::State::LoggedOut:
             return RLMSyncUserStateLoggedOut;
-        case SyncUser::State::Error:
-            return RLMSyncUserStateError;
+        case SyncUser::State::Removed:
+            return RLMSyncUserStateRemoved;
     }
-}
-
-- (NSURL *)authenticationServer {
-    if (!_user) {
-        return nil;
-    }
-    return [NSURL URLWithString:@(_user->server_url().c_str())];
 }
 
 #pragma mark - Private API
-
-- (NSURL *)urlForPath:(nullable NSString *)path {
-    if (!path) {
-        return nil;
-    }
-
-    NSURLComponents *components = [NSURLComponents componentsWithURL:self.authenticationServer resolvingAgainstBaseURL:YES];
-    if ([components.scheme caseInsensitiveCompare:@"http"] == NSOrderedSame)
-        components.scheme = @"realm";
-    else if ([components.scheme caseInsensitiveCompare:@"https"] == NSOrderedSame)
-        components.scheme = @"realms";
-    else
-        @throw RLMException(@"The provided user's authentication server URL (%@) was not valid.", self.authenticationServer);
-
-    components.path = path;
-    return components.URL;
-
-}
-
-- (NSURL *)defaultRealmURL {
-    return [self urlForPath:@"/default"];
-}
 
 + (void)_setUpBindingContextFactory {
     SyncUser::set_binding_context_factory([] {

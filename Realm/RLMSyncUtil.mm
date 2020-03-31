@@ -35,6 +35,7 @@ RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
 
 NSString *const RLMSyncErrorDomain = @"io.realm.sync";
 NSString *const RLMSyncAuthErrorDomain = @"io.realm.sync.auth";
+NSString *const RLMAppErrorDomain = @"io.realm.app";
 
 NSString *const kRLMSyncPathOfRealmBackupCopyKey            = @"recovered_realm_location_path";
 NSString *const kRLMSyncErrorActionTokenKey                 = @"error_action_token";
@@ -79,7 +80,7 @@ std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
     Realm::Config realmConfig = realm.configuration.config;
     if (auto config = realmConfig.sync_config) {
         std::shared_ptr<SyncUser> user = config->user;
-        if (user && user->state() != SyncUser::State::Error) {
+        if (user && user->state() != SyncUser::State::Removed) {
             return user->session_for_on_disk_path(realmConfig.path);
         }
     }

@@ -15,22 +15,21 @@
 // limitations under the License.
 //
 ////////////////////////////////////////////////////////////////////////////
+#import <Foundation/Foundation.h>
 
-#import "RLMApp.h"
-#import "sync/app.hpp"
+NS_ASSUME_NONNULL_BEGIN
 
-static NSMutableDictionary<NSString *, RLMApp *> *apps= [NSMutableDictionary new];
+@class RLMApp;
 
-@interface RLMApp ()
+@interface RLMProviderClient : NSObject
 
-- (realm::app::App)_realmApp;
+/// A block type used to report an error
+typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 
-/**
-Convert an object store AppError to an NSError.
-*/
-- (NSError*)AppErrorToNSError:(const realm::app::AppError&)appError;
+@property (nonatomic, strong) RLMApp *app;
 
-- (void)handleResponse:(Optional<realm::app::AppError>)error
-            completion:(RLMOptionalErrorBlock)completion;
+- (instancetype)initWithApp:(RLMApp *)app;
 
 @end
+
+NS_ASSUME_NONNULL_END

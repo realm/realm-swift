@@ -20,10 +20,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol RLMNetworkTransport;
 
-@class RLMSyncUser, RLMAppCredentials;
+@class RLMSyncUser, RLMAppCredentials, RLMUsernamePasswordProviderClient, RLMUserAPIKeyProviderClient;
 
 /// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
+
+/// A block type used to report an error
+typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 
 #pragma mark RLMAppConfiguration
 
@@ -75,7 +78,7 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
  @param appId The unique identifier of your Realm app.
  @param configuration A configuration object to configure this client.
  */
-+ (instancetype)app:(NSString *) appId
++ (instancetype)app:(NSString *)appId
       configuration:(nullable RLMAppConfiguration *)configuration;
 
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers;
@@ -86,10 +89,86 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
  Login to a user for the Realm app.
 
  @param credentials The credentials identifying the user.
- @param completionHandler A callback invoked after completion.
+ @param completion A callback invoked after completion.
  */
 - (void)loginWithCredential:(RLMAppCredentials *)credentials
-          completionHandler:(RLMUserCompletionBlock)completionHandler;
+                 completion:(RLMUserCompletionBlock)completion;
+
+/**
+ Switches the active user to the specified user.
+
+ This sets which user is used by all RLMApp operations which require a user. This is a local operation which does not access the network.
+ An exception will be throw if the user is not valid. The current user will remain logged in.
+ 
+ @param syncUser The user to switch to.
+ @returns The user you intend to switch to
+ */
+- (RLMSyncUser *)switchToUser:(RLMSyncUser *)syncUser;
+
+/**
+ Removes a specified user
+ 
+ This logs out and destroys the session related to the user. The completion block will return an error
+ if the user is not found or is already removed.
+
+ @param syncUser The user you would like to remove
+ @param completion A callback invoked on completion
+*/
+- (void)removeUser:(RLMSyncUser *)syncUser
+        completion:(RLMOptionalErrorBlock)completion;
+
+/**
+ Logs out the current user
+ 
+ The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
+ If the logout request fails, this method will still clear local authentication state.
+ 
+ @param completion A callback invoked on completion
+*/
+- (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion;
+
+/**
+ Logs out a specific user
+ 
+ The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
+ If the logout request fails, this method will still clear local authentication state.
+ 
+ @param syncUser The user to log out
+ @param completion A callback invoked on completion
+*/
+- (void)logOut:(RLMSyncUser *)syncUser
+    completion:(RLMOptionalErrorBlock)completion;
+
+/**
+ Links the currently authenticated user with a new identity, where the identity is defined by the credential
+ specified as a parameter. This will only be successful if this `RLMSyncUser` is the currently authenticated
+ with the client from which it was created. On success a new user will be returned with the new linked credentials.
+ 
+ @param syncUser The user which will have the credentials linked to, the user must be logged in
+ @param credentials The `RLMAppCredentials` used to link the user to a new identity.
+ @param completion The completion handler to call when the linking is complete.
+                   If the operation is  successful, the result will contain a new
+                   `RLMSyncUser` object representing the currently logged in user.
+*/
+- (void)linkUser:(RLMSyncUser *)syncUser
+     credentials:(RLMAppCredentials *)credentials
+      completion:(RLMUserCompletionBlock)completion;
+
+/**
+  A client for the username/password authentication provider which
+  can be used to obtain a credential for logging in.
+ 
+  Used to perform requests specifically related to the username/password provider.
+*/
+- (RLMUsernamePasswordProviderClient *)usernamePasswordProviderClient;
+
+/**
+  A client for the user API key authentication provider which
+  can be used to create and modify user API keys.
+ 
+  This client should only be used by an authenticated user.
+*/
+- (RLMUserAPIKeyProviderClient *)userAPIKeyProviderClient;
 
 @end
 

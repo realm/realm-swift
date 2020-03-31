@@ -76,7 +76,7 @@ RLMRealm *RLMGetFrozenRealmForSourceRealm(__unsafe_unretained RLMRealm *const so
         s_realmsPerPath[path] = realms = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsIntegerPersonality|NSPointerFunctionsOpaqueMemory
                                                                valueOptions:NSPointerFunctionsWeakMemory];
     }
-    auto version = reinterpret_cast<void *>(r.transaction().get_version_of_current_transaction().version);
+    auto version = reinterpret_cast<void *>(r.current_transaction_version()->version);
     RLMRealm *realm = [realms objectForKey:(__bridge id)version];
     if (!realm) {
         realm = [sourceRealm frozenCopy];
