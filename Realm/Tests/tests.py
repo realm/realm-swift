@@ -70,6 +70,10 @@ for line in file:
     if not '$' in line:
         print line,
         continue
+    if '$allArrays' in line:
+        line = line.replace(' ^n', '\n' + ' ' * (line.find('(') + 4))
+        print '    for (RLMArray *array in allArrays) {\n    ' + line.replace('$allArrays', 'array') + '    }'
+        continue
 
     filtered_types = types
 
