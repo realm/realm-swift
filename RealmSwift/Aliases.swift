@@ -41,6 +41,8 @@ import Realm
  * `String`
  * `Data`
  * `Date`
+ * `Decimal128`
+ * `ObjectId`
 
  ### Relationships: Array (in Swift, `List`) and `Object` types
 

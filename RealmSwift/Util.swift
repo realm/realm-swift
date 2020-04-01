@@ -173,6 +173,17 @@ extension Optional: CustomObjectiveCBridgeable {
         }
     }
 }
+extension Decimal128: CustomObjectiveCBridgeable {
+    static func bridging(objCValue: Any) -> Decimal128 {
+        if let number = objCValue as? NSNumber {
+            return Decimal128(number: number)
+        }
+        return objCValue as! Decimal128
+    }
+    var objCValue: Any {
+        return self
+    }
+}
 
 // MARK: AssistedObjectiveCBridgeable
 

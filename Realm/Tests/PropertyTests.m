@@ -44,20 +44,27 @@
                                                 @"}");
 }
 
+static RLMProperty *makeProperty(NSString *name, RLMPropertyType type, NSString *objectClassName, BOOL optional) {
+    return [[RLMProperty alloc] initWithName:name type:type objectClassName:objectClassName
+                      linkOriginPropertyName:nil indexed:NO optional:optional];
+}
+
 - (void)testEqualityFromObjectSchema {
     { // Test non-optional property types
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[AllTypesObject class]];
         NSDictionary *expectedProperties = @{
-            @"boolCol":   [[RLMProperty alloc] initWithName:@"boolCol"    type:RLMPropertyTypeBool   objectClassName:nil             linkOriginPropertyName:nil indexed:NO optional:NO],
-            @"intCol":    [[RLMProperty alloc] initWithName:@"intCol"     type:RLMPropertyTypeInt    objectClassName:nil             linkOriginPropertyName:nil indexed:NO optional:NO],
-            @"floatCol":  [[RLMProperty alloc] initWithName:@"floatCol"   type:RLMPropertyTypeFloat  objectClassName:nil             linkOriginPropertyName:nil indexed:NO optional:NO],
-            @"doubleCol": [[RLMProperty alloc] initWithName:@"doubleCol"  type:RLMPropertyTypeDouble objectClassName:nil             linkOriginPropertyName:nil indexed:NO optional:NO],
-            @"stringCol": [[RLMProperty alloc] initWithName:@"stringCol"  type:RLMPropertyTypeString objectClassName:nil             linkOriginPropertyName:nil indexed:NO optional:NO],
-            @"binaryCol": [[RLMProperty alloc] initWithName:@"binaryCol"  type:RLMPropertyTypeData   objectClassName:nil             linkOriginPropertyName:nil indexed:NO optional:NO],
-            @"dateCol":   [[RLMProperty alloc] initWithName:@"dateCol"    type:RLMPropertyTypeDate   objectClassName:nil             linkOriginPropertyName:nil indexed:NO optional:NO],
-            @"cBoolCol":  [[RLMProperty alloc] initWithName:@"cBoolCol"   type:RLMPropertyTypeBool   objectClassName:nil             linkOriginPropertyName:nil indexed:NO optional:NO],
-            @"longCol":   [[RLMProperty alloc] initWithName:@"longCol"    type:RLMPropertyTypeInt    objectClassName:nil             linkOriginPropertyName:nil indexed:NO optional:NO],
-            @"objectCol": [[RLMProperty alloc] initWithName:@"objectCol"  type:RLMPropertyTypeObject objectClassName:@"StringObject" linkOriginPropertyName:nil indexed:NO optional:YES],
+            @"boolCol":     makeProperty(@"boolCol", RLMPropertyTypeBool, nil, NO),
+            @"intCol":      makeProperty(@"intCol", RLMPropertyTypeInt, nil, NO),
+            @"floatCol":    makeProperty(@"floatCol", RLMPropertyTypeFloat, nil, NO),
+            @"doubleCol":   makeProperty(@"doubleCol", RLMPropertyTypeDouble, nil, NO),
+            @"stringCol":   makeProperty(@"stringCol", RLMPropertyTypeString, nil, NO),
+            @"binaryCol":   makeProperty(@"binaryCol", RLMPropertyTypeData, nil, NO),
+            @"dateCol":     makeProperty(@"dateCol", RLMPropertyTypeDate, nil, NO),
+            @"cBoolCol":    makeProperty(@"cBoolCol", RLMPropertyTypeBool, nil, NO),
+            @"longCol":     makeProperty(@"longCol", RLMPropertyTypeInt, nil, NO),
+            @"objectIdCol": makeProperty(@"objectIdCol", RLMPropertyTypeObjectId, nil, NO),
+            @"decimalCol":  makeProperty(@"decimalCol", RLMPropertyTypeDecimal128, nil, NO),
+            @"objectCol":   makeProperty(@"objectCol", RLMPropertyTypeObject, @"StringObject", YES),
         };
         XCTAssertEqual(objectSchema.properties.count, expectedProperties.allKeys.count);
         for (NSString *propertyName in expectedProperties) {
@@ -67,13 +74,15 @@
     { // Test optional property types
         RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:[AllOptionalTypes class]];
         NSDictionary *expectedProperties = @{
-            @"intObj":    [[RLMProperty alloc] initWithName:@"intObj"    type:RLMPropertyTypeInt    objectClassName:nil linkOriginPropertyName:nil indexed:NO optional:YES],
-            @"floatObj":  [[RLMProperty alloc] initWithName:@"floatObj"  type:RLMPropertyTypeFloat  objectClassName:nil linkOriginPropertyName:nil indexed:NO optional:YES],
-            @"doubleObj": [[RLMProperty alloc] initWithName:@"doubleObj" type:RLMPropertyTypeDouble objectClassName:nil linkOriginPropertyName:nil indexed:NO optional:YES],
-            @"boolObj":   [[RLMProperty alloc] initWithName:@"boolObj"   type:RLMPropertyTypeBool   objectClassName:nil linkOriginPropertyName:nil indexed:NO optional:YES],
-            @"string":    [[RLMProperty alloc] initWithName:@"string"    type:RLMPropertyTypeString objectClassName:nil linkOriginPropertyName:nil indexed:NO optional:YES],
-            @"data":      [[RLMProperty alloc] initWithName:@"data"      type:RLMPropertyTypeData   objectClassName:nil linkOriginPropertyName:nil indexed:NO optional:YES],
-            @"date":      [[RLMProperty alloc] initWithName:@"date"      type:RLMPropertyTypeDate   objectClassName:nil linkOriginPropertyName:nil indexed:NO optional:YES],
+            @"intObj":    makeProperty(@"intObj", RLMPropertyTypeInt, nil, YES),
+            @"floatObj":  makeProperty(@"floatObj", RLMPropertyTypeFloat, nil, YES),
+            @"doubleObj": makeProperty(@"doubleObj", RLMPropertyTypeDouble, nil, YES),
+            @"boolObj":   makeProperty(@"boolObj", RLMPropertyTypeBool, nil, YES),
+            @"string":    makeProperty(@"string", RLMPropertyTypeString, nil, YES),
+            @"data":      makeProperty(@"data", RLMPropertyTypeData, nil, YES),
+            @"date":      makeProperty(@"date", RLMPropertyTypeDate, nil, YES),
+            @"objectId":  makeProperty(@"objectId", RLMPropertyTypeObjectId, nil, YES),
+            @"decimal":   makeProperty(@"decimal", RLMPropertyTypeDecimal128, nil, YES),
         };
         XCTAssertEqual(objectSchema.properties.count, expectedProperties.allKeys.count);
         for (NSString *propertyName in expectedProperties) {

@@ -3,7 +3,7 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "10.0.0-alpha.1"
+let coreVersionStr = "10.0.0-alpha.3"
 let cocoaVersionStr = "4.4.0"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
@@ -77,11 +77,13 @@ let package = Package(
                 "Realm/RLMClassInfo.mm",
                 "Realm/RLMCollection.mm",
                 "Realm/RLMConstants.m",
+                "Realm/RLMDecimal128.mm",
                 "Realm/RLMListBase.mm",
                 "Realm/RLMManagedArray.mm",
                 "Realm/RLMMigration.mm",
                 "Realm/RLMObject.mm",
                 "Realm/RLMObjectBase.mm",
+                "Realm/RLMObjectId.mm",
                 "Realm/RLMObjectSchema.mm",
                 "Realm/RLMObjectStore.mm",
                 "Realm/RLMObservation.mm",

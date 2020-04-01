@@ -44,12 +44,15 @@ import Realm.Private
  - `Bool`
  - `Date`, `NSDate`
  - `Data`, `NSData`
+ - `Decimal128`
+ - `ObjectId`
  - `@objc enum` which has been delcared as conforming to `RealmEnum`.
  - `RealmOptional<Value>` for optional numeric properties
  - `Object` subclasses, to model many-to-one relationships
  - `List<Element>`, to model many-to-many relationships
 
- `String`, `NSString`, `Date`, `NSDate`, `Data`, `NSData` and `Object` subclass properties can be declared as optional.
+ `String`, `NSString`, `Date`, `NSDate`, `Data`, `NSData`, `Decimal128`, `ObjectId`  and
+ `Object` subclass properties can be declared as optional.
  `Int`, `Int8`, `Int16`, `Int32`, `Int64`, `Float`, `Double`, `Bool`,  enum, and `List` properties cannot.
  To store an optional number, use `RealmOptional<Int>`, `RealmOptional<Float>`, `RealmOptional<Double>`, or
  `RealmOptional<Bool>` instead, which wraps an optional numeric value. Lists cannot be optional at all.
@@ -575,6 +578,20 @@ extension NSDate: _ManagedPropertyType {
     // swiftlint:disable:next identifier_name
     public static func _rlmProperty(_ prop: RLMProperty) {
         prop.type = .date
+    }
+}
+/// :nodoc:
+extension Decimal128: _ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
+    public static func _rlmProperty(_ prop: RLMProperty) {
+        prop.type = .decimal128
+    }
+}
+/// :nodoc:
+extension ObjectId: _ManagedPropertyType {
+    // swiftlint:disable:next identifier_name
+    public static func _rlmProperty(_ prop: RLMProperty) {
+        prop.type = .objectId
     }
 }
 

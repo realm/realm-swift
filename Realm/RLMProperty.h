@@ -34,6 +34,10 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol RLMDate @end
 /// :nodoc:
 @protocol RLMData @end
+/// :nodoc:
+@protocol RLMDecimal128 @end
+/// :nodoc:
+@protocol RLMObjectId @end
 
 /// :nodoc:
 @interface NSNumber ()<RLMInt, RLMBool, RLMDouble, RLMFloat>

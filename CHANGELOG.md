@@ -3,6 +3,12 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Enhancements
 * The memory mapping scheme for Realm files has changed to better support
   opening very large files.
+* Add support for the ObjectId data type. This is an automatically-generated
+  unique identifier similar to a GUID or a UUID.
+  ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
+* Add support for the Decimal128 data type. This is a 128-bit IEEE 754 decimal
+  floating point number similar to NSDecimalNumber.
+  ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)

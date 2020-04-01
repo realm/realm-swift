@@ -451,16 +451,7 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     __block AllTypesObject *obj;
     __block StringObject *stringObj;
-    NSDictionary *values = @{@"boolCol": @NO,
-                             @"intCol": @0,
-                             @"floatCol": @0,
-                             @"doubleCol": @0,
-                             @"stringCol": @"",
-                             @"binaryCol": NSData.data,
-                             @"dateCol": NSDate.date,
-                             @"cBoolCol": @NO,
-                             @"longCol": @0,
-                             @"objectCol": NSNull.null};
+    NSDictionary *values = [AllTypesObject values:1 stringObject:nil];
     [realm transactionWithBlock:^{
         obj = [AllTypesObject createInRealm:realm withValue:values];
         stringObj = [StringObject createInRealm:realm withValue:@[@""]];
@@ -483,6 +474,8 @@
         RLMAssertThrowsWithReasonMatching(obj.dateCol, @"thread");
         RLMAssertThrowsWithReasonMatching(obj.cBoolCol, @"thread");
         RLMAssertThrowsWithReasonMatching(obj.longCol, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.objectIdCol, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.decimalCol, @"thread");
         RLMAssertThrowsWithReasonMatching(obj.objectCol, @"thread");
         RLMAssertThrowsWithReasonMatching(obj.linkingObjectsCol, @"thread");
 
@@ -500,6 +493,8 @@
         RLMAssertThrowsWithReasonMatching(obj.dateCol = nil, @"thread");
         RLMAssertThrowsWithReasonMatching(obj.cBoolCol = 0, @"thread");
         RLMAssertThrowsWithReasonMatching(obj.longCol = 0, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.objectIdCol = nil, @"thread");
+        RLMAssertThrowsWithReasonMatching(obj.decimalCol = nil, @"thread");
         RLMAssertThrowsWithReasonMatching(obj.objectCol = nil, @"thread");
         RLMAssertThrowsWithReasonMatching(obj.objectCol = [StringObject new], @"thread");
         RLMAssertThrowsWithReasonMatching(obj.objectCol = stringObj, @"thread");
@@ -510,16 +505,7 @@
 - (void)testAllMethodsCheckForInvalidation {
     RLMRealm *realm = [RLMRealm defaultRealm];
     __block StringObject *stringObj;
-    NSDictionary *values = @{@"boolCol": @NO,
-                             @"intCol": @0,
-                             @"floatCol": @0,
-                             @"doubleCol": @0,
-                             @"stringCol": @"",
-                             @"binaryCol": NSData.data,
-                             @"dateCol": NSDate.date,
-                             @"cBoolCol": @NO,
-                             @"longCol": @0,
-                             @"objectCol": NSNull.null};
+    NSDictionary *values = [AllTypesObject values:1 stringObject:nil];
     [realm transactionWithBlock:^{
         [AllTypesObject createInRealm:realm withValue:values];
         stringObj = [StringObject createInRealm:realm withValue:@[@""]];
@@ -552,6 +538,8 @@
         RLMAssertThrowsWithReasonMatching(obj.dateCol, @"invalidated");
         RLMAssertThrowsWithReasonMatching(obj.cBoolCol, @"invalidated");
         RLMAssertThrowsWithReasonMatching(obj.longCol, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.objectIdCol, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.decimalCol, @"invalidated");
         RLMAssertThrowsWithReasonMatching(obj.objectCol, @"invalidated");
         RLMAssertThrowsWithReasonMatching(obj.linkingObjectsCol, @"invalidated");
 
@@ -569,6 +557,8 @@
         RLMAssertThrowsWithReasonMatching(obj.dateCol = nil, @"invalidated");
         RLMAssertThrowsWithReasonMatching(obj.cBoolCol = 0, @"invalidated");
         RLMAssertThrowsWithReasonMatching(obj.longCol = 0, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.objectIdCol = nil, @"invalidated");
+        RLMAssertThrowsWithReasonMatching(obj.decimalCol = nil, @"invalidated");
         RLMAssertThrowsWithReasonMatching(obj.objectCol = nil, @"invalidated");
         RLMAssertThrowsWithReasonMatching(obj.objectCol = [StringObject new], @"invalidated");
         RLMAssertThrowsWithReasonMatching(obj.objectCol = stringObj, @"invalidated");

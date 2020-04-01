@@ -20,6 +20,7 @@
 
 #import "RLMArray_Private.hpp"
 #import "RLMListBase.h"
+#import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
@@ -29,6 +30,7 @@
 #import "RLMResults_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMUtil.hpp"
+
 #import "results.hpp"
 #import "property.hpp"
 
@@ -54,6 +56,14 @@ bool is_null(T const& v) {
 }
 template<>
 bool is_null(realm::Timestamp const& v) {
+    return v.is_null();
+}
+template<>
+bool is_null(realm::ObjectId const&) {
+    return false;
+}
+template<>
+bool is_null(realm::Decimal128 const& v) {
     return v.is_null();
 }
 
@@ -211,6 +221,30 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
     }
 }
 
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
+              __unsafe_unretained RLMDecimal128 *const value) {
+    RLMVerifyInWriteTransaction(obj);
+
+    if (value) {
+        obj->_row.set(key, value.decimal128Value);
+    }
+    else {
+        setNull(obj->_row, key);
+    }
+}
+
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
+              __unsafe_unretained RLMObjectId *const value) {
+    RLMVerifyInWriteTransaction(obj);
+
+    if (value) {
+        obj->_row.set(key, value.value);
+    }
+    else {
+        setNull(obj->_row, key);
+    }
+}
+
 RLMLinkingObjects *getLinkingObjects(__unsafe_unretained RLMObjectBase *const obj,
                                      __unsafe_unretained RLMProperty *const property) {
     RLMVerifyAttached(obj);
@@ -252,6 +286,13 @@ id makeNumberGetter(NSUInteger index, bool boxed, bool optional) {
     }
     return makeGetter<Type>(index);
 }
+template<typename Type>
+id makeWrapperGetter(NSUInteger index, bool optional) {
+    if (optional) {
+        return makeOptionalGetter<Type>(index);
+    }
+    return makeBoxedGetter<Type>(index);
+}
 
 // dynamic getter with column closure
 id managedGetter(RLMProperty *prop, const char *type) {
@@ -291,6 +332,10 @@ id managedGetter(RLMProperty *prop, const char *type) {
             return makeBoxedGetter<realm::BinaryData>(index);
         case RLMPropertyTypeObject:
             return makeBoxedGetter<realm::Obj>(index);
+        case RLMPropertyTypeDecimal128:
+            return makeBoxedGetter<realm::Decimal128>(index);
+        case RLMPropertyTypeObjectId:
+            return makeWrapperGetter<realm::ObjectId>(index, prop.optional);
         case RLMPropertyTypeAny:
             @throw RLMException(@"Cannot create accessor class for schema with Mixed properties");
         case RLMPropertyTypeLinkingObjects:
@@ -360,6 +405,8 @@ id managedSetter(RLMProperty *prop, const char *type) {
         case RLMPropertyTypeAny:            return nil;
         case RLMPropertyTypeLinkingObjects: return nil;
         case RLMPropertyTypeObject:         return makeSetter<RLMObjectBase *>(prop);
+        case RLMPropertyTypeObjectId:       return makeSetter<RLMObjectId *>(prop);
+        case RLMPropertyTypeDecimal128:     return makeSetter<RLMDecimal128 *>(prop);
     }
 }
 
@@ -703,6 +750,14 @@ realm::StringData RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
     v = RLMCoerceToNil(v);
     return RLMStringDataWithNSString(v);
 }
+template<>
+realm::Decimal128 RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+    return RLMObjcToDecimal128(v);
+}
+template<>
+realm::ObjectId RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
+    return static_cast<RLMObjectId *>(v).value;
+}
 
 template<typename Fn>
 static auto to_optional(__unsafe_unretained id const value, Fn&& fn) {
@@ -725,6 +780,10 @@ realm::util::Optional<float> RLMAccessorContext::unbox(__unsafe_unretained id co
 template<>
 realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v longLongValue]; });
+}
+template<>
+realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
+    return to_optional(v, [&](__unsafe_unretained RLMObjectId *v) { return v.value; });
 }
 
 template<>
@@ -768,24 +827,6 @@ realm::Obj RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolic
     return link->_row;
 }
 
-// FIXME: Implement stub
-template<>
-realm::ObjectId RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
-    REALM_UNREACHABLE();
-}
-
-// FIXME: Implement stub
-template<>
-realm::util::Optional<realm::ObjectId> RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
-    REALM_UNREACHABLE();
-}
-
-template<>
-realm::Decimal128 RLMAccessorContext::unbox(__unsafe_unretained id const, CreatePolicy, ObjKey) {
-    REALM_UNREACHABLE();
-}
-
-// FIXME: Implement stub
 id RLMAccessorContext::unbox_embedded(id, realm::CreatePolicy, realm::Obj, realm::ColKey, size_t) {
     REALM_UNREACHABLE();
 }
