@@ -530,7 +530,7 @@ public struct Realm {
 
      - parameter object: The object to be deleted.
      */
-    public func delete(_ object: Object) {
+    public func delete(_ object: ObjectBase) {
         RLMDeleteObjectFromRealm(object, rlmRealm)
     }
 
@@ -549,7 +549,7 @@ public struct Realm {
                             `Results<Object>`, or any other Swift `Sequence` whose
                             elements are `Object`s (subject to the caveats above).
      */
-    public func delete<S: Sequence>(_ objects: S) where S.Iterator.Element: Object {
+    public func delete<S: Sequence>(_ objects: S) where S.Iterator.Element: ObjectBase {
         for obj in objects {
             delete(obj)
         }
@@ -564,7 +564,7 @@ public struct Realm {
 
      :nodoc:
      */
-    public func delete<Element: Object>(_ objects: List<Element>) {
+    public func delete<Element: ObjectBase>(_ objects: List<Element>) {
         rlmRealm.deleteObjects(objects._rlmArray)
     }
 
@@ -577,7 +577,7 @@ public struct Realm {
 
      :nodoc:
      */
-    public func delete<Element: Object>(_ objects: Results<Element>) {
+    public func delete<Element: ObjectBase>(_ objects: Results<Element>) {
         rlmRealm.deleteObjects(objects.rlmResults)
     }
 
@@ -780,7 +780,7 @@ public struct Realm {
      transaction on the Realm may result in the Realm file growing to large sizes. See
      `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
      */
-    public func freeze<T: Object>(_ obj: T) -> T {
+    public func freeze<T: ObjectBase>(_ obj: T) -> T {
         return RLMObjectFreeze(obj) as! T
     }
 

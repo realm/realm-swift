@@ -9,6 +9,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add support for the Decimal128 data type. This is a 128-bit IEEE 754 decimal
   floating point number similar to NSDecimalNumber.
   ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
+* Add support for embedded objects. Embedded objects are objects which are
+  owned by a single parent object, and are deleted when that parent object is
+  deleted. They are defined by subclassing `EmbeddedObject` /
+  `RLMEmbeddedObject` rather than `Object` / `RLMObject`.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)

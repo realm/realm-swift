@@ -1349,6 +1349,10 @@ public:
     return [KVOLinkObject2 createInRealm:_realm withValue:@[@(++pk), @[@(++pk), [self createObject], @[]], @[]]];
 }
 
+- (EmbeddedIntParentObject *)createEmbeddedObject {
+    return [EmbeddedIntParentObject createInRealm:_realm withValue:@[@1, @[@2], @[@[@3]]]];
+}
+
 - (void)testDeleteObservedObject {
     KVOObject *obj = [self createObject];
     KVORecorder r1(self, obj, @"boolCol");
@@ -1561,6 +1565,92 @@ public:
         AssertNotification(r);
     }
 }
+
+- (void)testDeleteParentOfObservedEmbeddedObject {
+    EmbeddedIntParentObject *obj = [self createEmbeddedObject];
+    KVORecorder r1(self, obj, @"object");
+    KVORecorder r2(self, obj, @"object.invalidated");
+    KVORecorder r3(self, obj.object, RLMInvalidatedKey);
+    [self.realm deleteObject:obj];
+    AssertChanged(r2, @NO, @YES);
+    AssertChanged(r3, @NO, @YES);
+}
+
+- (void)testSetLinkToEmbeddedObjectToNil {
+    EmbeddedIntParentObject *obj = [self createEmbeddedObject];
+    KVORecorder r1(self, obj, @"object.invalidated");
+    KVORecorder r2(self, obj.object, RLMInvalidatedKey);
+    obj.object = nil;
+
+    AssertChanged(r1, @NO, NSNull.null);
+    AssertChanged(r2, @NO, @YES);
+}
+
+- (void)testSetLinkToEmbeddedObjectToNewObject {
+    EmbeddedIntParentObject *obj = [self createEmbeddedObject];
+    KVORecorder r1(self, obj, @"object.invalidated");
+    KVORecorder r2(self, obj.object, RLMInvalidatedKey);
+    obj.object = [[EmbeddedIntObject alloc] init];
+
+    AssertChanged(r1, @NO, @NO);
+    AssertChanged(r2, @NO, @YES);
+}
+
+- (void)testDynamicSetLinkToEmbeddedObjectToNil {
+    EmbeddedIntParentObject *obj = [self createEmbeddedObject];
+    KVORecorder r1(self, obj, @"object.invalidated");
+    KVORecorder r2(self, obj.object, RLMInvalidatedKey);
+    obj[@"object"] = nil;
+
+    AssertChanged(r1, @NO, NSNull.null);
+    AssertChanged(r2, @NO, @YES);
+}
+
+- (void)testDynamicSetLinkToEmbeddedObjectToNewObject {
+    EmbeddedIntParentObject *obj = [self createEmbeddedObject];
+    KVORecorder r1(self, obj, @"object.invalidated");
+    KVORecorder r2(self, obj.object, RLMInvalidatedKey);
+    obj[@"object"] = [[EmbeddedIntObject alloc] init];
+
+    AssertChanged(r1, @NO, @NO);
+    AssertChanged(r2, @NO, @YES);
+}
+
+- (void)testRemoveEmbeddedObjectFromArray {
+    EmbeddedIntParentObject *obj = [self createEmbeddedObject];
+    KVORecorder r(self, obj.array[0], RLMInvalidatedKey);
+    [obj.array removeAllObjects];
+    AssertChanged(r, @NO, @YES);
+}
+
+- (void)testOverwriteEmbeddedObjectInArray {
+    EmbeddedIntParentObject *obj = [self createEmbeddedObject];
+    KVORecorder r(self, obj, @"array");
+    KVORecorder r2(self, obj.array[0], RLMInvalidatedKey);
+    obj.array[0] = [[EmbeddedIntObject alloc] init];
+    AssertIndexChange(NSKeyValueChangeReplacement, ([NSIndexSet indexSetWithIndexesInRange:{0, 1}]));
+    AssertChanged(r2, @NO, @YES);
+}
+
+- (void)testOverwriteEmbeddedObjectViaAddParent {
+    EmbeddedIntParentObject *obj = [self createEmbeddedObject];
+    KVORecorder r1(self, obj.object, RLMInvalidatedKey);
+    KVORecorder r2(self, obj.array[0], RLMInvalidatedKey);
+
+    [self.realm addOrUpdateObject:[[EmbeddedIntParentObject alloc] initWithValue:@[@1]]];
+    AssertChanged(r1, @NO, @YES);
+    AssertChanged(r2, @NO, @YES);
+}
+
+- (void)testOverwriteEmbeddedObjectViaCreateParent {
+    EmbeddedIntParentObject *obj = [self createEmbeddedObject];
+    KVORecorder r1(self, obj.object, RLMInvalidatedKey);
+    KVORecorder r2(self, obj.array[0], RLMInvalidatedKey);
+
+    [EmbeddedIntParentObject createOrUpdateInRealm:self.realm withValue:@[@1, NSNull.null, NSNull.null]];
+    AssertChanged(r1, @NO, @YES);
+    AssertChanged(r2, @NO, @YES);
+}
 @end
 
 // Mutate a different accessor backed by the same row as the accessor being observed
@@ -1568,8 +1658,8 @@ public:
 @end
 @implementation KVOMultipleAccessorsTests
 - (id)observableForObject:(id)value {
-    if (RLMObject *obj = RLMDynamicCast<RLMObject>(value)) {
-        RLMObject *copy = RLMCreateManagedAccessor(obj.objectSchema.accessorClass, obj->_info);
+    if (RLMObjectBase *obj = RLMDynamicCast<RLMObjectBase>(value)) {
+        RLMObject *copy = RLMCreateManagedAccessor(RLMObjectBaseObjectSchema(obj).accessorClass, obj->_info);
         copy->_row = obj->_row;
         return copy;
     }
@@ -1917,9 +2007,10 @@ public:
     [self.realm beginWriteTransaction];
     [self.secondaryRealm refresh];
 
-    if (RLMObject *obj = RLMDynamicCast<RLMObject>(value)) {
-        RLMObject *copy = RLMCreateManagedAccessor(obj.objectSchema.accessorClass,
-                                                   &self.secondaryRealm->_info[obj.objectSchema.className]);
+    if (RLMObjectBase *obj = RLMDynamicCast<RLMObjectBase>(value)) {
+        RLMObjectSchema *objectSchema = RLMObjectBaseObjectSchema(obj);
+        RLMObject *copy = RLMCreateManagedAccessor(objectSchema.accessorClass,
+                                                   &self.secondaryRealm->_info[objectSchema.className]);
         copy->_row = (*copy->_info->table()).get_object(obj->_row.get_key());
         return copy;
     }

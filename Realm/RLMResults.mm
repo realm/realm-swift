@@ -467,7 +467,8 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
             RLMClearTable(*_info);
         }
         else {
-            RLMTrackDeletions(_realm, [&] { _results.clear(); });
+            RLMObservationTracker tracker(_realm, true);
+            _results.clear();
         }
     });
 }

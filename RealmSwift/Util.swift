@@ -74,11 +74,11 @@ internal func cast<U, V>(_ value: U, to: V.Type) -> V {
     return unsafeBitCast(value, to: to)
 }
 
-extension Object {
+extension ObjectBase {
     // Must *only* be used to call Realm Objective-C APIs that are exposed on `RLMObject`
     // but actually operate on `RLMObjectBase`. Do not expose cast value to user.
     internal func unsafeCastToRLMObject() -> RLMObject {
-        return unsafeBitCast(self, to: RLMObject.self)
+        return noWarnUnsafeBitCast(self, to: RLMObject.self)
     }
 }
 

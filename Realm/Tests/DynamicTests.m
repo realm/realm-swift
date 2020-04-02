@@ -356,4 +356,29 @@
     [realm commitWriteTransaction];
 }
 
+- (void)testDynamicSetEmbeddedLink {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    [realm beginWriteTransaction];
+
+    RLMObject *parent = [realm createObject:@"EmbeddedIntParentObject" withValue:@[@1]];
+    XCTAssertNil(parent[@"object"]);
+    XCTAssertEqual(0U, [parent[@"array"] count]);
+
+    XCTAssertNoThrow(parent[@"object"] = @[@1]);
+    XCTAssertEqualObjects(parent[@"object"][@"intCol"], @1);
+
+    XCTAssertNoThrow(parent[@"object"] = nil);
+    XCTAssertNil(parent[@"object"]);
+
+    XCTAssertNoThrow(parent[@"object"] = @[@1]);
+    XCTAssertNoThrow(parent[@"object"] = NSNull.null);
+    XCTAssertNil(parent[@"object"]);
+
+    [parent[@"array"] addObject:@[@2]];
+    RLMAssertThrowsWithReason(parent[@"object"] = [parent[@"array"] firstObject],
+                              @"Cannot set a link to an existing managed embedded object");
+
+    [realm cancelWriteTransaction];
+}
+
 @end

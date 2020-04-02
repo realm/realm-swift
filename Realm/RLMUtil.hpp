@@ -97,6 +97,8 @@ static inline T RLMCoerceToNil(__unsafe_unretained T obj) {
 
 id<NSFastEnumeration> RLMAsFastEnumeration(id obj);
 
+bool RLMIsSwiftObjectClass(Class cls);
+
 // String conversion utilities
 static inline NSString * RLMStringDataToNSString(realm::StringData stringData) {
     static_assert(sizeof(NSUInteger) >= sizeof(size_t),

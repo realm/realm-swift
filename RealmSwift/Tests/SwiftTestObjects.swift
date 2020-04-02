@@ -610,3 +610,29 @@ class LinkToSwiftRenamedProperties2: Object {
         return ["linkC": "link 1", "linkD": "link 2", "array2": "array"]
     }
 }
+
+class EmbeddedParentObject: Object {
+    @objc dynamic var object: EmbeddedTreeObject?
+    let array = List<EmbeddedTreeObject>()
+}
+
+class EmbeddedPrimaryParentObject: Object {
+    @objc dynamic var pk: Int = 0
+    @objc dynamic var object: EmbeddedTreeObject?
+    let array = List<EmbeddedTreeObject>()
+
+    override class func primaryKey() -> String? {
+        return "pk"
+    }
+}
+
+class EmbeddedTreeObject: EmbeddedObject {
+    @objc dynamic var value = 0
+    @objc dynamic var child: EmbeddedTreeObject?
+    let children = List<EmbeddedTreeObject>()
+
+    let parent1 = LinkingObjects(fromType: EmbeddedParentObject.self, property: "object")
+    let parent2 = LinkingObjects(fromType: EmbeddedParentObject.self, property: "array")
+    let parent3 = LinkingObjects(fromType: EmbeddedTreeObject.self, property: "child")
+    let parent4 = LinkingObjects(fromType: EmbeddedTreeObject.self, property: "children")
+}

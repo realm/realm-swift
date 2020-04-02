@@ -476,4 +476,27 @@ class ObjectAccessorTests: TestCase {
             XCTAssertEqual(Array(realm.objects(SwiftListObject.self).first!.int), [])
         }
     }
+
+    func testSetEmbeddedLink() {
+        let realm = try! Realm()
+        realm.beginWrite()
+
+        let parent = EmbeddedParentObject()
+        realm.add(parent)
+
+        let child1 = EmbeddedTreeObject()
+        parent.object = child1
+        XCTAssertEqual(child1.realm, realm)
+        XCTAssertNoThrow(parent.object = child1)
+
+        let child2 = EmbeddedTreeObject()
+        parent.object = child2
+        XCTAssertEqual(child1.realm, realm)
+        XCTAssertTrue(child1.isInvalidated)
+
+        let child3 = EmbeddedTreeObject()
+        parent.array.append(child3)
+        assertThrows(parent.object = child3,
+                     reason: "Can't set link to existing managed embedded object")
+    }
 }
