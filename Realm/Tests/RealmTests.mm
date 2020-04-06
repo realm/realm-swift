@@ -1519,6 +1519,96 @@
     }];
 }
 
+- (void)testAddingNotificationToQueueBoundThreadOutsideOfRunLoop {
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = [RLMRealm defaultRealmForQueue:self.bgQueue];
+        XCTAssertNoThrow([realm addNotificationBlock:^(NSString *, RLMRealm *) { }]);
+    }];
+}
+
+- (void)testQueueBoundRealmCaching {
+    auto q1 = dispatch_queue_create("queue 1", DISPATCH_QUEUE_SERIAL);
+    auto q2 = dispatch_queue_create("queue 2", DISPATCH_QUEUE_SERIAL);
+
+    RLMRealm *mainThreadRealm1 = [RLMRealm defaultRealm];
+    RLMRealm *mainQueueRealm1 = [RLMRealm defaultRealmForQueue:dispatch_get_main_queue()];
+    RLMRealm *q1Realm1 = [RLMRealm defaultRealmForQueue:q1];
+    RLMRealm *q2Realm1 = [RLMRealm defaultRealmForQueue:q2];
+
+    XCTAssertEqual(mainQueueRealm1, mainThreadRealm1);
+
+    XCTAssertNotEqual(mainThreadRealm1, q1Realm1);
+    XCTAssertNotEqual(mainThreadRealm1, q2Realm1);
+    XCTAssertNotEqual(mainQueueRealm1, q1Realm1);
+    XCTAssertNotEqual(mainQueueRealm1, q2Realm1);
+    XCTAssertNotEqual(q1Realm1, q2Realm1);
+
+    RLMRealm *mainThreadRealm2 = [RLMRealm defaultRealm];
+    RLMRealm *mainQueueRealm2 = [RLMRealm defaultRealmForQueue:dispatch_get_main_queue()];
+    RLMRealm *q1Realm2 = [RLMRealm defaultRealmForQueue:q1];
+    RLMRealm *q2Realm2 = [RLMRealm defaultRealmForQueue:q2];
+
+    XCTAssertEqual(mainThreadRealm1, mainThreadRealm2);
+    XCTAssertEqual(mainQueueRealm1, mainQueueRealm2);
+    XCTAssertEqual(q1Realm1, q1Realm2);
+    XCTAssertEqual(q2Realm2, q2Realm2);
+
+    dispatch_async(q1, ^{
+        @autoreleasepool {
+            RLMRealm *backgroundThreadRealm = [RLMRealm defaultRealm];
+            RLMRealm *q1Realm3 = [RLMRealm defaultRealmForQueue:q1];
+            RLMRealm *q2Realm3 = [RLMRealm defaultRealmForQueue:q2];
+
+            XCTAssertNotEqual(backgroundThreadRealm, mainThreadRealm1);
+            XCTAssertNotEqual(backgroundThreadRealm, mainQueueRealm1);
+            XCTAssertNotEqual(backgroundThreadRealm, q1Realm1);
+            XCTAssertNotEqual(backgroundThreadRealm, q1Realm2);
+            XCTAssertEqual(q1Realm1, q1Realm3);
+            XCTAssertEqual(q2Realm2, q2Realm3);
+        }
+    });
+    dispatch_sync(q1, ^{});
+}
+
+- (void)testQueueValidation {
+    XCTAssertNoThrow([RLMRealm defaultRealmForQueue:dispatch_get_main_queue()]);
+    XCTAssertNoThrow([RLMRealm defaultRealmForQueue:self.bgQueue]);
+    XCTAssertThrows([RLMRealm defaultRealmForQueue:dispatch_get_global_queue(0, 0)]);
+    XCTAssertThrows([RLMRealm defaultRealmForQueue:dispatch_queue_create("concurrent queue", DISPATCH_QUEUE_CONCURRENT)]);
+}
+
+- (void)testQueueChecking {
+    auto q1 = dispatch_queue_create("queue 1", DISPATCH_QUEUE_SERIAL);
+    auto q2 = dispatch_queue_create("queue 2", DISPATCH_QUEUE_SERIAL);
+
+    RLMRealm *mainRealm = [RLMRealm defaultRealmForQueue:dispatch_get_main_queue()];
+    RLMRealm *q1Realm = [RLMRealm defaultRealmForQueue:q1];
+    RLMRealm *q2Realm = [RLMRealm defaultRealmForQueue:q2];
+
+    XCTAssertNoThrow([mainRealm refresh]);
+    RLMAssertThrowsWithReason([q1Realm refresh], @"thread");
+    RLMAssertThrowsWithReason([q2Realm refresh], @"thread");
+
+    dispatch_sync(q1, ^{
+        // dispatch_sync() doesn't change the thread and mainRealm is actually
+        // bound to the main thread and not the main queue
+        XCTAssertNoThrow([mainRealm refresh]);
+
+        XCTAssertNoThrow([q1Realm refresh]);
+        RLMAssertThrowsWithReason([q2Realm refresh], @"thread");
+        dispatch_sync(q2, ^{
+            XCTAssertNoThrow([mainRealm refresh]);
+            XCTAssertNoThrow([q2Realm refresh]);
+            RLMAssertThrowsWithReason([q1Realm refresh], @"thread");
+        });
+        [self dispatchAsyncAndWait:^{
+            RLMAssertThrowsWithReason([mainRealm refresh], @"thread");
+            RLMAssertThrowsWithReason([q1Realm refresh], @"thread");
+            RLMAssertThrowsWithReason([q2Realm refresh], @"thread");
+        }];
+    });
+}
+
 #pragma mark - In-memory Realms
 
 - (void)testInMemoryRealm {

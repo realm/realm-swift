@@ -80,6 +80,27 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)defaultRealm;
 
 /**
+ Obtains an instance of the default Realm bound to the given queue.
+
+ Rather than being confined to the thread they are opened on, queue-bound
+ RLMRealms are confined to the given queue. They can be accessed from any
+ thread as long as it is from within a block dispatch to the queue, and
+ notifications will be delivered to the queue instead of a thread's run loop.
+
+ Realms can only be confined to a serial queue. Queue-confined RLMRealm
+ instances can be obtained when not on that queue, but attempting to do
+ anything with that instance without first dispatching to the queue will throw
+ an incorrect thread exception.
+
+ The default Realm is created using the default `RLMRealmConfiguration`, which
+ can be changed via `+[RLMRealmConfiguration setDefaultConfiguration:]`.
+
+ @param queue A serial dispatch queue to confine the Realm to.
+ @return The default `RLMRealm` instance for the given queue.
+ */
++ (instancetype)defaultRealmForQueue:(dispatch_queue_t)queue;
+
+/**
  Obtains an `RLMRealm` instance with the given configuration.
 
  @param configuration A configuration object to use when creating the Realm.
@@ -90,6 +111,31 @@ NS_ASSUME_NONNULL_BEGIN
  @return An `RLMRealm` instance.
  */
 + (nullable instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error;
+
+/**
+ Obtains an `RLMRealm` instance with the given configuration bound to the given queue.
+
+ Rather than being confined to the thread they are opened on, queue-bound
+ RLMRealms are confined to the given queue. They can be accessed from any
+ thread as long as it is from within a block dispatch to the queue, and
+ notifications will be delivered to the queue instead of a thread's run loop.
+
+ Realms can only be confined to a serial queue. Queue-confined RLMRealm
+ instances can be obtained when not on that queue, but attempting to do
+ anything with that instance without first dispatching to the queue will throw
+ an incorrect thread exception.
+
+ @param configuration A configuration object to use when creating the Realm.
+ @param queue         A serial dispatch queue to confine the Realm to.
+ @param error         If an error occurs, upon return contains an `NSError` object
+                      that describes the problem. If you are not interested in
+                      possible errors, pass in `NULL`.
+
+ @return An `RLMRealm` instance.
+ */
++ (nullable instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration
+                                          queue:(nullable dispatch_queue_t)queue
+                                          error:(NSError **)error;
 
 /**
  Obtains an `RLMRealm` instance persisted at a specified file URL.
@@ -109,21 +155,19 @@ NS_ASSUME_NONNULL_BEGIN
  synchronized Realms wait for all remote content available at the time the
  operation began to be downloaded and available locally.
 
+ The Realm passed to the callback function is confined to the callback queue as
+ if `-[RLMRealm realmWithConfiguration:queue:error]` was used.
+
  @param configuration A configuration object to use when opening the Realm.
- @param callbackQueue The dispatch queue on which the callback should be run.
+ @param callbackQueue The serial dispatch queue on which the callback should be run.
  @param callback      A callback block. If the Realm was successfully opened,
                       it will be passed in as an argument.
                       Otherwise, an `NSError` describing what went wrong will be
                       passed to the block instead.
-
- @note The returned Realm is confined to the thread on which it was created.
-       Because GCD does not guarantee that queues will always use the same
-       thread, accessing the returned Realm outside the callback block (even if
-       accessed from `callbackQueue`) is unsafe.
  */
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
-                     callbackQueue:(dispatch_queue_t)callbackQueue
-                          callback:(RLMAsyncOpenRealmCallback)callback;
+                                   callbackQueue:(dispatch_queue_t)callbackQueue
+                                        callback:(RLMAsyncOpenRealmCallback)callback;
 
 /**
  The `RLMSchema` used by the Realm.

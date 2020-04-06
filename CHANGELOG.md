@@ -1,13 +1,23 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add support for queue-confined Realms. Rather than being bound to a specific
+  thread, queue-confined Realms are bound to a dispatch queue and can be used
+  within blocks dispatched to that queue regardless of what thread they happen
+  to run on. In addition, change notifications will be delivered to that queue
+  rather than the thread's run loop.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+### Breaking Changes
+
+* The Realm instance passed in the callback to asyncOpen() is now confined to
+  the callback queue passed to asyncOpen() rather than the thread which the
+  callback happens to be called on. This means that the Realm instance may be
+  stored and reused in further blocks dispatched to that queue, but the queue
+  must now be a serial queue.
 
 ### Compatibility
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)

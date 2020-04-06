@@ -42,6 +42,7 @@
 #include "schema.hpp"
 #include "shared_realm.hpp"
 #include "thread_safe_reference.hpp"
+#include "util/scheduler.hpp"
 
 #include <realm/disable_sync_to_disk.hpp>
 #include <realm/util/scope_exit.hpp>
@@ -201,10 +202,20 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
     return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration rawDefaultConfiguration] error:nil];
 }
 
++ (instancetype)defaultRealmForQueue:(dispatch_queue_t)queue {
+    return [RLMRealm realmWithConfiguration:[RLMRealmConfiguration rawDefaultConfiguration] queue:queue error:nil];
+}
+
 + (instancetype)realmWithURL:(NSURL *)fileURL {
     RLMRealmConfiguration *configuration = [RLMRealmConfiguration defaultConfiguration];
     configuration.fileURL = fileURL;
     return [RLMRealm realmWithConfiguration:configuration error:nil];
+}
+
+static dispatch_queue_t s_async_open_queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue",
+                                                                   DISPATCH_QUEUE_CONCURRENT);
+void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
+    s_async_open_queue = queue;
 }
 
 // The server doesn't send us the subscriptions for permission types until the
@@ -212,9 +223,10 @@ NSData *RLMRealmValidatedEncryptionKey(NSData *key) {
 // creating a new Realm we create the permission objects ourselves), but it
 // causes issues for asyncOpen because it means that when our download completes
 // we don't actually have the full Realm state yet.
-static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
+static void waitForPartialSyncSubscriptions(dispatch_queue_t queue, Realm::Config config, void (^completion)()) {
 #if REALM_ENABLE_SYNC
-    auto realm = Realm::get_shared_realm(config);
+    config.scheduler = realm::util::Scheduler::make_dispatch((__bridge void *)queue);
+    auto realm = Realm::get_shared_realm(std::move(config));
     auto table = ObjectStore::table_for_object_type(realm->read_group(), "__ResultSets");
 
     realm->begin_transaction();
@@ -229,27 +241,23 @@ static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
     row.set(expires_at_col, Timestamp(0, 0));
     realm->commit_transaction();
 
-    NotificationToken token;
-    Results results(realm, table);
-    CFRunLoopRef runLoop = CFRunLoopGetCurrent();
-    CFRunLoopPerformBlock(runLoop, kCFRunLoopDefaultMode, [&]() mutable {
-        token = results.add_notification_callback([&](CollectionChangeSet const&, std::exception_ptr) mutable {
-            if (table->size() > 1) {
-                token = {};
-                CFRunLoopStop(runLoop);
-            }
-        });
+    struct State {
+        std::shared_ptr<Realm> realm;
+        Results results;
+        NotificationToken token;
+    };
+    auto state = std::make_shared<State>(State{realm, Results(realm, table), {}});
+    state->token = state->results.add_notification_callback([=](CollectionChangeSet const&, std::exception_ptr) {
+        if (table->size() > 1) {
+            state->token = {};
+            completion();
+        }
     });
-    CFRunLoopRun();
 #else
+    static_cast<void>(queue);
     static_cast<void>(config);
+    static_cast<void>(completion);
 #endif
-}
-
-static dispatch_queue_t s_async_open_queue = dispatch_queue_create("io.realm.asyncOpenDispatchQueue",
-                                                                   DISPATCH_QUEUE_CONCURRENT);
-void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
-    s_async_open_queue = queue;
 }
 
 + (RLMAsyncOpenTask *)asyncOpenWithConfiguration:(RLMRealmConfiguration *)configuration
@@ -271,26 +279,26 @@ void RLMSetAsyncOpenQueue(dispatch_queue_t queue) {
                 return;
             }
 
-            auto complete = ^{
-                dispatch_async(callbackQueue, ^{
+            auto realm = Realm::get_shared_realm(std::move(ref));
+            auto complete = [=] {
+                dispatch_async(callbackQueue, [=]() mutable {
                     @autoreleasepool {
                         NSError *error;
-                        RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration error:&error];
+                        RLMRealm *localRealm = [RLMRealm realmWithConfiguration:configuration
+                                                                          queue:callbackQueue
+                                                                          error:&error];
+                        realm.reset();
                         callback(localRealm, error);
                     }
                 });
             };
 
-            auto realm = Realm::get_shared_realm(std::move(ref));
             bool needsSubscriptions = realm->is_partial() && ObjectStore::table_for_object_type(realm->read_group(), "__ResultSets")->size() == 0;
             if (needsSubscriptions) {
-                // We need to dispatch back to the work queue to wait for the
-                // subscriptions as we're currently running on the sync worker
-                // thread and blocking it to wait for subscriptions means no syncing
-                dispatch_async(s_async_open_queue, ^{
+                auto queue = dispatch_queue_create("io.realm.asyncOpenWaitForPartialSync", DISPATCH_QUEUE_SERIAL);
+                dispatch_sync(queue, ^{
                     @autoreleasepool {
-                        waitForPartialSyncSubscriptions(realm->config());
-                        complete();
+                        waitForPartialSyncSubscriptions(queue, realm->config(), complete);
                     }
                 });
             }
@@ -415,16 +423,38 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
 
 
 + (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration error:(NSError **)error {
+    return [self realmWithConfiguration:configuration queue:nil error:error];
+}
+
++ (instancetype)realmWithConfiguration:(RLMRealmConfiguration *)configuration
+                                 queue:(dispatch_queue_t)queue
+                                 error:(NSError **)error {
     bool dynamic = configuration.dynamic;
     bool cache = configuration.cache;
     bool readOnly = configuration.readOnly;
+
+    // The main thread and main queue share a cache key of 1 so that they give
+    // the same instance. Other Realms are keyed on either the thread or the queue.
+    // Note that despite being a void* the cache key is not actually a pointer;
+    // this is just an artifact of NSMapTable's strange API.
+    void *cacheKey = reinterpret_cast<void *>(1);
+    if (queue) {
+        if (queue != dispatch_get_main_queue()) {
+            cacheKey = (__bridge void *)queue;
+        }
+    }
+    else {
+        if (!pthread_main_np()) {
+            cacheKey = pthread_self();
+        }
+    }
 
     {
         Realm::Config& config = configuration.config;
 
         // try to reuse existing realm first
         if (cache || dynamic) {
-            if (RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path)) {
+            if (RLMRealm *realm = RLMGetThreadLocalCachedRealmForPath(config.path, cacheKey)) {
                 auto const& old_config = realm->_realm->config();
                 if (old_config.immutable() != config.immutable()
                     || old_config.read_only_alternative() != config.read_only_alternative()) {
@@ -455,6 +485,14 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
     std::lock_guard<std::mutex> lock(initLock);
 
     try {
+        if (queue) {
+            if (queue == dispatch_get_main_queue()) {
+                config.scheduler = realm::util::Scheduler::make_runloop(CFRunLoopGetMain());
+            }
+            else {
+                config.scheduler = realm::util::Scheduler::make_dispatch((__bridge void *)queue);
+            }
+        }
         realm->_realm = Realm::get_shared_realm(config);
     }
     catch (...) {
@@ -516,8 +554,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
         RLMRealmCreateAccessors(realm.schema);
 
         if (!readOnly) {
-            // initializing the schema started a read transaction, so end it
-            [realm invalidate];
+            REALM_ASSERT(!realm->_realm->is_in_read_transaction());
 
             if (s_set_skip_backup_attribute) {
                 RLMAddSkipBackupAttributeToItemAtPath(config.path + ".management");
@@ -528,7 +565,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
     }
 
     if (cache) {
-        RLMCacheRealm(config.path, realm);
+        RLMCacheRealm(config.path, cacheKey, realm);
     }
 
     if (!readOnly) {
@@ -769,7 +806,12 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
 }
 
 - (BOOL)refresh {
-    return _realm->refresh();
+    try {
+        return _realm->refresh();
+    }
+    catch (std::exception const& e) {
+        @throw RLMException(e);
+    }
 }
 
 - (void)addObject:(__unsafe_unretained RLMObject *const)object {
