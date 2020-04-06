@@ -218,7 +218,7 @@ static void waitForPartialSyncSubscriptions(Realm::Config const& config) {
     auto table = ObjectStore::table_for_object_type(realm->read_group(), "__ResultSets");
 
     realm->begin_transaction();
-    auto row = realm::sync::create_object(realm->transaction(), *table);
+    auto row = realm::sync::create_object(static_cast<Transaction&>(realm->read_group()), *table);
 
     // Set expires_at to time 0 so that this object will be cleaned up the first
     // time the user creates a subscription
@@ -964,6 +964,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
 }
 
 - (RLMRealm *)freeze {
+    [self verifyThread];
     return self.isFrozen ? self : RLMGetFrozenRealmForSourceRealm(self);
 }
 
