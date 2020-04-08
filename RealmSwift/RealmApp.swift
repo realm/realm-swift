@@ -20,18 +20,23 @@ import Foundation
 import Realm
 import Realm.Private
 
+/**
+An object representing the Realm App configuration
+
+- see: `RLMAppConfiguration`
+*/
+public typealias AppConfiguration = RLMAppConfiguration
+
 /// The `RealmApp` has the fundamental set of methods for communicating with a Realm
 /// application backend.
 
 /// This interface provides access to login and authentication.
 public class RealmApp {
     
-    public typealias SyncUser = RLMSyncUser
-    public typealias AppConfiguration = RLMAppConfiguration
     public typealias UserCompletionBlock = ((SyncUser?, Error?) -> ())
     public typealias OptionalErrorCompletionBlock = ((Error?) -> ())
     
-    internal var _app: RLMApp!
+    internal var _app: RLMApp
 
     /// Returns a list of users
     public var allUsers: [String:SyncUser] {
@@ -43,11 +48,20 @@ public class RealmApp {
         _app.currentUser()
     }
     
+    /// Get an application with a given appId and configuration.
+    /// - Parameters:
+    ///   - appId: appId The unique identifier of your Realm app.
+    ///   - configuration: configuration A configuration object to configure this client.
+    public init(_ appId: String, _ configuration: AppConfiguration?) {
+        _app = RLMApp.init(appId, configuration: configuration)
+    }
+    
     /// A client for the username/password authentication provider which
     /// can be used to obtain a credential for logging in.
     ///
     /// Used to perform requests specifically related to the username/password provider.
-    public var usernamePasswordProviderClient: RLMUsernamePasswordProviderClient {
+    /// - Returns: A usernamePasswordProviderClient for performing auth functions
+    public func usernamePasswordProviderClient() -> RLMUsernamePasswordProviderClient {
         _app.usernamePasswordProviderClient()
     }
 
@@ -55,16 +69,8 @@ public class RealmApp {
     /// can be used to create and modify user API keys.
     ///
     /// This client should only be used by an authenticated user.
-    public var userAPIKeyProviderClient: RLMUserAPIKeyProviderClient {
+    public func userAPIKeyProviderClient() -> RLMUserAPIKeyProviderClient {
         _app.userAPIKeyProviderClient()
-    }
-    
-    /// Get an application with a given appId and configuration.
-    /// - Parameters:
-    ///   - appId: appId The unique identifier of your Realm app.
-    ///   - configuration: configuration A configuration object to configure this client.
-    public init(_ appId: String, _ configuration: AppConfiguration?) {
-        _app = RLMApp.init(appId, configuration: configuration)
     }
     
     /// Login to a user for the Realm app.
@@ -82,6 +88,7 @@ public class RealmApp {
     /// An exception will be throw if the user is not valid. The current user will remain logged in.
     /// - Parameter syncUser: The user to switch to.
     /// - Returns: The user you intend to switch to
+    @discardableResult
     public func switchToUser(_ syncUser: SyncUser) -> SyncUser {
         _app.switch(to: syncUser)
     }

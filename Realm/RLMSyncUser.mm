@@ -195,6 +195,20 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     return @(_user->identity().c_str());
 }
 
+- (NSArray<RLMSyncUserIdentity *> *)identities {
+    if (!_user) {
+        return @[];
+    }
+    NSMutableArray<RLMSyncUserIdentity *> *buffer = [NSMutableArray array];
+    auto identities = _user->identities();
+    for (auto identity : identities) {
+        [buffer addObject: [[RLMSyncUserIdentity alloc] initSyncUserIdentityWithProviderType:@(identity.provider_type.c_str())
+                                                                                    identity:@(identity.id.c_str())]];
+    }
+                            
+    return [buffer copy];
+}
+
 - (RLMSyncUserState)state {
     if (!_user) {
         return RLMSyncUserStateRemoved;
@@ -252,6 +266,21 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     info.isAdmin = model.isAdmin;
     info.identity = model.identity;
     return info;
+}
+
+@end
+
+#pragma mark - RLMSyncUserIdentity
+
+@implementation RLMSyncUserIdentity
+
+- (instancetype)initSyncUserIdentityWithProviderType:(NSString *)providerType
+                                            identity:(NSString *)identity {
+    if (self = [super init]) {
+        _providerType = providerType;
+        _identity = identity;
+    }
+    return self;
 }
 
 @end

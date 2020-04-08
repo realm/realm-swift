@@ -557,8 +557,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
       return String((0..<length).map{ _ in letters.randomElement()! })
     }
     
-    private func realmAppConfig() -> RLMAppConfiguration {
-        RLMAppConfiguration.init(baseURL: "http://localhost:9090", transport: nil, localAppName: "default-fgoon", localAppVersion: "20180301")
+    private func realmAppConfig() -> AppConfiguration {
+        AppConfiguration.init(baseURL: "http://localhost:9090",
+                              transport: nil,
+                              localAppName: "default-fgoon",
+                              localAppVersion: "20180301")
     }
     
     func testRealmAppInit() {
@@ -577,7 +580,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         
         let registerUserEx = expectation(description: "Register user")
         
-        app.usernamePasswordProviderClient.registerEmail(email, password: password) { (error) in
+        app.usernamePasswordProviderClient().registerEmail(email, password: password) { (error) in
             XCTAssertTrue(error == nil)
             registerUserEx.fulfill()
         }
@@ -597,4 +600,113 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertTrue(syncUser?.identity == app.currentUser?.identity)
         XCTAssertTrue(app.allUsers.count == 1)
     }
+    
+    func testRealmAppSwitchAndRemove() {
+        let app = RealmApp("default-fgoon", realmAppConfig())
+        
+        let email1 = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
+        let password1 = randomString(length: 10)
+        let email2 = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
+        let password2 = randomString(length: 10)
+        
+        let registerUser1Ex = expectation(description: "Register user 1")
+        let registerUser2Ex = expectation(description: "Register user 2")
+
+        app.usernamePasswordProviderClient().registerEmail(email1, password: password1) { (error) in
+            XCTAssertTrue(error == nil)
+            registerUser1Ex.fulfill()
+        }
+        
+        app.usernamePasswordProviderClient().registerEmail(email2, password: password2) { (error) in
+            XCTAssertTrue(error == nil)
+            registerUser2Ex.fulfill()
+        }
+        
+        self.wait(for: [registerUser1Ex, registerUser2Ex], timeout: 4.0)
+        
+        let login1Ex = expectation(description: "Login user 1")
+        let login2Ex = expectation(description: "Login user 2")
+
+        var syncUser1: SyncUser?
+        var syncUser2: SyncUser?
+
+        app.loginWithCredential(AppCredentials.usernamePassword(username: email1, password: password1)) { (user, error) in
+            XCTAssertTrue(error == nil)
+            syncUser1 = user
+            login1Ex.fulfill()
+        }
+        
+        self.wait(for: [login1Ex], timeout: 4.0)
+
+        app.loginWithCredential(AppCredentials.usernamePassword(username: email2, password: password2)) { (user, error) in
+            XCTAssertTrue(error == nil)
+            syncUser2 = user
+            login2Ex.fulfill()
+        }
+
+        self.wait(for: [login2Ex], timeout: 4.0)
+        
+        XCTAssertTrue(app.allUsers.count == 2)
+        
+        XCTAssertTrue(syncUser2!.identity == app.currentUser!.identity)
+
+        app.switchToUser(syncUser1!)
+        XCTAssertTrue(syncUser1!.identity == app.currentUser!.identity)
+        
+        let removeEx = expectation(description: "Remove user 1")
+
+        app.removeUser(syncUser1!) { (error) in
+            XCTAssertTrue(error == nil)
+            removeEx.fulfill()
+        }
+        
+        self.wait(for: [removeEx], timeout: 4.0)
+
+        XCTAssertTrue(syncUser2!.identity == app.currentUser!.identity)
+        XCTAssertTrue(app.allUsers.count == 1)
+
+    }
+    
+    func testRealmAppLinkUser() {
+        let app = RealmApp("default-fgoon", realmAppConfig())
+        
+        let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
+        let password = randomString(length: 10)
+        
+        let registerUserEx = expectation(description: "Register user")
+        
+        app.usernamePasswordProviderClient().registerEmail(email, password: password) { (error) in
+            XCTAssertTrue(error == nil)
+            registerUserEx.fulfill()
+        }
+        self.wait(for: [registerUserEx], timeout: 4.0)
+        
+        let loginEx = expectation(description: "Login user")
+        var syncUser: SyncUser?
+        
+        let credentials = AppCredentials.usernamePassword(username: email, password: password)
+        
+        app.loginWithCredential(AppCredentials.anonymous()) { (user, error) in
+            XCTAssertTrue(error == nil)
+            syncUser = user
+            loginEx.fulfill()
+        }
+        
+        self.wait(for: [loginEx], timeout: 4.0)
+
+        let linkEx = expectation(description: "Link user")
+
+        app.linkUser(syncUser!, credentials) { (user, error) in
+            XCTAssertTrue(error == nil)
+            syncUser = user
+            linkEx.fulfill()
+        }
+        
+        self.wait(for: [linkEx], timeout: 4.0)
+
+        XCTAssertTrue(syncUser?.identity == app.currentUser?.identity)
+        XCTAssertTrue(syncUser?.identities().count == 2)
+
+    }
+    
 }
