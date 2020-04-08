@@ -403,6 +403,37 @@
 
 }
 
+#pragma mark - Auth Credentials
+
+- (void)testAuthCredentials {
+    RLMAppCredentials *usernamePasswordCredential = [RLMAppCredentials credentialsWithUsername:@"test@mongodb.com" password:@"apassword"];
+    XCTAssertTrue([usernamePasswordCredential.provider isEqualToString:@"local-userpass"]);
+
+    RLMAppCredentials *jwtCredential = [RLMAppCredentials credentialsWithJWT:@"sometoken"];
+    XCTAssertTrue([jwtCredential.provider isEqualToString:@"custom-token"]);
+    
+    RLMAppCredentials *anonymousCredential = [RLMAppCredentials anonymousCredentials];
+    XCTAssertTrue([anonymousCredential.provider isEqualToString:@"anon-user"]);
+    
+    RLMAppCredentials *userAPICredential = [RLMAppCredentials credentialsWithUserAPIKey:@"apikey"];
+    XCTAssertTrue([userAPICredential.provider isEqualToString:@"api-key"]);
+    
+    RLMAppCredentials *serverAPICredential = [RLMAppCredentials credentialsWithServerAPIKey:@"apikey"];
+    XCTAssertTrue([serverAPICredential.provider isEqualToString:@"api-key"]);
+    
+    RLMAppCredentials *facebookCredential = [RLMAppCredentials credentialsWithFacebookToken:@"facebook token"];
+    XCTAssertTrue([facebookCredential.provider isEqualToString:@"oauth2-facebook"]);
+    
+    RLMAppCredentials *googleCredential = [RLMAppCredentials credentialsWithGoogleToken:@"google token"];
+    XCTAssertTrue([googleCredential.provider isEqualToString:@"oauth2-google"]);
+    
+    RLMAppCredentials *appleCredential = [RLMAppCredentials credentialsWithAppleToken:@"apple token"];
+    XCTAssertTrue([appleCredential.provider isEqualToString:@"oauth2-apple"]);
+    
+    RLMAppCredentials *functionCredential = [RLMAppCredentials credentialsWithFunction:@"{}"];
+    XCTAssertTrue([functionCredential.provider isEqualToString:@"custom-function"]);
+}
+
 #pragma mark - Username Password
 
 /// Valid username/password credentials should be able to log in a user. Using the same credentials should return the

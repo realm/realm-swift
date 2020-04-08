@@ -45,6 +45,15 @@ extern RLMIdentityProvider const RLMIdentityProviderJWT;
 /// An Anonymous account as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderAnonymous;
 
+/// An Stitch function as an identity provider.
+extern RLMIdentityProvider const RLMIdentityProviderFunction;
+
+/// A user api key as an identity provider.
+extern RLMIdentityProvider const RLMIdentityProviderUserAPIKey;
+
+/// A server api key as an identity provider.
+extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
+
 /**
  Opaque credentials representing a specific Realm App user.
  */
@@ -67,6 +76,21 @@ extern RLMIdentityProvider const RLMIdentityProviderAnonymous;
  Construct and return credentials from an Apple account token.
  */
 + (instancetype)credentialsWithAppleToken:(RLMAppCredentialsToken)token;
+
+/**
+ Construct and return credentials for a stitch function using a document as json.
+*/
++ (instancetype)credentialsWithFunction:(NSString *)payloadJson;
+
+/**
+ Construct and return credentials from a user api key.
+*/
++ (instancetype)credentialsWithUserAPIKey:(NSString *)apiKey;
+
+/**
+ Construct and return credentials from a server api key.
+*/
++ (instancetype)credentialsWithServerAPIKey:(NSString *)apiKey;
 
 /**
  Construct and return credentials from a Realm Object Server username and password.

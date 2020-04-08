@@ -55,6 +55,18 @@ using namespace realm;
     return [[self alloc] initWithAppCredentials: app::AppCredentials::custom(token.UTF8String)];
 }
 
++ (instancetype)credentialsWithFunction:(NSString *)payloadJson {
+    return [[self alloc] initWithAppCredentials: app::AppCredentials::function(payloadJson.UTF8String)];
+}
+
++ (instancetype)credentialsWithUserAPIKey:(NSString *)apiKey {
+    return [[self alloc] initWithAppCredentials: app::AppCredentials::user_api_key(apiKey.UTF8String)];
+}
+
++ (instancetype)credentialsWithServerAPIKey:(NSString *)apiKey {
+    return [[self alloc] initWithAppCredentials: app::AppCredentials::server_api_key(apiKey.UTF8String)];
+}
+
 + (instancetype)anonymousCredentials {
     return [[self alloc] initWithAppCredentials:realm::app::AppCredentials::anonymous()];
 }
