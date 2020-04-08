@@ -314,11 +314,19 @@ public struct SyncConfiguration {
 public struct AppCredentials {
     /// An account token serialized as a string
     public typealias Token = String
+    /// An api key serialized as a string
+    public typealias APIKey = String
+    /// A dictionary which represents a MongoDB document
+    public typealias Document = [String : Any]
 
     internal let credentials: RLMAppCredentials
 
     internal init(_ credentials: RLMAppCredentials) {
         self.credentials = credentials
+    }
+    
+    public var provider: String {
+        credentials.provider.rawValue
     }
 
     /// Initialize new credentials using a Facebook account token.
@@ -329,6 +337,11 @@ public struct AppCredentials {
     /// Initialize new credentials using a Google account token.
     public static func google(token: Token) -> AppCredentials {
         return AppCredentials(RLMAppCredentials(googleToken: token))
+    }
+    
+    /// Initialize new credentials using an Apple account token.
+    public static func apple(token: Token) -> AppCredentials {
+        return AppCredentials(RLMAppCredentials(appleToken: token))
     }
 
     /// Initialize new credentials using a Realm Object Server username and password.
@@ -345,6 +358,21 @@ public struct AppCredentials {
     /// Initialize new credentials anonymously
     public static func anonymous() -> AppCredentials {
         return AppCredentials(RLMAppCredentials.anonymous())
+    }
+    
+    /// Initialize new credentials with a stitch function
+    public static func function(_ document: Document) -> AppCredentials {
+        return AppCredentials(RLMAppCredentials(function: document))
+    }
+    
+    /// Initialize new credentials using a user api key.
+    public static func userAPIKey(_ apiKey: APIKey) -> AppCredentials {
+        return AppCredentials(RLMAppCredentials(userAPIKey: apiKey))
+    }
+    
+    /// Initialize new credentials using a server api key.
+    public static func serverAPIKey(_ apiKey: APIKey) -> AppCredentials {
+        return AppCredentials(RLMAppCredentials(serverAPIKey: apiKey))
     }
 }
 

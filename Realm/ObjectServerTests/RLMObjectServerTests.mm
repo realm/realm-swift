@@ -430,7 +430,7 @@
     RLMAppCredentials *appleCredential = [RLMAppCredentials credentialsWithAppleToken:@"apple token"];
     XCTAssertTrue([appleCredential.provider isEqualToString:@"oauth2-apple"]);
     
-    RLMAppCredentials *functionCredential = [RLMAppCredentials credentialsWithFunction:@"{}"];
+    RLMAppCredentials *functionCredential = [RLMAppCredentials credentialsWithFunction:@{ @"dog" : @{ @"name" : @"fido" } }];
     XCTAssertTrue([functionCredential.provider isEqualToString:@"custom-function"]);
 }
 

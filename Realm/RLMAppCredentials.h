@@ -80,7 +80,7 @@ extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
 /**
  Construct and return credentials for a stitch function using a document as json.
 */
-+ (instancetype)credentialsWithFunction:(NSString *)payloadJson;
++ (instancetype)credentialsWithFunction:(NSDictionary *)payload;
 
 /**
  Construct and return credentials from a user api key.
