@@ -549,4 +549,52 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let directory = URL(fileURLWithPath: testDir, isDirectory: true)
         return directory.appendingPathComponent(fileName, isDirectory: false)
     }
+    
+    //MARK: - RealmApp tests
+    
+    private func randomString(length: Int) -> String {
+      let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      return String((0..<length).map{ _ in letters.randomElement()! })
+    }
+    
+    private func realmAppConfig() -> RLMAppConfiguration {
+        RLMAppConfiguration.init(baseURL: "http://localhost:9090", transport: nil, localAppName: "default-fgoon", localAppVersion: "20180301")
+    }
+    
+    func testRealmAppInit() {
+        let appWithNoConfig = RealmApp("test-app", nil)
+        XCTAssertTrue(appWithNoConfig.allUsers.capacity == 0)
+        
+        let appWithConfig = RealmApp("test-app", realmAppConfig())
+        XCTAssertTrue(appWithConfig.allUsers.capacity == 0)
+    }
+    
+    func testRealmAppLogin() {
+        let app = RealmApp("default-fgoon", realmAppConfig())
+        
+        let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
+        let password = randomString(length: 10)
+        
+        let registerUserEx = expectation(description: "Register user")
+        
+        app.usernamePasswordProviderClient.registerEmail(email, password: password) { (error) in
+            XCTAssertTrue(error == nil)
+            registerUserEx.fulfill()
+        }
+        self.wait(for: [registerUserEx], timeout: 4.0)
+        
+        let loginEx = expectation(description: "Login user")
+        var syncUser: SyncUser?
+        
+        app.loginWithCredential(AppCredentials.usernamePassword(username: email, password: password)) { (user, error) in
+            XCTAssertTrue(error == nil)
+            syncUser = user
+            loginEx.fulfill()
+        }
+
+        self.wait(for: [loginEx], timeout: 4.0)
+        
+        XCTAssertTrue(syncUser?.identity == app.currentUser?.identity)
+        XCTAssertTrue(app.allUsers.count == 1)
+    }
 }
