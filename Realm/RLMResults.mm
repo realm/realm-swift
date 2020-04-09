@@ -516,13 +516,16 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMCollectionChange *, NSError *))block {
-    if (!_realm) {
-        @throw RLMException(@"Linking objects notifications are only supported on managed objects.");
-    }
-    [_realm verifyNotificationsAreSupported:true];
-    return RLMAddNotificationBlock(self, _results, block, true);
+    return RLMAddNotificationBlock(self, block, nil);
+}
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMCollectionChange *, NSError *))block receiveOnQueue:(dispatch_queue_t)queue {
+    return RLMAddNotificationBlock(self, block, queue);
 }
 #pragma clang diagnostic pop
+
+realm::Results& RLMGetBackingCollection(RLMResults *self) {
+    return self->_results;
+}
 
 - (BOOL)isAttached {
     return !!_realm;

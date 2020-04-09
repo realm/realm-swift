@@ -72,7 +72,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
         super.init()
     }
 
-    internal init(rlmArray: RLMArray<AnyObject>) {
+    internal init(objc rlmArray: RLMArray<AnyObject>) {
         super.init(array: rlmArray)
     }
 
@@ -374,9 +374,10 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
      perform blocking work.
 
-     Notifications are delivered via the standard run loop, and so can't be delivered while the run loop is blocked by
-     other activity. When notifications can't be delivered instantly, multiple notifications may be coalesced into a
-     single notification. This can include the notification with the initial collection.
+     If no queue is given, notifications are delivered via the standard run loop, and so can't be delivered while the
+     run loop is blocked by other activity. If a queue is given, notifications are delivered to that queue instead. When
+     notifications can't be delivered instantly, multiple notifications may be coalesced into a single notification.
+     This can include the notification with the initial collection.
 
      For example, the following code performs a write transaction immediately after adding the notification block, so
      there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
@@ -411,13 +412,14 @@ public final class List<Element: RealmCollectionValue>: ListBase {
 
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
 
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe(_ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
-        return _rlmArray.addNotificationBlock { _, change, error in
-            block(RealmCollectionChange.fromObjc(value: self, change: change, error: error))
-        }
+    public func observe(on queue: DispatchQueue? = nil,
+                        _ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
+        return _rlmArray.addNotificationBlock(wrapObserveBlock(block), receiveOn: queue)
     }
 
     // MARK: Frozen Objects
@@ -427,7 +429,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     }
 
     public func freeze() -> List {
-        return List(rlmArray: _rlmArray.freeze())
+        return List(objc: _rlmArray.freeze())
     }
 
     // swiftlint:disable:next identifier_name
@@ -515,11 +517,11 @@ extension List: RealmCollection {
     public func index(before i: Int) -> Int { return i - 1 }
 
     /// :nodoc:
-    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken {
-        let anyCollection = AnyRealmCollection(self)
-        return _rlmArray.addNotificationBlock { _, change, error in
-            block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
-        }
+    // swiftlint:disable:next identifier_name
+    public func _observe(_ queue: DispatchQueue?,
+                         _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
+        -> NotificationToken {
+            return _rlmArray.addNotificationBlock(wrapObserveBlock(block), receiveOn: queue)
     }
 }
 
@@ -701,7 +703,7 @@ extension List: Encodable where Element: Encodable {
 extension List: AssistedObjectiveCBridgeable {
     internal static func bridging(from objectiveCValue: Any, with metadata: Any?) -> List {
         guard let objectiveCValue = objectiveCValue as? RLMArray<AnyObject> else { preconditionFailure() }
-        return List(rlmArray: objectiveCValue)
+        return List(objc: objectiveCValue)
     }
 
     internal var bridged: (objectiveCValue: Any, metadata: Any?) {

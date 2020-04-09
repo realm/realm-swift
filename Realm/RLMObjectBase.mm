@@ -484,3 +484,197 @@ id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {
         @throw;
     }
 }
+
+#pragma mark - Notifications
+
+namespace {
+struct ObjectChangeCallbackWrapper {
+    void (^block)(NSArray<NSString *> *, NSArray *, NSArray *, NSError *);
+    RLMObjectBase *object;
+
+    NSArray<NSString *> *propertyNames = nil;
+    NSArray *oldValues = nil;
+    bool deleted = false;
+
+    void populateProperties(realm::CollectionChangeSet const& c) {
+        if (propertyNames) {
+            return;
+        }
+        if (!c.deletions.empty()) {
+            deleted = true;
+            return;
+        }
+        if (c.columns.empty()) {
+            return;
+        }
+
+        auto properties = [NSMutableArray new];
+        for (RLMProperty *property in object->_info->rlmObjectSchema.properties) {
+            if (c.columns.count(object->_info->tableColumn(property).value)) {
+                [properties addObject:property.name];
+            }
+        }
+        if (properties.count) {
+            propertyNames = properties;
+        }
+    }
+
+    NSArray *readValues(realm::CollectionChangeSet const& c) {
+        if (c.empty()) {
+            return nil;
+        }
+        populateProperties(c);
+        if (!propertyNames) {
+            return nil;
+        }
+
+        auto values = [NSMutableArray arrayWithCapacity:propertyNames.count];
+        for (NSString *name in propertyNames) {
+            id value = [object valueForKey:name];
+            if (!value || [value isKindOfClass:[RLMArray class]]) {
+                [values addObject:NSNull.null];
+            }
+            else {
+                [values addObject:value];
+            }
+        }
+        return values;
+    }
+
+    void before(realm::CollectionChangeSet const& c) {
+        @autoreleasepool {
+            oldValues = readValues(c);
+        }
+    }
+
+    void after(realm::CollectionChangeSet const& c) {
+        @autoreleasepool {
+            auto newValues = readValues(c);
+            if (deleted) {
+                block(nil, nil, nil, nil);
+            }
+            else if (newValues) {
+                block(propertyNames, oldValues, newValues, nil);
+            }
+            propertyNames = nil;
+            oldValues = nil;
+        }
+    }
+
+    void error(std::exception_ptr err) {
+        @autoreleasepool {
+            try {
+                rethrow_exception(err);
+            }
+            catch (...) {
+                NSError *error = nil;
+                RLMRealmTranslateException(&error);
+                block(nil, nil, nil, error);
+            }
+        }
+    }
+};
+} // anonymous namespace
+
+@interface RLMPropertyChange ()
+@property (nonatomic, readwrite, strong) NSString *name;
+@property (nonatomic, readwrite, strong, nullable) id previousValue;
+@property (nonatomic, readwrite, strong, nullable) id value;
+@end
+
+@implementation RLMPropertyChange
+- (NSString *)description {
+    return [NSString stringWithFormat:@"<RLMPropertyChange: %p> %@ %@ -> %@",
+            (__bridge void *)self, _name, _previousValue, _value];
+}
+@end
+@interface RLMObjectNotificationToken : RLMNotificationToken
+@end
+
+@implementation RLMObjectNotificationToken {
+    std::mutex _mutex;
+    __unsafe_unretained RLMRealm *_realm;
+    realm::Object _object;
+    realm::NotificationToken _token;
+}
+
+- (RLMRealm *)realm {
+    return _realm;
+}
+
+- (void)suppressNextNotification {
+    std::lock_guard<std::mutex> lock(_mutex);
+    if (_object.is_valid()) {
+        _token.suppress_next();
+    }
+}
+
+- (void)invalidate {
+    std::lock_guard<std::mutex> lock(_mutex);
+    _realm = nil;
+    _token = {};
+    _object = {};
+}
+
+- (void)addNotificationBlock:(RLMObjectNotificationCallback)block object:(RLMObjectBase *)obj {
+    std::lock_guard<std::mutex> lock(_mutex);
+    if (!_realm) {
+        // Token was invalidated before we got this far
+        return;
+    }
+
+    _object = realm::Object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
+    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj});
+}
+
+RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj, dispatch_queue_t queue,
+                                                        RLMObjectNotificationCallback block) {
+    if (!obj->_realm) {
+        @throw RLMException(@"Only objects which are managed by a Realm support change notifications");
+    }
+
+    if (!queue) {
+        [obj->_realm verifyNotificationsAreSupported:true];
+        auto token = [[RLMObjectNotificationToken alloc] init];
+        token->_realm = obj->_realm;
+        [token addNotificationBlock:block object:obj];
+        return token;
+    }
+
+    RLMRealm *targetRealm = [RLMRealm realmWithConfiguration:obj->_realm.configuration queue:queue error:nil];
+    RLMThreadSafeReference *tsr = [RLMThreadSafeReference referenceWithThreadConfined:(id)obj];
+    auto token = [[RLMObjectNotificationToken alloc] init];
+    token->_realm = obj->_realm;
+    dispatch_async(queue, ^{
+        @autoreleasepool {
+            RLMObjectBase *obj = [targetRealm resolveThreadSafeReference:tsr];
+            [token addNotificationBlock:block object:obj];
+        }
+    });
+    return token;
+}
+
+@end
+
+RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjectChangeBlock block, dispatch_queue_t queue) {
+    return RLMObjectBaseAddNotificationBlock(obj, queue, ^(NSArray<NSString *> *propertyNames,
+                                                           NSArray *oldValues, NSArray *newValues, NSError *error) {
+        if (error) {
+            block(false, nil, error);
+        }
+        else if (!propertyNames) {
+            block(true, nil, nil);
+        }
+        else {
+            auto properties = [NSMutableArray arrayWithCapacity:propertyNames.count];
+            for (NSUInteger i = 0, count = propertyNames.count; i < count; ++i) {
+                auto prop = [RLMPropertyChange new];
+                prop.name = propertyNames[i];
+                prop.previousValue = RLMCoerceToNil(oldValues[i]);
+                prop.value = RLMCoerceToNil(newValues[i]);
+                [properties addObject:prop];
+            }
+            block(false, properties, nil);
+        }
+    });
+}

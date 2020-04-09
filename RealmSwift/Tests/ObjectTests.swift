@@ -560,6 +560,10 @@ class ObjectTests: TestCase {
         XCTAssertEqual(data, object.dataCol)
     }
 
+    func testObserveUnmanagedObject() {
+        assertThrows(SwiftIntObject().observe { _ in }, reason: "managed")
+    }
+
     func testDeleteObservedObject() {
         let realm = try! Realm()
         realm.beginWrite()
@@ -583,19 +587,24 @@ class ObjectTests: TestCase {
         token.invalidate()
     }
 
-    func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?) -> ((ObjectChange) -> Void) {
-        let exp = expectation(description: "")
-        return { change in
-            if case .change(let properties) = change {
-                XCTAssertEqual(properties.count, 1)
-                if let prop = properties.first {
-                    XCTAssertEqual(prop.name, name)
-                    XCTAssertEqual(prop.oldValue as? T, old)
-                    XCTAssertEqual(prop.newValue as? U, new)
-                }
-            } else {
-                XCTFail("expected .change, got \(change)")
+    func checkChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?, _ change: ObjectChange) {
+        if case .change(let properties) = change {
+            XCTAssertEqual(properties.count, 1)
+            if let prop = properties.first {
+                XCTAssertEqual(prop.name, name)
+                XCTAssertEqual(prop.oldValue as? T, old)
+                XCTAssertEqual(prop.newValue as? U, new)
             }
+        } else {
+            XCTFail("expected .change, got \(change)")
+        }
+
+    }
+
+    func expectChange<T: Equatable, U: Equatable>(_ name: String, _ old: T?, _ new: U?) -> ((ObjectChange) -> Void) {
+        let exp = expectation(description: "change from \(String(describing: old)) to \(String(describing: new))")
+        return { change in
+            self.checkChange(name, old, new, change)
             exp.fulfill()
         }
     }
@@ -692,6 +701,58 @@ class ObjectTests: TestCase {
         realm.refresh()
         waitForExpectations(timeout: 0)
         token.invalidate()
+    }
+
+    func testObserveOnDifferentQueue() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let object = realm.create(SwiftIntObject.self, value: [1])
+        try! realm.commitWrite()
+
+        let queue = DispatchQueue(label: "label")
+        let sema = DispatchSemaphore(value: 0)
+        let token = object.observe(on: queue) { change in
+            self.checkChange("intCol", 1, 2, change)
+            sema.signal()
+        }
+        try! realm.write {
+            object.intCol = 2
+        }
+
+        sema.wait()
+        token.invalidate()
+    }
+
+    func testInvalidateObserverOnDifferentQueueBeforeRegistration() {
+        let realm = try! Realm()
+        realm.beginWrite()
+        let object = realm.create(SwiftIntObject.self, value: [1])
+        try! realm.commitWrite()
+
+        let queue = DispatchQueue(label: "label")
+        let sema = DispatchSemaphore(value: 0)
+
+        // Block the queue for now
+        queue.async { sema.wait() }
+
+        // Add two observers, invalidating one
+        let token1 = object.observe(on: queue) { _ in
+            XCTFail("notification should not have fired")
+        }
+        let token2 = object.observe(on: queue) { _ in
+            sema.signal()
+        }
+        token1.invalidate()
+
+        // Now let token2 registration happen
+        sema.signal()
+
+        // Perform a write and make sure only token2 notifies
+        try! realm.write {
+            object.intCol = 2
+        }
+        sema.wait()
+        token2.invalidate()
     }
 
     func testEqualityForObjectTypeWithPrimaryKey() {

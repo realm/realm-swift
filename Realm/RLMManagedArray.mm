@@ -528,10 +528,16 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
-    [_realm verifyNotificationsAreSupported:true];
-    return RLMAddNotificationBlock(self, _backingList, block);
+    return RLMAddNotificationBlock(self, block, nil);
+}
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block receiveOnQueue:(dispatch_queue_t)queue {
+    return RLMAddNotificationBlock(self, block, queue);
 }
 #pragma clang diagnostic pop
+
+realm::List& RLMGetBackingCollection(RLMManagedArray *self) {
+    return self->_backingList;
+}
 
 #pragma mark - Thread Confined Protocol Conformance
 
