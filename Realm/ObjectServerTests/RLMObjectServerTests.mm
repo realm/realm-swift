@@ -407,31 +407,35 @@
 
 - (void)testAuthCredentials {
     RLMAppCredentials *usernamePasswordCredential = [RLMAppCredentials credentialsWithUsername:@"test@mongodb.com" password:@"apassword"];
-    XCTAssertTrue([usernamePasswordCredential.provider isEqualToString:@"local-userpass"]);
-
+    XCTAssertEqualObjects(usernamePasswordCredential.provider, @"local-userpass");
+    
     RLMAppCredentials *jwtCredential = [RLMAppCredentials credentialsWithJWT:@"sometoken"];
-    XCTAssertTrue([jwtCredential.provider isEqualToString:@"custom-token"]);
-    
+    XCTAssertEqualObjects(jwtCredential.provider, @"custom-token");
+
     RLMAppCredentials *anonymousCredential = [RLMAppCredentials anonymousCredentials];
-    XCTAssertTrue([anonymousCredential.provider isEqualToString:@"anon-user"]);
-    
+    XCTAssertEqualObjects(anonymousCredential.provider, @"anon-user");
+
     RLMAppCredentials *userAPICredential = [RLMAppCredentials credentialsWithUserAPIKey:@"apikey"];
-    XCTAssertTrue([userAPICredential.provider isEqualToString:@"api-key"]);
-    
+    XCTAssertEqualObjects(userAPICredential.provider, @"api-key");
+
     RLMAppCredentials *serverAPICredential = [RLMAppCredentials credentialsWithServerAPIKey:@"apikey"];
-    XCTAssertTrue([serverAPICredential.provider isEqualToString:@"api-key"]);
-    
+    XCTAssertEqualObjects(serverAPICredential.provider, @"api-key");
+
     RLMAppCredentials *facebookCredential = [RLMAppCredentials credentialsWithFacebookToken:@"facebook token"];
-    XCTAssertTrue([facebookCredential.provider isEqualToString:@"oauth2-facebook"]);
-    
+    XCTAssertEqualObjects(facebookCredential.provider, @"oauth2-facebook");
+
     RLMAppCredentials *googleCredential = [RLMAppCredentials credentialsWithGoogleToken:@"google token"];
-    XCTAssertTrue([googleCredential.provider isEqualToString:@"oauth2-google"]);
-    
+    XCTAssertEqualObjects(googleCredential.provider, @"oauth2-google");
+
     RLMAppCredentials *appleCredential = [RLMAppCredentials credentialsWithAppleToken:@"apple token"];
-    XCTAssertTrue([appleCredential.provider isEqualToString:@"oauth2-apple"]);
-    
-    RLMAppCredentials *functionCredential = [RLMAppCredentials credentialsWithFunction:@{ @"dog" : @{ @"name" : @"fido" } }];
-    XCTAssertTrue([functionCredential.provider isEqualToString:@"custom-function"]);
+    XCTAssertEqualObjects(appleCredential.provider, @"oauth2-apple");
+
+    NSError *error;
+    RLMAppCredentials *functionCredential = [RLMAppCredentials credentialsWithFunctionPayload:@{ @"dog" : @{ @"name" : @"fido" } }
+                                                                                        error:&error];
+    XCTAssertEqualObjects(functionCredential.provider, @"custom-function");
+    XCTAssertEqualObjects(error, nil);
+
 }
 
 #pragma mark - Username Password

@@ -55,18 +55,17 @@ using namespace realm;
     return [[self alloc] initWithAppCredentials: app::AppCredentials::custom(token.UTF8String)];
 }
 
-+ (instancetype)credentialsWithFunction:(NSDictionary *)payload {
-    NSError *error;
++ (instancetype)credentialsWithFunctionPayload:(NSDictionary *)payload
+                                         error:(NSError **)error {
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:payload
                                                        options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
+                                                         error:error];
     if (!jsonData) {
-        @throw RLMException(@"RLMAppCredentials could not be created with the given NSDictionary, %@",
-                            error.localizedDescription);
+        return nil;
     }
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::function(jsonString.UTF8String)];
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::function(jsonString.UTF8String)];
 }
 
 + (instancetype)credentialsWithUserAPIKey:(NSString *)apiKey {

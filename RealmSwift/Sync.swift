@@ -360,9 +360,15 @@ public struct AppCredentials {
         return AppCredentials(RLMAppCredentials.anonymous())
     }
     
-    /// Initialize new credentials with a stitch function
-    public static func function(_ document: Document) -> AppCredentials {
-        return AppCredentials(RLMAppCredentials(function: document))
+    /// Initialize new credentials with a stitch function, this takes in a mongodb document
+    /// which will be sent to the stitch function used for authentication. If the document cannot be serialised it will throw and error
+    public static func function(payload document: Document) throws -> AppCredentials {
+        var error: NSError?
+        let credentials = RLMAppCredentials(functionPayload: document, error: &error)
+        if (error == nil) {
+            return AppCredentials(credentials)
+        }
+        throw error ?? NSError()
     }
     
     /// Initialize new credentials using a user api key.

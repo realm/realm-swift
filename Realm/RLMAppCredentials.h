@@ -78,9 +78,11 @@ extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
 + (instancetype)credentialsWithAppleToken:(RLMAppCredentialsToken)token;
 
 /**
- Construct and return credentials for a stitch function using a document as json.
+ Construct and return credentials for a stitch function using a mongodb document as a json payload.
+ If the json can not be successfully serialised and error will be produced and the object will be nil.
 */
-+ (instancetype)credentialsWithFunction:(NSDictionary *)payload;
++ (instancetype)credentialsWithFunctionPayload:(NSDictionary *)payload
+                                         error:(NSError **)error;
 
 /**
  Construct and return credentials from a user api key.
