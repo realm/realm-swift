@@ -694,3 +694,13 @@ RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjec
         }
     });
 }
+
+uint64_t RLMObjectBaseGetCombineId(__unsafe_unretained RLMObjectBase *const obj) {
+    if (obj.invalidated) {
+        RLMVerifyAttached(obj);
+    }
+    if (obj->_realm) {
+        return obj->_row.get_key().value;
+    }
+    return reinterpret_cast<uint64_t>((__bridge void *)obj);
+}
