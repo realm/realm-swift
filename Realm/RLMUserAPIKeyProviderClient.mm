@@ -51,7 +51,8 @@
 
 - (void)fetchApiKey:(RLMObjectId *)objectId
          completion:(RLMOptionalUserAPIKeyBlock)completion {
-    self.client.fetch_api_key(nil, self.currentUser,
+    self.client.fetch_api_key(realm::ObjectId(objectId.stringValue.UTF8String),
+                              self.currentUser,
                               ^(Optional<realm::app::App::UserAPIKey> userAPIKey,
                                 Optional<realm::app::AppError> error) {
         if (error && error->error_code) {
@@ -83,26 +84,28 @@
     });
 }
 
-- (void)deleteApiKey:(RLMUserAPIKey *)apiKey
+- (void)deleteApiKey:(RLMObjectId *)objectId
           completion:(RLMOptionalErrorBlock)completion {
-    self.client.delete_api_key(apiKey._apiKey.id,
+    self.client.delete_api_key(realm::ObjectId(objectId.stringValue.UTF8String),
                                self.currentUser,
                                ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
 
-- (void)enableApiKey:(RLMUserAPIKey *)apiKey
+- (void)enableApiKey:(RLMObjectId *)objectId
           completion:(RLMOptionalErrorBlock)completion {
-    self.client.enable_api_key(apiKey._apiKey.id, self.currentUser,
+    self.client.enable_api_key(realm::ObjectId(objectId.stringValue.UTF8String),
+                               self.currentUser,
                                ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
 
-- (void)disableApiKey:(RLMUserAPIKey *)apiKey
+- (void)disableApiKey:(RLMObjectId *)objectId
            completion:(RLMOptionalErrorBlock)completion {
-    self.client.disable_api_key(apiKey._apiKey.id, self.currentUser,
+    self.client.disable_api_key(realm::ObjectId(objectId.stringValue.UTF8String),
+                                self.currentUser,
                                 ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });

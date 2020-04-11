@@ -300,7 +300,10 @@
     XCTestExpectation *createAPIKeyExpectationA = [self expectationWithDescription:@"should try create an api key"];
     XCTestExpectation *createAPIKeyExpectationB = [self expectationWithDescription:@"should try create an api key"];
     XCTestExpectation *fetchAPIKeysExpectation = [self expectationWithDescription:@"should try call fetch api keys"];
-    
+    XCTestExpectation *disableAPIKeyExpectation = [self expectationWithDescription:@"should try disable api key"];
+    XCTestExpectation *enableAPIKeyExpectation = [self expectationWithDescription:@"should try enable api key"];
+    XCTestExpectation *deleteAPIKeyExpectation = [self expectationWithDescription:@"should try delete api key"];
+
     __block RLMSyncUser *syncUser;
     __block RLMUserAPIKey *userAPIKeyA;
     __block RLMUserAPIKey *userAPIKeyB;
@@ -332,8 +335,6 @@
         [createAPIKeyExpectationA fulfill];
     }];
     
-    [self waitForExpectations:@[createAPIKeyExpectationA] timeout:60.0];
-
     [[app userAPIKeyProviderClient] createApiKeyWithName:@"apiKeyName2" completion:^(RLMUserAPIKey * _Nullable userAPIKey, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName2"]);
@@ -341,8 +342,11 @@
         [createAPIKeyExpectationB fulfill];
     }];
     
-    [self waitForExpectations:@[createAPIKeyExpectationB] timeout:60.0];
-
+    [self waitForExpectations:@[createAPIKeyExpectationA, createAPIKeyExpectationB] timeout:60.0];
+    
+    // sleep for 2 seconds as there seems to be an issue fetching the keys straight after they are created.
+    [NSThread sleepForTimeInterval:2];
+    
     [[app userAPIKeyProviderClient] fetchApiKeysWithCompletion:^(NSArray<RLMUserAPIKey *> * _Nonnull apiKeys, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert(apiKeys.count == 2);
@@ -350,14 +354,28 @@
     }];
     
     [self waitForExpectations:@[fetchAPIKeysExpectation] timeout:60.0];
-
-    //These tests require an ObjectId
-    /*
-    [[app userAPIKeyProviderClient] disableApiKey:userAPIKeyA completionHandler:^(NSError * _Nullable error) {
+    
+    [[app userAPIKeyProviderClient] disableApiKey:userAPIKeyA.objectId completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
-        [expectation fulfill];
+        [disableAPIKeyExpectation fulfill];
     }];
-     */
+    
+    [self waitForExpectations:@[disableAPIKeyExpectation] timeout:60.0];
+    
+    [[app userAPIKeyProviderClient] enableApiKey:userAPIKeyA.objectId completion:^(NSError * _Nullable error) {
+        XCTAssert(!error);
+        [enableAPIKeyExpectation fulfill];
+    }];
+    
+    [self waitForExpectations:@[enableAPIKeyExpectation] timeout:60.0];
+    
+    [[app userAPIKeyProviderClient] deleteApiKey:userAPIKeyA.objectId completion:^(NSError * _Nullable error) {
+        XCTAssert(!error);
+        [deleteAPIKeyExpectation fulfill];
+    }];
+    
+    [self waitForExpectations:@[deleteAPIKeyExpectation] timeout:60.0];
+
 }
 
 #pragma mark - Link user
