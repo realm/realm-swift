@@ -557,13 +557,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
       return String((0..<length).map{ _ in letters.randomElement()! })
     }
     
-    let appName = "auth-integration-tests-hjxas"
+    let appName = "translate-utwuv"
     
     private func realmAppConfig() -> AppConfiguration {
 
         return AppConfiguration.init(baseURL: "http://localhost:9090",
                                      transport: nil,
-                                     localAppName: appName,
+                                     localAppName: "auth-integration-tests",
                                      localAppVersion: "20180301")
     }
     
@@ -576,7 +576,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
     
     func testRealmAppLogin() {
-        let app = RealmApp(appName, realmAppConfig())
+        let app = RealmApp(appName, nil)
         
         let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
         let password = randomString(length: 10)
@@ -605,7 +605,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
     
     func testRealmAppSwitchAndRemove() {
-        let app = RealmApp(appName, realmAppConfig())
+        let app = RealmApp(appName, nil)
         
         let email1 = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
         let password1 = randomString(length: 10)
@@ -671,7 +671,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
     
     func testRealmAppLinkUser() {
-        let app = RealmApp(appName, realmAppConfig())
+        let app = RealmApp(appName, nil)
         
         let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
         let password = randomString(length: 10)
@@ -715,7 +715,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     //MARK: - Provider Clients
     
     func testUsernamePasswordProviderClient() {
-        let app = RealmApp(appName, realmAppConfig())
+        let app = RealmApp(appName, nil)
         
         let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
         let password = randomString(length: 10)
@@ -770,7 +770,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
     
     func testUserAPIKeyProviderClient() {
-        let app = RealmApp(appName, realmAppConfig())
+        let app = RealmApp(appName, nil)
         
         let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
         let password = randomString(length: 10)
