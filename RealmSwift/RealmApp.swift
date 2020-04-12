@@ -57,14 +57,6 @@ public class RealmApp {
         _app = RLMApp.init(appId, configuration: configuration)
     }
     
-    public func providerClient<T>() -> T where T: ProviderClient {
-        if (type(of: UserAPIKeyProviderClient.self) == T.self) {
-            return userAPIKeyProviderClient() as! T
-        }
-        
-        return UserAPIKeyProviderClient(_app.userAPIKeyProviderClient()) as! T
-    }
-    
     /// A client for the username/password authentication provider which
     /// can be used to obtain a credential for logging in.
     ///
