@@ -44,7 +44,25 @@ namespace {
                 headers[@(header.first.data())] = @(header.second.data());
             }
             rlmRequest.headers = headers;
-            rlmRequest.method = static_cast<RLMHTTPMethod>(request.method);
+            
+            switch (request.method) {
+                case app::HttpMethod::get:
+                    rlmRequest.method = RLMHTTPMethodGET;
+                    break;
+                case app::HttpMethod::post:
+                    rlmRequest.method = RLMHTTPMethodPOST;
+                    break;
+                case app::HttpMethod::put:
+                    rlmRequest.method = RLMHTTPMethodPUT;
+                    break;
+                case app::HttpMethod::patch:
+                    rlmRequest.method = RLMHTTPMethodPATCH;
+                    break;
+                case app::HttpMethod::del:
+                    rlmRequest.method = RLMHTTPMethodDELETE;
+                    break;
+            }
+            
             rlmRequest.timeout = request.timeout_ms / 1000;
 
             // Send the request through to the Cocoa level transport
