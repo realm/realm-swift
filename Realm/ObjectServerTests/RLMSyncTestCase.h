@@ -19,6 +19,8 @@
 #import "RLMMultiProcessTestCase.h"
 #import "RLMSyncConfiguration_Private.h"
 
+@class RLMAppConfiguration;
+
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
@@ -38,19 +40,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncTestCase : RLMMultiProcessTestCase
 
+@property (nonatomic, readonly) NSString *appId;
+
+- (RLMAppConfiguration *)defaultAppConfiguration;
+
 + (NSURL *)authServerURL;
 + (NSURL *)secureAuthServerURL;
 
 + (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm;
-
-/// Retrieve the administrator token.
-- (NSString *)adminToken;
-
-/// Read and delete the last email sent by ROS to the given address.
-/// Returns nil if none has been sent to that address.
-- (nullable NSString *)emailForAddress:(NSString *)email;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 - (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
@@ -89,9 +88,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// Synchronously create, log in, and return a user.
 - (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials
                                   server:(NSURL *)url;
-
-/// Create and log in an admin user.
-- (RLMSyncUser *)createAdminUserForURL:(NSURL *)url username:(NSString *)username;
 
 /// Add a number of objects to a Realm.
 - (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions;
