@@ -405,37 +405,52 @@
 
 #pragma mark - Auth Credentials
 
-- (void)testAuthCredentials {
+- (void)testUsernamePasswordCredential {
     RLMAppCredentials *usernamePasswordCredential = [RLMAppCredentials credentialsWithUsername:@"test@mongodb.com" password:@"apassword"];
     XCTAssertEqualObjects(usernamePasswordCredential.provider, @"local-userpass");
-    
+}
+
+- (void)testJWTCredential {
     RLMAppCredentials *jwtCredential = [RLMAppCredentials credentialsWithJWT:@"sometoken"];
     XCTAssertEqualObjects(jwtCredential.provider, @"custom-token");
+}
 
+- (void)testAnonymousCredential {
     RLMAppCredentials *anonymousCredential = [RLMAppCredentials anonymousCredentials];
     XCTAssertEqualObjects(anonymousCredential.provider, @"anon-user");
+}
 
+- (void)testUserAPIKeyCredential {
     RLMAppCredentials *userAPICredential = [RLMAppCredentials credentialsWithUserAPIKey:@"apikey"];
     XCTAssertEqualObjects(userAPICredential.provider, @"api-key");
+}
 
+- (void)testServerAPIKeyCredential {
     RLMAppCredentials *serverAPICredential = [RLMAppCredentials credentialsWithServerAPIKey:@"apikey"];
     XCTAssertEqualObjects(serverAPICredential.provider, @"api-key");
+}
 
+- (void)testFacebookCredential {
     RLMAppCredentials *facebookCredential = [RLMAppCredentials credentialsWithFacebookToken:@"facebook token"];
     XCTAssertEqualObjects(facebookCredential.provider, @"oauth2-facebook");
+}
 
+- (void)testGoogleCredential {
     RLMAppCredentials *googleCredential = [RLMAppCredentials credentialsWithGoogleToken:@"google token"];
     XCTAssertEqualObjects(googleCredential.provider, @"oauth2-google");
+}
 
+- (void)testAppleCredential {
     RLMAppCredentials *appleCredential = [RLMAppCredentials credentialsWithAppleToken:@"apple token"];
     XCTAssertEqualObjects(appleCredential.provider, @"oauth2-apple");
+}
 
+- (void)testFunctionCredential {
     NSError *error;
     RLMAppCredentials *functionCredential = [RLMAppCredentials credentialsWithFunctionPayload:@{ @"dog" : @{ @"name" : @"fido" } }
                                                                                         error:&error];
     XCTAssertEqualObjects(functionCredential.provider, @"custom-function");
     XCTAssertEqualObjects(error, nil);
-
 }
 
 #pragma mark - Username Password

@@ -314,9 +314,8 @@ public struct SyncConfiguration {
 public struct AppCredentials {
     /// An account token serialized as a string
     public typealias Token = String
-    /// An api key serialized as a string
-    public typealias APIKey = String
     /// A dictionary which represents a MongoDB document
+    /// FIXME: This is to be replaced by the Mongo BSON type
     public typealias Document = [String : Any]
 
     internal let credentials: RLMAppCredentials
@@ -372,12 +371,12 @@ public struct AppCredentials {
     }
     
     /// Initialize new credentials using a user api key.
-    public static func userAPIKey(_ apiKey: APIKey) -> AppCredentials {
+    public static func userAPIKey(_ apiKey: String) -> AppCredentials {
         return AppCredentials(RLMAppCredentials(userAPIKey: apiKey))
     }
     
     /// Initialize new credentials using a server api key.
-    public static func serverAPIKey(_ apiKey: APIKey) -> AppCredentials {
+    public static func serverAPIKey(_ apiKey: String) -> AppCredentials {
         return AppCredentials(RLMAppCredentials(serverAPIKey: apiKey))
     }
 }

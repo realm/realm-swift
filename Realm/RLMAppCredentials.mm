@@ -34,7 +34,7 @@ using namespace realm;
 }
 
 + (instancetype)credentialsWithFacebookToken:(RLMAppCredentialsToken)token {
-    return [[self alloc] initWithAppCredentials:app::AppCredentials::facebook(token.UTF8String)];
+    return [[self alloc] initWithAppCredentials: app::AppCredentials::facebook(token.UTF8String)];
 }
 
 + (instancetype)credentialsWithGoogleToken:(RLMAppCredentialsToken)token {
@@ -47,8 +47,8 @@ using namespace realm;
 
 + (instancetype)credentialsWithUsername:(NSString *)username
                                password:(NSString *)password {
-    return [[self alloc] initWithAppCredentials:app::AppCredentials::username_password(username.UTF8String,
-                                                                                       password.UTF8String)];
+    return [[self alloc] initWithAppCredentials: app::AppCredentials::username_password(username.UTF8String,
+                                                                                        password.UTF8String)];
 }
 
 + (instancetype)credentialsWithJWT:(NSString *)token {
@@ -65,7 +65,7 @@ using namespace realm;
     }
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     
-    return [[self alloc] initWithAppCredentials:app::AppCredentials::function(jsonString.UTF8String)];
+    return [[self alloc] initWithAppCredentials: app::AppCredentials::function(jsonString.UTF8String)];
 }
 
 + (instancetype)credentialsWithUserAPIKey:(NSString *)apiKey {
@@ -77,7 +77,7 @@ using namespace realm;
 }
 
 + (instancetype)anonymousCredentials {
-    return [[self alloc] initWithAppCredentials:realm::app::AppCredentials::anonymous()];
+    return [[self alloc] initWithAppCredentials: realm::app::AppCredentials::anonymous()];
 }
 
 - (BOOL)isEqual:(id)object {

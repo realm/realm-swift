@@ -434,31 +434,47 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     
     // MARK: - App Credentials
     
-    func testAppCredentials() {
+    func testUsernamePasswordCredential() {
         let usernamePasswordCredential = AppCredentials.usernamePassword(username: "username", password: "password")
         XCTAssertEqual(usernamePasswordCredential.provider, "local-userpass")
-        
+    }
+    
+    func testJWTCredentials() {
         let jwtCredential = AppCredentials.jwt("token")
         XCTAssertEqual(jwtCredential.provider, "custom-token")
-
+    }
+    
+    func testAnonymousCredentials() {
         let anonymousCredential = AppCredentials.anonymous();
         XCTAssertEqual(anonymousCredential.provider, "anon-user")
-        
+    }
+    
+    func testUserAPIKeyCredentials() {
         let userAPIKeyCredential = AppCredentials.userAPIKey("apikey")
         XCTAssertEqual(userAPIKeyCredential.provider, "api-key")
-        
+    }
+    
+    func testServerAPIKeyCredentials() {
         let serverAPIKeyCredential = AppCredentials.serverAPIKey("apikey")
         XCTAssertEqual(serverAPIKeyCredential.provider, "api-key")
-        
+    }
+    
+    func testFacebookCredentials() {
         let facebookCredential = AppCredentials.facebook(token: "token")
         XCTAssertEqual(facebookCredential.provider, "oauth2-facebook")
-        
+    }
+    
+    func testGoogleCredentials() {
         let googleCredential = AppCredentials.google(token: "token")
         XCTAssertEqual(googleCredential.provider, "oauth2-google")
-        
+    }
+    
+    func testAppleCredentials() {
         let appleCredential = AppCredentials.apple(token: "token")
         XCTAssertEqual(appleCredential.provider, "oauth2-apple")
-        
+    }
+    
+    func testFunctionCredentials() {
         let functionCredential = try! AppCredentials.function(payload: ["dog" : ["name" : "fido"]])
         XCTAssertEqual(functionCredential.provider, "custom-function");
     }

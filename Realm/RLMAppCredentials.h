@@ -45,7 +45,7 @@ extern RLMIdentityProvider const RLMIdentityProviderJWT;
 /// An Anonymous account as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderAnonymous;
 
-/// An Stitch function as an identity provider.
+/// An Realm Cloud function as an identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderFunction;
 
 /// A user api key as an identity provider.
