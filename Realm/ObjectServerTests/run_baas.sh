@@ -82,7 +82,6 @@ function build_action() {
     echo "api server up"
 }
 
-
 case $1 in
     "")
         build_action
