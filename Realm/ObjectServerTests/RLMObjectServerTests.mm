@@ -98,7 +98,6 @@
 
 #pragma mark - Authentication and Tokens
 
-
 - (void)testAnonymousAuthentication {
     RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
@@ -183,7 +182,6 @@
     [self waitForExpectations:@[loginExpectationB] timeout:60.0];
 
     XCTAssert([[app switchToUser:syncUserA].identity isEqualToString:syncUserA.identity]);
-
 }
 
 - (void)testRemoveUser {

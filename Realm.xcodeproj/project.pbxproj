@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
+		49BCDBFB24471E2600F53C7B /* Download Realm Cloud */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 49BCDBFC24471E2600F53C7B /* Build configuration list for PBXAggregateTarget "Download Realm Cloud" */;
+			buildPhases = (
+				49BCDBFF24471E3100F53C7B /* Setup BaaS */,
+			);
+			dependencies = (
+			);
+			name = "Download Realm Cloud";
+			productName = "Download Realm Cloud";
+		};
 		C04B4BD71B55C47600FAE58E /* Download Core Library */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = C04B4BDA1B55C47600FAE58E /* Build configuration list for PBXAggregateTarget "Download Core Library" */;
@@ -543,6 +554,13 @@
 			remoteGlobalIDString = 3FE5818822C2CA2E00BA10E7;
 			remoteInfo = "RealmTestSupport static";
 		};
+		49BCDC0024471E6500F53C7B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 49BCDBFB24471E2600F53C7B;
+			remoteInfo = "Download Realm Cloud";
+		};
 		5D6157011BE0A3A100A4BD3F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
@@ -747,7 +765,7 @@
 		3F0543E91C56F71500AA5322 /* realm_coordinator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = realm_coordinator.hpp; sourceTree = "<group>"; };
 		3F0543EA1C56F71500AA5322 /* realm_coordinator.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = realm_coordinator.cpp; sourceTree = "<group>"; };
 		3F0543F61C56F78300AA5322 /* external_commit_helper.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = external_commit_helper.hpp; sourceTree = "<group>"; };
-		3F0C129220926CAD00D0D6C8 /* createApp.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = createApp.js; path = Realm/ObjectServerTests/createApp.js; sourceTree = "<group>"; };
+		3F0C129220926CAD00D0D6C8 /* admin.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = admin.js; path = Realm/ObjectServerTests/admin.js; sourceTree = "<group>"; };
 		3F0C6ACE23E11FAD00F03A4F /* object_changeset.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = object_changeset.cpp; sourceTree = "<group>"; };
 		3F0C6ACF23E11FAD00F03A4F /* object_changeset.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = object_changeset.hpp; sourceTree = "<group>"; };
 		3F0F029D1B6FFE610046A4D5 /* KVOTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = KVOTests.mm; sourceTree = "<group>"; };
@@ -873,6 +891,7 @@
 		4993221524129E6600A0EC8E /* RLMNetworkTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMNetworkTransport.h; sourceTree = "<group>"; };
 		4993221A2412A07F00A0EC8E /* generic_network_transport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = generic_network_transport.cpp; path = sync/generic_network_transport.cpp; sourceTree = "<group>"; };
 		4993221B2412A07F00A0EC8E /* generic_network_transport.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = generic_network_transport.hpp; path = sync/generic_network_transport.hpp; sourceTree = "<group>"; };
+		49BCDBF824471CD300F53C7B /* setup_baas.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = setup_baas.sh; path = Realm/ObjectServerTests/setup_baas.sh; sourceTree = "<group>"; };
 		5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupport.swift; sourceTree = "<group>"; };
 		5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupportTests.swift; sourceTree = "<group>"; };
 		5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PredicateUtilTests.mm; sourceTree = "<group>"; };
@@ -1548,8 +1567,9 @@
 				3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */,
 				1AA5AE9F1D98C99500ED8C27 /* SwiftObjectServerTests.swift */,
 				1AA5AE961D989BE000ED8C27 /* SwiftSyncTestCase.swift */,
-				3F0C129220926CAD00D0D6C8 /* createApp.js */,
+				3F0C129220926CAD00D0D6C8 /* admin.js */,
 				4992F62024463296005C93EE /* run_baas.sh */,
+				49BCDBF824471CD300F53C7B /* setup_baas.sh */,
 			);
 			name = "Object Server Tests";
 			sourceTree = "<group>";
@@ -2047,6 +2067,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				49BCDC0124471E6500F53C7B /* PBXTargetDependency */,
 				E8267FB21D90B79000E001C7 /* PBXTargetDependency */,
 				E8267FB41D90B79000E001C7 /* PBXTargetDependency */,
 				E8267FB61D90B79000E001C7 /* PBXTargetDependency */,
@@ -2127,6 +2148,11 @@
 						DevelopmentTeam = QX5CR2FTN2;
 						ProvisioningStyle = Automatic;
 					};
+					49BCDBFB24471E2600F53C7B = {
+						CreatedOnToolsVersion = 11.4;
+						DevelopmentTeam = 2Z8M9MTEVV;
+						ProvisioningStyle = Automatic;
+					};
 					5D659E7D1BE04556006515A0 = {
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
@@ -2188,6 +2214,7 @@
 				E8267FB11D90B79000E001C7 /* ObjectServerTests */,
 				E856D1DE195614A400FB2FCF /* iOS static tests */,
 				C04B4BD71B55C47600FAE58E /* Download Core Library */,
+				49BCDBFB24471E2600F53C7B /* Download Realm Cloud */,
 				E83EAC791BED3D880085CCD2 /* SwiftLint */,
 				3F1A5E711992EB7400F45F4C /* TestHost */,
 				3F9D91802152D42F00474F09 /* TestHost static */,
@@ -2264,6 +2291,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		49BCDBFF24471E3100F53C7B /* Setup BaaS */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Setup BaaS";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nsh Realm/ObjectServerTests/setup_baas.sh\n";
+		};
 		5D304A2E1BE9AEFB0082C1A6 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -2829,6 +2874,11 @@
 			target = 3FE5818822C2CA2E00BA10E7 /* RealmTestSupport static */;
 			targetProxy = 3FE5819322C2CA6800BA10E7 /* PBXContainerItemProxy */;
 		};
+		49BCDC0124471E6500F53C7B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 49BCDBFB24471E2600F53C7B /* Download Realm Cloud */;
+			targetProxy = 49BCDC0024471E6500F53C7B /* PBXContainerItemProxy */;
+		};
 		5D6157021BE0A3A100A4BD3F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 3F1A5E711992EB7400F45F4C /* TestHost */;
@@ -2971,6 +3021,24 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.Realm.RealmTestSupport;
 				PRODUCT_MODULE_NAME = RealmTestSupport;
 				PRODUCT_NAME = RealmTestSupport;
+			};
+			name = Release;
+		};
+		49BCDBFD24471E2600F53C7B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2Z8M9MTEVV;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		49BCDBFE24471E2600F53C7B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2Z8M9MTEVV;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -3183,6 +3251,15 @@
 			buildConfigurations = (
 				3FE5818F22C2CA2E00BA10E7 /* Debug */,
 				3FE5819022C2CA2E00BA10E7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		49BCDBFC24471E2600F53C7B /* Build configuration list for PBXAggregateTarget "Download Realm Cloud" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				49BCDBFD24471E2600F53C7B /* Debug */,
+				49BCDBFE24471E2600F53C7B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

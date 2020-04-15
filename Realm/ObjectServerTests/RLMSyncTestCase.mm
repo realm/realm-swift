@@ -107,7 +107,6 @@ static NSURL *syncDirectoryForChildProcess() {
 @end
 
 @implementation RealmObjectServer {
-    NSURL *_serverDataRoot;
 }
 
 + (instancetype)sharedServer {
@@ -117,8 +116,6 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (instancetype)init {
     if (self = [super init]) {
-        _serverDataRoot = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"test-ros-data"]];
-
         [self cleanUp];
 
         [self downloadAdminSDK];
@@ -140,39 +137,33 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)cleanUp {
-    NSString *pidfile = [[@(__FILE__) stringByDeletingLastPathComponent] stringByAppendingString:@"/build/mongodb-osx-x86_64-4.0.2/pid.txt"];
+    NSTask *task = [[NSTask alloc] init];
+    task.launchPath = nodePath();
+    NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
+    task.arguments = @[[directory stringByAppendingPathComponent:@"admin.js"], @"clean"];
+    [task launch];
+    [task waitUntilExit];
+    
+    NSString *pidfile = [[@(__FILE__) stringByDeletingLastPathComponent]
+                         stringByAppendingString:@"../../build/baas/pid.txt"];
+
     if ([[NSFileManager defaultManager] fileExistsAtPath:pidfile]) {
-        NSString *content = [NSString stringWithContentsOfFile:pidfile encoding:NSUTF8StringEncoding error:nil];
         // Clean up any old state from the server
         [[NSTask launchedTaskWithLaunchPath:@"/usr/bin/pkill"
-                                  arguments:@[content]] waitUntilExit];
+                                  arguments:@[pidfile]] waitUntilExit];
     }
 
     [[NSTask launchedTaskWithLaunchPath:@"/usr/bin/pkill"
                               arguments:@[@"-f", @"stitch"]] waitUntilExit];
-
-    NSTask *task = [[NSTask alloc] init];
-    NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
-    task.currentDirectoryPath = directory;
-    task.launchPath = @"/bin/rm";
-    task.arguments = @[@"-rf", @"build"];
-    [task launch];
-    [task waitUntilExit];
-}
-
-- (void)dealloc {
-    [self cleanUp];
 }
 
 - (NSString *)createApp {
     // Set up the actual ROS task
     NSPipe *pipe = [NSPipe pipe];
     NSTask *task = [[NSTask alloc] init];
-    task.currentDirectoryPath = self.serverDataRoot.path;
     task.launchPath = nodePath();
     NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
-    task.arguments = @[[directory stringByAppendingPathComponent:@"createApp.js"],
-                        self.serverDataRoot.path];
+    task.arguments = @[[directory stringByAppendingPathComponent:@"admin.js"], @"create"];
     task.standardOutput = pipe;
     [task launch];
 
@@ -245,7 +236,7 @@ static NSURL *syncDirectoryForChildProcess() {
                        @"--no-save",
                        @"--no-package-lock",
                        @"install",
-                       @"mongodb-stitch"
+                       [@"mongodb-stitch" stringByAppendingString:@"@3.11.0"]
                        ];
     [task launch];
     [task waitUntilExit];

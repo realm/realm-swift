@@ -2,7 +2,7 @@
 
 const stitch = require('mongodb-stitch');
 
-async function main() {
+async function create() {
     const admin = await stitch.StitchAdminClientFactory.create("http://localhost:9090");
 
     await admin.login("unique_user@domain.com", "password");
@@ -10,7 +10,7 @@ async function main() {
     const groupId = profile.roles[0].group_id;
     const appResponse = (await admin.apps(groupId).create({name: 'test'}));
     const appId = appResponse['_id'];
-    process.stdout.write(appResponse['client_app_id']);
+
     const app = admin.apps(groupId).app(appId);
 
     await app.authProviders().create({type: 'anon-user'});
@@ -21,6 +21,32 @@ async function main() {
         resetPasswordSubject: 'Bye',
         autoConfirm: true
     }});
+
+    process.stdout.write(appResponse['client_app_id']);
 }
 
-main();
+async function clean() {
+    const admin = await stitch.StitchAdminClientFactory.create("http://localhost:9090");
+
+    await admin.login("unique_user@domain.com", "password");
+    const profile = await admin.userProfile();
+    const groupId = profile.roles[0].group_id;
+    const apps = await admin.apps(groupId).list();
+    for (app in apps) {
+        await admin.apps(groupId).app(app['_id']).remove();
+    }
+}
+
+var args = process.argv.slice(2);
+
+switch (args[0]) {
+    case 'create':
+        create();
+        break;
+    case 'clean':
+        clean();
+        break;
+    default:
+        process.stderr.write("Invalid arg: " + args[0]);
+        break;
+}
