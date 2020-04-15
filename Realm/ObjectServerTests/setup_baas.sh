@@ -26,12 +26,12 @@ mongodb_url="https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-$mongodb_versio
 transpiler_target="node8-macos"
 server_stitch_lib_url="https://s3.amazonaws.com/mciuploads/mongodb-mongo-master/stitch-support/macos-debug/e791a2ea966bb302ff180dd4538d87c078e74747/stitch-support-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
 
-BASE_DIR=`pwd`/build/baas
+BASE_DIR=`pwd`/Realm/ObjectServerTests/build
 PID_FILE="$BASE_DIR/pid.txt"
 
 function setup_mongod() {
     set -e
-    if [ ! -d mongodb-macos-x86_64-4.2.5 ]
+    if [ ! -d "mongodb-macos-x86_64-$mongodb_version" ]
     then
     curl --silent ${mongodb_url} | tar xz
     pushd mongodb-*
@@ -70,6 +70,7 @@ function shutdown_mongod() {
 function setup_stitch() {
     set -e
     OG_DIR=`pwd`
+    echo "setting up stitch"
     if [ ! -d stitch ]
     then
     echo "cloning stitch"
@@ -133,15 +134,34 @@ function setup_stitch() {
     fi
 }
 
-set -e
-cd build
-mkdir -p baas
-cd baas
-setup_mongod
-run_mongod &
-wait_for_mongod
-setup_stitch
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# MAIN
 
-echo "killing mongod process"
-shutdown_mongod
-echo "process successfully killed"
+echo "Running with ACTION=${ACTION}"
+
+function build_action() {
+    echo "building baas"
+    mkdir -p $BASE_DIR
+    cd $BASE_DIR
+    setup_mongod
+    run_mongod &
+    wait_for_mongod
+    setup_stitch
+    shutdown_mongod
+}
+
+function clean_action() {
+    echo "cleaning baas"
+    shutdown_mongod
+    rm -rf $BASE_DIR
+}
+
+case $1 in
+    "")
+        build_action
+        ;;
+
+    "clean")
+        clean_action
+        ;;
+esac

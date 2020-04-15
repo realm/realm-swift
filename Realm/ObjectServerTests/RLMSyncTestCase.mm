@@ -143,15 +143,13 @@ static NSURL *syncDirectoryForChildProcess() {
     task.arguments = @[[directory stringByAppendingPathComponent:@"admin.js"], @"clean"];
     [task launch];
     [task waitUntilExit];
-    
-    NSString *pidfile = [[@(__FILE__) stringByDeletingLastPathComponent]
-                         stringByAppendingString:@"../../build/baas/pid.txt"];
 
-    if ([[NSFileManager defaultManager] fileExistsAtPath:pidfile]) {
-        // Clean up any old state from the server
-        [[NSTask launchedTaskWithLaunchPath:@"/usr/bin/pkill"
-                                  arguments:@[pidfile]] waitUntilExit];
-    }
+    task = [[NSTask alloc] init];
+    task.currentDirectoryPath = directory;
+    task.launchPath = @"/bin/sh";
+    task.arguments = @[[directory stringByAppendingPathComponent:@"run_baas.sh"], @"clean"];
+    [task launch];
+    [task waitUntilExit];
 
     [[NSTask launchedTaskWithLaunchPath:@"/usr/bin/pkill"
                               arguments:@[@"-f", @"stitch"]] waitUntilExit];

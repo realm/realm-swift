@@ -2293,7 +2293,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		49BCDBFF24471E3100F53C7B /* Setup BaaS */ = {
 			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			files = (
 			);
 			inputFileListPaths = (
@@ -2304,10 +2304,11 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"$(SRCROOT)/Realm/ObjectServerTests/build",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\nsh Realm/ObjectServerTests/setup_baas.sh\n";
+			shellScript = "sh Realm/ObjectServerTests/setup_baas.sh\n";
 		};
 		5D304A2E1BE9AEFB0082C1A6 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3030,6 +3031,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 2Z8M9MTEVV;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = "$(PROJECT_DIR)/Realm/ObjectServerTests/build";
 			};
 			name = Debug;
 		};
@@ -3039,6 +3041,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 2Z8M9MTEVV;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = "$(PROJECT_DIR)/Realm/ObjectServerTests/build";
 			};
 			name = Release;
 		};

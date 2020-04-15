@@ -34,6 +34,15 @@ function wait_for_mongod() {
     popd
 }
 
+function shutdown_mongod() {
+    set -e
+    pushd mongodb-*
+    ./bin/mongo --port 26000 admin --eval "db.adminCommand({replSetStepDown: 0, secondaryCatchUpPeriodSecs: 0, force: true})"
+    ./bin/mongo --port 26000 admin --eval "db.shutdownServer()"
+    echo "mongod is down."
+    popd
+}
+
 function run_stitch() {
     ROOT_DIR=`pwd`
     export PATH=$ROOT_DIR/:$PATH
@@ -58,10 +67,28 @@ function wait_for_stitch() {
     done
 }
 
-cd ../../build/baas
-run_mongod &
-wait_for_mongod
-run_stitch &
-wait_for_stitch
+function clean_action() {
+    echo "cleaning baas"
+    cd build
+    shutdown_mongod
+}
 
-echo "api server up"
+function build_action() {
+    cd build
+    run_mongod &
+    wait_for_mongod
+    run_stitch &
+    wait_for_stitch
+    echo "api server up"
+}
+
+
+case $1 in
+    "")
+        build_action
+        ;;
+
+    "clean")
+        clean_action
+        ;;
+esac
