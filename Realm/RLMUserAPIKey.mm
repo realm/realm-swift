@@ -19,6 +19,7 @@
 #import "RLMUserAPIKey.h"
 #import "RLMUserAPIKey_Private.hpp"
 #import "RLMUtil.hpp"
+#import "RLMObjectId_Private.hpp"
 
 @interface RLMUserAPIKey() {
     realm::app::App::UserAPIKey _userAPIKey;
@@ -57,13 +58,7 @@
 }
 
 - (RLMObjectId *)objectId {
-    NSError *error;
-    RLMObjectId *objectId = [[RLMObjectId alloc] initWithString:@(_userAPIKey.id.to_string().c_str())
-                                                          error:&error];
-    if (error == nil) {
-        return objectId;
-    }
-    @throw RLMException(@"Could not construct RLMObjectId");
+    return [[RLMObjectId alloc] initWithValue:_userAPIKey.id];
 }
 
 - (realm::app::App::UserAPIKey)_apiKey {

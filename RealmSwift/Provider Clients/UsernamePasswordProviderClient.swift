@@ -39,7 +39,7 @@ public class UsernamePasswordProviderClient: ProviderClient {
     ///   - email: The email address of the user to register.
     ///   - password: The password that the user created for the new username/password identity.
     ///   - completion: A callback to be invoked once the call is complete.
-    public func register(withEmail email: String,
+    public func register(_ email: String,
                          _ password: String,
                          _ completion: @escaping OptionalErrorCompletionBlock) {
         providerClient.registerEmail(email, password: password, completion: completion)
@@ -50,7 +50,7 @@ public class UsernamePasswordProviderClient: ProviderClient {
     ///   - token: The confirmation token that was emailed to the user.
     ///   - tokenId: The confirmation token id that was emailed to the user.
     ///   - completion: A callback to be invoked once the call is complete.
-    public func confirm(withToken token: String,
+    public func confirm(_ token: String,
                         _ tokenId: String,
                         _ completion: @escaping OptionalErrorCompletionBlock) {
         providerClient.confirmUser(token, tokenId: tokenId, completion: completion)
@@ -80,7 +80,7 @@ public class UsernamePasswordProviderClient: ProviderClient {
     ///   - token: The password reset token that was emailed to the user.
     ///   - tokenId: The password reset token id that was emailed to the user.
     ///   - completion: A callback to be invoked once the call is complete.
-    public func resetPassword(to password: String,
+    public func resetPassword(_ password: String,
                               _ token: String,
                               _ tokenId: String,
                               _ completion: @escaping OptionalErrorCompletionBlock) {
@@ -98,8 +98,8 @@ public class UsernamePasswordProviderClient: ProviderClient {
     ///   - args: A pre-serialized list of arguments. Must be a JSON array.
     ///   - completion: A callback to be invoked once the call is complete.
     public func callResetPasswordFunction(_ email: String,
-                                          password: String,
-                                          args: String,
+                                          _ password: String,
+                                          _ args: String,
                                           _ completion: @escaping OptionalErrorCompletionBlock) {
         providerClient.callResetPasswordFunction(email, password: password, args: args, completion: completion)
     }
