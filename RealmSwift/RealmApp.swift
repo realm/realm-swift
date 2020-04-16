@@ -46,7 +46,7 @@ public class RealmApp {
 
     /// Returns the current user if there is one
     public var currentUser: SyncUser? {
-        app.currentUser()
+        return app.currentUser()
     }
 
     /// Get an application with a given appId and configuration.
@@ -63,7 +63,7 @@ public class RealmApp {
     /// Used to perform requests specifically related to the username/password provider.
     /// - Returns: A usernamePasswordProviderClient for performing auth functions
     public func usernamePasswordProviderClient() -> UsernamePasswordProviderClient {
-        UsernamePasswordProviderClient(app.usernamePasswordProviderClient())
+        return UsernamePasswordProviderClient(app.usernamePasswordProviderClient())
     }
 
     /// A client for the user API key authentication provider which
@@ -71,7 +71,7 @@ public class RealmApp {
     ///
     /// This client should only be used by an authenticated user.
     public func userAPIKeyProviderClient() -> UserAPIKeyProviderClient {
-        UserAPIKeyProviderClient(app.userAPIKeyProviderClient())
+        return UserAPIKeyProviderClient(app.userAPIKeyProviderClient())
     }
 
     /// Login to a user for the Realm app.
@@ -91,7 +91,7 @@ public class RealmApp {
     /// - Returns: The user you intend to switch to
     @discardableResult
     public func switchToUser(_ syncUser: SyncUser) -> SyncUser {
-        app.switch(to: syncUser)
+        return app.switch(to: syncUser)
     }
 
     /// Removes a specified user

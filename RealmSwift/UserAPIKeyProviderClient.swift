@@ -38,18 +38,18 @@ public struct UserAPIKey {
 
     // The name of the key.
     public var name: String {
-        userAPIKey.name
+        return userAPIKey.name
     }
 
     // The actual key. Will only be included in
     // the response when an API key is first created.
     public var key: String? {
-        userAPIKey.key
+        return userAPIKey.key
     }
 
     // Indicates if the API key is disabled or not
     public var disabled: Bool {
-        userAPIKey.disabled
+        return userAPIKey.disabled
     }
 
     internal var userAPIKey: RLMUserAPIKey
