@@ -34,25 +34,25 @@ using namespace realm;
 }
 
 + (instancetype)credentialsWithFacebookToken:(RLMAppCredentialsToken)token {
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::facebook(token.UTF8String)];
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::facebook(token.UTF8String)];
 }
 
 + (instancetype)credentialsWithGoogleToken:(RLMAppCredentialsToken)token {
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::google(token.UTF8String)];
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::google(token.UTF8String)];
 }
 
 + (instancetype)credentialsWithAppleToken:(RLMAppCredentialsToken)token {
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::apple(token.UTF8String)];
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::apple(token.UTF8String)];
 }
 
 + (instancetype)credentialsWithUsername:(NSString *)username
                                password:(NSString *)password {
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::username_password(username.UTF8String,
-                                                                                        password.UTF8String)];
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::username_password(username.UTF8String,
+                                                                                       password.UTF8String)];
 }
 
 + (instancetype)credentialsWithJWT:(NSString *)token {
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::custom(token.UTF8String)];
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::custom(token.UTF8String)];
 }
 
 + (instancetype)credentialsWithFunctionPayload:(NSDictionary *)payload
@@ -65,19 +65,19 @@ using namespace realm;
     }
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::function(jsonString.UTF8String)];
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::function(jsonString.UTF8String)];
 }
 
 + (instancetype)credentialsWithUserAPIKey:(NSString *)apiKey {
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::user_api_key(apiKey.UTF8String)];
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::user_api_key(apiKey.UTF8String)];
 }
 
 + (instancetype)credentialsWithServerAPIKey:(NSString *)apiKey {
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::server_api_key(apiKey.UTF8String)];
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::server_api_key(apiKey.UTF8String)];
 }
 
 + (instancetype)anonymousCredentials {
-    return [[self alloc] initWithAppCredentials: realm::app::AppCredentials::anonymous()];
+    return [[self alloc] initWithAppCredentials:realm::app::AppCredentials::anonymous()];
 }
 
 - (BOOL)isEqual:(id)object {
