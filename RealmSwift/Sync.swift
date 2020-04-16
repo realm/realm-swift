@@ -316,16 +316,16 @@ public struct AppCredentials {
     public typealias Token = String
     /// A dictionary which represents a MongoDB document
     /// FIXME: This is to be replaced by the Mongo BSON type
-    public typealias Document = [String : Any]
+    public typealias Document = [String: Any]
 
     internal let credentials: RLMAppCredentials
 
     internal init(_ credentials: RLMAppCredentials) {
         self.credentials = credentials
     }
-    
+
     public var provider: String {
-        credentials.provider.rawValue
+        return credentials.provider.rawValue
     }
 
     /// Initialize new credentials using a Facebook account token.
@@ -337,7 +337,7 @@ public struct AppCredentials {
     public static func google(token: Token) -> AppCredentials {
         return AppCredentials(RLMAppCredentials(googleToken: token))
     }
-    
+
     /// Initialize new credentials using an Apple account token.
     public static func apple(token: Token) -> AppCredentials {
         return AppCredentials(RLMAppCredentials(appleToken: token))
@@ -358,23 +358,23 @@ public struct AppCredentials {
     public static func anonymous() -> AppCredentials {
         return AppCredentials(RLMAppCredentials.anonymous())
     }
-    
+
     /// Initialize new credentials with a stitch function, this takes in a mongodb document
     /// which will be sent to the stitch function used for authentication. If the document cannot be serialised it will throw and error
     public static func function(payload document: Document) throws -> AppCredentials {
         var error: NSError?
         let credentials = RLMAppCredentials(functionPayload: document, error: &error)
-        if (error == nil) {
+        if error == nil {
             return AppCredentials(credentials)
         }
         throw error ?? NSError()
     }
-    
+
     /// Initialize new credentials using a user api key.
     public static func userAPIKey(_ apiKey: String) -> AppCredentials {
         return AppCredentials(RLMAppCredentials(userAPIKey: apiKey))
     }
-    
+
     /// Initialize new credentials using a server api key.
     public static func serverAPIKey(_ apiKey: String) -> AppCredentials {
         return AppCredentials(RLMAppCredentials(serverAPIKey: apiKey))
