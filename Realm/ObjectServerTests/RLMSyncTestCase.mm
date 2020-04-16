@@ -98,7 +98,6 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 @interface RealmObjectServer : NSObject
-@property (nonatomic, readonly) NSURL *serverDataRoot;
 @property (nonatomic, readonly) NSString *appId;
 + (instancetype)sharedServer;
 
@@ -388,33 +387,6 @@ static NSURL *syncDirectoryForChildProcess() {
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
     XCTAssertTrue(theUser.state == RLMSyncUserStateLoggedIn, @"User should have been valid, but wasn't");
     return theUser;
-}
-
-- (NSString *)adminToken {
-    NSURL *target = [RealmObjectServer.sharedServer.serverDataRoot
-                     URLByAppendingPathComponent:@"/keys/admin.json"];
-    if (![[NSFileManager defaultManager] fileExistsAtPath:[target path]]) {
-        XCTFail(@"Could not find the JSON file containing the admin token.");
-        return nil;
-    }
-    NSData *raw = [NSData dataWithContentsOfURL:target];
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:raw options:0 error:nil];
-    NSString *token = json[@"ADMIN_TOKEN"];
-    if ([token length] == 0) {
-        XCTFail(@"Could not successfully extract the token.");
-    }
-    return token;
-}
-
-- (NSString *)emailForAddress:(NSString *)email {
-    NSURL *target = [[RealmObjectServer.sharedServer.serverDataRoot
-                     URLByAppendingPathComponent:@"/email"]
-                     URLByAppendingPathComponent:email];
-    NSString *body = [NSString stringWithContentsOfURL:target encoding:NSUTF8StringEncoding error:nil];
-    if (body) {
-        [NSFileManager.defaultManager removeItemAtURL:target error:nil];
-    }
-    return body;
 }
 
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm {
