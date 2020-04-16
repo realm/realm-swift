@@ -549,16 +549,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let directory = URL(fileURLWithPath: testDir, isDirectory: true)
         return directory.appendingPathComponent(fileName, isDirectory: false)
     }
-    
-    //MARK: - RealmApp tests
-    
+
+    // MARK: - RealmApp tests
+
     private func randomString(length: Int) -> String {
       let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-      return String((0..<length).map{ _ in letters.randomElement()! })
+      return String((0..<length).map { _ in letters.randomElement()! })
     }
-    
+
     let appName = "translate-utwuv"
-    
+
     private func realmAppConfig() -> AppConfiguration {
 
         return AppConfiguration.init(baseURL: "http://localhost:9090",
@@ -566,32 +566,32 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                      localAppName: "auth-integration-tests",
                                      localAppVersion: "20180301")
     }
-    
+
     func testRealmAppInit() {
         let appWithNoConfig = RealmApp(appName, nil)
         XCTAssertTrue(appWithNoConfig.allUsers.capacity == 0)
-        
+
         let appWithConfig = RealmApp(appName, realmAppConfig())
         XCTAssertTrue(appWithConfig.allUsers.capacity == 0)
     }
-    
+
     func testRealmAppLogin() {
         let app = RealmApp(appName, nil)
-        
+
         let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
         let password = randomString(length: 10)
-        
+
         let registerUserEx = expectation(description: "Register user")
-        
+
         app.usernamePasswordProviderClient().register(withEmail: email, password) { (error) in
             XCTAssertTrue(error == nil)
             registerUserEx.fulfill()
         }
         self.wait(for: [registerUserEx], timeout: 4.0)
-        
+
         let loginEx = expectation(description: "Login user")
         var syncUser: SyncUser?
-        
+
         app.loginWithCredential(AppCredentials.usernamePassword(username: email, password: password)) { (user, error) in
             XCTAssertTrue(error == nil)
             syncUser = user
@@ -599,19 +599,19 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         self.wait(for: [loginEx], timeout: 4.0)
-        
+
         XCTAssertTrue(syncUser?.identity == app.currentUser?.identity)
         XCTAssertTrue(app.allUsers.count == 1)
     }
-    
+
     func testRealmAppSwitchAndRemove() {
         let app = RealmApp(appName, nil)
-        
+
         let email1 = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
         let password1 = randomString(length: 10)
         let email2 = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
         let password2 = randomString(length: 10)
-        
+
         let registerUser1Ex = expectation(description: "Register user 1")
         let registerUser2Ex = expectation(description: "Register user 2")
 
@@ -619,14 +619,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertTrue(error == nil)
             registerUser1Ex.fulfill()
         }
-        
+
         app.usernamePasswordProviderClient().register(withEmail: email2, password2) { (error) in
             XCTAssertTrue(error == nil)
             registerUser2Ex.fulfill()
         }
-        
+
         self.wait(for: [registerUser1Ex, registerUser2Ex], timeout: 4.0)
-        
+
         let login1Ex = expectation(description: "Login user 1")
         let login2Ex = expectation(description: "Login user 2")
 
@@ -638,7 +638,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             syncUser1 = user
             login1Ex.fulfill()
         }
-        
+
         self.wait(for: [login1Ex], timeout: 4.0)
 
         app.loginWithCredential(AppCredentials.usernamePassword(username: email2, password: password2)) { (user, error) in
@@ -648,53 +648,53 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         self.wait(for: [login2Ex], timeout: 4.0)
-        
+
         XCTAssertTrue(app.allUsers.count == 2)
-        
+
         XCTAssertTrue(syncUser2!.identity == app.currentUser!.identity)
 
         app.switchToUser(syncUser1!)
         XCTAssertTrue(syncUser1!.identity == app.currentUser!.identity)
-        
+
         let removeEx = expectation(description: "Remove user 1")
 
         app.removeUser(syncUser1!) { (error) in
             XCTAssertTrue(error == nil)
             removeEx.fulfill()
         }
-        
+
         self.wait(for: [removeEx], timeout: 4.0)
 
         XCTAssertTrue(syncUser2!.identity == app.currentUser!.identity)
         XCTAssertTrue(app.allUsers.count == 1)
 
     }
-    
+
     func testRealmAppLinkUser() {
         let app = RealmApp(appName, nil)
-        
+
         let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
         let password = randomString(length: 10)
-        
+
         let registerUserEx = expectation(description: "Register user")
-        
+
         app.usernamePasswordProviderClient().register(withEmail: email, password) { (error) in
             XCTAssertTrue(error == nil)
             registerUserEx.fulfill()
         }
         self.wait(for: [registerUserEx], timeout: 4.0)
-        
+
         let loginEx = expectation(description: "Login user")
         var syncUser: SyncUser?
-        
+
         let credentials = AppCredentials.usernamePassword(username: email, password: password)
-        
+
         app.loginWithCredential(AppCredentials.anonymous()) { (user, error) in
             XCTAssertTrue(error == nil)
             syncUser = user
             loginEx.fulfill()
         }
-        
+
         self.wait(for: [loginEx], timeout: 4.0)
 
         let linkEx = expectation(description: "Link user")
@@ -704,30 +704,30 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             syncUser = user
             linkEx.fulfill()
         }
-        
+
         self.wait(for: [linkEx], timeout: 4.0)
 
         XCTAssertTrue(syncUser?.identity == app.currentUser?.identity)
         XCTAssertTrue(syncUser?.identities().count == 2)
 
     }
-    
-    //MARK: - Provider Clients
-    
+
+    // MARK: - Provider Clients
+
     func testUsernamePasswordProviderClient() {
         let app = RealmApp(appName, nil)
-        
+
         let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
         let password = randomString(length: 10)
-        
+
         let registerUserEx = expectation(description: "Register user")
-        
+
         app.usernamePasswordProviderClient().register(withEmail: email, password) { (error) in
             XCTAssertTrue(error == nil)
             registerUserEx.fulfill()
         }
         self.wait(for: [registerUserEx], timeout: 4.0)
-        
+
         let confirmUserEx = expectation(description: "Confirm user")
 
         app.usernamePasswordProviderClient().confirm(withToken: "atoken", "atokenid") { (error) in
@@ -735,7 +735,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             confirmUserEx.fulfill()
         }
         self.wait(for: [confirmUserEx], timeout: 4.0)
-        
+
         let resendEmailEx = expectation(description: "Resend email confirmation")
 
         app.usernamePasswordProviderClient().resendConfirmationEmail("atoken") { (error) in
@@ -743,7 +743,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             resendEmailEx.fulfill()
         }
         self.wait(for: [resendEmailEx], timeout: 4.0)
-        
+
         let resendResetPasswordEx = expectation(description: "Resend reset password email")
 
         app.usernamePasswordProviderClient().sendResetPasswordEmail("atoken") { (error) in
@@ -759,7 +759,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             resetPasswordEx.fulfill()
         }
         self.wait(for: [resetPasswordEx], timeout: 4.0)
-        
+
         let callResetFunctionEx = expectation(description: "Reset password function")
 
         app.usernamePasswordProviderClient().callResetPasswordFunction(email, password: password, args: "") { (error) in
@@ -768,34 +768,34 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         self.wait(for: [callResetFunctionEx], timeout: 4.0)
     }
-    
+
     func testUserAPIKeyProviderClient() {
         let app = RealmApp(appName, nil)
-        
+
         let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
         let password = randomString(length: 10)
-        
+
         let registerUserEx = expectation(description: "Register user")
-        
+
         app.usernamePasswordProviderClient().register(withEmail: email, password) { (error) in
             XCTAssertTrue(error == nil)
             registerUserEx.fulfill()
         }
         self.wait(for: [registerUserEx], timeout: 4.0)
-        
-        let loginEx = expectation(description: "Login user")        
+
+        let loginEx = expectation(description: "Login user")
         let credentials = AppCredentials.usernamePassword(username: email, password: password)
-                
-        app.loginWithCredential(credentials) { (user, error) in
+
+        app.loginWithCredential(credentials) { (_, error) in
             XCTAssertTrue(error == nil)
             loginEx.fulfill()
         }
-        
+
         self.wait(for: [loginEx], timeout: 4.0)
-        
+
         let createAPIKeyEx = expectation(description: "Create user api key")
 
-        var apiKey:UserAPIKey?
+        var apiKey: UserAPIKey?
         app.userAPIKeyProviderClient().createAPIKey("my-api-key") { (key, error) in
             XCTAssertNotNil(key)
             XCTAssertNil(error)
@@ -813,28 +813,28 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         self.wait(for: [fetchAPIKeyEx], timeout: 4.0)
 
         let fetchAPIKeysEx = expectation(description: "Fetch user api keys")
-        app.userAPIKeyProviderClient().fetchAPIKeys() { (keys, error) in
+        app.userAPIKeyProviderClient().fetchAPIKeys { (keys, error) in
             XCTAssertNotNil(keys)
             XCTAssert(keys!.count == 1)
             XCTAssertNil(error)
             fetchAPIKeysEx.fulfill()
         }
         self.wait(for: [fetchAPIKeysEx], timeout: 4.0)
-        
+
         let disableKeyEx = expectation(description: "Disable API key")
         app.userAPIKeyProviderClient().disable(apiKey!) { (error) in
             XCTAssertNil(error)
             disableKeyEx.fulfill()
         }
         self.wait(for: [disableKeyEx], timeout: 4.0)
-        
+
         let enableKeyEx = expectation(description: "Enable API key")
         app.userAPIKeyProviderClient().enable(apiKey!) { (error) in
             XCTAssertNil(error)
             enableKeyEx.fulfill()
         }
         self.wait(for: [enableKeyEx], timeout: 4.0)
-        
+
         let deleteKeyEx = expectation(description: "Delete API key")
         app.userAPIKeyProviderClient().delete(apiKey!) { (error) in
             XCTAssertNil(error)
@@ -842,5 +842,5 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         self.wait(for: [deleteKeyEx], timeout: 4.0)
     }
-    
+
 }

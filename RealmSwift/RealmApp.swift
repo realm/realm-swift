@@ -27,43 +27,43 @@ An object representing the Realm App configuration
 */
 public typealias AppConfiguration = RLMAppConfiguration
 
-public typealias OptionalErrorCompletionBlock = ((Error?) -> ())
+public typealias OptionalErrorCompletionBlock = ((Error?) -> Void)
 
 /// The `RealmApp` has the fundamental set of methods for communicating with a Realm
 /// application backend.
 
 /// This interface provides access to login and authentication.
 public class RealmApp {
-    
-    public typealias UserCompletionBlock = ((SyncUser?, Error?) -> ())
-    
-    internal var _app: RLMApp
+
+    public typealias UserCompletionBlock = ((SyncUser?, Error?) -> Void)
+
+    internal var app: RLMApp
 
     /// Returns a list of users
-    public var allUsers: [String:SyncUser] {
-        _app.allUsers()
+    public var allUsers: [String: SyncUser] {
+        return app.allUsers()
     }
-    
+
     /// Returns the current user if there is one
     public var currentUser: SyncUser? {
-        _app.currentUser()
+        app.currentUser()
     }
-    
+
     /// Get an application with a given appId and configuration.
     /// - Parameters:
     ///   - appId: appId The unique identifier of your Realm app.
     ///   - configuration: configuration A configuration object to configure this client.
     public init(_ appId: String, _ configuration: AppConfiguration?) {
-        _app = RLMApp.init(appId, configuration: configuration)
+        app = RLMApp.init(appId, configuration: configuration)
     }
-    
+
     /// A client for the username/password authentication provider which
     /// can be used to obtain a credential for logging in.
     ///
     /// Used to perform requests specifically related to the username/password provider.
     /// - Returns: A usernamePasswordProviderClient for performing auth functions
     public func usernamePasswordProviderClient() -> UsernamePasswordProviderClient {
-        UsernamePasswordProviderClient(_app.usernamePasswordProviderClient())
+        UsernamePasswordProviderClient(app.usernamePasswordProviderClient())
     }
 
     /// A client for the user API key authentication provider which
@@ -71,18 +71,18 @@ public class RealmApp {
     ///
     /// This client should only be used by an authenticated user.
     public func userAPIKeyProviderClient() -> UserAPIKeyProviderClient {
-        UserAPIKeyProviderClient(_app.userAPIKeyProviderClient())
+        UserAPIKeyProviderClient(app.userAPIKeyProviderClient())
     }
-    
+
     /// Login to a user for the Realm app.
     /// - Parameters:
     ///   - credentials: The credentials identifying the user.
     ///   - completion: A callback invoked after completion.
     public func loginWithCredential(_ credentials: AppCredentials,
                                     _ completion: @escaping UserCompletionBlock) {
-        _app.login(withCredential: credentials.credentials, completion: completion)
+        app.login(withCredential: credentials.credentials, completion: completion)
     }
-    
+
     /// Switches the active user to the specified user.
     ///
     /// This sets which user is used by all RLMApp operations which require a user. This is a local operation which does not access the network.
@@ -91,9 +91,9 @@ public class RealmApp {
     /// - Returns: The user you intend to switch to
     @discardableResult
     public func switchToUser(_ syncUser: SyncUser) -> SyncUser {
-        _app.switch(to: syncUser)
+        app.switch(to: syncUser)
     }
-        
+
     /// Removes a specified user
     ///
     /// This logs out and destroys the session related to the user. The completion block will return an error
@@ -102,7 +102,7 @@ public class RealmApp {
     ///   - syncUser: The user you would like to remove
     ///   - completion: A callback invoked on completion
     public func removeUser(_ syncUser: SyncUser, _ completion: @escaping OptionalErrorCompletionBlock) {
-        _app.remove(syncUser, completion: completion)
+        app.remove(syncUser, completion: completion)
     }
 
     /// Logs out the current user
@@ -111,9 +111,9 @@ public class RealmApp {
     /// If the logout request fails, this method will still clear local authentication state.
     /// - Parameter completion: A callback invoked on completion
     public func logOut(_ completion: @escaping OptionalErrorCompletionBlock) {
-        _app.logOut(completion: completion)
+        app.logOut(completion: completion)
     }
-    
+
     /// Logs out the current user
     ///
     /// The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
@@ -122,9 +122,9 @@ public class RealmApp {
     ///   - syncUser: The user to log out
     ///   - completion: A callback invoked on completion
     public func logOut(_ syncUser: SyncUser, _ completion: @escaping OptionalErrorCompletionBlock) {
-        _app.logOut(syncUser, completion: completion)
+        app.logOut(syncUser, completion: completion)
     }
-    
+
     /// Links the currently authenticated user with a new identity, where the identity is defined by the credential
     /// specified as a parameter. This will only be successful if this `RLMSyncUser` is the currently authenticated
     /// with the client from which it was created. On success a new user will be returned with the new linked credentials.
@@ -137,7 +137,7 @@ public class RealmApp {
     public func linkUser(_ syncUser: SyncUser,
                          _ credentials: AppCredentials,
                          _ completion: @escaping UserCompletionBlock) {
-        _app.linkUser(syncUser, credentials: credentials.credentials, completion: completion)
+        app.linkUser(syncUser, credentials: credentials.credentials, completion: completion)
     }
 
 }

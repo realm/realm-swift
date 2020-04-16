@@ -26,13 +26,13 @@ import Realm.Private
   and to perform requests specifically related to the username/password provider.
 */
 public class UsernamePasswordProviderClient: ProviderClient {
-    
+
     public var providerClient: RLMUsernamePasswordProviderClient
-    
+
     init(_ providerClient: RLMUsernamePasswordProviderClient) {
         self.providerClient = providerClient
     }
-    
+
     /// Registers a new email identity with the username/password provider,
     /// and sends a confirmation email to the provided address.
     /// - Parameters:
@@ -44,7 +44,7 @@ public class UsernamePasswordProviderClient: ProviderClient {
                          _ completion: @escaping OptionalErrorCompletionBlock) {
         providerClient.registerEmail(email, password: password, completion: completion)
     }
-    
+
     /// Confirms an email identity with the username/password provider.
     /// - Parameters:
     ///   - token: The confirmation token that was emailed to the user.
@@ -64,7 +64,7 @@ public class UsernamePasswordProviderClient: ProviderClient {
     public func resendConfirmationEmail(_ email: String, _ completion: @escaping OptionalErrorCompletionBlock) {
         providerClient.resendConfirmationEmail(email, completion: completion)
     }
-    
+
     /// Sends a password reset email to the given email address.
     /// - Parameters:
     ///   - email: The email address of the user to send a password reset email for.
@@ -72,7 +72,7 @@ public class UsernamePasswordProviderClient: ProviderClient {
     public func sendResetPasswordEmail(_ email: String, _ completion: @escaping OptionalErrorCompletionBlock) {
         providerClient.sendResetPasswordEmail(email, completion: completion)
     }
-    
+
     /// Resets the password of an email identity using the
     /// password reset token emailed to a user.
     /// - Parameters:
@@ -86,7 +86,7 @@ public class UsernamePasswordProviderClient: ProviderClient {
                               _ completion: @escaping OptionalErrorCompletionBlock) {
         providerClient.resetPassword(to: password, token: token, tokenId: tokenId, completion: completion)
     }
-    
+
     /// Resets the password of an email identity using the
     /// password reset function set up in the application.
     ///
@@ -103,5 +103,5 @@ public class UsernamePasswordProviderClient: ProviderClient {
                                           _ completion: @escaping OptionalErrorCompletionBlock) {
         providerClient.callResetPasswordFunction(email, password: password, args: args, completion: completion)
     }
-    
+
 }

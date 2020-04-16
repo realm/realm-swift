@@ -26,7 +26,7 @@ An object representing the Stitch User API Key used by userAPIKeyProviderClient(
 - see: `RLMUserAPIKey`
 */
 public struct UserAPIKey {
-    
+
     // The ObjectId of the user
     public var objectId: ObjectId {
         do {
@@ -35,44 +35,44 @@ public struct UserAPIKey {
             fatalError(error.localizedDescription)
         }
     }
-    
+
     // The name of the key.
     public var name: String {
         userAPIKey.name
     }
-    
+
     // The actual key. Will only be included in
     // the response when an API key is first created.
     public var key: String? {
         userAPIKey.key
     }
-    
+
     // Indicates if the API key is disabled or not
     public var disabled: Bool {
         userAPIKey.disabled
     }
-    
+
     internal var userAPIKey: RLMUserAPIKey
-    
+
     init(_ userAPIKey: RLMUserAPIKey) {
         self.userAPIKey = userAPIKey
     }
 }
 
 public class UserAPIKeyProviderClient: ProviderClient {
-    
-    public typealias OptionalUserAPIKeyCompletionBlock = ((UserAPIKey?, Error?) -> ())
-    public typealias OptionalUserAPIKeysCompletionBlock = (([UserAPIKey]?, Error?) -> ())
 
-    public typealias OptionalErrorCompletionBlock = ((Error?) -> ())
+    public typealias OptionalUserAPIKeyCompletionBlock = ((UserAPIKey?, Error?) -> Void)
+    public typealias OptionalUserAPIKeysCompletionBlock = (([UserAPIKey]?, Error?) -> Void)
 
-    
+    public typealias OptionalErrorCompletionBlock = ((Error?) -> Void)
+
+
     public var providerClient: RLMUserAPIKeyProviderClient
-    
+
     init(_ providerClient: RLMUserAPIKeyProviderClient) {
         self.providerClient = providerClient
     }
-    
+
     /// Creates a user API key that can be used to authenticate as the current user.
     /// - Parameters:
     ///   - name: The name of the API key to be created.
@@ -86,7 +86,7 @@ public class UserAPIKeyProviderClient: ProviderClient {
             completion(UserAPIKey(userAPIKey), error)
         }
     }
-    
+
     /// Fetches a user API key associated with the current user.
     /// - Parameters:
     ///   - userAPIKey: The ObjectId of the API key to fetch.
@@ -112,7 +112,7 @@ public class UserAPIKeyProviderClient: ProviderClient {
             completion(apiKeys.map {UserAPIKey($0)}, error)
         }
     }
-    
+
     /// Enables a user API key associated with the current user.
     /// - Parameters:
     ///   - userAPIKey: The ObjectId of the  API key to enable.
@@ -120,7 +120,7 @@ public class UserAPIKeyProviderClient: ProviderClient {
     public func enable(_ userAPIKey: UserAPIKey, _ completion: @escaping OptionalErrorCompletionBlock) {
         providerClient.enableApiKey(userAPIKey.objectId, completion: completion)
     }
-    
+
     /// Disables a user API key associated with the current user.
     /// - Parameters:
     ///   - userAPIKey: The ObjectId of the API key to disable.
