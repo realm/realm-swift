@@ -1392,7 +1392,6 @@
 				3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */,
 				5D660FF01BE98D670021E04F /* Util.swift */,
 				CFB43139243DF87100471C18 /* RealmApp.swift */,
-				CF1CEA7924420C910076C152 /* Provider Clients */,
 			);
 			path = RealmSwift;
 			sourceTree = "<group>";
@@ -1463,13 +1462,6 @@
 			);
 			name = apple;
 			path = sync/impl/apple;
-			sourceTree = "<group>";
-		};
-		CF1CEA7924420C910076C152 /* Provider Clients */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = "Provider Clients";
 			sourceTree = "<group>";
 		};
 		CF6E047D242A13CB00DB7F14 /* ProviderClients */ = {
