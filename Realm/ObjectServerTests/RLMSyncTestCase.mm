@@ -174,7 +174,7 @@ static NSURL *syncDirectoryForChildProcess() {
     return appId;
 }
 
-- (NSString *)desiredObjectServerVersion {
+- (NSString *)desiredAdminSDKVersion {
     auto path = [[[[@(__FILE__) stringByDeletingLastPathComponent] // RLMSyncTestCase.mm
                  stringByDeletingLastPathComponent] // ObjectServerTests
                  stringByDeletingLastPathComponent] // Realm
@@ -185,7 +185,7 @@ static NSURL *syncDirectoryForChildProcess() {
         abort();
     }
 
-    auto regex = [NSRegularExpression regularExpressionWithPattern:@"^REALM_OBJECT_SERVER_VERSION=(.*)$"
+    auto regex = [NSRegularExpression regularExpressionWithPattern:@"^MONGODB_STITCH_ADMIN_SDK_VERSION=(.*)$"
                                                            options:NSRegularExpressionAnchorsMatchLines error:nil];
     auto match = [regex firstMatchInString:file options:0 range:{0, file.length}];
     if (!match) {
@@ -195,7 +195,7 @@ static NSURL *syncDirectoryForChildProcess() {
     return [file substringWithRange:[match rangeAtIndex:1]];
 }
 
-- (NSString *)currentObjectServerVersion {
+- (NSString *)currentAdminSDKVersion {
     auto path = [[[[@(__FILE__) stringByDeletingLastPathComponent] // RLMSyncTestCase.mm
                  stringByAppendingPathComponent:@"node_modules"]
                  stringByAppendingPathComponent:@"realm-object-server"]
@@ -216,8 +216,8 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)downloadAdminSDK {
-    NSString *desiredVersion = [self desiredObjectServerVersion];
-    NSString *currentVersion = [self currentObjectServerVersion];
+    NSString *desiredVersion = [self desiredAdminSDKVersion];
+    NSString *currentVersion = [self currentAdminSDKVersion];
     if ([currentVersion isEqualToString:desiredVersion]) {
         return;
     }
@@ -233,7 +233,7 @@ static NSURL *syncDirectoryForChildProcess() {
                        @"--no-save",
                        @"--no-package-lock",
                        @"install",
-                       [@"mongodb-stitch" stringByAppendingString:@"@3.11.0"]
+                       [@"mongodb-stitch@" stringByAppendingString:desiredVersion]
                        ];
     [task launch];
     [task waitUntilExit];
