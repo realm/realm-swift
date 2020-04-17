@@ -3067,7 +3067,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 2Z8M9MTEVV;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYMROOT = "$(PROJECT_DIR)/Realm/ObjectServerTests/build";
+				SYMROOT = "$(PROJECT_DIR)/build";
 			};
 			name = Debug;
 		};
@@ -3077,7 +3077,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 2Z8M9MTEVV;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYMROOT = "$(PROJECT_DIR)/Realm/ObjectServerTests/build";
+				SYMROOT = "$(PROJECT_DIR)/build";
 			};
 			name = Release;
 		};

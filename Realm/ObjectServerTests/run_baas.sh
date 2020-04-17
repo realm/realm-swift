@@ -18,6 +18,10 @@
 #
 ######################################
 
+RUN_DIR=`pwd`
+BASE_DIR="$RUN_DIR/../.."
+BUILD_DIR="$BASE_DIR/build/baas"
+
 function run_mongod() {
     pushd mongodb-*
     echo "starting mongod..."
@@ -69,14 +73,15 @@ function wait_for_stitch() {
 
 function clean_action() {
     echo "cleaning baas"
-    cd build
+    cd $BUILD_DIR
     shutdown_mongod
 }
 
 function build_action() {
-    cd build
+    cd $BUILD_DIR
     run_mongod &
     wait_for_mongod
+    cd $BASE_DIR
     run_stitch &
     wait_for_stitch
     echo "api server up"
