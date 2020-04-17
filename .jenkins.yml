@@ -8,7 +8,7 @@ xcode_version:
  - 11.1
  - 11.2.1
  - 11.3
- - 11.4
+ - 11.4.1
 target: 
  - docs
  - swiftlint
@@ -69,7 +69,7 @@ exclude:
     target: docs
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: docs
     configuration: Debug
 
@@ -105,7 +105,7 @@ exclude:
     target: swiftlint
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: swiftlint
     configuration: Debug
 
@@ -137,7 +137,7 @@ exclude:
     target: osx-encryption
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: osx-encryption
     configuration: Debug
 
@@ -169,7 +169,7 @@ exclude:
     target: osx-object-server
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: osx-object-server
     configuration: Debug
 
@@ -201,7 +201,7 @@ exclude:
     target: ios-static
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: ios-static
     configuration: Debug
 
@@ -233,7 +233,7 @@ exclude:
     target: ios-dynamic
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: ios-dynamic
     configuration: Debug
 
@@ -265,7 +265,7 @@ exclude:
     target: watchos
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: watchos
     configuration: Debug
 
@@ -297,7 +297,7 @@ exclude:
     target: tvos
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: tvos
     configuration: Debug
 
@@ -329,7 +329,7 @@ exclude:
     target: ios-swift
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: ios-swift
     configuration: Debug
 
@@ -361,7 +361,7 @@ exclude:
     target: tvos-swift
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: tvos-swift
     configuration: Debug
 
@@ -421,7 +421,7 @@ exclude:
     target: cocoapods-osx
     configuration: Debug
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: cocoapods-osx
     configuration: Debug
 
@@ -453,7 +453,7 @@ exclude:
     target: cocoapods-ios
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: cocoapods-ios
     configuration: Debug
 
@@ -485,7 +485,7 @@ exclude:
     target: cocoapods-ios-dynamic
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: cocoapods-ios-dynamic
     configuration: Debug
 
@@ -517,7 +517,7 @@ exclude:
     target: cocoapods-watchos
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: cocoapods-watchos
     configuration: Debug
 
@@ -573,7 +573,7 @@ exclude:
     target: swiftpm-address
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: swiftpm-address
     configuration: Debug
 
@@ -609,6 +609,6 @@ exclude:
     target: swiftpm-thread
     configuration: Release
 
-  - xcode_version: 11.4
+  - xcode_version: 11.4.1
     target: swiftpm-thread
     configuration: Debug
