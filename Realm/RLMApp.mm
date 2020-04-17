@@ -108,7 +108,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 }
 
 @interface RLMApp() {
-    realm::app::App _app;
+    std::shared_ptr<realm::app::App> _app;
 }
 @end
 
@@ -139,7 +139,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
             }
             boundConfiguration.default_request_timeout_ms = (uint64_t)configuration.defaultRequestTimeoutMS;
         }
-        _app = realm::app::App(boundConfiguration);
+        _app = std::make_shared<realm::app::App>(boundConfiguration);
         return self;
     }
     return nil;
@@ -149,7 +149,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     return [[RLMApp alloc] initWithAppId:appId configuration:configuration];
 }
 
-- (realm::app::App&)_realmApp {
+- (std::shared_ptr<realm::app::App>)_realmApp {
     return _app;
 }
 
@@ -165,7 +165,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 - (void)loginWithCredential:(RLMAppCredentials *)credentials
           completion:(RLMUserCompletionBlock)completionHandler {
-    _app.log_in_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
+    _app->log_in_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
             return completionHandler(nil, RLMAppErrorToNSError(*error));
         }
@@ -175,23 +175,23 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 }
 
 - (RLMSyncUser *)switchToUser:(RLMSyncUser *)syncUser {
-    return [[RLMSyncUser alloc] initWithSyncUser:_app.switch_user(syncUser._syncUser)];
+    return [[RLMSyncUser alloc] initWithSyncUser:_app->switch_user(syncUser._syncUser)];
 }
 
 - (void)removeUser:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app.remove_user(syncUser._syncUser, ^(Optional<app::AppError> error) {
+    _app->remove_user(syncUser._syncUser, ^(Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
-    _app.log_out(^(Optional<app::AppError> error) {
+    _app->log_out(^(Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (void)logOut:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app.log_out(syncUser._syncUser, ^(Optional<app::AppError> error) {
+    _app->log_out(syncUser._syncUser, ^(Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
@@ -199,7 +199,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 - (void)linkUser:(RLMSyncUser *)syncUser
      credentials:(RLMAppCredentials *)credentials
       completion:(RLMUserCompletionBlock)completion {
-    _app.link_user(syncUser._syncUser, credentials.appCredentials,
+    _app->link_user(syncUser._syncUser, credentials.appCredentials,
                    ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
             return completion(nil, RLMAppErrorToNSError(*error));

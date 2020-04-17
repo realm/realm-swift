@@ -23,10 +23,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// A token representing an identity provider's credentials.
 typedef NSString *RLMAppCredentialsToken;
 
-/// A type representing the unique identifier of a Realm Object Server identity provider.
+/// A type representing the unique identifier of a MongoDB Realm identity provider.
 typedef NSString *RLMIdentityProvider NS_EXTENSIBLE_STRING_ENUM;
 
-/// The username/password identity provider. User accounts are handled by the Realm Object Server directly without the
+/// The username/password identity provider. User accounts are handled by MongoDB Realm directly without the
 /// involvement of a third-party identity provider.
 extern RLMIdentityProvider const RLMIdentityProviderUsernamePassword;
 
@@ -69,7 +69,7 @@ extern RLMIdentityProvider const RLMIdentityProviderAnonymous;
 + (instancetype)credentialsWithAppleToken:(RLMAppCredentialsToken)token;
 
 /**
- Construct and return credentials from a Realm Object Server username and password.
+ Construct and return credentials from a MongoDB Realm username and password.
  */
 + (instancetype)credentialsWithUsername:(NSString *)username
                                password:(NSString *)password;

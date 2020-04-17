@@ -24,11 +24,11 @@
 @implementation RLMUserAPIKeyProviderClient
 
 - (realm::app::App::UserAPIKeyProviderClient)client {
-    return self.app._realmApp.provider_client<realm::app::App::UserAPIKeyProviderClient>();
+    return self.app._realmApp->provider_client<realm::app::App::UserAPIKeyProviderClient>();
 }
 
 - (std::shared_ptr<realm::SyncUser>)currentUser {
-    return self.app._realmApp.current_user();
+    return self.app._realmApp->current_user();
 }
 
 - (void)createApiKeyWithName:(NSString *)name

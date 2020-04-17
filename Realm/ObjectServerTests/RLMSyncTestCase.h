@@ -52,23 +52,23 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
-- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 - (RLMRealm *)openRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
 
 /// Synchronously open a synced Realm. Also run a block right after the Realm is created.
-- (RLMRealm *)openRealmForURL:(NSURL *)url
-                         user:(RLMSyncUser *)user
-             immediatelyBlock:(nullable void(^)(void))block;
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
+                                    user:(RLMSyncUser *)user
+                        immediatelyBlock:(nullable void(^)(void))block;
 
 /// Synchronously open a synced Realm with encryption key and stop policy.
 /// Also run a block right after the Realm is created.
-- (RLMRealm *)openRealmForURL:(NSURL *)url
-                         user:(RLMSyncUser *)user
-                encryptionKey:(nullable NSData *)encryptionKey
-                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
-             immediatelyBlock:(nullable void(^)(void))block;
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
+                                    user:(RLMSyncUser *)user
+                           encryptionKey:(nullable NSData *)encryptionKey
+                              stopPolicy:(RLMSyncStopPolicy)stopPolicy
+                        immediatelyBlock:(nullable void(^)(void))block;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 /// Also run a block right after the Realm is created.
@@ -77,13 +77,13 @@ NS_ASSUME_NONNULL_BEGIN
 ;
 
 /// Immediately open a synced Realm.
-- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user;
 
 /// Immediately open a synced Realm with encryption key and stop policy.
-- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url
-                                    user:(RLMSyncUser *)user
-                           encryptionKey:(nullable NSData *)encryptionKey
-                              stopPolicy:(RLMSyncStopPolicy)stopPolicy;
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue
+                                               user:(RLMSyncUser *)user
+                                      encryptionKey:(nullable NSData *)encryptionKey
+                                         stopPolicy:(RLMSyncStopPolicy)stopPolicy;
 
 /// Synchronously create, log in, and return a user.
 - (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials

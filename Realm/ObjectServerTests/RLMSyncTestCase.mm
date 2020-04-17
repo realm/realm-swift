@@ -25,7 +25,6 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMSyncManager_Private.h"
-#import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncConfiguration_Private.h"
 #import "RLMUtil.hpp"
 #import "RLMApp.h"
@@ -176,8 +175,8 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (NSString *)desiredAdminSDKVersion {
     auto path = [[[[@(__FILE__) stringByDeletingLastPathComponent] // RLMSyncTestCase.mm
-                 stringByDeletingLastPathComponent] // ObjectServerTests
-                 stringByDeletingLastPathComponent] // Realm
+                   stringByDeletingLastPathComponent] // ObjectServerTests
+                  stringByDeletingLastPathComponent] // Realm
                  stringByAppendingPathComponent:@"dependencies.list"];
     auto file = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
     if (!file) {
@@ -197,8 +196,8 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (NSString *)currentAdminSDKVersion {
     auto path = [[[[@(__FILE__) stringByDeletingLastPathComponent] // RLMSyncTestCase.mm
-                 stringByAppendingPathComponent:@"node_modules"]
-                 stringByAppendingPathComponent:@"realm-object-server"]
+                   stringByAppendingPathComponent:@"node_modules"]
+                  stringByAppendingPathComponent:@"realm-object-server"]
                  stringByAppendingPathComponent:@"package.json"];
     auto file = [NSData dataWithContentsOfFile:path];
     if (!file) {
@@ -234,7 +233,7 @@ static NSURL *syncDirectoryForChildProcess() {
                        @"--no-package-lock",
                        @"install",
                        [@"mongodb-stitch@" stringByAppendingString:desiredVersion]
-                       ];
+    ];
     [task launch];
     [task waitUntilExit];
 }
@@ -258,7 +257,7 @@ static NSURL *syncDirectoryForChildProcess() {
 
 + (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
     return [RLMAppCredentials credentialsWithUsername:name
-                                              password:@"a"];
+                                             password:@"a"];
 }
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm {
@@ -294,40 +293,40 @@ static NSURL *syncDirectoryForChildProcess() {
     }
 }
 
-- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
-    return [self openRealmForURL:url user:user immediatelyBlock:nil];
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user {
+    return [self openRealmForPartitionValue:partitionValue user:user immediatelyBlock:nil];
 }
 
-- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user immediatelyBlock:(void(^)(void))block {
-    return [self openRealmForURL:url
-                            user:user
-                   encryptionKey:nil
-                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-                immediatelyBlock:block];
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user immediatelyBlock:(void(^)(void))block {
+    return [self openRealmForPartitionValue:partitionValue
+                                       user:user
+                              encryptionKey:nil
+                                 stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                           immediatelyBlock:block];
 }
 
-- (RLMRealm *)openRealmForURL:(NSURL *)url
-                         user:(RLMSyncUser *)user
-                encryptionKey:(nullable NSData *)encryptionKey
-                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
-             immediatelyBlock:(nullable void(^)(void))block {
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
+                                    user:(RLMSyncUser *)user
+                           encryptionKey:(nullable NSData *)encryptionKey
+                              stopPolicy:(RLMSyncStopPolicy)stopPolicy
+                        immediatelyBlock:(nullable void(^)(void))block {
     const NSTimeInterval timeout = 4;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncManager.sharedManager.sessionCompletionNotifier = ^(NSError *error) {
         if (error) {
-            XCTFail(@"Received an asynchronous error when trying to open Realm at '%@' for user '%@': %@ (process: %@)",
-                    url, user.identity, error, self.isParent ? @"parent" : @"child");
+            XCTFail(@"Received an asynchronous error when trying to open Realm with partitin value '%@' for user '%@': %@ (process: %@)",
+                    partitionValue, user.identity, error, self.isParent ? @"parent" : @"child");
         }
         dispatch_semaphore_signal(sema);
     };
 
-    RLMRealm *realm = [self immediatelyOpenRealmForURL:url user:user encryptionKey:encryptionKey stopPolicy:stopPolicy];
+    RLMRealm *realm = [self immediatelyOpenRealmForPartitionValue:partitionValue user:user encryptionKey:encryptionKey stopPolicy:stopPolicy];
     if (block) {
         block();
     }
     // Wait for login to succeed or fail.
     XCTAssert(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0,
-              @"Timed out while trying to asynchronously open Realm for URL: %@", url);
+              @"Timed out while trying to asynchronously open Realm for partition value: %@", partitionValue);
     RLMSyncManager.sharedManager.sessionCompletionNotifier = nil;
     return realm;
 }
@@ -337,14 +336,14 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMRealm *)openRealmWithConfiguration:(RLMRealmConfiguration *)configuration
-             immediatelyBlock:(nullable void(^)(void))block {
+                        immediatelyBlock:(nullable void(^)(void))block {
     const NSTimeInterval timeout = 4;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMSyncConfiguration *syncConfig = configuration.syncConfiguration;
     RLMSyncManager.sharedManager.sessionCompletionNotifier = ^(NSError *error) {
         if (error) {
-            XCTFail(@"Received an asynchronous error when trying to open Realm at '%@' for user '%@': %@ (process: %@)",
-                    syncConfig.realmURL, syncConfig.user.identity, error, self.isParent ? @"parent" : @"child");
+            XCTFail(@"Received an asynchronous error when trying to open Realm with partition value '%@' for user '%@': %@ (process: %@)",
+                    syncConfig.partitionValue, syncConfig.user.identity, error, self.isParent ? @"parent" : @"child");
         }
         dispatch_semaphore_signal(sema);
     };
@@ -355,21 +354,21 @@ static NSURL *syncDirectoryForChildProcess() {
     }
     // Wait for login to succeed or fail.
     XCTAssert(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0,
-              @"Timed out while trying to asynchronously open Realm for URL: %@", syncConfig.realmURL);
+              @"Timed out while trying to asynchronously open Realm for partition value: %@", syncConfig.partitionValue);
     return realm;
 }
-- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
-    return [self immediatelyOpenRealmForURL:url
-                                       user:user
-                              encryptionKey:nil
-                                 stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user {
+    return [self immediatelyOpenRealmForPartitionValue:partitionValue
+                                                  user:user
+                                         encryptionKey:nil
+                                            stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
 }
 
-- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url
-                                    user:(RLMSyncUser *)user
-                           encryptionKey:(NSData *)encryptionKey
-                              stopPolicy:(RLMSyncStopPolicy)stopPolicy {
-    auto c = [user configurationWithURL:url];
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue
+                                               user:(RLMSyncUser *)user
+                                      encryptionKey:(NSData *)encryptionKey
+                                         stopPolicy:(RLMSyncStopPolicy)stopPolicy {
+    auto c = [user configurationWithPartitionValue:partitionValue];
     c.encryptionKey = encryptionKey;
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;
@@ -381,8 +380,10 @@ static NSURL *syncDirectoryForChildProcess() {
                                   server:(NSURL *)url {
     RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     __block RLMSyncUser* theUser;
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
     [app loginWithCredential:credentials completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable) {
         theUser = user;
+        [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
     XCTAssertTrue(theUser.state == RLMSyncUserStateLoggedIn, @"User should have been valid, but wasn't");
@@ -512,9 +513,8 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)resetSyncManager {
-//    [RLMSyncManager.sharedManager._allUsers makeObjectsPerformSelector:@selector(logOutWithCompletion)];
+    //    [RLMSyncManager.sharedManager._allUsers makeObjectsPerformSelector:@selector(logOutWithCompletion)];
     [RLMSyncManager resetForTesting];
-    [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:NO blockOnRefreshCompletion:nil];
 }
 
 @end

@@ -18,7 +18,6 @@
 
 #import "RLMSyncTestCase.h"
 #import "RLMTestUtils.h"
-#import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 
 #import "RLMAppCredentials.h"

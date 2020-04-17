@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMApp.h>
+#import <memory>
 
 namespace realm {
 namespace app {
@@ -30,7 +31,7 @@ class Optional;
 }
 
 @interface RLMApp ()
-- (realm::app::App&)_realmApp;
+- (std::shared_ptr<realm::app::App>)_realmApp;
 
 - (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
             completion:(RLMOptionalErrorBlock)completion;

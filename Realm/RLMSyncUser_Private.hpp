@@ -35,10 +35,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 class CocoaSyncUserContext : public SyncUserContext {
 public:
-    void register_refresh_handle(const std::string& path, RLMSyncSessionRefreshHandle *handle);
-    void unregister_refresh_handle(const std::string& path);
-    void invalidate_all_handles();
-
+    
     RLMUserErrorReportingBlock error_handler() const;
     void set_error_handler(RLMUserErrorReportingBlock);
 
@@ -65,6 +62,8 @@ private:
 - (instancetype)initWithSyncUser:(std::shared_ptr<SyncUser>)user;
 - (std::shared_ptr<SyncUser>)_syncUser;
 + (void)_setUpBindingContextFactory;
+@property (weak, readonly) RLMApp* app;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -29,7 +29,7 @@
 typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
     /// The user is logged out. Call `logInWithCredentials:...` with valid credentials to log the user back in.
     RLMSyncUserStateLoggedOut,
-    /// The user is logged in, and any Realms associated with it are syncing with the Realm Object Server.
+    /// The user is logged in, and any Realms associated with it are syncing with MongoDB Realm.
     RLMSyncUserStateLoggedIn,
     /// The user has been removed, and cannot be used.
     RLMSyncUserStateRemoved,
@@ -56,7 +56,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  A user may have one or more credentials associated with it. These credentials
  uniquely identify the user to the authentication provider, and are used to sign
- into a Realm Object Server user account.
+ into a MongoDB Realm user account.
 
  Note that user objects are only vended out via SDK APIs, and cannot be directly
  initialized. User objects can be accessed from any thread.
@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMSyncUser : NSObject
 
 /**
- The unique Realm Object Server user ID string identifying this user.
+ The unique MongoDB Realm user ID string identifying this user.
  */
 @property (nullable, nonatomic, readonly) NSString *identity;
 
@@ -80,7 +80,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The user's refresh token used to access the Realm Application.
 
- This is required to make HTTP requests to Realm Object Server's REST API
+ This is required to make HTTP requests to MongoDB Realm's REST API
  for functionality not exposed natively. It should be treated as sensitive data.
  */
 @property (nullable, nonatomic, readonly) NSString *accessToken;
@@ -93,41 +93,25 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark - Lifecycle
 
 /**
- Returns the default configuration for the user. The default configuration
- points to the default query-based Realm on the server the user authenticated against.
- */
-- (RLMRealmConfiguration *)configuration NS_REFINED_FOR_SWIFT;
-
-/**
  Create a query-based configuration instance for the given url.
 
- @param url The unresolved absolute URL to the Realm on the Realm Object Server,
-            e.g. "realm://example.org/~/path/to/realm". "Unresolved" means the
-            path should contain the wildcard marker `~`, which will automatically
-            be filled in with the user identity by the Realm Object Server.
- @return A default configuration object with the sync configuration set to use the given URL.
+ @param partitionValue FIXME
+ @return A default configuration object with the sync configuration set to use the given partition value.
  */
-- (RLMRealmConfiguration *)configurationWithURL:(nullable NSURL *)url NS_REFINED_FOR_SWIFT;
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable NSString *)partitionValue NS_REFINED_FOR_SWIFT;
 
 /**
  Create a configuration instance for the given url.
 
- @param url The unresolved absolute URL to the Realm on the Realm Object Server,
-            e.g. "realm://example.org/~/path/to/realm". "Unresolved" means the
-            path should contain the wildcard marker `~`, which will automatically
-            be filled in with the user identity by the Realm Object Server.
+ @param partitionValue FIXME
  @param enableSSLValidation If NO, invalid SSL certificates for the server will
                             not be rejected. THIS SHOULD NEVER BE USED IN
                             PRODUCTION AND EXISTS ONLY FOR TESTING PURPOSES.
- @param urlPrefix A prefix which is prepending to URLs constructed for
-                  the server. This should normally be `nil`, and customized only
-                  to match corresponding settings on the server.
  @return A default configuration object with the sync configuration set to use
          the given URL and options.
  */
-- (RLMRealmConfiguration *)configurationWithURL:(nullable NSURL *)url
-                            enableSSLValidation:(bool)enableSSLValidation
-                                      urlPrefix:(nullable NSString *)urlPrefix NS_REFINED_FOR_SWIFT;
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable NSString *)partitionValue
+                                       enableSSLValidation:(bool)enableSSLValidation NS_REFINED_FOR_SWIFT;
 
 /**
  An optional error handler which can be set to notify the host application when
@@ -197,12 +181,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSArray<RLMSyncUserAccountInfo *> *accounts;
 
 /**
- The identity issued to this user by the Realm Object Server.
+ The identity issued to this user by MongoDB Realm.
  */
 @property (nonatomic, readonly) NSString *identity;
 
 /**
- Metadata about this user stored on the Realm Object Server.
+ Metadata about this user stored on MongoDB Realm.
  */
 @property (nonatomic, readonly) NSDictionary<NSString *, NSString *> *metadata;
 

@@ -29,7 +29,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  A configuration object representing configuration state for Realms intended
- to sync with a Realm Object Server.
+ to sync with MongoDB Realm.
 
  This property is mutually exclusive with both `inMemoryIdentifier` and `fileURL`;
  setting any one of the three properties will automatically nil out the other two.
