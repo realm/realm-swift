@@ -310,44 +310,6 @@ public struct SyncConfiguration {
     }
 }
 
-/// A `AppCredentials` represents data that uniquely identifies a Realm Object Server user.
-public struct AppCredentials {
-    /// An account token serialized as a string
-    public typealias Token = String
-
-    internal let credentials: RLMAppCredentials
-
-    internal init(_ credentials: RLMAppCredentials) {
-        self.credentials = credentials
-    }
-
-    /// Initialize new credentials using a Facebook account token.
-    public static func facebook(token: Token) -> AppCredentials {
-        return AppCredentials(RLMAppCredentials(facebookToken: token))
-    }
-
-    /// Initialize new credentials using a Google account token.
-    public static func google(token: Token) -> AppCredentials {
-        return AppCredentials(RLMAppCredentials(googleToken: token))
-    }
-
-    /// Initialize new credentials using a Realm Object Server username and password.
-    public static func usernamePassword(username: String,
-                                        password: String) -> AppCredentials {
-        return AppCredentials(RLMAppCredentials(username: username, password: password))
-    }
-
-    /// Initialize new credentials using a JSON Web Token.
-    public static func jwt(_ token: Token) -> AppCredentials {
-        return AppCredentials(RLMAppCredentials(jwt: token))
-    }
-
-    /// Initialize new credentials anonymously
-    public static func anonymous() -> AppCredentials {
-        return AppCredentials(RLMAppCredentials.anonymous())
-    }
-}
-
 extension SyncUser {
     /**
      An optional error handler which can be set to notify the host application when

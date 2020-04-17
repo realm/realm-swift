@@ -440,9 +440,6 @@
 		C2CAAE771E9BB5760025454C /* system_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2CAAE751E9BB5760025454C /* system_configuration.cpp */; };
 		C2CAAE781E9BB5760025454C /* system_configuration.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2CAAE751E9BB5760025454C /* system_configuration.cpp */; };
 		C2CAAE7A1E9BB5760025454C /* system_configuration.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C2CAAE761E9BB5760025454C /* system_configuration.hpp */; };
-		CF1CEA7B24420CAF0076C152 /* UserAPIKeyProviderClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF1CEA7A24420CAF0076C152 /* UserAPIKeyProviderClient.swift */; };
-		CF1CEA7D24420CEE0076C152 /* UsernamePasswordProviderClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF1CEA7C24420CEE0076C152 /* UsernamePasswordProviderClient.swift */; };
-		CF1CEA7F24420D290076C152 /* ProviderClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF1CEA7E24420D290076C152 /* ProviderClient.swift */; };
 		CF6E0482242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0480242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF6E0483242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */; };
 		CF6E0486242A321200DB7F14 /* RLMProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0484242A321200DB7F14 /* RLMProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -949,9 +946,6 @@
 		C2CAAE721E9642FF0025454C /* network_reachability.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = network_reachability.hpp; path = sync/impl/network_reachability.hpp; sourceTree = "<group>"; };
 		C2CAAE751E9BB5760025454C /* system_configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = system_configuration.cpp; sourceTree = "<group>"; };
 		C2CAAE761E9BB5760025454C /* system_configuration.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = system_configuration.hpp; sourceTree = "<group>"; };
-		CF1CEA7A24420CAF0076C152 /* UserAPIKeyProviderClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UserAPIKeyProviderClient.swift; path = RealmSwift/UserAPIKeyProviderClient.swift; sourceTree = SOURCE_ROOT; };
-		CF1CEA7C24420CEE0076C152 /* UsernamePasswordProviderClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsernamePasswordProviderClient.swift; sourceTree = "<group>"; };
-		CF1CEA7E24420D290076C152 /* ProviderClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProviderClient.swift; sourceTree = "<group>"; };
 		CF6E0480242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMUsernamePasswordProviderClient.h; sourceTree = "<group>"; };
 		CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUsernamePasswordProviderClient.mm; sourceTree = "<group>"; };
 		CF6E0484242A321200DB7F14 /* RLMProviderClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMProviderClient.h; sourceTree = "<group>"; };
@@ -1474,9 +1468,6 @@
 		CF1CEA7924420C910076C152 /* Provider Clients */ = {
 			isa = PBXGroup;
 			children = (
-				CF1CEA7A24420CAF0076C152 /* UserAPIKeyProviderClient.swift */,
-				CF1CEA7C24420CEE0076C152 /* UsernamePasswordProviderClient.swift */,
-				CF1CEA7E24420D290076C152 /* ProviderClient.swift */,
 			);
 			path = "Provider Clients";
 			sourceTree = "<group>";
@@ -2542,14 +2533,11 @@
 				3FB6ABD72416A26100E318C2 /* ObjectId.swift in Sources */,
 				3FE5818622C2B4B900BA10E7 /* ObjectiveCSupport+Sync.swift in Sources */,
 				5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */,
-				CF1CEA7B24420CAF0076C152 /* UserAPIKeyProviderClient.swift in Sources */,
 				5D660FF51BE98D670021E04F /* ObjectSchema.swift in Sources */,
-				CF1CEA7F24420D290076C152 /* ProviderClient.swift in Sources */,
 				CFB4313A243DF87100471C18 /* RealmApp.swift in Sources */,
 				5D660FF61BE98D670021E04F /* Optional.swift in Sources */,
 				5D660FF71BE98D670021E04F /* Property.swift in Sources */,
 				5D660FF81BE98D670021E04F /* Realm.swift in Sources */,
-				CF1CEA7D24420CEE0076C152 /* UsernamePasswordProviderClient.swift in Sources */,
 				1AB605D31D495927007F53DE /* RealmCollection.swift in Sources */,
 				5D660FFA1BE98D670021E04F /* RealmConfiguration.swift in Sources */,
 				5D660FFB1BE98D670021E04F /* Results.swift in Sources */,
