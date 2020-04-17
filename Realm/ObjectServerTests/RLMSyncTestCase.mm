@@ -115,9 +115,9 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (instancetype)init {
     if (self = [super init]) {
-        [self cleanUp];
-
         [self downloadAdminSDK];
+
+        [self cleanUp];
 
         NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
 
@@ -208,7 +208,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSError *error;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:file options:0 error:&error];
     if (!json) {
-        NSLog(@"Error reading version from installed ROS: %@", error);
+        NSLog(@"Error reading version from installed Admin SDK: %@", error);
         abort();
     }
 
