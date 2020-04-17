@@ -1,23 +1,20 @@
-x.y.z Release notes (yyyy-MM-dd)
+4.4.1 Release notes (2020-04-16)
 =============================================================
+
 ### Enhancements
-* None.
+
+* Upgrade Xcode 11.4 binaries to Xcode 11.4.1.
 
 ### Fixed
+
 * Fix a "previous <= m_schema_transaction_version_max" assertion failure caused
   by a race condition that could occur after performing a migration. (Since 3.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 4.x.y series.
 * Carthage release for Swift is built with Xcode 11.4.1.
-
-### Internal
-Upgraded realm-core from ? to ?
-Upgraded realm-sync from ? to ?
 
 4.4.0 Release notes (2020-03-26)
 =============================================================
