@@ -149,13 +149,17 @@ echo "Running with ACTION=${ACTION}"
 
 function build_action() {
     echo "building baas"
-    mkdir -p $BUILD_DIR
-    cd $BUILD_DIR
-    setup_mongod
-    run_mongod &
-    wait_for_mongod
-    setup_stitch
-    shutdown_mongod
+    if [ ! -d "mongodb-macos-x86_64-$mongodb_version" ]; then
+        mkdir -p $BUILD_DIR
+        cd $BUILD_DIR
+        setup_mongod
+        run_mongod &
+        wait_for_mongod
+        setup_stitch
+        shutdown_mongod
+    else
+        echo "MongoDB Realm already exists"
+    fi
 }
 
 function clean_action() {
