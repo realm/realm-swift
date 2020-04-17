@@ -201,11 +201,11 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     }
     NSMutableArray<RLMSyncUserIdentity *> *buffer = [NSMutableArray array];
     auto identities = _user->identities();
-    for (auto identity : identities) {
+    for (auto& identity : identities) {
         [buffer addObject: [[RLMSyncUserIdentity alloc] initSyncUserIdentityWithProviderType:@(identity.provider_type.c_str())
                                                                                     identity:@(identity.id.c_str())]];
     }
-                            
+
     return [buffer copy];
 }
 

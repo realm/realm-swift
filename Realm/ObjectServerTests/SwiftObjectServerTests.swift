@@ -560,11 +560,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     let appName = "translate-utwuv"
 
     private func realmAppConfig() -> AppConfiguration {
-
-        return AppConfiguration.init(baseURL: "http://localhost:9090",
-                                     transport: nil,
-                                     localAppName: "auth-integration-tests",
-                                     localAppVersion: "20180301")
+        
+        return AppConfiguration(baseURL: "http://localhost:9090",
+                                transport: nil,
+                                localAppName: "auth-integration-tests",
+                                localAppVersion: "20180301")
     }
 
     func testRealmAppInit() {
@@ -584,7 +584,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let registerUserEx = expectation(description: "Register user")
 
         app.usernamePasswordProviderClient().registerEmail(email, password: password) { (error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             registerUserEx.fulfill()
         }
         wait(for: [registerUserEx], timeout: 4.0)
@@ -593,7 +593,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         var syncUser: SyncUser?
 
         app.login(withCredential: AppCredentials(username: email, password: password)) { (user, error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             syncUser = user
             loginEx.fulfill()
         }
@@ -616,12 +616,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let registerUser2Ex = expectation(description: "Register user 2")
 
         app.usernamePasswordProviderClient().registerEmail(email1, password: password1) { (error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             registerUser1Ex.fulfill()
         }
 
         app.usernamePasswordProviderClient().registerEmail(email2, password: password2) { (error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             registerUser2Ex.fulfill()
         }
 
@@ -634,7 +634,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         var syncUser2: SyncUser?
 
         app.login(withCredential: AppCredentials(username: email1, password: password1)) { (user, error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             syncUser1 = user
             login1Ex.fulfill()
         }
@@ -642,7 +642,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [login1Ex], timeout: 4.0)
 
         app.login(withCredential: AppCredentials(username: email2, password: password2)) { (user, error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             syncUser2 = user
             login2Ex.fulfill()
         }
@@ -659,7 +659,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let removeEx = expectation(description: "Remove user 1")
 
         app.remove(syncUser1!) { (error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             removeEx.fulfill()
         }
 
@@ -679,7 +679,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let registerUserEx = expectation(description: "Register user")
 
         app.usernamePasswordProviderClient().registerEmail(email, password: password) { (error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             registerUserEx.fulfill()
         }
         wait(for: [registerUserEx], timeout: 4.0)
@@ -690,7 +690,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let credentials = AppCredentials(username: email, password: password)
 
         app.login(withCredential: AppCredentials.anonymous()) { (user, error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             syncUser = user
             loginEx.fulfill()
         }
@@ -700,7 +700,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let linkEx = expectation(description: "Link user")
 
         app.linkUser(syncUser!, credentials: credentials) { (user, error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             syncUser = user
             linkEx.fulfill()
         }
@@ -723,7 +723,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let registerUserEx = expectation(description: "Register user")
 
         app.usernamePasswordProviderClient().registerEmail(email, password: password) { (error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             registerUserEx.fulfill()
         }
         wait(for: [registerUserEx], timeout: 4.0)
@@ -778,7 +778,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let registerUserEx = expectation(description: "Register user")
 
         app.usernamePasswordProviderClient().registerEmail(email, password: password) { (error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             registerUserEx.fulfill()
         }
         wait(for: [registerUserEx], timeout: 4.0)
@@ -787,7 +787,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let credentials = AppCredentials(username: email, password: password)
 
         app.login(withCredential: credentials) { (_, error) in
-            XCTAssertTrue(error == nil)
+            XCTAssertNil(error)
             loginEx.fulfill()
         }
 
