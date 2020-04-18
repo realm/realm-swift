@@ -25,8 +25,9 @@ source_root="$(cd "$(dirname "$0")"/../..; pwd)"
 export $(xargs < "${source_root}/dependencies.list")
 
 mongodb_version=4.2.5
-go_version=1.14
+go_version=1.14.2
 node_version=8.11.2
+STITCH_VERSION=f2e29a641d8c5d9019b7a67d8a639f2476e14e2e
 
 mongodb_url="https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-$mongodb_version.tgz"
 transpiler_target="node8-macos"
@@ -81,7 +82,7 @@ setup_stitch() {
     cd stitch
 
     if [ -d .git ]; then
-        git checkout "$STITCH_VERSION"
+        git checkout $STITCH_VERSION
     fi
 
     if [ ! -d etc/dylib ]; then
@@ -120,7 +121,7 @@ setup_stitch() {
     yarn install && yarn run build -t "${transpiler_target}"
 
     cd "$BASE_DIR"
-    if ! command -v go >/dev/null 2>&1; then
+    if ! command -v go >/dev/null 2>&1 || [ ! -d $BASE_DIR/go ]; then
         echo "downloading go"
         curl --silent "https://dl.google.com/go/go$go_version.darwin-amd64.tar.gz" | tar xz
         export GOROOT="$BASE_DIR/go"

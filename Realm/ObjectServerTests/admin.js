@@ -22,6 +22,114 @@ async function create() {
         autoConfirm: true
     }});
 
+    await app.secrets().create({
+        name: "BackingDB_uri",
+        value: "mongodb://localhost:26000"
+    });
+
+    const serviceResponse = await app.services().create({
+        "name": "mongodb1",
+        "type": "mongodb",
+        "config": {
+            "uri": "mongodb://localhost:26000",
+            "sync": {
+                "state": "enabled",
+                "database_name": "test_data",
+                "partition": {
+                    "key": "realm_id",
+                    "permissions": {
+                        "read": true,
+                        "write": true
+                    }
+                }
+            }
+        }
+    });
+
+    await app.sync().config().update({
+        "development_mode_enabled": true
+    });
+
+    await app.services().service(serviceResponse['_id']).rules().create({
+        "database": "test_data",
+        "collection": "Person",
+        "roles": [
+            {
+                "name": "default",
+                "apply_when": {},
+                "insert": true,
+                "delete": true,
+                "additional_fields": {}
+            }
+        ],
+        "schema": {
+            "properties": {
+                "_id": {
+                    "bsonType": "objectId"
+                },
+                "age": {
+                    "bsonType": "int"
+                },
+                "dogs": {
+                    "bsonType": "array",
+                    "items": {
+                        "bsonType": "objectId"
+                    }
+                },
+                "firstName": {
+                    "bsonType": "string"
+                },
+                "lastName": {
+                    "bsonType": "string"
+                },
+                "realm_id": {
+                    "bsonType": "string"
+                }
+            },
+            "required": [
+                "firstName",
+                "lastName",
+                "age",
+                "dogs"
+            ],
+            "title": "Person"
+        }
+    });
+
+    await app.services().service(serviceResponse['_id']).rules().create({
+        "database": "test_data",
+        "collection": "Dog",
+        "roles": [
+            {
+                "name": "default",
+                "apply_when": {},
+                "insert": true,
+                "delete": true,
+                "additional_fields": {}
+            }
+        ],
+        "schema": {
+            "properties": {
+                "_id": {
+                    "bsonType": "objectId"
+                },
+                "breed": {
+                    "bsonType": "string"
+                },
+                "name": {
+                    "bsonType": "string"
+                },
+                "realm_id": {
+                    "bsonType": "string"
+                }
+            },
+            "required": [
+                "name"
+            ],
+            "title": "Dog"
+        }
+    });
+
     process.stdout.write(appResponse['client_app_id']);
 }
 

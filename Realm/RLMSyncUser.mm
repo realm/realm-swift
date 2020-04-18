@@ -132,11 +132,13 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     context_for(_user).set_error_handler([errorHandler copy]);
 }
 
-- (nullable RLMSyncSession *)sessionForURL:(NSURL *)url {
+- (nullable RLMSyncSession *)sessionForPartitionValue:(NSString *)partitionValue {
     if (!_user) {
         return nil;
     }
-    auto path = SyncManager::shared().path_for_realm(*_user, [url.absoluteString UTF8String]);
+
+    auto partition_path = _user->identity() + [partitionValue UTF8String];
+    auto path = SyncManager::shared().path_for_realm(*_user, partition_path);
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }

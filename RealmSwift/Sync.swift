@@ -388,7 +388,7 @@ extension SyncUser {
     public func configuration(partitionValue: String,
                               serverValidationPolicy: ServerValidationPolicy = .system,
                               cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
-        let config = self.__configuration(withParitionValue: partitionValue)
+        let config = self.__configuration(withPartitionValue: partitionValue)
         let syncConfig = config.syncConfiguration!
         syncConfig.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         switch serverValidationPolicy {

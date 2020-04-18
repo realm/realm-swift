@@ -36,37 +36,27 @@
 
 #pragma mark - Test objects
 
-@interface PartialSyncObjectA : RLMObject
-@property NSInteger number;
-@property NSString *string;
-+ (instancetype)objectWithNumber:(NSInteger)number string:(NSString *)string;
+@interface Dog : RLMObject
+@property RLMObjectId *_id;
+@property NSString *breed;
+@property NSString *name;
+@property NSString *realm_id;
 @end
 
-@interface PartialSyncObjectB : RLMObject
-@property NSInteger number;
-@property NSString *firstString;
-@property NSString *secondString;
-+ (instancetype)objectWithNumber:(NSInteger)number firstString:(NSString *)first secondString:(NSString *)second;
-@end
+//@implementation Dog
+//@end
 
-@implementation PartialSyncObjectA
-+ (instancetype)objectWithNumber:(NSInteger)number string:(NSString *)string {
-    PartialSyncObjectA *object = [[PartialSyncObjectA alloc] init];
-    object.number = number;
-    object.string = string;
-    return object;
-}
+RLM_ARRAY_TYPE(Dog)
+@interface Person : RLMObject
+@property RLMObjectId *_id;
+@property NSInteger age;
+@property RLMArray<Dog *><Dog> *dogs;
+@property NSString *firstName;
+@property NSString *lastName;
+@property NSString *realm_id;
 @end
-
-@implementation PartialSyncObjectB
-+ (instancetype)objectWithNumber:(NSInteger)number firstString:(NSString *)first secondString:(NSString *)second {
-    PartialSyncObjectB *object = [[PartialSyncObjectB alloc] init];
-    object.number = number;
-    object.firstString = first;
-    object.secondString = second;
-    return object;
-}
-@end
+//@implementation Person
+//@end
 
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
@@ -404,27 +394,24 @@
 
 }
 
-#if REALM_ENABLE_AUTH_TESTS
+//#if REALM_ENABLE_AUTH_TESTS
 
 #pragma mark - Username Password
 
 /// Valid username/password credentials should be able to log in a user. Using the same credentials should return the
 /// same user object.
 - (void)testUsernamePasswordAuthentication {
-    RLMSyncUser *firstUser = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:YES]
-                                                    server:[RLMSyncTestCase authServerURL]];
-    RLMSyncUser *secondUser = [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                             register:NO]
-                                                     server:[RLMSyncTestCase authServerURL]];
+    RLMSyncUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                                            register:YES]];
+    RLMSyncUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                                             register:NO]];
     // Two users created with the same credential should resolve to the same actual user.
     XCTAssertTrue([firstUser.identity isEqualToString:secondUser.identity]);
 }
 
 /// An invalid username/password credential should not be able to log in a user and a corresponding error should be generated.
 - (void)testInvalidPasswordAuthentication {
-    [self logInUserForCredentials:[RLMSyncTestCase basicCredentialsWithName:NSStringFromSelector(_cmd) register:YES]
-                          server:[RLMSyncTestCase authServerURL]];
+    [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:YES]];
 
     RLMAppCredentials *credentials = [RLMAppCredentials credentialsWithUsername:NSStringFromSelector(_cmd)
                                                                        password:@"INVALID_PASSWORD"];
@@ -448,10 +435,9 @@
 
 /// Registering a user with existing username should return corresponding error.
 - (void)testExistingUsernameRegistration {
-    RLMAppCredentials *credentials = [RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                           register:YES];
+    RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd) register:YES];
 
-    [self logInUserForCredentials:credentials server:[RLMSyncTestCase authServerURL]];
+    [self logInUserForCredentials:credentials];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
     // FIXME: [realmapp] This should use the new login
@@ -460,6 +446,7 @@
 }
 
 /// Errors reported in RLMSyncManager.errorHandler shouldn't contain sync error domain errors as underlying error
+#if 0
 - (void)testSyncErrorHandlerErrorDomain {
     RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                                             register:YES]
@@ -484,37 +471,6 @@
     };
 
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
-}
-
-/// The pre-emptive token refresh subsystem should function, and properly refresh the token.
-- (void)testPreemptiveTokenRefresh {
-    // Prepare the test.
-    __block NSInteger refreshCount = 0;
-    __block NSInteger errorCount = 0;
-    [RLMSyncManager sharedManager].errorHandler = ^(__unused NSError *error,
-                                                    __unused RLMSyncSession *session) {
-        errorCount++;
-    };
-
-    __block XCTestExpectation *ex;
-    [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:YES
-                                        blockOnRefreshCompletion:^(BOOL success) {
-        XCTAssertTrue(success);
-        if (refreshCount++ == 3) { // arbitrary choice; refreshes every second
-            [ex fulfill];
-        }
-    }];
-    // Open the Realm.
-    NSURL *url = REALM_URL();
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests
-                                                       basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                       register:true]
-                                               server:[RLMObjectServerTests authServerURL]];
-    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForURL:url user:user];
-    ex = [self expectationWithDescription:@"Timer fired"];
-    [self waitForExpectationsWithTimeout:10 handler:nil];
-    XCTAssertTrue(errorCount == 0);
-    XCTAssertTrue(refreshCount >= 4);
 }
 
 - (void)testLoginConnectionTimeoutFromManager {
@@ -676,30 +632,25 @@
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
     XCTAssertTrue(user.state == RLMSyncUserStateLoggedOut);
 }
-
+#endif
 #pragma mark - Basic Sync
 
 /// It should be possible to successfully open a Realm configured for sync with a normal user.
 - (void)testOpenRealmWithNormalCredentials {
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:YES]
-                                               server:[RLMObjectServerTests authServerURL]];
-    NSURL *url = REALM_URL();
-    RLMRealm *realm = [self openRealmForURL:url user:user];
+    RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:YES]];
+    RLMRealm *realm = [self openRealmForPartitionValue:@"\"foo\"" user:user];
     XCTAssertTrue(realm.isEmpty);
 }
 
 /// If client B adds objects to a synced Realm, client A should see those objects.
 - (void)testAddObjects {
-    NSURL *url = REALM_URL();
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
-                                              server:[RLMObjectServerTests authServerURL]];
-    RLMRealm *realm = [self openRealmForURL:url user:user];
+    RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]];
+    RLMRealm *realm = [self openRealmForPartitionValue:@"\"foo\""
+                                                  user:user];
     if (self.isParent) {
         CHECK_COUNT(0, SyncObject, realm);
         RLMRunChildAndWait();
-        [self waitForDownloadsForUser:user realms:@[realm] realmURLs:@[url] expectedCounts:@[@3]];
+        [self waitForDownloadsForUser:user realms:@[realm] partitionValues:@[@"\"foo\""] expectedCounts:@[@3]];
     } else {
         // Add objects.
         [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
@@ -711,10 +662,9 @@
 /// If client B deletes objects from a synced Realm, client A should see the effects of that deletion.
 - (void)testDeleteObjects {
     NSURL *url = REALM_URL();
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
-                                               server:[RLMObjectServerTests authServerURL]];
-    RLMRealm *realm = [self openRealmForURL:url user:user];
+    RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                                            register:self.isParent]];
+    RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
     if (self.isParent) {
         // Add objects.
         [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1", @"parent-2", @"parent-3"]];
@@ -735,7 +685,7 @@
 }
 
 #pragma mark - Encryption
-
+#if 0
 /// If client B encrypts its synced Realm, client A should be able to access that Realm with a different encryption key.
 - (void)testEncryptedSyncedRealm {
     NSURL *url = REALM_URL();
@@ -794,9 +744,9 @@
         CHECK_COUNT(3, SyncObject, realm);
     }
 }
-
+#endif
 #pragma mark - Multiple Realm Sync
-
+#if 0
 /// If a client opens multiple Realms, there should be one session object for each Realm that was opened.
 - (void)testMultipleRealmsSessions {
     NSURL *urlA = CUSTOM_REALM_URL(@"a");
@@ -917,9 +867,9 @@
         CHECK_COUNT(0, SyncObject, realmC);
     }
 }
-
+#endif
 #pragma mark - Session Lifetime
-
+#if 0
 /// When a session opened by a Realm goes out of scope, it should stay alive long enough to finish any waiting uploads.
 - (void)testUploadChangesWhenRealmOutOfScope {
     const NSInteger OBJECT_COUNT = 10000;
@@ -953,9 +903,9 @@
         CHECK_COUNT(OBJECT_COUNT, SyncObject, realm);
     }
 }
-
+#endif
 #pragma mark - Logging Back In
-
+#if 0
 /// A Realm that was opened before a user logged out should be able to resume uploading if the user logs back in.
 - (void)testLogBackInSameRealmUpload {
     NSURL *url = REALM_URL();
@@ -1845,6 +1795,5 @@ static NSURL *certificateURL(NSString *filename) {
                                                server:[RLMSyncTestCase authServerURL]];
     [self verifyOpenFails:[user configurationWithURL:[NSURL URLWithString:@"realms://localhost:9443/~/default"]]];
 }
-
 #endif
 @end

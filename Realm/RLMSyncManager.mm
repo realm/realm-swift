@@ -222,18 +222,6 @@ static RLMSyncManager *s_sharedManager = nil;
     });
 }
 
-- (NSArray<RLMSyncUser *> *)_allUsers {
-    NSMutableArray<RLMSyncUser *> *buffer = [NSMutableArray array];
-    for (auto user : SyncManager::shared().all_users()) {
-        [buffer addObject:[[RLMSyncUser alloc] initWithSyncUser:std::move(user)]];
-    }
-    return buffer;
-}
-
-- (RLMSyncUser *)_currentUser {
-    return [[RLMSyncUser alloc] initWithSyncUser:SyncManager::shared().get_current_user()];
-}
-
 + (void)resetForTesting {
     RLMSyncManager *manager = self.sharedManager;
     manager->_errorHandler = nil;

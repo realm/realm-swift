@@ -121,7 +121,8 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 }
 
 - (RLMSyncUser *)user {
-    return [[RLMSyncUser alloc] initWithSyncUser:_config->user];
+    return [[RLMSyncUser alloc] initWithSyncUser:_config->user
+                                             app:[[RLMApp alloc] initWithApp:_config->app]];
 }
 
 - (RLMSyncStopPolicy)stopPolicy {

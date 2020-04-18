@@ -22,10 +22,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMSyncUser (ObjectServerTests)
 
-- (BOOL)waitForUploadToFinish:(NSURL *)url;
-- (BOOL)waitForDownloadToFinish:(NSURL *)url;
+- (BOOL)waitForUploadToFinish:(NSString *)partitionValue;
+- (BOOL)waitForDownloadToFinish:(NSString *)partitionValue;
 
-- (void)simulateClientResetErrorForSession:(NSURL *)url;
+- (void)simulateClientResetErrorForSession:(NSString *)partitionValue;
 
 @end
 

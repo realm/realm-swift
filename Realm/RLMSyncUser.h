@@ -134,7 +134,7 @@ NS_ASSUME_NONNULL_BEGIN
  Retrieve a valid session object belonging to this user for a given URL, or `nil`
  if no such object exists.
  */
-- (nullable RLMSyncSession *)sessionForURL:(NSURL *)url;
+- (nullable RLMSyncSession *)sessionForPartitionValue:(NSString *)partitionValue;
 
 /**
  Retrieve all the valid sessions belonging to this user.

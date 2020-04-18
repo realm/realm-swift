@@ -20,10 +20,16 @@ import XCTest
 import RealmSwift
 
 class SwiftSyncObject: Object {
+    @objc dynamic var _id: ObjectId = ObjectId()
     @objc dynamic var stringProp: String = ""
+
+    override class func primaryKey() -> String? {
+        return "_id"
+    }
 }
 
 class SwiftHugeSyncObject: Object {
+    @objc dynamic var _id: ObjectId = ObjectId()
     @objc dynamic var dataProp: NSData?
 
     required init() {
@@ -34,6 +40,10 @@ class SwiftHugeSyncObject: Object {
         free(ptr)
     }
 
+    override class func primaryKey() -> String? {
+        return "_id"
+    }
+
     required init(realm: RLMRealm, schema: RLMObjectSchema) {
         fatalError("init(realm:schema:) has not been implemented")
     }
@@ -42,29 +52,29 @@ class SwiftHugeSyncObject: Object {
     }
 }
 
-class SwiftPartialSyncObjectA: Object {
-    @objc dynamic var number: Int = 0
-    @objc dynamic var string: String = ""
-
-    convenience init(number: Int, string: String) {
-        self.init()
-        self.number = number
-        self.string = string
-    }
-}
-
-class SwiftPartialSyncObjectB: Object {
-    @objc dynamic var number: Int = 0
-    @objc dynamic var firstString: String = ""
-    @objc dynamic var secondString: String = ""
-
-    convenience init(number: Int, firstString: String, secondString: String) {
-        self.init()
-        self.number = number
-        self.firstString = firstString
-        self.secondString = secondString
-    }
-}
+//class SwiftPartialSyncObjectA: Object {
+//    @objc dynamic var number: Int = 0
+//    @objc dynamic var string: String = ""
+//
+//    convenience init(number: Int, string: String) {
+//        self.init()
+//        self.number = number
+//        self.string = string
+//    }
+//}
+//
+//class SwiftPartialSyncObjectB: Object {
+//    @objc dynamic var number: Int = 0
+//    @objc dynamic var firstString: String = ""
+//    @objc dynamic var secondString: String = ""
+//
+//    convenience init(number: Int, firstString: String, secondString: String) {
+//        self.init()
+//        self.number = number
+//        self.firstString = firstString
+//        self.secondString = secondString
+//    }
+//}
 
 // MARK: Test case
 

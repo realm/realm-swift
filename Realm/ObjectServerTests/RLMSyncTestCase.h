@@ -30,10 +30,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface SyncObject : RLMObject
+@property RLMObjectId *_id;
 @property NSString *stringProp;
 @end
 
 @interface HugeSyncObject : RLMObject
+@property RLMObjectId *_id;
 @property NSData *dataProp;
 + (instancetype)object;
 @end
@@ -44,10 +46,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (RLMAppConfiguration *)defaultAppConfiguration;
 
-+ (NSURL *)authServerURL;
-+ (NSURL *)secureAuthServerURL;
+- (RLMApp *)app;
 
-+ (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
+- (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm;
 
@@ -86,8 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy;
 
 /// Synchronously create, log in, and return a user.
-- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials
-                                  server:(NSURL *)url;
+- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials;
 
 /// Add a number of objects to a Realm.
 - (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions;
@@ -95,7 +95,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// Synchronously wait for downloads to complete for any number of Realms, and then check their `SyncObject` counts.
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
                          realms:(NSArray<RLMRealm *> *)realms
-                      realmURLs:(NSArray<NSURL *> *)realmURLs
+                      partitionValues:(NSArray<NSString *> *)partitionValues
                  expectedCounts:(NSArray<NSNumber *> *)counts;
 
 /// "Prime" the sync manager to signal the given semaphore the next time a session is bound. This method should be
@@ -112,7 +112,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Wait for downloads to complete while spinning the runloop. This method uses expectations.
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
-                            url:(NSURL *)url
+                            partitionValue:(NSString *)partitionValue
                     expectation:(nullable XCTestExpectation *)expectation
                           error:(NSError **)error;
 

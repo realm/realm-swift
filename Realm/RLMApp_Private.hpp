@@ -35,6 +35,9 @@ class Optional;
 
 - (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
             completion:(RLMOptionalErrorBlock)completion;
+
+- (instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app;
+
 @end
 
 NSError *RLMAppErrorToNSError(realm::app::AppError const& appError);

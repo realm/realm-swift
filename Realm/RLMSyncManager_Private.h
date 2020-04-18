@@ -34,10 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)_fireError:(NSError *)error;
 
-- (NSArray<RLMSyncUser *> *)_allUsers;
-
-- (RLMSyncUser *)_currentUser;
-
 + (void)resetForTesting;
 
 - (RLMNetworkRequestOptions *)networkRequestOptions;

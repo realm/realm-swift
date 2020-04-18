@@ -71,9 +71,22 @@ static NSString *nodePath() {
 @end
 
 @implementation SyncObject
++ (NSString *)primaryKey {
+    return @"_id";
+}
++ (NSArray *)requiredProperties {
+    return @[@"_id"];
+}
 @end
 
 @implementation HugeSyncObject
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
++ (NSArray *)requiredProperties {
+    return @[@"_id"];
+}
 
 + (instancetype)object  {
     const NSInteger fakeDataSize = 1000000;
@@ -247,17 +260,22 @@ static NSURL *syncDirectoryForChildProcess() {
     return NO;
 }
 
-+ (NSURL *)authServerURL {
-    return [NSURL URLWithString:@"http://127.0.0.1:9090"];
+
+- (RLMApp *)app {
+    return [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
 }
 
-+ (NSURL *)secureAuthServerURL {
-    return [NSURL URLWithString:@"https://localhost:9443"];
-}
-
-+ (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
+- (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
+    if (shouldRegister) {
+        XCTestExpectation *expectation = [self expectationWithDescription:@""];
+        [[[self app] usernamePasswordProviderClient] registerEmail:name password:@"password" completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
+            [expectation fulfill];
+        }];
+        [self waitForExpectationsWithTimeout:4.0 handler:nil];
+    }
     return [RLMAppCredentials credentialsWithUsername:name
-                                             password:@"a"];
+                                             password:@"password"];
 }
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm {
@@ -282,12 +300,12 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
                          realms:(NSArray<RLMRealm *> *)realms
-                      realmURLs:(NSArray<NSURL *> *)realmURLs
+                      partitionValues:(NSArray<NSString *> *)partitionValues
                  expectedCounts:(NSArray<NSNumber *> *)counts {
-    NSAssert(realms.count == counts.count && realms.count == realmURLs.count,
+    NSAssert(realms.count == counts.count && realms.count == partitionValues.count,
              @"Test logic error: all array arguments must be the same size.");
     for (NSUInteger i = 0; i < realms.count; i++) {
-        [self waitForDownloadsForUser:user url:realmURLs[i] expectation:nil error:nil];
+        [self waitForDownloadsForUser:user partitionValue:partitionValues[i] expectation:nil error:nil];
         [realms[i] refresh];
         CHECK_COUNT([counts[i] integerValue], SyncObject, realms[i]);
     }
@@ -376,8 +394,7 @@ static NSURL *syncDirectoryForChildProcess() {
     return [RLMRealm realmWithConfiguration:c error:nil];
 }
 
-- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials
-                                  server:(NSURL *)url {
+- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials {
     RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     __block RLMSyncUser* theUser;
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
@@ -399,11 +416,11 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
-                            url:(NSURL *)url
+                 partitionValue:(NSString *)partitionValue
                     expectation:(XCTestExpectation *)expectation
                           error:(NSError **)error {
-    RLMSyncSession *session = [user sessionForURL:url];
-    NSAssert(session, @"Cannot call with invalid URL");
+    RLMSyncSession *session = [user sessionForPartitionValue:partitionValue];
+    NSAssert(session, @"Cannot call with invalid partition value");
     XCTestExpectation *ex = expectation ?: [self expectationWithDescription:@"Wait for download completion"];
     __block NSError *theError = nil;
     BOOL queued = [session waitForDownloadCompletionOnQueue:nil callback:^(NSError *err) {
@@ -478,7 +495,7 @@ static NSURL *syncDirectoryForChildProcess() {
     [super setUp];
     self.continueAfterFailure = NO;
 
-    REALM_ASSERT(RLMSyncManager.sharedManager._allUsers.count == 0);
+//    REALM_ASSERT(RLMSyncManager.sharedManager._allUsers.count == 0);
     [self resetSyncManager];
     [self setupSyncManager];
 }

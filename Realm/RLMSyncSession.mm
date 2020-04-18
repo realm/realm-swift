@@ -138,7 +138,7 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 
 - (RLMSyncUser *)parentUser {
     if (auto session = _session.lock()) {
-        return [[RLMSyncUser alloc] initWithSyncUser:session->user()];
+//        return [[RLMSyncUser alloc] initWithSyncUser:session->user()];
     }
     return nil;
 }

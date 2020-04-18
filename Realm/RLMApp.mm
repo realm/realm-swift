@@ -145,6 +145,14 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     return nil;
 }
 
+- (instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app {
+    if (self = [super init]) {
+        _app = app;
+        return self;
+    }
+    return nil;
+}
+
 + (instancetype)app:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
     return [[RLMApp alloc] initWithAppId:appId configuration:configuration];
 }
@@ -154,13 +162,16 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 }
 
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers {
-    NSArray *allUsers = [[RLMSyncManager sharedManager] _allUsers];
-    return [NSDictionary dictionaryWithObjects:allUsers
-                                       forKeys:[allUsers valueForKey:@"identity"]];
+    NSMutableDictionary *buffer = [NSMutableDictionary new];
+    for (auto user : SyncManager::shared().all_users()) {
+        [buffer setValue:[[RLMSyncUser alloc] initWithSyncUser:std::move(user) app:self]
+                  forKey:@(user->identity().c_str())];
+    }
+    return buffer;
 }
 
 - (RLMSyncUser *)currentUser {
-    return [[RLMSyncManager sharedManager] _currentUser];
+    return [[RLMSyncUser alloc] initWithSyncUser:SyncManager::shared().get_current_user() app:self];
 }
 
 - (void)loginWithCredential:(RLMAppCredentials *)credentials
@@ -170,12 +181,12 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
             return completionHandler(nil, RLMAppErrorToNSError(*error));
         }
 
-        completionHandler([[RLMSyncUser alloc] initWithSyncUser:user], nil);
+        completionHandler([[RLMSyncUser alloc] initWithSyncUser:user app:self], nil);
     });
 }
 
 - (RLMSyncUser *)switchToUser:(RLMSyncUser *)syncUser {
-    return [[RLMSyncUser alloc] initWithSyncUser:_app->switch_user(syncUser._syncUser)];
+    return [[RLMSyncUser alloc] initWithSyncUser:_app->switch_user(syncUser._syncUser) app:self];
 }
 
 - (void)removeUser:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
@@ -205,7 +216,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
         
-        completion([[RLMSyncUser alloc] initWithSyncUser:user], nil);
+        completion([[RLMSyncUser alloc] initWithSyncUser:user app:self], nil);
     });
 }
 
