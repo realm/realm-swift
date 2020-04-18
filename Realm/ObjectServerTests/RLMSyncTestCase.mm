@@ -114,9 +114,9 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (instancetype)init {
     if (self = [super init]) {
-        [self cleanUp];
-
         [self downloadAdminSDK];
+
+        [self cleanUp];
 
         NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
 
@@ -188,7 +188,7 @@ static NSURL *syncDirectoryForChildProcess() {
                                                            options:NSRegularExpressionAnchorsMatchLines error:nil];
     auto match = [regex firstMatchInString:file options:0 range:{0, file.length}];
     if (!match) {
-        NSLog(@"Failed to read REALM_OBJECT_SERVER_VERSION from dependencies.list");
+        NSLog(@"Failed to read MONGODB_STITCH_ADMIN_SDK_VERSION from dependencies.list");
         abort();
     }
     return [file substringWithRange:[match rangeAtIndex:1]];
@@ -196,8 +196,8 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (NSString *)currentAdminSDKVersion {
     auto path = [[[[@(__FILE__) stringByDeletingLastPathComponent] // RLMSyncTestCase.mm
-                   stringByAppendingPathComponent:@"node_modules"]
-                  stringByAppendingPathComponent:@"realm-object-server"]
+                 stringByAppendingPathComponent:@"node_modules"]
+                 stringByAppendingPathComponent:@"mongodb-stitch"]
                  stringByAppendingPathComponent:@"package.json"];
     auto file = [NSData dataWithContentsOfFile:path];
     if (!file) {
@@ -207,7 +207,7 @@ static NSURL *syncDirectoryForChildProcess() {
     NSError *error;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:file options:0 error:&error];
     if (!json) {
-        NSLog(@"Error reading version from installed ROS: %@", error);
+        NSLog(@"Error reading version from installed Admin SDK: %@", error);
         abort();
     }
 
