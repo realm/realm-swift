@@ -36,28 +36,6 @@
 
 #pragma mark - Test objects
 
-@interface Dog : RLMObject
-@property RLMObjectId *_id;
-@property NSString *breed;
-@property NSString *name;
-@property NSString *realm_id;
-@end
-
-//@implementation Dog
-//@end
-
-RLM_ARRAY_TYPE(Dog)
-@interface Person : RLMObject
-@property RLMObjectId *_id;
-@property NSInteger age;
-@property RLMArray<Dog *><Dog> *dogs;
-@property NSString *firstName;
-@property NSString *lastName;
-@property NSString *realm_id;
-@end
-//@implementation Person
-//@end
-
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
 
@@ -397,7 +375,7 @@ RLM_ARRAY_TYPE(Dog)
 //#if REALM_ENABLE_AUTH_TESTS
 
 #pragma mark - Username Password
-
+#if 0
 /// Valid username/password credentials should be able to log in a user. Using the same credentials should return the
 /// same user object.
 - (void)testUsernamePasswordAuthentication {
@@ -444,7 +422,7 @@ RLM_ARRAY_TYPE(Dog)
     REALM_UNREACHABLE();
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
-
+#endif
 /// Errors reported in RLMSyncManager.errorHandler shouldn't contain sync error domain errors as underlying error
 #if 0
 - (void)testSyncErrorHandlerErrorDomain {
@@ -648,82 +626,124 @@ RLM_ARRAY_TYPE(Dog)
     RLMRealm *realm = [self openRealmForPartitionValue:@"\"foo\""
                                                   user:user];
     if (self.isParent) {
-        CHECK_COUNT(0, SyncObject, realm);
+        CHECK_COUNT(0, Person, realm);
         RLMRunChildAndWait();
-        [self waitForDownloadsForUser:user realms:@[realm] partitionValues:@[@"\"foo\""] expectedCounts:@[@3]];
+        [self waitForDownloadsForUser:user
+                               realms:@[realm]
+                      partitionValues:@[@"\"foo\""] expectedCounts:@[@1]];
     } else {
         // Add objects.
-        [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+        Person *john = [[Person alloc] init];
+        john._id = [RLMObjectId objectId];
+        john.age = 30;
+        [john.dogs count];
+        john.firstName = @"John";
+        john.lastName = @"Lennon";
+        john.realm_id = @"foo";
+
+        Person *paul = [[Person alloc] init];
+        paul._id = [RLMObjectId objectId];
+        paul.age = 30;
+        paul.firstName = @"Paul";
+        paul.lastName = @"McCartney";
+        paul.realm_id = @"foo";
+
+        Person *ringo = [[Person alloc] init];
+        ringo._id = [RLMObjectId objectId];
+        ringo.age = 30;
+        ringo.firstName = @"Ringo";
+        ringo.lastName = @"Star";
+        ringo.realm_id = @"foo";
+
+        [self addPersonsToRealm:realm
+                        persons:@[john]];
         [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(3, SyncObject, realm);
     }
 }
 
 /// If client B deletes objects from a synced Realm, client A should see the effects of that deletion.
 - (void)testDeleteObjects {
-    NSURL *url = REALM_URL();
     RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                                             register:self.isParent]];
-    RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
+    RLMRealm *realm = [self openRealmForPartitionValue:@"\"foo\"" user:user];
     if (self.isParent) {
+        Person *john = [[Person alloc] init];
+        john._id = [RLMObjectId objectId];
+        john.age = 30;
+        [john.dogs count];
+        john.firstName = @"John";
+        john.lastName = @"Lennon";
+        john.realm_id = @"foo";
         // Add objects.
-        [self addSyncObjectsToRealm:realm descriptions:@[@"parent-1", @"parent-2", @"parent-3"]];
+        [self addPersonsToRealm:realm persons:@[john]];
         [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(3, SyncObject, realm);
+        CHECK_COUNT(1, Person, realm);
         RLMRunChildAndWait();
         [self waitForDownloadsForRealm:realm];
-        CHECK_COUNT(0, SyncObject, realm);
+        CHECK_COUNT(0, Person, realm);
     } else {
         [self waitForDownloadsForRealm:realm];
-        CHECK_COUNT(3, SyncObject, realm);
+        CHECK_COUNT(1, Person, realm);
         [realm beginWriteTransaction];
         [realm deleteAllObjects];
         [realm commitWriteTransaction];
         [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(0, SyncObject, realm);
+        CHECK_COUNT(0, Person, realm);
     }
 }
 
 #pragma mark - Encryption
-#if 0
+
 /// If client B encrypts its synced Realm, client A should be able to access that Realm with a different encryption key.
 - (void)testEncryptedSyncedRealm {
-    NSURL *url = REALM_URL();
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
-                                               server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+    register:self.isParent]];
 
     NSData *key = RLMGenerateKey();
-    RLMRealm *realm = [self openRealmForURL:url user:user encryptionKey:key
-                                 stopPolicy:RLMSyncStopPolicyAfterChangesUploaded immediatelyBlock:nil];
+    RLMRealm *realm = [self openRealmForPartitionValue:@"\"foo\"" user:user encryptionKey:key stopPolicy:RLMSyncStopPolicyAfterChangesUploaded immediatelyBlock:nil];
+
     if (self.isParent) {
-        CHECK_COUNT(0, SyncObject, realm);
+        CHECK_COUNT(0, Person, realm);
         RLMRunChildAndWait();
-        [self waitForDownloadsForUser:user realms:@[realm] realmURLs:@[url] expectedCounts:@[@3]];
+        [self waitForDownloadsForUser:user
+                               realms:@[realm]
+                      partitionValues:@[@"\"foo\""]
+                       expectedCounts:@[@1]];
     } else {
         // Add objects.
-        [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+        Person *john = [[Person alloc] init];
+        john._id = [RLMObjectId objectId];
+        john.age = 30;
+        [john.dogs count];
+        john.firstName = @"John";
+        john.lastName = @"Lennon";
+        john.realm_id = @"foo";
+        [self addPersonsToRealm:realm persons:@[john]];
         [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(3, SyncObject, realm);
+        CHECK_COUNT(1, Person, realm);
     }
 }
 
 /// If an encrypted synced Realm is re-opened with the wrong key, throw an exception.
 - (void)testEncryptedSyncedRealmWrongKey {
-    NSURL *url = REALM_URL();
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
-                                               server:[RLMObjectServerTests authServerURL]];
+    RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+    register:self.isParent]];
 
     if (self.isParent) {
         NSString *path;
         @autoreleasepool {
-            RLMRealm *realm = [self openRealmForURL:url user:user encryptionKey:RLMGenerateKey()
-                                         stopPolicy:RLMSyncStopPolicyImmediately immediatelyBlock:nil];
+            RLMRealm *realm = [self openRealmForPartitionValue:@"\"foo\""
+                                                          user:user
+                                                 encryptionKey:RLMGenerateKey() stopPolicy:RLMSyncStopPolicyImmediately
+                                              immediatelyBlock:nil];
+
             path = realm.configuration.pathOnDisk;
-            CHECK_COUNT(0, SyncObject, realm);
+            CHECK_COUNT(0, Person, realm);
             RLMRunChildAndWait();
-            [self waitForDownloadsForUser:user realms:@[realm] realmURLs:@[url] expectedCounts:@[@3]];
+            [self waitForDownloadsForUser:user
+                                   realms:@[realm]
+                          partitionValues:@[@"\"foo\""]
+                           expectedCounts:@[@1]];
         }
         RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
         c.fileURL = [NSURL fileURLWithPath:path];
@@ -737,14 +757,23 @@ RLM_ARRAY_TYPE(Dog)
                                  RLMErrorFileAccess,
                                  @"Realm file decryption failed");
     } else {
-        RLMRealm *realm = [self openRealmForURL:url user:user encryptionKey:RLMGenerateKey()
-                                     stopPolicy:RLMSyncStopPolicyImmediately immediatelyBlock:nil];
-        [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+        RLMRealm *realm = [self openRealmForPartitionValue:@"\"foo\""
+                                                      user:user
+                                             encryptionKey:RLMGenerateKey() stopPolicy:RLMSyncStopPolicyImmediately
+                                          immediatelyBlock:nil];
+        Person *john = [[Person alloc] init];
+        john._id = [RLMObjectId objectId];
+        john.age = 30;
+        [john.dogs count];
+        john.firstName = @"John";
+        john.lastName = @"Lennon";
+        john.realm_id = @"foo";
+        [self addPersonsToRealm:realm persons:@[john]];
         [self waitForUploadsForRealm:realm];
-        CHECK_COUNT(3, SyncObject, realm);
+        CHECK_COUNT(1, Person, realm);
     }
 }
-#endif
+
 #pragma mark - Multiple Realm Sync
 #if 0
 /// If a client opens multiple Realms, there should be one session object for each Realm that was opened.

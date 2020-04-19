@@ -164,8 +164,9 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers {
     NSMutableDictionary *buffer = [NSMutableDictionary new];
     for (auto user : SyncManager::shared().all_users()) {
+        auto identity = user->identity().c_str();
         [buffer setValue:[[RLMSyncUser alloc] initWithSyncUser:std::move(user) app:self]
-                  forKey:@(user->identity().c_str())];
+                  forKey:@(identity)];
     }
     return buffer;
 }

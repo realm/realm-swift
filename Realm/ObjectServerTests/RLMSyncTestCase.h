@@ -29,16 +29,38 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setSessionCompletionNotifier:(nullable RLMSyncBasicErrorReportingBlock)sessionCompletionNotifier;
 @end
 
-@interface SyncObject : RLMObject
+
+@interface Dog : RLMObject
+
 @property RLMObjectId *_id;
-@property NSString *stringProp;
+@property NSString *breed;
+@property NSString *name;
+@property NSString *realm_id;
+
 @end
 
-@interface HugeSyncObject : RLMObject
+RLM_ARRAY_TYPE(Dog)
+@interface Person : RLMObject
+
 @property RLMObjectId *_id;
-@property NSData *dataProp;
-+ (instancetype)object;
+@property NSInteger age;
+@property RLMArray<Dog *><Dog> *dogs;
+@property NSString *firstName;
+@property NSString *lastName;
+@property NSString *realm_id;
+
 @end
+
+//@interface SyncObject : RLMObject
+//@property RLMObjectId *_id;
+//@property NSString *stringProp;
+//@end
+//
+//@interface HugeSyncObject : RLMObject
+//@property RLMObjectId *_id;
+//@property NSData *dataProp;
+//+ (instancetype)object;
+//@end
 
 @interface RLMSyncTestCase : RLMMultiProcessTestCase
 
@@ -88,6 +110,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Synchronously create, log in, and return a user.
 - (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials;
+
+- (void)addPersonsToRealm:(RLMRealm *)realm persons:(NSArray<Person *> *)persons;
 
 /// Add a number of objects to a Realm.
 - (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions;

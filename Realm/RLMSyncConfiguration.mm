@@ -230,6 +230,8 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
         _config->stop_policy = translateStopPolicy(stopPolicy);
         _config->error_handler = errorHandler;
         _config->client_resync_mode = realm::ClientResyncMode::Manual;
+        
+//        context_for(user).register_refresh_handle([partitionValue UTF8String], handle);
 
         if (NSString *authorizationHeaderName = [RLMSyncManager sharedManager].authorizationHeaderName) {
             _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);

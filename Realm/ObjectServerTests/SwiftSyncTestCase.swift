@@ -19,6 +19,7 @@
 import XCTest
 import RealmSwift
 
+#if false
 class SwiftSyncObject: Object {
     @objc dynamic var _id: ObjectId = ObjectId()
     @objc dynamic var stringProp: String = ""
@@ -173,3 +174,4 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                   line: line)
     }
 }
+#endif
