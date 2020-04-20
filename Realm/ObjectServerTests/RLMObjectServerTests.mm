@@ -623,14 +623,20 @@
 /// If client B adds objects to a synced Realm, client A should see those objects.
 - (void)testAddObjects {
     RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]];
+    RLMSyncUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
     RLMRealm *realm = [self openRealmForPartitionValue:@"\"foo\""
                                                   user:user];
+    RLMRealm *realm2 = [self openRealmForPartitionValue:@"\"foo\""
+                                                   user:user2];
     if (self.isParent) {
         CHECK_COUNT(0, Person, realm);
         RLMRunChildAndWait();
         [self waitForDownloadsForUser:user
                                realms:@[realm]
                       partitionValues:@[@"\"foo\""] expectedCounts:@[@1]];
+        [self waitForDownloadsForUser:user2
+                 realms:@[realm2]
+        partitionValues:@[@"\"foo\""] expectedCounts:@[@1]];
     } else {
         // Add objects.
         Person *john = [[Person alloc] init];
@@ -640,20 +646,6 @@
         john.firstName = @"John";
         john.lastName = @"Lennon";
         john.realm_id = @"foo";
-
-        Person *paul = [[Person alloc] init];
-        paul._id = [RLMObjectId objectId];
-        paul.age = 30;
-        paul.firstName = @"Paul";
-        paul.lastName = @"McCartney";
-        paul.realm_id = @"foo";
-
-        Person *ringo = [[Person alloc] init];
-        ringo._id = [RLMObjectId objectId];
-        ringo.age = 30;
-        ringo.firstName = @"Ringo";
-        ringo.lastName = @"Star";
-        ringo.realm_id = @"foo";
 
         [self addPersonsToRealm:realm
                         persons:@[john]];
