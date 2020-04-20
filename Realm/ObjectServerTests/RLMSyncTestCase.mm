@@ -117,8 +117,6 @@ static NSURL *syncDirectoryForChildProcess() {
     if (self = [super init]) {
         [self downloadAdminSDK];
 
-        [self cleanUp];
-
         NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
 
         NSTask *task = [[NSTask alloc] init];
