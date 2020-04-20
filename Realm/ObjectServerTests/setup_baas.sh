@@ -120,12 +120,14 @@ setup_stitch() {
     yarn install && yarn run build -t "${transpiler_target}"
 
     cd "$BASE_DIR"
-    if ! command -v go >/dev/null 2>&1; then
-        echo "downloading go"
-        curl --silent "https://dl.google.com/go/go$go_version.darwin-amd64.tar.gz" | tar xz
-        export GOROOT="$BASE_DIR/go"
-        export PATH="$GOROOT/bin:$PATH"
-    fi
+
+    # FIXME: We should not be downloading go every time
+    echo "downloading go"
+    rm -rf go
+    curl --silent "https://dl.google.com/go/go$go_version.darwin-amd64.tar.gz" | tar xz
+    export GOROOT="$BASE_DIR/go"
+    export PATH="$GOROOT/bin:$PATH"
+
 
     export STITCH_PATH="$BASE_DIR/stitch"
     export PATH="$PATH:$STITCH_PATH/etc/transpiler/bin"
