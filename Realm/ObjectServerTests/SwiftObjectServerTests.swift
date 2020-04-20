@@ -560,7 +560,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     let appName = "translate-utwuv"
 
     private func realmAppConfig() -> AppConfiguration {
-        
+
         return AppConfiguration(baseURL: "http://localhost:9090",
                                 transport: nil,
                                 localAppName: "auth-integration-tests",
