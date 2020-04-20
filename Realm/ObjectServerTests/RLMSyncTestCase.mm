@@ -128,6 +128,37 @@ static NSURL *syncDirectoryForChildProcess() {
         [task launch];
         [task waitUntilExit];
 
+        __block BOOL isLive = NO;
+        NSInteger tryCount = 0;
+        const NSTimeInterval timeout = 4;
+
+        while (tryCount < 100 && !isLive) {
+            __block dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+            [[[NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]]
+              dataTaskWithURL:[NSURL URLWithString:@"http://127.0.0.1:9090"]
+              completionHandler:^(NSData * _Nullable, NSURLResponse * _Nullable response, NSError * _Nullable) {
+                NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
+                isLive = [urlResponse statusCode] == 200;
+                dispatch_semaphore_signal(sema);
+            }] resume];
+
+            BOOL canConnect = dispatch_semaphore_wait(sema,
+                                                      dispatch_time(DISPATCH_TIME_NOW,
+                                                                    (int64_t)(timeout * NSEC_PER_SEC))) == 0;
+
+            if (!canConnect) {
+                NSLog(@"Timed out while trying to connect to MongoDB Realm at http://127.0.0.1:9090");
+                abort();
+            }
+
+            tryCount++;
+        }
+
+        if (!isLive) {
+            NSLog(@"Timed out while trying to connect to MongoDB Realm at http://127.0.0.1:9090");
+            abort();
+        }
+
         atexit([] {
             [[RealmObjectServer sharedServer] cleanUp];
         });
