@@ -264,6 +264,9 @@
 		3FEB38401E70AC8800F22712 /* ObjectCreationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FEB383C1E70AC6900F22712 /* ObjectCreationTests.mm */; };
 		3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */; };
 		3FF3FFAF1F0D6D6400B84599 /* KVOTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FFF1BE98D880021E04F /* KVOTests.swift */; };
+		492F5CB2244F48D800ACEBC0 /* regular_expression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F0244E1A370097500E /* regular_expression.cpp */; };
+		492F5CB3244F48D800ACEBC0 /* bson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F2244E1A370097500E /* bson.cpp */; };
+		492F5CB4244F48D800ACEBC0 /* datetime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F4244E1A370097500E /* datetime.cpp */; };
 		498C7F3E24479905009DE80A /* remote_mongo_database.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 498C7F3724479904009DE80A /* remote_mongo_database.hpp */; };
 		498C7F3F24479905009DE80A /* remote_mongo_client.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 498C7F3824479904009DE80A /* remote_mongo_client.hpp */; };
 		498C7F4024479905009DE80A /* remote_mongo_collection.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 498C7F3924479904009DE80A /* remote_mongo_collection.hpp */; };
@@ -2709,6 +2712,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				499321FF24129CFE00A0EC8E /* app.cpp in Sources */,
+				492F5CB2244F48D800ACEBC0 /* regular_expression.cpp in Sources */,
+				492F5CB3244F48D800ACEBC0 /* bson.cpp in Sources */,
+				492F5CB4244F48D800ACEBC0 /* datetime.cpp in Sources */,
 				499321FD24129CFD00A0EC8E /* app_credentials.cpp in Sources */,
 				3F558C7A22BC023B002F0F30 /* async_open_task.cpp in Sources */,
 				3F5B5D321E84230E00953B33 /* binding_callback_thread_observer.cpp in Sources */,
