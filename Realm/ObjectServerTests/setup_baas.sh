@@ -119,21 +119,22 @@ setup_stitch() {
     cd etc/transpiler
     yarn install && yarn run build -t "${transpiler_target}"
 
-    cd "$BASE_DIR"
+    cd $BASE_DIR
 
-    # FIXME: We should not be downloading go every time
-    echo "downloading go"
-    rm -rf go
-    curl --silent "https://dl.google.com/go/go$go_version.darwin-amd64.tar.gz" | tar xz
+    if [ ! -d go ]; then
+        echo "downloading go"
+        curl --silent "https://dl.google.com/go/go$go_version.darwin-amd64.tar.gz" | tar xz
+    fi
+
     export GOROOT="$BASE_DIR/go"
     export PATH="$GOROOT/bin:$PATH"
-
 
     export STITCH_PATH="$BASE_DIR/stitch"
     export PATH="$PATH:$STITCH_PATH/etc/transpiler/bin"
     export LD_LIBRARY_PATH="$STITCH_PATH/etc/dylib/lib"
     echo "running stitch"
     cd "$STITCH_PATH"
+    
     go run cmd/auth/user.go addUser \
         -domainID 000000000000000000000000 \
         -mongoURI mongodb://127.0.0.1:26000 \
