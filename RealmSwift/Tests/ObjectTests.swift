@@ -715,6 +715,9 @@ class ObjectTests: TestCase {
             self.checkChange("intCol", 1, 2, change)
             sema.signal()
         }
+        // wait for the notification to be registered as otherwise it may not
+        // have the old value
+        queue.sync { }
         try! realm.write {
             object.intCol = 2
         }
@@ -746,6 +749,7 @@ class ObjectTests: TestCase {
 
         // Now let token2 registration happen
         sema.signal()
+        queue.sync { }
 
         // Perform a write and make sure only token2 notifies
         try! realm.write {
