@@ -489,7 +489,7 @@ id RLMValidatedValueForProperty(id object, NSString *key, NSString *className) {
 
 namespace {
 struct ObjectChangeCallbackWrapper {
-    void (^block)(NSArray<NSString *> *, NSArray *, NSArray *, NSError *);
+    RLMObjectNotificationCallback block;
     RLMObjectBase *object;
 
     NSArray<NSString *> *propertyNames = nil;
@@ -551,10 +551,10 @@ struct ObjectChangeCallbackWrapper {
         @autoreleasepool {
             auto newValues = readValues(c);
             if (deleted) {
-                block(nil, nil, nil, nil);
+                block(nil, nil, nil, nil, nil);
             }
             else if (newValues) {
-                block(propertyNames, oldValues, newValues, nil);
+                block(object, propertyNames, oldValues, newValues, nil);
             }
             propertyNames = nil;
             oldValues = nil;
@@ -569,7 +569,7 @@ struct ObjectChangeCallbackWrapper {
             catch (...) {
                 NSError *error = nil;
                 RLMRealmTranslateException(&error);
-                block(nil, nil, nil, error);
+                block(nil, nil, nil, nil, error);
             }
         }
     }
@@ -629,7 +629,7 @@ struct ObjectChangeCallbackWrapper {
     NSError *error;
     RLMRealm *realm = _realm = [RLMRealm realmWithConfiguration:config queue:queue error:&error];
     if (!realm) {
-        block(nil, nil, nil, error);
+        block(nil, nil, nil, nil, error);
         return;
     }
     RLMObjectBase *obj = [realm resolveThreadSafeReference:tsr];
@@ -673,7 +673,7 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj, disp
 @end
 
 RLMNotificationToken *RLMObjectAddNotificationBlock(RLMObjectBase *obj, RLMObjectChangeBlock block, dispatch_queue_t queue) {
-    return RLMObjectBaseAddNotificationBlock(obj, queue, ^(NSArray<NSString *> *propertyNames,
+    return RLMObjectBaseAddNotificationBlock(obj, queue, ^(RLMObjectBase *, NSArray<NSString *> *propertyNames,
                                                            NSArray *oldValues, NSArray *newValues, NSError *error) {
         if (error) {
             block(false, nil, error);

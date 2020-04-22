@@ -50,7 +50,8 @@ FOUNDATION_EXTERN id _Nullable RLMValidatedValueForProperty(id object, NSString 
 // Compare two RLObjectBases
 FOUNDATION_EXTERN BOOL RLMObjectBaseAreEqual(RLMObjectBase * _Nullable o1, RLMObjectBase * _Nullable o2);
 
-typedef void (^RLMObjectNotificationCallback)(NSArray<NSString *> *_Nullable propertyNames,
+typedef void (^RLMObjectNotificationCallback)(RLMObjectBase *_Nullable object,
+                                              NSArray<NSString *> *_Nullable propertyNames,
                                               NSArray *_Nullable oldValues,
                                               NSArray *_Nullable newValues,
                                               NSError *_Nullable error);
