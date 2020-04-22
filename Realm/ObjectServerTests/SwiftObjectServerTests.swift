@@ -840,6 +840,5 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [deleteKeyEx], timeout: 4.0)
     }
-
 }
 #endif
