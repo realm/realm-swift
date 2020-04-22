@@ -90,7 +90,8 @@ Pod::Spec.new do |s|
                               'Realm/ObjectStore/src/impl/*.cpp',
                               'Realm/ObjectStore/src/impl/apple/*.cpp',
                               'Realm/ObjectStore/src/util/*.cpp',
-                              'Realm/ObjectStore/src/util/apple/*.cpp'
+                              'Realm/ObjectStore/src/util/apple/*.cpp',
+                              'Realm/ObjectStore/src/util/bson/*.cpp'
 
   s.frameworks              = 'Security'
   s.module_map              = 'Realm/Realm.modulemap'
