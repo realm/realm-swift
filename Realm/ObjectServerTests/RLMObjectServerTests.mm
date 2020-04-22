@@ -31,6 +31,10 @@
 
 #import "shared_realm.hpp"
 
+#ifndef REALM_ENABLE_SYNC_TESTS
+#define REALM_ENABLE_SYNC_TESTS 0
+#endif
+
 #pragma mark - Test objects
 
 @interface PartialSyncObjectA : RLMObject
@@ -88,15 +92,13 @@
                                                        defaultRequestTimeoutMS:42.0];
 
     RLMApp *app = [RLMApp app:@"<app-id>" configuration:config];
-
     // TODO: Get config and compare values
 }
 
 #pragma mark - Authentication and Tokens
 
-
 - (void)testAnonymousAuthentication {
-    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
     __block RLMSyncUser *syncUser;
     [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
@@ -115,7 +117,7 @@
 }
 
 - (void)testLogoutCurrentUser {
-    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should log out current user"];
     __block RLMSyncUser *syncUser;
     [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
@@ -134,7 +136,7 @@
 }
 
 - (void)testLogoutSpecificUser {
-    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should log out specific user"];
     __block RLMSyncUser *syncUser;
     [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
@@ -153,7 +155,7 @@
 }
 
 - (void)testSwitchUser {
-    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     
     XCTestExpectation *loginExpectationA = [self expectationWithDescription:@"should login user A"];
     XCTestExpectation *loginExpectationB = [self expectationWithDescription:@"should login user B"];
@@ -179,11 +181,10 @@
     [self waitForExpectations:@[loginExpectationB] timeout:60.0];
 
     XCTAssert([[app switchToUser:syncUserA].identity isEqualToString:syncUserA.identity]);
-
 }
 
 - (void)testRemoveUser {
-    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *loginExpectationA = [self expectationWithDescription:@"should login user A"];
     XCTestExpectation *loginExpectationB = [self expectationWithDescription:@"should login user B"];
     XCTestExpectation *removeUserExpectation = [self expectationWithDescription:@"should remove user"];
@@ -224,7 +225,7 @@
 #pragma mark - RLMUsernamePasswordProviderClient
 
 - (void)testRegisterEmailAndPassword {
-    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should register with email and password"];
 
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
@@ -239,7 +240,7 @@
 }
 
 - (void)testConfirmUser {
-    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try confirm user and fail"];
 
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
@@ -253,7 +254,7 @@
 }
 
 - (void)testResendConfirmationEmail {
-    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try resend confirmation email and fail"];
 
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
@@ -267,7 +268,7 @@
 }
 
 - (void)testResetPassword {
-    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try reset password and fail"];
 
     [[app usernamePasswordProviderClient] resetPasswordTo:@"APassword123" token:@"a_token" tokenId:@"a_token_id" completion:^(NSError * _Nullable error) {
@@ -279,7 +280,7 @@
 }
 
 - (void)testCallResetPasswordFunction {
-    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try call reset password function and fail"];
 
     [[app usernamePasswordProviderClient] callResetPasswordFunction:@"test@mongodb.com" password:@"aPassword123" args:@"" completion:^(NSError * _Nullable error) {
@@ -293,14 +294,17 @@
 #pragma mark - UserAPIKeyProviderClient
 
 - (void)testUserAPIKeyProviderClientFlow {
-    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
-    
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+
     XCTestExpectation *registerExpectation = [self expectationWithDescription:@"should try register"];
     XCTestExpectation *loginExpectation = [self expectationWithDescription:@"should try login"];
     XCTestExpectation *createAPIKeyExpectationA = [self expectationWithDescription:@"should try create an api key"];
     XCTestExpectation *createAPIKeyExpectationB = [self expectationWithDescription:@"should try create an api key"];
     XCTestExpectation *fetchAPIKeysExpectation = [self expectationWithDescription:@"should try call fetch api keys"];
-    
+    XCTestExpectation *disableAPIKeyExpectation = [self expectationWithDescription:@"should try disable api key"];
+    XCTestExpectation *enableAPIKeyExpectation = [self expectationWithDescription:@"should try enable api key"];
+    XCTestExpectation *deleteAPIKeyExpectation = [self expectationWithDescription:@"should try delete api key"];
+
     __block RLMSyncUser *syncUser;
     __block RLMUserAPIKey *userAPIKeyA;
     __block RLMUserAPIKey *userAPIKeyB;
@@ -332,8 +336,6 @@
         [createAPIKeyExpectationA fulfill];
     }];
     
-    [self waitForExpectations:@[createAPIKeyExpectationA] timeout:60.0];
-
     [[app userAPIKeyProviderClient] createApiKeyWithName:@"apiKeyName2" completion:^(RLMUserAPIKey * _Nullable userAPIKey, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert([userAPIKey.name isEqualToString:@"apiKeyName2"]);
@@ -341,8 +343,11 @@
         [createAPIKeyExpectationB fulfill];
     }];
     
-    [self waitForExpectations:@[createAPIKeyExpectationB] timeout:60.0];
-
+    [self waitForExpectations:@[createAPIKeyExpectationA, createAPIKeyExpectationB] timeout:60.0];
+    
+    // sleep for 2 seconds as there seems to be an issue fetching the keys straight after they are created.
+    [NSThread sleepForTimeInterval:2];
+    
     [[app userAPIKeyProviderClient] fetchApiKeysWithCompletion:^(NSArray<RLMUserAPIKey *> * _Nonnull apiKeys, NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert(apiKeys.count == 2);
@@ -350,20 +355,34 @@
     }];
     
     [self waitForExpectations:@[fetchAPIKeysExpectation] timeout:60.0];
-
-    //These tests require an ObjectId
-    /*
-    [[app userAPIKeyProviderClient] disableApiKey:userAPIKeyA completionHandler:^(NSError * _Nullable error) {
+    
+    [[app userAPIKeyProviderClient] disableApiKey:userAPIKeyA.objectId completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
-        [expectation fulfill];
+        [disableAPIKeyExpectation fulfill];
     }];
-     */
+    
+    [self waitForExpectations:@[disableAPIKeyExpectation] timeout:60.0];
+    
+    [[app userAPIKeyProviderClient] enableApiKey:userAPIKeyA.objectId completion:^(NSError * _Nullable error) {
+        XCTAssert(!error);
+        [enableAPIKeyExpectation fulfill];
+    }];
+    
+    [self waitForExpectations:@[enableAPIKeyExpectation] timeout:60.0];
+    
+    [[app userAPIKeyProviderClient] deleteApiKey:userAPIKeyA.objectId completion:^(NSError * _Nullable error) {
+        XCTAssert(!error);
+        [deleteAPIKeyExpectation fulfill];
+    }];
+    
+    [self waitForExpectations:@[deleteAPIKeyExpectation] timeout:60.0];
+
 }
 
 #pragma mark - Link user
 
 - (void)testLinkUser {
-    RLMApp *app = [RLMApp app:@"translate-utwuv" configuration:nil];
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
 
     XCTestExpectation *registerExpectation = [self expectationWithDescription:@"should try register"];
     XCTestExpectation *loginExpectation = [self expectationWithDescription:@"should try login"];
@@ -371,7 +390,7 @@
 
     __block RLMSyncUser *syncUser;
 
-    NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
+    NSString *randomEmail = [NSString stringWithFormat:@"%@@10gen.com", [self generateRandomString:10]];
     NSString *randomPassword = [self generateRandomString:10];
     
     [[app usernamePasswordProviderClient] registerEmail:randomEmail password:randomPassword completion:^(NSError * _Nullable error) {
@@ -402,6 +421,9 @@
     [self waitForExpectations:@[linkExpectation] timeout:60.0];
 
 }
+
+
+#if REALM_ENABLE_AUTH_TESTS
 
 #pragma mark - Auth Credentials
 
@@ -1893,4 +1915,5 @@ static NSURL *certificateURL(NSString *filename) {
     [self verifyOpenFails:[user configurationWithURL:[NSURL URLWithString:@"realms://localhost:9443/~/default"]]];
 }
 
+#endif
 @end

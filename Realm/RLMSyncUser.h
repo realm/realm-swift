@@ -21,7 +21,7 @@
 #import <Realm/RLMAppCredentials.h>
 #import <Realm/RLMRealmConfiguration.h>
 
-@class RLMSyncUser, RLMSyncUserInfo, RLMSyncSession, RLMRealm;
+@class RLMSyncUser, RLMSyncUserInfo, RLMSyncSession, RLMRealm, RLMSyncUserIdentity;
 
 /**
  The state of the user object.
@@ -67,6 +67,11 @@ NS_ASSUME_NONNULL_BEGIN
  The unique Realm Object Server user ID string identifying this user.
  */
 @property (nullable, nonatomic, readonly) NSString *identity;
+
+/**
+    Returns an array of identities currently linked to a user.
+*/
+- (NSArray<RLMSyncUserIdentity *> *)identities;
 
 /**
  The user's refresh token used to access the Realm Applcation.
@@ -210,6 +215,23 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)init __attribute__((unavailable("RLMSyncUserInfo cannot be created directly")));
 /// :nodoc:
 + (instancetype)new __attribute__((unavailable("RLMSyncUserInfo cannot be created directly")));
+
+@end
+
+@interface RLMSyncUserIdentity : NSObject
+
+/**
+ The associated provider type of the identity
+ */
+@property (nonatomic, readonly) NSString *providerType;
+
+/**
+ The id of the identity
+ */
+@property (nonatomic, readonly) NSString *identity;
+
+- (instancetype)initSyncUserIdentityWithProviderType:(NSString *)providerType
+                                            identity:(NSString *)identity;
 
 @end
 

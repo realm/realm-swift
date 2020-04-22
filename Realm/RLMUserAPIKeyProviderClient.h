@@ -56,28 +56,28 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
 /**
   Deletes a user API key associated with the current user.
  
-  @param apiKey The API key to delete.
+  @param objectId The ObjectId of the API key to delete.
   @param completion A callback to be invoked once the call is complete.
  */
-- (void)deleteApiKey:(RLMUserAPIKey *)apiKey
+- (void)deleteApiKey:(RLMObjectId *)objectId
           completion:(RLMOptionalErrorBlock)completion;
 
 /**
   Enables a user API key associated with the current user.
  
-  @param apiKey The API key to enable.
+  @param objectId The ObjectId of the  API key to enable.
   @param completion A callback to be invoked once the call is complete.
  */
-- (void)enableApiKey:(RLMUserAPIKey *)apiKey
+- (void)enableApiKey:(RLMObjectId *)objectId
           completion:(RLMOptionalErrorBlock)completion;
 
 /**
   Disables a user API key associated with the current user.
  
-  @param apiKey The API key to disable.
+  @param objectId The ObjectId of the API key to disable.
   @param completion A callback to be invoked once the call is complete.
  */
-- (void)disableApiKey:(RLMUserAPIKey *)apiKey
+- (void)disableApiKey:(RLMObjectId *)objectId
            completion:(RLMOptionalErrorBlock)completion;
 
 @end
