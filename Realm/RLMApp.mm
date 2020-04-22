@@ -131,8 +131,12 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
                     return std::make_unique<CocoaNetworkTransport>(configuration.transport);
                 };
             }
-            boundConfiguration.local_app_name = std::string(configuration.localAppName.UTF8String);
-            boundConfiguration.local_app_version = std::string(configuration.localAppVersion.UTF8String);
+            if (configuration.localAppName) {
+                boundConfiguration.local_app_name = std::string(configuration.localAppName.UTF8String);
+            }
+            if (configuration.localAppVersion) {
+                boundConfiguration.local_app_version = std::string(configuration.localAppVersion.UTF8String);
+            }
             boundConfiguration.default_request_timeout_ms = (uint64_t)configuration.defaultRequestTimeoutMS;
         }
         _app = realm::app::App(boundConfiguration);

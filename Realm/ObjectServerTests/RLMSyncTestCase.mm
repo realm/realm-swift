@@ -28,6 +28,7 @@
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncConfiguration_Private.h"
 #import "RLMUtil.hpp"
+#import "RLMApp.h"
 
 #import "sync/sync_manager.hpp"
 #import "sync/sync_session.hpp"
@@ -38,12 +39,6 @@
 
 #if !TARGET_OS_MAC
 #error These tests can only be run on a macOS host.
-#endif
-
-#define REALM_ENABLE_OBJECT_SERVER_TESTS 0
-
-#if !REALM_ENABLE_OBJECT_SERVER_TESTS
-#warning These tests will not pass until they are migrated to use new Realm Cloud.
 #endif
 
 static NSString *nodePath() {
@@ -103,17 +98,16 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 @interface RealmObjectServer : NSObject
-@property (nonatomic, readonly) NSURL *serverDataRoot;
-
+@property (nonatomic, readonly) NSString *appId;
 + (instancetype)sharedServer;
 
-- (void)launch;
+- (NSString *)createApp;
+
 @end
 
 @implementation RealmObjectServer {
-    NSTask *_task;
-    NSURL *_serverDataRoot;
 }
+
 + (instancetype)sharedServer {
     static RealmObjectServer *instance = [RealmObjectServer new];
     return instance;
@@ -121,60 +115,95 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (instancetype)init {
     if (self = [super init]) {
-        _serverDataRoot = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:@"test-ros-data"]];
+        [self downloadAdminSDK];
+
+        NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
+
+        NSTask *task = [[NSTask alloc] init];
+        task.currentDirectoryPath = directory;
+        task.launchPath = @"/bin/sh";
+        task.arguments = @[@"run_baas.sh"];
+        [task launch];
+        [task waitUntilExit];
+
+        __block BOOL isLive = NO;
+        NSInteger tryCount = 0;
+        const NSTimeInterval timeout = 4;
+
+        while (tryCount < 100 && !isLive) {
+            __block dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+            [[[NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]]
+              dataTaskWithURL:[NSURL URLWithString:@"http://127.0.0.1:9090"]
+              completionHandler:^(NSData * _Nullable, NSURLResponse * _Nullable response, NSError * _Nullable) {
+                NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
+                isLive = [urlResponse statusCode] == 200;
+                dispatch_semaphore_signal(sema);
+            }] resume];
+
+            BOOL canConnect = dispatch_semaphore_wait(sema,
+                                                      dispatch_time(DISPATCH_TIME_NOW,
+                                                                    (int64_t)(timeout * NSEC_PER_SEC))) == 0;
+
+            if (!canConnect) {
+                NSLog(@"Timed out while trying to connect to MongoDB Realm at http://127.0.0.1:9090");
+                abort();
+            }
+
+            tryCount++;
+        }
+
+        if (!isLive) {
+            NSLog(@"Timed out while trying to connect to MongoDB Realm at http://127.0.0.1:9090");
+            abort();
+        }
+
+        atexit([] {
+            [[RealmObjectServer sharedServer] cleanUp];
+        });
     }
     return self;
 }
 
-- (void)launch {
-    if (_task) {
-        return;
-    }
-    // Clean up any old state from the server
-    [[NSTask launchedTaskWithLaunchPath:@"/usr/bin/pkill"
-                              arguments:@[@"-f", @"node.*test-ros-server.js"]] waitUntilExit];
-    NSError *error;
-    [NSFileManager.defaultManager removeItemAtURL:self.serverDataRoot error:&error];
-    if (error && error.code != NSFileNoSuchFileError) {
-        NSLog(@"Failed to delete old test state: %@", error);
-        abort();
-    }
-    error = nil;
-    [NSFileManager.defaultManager createDirectoryAtURL:self.serverDataRoot
-                           withIntermediateDirectories:YES attributes:nil error:&error];
-    if (error) {
-        NSLog(@"Failed to create scratch directory: %@", error);
-        abort();
-    }
-
-    // Install ROS if it isn't already present
-    [self downloadObjectServer];
-
-    // Set up the actual ROS task
-    NSPipe *pipe = [NSPipe pipe];
-    _task = [[NSTask alloc] init];
-    _task.currentDirectoryPath = self.serverDataRoot.path;
-    _task.launchPath = nodePath();
+- (void)cleanUp {
+    NSTask *task = [[NSTask alloc] init];
+    task.launchPath = nodePath();
     NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
-    _task.arguments = @[[directory stringByAppendingPathComponent:@"test-ros-server.js"],
-                        self.serverDataRoot.path];
-    _task.standardOutput = pipe;
-    [_task launch];
+    task.arguments = @[[directory stringByAppendingPathComponent:@"admin.js"], @"clean"];
+    [task launch];
+    [task waitUntilExit];
 
-    NSData *childStdout = pipe.fileHandleForReading.readDataToEndOfFile;
-    if (![childStdout isEqual:[@"started\n" dataUsingEncoding:NSUTF8StringEncoding]]) {
-        abort();
-    }
+    task = [[NSTask alloc] init];
+    task.currentDirectoryPath = directory;
+    task.launchPath = @"/bin/sh";
+    task.arguments = @[[directory stringByAppendingPathComponent:@"run_baas.sh"], @"clean"];
+    [task launch];
+    [task waitUntilExit];
 
-    atexit([] {
-        auto self = RealmObjectServer.sharedServer;
-        [self->_task terminate];
-        [self->_task waitUntilExit];
-        [NSFileManager.defaultManager removeItemAtURL:self->_serverDataRoot error:nil];
-    });
+    [[NSTask launchedTaskWithLaunchPath:@"/usr/bin/pkill"
+                              arguments:@[@"-f", @"stitch"]] waitUntilExit];
 }
 
-- (NSString *)desiredObjectServerVersion {
+- (NSString *)createApp {
+    // Set up the actual ROS task
+    NSPipe *pipe = [NSPipe pipe];
+    NSTask *task = [[NSTask alloc] init];
+    task.launchPath = nodePath();
+    NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
+    task.arguments = @[[directory stringByAppendingPathComponent:@"admin.js"], @"create"];
+    task.standardOutput = pipe;
+    [task launch];
+
+    NSData *childStdout = pipe.fileHandleForReading.readDataToEndOfFile;
+    NSString *appId = [[NSString alloc] initWithData:childStdout encoding:NSUTF8StringEncoding];
+
+    if (!appId.length) {
+        abort();
+    }
+
+    return appId;
+}
+
+- (NSString *)desiredAdminSDKVersion {
     auto path = [[[[@(__FILE__) stringByDeletingLastPathComponent] // RLMSyncTestCase.mm
                  stringByDeletingLastPathComponent] // ObjectServerTests
                  stringByDeletingLastPathComponent] // Realm
@@ -185,20 +214,20 @@ static NSURL *syncDirectoryForChildProcess() {
         abort();
     }
 
-    auto regex = [NSRegularExpression regularExpressionWithPattern:@"^REALM_OBJECT_SERVER_VERSION=(.*)$"
+    auto regex = [NSRegularExpression regularExpressionWithPattern:@"^MONGODB_STITCH_ADMIN_SDK_VERSION=(.*)$"
                                                            options:NSRegularExpressionAnchorsMatchLines error:nil];
     auto match = [regex firstMatchInString:file options:0 range:{0, file.length}];
     if (!match) {
-        NSLog(@"Failed to read REALM_OBJECT_SERVER_VERSION from dependencies.list");
+        NSLog(@"Failed to read MONGODB_STITCH_ADMIN_SDK_VERSION from dependencies.list");
         abort();
     }
     return [file substringWithRange:[match rangeAtIndex:1]];
 }
 
-- (NSString *)currentObjectServerVersion {
+- (NSString *)currentAdminSDKVersion {
     auto path = [[[[@(__FILE__) stringByDeletingLastPathComponent] // RLMSyncTestCase.mm
                  stringByAppendingPathComponent:@"node_modules"]
-                 stringByAppendingPathComponent:@"realm-object-server"]
+                 stringByAppendingPathComponent:@"mongodb-stitch"]
                  stringByAppendingPathComponent:@"package.json"];
     auto file = [NSData dataWithContentsOfFile:path];
     if (!file) {
@@ -208,21 +237,21 @@ static NSURL *syncDirectoryForChildProcess() {
     NSError *error;
     NSDictionary *json = [NSJSONSerialization JSONObjectWithData:file options:0 error:&error];
     if (!json) {
-        NSLog(@"Error reading version from installed ROS: %@", error);
+        NSLog(@"Error reading version from installed Admin SDK: %@", error);
         abort();
     }
 
     return json[@"version"];
 }
 
-- (void)downloadObjectServer {
-    NSString *desiredVersion = [self desiredObjectServerVersion];
-    NSString *currentVersion = [self currentObjectServerVersion];
+- (void)downloadAdminSDK {
+    NSString *desiredVersion = [self desiredAdminSDKVersion];
+    NSString *currentVersion = [self currentAdminSDKVersion];
     if ([currentVersion isEqualToString:desiredVersion]) {
         return;
     }
 
-    NSLog(@"Installing Realm Object Server %@", desiredVersion);
+    NSLog(@"Installing Realm Cloud %@", desiredVersion);
     NSTask *task = [[NSTask alloc] init];
     task.currentDirectoryPath = [@(__FILE__) stringByDeletingLastPathComponent];
     task.launchPath = nodePath();
@@ -233,7 +262,7 @@ static NSURL *syncDirectoryForChildProcess() {
                        @"--no-save",
                        @"--no-package-lock",
                        @"install",
-                       [@"realm-object-server@" stringByAppendingString:desiredVersion]
+                       [@"mongodb-stitch@" stringByAppendingString:desiredVersion]
                        ];
     [task launch];
     [task waitUntilExit];
@@ -249,7 +278,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 + (NSURL *)authServerURL {
-    return [NSURL URLWithString:@"http://127.0.0.1:9080"];
+    return [NSURL URLWithString:@"http://127.0.0.1:9090"];
 }
 
 + (NSURL *)secureAuthServerURL {
@@ -263,6 +292,14 @@ static NSURL *syncDirectoryForChildProcess() {
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm {
     return [NSURL fileURLWithPath:@(realm->_realm->config().path.data())];
+}
+
+- (RLMAppConfiguration*) defaultAppConfiguration {
+    return  [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
+                                               transport:nil
+                                            localAppName:nil
+                                         localAppVersion:nil
+                                 defaultRequestTimeoutMS:60];
 }
 
 - (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions {
@@ -371,42 +408,14 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials
                                   server:(NSURL *)url {
-    NSString *process = self.isParent ? @"parent" : @"child";
-    __block RLMSyncUser *theUser = nil;
-    XCTestExpectation *expectation = [self expectationWithDescription:@"Should log in the user properly"];
-    // FIXME: [realmapp] This should use the new login
-    REALM_UNREACHABLE();
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    __block RLMSyncUser* theUser;
+    [app loginWithCredential:credentials completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable) {
+        theUser = user;
+    }];
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
-    XCTAssertTrue(theUser.state == RLMSyncUserStateLoggedIn,
-                  @"User should have been valid, but wasn't. (process: %@)", process);
+    XCTAssertTrue(theUser.state == RLMSyncUserStateLoggedIn, @"User should have been valid, but wasn't");
     return theUser;
-}
-
-- (NSString *)adminToken {
-    NSURL *target = [RealmObjectServer.sharedServer.serverDataRoot
-                     URLByAppendingPathComponent:@"/keys/admin.json"];
-    if (![[NSFileManager defaultManager] fileExistsAtPath:[target path]]) {
-        XCTFail(@"Could not find the JSON file containing the admin token.");
-        return nil;
-    }
-    NSData *raw = [NSData dataWithContentsOfURL:target];
-    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:raw options:0 error:nil];
-    NSString *token = json[@"ADMIN_TOKEN"];
-    if ([token length] == 0) {
-        XCTFail(@"Could not successfully extract the token.");
-    }
-    return token;
-}
-
-- (NSString *)emailForAddress:(NSString *)email {
-    NSURL *target = [[RealmObjectServer.sharedServer.serverDataRoot
-                     URLByAppendingPathComponent:@"/email"]
-                     URLByAppendingPathComponent:email];
-    NSString *body = [NSString stringWithContentsOfURL:target encoding:NSUTF8StringEncoding error:nil];
-    if (body) {
-        [NSFileManager.defaultManager removeItemAtURL:target error:nil];
-    }
-    return body;
 }
 
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm {
@@ -498,22 +507,23 @@ static NSURL *syncDirectoryForChildProcess() {
     self.continueAfterFailure = NO;
 
     REALM_ASSERT(RLMSyncManager.sharedManager._allUsers.count == 0);
-    [RLMSyncManager resetForTesting];
-
-    // FIXME: Figure out why this is broken
-//    [self setupSyncManager];
+    [self resetSyncManager];
+    [self setupSyncManager];
 }
 
 - (void)tearDown {
-    // FIXME: Figure out why this is broken
-//    [self resetSyncManager];
+    [self resetSyncManager];
     [super tearDown];
+}
+
++ (void)tearDown {
+
 }
 
 - (void)setupSyncManager {
     NSURL *clientDataRoot;
     if (self.isParent) {
-        [RealmObjectServer.sharedServer launch];
+        _appId = [RealmObjectServer.sharedServer createApp];
         clientDataRoot = [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
     }
     else {
@@ -531,7 +541,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)resetSyncManager {
-    [RLMSyncManager.sharedManager._allUsers makeObjectsPerformSelector:@selector(logOutWithCompletion)];
+//    [RLMSyncManager.sharedManager._allUsers makeObjectsPerformSelector:@selector(logOutWithCompletion)];
     [RLMSyncManager resetForTesting];
     [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:NO blockOnRefreshCompletion:nil];
 }
