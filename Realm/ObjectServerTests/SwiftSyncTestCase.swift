@@ -102,7 +102,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                           file: StaticString = #file,
                           line: UInt = #line) -> AppCredentials {
         let filename = URL(fileURLWithPath: String(describing: file)).deletingPathExtension().lastPathComponent
-        return .usernamePassword(username: "\(filename)\(line)\(usernameSuffix)", password: "a")
+        return .init(username: "\(filename)\(line)\(usernameSuffix)", password: "a")
     }
 
     func synchronouslyOpenRealm(partitionValue: String,

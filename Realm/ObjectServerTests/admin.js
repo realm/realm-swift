@@ -21,6 +21,13 @@ async function create() {
         resetPasswordSubject: 'Bye',
         autoConfirm: true
     }});
+    const authProviders = await app.authProviders().list();
+    for (const i in authProviders) {
+        if (authProviders[i].type == 'api-key') {
+            await app.authProviders().authProvider(authProviders[i]._id).enable();
+            break;
+        }
+    }
 
     await app.secrets().create({
         name: "BackingDB_uri",

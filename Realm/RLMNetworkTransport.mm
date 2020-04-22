@@ -32,6 +32,12 @@ using namespace realm;
 
 typedef void(^RLMServerURLSessionCompletionBlock)(NSData *, NSURLResponse *, NSError *);
 
+static_assert((int)RLMHTTPMethodGET        == (int)app::HttpMethod::get);
+static_assert((int)RLMHTTPMethodPOST       == (int)app::HttpMethod::post);
+static_assert((int)RLMHTTPMethodPUT        == (int)app::HttpMethod::put);
+static_assert((int)RLMHTTPMethodPATCH      == (int)app::HttpMethod::patch);
+static_assert((int)RLMHTTPMethodDELETE     == (int)app::HttpMethod::del);
+
 #pragma mark RLMSessionDelegate
 
 @interface RLMSessionDelegate <NSURLSessionDelegate> : NSObject
