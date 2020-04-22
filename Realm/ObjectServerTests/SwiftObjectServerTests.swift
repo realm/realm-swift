@@ -667,7 +667,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         XCTAssertEqual(syncUser2!.identity, app.currentUser()!.identity)
         XCTAssertEqual(app.allUsers().count, 1)
-
     }
 
     func testRealmAppLinkUser() {
