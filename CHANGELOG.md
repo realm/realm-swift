@@ -1,4 +1,4 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.0.0-alpha.0 Release notes (2020-04-22)
 =============================================================
 ### Enhancements
 * The memory mapping scheme for Realm files has changed to better support
@@ -12,8 +12,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add support for embedded objects. Embedded objects are objects which are
   owned by a single parent object, and are deleted when that parent object is
   deleted. They are defined by subclassing `EmbeddedObject` /
-  `RLMEmbeddedObject` rather than `Object` / `RLMObject`.
-
+	`RLMEmbeddedObject` rather than `Object` / `RLMObject`.
+* Add support for next generation sync. Next generation sync includes the
+  ability to use partition keys. Applications must be created at 
+  realm.mongodb.com.
+  
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
 * None.
