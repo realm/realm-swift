@@ -56,7 +56,7 @@
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
     } else {
         self.config.path = SyncManager::shared().path_for_realm(*[user _syncUser],
-                                                                [[user.identity stringByAppendingFormat:@"/%@", @(self.config.sync_config->partition_value.c_str())] UTF8String]);
+                                                                [[user pathForPartitionValueHash:[@(self.config.sync_config->partition_value.c_str()) hash]] UTF8String]);
     }
 
     if (!self.config.encryption_key.empty()) {

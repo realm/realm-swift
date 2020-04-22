@@ -142,6 +142,12 @@ static NSString *nodePath() {
     return john;
 }
 
++ (instancetype)johnWithRealmIdentifier:(NSString *)realmId {
+    Person *john = [Person john];
+    john.realm_id = realmId;
+    return john;
+}
+
 + (instancetype)paul {
     Person *paul = [[Person alloc] init];
     paul._id = [RLMObjectId objectId];
@@ -149,6 +155,12 @@ static NSString *nodePath() {
     paul.firstName = @"Paul";
     paul.lastName = @"McCartney";
     paul.realm_id = @"foo";
+    return paul;
+}
+
++ (instancetype)paulWithRealmIdentifier:(NSString *)realmId {
+    Person *paul = [Person paul];
+    paul.realm_id = realmId;
     return paul;
 }
 
@@ -162,6 +174,12 @@ static NSString *nodePath() {
     return ringo;
 }
 
++ (instancetype)ringoWithRealmIdentifier:(NSString *)realmId {
+    Person *ringo = [Person ringo];
+    ringo.realm_id = realmId;
+    return ringo;
+}
+
 + (instancetype)george {
     Person *george = [[Person alloc] init];
     george._id = [RLMObjectId objectId];
@@ -169,6 +187,12 @@ static NSString *nodePath() {
     george.firstName = @"George";
     george.lastName = @"Harrison";
     george.realm_id = @"foo";
+    return george;
+}
+
++ (instancetype)georgeWithRealmIdentifier:(NSString *)realmId {
+    Person *george = [Person george];
+    george.realm_id = realmId;
     return george;
 }
 
@@ -593,7 +617,7 @@ static NSURL *syncDirectoryForChildProcess() {
 
     //    REALM_ASSERT(RLMSyncManager.sharedManager._allUsers.count == 0);
 //    if ([self isParent]) {
-        [self resetSyncManager];
+    [self resetSyncManager];
 //    }
 
     [self setupSyncManager];

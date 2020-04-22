@@ -223,9 +223,10 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
                customFileURL:(nullable NSURL *)customFileURL
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     if (self = [super init]) {
+        partitionValue = [[NSString alloc] initWithFormat:@"\"%@\"", partitionValue];
         _config = std::make_unique<SyncConfig>(SyncConfig{
             [user _syncUser],
-            [[[NSString alloc] initWithFormat:@"\"%@\"", partitionValue] UTF8String]
+            [partitionValue UTF8String]
         });
         _config->stop_policy = translateStopPolicy(stopPolicy);
         _config->error_handler = errorHandler;

@@ -655,15 +655,8 @@
                                                                                             register:self.isParent]];
     RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
     if (self.isParent) {
-        Person *john = [[Person alloc] init];
-        john._id = [RLMObjectId objectId];
-        john.age = 30;
-        [john.dogs count];
-        john.firstName = @"John";
-        john.lastName = @"Lennon";
-        john.realm_id = @"foo";
         // Add objects.
-        [self addPersonsToRealm:realm persons:@[john]];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
         RLMRunChildAndWait();
@@ -688,7 +681,11 @@
     register:self.isParent]];
 
     NSData *key = RLMGenerateKey();
-    RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user encryptionKey:key stopPolicy:RLMSyncStopPolicyAfterChangesUploaded immediatelyBlock:nil];
+    RLMRealm *realm = [self openRealmForPartitionValue:@"foo"
+                                                  user:user
+                                         encryptionKey:key
+                                            stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                                      immediatelyBlock:nil];
 
     if (self.isParent) {
         CHECK_COUNT(0, Person, realm);
@@ -699,14 +696,7 @@
                        expectedCounts:@[@1]];
     } else {
         // Add objects.
-        Person *john = [[Person alloc] init];
-        john._id = [RLMObjectId objectId];
-        john.age = 30;
-        [john.dogs count];
-        john.firstName = @"John";
-        john.lastName = @"Lennon";
-        john.realm_id = @"foo";
-        [self addPersonsToRealm:realm persons:@[john]];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
     }
@@ -715,14 +705,15 @@
 /// If an encrypted synced Realm is re-opened with the wrong key, throw an exception.
 - (void)testEncryptedSyncedRealmWrongKey {
     RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-    register:self.isParent]];
+                                                                            register:self.isParent]];
 
     if (self.isParent) {
         NSString *path;
         @autoreleasepool {
             RLMRealm *realm = [self openRealmForPartitionValue:@"foo"
                                                           user:user
-                                                 encryptionKey:RLMGenerateKey() stopPolicy:RLMSyncStopPolicyImmediately
+                                                 encryptionKey:RLMGenerateKey()
+                                                    stopPolicy:RLMSyncStopPolicyImmediately
                                               immediatelyBlock:nil];
 
             path = realm.configuration.pathOnDisk;
@@ -733,12 +724,13 @@
                           partitionValues:@[@"foo"]
                            expectedCounts:@[@1]];
         }
+
         RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
         c.fileURL = [NSURL fileURLWithPath:path];
         RLMAssertThrowsWithError([RLMRealm realmWithConfiguration:c error:nil],
                                  @"Unable to open a realm at path",
                                  RLMErrorFileAccess,
-                                 @"invalid mnemonic");
+                                 @"Realm file initial open failed");
         c.encryptionKey = RLMGenerateKey();
         RLMAssertThrowsWithError([RLMRealm realmWithConfiguration:c error:nil],
                                  @"Unable to open a realm at path",
@@ -747,85 +739,100 @@
     } else {
         RLMRealm *realm = [self openRealmForPartitionValue:@"foo"
                                                       user:user
-                                             encryptionKey:RLMGenerateKey() stopPolicy:RLMSyncStopPolicyImmediately
+                                             encryptionKey:RLMGenerateKey()
+                                                stopPolicy:RLMSyncStopPolicyImmediately
                                           immediatelyBlock:nil];
-        Person *john = [[Person alloc] init];
-        john._id = [RLMObjectId objectId];
-        john.age = 30;
-        [john.dogs count];
-        john.firstName = @"John";
-        john.lastName = @"Lennon";
-        john.realm_id = @"foo";
-        [self addPersonsToRealm:realm persons:@[john]];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
     }
 }
 
 #pragma mark - Multiple Realm Sync
-#if 0
+
 /// If a client opens multiple Realms, there should be one session object for each Realm that was opened.
 - (void)testMultipleRealmsSessions {
-    NSURL *urlA = CUSTOM_REALM_URL(@"a");
-    NSURL *urlB = CUSTOM_REALM_URL(@"b");
-    NSURL *urlC = CUSTOM_REALM_URL(@"c");
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
-                                               server:[RLMObjectServerTests authServerURL]];
+    NSString *partitionValueA = @"foo";
+    NSString *partitionValueB = @"bar";
+    NSString *partitionValueC = @"baz";
+    RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                            register:self.isParent]];
+
     // Open three Realms.
-    __attribute__((objc_precise_lifetime)) RLMRealm *realmealmA = [self openRealmForURL:urlA user:user];
-    __attribute__((objc_precise_lifetime)) RLMRealm *realmealmB = [self openRealmForURL:urlB user:user];
-    __attribute__((objc_precise_lifetime)) RLMRealm *realmealmC = [self openRealmForURL:urlC user:user];
+
+    __attribute__((objc_precise_lifetime)) RLMRealm *realmealmA = [self openRealmForPartitionValue:partitionValueA
+                                                                                              user:user];
+    __attribute__((objc_precise_lifetime)) RLMRealm *realmealmB = [self openRealmForPartitionValue:partitionValueB
+                                                                                              user:user];
+    __attribute__((objc_precise_lifetime)) RLMRealm *realmealmC = [self openRealmForPartitionValue:partitionValueC
+                                                                                              user:user];
     // Make sure there are three active sessions for the user.
     XCTAssert(user.allSessions.count == 3, @"Expected 3 sessions, but didn't get 3 sessions");
-    XCTAssertNotNil([user sessionForURL:urlA], @"Expected to get a session for URL A");
-    XCTAssertNotNil([user sessionForURL:urlB], @"Expected to get a session for URL B");
-    XCTAssertNotNil([user sessionForURL:urlC], @"Expected to get a session for URL C");
-    XCTAssertTrue([user sessionForURL:urlA].state == RLMSyncSessionStateActive, @"Expected active session for URL A");
-    XCTAssertTrue([user sessionForURL:urlB].state == RLMSyncSessionStateActive, @"Expected active session for URL B");
-    XCTAssertTrue([user sessionForURL:urlC].state == RLMSyncSessionStateActive, @"Expected active session for URL C");
+    XCTAssertNotNil([user sessionForPartitionValue:partitionValueA],
+                    @"Expected to get a session for partition value A");
+    XCTAssertNotNil([user sessionForPartitionValue:partitionValueB],
+                    @"Expected to get a session for partition value B");
+    XCTAssertNotNil([user sessionForPartitionValue:partitionValueC],
+                    @"Expected to get a session for partition value C");
+    XCTAssertTrue([user sessionForPartitionValue:partitionValueA].state == RLMSyncSessionStateActive,
+                  @"Expected active session for URL A");
+    XCTAssertTrue([user sessionForPartitionValue:partitionValueB].state == RLMSyncSessionStateActive,
+                  @"Expected active session for URL B");
+    XCTAssertTrue([user sessionForPartitionValue:partitionValueC].state == RLMSyncSessionStateActive,
+                  @"Expected active session for URL C");
 }
 
 /// A client should be able to open multiple Realms and add objects to each of them.
 - (void)testMultipleRealmsAddObjects {
-    NSURL *urlA = CUSTOM_REALM_URL(@"a");
-    NSURL *urlB = CUSTOM_REALM_URL(@"b");
-    NSURL *urlC = CUSTOM_REALM_URL(@"c");
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
-                                               server:[RLMObjectServerTests authServerURL]];
-    RLMRealm *realmA = [self openRealmForURL:urlA user:user];
-    RLMRealm *realmB = [self openRealmForURL:urlB user:user];
-    RLMRealm *realmC = [self openRealmForURL:urlC user:user];
+    NSString *partitionValueA = @"foo";
+    NSString *partitionValueB = @"bar";
+    NSString *partitionValueC = @"baz";
+    RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                            register:self.isParent]];
+
+    RLMRealm *realmA = [self openRealmForPartitionValue:partitionValueA user:user];
+    RLMRealm *realmB = [self openRealmForPartitionValue:partitionValueB user:user];
+    RLMRealm *realmC = [self openRealmForPartitionValue:partitionValueC user:user];
+
     if (self.isParent) {
         [self waitForDownloadsForRealm:realmA];
         [self waitForDownloadsForRealm:realmB];
         [self waitForDownloadsForRealm:realmC];
-        CHECK_COUNT(0, SyncObject, realmA);
-        CHECK_COUNT(0, SyncObject, realmB);
-        CHECK_COUNT(0, SyncObject, realmC);
+        CHECK_COUNT(0, Person, realmA);
+        CHECK_COUNT(0, Person, realmB);
+        CHECK_COUNT(0, Person, realmC);
         RLMRunChildAndWait();
         [self waitForDownloadsForUser:user
                                realms:@[realmA, realmB, realmC]
-                            realmURLs:@[urlA, urlB, urlC]
+                            partitionValues:@[partitionValueA,
+                                              partitionValueB,
+                                              partitionValueC]
                        expectedCounts:@[@3, @2, @5]];
     } else {
         // Add objects.
-        [self addSyncObjectsToRealm:realmA
-                       descriptions:@[@"child-A1", @"child-A2", @"child-A3"]];
-        [self addSyncObjectsToRealm:realmB
-                       descriptions:@[@"child-B1", @"child-B2"]];
-        [self addSyncObjectsToRealm:realmC
-                       descriptions:@[@"child-C1", @"child-C2", @"child-C3", @"child-C4", @"child-C5"]];
+        [self addPersonsToRealm:realmA
+                        persons:@[[Person johnWithRealmIdentifier:partitionValueA],
+                                  [Person paulWithRealmIdentifier:partitionValueA],
+                                  [Person ringoWithRealmIdentifier:partitionValueA]]];
+        [self addPersonsToRealm:realmB
+                        persons:@[[Person johnWithRealmIdentifier:partitionValueB],
+                                  [Person paulWithRealmIdentifier:partitionValueB]]];
+        [self addPersonsToRealm:realmC
+                        persons:@[[Person johnWithRealmIdentifier:partitionValueC],
+                                  [Person paulWithRealmIdentifier:partitionValueC],
+                                  [Person ringoWithRealmIdentifier:partitionValueC],
+                                  [Person georgeWithRealmIdentifier:partitionValueC],
+                                  [Person ringoWithRealmIdentifier:partitionValueC]]];
         [self waitForUploadsForRealm:realmA];
         [self waitForUploadsForRealm:realmB];
         [self waitForUploadsForRealm:realmC];
-        CHECK_COUNT(3, SyncObject, realmA);
-        CHECK_COUNT(2, SyncObject, realmB);
-        CHECK_COUNT(5, SyncObject, realmC);
+        CHECK_COUNT(3, Person, realmA);
+        CHECK_COUNT(2, Person, realmB);
+        CHECK_COUNT(5, Person, realmC);
     }
 }
 
+#if 0
 /// A client should be able to open multiple Realms and delete objects from each of them.
 - (void)testMultipleRealmsDeleteObjects {
     NSURL *urlA = CUSTOM_REALM_URL(@"a");

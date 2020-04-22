@@ -132,13 +132,19 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     context_for(_user).set_error_handler([errorHandler copy]);
 }
 
+- (NSString *)pathForPartitionValueHash:(NSUInteger)partitionValueHash {
+    return [[NSString alloc] initWithFormat:@"%@/%ld", [self identity], partitionValueHash];
+}
+
 - (nullable RLMSyncSession *)sessionForPartitionValue:(NSString *)partitionValue {
+    // FIXME: This step will be encode the partition value as xjson
+    partitionValue = [[NSString alloc] initWithFormat:@"\"%@\"", partitionValue];
+
     if (!_user) {
         return nil;
     }
 
-    auto partition_path = _user->identity() + "/" + [[[NSString alloc] initWithFormat:@"\"%@\"", partitionValue] UTF8String];
-    auto path = SyncManager::shared().path_for_realm(*_user, partition_path);
+    auto path = SyncManager::shared().path_for_realm(*_user, [[self pathForPartitionValueHash:[partitionValue hash]] UTF8String]);
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }

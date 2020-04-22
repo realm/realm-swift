@@ -60,6 +60,7 @@ private:
 
 @interface RLMSyncUser ()
 - (instancetype)initWithSyncUser:(std::shared_ptr<SyncUser>)user app:(RLMApp *)app;
+- (NSString *)pathForPartitionValueHash:(NSUInteger)partitionValueHash;
 - (std::shared_ptr<SyncUser>)_syncUser;
 + (void)_setUpBindingContextFactory;
 @property (weak, readonly) RLMApp* app;

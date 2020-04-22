@@ -50,9 +50,13 @@ RLM_ARRAY_TYPE(Dog)
 @property NSString *realm_id;
 
 + (instancetype)john;
++ (instancetype)johnWithRealmIdentifier:(NSString *)realmId;
 + (instancetype)paul;
++ (instancetype)paulWithRealmIdentifier:(NSString *)realmId;
 + (instancetype)ringo;
++ (instancetype)ringoWithRealmIdentifier:(NSString *)realmId;
 + (instancetype)george;
++ (instancetype)georgeWithRealmIdentifier:(NSString *)realmId;
 
 @end
 
@@ -117,9 +121,6 @@ RLM_ARRAY_TYPE(Dog)
 - (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials;
 
 - (void)addPersonsToRealm:(RLMRealm *)realm persons:(NSArray<Person *> *)persons;
-
-/// Add a number of objects to a Realm.
-- (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions;
 
 /// Synchronously wait for downloads to complete for any number of Realms, and then check their `SyncObject` counts.
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
