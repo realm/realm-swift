@@ -843,14 +843,14 @@
 
 - (void)testAddNotificationBlockFromWrongQueue {
     auto queue = dispatch_queue_create("background queue", DISPATCH_QUEUE_SERIAL);
-    RLMRealm *realm = [RLMRealm defaultRealmForQueue:queue];
     __block RLMResults *results;
-    dispatch_sync(queue, ^{ results = [IntObject allObjectsInRealm:realm]; });
-    [self dispatchAsyncAndWait:^{
-        XCTAssertThrows([results addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
-            XCTFail(@"should not be called");
-        }]);
-    }];
+    dispatch_sync(queue, ^{
+        RLMRealm *realm = [RLMRealm defaultRealmForQueue:queue];
+        results = [IntObject allObjectsInRealm:realm];
+    });
+    XCTAssertThrows([results addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
+        XCTFail(@"should not be called");
+    }]);
 }
 
 - (void)testRemoveNotificationBlockFromWrongThread {
@@ -995,11 +995,11 @@
 
 - (void)testNotificationDeliveryToQueue {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    RLMRealm *bgRealm = [RLMRealm defaultRealmForQueue:self.bgQueue];
     __block RLMNotificationToken *token;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
 
     [self dispatchAsync:^{
+        RLMRealm *bgRealm = [RLMRealm defaultRealmForQueue:self.bgQueue];
         token = [[IntObject allObjectsInRealm:bgRealm] addNotificationBlock:^(RLMResults *results, RLMCollectionChange *, NSError *) {
             XCTAssertNotNil(results);
             XCTAssertNoThrow(results.count);

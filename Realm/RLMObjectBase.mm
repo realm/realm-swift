@@ -616,14 +616,31 @@ struct ObjectChangeCallbackWrapper {
     _object = {};
 }
 
-- (void)addNotificationBlock:(RLMObjectNotificationCallback)block object:(RLMObjectBase *)obj {
+- (void)addNotificationBlock:(RLMObjectNotificationCallback)block
+         threadSafeReference:(RLMThreadSafeReference *)tsr
+                      config:(RLMRealmConfiguration *)config
+                       queue:(dispatch_queue_t)queue {
     std::lock_guard<std::mutex> lock(_mutex);
     if (!_realm) {
         // Token was invalidated before we got this far
         return;
     }
 
+    NSError *error;
+    RLMRealm *realm = _realm = [RLMRealm realmWithConfiguration:config queue:queue error:&error];
+    if (!realm) {
+        block(nil, nil, nil, error);
+        return;
+    }
+    RLMObjectBase *obj = [realm resolveThreadSafeReference:tsr];
+
     _object = realm::Object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
+    _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj});
+}
+
+- (void)addNotificationBlock:(RLMObjectNotificationCallback)block object:(RLMObjectBase *)obj {
+    _object = realm::Object(obj->_realm->_realm, *obj->_info->objectSchema, obj->_row);
+    _realm = obj->_realm;
     _token = _object.add_notification_callback(ObjectChangeCallbackWrapper{block, obj});
 }
 
@@ -641,14 +658,13 @@ RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj, disp
         return token;
     }
 
-    RLMRealm *targetRealm = [RLMRealm realmWithConfiguration:obj->_realm.configuration queue:queue error:nil];
     RLMThreadSafeReference *tsr = [RLMThreadSafeReference referenceWithThreadConfined:(id)obj];
     auto token = [[RLMObjectNotificationToken alloc] init];
     token->_realm = obj->_realm;
+    RLMRealmConfiguration *config = obj->_realm.configuration;
     dispatch_async(queue, ^{
         @autoreleasepool {
-            RLMObjectBase *obj = [targetRealm resolveThreadSafeReference:tsr];
-            [token addNotificationBlock:block object:obj];
+            [token addNotificationBlock:block threadSafeReference:tsr config:config queue:queue];
         }
     });
     return token;

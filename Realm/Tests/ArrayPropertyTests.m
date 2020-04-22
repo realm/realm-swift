@@ -315,6 +315,7 @@
 
     [obj.intObj addObject:@5];
     XCTAssertEqualObjects(obj.intObj.firstObject, @5);
+    [realm cancelWriteTransaction];
 }
 
 - (void)testReplaceObjectAtIndexInUnmanagedArray {

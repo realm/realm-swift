@@ -1532,8 +1532,10 @@
 
     RLMRealm *mainThreadRealm1 = [RLMRealm defaultRealm];
     RLMRealm *mainQueueRealm1 = [RLMRealm defaultRealmForQueue:dispatch_get_main_queue()];
-    RLMRealm *q1Realm1 = [RLMRealm defaultRealmForQueue:q1];
-    RLMRealm *q2Realm1 = [RLMRealm defaultRealmForQueue:q2];
+    __block RLMRealm *q1Realm1;
+    __block RLMRealm *q2Realm1;
+    dispatch_sync(q1, ^{ q1Realm1 = [RLMRealm defaultRealmForQueue:q1]; });
+    dispatch_sync(q2, ^{ q2Realm1 = [RLMRealm defaultRealmForQueue:q2]; });
 
     XCTAssertEqual(mainQueueRealm1, mainThreadRealm1);
 
@@ -1545,8 +1547,10 @@
 
     RLMRealm *mainThreadRealm2 = [RLMRealm defaultRealm];
     RLMRealm *mainQueueRealm2 = [RLMRealm defaultRealmForQueue:dispatch_get_main_queue()];
-    RLMRealm *q1Realm2 = [RLMRealm defaultRealmForQueue:q1];
-    RLMRealm *q2Realm2 = [RLMRealm defaultRealmForQueue:q2];
+    __block RLMRealm *q1Realm2;
+    __block RLMRealm *q2Realm2;
+    dispatch_sync(q1, ^{ q1Realm2 = [RLMRealm defaultRealmForQueue:q1]; });
+    dispatch_sync(q2, ^{ q2Realm2 = [RLMRealm defaultRealmForQueue:q2]; });
 
     XCTAssertEqual(mainThreadRealm1, mainThreadRealm2);
     XCTAssertEqual(mainQueueRealm1, mainQueueRealm2);
@@ -1572,9 +1576,15 @@
 
 - (void)testQueueValidation {
     XCTAssertNoThrow([RLMRealm defaultRealmForQueue:dispatch_get_main_queue()]);
-    XCTAssertNoThrow([RLMRealm defaultRealmForQueue:self.bgQueue]);
-    XCTAssertThrows([RLMRealm defaultRealmForQueue:dispatch_get_global_queue(0, 0)]);
-    XCTAssertThrows([RLMRealm defaultRealmForQueue:dispatch_queue_create("concurrent queue", DISPATCH_QUEUE_CONCURRENT)]);
+    RLMAssertThrowsWithReason([RLMRealm defaultRealmForQueue:self.bgQueue],
+                              @"Realm opened from incorrect dispatch queue.");
+    RLMAssertThrowsWithReasonMatching([RLMRealm defaultRealmForQueue:dispatch_get_global_queue(0, 0)],
+                              @"Invalid queue '.*' \\(.*\\): Realms can only be confined to serial queues or the main queue.");
+    RLMAssertThrowsWithReason([RLMRealm defaultRealmForQueue:dispatch_queue_create("concurrent queue", DISPATCH_QUEUE_CONCURRENT)],
+                              @"Invalid queue 'concurrent queue' (OS_dispatch_queue_concurrent): Realms can only be confined to serial queues or the main queue.");
+    dispatch_sync(self.bgQueue, ^{
+        XCTAssertNoThrow([RLMRealm defaultRealmForQueue:self.bgQueue]);
+    });
 }
 
 - (void)testQueueChecking {
@@ -1582,8 +1592,10 @@
     auto q2 = dispatch_queue_create("queue 2", DISPATCH_QUEUE_SERIAL);
 
     RLMRealm *mainRealm = [RLMRealm defaultRealmForQueue:dispatch_get_main_queue()];
-    RLMRealm *q1Realm = [RLMRealm defaultRealmForQueue:q1];
-    RLMRealm *q2Realm = [RLMRealm defaultRealmForQueue:q2];
+    __block RLMRealm *q1Realm;
+    __block RLMRealm *q2Realm;
+    dispatch_sync(q1, ^{ q1Realm = [RLMRealm defaultRealmForQueue:q1]; });
+    dispatch_sync(q2, ^{ q2Realm = [RLMRealm defaultRealmForQueue:q2]; });
 
     XCTAssertNoThrow([mainRealm refresh]);
     RLMAssertThrowsWithReason([q1Realm refresh], @"thread");

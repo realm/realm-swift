@@ -492,6 +492,9 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
             else {
                 config.scheduler = realm::util::Scheduler::make_dispatch((__bridge void *)queue);
             }
+            if (!config.scheduler->is_on_thread()) {
+                throw RLMException(@"Realm opened from incorrect dispatch queue.");
+            }
         }
         realm->_realm = Realm::get_shared_realm(config);
     }

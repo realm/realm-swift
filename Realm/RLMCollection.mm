@@ -434,15 +434,21 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
         return token;
     }
 
-    RLMRealm *targetRealm = [RLMRealm realmWithConfiguration:realm.configuration queue:queue error:nil];
     RLMThreadSafeReference *tsr = [RLMThreadSafeReference referenceWithThreadConfined:collection];
-    token->_realm = targetRealm;
+    token->_realm = realm;
+    RLMRealmConfiguration *config = realm.configuration;
     dispatch_async(queue, ^{
         std::lock_guard<std::mutex> lock(token->_mutex);
         if (!token->_realm) {
             return;
         }
-        RLMCollection *collection = [targetRealm resolveThreadSafeReference:tsr];
+        NSError *error;
+        RLMRealm *realm = token->_realm = [RLMRealm realmWithConfiguration:config queue:queue error:&error];
+        if (!realm) {
+            block(nil, nil, error);
+            return;
+        }
+        RLMCollection *collection = [realm resolveThreadSafeReference:tsr];
         token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skip});
     });
     return token;
