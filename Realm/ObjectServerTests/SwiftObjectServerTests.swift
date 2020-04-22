@@ -30,8 +30,8 @@ class Person: Object {
     override class func shouldIncludeInDefaultSchema() -> Bool { return false }
 }
 
+#if (false)
 class SwiftObjectServerTests: SwiftSyncTestCase {
-
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
         let url = URL(string: "realm://127.0.0.1:9080/~/testBasicSync")!
@@ -550,3 +550,4 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         return directory.appendingPathComponent(fileName, isDirectory: false)
     }
 }
+#endif
