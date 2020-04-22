@@ -24,6 +24,7 @@
 #define RLM_GENERIC_ARRAY(CLASS) RLMArray<CLASS>
 #endif
 
+#if 0
 #pragma mark - Abstract Objects
 #pragma mark -
 
@@ -491,3 +492,4 @@ RLM_ARRAY_TYPE(RenamedProperties2)
 
 @interface FakeEmbeddedObject : RLMEmbeddedObject
 @end
+#endif

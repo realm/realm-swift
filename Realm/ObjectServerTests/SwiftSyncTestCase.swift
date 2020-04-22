@@ -19,11 +19,18 @@
 import XCTest
 import RealmSwift
 
+#if false
 class SwiftSyncObject: Object {
+    @objc dynamic var _id: ObjectId = ObjectId()
     @objc dynamic var stringProp: String = ""
+
+    override class func primaryKey() -> String? {
+        return "_id"
+    }
 }
 
 class SwiftHugeSyncObject: Object {
+    @objc dynamic var _id: ObjectId = ObjectId()
     @objc dynamic var dataProp: NSData?
 
     required init() {
@@ -34,6 +41,10 @@ class SwiftHugeSyncObject: Object {
         free(ptr)
     }
 
+    override class func primaryKey() -> String? {
+        return "_id"
+    }
+
     required init(realm: RLMRealm, schema: RLMObjectSchema) {
         fatalError("init(realm:schema:) has not been implemented")
     }
@@ -42,29 +53,29 @@ class SwiftHugeSyncObject: Object {
     }
 }
 
-class SwiftPartialSyncObjectA: Object {
-    @objc dynamic var number: Int = 0
-    @objc dynamic var string: String = ""
-
-    convenience init(number: Int, string: String) {
-        self.init()
-        self.number = number
-        self.string = string
-    }
-}
-
-class SwiftPartialSyncObjectB: Object {
-    @objc dynamic var number: Int = 0
-    @objc dynamic var firstString: String = ""
-    @objc dynamic var secondString: String = ""
-
-    convenience init(number: Int, firstString: String, secondString: String) {
-        self.init()
-        self.number = number
-        self.firstString = firstString
-        self.secondString = secondString
-    }
-}
+//class SwiftPartialSyncObjectA: Object {
+//    @objc dynamic var number: Int = 0
+//    @objc dynamic var string: String = ""
+//
+//    convenience init(number: Int, string: String) {
+//        self.init()
+//        self.number = number
+//        self.string = string
+//    }
+//}
+//
+//class SwiftPartialSyncObjectB: Object {
+//    @objc dynamic var number: Int = 0
+//    @objc dynamic var firstString: String = ""
+//    @objc dynamic var secondString: String = ""
+//
+//    convenience init(number: Int, firstString: String, secondString: String) {
+//        self.init()
+//        self.number = number
+//        self.firstString = firstString
+//        self.secondString = secondString
+//    }
+//}
 
 // MARK: Test case
 
@@ -94,8 +105,11 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return .usernamePassword(username: "\(filename)\(line)\(usernameSuffix)", password: "a")
     }
 
-    func synchronouslyOpenRealm(url: URL, user: SyncUser, file: StaticString = #file, line: UInt = #line) throws -> Realm {
-        let config = user.configuration(realmURL: url, fullSynchronization: true)
+    func synchronouslyOpenRealm(partitionValue: String,
+                                user: SyncUser,
+                                file: StaticString = #file,
+                                line: UInt = #line) throws -> Realm {
+        let config = user.configuration(partitionValue: partitionValue)
         return try synchronouslyOpenRealm(configuration: config)
     }
 
@@ -116,12 +130,11 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return realm
     }
 
-    func immediatelyOpenRealm(url: URL, user: SyncUser) throws -> Realm {
-        return try Realm(configuration: user.configuration(realmURL: url, fullSynchronization: true))
+    func immediatelyOpenRealm(partitionValue: String, user: SyncUser) throws -> Realm {
+        return try Realm(configuration: user.configuration(partitionValue: partitionValue))
     }
 
     func synchronouslyLogInUser(for credentials: AppCredentials,
-                                server url: URL,
                                 file: StaticString = #file,
                                 line: UInt = #line) throws -> SyncUser {
         let process = isParent ? "parent" : "child"
@@ -130,6 +143,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         let ex = expectation(description: "Should log in the user properly")
         // FIXME: [realmapp] This should use the new login
         fatalError("test not implemented")
+        
         waitForExpectations(timeout: 10, handler: nil)
         XCTAssertNotNil(theUser, file: file, line: line)
         XCTAssertEqual(theUser?.state, .loggedIn,
@@ -160,3 +174,4 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                   line: line)
     }
 }
+#endif

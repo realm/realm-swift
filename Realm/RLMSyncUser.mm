@@ -27,7 +27,6 @@
 #import "RLMSyncConfiguration.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.h"
-#import "RLMSyncSessionRefreshHandle.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
@@ -37,30 +36,6 @@
 #import "sync/sync_user.hpp"
 
 using namespace realm;
-
-void CocoaSyncUserContext::register_refresh_handle(const std::string& path, RLMSyncSessionRefreshHandle *handle)
-{
-    REALM_ASSERT(handle);
-    std::lock_guard<std::mutex> lock(m_mutex);
-    auto& refresh_handle = m_refresh_handles[path];
-    [refresh_handle invalidate];
-    refresh_handle = handle;
-}
-
-void CocoaSyncUserContext::unregister_refresh_handle(const std::string& path)
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    m_refresh_handles.erase(path);
-}
-
-void CocoaSyncUserContext::invalidate_all_handles()
-{
-    std::lock_guard<std::mutex> lock(m_mutex);
-    for (auto& it : m_refresh_handles) {
-        [it.second invalidate];
-    }
-    m_refresh_handles.clear();
-}
 
 RLMUserErrorReportingBlock CocoaSyncUserContext::error_handler() const
 {
@@ -94,9 +69,11 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
 
 #pragma mark - API
 
-- (instancetype)initWithSyncUser:(std::shared_ptr<SyncUser>)user {
+- (instancetype)initWithSyncUser:(std::shared_ptr<SyncUser>)user
+                             app:(RLMApp *)app {
     if (self = [super init]) {
         _user = user;
+        _app = app;
         return self;
     }
     return nil;
@@ -109,27 +86,19 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     return _user == ((RLMSyncUser *)object)->_user;
 }
 
-- (RLMRealmConfiguration *)configuration {
-    return [self configurationWithURL:nil
-                  enableSSLValidation:YES
-                            urlPrefix:nil];
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(NSString *)partitionValue {
+    return [self configurationWithPartitionValue:partitionValue
+                             enableSSLValidation:YES];
 }
 
-- (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url {
-    return [self configurationWithURL:url
-                  enableSSLValidation:YES
-                            urlPrefix:nil];
-}
-
-- (RLMRealmConfiguration *)configurationWithURL:(NSURL *)url
-                            enableSSLValidation:(bool)enableSSLValidation
-                                      urlPrefix:(NSString * _Nullable)urlPrefix {
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(NSString *)partitionValue
+                                       enableSSLValidation:(bool)enableSSLValidation {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
-                                                        realmURL:url
-                                                   customFileURL:nil stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
-    syncConfig.urlPrefix = urlPrefix;
+                                                  partitionValue:partitionValue
+                                                   customFileURL:nil
+                                                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
     syncConfig.enableSSLValidation = enableSSLValidation;
-    syncConfig.pinnedCertificateURL = RLMSyncManager.sharedManager.pinnedCertificatePaths[syncConfig.realmURL.host];
+//    syncConfig.pinnedCertificateURL = RLMSyncManager.sharedManager.pinnedCertificatePaths[syncConfig.realmURL.host];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = syncConfig;
     return config;
@@ -140,14 +109,12 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
         return;
     }
     _user->log_out();
-    context_for(_user).invalidate_all_handles();
 }
 
 - (void)invalidate {
     if (!_user) {
         return;
     }
-    context_for(_user).invalidate_all_handles();
     _user = nullptr;
 }
 
@@ -165,11 +132,13 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
     context_for(_user).set_error_handler([errorHandler copy]);
 }
 
-- (nullable RLMSyncSession *)sessionForURL:(NSURL *)url {
+- (nullable RLMSyncSession *)sessionForPartitionValue:(NSString *)partitionValue {
     if (!_user) {
         return nil;
     }
-    auto path = SyncManager::shared().path_for_realm(*_user, [url.absoluteString UTF8String]);
+
+    auto partition_path = _user->identity() + "/" + [[[NSString alloc] initWithFormat:@"\"%@\"", partitionValue] UTF8String];
+    auto path = SyncManager::shared().path_for_realm(*_user, partition_path);
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }

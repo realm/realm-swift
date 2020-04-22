@@ -16,12 +16,12 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
+#import "RLMApp_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
 
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncManager_Private.h"
 #import "RLMSyncSession_Private.hpp"
-#import "RLMSyncSessionRefreshHandle.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
@@ -53,21 +53,17 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
         return RLMSyncSystemErrorKindUnknown;
     }
 }
-
-BOOL isValidRealmURL(NSURL *url) {
-    NSString *scheme = [url scheme];
-    return [scheme isEqualToString:@"realm"] || [scheme isEqualToString:@"realms"];
-}
 }
 
 @interface RLMSyncConfiguration () {
     std::unique_ptr<realm::SyncConfig> _config;
 }
 
-- (instancetype)initWithUser:(RLMSyncUser *)user
-                    realmURL:(NSURL *)url
-               customFileURL:(nullable NSURL *)customFileURL
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy;
+- (instancetype)initWithApp:(RLMApp *)app
+                       user:(RLMSyncUser *)user
+             partitionValue:(NSString *)partitionValue
+              customFileURL:(nullable NSURL *)customFileURL
+                 stopPolicy:(RLMSyncStopPolicy)stopPolicy;
 @end
 
 @implementation RLMSyncConfiguration
@@ -86,9 +82,9 @@ BOOL isValidRealmURL(NSURL *url) {
         return NO;
     }
     RLMSyncConfiguration *that = (RLMSyncConfiguration *)object;
-    return [self.realmURL isEqual:that.realmURL]
-        && [self.user isEqual:that.user]
-        && self.stopPolicy == that.stopPolicy;
+    return [self.partitionValue isEqual:that.partitionValue]
+    && [self.user isEqual:that.user]
+    && self.stopPolicy == that.stopPolicy;
 }
 
 - (void)setEnableSSLValidation:(BOOL)enableSSLValidation {
@@ -125,7 +121,9 @@ BOOL isValidRealmURL(NSURL *url) {
 }
 
 - (RLMSyncUser *)user {
-    return [[RLMSyncUser alloc] initWithSyncUser:_config->user];
+    auto app = realm::SyncManager::shared().app();
+    return [[RLMSyncUser alloc] initWithSyncUser:_config->user
+                                             app:[[RLMApp alloc] initWithApp:app]];
 }
 
 - (RLMSyncStopPolicy)stopPolicy {
@@ -136,19 +134,11 @@ BOOL isValidRealmURL(NSURL *url) {
     _config->stop_policy = translateStopPolicy(stopPolicy);
 }
 
-- (NSString *)urlPrefix {
-    if (_config->url_prefix) {
-        return @(_config->url_prefix->c_str());
+- (NSString *)partitionValue {
+    if (!_config->partition_value.empty()) {
+        return @(_config->partition_value.c_str());
     }
     return nil;
-}
-
-- (void)setUrlPrefix:(NSString *)urlPrefix {
-    if (urlPrefix) {
-        _config->url_prefix.emplace(urlPrefix.UTF8String);
-    } else {
-        _config->url_prefix = none;
-    }
 }
 
 - (bool)cancelAsyncOpenOnNonFatalErrors {
@@ -159,44 +149,26 @@ BOOL isValidRealmURL(NSURL *url) {
     _config->cancel_waits_on_nonfatal_error = cancelAsyncOpenOnNonFatalErrors;
 }
 
-- (NSURL *)realmURL {
-    NSString *rawStringURL = @(_config->realm_url.c_str());
-    return [NSURL URLWithString:rawStringURL];
-}
-
-- (instancetype)initWithUser:(RLMSyncUser *)user realmURL:(NSURL *)url {
+- (instancetype)initWithUser:(RLMSyncUser *)user
+              partitionValue:(NSString *)partitionValue {
     return [self initWithUser:user
-                     realmURL:url
+               partitionValue:partitionValue
                 customFileURL:nil
                    stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
 }
 
 - (instancetype)initWithUser:(RLMSyncUser *)user
-                    realmURL:(NSURL *)url
-                   urlPrefix:(NSString *)urlPrefix
+              partitionValue:(NSString *)partitionValue
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
          enableSSLValidation:(BOOL)enableSSLValidation
              certificatePath:(nullable NSURL *)certificatePath {
     auto config = [self initWithUser:user
-                            realmURL:url
+                      partitionValue:partitionValue
                        customFileURL:nil
                           stopPolicy:stopPolicy];
-    config.urlPrefix = urlPrefix;
     config.enableSSLValidation = enableSSLValidation;
     config.pinnedCertificateURL = certificatePath;
     return config;
-}
-
-static void bindHandler(std::string const&, SyncConfig const& config, std::shared_ptr<SyncSession> session) {
-    const std::shared_ptr<SyncUser>& user = config.user;
-    NSURL *realmURL = [NSURL URLWithString:@(config.realm_url.c_str())];
-    NSString *path = [realmURL path];
-    REALM_ASSERT(realmURL && path);
-    auto handle = [[RLMSyncSessionRefreshHandle alloc] initWithRealmURL:realmURL
-                                                                   user:user
-                                                                session:std::move(session)
-                                                        completionBlock:RLMSyncManager.sharedManager.sessionCompletionNotifier];
-    context_for(user).register_refresh_handle([path UTF8String], handle);
 }
 
 static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError error) {
@@ -235,7 +207,7 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
             shouldMakeError = error.is_fatal;
             break;
     }
-    auto errorHandler = RLMSyncManager.sharedManager.errorHandler;
+    auto errorHandler = RLMApp.sharedManager.errorHandler;
     if (!shouldMakeError || !errorHandler) {
         return;
     }
@@ -247,27 +219,22 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
 };
 
 - (instancetype)initWithUser:(RLMSyncUser *)user
-                    realmURL:(NSURL *)url
+              partitionValue:(NSString *)partitionValue
                customFileURL:(nullable NSURL *)customFileURL
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     if (self = [super init]) {
-        if (!isValidRealmURL(url)) {
-            @throw RLMException(@"The provided URL (%@) was not a valid Realm URL.", [url absoluteString]);
-        }
-
         _config = std::make_unique<SyncConfig>(SyncConfig{
             [user _syncUser],
-            [[url absoluteString] UTF8String]
+            [[[NSString alloc] initWithFormat:@"\"%@\"", partitionValue] UTF8String]
         });
         _config->stop_policy = translateStopPolicy(stopPolicy);
-        _config->bind_session_handler = bindHandler;
         _config->error_handler = errorHandler;
         _config->client_resync_mode = realm::ClientResyncMode::Manual;
 
-        if (NSString *authorizationHeaderName = [RLMSyncManager sharedManager].authorizationHeaderName) {
+        if (NSString *authorizationHeaderName = [RLMApp sharedManager].authorizationHeaderName) {
             _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);
         }
-        if (NSDictionary<NSString *, NSString *> *customRequestHeaders = [RLMSyncManager sharedManager].customRequestHeaders) {
+        if (NSDictionary<NSString *, NSString *> *customRequestHeaders = [RLMApp sharedManager].customRequestHeaders) {
             for (NSString *key in customRequestHeaders) {
                 _config->custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
             }

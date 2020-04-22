@@ -31,8 +31,7 @@ typedef RLM_CLOSED_ENUM(NSUInteger, RLMSyncStopPolicy) {
 @interface RLMSyncConfiguration ()
 
 - (instancetype)initWithUser:(RLMSyncUser *)user
-                    realmURL:(NSURL *)url
-                   urlPrefix:(nullable NSString *)urlPrefix
+              partitionValue:(NSString *)partitionValue
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
          enableSSLValidation:(BOOL)enableSSLValidation
              certificatePath:(nullable NSURL *)certificatePath;

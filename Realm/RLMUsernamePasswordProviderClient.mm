@@ -24,7 +24,7 @@
 @implementation RLMUsernamePasswordProviderClient
 
 - (realm::app::App::UsernamePasswordProviderClient)client {
-    return self.app._realmApp.provider_client<realm::app::App::UsernamePasswordProviderClient>();
+    return self.app._realmApp->provider_client<realm::app::App::UsernamePasswordProviderClient>();
 }
 
 - (void)registerEmail:(NSString *)email

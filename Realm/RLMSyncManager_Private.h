@@ -21,7 +21,7 @@
 #import "RLMSyncUtil_Private.h"
 #import "RLMNetworkTransport.h"
 
-@class RLMSyncUser, RLMSyncConfiguration;
+@class RLMApp, RLMSyncUser, RLMSyncConfiguration;
 
 // All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
 // called very infrequently, this should pose no issues.
@@ -32,11 +32,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock sessionCompletionNotifier;
 
+/// The sole instance of the singleton.
++ (instancetype)sharedManagerWithApp:(RLMApp *)app NS_REFINED_FOR_SWIFT;
+
+- (void)configureWithRootDirectory:(nullable NSURL *)rootDirectory
+                               app:(nullable RLMApp *)app;
+
 - (void)_fireError:(NSError *)error;
-
-- (NSArray<RLMSyncUser *> *)_allUsers;
-
-- (RLMSyncUser *)_currentUser;
 
 + (void)resetForTesting;
 

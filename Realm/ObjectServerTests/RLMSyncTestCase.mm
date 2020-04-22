@@ -25,7 +25,6 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMSyncManager_Private.h"
-#import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncConfiguration_Private.h"
 #import "RLMUtil.hpp"
 #import "RLMApp.h"
@@ -54,7 +53,6 @@ static NSString *nodePath() {
 
 @interface RLMSyncManager ()
 + (void)_setCustomBundleID:(NSString *)customBundleID;
-- (void)configureWithRootDirectory:(NSURL *)rootDirectory;
 - (NSArray<RLMSyncUser *> *)_allUsers;
 @end
 
@@ -71,18 +69,107 @@ static NSString *nodePath() {
 - (std::shared_ptr<realm::SyncUser>)_syncUser;
 @end
 
-@implementation SyncObject
+//@implementation SyncObject
+//
+//+ (NSString *)primaryKey {
+//    return @"_id";
+//}
+//
+//+ (NSArray *)requiredProperties {
+//    return @[@"_id"];
+//}
+//
+//@end
+//
+//@implementation HugeSyncObject
+//
+//+ (NSString *)primaryKey {
+//    return @"_id";
+//}
+//
+//+ (NSArray *)requiredProperties {
+//    return @[@"_id"];
+//}
+//
+//+ (instancetype)object  {
+//    const NSInteger fakeDataSize = 1000000;
+//    HugeSyncObject *object = [[self alloc] init];
+//    char fakeData[fakeDataSize];
+//    memset(fakeData, 16, sizeof(fakeData));
+//    object.dataProp = [NSData dataWithBytes:fakeData length:sizeof(fakeData)];
+//    return object;
+//}
+//
+//@end
+
+@implementation Dog
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"_id", @"name"];
+}
+
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": [RLMObjectId objectId]};
+}
+
 @end
 
-@implementation HugeSyncObject
+@implementation Person
 
-+ (instancetype)object  {
-    const NSInteger fakeDataSize = 1000000;
-    HugeSyncObject *object = [[self alloc] init];
-    char fakeData[fakeDataSize];
-    memset(fakeData, 16, sizeof(fakeData));
-    object.dataProp = [NSData dataWithBytes:fakeData length:sizeof(fakeData)];
-    return object;
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": [RLMObjectId objectId]};
+}
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (NSArray *)requiredProperties {
+    return @[@"_id", @"firstName", @"lastName", @"age", @"dogs"];
+}
+
++ (instancetype)john {
+    Person *john = [[Person alloc] init];
+    john._id = [RLMObjectId objectId];
+    john.age = 30;
+    john.firstName = @"John";
+    john.lastName = @"Lennon";
+    john.realm_id = @"foo";
+    return john;
+}
+
++ (instancetype)paul {
+    Person *paul = [[Person alloc] init];
+    paul._id = [RLMObjectId objectId];
+    paul.age = 30;
+    paul.firstName = @"Paul";
+    paul.lastName = @"McCartney";
+    paul.realm_id = @"foo";
+    return paul;
+}
+
++ (instancetype)ringo {
+    Person *ringo = [[Person alloc] init];
+    ringo._id = [RLMObjectId objectId];
+    ringo.age = 30;
+    ringo.firstName = @"Ringo";
+    ringo.lastName = @"Starr";
+    ringo.realm_id = @"foo";
+    return ringo;
+}
+
++ (instancetype)george {
+    Person *george = [[Person alloc] init];
+    george._id = [RLMObjectId objectId];
+    george.age = 30;
+    george.firstName = @"George";
+    george.lastName = @"Harrison";
+    george.realm_id = @"foo";
+    return george;
 }
 
 @end
@@ -158,7 +245,7 @@ static NSURL *syncDirectoryForChildProcess() {
         }
 
         atexit([] {
-            [[RealmObjectServer sharedServer] cleanUp];
+//            [[RealmObjectServer sharedServer] cleanUp];
         });
     }
     return self;
@@ -184,7 +271,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (NSString *)createApp {
-    // Set up the actual ROS task
+    // Set up the actual MongoDB Realm creation task
     NSPipe *pipe = [NSPipe pipe];
     NSTask *task = [[NSTask alloc] init];
     task.launchPath = nodePath();
@@ -203,10 +290,31 @@ static NSURL *syncDirectoryForChildProcess() {
     return appId;
 }
 
+- (NSString *)lastApp {
+    // Set up the actual MongoDB Realm last app task
+    NSPipe *pipe = [NSPipe pipe];
+    NSTask *task = [[NSTask alloc] init];
+    task.launchPath = nodePath();
+    NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
+    task.arguments = @[[directory stringByAppendingPathComponent:@"admin.js"], @"last"];
+    task.standardOutput = pipe;
+    [task launch];
+
+    NSData *childStdout = pipe.fileHandleForReading.readDataToEndOfFile;
+    NSString *appId = [[NSString alloc] initWithData:childStdout encoding:NSUTF8StringEncoding];
+
+    if (!appId.length) {
+        abort();
+    }
+
+    return appId;
+}
+
+
 - (NSString *)desiredAdminSDKVersion {
     auto path = [[[[@(__FILE__) stringByDeletingLastPathComponent] // RLMSyncTestCase.mm
-                 stringByDeletingLastPathComponent] // ObjectServerTests
-                 stringByDeletingLastPathComponent] // Realm
+                   stringByDeletingLastPathComponent] // ObjectServerTests
+                  stringByDeletingLastPathComponent] // Realm
                  stringByAppendingPathComponent:@"dependencies.list"];
     auto file = [NSString stringWithContentsOfFile:path encoding:NSUTF8StringEncoding error:nil];
     if (!file) {
@@ -263,7 +371,7 @@ static NSURL *syncDirectoryForChildProcess() {
                        @"--no-package-lock",
                        @"install",
                        [@"mongodb-stitch@" stringByAppendingString:desiredVersion]
-                       ];
+    ];
     [task launch];
     [task waitUntilExit];
 }
@@ -277,17 +385,22 @@ static NSURL *syncDirectoryForChildProcess() {
     return NO;
 }
 
-+ (NSURL *)authServerURL {
-    return [NSURL URLWithString:@"http://127.0.0.1:9090"];
+
+- (RLMApp *)app {
+    return [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
 }
 
-+ (NSURL *)secureAuthServerURL {
-    return [NSURL URLWithString:@"https://localhost:9443"];
-}
-
-+ (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
+- (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
+    if (shouldRegister) {
+        XCTestExpectation *expectation = [self expectationWithDescription:@""];
+        [[[self app] usernamePasswordProviderClient] registerEmail:name password:@"password" completion:^(NSError * _Nullable error) {
+            XCTAssertNil(error);
+            [expectation fulfill];
+        }];
+        [self waitForExpectationsWithTimeout:4.0 handler:nil];
+    }
     return [RLMAppCredentials credentialsWithUsername:name
-                                              password:@"a"];
+                                             password:@"password"];
 }
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm {
@@ -302,62 +415,46 @@ static NSURL *syncDirectoryForChildProcess() {
                                  defaultRequestTimeoutMS:60];
 }
 
-- (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions {
+- (void)addPersonsToRealm:(RLMRealm *)realm persons:(NSArray<Person *> *)persons {
     [realm beginWriteTransaction];
-    for (NSString *desc in descriptions) {
-        [SyncObject createInRealm:realm withValue:@[desc]];
-    }
+    [realm addObjects:persons];
     [realm commitWriteTransaction];
 }
 
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
                          realms:(NSArray<RLMRealm *> *)realms
-                      realmURLs:(NSArray<NSURL *> *)realmURLs
+                      partitionValues:(NSArray<NSString *> *)partitionValues
                  expectedCounts:(NSArray<NSNumber *> *)counts {
-    NSAssert(realms.count == counts.count && realms.count == realmURLs.count,
+    NSAssert(realms.count == counts.count && realms.count == partitionValues.count,
              @"Test logic error: all array arguments must be the same size.");
     for (NSUInteger i = 0; i < realms.count; i++) {
-        [self waitForDownloadsForUser:user url:realmURLs[i] expectation:nil error:nil];
+        [self waitForDownloadsForUser:user partitionValue:partitionValues[i] expectation:nil error:nil];
         [realms[i] refresh];
-        CHECK_COUNT([counts[i] integerValue], SyncObject, realms[i]);
+        CHECK_COUNT([counts[i] integerValue], Person, realms[i]);
     }
 }
 
-- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
-    return [self openRealmForURL:url user:user immediatelyBlock:nil];
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user {
+    return [self openRealmForPartitionValue:partitionValue user:user immediatelyBlock:nil];
 }
 
-- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user immediatelyBlock:(void(^)(void))block {
-    return [self openRealmForURL:url
-                            user:user
-                   encryptionKey:nil
-                      stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
-                immediatelyBlock:block];
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user immediatelyBlock:(void(^)(void))block {
+    return [self openRealmForPartitionValue:partitionValue
+                                       user:user
+                              encryptionKey:nil
+                                 stopPolicy:RLMSyncStopPolicyAfterChangesUploaded
+                           immediatelyBlock:block];
 }
 
-- (RLMRealm *)openRealmForURL:(NSURL *)url
-                         user:(RLMSyncUser *)user
-                encryptionKey:(nullable NSData *)encryptionKey
-                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
-             immediatelyBlock:(nullable void(^)(void))block {
-    const NSTimeInterval timeout = 4;
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    RLMSyncManager.sharedManager.sessionCompletionNotifier = ^(NSError *error) {
-        if (error) {
-            XCTFail(@"Received an asynchronous error when trying to open Realm at '%@' for user '%@': %@ (process: %@)",
-                    url, user.identity, error, self.isParent ? @"parent" : @"child");
-        }
-        dispatch_semaphore_signal(sema);
-    };
-
-    RLMRealm *realm = [self immediatelyOpenRealmForURL:url user:user encryptionKey:encryptionKey stopPolicy:stopPolicy];
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
+                                    user:(RLMSyncUser *)user
+                           encryptionKey:(nullable NSData *)encryptionKey
+                              stopPolicy:(RLMSyncStopPolicy)stopPolicy
+                        immediatelyBlock:(nullable void(^)(void))block {
+    RLMRealm *realm = [self immediatelyOpenRealmForPartitionValue:partitionValue user:user encryptionKey:encryptionKey stopPolicy:stopPolicy];
     if (block) {
         block();
     }
-    // Wait for login to succeed or fail.
-    XCTAssert(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0,
-              @"Timed out while trying to asynchronously open Realm for URL: %@", url);
-    RLMSyncManager.sharedManager.sessionCompletionNotifier = nil;
     return realm;
 }
 
@@ -366,39 +463,25 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMRealm *)openRealmWithConfiguration:(RLMRealmConfiguration *)configuration
-             immediatelyBlock:(nullable void(^)(void))block {
-    const NSTimeInterval timeout = 4;
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    RLMSyncConfiguration *syncConfig = configuration.syncConfiguration;
-    RLMSyncManager.sharedManager.sessionCompletionNotifier = ^(NSError *error) {
-        if (error) {
-            XCTFail(@"Received an asynchronous error when trying to open Realm at '%@' for user '%@': %@ (process: %@)",
-                    syncConfig.realmURL, syncConfig.user.identity, error, self.isParent ? @"parent" : @"child");
-        }
-        dispatch_semaphore_signal(sema);
-    };
-
+                        immediatelyBlock:(nullable void(^)(void))block {
     RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:nullptr];
     if (block) {
         block();
     }
-    // Wait for login to succeed or fail.
-    XCTAssert(dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0,
-              @"Timed out while trying to asynchronously open Realm for URL: %@", syncConfig.realmURL);
     return realm;
 }
-- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
-    return [self immediatelyOpenRealmForURL:url
-                                       user:user
-                              encryptionKey:nil
-                                 stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user {
+    return [self immediatelyOpenRealmForPartitionValue:partitionValue
+                                                  user:user
+                                         encryptionKey:nil
+                                            stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
 }
 
-- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url
-                                    user:(RLMSyncUser *)user
-                           encryptionKey:(NSData *)encryptionKey
-                              stopPolicy:(RLMSyncStopPolicy)stopPolicy {
-    auto c = [user configurationWithURL:url];
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue
+                                               user:(RLMSyncUser *)user
+                                      encryptionKey:(NSData *)encryptionKey
+                                         stopPolicy:(RLMSyncStopPolicy)stopPolicy {
+    auto c = [user configurationWithPartitionValue:partitionValue];
     c.encryptionKey = encryptionKey;
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
     syncConfig.stopPolicy = stopPolicy;
@@ -406,12 +489,13 @@ static NSURL *syncDirectoryForChildProcess() {
     return [RLMRealm realmWithConfiguration:c error:nil];
 }
 
-- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials
-                                  server:(NSURL *)url {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials {
+    RLMApp *app = [self app];
     __block RLMSyncUser* theUser;
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
     [app loginWithCredential:credentials completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable) {
         theUser = user;
+        [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
     XCTAssertTrue(theUser.state == RLMSyncUserStateLoggedIn, @"User should have been valid, but wasn't");
@@ -427,11 +511,11 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
-                            url:(NSURL *)url
+                 partitionValue:(NSString *)partitionValue
                     expectation:(XCTestExpectation *)expectation
                           error:(NSError **)error {
-    RLMSyncSession *session = [user sessionForURL:url];
-    NSAssert(session, @"Cannot call with invalid URL");
+    RLMSyncSession *session = [user sessionForPartitionValue:partitionValue];
+    NSAssert(session, @"Cannot call with invalid partition value");
     XCTestExpectation *ex = expectation ?: [self expectationWithDescription:@"Wait for download completion"];
     __block NSError *theError = nil;
     BOOL queued = [session waitForDownloadCompletionOnQueue:nil callback:^(NSError *err) {
@@ -491,10 +575,10 @@ static NSURL *syncDirectoryForChildProcess() {
 // FIXME: remove this API once the new token system is implemented.
 - (void)primeSyncManagerWithSemaphore:(dispatch_semaphore_t)semaphore {
     if (semaphore == nil) {
-        [[RLMSyncManager sharedManager] setSessionCompletionNotifier:^(__unused NSError *error){ }];
+        [[RLMApp sharedManager] setSessionCompletionNotifier:^(__unused NSError *error){ }];
         return;
     }
-    [[RLMSyncManager sharedManager] setSessionCompletionNotifier:^(NSError *error) {
+    [[RLMApp sharedManager] setSessionCompletionNotifier:^(NSError *error) {
         XCTAssertNil(error, @"Session completion block returned with an error: %@", error);
         dispatch_semaphore_signal(semaphore);
     }];
@@ -506,18 +590,18 @@ static NSURL *syncDirectoryForChildProcess() {
     [super setUp];
     self.continueAfterFailure = NO;
 
-    REALM_ASSERT(RLMSyncManager.sharedManager._allUsers.count == 0);
-    [self resetSyncManager];
+
+    //    REALM_ASSERT(RLMSyncManager.sharedManager._allUsers.count == 0);
+//    if ([self isParent]) {
+        [self resetSyncManager];
+//    }
+
     [self setupSyncManager];
 }
 
 - (void)tearDown {
     [self resetSyncManager];
     [super tearDown];
-}
-
-+ (void)tearDown {
-
 }
 
 - (void)setupSyncManager {
@@ -527,6 +611,7 @@ static NSURL *syncDirectoryForChildProcess() {
         clientDataRoot = [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
     }
     else {
+        _appId = [RealmObjectServer.sharedServer lastApp];
         clientDataRoot = syncDirectoryForChildProcess();
     }
 
@@ -534,16 +619,26 @@ static NSURL *syncDirectoryForChildProcess() {
     [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:&error];
     [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
                            withIntermediateDirectories:YES attributes:nil error:&error];
-    RLMSyncManager *syncManager = RLMSyncManager.sharedManager;
-    [syncManager configureWithRootDirectory:clientDataRoot];
+    [self app];
+    RLMSyncManager *syncManager = RLMApp.sharedManager;
+    [syncManager configureWithRootDirectory:clientDataRoot app: [self app]];
     syncManager.logLevel = RLMSyncLogLevelOff;
     syncManager.userAgent = self.name;
 }
 
 - (void)resetSyncManager {
-//    [RLMSyncManager.sharedManager._allUsers makeObjectsPerformSelector:@selector(logOutWithCompletion)];
+    if ([self appId]) {
+        for (NSString *key in [[self app] allUsers]) {
+            RLMSyncUser *user = [[self app] allUsers][key];
+            XCTestExpectation *ex = [self expectationWithDescription:@"Wait for logout"];
+            [[self app] logOut:user completion:^(NSError * _Nullable error) {
+                XCTAssertNil(error);
+                [ex fulfill];
+            }];
+            [self waitForExpectations:@[ex] timeout:20.0];
+        }
+    }
     [RLMSyncManager resetForTesting];
-    [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:NO blockOnRefreshCompletion:nil];
 }
 
 @end

@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMRealmConfiguration+Sync.h"
-
+#import "RLMApp.h"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
@@ -46,7 +46,7 @@
     }
 
     // Ensure sync manager is initialized, if it hasn't already been.
-    [RLMSyncManager sharedManager];
+    [RLMApp sharedManager];
     NSAssert(user.identity, @"Cannot call this method on a user that doesn't have an identity.");
     self.config.in_memory = false;
     self.config.sync_config = std::make_shared<realm::SyncConfig>([syncConfiguration rawConfiguration]);
@@ -56,7 +56,7 @@
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
     } else {
         self.config.path = SyncManager::shared().path_for_realm(*[user _syncUser],
-                                                                self.config.sync_config->realm_url);
+                                                                [[user.identity stringByAppendingFormat:@"/%@", @(self.config.sync_config->partition_value.c_str())] UTF8String]);
     }
 
     if (!self.config.encryption_key.empty()) {

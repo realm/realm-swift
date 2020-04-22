@@ -18,6 +18,7 @@
 
 #import "RLMSyncManager_Private.h"
 
+#import "RLMApp_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
@@ -34,6 +35,7 @@
 #endif
 
 using namespace realm;
+
 using Level = realm::util::Logger::Level;
 
 namespace {
@@ -124,13 +126,14 @@ static RLMSyncManager *s_sharedManager = nil;
     return self = [super init];
 }
 
-+ (instancetype)sharedManager {
+
++ (instancetype)sharedManagerWithApp:(RLMApp *)app {
     static std::once_flag flag;
-    std::call_once(flag, [] {
+    std::call_once(flag, [app] {
         try {
             [RLMSyncUser _setUpBindingContextFactory];
             s_sharedManager = [[RLMSyncManager alloc] initPrivate];
-            [s_sharedManager configureWithRootDirectory:nil];
+            [s_sharedManager configureWithRootDirectory:nil app:app];
         }
         catch (std::exception const& e) {
             @throw RLMException(e);
@@ -139,7 +142,7 @@ static RLMSyncManager *s_sharedManager = nil;
     return s_sharedManager;
 }
 
-- (void)configureWithRootDirectory:(NSURL *)rootDirectory {
+- (void)configureWithRootDirectory:(NSURL *)rootDirectory app:(RLMApp *)app {
     SyncClientConfig config;
     bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
     config.logger_factory = &s_syncLoggerFactory;
@@ -155,7 +158,9 @@ static RLMSyncManager *s_sharedManager = nil;
                          RLMStringDataWithNSString(REALM_COCOA_VERSION));
         config.user_agent_application_info = RLMStringDataWithNSString(self.appID);
     }
-    SyncManager::shared().configure(config);
+
+    SyncManager::shared().configure(config,
+                                    app ? util::Optional([app _realmApp]->config()) : util::none);
 }
 
 - (NSString *)appID {
@@ -222,20 +227,8 @@ static RLMSyncManager *s_sharedManager = nil;
     });
 }
 
-- (NSArray<RLMSyncUser *> *)_allUsers {
-    NSMutableArray<RLMSyncUser *> *buffer = [NSMutableArray array];
-    for (auto user : SyncManager::shared().all_users()) {
-        [buffer addObject:[[RLMSyncUser alloc] initWithSyncUser:std::move(user)]];
-    }
-    return buffer;
-}
-
-- (RLMSyncUser *)_currentUser {
-    return [[RLMSyncUser alloc] initWithSyncUser:SyncManager::shared().get_current_user()];
-}
-
 + (void)resetForTesting {
-    RLMSyncManager *manager = self.sharedManager;
+    RLMSyncManager *manager = [self sharedManagerWithApp:nil];
     manager->_errorHandler = nil;
     manager->_appID = nil;
     manager->_userAgent = nil;

@@ -27,10 +27,10 @@ using namespace realm;
 
 @implementation RLMSyncUser (ObjectServerTests)
 
-- (BOOL)waitForUploadToFinish:(NSURL *)url {
+- (BOOL)waitForUploadToFinish:(NSString *)partitionValue {
     const NSTimeInterval timeout = 20;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    RLMSyncSession *session = [self sessionForURL:url];
+    RLMSyncSession *session = [self sessionForPartitionValue:partitionValue];
     NSAssert(session, @"Cannot call with invalid URL");
     BOOL couldWait = [session waitForUploadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
                                                     callback:^(NSError *){
@@ -42,10 +42,10 @@ using namespace realm;
     return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
 }
 
-- (BOOL)waitForDownloadToFinish:(NSURL *)url {
+- (BOOL)waitForDownloadToFinish:(NSString *)partitionValue {
     const NSTimeInterval timeout = 20;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    RLMSyncSession *session = [self sessionForURL:url];
+    RLMSyncSession *session = [self sessionForPartitionValue:partitionValue];
     NSAssert(session, @"Cannot call with invalid URL");
     BOOL couldWait = [session waitForDownloadCompletionOnQueue:dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
                                                       callback:^(NSError *){
@@ -57,8 +57,8 @@ using namespace realm;
     return dispatch_semaphore_wait(sema, dispatch_time(DISPATCH_TIME_NOW, (int64_t)(timeout * NSEC_PER_SEC))) == 0;
 }
 
-- (void)simulateClientResetErrorForSession:(NSURL *)url {
-    RLMSyncSession *session = [self sessionForURL:url];
+- (void)simulateClientResetErrorForSession:(NSString *)partitionValue {
+    RLMSyncSession *session = [self sessionForPartitionValue:partitionValue];
     NSAssert(session, @"Cannot call with invalid URL");
 
     std::shared_ptr<SyncSession> raw_session = session->_session.lock();

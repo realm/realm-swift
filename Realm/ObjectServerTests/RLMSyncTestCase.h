@@ -29,14 +29,43 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setSessionCompletionNotifier:(nullable RLMSyncBasicErrorReportingBlock)sessionCompletionNotifier;
 @end
 
-@interface SyncObject : RLMObject
-@property NSString *stringProp;
+
+@interface Dog : RLMObject
+
+@property RLMObjectId *_id;
+@property NSString *breed;
+@property NSString *name;
+@property NSString *realm_id;
+
 @end
 
-@interface HugeSyncObject : RLMObject
-@property NSData *dataProp;
-+ (instancetype)object;
+RLM_ARRAY_TYPE(Dog)
+@interface Person : RLMObject
+
+@property RLMObjectId *_id;
+@property NSInteger age;
+@property RLMArray<Dog *><Dog> *dogs;
+@property NSString *firstName;
+@property NSString *lastName;
+@property NSString *realm_id;
+
++ (instancetype)john;
++ (instancetype)paul;
++ (instancetype)ringo;
++ (instancetype)george;
+
 @end
+
+//@interface SyncObject : RLMObject
+//@property RLMObjectId *_id;
+//@property NSString *stringProp;
+//@end
+//
+//@interface HugeSyncObject : RLMObject
+//@property RLMObjectId *_id;
+//@property NSData *dataProp;
+//+ (instancetype)object;
+//@end
 
 @interface RLMSyncTestCase : RLMMultiProcessTestCase
 
@@ -44,31 +73,30 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (RLMAppConfiguration *)defaultAppConfiguration;
 
-+ (NSURL *)authServerURL;
-+ (NSURL *)secureAuthServerURL;
+- (RLMApp *)app;
 
-+ (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
+- (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
-- (RLMRealm *)openRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 - (RLMRealm *)openRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
 
 /// Synchronously open a synced Realm. Also run a block right after the Realm is created.
-- (RLMRealm *)openRealmForURL:(NSURL *)url
-                         user:(RLMSyncUser *)user
-             immediatelyBlock:(nullable void(^)(void))block;
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
+                                    user:(RLMSyncUser *)user
+                        immediatelyBlock:(nullable void(^)(void))block;
 
 /// Synchronously open a synced Realm with encryption key and stop policy.
 /// Also run a block right after the Realm is created.
-- (RLMRealm *)openRealmForURL:(NSURL *)url
-                         user:(RLMSyncUser *)user
-                encryptionKey:(nullable NSData *)encryptionKey
-                   stopPolicy:(RLMSyncStopPolicy)stopPolicy
-             immediatelyBlock:(nullable void(^)(void))block;
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
+                                    user:(RLMSyncUser *)user
+                           encryptionKey:(nullable NSData *)encryptionKey
+                              stopPolicy:(RLMSyncStopPolicy)stopPolicy
+                        immediatelyBlock:(nullable void(^)(void))block;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 /// Also run a block right after the Realm is created.
@@ -77,17 +105,18 @@ NS_ASSUME_NONNULL_BEGIN
 ;
 
 /// Immediately open a synced Realm.
-- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user;
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user;
 
 /// Immediately open a synced Realm with encryption key and stop policy.
-- (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url
-                                    user:(RLMSyncUser *)user
-                           encryptionKey:(nullable NSData *)encryptionKey
-                              stopPolicy:(RLMSyncStopPolicy)stopPolicy;
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue
+                                               user:(RLMSyncUser *)user
+                                      encryptionKey:(nullable NSData *)encryptionKey
+                                         stopPolicy:(RLMSyncStopPolicy)stopPolicy;
 
 /// Synchronously create, log in, and return a user.
-- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials
-                                  server:(NSURL *)url;
+- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials;
+
+- (void)addPersonsToRealm:(RLMRealm *)realm persons:(NSArray<Person *> *)persons;
 
 /// Add a number of objects to a Realm.
 - (void)addSyncObjectsToRealm:(RLMRealm *)realm descriptions:(NSArray<NSString *> *)descriptions;
@@ -95,7 +124,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// Synchronously wait for downloads to complete for any number of Realms, and then check their `SyncObject` counts.
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
                          realms:(NSArray<RLMRealm *> *)realms
-                      realmURLs:(NSArray<NSURL *> *)realmURLs
+                      partitionValues:(NSArray<NSString *> *)partitionValues
                  expectedCounts:(NSArray<NSNumber *> *)counts;
 
 /// "Prime" the sync manager to signal the given semaphore the next time a session is bound. This method should be
@@ -112,7 +141,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Wait for downloads to complete while spinning the runloop. This method uses expectations.
 - (void)waitForDownloadsForUser:(RLMSyncUser *)user
-                            url:(NSURL *)url
+                            partitionValue:(NSString *)partitionValue
                     expectation:(nullable XCTestExpectation *)expectation
                           error:(NSError **)error;
 

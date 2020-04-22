@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol RLMNetworkTransport;
 
-@class RLMSyncUser, RLMAppCredentials, RLMUsernamePasswordProviderClient, RLMUserAPIKeyProviderClient;
+@class RLMSyncUser, RLMAppCredentials, RLMUsernamePasswordProviderClient, RLMUserAPIKeyProviderClient, RLMSyncManager;
 
 /// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
@@ -82,6 +82,8 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
  */
 + (instancetype)app:(NSString *)appId
       configuration:(nullable RLMAppConfiguration *)configuration;
+
++ (RLMSyncManager *)sharedManager;
 
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers;
 

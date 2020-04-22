@@ -120,13 +120,13 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 @property (nonatomic, nullable) RLMSyncLogFunction logger;
 
 /**
- The name of the HTTP header to send authorization data in when making requests to a Realm Object Server which has
+ The name of the HTTP header to send authorization data in when making requests to MongoDB Realm which has
  been configured to expect a custom authorization header.
  */
 @property (nullable, nonatomic, copy) NSString *authorizationHeaderName;
 
 /**
- Extra HTTP headers to append to every request to a Realm Object Server.
+ Extra HTTP headers to append to every request to MongoDB Realm.
 
  Modifying this property while sync sessions are active will result in all
  sessions disconnecting and reconnecting using the new headers.
@@ -167,9 +167,6 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
  it after opening any synced Realm will do nothing.
  */
 @property (nullable, nonatomic, copy) RLMSyncTimeoutOptions *timeoutOptions;
-
-/// The sole instance of the singleton.
-+ (instancetype)sharedManager NS_REFINED_FOR_SWIFT;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncManager cannot be created directly")));

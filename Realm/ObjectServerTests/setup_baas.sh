@@ -24,9 +24,10 @@ set -o pipefail
 source_root="$(cd "$(dirname "$0")"/../..; pwd)"
 export $(xargs < "${source_root}/dependencies.list")
 
-mongodb_version=4.2.5
-go_version=1.14
+mongodb_version=4.3.6
+go_version=1.14.2
 node_version=8.11.2
+STITCH_VERSION=f95f9bda40b5f886d1757bb17e60e8b9f3c56599
 
 mongodb_url="https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-$mongodb_version.tgz"
 transpiler_target="node8-macos"
@@ -81,7 +82,7 @@ setup_stitch() {
     cd stitch
 
     if [ -d .git ]; then
-        git checkout "$STITCH_VERSION"
+        git checkout $STITCH_VERSION
     fi
 
     if [ ! -d etc/dylib ]; then

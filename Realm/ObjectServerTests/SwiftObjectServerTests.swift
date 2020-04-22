@@ -22,6 +22,7 @@ import RealmSwift
 // Used by testOfflineClientReset
 // The naming here is nonstandard as the sync-1.x.realm test file comes from the .NET unit tests.
 // swiftlint:disable identifier_name
+#if (false)
 @objc(Person)
 class Person: Object {
     @objc dynamic var FirstName: String?
@@ -30,7 +31,7 @@ class Person: Object {
     override class func shouldIncludeInDefaultSchema() -> Bool { return false }
 }
 
-#if (false)
+
 class SwiftObjectServerTests: SwiftSyncTestCase {
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {

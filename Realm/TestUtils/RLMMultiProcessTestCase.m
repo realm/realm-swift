@@ -142,19 +142,19 @@
     // Filter the output from the child process to reduce xctest noise
     pipe.fileHandleForReading.readabilityHandler = ^(NSFileHandle *file) {
         [buffer appendData:[file availableData]];
-        const char *newline;
-        const char *start = buffer.bytes;
-        const char *end = start + buffer.length;
-        while ((newline = memchr(start, '\n', end - start))) {
-            if (newline < start + 17 ||
-                (memcmp(start, "Test Suite", 10) && memcmp(start, "Test Case", 9) && memcmp(start, "	 Executed 1 test", 17))) {
-                fwrite(start, newline - start + 1, 1, stderr);
-            }
-            start = newline + 1;
-        }
+//        const char *newline;
+//        const char *start = buffer.bytes;
+//        const char *end = start + buffer.length;
+//        while ((newline = memchr(start, '\n', end - start))) {
+//            if (newline < start + 17 ||
+//                (memcmp(start, "Test Suite", 10) && memcmp(start, "Test Case", 9) && memcmp(start, "	 Executed 1 test", 17))) {
+//                fwrite(start, newline - start + 1, 1, stderr);
+//            }
+//            start = newline + 1;
+//        }
 
         // Remove everything up to the last newline, leaving any data not newline-terminated in the buffer
-        [buffer replaceBytesInRange:NSMakeRange(0, start - (char *)buffer.bytes) withBytes:0 length:0];
+//        [buffer replaceBytesInRange:NSMakeRange(0, start - (char *)buffer.bytes) withBytes:0 length:0];
     };
 
     NSTask *task = [self childTask];
@@ -162,6 +162,8 @@
     [task launch];
     [task waitUntilExit];
 
+    NSString *output = [[NSString alloc] initWithData:buffer encoding:NSUTF8StringEncoding];
+    NSLog(@"%@", output);
     return task.terminationStatus;
 }
 #else
