@@ -47,16 +47,11 @@ RLM_ARRAY_TYPE(Dog)
 @property RLMArray<Dog *><Dog> *dogs;
 @property NSString *firstName;
 @property NSString *lastName;
-@property NSString *realm_id;
 
 + (instancetype)john;
-+ (instancetype)johnWithRealmIdentifier:(NSString *)realmId;
 + (instancetype)paul;
-+ (instancetype)paulWithRealmIdentifier:(NSString *)realmId;
 + (instancetype)ringo;
-+ (instancetype)ringoWithRealmIdentifier:(NSString *)realmId;
 + (instancetype)george;
-+ (instancetype)georgeWithRealmIdentifier:(NSString *)realmId;
 
 @end
 

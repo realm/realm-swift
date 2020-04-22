@@ -808,21 +808,29 @@
                                               partitionValueB,
                                               partitionValueC]
                        expectedCounts:@[@3, @2, @5]];
+
+        RLMResults *resultsA = [realmA objects:@"Person"
+                                 withPredicate:[NSPredicate predicateWithFormat:@"firstName == %@", @"Ringo"]];
+        RLMResults *resultsB = [realmB objects:@"Person"
+                                 withPredicate:[NSPredicate predicateWithFormat:@"firstName == %@", @"Ringo"]];
+
+        XCTAssertEqual([resultsA count], 1UL);
+        XCTAssertEqual([resultsB count], 0UL);
     } else {
         // Add objects.
         [self addPersonsToRealm:realmA
-                        persons:@[[Person johnWithRealmIdentifier:partitionValueA],
-                                  [Person paulWithRealmIdentifier:partitionValueA],
-                                  [Person ringoWithRealmIdentifier:partitionValueA]]];
+                        persons:@[[Person john],
+                                  [Person paul],
+                                  [Person ringo]]];
         [self addPersonsToRealm:realmB
-                        persons:@[[Person johnWithRealmIdentifier:partitionValueB],
-                                  [Person paulWithRealmIdentifier:partitionValueB]]];
+                        persons:@[[Person john],
+                                  [Person paul]]];
         [self addPersonsToRealm:realmC
-                        persons:@[[Person johnWithRealmIdentifier:partitionValueC],
-                                  [Person paulWithRealmIdentifier:partitionValueC],
-                                  [Person ringoWithRealmIdentifier:partitionValueC],
-                                  [Person georgeWithRealmIdentifier:partitionValueC],
-                                  [Person ringoWithRealmIdentifier:partitionValueC]]];
+                        persons:@[[Person john],
+                                  [Person paul],
+                                  [Person ringo],
+                                  [Person george],
+                                  [Person ringo]]];
         [self waitForUploadsForRealm:realmA];
         [self waitForUploadsForRealm:realmB];
         [self waitForUploadsForRealm:realmC];

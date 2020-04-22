@@ -138,13 +138,6 @@ static NSString *nodePath() {
     john.age = 30;
     john.firstName = @"John";
     john.lastName = @"Lennon";
-    john.realm_id = @"foo";
-    return john;
-}
-
-+ (instancetype)johnWithRealmIdentifier:(NSString *)realmId {
-    Person *john = [Person john];
-    john.realm_id = realmId;
     return john;
 }
 
@@ -154,13 +147,6 @@ static NSString *nodePath() {
     paul.age = 30;
     paul.firstName = @"Paul";
     paul.lastName = @"McCartney";
-    paul.realm_id = @"foo";
-    return paul;
-}
-
-+ (instancetype)paulWithRealmIdentifier:(NSString *)realmId {
-    Person *paul = [Person paul];
-    paul.realm_id = realmId;
     return paul;
 }
 
@@ -170,13 +156,6 @@ static NSString *nodePath() {
     ringo.age = 30;
     ringo.firstName = @"Ringo";
     ringo.lastName = @"Starr";
-    ringo.realm_id = @"foo";
-    return ringo;
-}
-
-+ (instancetype)ringoWithRealmIdentifier:(NSString *)realmId {
-    Person *ringo = [Person ringo];
-    ringo.realm_id = realmId;
     return ringo;
 }
 
@@ -186,13 +165,6 @@ static NSString *nodePath() {
     george.age = 30;
     george.firstName = @"George";
     george.lastName = @"Harrison";
-    george.realm_id = @"foo";
-    return george;
-}
-
-+ (instancetype)georgeWithRealmIdentifier:(NSString *)realmId {
-    Person *george = [Person george];
-    george.realm_id = realmId;
     return george;
 }
 
