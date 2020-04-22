@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import "RLMObjectId.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -32,7 +33,8 @@ NS_ASSUME_NONNULL_BEGIN
 // the response when an API key is first created.
 @property (nonatomic, readonly, nullable) NSString *key;
 
-@property (nonatomic, readonly) id objectId;
+// The ObjectId of the user
+@property (nonatomic, readonly) RLMObjectId *objectId;
 
 @end
 

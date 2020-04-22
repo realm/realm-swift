@@ -29,8 +29,8 @@ NS_ASSUME_NONNULL_BEGIN
 typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
     RLMHTTPMethodGET    = 0,
     RLMHTTPMethodPOST   = 1,
-    RLMHTTPMethodPUT    = 2,
-    RLMHTTPMethodPATCH  = 3,
+    RLMHTTPMethodPATCH  = 2,
+    RLMHTTPMethodPUT    = 3,
     RLMHTTPMethodDELETE = 4
 };
 

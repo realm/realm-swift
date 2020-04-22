@@ -481,10 +481,29 @@
 		CF6E048B242A4B6F00DB7F14 /* RLMProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0484242A321200DB7F14 /* RLMProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF6E048C242A4B7100DB7F14 /* RLMUsernamePasswordProviderClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */; };
 		CF6E048D242A4B7400DB7F14 /* RLMUsernamePasswordProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0480242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CF8004C124504B75001C8E9C /* datetime.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AC24504A85001C8E9C /* datetime.hpp */; };
+		CF8004C224504B75001C8E9C /* min_key.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AD24504A85001C8E9C /* min_key.hpp */; };
+		CF8004C324504B75001C8E9C /* bson.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AE24504A85001C8E9C /* bson.hpp */; };
+		CF8004C424504B75001C8E9C /* regular_expression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AF24504A85001C8E9C /* regular_expression.cpp */; };
+		CF8004C524504B75001C8E9C /* indexed_map.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B024504A85001C8E9C /* indexed_map.hpp */; };
+		CF8004C624504B75001C8E9C /* bson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B124504A85001C8E9C /* bson.cpp */; };
+		CF8004C724504B75001C8E9C /* regular_expression.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B224504A85001C8E9C /* regular_expression.hpp */; };
+		CF8004C824504B75001C8E9C /* datetime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B324504A85001C8E9C /* datetime.cpp */; };
+		CF8004C924504B75001C8E9C /* max_key.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B424504A85001C8E9C /* max_key.hpp */; };
+		CF8004CA24504B86001C8E9C /* datetime.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AC24504A85001C8E9C /* datetime.hpp */; };
+		CF8004CB24504B86001C8E9C /* min_key.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AD24504A85001C8E9C /* min_key.hpp */; };
+		CF8004CC24504B86001C8E9C /* bson.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AE24504A85001C8E9C /* bson.hpp */; };
+		CF8004CD24504B86001C8E9C /* regular_expression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AF24504A85001C8E9C /* regular_expression.cpp */; };
+		CF8004CE24504B86001C8E9C /* indexed_map.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B024504A85001C8E9C /* indexed_map.hpp */; };
+		CF8004CF24504B86001C8E9C /* bson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B124504A85001C8E9C /* bson.cpp */; };
+		CF8004D024504B86001C8E9C /* regular_expression.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B224504A85001C8E9C /* regular_expression.hpp */; };
+		CF8004D124504B86001C8E9C /* datetime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B324504A85001C8E9C /* datetime.cpp */; };
+		CF8004D224504B86001C8E9C /* max_key.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B424504A85001C8E9C /* max_key.hpp */; };
 		CFAEF761242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF75F242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFAEF762242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFAEF760242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.mm */; };
 		CFAEF765242B672700EAF721 /* RLMUserAPIKey.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFAEF766242B672700EAF721 /* RLMUserAPIKey.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFAEF764242B672700EAF721 /* RLMUserAPIKey.mm */; };
+		CFB4313A243DF87100471C18 /* RealmApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB43139243DF87100471C18 /* RealmApp.swift */; };
 		E81A1FD51955FE0100FDED82 /* ArrayPropertyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FB81955FE0100FDED82 /* ArrayPropertyTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
 		E81A1FDB1955FE0100FDED82 /* EnumeratorTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBB1955FE0100FDED82 /* EnumeratorTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
 		E81A1FDD1955FE0100FDED82 /* LinkTests.m in Sources */ = {isa = PBXBuildFile; fileRef = E81A1FBC1955FE0100FDED82 /* LinkTests.m */; settings = {COMPILER_FLAGS = "-fobjc-arc-exceptions"; }; };
@@ -1009,11 +1028,21 @@
 		CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUsernamePasswordProviderClient.mm; sourceTree = "<group>"; };
 		CF6E0484242A321200DB7F14 /* RLMProviderClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMProviderClient.h; sourceTree = "<group>"; };
 		CF6E0485242A321200DB7F14 /* RLMProviderClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMProviderClient.mm; sourceTree = "<group>"; };
+		CF8004AC24504A85001C8E9C /* datetime.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = datetime.hpp; sourceTree = "<group>"; };
+		CF8004AD24504A85001C8E9C /* min_key.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = min_key.hpp; sourceTree = "<group>"; };
+		CF8004AE24504A85001C8E9C /* bson.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = bson.hpp; sourceTree = "<group>"; };
+		CF8004AF24504A85001C8E9C /* regular_expression.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = regular_expression.cpp; sourceTree = "<group>"; };
+		CF8004B024504A85001C8E9C /* indexed_map.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = indexed_map.hpp; sourceTree = "<group>"; };
+		CF8004B124504A85001C8E9C /* bson.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bson.cpp; sourceTree = "<group>"; };
+		CF8004B224504A85001C8E9C /* regular_expression.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = regular_expression.hpp; sourceTree = "<group>"; };
+		CF8004B324504A85001C8E9C /* datetime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = datetime.cpp; sourceTree = "<group>"; };
+		CF8004B424504A85001C8E9C /* max_key.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = max_key.hpp; sourceTree = "<group>"; };
 		CFAEF75F242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMUserAPIKeyProviderClient.h; sourceTree = "<group>"; };
 		CFAEF760242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUserAPIKeyProviderClient.mm; sourceTree = "<group>"; };
 		CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMUserAPIKey.h; sourceTree = "<group>"; };
 		CFAEF764242B672700EAF721 /* RLMUserAPIKey.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUserAPIKey.mm; sourceTree = "<group>"; };
 		CFAEF767242B7F8900EAF721 /* RLMUserAPIKey_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMUserAPIKey_Private.hpp; sourceTree = "<group>"; };
+		CFB43139243DF87100471C18 /* RealmApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmApp.swift; sourceTree = "<group>"; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
 		E81A1F631955FC9300FDED82 /* RLMAccessor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMAccessor.h; sourceTree = "<group>"; };
 		E81A1F641955FC9300FDED82 /* RLMAccessor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAccessor.mm; sourceTree = "<group>"; };
@@ -1474,6 +1503,7 @@
 				1A7DE7021D38460B0029F0AE /* Sync.swift */,
 				3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */,
 				5D660FF01BE98D670021E04F /* Util.swift */,
+				CFB43139243DF87100471C18 /* RealmApp.swift */,
 			);
 			path = RealmSwift;
 			sourceTree = "<group>";
@@ -1522,6 +1552,7 @@
 		5DB591A51D063DE5001D8F93 /* util */ = {
 			isa = PBXGroup;
 			children = (
+				CF8004AB24504A85001C8E9C /* bson */,
 				5D274C511D6D16BA006FEBB1 /* apple */,
 				49AD39EC244E1A370097500E /* bson */,
 				3F92F62A222F311C008B2333 /* aligned_union.hpp */,
@@ -1561,6 +1592,22 @@
 				CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */,
 			);
 			name = ProviderClients;
+			sourceTree = "<group>";
+		};
+		CF8004AB24504A85001C8E9C /* bson */ = {
+			isa = PBXGroup;
+			children = (
+				CF8004AC24504A85001C8E9C /* datetime.hpp */,
+				CF8004AD24504A85001C8E9C /* min_key.hpp */,
+				CF8004AE24504A85001C8E9C /* bson.hpp */,
+				CF8004AF24504A85001C8E9C /* regular_expression.cpp */,
+				CF8004B024504A85001C8E9C /* indexed_map.hpp */,
+				CF8004B124504A85001C8E9C /* bson.cpp */,
+				CF8004B224504A85001C8E9C /* regular_expression.hpp */,
+				CF8004B324504A85001C8E9C /* datetime.cpp */,
+				CF8004B424504A85001C8E9C /* max_key.hpp */,
+			);
+			path = bson;
 			sourceTree = "<group>";
 		};
 		E81A1FC81955FE0100FDED82 /* Swift */ = {
@@ -2511,7 +2558,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"SwiftLint does not exist, download from https://github.com/realm/SwiftLint\"\nfi";
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"SwiftLint does not exist, download from https://github.com/realm/SwiftLint\"\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2637,6 +2684,15 @@
 				5D659E9E1BE04556006515A0 /* transact_log_handler.cpp in Sources */,
 				1AABD4021E9552BA00115A75 /* uuid.cpp in Sources */,
 				5D274C4D1D6D15D2006FEBB1 /* weak_realm_notifier.cpp in Sources */,
+				CF8004C124504B75001C8E9C /* datetime.hpp in Sources */,
+				CF8004C224504B75001C8E9C /* min_key.hpp in Sources */,
+				CF8004C324504B75001C8E9C /* bson.hpp in Sources */,
+				CF8004C424504B75001C8E9C /* regular_expression.cpp in Sources */,
+				CF8004C524504B75001C8E9C /* indexed_map.hpp in Sources */,
+				CF8004C624504B75001C8E9C /* bson.cpp in Sources */,
+				CF8004C724504B75001C8E9C /* regular_expression.hpp in Sources */,
+				CF8004C824504B75001C8E9C /* datetime.cpp in Sources */,
+				CF8004C924504B75001C8E9C /* max_key.hpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2656,6 +2712,7 @@
 				3FE5818622C2B4B900BA10E7 /* ObjectiveCSupport+Sync.swift in Sources */,
 				5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */,
 				5D660FF51BE98D670021E04F /* ObjectSchema.swift in Sources */,
+				CFB4313A243DF87100471C18 /* RealmApp.swift in Sources */,
 				5D660FF61BE98D670021E04F /* Optional.swift in Sources */,
 				5D660FF71BE98D670021E04F /* Property.swift in Sources */,
 				5D660FF81BE98D670021E04F /* Realm.swift in Sources */,
@@ -2795,6 +2852,15 @@
 				5DD7559C1BE056DE002800DA /* transact_log_handler.cpp in Sources */,
 				1AABD4041E9552C200115A75 /* uuid.cpp in Sources */,
 				5D274C4E1D6D15FD006FEBB1 /* weak_realm_notifier.cpp in Sources */,
+				CF8004CA24504B86001C8E9C /* datetime.hpp in Sources */,
+				CF8004CB24504B86001C8E9C /* min_key.hpp in Sources */,
+				CF8004CC24504B86001C8E9C /* bson.hpp in Sources */,
+				CF8004CD24504B86001C8E9C /* regular_expression.cpp in Sources */,
+				CF8004CE24504B86001C8E9C /* indexed_map.hpp in Sources */,
+				CF8004CF24504B86001C8E9C /* bson.cpp in Sources */,
+				CF8004D024504B86001C8E9C /* regular_expression.hpp in Sources */,
+				CF8004D124504B86001C8E9C /* datetime.cpp in Sources */,
+				CF8004D224504B86001C8E9C /* max_key.hpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

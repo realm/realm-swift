@@ -18,6 +18,8 @@
 
 #import "RLMUserAPIKey.h"
 #import "RLMUserAPIKey_Private.hpp"
+#import "RLMUtil.hpp"
+#import "RLMObjectId_Private.hpp"
 
 @interface RLMUserAPIKey() {
     realm::app::App::UserAPIKey _userAPIKey;
@@ -55,8 +57,8 @@
     return nil;
 }
 
-- (id)objectId {
-    return nil;
+- (RLMObjectId *)objectId {
+    return [[RLMObjectId alloc] initWithValue:_userAPIKey.id];
 }
 
 - (realm::app::App::UserAPIKey)_apiKey {
