@@ -708,7 +708,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         XCTAssertEqual(syncUser?.identity, app.currentUser()?.identity)
         XCTAssertEqual(syncUser?.identities().count, 2)
-
     }
 
     // MARK: - Provider Clients
