@@ -19,64 +19,6 @@
 import XCTest
 import RealmSwift
 
-#if false
-class SwiftSyncObject: Object {
-    @objc dynamic var _id: ObjectId = ObjectId()
-    @objc dynamic var stringProp: String = ""
-
-    override class func primaryKey() -> String? {
-        return "_id"
-    }
-}
-
-class SwiftHugeSyncObject: Object {
-    @objc dynamic var _id: ObjectId = ObjectId()
-    @objc dynamic var dataProp: NSData?
-
-    required init() {
-        super.init()
-        let size = 1000000
-        let ptr = malloc(size)
-        dataProp = NSData(bytes: ptr, length: size)
-        free(ptr)
-    }
-
-    override class func primaryKey() -> String? {
-        return "_id"
-    }
-
-    required init(realm: RLMRealm, schema: RLMObjectSchema) {
-        fatalError("init(realm:schema:) has not been implemented")
-    }
-    required init(value: Any, schema: RLMSchema) {
-        fatalError("init(value:schema:) has not been implemented")
-    }
-}
-
-//class SwiftPartialSyncObjectA: Object {
-//    @objc dynamic var number: Int = 0
-//    @objc dynamic var string: String = ""
-//
-//    convenience init(number: Int, string: String) {
-//        self.init()
-//        self.number = number
-//        self.string = string
-//    }
-//}
-//
-//class SwiftPartialSyncObjectB: Object {
-//    @objc dynamic var number: Int = 0
-//    @objc dynamic var firstString: String = ""
-//    @objc dynamic var secondString: String = ""
-//
-//    convenience init(number: Int, firstString: String, secondString: String) {
-//        self.init()
-//        self.number = number
-//        self.firstString = firstString
-//        self.secondString = secondString
-//    }
-//}
-
 // MARK: Test case
 
 class SwiftSyncTestCase: RLMSyncTestCase {
@@ -102,7 +44,18 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                           file: StaticString = #file,
                           line: UInt = #line) -> AppCredentials {
         let filename = URL(fileURLWithPath: String(describing: file)).deletingPathExtension().lastPathComponent
-        return .init(username: "\(filename)\(line)\(usernameSuffix)", password: "a")
+        let username = "\(filename)\(line)\(usernameSuffix)"
+        let password = "abcdef"
+        let credentials = AppCredentials(username: username, password: password)
+        if register {
+            let ex = expectation(description: "Should register in the user properly")
+            app().usernamePasswordProviderClient().registerEmail(username, password: password, completion: { error in
+                XCTAssertNil(error)
+                ex.fulfill()
+            })
+            waitForExpectations(timeout: 4, handler: nil)
+        }
+        return credentials
     }
 
     func synchronouslyOpenRealm(partitionValue: String,
@@ -113,21 +66,10 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return try synchronouslyOpenRealm(configuration: config)
     }
 
-    func synchronouslyOpenRealm(configuration: Realm.Configuration, file: StaticString = #file, line: UInt = #line) throws -> Realm {
-        let semaphore = DispatchSemaphore(value: 0)
-        let basicBlock = { (error: Error?) in
-            if let error = error {
-                let process = self.isParent ? "parent" : "child"
-                XCTFail("Received an asynchronous error: \(error) (process: \(process))", file: file, line: line)
-            }
-            semaphore.signal()
-        }
-        SyncManager.shared.setSessionCompletionNotifier(basicBlock)
-        let realm = try Realm(configuration: configuration)
-        let result = semaphore.wait(timeout: .now() + DispatchTimeInterval.seconds(20))
-        SyncManager.shared.setSessionCompletionNotifier(nil)
-        XCTAssertEqual(result, .success)
-        return realm
+    func synchronouslyOpenRealm(configuration: Realm.Configuration,
+                                file: StaticString = #file,
+                                line: UInt = #line) throws -> Realm {
+        return try Realm(configuration: configuration)
     }
 
     func immediatelyOpenRealm(partitionValue: String, user: SyncUser) throws -> Realm {
@@ -141,8 +83,12 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         var theUser: SyncUser?
         var theError: Error?
         let ex = expectation(description: "Should log in the user properly")
-        // FIXME: [realmapp] This should use the new login
-        fatalError("test not implemented")
+
+        self.app().login(withCredential: credentials, completion: { user, error in
+            theUser = user
+            theError = error
+            ex.fulfill()
+        })
         
         waitForExpectations(timeout: 10, handler: nil)
         XCTAssertNotNil(theUser, file: file, line: line)
@@ -174,4 +120,3 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                   line: line)
     }
 }
-#endif

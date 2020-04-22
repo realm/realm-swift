@@ -48,6 +48,7 @@ shutdown_mongod() {
     pushd mongodb-*
     ./bin/mongo --port 26000 admin --eval "db.adminCommand({replSetStepDown: 0, secondaryCatchUpPeriodSecs: 0, force: true})"
     ./bin/mongo --port 26000 admin --eval "db.shutdownServer()"
+    pkill -f mongod
     echo "mongod is down."
     popd
 }

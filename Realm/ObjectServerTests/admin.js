@@ -53,7 +53,7 @@ async function create() {
         }
     });
 
-    await app.services().service(serviceResponse['_id']).rules().create({
+    var dogRule = {
         "database": "test_data",
         "collection": "Dog",
         "roles": [
@@ -85,9 +85,9 @@ async function create() {
             ],
             "title": "Dog"
         }
-    });
+    };
 
-    await app.services().service(serviceResponse['_id']).rules().create({
+    var personRule = {
         "database": "test_data",
         "collection": "Person",
         "roles": [
@@ -138,8 +138,20 @@ async function create() {
             "is_list": true
           }
         }
-    });
+    };
 
+    await app.services().service(serviceResponse['_id']).rules().create(dogRule);
+    await app.services().service(serviceResponse['_id']).rules().create(personRule);
+
+    dogRule.collection = "SwiftDog";
+    dogRule.schema.title = "SwiftDog";
+    personRule.schema.title = "SwiftPerson";
+    personRule.collection = "SwiftPerson";
+    personRule.relationships.dogs.ref = "#/stitch/mongodb1/test_data/SwiftDog"
+
+    await app.services().service(serviceResponse['_id']).rules().create(dogRule);
+    await app.services().service(serviceResponse['_id']).rules().create(personRule);
+    
     await app.sync().config().update({
         "development_mode_enabled": true
     });

@@ -381,7 +381,6 @@ static NSURL *syncDirectoryForChildProcess() {
     return NO;
 }
 
-
 - (RLMApp *)app {
     return [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
 }
@@ -587,11 +586,17 @@ static NSURL *syncDirectoryForChildProcess() {
     self.continueAfterFailure = NO;
 
 
-    //    REALM_ASSERT(RLMSyncManager.sharedManager._allUsers.count == 0);
-//    if ([self isParent]) {
     [self resetSyncManager];
-//    }
 
+    static bool is_parent = [self isParent];
+
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+//        if (is_parent) [[RealmObjectServer sharedServer] cleanUp];
+    });
+    atexit([] {
+//        if (is_parent) [[RealmObjectServer sharedServer] cleanUp];
+    });
     [self setupSyncManager];
 }
 

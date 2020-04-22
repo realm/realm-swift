@@ -22,55 +22,63 @@ import RealmSwift
 // Used by testOfflineClientReset
 // The naming here is nonstandard as the sync-1.x.realm test file comes from the .NET unit tests.
 // swiftlint:disable identifier_name
-#if (false)
-@objc(Person)
-class Person: Object {
-    @objc dynamic var FirstName: String?
-    @objc dynamic var LastName: String?
 
-    override class func shouldIncludeInDefaultSchema() -> Bool { return false }
+class SwiftPerson: Object {
+    @objc dynamic var _id: ObjectId = ObjectId.generate()
+    @objc dynamic var firstName: String = ""
+    @objc dynamic var lastName: String = ""
+
+    convenience init(firstName: String, lastName: String) {
+        self.init()
+        self.firstName = firstName
+        self.lastName = lastName
+    }
+
+    override class func primaryKey() -> String? {
+        "_id"
+    }
 }
-
 
 class SwiftObjectServerTests: SwiftSyncTestCase {
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
-        let url = URL(string: "realm://127.0.0.1:9080/~/testBasicSync")!
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials(register: true), server: authURL)
-            let realm = try synchronouslyOpenRealm(url: url, user: user)
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: true))
+            let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
             XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
         } catch {
             XCTFail("Got an error: \(error)")
         }
     }
 
+
     /// If client B adds objects to a Realm, client A should see those new objects.
     func testSwiftAddObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
-            let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
-            if isParent {
+            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent))
+            let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
+            if !isParent {
                 waitForDownloads(for: realm)
-                checkCount(expected: 0, realm, SwiftSyncObject.self)
+                checkCount(expected: 0, realm, SwiftPerson.self)
                 executeChild()
                 waitForDownloads(for: realm)
-                checkCount(expected: 3, realm, SwiftSyncObject.self)
+                checkCount(expected: 3, realm, SwiftPerson.self)
             } else {
                 // Add objects
                 try realm.write {
-                    realm.add(SwiftSyncObject(value: ["child-1"]))
-                    realm.add(SwiftSyncObject(value: ["child-2"]))
-                    realm.add(SwiftSyncObject(value: ["child-3"]))
+                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
+                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
                 }
                 waitForUploads(for: realm)
-                checkCount(expected: 3, realm, SwiftSyncObject.self)
+                checkCount(expected: 3, realm, SwiftPerson.self)
             }
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
     }
 
+    #if false
     /// If client B removes objects from a Realm, client A should see those changes.
     func testSwiftDeleteObjects() {
         do {
@@ -841,5 +849,5 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [deleteKeyEx], timeout: 4.0)
     }
+    #endif
 }
-#endif
