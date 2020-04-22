@@ -92,7 +92,6 @@
                                                        defaultRequestTimeoutMS:42.0];
 
     RLMApp *app = [RLMApp app:@"<app-id>" configuration:config];
-
     // TODO: Get config and compare values
 }
 
