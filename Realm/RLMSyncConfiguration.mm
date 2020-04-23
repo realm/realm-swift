@@ -58,12 +58,12 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 @interface RLMSyncConfiguration () {
     std::unique_ptr<realm::SyncConfig> _config;
 }
-
-- (instancetype)initWithApp:(RLMApp *)app
-                       user:(RLMSyncUser *)user
-             partitionValue:(NSString *)partitionValue
-              customFileURL:(nullable NSURL *)customFileURL
-                 stopPolicy:(RLMSyncStopPolicy)stopPolicy;
+//
+//- (instancetype)initWithApp:(RLMApp *)app
+//                       user:(RLMSyncUser *)user
+//             partitionValue:(NSString *)partitionValue
+//              customFileURL:(nullable NSURL *)customFileURL
+//                 stopPolicy:(RLMSyncStopPolicy)stopPolicy;
 @end
 
 @implementation RLMSyncConfiguration

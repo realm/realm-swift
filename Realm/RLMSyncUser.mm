@@ -133,7 +133,7 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
 }
 
 - (NSString *)pathForPartitionValueHash:(NSUInteger)partitionValueHash {
-    return [[NSString alloc] initWithFormat:@"%@/%ld", [self identity], partitionValueHash];
+    return [[NSString alloc] initWithFormat:@"%@/%lu", [self identity], (unsigned long)partitionValueHash];
 }
 
 - (nullable RLMSyncSession *)sessionForPartitionValue:(NSString *)partitionValue {

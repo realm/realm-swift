@@ -16,10 +16,7 @@
 * Add support for next generation sync. Next generation sync includes the
   ability to use partition keys. Applications must be created at 
   realm.mongodb.com.
-  
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+
 
 ### Breaking Changes
 * Remove support for Query-based sync, including the configuration parameters
@@ -35,15 +32,9 @@
   the property was changed to a unique value before the end of the migration,
   but now a unique value must be supplied when creating the object.
 
-### Compatibility
-* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
-* Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 4.x.y series.
-* Carthage release for Swift is built with Xcode 11.4.1.
-
 ### Internal
-* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.3
-* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.5
+* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.6
+* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.8
 
 5.0.0-beta.3 Release notes (2020-02-26)
 =============================================================

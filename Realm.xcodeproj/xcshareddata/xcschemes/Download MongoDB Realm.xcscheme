@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "49BCDBFB24471E2600F53C7B"
-               BuildableName = "Download Realm Cloud"
-               BlueprintName = "Download Realm Cloud"
+               BlueprintIdentifier = "49E3AF6E245185FB003EE342"
+               BuildableName = "Download MongoDB Realm"
+               BlueprintName = "Download MongoDB Realm"
                ReferencedContainer = "container:Realm.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -50,9 +50,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "49BCDBFB24471E2600F53C7B"
-            BuildableName = "Download Realm Cloud"
-            BlueprintName = "Download Realm Cloud"
+            BlueprintIdentifier = "49E3AF6E245185FB003EE342"
+            BuildableName = "Download MongoDB Realm"
+            BlueprintName = "Download MongoDB Realm"
             ReferencedContainer = "container:Realm.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
