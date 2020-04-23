@@ -38,11 +38,11 @@ using namespace realm;
 }
 
 + (instancetype)credentialsWithGoogleToken:(RLMAppCredentialsToken)token {
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::google(token.UTF8String)];
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::google(token.UTF8String)];
 }
 
 + (instancetype)credentialsWithAppleToken:(RLMAppCredentialsToken)token {
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::apple(token.UTF8String)];
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::apple(token.UTF8String)];
 }
 
 + (instancetype)credentialsWithUsername:(NSString *)username
@@ -52,7 +52,28 @@ using namespace realm;
 }
 
 + (instancetype)credentialsWithJWT:(NSString *)token {
-    return [[self alloc] initWithAppCredentials: app::AppCredentials::custom(token.UTF8String)];
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::custom(token.UTF8String)];
+}
+
++ (instancetype)credentialsWithFunctionPayload:(NSDictionary *)payload
+                                         error:(NSError **)error {
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:payload
+                                                       options:NSJSONWritingPrettyPrinted
+                                                         error:error];
+    if (!jsonData) {
+        return nil;
+    }
+    NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::function(jsonString.UTF8String)];
+}
+
++ (instancetype)credentialsWithUserAPIKey:(NSString *)apiKey {
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::user_api_key(apiKey.UTF8String)];
+}
+
++ (instancetype)credentialsWithServerAPIKey:(NSString *)apiKey {
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::server_api_key(apiKey.UTF8String)];
 }
 
 + (instancetype)anonymousCredentials {
