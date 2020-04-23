@@ -3229,6 +3229,7 @@
 			baseConfigurationReference = 5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
+				SYMROOT = build/DerivedData/Realm/Build/Products;
 			};
 			name = Debug;
 		};
@@ -3237,6 +3238,7 @@
 			baseConfigurationReference = 5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
+				SYMROOT = build/DerivedData/Realm/Build/Products;
 			};
 			name = Release;
 		};
