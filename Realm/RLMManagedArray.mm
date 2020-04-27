@@ -530,7 +530,7 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
     return RLMAddNotificationBlock(self, block, nil);
 }
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block receiveOnQueue:(dispatch_queue_t)queue {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block queue:(dispatch_queue_t)queue {
     return RLMAddNotificationBlock(self, block, queue);
 }
 #pragma clang diagnostic pop

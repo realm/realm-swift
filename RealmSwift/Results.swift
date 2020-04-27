@@ -347,7 +347,7 @@ public struct Results<Element: RealmCollectionValue>: Equatable {
      */
     public func observe(on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<Results>) -> Void) -> NotificationToken {
-        return rlmResults.addNotificationBlock(wrapObserveBlock(block), receiveOn: queue)
+        return rlmResults.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Frozen Objects
@@ -395,7 +395,7 @@ extension Results: RealmCollection {
     public func _observe(_ queue: DispatchQueue?,
                          _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
         -> NotificationToken {
-            return rlmResults.addNotificationBlock(wrapObserveBlock(block), receiveOn: queue)
+            return rlmResults.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 }
 

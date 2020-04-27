@@ -359,7 +359,7 @@ namespace {
 struct CollectionCallbackWrapper {
     void (^block)(id, RLMCollectionChange *, NSError *);
     id collection;
-    std::shared_ptr<bool> skip;
+    bool ignoreChangesInInitialNotification;
 
     void operator()(realm::CollectionChangeSet const& changes, std::exception_ptr err) {
         if (err) {
@@ -374,8 +374,8 @@ struct CollectionCallbackWrapper {
             }
         }
 
-        if (skip && *skip) {
-            *skip = false;
+        if (ignoreChangesInInitialNotification) {
+            ignoreChangesInInitialNotification = false;
             block(collection, nil, nil);
         }
         else if (changes.empty()) {
@@ -424,13 +424,13 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
     if (!realm) {
         @throw RLMException(@"Linking objects notifications are only supported on managed objects.");
     }
-    auto skip = std::is_same_v<RLMCollection, RLMResults> ? std::make_shared<bool>(true) : nullptr;
+    bool skipFirst = std::is_same_v<RLMCollection, RLMResults>;
     auto token = [[RLMCancellationToken alloc] init];
 
     if (!queue) {
         [realm verifyNotificationsAreSupported:true];
         token->_realm = realm;
-        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skip});
+        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst});
         return token;
     }
 
@@ -449,7 +449,7 @@ RLMNotificationToken *RLMAddNotificationBlock(RLMCollection *collection,
             return;
         }
         RLMCollection *collection = [realm resolveThreadSafeReference:tsr];
-        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skip});
+        token->_token = RLMGetBackingCollection(collection).add_notification_callback(CollectionCallbackWrapper{block, collection, skipFirst});
     });
     return token;
 }

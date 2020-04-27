@@ -518,7 +518,7 @@ static inline void RLMResultsValidateInWriteTransaction(__unsafe_unretained RLMR
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMCollectionChange *, NSError *))block {
     return RLMAddNotificationBlock(self, block, nil);
 }
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMCollectionChange *, NSError *))block receiveOnQueue:(dispatch_queue_t)queue {
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults *, RLMCollectionChange *, NSError *))block queue:(dispatch_queue_t)queue {
     return RLMAddNotificationBlock(self, block, queue);
 }
 #pragma clang diagnostic pop

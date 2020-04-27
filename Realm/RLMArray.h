@@ -411,7 +411,7 @@ __attribute__((warn_unused_result));
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray<RLMObjectType> *_Nullable array,
                                                          RLMCollectionChange *_Nullable changes,
                                                          NSError *_Nullable error))block
-                                receiveOnQueue:(nullable dispatch_queue_t)queue
+                                         queue:(nullable dispatch_queue_t)queue
 __attribute__((warn_unused_result));
 
 #pragma mark - Aggregating Property Values

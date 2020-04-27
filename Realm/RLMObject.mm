@@ -161,7 +161,7 @@
 }
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block
-                                receiveOnQueue:(nonnull dispatch_queue_t)queue {
+                                         queue:(nonnull dispatch_queue_t)queue {
     return RLMObjectAddNotificationBlock(self, block, queue);
 }
 

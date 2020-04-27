@@ -2,12 +2,12 @@ x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add support for queue-confined Realms. Rather than being bound to a specific
-  thread, queue-confined Realms are bound to a dispatch queue and can be used
-  within blocks dispatched to that queue regardless of what thread they happen
-  to run on. In addition, change notifications will be delivered to that queue
-  rather than the thread's run loop.
+  thread, queue-confined Realms are bound to a serial dispatch queue and can be
+  used within blocks dispatched to that queue regardless of what thread they
+  happen to run on. In addition, change notifications will be delivered to that
+  queue rather than the thread's run loop. ([PR #6478](https://github.com/realm/realm-cocoa/pull/6478)).
 * Add an option to deliver object and collection notifications to a specific
-  queue rather than the current thread.
+  serial queue rather than the current thread. ([PR #6478](https://github.com/realm/realm-cocoa/pull/6478)).
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)

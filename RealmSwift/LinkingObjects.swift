@@ -303,7 +303,7 @@ public struct LinkingObjects<Element: Object> {
      */
     public func observe(on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<LinkingObjects>) -> Void) -> NotificationToken {
-        return rlmResults.addNotificationBlock(wrapObserveBlock(block), receiveOn: queue)
+        return rlmResults.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Frozen Objects
@@ -385,7 +385,7 @@ extension LinkingObjects: RealmCollection {
     public func _observe(_ queue: DispatchQueue?,
                          _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
         -> NotificationToken {
-            return rlmResults.addNotificationBlock(wrapObserveBlock(block), receiveOn: queue)
+            return rlmResults.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 }
 

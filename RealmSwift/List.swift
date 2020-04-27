@@ -419,7 +419,7 @@ public final class List<Element: RealmCollectionValue>: ListBase {
      */
     public func observe(on queue: DispatchQueue? = nil,
                         _ block: @escaping (RealmCollectionChange<List>) -> Void) -> NotificationToken {
-        return _rlmArray.addNotificationBlock(wrapObserveBlock(block), receiveOn: queue)
+        return _rlmArray.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 
     // MARK: Frozen Objects
@@ -521,7 +521,7 @@ extension List: RealmCollection {
     public func _observe(_ queue: DispatchQueue?,
                          _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void)
         -> NotificationToken {
-            return _rlmArray.addNotificationBlock(wrapObserveBlock(block), receiveOn: queue)
+            return _rlmArray.addNotificationBlock(wrapObserveBlock(block), queue: queue)
     }
 }
 
