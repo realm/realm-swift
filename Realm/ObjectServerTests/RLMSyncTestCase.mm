@@ -69,39 +69,6 @@ static NSString *nodePath() {
 - (std::shared_ptr<realm::SyncUser>)_syncUser;
 @end
 
-//@implementation SyncObject
-//
-//+ (NSString *)primaryKey {
-//    return @"_id";
-//}
-//
-//+ (NSArray *)requiredProperties {
-//    return @[@"_id"];
-//}
-//
-//@end
-//
-//@implementation HugeSyncObject
-//
-//+ (NSString *)primaryKey {
-//    return @"_id";
-//}
-//
-//+ (NSArray *)requiredProperties {
-//    return @[@"_id"];
-//}
-//
-//+ (instancetype)object  {
-//    const NSInteger fakeDataSize = 1000000;
-//    HugeSyncObject *object = [[self alloc] init];
-//    char fakeData[fakeDataSize];
-//    memset(fakeData, 16, sizeof(fakeData));
-//    object.dataProp = [NSData dataWithBytes:fakeData length:sizeof(fakeData)];
-//    return object;
-//}
-//
-//@end
-
 @implementation Dog
 
 + (NSString *)primaryKey {
