@@ -73,9 +73,9 @@
     if (!args.length) {
         args = @"{}";
     }
-    self.client.call_reset_password_function(email.UTF8String, password.UTF8String, args.UTF8String, ^(Optional<realm::app::AppError> error) {
-        [self.app handleResponse:error completion:completion];
-    });
+//    self.client.call_reset_password_function(email.UTF8String, password.UTF8String, args.UTF8String, ^(Optional<realm::app::AppError> error) {
+//        [self.app handleResponse:error completion:completion];
+//    });
 }
 
 @end

@@ -7,16 +7,16 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		49E3AF6E245185FB003EE342 /* Download MongoDB Realm */ = {
+		49E57A16245C3F31004AF428 /* Download BaaS */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = 49E3AF71245185FB003EE342 /* Build configuration list for PBXAggregateTarget "Download MongoDB Realm" */;
+			buildConfigurationList = 49E57A17245C3F31004AF428 /* Build configuration list for PBXAggregateTarget "Download BaaS" */;
 			buildPhases = (
-				49E3AF70245185FB003EE342 /* Download Core and Sync */,
+				49E57A1A245C3F36004AF428 /* ShellScript */,
 			);
 			dependencies = (
 			);
-			name = "Download MongoDB Realm";
-			productName = "Swift Version";
+			name = "Download BaaS";
+			productName = "Download BaaS";
 		};
 		C04B4BD71B55C47600FAE58E /* Download Core Library */ = {
 			isa = PBXAggregateTarget;
@@ -575,12 +575,12 @@
 			remoteGlobalIDString = 3FE5818822C2CA2E00BA10E7;
 			remoteInfo = "RealmTestSupport static";
 		};
-		49E3AF7424518627003EE342 /* PBXContainerItemProxy */ = {
+		49E57A1B245C5B0E004AF428 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 49E3AF6E245185FB003EE342;
-			remoteInfo = "Download MongoDB Realm";
+			remoteGlobalIDString = 49E57A16245C3F31004AF428;
+			remoteInfo = "Download BaaS";
 		};
 		5D6157011BE0A3A100A4BD3F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -630,13 +630,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
 			remoteInfo = "Swift Version";
-		};
-		E8267FB31D90B79000E001C7 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E8D89B8F1955FC6D00CF2B9A /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = C04B4BD71B55C47600FAE58E;
-			remoteInfo = "Set Swift Version";
 		};
 		E8267FB51D90B79000E001C7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -2148,8 +2141,7 @@
 			buildRules = (
 			);
 			dependencies = (
-				49E3AF7524518627003EE342 /* PBXTargetDependency */,
-				E8267FB21D90B79000E001C7 /* PBXTargetDependency */,
+				49E57A1C245C5B0E004AF428 /* PBXTargetDependency */,
 				E8267FB41D90B79000E001C7 /* PBXTargetDependency */,
 				E8267FB61D90B79000E001C7 /* PBXTargetDependency */,
 			);
@@ -2229,6 +2221,11 @@
 						DevelopmentTeam = QX5CR2FTN2;
 						ProvisioningStyle = Automatic;
 					};
+					49E57A16245C3F31004AF428 = {
+						CreatedOnToolsVersion = 11.4.1;
+						DevelopmentTeam = 2Z8M9MTEVV;
+						ProvisioningStyle = Automatic;
+					};
 					5D659E7D1BE04556006515A0 = {
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
@@ -2295,7 +2292,7 @@
 				3F9D91802152D42F00474F09 /* TestHost static */,
 				3F558C9B22C29CAF002F0F30 /* RealmTestSupport */,
 				3FE5818822C2CA2E00BA10E7 /* RealmTestSupport static */,
-				49E3AF6E245185FB003EE342 /* Download MongoDB Realm */,
+				49E57A16245C3F31004AF428 /* Download BaaS */,
 			);
 		};
 /* End PBXProject section */
@@ -2367,21 +2364,23 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		49E3AF70245185FB003EE342 /* Download Core and Sync */ = {
+		49E57A1A245C3F36004AF428 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
+			inputFileListPaths = (
+			);
 			inputPaths = (
 			);
-			name = "Download Core and Sync";
+			outputFileListPaths = (
+			);
 			outputPaths = (
-				"$(SRCROOT)/core",
+				"$(SRCROOT)/baas",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "sh Realm/ObjectServerTests/setup_baas.sh\n";
-			showEnvVarsInLog = 0;
 		};
 		5D304A2E1BE9AEFB0082C1A6 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2969,10 +2968,10 @@
 			target = 3FE5818822C2CA2E00BA10E7 /* RealmTestSupport static */;
 			targetProxy = 3FE5819322C2CA6800BA10E7 /* PBXContainerItemProxy */;
 		};
-		49E3AF7524518627003EE342 /* PBXTargetDependency */ = {
+		49E57A1C245C5B0E004AF428 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 49E3AF6E245185FB003EE342 /* Download MongoDB Realm */;
-			targetProxy = 49E3AF7424518627003EE342 /* PBXContainerItemProxy */;
+			target = 49E57A16245C3F31004AF428 /* Download BaaS */;
+			targetProxy = 49E57A1B245C5B0E004AF428 /* PBXContainerItemProxy */;
 		};
 		5D6157021BE0A3A100A4BD3F /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3008,11 +3007,6 @@
 			isa = PBXTargetDependency;
 			target = C04B4BD71B55C47600FAE58E /* Download Core Library */;
 			targetProxy = C04B4BDC1B55C51500FAE58E /* PBXContainerItemProxy */;
-		};
-		E8267FB21D90B79000E001C7 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = C04B4BD71B55C47600FAE58E /* Download Core Library */;
-			targetProxy = E8267FB31D90B79000E001C7 /* PBXContainerItemProxy */;
 		};
 		E8267FB41D90B79000E001C7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -3119,22 +3113,21 @@
 			};
 			name = Release;
 		};
-		49E3AF7624518C8F003EE342 /* Debug */ = {
+		49E57A18245C3F31004AF428 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				PRODUCT_NAME = "Swift Version";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2Z8M9MTEVV;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
-		49E3AF7724518C8F003EE342 /* Release */ = {
+		49E57A19245C3F31004AF428 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				PRODUCT_NAME = "Swift Version";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 2Z8M9MTEVV;
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -3145,8 +3138,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OBJROOT = build;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SYMROOT = build/DerivedData/Realm/Build/Products;
+				SYMROOT = build;
 			};
 			name = Debug;
 		};
@@ -3157,7 +3151,8 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				SYMROOT = build/DerivedData/Realm/Build/Products;
+				OBJROOT = build;
+				SYMROOT = build;
 			};
 			name = Release;
 		};
@@ -3165,7 +3160,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
-				SYMROOT = build/DerivedData/Realm/Build/Products;
+				SYMROOT = build;
 			};
 			name = Debug;
 		};
@@ -3173,7 +3168,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
-				SYMROOT = build/DerivedData/Realm/Build/Products;
+				SYMROOT = build;
 			};
 			name = Release;
 		};
@@ -3357,11 +3352,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		49E3AF71245185FB003EE342 /* Build configuration list for PBXAggregateTarget "Download MongoDB Realm" */ = {
+		49E57A17245C3F31004AF428 /* Build configuration list for PBXAggregateTarget "Download BaaS" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				49E3AF7624518C8F003EE342 /* Debug */,
-				49E3AF7724518C8F003EE342 /* Release */,
+				49E57A18245C3F31004AF428 /* Debug */,
+				49E57A19245C3F31004AF428 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

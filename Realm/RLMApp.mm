@@ -178,7 +178,10 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 }
 
 - (RLMSyncUser *)currentUser {
-    return [[RLMSyncUser alloc] initWithSyncUser:SyncManager::shared().get_current_user() app:self];
+    if (auto user = SyncManager::shared().get_current_user()) {
+        return [[RLMSyncUser alloc] initWithSyncUser:user app:self];
+    }
+    return nil;
 }
 
 - (void)loginWithCredential:(RLMAppCredentials *)credentials
