@@ -48,7 +48,7 @@
 #include <realm/version.hpp>
 
 #if REALM_ENABLE_SYNC
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 

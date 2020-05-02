@@ -49,13 +49,6 @@ public typealias SyncUserAccountInfo = RLMSyncUserAccountInfo
  */
 public typealias SyncManager = RLMSyncManager
 
-extension SyncManager {
-    /// The sole instance of the singleton.
-    public static var shared: SyncManager {
-        return RLMApp.sharedManager()
-    }
-}
-
 /**
  Options for configuring timeouts and intervals in the sync client.
 

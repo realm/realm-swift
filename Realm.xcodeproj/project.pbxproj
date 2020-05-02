@@ -762,7 +762,7 @@
 		1AF64DD11DA304A90081EB15 /* RLMSyncUser+ObjectServerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "RLMSyncUser+ObjectServerTests.mm"; path = "Realm/ObjectServerTests/RLMSyncUser+ObjectServerTests.mm"; sourceTree = "<group>"; };
 		1AF7EA941D340AF70001A9B5 /* RLMSyncManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSyncManager.h; sourceTree = "<group>"; };
 		1AF7EA951D340AF70001A9B5 /* RLMSyncManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMSyncManager.mm; sourceTree = "<group>"; };
-		1AF7EA981D340D1F0001A9B5 /* RLMSyncManager_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMSyncManager_Private.h; sourceTree = "<group>"; };
+		1AF7EA981D340D1F0001A9B5 /* RLMSyncManager_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMSyncManager_Private.hpp; sourceTree = "<group>"; };
 		26F3CA681986CC86004623E1 /* SwiftPropertyTypeTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftPropertyTypeTest.swift; sourceTree = "<group>"; };
 		297FBEFA1C19F696009D1118 /* RLMTestCaseUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RLMTestCaseUtils.swift; sourceTree = "<group>"; };
 		29B7FDF51C0DA6560023224E /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
@@ -1302,7 +1302,7 @@
 				1A4AC06D1D8BA86200DC9736 /* RLMSyncConfiguration_Private.hpp */,
 				1AF7EA941D340AF70001A9B5 /* RLMSyncManager.h */,
 				1AF7EA951D340AF70001A9B5 /* RLMSyncManager.mm */,
-				1AF7EA981D340D1F0001A9B5 /* RLMSyncManager_Private.h */,
+				1AF7EA981D340D1F0001A9B5 /* RLMSyncManager_Private.hpp */,
 				1AD3870A1D4A7FBB00479110 /* RLMSyncSession.h */,
 				1AD3870B1D4A7FBB00479110 /* RLMSyncSession.mm */,
 				1ABF256A1D528B9900BAC441 /* RLMSyncSession_Private.hpp */,

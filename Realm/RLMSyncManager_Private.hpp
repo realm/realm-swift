@@ -20,8 +20,15 @@
 
 #import "RLMSyncUtil_Private.h"
 #import "RLMNetworkTransport.h"
+#import <memory>
 
-@class RLMApp, RLMSyncUser, RLMSyncConfiguration;
+namespace realm {
+namespace app {
+class App;
+}
+}
+
+@class RLMAppConfiguration, RLMSyncUser, RLMSyncConfiguration;
 
 // All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
 // called very infrequently, this should pose no issues.
@@ -33,10 +40,12 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock sessionCompletionNotifier;
 
 /// The sole instance of the singleton.
-+ (instancetype)sharedManagerWithApp:(RLMApp *)app NS_REFINED_FOR_SWIFT;
++ (instancetype)sharedManagerWithAppConfiguration:(RLMAppConfiguration *)appConfiguration NS_REFINED_FOR_SWIFT;
+
+- (std::shared_ptr<realm::app::App>)app;
 
 - (void)configureWithRootDirectory:(nullable NSURL *)rootDirectory
-                               app:(nullable RLMApp *)app;
+                  appConfiguration:(nullable RLMAppConfiguration *)appConfiguration;
 
 - (void)_fireError:(NSError *)error;
 

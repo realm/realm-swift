@@ -24,7 +24,7 @@
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMRealmConfiguration_Private.h"
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMSyncConfiguration_Private.h"
 #import "RLMUtil.hpp"
 #import "RLMApp.h"
@@ -349,7 +349,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMApp *)app {
-    return [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    return [RLMApp app:@"dogs-tsudb" configuration:[self defaultAppConfiguration]];
 }
 
 - (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
@@ -370,7 +370,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMAppConfiguration*) defaultAppConfiguration {
-    return  [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
+    return  [[RLMAppConfiguration alloc] initWithBaseURL:@"https://realm-dev.mongodb.com"
                                                transport:nil
                                             localAppName:nil
                                          localAppVersion:nil
@@ -537,10 +537,10 @@ static NSURL *syncDirectoryForChildProcess() {
 // FIXME: remove this API once the new token system is implemented.
 - (void)primeSyncManagerWithSemaphore:(dispatch_semaphore_t)semaphore {
     if (semaphore == nil) {
-        [[RLMApp sharedManager] setSessionCompletionNotifier:^(__unused NSError *error){ }];
+        [[[self app] sharedManager] setSessionCompletionNotifier:^(__unused NSError *error){ }];
         return;
     }
-    [[RLMApp sharedManager] setSessionCompletionNotifier:^(NSError *error) {
+    [[[self app] sharedManager] setSessionCompletionNotifier:^(NSError *error) {
         XCTAssertNil(error, @"Session completion block returned with an error: %@", error);
         dispatch_semaphore_signal(semaphore);
     }];
@@ -587,10 +587,11 @@ static NSURL *syncDirectoryForChildProcess() {
     [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:&error];
     [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
                            withIntermediateDirectories:YES attributes:nil error:&error];
-    [self app];
-    RLMSyncManager *syncManager = RLMApp.sharedManager;
-    [syncManager configureWithRootDirectory:clientDataRoot app: [self app]];
-    syncManager.logLevel = RLMSyncLogLevelOff;
+
+    RLMSyncManager *syncManager = [[self app] sharedManager];
+
+    [syncManager configureWithRootDirectory:clientDataRoot appConfiguration:[[self app] configuration]];
+    syncManager.logLevel = RLMSyncLogLevelTrace;
     syncManager.userAgent = self.name;
 }
 

@@ -74,6 +74,8 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
  */
 @interface RLMApp : NSObject
 
+@property (readonly) RLMAppConfiguration *configuration;
+
 /**
  Get an application with a given appId and configuration.
 
@@ -83,7 +85,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 + (instancetype)app:(NSString *)appId
       configuration:(nullable RLMAppConfiguration *)configuration;
 
-+ (RLMSyncManager *)sharedManager;
+- (RLMSyncManager *)sharedManager;
 
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers;
 

@@ -857,48 +857,58 @@
     }
 }
 
-#if 0
 /// A client should be able to open multiple Realms and delete objects from each of them.
 - (void)testMultipleRealmsDeleteObjects {
-    NSURL *urlA = CUSTOM_REALM_URL(@"a");
-    NSURL *urlB = CUSTOM_REALM_URL(@"b");
-    NSURL *urlC = CUSTOM_REALM_URL(@"c");
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]
-                                               server:[RLMObjectServerTests authServerURL]];
-    RLMRealm *realmA = [self openRealmForURL:urlA user:user];
-    RLMRealm *realmB = [self openRealmForURL:urlB user:user];
-    RLMRealm *realmC = [self openRealmForURL:urlC user:user];
+    NSString *partitionValueA = @"foo";
+    NSString *partitionValueB = @"bar";
+    NSString *partitionValueC = @"baz";
+    RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                            register:self.isParent]];
+    RLMRealm *realmA = [self openRealmForPartitionValue:partitionValueA user:user];
+    RLMRealm *realmB = [self openRealmForPartitionValue:partitionValueB user:user];
+    RLMRealm *realmC = [self openRealmForPartitionValue:partitionValueC user:user];
+
     if (self.isParent) {
         [self waitForDownloadsForRealm:realmA];
         [self waitForDownloadsForRealm:realmB];
         [self waitForDownloadsForRealm:realmC];
         // Add objects.
-        [self addSyncObjectsToRealm:realmA
-                       descriptions:@[@"parent-A1", @"parent-A2", @"parent-A3", @"parent-A4"]];
-        [self addSyncObjectsToRealm:realmB
-                       descriptions:@[@"parent-B1", @"parent-B2", @"parent-B3", @"parent-B4", @"parent-B5"]];
-        [self addSyncObjectsToRealm:realmC
-                       descriptions:@[@"parent-C1", @"parent-C2"]];
+        [self addPersonsToRealm:realmA
+                        persons:@[[Person john],
+                                  [Person paul],
+                                  [Person ringo],
+                                  [Person george]]];
+        [self addPersonsToRealm:realmB
+                        persons:@[[Person john],
+                                  [Person paul],
+                                  [Person ringo],
+                                  [Person george],
+                                  [Person george]]];
+        [self addPersonsToRealm:realmC
+                        persons:@[[Person john],
+                                  [Person paul]]];
+
         [self waitForUploadsForRealm:realmA];
         [self waitForUploadsForRealm:realmB];
         [self waitForUploadsForRealm:realmC];
-        CHECK_COUNT(4, SyncObject, realmA);
-        CHECK_COUNT(5, SyncObject, realmB);
-        CHECK_COUNT(2, SyncObject, realmC);
+        CHECK_COUNT(4, Person, realmA);
+        CHECK_COUNT(5, Person, realmB);
+        CHECK_COUNT(2, Person, realmC);
         RLMRunChildAndWait();
         [self waitForDownloadsForUser:user
                                realms:@[realmA, realmB, realmC]
-                            realmURLs:@[urlA, urlB, urlC]
+                      partitionValues:@[partitionValueA,
+                                        partitionValueB,
+                                        partitionValueC]
                        expectedCounts:@[@0, @0, @0]];
     } else {
         // Delete all the objects from the Realms.
         [self waitForDownloadsForRealm:realmA];
         [self waitForDownloadsForRealm:realmB];
         [self waitForDownloadsForRealm:realmC];
-        CHECK_COUNT(4, SyncObject, realmA);
-        CHECK_COUNT(5, SyncObject, realmB);
-        CHECK_COUNT(2, SyncObject, realmC);
+        CHECK_COUNT(4, Person, realmA);
+        CHECK_COUNT(5, Person, realmB);
+        CHECK_COUNT(2, Person, realmC);
         [realmA beginWriteTransaction];
         [realmA deleteAllObjects];
         [realmA commitWriteTransaction];
@@ -911,12 +921,12 @@
         [self waitForUploadsForRealm:realmA];
         [self waitForUploadsForRealm:realmB];
         [self waitForUploadsForRealm:realmC];
-        CHECK_COUNT(0, SyncObject, realmA);
-        CHECK_COUNT(0, SyncObject, realmB);
-        CHECK_COUNT(0, SyncObject, realmC);
+        CHECK_COUNT(0, Person, realmA);
+        CHECK_COUNT(0, Person, realmB);
+        CHECK_COUNT(0, Person, realmC);
     }
 }
-#endif
+
 #pragma mark - Session Lifetime
 #if 0
 /// When a session opened by a Realm goes out of scope, it should stay alive long enough to finish any waiting uploads.

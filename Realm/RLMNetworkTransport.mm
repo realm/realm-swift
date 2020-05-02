@@ -21,7 +21,7 @@
 #import "RLMRealmConfiguration.h"
 #import "RLMJSONModels.h"
 #import "RLMSyncUtil_Private.hpp"
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import <realm/util/scope_exit.hpp>
@@ -72,7 +72,7 @@ NSString * const RLMHTTPMethodToNSString[] = {
     }
     urlRequest.timeoutInterval = request.timeout;
 
-    RLMSyncManager *syncManager = RLMApp.sharedManager;
+    RLMSyncManager *syncManager = [RLMSyncManager sharedManagerWithAppConfiguration:nil];
     RLMNetworkRequestOptions *options = syncManager.networkRequestOptions;
 
     for (NSString *key in request.headers) {

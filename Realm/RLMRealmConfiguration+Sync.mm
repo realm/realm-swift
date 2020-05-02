@@ -21,7 +21,7 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
@@ -46,7 +46,7 @@
     }
 
     // Ensure sync manager is initialized, if it hasn't already been.
-    [RLMApp sharedManager];
+//    [RLMApp sharedManager];
     NSAssert(user.identity, @"Cannot call this method on a user that doesn't have an identity.");
     self.config.in_memory = false;
     self.config.sync_config = std::make_shared<realm::SyncConfig>([syncConfiguration rawConfiguration]);

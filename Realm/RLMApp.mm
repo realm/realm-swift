@@ -20,10 +20,10 @@
 
 #import "RLMAppCredentials_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMUsernamePasswordProviderClient.h"
 #import "RLMUserAPIKeyProviderClient.h"
-#import "sync/app.hpp"
+
 
 using namespace realm;
 
@@ -69,6 +69,11 @@ namespace {
     };
 }
 
+@interface RLMAppConfiguration() {
+    realm::app::App::Config __config;
+}
+@end
+
 @implementation RLMAppConfiguration
 
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
@@ -93,10 +98,39 @@ namespace {
         self.localAppName = localAppName;
         self.localAppVersion = localAppVersion;
         self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
+
+        __config.transport_generator = []{
+            return std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
+        };
+
+        if (baseURL) {
+            __config.base_url = util::Optional<std::string>(baseURL.UTF8String);
+        }
+        if (transport) {
+            __config.transport_generator = [self]{
+                return std::make_unique<CocoaNetworkTransport>(self.transport);
+            };
+        }
+        if (localAppName) {
+            __config.local_app_name = std::string(localAppName.UTF8String);
+        }
+        if (localAppVersion) {
+            __config.local_app_version = std::string(localAppVersion.UTF8String);
+        }
+        __config.default_request_timeout_ms = (uint64_t)defaultRequestTimeoutMS;
         return self;
     }
     return nil;
 }
+
+- (realm::app::App::Config)_config {
+    return __config;
+}
+
+- (void)setAppId:(NSString *)appId {
+    __config.app_id = appId.UTF8String;
+}
+
 @end
 
 NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
@@ -116,32 +150,11 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 - (instancetype)initWithAppId:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
     if (self = [super init]) {
-        app::App::Config boundConfiguration = {
-            .app_id = appId.UTF8String
-        };
-        boundConfiguration.transport_generator = [configuration]{
-            return std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
-        };
-        if (configuration) {
-            if (configuration.baseURL) {
-                boundConfiguration.base_url = util::Optional<std::string>(configuration.baseURL.UTF8String);
-            }
-            if (configuration.transport) {
-                boundConfiguration.transport_generator = [configuration]{
-                    return std::make_unique<CocoaNetworkTransport>(configuration.transport);
-                };
-            }
-            if (configuration.localAppName) {
-                boundConfiguration.local_app_name = std::string(configuration.localAppName.UTF8String);
-            }
-            if (configuration.localAppVersion) {
-                boundConfiguration.local_app_version = std::string(configuration.localAppVersion.UTF8String);
-            }
-            boundConfiguration.default_request_timeout_ms = (uint64_t)configuration.defaultRequestTimeoutMS;
-        }
-        _app = std::make_shared<realm::app::App>(boundConfiguration);
-        
-        [RLMSyncManager sharedManagerWithApp:self];
+        _configuration = configuration;
+        [_configuration setAppId: appId];
+
+        _app = [[RLMSyncManager sharedManagerWithAppConfiguration:configuration] app];
+
         return self;
     }
     return nil;
@@ -155,8 +168,8 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     return nil;
 }
 
-+ (RLMSyncManager *)sharedManager {
-    return [RLMSyncManager sharedManagerWithApp:self];
+- (RLMSyncManager *)sharedManager {
+    return [RLMSyncManager sharedManagerWithAppConfiguration:_configuration];
 }
 
 + (instancetype)app:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {

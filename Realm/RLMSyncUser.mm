@@ -26,7 +26,7 @@
 #import "RLMResults_Private.hpp"
 #import "RLMSyncConfiguration.h"
 #import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"

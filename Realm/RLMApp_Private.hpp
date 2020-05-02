@@ -18,17 +18,26 @@
 
 #import <Realm/RLMApp.h>
 #import <memory>
+#import "sync/app.hpp"
 
-namespace realm {
-namespace app {
-class App;
-struct AppError;
-}
-namespace util {
-template<typename T>
-class Optional;
-}
-}
+//namespace realm {
+//namespace app {
+//class App;
+//struct AppError;
+//}
+//namespace util {
+//template<typename T>
+//class Optional;
+//}
+//}
+
+@interface RLMAppConfiguration()
+
+- (realm::app::App::Config)_config;
+
+- (void)setAppId:(NSString *)appId;
+
+@end
 
 @interface RLMApp ()
 - (std::shared_ptr<realm::app::App>)_realmApp;

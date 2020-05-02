@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 
 #import "RLMApp_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
@@ -126,14 +126,13 @@ static RLMSyncManager *s_sharedManager = nil;
     return self = [super init];
 }
 
-
-+ (instancetype)sharedManagerWithApp:(RLMApp *)app {
++ (instancetype)sharedManagerWithAppConfiguration:(RLMAppConfiguration *)appConfiguration {
     static std::once_flag flag;
-    std::call_once(flag, [app] {
+    std::call_once(flag, [appConfiguration] {
         try {
             [RLMSyncUser _setUpBindingContextFactory];
             s_sharedManager = [[RLMSyncManager alloc] initPrivate];
-            [s_sharedManager configureWithRootDirectory:nil app:app];
+            [s_sharedManager configureWithRootDirectory:nil appConfiguration:appConfiguration];
         }
         catch (std::exception const& e) {
             @throw RLMException(e);
@@ -142,7 +141,7 @@ static RLMSyncManager *s_sharedManager = nil;
     return s_sharedManager;
 }
 
-- (void)configureWithRootDirectory:(NSURL *)rootDirectory app:(RLMApp *)app {
+- (void)configureWithRootDirectory:(NSURL *)rootDirectory appConfiguration:(RLMAppConfiguration *)appConfiguration {
     SyncClientConfig config;
     bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
     config.logger_factory = &s_syncLoggerFactory;
@@ -159,8 +158,15 @@ static RLMSyncManager *s_sharedManager = nil;
         config.user_agent_application_info = RLMStringDataWithNSString(self.appID);
     }
 
-    SyncManager::shared().configure(config,
-                                    app ? util::Optional([app _realmApp]->config()) : util::none);
+    if (appConfiguration) {
+        SyncManager::shared().configure(config, [appConfiguration _config]);
+    } else {
+        SyncManager::shared().configure(config, realm::util::none);
+    }
+}
+
+- (std::shared_ptr<realm::app::App>)app {
+    return SyncManager::shared().app();
 }
 
 - (NSString *)appID {
@@ -228,7 +234,7 @@ static RLMSyncManager *s_sharedManager = nil;
 }
 
 + (void)resetForTesting {
-    RLMSyncManager *manager = [self sharedManagerWithApp:nil];
+    RLMSyncManager *manager = [self sharedManagerWithAppConfiguration:nil];
     manager->_errorHandler = nil;
     manager->_appID = nil;
     manager->_userAgent = nil;

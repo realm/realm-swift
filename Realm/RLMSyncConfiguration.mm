@@ -20,7 +20,7 @@
 #import "RLMSyncConfiguration_Private.hpp"
 
 #import "RLMRealmConfiguration+Sync.h"
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
@@ -207,7 +207,9 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
             shouldMakeError = error.is_fatal;
             break;
     }
-    auto errorHandler = RLMApp.sharedManager.errorHandler;
+
+    RLMSyncManager *manager = [RLMSyncManager sharedManagerWithAppConfiguration:nil];
+    auto errorHandler = manager.errorHandler;
     if (!shouldMakeError || !errorHandler) {
         return;
     }
@@ -232,10 +234,11 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
         _config->error_handler = errorHandler;
         _config->client_resync_mode = realm::ClientResyncMode::Manual;
 
-        if (NSString *authorizationHeaderName = [RLMApp sharedManager].authorizationHeaderName) {
+        RLMSyncManager *manager = [RLMSyncManager sharedManagerWithAppConfiguration:nil];
+        if (NSString *authorizationHeaderName = manager.authorizationHeaderName) {
             _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);
         }
-        if (NSDictionary<NSString *, NSString *> *customRequestHeaders = [RLMApp sharedManager].customRequestHeaders) {
+        if (NSDictionary<NSString *, NSString *> *customRequestHeaders = manager.customRequestHeaders) {
             for (NSString *key in customRequestHeaders) {
                 _config->custom_http_headers.emplace(key.UTF8String, customRequestHeaders[key].UTF8String);
             }
