@@ -31,24 +31,20 @@
 
 #import <map>
 #import <mutex>
-#import <sys/event.h>
-#import <sys/stat.h>
-#import <sys/time.h>
-#import <unistd.h>
 
 // Global realm state
 static auto& s_realmCacheMutex = *new std::mutex();
 static auto& s_realmsPerPath = *new std::map<std::string, NSMapTable *>();
 static auto& s_frozenRealms = *new std::map<std::string, NSMapTable *>();
 
-void RLMCacheRealm(std::string const& path, __unsafe_unretained RLMRealm *const realm) {
+void RLMCacheRealm(std::string const& path, void *key, __unsafe_unretained RLMRealm *const realm) {
     std::lock_guard<std::mutex> lock(s_realmCacheMutex);
     NSMapTable *realms = s_realmsPerPath[path];
     if (!realms) {
         s_realmsPerPath[path] = realms = [NSMapTable mapTableWithKeyOptions:NSPointerFunctionsOpaquePersonality|NSPointerFunctionsOpaqueMemory
                                                                valueOptions:NSPointerFunctionsWeakMemory];
     }
-    [realms setObject:realm forKey:(__bridge id)pthread_self()];
+    [realms setObject:realm forKey:(__bridge id)key];
 }
 
 RLMRealm *RLMGetAnyCachedRealmForPath(std::string const& path) {
@@ -56,9 +52,9 @@ RLMRealm *RLMGetAnyCachedRealmForPath(std::string const& path) {
     return [s_realmsPerPath[path] objectEnumerator].nextObject;
 }
 
-RLMRealm *RLMGetThreadLocalCachedRealmForPath(std::string const& path) {
+RLMRealm *RLMGetThreadLocalCachedRealmForPath(std::string const& path, void *key) {
     std::lock_guard<std::mutex> lock(s_realmCacheMutex);
-    return [s_realmsPerPath[path] objectForKey:(__bridge id)pthread_self()];
+    return [s_realmsPerPath[path] objectForKey:(__bridge id)key];
 }
 
 void RLMClearRealmCache() {
@@ -86,30 +82,10 @@ RLMRealm *RLMGetFrozenRealmForSourceRealm(__unsafe_unretained RLMRealm *const so
     return realm;
 }
 
-bool RLMIsInRunLoop() {
-    // The main thread may not be in a run loop yet if we're called from
-    // something like `applicationDidFinishLaunching:`, but it presumably will
-    // be in the future
-    if ([NSThread isMainThread]) {
-        return true;
-    }
-    // Current mode indicates why the current callout from the runloop was made,
-    // and is null if a runloop callout isn't currently being processed
-    if (auto mode = CFRunLoopCopyCurrentMode(CFRunLoopGetCurrent())) {
-        CFRelease(mode);
-        return true;
-    }
-    return false;
-}
-
 namespace {
 class RLMNotificationHelper : public realm::BindingContext {
 public:
     RLMNotificationHelper(RLMRealm *realm) : _realm(realm) { }
-
-    bool can_deliver_notifications() const noexcept override {
-        return RLMIsInRunLoop();
-    }
 
     void changes_available() override {
         @autoreleasepool {

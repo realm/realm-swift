@@ -114,17 +114,17 @@ public enum RealmCollectionChange<CollectionType> {
      */
     case error(Error)
 
-    static func fromObjc(value: CollectionType, change: RLMCollectionChange?, error: Error?) -> RealmCollectionChange {
+    static func fromObjc(value: CollectionType?, change: RLMCollectionChange?, error: Error?) -> RealmCollectionChange {
         if let error = error {
             return .error(error)
         }
         if let change = change {
-            return .update(value,
+            return .update(value!,
                 deletions: forceCast(change.deletions, to: [Int].self),
                 insertions: forceCast(change.insertions, to: [Int].self),
                 modifications: forceCast(change.modifications, to: [Int].self))
         }
-        return .initial(value)
+        return .initial(value!)
     }
 }
 
@@ -419,9 +419,10 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
      not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
      perform blocking work.
 
-     Notifications are delivered via the standard run loop, and so can't be delivered while the run loop is blocked by
-     other activity. When notifications can't be delivered instantly, multiple notifications may be coalesced into a
-     single notification. This can include the notification with the initial collection.
+     If no queue is given, notifications are delivered via the standard run loop, and so can't be delivered while the
+     run loop is blocked by other activity. If a queue is given, notifications are delivered to that queue instead. When
+     notifications can't be delivered instantly, multiple notifications may be coalesced into a single notification.
+     This can include the notification with the initial collection.
 
      For example, the following code performs a write transaction immediately after adding the notification block, so
      there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
@@ -456,13 +457,16 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
 
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
 
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    func observe(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
+    func observe(on queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
     /// :nodoc:
-    func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
+    // swiftlint:disable:next identifier_name
+    func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
 
     // MARK: Frozen Objects
 
@@ -634,7 +638,8 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func value(forKey key: String) -> Any? { fatalError() }
     func value(forKeyPath keyPath: String) -> Any? { fatalError() }
     func setValue(_ value: Any?, forKey key: String) { fatalError() }
-    func _observe(_ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
+    // swiftlint:disable:next identifier_name
+    func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
     class func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self { fatalError() }
     var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
@@ -739,8 +744,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     // MARK: Notifications
 
     /// :nodoc:
-    override func _observe(_ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
-        -> NotificationToken { return base._observe(block) }
+    override func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
+        -> NotificationToken { return base._observe(queue, block) }
 
     // MARK: AssistedObjectiveCBridgeable
 
@@ -1029,12 +1034,14 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
-        -> NotificationToken { return base._observe(block) }
+    public func observe(on queue: DispatchQueue? = nil,
+                        _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
+        -> NotificationToken { return base._observe(queue, block) }
 
     /// :nodoc:
-    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
-        -> NotificationToken { return base._observe(block) }
+    // swiftlint:disable:next identifier_name
+    public func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
+        -> NotificationToken { return base._observe(queue, block) }
 
     // MARK: Frozen Objects
 
@@ -1075,5 +1082,61 @@ extension AnyRealmCollection: AssistedObjectiveCBridgeable {
             objectiveCValue: base.bridged.objectiveCValue,
             metadata: AnyRealmCollectionBridgingMetadata(baseMetadata: base.bridged.metadata, baseType: type(of: base))
         )
+    }
+}
+
+// MARK: Collection observation helpers
+
+internal protocol ObservableCollection: RealmCollection {
+    associatedtype BackingObjcCollection
+    func isSameObjcCollection(_ objc: BackingObjcCollection) -> Bool
+    init(objc: BackingObjcCollection)
+}
+
+extension ObservableCollection {
+    // We want to pass the same object instance to the change callback each time.
+    // If the callback is being called on the source thread the instance should
+    // be `self`, but if it's on a different thread it needs to be a new Swift
+    // wrapper for the obj-c type, which we'll construct the first time the
+    // callback is called.
+    internal typealias ObjcCollectionChange = (BackingObjcCollection?, RLMCollectionChange?, Error?) -> Void
+    internal func wrapObserveBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> ObjcCollectionChange {
+        var anyCollection: AnyRealmCollection<Element>?
+        return { collection, change, error in
+            if anyCollection == nil, let collection = collection {
+                anyCollection = AnyRealmCollection(self.isSameObjcCollection(collection) ? self : Self(objc: collection))
+            }
+            block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
+        }
+    }
+
+    internal func wrapObserveBlock(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> ObjcCollectionChange {
+        var list: Self?
+        return { array, change, error in
+            if list == nil, let array = array {
+                list = self.isSameObjcCollection(array) ? self : Self(objc: array)
+            }
+            block(RealmCollectionChange.fromObjc(value: list, change: change, error: error))
+        }
+    }
+}
+extension List: ObservableCollection {
+    internal typealias BackingObjcCollection = RLMArray<AnyObject>
+    internal func isSameObjcCollection(_ rlmArray: BackingObjcCollection) -> Bool {
+        return _rlmArray === rlmArray
+    }
+}
+
+extension Results: ObservableCollection {
+    internal typealias BackingObjcCollection = RLMResults<AnyObject>
+    internal func isSameObjcCollection(_ objc: RLMResults<AnyObject>) -> Bool {
+        return objc === rlmResults
+    }
+}
+
+extension LinkingObjects: ObservableCollection {
+    internal typealias BackingObjcCollection = RLMResults<AnyObject>
+    internal func isSameObjcCollection(_ objc: RLMResults<AnyObject>) -> Bool {
+        return objc === rlmResults
     }
 }

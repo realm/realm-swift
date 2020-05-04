@@ -435,7 +435,7 @@ class RealmCollectionTypeTests: TestCase {
     }
 
     func testObserve() {
-        var theExpectation = expectation(description: "")
+        let ex = expectation(description: "initial notification")
         let token = collection.observe { (changes: RealmCollectionChange) in
             switch changes {
             case .initial(let collection):
@@ -446,20 +446,20 @@ class RealmCollectionTypeTests: TestCase {
                 XCTFail("Shouldn't happen")
             }
 
-            theExpectation.fulfill()
+            ex.fulfill()
         }
         waitForExpectations(timeout: 1, handler: nil)
 
         // add a second notification and wait for it
-        theExpectation = expectation(description: "")
+        var ex2 = expectation(description: "second initial notification")
         let token2 = collection.observe { _ in
-            theExpectation.fulfill()
+            ex2.fulfill()
         }
         waitForExpectations(timeout: 1, handler: nil)
 
         // make a write and implicitly verify that only the unskipped
         // notification is called (the first would error on .update)
-        theExpectation = expectation(description: "")
+        ex2 = expectation(description: "change notification")
         let realm = realmWithTestPath()
         realm.beginWrite()
         realm.delete(collection)
@@ -468,6 +468,37 @@ class RealmCollectionTypeTests: TestCase {
 
         token.invalidate()
         token2.invalidate()
+    }
+
+    func observeOnQueue<Collection: RealmCollection>(_ collection: Collection) where Collection.Element: Object {
+        let sema = DispatchSemaphore(value: 0)
+        let queue = DispatchQueue(label: "background queue")
+        let token = collection.observe(on: queue) { (changes: RealmCollectionChange) in
+            switch changes {
+            case .initial(let collection):
+                XCTAssertEqual(collection.count, 2)
+            case .update(let collection, let deletions, _, _):
+                XCTAssertEqual(collection.count, 0)
+                XCTAssertEqual(deletions, [0, 1])
+            case .error:
+                XCTFail("Shouldn't happen")
+            }
+
+            sema.signal()
+        }
+        sema.wait()
+
+        let realm = realmWithTestPath()
+        try! realm.write {
+            realm.delete(collection)
+        }
+        sema.wait()
+
+        token.invalidate()
+    }
+
+    func testObserveOnQueue() {
+        observeOnQueue(collection)
     }
 
     func testValueForKeyPath() {
@@ -622,6 +653,10 @@ class ResultsTests: RealmCollectionTypeTests {
 
         token.invalidate()
     }
+
+    func testObserveDirectOnQueue() {
+        observeOnQueue(collectionBase())
+    }
 }
 
 class ResultsWithCustomInitializerTests: TestCase {
@@ -701,7 +736,6 @@ class ResultsDistinctTests: TestCase {
 }
 
 class ResultsFromTableTests: ResultsTests {
-
     override func collectionBaseInWriteTransaction() -> Results<CTTNullableStringObjectWithLink> {
         return realmWithTestPath().objects(CTTNullableStringObjectWithLink.self)
     }
@@ -713,7 +747,6 @@ class ResultsFromTableTests: ResultsTests {
 }
 
 class ResultsFromTableViewTests: ResultsTests {
-
     override func collectionBaseInWriteTransaction() -> Results<CTTNullableStringObjectWithLink> {
         return realmWithTestPath().objects(CTTNullableStringObjectWithLink.self).filter("stringCol != ''")
     }
@@ -826,9 +859,13 @@ class ListRealmCollectionTypeTests: RealmCollectionTypeTests {
         token.invalidate()
         token2.invalidate()
     }
+
+    func testObserveDirectOnQueue() {
+        observeOnQueue(collectionBase())
+    }
 }
 
-class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
+class ListUnmanagedRealmCollectionTypeTests: ListRealmCollectionTypeTests {
     override func collectionBaseInWriteTransaction() -> List<CTTNullableStringObjectWithLink> {
         return CTTStringList(value: [[str1, str2]]).array
     }
@@ -901,9 +938,18 @@ class ListStandaloneRealmCollectionTypeTests: ListRealmCollectionTypeTests {
         assertThrows(collection.observe { _ in })
     }
 
+    override func testObserveOnQueue() {
+        assertThrows(collection.observe(on: DispatchQueue(label: "bg")) { _ in })
+    }
+
     override func testObserveDirect() {
         let collection = collectionBase()
         assertThrows(collection.observe { _ in })
+    }
+
+    override func testObserveDirectOnQueue() {
+        let collection = collectionBase()
+        assertThrows(collection.observe(on: DispatchQueue(label: "bg")) { _ in })
     }
 
     func testFreeze() {
@@ -1023,5 +1069,9 @@ class LinkingObjectsCollectionTypeTests: RealmCollectionTypeTests {
             realmWithTestPath().add(array)
             array["array"] = collectionBaseInWriteTransaction()
         }
+    }
+
+    func testObserveDirectOnQueue() {
+        observeOnQueue(collectionBase())
     }
 }

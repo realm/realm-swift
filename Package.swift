@@ -70,6 +70,7 @@ let package = Package(
                 "Realm/ObjectStore/src/schema.cpp",
                 "Realm/ObjectStore/src/shared_realm.cpp",
                 "Realm/ObjectStore/src/thread_safe_reference.cpp",
+                "Realm/ObjectStore/src/util/scheduler.cpp",
                 "Realm/ObjectStore/src/util/uuid.cpp",
                 "Realm/RLMAccessor.mm",
                 "Realm/RLMAnalytics.mm",
