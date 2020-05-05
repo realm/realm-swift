@@ -136,7 +136,7 @@ setup_stitch() {
     echo "running stitch"
     cd "$STITCH_PATH"
     
-    go run cmd/auth/user.go addUser \
+    go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" cmd/auth/user.go addUser \
         -domainID 000000000000000000000000 \
         -mongoURI mongodb://127.0.0.1:26000 \
         -salt 'DQOWene1723baqD!_@#' \

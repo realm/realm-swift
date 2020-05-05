@@ -24,11 +24,7 @@ import RealmSwift
 class SwiftSyncTestCase: RLMSyncTestCase {
 
     var task: Process?
-
-    let authURL: URL = URL(string: "http://127.0.0.1:9080")!
-    let slowConnectAuthURL: URL = URL(string: "http://127.0.0.1:9083")!
-    let realmURL: URL = URL(string: "realm://127.0.0.1:9080/~/testBasicSync")!
-
+    
     /// For testing, make a unique Realm URL of the form "realm://127.0.0.1:9080/~/X",
     /// where X is either a custom string passed as an argument, or an UUID string.
     static func uniqueRealmURL(customName: String? = nil) -> URL {
@@ -38,23 +34,24 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     func executeChild(file: StaticString = #file, line: UInt = #line) {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
+    
+    func randomString(_ length: Int) -> String {
+      let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      return String((0..<length).map{ _ in letters.randomElement()! })
+    }
 
-    func basicCredentials(register: Bool = true,
-                          usernameSuffix: String = "",
+    func basicCredentials(usernameSuffix: String = "",
                           file: StaticString = #file,
                           line: UInt = #line) -> AppCredentials {
-        let filename = URL(fileURLWithPath: String(describing: file)).deletingPathExtension().lastPathComponent
-        let username = "\(filename)\(line)\(usernameSuffix)"
+        let username = "\(randomString(10))\(usernameSuffix)"
         let password = "abcdef"
         let credentials = AppCredentials(username: username, password: password)
-        if register {
-            let ex = expectation(description: "Should register in the user properly")
-            app().usernamePasswordProviderClient().registerEmail(username, password: password, completion: { error in
-                XCTAssertNil(error)
-                ex.fulfill()
-            })
-            waitForExpectations(timeout: 4, handler: nil)
-        }
+        let ex = expectation(description: "Should register in the user properly")
+        app().usernamePasswordProviderClient().registerEmail(username, password: password, completion: { error in
+            XCTAssertNil(error)
+            ex.fulfill()
+        })
+        waitForExpectations(timeout: 4, handler: nil)
         return credentials
     }
 
@@ -98,6 +95,25 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                        file: file,
                        line: line)
         return theUser!
+    }
+    
+    func synchronouslyLogOutUser(_ user: SyncUser,
+                                 file: StaticString = #file,
+                                 line: UInt = #line) throws {
+        var theError: Error?
+        let ex = expectation(description: "Should log out the user properly")
+        
+        self.app().logOut(user) { (error) in
+            theError = error
+            ex.fulfill()
+        }
+        
+        waitForExpectations(timeout: 10, handler: nil)
+        XCTAssertEqual(user.state, .loggedOut,
+                       "User should have been valid, but wasn't. (error: "
+                        + "\(theError != nil ? String(describing: theError!) : "n/a"))",
+            file: file,
+            line: line)
     }
 
     func waitForUploads(for realm: Realm) {

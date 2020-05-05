@@ -63,7 +63,8 @@ run_stitch() {
     export PATH="$PATH:$STITCH_PATH/etc/transpiler/bin"
     export LD_LIBRARY_PATH="$STITCH_PATH/etc/dylib/lib"
     cd "$STITCH_PATH"
-    go run cmd/server/main.go --configFile "$STITCH_PATH/etc/configs/test_config.json"
+    
+    go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" cmd/server/main.go --configFile "$STITCH_PATH/etc/configs/test_config.json"
 }
 
 wait_for_stitch() {

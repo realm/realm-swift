@@ -142,7 +142,7 @@ RLM_ARRAY_TYPE(Dog)
                           error:(NSError **)error;
 
 /// Manually set the refresh token for a user. Used for testing invalid token conditions.
-- (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue;
+- (void)manuallySetAccessTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue;
 
 - (void)setupSyncManager;
 - (void)resetSyncManager;

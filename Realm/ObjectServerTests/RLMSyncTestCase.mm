@@ -349,7 +349,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMApp *)app {
-    return [RLMApp app:@"dogs-tsudb" configuration:[self defaultAppConfiguration]];
+    return [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
 }
 
 - (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
@@ -370,7 +370,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMAppConfiguration*) defaultAppConfiguration {
-    return  [[RLMAppConfiguration alloc] initWithBaseURL:@"https://realm-dev.mongodb.com"
+    return  [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:9090"
                                                transport:nil
                                             localAppName:nil
                                          localAppVersion:nil
@@ -530,8 +530,8 @@ static NSURL *syncDirectoryForChildProcess() {
         *error = completionError;
 }
 
-- (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue {
-    [user _syncUser]->update_refresh_token(tokenValue.UTF8String);
+- (void)manuallySetAccessTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue {
+    [user _syncUser]->update_access_token(tokenValue.UTF8String);
 }
 
 // FIXME: remove this API once the new token system is implemented.

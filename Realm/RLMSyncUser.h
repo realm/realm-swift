@@ -118,21 +118,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable NSString *)partitionValue
                                        enableSSLValidation:(bool)enableSSLValidation NS_REFINED_FOR_SWIFT;
 
-/**
- An optional error handler which can be set to notify the host application when
- the user encounters an error. Errors reported by this error handler are always
- `RLMSyncAuthError`s.
-
- @note Check for `RLMSyncAuthErrorInvalidAccessToken` to see if the user has
-       been remotely logged out because its refresh token expired, or because the
-       third party authentication service providing the user's identity has
-       logged the user out.
-
- @warning Regardless of whether an error handler is installed, certain user errors
-          will automatically cause the user to enter the logged out state.
- */
-@property (nullable, nonatomic) RLMUserErrorReportingBlock errorHandler NS_REFINED_FOR_SWIFT;
-
 #pragma mark - Sessions
 
 /**

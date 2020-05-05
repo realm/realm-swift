@@ -35,9 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 class CocoaSyncUserContext : public SyncUserContext {
 public:
-    
-    RLMUserErrorReportingBlock error_handler() const;
-    void set_error_handler(RLMUserErrorReportingBlock);
 
 private:
     /**
@@ -49,13 +46,6 @@ private:
      */
     std::unordered_map<std::string, RLMSyncSessionRefreshHandle *> m_refresh_handles;
     std::mutex m_mutex;
-
-    /**
-     An optional callback invoked when the authentication server reports the user as
-     being in an expired state.
-     */
-    RLMUserErrorReportingBlock m_error_handler;
-    mutable std::mutex m_error_handler_mutex;
 };
 
 @interface RLMSyncUser ()

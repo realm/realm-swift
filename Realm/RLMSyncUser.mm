@@ -37,18 +37,6 @@
 
 using namespace realm;
 
-RLMUserErrorReportingBlock CocoaSyncUserContext::error_handler() const
-{
-    std::lock_guard<std::mutex> lock(m_error_handler_mutex);
-    return m_error_handler;
-}
-
-void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
-{
-    std::lock_guard<std::mutex> lock(m_error_handler_mutex);
-    m_error_handler = block;
-}
-
 @interface RLMSyncUserInfo ()
 
 @property (nonatomic, readwrite) NSArray *accounts;
@@ -116,20 +104,6 @@ void CocoaSyncUserContext::set_error_handler(RLMUserErrorReportingBlock block)
         return;
     }
     _user = nullptr;
-}
-
-- (RLMUserErrorReportingBlock)errorHandler {
-    if (!_user) {
-        return nil;
-    }
-    return context_for(_user).error_handler();
-}
-
-- (void)setErrorHandler:(RLMUserErrorReportingBlock)errorHandler {
-    if (!_user) {
-        return;
-    }
-    context_for(_user).set_error_handler([errorHandler copy]);
 }
 
 - (NSString *)pathForPartitionValueHash:(NSUInteger)partitionValueHash {
