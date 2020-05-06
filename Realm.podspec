@@ -60,7 +60,8 @@ Pod::Spec.new do |s|
                               'include/**/RLMUserAPIKey.h',
                               'include/**/RLMUserAPIKeyProviderClient.h',
                               'include/**/RLMUsernamePasswordProviderClient.h',
-
+                              'include/**/RLMBSON.h',
+                              
                               # Realm.Dynamic module
                               'include/**/RLMRealm_Dynamic.h',
                               'include/**/RLMObjectBase_Dynamic.h'
@@ -81,8 +82,9 @@ Pod::Spec.new do |s|
                               'include/**/RLMResults_Private.h',
                               'include/**/RLMSchema_Private.h',
                               'include/**/RLMSyncConfiguration_Private.h',
-                              'include/**/RLMSyncUtil_Private.h'
-
+                              'include/**/RLMSyncUtil_Private.h',
+                              'include/**/RLMBSON_Private.h'
+  
   source_files              = 'Realm/*.{m,mm}',
                               'Realm/ObjectStore/src/*.cpp',
                               'Realm/ObjectStore/src/sync/*.cpp',
