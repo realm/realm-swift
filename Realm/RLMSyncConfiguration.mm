@@ -58,12 +58,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 @interface RLMSyncConfiguration () {
     std::unique_ptr<realm::SyncConfig> _config;
 }
-//
-//- (instancetype)initWithApp:(RLMApp *)app
-//                       user:(RLMSyncUser *)user
-//             partitionValue:(NSString *)partitionValue
-//              customFileURL:(nullable NSURL *)customFileURL
-//                 stopPolicy:(RLMSyncStopPolicy)stopPolicy;
+
 @end
 
 @implementation RLMSyncConfiguration
@@ -85,35 +80,6 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     return [self.partitionValue isEqual:that.partitionValue]
     && [self.user isEqual:that.user]
     && self.stopPolicy == that.stopPolicy;
-}
-
-- (void)setEnableSSLValidation:(BOOL)enableSSLValidation {
-    _config->client_validate_ssl = (bool)enableSSLValidation;
-}
-
-- (BOOL)enableSSLValidation {
-    return (BOOL)_config->client_validate_ssl;
-}
-
-- (NSURL *)pinnedCertificateURL {
-    if (auto& path = _config->ssl_trust_certificate_path) {
-        return [NSURL fileURLWithPath:RLMStringDataToNSString(*path)];
-    }
-    return nil;
-}
-
-- (void)setPinnedCertificateURL:(NSURL *)pinnedCertificateURL {
-    if (pinnedCertificateURL) {
-        if ([pinnedCertificateURL respondsToSelector:@selector(UTF8String)]) {
-            _config->ssl_trust_certificate_path = std::string([(id)pinnedCertificateURL UTF8String]);
-        }
-        else {
-            _config->ssl_trust_certificate_path = std::string(pinnedCertificateURL.path.UTF8String);
-        }
-    }
-    else {
-        _config->ssl_trust_certificate_path = util::none;
-    }
 }
 
 - (realm::SyncConfig&)rawConfiguration {
@@ -159,15 +125,11 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 
 - (instancetype)initWithUser:(RLMSyncUser *)user
               partitionValue:(NSString *)partitionValue
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy
-         enableSSLValidation:(BOOL)enableSSLValidation
-             certificatePath:(nullable NSURL *)certificatePath {
+                  stopPolicy:(RLMSyncStopPolicy)stopPolicy{
     auto config = [self initWithUser:user
                       partitionValue:partitionValue
                        customFileURL:nil
                           stopPolicy:stopPolicy];
-    config.enableSSLValidation = enableSSLValidation;
-    config.pinnedCertificateURL = certificatePath;
     return config;
 }
 
@@ -208,6 +170,7 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
             break;
     }
 
+    // FIXME:
     RLMSyncManager *manager = [RLMSyncManager sharedManagerWithAppConfiguration:nil];
     auto errorHandler = manager.errorHandler;
     if (!shouldMakeError || !errorHandler) {
@@ -234,7 +197,7 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
         _config->error_handler = errorHandler;
         _config->client_resync_mode = realm::ClientResyncMode::Manual;
 
-        RLMSyncManager *manager = [RLMSyncManager sharedManagerWithAppConfiguration:nil];
+        RLMSyncManager *manager = [user.app sharedManager];
         if (NSString *authorizationHeaderName = manager.authorizationHeaderName) {
             _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);
         }

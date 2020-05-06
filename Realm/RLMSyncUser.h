@@ -105,19 +105,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable NSString *)partitionValue NS_REFINED_FOR_SWIFT;
 
-/**
- Create a configuration instance for the given url.
-
- @param partitionValue FIXME
- @param enableSSLValidation If NO, invalid SSL certificates for the server will
-                            not be rejected. THIS SHOULD NEVER BE USED IN
-                            PRODUCTION AND EXISTS ONLY FOR TESTING PURPOSES.
- @return A default configuration object with the sync configuration set to use
-         the given URL and options.
- */
-- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable NSString *)partitionValue
-                                       enableSSLValidation:(bool)enableSSLValidation NS_REFINED_FOR_SWIFT;
-
 #pragma mark - Sessions
 
 /**

@@ -223,11 +223,6 @@ public struct SyncConfiguration {
     internal let stopPolicy: RLMSyncStopPolicy
 
     /**
-     How the SSL certificate of the MongoDB Realm should be validated.
-     */
-    public let serverValidationPolicy: ServerValidationPolicy
-
-    /**
      By default, Realm.asyncOpen() swallows non-fatal connection errors such as
      a connection attempt timing out and simply retries until it succeeds. If
      this is set to `true`, instead the error will be reported to the callback
@@ -238,33 +233,14 @@ public struct SyncConfiguration {
     internal init(config: RLMSyncConfiguration) {
         self.user = config.user
         self.stopPolicy = config.stopPolicy
-        if let certificateURL = config.pinnedCertificateURL {
-            self.serverValidationPolicy = .pinCertificate(path: certificateURL)
-        } else {
-            self.serverValidationPolicy = config.enableSSLValidation ? .system : .none
-        }
-
         self.partitionValue = config.partitionValue
         self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
     }
 
     func asConfig() -> RLMSyncConfiguration {
-        var validateSSL = true
-        var certificate: URL?
-        switch serverValidationPolicy {
-        case .none:
-            validateSSL = false
-        case .system:
-            break
-        case .pinCertificate(let path):
-            certificate = path
-        }
-
         let c = RLMSyncConfiguration(user: user,
                                      partitionValue: partitionValue,
-                                     stopPolicy: stopPolicy,
-                                     enableSSLValidation: validateSSL,
-                                     certificatePath: certificate)
+                                     stopPolicy: stopPolicy)
         c.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         return c
     }
@@ -283,30 +259,15 @@ extension SyncUser {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    public func configuration(partitionValue: String,
-                              enableSSLValidation: Bool) -> Realm.Configuration {
-        let config = self.__configuration(withPartitionValue: partitionValue,
-                                          enableSSLValidation: enableSSLValidation)
+    public func configuration(partitionValue: String) -> Realm.Configuration {
+        let config = self.__configuration(withPartitionValue: partitionValue)
         return ObjectiveCSupport.convert(object: config)
     }
 
     /**
      Create a sync configuration instance.
 
-     - parameter realmURL: The URL to connect to. If not set, the default Realm
-     derived from the authentication URL is used. The URL must be absolute (e.g.
-     `realms://example.com/~/foo`), and cannot end with `.realm`, `.realm.lock`
-     or `.realm.management`.
-     - parameter serverValidationPolicy: How the SSL certificate of the Realm Object
-     Server should be validated. By default the system SSL validation is used,
-     but it can be set to `.pinCertificate` to pin a specific SSL certificate,
-     or `.none` for debugging.
-     - parameter fullSynchronization: Whether this Realm should be a fully
-     synchronized or a query-based Realm.
-     - parameter urlPrefix: The prefix that is prepended to the path in the HTTP
-     request that initiates a sync connection. The value specified must match
-     with the server's expectation, and this parameter only needs to be set if
-     you have changed the configuration of the server.
+     - parameter partitionValue: FIXME
      - parameter cancelAsyncOpenOnNonFatalErrors: By default, Realm.asyncOpen()
      swallows non-fatal connection errors such as a connection attempt timing
      out and simply retries until it succeeds. If this is set to `true`, instead
@@ -316,19 +277,10 @@ extension SyncUser {
      - warning: NEVER disable SSL validation for a system running in production.
      */
     public func configuration(partitionValue: String,
-                              serverValidationPolicy: ServerValidationPolicy = .system,
                               cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: partitionValue)
         let syncConfig = config.syncConfiguration!
         syncConfig.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
-        switch serverValidationPolicy {
-        case .none:
-            syncConfig.enableSSLValidation = false
-        case .system:
-            break
-        case .pinCertificate(let path):
-            syncConfig.pinnedCertificateURL = path
-        }
         config.syncConfiguration = syncConfig
         return ObjectiveCSupport.convert(object: config)
     }

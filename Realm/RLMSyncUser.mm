@@ -75,18 +75,10 @@ using namespace realm;
 }
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(NSString *)partitionValue {
-    return [self configurationWithPartitionValue:partitionValue
-                             enableSSLValidation:YES];
-}
-
-- (RLMRealmConfiguration *)configurationWithPartitionValue:(NSString *)partitionValue
-                                       enableSSLValidation:(bool)enableSSLValidation {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                   partitionValue:partitionValue
                                                    customFileURL:nil
                                                       stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
-    syncConfig.enableSSLValidation = enableSSLValidation;
-//    syncConfig.pinnedCertificateURL = RLMSyncManager.sharedManager.pinnedCertificatePaths[syncConfig.realmURL.host];
     RLMRealmConfiguration *config = [[RLMRealmConfiguration alloc] init];
     config.syncConfiguration = syncConfig;
     return config;
