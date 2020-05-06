@@ -51,7 +51,7 @@
     return string;
 }
 
-- (void)testAppInit {
+- (void)testAppConfigInit {
     RLMAppConfiguration *config = [[RLMAppConfiguration alloc] initWithBaseURL:@"base_url"
                                                                      transport:nil
                                                                   localAppName:@"app_name"
@@ -59,7 +59,18 @@
                                                        defaultRequestTimeoutMS:42.0];
 
     RLMApp *app = [RLMApp app:@"<app-id>" configuration:config];
-    // TODO: Get config and compare values
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    __block RLMSyncUser *syncUser;
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    RLMRealmConfiguration *realmConfig = [syncUser configurationWithPartitionValue:@"happy"];
+    XCTAssert([@"\"happy\"" isEqualToString:[[realmConfig syncConfiguration] partitionValue]]);
 }
 
 #pragma mark - Authentication and Tokens

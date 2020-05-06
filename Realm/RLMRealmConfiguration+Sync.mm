@@ -45,11 +45,9 @@
         @throw RLMException(@"Cannot set a sync configuration which has an errored-out user.");
     }
 
-    // Ensure sync manager is initialized, if it hasn't already been.
-//    [RLMApp sharedManager];
     NSAssert(user.identity, @"Cannot call this method on a user that doesn't have an identity.");
     self.config.in_memory = false;
-    self.config.sync_config = std::make_shared<realm::SyncConfig>([syncConfiguration rawConfiguration]);
+    self.config.sync_config = std::make_shared<realm::SyncConfig>(std::move([syncConfiguration rawConfiguration]));
     self.config.schema_mode = realm::SchemaMode::Additive;
 
     if (syncConfiguration.customFileURL) {
