@@ -189,10 +189,10 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     if (self = [super init]) {
         partitionValue = [[NSString alloc] initWithFormat:@"\"%@\"", partitionValue];
-        _config = std::make_unique<SyncConfig>(SyncConfig{
+        _config = std::make_unique<SyncConfig>(
             [user _syncUser],
             [partitionValue UTF8String]
-        });
+        );
         _config->stop_policy = translateStopPolicy(stopPolicy);
         _config->error_handler = errorHandler;
         _config->client_resync_mode = realm::ClientResyncMode::Manual;
