@@ -219,6 +219,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+    // FIXME: Dependancy on Stitch deployment
+    #if false
     func testStreamingDownloadNotifier() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
@@ -260,6 +262,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
     }
+    #endif
     
     func testStreamingUploadNotifier() {
         do {
@@ -400,6 +403,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
     
+    // FIXME: Dependancy on Stitch deployment
+    #if false
     func testAsyncOpenProgress() {
         app().sharedManager().logLevel = .all
         do {
@@ -431,7 +436,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
     
-/*
     func testAsyncOpenTimeout() {
         let syncTimeoutOptions = SyncTimeoutOptions()
         syncTimeoutOptions.connectTimeout = 3000
@@ -481,7 +485,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
             }
         }
-    }*/
+    }
+    
+    #endif
     
     // MARK: - Authentication
 
@@ -523,14 +529,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 ex.fulfill()
             }
                         
-            let badToken =
-                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1ODE1MDc3OTYsImlhdCI6MTU4MTUwNTk" +
-            "5NiwiaXNzIjoiNWU0M2RkY2M2MzZlZTEwNmVhYTEyYmRjIiwic3RpdGNoX2RldklkIjoiMDAwMDAwMDAwMDAwMDAwMDAwMDAw" +
-            "MDAwIiwic3RpdGNoX2RvbWFpbklkIjoiNWUxNDk5MTNjOTBiNGFmMGViZTkzNTI3Iiwic3ViIjoiNWU0M2RkY2M2MzZlZTEwNm" +
-            "VhYTEyYmRhIiwidHlwIjoiYWNjZXNzIn0.0q3y9KpFxEnbmRwahvjWU1v9y1T1s3r2eozu93vMc3s"
-
             // Screw up the token on the user.
-            manuallySetAccessToken(for: user, value: badToken)
+            manuallySetAccessToken(for: user, value: badAccessToken())
 
             // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
             XCTAssertFalse(blockCalled)

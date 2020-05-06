@@ -464,6 +464,16 @@ static NSURL *syncDirectoryForChildProcess() {
     return theUser;
 }
 
+- (void)logOutUser:(RLMSyncUser *)user {
+    RLMApp *app = [self app];
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    [app logOut:user completion:^(NSError * error) {
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:4.0 handler:nil];
+    XCTAssertTrue(user.state == RLMSyncUserStateLoggedOut, @"User should have been logged out, but wasn't");
+}
+
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm {
     [self waitForDownloadsForRealm:realm error:nil];
 }
@@ -608,6 +618,16 @@ static NSURL *syncDirectoryForChildProcess() {
         }
     }
     [RLMSyncManager resetForTesting];
+}
+
+- (NSString *)badAccessToken {
+    return @"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJl"
+    "eHAiOjE1ODE1MDc3OTYsImlhdCI6MTU4MTUwNTk5NiwiaXNzIjoiN"
+    "WU0M2RkY2M2MzZlZTEwNmVhYTEyYmRjIiwic3RpdGNoX2RldklkIjo"
+    "iMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwIiwic3RpdGNoX2RvbWFpbk"
+    "lkIjoiNWUxNDk5MTNjOTBiNGFmMGViZTkzNTI3Iiwic3ViIjoiNWU0M2R"
+    "kY2M2MzZlZTEwNmVhYTEyYmRhIiwidHlwIjoiYWNjZXNzIn0.0q3y9KpFx"
+    "EnbmRwahvjWU1v9y1T1s3r2eozu93vMc3s";
 }
 
 @end

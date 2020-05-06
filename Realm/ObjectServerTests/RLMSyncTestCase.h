@@ -115,6 +115,9 @@ RLM_ARRAY_TYPE(Dog)
 /// Synchronously create, log in, and return a user.
 - (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials;
 
+/// Synchronously, log out.
+- (void)logOutUser:(RLMSyncUser *)user;
+
 - (void)addPersonsToRealm:(RLMRealm *)realm persons:(NSArray<Person *> *)persons;
 
 /// Synchronously wait for downloads to complete for any number of Realms, and then check their `SyncObject` counts.
@@ -146,6 +149,8 @@ RLM_ARRAY_TYPE(Dog)
 
 - (void)setupSyncManager;
 - (void)resetSyncManager;
+
+- (NSString *)badAccessToken;
 
 @end
 
