@@ -14,7 +14,7 @@
   deleted. They are defined by subclassing `EmbeddedObject` /
 	`RLMEmbeddedObject` rather than `Object` / `RLMObject`.
 * Add support for next generation sync. Next generation sync includes the
-  ability to use partition keys. Applications must be created at 
+  ability to use partition keys. Applications must be created at
   realm.mongodb.com.
 
 
