@@ -201,6 +201,44 @@ public enum ServerValidationPolicy {
     case pinCertificate(path: URL)
 }
 
+public enum BSONType {
+    case string
+}
+
+public protocol BSON {
+}
+
+extension String : BSON {
+}
+
+extension ObjectId: BSON {
+}
+
+extension Int: BSON {
+}
+
+private func BSONToRLMBSON(_ bson: BSON) -> RLMBSON {
+    switch bson {
+    case let val as String:
+        return val as NSString
+    case let val as ObjectId:
+        return val as RLMObjectId
+    case let val as Int:
+        return val as NSNumber
+    default:
+        fatalError()
+    }
+}
+
+private func RLMBSONToBSON(_ bson: RLMBSON) -> BSON {
+    switch bson {
+    case let val as NSString:
+        return val as String
+    default:
+        fatalError()
+    }
+}
+
 /**
  A `SyncConfiguration` represents configuration parameters for Realms intended to sync with
  MongoDB Realm.
@@ -214,7 +252,7 @@ public struct SyncConfiguration {
      MongoDB Realm. All classes with a property with this value will be synchronized to the
      Realm.
      */
-    public let partitionValue: String
+    public let partitionValue: BSON
 
     /**
      A policy that determines what should happen when all references to Realms opened by this
@@ -233,13 +271,13 @@ public struct SyncConfiguration {
     internal init(config: RLMSyncConfiguration) {
         self.user = config.user
         self.stopPolicy = config.stopPolicy
-        self.partitionValue = config.partitionValue
+        self.partitionValue = RLMBSONToBSON(config.partitionValue)
         self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
     }
 
     func asConfig() -> RLMSyncConfiguration {
         let c = RLMSyncConfiguration(user: user,
-                                     partitionValue: partitionValue,
+                                     partitionValue: BSONToRLMBSON(partitionValue),
                                      stopPolicy: stopPolicy)
         c.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         return c
@@ -259,8 +297,8 @@ extension SyncUser {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    public func configuration(partitionValue: String) -> Realm.Configuration {
-        let config = self.__configuration(withPartitionValue: partitionValue)
+    public func configuration(partitionValue: BSON) -> Realm.Configuration {
+        let config = self.__configuration(withPartitionValue: BSONToRLMBSON(partitionValue))
         return ObjectiveCSupport.convert(object: config)
     }
 
@@ -276,9 +314,9 @@ extension SyncUser {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    public func configuration(partitionValue: String,
+    public func configuration(partitionValue: BSON,
                               cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
-        let config = self.__configuration(withPartitionValue: partitionValue)
+        let config = self.__configuration(withPartitionValue: BSONToRLMBSON(partitionValue))
         let syncConfig = config.syncConfiguration!
         syncConfig.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         config.syncConfiguration = syncConfig

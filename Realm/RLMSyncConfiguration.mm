@@ -25,6 +25,7 @@
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
+#import "RLMBSON_Private.hpp"
 
 #import "sync/sync_manager.hpp"
 #import "sync/sync_config.hpp"
@@ -100,9 +101,9 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     _config->stop_policy = translateStopPolicy(stopPolicy);
 }
 
-- (NSString *)partitionValue {
+- (id<RLMBSON>)partitionValue {
     if (!_config->partition_value.empty()) {
-        return @(_config->partition_value.c_str());
+        return BsonToRLMBSON(realm::bson::parse(_config->partition_value.c_str()));
     }
     return nil;
 }
@@ -116,7 +117,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 }
 
 - (instancetype)initWithUser:(RLMSyncUser *)user
-              partitionValue:(NSString *)partitionValue {
+              partitionValue:(id<RLMBSON>)partitionValue {
     return [self initWithUser:user
                partitionValue:partitionValue
                 customFileURL:nil
@@ -124,7 +125,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 }
 
 - (instancetype)initWithUser:(RLMSyncUser *)user
-              partitionValue:(NSString *)partitionValue
+              partitionValue:(id<RLMBSON>)partitionValue
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy{
     auto config = [self initWithUser:user
                       partitionValue:partitionValue
@@ -184,14 +185,15 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
 };
 
 - (instancetype)initWithUser:(RLMSyncUser *)user
-              partitionValue:(NSString *)partitionValue
+              partitionValue:(id<RLMBSON>)partitionValue
                customFileURL:(nullable NSURL *)customFileURL
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     if (self = [super init]) {
-        partitionValue = [[NSString alloc] initWithFormat:@"\"%@\"", partitionValue];
+        std::stringstream s;
+        s << RLMBSONToBson(partitionValue);
         _config = std::make_unique<SyncConfig>(
             [user _syncUser],
-            [partitionValue UTF8String]
+            s.str()
         );
         _config->stop_policy = translateStopPolicy(stopPolicy);
         _config->error_handler = errorHandler;

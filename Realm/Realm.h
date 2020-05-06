@@ -49,3 +49,4 @@
 #import <Realm/RLMUserAPIKeyProviderClient.h>
 #import <Realm/RLMUsernamePasswordProviderClient.h>
 #import <Realm/NSError+RLMSync.h>
+#import <Realm/RLMBSON.h>

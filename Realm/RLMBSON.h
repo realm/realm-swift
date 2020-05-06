@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2016 Realm Inc.
+// Copyright 2020 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,31 +16,38 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncConfiguration_Private.h"
+#ifndef RLMBson_h
+#define RLMBson_h
 
-#import <functional>
-#import <memory>
+#import "RLMObjectId.h"
 
-namespace realm {
-class SyncSession;
-struct SyncConfig;
-struct SyncError;
-using SyncSessionErrorHandler = void(std::shared_ptr<SyncSession>, SyncError);
-}
+///**
+// The current state of the session represented by a session object.
+// */
+typedef NS_ENUM(NSUInteger, RLMBSONType) {
+    RLMBSONTypeString,
+    RLMBSONTypeInt32,
+    RLMBSONTypeInt64,
+    RLMBSONTypeDouble,
+    RLMBSONTypeDecimal128,
+    RLMBSONTypeBinary,
+    RLMBSONTypeObjectId
+};
 
-NS_ASSUME_NONNULL_BEGIN
+@protocol RLMBSON <NSObject>
 
-@interface RLMSyncConfiguration ()
-
-- (instancetype)initWithUser:(RLMSyncUser *)user
-              partitionValue:(id<RLMBSON>)partitionValue
-               customFileURL:(nullable NSURL *)customFileURL
-                  stopPolicy:(RLMSyncStopPolicy)stopPolicy;
-
-- (instancetype)initWithRawConfig:(realm::SyncConfig)config;
-
-- (realm::SyncConfig&)rawConfiguration;
+@property (readonly) RLMBSONType bsonType;
 
 @end
 
-NS_ASSUME_NONNULL_END
+@interface RLMObjectId (RLMBSON)<RLMBSON>
+@end
+
+@interface NSNumber (RLMBSON)<RLMBSON>
+@end
+
+@interface NSString (RLMBSON)<RLMBSON>
+@end
+
+
+#endif /* RLMBson_h */

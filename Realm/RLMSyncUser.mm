@@ -74,7 +74,7 @@ using namespace realm;
     return _user == ((RLMSyncUser *)object)->_user;
 }
 
-- (RLMRealmConfiguration *)configurationWithPartitionValue:(NSString *)partitionValue {
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(id<RLMBSON>)partitionValue {
     auto syncConfig = [[RLMSyncConfiguration alloc] initWithUser:self
                                                   partitionValue:partitionValue
                                                    customFileURL:nil

@@ -23,7 +23,7 @@
 #import "RLMSyncManager_Private.hpp"
 #import "RLMUsernamePasswordProviderClient.h"
 #import "RLMUserAPIKeyProviderClient.h"
-
+#import "RLMBSON_Private.hpp"
 
 using namespace realm;
 
@@ -258,6 +258,27 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
         return completion(RLMAppErrorToNSError(*error));
     }
     completion(nil);
+}
+
+- (void)callFunction:(NSString *)name
+           arguments:(NSArray<id<RLMBSON>> *)arguments
+     completionBlock:(RLMCallFunctionCompletionBlock)completionBlock {
+    bson::BsonArray args;
+
+    for (id<RLMBSON> argument in arguments) {
+        args.push_back(RLMBSONToBson(argument));
+    }
+
+    _app->call_function(SyncManager::shared().get_current_user(),
+                        std::string(name.UTF8String),
+                        args, [completionBlock](util::Optional<app::AppError> error,
+                                     util::Optional<bson::Bson> response) {
+        if (error) {
+            return completionBlock(nil, RLMAppErrorToNSError(*error));
+        }
+
+        completionBlock(BsonToRLMBSON(*response), nil);
+    });
 }
 
 @end

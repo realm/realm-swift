@@ -21,6 +21,7 @@
 @class RLMRealmConfiguration;
 @class RLMSyncUser;
 @class RLMApp;
+@protocol RLMBSON;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -38,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
  MongoDB Realm. All classes with a property with this value will be synchronized to the
  Realm.
  */
-@property (nonatomic, readonly) NSString *partitionValue;
+@property (nonatomic, readonly) id<RLMBSON> partitionValue;
 
 /**
  Whether nonfatal connection errors should cancel async opens.
@@ -51,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// :nodoc:
 - (instancetype)initWithUser:(RLMSyncUser *)user
-              partitionValue:(NSString *)url __attribute__((unavailable("Use [RLMSyncUser configurationWithURL:] instead")));
+              partitionValue:(id<RLMBSON>)partitionValue __attribute__((unavailable("Use [RLMSyncUser configurationWithPartitionValue:] instead")));
 
 /// :nodoc:
 + (RLMRealmConfiguration *)automaticConfiguration __attribute__((unavailable("Use [RLMSyncUser configuration] instead")));

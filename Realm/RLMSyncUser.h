@@ -22,6 +22,7 @@
 #import <Realm/RLMRealmConfiguration.h>
 
 @class RLMSyncUser, RLMSyncUserInfo, RLMSyncSession, RLMRealm, RLMSyncUserIdentity;
+@protocol RLMBSON;
 
 /**
  The state of the user object.
@@ -103,7 +104,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param partitionValue FIXME
  @return A default configuration object with the sync configuration set to use the given partition value.
  */
-- (RLMRealmConfiguration *)configurationWithPartitionValue:(nullable NSString *)partitionValue NS_REFINED_FOR_SWIFT;
+- (RLMRealmConfiguration *)configurationWithPartitionValue:(id<RLMBSON>)partitionValue NS_REFINED_FOR_SWIFT;
 
 #pragma mark - Sessions
 
@@ -111,7 +112,7 @@ NS_ASSUME_NONNULL_BEGIN
  Retrieve a valid session object belonging to this user for a given URL, or `nil`
  if no such object exists.
  */
-- (nullable RLMSyncSession *)sessionForPartitionValue:(NSString *)partitionValue;
+- (nullable RLMSyncSession *)sessionForPartitionValue:(id<RLMBSON>)partitionValue;
 
 /**
  Retrieve all the valid sessions belonging to this user.

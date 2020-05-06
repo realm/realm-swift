@@ -106,7 +106,74 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
     }
-    
+
+    /// A client should be able to open multiple Realms and add objects to each of them.
+    func testMultipleRealmsAddObjects() {
+        let partitionValueA = "foo";
+        let partitionValueB = "bar";
+        let partitionValueC = "baz";
+
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+
+            let realmA = try Realm(configuration: user.configuration(partitionValue: partitionValueA))
+            let realmB = try Realm(configuration: user.configuration(partitionValue: partitionValueB))
+            let realmC = try Realm(configuration: user.configuration(partitionValue: partitionValueC))
+
+            if (self.isParent) {
+                waitForDownloads(for: realmA)
+                waitForDownloads(for: realmB)
+                waitForDownloads(for: realmC)
+
+                checkCount(expected: 0, realmA, SwiftPerson.self)
+                checkCount(expected: 0, realmB, SwiftPerson.self)
+                checkCount(expected: 0, realmC, SwiftPerson.self)
+                executeChild()
+
+                waitForDownloads(for: realmA)
+                waitForDownloads(for: realmB)
+                waitForDownloads(for: realmC)
+
+                checkCount(expected: 3, realmA, SwiftPerson.self)
+                checkCount(expected: 2, realmB, SwiftPerson.self)
+                checkCount(expected: 5, realmC, SwiftPerson.self)
+
+                XCTAssertEqual(realmA.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count,
+                               1)
+                XCTAssertEqual(realmB.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count,
+                               0)
+            } else {
+                // Add objects.
+                try realmA.write {
+                    realmA.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
+                    realmA.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                    realmA.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                }
+                try realmB.write {
+                    realmB.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                    realmB.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                }
+                try realmC.write {
+                    realmC.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
+                    realmC.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                    realmC.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                    realmC.add(SwiftPerson(firstName: "George", lastName: "Harrison"))
+                    realmC.add(SwiftPerson(firstName: "Pete", lastName: "Best"))
+                }
+
+                waitForUploads(for: realmA)
+                waitForUploads(for: realmB)
+                waitForUploads(for: realmC)
+
+                checkCount(expected: 3, realmA, SwiftPerson.self)
+                checkCount(expected: 2, realmB, SwiftPerson.self)
+                checkCount(expected: 5, realmC, SwiftPerson.self)
+            }
+        } catch {
+            XCTFail()
+        }
+    }
+
     func testConnectionState() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())

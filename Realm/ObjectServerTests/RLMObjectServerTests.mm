@@ -94,6 +94,25 @@
     XCTAssert([currentUser.accessToken isEqualToString:syncUser.accessToken]);
 }
 
+- (void)testCallFunction {
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    __block RLMSyncUser *syncUser;
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    [app callFunction:@"sumFunc"
+            arguments:@[@1, @2, @3, @4, @5, @"HI"]
+      completionBlock:^(id<RLMBSON> _Nullable, NSError * _Nullable) {
+
+    }];
+}
+
 - (void)testLogoutCurrentUser {
     RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should log out current user"];

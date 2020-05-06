@@ -20,7 +20,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol RLMNetworkTransport;
+@protocol RLMNetworkTransport, RLMBSON;
 
 @class RLMSyncUser, RLMAppCredentials, RLMUsernamePasswordProviderClient, RLMUserAPIKeyProviderClient, RLMSyncManager;
 
@@ -29,6 +29,9 @@ typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullab
 
 /// A block type used to report an error
 typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
+
+/// A block type for returning from function calls.
+typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _Nullable);
 
 #pragma mark RLMAppConfiguration
 
@@ -175,6 +178,10 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
   This client should only be used by an authenticated user.
 */
 - (RLMUserAPIKeyProviderClient *)userAPIKeyProviderClient;
+
+- (void)callFunction:(NSString *)name
+           arguments:(NSArray<id<RLMBSON>> *)arguments
+     completionBlock:(RLMCallFunctionCompletionBlock)completionBlock;
 
 @end
 
