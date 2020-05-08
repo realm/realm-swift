@@ -1,6 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.0.0-beta.4 Release notes (2020-05-08)
 =============================================================
+
 ### Enhancements
+
 * Add support for queue-confined Realms. Rather than being bound to a specific
   thread, queue-confined Realms are bound to a serial dispatch queue and can be
   used within blocks dispatched to that queue regardless of what thread they
@@ -10,8 +12,9 @@ x.y.z Release notes (yyyy-MM-dd)
   serial queue rather than the current thread. ([PR #6478](https://github.com/realm/realm-cocoa/pull/6478)).
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+
+* The uploaded bytes in sync progress notifications was sometimes incorrect and
+  wouldn't exactly equal the uploadable bytes when the uploaded completed.
 
 ### Breaking Changes
 
@@ -22,14 +25,15 @@ x.y.z Release notes (yyyy-MM-dd)
   must now be a serial queue.
 
 ### Compatibility
-* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 4.x.y series.
 * Carthage release for Swift is built with Xcode 11.4.1.
 
 ### Internal
-Upgraded realm-core from ? to ?
-Upgraded realm-sync from ? to ?
+
+* Upgraded realm-core from v6.0.3 to v6.0.4
+* Upgraded realm-sync from v5.0.1 to v5.0.3
 
 5.0.0-beta.3 Release notes (2020-02-26)
 =============================================================
