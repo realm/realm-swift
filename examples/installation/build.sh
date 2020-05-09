@@ -137,6 +137,7 @@ swiftpm() {
     xcrun swift build
 }
 
+# shellcheck source=../../scripts/swift-version.sh
 source "$(dirname "$0")/../../scripts/swift-version.sh"
 set_xcode_and_swift_versions # exports REALM_SWIFT_VERSION, REALM_XCODE_VERSION, and DEVELOPER_DIR variables if not already set
 
@@ -155,6 +156,14 @@ case "$COMMAND" in
         fi
         ;;
 
+    test-*-*-cocoapods)
+        xctest "$PLATFORM" "$LANGUAGE" CocoaPodsExample
+        ;;
+
+    test-*-*-cocoapods-dynamic)
+        xctest "$PLATFORM" "$LANGUAGE" CocoaPodsDynamicExample
+        ;;
+
     test-*-*-static)
         xctest "$PLATFORM" "$LANGUAGE" StaticExample
         ;;
@@ -165,14 +174,6 @@ case "$COMMAND" in
 
     test-*-*-xcframework)
         xctest "$PLATFORM" "$LANGUAGE" XCFrameworkExample
-        ;;
-
-    test-*-*-cocoapods)
-        xctest "$PLATFORM" "$LANGUAGE" CocoaPodsExample
-        ;;
-
-    test-*-*-cocoapods-dynamic)
-        xctest "$PLATFORM" "$LANGUAGE" CocoaPodsDynamicExample
         ;;
 
     test-*-*-carthage)
