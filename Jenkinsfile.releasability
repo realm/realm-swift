@@ -31,6 +31,7 @@ def installationTest(platform, test, language) {
         mv realm-${language}-* realm-${language}-latest
       fi
 
+      find . -name project.pbxproj -exec sed -i '' 's@swift-[0-9.]*/@swift-${carthageXcodeVersion}/@' {} \;
       ./build.sh test-${platform}-${language}-${test}
       """
     }
