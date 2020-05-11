@@ -20,7 +20,7 @@
 
 #import "RLMSyncUtil.h"
 
-@class RLMSyncSession, RLMSyncTimeoutOptions;
+@class RLMSyncSession, RLMSyncTimeoutOptions, RLMAppConfiguration;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -237,6 +237,8 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 ///
 /// Defaults to 1 minute.
 @property (nonatomic) NSUInteger fastReconnectLimit;
+
+@property (nonatomic, readonly) RLMAppConfiguration *appConfiguration;
 @end
 
 NS_ASSUME_NONNULL_END

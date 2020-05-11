@@ -27,7 +27,7 @@
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncConfiguration_Private.h"
 #import "RLMUtil.hpp"
-#import "RLMApp.h"
+#import "RLMApp_Private.hpp"
 
 #import "sync/sync_manager.hpp"
 #import "sync/sync_session.hpp"
@@ -245,7 +245,6 @@ static NSURL *syncDirectoryForChildProcess() {
 
     NSData *childStdout = pipe.fileHandleForReading.readDataToEndOfFile;
     NSString *appId = [[NSString alloc] initWithData:childStdout encoding:NSUTF8StringEncoding];
-
     if (!appId.length) {
         abort();
     }
@@ -346,10 +345,6 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (BOOL)isPartial {
     return NO;
-}
-
-- (RLMApp *)app {
-    return [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
 }
 
 - (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
@@ -468,6 +463,7 @@ static NSURL *syncDirectoryForChildProcess() {
     RLMApp *app = [self app];
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
     [app logOut:user completion:^(NSError * error) {
+        XCTAssertNil(error);
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
@@ -547,10 +543,10 @@ static NSURL *syncDirectoryForChildProcess() {
 // FIXME: remove this API once the new token system is implemented.
 - (void)primeSyncManagerWithSemaphore:(dispatch_semaphore_t)semaphore {
     if (semaphore == nil) {
-        [[[self app] sharedManager] setSessionCompletionNotifier:^(__unused NSError *error){ }];
+        [[[self app] syncManager] setSessionCompletionNotifier:^(__unused NSError *error){ }];
         return;
     }
-    [[[self app] sharedManager] setSessionCompletionNotifier:^(NSError *error) {
+    [[[self app] syncManager] setSessionCompletionNotifier:^(NSError *error) {
         XCTAssertNil(error, @"Session completion block returned with an error: %@", error);
         dispatch_semaphore_signal(semaphore);
     }];
@@ -569,9 +565,11 @@ static NSURL *syncDirectoryForChildProcess() {
 
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
+        // FIXME:
 //        if (is_parent) [[RealmObjectServer sharedServer] cleanUp];
     });
     atexit([] {
+        // FIXME:
 //        if (is_parent) [[RealmObjectServer sharedServer] cleanUp];
     });
     [self setupSyncManager];
@@ -584,23 +582,26 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (void)setupSyncManager {
     NSURL *clientDataRoot;
+    NSError *error;
     if (self.isParent) {
-        _appId = [RealmObjectServer.sharedServer createApp];
         clientDataRoot = [NSURL fileURLWithPath:RLMDefaultDirectoryForBundleIdentifier(nil)];
-    }
-    else {
-        _appId = [RealmObjectServer.sharedServer lastApp];
+    } else {
         clientDataRoot = syncDirectoryForChildProcess();
     }
-
-    NSError *error;
     [NSFileManager.defaultManager removeItemAtURL:clientDataRoot error:&error];
     [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
                            withIntermediateDirectories:YES attributes:nil error:&error];
 
-    RLMSyncManager *syncManager = [[self app] sharedManager];
+    if (self.isParent) {
+        _appId = [RealmObjectServer.sharedServer createApp];
+        _app = [RLMApp app:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
+    }
+    else {
+        _appId = [RealmObjectServer.sharedServer lastApp];
+        _app = [RLMApp app:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
+    }
 
-    [syncManager configureWithRootDirectory:clientDataRoot appConfiguration:[[self app] configuration]];
+    RLMSyncManager *syncManager = [[self app] syncManager];
     syncManager.logLevel = RLMSyncLogLevelTrace;
     syncManager.userAgent = self.name;
 }
@@ -616,8 +617,9 @@ static NSURL *syncDirectoryForChildProcess() {
             }];
             [self waitForExpectations:@[ex] timeout:20.0];
         }
+
+        [[[self app] syncManager] resetForTesting];
     }
-    [RLMSyncManager resetForTesting];
 }
 
 - (NSString *)badAccessToken {

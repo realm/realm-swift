@@ -285,6 +285,8 @@
 		4993221924129E6600A0EC8E /* RLMNetworkTransport.h in Headers */ = {isa = PBXBuildFile; fileRef = 4993221524129E6600A0EC8E /* RLMNetworkTransport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		4993221C2412A08200A0EC8E /* generic_network_transport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4993221A2412A07F00A0EC8E /* generic_network_transport.cpp */; };
 		4993221D2412A08F00A0EC8E /* generic_network_transport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4993221A2412A07F00A0EC8E /* generic_network_transport.cpp */; };
+		4996EA9E2465BB8A003A1F51 /* BSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4996EA9D2465BB8A003A1F51 /* BSON.swift */; };
+		4996EAA02465C44E003A1F51 /* SwiftBSONTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4996EA9F2465C44E003A1F51 /* SwiftBSONTests.swift */; };
 		49DF0AA42463286800F7E0B8 /* RLMBSON.mm in Sources */ = {isa = PBXBuildFile; fileRef = 49E12CEF245DB7CC00359DF1 /* RLMBSON.mm */; };
 		49E12CF0245DB7CC00359DF1 /* RLMBSON.mm in Sources */ = {isa = PBXBuildFile; fileRef = 49E12CEF245DB7CC00359DF1 /* RLMBSON.mm */; };
 		49E12CF2245DB7E800359DF1 /* RLMBSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 49E12CF1245DB7E800359DF1 /* RLMBSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -913,6 +915,8 @@
 		4993221524129E6600A0EC8E /* RLMNetworkTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMNetworkTransport.h; sourceTree = "<group>"; };
 		4993221A2412A07F00A0EC8E /* generic_network_transport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = generic_network_transport.cpp; path = sync/generic_network_transport.cpp; sourceTree = "<group>"; };
 		4993221B2412A07F00A0EC8E /* generic_network_transport.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = generic_network_transport.hpp; path = sync/generic_network_transport.hpp; sourceTree = "<group>"; };
+		4996EA9D2465BB8A003A1F51 /* BSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSON.swift; sourceTree = "<group>"; };
+		4996EA9F2465C44E003A1F51 /* SwiftBSONTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SwiftBSONTests.swift; path = Realm/ObjectServerTests/SwiftBSONTests.swift; sourceTree = "<group>"; };
 		49AD39ED244E1A370097500E /* datetime.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = datetime.hpp; sourceTree = "<group>"; };
 		49AD39EE244E1A370097500E /* min_key.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = min_key.hpp; sourceTree = "<group>"; };
 		49AD39EF244E1A370097500E /* bson.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = bson.hpp; sourceTree = "<group>"; };
@@ -1478,6 +1482,7 @@
 				5D660FEF1BE98D670021E04F /* SortDescriptor.swift */,
 				E8BF67FB1C24D07100E591CD /* SwiftVersion.swift */,
 				1A7DE7021D38460B0029F0AE /* Sync.swift */,
+				4996EA9D2465BB8A003A1F51 /* BSON.swift */,
 				3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */,
 				5D660FF01BE98D670021E04F /* Util.swift */,
 				CFB43139243DF87100471C18 /* RealmApp.swift */,
@@ -1652,6 +1657,7 @@
 				3F73BC8A1E3A876600FE80B6 /* RLMTestUtils.h */,
 				3F73BC8B1E3A876600FE80B6 /* RLMTestUtils.m */,
 				1AA5AE9F1D98C99500ED8C27 /* SwiftObjectServerTests.swift */,
+				4996EA9F2465C44E003A1F51 /* SwiftBSONTests.swift */,
 				1AA5AE961D989BE000ED8C27 /* SwiftSyncTestCase.swift */,
 				3F0C129220926CAD00D0D6C8 /* admin.js */,
 				4992F62024463296005C93EE /* run_baas.sh */,
@@ -2662,6 +2668,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5D660FF11BE98D670021E04F /* Aliases.swift in Sources */,
+				4996EA9E2465BB8A003A1F51 /* BSON.swift in Sources */,
 				3FB6ABD92416A27000E318C2 /* Decimal128.swift in Sources */,
 				3FC3F9172419B63200E27322 /* EmbeddedObject.swift in Sources */,
 				29B7FDF61C0DA6560023224E /* Error.swift in Sources */,
@@ -2838,6 +2845,7 @@
 				3F73BC921E3A877300FE80B6 /* RLMTestUtils.m in Sources */,
 				1AA5AEA11D98C99800ED8C27 /* SwiftObjectServerTests.swift in Sources */,
 				1AA5AE981D989BE400ED8C27 /* SwiftSyncTestCase.swift in Sources */,
+				4996EAA02465C44E003A1F51 /* SwiftBSONTests.swift in Sources */,
 				3F558C8822C29A03002F0F30 /* TestUtils.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

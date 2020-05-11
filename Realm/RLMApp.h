@@ -78,6 +78,9 @@ typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _
 @interface RLMApp : NSObject
 
 @property (readonly) RLMAppConfiguration *configuration;
+@property (nonatomic, readonly) RLMSyncManager *syncManager;
+
++ (NSDictionary<NSString *, RLMApp *> *)apps;
 
 /**
  Get an application with a given appId and configuration.
@@ -87,8 +90,6 @@ typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _
  */
 + (instancetype)app:(NSString *)appId
       configuration:(nullable RLMAppConfiguration *)configuration;
-
-- (RLMSyncManager *)sharedManager;
 
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers;
 
@@ -179,9 +180,17 @@ typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _
 */
 - (RLMUserAPIKeyProviderClient *)userAPIKeyProviderClient;
 
-- (void)callFunction:(NSString *)name
-           arguments:(NSArray<id<RLMBSON>> *)arguments
-     completionBlock:(RLMCallFunctionCompletionBlock)completionBlock;
+/**
+ Calls the MongoDB Realm function with the provided name and arguments.
+
+ @param name The name of the MongoDB Realm function to be called.
+ @param arguments The `BSONArray` of arguments to be provided to the function.
+ @param completionBlock The completion handler to call when the function call is complete.
+                        This handler is executed on a non-main global `DispatchQueue`.
+*/
+- (void)callFunctionWithName:(NSString *)name
+                   arguments:(NSArray<id<RLMBSON>> *)arguments
+             completionBlock:(RLMCallFunctionCompletionBlock)completionBlock NS_REFINED_FOR_SWIFT;
 
 @end
 

@@ -122,23 +122,13 @@ struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
 
 static RLMSyncManager *s_sharedManager = nil;
 
-- (instancetype)initPrivate {
+- (instancetype)initWithAppConfiguration:(RLMAppConfiguration *)appConfiguration
+                           rootDirectory:(NSURL *)rootDirectory {
+    if (self = [super init]) {
+        [RLMSyncUser _setUpBindingContextFactory];
+        [self configureWithRootDirectory:rootDirectory appConfiguration:appConfiguration];
+    }
     return self = [super init];
-}
-
-+ (instancetype)sharedManagerWithAppConfiguration:(RLMAppConfiguration *)appConfiguration {
-    static std::once_flag flag;
-    std::call_once(flag, [appConfiguration] {
-        try {
-            [RLMSyncUser _setUpBindingContextFactory];
-            s_sharedManager = [[RLMSyncManager alloc] initPrivate];
-            [s_sharedManager configureWithRootDirectory:nil appConfiguration:appConfiguration];
-        }
-        catch (std::exception const& e) {
-            @throw RLMException(e);
-        }
-    });
-    return s_sharedManager;
 }
 
 - (void)configureWithRootDirectory:(NSURL *)rootDirectory appConfiguration:(RLMAppConfiguration *)appConfiguration {
@@ -233,17 +223,15 @@ static RLMSyncManager *s_sharedManager = nil;
     });
 }
 
-+ (void)resetForTesting {
-    RLMSyncManager *manager = [self sharedManagerWithAppConfiguration:nil];
-    manager->_errorHandler = nil;
-    manager->_appID = nil;
-    manager->_userAgent = nil;
-    manager->_logger = nil;
-    manager->_authorizationHeaderName = nil;
-    manager->_customRequestHeaders = nil;
-    manager->_pinnedCertificatePaths = nil;
-    manager->_timeoutOptions = nil;
-
+- (void)resetForTesting {
+    _errorHandler = nil;
+    _appID = nil;
+    _userAgent = nil;
+    _logger = nil;
+    _authorizationHeaderName = nil;
+    _customRequestHeaders = nil;
+    _pinnedCertificatePaths = nil;
+    _timeoutOptions = nil;
     SyncManager::shared().reset_for_testing();
 }
 

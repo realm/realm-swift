@@ -31,6 +31,10 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return URL(string: "realm://127.0.0.1:9080/~/\(customName ?? UUID().uuidString)")!
     }
 
+//    override var app: RealmApp {
+//        return RealmApp(appId, configuration: defaultAppConfiguration())
+//    }
+
     func executeChild(file: StaticString = #file, line: UInt = #line) {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
@@ -47,7 +51,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         let password = "abcdef"
         let credentials = AppCredentials(username: username, password: password)
         let ex = expectation(description: "Should register in the user properly")
-        app().usernamePasswordProviderClient().registerEmail(username, password: password, completion: { error in
+        app.usernamePasswordProviderClient().registerEmail(username, password: password, completion: { error in
             XCTAssertNil(error)
             ex.fulfill()
         })
@@ -81,7 +85,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         var theError: Error?
         let ex = expectation(description: "Should log in the user properly")
 
-        self.app().login(withCredential: credentials, completion: { user, error in
+        self.app.login(withCredential: credentials, completion: { user, error in
             theUser = user
             theError = error
             ex.fulfill()
@@ -103,7 +107,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         var theError: Error?
         let ex = expectation(description: "Should log out the user properly")
         
-        self.app().logOut(user) { (error) in
+        self.app.logOut(user) { (error) in
             theError = error
             ex.fulfill()
         }

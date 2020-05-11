@@ -16,31 +16,39 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#ifndef RLMBson_h
-#define RLMBson_h
-
 #import "RLMObjectId.h"
 
-///**
-// The current state of the session represented by a session object.
-// */
+/**
+ Allowed BSON types.
+ */
 typedef NS_ENUM(NSUInteger, RLMBSONType) {
-    RLMBSONTypeString,
+    RLMBSONTypeNull,
     RLMBSONTypeInt32,
     RLMBSONTypeInt64,
+    RLMBSONTypeBool,
     RLMBSONTypeDouble,
-    RLMBSONTypeDecimal128,
+    RLMBSONTypeString,
     RLMBSONTypeBinary,
-    RLMBSONTypeObjectId
+    RLMBSONTypeTimestamp,
+    RLMBSONTypeDatetime,
+    RLMBSONTypeObjectId,
+    RLMBSONTypeDecimal128,
+    RLMBSONTypeRegularExpression,
+    RLMBSONTypeMaxKey,
+    RLMBSONTypeMinKey,
+    RLMBSONTypeDocument,
+    RLMBSONTypeArray
 };
 
 @protocol RLMBSON <NSObject>
 
-@property (readonly) RLMBSONType bsonType;
+/**
+ The BSON type for the conforming interface.
+ */
+@property (readonly) RLMBSONType bsonType NS_REFINED_FOR_SWIFT;
 
-@end
+- (BOOL)isEqual:(_Nullable id)other;
 
-@interface RLMObjectId (RLMBSON)<RLMBSON>
 @end
 
 @interface NSNumber (RLMBSON)<RLMBSON>
@@ -49,5 +57,41 @@ typedef NS_ENUM(NSUInteger, RLMBSONType) {
 @interface NSString (RLMBSON)<RLMBSON>
 @end
 
+@interface NSData (RLMBSON)<RLMBSON>
+@end
 
-#endif /* RLMBson_h */
+@interface NSDateInterval (RLMBSON)<RLMBSON>
+@end
+
+@interface NSDate (RLMBSON)<RLMBSON>
+@end
+
+@interface RLMObjectId (RLMBSON)<RLMBSON>
+@end
+
+@interface RLMDecimal128 (RLMBSON)<RLMBSON>
+@end
+
+@interface NSRegularExpression (RLMBSON)<RLMBSON>
+@end
+
+@interface RLMMaxKey : NSObject
+@end
+
+@interface RLMMinKey : NSObject
+@end
+
+@interface RLMMaxKey (RLMBSON)<RLMBSON>
+@end
+
+@interface RLMMinKey (RLMBSON)<RLMBSON>
+@end
+
+@interface NSDictionary (RLMBSON)<RLMBSON>
+@end
+
+@interface NSMutableArray (RLMBSON)<RLMBSON>
+@end
+
+@interface NSArray (RLMBSON)<RLMBSON>
+@end

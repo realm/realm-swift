@@ -18,6 +18,7 @@
 
 #import "RLMSyncSession_Private.hpp"
 
+#import "RLMApp.h"
 #import "RLMRealm_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
@@ -138,7 +139,9 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
 
 - (RLMSyncUser *)parentUser {
     if (auto session = _session.lock()) {
-//        return [[RLMSyncUser alloc] initWithSyncUser:session->user()];
+
+        return [[RLMSyncUser alloc] initWithSyncUser:session->user()
+                                                 app:[RLMApp apps][@(SyncManager::shared().app()->config().app_id.data())]];
     }
     return nil;
 }

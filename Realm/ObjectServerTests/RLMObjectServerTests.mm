@@ -51,28 +51,6 @@
     return string;
 }
 
-- (void)testAppConfigInit {
-    RLMAppConfiguration *config = [[RLMAppConfiguration alloc] initWithBaseURL:@"base_url"
-                                                                     transport:nil
-                                                                  localAppName:@"app_name"
-                                                               localAppVersion:@"app_version"
-                                                       defaultRequestTimeoutMS:42.0];
-
-    RLMApp *app = [RLMApp app:@"<app-id>" configuration:config];
-    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
-    __block RLMSyncUser *syncUser;
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
-        XCTAssert(!error);
-        XCTAssert(user);
-        syncUser = user;
-        [expectation fulfill];
-    }];
-
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-    RLMRealmConfiguration *realmConfig = [syncUser configurationWithPartitionValue:@"happy"];
-    XCTAssert([@"\"happy\"" isEqualToString:[[realmConfig syncConfiguration] partitionValue]]);
-}
-
 #pragma mark - Authentication and Tokens
 
 - (void)testAnonymousAuthentication {
@@ -106,10 +84,11 @@
     }];
 
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
-    [app callFunction:@"sumFunc"
-            arguments:@[@1, @2, @3, @4, @5, @"HI"]
-      completionBlock:^(id<RLMBSON> _Nullable, NSError * _Nullable) {
-
+    [app callFunctionWithName:@"sum"
+                    arguments:@[@1, @2, @3, @4, @5]
+              completionBlock:^(id<RLMBSON> _Nullable bson, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssertEqual([((NSNumber *)bson) intValue], 15);
     }];
 }
 
@@ -498,7 +477,7 @@
     XCTAssertNotNil(user);
     
     XCTestExpectation *expectation = [self expectationWithDescription:@"should fail after setting bad token"];
-    [self.app sharedManager].errorHandler = ^(__unused NSError *error, __unused RLMSyncSession *session) {
+    [self.app syncManager].errorHandler = ^(__unused NSError *error, __unused RLMSyncSession *session) {
         XCTAssertTrue([error.domain isEqualToString:RLMSyncErrorDomain]);
         XCTAssertFalse([[error.userInfo[kRLMSyncUnderlyingErrorKey] domain] isEqualToString:RLMSyncErrorDomain]);
         [expectation fulfill];
@@ -1188,7 +1167,7 @@
 
     __block NSError *theError = nil;
     XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
-    [self.app sharedManager].errorHandler = ^void(NSError *error, RLMSyncSession *) {
+    [self.app syncManager].errorHandler = ^void(NSError *error, RLMSyncSession *) {
         theError = error;
         [ex fulfill];
     };
@@ -1214,7 +1193,7 @@
     @autoreleasepool {
         __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
         XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
-        [self.app sharedManager].errorHandler = ^void(NSError *error, RLMSyncSession *) {
+        [self.app syncManager].errorHandler = ^void(NSError *error, RLMSyncSession *) {
             theError = error;
             [ex fulfill];
         };
@@ -1548,7 +1527,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         blockCalled = true;
         return YES;
     };
-
+    
     @autoreleasepool {
         [RLMRealm realmWithConfiguration:config error:nil];
     }

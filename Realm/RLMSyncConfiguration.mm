@@ -29,6 +29,7 @@
 
 #import "sync/sync_manager.hpp"
 #import "sync/sync_config.hpp"
+#import "sync/sync_session.hpp"
 
 #import <realm/sync/protocol.hpp>
 
@@ -90,7 +91,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 - (RLMSyncUser *)user {
     auto app = realm::SyncManager::shared().app();
     return [[RLMSyncUser alloc] initWithSyncUser:_config->user
-                                             app:[[RLMApp alloc] initWithApp:app]];
+                                             app:[RLMApp apps][@(app->config().app_id.data())]];
 }
 
 - (RLMSyncStopPolicy)stopPolicy {
@@ -134,56 +135,6 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     return config;
 }
 
-static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError error) {
-    NSString *recoveryPath;
-    RLMSyncErrorActionToken *token;
-    for (auto& pair : error.user_info) {
-        if (pair.first == realm::SyncError::c_original_file_path_key) {
-            token = [[RLMSyncErrorActionToken alloc] initWithOriginalPath:pair.second];
-        }
-        else if (pair.first == realm::SyncError::c_recovery_file_path_key) {
-            recoveryPath = @(pair.second.c_str());
-        }
-    }
-
-    BOOL shouldMakeError = YES;
-    NSDictionary *custom = nil;
-    // Note that certain types of errors are 'interactive'; users have several options
-    // as to how to proceed after the error is reported.
-    auto errorClass = errorKindForSyncError(error);
-    switch (errorClass) {
-        case RLMSyncSystemErrorKindClientReset: {
-            custom = @{kRLMSyncPathOfRealmBackupCopyKey: recoveryPath, kRLMSyncErrorActionTokenKey: token};
-            break;
-        }
-        case RLMSyncSystemErrorKindPermissionDenied: {
-            custom = @{kRLMSyncErrorActionTokenKey: token};
-            break;
-        }
-        case RLMSyncSystemErrorKindUser:
-        case RLMSyncSystemErrorKindSession:
-            break;
-        case RLMSyncSystemErrorKindConnection:
-        case RLMSyncSystemErrorKindClient:
-        case RLMSyncSystemErrorKindUnknown:
-            // Report the error. There's nothing the user can do about it, though.
-            shouldMakeError = error.is_fatal;
-            break;
-    }
-
-    // FIXME:
-    RLMSyncManager *manager = [RLMSyncManager sharedManagerWithAppConfiguration:nil];
-    auto errorHandler = manager.errorHandler;
-    if (!shouldMakeError || !errorHandler) {
-        return;
-    }
-    NSError *nsError = make_sync_error(errorClass, @(error.message.c_str()), error.error_code.value(), custom);
-    RLMSyncSession *session = [[RLMSyncSession alloc] initWithSyncSession:errored_session];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        errorHandler(nsError, session);
-    });
-};
-
 - (instancetype)initWithUser:(RLMSyncUser *)user
               partitionValue:(id<RLMBSON>)partitionValue
                customFileURL:(nullable NSURL *)customFileURL
@@ -196,10 +147,58 @@ static void errorHandler(std::shared_ptr<SyncSession> errored_session, SyncError
             s.str()
         );
         _config->stop_policy = translateStopPolicy(stopPolicy);
-        _config->error_handler = errorHandler;
+        RLMApp *app = user.app;
+        _config->error_handler = [app](std::shared_ptr<SyncSession> errored_session, SyncError error) {
+            NSString *recoveryPath;
+            RLMSyncErrorActionToken *token;
+            for (auto& pair : error.user_info) {
+                if (pair.first == realm::SyncError::c_original_file_path_key) {
+                    token = [[RLMSyncErrorActionToken alloc] initWithOriginalPath:pair.second];
+                }
+                else if (pair.first == realm::SyncError::c_recovery_file_path_key) {
+                    recoveryPath = @(pair.second.c_str());
+                }
+            }
+
+            BOOL shouldMakeError = YES;
+            NSDictionary *custom = nil;
+            // Note that certain types of errors are 'interactive'; users have several options
+            // as to how to proceed after the error is reported.
+            auto errorClass = errorKindForSyncError(error);
+            switch (errorClass) {
+                case RLMSyncSystemErrorKindClientReset: {
+                    custom = @{kRLMSyncPathOfRealmBackupCopyKey: recoveryPath, kRLMSyncErrorActionTokenKey: token};
+                    break;
+                }
+                case RLMSyncSystemErrorKindPermissionDenied: {
+                    custom = @{kRLMSyncErrorActionTokenKey: token};
+                    break;
+                }
+                case RLMSyncSystemErrorKindUser:
+                case RLMSyncSystemErrorKindSession:
+                    break;
+                case RLMSyncSystemErrorKindConnection:
+                case RLMSyncSystemErrorKindClient:
+                case RLMSyncSystemErrorKindUnknown:
+                    // Report the error. There's nothing the user can do about it, though.
+                    shouldMakeError = error.is_fatal;
+                    break;
+            }
+
+            RLMSyncManager *manager = [app syncManager];
+            auto errorHandler = manager.errorHandler;
+            if (!shouldMakeError || !errorHandler) {
+                return;
+            }
+            NSError *nsError = make_sync_error(errorClass, @(error.message.c_str()), error.error_code.value(), custom);
+            RLMSyncSession *session = [[RLMSyncSession alloc] initWithSyncSession:errored_session];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                errorHandler(nsError, session);
+            });
+        };
         _config->client_resync_mode = realm::ClientResyncMode::Manual;
 
-        RLMSyncManager *manager = [user.app sharedManager];
+        RLMSyncManager *manager = [user.app syncManager];
         if (NSString *authorizationHeaderName = manager.authorizationHeaderName) {
             _config->authorization_header_name.emplace(authorizationHeaderName.UTF8String);
         }

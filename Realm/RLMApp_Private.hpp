@@ -20,22 +20,11 @@
 #import <memory>
 #import "sync/app.hpp"
 
-//namespace realm {
-//namespace app {
-//class App;
-//struct AppError;
-//}
-//namespace util {
-//template<typename T>
-//class Optional;
-//}
-//}
-
 @interface RLMAppConfiguration()
 
 - (realm::app::App::Config)_config;
 
-- (void)setAppId:(NSString *)appId;
+- (void)setAppId:(nonnull NSString *)appId;
 
 @end
 
@@ -43,10 +32,11 @@
 - (std::shared_ptr<realm::app::App>)_realmApp;
 
 - (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
-            completion:(RLMOptionalErrorBlock)completion;
+            completion:(nonnull RLMOptionalErrorBlock)completion;
 
-- (instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app;
-
++ (nonnull instancetype)app:(nonnull NSString *)appId
+              configuration:(nonnull RLMAppConfiguration *)configuration
+              rootDirectory:(nullable NSURL *)rootDirectory;
 @end
 
-NSError *RLMAppErrorToNSError(realm::app::AppError const& appError);
+NSError * _Nonnull RLMAppErrorToNSError(realm::app::AppError const& appError);

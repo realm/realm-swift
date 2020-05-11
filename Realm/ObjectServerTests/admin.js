@@ -155,7 +155,17 @@ async function create() {
     await app.sync().config().update({
         "development_mode_enabled": true
     });
-    
+
+    await app.functions().create({
+        "name": "sum",
+        "private": false,
+        "can_evaluate": {},
+        "source": `
+        exports = function(...args) {
+            return parseInt(args.reduce((a,b) => a + b, 0));
+        };
+        `
+    });
     process.stdout.write(appResponse['client_app_id']);
 }
 

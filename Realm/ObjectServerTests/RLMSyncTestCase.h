@@ -72,7 +72,7 @@ RLM_ARRAY_TYPE(Dog)
 
 - (RLMAppConfiguration *)defaultAppConfiguration;
 
-- (RLMApp *)app;
+@property (nonatomic, readonly) RLMApp *app;
 
 - (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
 

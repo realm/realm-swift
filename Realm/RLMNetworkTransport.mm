@@ -72,13 +72,10 @@ NSString * const RLMHTTPMethodToNSString[] = {
     }
     urlRequest.timeoutInterval = request.timeout;
 
-    RLMSyncManager *syncManager = [RLMSyncManager sharedManagerWithAppConfiguration:nil];
-    RLMNetworkRequestOptions *options = syncManager.networkRequestOptions;
-
     for (NSString *key in request.headers) {
         [urlRequest addValue:request.headers[key] forHTTPHeaderField:key];
     }
-    id delegate = [RLMSessionDelegate delegateWithCertificatePaths:options.pinnedCertificatePaths
+    id delegate = [RLMSessionDelegate delegateWithCertificatePaths:@{}
                                                         completion:completionBlock];
     auto session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration
                                                  delegate:delegate delegateQueue:nil];

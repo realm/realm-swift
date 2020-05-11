@@ -145,36 +145,46 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 @interface RLMApp() {
     std::shared_ptr<realm::app::App> _app;
 }
+
 @end
 
 @implementation RLMApp : NSObject
 
-- (instancetype)initWithAppId:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
+static NSMutableDictionary *_apps = [NSMutableDictionary new];
+
++ (NSDictionary<NSString *,RLMApp *> *)apps {
+    return _apps;
+}
+
+- (instancetype)initWithAppId:(NSString *)appId
+                configuration:(RLMAppConfiguration *)configuration
+                rootDirectory:(NSURL *)rootDirectory {
     if (self = [super init]) {
         _configuration = configuration;
         [_configuration setAppId: appId];
 
-        _app = [[RLMSyncManager sharedManagerWithAppConfiguration:configuration] app];
+        _syncManager = [[RLMSyncManager alloc] initWithAppConfiguration:configuration rootDirectory:rootDirectory];
+        _app = [_syncManager app];
 
         return self;
     }
     return nil;
 }
 
-- (instancetype)initWithApp:(std::shared_ptr<realm::app::App>)app {
-    if (self = [super init]) {
-        _app = app;
-        return self;
++ (instancetype)app:(NSString *)appId
+      configuration:(RLMAppConfiguration *)configuration
+      rootDirectory:(NSURL *)rootDirectory {
+    if (RLMApp *app = _apps[appId]) {
+        return app;
     }
-    return nil;
-}
 
-- (RLMSyncManager *)sharedManager {
-    return [RLMSyncManager sharedManagerWithAppConfiguration:_configuration];
+    RLMApp *app = [[RLMApp alloc] initWithAppId:appId configuration:configuration rootDirectory:rootDirectory];
+    _apps[appId] = app;
+    return app;
 }
 
 + (instancetype)app:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
-    return [[RLMApp alloc] initWithAppId:appId configuration:configuration];
+    return [self app:appId configuration:configuration rootDirectory:nil];
 }
 
 - (std::shared_ptr<realm::app::App>)_realmApp {
@@ -260,9 +270,9 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     completion(nil);
 }
 
-- (void)callFunction:(NSString *)name
-           arguments:(NSArray<id<RLMBSON>> *)arguments
-     completionBlock:(RLMCallFunctionCompletionBlock)completionBlock {
+- (void)callFunctionWithName:(NSString *)name
+                   arguments:(NSArray<id<RLMBSON>> *)arguments
+             completionBlock:(RLMCallFunctionCompletionBlock)completionBlock {
     bson::BsonArray args;
 
     for (id<RLMBSON> argument in arguments) {
@@ -272,7 +282,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     _app->call_function(SyncManager::shared().get_current_user(),
                         std::string(name.UTF8String),
                         args, [completionBlock](util::Optional<app::AppError> error,
-                                     util::Optional<bson::Bson> response) {
+                                                util::Optional<bson::Bson> response) {
         if (error) {
             return completionBlock(nil, RLMAppErrorToNSError(*error));
         }

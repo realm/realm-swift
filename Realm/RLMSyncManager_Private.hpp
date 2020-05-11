@@ -39,17 +39,17 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock sessionCompletionNotifier;
 
-/// The sole instance of the singleton.
-+ (instancetype)sharedManagerWithAppConfiguration:(RLMAppConfiguration *)appConfiguration NS_REFINED_FOR_SWIFT;
-
 - (std::shared_ptr<realm::app::App>)app;
+
+- (instancetype)initWithAppConfiguration:(RLMAppConfiguration *)appConfiguration
+                           rootDirectory:(NSURL *)rootDirectory;
 
 - (void)configureWithRootDirectory:(nullable NSURL *)rootDirectory
                   appConfiguration:(nullable RLMAppConfiguration *)appConfiguration;
 
 - (void)_fireError:(NSError *)error;
 
-+ (void)resetForTesting;
+- (void)resetForTesting;
 
 - (RLMNetworkRequestOptions *)networkRequestOptions;
 

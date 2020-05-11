@@ -55,8 +55,64 @@ A `AppCredentials` represents data that uniquely identifies a Realm Object Serve
 */
 public typealias AppCredentials = RLMAppCredentials
 
+/// Structure providing an interface to call a MongoDB Realm function with the provided name and arguments.
+///
+///     let app = RealmApp(appId: "my-app-id")
+///     app.functions.sum([1, 2, 3, 4, 5]) { sum, error in
+///         guard case let .int64(value) = sum else {
+///             print(error?.localizedDescription)
+///         }
+///
+///         assert(value == 15)
+///     }
+///
+/// The dynamic member name (`sum` in the above example) is directly associated with the function name.
+/// The first argument is the `BSONArray` of arguments to be provided to the function.
+/// The second and final argument is the completion handler to call when the function call is complete.
+/// This handler is executed on a non-main global `DispatchQueue`.
+@dynamicMemberLookup
+public struct Functions {
+    weak var app: RealmApp?
+    fileprivate init(app: RealmApp) {
+        self.app = app
+    }
+
+    public typealias FunctionCompletionHandler = (AnyBSON?, Error?) -> Void
+    public typealias Function = ([AnyBSON], @escaping FunctionCompletionHandler) -> Void
+
+    public subscript(dynamicMember string: String) -> Function {
+        return { (arguments: [AnyBSON], completionHandler: @escaping FunctionCompletionHandler) in
+            self.app?.__callFunction(withName: string,
+                                     arguments: arguments.map(BSONToRLMBSON) as! [RLMBSON]) {
+                                        (bson: RLMBSON?, error: Error?) in
+                completionHandler(RLMBSONToBSON(bson), error)
+            }
+        }
+    }
+}
+
 /// The `RealmApp` has the fundamental set of methods for communicating with a Realm
 /// application backend.
-
 /// This interface provides access to login and authentication.
 public typealias RealmApp = RLMApp
+public extension RealmApp {
+
+    /// Call a MongoDB Realm function with the provided name and arguments.
+    ///
+    ///     let app = RealmApp(appId: "my-app-id")
+    ///     app.functions.sum([1, 2, 3, 4, 5]) { sum, error in
+    ///         guard case let .int64(value) = sum else {
+    ///             print(error?.localizedDescription)
+    ///         }
+    ///
+    ///         assert(value == 15)
+    ///     }
+    ///
+    /// The dynamic member name (`sum` in the above example) is directly associated with the function name.
+    /// The first argument is the `BSONArray` of arguments to be provided to the function.
+    /// The second and final argument is the completion handler to call when the function call is complete.
+    /// This handler is executed on a non-main global `DispatchQueue`.
+    var functions: Functions {
+        Functions(app: self)
+    }
+}
