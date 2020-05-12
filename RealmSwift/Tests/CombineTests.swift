@@ -176,7 +176,7 @@ class CombineObjectPublisherTests: TestCase {
         token = changesetPublisher(obj)
             .subscribe(on: DispatchQueue(label: "queue"))
             .assertNoFailure()
-            .sink(receiveCompletion: { _ in sema.signal() }) { change in
+            .sink(receiveCompletion: { _ in sema.signal() }, receiveValue: { change in
                 if case .change(let o, let properties) = change {
                     XCTAssertNotEqual(self.obj, o)
                     XCTAssertEqual(properties.count, 1)
@@ -194,7 +194,7 @@ class CombineObjectPublisherTests: TestCase {
                 } else {
                     XCTFail("Expected .change but got \(change)")
                 }
-            }
+            })
 
         for _ in 0..<100 {
             try! realm.write { obj.intCol += 1 }
@@ -213,7 +213,7 @@ class CombineObjectPublisherTests: TestCase {
         token = changesetPublisher(obj)
             .receive(on: DispatchQueue(label: "queue"))
             .assertNoFailure()
-            .sink(receiveCompletion: { _ in exp.fulfill() }) { change in
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { change in
                 if case .change(let o, let properties) = change {
                     XCTAssertNotEqual(self.obj, o)
                     XCTAssertEqual(properties.count, 1)
@@ -225,7 +225,7 @@ class CombineObjectPublisherTests: TestCase {
                     XCTFail("Expected .change but got \(change)")
                 }
                 exp.fulfill()
-            }
+            })
 
         for _ in 0..<10 {
             exp = XCTestExpectation(description: "change")
@@ -245,7 +245,7 @@ class CombineObjectPublisherTests: TestCase {
             .subscribe(on: DispatchQueue(label: "subscribe queue"))
             .receive(on: DispatchQueue(label: "receive queue"))
             .assertNoFailure()
-            .sink(receiveCompletion: { _ in sema.signal() }) { change in
+            .sink(receiveCompletion: { _ in sema.signal() }, receiveValue: { change in
                 if case .change(let o, let properties) = change {
                     XCTAssertNotEqual(self.obj, o)
                     XCTAssertEqual(properties.count, 1)
@@ -264,7 +264,7 @@ class CombineObjectPublisherTests: TestCase {
                 } else {
                     XCTFail("Expected .change but got \(change)")
                 }
-        }
+            })
 
         for _ in 0..<100 {
             try! realm.write { obj.intCol += 1 }
@@ -285,7 +285,7 @@ class CombineObjectPublisherTests: TestCase {
             .threadSafeReference()
             .receive(on: DispatchQueue(label: "queue"))
             .assertNoFailure()
-            .sink(receiveCompletion: { _ in exp.fulfill() }) { change in
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { change in
                 if case .change(let o, let properties) = change {
                     XCTAssertNotEqual(self.obj, o)
                     XCTAssertEqual(properties.count, 1)
@@ -296,7 +296,7 @@ class CombineObjectPublisherTests: TestCase {
                     XCTFail("Expected .change but got \(change)")
                 }
                 exp.fulfill()
-        }
+            })
 
         for _ in 0..<10 {
             exp = XCTestExpectation(description: "change")
