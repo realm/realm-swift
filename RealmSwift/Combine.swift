@@ -54,13 +54,14 @@ extension ObjectKeyIdentifable {
 /// A type which can be passed to `publisher()` or `changesetPublisher()`.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, *)
 public protocol RealmSubscribable {
-    // swiftlint:disable:next identifier_name
+    // swiftlint:disable identifier_name
     /// :nodoc:
     func _observe<S>(on queue: DispatchQueue?, _ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Self, S.Failure == Error
     /// :nodoc:
     func _observe<S>(_ subscriber: S)
         -> NotificationToken where S: Subscriber, S.Input == Void, S.Failure == Never
+    // swiftlint:enable identifier_name
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, *)
