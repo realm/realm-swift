@@ -840,7 +840,6 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Test
             .subscribe(on: DispatchQueue(label: "subscription queue"))
             .freeze()
             .receive(on: DispatchQueue(label: "receive queue"))
-            .print()
             .signal(sema)
             .prefix(10)
             .collect()
