@@ -107,7 +107,7 @@ class RLMNotificationHelper : public realm::BindingContext {
 public:
     RLMNotificationHelper(RLMRealm *realm) : _realm(realm) { }
 
-    bool can_deliver_notifications() const noexcept override {
+    bool can_deliver_notifications() const noexcept {
         return RLMIsInRunLoop();
     }
 

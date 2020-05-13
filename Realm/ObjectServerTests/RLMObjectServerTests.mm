@@ -485,7 +485,7 @@
     
     [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
     
-    [self openRealmForPartitionValue:@"realm_id" user:user];
+    [self openRealmForPartitionValue:@"foo" user:user];
 
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 }
@@ -800,7 +800,7 @@
     if (self.isParent) {
         // Open the Realm in an autorelease pool so that it is destroyed as soon as possible.
         @autoreleasepool {
-            RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+            RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
             [self addPersonsToRealm:realm
                             persons:@[[Person john],
                                       [Person paul],
@@ -812,7 +812,7 @@
         
         RLMRunChildAndWait();
     } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
         // Wait for download to complete.
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(OBJECT_COUNT, Person, realm);
@@ -826,7 +826,7 @@
     RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                        register:YES];
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
-    RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+    RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
 
     [self addPersonsToRealm:realm persons:@[[Person john]]];
     CHECK_COUNT(1, Person, realm);
@@ -850,7 +850,7 @@
     RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                        register:YES];
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
-    RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+    RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
 
     [self addPersonsToRealm:realm persons:@[[Person john]]];
     CHECK_COUNT(1, Person, realm);
@@ -925,7 +925,7 @@
         [self logOutUser:user];
         // Open a Realm after the user's been logged out.
         [self primeSyncManagerWithSemaphore:sema];
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
         XCTAssertNil(error, @"Error when opening Realm: %@", error);
         
         [self addPersonsToRealm:realm persons:@[[Person john]]];
@@ -938,7 +938,7 @@
         
         [self waitForDownloadsForUser:user
                                realms:@[realm]
-                      partitionValues:@[@"realm_id"] expectedCounts:@[@4]];
+                      partitionValues:@[@"foo"] expectedCounts:@[@4]];
         
         
     } else {
@@ -1000,13 +1000,13 @@
         user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                    register:NO]];
         // Open the Realm (for the first time).
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
         // Run the sub-test.
         RLMRunChildAndWait();
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
     } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
         // Add objects.
         [self waitForDownloadsForRealm:realm];
         [self addPersonsToRealm:realm
@@ -1326,7 +1326,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
     
     if (!self.isParent) {
-        [self populateDataForUser:user partitionValue:@"realm_id"];
+        [self populateDataForUser:user partitionValue:@"foo"];
         return;
     }
 
@@ -1334,7 +1334,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMRunChildAndWait();
 
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-    RLMRealmConfiguration *c = [user configurationWithPartitionValue:@"realm_id"];
+    RLMRealmConfiguration *c = [user configurationWithPartitionValue:@"foo"];
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
         
     [RLMRealm asyncOpenWithConfiguration:c
@@ -1364,12 +1364,12 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
     
     if (!self.isParent) {
-        [self populateDataForUser:user partitionValue:@"realm_id"];
+        [self populateDataForUser:user partitionValue:@"foo"];
         return;
     }
 
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-    RLMRealmConfiguration *c = [user configurationWithPartitionValue:@"realm_id"];
+    RLMRealmConfiguration *c = [user configurationWithPartitionValue:@"foo"];
     XCTAssertFalse([[NSFileManager defaultManager] fileExistsAtPath:c.pathOnDisk isDirectory:nil]);
     RLMRealm *realm = [RLMRealm realmWithConfiguration:c error:nil];
     CHECK_COUNT(0, Person, realm);
@@ -1409,7 +1409,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
     [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
     auto ex = [self expectationWithDescription:@"async open"];
-    auto c = [user configurationWithPartitionValue:@"realm_id"];
+    auto c = [user configurationWithPartitionValue:@"foo"];
     [RLMRealm asyncOpenWithConfiguration:c callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
                                     XCTAssertNil(realm);
@@ -1425,7 +1425,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
     
     if (!self.isParent) {
-        [self populateDataForUser:user partitionValue:@"realm_id"];
+        [self populateDataForUser:user partitionValue:@"foo"];
         return;
     }
 
@@ -1437,7 +1437,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMSetAsyncOpenQueue(dispatch_queue_create("io.realm.asyncOpen", 0));
 
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
-    RLMRealmConfiguration *c = [user configurationWithPartitionValue:@"realm_id"];
+    RLMRealmConfiguration *c = [user configurationWithPartitionValue:@"foo"];
 
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
@@ -1462,7 +1462,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
 
     if (!self.isParent) {
-        [self populateDataForUser:user partitionValue:@"realm_id"];
+        [self populateDataForUser:user partitionValue:@"foo"];
         return;
     }
 
@@ -1470,7 +1470,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *ex1 = [self expectationWithDescription:@"async open"];
     XCTestExpectation *ex2 = [self expectationWithDescription:@"download progress complete"];
-    RLMRealmConfiguration *c = [user configurationWithPartitionValue:@"realm_id"];
+    RLMRealmConfiguration *c = [user configurationWithPartitionValue:@"foo"];
 
     auto task = [RLMRealm asyncOpenWithConfiguration:c
                                        callbackQueue:dispatch_get_main_queue()
@@ -1499,7 +1499,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     // Create a large object and then delete it in the next transaction so that
     // the file is bloated
     @autoreleasepool {
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
         [realm beginWriteTransaction];
         [realm addObject:[Person john]];
         [realm commitWriteTransaction];
@@ -1519,7 +1519,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     // Reopen the file with a shouldCompactOnLaunch block and verify that it is
     // actually compacted
-    auto config = [user configurationWithPartitionValue:@"realm_id"];
+    auto config = [user configurationWithPartitionValue:@"foo"];
     __block bool blockCalled = false;
     __block NSUInteger usedSize = 0;
     config.shouldCompactOnLaunch = ^(NSUInteger, NSUInteger used) {

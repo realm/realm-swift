@@ -47,6 +47,7 @@ RLM_ARRAY_TYPE(Dog)
 @property RLMArray<Dog *><Dog> *dogs;
 @property NSString *firstName;
 @property NSString *lastName;
+//@property NSString *realm_id;
 
 + (instancetype)john;
 + (instancetype)paul;

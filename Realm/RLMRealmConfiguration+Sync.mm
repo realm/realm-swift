@@ -47,7 +47,7 @@
 
     NSAssert(user.identity, @"Cannot call this method on a user that doesn't have an identity.");
     self.config.in_memory = false;
-    self.config.sync_config = std::make_shared<realm::SyncConfig>(std::move([syncConfiguration rawConfiguration]));
+    self.config.sync_config = std::make_shared<realm::SyncConfig>([syncConfiguration rawConfiguration]);
     self.config.schema_mode = realm::SchemaMode::Additive;
 
     if (syncConfiguration.customFileURL) {

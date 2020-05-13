@@ -18,6 +18,7 @@
 
 #import "RLMSyncUser_Private.hpp"
 
+#import "RLMBSON_Private.hpp"
 #import "RLMJSONModels.h"
 #import "RLMNetworkTransport.h"
 #import "RLMRealmConfiguration+Sync.h"
@@ -184,6 +185,14 @@ using namespace realm;
         return nil;
     }
     return @(_user->access_token().c_str());
+}
+
+- (NSDictionary *)customData {
+    if (!_user || !_user->custom_data()) {
+        return nil;
+    }
+
+    return (NSDictionary *)BsonToRLMBSON(*_user->custom_data());
 }
 
 - (std::shared_ptr<SyncUser>)_syncUser {

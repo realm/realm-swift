@@ -113,7 +113,7 @@ using namespace bson;
 
 #pragma mark NSDictionary
 
-@implementation NSDictionary (RLMBSON)
+@implementation NSMutableDictionary (RLMBSON)
 
 - (RLMBSONType)bsonType {
     return RLMBSONTypeDocument;
@@ -130,14 +130,30 @@ using namespace bson;
 - (instancetype)initWithBsonDocument:(BsonDocument)bsonDocument {
     if ((self = [self init])) {
         for (auto it = bsonDocument.begin(); it != bsonDocument.end(); ++it) {
-            auto entry = (*it);
-            [self setValue:BsonToRLMBSON(entry.second) forKey:@(entry.first.data())];
+            const auto& entry = (*it);
+            [self setObject:BsonToRLMBSON(entry.second) forKey:@(entry.first.data())];
         }
 
         return self;
     }
 
     return nil;
+}
+
+@end
+
+@implementation NSDictionary (RLMBSON)
+
+- (RLMBSONType)bsonType {
+    return RLMBSONTypeDocument;
+}
+
+- (BsonDocument)bsonDocumentValue {
+    BsonDocument bsonDocument;
+    for (NSString *value in self) {
+        bsonDocument[value.UTF8String] = RLMBSONToBson(self[value]);
+    }
+    return bsonDocument;
 }
 
 @end
@@ -221,8 +237,7 @@ using namespace bson;
 
 @implementation RLMMaxKey
 
-- (BOOL)isEqual:(id)other
-{
+- (BOOL)isEqual:(id)other {
     if (other == self) {
         return YES;
     } else if ([self class] == [other class]) {
@@ -232,8 +247,7 @@ using namespace bson;
     }
 }
 
-- (NSUInteger)hash
-{
+- (NSUInteger)hash {
     return 0;
 }
 
@@ -243,8 +257,7 @@ using namespace bson;
 
 @implementation RLMMinKey
 
-- (BOOL)isEqual:(id)other
-{
+- (BOOL)isEqual:(id)other {
     if (other == self) {
         return YES;
     } else if ([self class] == [other class]) {
@@ -254,8 +267,7 @@ using namespace bson;
     }
 }
 
-- (NSUInteger)hash
-{
+- (NSUInteger)hash {
     return 0;
 }
 
@@ -318,7 +330,7 @@ Bson RLMBSONToBson(id<RLMBSON> b) {
 
 #pragma mark BsonToRLMBSON
 
-id<RLMBSON> BsonToRLMBSON(Bson b) {
+id<RLMBSON> BsonToRLMBSON(const Bson& b) {
     switch (b.type()) {
         case realm::bson::Bson::Type::Null:
             return nil;
@@ -349,7 +361,7 @@ id<RLMBSON> BsonToRLMBSON(Bson b) {
         case realm::bson::Bson::Type::MinKey:
             return [RLMMinKey new];
         case realm::bson::Bson::Type::Document:
-            return [[NSDictionary alloc] initWithBsonDocument:static_cast<BsonDocument>(b)];
+            return [[NSMutableDictionary alloc] initWithBsonDocument:static_cast<BsonDocument>(b)];
         case realm::bson::Bson::Type::Array:
             return [[NSMutableArray alloc] initWithBsonArray:static_cast<BsonArray>(b)];
     }

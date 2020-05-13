@@ -96,6 +96,12 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMSyncUserState state;
 
+/**
+ The custom data of the user.
+ This is configured in your MongoDB Realm App.
+ */
+@property (nullable, nonatomic, readonly) NSDictionary *customData NS_REFINED_FOR_SWIFT;
+
 #pragma mark - Lifecycle
 
 /**

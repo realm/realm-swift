@@ -1,0 +1,168 @@
+#!/usr/bin/ruby
+
+require 'net/http'
+require 'fileutils'
+
+MONGODB_VERSION='4.4.0-rc5'
+GO_VERSION='1.14.2'
+NODE_VERSION='8.11.2'
+STITCH_VERSION='5c3e2f9e5169d09e52bb608415d620e93262d341'
+
+BASE_DIR = Dir.pwd
+BUILD_DIR = "#{BASE_DIR}/build"
+PID_FILE = "#{BUILD_DIR}/pid.txt"
+STITCH_DIR = "#{BASE_DIR}/stitch"
+
+MONGODB_URL="https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-#{MONGODB_VERSION}.tgz"
+TRANSPILER_TARGET='node8-macos'
+SERVER_STITCH_LIB_URL="https://s3.amazonaws.com/mciuploads/mongodb-mongo-master/stitch-support/macos-debug/e791a2ea966bb302ff180dd4538d87c078e74747/stitch-support-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
+MONGO_DIR="#{BUILD_DIR}/mongodb-macos-x86_64-#{MONGODB_VERSION}"
+
+def setup_mongod
+    if !Dir.exists?(MONGO_DIR)
+        `cd #{BUILD_DIR} && curl --silent #{MONGODB_URL} | tar xz && mkdir #{MONGO_DIR}/db_files`
+    end
+end
+
+def run_mongod
+    puts "starting mongod..."
+    `#{MONGO_DIR}/bin/mongod --quiet \
+        --dbpath #{MONGO_DIR}/db_files \
+        --bind_ip localhost \
+        --port 26000 \
+        --replSet test \
+        --fork --logpath #{MONGO_DIR}/mongod.log`
+    puts "mongod starting"
+
+    retries = 0
+    begin
+        Net::HTTP.get(URI('http://localhost:26000'))
+    rescue => exception
+        sleep(1)
+        retries += 1
+        if retries == 5
+            abort('could not connect to mongod')
+        end
+    end
+    `#{MONGO_DIR}/bin/mongo --port 26000 --eval 'rs.initiate()'`
+    puts "mongod started"
+end
+
+def shutdown_mongod
+    puts 'shutting down mongod'
+    if Dir.exists?(MONGO_DIR)
+        `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.adminCommand({replSetStepDown: 0, secondaryCatchUpPeriodSecs: 0, force: true})"`
+        `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.shutdownServer({force: true})"`
+    end
+end
+
+def setup_stitch
+    puts "setting up stitch"
+    exports = []
+
+    if !Dir.exists?(STITCH_DIR)
+        puts 'cloning stitch'
+        `git clone git@github.com:10gen/stitch`
+    end
+
+    if !File.exists?("#{STITCH_DIR}/.git")
+        puts 'checking out stitch'
+        `git checkout #{STITCH_VERSION}`
+    end
+
+    dylib_dir = "#{STITCH_DIR}/etc/dylib"
+    if !Dir.exists?(dylib_dir)
+        puts 'downloading mongodb dylibs'
+        Dir.mkdir dylib_dir
+        `curl -s "#{SERVER_STITCH_LIB_URL}" \
+            | tar xvfz - --strip-components=1 -C #{dylib_dir}`
+    end
+
+    update_doc_filepath = "#{STITCH_DIR}/update_doc"
+    if !File.exists?(update_doc_filepath)
+        puts "downloading update_doc"
+        `cd #{STITCH_DIR} && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7a5c9ec4432c400181c_17_10_15_01_19_33/update_doc"`
+        `chmod +x #{update_doc_filepath}`
+    end
+
+    assisted_agg_filepath = "#{STITCH_DIR}/assisted_agg"
+    if !File.exists?(assisted_agg_filepath)
+        puts "downloading assisted_agg"
+        `cd #{STITCH_DIR} && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7ab2a60ed5647001827_17_10_15_01_19_39/assisted_agg"`
+        `chmod +x #{assisted_agg_filepath}`
+    end
+
+    if `which node`.empty?
+        puts "downloading node 🚀"
+        `curl -O "https://nodejs.org/dist/v8.11.2/node-v$node_version-darwin-x64.tar.gz" | tar xvfz -C #{STITCH_DIR}/node-v8.11.2-darwin-x64.tar.gz`
+        exports << "export PATH=\"#{STITCH_DIR}/node-v8.11.2-darwin-x64/bin/:$PATH\""
+    end
+
+    if `which yarn`.empty?
+        `rm -rf "$HOME/.yarn"`
+        `curl -o- -L https://yarnpkg.com/install.sh #{STITCH_DIR} | bash`
+        exports << "export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\""
+    end
+
+    puts 'building transpiler'
+    `cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
+
+    if !Dir.exists?('go')
+        puts 'downloading go'
+        `curl --silent "https://dl.google.com/go/go#{GO_VERSION}.darwin-amd64.tar.gz" | tar xz`
+    end
+
+    exports << "export GOROOT=\"#{BASE_DIR}/go\""
+    exports << "export PATH=\"$GOROOT/bin:$PATH\""
+
+    exports << "export STITCH_PATH=\"#{BASE_DIR}/stitch\""
+    exports << "export PATH=\"$PATH:$STITCH_PATH/etc/transpiler/bin\""
+    exports << "export LD_LIBRARY_PATH=\"$STITCH_PATH/etc/dylib/lib\""
+
+    puts 'running stitch'
+    
+    `#{exports.join(' && ')} && \
+        cd #{STITCH_DIR} && \
+        go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" cmd/auth/user.go addUser \
+            -domainID 000000000000000000000000 \
+            -mongoURI mongodb://127.0.0.1:26000 \
+            -salt 'DQOWene1723baqD!_@#' \
+            -id "unique_user@domain.com" \
+            -password "password"`
+end
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+# MAIN
+
+def build_action
+    puts 'building baas'
+    if !Dir.exists?(MONGO_DIR)
+        begin
+            FileUtils.mkdir_p BUILD_DIR
+            setup_mongod
+            run_mongod
+            setup_stitch
+        rescue => exception
+            puts "error setting up: #{exception}"
+        ensure
+            shutdown_mongod
+        end
+    end
+end
+
+def clean_action
+    puts 'cleaning'
+    shutdown_mongod
+    `rm -rf #{MONGO_DIR}`
+end
+
+if ARGV.length < 1
+    build_action
+end
+
+case ARGV[0]
+when "" 
+    build_action
+when "clean" 
+    clean_action
+end

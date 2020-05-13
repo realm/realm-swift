@@ -96,7 +96,7 @@ static NSString *nodePath() {
 }
 
 + (NSArray *)requiredProperties {
-    return @[@"_id", @"firstName", @"lastName", @"age", @"dogs"];
+    return @[@"_id", @"firstName", @"lastName", @"age"];
 }
 
 + (instancetype)john {
@@ -105,6 +105,7 @@ static NSString *nodePath() {
     john.age = 30;
     john.firstName = @"John";
     john.lastName = @"Lennon";
+//    john.realm_id = @"foo";
     return john;
 }
 
@@ -114,6 +115,7 @@ static NSString *nodePath() {
     paul.age = 30;
     paul.firstName = @"Paul";
     paul.lastName = @"McCartney";
+//    paul.realm_id = @"foo";
     return paul;
 }
 
@@ -123,6 +125,7 @@ static NSString *nodePath() {
     ringo.age = 30;
     ringo.firstName = @"Ringo";
     ringo.lastName = @"Starr";
+//    ringo.realm_id = @"foo";
     return ringo;
 }
 
@@ -132,6 +135,7 @@ static NSString *nodePath() {
     george.age = 30;
     george.firstName = @"George";
     george.lastName = @"Harrison";
+//    george.realm_id = @"foo";
     return george;
 }
 
@@ -165,14 +169,18 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (instancetype)init {
     if (self = [super init]) {
+        if (getenv("RLMProcessIsChild")) {
+            return self;
+        }
+
         [self downloadAdminSDK];
 
         NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
 
         NSTask *task = [[NSTask alloc] init];
         task.currentDirectoryPath = directory;
-        task.launchPath = @"/bin/sh";
-        task.arguments = @[@"run_baas.sh"];
+        task.launchPath = @"/usr/bin/ruby";
+        task.arguments = @[[directory stringByAppendingPathComponent:@"run_baas.rb"], @"start"];
         [task launch];
         [task waitUntilExit];
 
@@ -200,21 +208,22 @@ static NSURL *syncDirectoryForChildProcess() {
             }
 
             tryCount++;
+            sleep(1);
         }
 
         if (!isLive) {
             NSLog(@"Timed out while trying to connect to MongoDB Realm at http://127.0.0.1:9090");
             abort();
         }
-
-        atexit([] {
-//            [[RealmObjectServer sharedServer] cleanUp];
-        });
     }
     return self;
 }
 
 - (void)cleanUp {
+    if (getenv("RLMProcessIsChild")) {
+        return;
+    }
+
     NSTask *task = [[NSTask alloc] init];
     task.launchPath = nodePath();
     NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
@@ -224,13 +233,10 @@ static NSURL *syncDirectoryForChildProcess() {
 
     task = [[NSTask alloc] init];
     task.currentDirectoryPath = directory;
-    task.launchPath = @"/bin/sh";
-    task.arguments = @[[directory stringByAppendingPathComponent:@"run_baas.sh"], @"clean"];
+    task.launchPath = @"/usr/bin/ruby";
+    task.arguments = @[[directory stringByAppendingPathComponent:@"run_baas.rb"], @"shutdown"];
     [task launch];
     [task waitUntilExit];
-
-    [[NSTask launchedTaskWithLaunchPath:@"/usr/bin/pkill"
-                              arguments:@[@"-f", @"stitch"]] waitUntilExit];
 }
 
 - (NSString *)createApp {
@@ -563,14 +569,11 @@ static NSURL *syncDirectoryForChildProcess() {
 
     static bool is_parent = [self isParent];
 
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        // FIXME:
-//        if (is_parent) [[RealmObjectServer sharedServer] cleanUp];
-    });
     atexit([] {
-        // FIXME:
-//        if (is_parent) [[RealmObjectServer sharedServer] cleanUp];
+        static dispatch_once_t onceToken;
+        dispatch_once(&onceToken, ^{
+            if (is_parent) [[RealmObjectServer sharedServer] cleanUp];
+        });
     });
     [self setupSyncManager];
 }
@@ -595,8 +598,7 @@ static NSURL *syncDirectoryForChildProcess() {
     if (self.isParent) {
         _appId = [RealmObjectServer.sharedServer createApp];
         _app = [RLMApp app:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
-    }
-    else {
+    } else {
         _appId = [RealmObjectServer.sharedServer lastApp];
         _app = [RLMApp app:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
     }

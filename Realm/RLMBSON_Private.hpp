@@ -13,7 +13,7 @@ using namespace realm;
 using namespace bson;
 
 Bson RLMBSONToBson(id<RLMBSON> b);
-id<RLMBSON> BsonToRLMBSON(Bson b);
+id<RLMBSON> BsonToRLMBSON(const Bson& b);
 
 
 

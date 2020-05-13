@@ -260,6 +260,8 @@
 		3FEB38401E70AC8800F22712 /* ObjectCreationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3FEB383C1E70AC6900F22712 /* ObjectCreationTests.mm */; };
 		3FEC4A3F1BBB18D400F009C3 /* SwiftSchemaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */; };
 		3FF3FFAF1F0D6D6400B84599 /* KVOTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D660FFF1BE98D880021E04F /* KVOTests.swift */; };
+		49101A1E246C38550022BB0B /* scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49101A1D246C38550022BB0B /* scheduler.cpp */; };
+		49101A1F246C38550022BB0B /* scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49101A1D246C38550022BB0B /* scheduler.cpp */; };
 		492F5CB2244F48D800ACEBC0 /* regular_expression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F0244E1A370097500E /* regular_expression.cpp */; };
 		492F5CB3244F48D800ACEBC0 /* bson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F2244E1A370097500E /* bson.cpp */; };
 		492F5CB4244F48D800ACEBC0 /* datetime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F4244E1A370097500E /* datetime.cpp */; };
@@ -893,6 +895,7 @@
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
 		3FEB383C1E70AC6900F22712 /* ObjectCreationTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ObjectCreationTests.mm; sourceTree = "<group>"; };
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
+		49101A1D246C38550022BB0B /* scheduler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scheduler.cpp; sourceTree = "<group>"; };
 		498C7F3724479904009DE80A /* remote_mongo_database.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = remote_mongo_database.hpp; path = sync/remote_mongo_database.hpp; sourceTree = "<group>"; };
 		498C7F3824479904009DE80A /* remote_mongo_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = remote_mongo_client.hpp; path = sync/remote_mongo_client.hpp; sourceTree = "<group>"; };
 		498C7F3924479904009DE80A /* remote_mongo_collection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = remote_mongo_collection.hpp; path = sync/remote_mongo_collection.hpp; sourceTree = "<group>"; };
@@ -1541,6 +1544,7 @@
 				5DB591A61D063DF8001D8F93 /* atomic_shared_ptr.hpp */,
 				3F92F627222F311B008B2333 /* event_loop_dispatcher.hpp */,
 				5D274C4F1D6D16A8006FEBB1 /* event_loop_signal.hpp */,
+				49101A1D246C38550022BB0B /* scheduler.cpp */,
 				3F92F628222F311C008B2333 /* tagged_bool.hpp */,
 				1AABD4001E9552BA00115A75 /* uuid.cpp */,
 				1AABD4011E9552BA00115A75 /* uuid.hpp */,
@@ -2402,7 +2406,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh Realm/ObjectServerTests/setup_baas.sh\n";
+			shellScript = "ruby Realm/ObjectServerTests/setup_baas.rb\n";
 		};
 		5D304A2E1BE9AEFB0082C1A6 /* Get Version Number */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2580,6 +2584,7 @@
 				5D659E821BE04556006515A0 /* index_set.cpp in Sources */,
 				1A64CA8B1D8763B400BC0F9B /* keychain_helper.cpp in Sources */,
 				3F9026111C625C5D006AE98E /* list.cpp in Sources */,
+				49101A1E246C38550022BB0B /* scheduler.cpp in Sources */,
 				3F9801A51C8E4F55000A8B07 /* list_notifier.cpp in Sources */,
 				C281E9301E8BC7AC0015BA4A /* network_reachability_observer.cpp in Sources */,
 				3F73BC961E3A878500FE80B6 /* NSError+RLMSync.m in Sources */,
@@ -2749,6 +2754,7 @@
 				3F9801A61C8E4F5A000A8B07 /* collection_notifier.cpp in Sources */,
 				5DD7557F1BE056DE002800DA /* external_commit_helper.cpp in Sources */,
 				4993221D2412A08F00A0EC8E /* generic_network_transport.cpp in Sources */,
+				49101A1F246C38550022BB0B /* scheduler.cpp in Sources */,
 				5DD755801BE056DE002800DA /* index_set.cpp in Sources */,
 				E8FD2E381D93345100569F10 /* keychain_helper.cpp in Sources */,
 				3F9026131C625C63006AE98E /* list.cpp in Sources */,

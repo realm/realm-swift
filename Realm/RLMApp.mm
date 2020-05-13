@@ -150,10 +150,10 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 @implementation RLMApp : NSObject
 
-static NSMutableDictionary *_apps = [NSMutableDictionary new];
+static NSMutableDictionary *s_apps = [NSMutableDictionary new];
 
 + (NSDictionary<NSString *,RLMApp *> *)apps {
-    return _apps;
+    return s_apps;
 }
 
 - (instancetype)initWithAppId:(NSString *)appId
@@ -174,17 +174,25 @@ static NSMutableDictionary *_apps = [NSMutableDictionary new];
 + (instancetype)app:(NSString *)appId
       configuration:(RLMAppConfiguration *)configuration
       rootDirectory:(NSURL *)rootDirectory {
-    if (RLMApp *app = _apps[appId]) {
+    // protects the app cache
+    static std::mutex& initLock = *new std::mutex();
+    std::lock_guard<std::mutex> lock(initLock);
+
+    if (RLMApp *app = s_apps[appId]) {
         return app;
     }
 
     RLMApp *app = [[RLMApp alloc] initWithAppId:appId configuration:configuration rootDirectory:rootDirectory];
-    _apps[appId] = app;
+    s_apps[appId] = app;
     return app;
 }
 
 + (instancetype)app:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
     return [self app:appId configuration:configuration rootDirectory:nil];
+}
+
++ (instancetype)app:(NSString *)appId {
+    return [self app:appId configuration:nil];
 }
 
 - (std::shared_ptr<realm::app::App>)_realmApp {

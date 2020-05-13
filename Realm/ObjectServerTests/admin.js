@@ -126,8 +126,7 @@ async function create() {
             "required": [
                 "firstName",
                 "lastName",
-                "age",
-                "dogs"
+                "age"
             ],
             "title": "Person"
         },
@@ -139,15 +138,6 @@ async function create() {
           }
         }
     };
-
-    await app.services().service(serviceResponse['_id']).rules().create(dogRule);
-    await app.services().service(serviceResponse['_id']).rules().create(personRule);
-
-    dogRule.collection = "SwiftDog";
-    dogRule.schema.title = "SwiftDog";
-    personRule.schema.title = "SwiftPerson";
-    personRule.collection = "SwiftPerson";
-    personRule.relationships.dogs.ref = "#/stitch/mongodb1/test_data/SwiftDog"
 
     await app.services().service(serviceResponse['_id']).rules().create(dogRule);
     await app.services().service(serviceResponse['_id']).rules().create(personRule);
