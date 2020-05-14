@@ -18,7 +18,7 @@
 
 #import "RLMTestObjects.h"
 #import <Realm/RLMObject_Private.h>
-#if 0
+
 #pragma mark - Abstract Objects
 #pragma mark -
 
@@ -434,4 +434,3 @@
 }
 
 @end
-#endif

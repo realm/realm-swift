@@ -284,7 +284,7 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
     bson::BsonArray args;
 
     for (id<RLMBSON> argument in arguments) {
-        args.push_back(RLMBSONToBson(argument));
+        args.push_back(RLMRLMBSONToBson(argument));
     }
 
     _app->call_function(SyncManager::shared().get_current_user(),
@@ -295,7 +295,7 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
             return completionBlock(nil, RLMAppErrorToNSError(*error));
         }
 
-        completionBlock(BsonToRLMBSON(*response), nil);
+        completionBlock(RLMBsonToRLMBSON(*response), nil);
     });
 }
 

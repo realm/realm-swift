@@ -1,20 +1,28 @@
-#ifndef RLMBSON_Private_h
-#define RLMBSON_Private_h
+////////////////////////////////////////////////////////////////////////////
+//
+// Copyright 2020 Realm Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import "util/bson/bson.hpp"
-#import "RLMDecimal128_Private.hpp"
 #import "RLMBSON.h"
-#import "RLMUtil.hpp"
-#import "RLMObjectId_Private.hpp"
-#import <realm/mixed.hpp>
 
-using namespace realm;
-using namespace bson;
+namespace realm {
+namespace bson {
+    class Bson;
+}
+}
 
-Bson RLMBSONToBson(id<RLMBSON> b);
-id<RLMBSON> BsonToRLMBSON(const Bson& b);
-
-
-
-#endif /* RLMBSON_Private_h */
+realm::bson::Bson RLMRLMBSONToBson(id<RLMBSON> b);
+id<RLMBSON> RLMBsonToRLMBSON(const realm::bson::Bson& b);

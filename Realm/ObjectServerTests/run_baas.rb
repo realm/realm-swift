@@ -17,16 +17,21 @@ def run_mongod
 
     retries = 0
     begin
+        puts '🟠 attempting to connect to mongod'
         Net::HTTP.get(URI('http://localhost:26000'))
     rescue => exception
         sleep(1)
         retries += 1
         if retries == 5
-            abort('could not connect to mongod')
+            abort('🔴 could not connect to mongod')
         end
     end
 
     puts "mongod started"
+end
+
+def clean_mongo_test_data
+    puts `#{MONGO_DIR}/bin/mongo --port 26000 test_data --eval "db.dropDatabase()"`
 end
 
 def shutdown_mongod
@@ -50,25 +55,28 @@ def run_stitch
     exports << "PATH=\"$PATH:$STITCH_PATH/etc/transpiler/bin\""
     exports << "export LD_LIBRARY_PATH=\"$STITCH_PATH/etc/dylib/lib\""
     
-    puts 'starting baas'
+    puts 'starting stitch'
 
+    puts exports
     pid = Process.fork {
-        `#{exports.join(' && ')} && \
-        cd #{stitch_path} && \
-        go run -exec "env LD_LIBRARY_PATH=#{stitch_path}/etc/dylib/lib" #{stitch_path}/cmd/server/main.go --configFile "#{stitch_path}/etc/configs/test_config.json"`
+        `cd #{stitch_path} && \
+        #{exports.join(' && ')} && \
+        go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" #{stitch_path}/cmd/server/main.go --configFile "#{stitch_path}/etc/configs/test_config.json" >> output.log`
     }
     Process.detach(pid)
     retries = 0
     begin
+        puts '🟠 attempting to connect to stitch'
         Net::HTTP.get(URI('http://localhost:9090'))
     rescue => exception
         sleep(1)
         retries += 1
         if retries == 50
-            abort('could not connect to baas')
+            abort('🔴 could not connect to baas')
         end
         retry
     end
+    puts '🟢 stitch is running'
 end
 
 def shutdown_stitch
@@ -88,12 +96,15 @@ def shutdown
 end
 
 if ARGV.length < 1
-    abort("Too few arguments")
+    abort("🔴 too few arguments")
 end
 
 case ARGV[0]
-when "start" 
+when "start"
     start
-when "shutdown" 
+when "shutdown"
+    clean_mongo_test_data
     shutdown
+when "clean"
+    clean_mongo_test_data
 end

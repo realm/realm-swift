@@ -69,6 +69,8 @@ static NSString *nodePath() {
 - (std::shared_ptr<realm::SyncUser>)_syncUser;
 @end
 
+#pragma mark Dog
+
 @implementation Dog
 
 + (NSString *)primaryKey {
@@ -85,6 +87,8 @@ static NSString *nodePath() {
 
 @end
 
+#pragma mark Person
+
 @implementation Person
 
 + (NSDictionary *)defaultPropertyValues {
@@ -99,43 +103,43 @@ static NSString *nodePath() {
     return @[@"_id", @"firstName", @"lastName", @"age"];
 }
 
-+ (instancetype)john {
++ (instancetype)johnWithRealmId:(NSString *)realmId {
     Person *john = [[Person alloc] init];
     john._id = [RLMObjectId objectId];
     john.age = 30;
     john.firstName = @"John";
     john.lastName = @"Lennon";
-//    john.realm_id = @"foo";
+    john.realm_id = realmId;
     return john;
 }
 
-+ (instancetype)paul {
++ (instancetype)paulWithRealmId:(NSString *)realmId {
     Person *paul = [[Person alloc] init];
     paul._id = [RLMObjectId objectId];
     paul.age = 30;
     paul.firstName = @"Paul";
     paul.lastName = @"McCartney";
-//    paul.realm_id = @"foo";
+    paul.realm_id = realmId;
     return paul;
 }
 
-+ (instancetype)ringo {
++ (instancetype)ringoWithRealmId:(NSString *)realmId {
     Person *ringo = [[Person alloc] init];
     ringo._id = [RLMObjectId objectId];
     ringo.age = 30;
     ringo.firstName = @"Ringo";
     ringo.lastName = @"Starr";
-//    ringo.realm_id = @"foo";
+    ringo.realm_id = realmId;
     return ringo;
 }
 
-+ (instancetype)george {
++ (instancetype)georgeWithRealmId:(NSString *)realmId {
     Person *george = [[Person alloc] init];
     george._id = [RLMObjectId objectId];
     george.age = 30;
     george.firstName = @"George";
     george.lastName = @"Harrison";
-//    george.realm_id = @"foo";
+    george.realm_id = realmId;
     return george;
 }
 
@@ -150,6 +154,8 @@ static NSURL *syncDirectoryForChildProcess() {
     path = [path stringByAppendingPathComponent:[NSString stringWithFormat:@"%@-child", bundleIdentifier]];
     return [NSURL fileURLWithPath:path isDirectory:YES];
 }
+
+#pragma mark RealmObjectServer
 
 @interface RealmObjectServer : NSObject
 @property (nonatomic, readonly) NSString *appId;
@@ -178,6 +184,13 @@ static NSURL *syncDirectoryForChildProcess() {
         NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
 
         NSTask *task = [[NSTask alloc] init];
+        task.currentDirectoryPath = directory;
+        task.launchPath = @"/usr/bin/ruby";
+        task.arguments = @[[directory stringByAppendingPathComponent:@"run_baas.rb"], @"shutdown"];
+        [task launch];
+        [task waitUntilExit];
+
+        task = [[NSTask alloc] init];
         task.currentDirectoryPath = directory;
         task.launchPath = @"/usr/bin/ruby";
         task.arguments = @[[directory stringByAppendingPathComponent:@"run_baas.rb"], @"start"];
@@ -344,6 +357,8 @@ static NSURL *syncDirectoryForChildProcess() {
     [task waitUntilExit];
 }
 @end
+
+#pragma mark RLMSyncTestCase
 
 @implementation RLMSyncTestCase
 
@@ -580,6 +595,17 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (void)tearDown {
     [self resetSyncManager];
+
+    if ([self isParent]) {
+        NSTask *task = [[NSTask alloc] init];
+        NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
+        task.currentDirectoryPath = directory;
+        task.launchPath = @"/usr/bin/ruby";
+        task.arguments = @[[directory stringByAppendingPathComponent:@"run_baas.rb"], @"clean"];
+        [task launch];
+        [task waitUntilExit];
+    }
+
     [super tearDown];
 }
 

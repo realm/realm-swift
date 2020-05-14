@@ -17,9 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMNetworkTransport.h"
+
 #import "RLMApp.h"
-#import "RLMRealmConfiguration.h"
 #import "RLMJSONModels.h"
+#import "RLMRealmConfiguration.h"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMUtil.hpp"
@@ -41,8 +42,7 @@ static_assert((int)RLMHTTPMethodDELETE     == (int)app::HttpMethod::del);
 #pragma mark RLMSessionDelegate
 
 @interface RLMSessionDelegate <NSURLSessionDelegate> : NSObject
-+ (instancetype)delegateWithCertificatePaths:(NSDictionary *)paths
-                                  completion:(RLMNetworkTransportCompletionBlock)completion;
++ (instancetype)delegateWithCompletion:(RLMNetworkTransportCompletionBlock)completion;
 @end
 
 NSString * const RLMHTTPMethodToNSString[] = {
@@ -75,8 +75,7 @@ NSString * const RLMHTTPMethodToNSString[] = {
     for (NSString *key in request.headers) {
         [urlRequest addValue:request.headers[key] forHTTPHeaderField:key];
     }
-    id delegate = [RLMSessionDelegate delegateWithCertificatePaths:@{}
-                                                        completion:completionBlock];
+    id delegate = [RLMSessionDelegate delegateWithCompletion:completionBlock];
     auto session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration
                                                  delegate:delegate delegateQueue:nil];
 
@@ -91,15 +90,12 @@ NSString * const RLMHTTPMethodToNSString[] = {
 #pragma mark RLMSessionDelegate
 
 @implementation RLMSessionDelegate {
-    NSDictionary<NSString *, NSURL *> *_certificatePaths;
     NSData *_data;
     RLMNetworkTransportCompletionBlock _completionBlock;
 }
 
-+ (instancetype)delegateWithCertificatePaths:(NSDictionary *)paths
-                                  completion:(RLMNetworkTransportCompletionBlock)completion {
++ (instancetype)delegateWithCompletion:(RLMNetworkTransportCompletionBlock)completion {
     RLMSessionDelegate *delegate = [RLMSessionDelegate new];
-    delegate->_certificatePaths = paths;
     delegate->_completionBlock = completion;
     return delegate;
 }
@@ -114,18 +110,6 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
         completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
         return;
     }
-
-    // If we have a pinned certificate for this hostname, we want to validate
-    // against that, and otherwise just do the default thing
-    auto certPath = _certificatePaths[protectionSpace.host];
-    if (!certPath) {
-        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
-        return;
-    }
-    if ([certPath isKindOfClass:[NSString class]]) {
-        certPath = [NSURL fileURLWithPath:(id)certPath];
-    }
-
 
     // Reject the server auth and report an error if any errors occur along the way
     CFArrayRef items = nil;
@@ -151,29 +135,6 @@ didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
         }
     });
 
-    NSData *data = [NSData dataWithContentsOfURL:certPath options:0 error:&error];
-    if (!data) {
-        return;
-    }
-
-    // Load our pinned certificate and add it to the anchor set
-#if TARGET_OS_IPHONE
-    id certificate = (__bridge_transfer id)SecCertificateCreateWithData(NULL, (__bridge CFDataRef)data);
-    if (!certificate) {
-        error = [NSError errorWithDomain:NSOSStatusErrorDomain code:errSecUnknownFormat userInfo:nil];
-        return;
-    }
-    items = (CFArrayRef)CFBridgingRetain(@[certificate]);
-#else
-    SecItemImportExportKeyParameters params{
-        .version = SEC_KEY_IMPORT_EXPORT_PARAMS_VERSION
-    };
-    if (OSStatus status = SecItemImport((__bridge CFDataRef)data, (__bridge CFStringRef)certPath.absoluteString,
-                                        nullptr, nullptr, 0, &params, nullptr, &items)) {
-        error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];
-        return;
-    }
-#endif
     SecTrustRef serverTrust = protectionSpace.serverTrust;
     if (OSStatus status = SecTrustSetAnchorCertificates(serverTrust, items)) {
         error = [NSError errorWithDomain:NSOSStatusErrorDomain code:status userInfo:nil];

@@ -47,12 +47,13 @@ RLM_ARRAY_TYPE(Dog)
 @property RLMArray<Dog *><Dog> *dogs;
 @property NSString *firstName;
 @property NSString *lastName;
-//@property NSString *realm_id;
+// FIXME: Remove this once REALMC-5426 is fixed
+@property NSString *realm_id;
 
-+ (instancetype)john;
-+ (instancetype)paul;
-+ (instancetype)ringo;
-+ (instancetype)george;
++ (instancetype)johnWithRealmId:(NSString *)realmId;
++ (instancetype)paulWithRealmId:(NSString *)realmId;
++ (instancetype)ringoWithRealmId:(NSString *)realmId;
++ (instancetype)georgeWithRealmId:(NSString *)realmId;
 
 @end
 

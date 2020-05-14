@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncTestCase.h"
-#import "RLMTestUtils.h"
+//#import "RLMTestUtils.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 
 #import "RLMAppCredentials.h"
@@ -504,26 +504,27 @@
     RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]];
     RLMSyncUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
 
-    RLMRealm *realm = [self openRealmForPartitionValue:@"foo"
+    NSString *realmId = @"foo";
+    RLMRealm *realm = [self openRealmForPartitionValue:realmId
                                                   user:user];
-    RLMRealm *realm2 = [self openRealmForPartitionValue:@"foo"
+    RLMRealm *realm2 = [self openRealmForPartitionValue:realmId
                                                    user:user2];
     if (self.isParent) {
         CHECK_COUNT(0, Person, realm);
         RLMRunChildAndWait();
         [self waitForDownloadsForUser:user
                                realms:@[realm]
-                      partitionValues:@[@"foo"] expectedCounts:@[@4]];
+                      partitionValues:@[realmId] expectedCounts:@[@4]];
         [self waitForDownloadsForUser:user2
                                realms:@[realm2]
-                      partitionValues:@[@"foo"] expectedCounts:@[@4]];
+                      partitionValues:@[realmId] expectedCounts:@[@4]];
     } else {
         // Add objects.
         [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo],
-                                  [Person george]]];
+                        persons:@[[Person johnWithRealmId:realmId],
+                                  [Person paulWithRealmId:realmId],
+                                  [Person ringoWithRealmId:realmId],
+                                  [Person georgeWithRealmId:realmId]]];
         [self waitForUploadsForRealm:realm];
     }
 }
@@ -531,11 +532,11 @@
 /// If client B deletes objects from a synced Realm, client A should see the effects of that deletion.
 - (void)testDeleteObjects {
     RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]];
+                                                                            register:self.isParent]];
     RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
     if (self.isParent) {
         // Add objects.
-        [self addPersonsToRealm:realm persons:@[[Person john]]];
+        [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:@"foo"]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
         RLMRunChildAndWait();
@@ -575,7 +576,7 @@
                        expectedCounts:@[@1]];
     } else {
         // Add objects.
-        [self addPersonsToRealm:realm persons:@[[Person john]]];
+        [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:@"foo"]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
     }
@@ -621,7 +622,7 @@
                                              encryptionKey:RLMGenerateKey()
                                                 stopPolicy:RLMSyncStopPolicyImmediately
                                           immediatelyBlock:nil];
-        [self addPersonsToRealm:realm persons:@[[Person john]]];
+        [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:@"foo"]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
     }
@@ -698,18 +699,18 @@
     } else {
         // Add objects.
         [self addPersonsToRealm:realmA
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo]]];
+                        persons:@[[Person johnWithRealmId:partitionValueA],
+                                  [Person paulWithRealmId:partitionValueA],
+                                  [Person ringoWithRealmId:partitionValueA]]];
         [self addPersonsToRealm:realmB
-                        persons:@[[Person john],
-                                  [Person paul]]];
+                        persons:@[[Person johnWithRealmId:partitionValueB],
+                                  [Person paulWithRealmId:partitionValueB]]];
         [self addPersonsToRealm:realmC
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo],
-                                  [Person george],
-                                  [Person ringo]]];
+                        persons:@[[Person johnWithRealmId:partitionValueC],
+                                  [Person paulWithRealmId:partitionValueC],
+                                  [Person ringoWithRealmId:partitionValueC],
+                                  [Person georgeWithRealmId:partitionValueC],
+                                  [Person ringoWithRealmId:partitionValueC]]];
         [self waitForUploadsForRealm:realmA];
         [self waitForUploadsForRealm:realmB];
         [self waitForUploadsForRealm:realmC];
@@ -736,19 +737,19 @@
         [self waitForDownloadsForRealm:realmC];
         // Add objects.
         [self addPersonsToRealm:realmA
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo],
-                                  [Person george]]];
+                        persons:@[[Person johnWithRealmId:partitionValueA],
+                                  [Person paulWithRealmId:partitionValueA],
+                                  [Person ringoWithRealmId:partitionValueA],
+                                  [Person georgeWithRealmId:partitionValueA]]];
         [self addPersonsToRealm:realmB
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo],
-                                  [Person george],
-                                  [Person george]]];
+                        persons:@[[Person johnWithRealmId:partitionValueB],
+                                  [Person paulWithRealmId:partitionValueB],
+                                  [Person ringoWithRealmId:partitionValueB],
+                                  [Person georgeWithRealmId:partitionValueB],
+                                  [Person georgeWithRealmId:partitionValueB]]];
         [self addPersonsToRealm:realmC
-                        persons:@[[Person john],
-                                  [Person paul]]];
+                        persons:@[[Person johnWithRealmId:partitionValueC],
+                                  [Person paulWithRealmId:partitionValueC]]];
 
         [self waitForUploadsForRealm:realmA];
         [self waitForUploadsForRealm:realmB];
@@ -802,9 +803,9 @@
         @autoreleasepool {
             RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
             [self addPersonsToRealm:realm
-                            persons:@[[Person john],
-                                      [Person paul],
-                                      [Person ringo]]];
+                            persons:@[[Person johnWithRealmId:@"foo"],
+                                      [Person paulWithRealmId:@"foo"],
+                                      [Person ringoWithRealmId:@"foo"]]];
             CHECK_COUNT(OBJECT_COUNT, Person, realm);
             
             [self waitForUploadsForRealm:realm];
@@ -828,7 +829,7 @@
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
     RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
 
-    [self addPersonsToRealm:realm persons:@[[Person john]]];
+    [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:@"foo"]]];
     CHECK_COUNT(1, Person, realm);
     [self waitForUploadsForRealm:realm];
     // Log out the user.
@@ -836,9 +837,9 @@
     // Log the user back in.
     user = [self logInUserForCredentials:credentials];
     [self addPersonsToRealm:realm
-    persons:@[[Person john],
-              [Person paul],
-              [Person ringo]]];
+    persons:@[[Person johnWithRealmId:@"foo"],
+              [Person paulWithRealmId:@"foo"],
+              [Person ringoWithRealmId:@"foo"]]];
     CHECK_COUNT(4, Person, realm);
 }
 
@@ -969,16 +970,16 @@
         user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                    register:NO]];
         // Open the Realm (for the first time).
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
         [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul]]];
+                        persons:@[[Person johnWithRealmId:@"foo"],
+                                  [Person paulWithRealmId:@"foo"]]];
         
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
         RLMRunChildAndWait();
     } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
         // Add objects.
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
@@ -1010,8 +1011,8 @@
         // Add objects.
         [self waitForDownloadsForRealm:realm];
         [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul]]];
+                        persons:@[[Person johnWithRealmId:@"foo"],
+                                  [Person paulWithRealmId:@"foo"]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
     }
@@ -1216,7 +1217,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
     [realm beginWriteTransaction];
     for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
-        [realm addObject:[Person john]];
+        [realm addObject:[Person johnWithRealmId:@"foo"]];
     }
     [realm commitWriteTransaction];
     [self waitForUploadsForRealm:realm];
@@ -1501,7 +1502,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     @autoreleasepool {
         RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
         [realm beginWriteTransaction];
-        [realm addObject:[Person john]];
+        [realm addObject:[Person johnWithRealmId:@"foo"]];
         [realm commitWriteTransaction];
         [self waitForUploadsForRealm:realm];
 
