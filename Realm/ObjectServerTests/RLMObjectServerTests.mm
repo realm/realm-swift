@@ -1538,4 +1538,32 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertLessThanOrEqual(finalSize, usedSize + 4096U);
 }
 
+#pragma mark - Remote Mongo
+
+- (void)testRemoteMongo {
+    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    __block RLMSyncUser *syncUser;
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+
+    RLMSyncUser *currentUser = [app currentUser];
+    XCTAssert([currentUser.identity isEqualToString:syncUser.identity]);
+    XCTAssert([currentUser.refreshToken isEqualToString:syncUser.refreshToken]);
+    XCTAssert([currentUser.accessToken isEqualToString:syncUser.accessToken]);
+        
+    RLMMongoClient *client = [app mongoClient:@"BackingDB"];
+    RLMMongoDatabase *database = [client database:@"test_data"];
+    RLMMongoCollection *collection = [database collection:@"Dog"];
+
+    [collection insertTest:@{}];
+    
+}
+
 @end

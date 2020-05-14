@@ -50,3 +50,7 @@
 #import <Realm/RLMUsernamePasswordProviderClient.h>
 #import <Realm/NSError+RLMSync.h>
 #import <Realm/RLMBSON.h>
+#import <Realm/RLMMongoClient.h>
+#import <Realm/RLMMongoDatabase.h>
+#import <Realm/RLMMongoCollection.h>
+

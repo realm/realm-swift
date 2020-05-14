@@ -21,8 +21,10 @@
 #import "RLMAppCredentials_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
+#import "RLMMongoClient_Private.hpp"
 #import "RLMUsernamePasswordProviderClient.h"
 #import "RLMUserAPIKeyProviderClient.h"
+#import "RLMMongoClient.h"
 #import "RLMBSON_Private.hpp"
 
 using namespace realm;
@@ -197,6 +199,10 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
 
 - (std::shared_ptr<realm::app::App>)_realmApp {
     return _app;
+}
+
+- (RLMMongoClient *)mongoClient:(NSString *)serviceName {
+    return [[RLMMongoClient alloc] initWithApp:self serviceName:serviceName];
 }
 
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers {
