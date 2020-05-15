@@ -52,7 +52,7 @@ def run_stitch
     end
 
     exports << "export STITCH_PATH=\"#{root_dir}/stitch\""
-    exports << "PATH=\"$PATH:$STITCH_PATH/etc/transpiler/bin\""
+    exports << "export PATH=\"$PATH:$STITCH_PATH/etc/transpiler/bin\""
     exports << "export LD_LIBRARY_PATH=\"$STITCH_PATH/etc/dylib/lib\""
     
     puts 'starting stitch'
