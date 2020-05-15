@@ -21,7 +21,7 @@ import XCTest
 import Combine
 import RealmSwift
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, *)
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension Publisher {
     public func signal(_ semaphore: DispatchSemaphore) -> Combine.Publishers.HandleEvents<Self> {
         self.handleEvents(receiveOutput: { _ in semaphore.signal() })
@@ -33,13 +33,13 @@ extension Publisher {
 // results in a warning about it being redundant due to the enclosing check, so
 // it needs to be out of line.
 func hasCombine() -> Bool {
-    if #available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, *) {
+    if #available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *) {
         return true
     }
     return false
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, *)
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class CombineObjectPublisherTests: TestCase {
     var realm: Realm!
     var token: AnyCancellable?
@@ -552,7 +552,7 @@ private protocol CombineTestCollection {
     func appendObject()
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, *)
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 private class CombineCollectionPublisherTests<Collection: RealmCollection>: TestCase
         where Collection: CombineTestCollection, Collection: RealmSubscribable {
     var realm: Realm!
@@ -914,7 +914,7 @@ extension Results: CombineTestCollection where Element: Object {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, *)
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class ResultsPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         return CombineCollectionPublisherTests<Results<SwiftIntObject>>.testSuite("Results")
@@ -931,7 +931,7 @@ extension List: CombineTestCollection where Element == SwiftIntObject {
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, *)
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class ManagedListPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         return CombineCollectionPublisherTests<List<SwiftIntObject>>.testSuite("List")
@@ -948,7 +948,7 @@ extension LinkingObjects: CombineTestCollection where Element == SwiftOwnerObjec
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, *)
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class LinkingObjectsPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         return CombineCollectionPublisherTests<LinkingObjects<SwiftOwnerObject>>.testSuite("LinkingObjects")
@@ -965,7 +965,7 @@ extension AnyRealmCollection: CombineTestCollection where Element == SwiftIntObj
     }
 }
 
-@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, *)
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class AnyRealmCollectionPublisherTests: TestCase {
     override class var defaultTestSuite: XCTestSuite {
         return CombineCollectionPublisherTests<AnyRealmCollection<SwiftIntObject>>.testSuite("AnyRealmCollection")
