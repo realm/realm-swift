@@ -500,8 +500,6 @@
 /// Registering a user with existing username should return corresponding error.
 - (void)testExistingUsernameRegistration {
     XCTestExpectation *expectationA = [self expectationWithDescription:@"registration should succeed"];
-    XCTestExpectation *expectationB = [self expectationWithDescription:@"registration should fail"];
-
     [[self.app usernamePasswordProviderClient] registerEmail:NSStringFromSelector(_cmd)
                                                     password:@"password"
                                                   completion:^(NSError * error) {
@@ -510,6 +508,7 @@
     }];
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 
+    XCTestExpectation *expectationB = [self expectationWithDescription:@"registration should fail"];
     [[self.app usernamePasswordProviderClient] registerEmail:NSStringFromSelector(_cmd)
                                                     password:@"password"
                                                   completion:^(NSError * error) {
