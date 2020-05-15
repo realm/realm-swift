@@ -19,6 +19,8 @@
 #import "RLMObjectId.h"
 #import "RLMDecimal128.h"
 
+#pragma mark RLMBSONType
+
 /**
  Allowed BSON types.
  */
@@ -41,6 +43,13 @@ typedef NS_ENUM(NSUInteger, RLMBSONType) {
     RLMBSONTypeArray
 };
 
+#pragma mark RLMBSON
+
+/**
+ Protocol representing a BSON value.
+ @see RLMBSONType
+ @see bsonspec.org
+ */
 @protocol RLMBSON <NSObject>
 
 /**

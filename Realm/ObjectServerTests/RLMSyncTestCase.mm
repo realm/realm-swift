@@ -623,10 +623,10 @@ static NSURL *syncDirectoryForChildProcess() {
 
     if (self.isParent) {
         _appId = [RealmObjectServer.sharedServer createApp];
-        _app = [RLMApp app:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
+        _app = [RLMApp appWithAppId:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
     } else {
         _appId = [RealmObjectServer.sharedServer lastApp];
-        _app = [RLMApp app:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
+        _app = [RLMApp appWithAppId:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
     }
 
     RLMSyncManager *syncManager = [[self app] syncManager];
@@ -636,15 +636,16 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (void)resetSyncManager {
     if ([self appId]) {
-        for (NSString *key in [[self app] allUsers]) {
-            RLMSyncUser *user = [[self app] allUsers][key];
+        NSMutableArray<XCTestExpectation *> *exs = [NSMutableArray new];
+        [self.app.allUsers enumerateKeysAndObjectsUsingBlock:^(NSString *, RLMSyncUser *user, BOOL *) {
             XCTestExpectation *ex = [self expectationWithDescription:@"Wait for logout"];
-            [[self app] logOut:user completion:^(NSError * _Nullable error) {
+            [exs addObject:ex];
+            [self.app logOut:user completion:^(NSError *error) {
                 XCTAssertNil(error);
                 [ex fulfill];
             }];
-            [self waitForExpectations:@[ex] timeout:20.0];
-        }
+        }];
+        [self waitForExpectationsWithTimeout:60.0 handler:nil];
 
         [[[self app] syncManager] resetForTesting];
     }

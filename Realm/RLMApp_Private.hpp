@@ -22,7 +22,7 @@
 
 @interface RLMAppConfiguration()
 
-- (realm::app::App::Config)_config;
+- (realm::app::App::Config&)config;
 
 - (void)setAppId:(nonnull NSString *)appId;
 
@@ -34,9 +34,9 @@
 - (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
             completion:(nonnull RLMOptionalErrorBlock)completion;
 
-+ (nonnull instancetype)app:(nonnull NSString *)appId
-              configuration:(nonnull RLMAppConfiguration *)configuration
-              rootDirectory:(nullable NSURL *)rootDirectory;
++ (nonnull instancetype)appWithAppId:(nonnull NSString *)appId
+                       configuration:(nonnull RLMAppConfiguration *)configuration
+                       rootDirectory:(nullable NSURL *)rootDirectory;
 @end
 
 NSError * _Nonnull RLMAppErrorToNSError(realm::app::AppError const& appError);

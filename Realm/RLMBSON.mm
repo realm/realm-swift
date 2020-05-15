@@ -214,14 +214,14 @@ using namespace bson;
 
 - (RegularExpression)regularExpressionValue {
     using Option = RegularExpression::Option;
-    std::stringstream s;
+    std::string s;
 
-    if ((_options & NSRegularExpressionCaseInsensitive) != 0) s << 'i';
-    if ((_options & NSRegularExpressionUseUnixLineSeparators) != 0) s << 'm';
-    if ((_options & NSRegularExpressionDotMatchesLineSeparators) != 0) s << 's';
-    if ((_options & NSRegularExpressionUseUnicodeWordBoundaries) != 0) s << 'x';
+    if ((_options & NSRegularExpressionCaseInsensitive) != 0) s += 'i';
+    if ((_options & NSRegularExpressionUseUnixLineSeparators) != 0) s += 'm';
+    if ((_options & NSRegularExpressionDotMatchesLineSeparators) != 0) s += 's';
+    if ((_options & NSRegularExpressionUseUnicodeWordBoundaries) != 0) s += 'x';
 
-    return RegularExpression(_pattern.UTF8String, s.str());
+    return RegularExpression(_pattern.UTF8String, s);
 }
 
 - (instancetype)initWithRegularExpression:(RegularExpression)regularExpression {

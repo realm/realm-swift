@@ -69,12 +69,9 @@ namespace {
     };
 }
 
-@interface RLMAppConfiguration() {
-    realm::app::App::Config __config;
+@implementation RLMAppConfiguration {
+    realm::app::App::Config _config;
 }
-@end
-
-@implementation RLMAppConfiguration
 
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
@@ -99,36 +96,36 @@ namespace {
         self.localAppVersion = localAppVersion;
         self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
 
-        __config.transport_generator = []{
+        _config.transport_generator = []{
             return std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
         };
 
         if (baseURL) {
-            __config.base_url = util::Optional<std::string>(baseURL.UTF8String);
+            _config.base_url = util::Optional<std::string>(baseURL.UTF8String);
         }
         if (transport) {
-            __config.transport_generator = [self]{
+            _config.transport_generator = [self]{
                 return std::make_unique<CocoaNetworkTransport>(self.transport);
             };
         }
         if (localAppName) {
-            __config.local_app_name = std::string(localAppName.UTF8String);
+            _config.local_app_name = std::string(localAppName.UTF8String);
         }
         if (localAppVersion) {
-            __config.local_app_version = std::string(localAppVersion.UTF8String);
+            _config.local_app_version = std::string(localAppVersion.UTF8String);
         }
-        __config.default_request_timeout_ms = (uint64_t)defaultRequestTimeoutMS;
+        _config.default_request_timeout_ms = (uint64_t)defaultRequestTimeoutMS;
         return self;
     }
     return nil;
 }
 
-- (realm::app::App::Config)_config {
-    return __config;
+- (realm::app::App::Config&)config {
+    return _config;
 }
 
 - (void)setAppId:(NSString *)appId {
-    __config.app_id = appId.UTF8String;
+    _config.app_id = appId.UTF8String;
 }
 
 @end
@@ -152,16 +149,12 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 static NSMutableDictionary *s_apps = [NSMutableDictionary new];
 
-+ (NSDictionary<NSString *,RLMApp *> *)apps {
-    return s_apps;
-}
-
 - (instancetype)initWithAppId:(NSString *)appId
                 configuration:(RLMAppConfiguration *)configuration
                 rootDirectory:(NSURL *)rootDirectory {
     if (self = [super init]) {
         _configuration = configuration;
-        [_configuration setAppId: appId];
+        [_configuration setAppId:appId];
 
         _syncManager = [[RLMSyncManager alloc] initWithAppConfiguration:configuration rootDirectory:rootDirectory];
         _app = [_syncManager app];
@@ -171,9 +164,9 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
     return nil;
 }
 
-+ (instancetype)app:(NSString *)appId
-      configuration:(RLMAppConfiguration *)configuration
-      rootDirectory:(NSURL *)rootDirectory {
++ (instancetype)appWithAppId:(NSString *)appId
+               configuration:(RLMAppConfiguration *)configuration
+               rootDirectory:(NSURL *)rootDirectory {
     // protects the app cache
     static std::mutex& initLock = *new std::mutex();
     std::lock_guard<std::mutex> lock(initLock);
@@ -187,12 +180,12 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
     return app;
 }
 
-+ (instancetype)app:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
-    return [self app:appId configuration:configuration rootDirectory:nil];
++ (instancetype)appWithAppId:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
+    return [self appWithAppId:appId configuration:configuration rootDirectory:nil];
 }
 
-+ (instancetype)app:(NSString *)appId {
-    return [self app:appId configuration:nil];
++ (instancetype)appWithAppId:(NSString *)appId {
+    return [self appWithAppId:appId configuration:nil];
 }
 
 - (std::shared_ptr<realm::app::App>)_realmApp {
@@ -202,9 +195,10 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers {
     NSMutableDictionary *buffer = [NSMutableDictionary new];
     for (auto user : SyncManager::shared().all_users()) {
-        auto identity = user->identity().c_str();
-        [buffer setValue:[[RLMSyncUser alloc] initWithSyncUser:std::move(user) app:self]
-                  forKey:@(identity)];
+        if (user) {
+            std::string identity(user->identity());
+            buffer[std::move(@(identity.c_str()))] = [[RLMSyncUser alloc] initWithSyncUser:std::move(user) app:self];
+        }
     }
     return buffer;
 }

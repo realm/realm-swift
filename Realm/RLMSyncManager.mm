@@ -149,7 +149,7 @@ static RLMSyncManager *s_sharedManager = nil;
     }
 
     if (appConfiguration) {
-        SyncManager::shared().configure(config, [appConfiguration _config]);
+        SyncManager::shared().configure(config, [appConfiguration config]);
     } else {
         SyncManager::shared().configure(config, realm::util::none);
     }

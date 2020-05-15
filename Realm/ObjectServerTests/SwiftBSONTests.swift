@@ -17,19 +17,25 @@
 ////////////////////////////////////////////////////////////////////////////
 
 import XCTest
-@testable import RealmSwift
+import RealmSwift
 
 class SwiftBSONTests : XCTestCase {
-    private func testBSONRoundTrip<T>(_ value: T) where T : BSON {
-        let rlmBSON = BSONToRLMBSON(AnyBSON(value))
+    private func testBSONRoundTrip<T>(_ value: T,
+                                      funcName: String = #function,
+                                      line: Int = #line,
+                                      column: Int = #column) where T : BSON {
+        let rlmBSON: RLMBSON? = ObjectiveCSupport.convert(object: AnyBSON(value))
+
         XCTAssertEqual(rlmBSON as? T, value)
-        let bson = RLMBSONToBSON(rlmBSON)
+        let bson: AnyBSON? = ObjectiveCSupport.convert(object: rlmBSON)
         XCTAssertEqual(bson?.value(), value)
     }
 
     func testNilRoundTrip() {
-        XCTAssertNil(BSONToRLMBSON(nil))
-        XCTAssertNil(RLMBSONToBSON(nil))
+        let anyBSONNil: AnyBSON? = nil
+        let rlmBSONNil: RLMBSON? = nil
+        XCTAssertNil(ObjectiveCSupport.convert(object: anyBSONNil))
+        XCTAssertNil(ObjectiveCSupport.convert(object: rlmBSONNil))
     }
 
     func testIntRoundTrip() {
