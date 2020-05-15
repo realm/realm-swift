@@ -114,17 +114,17 @@ public enum RealmCollectionChange<CollectionType> {
      */
     case error(Error)
 
-    static func fromObjc(value: CollectionType, change: RLMCollectionChange?, error: Error?) -> RealmCollectionChange {
+    static func fromObjc(value: CollectionType?, change: RLMCollectionChange?, error: Error?) -> RealmCollectionChange {
         if let error = error {
             return .error(error)
         }
         if let change = change {
-            return .update(value,
+            return .update(value!,
                 deletions: forceCast(change.deletions, to: [Int].self),
                 insertions: forceCast(change.insertions, to: [Int].self),
                 modifications: forceCast(change.modifications, to: [Int].self))
         }
-        return .initial(value)
+        return .initial(value!)
     }
 }
 
@@ -419,9 +419,10 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
      not perform a write transaction on the same thread or explicitly call `realm.refresh()`, accessing it will never
      perform blocking work.
 
-     Notifications are delivered via the standard run loop, and so can't be delivered while the run loop is blocked by
-     other activity. When notifications can't be delivered instantly, multiple notifications may be coalesced into a
-     single notification. This can include the notification with the initial collection.
+     If no queue is given, notifications are delivered via the standard run loop, and so can't be delivered while the
+     run loop is blocked by other activity. If a queue is given, notifications are delivered to that queue instead. When
+     notifications can't be delivered instantly, multiple notifications may be coalesced into a single notification.
+     This can include the notification with the initial collection.
 
      For example, the following code performs a write transaction immediately after adding the notification block, so
      there is no opportunity for the initial notification to be delivered first. As a result, the initial notification
@@ -456,14 +457,58 @@ public protocol RealmCollection: RealmCollectionBase, _RealmCollectionEnumerator
 
      - warning: This method cannot be called during a write transaction, or when the containing Realm is read-only.
 
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    func observe(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
+    func observe(on queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Self>) -> Void) -> NotificationToken
 
     /// :nodoc:
-    func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
+    // swiftlint:disable:next identifier_name
+    func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> NotificationToken
+
+    // MARK: Frozen Objects
+
+    /// Returns if this collection is frozen
+    var isFrozen: Bool { get }
+
+    /**
+     Returns a frozen (immutable) snapshot of this collection.
+
+     The frozen copy is an immutable collection which contains the same data as this collection
+    currently contains, but will not update when writes are made to the containing Realm. Unlike
+    live collections, frozen collections can be accessed from any thread.
+
+     - warning: This method cannot be called during a write transaction, or when the containing
+    Realm is read-only.
+     - warning: Holding onto a frozen collection for an extended period while performing write
+     transaction on the Realm may result in the Realm file growing to large sizes. See
+     `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+    */
+    func freeze() -> Self
 }
+
+public extension RealmCollection {
+    /**
+     Returns the index of the first object matching the given predicate, or `nil` if no objects match.
+
+     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
+     */
+    func index(matching predicateFormat: String, _ args: Any...) -> Int? {
+        return index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
+    }
+
+    /**
+     Returns a `Results` containing all objects matching the given predicate in the collection.
+
+     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
+     */
+    func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
+        return filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
+    }
+}
+
 
 /// :nodoc:
 public protocol OptionalProtocol {
@@ -577,8 +622,6 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     var description: String { fatalError() }
     func index(of object: Element) -> Int? { fatalError() }
     func index(matching predicate: NSPredicate) -> Int? { fatalError() }
-    func index(matching predicateFormat: String, _ args: Any...) -> Int? { fatalError() }
-    func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> { fatalError() }
     func filter(_ predicate: NSPredicate) -> Results<Element> { fatalError() }
     func sorted(byKeyPath keyPath: String, ascending: Bool) -> Results<Element> { fatalError() }
     func sorted<S: Sequence>(by sortDescriptors: S) -> Results<Element> where S.Iterator.Element == SortDescriptor {
@@ -595,12 +638,15 @@ private class _AnyRealmCollectionBase<T: RealmCollectionValue>: AssistedObjectiv
     func value(forKey key: String) -> Any? { fatalError() }
     func value(forKeyPath keyPath: String) -> Any? { fatalError() }
     func setValue(_ value: Any?, forKey key: String) { fatalError() }
-    func _observe(_ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
+    // swiftlint:disable:next identifier_name
+    func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
         -> NotificationToken { fatalError() }
     class func bridging(from objectiveCValue: Any, with metadata: Any?) -> Self { fatalError() }
     var bridged: (objectiveCValue: Any, metadata: Any?) { fatalError() }
     // swiftlint:disable:next identifier_name
     func _asNSFastEnumerator() -> Any { fatalError() }
+    var isFrozen: Bool { fatalError() }
+    func freeze() -> AnyRealmCollection<T> { fatalError() }
 }
 
 private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollectionBase<C.Element> {
@@ -623,15 +669,7 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     override func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
 
-    override func index(matching predicateFormat: String, _ args: Any...) -> Int? {
-        return base.index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
-
     // MARK: Filtering
-
-    override func filter(_ predicateFormat: String, _ args: Any...) -> Results<C.Element> {
-        return base.filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
 
     override func filter(_ predicate: NSPredicate) -> Results<C.Element> { return base.filter(predicate) }
 
@@ -706,8 +744,8 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
     // MARK: Notifications
 
     /// :nodoc:
-    override func _observe(_ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
-        -> NotificationToken { return base._observe(block) }
+    override func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<Wrapper>) -> Void)
+        -> NotificationToken { return base._observe(queue, block) }
 
     // MARK: AssistedObjectiveCBridgeable
 
@@ -718,6 +756,14 @@ private final class _AnyRealmCollection<C: RealmCollection>: _AnyRealmCollection
 
     override var bridged: (objectiveCValue: Any, metadata: Any?) {
         return (base as! AssistedObjectiveCBridgeable).bridged
+    }
+
+    override var isFrozen: Bool {
+        return base.isFrozen
+    }
+
+    override func freeze() -> AnyRealmCollection<Element> {
+        return AnyRealmCollection(base.freeze())
     }
 }
 
@@ -781,25 +827,7 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      */
     public func index(matching predicate: NSPredicate) -> Int? { return base.index(matching: predicate) }
 
-    /**
-     Returns the index of the first object matching the given predicate, or `nil` if no objects match.
-
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-     */
-    public func index(matching predicateFormat: String, _ args: Any...) -> Int? {
-        return base.index(matching: NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
-
     // MARK: Filtering
-
-    /**
-     Returns a `Results` containing all objects matching the given predicate in the collection.
-
-     - parameter predicateFormat: A predicate format string, optionally followed by a variable number of arguments.
-     */
-    public func filter(_ predicateFormat: String, _ args: Any...) -> Results<Element> {
-        return base.filter(NSPredicate(format: predicateFormat, argumentArray: unwrapOptionals(in: args)))
-    }
 
     /**
      Returns a `Results` containing all objects matching the given predicate in the collection.
@@ -1006,12 +1034,34 @@ public struct AnyRealmCollection<Element: RealmCollectionValue>: RealmCollection
      - parameter block: The block to be called whenever a change occurs.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
-        -> NotificationToken { return base._observe(block) }
+    public func observe(on queue: DispatchQueue? = nil,
+                        _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
+        -> NotificationToken { return base._observe(queue, block) }
 
     /// :nodoc:
-    public func _observe(_ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
-        -> NotificationToken { return base._observe(block) }
+    // swiftlint:disable:next identifier_name
+    public func _observe(_ queue: DispatchQueue?, _ block: @escaping (RealmCollectionChange<AnyRealmCollection>) -> Void)
+        -> NotificationToken { return base._observe(queue, block) }
+
+    // MARK: Frozen Objects
+
+    /// Returns if this collection is frozen.
+    public var isFrozen: Bool { return base.isFrozen }
+
+    /**
+     Returns a frozen (immutable) snapshot of this collection.
+
+     The frozen copy is an immutable collection which contains the same data as this collection
+    currently contains, but will not update when writes are made to the containing Realm. Unlike
+    live collections, frozen collections can be accessed from any thread.
+
+     - warning: This method cannot be called during a write transaction, or when the containing
+    Realm is read-only.
+     - warning: Holding onto a frozen collection for an extended period while performing write
+     transaction on the Realm may result in the Realm file growing to large sizes. See
+     `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+    */
+    public func freeze() -> AnyRealmCollection { return base.freeze() }
 }
 
 // MARK: AssistedObjectiveCBridgeable
@@ -1032,5 +1082,61 @@ extension AnyRealmCollection: AssistedObjectiveCBridgeable {
             objectiveCValue: base.bridged.objectiveCValue,
             metadata: AnyRealmCollectionBridgingMetadata(baseMetadata: base.bridged.metadata, baseType: type(of: base))
         )
+    }
+}
+
+// MARK: Collection observation helpers
+
+internal protocol ObservableCollection: RealmCollection {
+    associatedtype BackingObjcCollection
+    func isSameObjcCollection(_ objc: BackingObjcCollection) -> Bool
+    init(objc: BackingObjcCollection)
+}
+
+extension ObservableCollection {
+    // We want to pass the same object instance to the change callback each time.
+    // If the callback is being called on the source thread the instance should
+    // be `self`, but if it's on a different thread it needs to be a new Swift
+    // wrapper for the obj-c type, which we'll construct the first time the
+    // callback is called.
+    internal typealias ObjcCollectionChange = (BackingObjcCollection?, RLMCollectionChange?, Error?) -> Void
+    internal func wrapObserveBlock(_ block: @escaping (RealmCollectionChange<AnyRealmCollection<Element>>) -> Void) -> ObjcCollectionChange {
+        var anyCollection: AnyRealmCollection<Element>?
+        return { collection, change, error in
+            if anyCollection == nil, let collection = collection {
+                anyCollection = AnyRealmCollection(self.isSameObjcCollection(collection) ? self : Self(objc: collection))
+            }
+            block(RealmCollectionChange.fromObjc(value: anyCollection, change: change, error: error))
+        }
+    }
+
+    internal func wrapObserveBlock(_ block: @escaping (RealmCollectionChange<Self>) -> Void) -> ObjcCollectionChange {
+        var list: Self?
+        return { array, change, error in
+            if list == nil, let array = array {
+                list = self.isSameObjcCollection(array) ? self : Self(objc: array)
+            }
+            block(RealmCollectionChange.fromObjc(value: list, change: change, error: error))
+        }
+    }
+}
+extension List: ObservableCollection {
+    internal typealias BackingObjcCollection = RLMArray<AnyObject>
+    internal func isSameObjcCollection(_ rlmArray: BackingObjcCollection) -> Bool {
+        return _rlmArray === rlmArray
+    }
+}
+
+extension Results: ObservableCollection {
+    internal typealias BackingObjcCollection = RLMResults<AnyObject>
+    internal func isSameObjcCollection(_ objc: RLMResults<AnyObject>) -> Bool {
+        return objc === rlmResults
+    }
+}
+
+extension LinkingObjects: ObservableCollection {
+    internal typealias BackingObjcCollection = RLMResults<AnyObject>
+    internal func isSameObjcCollection(_ objc: RLMResults<AnyObject>) -> Bool {
+        return objc === rlmResults
     }
 }

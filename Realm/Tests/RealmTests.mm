@@ -20,9 +20,10 @@
 
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealmConfiguration_Private.hpp"
-#import "RLMRealm_Dynamic.h"
-#import "RLMSchema_Private.h"
 #import "RLMRealmUtil.hpp"
+#import "RLMRealm_Dynamic.h"
+#import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
 
 #import <mach/mach_init.h>
 #import <mach/vm_map.h>
@@ -30,7 +31,7 @@
 #import <thread>
 
 #import <realm/util/file.hpp>
-#import <realm/group_shared_options.hpp>
+#import <realm/db_options.hpp>
 
 @interface RLMRealm ()
 + (BOOL)isCoreDebug;
@@ -205,7 +206,7 @@
         XCTAssertEqualObjects(oldData, newData); \
 } while (0)
 
-#ifndef REALM_SPM
+#if 0 // FIXME: replace with migration from core 5 files
 - (void)testFileFormatUpgradeRequiredDeleteRealmIfNeeded {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     config.deleteRealmIfMigrationNeeded = YES;
@@ -672,20 +673,20 @@
     [realm addObject:obj3];
 
     RLMResults *objects = [PrimaryStringObject allObjects];
-    XCTAssertEqual([objects count], 3U, @"Should have 3 object");
-    XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
-    XCTAssertEqual([(PrimaryStringObject *)objects[1] intCol], 2, @"Value should be 2");
-    XCTAssertEqual([(PrimaryStringObject *)objects[2] intCol], 3, @"Value should be 3");
+    XCTAssertEqual([objects count], 3U);
+    XCTAssertEqual(obj.intCol, 1);
+    XCTAssertEqual(obj2.intCol, 2);
+    XCTAssertEqual(obj3.intCol, 3);
 
     // upsert with array of 2 objects. One is to update the existing value, another is added
     NSArray *array = @[[[PrimaryStringObject alloc] initWithValue:@[@"string2", @4]],
                        [[PrimaryStringObject alloc] initWithValue:@[@"string4", @5]]];
     [realm addOrUpdateObjects:array];
     XCTAssertEqual([objects count], 4U, @"Should have 4 objects");
-    XCTAssertEqual([(PrimaryStringObject *)objects[0] intCol], 1, @"Value should be 1");
-    XCTAssertEqual([(PrimaryStringObject *)objects[1] intCol], 4, @"Value should be 4");
-    XCTAssertEqual([(PrimaryStringObject *)objects[2] intCol], 3, @"Value should be 3");
-    XCTAssertEqual([(PrimaryStringObject *)objects[3] intCol], 5, @"Value should be 5");
+    XCTAssertEqual(obj.intCol, 1);
+    XCTAssertEqual(obj2.intCol, 4);
+    XCTAssertEqual(obj3.intCol, 3);
+    XCTAssertEqual([array[1] intCol], 5);
 
     [realm commitWriteTransaction];
 }
@@ -1060,15 +1061,16 @@
     RLMRealm *realm = [self realmWithTestPath];
 
     [realm beginWriteTransaction];
-    IntObject *objectToDelete = [IntObject createInRealm:realm withValue:@[@0]];
+    IntObject *objectToDelete = [IntObject createInRealm:realm withValue:@[@5]];
     [realm commitWriteTransaction];
 
     [realm beginWriteTransaction];
     [realm deleteObject:objectToDelete];
     [realm cancelWriteTransaction];
 
-    XCTAssertTrue(objectToDelete.isInvalidated);
+    XCTAssertFalse(objectToDelete.isInvalidated);
     XCTAssertEqual(1U, [IntObject allObjectsInRealm:realm].count);
+    XCTAssertEqual(5, objectToDelete.intCol);
 }
 
 - (void)testRollbackModify
@@ -1414,6 +1416,26 @@
     XCTAssertThrows([RLMRealm.defaultRealm cancelWriteTransaction]);
 }
 
+- (void)testActiveVersionLimit {
+    RLMRealmConfiguration *config = RLMRealmConfiguration.defaultConfiguration;
+    config.maximumNumberOfActiveVersions = 3;
+    RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+
+    // Pin this version
+    __attribute((objc_precise_lifetime)) RLMRealm *frozen = [realm freeze];
+
+    // First 3 should work
+    [realm transactionWithBlock:^{ }];
+    [realm transactionWithBlock:^{ }];
+    [realm transactionWithBlock:^{ }];
+
+    XCTAssertThrows([realm beginWriteTransaction]);
+    XCTAssertThrows([realm transactionWithBlock:^{ }]);
+    NSError *error;
+    [realm transactionWithBlock:^{} error:&error];
+    XCTAssertNotNil(error);
+}
+
 #pragma mark - Threads
 
 - (void)testCrossThreadAccess
@@ -1495,6 +1517,108 @@
 
         CFRunLoopRun();
     }];
+}
+
+- (void)testAddingNotificationToQueueBoundThreadOutsideOfRunLoop {
+    [self dispatchAsyncAndWait:^{
+        RLMRealm *realm = [RLMRealm defaultRealmForQueue:self.bgQueue];
+        XCTAssertNoThrow([realm addNotificationBlock:^(NSString *, RLMRealm *) { }]);
+    }];
+}
+
+- (void)testQueueBoundRealmCaching {
+    auto q1 = dispatch_queue_create("queue 1", DISPATCH_QUEUE_SERIAL);
+    auto q2 = dispatch_queue_create("queue 2", DISPATCH_QUEUE_SERIAL);
+
+    RLMRealm *mainThreadRealm1 = [RLMRealm defaultRealm];
+    RLMRealm *mainQueueRealm1 = [RLMRealm defaultRealmForQueue:dispatch_get_main_queue()];
+    __block RLMRealm *q1Realm1;
+    __block RLMRealm *q2Realm1;
+    dispatch_sync(q1, ^{ q1Realm1 = [RLMRealm defaultRealmForQueue:q1]; });
+    dispatch_sync(q2, ^{ q2Realm1 = [RLMRealm defaultRealmForQueue:q2]; });
+
+    XCTAssertEqual(mainQueueRealm1, mainThreadRealm1);
+
+    XCTAssertNotEqual(mainThreadRealm1, q1Realm1);
+    XCTAssertNotEqual(mainThreadRealm1, q2Realm1);
+    XCTAssertNotEqual(mainQueueRealm1, q1Realm1);
+    XCTAssertNotEqual(mainQueueRealm1, q2Realm1);
+    XCTAssertNotEqual(q1Realm1, q2Realm1);
+
+    RLMRealm *mainThreadRealm2 = [RLMRealm defaultRealm];
+    RLMRealm *mainQueueRealm2 = [RLMRealm defaultRealmForQueue:dispatch_get_main_queue()];
+    __block RLMRealm *q1Realm2;
+    __block RLMRealm *q2Realm2;
+    dispatch_sync(q1, ^{ q1Realm2 = [RLMRealm defaultRealmForQueue:q1]; });
+    dispatch_sync(q2, ^{ q2Realm2 = [RLMRealm defaultRealmForQueue:q2]; });
+
+    XCTAssertEqual(mainThreadRealm1, mainThreadRealm2);
+    XCTAssertEqual(mainQueueRealm1, mainQueueRealm2);
+    XCTAssertEqual(q1Realm1, q1Realm2);
+    XCTAssertEqual(q2Realm2, q2Realm2);
+
+    dispatch_async(q1, ^{
+        @autoreleasepool {
+            RLMRealm *backgroundThreadRealm = [RLMRealm defaultRealm];
+            RLMRealm *q1Realm3 = [RLMRealm defaultRealmForQueue:q1];
+            RLMRealm *q2Realm3 = [RLMRealm defaultRealmForQueue:q2];
+
+            XCTAssertNotEqual(backgroundThreadRealm, mainThreadRealm1);
+            XCTAssertNotEqual(backgroundThreadRealm, mainQueueRealm1);
+            XCTAssertNotEqual(backgroundThreadRealm, q1Realm1);
+            XCTAssertNotEqual(backgroundThreadRealm, q1Realm2);
+            XCTAssertEqual(q1Realm1, q1Realm3);
+            XCTAssertEqual(q2Realm2, q2Realm3);
+        }
+    });
+    dispatch_sync(q1, ^{});
+}
+
+- (void)testQueueValidation {
+    XCTAssertNoThrow([RLMRealm defaultRealmForQueue:dispatch_get_main_queue()]);
+    RLMAssertThrowsWithReason([RLMRealm defaultRealmForQueue:self.bgQueue],
+                              @"Realm opened from incorrect dispatch queue.");
+    RLMAssertThrowsWithReasonMatching([RLMRealm defaultRealmForQueue:dispatch_get_global_queue(0, 0)],
+                              @"Invalid queue '.*' \\(.*\\): Realms can only be confined to serial queues or the main queue.");
+    RLMAssertThrowsWithReason([RLMRealm defaultRealmForQueue:dispatch_queue_create("concurrent queue", DISPATCH_QUEUE_CONCURRENT)],
+                              @"Invalid queue 'concurrent queue' (OS_dispatch_queue_concurrent): Realms can only be confined to serial queues or the main queue.");
+    dispatch_sync(self.bgQueue, ^{
+        XCTAssertNoThrow([RLMRealm defaultRealmForQueue:self.bgQueue]);
+    });
+}
+
+- (void)testQueueChecking {
+    auto q1 = dispatch_queue_create("queue 1", DISPATCH_QUEUE_SERIAL);
+    auto q2 = dispatch_queue_create("queue 2", DISPATCH_QUEUE_SERIAL);
+
+    RLMRealm *mainRealm = [RLMRealm defaultRealmForQueue:dispatch_get_main_queue()];
+    __block RLMRealm *q1Realm;
+    __block RLMRealm *q2Realm;
+    dispatch_sync(q1, ^{ q1Realm = [RLMRealm defaultRealmForQueue:q1]; });
+    dispatch_sync(q2, ^{ q2Realm = [RLMRealm defaultRealmForQueue:q2]; });
+
+    XCTAssertNoThrow([mainRealm refresh]);
+    RLMAssertThrowsWithReason([q1Realm refresh], @"thread");
+    RLMAssertThrowsWithReason([q2Realm refresh], @"thread");
+
+    dispatch_sync(q1, ^{
+        // dispatch_sync() doesn't change the thread and mainRealm is actually
+        // bound to the main thread and not the main queue
+        XCTAssertNoThrow([mainRealm refresh]);
+
+        XCTAssertNoThrow([q1Realm refresh]);
+        RLMAssertThrowsWithReason([q2Realm refresh], @"thread");
+        dispatch_sync(q2, ^{
+            XCTAssertNoThrow([mainRealm refresh]);
+            XCTAssertNoThrow([q2Realm refresh]);
+            RLMAssertThrowsWithReason([q1Realm refresh], @"thread");
+        });
+        [self dispatchAsyncAndWait:^{
+            RLMAssertThrowsWithReason([mainRealm refresh], @"thread");
+            RLMAssertThrowsWithReason([q1Realm refresh], @"thread");
+            RLMAssertThrowsWithReason([q2Realm refresh], @"thread");
+        }];
+    });
 }
 
 #pragma mark - In-memory Realms
@@ -1691,6 +1815,61 @@
     }];
 }
 
+#pragma mark - Frozen Realms
+
+- (void)testIsFrozen {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    XCTAssertFalse(realm.frozen);
+    RLMRealm *frozenRealm = [realm freeze];
+    XCTAssertFalse(realm.frozen);
+    XCTAssertTrue(frozenRealm.frozen);
+}
+
+- (void)testRefreshFrozen {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *frozenRealm = realm.freeze;
+    XCTAssertFalse([realm refresh]);
+    XCTAssertFalse([frozenRealm refresh]);
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withValue:@[@0]];
+    }];
+    XCTAssertFalse([frozenRealm refresh]);
+    XCTAssertEqual(0U, [IntObject allObjectsInRealm:frozenRealm].count);
+}
+
+- (void)testForbiddenMethodsOnFrozenRealm {
+    RLMRealm *realm = [RLMRealm defaultRealm].freeze;
+    RLMAssertThrowsWithReason([realm setAutorefresh:YES],
+                              @"Auto-refresh cannot be enabled for frozen Realms.");
+    RLMAssertThrowsWithReason([realm beginWriteTransaction],
+                              @"Can't perform transactions on a frozen Realm");
+    RLMAssertThrowsWithReason([realm addNotificationBlock:^(RLMNotification, RLMRealm *) { }],
+                              @"Frozen Realms do not change and do not have change notifications.");
+    RLMAssertThrowsWithReason(([[IntObject allObjectsInRealm:realm]
+                                addNotificationBlock:^(RLMResults *, RLMCollectionChange *, NSError *) { }]),
+                              @"Frozen Realms do not change and do not have change notifications.");
+}
+
+- (void)testFrozenRealmCaching {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    RLMRealm *fr1 = realm.freeze;
+    RLMRealm *fr2 = realm.freeze;
+    XCTAssertEqual(fr1, fr2); // note: pointer equality as it should return the same instance
+
+    [realm transactionWithBlock:^{ }];
+    RLMRealm *fr3 = realm.freeze;
+    RLMRealm *fr4 = realm.freeze;
+    XCTAssertEqual(fr3, fr4);
+    XCTAssertNotEqual(fr1, fr3);
+}
+
+- (void)testReadAfterInvalidateFrozen {
+    RLMRealm *realm = [RLMRealm defaultRealm].freeze;
+    [realm invalidate];
+    RLMAssertThrowsWithReason([IntObject allObjectsInRealm:realm],
+                              @"Cannot read from a frozen Realm which has been invalidated.");
+}
+
 #pragma mark - Assorted tests
 
 #ifndef REALM_SPM
@@ -1785,15 +1964,15 @@
     [manager createDirectoryAtPath:fifoURL.path withIntermediateDirectories:YES attributes:nil error:nil];
 
     // Ensure that it doesn't try to fall back to putting it in the temp directory
-    auto oldTempDir = realm::SharedGroupOptions::get_sys_tmp_dir();
-    realm::SharedGroupOptions::set_sys_tmp_dir("");
+    auto oldTempDir = realm::DBOptions::get_sys_tmp_dir();
+    realm::DBOptions::set_sys_tmp_dir("");
 
     NSError *error;
     XCTAssertNil([RLMRealm realmWithConfiguration:configuration error:&error], @"Should not have been able to open FIFO");
     XCTAssertNotNil(error);
     RLMValidateRealmError(error, RLMErrorFileAccess, @"Is a directory", nil);
 
-    realm::SharedGroupOptions::set_sys_tmp_dir(std::move(oldTempDir));
+    realm::DBOptions::set_sys_tmp_dir(std::move(oldTempDir));
 }
 #endif
 
@@ -1886,6 +2065,7 @@
 }
 
 - (void)testAuxiliaryFilesAreExcludedFromBackup {
+    RLMSetSkipBackupAttribute(true);
     @autoreleasepool { [RLMRealm defaultRealm]; }
 
 #if TARGET_OS_TV
@@ -1902,9 +2082,11 @@
         XCTAssertNil(error);
         XCTAssertTrue(attribute.boolValue);
     }
+    RLMSetSkipBackupAttribute(false);
 }
 
 - (void)testAuxiliaryFilesAreExcludedFromBackupPerformance {
+    RLMSetSkipBackupAttribute(true);
     [self measureBlock:^{
         @autoreleasepool {
             RLMRealm *realm = [RLMRealm defaultRealm];

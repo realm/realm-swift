@@ -751,6 +751,8 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     XCTAssertNil(obj2.url, @"ignored property should be nil when getting from realm");
 }
 
+#pragma mark - Create
+
 - (void)testCreateInRealmValidationForDictionary {
     RLMRealm *realm = [RLMRealm defaultRealm];
 
@@ -926,6 +928,8 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     XCTAssertEqual(2U, DateObjectNoThrow.allObjects.count);
     [realm commitWriteTransaction];
 }
+
+#pragma mark - Description
 
 - (void)testObjectDescription {
     RLMRealm *realm = [RLMRealm defaultRealm];
@@ -1106,6 +1110,8 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     XCTAssertNil(obj1.realm, @"Realm should be nil after deletion");
 }
 
+#pragma mark - Primary Keys
+
 - (void)testPrimaryKey {
     [[RLMRealm defaultRealm] beginWriteTransaction];
 
@@ -1139,10 +1145,11 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
 
-    [PrimaryNullableStringObject createOrUpdateInDefaultRealmWithValue:@[@"string", @1]];
+    PrimaryNullableStringObject *obj1 = [PrimaryNullableStringObject
+                                         createOrUpdateInDefaultRealmWithValue:@[@"string", @1]];
     RLMResults *objects = [PrimaryNullableStringObject allObjects];
     XCTAssertEqual([objects count], 1U, @"Should have 1 object");
-    XCTAssertEqual([(PrimaryNullableStringObject *)objects[0] intCol], 1, @"Value should be 1");
+    XCTAssertEqual(obj1.intCol, 1, @"Value should be 1");
 
     [PrimaryNullableStringObject createOrUpdateInRealm:realm withValue:@{@"stringCol": @"string2", @"intCol": @2}];
     XCTAssertEqual([objects count], 2U, @"Should have 2 objects");
@@ -1156,7 +1163,7 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     // upsert with new secondary property
     [PrimaryNullableStringObject createOrUpdateInDefaultRealmWithValue:@[@"string", @3]];
     XCTAssertEqual([objects count], 3U, @"Should have 3 objects");
-    XCTAssertEqual([(PrimaryNullableStringObject *)objects[0] intCol], 3, @"Value should be 3");
+    XCTAssertEqual(obj1.intCol, 3, @"Value should be 3");
 
     [realm commitWriteTransaction];
 }
@@ -1328,6 +1335,124 @@ static void addProperty(Class cls, const char *name, const char *type, size_t si
     BaseClassStringObject *objectFromRealm = [BaseClassStringObject allObjects][0];
     XCTAssertEqual(1, objectFromRealm.intCol);
     XCTAssertEqualObjects(@"stringVal", objectFromRealm.stringCol);
+}
+
+#pragma mark - Frozen Objects
+
+static IntObject *managedObject() {
+    IntObject *obj = [[IntObject alloc] init];
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm transactionWithBlock:^{
+        [realm addObject:obj];
+    }];
+    return obj;
+}
+
+- (void)testIsFrozen {
+    IntObject *standalone = [[IntObject alloc] init];
+    IntObject *managed = managedObject();
+    IntObject *frozen = [managed freeze];
+    XCTAssertFalse(standalone.isFrozen);
+    XCTAssertFalse(managed.isFrozen);
+    XCTAssertFalse(frozen.isFrozen);
+}
+
+- (void)testFreezeUnmanagedObject {
+    RLMAssertThrowsWithReason([[[IntObject alloc] init] freeze],
+                              @"Unmanaged objects cannot be frozen.");
+}
+
+- (void)testFreezingFrozenObjectReturnsSelf {
+    IntObject *obj = managedObject();
+    IntObject *frozen = obj.freeze;
+    XCTAssertNotEqual(obj, frozen);
+    XCTAssertNotEqual(obj.freeze, frozen);
+    XCTAssertEqual(frozen, frozen.freeze);
+}
+
+- (void)testFreezingDeletedObject {
+    IntObject *obj = managedObject();
+    [obj.realm transactionWithBlock:^{
+        [obj.realm deleteObject:obj];
+    }];
+    RLMAssertThrowsWithReason([obj freeze],
+                              @"Object has been deleted or invalidated.");
+}
+
+- (void)testFreezeFromWrongThread {
+    IntObject *obj = managedObject();
+    [self dispatchAsyncAndWait:^{
+        RLMAssertThrowsWithReason([obj freeze],
+                                  @"Realm accessed from incorrect thread");
+    }];
+}
+
+- (void)testAccessFrozenObjectFromDifferentThread {
+    IntObject *obj = managedObject();
+    IntObject *frozen = [obj freeze];
+    [self dispatchAsyncAndWait:^{
+        XCTAssertEqual(frozen.intCol, 0);
+    }];
+}
+
+- (void)testMutateFrozenObject {
+    IntObject *obj = managedObject();
+    IntObject *frozen = obj.freeze;
+    XCTAssertThrows(frozen.intCol = 1);
+}
+
+- (void)testObserveFrozenObject {
+    IntObject *frozen = [managedObject() freeze];
+    id block = ^(__unused BOOL deleted, __unused NSArray *changes, __unused NSError *error) {};
+    RLMAssertThrowsWithReason([frozen addNotificationBlock:block],
+                              @"Frozen Realms do not change and do not have change notifications.");
+}
+
+- (void)testFrozenObjectEquality {
+    IntObject *liveObj = [[IntObject alloc] init];
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm transactionWithBlock:^{
+        [realm addObject:liveObj];
+    }];
+
+    IntObject *frozen1 = [liveObj freeze];
+    IntObject *frozen2 = [liveObj freeze];
+    XCTAssertNotEqual(frozen1, frozen2);
+    XCTAssertEqualObjects(frozen1, frozen2);
+
+    [realm transactionWithBlock:^{
+        [StringObject createInRealm:realm withValue:@[@"a"]];
+    }];
+    IntObject *frozen3 = [liveObj freeze];
+
+    XCTAssertEqualObjects(frozen1, frozen2);
+    XCTAssertNotEqualObjects(frozen1, frozen3);
+    XCTAssertNotEqualObjects(frozen2, frozen3);
+}
+
+- (void)testFrozenObjectHashing {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm transactionWithBlock:^{
+        // NSSet does a linear search on an array for very small sets, so make
+        // enough objects to ensure it actually does hash lookups
+        for (int i = 0; i < 200; ++i) {
+            [IntObject createInRealm:realm withValue:@[@(i)]];
+        }
+    }];
+
+    NSMutableSet *frozenSet = [NSMutableSet new];
+    NSMutableSet *thawedSet = [NSMutableSet new];
+    RLMResults<IntObject *> *allObjects = [IntObject allObjectsInRealm:realm];
+    for (int i = 0; i < 100; ++i) {
+        [thawedSet addObject:allObjects[i]];
+        [frozenSet addObject:allObjects[i].freeze];
+    }
+
+    for (IntObject *obj in allObjects) {
+        XCTAssertFalse([thawedSet containsObject:obj]);
+        XCTAssertFalse([frozenSet containsObject:obj]);
+        XCTAssertEqual([frozenSet containsObject:obj.freeze], obj.intCol < 100);
+    }
 }
 
 @end

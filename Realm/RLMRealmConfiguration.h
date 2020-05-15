@@ -118,6 +118,32 @@ typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger 
 /// The classes managed by the Realm.
 @property (nonatomic, copy, nullable) NSArray *objectClasses;
 
+/**
+ The maximum number of live versions in the Realm file before an exception will
+ be thrown when attempting to start a write transaction.
+
+ Realm provides MVCC snapshot isolation, meaning that writes on one thread do
+ not overwrite data being read on another thread, and instead write a new copy
+ of that data. When a Realm refreshes it updates to the latest version of the
+ data and releases the old versions, allowing them to be overwritten by
+ subsequent write transactions.
+
+ Under normal circumstances this is not a problem, but if the number of active
+ versions grow too large, it will have a negative effect on the filesize on
+ disk. This can happen when performing writes on many different threads at
+ once, when holding on to frozen objects for an extended time, or when
+ performing long operations on background threads which do not allow the Realm
+ to refresh.
+
+ Setting this property to a non-zero value makes it so that exceeding the set
+ number of versions will instead throw an exception. This can be used with a
+ low value during development to help identify places that may be problematic,
+ or in production use to cause the app to crash rather than produce a Realm
+ file which is too large to be oened.
+
+ */
+@property (nonatomic) NSUInteger maximumNumberOfActiveVersions;
+
 @end
 
 NS_ASSUME_NONNULL_END

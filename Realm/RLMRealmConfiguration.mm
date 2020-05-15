@@ -103,13 +103,6 @@ NSString *RLMRealmPathForFile(NSString *fileName) {
         self.fileURL = defaultRealmURL;
         self.schemaVersion = 0;
         self.cache = YES;
-
-        // We have our own caching of RLMRealm instances, so the ObjectStore
-        // cache is at best pointless, and may result in broken behavior when
-        // a realm::Realm instance outlives the RLMRealm (due to collection
-        // notifiers being in the middle of running when the RLMRealm is
-        // dealloced) and then reused for a new RLMRealm
-        _config.cache = false;
     }
 
     return self;
@@ -262,6 +255,22 @@ static void RLMNSStringToStdString(std::string &out, NSString *in) {
 
 - (void)setObjectClasses:(NSArray *)objectClasses {
     self.customSchema = [RLMSchema schemaWithObjectClasses:objectClasses];
+}
+
+- (NSUInteger)maximumNumberOfActiveVersions {
+    if (_config.max_number_of_active_versions > std::numeric_limits<NSUInteger>::max()) {
+        return std::numeric_limits<NSUInteger>::max();
+    }
+    return static_cast<NSUInteger>(_config.max_number_of_active_versions);
+}
+
+- (void)setMaximumNumberOfActiveVersions:(NSUInteger)maximumNumberOfActiveVersions {
+    if (maximumNumberOfActiveVersions == 0) {
+        _config.max_number_of_active_versions = std::numeric_limits<uint_fast64_t>::max();
+    }
+    else {
+        _config.max_number_of_active_versions = maximumNumberOfActiveVersions;
+    }
 }
 
 - (void)setDynamic:(bool)dynamic {

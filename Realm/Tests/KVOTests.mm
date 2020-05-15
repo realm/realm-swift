@@ -27,7 +27,6 @@
 
 #import "shared_realm.hpp"
 
-#import <realm/descriptor.hpp>
 #import <realm/group.hpp>
 
 #import <atomic>
@@ -1172,6 +1171,17 @@ public:
     AssertChanged(r, @NO, @YES);
 }
 
+- (void)testSharedSchemaOnObservedObjectGivesOriginalSchema {
+    KVOObject *obj = [self createObject];
+    if (![obj isKindOfClass:RLMObjectBase.class]) {
+        return;
+    }
+
+    RLMObjectSchema *original = [obj.class sharedSchema];
+    KVORecorder r(self, obj, @"boolCol");
+    XCTAssertEqual(original, [obj.class sharedSchema]); // note: intentionally not EqualObjects
+}
+
 // RLMArray doesn't support @count at all
 //- (void)testObserveArrayCount {
 //    KVOObject *obj = [self createObject];
@@ -1286,6 +1296,31 @@ public:
     [self.realm deleteObject:obj];
     AssertChanged(r2, @NO, @YES);
     // should not crash
+}
+
+- (void)testDeleteMultipleObservedObjects {
+    KVOObject *obj1 = [self createObject];
+    KVOObject *obj2 = [self createObject];
+    KVOObject *obj3 = [self createObject];
+
+    KVORecorder r1(self, obj1, RLMInvalidatedKey);
+    KVORecorder r2(self, obj2, RLMInvalidatedKey);
+    KVORecorder r3(self, obj3, RLMInvalidatedKey);
+
+    [self.realm deleteObject:obj2];
+    AssertChanged(r2, @NO, @YES);
+    XCTAssertTrue(r1.empty());
+    XCTAssertTrue(r3.empty());
+
+    [self.realm deleteObject:obj3];
+    AssertChanged(r3, @NO, @YES);
+    XCTAssertTrue(r1.empty());
+    XCTAssertTrue(r2.empty());
+
+    [self.realm deleteObject:obj1];
+    AssertChanged(r1, @NO, @YES);
+    XCTAssertTrue(r2.empty());
+    XCTAssertTrue(r3.empty());
 }
 
 - (void)testDeleteMiddleOfKeyPath {
@@ -1423,9 +1458,9 @@ public:
 - (void)testDeleteObjectsInArrayViaTableViewClear {
     KVOLinkObject2 *obj = [self createLinkObject];
     KVOLinkObject2 *obj2 = [self createLinkObject];
-    [obj.array addObject:obj.obj];
-    [obj.array addObject:obj.obj];
     [obj.array addObject:obj2.obj];
+    [obj.array addObject:obj.obj];
+    [obj.array addObject:obj.obj];
 
     KVORecorder r(self, obj, @"array");
     RLMResults *results = [KVOLinkObject1 objectsInRealm:self.realm where:@"TRUEPREDICATE"];
@@ -1825,7 +1860,7 @@ public:
     if (RLMObject *obj = RLMDynamicCast<RLMObject>(value)) {
         RLMObject *copy = RLMCreateManagedAccessor(obj.objectSchema.accessorClass,
                                                    &self.secondaryRealm->_info[obj.objectSchema.className]);
-        copy->_row = (*copy->_info->table())[obj->_row.get_index()];
+        copy->_row = (*copy->_info->table()).get_object(obj->_row.get_key());
         return copy;
     }
     else if (RLMArray *array = RLMDynamicCast<RLMArray>(value)) {
@@ -1933,113 +1968,6 @@ public:
         deleteObject(8);
         AssertChanged(r, @NO, @YES);
     }
-}
-
-- (void)testInsertNewTables {
-    KVOObject *obj = [self createObject];
-
-    KVORecorder r1(self, obj, @"boolCol");
-    KVORecorder r2(self, obj, @"int32Col");
-
-    obj.boolCol = YES;
-
-    // Add tables before the observed one so that the observed one's index changes
-    realm::Group &group = self.realm->_realm->read_group();
-    realm::TableRef table1 = group.insert_table(5, "new table");
-    realm::TableRef table2 = group.insert_table(0, "new table 2");
-    table1->add_column(realm::type_Int, "col");
-    table2->add_column(realm::type_Int, "col");
-
-    obj.int32Col = 3;
-    AssertChanged(r1, @NO, @YES);
-    AssertChanged(r2, @2, @3);
-}
-
-- (void)testInsertNewColumns {
-    KVOObject *obj = [self createObject];
-
-    KVORecorder r1(self, obj, @"boolCol");
-    KVORecorder r2(self, obj, @"int32Col");
-    auto ndx = obj->_info->tableColumn(@"int32Col");
-
-    // Add a column before the observed one so that the observed one's index changes
-    obj.boolCol = YES;
-    auto& table = *obj->_info->table();
-    table.insert_column(0, realm::type_Binary, "new col");
-    table.insert_column(ndx, realm::type_Binary, "new col 2");
-    obj->_row.set_int(ndx + 2, 3); // can't use the accessor after a local schema change
-
-    AssertChanged(r1, @NO, @YES);
-    AssertChanged(r2, @2, @3);
-}
-
-- (void)testShiftObservedColumnBeforeChange {
-    KVOObject *obj = [self createObject];
-    auto ndx = obj->_info->tableColumn(@"boolCol");
-
-    KVORecorder r(self, obj, @"boolCol");
-    obj->_info->table()->insert_column(0, realm::type_Binary, "new col");
-    obj->_row.set_bool(ndx + 1, true); // can't use the accessor after a local schema change
-    AssertChanged(r, @NO, @YES);
-}
-
-- (void)testShiftObservedColumnAfterChange {
-    KVOObject *obj = [self createObject];
-
-    KVORecorder r(self, obj, @"boolCol");
-    obj.boolCol = YES;
-    obj->_info->table()->insert_column(0, realm::type_Binary, "new col");
-    AssertChanged(r, @NO, @YES);
-}
-
-- (void)testSwapRowsIsNotAChange {
-    KVOObject *obj = [self createObject];
-    [self createObject];
-
-    KVORecorder r(self, obj, @"boolCol");
-    obj->_info->table()->swap_rows(0, 1);
-    r.refresh();
-    XCTAssertTrue(r.empty());
-}
-
-- (void)testSwapRowsBeforeChange {
-    KVOObject *obj = [self createObject];
-    [self createObject];
-
-    KVORecorder r(self, obj, @"boolCol");
-    obj->_info->table()->swap_rows(0, 1);
-    obj.boolCol = YES;
-    AssertChanged(r, @NO, @YES);
-}
-
-- (void)testSwapRowsAfterChange {
-    KVOObject *obj = [self createObject];
-    [self createObject];
-
-    KVORecorder r(self, obj, @"boolCol");
-    obj.boolCol = YES;
-    obj->_info->table()->swap_rows(0, 1);
-    AssertChanged(r, @NO, @YES);
-}
-
-- (void)testSwapRowsBeforeArrayChange {
-    KVOObject *obj = [self createObject];
-    [self createObject];
-
-    KVORecorder r(self, obj, @"objectArray");
-    obj->_info->table()->swap_rows(0, 1);
-    [obj.objectArray addObject:obj];
-    AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
-}
-
-- (void)testSwapRowsAfterArrayChange {
-    KVOObject *obj = [self createObject];
-    [self createObject];
-
-    KVORecorder r(self, obj, @"objectArray");
-    [obj.objectArray addObject:obj];
-    obj->_info->table()->swap_rows(0, 1);
-    AssertIndexChange(NSKeyValueChangeInsertion, [NSIndexSet indexSetWithIndex:0]);
 }
 @end
 

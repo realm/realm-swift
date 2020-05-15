@@ -291,7 +291,8 @@ static RLMCollectionChange *getChange(RLMTestCase<ChangesetTestCase> *self, void
     return changes;
 }
 
-static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArray *modifications, void (^block)(RLMRealm *)) {
+static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
+                         NSArray *modifications, void (^block)(RLMRealm *)) {
     RLMCollectionChange *changes = getChange(self, block);
     XCTAssertNotNil(changes);
     if (!changes) {
@@ -363,7 +364,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
         [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 2"]];
     });
 
-    ExpectChange(self, @[@3], @[@0], @[], ^(RLMRealm *realm) {
+    ExpectNoChange(self, ^(RLMRealm *realm) {
         [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol > 4"]];
         [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol < 1"]];
     });
@@ -460,6 +461,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
     });
 }
 
+#if 0 // maybe relevant to queries on backlinks?
 - (void)testMoveMatchingObjectDueToDeletionOfNonMatchingObject {
     ExpectChange(self, @[@3], @[@0], @[], ^(RLMRealm *realm) {
         // Make a matching object be the last row
@@ -477,6 +479,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
         [realm deleteObjects:[IntObject objectsInRealm:realm where:@"intCol = 2"]];
     });
 }
+#endif
 
 - (void)testExcludingChangesFromSkippedTransaction {
     [self prepare];
@@ -820,13 +823,13 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
 }
 
 - (void)testDeleteOneLinkingObject {
-    ExpectChange(self, @[@5], @[], @[], ^(RLMRealm *realm) {
+    ExpectChange(self, @[@5, @9], @[@5], @[], ^(RLMRealm *realm) {
         [realm deleteObjects:[PersonObject objectsInRealm:realm where:@"age == 30"]];
     });
 }
 
 - (void)testDeleteSomeLinkingObjects {
-    ExpectChange(self, @[@2, @8, @9], @[], @[], ^(RLMRealm *realm) {
+    ExpectChange(self, @[@2, @7, @8, @9], @[@2], @[], ^(RLMRealm *realm) {
         [realm deleteObjects:[PersonObject objectsInRealm:realm where:@"age > 32"]];
         [realm deleteObjects:[PersonObject objectsInRealm:realm where:@"age == 27"]];
     });
@@ -845,7 +848,7 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
 }
 
 - (void)testUnlinkOne {
-    ExpectChange(self, @[@4], @[], @[], ^(RLMRealm *realm) {
+    ExpectChange(self, @[@4, @9], @[@4], @[], ^(RLMRealm *realm) {
         PersonObject *parent = [[PersonObject objectsInRealm:realm where:@"age == 29"] firstObject];
         [parent.children removeAllObjects];
     });
@@ -1075,6 +1078,9 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions, NSArr
                                                                 __unused NSError *error) {
         XCTFail(@"notification block for wrong object called");
     }];
+
+    // Ensure initial notification is processed so that the change can report previousValue
+    [_obj.realm transactionWithBlock:^{}];
 
     [self dispatchAsync:^{
         RLMRealm *realm = [RLMRealm defaultRealm];

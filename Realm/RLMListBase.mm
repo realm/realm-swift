@@ -85,7 +85,8 @@
 @end
 
 @implementation RLMLinkingObjectsHandle {
-    realm::Row _row;
+    realm::TableKey _tableKey;
+    realm::ObjKey _objKey;
     RLMClassInfo *_info;
     RLMRealm *_realm;
     RLMProperty *_property;
@@ -97,8 +98,9 @@
     if (!(self = [super init])) {
         return nil;
     }
-
-    _row = object->_row;
+    auto& obj = object->_row;
+    _tableKey = obj.get_table()->get_key();
+    _objKey = obj.get_key();
     _info = object->_info;
     _realm = object->_realm;
     _property = prop;
@@ -106,30 +108,40 @@
     return self;
 }
 
+- (instancetype)initWithLinkingObjects:(RLMResults *)linkingObjects {
+    if (!(self = [super init])) {
+        return nil;
+    }
+    _realm = linkingObjects.realm;
+    _results = linkingObjects;
+
+    return self;
+}
+
+- (instancetype)freeze {
+    RLMLinkingObjectsHandle *frozen = [[self.class alloc] init];
+    frozen->_results = [self.results freeze];
+    return frozen;
+}
+
 - (RLMResults *)results {
     if (_results) {
         return _results;
     }
-    if (!_row.is_attached()) {
-        @throw RLMException(@"Object has been deleted or invalidated.");
-    }
     [_realm verifyThread];
 
+    auto table = _realm.group.get_table(_tableKey);
+    if (!table->is_valid(_objKey)) {
+        @throw RLMException(@"Object has been deleted or invalidated.");
+    }
+
+    auto obj = _realm.group.get_table(_tableKey)->get_object(_objKey);
     auto& objectInfo = _realm->_info[_property.objectClassName];
     auto& linkOrigin = _info->objectSchema->computed_properties[_property.index].link_origin_property_name;
     auto linkingProperty = objectInfo.objectSchema->property_for_name(linkOrigin);
-    auto backlinkView = _row.get_table()->get_backlink_view(_row.get_index(),
-                                                            objectInfo.table(),
-                                                            linkingProperty->table_column);
-    realm::Results results(_realm->_realm, std::move(backlinkView));
+    realm::Results results(_realm->_realm, obj.get_backlink_view(objectInfo.table(), linkingProperty->column_key));
     _results = [RLMLinkingObjects resultsWithObjectInfo:objectInfo results:std::move(results)];
     _realm = nil;
     return _results;
-}
-
-- (RLMObjectBase *)parent {
-    RLMObjectBase *obj = RLMCreateManagedAccessor(_info->rlmObjectSchema.accessorClass, _info);
-    obj->_row = _row;
-    return obj;
 }
 @end

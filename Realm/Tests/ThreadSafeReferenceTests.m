@@ -68,23 +68,15 @@
     RLMRealm *realm = [RLMRealm defaultRealm];
     [realm beginWriteTransaction];
     StringObject *stringObject = [StringObject createInDefaultRealmWithValue:@{@"stringCol": @"hello"}];
-    RLMAssertThrowsWithReasonMatching([RLMThreadSafeReference referenceWithThreadConfined:stringObject],
-                                      @"Cannot obtain thread safe reference during a write transaction");
+    RLMThreadSafeReference *ref1 = [RLMThreadSafeReference referenceWithThreadConfined:stringObject];
     [realm commitWriteTransaction];
 
-    RLMThreadSafeReference *ref1 = [RLMThreadSafeReference referenceWithThreadConfined:stringObject];
     RLMThreadSafeReference *ref2 = [RLMThreadSafeReference referenceWithThreadConfined:stringObject];
     RLMThreadSafeReference *ref3 = [RLMThreadSafeReference referenceWithThreadConfined:stringObject];
     [self dispatchAsyncAndWait:^{
         RLMRealm *realm = [RLMRealm defaultRealm];
-        RLMAssertThrowsWithReasonMatching([[self realmWithTestPath] resolveThreadSafeReference:ref1],
-                                          @"Cannot resolve thread safe reference in Realm with different configuration than the source Realm");
-        [realm beginWriteTransaction];
-        RLMAssertThrowsWithReasonMatching([realm resolveThreadSafeReference:ref2],
-                                          @"Cannot resolve thread safe reference during a write transaction");
-        RLMAssertThrowsWithReasonMatching([realm resolveThreadSafeReference:ref2],
-                                          @"Can only resolve a thread safe reference once");
-        [realm cancelWriteTransaction];
+        XCTAssertNil([[self realmWithTestPath] resolveThreadSafeReference:ref1]);
+        XCTAssertNoThrow([realm resolveThreadSafeReference:ref2]);
         RLMAssertThrowsWithReasonMatching([realm resolveThreadSafeReference:ref2],
                                           @"Can only resolve a thread safe reference once");
         // Assert that we can resolve a different reference to the same object.

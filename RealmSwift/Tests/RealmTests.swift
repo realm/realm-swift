@@ -760,8 +760,10 @@ class RealmTests: TestCase {
         // test that autoreresh is not applied
         // we have two notifications, one for opening the realm, and a second when performing our transaction
         let notificationFired = expectation(description: "notification fired")
-        let token = realm.observe { _, realm in
+        var token: NotificationToken!
+        token = realm.observe { _, realm in
             XCTAssertNotNil(realm, "Realm should not be nil")
+            token.invalidate()
             notificationFired.fulfill()
         }
 
@@ -770,12 +772,10 @@ class RealmTests: TestCase {
 
         dispatchSyncNewThread {
             try! Realm().write {
-                try! Realm().create(SwiftStringObject.self, value: ["string"])
-                return
+                _ = try! Realm().create(SwiftStringObject.self, value: ["string"])
             }
         }
         waitForExpectations(timeout: 1, handler: nil)
-        token.invalidate()
 
         XCTAssertEqual(results.count, Int(0), "There should be 1 object of type StringObject")
 

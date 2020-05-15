@@ -59,11 +59,7 @@ class CompactionTests: TestCase {
             // Confirm expected sizes
             XCTAssertEqual(totalBytes, expectedTotalBytesBefore)
             XCTAssert((usedBytes < totalBytes) && (usedBytes > expectedUsedBytesBeforeMin))
-
-            // Compact if the file is over 500KB in size and less than 20% 'used'
-            // In practice, users might want to use values closer to 100MB and 50%
-            let fiveHundredKB = 500 * 1024
-            return (totalBytes > fiveHundredKB) && (Double(usedBytes) / Double(totalBytes)) < 0.2
+            return true
         })
 
         // Confirm expected sizes before and after opening the Realm

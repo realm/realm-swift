@@ -35,20 +35,20 @@
 using namespace realm;
 
 RLMClassInfo::RLMClassInfo(RLMRealm *realm, RLMObjectSchema *rlmObjectSchema,
-                             const realm::ObjectSchema *objectSchema)
+                           const realm::ObjectSchema *objectSchema)
 : realm(realm), rlmObjectSchema(rlmObjectSchema), objectSchema(objectSchema) { }
 
-realm::Table *RLMClassInfo::table() const {
-    if (!m_table) {
-        m_table = ObjectStore::table_for_object_type(realm.group, objectSchema->name).get();
+realm::TableRef RLMClassInfo::table() const {
+    if (auto key = objectSchema->table_key) {
+        return realm.group.get_table(objectSchema->table_key);
     }
-    return m_table;
+    return nullptr;
 }
 
-RLMProperty *RLMClassInfo::propertyForTableColumn(NSUInteger col) const noexcept {
+RLMProperty *RLMClassInfo::propertyForTableColumn(ColKey col) const noexcept {
     auto const& props = objectSchema->persisted_properties;
     for (size_t i = 0; i < props.size(); ++i) {
-        if (props[i].table_column == col) {
+        if (props[i].column_key == col) {
             return rlmObjectSchema.properties[i];
         }
     }
@@ -59,28 +59,27 @@ RLMProperty *RLMClassInfo::propertyForPrimaryKey() const noexcept {
     return rlmObjectSchema.primaryKeyProperty;
 }
 
-NSUInteger RLMClassInfo::tableColumn(NSString *propertyName) const {
+realm::ColKey RLMClassInfo::tableColumn(NSString *propertyName) const {
     return tableColumn(RLMValidatedProperty(rlmObjectSchema, propertyName));
 }
 
-NSUInteger RLMClassInfo::tableColumn(RLMProperty *property) const {
-    return objectSchema->persisted_properties[property.index].table_column;
+realm::ColKey RLMClassInfo::tableColumn(RLMProperty *property) const {
+    return objectSchema->persisted_properties[property.index].column_key;
 }
 
 RLMClassInfo &RLMClassInfo::linkTargetType(size_t propertyIndex) {
-    if (propertyIndex < m_linkTargets.size() && m_linkTargets[propertyIndex]) {
-        return *m_linkTargets[propertyIndex];
-    }
-    if (m_linkTargets.size() <= propertyIndex) {
-        m_linkTargets.resize(propertyIndex + 1);
-    }
-    m_linkTargets[propertyIndex] = &realm->_info[rlmObjectSchema.properties[propertyIndex].objectClassName];
-    return *m_linkTargets[propertyIndex];
+    return realm->_info[rlmObjectSchema.properties[propertyIndex].objectClassName];
 }
 
 RLMClassInfo &RLMClassInfo::linkTargetType(realm::Property const& property) {
     REALM_ASSERT(property.type == PropertyType::Object);
     return linkTargetType(&property - &objectSchema->persisted_properties[0]);
+}
+
+RLMClassInfo &RLMClassInfo::freeze(__unsafe_unretained RLMRealm *const frozenRealm) {
+    REALM_ASSERT(frozenRealm.frozen);
+    // FIXME
+    return frozenRealm->_info[rlmObjectSchema.className];
 }
 
 RLMSchemaInfo::impl::iterator RLMSchemaInfo::begin() noexcept { return m_objects.begin(); }

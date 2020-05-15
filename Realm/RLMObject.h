@@ -359,6 +359,13 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly, getter = isInvalidated) BOOL invalidated;
 
+/**
+ Indicates if this object is frozen.
+
+ @see `-[RLMObject freeze]`
+ */
+@property (nonatomic, readonly, getter = isFrozen) BOOL frozen;
+
 
 #pragma mark - Customizing your Objects
 
@@ -548,7 +555,7 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
  deletes the object or modifies any of the managed properties of the object,
  including self-assignments that set a property to its existing value.
 
- For write transactions performed on different threads or in differen
+ For write transactions performed on different threads or in different
  processes, the block will be called when the managing Realm is
  (auto)refreshed to a version including the changes, while for local write
  transactions it will be called at some point in the future after the write
@@ -578,20 +585,75 @@ typedef void (^RLMObjectChangeBlock)(BOOL deleted,
  */
 - (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block;
 
+/**
+ Registers a block to be called each time the object changes.
+
+ The block will be asynchronously called after each write transaction which
+ deletes the object or modifies any of the managed properties of the object,
+ including self-assignments that set a property to its existing value.
+
+ For write transactions performed on different threads or in different
+ processes, the block will be called when the managing Realm is
+ (auto)refreshed to a version including the changes, while for local write
+ transactions it will be called at some point in the future after the write
+ transaction is committed.
+
+ Notifications are delivered on the given queue. If the queue is blocked and
+ notifications can't be delivered instantly, multiple notifications may be
+ coalesced into a single notification.
+
+ Unlike with `RLMArray` and `RLMResults`, there is no "initial" callback made
+ after you add a new notification block.
+
+ Only objects which are managed by a Realm can be observed in this way. You
+ must retain the returned token for as long as you want updates to be sent to
+ the block. To stop receiving updates, call `-invalidate` on the token.
+
+ It is safe to capture a strong reference to the observed object within the
+ callback block. There is no retain cycle due to that the callback is retained
+ by the returned token and not by the object itself.
+
+ @warning This method cannot be called during a write transaction, when the
+          containing Realm is read-only, or on an unmanaged object.
+ @warning The queue must be a serial queue.
+
+ @param block The block to be called whenever a change occurs.
+ @param queue The serial queue to deliver notifications to.
+ @return A token which must be held for as long as you want updates to be delivered.
+ */
+- (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block queue:(dispatch_queue_t)queue;
+
 #pragma mark - Other Instance Methods
 
 /**
  Returns YES if another Realm object instance points to the same object as the receiver in the Realm managing
  the receiver.
 
- For object types with a primary, key, `isEqual:` is overridden to use the same logic as this
- method (along with a corresponding implementation for `hash`).
+ For frozen objects and object types with a primary key, `isEqual:` is
+ overridden to use the same logic as this method (along with a corresponding
+ implementation for `hash`). Non-frozen objects without primary keys use
+ pointer identity for `isEqual:` and `hash`.
 
  @param object  The object to compare the receiver to.
 
  @return    Whether the object represents the same object as the receiver.
  */
 - (BOOL)isEqualToObject:(RLMObject *)object;
+
+/**
+ Returns a frozen (immutable) snapshot of this object.
+
+ The frozen copy is an immutable object which contains the same data as this
+ object currently contains, but will not update when writes are made to the
+ containing Realm. Unlike live objects, frozen objects can be accessed from any
+ thread.
+
+ - warning: Holding onto a frozen object for an extended period while performing write
+ transaction on the Realm may result in the Realm file growing to large sizes. See
+ `Realm.Configuration.maximumNumberOfActiveVersions` for more information.
+ - warning: This method can only be called on a managed object.
+ */
+- (instancetype)freeze NS_RETURNS_RETAINED;
 
 #pragma mark - Dynamic Accessors
 

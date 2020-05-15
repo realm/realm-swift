@@ -3,10 +3,11 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "5.23.8"
-let cocoaVersionStr = "4.4.1"
+let coreVersionStr = "6.0.4"
+let cocoaVersionStr = "5.0.0-beta.6"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
+let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
 let cxxSettings: [CXXSetting] = [
     .headerSearchPath("."),
     .headerSearchPath("include"),
@@ -22,8 +23,8 @@ let cxxSettings: [CXXSetting] = [
 
     .define("REALM_VERSION_MAJOR", to: String(coreVersionPieces[0])),
     .define("REALM_VERSION_MINOR", to: String(coreVersionPieces[1])),
-    .define("REALM_VERSION_PATCH", to: String(coreVersionPieces[2])),
-    .define("REALM_VERSION_EXTRA", to: "\"\""),
+    .define("REALM_VERSION_PATCH", to: String(coreVersionExtra[0])),
+    .define("REALM_VERSION_EXTRA", to: "\"\(coreVersionExtra.count > 1 ? String(coreVersionExtra[1]) : "")\""),
     .define("REALM_VERSION_STRING", to: "\"\(coreVersionStr)\""),
 ]
 
@@ -62,12 +63,14 @@ let package = Package(
                 "Realm/ObjectStore/src/index_set.cpp",
                 "Realm/ObjectStore/src/list.cpp",
                 "Realm/ObjectStore/src/object.cpp",
+                "Realm/ObjectStore/src/object_changeset.cpp",
                 "Realm/ObjectStore/src/object_schema.cpp",
                 "Realm/ObjectStore/src/object_store.cpp",
                 "Realm/ObjectStore/src/results.cpp",
                 "Realm/ObjectStore/src/schema.cpp",
                 "Realm/ObjectStore/src/shared_realm.cpp",
                 "Realm/ObjectStore/src/thread_safe_reference.cpp",
+                "Realm/ObjectStore/src/util/scheduler.cpp",
                 "Realm/ObjectStore/src/util/uuid.cpp",
                 "Realm/RLMAccessor.mm",
                 "Realm/RLMAnalytics.mm",
@@ -149,5 +152,5 @@ let package = Package(
             exclude: ["TestUtils.mm"]
         )
     ],
-    cxxLanguageStandard: .cxx14
+    cxxLanguageStandard: .cxx1z
 )

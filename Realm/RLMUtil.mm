@@ -405,7 +405,7 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
         case realm::type_Timestamp:
             return RLMTimestampToNSDate(mixed.get_timestamp());
         case realm::type_Binary:
-            return RLMBinaryDataToNSData(mixed.get_binary());
+            return RLMBinaryDataToNSData(mixed.get<realm::BinaryData>());
         case realm::type_Link:
         case realm::type_LinkList:
         default:

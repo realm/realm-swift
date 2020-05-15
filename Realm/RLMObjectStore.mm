@@ -70,6 +70,11 @@ static inline void RLMVerifyRealmRead(__unsafe_unretained RLMRealm *const realm)
         @throw RLMException(@"Realm must not be nil");
     }
     [realm verifyThread];
+    if (realm->_realm->is_closed()) {
+        // This message may seem overly specific, but frozen Realms are currently
+        // the only ones which we outright close.
+        @throw RLMException(@"Cannot read from a frozen Realm which has been invalidated.");
+    }
 }
 
 static inline void RLMVerifyInWriteTransaction(__unsafe_unretained RLMRealm *const realm) {
@@ -144,7 +149,7 @@ void RLMAddObjectToRealm(__unsafe_unretained RLMObjectBase *const object,
     try {
         realm::Object::create(c, realm->_realm, *info.objectSchema, (id)object,
                               static_cast<CreatePolicy>(updatePolicy),
-                              -1, &object->_row);
+                              {}, &object->_row);
     }
     catch (std::exception const& e) {
         @throw RLMException(e);
@@ -180,7 +185,7 @@ RLMObjectBase *RLMCreateObjectInRealmWithValue(RLMRealm *realm, NSString *classN
     RLMObjectBase *object = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
     try {
         object->_row = realm::Object::create(c, realm->_realm, *info.objectSchema, (id)value,
-                                             static_cast<realm::CreatePolicy>(updatePolicy)).row();
+                                             static_cast<CreatePolicy>(updatePolicy)).obj();
     }
     catch (std::exception const& e) {
         @throw RLMException(e);
@@ -198,9 +203,9 @@ void RLMDeleteObjectFromRealm(__unsafe_unretained RLMObjectBase *const object,
     RLMVerifyInWriteTransaction(object->_realm);
 
     // move last row to row we are deleting
-    if (object->_row.is_attached()) {
+    if (object->_row.is_valid()) {
         RLMTrackDeletions(realm, ^{
-            object->_row.move_last_over();
+            object->_row.remove();
         });
     }
 
@@ -237,7 +242,7 @@ RLMResults *RLMGetObjects(__unsafe_unretained RLMRealm *const realm,
     }
 
     return [RLMResults resultsWithObjectInfo:info
-                                     results:realm::Results(realm->_realm, *info.table())];
+                                     results:realm::Results(realm->_realm, info.table())];
 }
 
 id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
@@ -253,21 +258,21 @@ id RLMGetObject(RLMRealm *realm, NSString *objectClassName, id key) {
                                                       key ?: NSNull.null);
         if (!obj.is_valid())
             return nil;
-        return RLMCreateObjectAccessor(info, obj.row());
+        return RLMCreateObjectAccessor(info, obj.obj());
     }
     catch (std::exception const& e) {
         @throw RLMException(e);
     }
 }
 
-RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, NSUInteger index) {
-    return RLMCreateObjectAccessor(info, (*info.table())[index]);
+RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, int64_t key) {
+    return RLMCreateObjectAccessor(info, info.table()->get_object(realm::ObjKey(key)));
 }
 
 // Create accessor and register with realm
-RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, realm::RowExpr row) {
+RLMObjectBase *RLMCreateObjectAccessor(RLMClassInfo& info, realm::Obj&& obj) {
     RLMObjectBase *accessor = RLMCreateManagedAccessor(info.rlmObjectSchema.accessorClass, &info);
-    accessor->_row = row;
+    accessor->_row = std::move(obj);
     RLMInitializeSwiftAccessorGenerics(accessor);
     return accessor;
 }

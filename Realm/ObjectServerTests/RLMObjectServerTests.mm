@@ -1826,54 +1826,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertLessThanOrEqual(finalSize, usedSize + 4096U);
 }
 
-#pragma mark - Offline Client Reset
-
-- (void)testOfflineClientReset {
-    NSError *error;
-    RLMSyncUser *user = [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:YES]
-                                               server:[RLMObjectServerTests authServerURL]];
-    NSURL *sourceFileURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"sync-1.x" withExtension:@"realm"];
-    NSString *fileName = [NSString stringWithFormat:@"%@.realm", [NSUUID new]];
-    NSURL *fileURL = [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
-    [NSFileManager.defaultManager copyItemAtURL:sourceFileURL toURL:fileURL error:&error];
-    XCTAssertNil(error);
-    if (error) {
-        return;
-    }
-
-    RLMRealmConfiguration *configuration = [user configurationWithURL:REALM_URL() fullSynchronization:true];
-    RLMSyncConfiguration *syncConfig = configuration.syncConfiguration;
-    syncConfig.customFileURL = fileURL;
-    configuration.syncConfiguration = syncConfig;
-
-    RLMRealm *realm = [RLMRealm realmWithConfiguration:configuration error:&error];
-    XCTAssertNil(realm);
-    XCTAssertEqualObjects(error.domain, RLMErrorDomain);
-    XCTAssertEqual(error.code, RLMErrorIncompatibleSyncedFile);
-    RLMRealmConfiguration *backupConfiguration = error.userInfo[RLMBackupRealmConfigurationErrorKey];
-    XCTAssertNotNil(backupConfiguration);
-
-    // Open the backup Realm with a schema subset since it was created using the schema from .NET's unit tests.
-    // The Person class is declared in SwiftObjectServerTests.swift.
-    backupConfiguration.objectClasses = @[NSClassFromString(@"Person")];
-
-    error = nil;
-    RLMRealm *backupRealm = [RLMRealm realmWithConfiguration:backupConfiguration error:&error];
-    XCTAssertNotNil(backupRealm);
-    XCTAssertNil(error);
-
-    RLMResults *people = [backupRealm allObjects:@"Person"];
-    XCTAssertEqual(people.count, 1u);
-    XCTAssertEqualObjects([people[0] valueForKey:@"FirstName"], @"John");
-    XCTAssertEqualObjects([people[0] valueForKey:@"LastName"], @"Smith");
-
-    error = nil;
-    realm = [RLMRealm realmWithConfiguration:configuration error:&error];
-    XCTAssertNotNil(realm);
-    XCTAssertNil(error);
-}
-
 #pragma mark - Partial sync
 
 - (void)waitForKeyPath:(NSString *)keyPath object:(id)object value:(id)value {
@@ -1965,6 +1917,18 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMSyncUser *user = [self logInUserForCredentials:creds server:server];
     RLMRealmConfiguration *configuration = [user configuration];
     return [self openRealmWithConfiguration:configuration];
+}
+
+- (void)testAllSubscriptionsChecksThatRealmIsQBS {
+    RLMRealm *nonsyncRealm = [RLMRealm defaultRealm];
+    RLMAssertThrowsWithReason(nonsyncRealm.subscriptions, @"query-based sync");
+
+    NSString *name = NSStringFromSelector(_cmd);
+    NSURL *server = [RLMObjectServerTests authServerURL];
+    RLMSyncCredentials *creds = [RLMObjectServerTests basicCredentialsWithName:name register:YES];
+    RLMSyncUser *user = [self logInUserForCredentials:creds server:server];
+    RLMRealm *fullsyncRealm = [self openRealmWithConfiguration:[user configurationWithURL:[NSURL URLWithString:@"realms://localhost:9443/~/default"] fullSynchronization:YES]];
+    RLMAssertThrowsWithReason(fullsyncRealm.subscriptions, @"query-based sync");
 }
 
 - (void)testAllSubscriptionsReportsNewlyCreatedSubscription {
@@ -2060,6 +2024,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testSubscriptionWithName {
+    RLMRealm *nonsyncRealm = [RLMRealm defaultRealm];
+    XCTAssertThrows([nonsyncRealm subscriptionWithName:@"name"]);
+
     RLMRealm *realm = [self partialRealmWithName:_cmd];
     XCTAssertNil([realm subscriptionWithName:@"query"]);
 

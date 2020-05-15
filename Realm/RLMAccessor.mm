@@ -34,34 +34,48 @@
 
 #import <objc/runtime.h>
 #import <objc/message.h>
-#import <realm/descriptor.hpp>
 
 #pragma mark - Helper functions
 
+namespace realm {
+template<>
+Obj ConstObj::get<Obj>(ColKey col) const {
+    ObjKey key = get<ObjKey>(col);
+    return key ? get_target_table(col)->get_object(key) : Obj();
+}
+}
+
 namespace {
+using realm::ColKey;
+
+template<typename T>
+bool is_null(T const& v) {
+    return !v;
+}
+template<>
+bool is_null(realm::Timestamp const& v) {
+    return v.is_null();
+}
+
 template<typename T>
 T get(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index) {
     RLMVerifyAttached(obj);
-    return obj->_row.get<T>(obj->_info->objectSchema->persisted_properties[index].table_column);
+    return obj->_row.get<T>(obj->_info->objectSchema->persisted_properties[index].column_key);
 }
 
 template<typename T>
 id getBoxed(__unsafe_unretained RLMObjectBase *const obj, NSUInteger index) {
     RLMVerifyAttached(obj);
     auto& prop = obj->_info->objectSchema->persisted_properties[index];
-    auto col = prop.table_column;
-    if (obj->_row.is_null(col)) {
-        return nil;
-    }
-
     RLMAccessorContext ctx(obj, &prop);
-    return ctx.box(obj->_row.get<T>(col));
+    auto value = obj->_row.get<T>(prop.column_key);
+    return is_null(value) ? nil : ctx.box(std::move(value));
 }
 
 template<typename T>
-void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex, T val) {
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key, T val) {
     RLMVerifyInWriteTransaction(obj);
-    obj->_row.set(colIndex, val);
+    obj->_row.set(key, val);
 }
 
 template<typename Fn>
@@ -74,55 +88,55 @@ auto translateError(Fn&& fn) {
     }
 }
 
-void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSString *const val) {
     RLMVerifyInWriteTransaction(obj);
     translateError([&] {
-        obj->_row.set(colIndex, RLMStringDataWithNSString(val));
+        obj->_row.set(key, RLMStringDataWithNSString(val));
     });
 }
 
 [[gnu::noinline]]
-void setNull(realm::Row& row, size_t col) {
-    translateError([&] { row.set_null(col); });
+void setNull(realm::Obj& row, ColKey key) {
+    translateError([&] { row.set_null(key); });
 }
 
 void setValue(__unsafe_unretained RLMObjectBase *const obj,
-              NSUInteger colIndex, __unsafe_unretained NSDate *const date) {
+              ColKey key, __unsafe_unretained NSDate *const date) {
     RLMVerifyInWriteTransaction(obj);
     if (date) {
-        obj->_row.set(colIndex, RLMTimestampForNSDate(date));
+        obj->_row.set(key, RLMTimestampForNSDate(date));
     }
     else {
-        setNull(obj->_row, colIndex);
+        setNull(obj->_row, key);
     }
 }
 
-void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSData *const data) {
     RLMVerifyInWriteTransaction(obj);
     translateError([&] {
-        obj->_row.set(colIndex, RLMBinaryDataForNSData(data));
+        obj->_row.set(key, RLMBinaryDataForNSData(data));
     });
 }
 
-void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained RLMObjectBase *const val) {
     RLMVerifyInWriteTransaction(obj);
     if (!val) {
-        obj->_row.nullify_link(colIndex);
+        obj->_row.set(key, realm::null());
         return;
     }
 
     RLMAddObjectToRealm(val, obj->_realm, RLMUpdatePolicyError);
 
     // make sure it is the correct type
-    if (val->_row.get_table() != obj->_row.get_table()->get_link_target(colIndex)) {
+    if (val->_row.get_table() != obj->_row.get_table()->get_link_target(key)) {
         @throw RLMException(@"Can't set object of type '%@' to property of type '%@'",
                             val->_objectSchema.className,
-                            obj->_info->propertyForTableColumn(colIndex).objectClassName);
+                            obj->_info->propertyForTableColumn(key).objectClassName);
     }
-    obj->_row.set_link(colIndex, val->_row.get_index());
+    obj->_row.set(key, val->_row.get_key());
 }
 
 // array getter/setter
@@ -132,13 +146,13 @@ RLMArray *getArray(__unsafe_unretained RLMObjectBase *const obj, NSUInteger prop
     return [[RLMManagedArray alloc] initWithParent:obj property:prop];
 }
 
-void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained id<NSFastEnumeration> const value) {
     RLMVerifyInWriteTransaction(obj);
-    auto prop = obj->_info->propertyForTableColumn(colIndex);
+    auto prop = obj->_info->propertyForTableColumn(key);
     RLMValidateValueForProperty(value, obj->_info->rlmObjectSchema, prop, true);
 
-    realm::List list(obj->_realm->_realm, *obj->_row.get_table(), colIndex, obj->_row.get_index());
+    realm::List list(obj->_realm->_realm, obj->_row, key);
     RLMClassInfo *info = obj->_info;
     if (list.get_type() == realm::PropertyType::Object) {
         info = &obj->_info->linkTargetType(prop.index);
@@ -149,51 +163,51 @@ void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
     });
 }
 
-void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSNumber<RLMInt> *const intObject) {
     RLMVerifyInWriteTransaction(obj);
 
     if (intObject) {
-        obj->_row.set(colIndex, intObject.longLongValue);
+        obj->_row.set(key, intObject.longLongValue);
     }
     else {
-        setNull(obj->_row, colIndex);
+        setNull(obj->_row, key);
     }
 }
 
-void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSNumber<RLMFloat> *const floatObject) {
     RLMVerifyInWriteTransaction(obj);
 
     if (floatObject) {
-        obj->_row.set(colIndex, floatObject.floatValue);
+        obj->_row.set(key, floatObject.floatValue);
     }
     else {
-        setNull(obj->_row, colIndex);
+        setNull(obj->_row, key);
     }
 }
 
-void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSNumber<RLMDouble> *const doubleObject) {
     RLMVerifyInWriteTransaction(obj);
 
     if (doubleObject) {
-        obj->_row.set(colIndex, doubleObject.doubleValue);
+        obj->_row.set(key, doubleObject.doubleValue);
     }
     else {
-        setNull(obj->_row, colIndex);
+        setNull(obj->_row, key);
     }
 }
 
-void setValue(__unsafe_unretained RLMObjectBase *const obj, NSUInteger colIndex,
+void setValue(__unsafe_unretained RLMObjectBase *const obj, ColKey key,
               __unsafe_unretained NSNumber<RLMBool> *const boolObject) {
     RLMVerifyInWriteTransaction(obj);
 
     if (boolObject) {
-        obj->_row.set(colIndex, (bool)boolObject.boolValue);
+        obj->_row.set(key, (bool)boolObject.boolValue);
     }
     else {
-        setNull(obj->_row, colIndex);
+        setNull(obj->_row, key);
     }
 }
 
@@ -203,9 +217,7 @@ RLMLinkingObjects *getLinkingObjects(__unsafe_unretained RLMObjectBase *const ob
     auto& objectInfo = obj->_realm->_info[property.objectClassName];
     auto& linkOrigin = obj->_info->objectSchema->computed_properties[property.index].link_origin_property_name;
     auto linkingProperty = objectInfo.objectSchema->property_for_name(linkOrigin);
-    auto backlinkView = obj->_row.get_table()->get_backlink_view(obj->_row.get_index(),
-                                                                 objectInfo.table(),
-                                                                 linkingProperty->table_column);
+    auto backlinkView = obj->_row.get_backlink_view(objectInfo.table(), linkingProperty->column_key);
     realm::Results results(obj->_realm->_realm, std::move(backlinkView));
     return [RLMLinkingObjects resultsWithObjectInfo:objectInfo results:std::move(results)];
 }
@@ -278,7 +290,7 @@ id managedGetter(RLMProperty *prop, const char *type) {
         case RLMPropertyTypeData:
             return makeBoxedGetter<realm::BinaryData>(index);
         case RLMPropertyTypeObject:
-            return makeBoxedGetter<realm::RowExpr>(index);
+            return makeBoxedGetter<realm::Obj>(index);
         case RLMPropertyTypeAny:
             @throw RLMException(@"Cannot create accessor class for schema with Mixed properties");
         case RLMPropertyTypeLinkingObjects:
@@ -300,11 +312,11 @@ id makeSetter(__unsafe_unretained RLMProperty *const prop) {
 
     return ^(__unsafe_unretained RLMObjectBase *const obj, ArgType val) {
         auto set = [&] {
-            setValue(obj, obj->_info->objectSchema->persisted_properties[index].table_column,
+            setValue(obj, obj->_info->objectSchema->persisted_properties[index].column_key,
                      static_cast<StorageType>(val));
         };
         if (RLMObservationInfo *info = RLMGetObservationInfo(obj->_observationInfo,
-                                                             obj->_row.get_index(), *obj->_info)) {
+                                                             obj->_row.get_key(), *obj->_info)) {
             info->willChange(name);
             set();
             info->didChange(name);
@@ -351,7 +363,7 @@ id managedSetter(RLMProperty *prop, const char *type) {
     }
 }
 
-// call getter for superclass for property at colIndex
+// call getter for superclass for property at key
 id superGet(RLMObjectBase *obj, NSString *propName) {
     typedef id (*getter_type)(RLMObjectBase *, SEL);
     RLMProperty *prop = obj->_objectSchema[propName];
@@ -360,7 +372,7 @@ id superGet(RLMObjectBase *obj, NSString *propName) {
     return superGetter(obj, prop.getterSel);
 }
 
-// call setter for superclass for property at colIndex
+// call setter for superclass for property at key
 void superSet(RLMObjectBase *obj, NSString *propName, id val) {
     typedef void (*setter_type)(RLMObjectBase *, SEL, RLMArray *ar);
     RLMProperty *prop = obj->_objectSchema[propName];
@@ -643,11 +655,11 @@ id RLMAccessorContext::box(realm::List&& l) {
 
 id RLMAccessorContext::box(realm::Object&& o) {
     REALM_ASSERT(currentProperty);
-    return RLMCreateObjectAccessor(_info.linkTargetType(currentProperty.index), o.row());
+    return RLMCreateObjectAccessor(_info.linkTargetType(currentProperty.index), o.obj());
 }
 
-id RLMAccessorContext::box(realm::RowExpr r) {
-    return RLMCreateObjectAccessor(_info, r);
+id RLMAccessorContext::box(realm::Obj&& r) {
+    return RLMCreateObjectAccessor(_info, std::move(r));
 }
 
 id RLMAccessorContext::box(realm::Results&& r) {
@@ -656,35 +668,38 @@ id RLMAccessorContext::box(realm::Results&& r) {
                                      results:std::move(r)];
 }
 
+using realm::ObjKey;
+using realm::CreatePolicy;
+
 template<>
-realm::Timestamp RLMAccessorContext::unbox(__unsafe_unretained id const value, realm::CreatePolicy, size_t) {
+realm::Timestamp RLMAccessorContext::unbox(__unsafe_unretained id const value, CreatePolicy, ObjKey) {
     id v = RLMCoerceToNil(value);
     return RLMTimestampForNSDate(v);
 }
 
 template<>
-bool RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
+bool RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
     return [v boolValue];
 }
 template<>
-double RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
+double RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
     return [v doubleValue];
 }
 template<>
-float RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
+float RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
     return [v floatValue];
 }
 template<>
-long long RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
+long long RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
     return [v longLongValue];
 }
 template<>
-realm::BinaryData RLMAccessorContext::unbox(id v, realm::CreatePolicy, size_t) {
+realm::BinaryData RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
     v = RLMCoerceToNil(v);
     return RLMBinaryDataForNSData(v);
 }
 template<>
-realm::StringData RLMAccessorContext::unbox(id v, realm::CreatePolicy, size_t) {
+realm::StringData RLMAccessorContext::unbox(id v, CreatePolicy, ObjKey) {
     v = RLMCoerceToNil(v);
     return RLMStringDataWithNSString(v);
 }
@@ -696,30 +711,30 @@ static auto to_optional(__unsafe_unretained id const value, Fn&& fn) {
 }
 
 template<>
-realm::util::Optional<bool> RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
+realm::util::Optional<bool> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
     return to_optional(v, [&](__unsafe_unretained id v) { return (bool)[v boolValue]; });
 }
 template<>
-realm::util::Optional<double> RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
+realm::util::Optional<double> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v doubleValue]; });
 }
 template<>
-realm::util::Optional<float> RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
+realm::util::Optional<float> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v floatValue]; });
 }
 template<>
-realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy, size_t) {
+realm::util::Optional<int64_t> RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy, ObjKey) {
     return to_optional(v, [&](__unsafe_unretained id v) { return [v longLongValue]; });
 }
 
 template<>
-realm::RowExpr RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::CreatePolicy createPolicy, size_t) {
-    bool create = createPolicy != realm::CreatePolicy::Skip;
+realm::Obj RLMAccessorContext::unbox(__unsafe_unretained id const v, CreatePolicy createPolicy, ObjKey) {
+    bool create = createPolicy != CreatePolicy::Skip;
     auto policy = static_cast<RLMUpdatePolicy>(createPolicy);
     RLMObjectBase *link = RLMDynamicCast<RLMObjectBase>(v);
     if (!link) {
         if (!create)
-            return realm::RowExpr();
+            return realm::Obj();
         return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, v, policy)->_row;
     }
 
@@ -740,7 +755,7 @@ realm::RowExpr RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::
 
     if (!link->_realm) {
         if (!create)
-            return realm::RowExpr();
+            return realm::Obj();
         if (!_promote_existing)
             return RLMCreateObjectInRealmWithValue(_realm, _info.rlmObjectSchema.className, link, policy)->_row;
         RLMAddObjectToRealm(link, _realm, policy);
@@ -753,10 +768,10 @@ realm::RowExpr RLMAccessorContext::unbox(__unsafe_unretained id const v, realm::
     return link->_row;
 }
 
-void RLMAccessorContext::will_change(realm::Row const& row, realm::Property const& prop) {
-    _observationInfo = RLMGetObservationInfo(nullptr, row.get_index(), _info);
+void RLMAccessorContext::will_change(realm::Obj const& row, realm::Property const& prop) {
+    _observationInfo = RLMGetObservationInfo(nullptr, row.get_key(), _info);
     if (_observationInfo) {
-        _kvoPropertyName = _info.propertyForTableColumn(prop.table_column).name;
+        _kvoPropertyName = _info.propertyForTableColumn(prop.column_key).name;
         _observationInfo->willChange(_kvoPropertyName);
     }
 }

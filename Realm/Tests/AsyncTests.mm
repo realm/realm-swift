@@ -231,12 +231,14 @@
 
     __block XCTestExpectation *expectation = [self expectationWithDescription:@""];
     __block int expected = 0;
-    auto token = [[array.intArray objectsWhere:@"intCol > 0"] addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *e) {
+    auto token = [[array.intArray objectsWhere:@"intCol > 0"] addNotificationBlock:^(RLMResults<IntObject *> *results,
+                                                                                     RLMCollectionChange *change, NSError *e) {
+//        NSLog(@"IntArray: %d", (int)array.intArray.count);
         XCTAssertNil(e);
         XCTAssertNotNil(results);
         XCTAssertEqual((int)results.count, expected);
         for (int i = 0; i < expected; ++i) {
-            XCTAssertEqual([results[i] intCol], i + 1);
+            XCTAssertEqual(results[i].intCol, i + 1);
         }
         ++expected;
         [expectation fulfill];
@@ -392,6 +394,7 @@
     [token2 invalidate];
 }
 
+#if 0 // Not obvious if there's still any way for notifiers to fail other than memory allocation failure
 - (void)testErrorHandling {
     RLMRealm *realm = [RLMRealm defaultRealm];
     XCTestExpectation *exp = [self expectationWithDescription:@""];
@@ -437,6 +440,7 @@
     [token invalidate];
     [token2 invalidate];
 }
+#endif
 
 - (void)testRLMResultsInstanceIsReused {
     __weak __block RLMResults *prev;
@@ -620,7 +624,7 @@
     }
 
     // Let the background job run now
-    auto coord = realm::_impl::RealmCoordinator::get_existing_coordinator(config.config.path);
+    auto coord = realm::_impl::RealmCoordinator::get_coordinator(config.config.path);
     coord->on_change();
 
     for (int i = 7; i < 10; ++i) {
@@ -837,6 +841,18 @@
     }];
 }
 
+- (void)testAddNotificationBlockFromWrongQueue {
+    auto queue = dispatch_queue_create("background queue", DISPATCH_QUEUE_SERIAL);
+    __block RLMResults *results;
+    dispatch_sync(queue, ^{
+        RLMRealm *realm = [RLMRealm defaultRealmForQueue:queue];
+        results = [IntObject allObjectsInRealm:realm];
+    });
+    XCTAssertThrows([results addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
+        XCTFail(@"should not be called");
+    }]);
+}
+
 - (void)testRemoveNotificationBlockFromWrongThread {
     // Unlike adding this is allowed, because it can happen due to capturing
     // tokens in blocks and users are very confused by errors from deallocation
@@ -974,6 +990,28 @@
 
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
     CFRunLoopRun();
+    [token invalidate];
+}
+
+- (void)testNotificationDeliveryToQueue {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block RLMNotificationToken *token;
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+
+    [self dispatchAsync:^{
+        RLMRealm *bgRealm = [RLMRealm defaultRealmForQueue:self.bgQueue];
+        token = [[IntObject allObjectsInRealm:bgRealm] addNotificationBlock:^(RLMResults *results, RLMCollectionChange *, NSError *) {
+            XCTAssertNotNil(results);
+            XCTAssertNoThrow(results.count);
+            dispatch_semaphore_signal(sema);
+        }];
+    }];
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withValue:@[@1]];
+    }];
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
     [token invalidate];
 }
 

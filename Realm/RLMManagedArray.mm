@@ -85,8 +85,7 @@
                            property:(__unsafe_unretained RLMProperty *const)property {
     __unsafe_unretained RLMRealm *const realm = parentObject->_realm;
     auto col = parentObject->_info->tableColumn(property);
-    auto& row = parentObject->_row;
-    return [self initWithList:realm::List(realm->_realm, *row.get_table(), col, row.get_index())
+    return [self initWithList:realm::List(realm->_realm, parentObject->_row, col)
                    parentInfo:parentObject->_info
                      property:property];
 }
@@ -107,7 +106,7 @@ void RLMEnsureArrayObservationInfo(std::unique_ptr<RLMObservationInfo>& info,
     if (!info && array.class == [RLMManagedArray class]) {
         auto lv = static_cast<RLMManagedArray *>(array);
         info = std::make_unique<RLMObservationInfo>(*lv->_ownerInfo,
-                                                    lv->_backingList.get_origin_row_index(),
+                                                    lv->_backingList.get_parent_object_key(),
                                                     observed);
     }
 }
@@ -179,7 +178,7 @@ static void changeArray(__unsafe_unretained RLMManagedArray *const ar,
                         NSKeyValueChange kind, dispatch_block_t f, IndexSetFactory&& is) {
     translateErrors([&] { ar->_backingList.verify_in_transaction(); });
     RLMObservationInfo *info = RLMGetObservationInfo(ar->_observationInfo.get(),
-                                                     ar->_backingList.get_origin_row_index(),
+                                                     ar->_backingList.get_parent_object_key(),
                                                      *ar->_ownerInfo);
     if (info) {
         NSIndexSet *indexes = is();
@@ -401,35 +400,35 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     }
 }
 
-- (size_t)columnForProperty:(NSString *)propertyName {
+- (realm::ColKey)columnForProperty:(NSString *)propertyName {
     if (_backingList.get_type() == realm::PropertyType::Object) {
         return _objectInfo->tableColumn(propertyName);
     }
     if (![propertyName isEqualToString:@"self"]) {
         @throw RLMException(@"Arrays of '%@' can only be aggregated on \"self\"", RLMTypeToString(_type));
     }
-    return 0;
+    return {};
 }
 
 - (id)minOfProperty:(NSString *)property {
-    size_t column = [self columnForProperty:property];
+    auto column = [self columnForProperty:property];
     auto value = translateErrors(self, [&] { return _backingList.min(column); }, @"minOfProperty");
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)maxOfProperty:(NSString *)property {
-    size_t column = [self columnForProperty:property];
+    auto column = [self columnForProperty:property];
     auto value = translateErrors(self, [&] { return _backingList.max(column); }, @"maxOfProperty");
     return value ? RLMMixedToObjc(*value) : nil;
 }
 
 - (id)sumOfProperty:(NSString *)property {
-    size_t column = [self columnForProperty:property];
+    auto column = [self columnForProperty:property];
     return RLMMixedToObjc(translateErrors(self, [&] { return _backingList.sum(column); }, @"sumOfProperty"));
 }
 
 - (id)averageOfProperty:(NSString *)property {
-    size_t column = [self columnForProperty:property];
+    auto column = [self columnForProperty:property];
     auto value = translateErrors(self, [&] { return _backingList.average(column); }, @"averageOfProperty");
     return value ? @(*value) : nil;
 }
@@ -448,6 +447,13 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     return translateErrors([&] {
         return [RLMResults resultsWithObjectInfo:*_objectInfo
                                          results:_backingList.sort(RLMSortDescriptorsToKeypathArray(properties))];
+    });
+}
+
+- (RLMResults *)distinctResultsUsingKeyPaths:(NSArray<NSString *> *)keyPaths {
+    return translateErrors([&] {
+        auto results = [RLMResults resultsWithObjectInfo:*_objectInfo results:_backingList.as_results()];
+        return [results distinctResultsUsingKeyPaths:keyPaths];
     });
 }
 
@@ -497,6 +503,24 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     });
 }
 
+- (BOOL)isFrozen {
+    return _realm.isFrozen;
+}
+
+- (instancetype)freeze {
+    if (self.frozen) {
+        return self;
+    }
+
+    RLMRealm *frozenRealm = [_realm freeze];
+    auto& parentInfo = _ownerInfo->freeze(frozenRealm);
+    return translateRLMResultsErrors([&] {
+        return [[self.class alloc] initWithList:_backingList.freeze(frozenRealm->_realm)
+                                     parentInfo:&parentInfo
+                                       property:parentInfo.rlmObjectSchema[_key]];
+    });
+}
+
 // The compiler complains about the method's argument type not matching due to
 // it not having the generic type attached, but it doesn't seem to be possible
 // to actually include the generic type
@@ -504,16 +528,21 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wmismatched-parameter-types"
 - (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block {
-    [_realm verifyNotificationsAreSupported:true];
-    return RLMAddNotificationBlock(self, _backingList, block);
+    return RLMAddNotificationBlock(self, block, nil);
+}
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMArray *, RLMCollectionChange *, NSError *))block queue:(dispatch_queue_t)queue {
+    return RLMAddNotificationBlock(self, block, queue);
 }
 #pragma clang diagnostic pop
 
+realm::List& RLMGetBackingCollection(RLMManagedArray *self) {
+    return self->_backingList;
+}
+
 #pragma mark - Thread Confined Protocol Conformance
 
-- (std::unique_ptr<realm::ThreadSafeReferenceBase>)makeThreadSafeReference {
-    auto list_reference = _realm->_realm->obtain_thread_safe_reference(_backingList);
-    return std::make_unique<realm::ThreadSafeReference<realm::List>>(std::move(list_reference));
+- (realm::ThreadSafeReference)makeThreadSafeReference {
+    return _backingList;
 }
 
 - (RLMManagedArrayHandoverMetadata *)objectiveCMetadata {
@@ -523,13 +552,10 @@ static void RLMInsertObject(RLMManagedArray *ar, id object, NSUInteger index) {
     return metadata;
 }
 
-+ (instancetype)objectWithThreadSafeReference:(std::unique_ptr<realm::ThreadSafeReferenceBase>)reference
++ (instancetype)objectWithThreadSafeReference:(realm::ThreadSafeReference)reference
                                      metadata:(RLMManagedArrayHandoverMetadata *)metadata
                                         realm:(RLMRealm *)realm {
-    REALM_ASSERT_DEBUG(dynamic_cast<realm::ThreadSafeReference<realm::List> *>(reference.get()));
-    auto list_reference = static_cast<realm::ThreadSafeReference<realm::List> *>(reference.get());
-
-    auto list = realm->_realm->resolve_thread_safe_reference(std::move(*list_reference));
+    auto list = reference.resolve<realm::List>(realm->_realm);
     if (!list.is_valid()) {
         return nil;
     }

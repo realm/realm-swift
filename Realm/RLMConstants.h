@@ -152,15 +152,8 @@ typedef RLM_ERROR_ENUM(NSInteger, RLMError, RLMErrorDomain) {
 
     /** Denotes an error that occurs if there is a schema version mismatch, so that a migration is required. */
     RLMErrorSchemaMismatch = 10,
-
-    /** Denotes an error that occurs when attempting to open an incompatible synchronized Realm file.
-
-     This error occurs when the Realm file was created with an older version of Realm and an automatic migration
-     to the current version is not possible. When such an error occurs, the original file is moved to a backup
-     location, and future attempts to open the synchronized Realm will result in a new file being created.
-     If you wish to migrate any data from the backup Realm, you can open it using the provided Realm configuration.
-     */
-    RLMErrorIncompatibleSyncedFile = 11,
+    // Error code 11 is obsolete
+    // RLMErrorIncompatibleSyncedFile = 11,
     /**
      Denotates an error where an operation was requested which cannot be performed on an open file.
      */

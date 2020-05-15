@@ -1771,8 +1771,7 @@
     [self testClass:[AllTypesObject class] withNormalCount:1U notCount:0U where:@"objectCol.stringCol IN[c] %@", @[@"ABC"]];
 }
 
-- (void)testArrayIn
-{
+- (void)testArrayIn {
     RLMRealm *realm = [self realm];
     [realm beginWriteTransaction];
 

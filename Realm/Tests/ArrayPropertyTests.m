@@ -315,6 +315,7 @@
 
     [obj.intObj addObject:@5];
     XCTAssertEqualObjects(obj.intObj.firstObject, @5);
+    [realm cancelWriteTransaction];
 }
 
 - (void)testReplaceObjectAtIndexInUnmanagedArray {
@@ -1321,15 +1322,20 @@
     [(RLMNotificationToken *)token invalidate];
 }
 
-- (void)testAllMethodsCheckThread {
+static RLMArray<IntObject *> *managedTestArray() {
     RLMRealm *realm = [RLMRealm defaultRealm];
-    __block IntObject *io;
     __block RLMArray *array;
     [realm transactionWithBlock:^{
-        io = [IntObject createInDefaultRealmWithValue:@[@0]];
-        ArrayPropertyObject *obj = [ArrayPropertyObject createInDefaultRealmWithValue:@[@"", @[], @[io]]];
+        ArrayPropertyObject *obj = [ArrayPropertyObject createInDefaultRealmWithValue:@[@"", @[], @[@[@0], @[@1]]]];
         array = obj.intArray;
     }];
+    return array;
+}
+
+- (void)testAllMethodsCheckThread {
+    RLMArray<IntObject *> *array = managedTestArray();
+    IntObject *io = array.firstObject;
+    RLMRealm *realm = array.realm;
     [realm beginWriteTransaction];
 
     [self dispatchAsyncAndWait:^{
@@ -1365,14 +1371,9 @@
 }
 
 - (void)testAllMethodsCheckForInvalidation {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    __block IntObject *io;
-    __block RLMArray *array;
-    [realm transactionWithBlock:^{
-        io = [IntObject createInDefaultRealmWithValue:@[@0]];
-        ArrayPropertyObject *obj = [ArrayPropertyObject createInDefaultRealmWithValue:@[@"", @[], @[io]]];
-        array = obj.intArray;
-    }];
+    RLMArray<IntObject *> *array = managedTestArray();
+    IntObject *io = array.firstObject;
+    RLMRealm *realm = array.realm;
 
     [realm beginWriteTransaction];
 
@@ -1450,14 +1451,8 @@
 }
 
 - (void)testMutatingMethodsCheckForWriteTransaction {
-    RLMRealm *realm = [RLMRealm defaultRealm];
-    __block IntObject *io;
-    __block RLMArray *array;
-    [realm transactionWithBlock:^{
-        io = [IntObject createInDefaultRealmWithValue:@[@0]];
-        ArrayPropertyObject *obj = [ArrayPropertyObject createInDefaultRealmWithValue:@[@"", @[], @[io]]];
-        array = obj.intArray;
-    }];
+    RLMArray<IntObject *> *array = managedTestArray();
+    IntObject *io = array.firstObject;
 
     XCTAssertNoThrow([array objectClassName]);
     XCTAssertNoThrow([array realm]);
@@ -1492,5 +1487,57 @@
 
     RLMAssertThrowsWithReasonMatching(array[0] = io, @"write transaction");
     RLMAssertThrowsWithReasonMatching([array setValue:@1 forKey:@"intCol"], @"write transaction");
+}
+
+- (void)testIsFrozen {
+    RLMArray *unfrozen = managedTestArray();
+    RLMArray *frozen = [unfrozen freeze];
+    XCTAssertFalse(unfrozen.isFrozen);
+    XCTAssertTrue(frozen.isFrozen);
+}
+
+- (void)testFreezingFrozenObjectReturnsSelf {
+    RLMArray *array = managedTestArray();
+    RLMArray *frozen = [array freeze];
+    XCTAssertNotEqual(array, frozen);
+    XCTAssertNotEqual(array.freeze, frozen);
+    XCTAssertEqual(frozen, frozen.freeze);
+}
+
+- (void)testFreezeFromWrongThread {
+    RLMArray *array = managedTestArray();
+    [self dispatchAsyncAndWait:^{
+        RLMAssertThrowsWithReason([array freeze],
+                                  @"Realm accessed from incorrect thread");
+    }];
+}
+
+- (void)testAccessFrozenFromDifferentThread {
+    RLMArray *frozen = [managedTestArray() freeze];
+    [self dispatchAsyncAndWait:^{
+        XCTAssertEqualObjects([frozen valueForKey:@"intCol"], (@[@0, @1]));
+    }];
+}
+
+- (void)testObserveFrozenArray {
+    RLMArray *frozen = [managedTestArray() freeze];
+    id block = ^(__unused BOOL deleted, __unused NSArray *changes, __unused NSError *error) {};
+    RLMAssertThrowsWithReason([frozen addNotificationBlock:block],
+                              @"Frozen Realms do not change and do not have change notifications.");
+}
+
+- (void)testQueryFrozenArray {
+    RLMArray *frozen = [managedTestArray() freeze];
+    XCTAssertEqualObjects([[frozen objectsWhere:@"intCol > 0"] valueForKey:@"intCol"], (@[@1]));
+}
+
+- (void)testFrozenArraysDoNotUpdate {
+    RLMArray *array = managedTestArray();
+    RLMArray *frozen = [array freeze];
+    XCTAssertEqual(frozen.count, 2);
+    [array.realm transactionWithBlock:^{
+        [array removeLastObject];
+    }];
+    XCTAssertEqual(frozen.count, 2);
 }
 @end

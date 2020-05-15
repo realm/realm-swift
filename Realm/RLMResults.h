@@ -256,9 +256,54 @@ NS_ASSUME_NONNULL_BEGIN
  @param block The block to be called whenever a change occurs.
  @return A token which must be held for as long as you want updates to be delivered.
  */
-- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults<RLMObjectType> *__nullable results,
-                                                         RLMCollectionChange *__nullable change,
-                                                         NSError *__nullable error))block __attribute__((warn_unused_result));
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults<RLMObjectType> *_Nullable results,
+                                                         RLMCollectionChange *_Nullable change,
+                                                         NSError *_Nullable error))block
+__attribute__((warn_unused_result));
+
+/**
+ Registers a block to be called each time the results collection changes.
+
+ The block will be asynchronously called with the initial results collection,
+ and then called again after each write transaction which changes either any
+ of the objects in the results, or which objects are in the results.
+
+ The `change` parameter will be `nil` the first time the block is called.
+ For each call after that, it will contain information about
+ which rows in the results collection were added, removed or modified. If a
+ write transaction did not modify any objects in the results collection,
+ the block is not called at all. See the `RLMCollectionChange` documentation for
+ information on how the changes are reported and an example of updating a
+ `UITableView`.
+
+ If an error occurs the block will be called with `nil` for the results
+ parameter and a non-`nil` error. Currently the only errors that can occur are
+ when opening the Realm on the background worker thread.
+
+ At the time when the block is called, the `RLMResults` object will be fully
+ evaluated and up-to-date, and as long as you do not perform a write transaction
+ on the same thread or explicitly call `-[RLMRealm refresh]`, accessing it will
+ never perform blocking work.
+
+ Notifications are delivered on the given queue. If the queue is blocked and
+ notifications can't be delivered instantly, multiple notifications may be
+ coalesced into a single notification.
+
+ You must retain the returned token for as long as you want updates to continue
+ to be sent to the block. To stop receiving updates, call `-invalidate` on the token.
+
+ @warning This method cannot be called when the containing Realm is read-only or frozen.
+ @warning The queue must be a serial queue.
+
+ @param block The block to be called whenever a change occurs.
+ @param queue The serial queue to deliver notifications to.
+ @return A token which must be held for as long as you want updates to be delivered.
+ */
+- (RLMNotificationToken *)addNotificationBlock:(void (^)(RLMResults<RLMObjectType> *_Nullable results,
+                                                         RLMCollectionChange *_Nullable change,
+                                                         NSError *_Nullable error))block
+                                         queue:(nullable dispatch_queue_t)queue
+__attribute__((warn_unused_result));
 
 #pragma mark - Aggregating Property Values
 
@@ -321,6 +366,34 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// :nodoc:
 - (RLMObjectType)objectAtIndexedSubscript:(NSUInteger)index;
+
+#pragma mark - Freeze
+
+/**
+ Indicates if the result are frozen.
+
+ Frozen Results are immutable and can be accessed from any thread.The objects
+ read from a frozen Results will also be frozen.
+ */
+@property (nonatomic, readonly, getter=isFrozen) BOOL frozen;
+
+/**
+ Returns a frozen (immutable) snapshot of these results.
+
+ The frozen copy is an immutable collection which contains the same data as
+ this collection currently contains, but will not update when writes are made
+ to the containing Realm. Unlike live Results, frozen Results can be accessed
+ from any thread.
+
+ @warning This method cannot be called during a write transaction, or when the
+          containing Realm is read-only.
+ @warning Holding onto a frozen collection for an extended period while
+          performing write transaction on the Realm may result in the Realm
+          file growing to large sizes. See
+          `RLMRealmConfiguration.maximumNumberOfActiveVersions` for more
+          information.
+ */
+- (instancetype)freeze;
 
 #pragma mark - Unavailable Methods
 
