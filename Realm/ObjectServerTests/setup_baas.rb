@@ -66,7 +66,7 @@ def setup_stitch
         `git clone git@github.com:10gen/stitch`
     end
 
-    if !File.exists?("#{STITCH_DIR}/.git")
+    if File.exists?("#{STITCH_DIR}/.git")
         puts 'checking out stitch'
         `git checkout #{STITCH_VERSION}`
     end
@@ -100,12 +100,12 @@ def setup_stitch
 
     if `which yarn`.empty?
         `rm -rf "$HOME/.yarn"`
-        `curl -o- -L https://yarnpkg.com/install.sh #{STITCH_DIR} | bash`
+        `curl -o- -L https://yarnpkg.com/install.sh | bash`
         exports << "export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\""
     end
 
     puts 'building transpiler'
-    puts `cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
+    puts `export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\" && cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
 
     if !Dir.exists?('go')
         puts 'downloading go'
@@ -151,6 +151,7 @@ def clean_action
     puts 'cleaning'
     shutdown_mongod
     `rm -rf #{MONGO_DIR}`
+    `cd #{STITCH_DIR} && git rm -rf . && git clean -fxd`
 end
 
 if ARGV.length < 1

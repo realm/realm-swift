@@ -83,6 +83,7 @@ def shutdown_stitch
     puts 'shutting down baas'
     `pkill -9 stitch`
     `pkill -9 ruby`
+    `pkill -9 go`
 end
 
 def start
