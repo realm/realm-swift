@@ -145,6 +145,30 @@ static NSString *nodePath() {
 
 @end
 
+#pragma mark HugeSyncObject
+
+@implementation HugeSyncObject
+
++ (NSDictionary *)defaultPropertyValues {
+    return @{@"_id": [RLMObjectId objectId]};
+}
+
++ (NSString *)primaryKey {
+    return @"_id";
+}
+
++ (instancetype)objectWithRealmId:(NSString *)realmId {
+    const NSInteger fakeDataSize = 1000000;
+    HugeSyncObject *object = [[self alloc] init];
+    char fakeData[fakeDataSize];
+    memset(fakeData, 16, sizeof(fakeData));
+    object.dataProp = [NSData dataWithBytes:fakeData length:sizeof(fakeData)];
+    object.realm_id = realmId;
+    return object;
+}
+
+@end
+
 static NSTask *s_task;
 
 static NSURL *syncDirectoryForChildProcess() {

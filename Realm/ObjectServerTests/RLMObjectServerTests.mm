@@ -76,7 +76,7 @@
     RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
     __block RLMSyncUser *syncUser;
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser *user, NSError *error) {
         XCTAssert(!error);
         XCTAssert(user);
         syncUser = user;
@@ -86,7 +86,7 @@
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
     [app callFunctionWithName:@"sum"
                     arguments:@[@1, @2, @3, @4, @5]
-              completionBlock:^(id<RLMBSON> _Nullable bson, NSError * _Nullable error) {
+              completionBlock:^(id<RLMBSON> bson, NSError *error) {
         XCTAssert(!error);
         XCTAssertEqual([((NSNumber *)bson) intValue], 15);
     }];
@@ -738,10 +738,10 @@
                                               partitionValueC]
                        expectedCounts:@[@3, @2, @5]];
 
-        RLMResults *resultsA = [realmA objects:@"Person"
-                                 withPredicate:[NSPredicate predicateWithFormat:@"firstName == %@", @"Ringo"]];
-        RLMResults *resultsB = [realmB objects:@"Person"
-                                 withPredicate:[NSPredicate predicateWithFormat:@"firstName == %@", @"Ringo"]];
+
+
+        RLMResults *resultsA = [Person objectsInRealm:realmA where:@"firstName == %@", @"Ringo"];
+        RLMResults *resultsB = [Person objectsInRealm:realmB where:@"firstName == %@", @"Ringo"];
 
         XCTAssertEqual([resultsA count], 1UL);
         XCTAssertEqual([resultsB count], 0UL);
@@ -1155,8 +1155,8 @@
                                                        register:self.isParent];
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
         
-    RLMRealm *realmA = [self openRealmForPartitionValue:@"realm_id" user:user];
-    RLMRealm *realmB = [self openRealmForPartitionValue:@"realm_id" user:user];
+    __attribute__((objc_precise_lifetime)) RLMRealm *realmA = [self openRealmForPartitionValue:@"realm_id" user:user];
+    __attribute__((objc_precise_lifetime)) RLMRealm *realmB = [self openRealmForPartitionValue:@"realm_id" user:user];
     if (self.isParent) {
         [self waitForDownloadsForRealm:realmA];
         [self waitForDownloadsForRealm:realmB];
@@ -1266,11 +1266,11 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
     [realm beginWriteTransaction];
     for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
-        [realm addObject:[Person johnWithRealmId:@"foo"]];
+        [realm addObject:[HugeSyncObject objectWithRealmId:partitionValue]];
     }
     [realm commitWriteTransaction];
     [self waitForUploadsForRealm:realm];
-    CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, Person, realm);
+    CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
 }
 
 // FIXME: Dependancy on Stitch deployment
@@ -1391,7 +1391,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
                                     XCTAssertNil(error);
-                                    CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, Person, realm);
+                                    CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
                                     [ex fulfill];
                                 }];
     NSUInteger (^fileSize)(NSString *) = ^NSUInteger(NSString *path) {
@@ -1440,7 +1440,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm * _Nullable realm, NSError * _Nullable error) {
         XCTAssertNil(error);
-        CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, Person, realm);
+        CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
         [ex fulfill];
     }];
     [realm.syncSession resume];
@@ -1448,7 +1448,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTAssertGreaterThan(fileSize(c.pathOnDisk), sizeBefore);
     XCTAssertNotNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
-    CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, Person, realm);
+    CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
 
     (void)[realm configuration];
 }
@@ -1551,7 +1551,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     @autoreleasepool {
         RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
         [realm beginWriteTransaction];
-        [realm addObject:[Person johnWithRealmId:@"foo"]];
+        [realm addObject:[HugeSyncObject objectWithRealmId:@"foo"]];
         [realm commitWriteTransaction];
         [self waitForUploadsForRealm:realm];
 
