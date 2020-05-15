@@ -645,7 +645,7 @@ static NSURL *syncDirectoryForChildProcess() {
                 [ex fulfill];
             }];
         }];
-        [self waitForExpectationsWithTimeout:60.0 handler:nil];
+        [self waitForExpectations:exs timeout:60.0];
 
         [[[self app] syncManager] resetForTesting];
     }
