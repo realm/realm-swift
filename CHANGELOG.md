@@ -1,3 +1,33 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* Add Combine publishers for Realm types. Realm collections have a `.publisher`
+  property which publishes the collection each time it changes, and a
+  `.changesetPublisher` which publishes a `RealmCollectionChange` each time the
+  collection changes. Corresponding publishers for Realm Objects can be
+  obtained with the `publisher()` and `changesetPublisher()` global functions.
+* Extend Combine publishers which output Realm types with a `.freeze()`
+  function which will make the publisher instead output frozen objects.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
+* None.
+
+### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version
+* The ObjectChange type in Swift is now generic and includes a reference to the
+  object which changed. When using `observe(on:)` to receive notifications on a
+  dispatch queue, the object will be confined to that queue.
+
+### Compatibility
+* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* APIs are backwards compatible with all previous releases in the 4.x.y series.
+* Carthage release for Swift is built with Xcode 11.4.1.
+
+### Internal
+Upgraded realm-core from ? to ?
+Upgraded realm-sync from ? to ?
+
 5.0.0-beta.6 Release notes (2020-05-08)
 =============================================================
 

@@ -244,8 +244,10 @@ open class Object: RLMObjectBase, RealmCollectionValue {
      - parameter block: The block to call with information about changes to the object.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe(on queue: DispatchQueue? = nil, _ block: @escaping (ObjectChange) -> Void) -> NotificationToken {
-        return RLMObjectBaseAddNotificationBlock(self, queue) { names, oldValues, newValues, error in
+    public func observe<T: Object>(on queue: DispatchQueue? = nil,
+                                   _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
+        precondition(self as? T != nil)
+        return RLMObjectBaseAddNotificationBlock(self, queue) { object, names, oldValues, newValues, error in
             if let error = error {
                 block(.error(error as NSError))
                 return
@@ -255,7 +257,7 @@ open class Object: RLMObjectBase, RealmCollectionValue {
                 return
             }
 
-            block(.change((0..<newValues.count).map { i in
+            block(.change(object as! T, (0..<newValues.count).map { i in
                 PropertyChange(name: names[i], oldValue: oldValues?[i], newValue: newValues[i])
             }))
         }
@@ -364,7 +366,7 @@ public struct PropertyChange {
  Information about the changes made to an object which is passed to `Object`'s
  notification blocks.
  */
-public enum ObjectChange {
+public enum ObjectChange<T: Object> {
     /**
      If an error occurs, notification blocks are called one time with a `.error`
      result and an `NSError` containing details about the error. Currently the
@@ -372,11 +374,11 @@ public enum ObjectChange {
      worker thread to calculate the change set. The callback will never be
      called again after `.error` is delivered.
      */
-    case error(_: NSError)
+    case error(_ error: NSError)
     /**
      One or more of the properties of the object have been changed.
      */
-    case change(_: [PropertyChange])
+    case change(_: T, _: [PropertyChange])
     /// The object has been deleted from the Realm.
     case deleted
 }
