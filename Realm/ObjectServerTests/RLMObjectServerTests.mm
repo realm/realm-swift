@@ -39,6 +39,24 @@
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
 
+@interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
+@end
+
+@implementation AsyncOpenConnectionTimeoutTransport
+
+- (void)sendRequestToServer:(RLMRequest *)request completion:(RLMNetworkTransportCompletionBlock)completionBlock {
+    if ([request.url hasSuffix:@"location"]) {
+        RLMResponse *r = [RLMResponse new];
+        r.httpStatusCode = 200;
+        r.body = @"{\"deployment_model\":\"GLOBAL\",\"location\":\"US-VA\",\"hostname\":\"http://localhost:5678\",\"ws_hostname\":\"ws://localhost:5678\"}";
+        completionBlock(r);
+    } else {
+        [super sendRequestToServer:request completion:completionBlock];
+    }
+}
+
+@end
+
 @implementation RLMObjectServerTests
 
 #pragma mark - App Tests
@@ -456,9 +474,9 @@
 /// same user object.
 - (void)testUsernamePasswordAuthentication {
     RLMSyncUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:YES]];
+                                                                                 register:YES]];
     RLMSyncUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                             register:NO]];
+                                                                                  register:NO]];
     // Two users created with the same credential should resolve to the same actual user.
     XCTAssertTrue([firstUser.identity isEqualToString:secondUser.identity]);
 }
@@ -1213,7 +1231,7 @@
                                                        register:self.isParent];
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
     // Open the Realm
-    [self openRealmForPartitionValue:@"realm_id" user:user];
+    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
 
     __block NSError *theError = nil;
     XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
@@ -1365,6 +1383,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
               @"Transferred (%@) needs to be greater than or equal to transferrable (%@)",
               @(transferred), @(transferrable));
 }
+
 #endif
 
 #pragma mark - Download Realm
@@ -1508,7 +1527,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 #if 0
 - (void)testAsyncOpenProgressNotifications {
     RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                       register:self.isParent];
+                                                           register:self.isParent];
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
 
     if (!self.isParent) {
@@ -1537,6 +1556,54 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 #endif
+
+- (void)testAsyncOpenConnectionTimeout {
+    [self resetSyncManager];
+
+    NSTask *task = [[NSTask alloc] init];
+    NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
+    task.currentDirectoryPath = directory;
+    task.launchPath = @"/usr/bin/ruby";
+    task.arguments = @[[directory stringByAppendingPathComponent:@"run_baas.rb"], @"start_proxy", @"5678", @"2"];
+    [task launch];
+
+    RLMAppConfiguration *config = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:5678"
+                                                                     transport:[AsyncOpenConnectionTimeoutTransport new]
+                                                                  localAppName:nil
+                                                               localAppVersion:nil
+                                                       defaultRequestTimeoutMS:60];
+    RLMApp *app = [RLMApp appWithAppId:[[RealmObjectServer sharedServer] createApp] configuration:config];
+    __block RLMSyncUser* theUser;
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser *user, NSError *) {
+        theUser = user;
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+
+    RLMRealmConfiguration *c = [theUser configurationWithPartitionValue:@"foo"];
+    RLMSyncConfiguration *syncConfig = c.syncConfiguration;
+    syncConfig.cancelAsyncOpenOnNonFatalErrors = true;
+    c.syncConfiguration = syncConfig;
+
+    RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
+    timeoutOptions.connectTimeout = 1000.0;
+    [app syncManager].timeoutOptions = timeoutOptions;
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"async open"];
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.code, ETIMEDOUT);
+        XCTAssertEqual(error.domain, NSPOSIXErrorDomain);
+        XCTAssertNil(realm);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [task terminate];
+    [task waitUntilExit];
+}
 
 #pragma mark - Compact on Launch
 

@@ -24,5 +24,5 @@ namespace bson {
 }
 }
 
-realm::bson::Bson RLMRLMBSONToBson(id<RLMBSON> b);
-id<RLMBSON> RLMBsonToRLMBSON(const realm::bson::Bson& b);
+realm::bson::Bson RLMConvertRLMBSONToBson(id<RLMBSON> b);
+id<RLMBSON> RLMConvertBsonToRLMBSON(const realm::bson::Bson& b);

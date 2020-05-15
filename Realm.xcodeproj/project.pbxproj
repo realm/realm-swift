@@ -897,6 +897,7 @@
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
 		49101A1D246C38550022BB0B /* scheduler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scheduler.cpp; sourceTree = "<group>"; };
 		494566A8246E8C59000FD07F /* ObjectiveCSupport+BSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ObjectiveCSupport+BSON.swift"; sourceTree = "<group>"; };
+		494566AA246EF031000FD07F /* proxy.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; name = proxy.rb; path = Realm/ObjectServerTests/proxy.rb; sourceTree = "<group>"; };
 		498C7F3724479904009DE80A /* remote_mongo_database.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = remote_mongo_database.hpp; path = sync/remote_mongo_database.hpp; sourceTree = "<group>"; };
 		498C7F3824479904009DE80A /* remote_mongo_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = remote_mongo_client.hpp; path = sync/remote_mongo_client.hpp; sourceTree = "<group>"; };
 		498C7F3924479904009DE80A /* remote_mongo_collection.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = remote_mongo_collection.hpp; path = sync/remote_mongo_collection.hpp; sourceTree = "<group>"; };
@@ -1668,6 +1669,7 @@
 				4996EA9F2465C44E003A1F51 /* SwiftBSONTests.swift */,
 				1AA5AE961D989BE000ED8C27 /* SwiftSyncTestCase.swift */,
 				3F0C129220926CAD00D0D6C8 /* admin.js */,
+				494566AA246EF031000FD07F /* proxy.rb */,
 				49D9DFC3246C8E41003AD31D /* run_baas.rb */,
 				49D9DFC4246C8E48003AD31D /* setup_baas.rb */,
 				4992F62024463296005C93EE /* run_baas.sh */,
@@ -3176,9 +3178,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OBJROOT = build;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SYMROOT = build;
 			};
 			name = Debug;
 		};
@@ -3189,8 +3189,6 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				OBJROOT = build;
-				SYMROOT = build;
 			};
 			name = Release;
 		};
@@ -3198,7 +3196,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
-				SYMROOT = build;
 			};
 			name = Debug;
 		};
@@ -3206,7 +3203,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D660FBD1BE98BEF0021E04F /* RealmSwift.xcconfig */;
 			buildSettings = {
-				SYMROOT = build;
 			};
 			name = Release;
 		};
@@ -3238,7 +3234,6 @@
 			baseConfigurationReference = 5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
-				SYMROOT = build/DerivedData/Realm/Build/Products;
 			};
 			name = Debug;
 		};
@@ -3247,7 +3242,6 @@
 			baseConfigurationReference = 5D659E741BE03E0D006515A0 /* Realm iOS static.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULE_DEBUGGING = NO;
-				SYMROOT = build/DerivedData/Realm/Build/Products;
 			};
 			name = Release;
 		};

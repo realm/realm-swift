@@ -190,7 +190,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                         ex.fulfill()
                     }
                 }
-                waitForExpectations(timeout: 3.0)
+                waitForExpectations(timeout: 5.0)
                 token.invalidate()
             }
             
