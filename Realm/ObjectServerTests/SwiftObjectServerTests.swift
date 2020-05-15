@@ -27,11 +27,14 @@ class SwiftPerson: Object {
     @objc dynamic var _id: ObjectId = ObjectId.generate()
     @objc dynamic var firstName: String = ""
     @objc dynamic var lastName: String = ""
+    @objc dynamic var age: Int = 30
+    @objc dynamic var realm_id: String? = ""
 
-    convenience init(firstName: String, lastName: String) {
+    convenience init(firstName: String, lastName: String, realm_id: String) {
         self.init()
         self.firstName = firstName
         self.lastName = lastName
+        self.realm_id = realm_id
     }
 
     override class func primaryKey() -> String? {
@@ -66,9 +69,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             } else {
                 // Add objects
                 try realm.write {
-                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
-                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
-                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr", realm_id: "foo"))
+                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: "foo"))
+                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: "foo"))
                 }
                 waitForUploads(for: realm)
                 checkCount(expected: 3, realm, SwiftPerson.self)
@@ -82,12 +85,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testSwiftDeleteObjects() {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            let realm = try synchronouslyOpenRealm(partitionValue: "realm_id", user: user)
+            let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
             if isParent {
                 try realm.write {
-                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
-                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
-                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr", realm_id: "foo"))
+                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: "foo"))
+                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: "foo"))
                 }
                 waitForUploads(for: realm)
                 checkCount(expected: 3, realm, SwiftPerson.self)
@@ -145,20 +148,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             } else {
                 // Add objects.
                 try realmA.write {
-                    realmA.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
-                    realmA.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
-                    realmA.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                    realmA.add(SwiftPerson(firstName: "Ringo", lastName: "Starr", realm_id: partitionValueA))
+                    realmA.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: partitionValueA))
+                    realmA.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: partitionValueA))
                 }
                 try realmB.write {
-                    realmB.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
-                    realmB.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                    realmB.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: partitionValueB))
+                    realmB.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: partitionValueB))
                 }
                 try realmC.write {
-                    realmC.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
-                    realmC.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
-                    realmC.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
-                    realmC.add(SwiftPerson(firstName: "George", lastName: "Harrison"))
-                    realmC.add(SwiftPerson(firstName: "Pete", lastName: "Best"))
+                    realmC.add(SwiftPerson(firstName: "Ringo", lastName: "Starr", realm_id: partitionValueC))
+                    realmC.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: partitionValueC))
+                    realmC.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: partitionValueC))
+                    realmC.add(SwiftPerson(firstName: "George", lastName: "Harrison", realm_id: partitionValueC))
+                    realmC.add(SwiftPerson(firstName: "Pete", lastName: "Best", realm_id: partitionValueC))
                 }
 
                 waitForUploads(for: realmA)
@@ -187,7 +190,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                         ex.fulfill()
                     }
                 }
-                waitForExpectations(timeout: 2.0)
+                waitForExpectations(timeout: 3.0)
                 token.invalidate()
             }
             
@@ -269,14 +272,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     let bigObjectCount = 2
 
-    func populateRealm(user: SyncUser, partitionKey: String) {
+    func populateRealm(user: SyncUser, partitionValue: String) {
         do {
 
             let user = try synchronouslyLogInUser(for: basicCredentials())
-            let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
+            let realm = try synchronouslyOpenRealm(partitionValue: partitionValue, user: user)
             try! realm.write {
                 for _ in 0..<bigObjectCount {
-                    realm.add(SwiftPerson())
+                    realm.add(SwiftPerson(firstName: "Arthur",
+                                          lastName: "Jones",
+                                          realm_id: partitionValue))
                 }
             }
             waitForUploads(for: realm)
@@ -353,7 +358,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             ex = expectation(description: "write transaction upload")
             try realm.write {
                 for _ in 0..<bigObjectCount {
-                    realm.add(SwiftPerson())
+                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: "foo"))
                 }
             }
             waitForExpectations(timeout: 10.0, handler: nil)
@@ -370,7 +375,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
             if !isParent {
-                populateRealm(user: user, partitionKey: "foo")
+                populateRealm(user: user, partitionValue: "foo")
                 return
             }
             
@@ -383,7 +388,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
             Realm.asyncOpen(configuration: config) { realm, error in
                 XCTAssertNil(error)
-                self.checkCount(expected: self.bigObjectCount, realm!, SwiftPerson.self)
+                guard let realm = realm else {
+                    XCTFail("No realm on async open")
+                    ex.fulfill()
+                    return
+                }
+                self.checkCount(expected: self.bigObjectCount, realm, SwiftPerson.self)
                 ex.fulfill()
             }
             func fileSize(path: String) -> Int {
@@ -405,7 +415,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
             if !isParent {
-                populateRealm(user: user, partitionKey: "foo")
+                populateRealm(user: user, partitionValue: "foo")
                 return
             }
             
@@ -443,7 +453,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
             if !isParent {
-                populateRealm(user: user, partitionKey: "foo")
+                populateRealm(user: user, partitionValue: "foo")
                 return
             }
             
@@ -553,9 +563,56 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
         }
     }
-    
     #endif
-    
+
+    // MARK: - App Credentials
+
+    func testUsernamePasswordCredential() {
+        let usernamePasswordCredential = AppCredentials(username: "username", password: "password")
+        XCTAssertEqual(usernamePasswordCredential.provider.rawValue, "local-userpass")
+    }
+
+    func testJWTCredentials() {
+        let jwtCredential = AppCredentials(jwt: "token")
+        XCTAssertEqual(jwtCredential.provider.rawValue, "custom-token")
+    }
+
+    func testAnonymousCredentials() {
+        let anonymousCredential = AppCredentials.anonymous()
+        XCTAssertEqual(anonymousCredential.provider.rawValue, "anon-user")
+    }
+
+    func testUserAPIKeyCredentials() {
+        let userAPIKeyCredential = AppCredentials(userAPIKey: "apikey")
+        XCTAssertEqual(userAPIKeyCredential.provider.rawValue, "api-key")
+    }
+
+    func testServerAPIKeyCredentials() {
+        let serverAPIKeyCredential = AppCredentials(serverAPIKey: "apikey")
+        XCTAssertEqual(serverAPIKeyCredential.provider.rawValue, "api-key")
+    }
+
+    func testFacebookCredentials() {
+        let facebookCredential = AppCredentials(facebookToken: "token")
+        XCTAssertEqual(facebookCredential.provider.rawValue, "oauth2-facebook")
+    }
+
+    func testGoogleCredentials() {
+        let googleCredential = AppCredentials(googleToken: "token")
+        XCTAssertEqual(googleCredential.provider.rawValue, "oauth2-google")
+    }
+
+    func testAppleCredentials() {
+        let appleCredential = AppCredentials(appleToken: "token")
+        XCTAssertEqual(appleCredential.provider.rawValue, "oauth2-apple")
+    }
+
+    func testFunctionCredentials() {
+        var error: NSError!
+        let functionCredential = AppCredentials.init(functionPayload: ["dog": ["name": "fido"]], error: &error)
+        XCTAssertEqual(functionCredential.provider.rawValue, "custom-function")
+    }
+
     // MARK: - Authentication
 
     func testInvalidCredentials() {
@@ -628,10 +685,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testRealmAppInit() {
-        let appWithNoConfig = RealmApp(appName, configuration: nil)
+        let appWithNoConfig = RealmApp(appId: appName)
         XCTAssertEqual(appWithNoConfig.allUsers().count, 0)
 
-        let appWithConfig = RealmApp(appName, configuration: realmAppConfig())
+        let appWithConfig = RealmApp(appId: appName, configuration: realmAppConfig())
         XCTAssertEqual(appWithConfig.allUsers().count, 0)
     }
 

@@ -26,12 +26,12 @@ end
 
 def run_mongod
     puts "starting mongod..."
-    `#{MONGO_DIR}/bin/mongod --quiet \
+    puts `#{MONGO_DIR}/bin/mongod --quiet \
         --dbpath #{MONGO_DIR}/db_files \
-        --bind_ip localhost \
         --port 26000 \
         --replSet test \
-        --fork --logpath #{MONGO_DIR}/mongod.log`
+        --fork \
+        --logpath #{MONGO_DIR}/mongod.log`
     puts "mongod starting"
 
     retries = 0
@@ -44,16 +44,17 @@ def run_mongod
             abort('could not connect to mongod')
         end
     end
-    `#{MONGO_DIR}/bin/mongo --port 26000 --eval 'rs.initiate()'`
+    puts `#{MONGO_DIR}/bin/mongo --port 26000 --eval 'rs.initiate()'`
     puts "mongod started"
 end
 
 def shutdown_mongod
     puts 'shutting down mongod'
     if Dir.exists?(MONGO_DIR)
-        `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.adminCommand({replSetStepDown: 0, secondaryCatchUpPeriodSecs: 0, force: true})"`
-        `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.shutdownServer({force: true})"`
+        puts `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.adminCommand({replSetStepDown: 0, secondaryCatchUpPeriodSecs: 0, force: true})"`
+        puts `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.shutdownServer({force: true})"`
     end
+    puts 'mongod is down'
 end
 
 def setup_stitch
@@ -74,22 +75,21 @@ def setup_stitch
     if !Dir.exists?(dylib_dir)
         puts 'downloading mongodb dylibs'
         Dir.mkdir dylib_dir
-        `curl -s "#{SERVER_STITCH_LIB_URL}" \
-            | tar xvfz - --strip-components=1 -C #{dylib_dir}`
+        puts `curl -s "#{SERVER_STITCH_LIB_URL}" | tar xvfz - --strip-components=1 -C #{dylib_dir}`
     end
 
     update_doc_filepath = "#{STITCH_DIR}/update_doc"
     if !File.exists?(update_doc_filepath)
         puts "downloading update_doc"
-        `cd #{STITCH_DIR} && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7a5c9ec4432c400181c_17_10_15_01_19_33/update_doc"`
-        `chmod +x #{update_doc_filepath}`
+        puts `cd #{STITCH_DIR} && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7a5c9ec4432c400181c_17_10_15_01_19_33/update_doc"`
+        puts `chmod +x #{update_doc_filepath}`
     end
 
     assisted_agg_filepath = "#{STITCH_DIR}/assisted_agg"
     if !File.exists?(assisted_agg_filepath)
         puts "downloading assisted_agg"
-        `cd #{STITCH_DIR} && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7ab2a60ed5647001827_17_10_15_01_19_39/assisted_agg"`
-        `chmod +x #{assisted_agg_filepath}`
+        puts `cd #{STITCH_DIR} && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7ab2a60ed5647001827_17_10_15_01_19_39/assisted_agg"`
+        puts `chmod +x #{assisted_agg_filepath}`
     end
 
     if `which node`.empty?
@@ -100,12 +100,12 @@ def setup_stitch
 
     if `which yarn`.empty?
         `rm -rf "$HOME/.yarn"`
-        `curl -o- -L https://yarnpkg.com/install.sh #{STITCH_DIR} | bash`
+        `curl -o- -L https://yarnpkg.com/install.sh | bash`
         exports << "export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\""
     end
 
     puts 'building transpiler'
-    `cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
+    puts `export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\" && cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
 
     if !Dir.exists?('go')
         puts 'downloading go'
@@ -121,32 +121,29 @@ def setup_stitch
 
     puts 'running stitch'
     
-    `#{exports.join(' && ')} && \
+    puts `#{exports.join(' && ')} && \
         cd #{STITCH_DIR} && \
         go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" cmd/auth/user.go addUser \
             -domainID 000000000000000000000000 \
-            -mongoURI mongodb://127.0.0.1:26000 \
+            -mongoURI mongodb://localhost:26000 \
             -salt 'DQOWene1723baqD!_@#' \
             -id "unique_user@domain.com" \
             -password "password"`
-end
 
-# - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-# MAIN
+    puts 'user created'
+end
 
 def build_action
     puts 'building baas'
-    if !Dir.exists?(MONGO_DIR)
-        begin
-            FileUtils.mkdir_p BUILD_DIR
-            setup_mongod
-            run_mongod
-            setup_stitch
-        rescue => exception
-            puts "error setting up: #{exception}"
-        ensure
-            shutdown_mongod
-        end
+    begin
+        FileUtils.mkdir_p BUILD_DIR
+        setup_mongod
+        run_mongod
+        setup_stitch
+    rescue => exception
+        puts "error setting up: #{exception}"
+    ensure
+        shutdown_mongod
     end
 end
 

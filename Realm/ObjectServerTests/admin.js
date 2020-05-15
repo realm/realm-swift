@@ -141,7 +141,13 @@ async function create() {
 
     await app.services().service(serviceResponse['_id']).rules().create(dogRule);
     await app.services().service(serviceResponse['_id']).rules().create(personRule);
-    
+
+    personRule.schema.title = "SwiftPerson";
+    personRule.collection = "SwiftPerson";
+    personRule.relationships = {};
+
+    await app.services().service(serviceResponse['_id']).rules().create(personRule);
+
     await app.sync().config().update({
         "development_mode_enabled": true
     });

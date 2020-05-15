@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import "RLMObjectId.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @protocol RLMBSON;
@@ -25,7 +26,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMMongoCollection : NSObject
 
-- (void)insertTest:(id <RLMBSON>)bson;
+typedef void(^RLMInsertBlock)(RLMObjectId * _Nullable, NSError * _Nullable);
+
+- (void)insertOneDocument:(id<RLMBSON>)document completion:(RLMInsertBlock)completion;
 
 @end
 

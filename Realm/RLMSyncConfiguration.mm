@@ -16,10 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMApp_Private.hpp"
-#import "RLMSyncConfiguration_Private.hpp"
 
+
+#import "RLMApp_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
+#import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
@@ -91,7 +92,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 - (RLMSyncUser *)user {
     auto app = realm::SyncManager::shared().app();
     return [[RLMSyncUser alloc] initWithSyncUser:_config->user
-                                             app:[RLMApp apps][@(app->config().app_id.data())]];
+                                             app:[RLMApp appWithAppId:@(app->config().app_id.data())]];
 }
 
 - (RLMSyncStopPolicy)stopPolicy {
@@ -104,7 +105,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 
 - (id<RLMBSON>)partitionValue {
     if (!_config->partition_value.empty()) {
-        return BsonToRLMBSON(realm::bson::parse(_config->partition_value.c_str()));
+        return RLMBsonToRLMBSON(realm::bson::parse(_config->partition_value.c_str()));
     }
     return nil;
 }
@@ -141,7 +142,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     if (self = [super init]) {
         std::stringstream s;
-        s << RLMBSONToBson(partitionValue);
+        s << RLMRLMBSONToBson(partitionValue);
         _config = std::make_unique<SyncConfig>(
             [user _syncUser],
             s.str()

@@ -192,7 +192,7 @@ using namespace realm;
         return nil;
     }
 
-    return (NSDictionary *)BsonToRLMBSON(*_user->custom_data());
+    return (NSDictionary *)RLMBsonToRLMBSON(*_user->custom_data());
 }
 
 - (std::shared_ptr<SyncUser>)_syncUser {

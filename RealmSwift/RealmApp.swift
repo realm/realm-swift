@@ -83,9 +83,9 @@ public struct Functions {
     public subscript(dynamicMember string: String) -> Function {
         return { (arguments: [AnyBSON], completionHandler: @escaping FunctionCompletionHandler) in
             self.app?.__callFunction(withName: string,
-                                     arguments: arguments.map(BSONToRLMBSON) as! [RLMBSON]) {
+                                     arguments: arguments.map(ObjectiveCSupport.convert) as! [RLMBSON]) {
                                         (bson: RLMBSON?, error: Error?) in
-                completionHandler(RLMBSONToBSON(bson), error)
+                completionHandler(ObjectiveCSupport.convert(object:bson), error)
             }
         }
     }

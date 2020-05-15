@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncTestCase.h"
-#import "RLMTestUtils.h"
+//#import "RLMTestUtils.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 
 #import "RLMAppCredentials.h"
@@ -54,7 +54,7 @@
 #pragma mark - Authentication and Tokens
 
 - (void)testAnonymousAuthentication {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
     __block RLMSyncUser *syncUser;
     [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
@@ -73,7 +73,7 @@
 }
 
 - (void)testCallFunction {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
     __block RLMSyncUser *syncUser;
     [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
@@ -93,7 +93,7 @@
 }
 
 - (void)testLogoutCurrentUser {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should log out current user"];
     __block RLMSyncUser *syncUser;
     [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
@@ -112,7 +112,7 @@
 }
 
 - (void)testLogoutSpecificUser {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should log out specific user"];
     __block RLMSyncUser *syncUser;
     [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
@@ -131,7 +131,7 @@
 }
 
 - (void)testSwitchUser {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
     
     XCTestExpectation *loginExpectationA = [self expectationWithDescription:@"should login user A"];
     XCTestExpectation *loginExpectationB = [self expectationWithDescription:@"should login user B"];
@@ -160,7 +160,7 @@
 }
 
 - (void)testRemoveUser {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *loginExpectationA = [self expectationWithDescription:@"should login user A"];
     XCTestExpectation *loginExpectationB = [self expectationWithDescription:@"should login user B"];
     XCTestExpectation *removeUserExpectation = [self expectationWithDescription:@"should remove user"];
@@ -201,7 +201,7 @@
 #pragma mark - RLMUsernamePasswordProviderClient
 
 - (void)testRegisterEmailAndPassword {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should register with email and password"];
 
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
@@ -216,7 +216,7 @@
 }
 
 - (void)testConfirmUser {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try confirm user and fail"];
 
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
@@ -230,7 +230,7 @@
 }
 
 - (void)testResendConfirmationEmail {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try resend confirmation email and fail"];
 
     NSString *randomEmail = [NSString stringWithFormat:@"%@@%@.com", [self generateRandomString:10], [self generateRandomString:10]];
@@ -244,7 +244,7 @@
 }
 
 - (void)testResetPassword {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try reset password and fail"];
 
     [[app usernamePasswordProviderClient] resetPasswordTo:@"APassword123" token:@"a_token" tokenId:@"a_token_id" completion:^(NSError * _Nullable error) {
@@ -258,7 +258,7 @@
 // FIXME: Dependancy on BSON
 #if 0
 - (void)testCallResetPasswordFunction {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should try call reset password function and fail"];
 
     [[app usernamePasswordProviderClient] callResetPasswordFunction:@"test@mongodb.com" password:@"aPassword123" args:@"" completion:^(NSError * _Nullable error) {
@@ -272,7 +272,7 @@
 #pragma mark - UserAPIKeyProviderClient
 
 - (void)testUserAPIKeyProviderClientFlow {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
 
     XCTestExpectation *registerExpectation = [self expectationWithDescription:@"should try register"];
     XCTestExpectation *loginExpectation = [self expectationWithDescription:@"should try login"];
@@ -360,7 +360,7 @@
 #pragma mark - Link user
 
 - (void)testLinkUser {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
+    RLMApp *app = [RLMApp appWithAppId:self.appId configuration:[self defaultAppConfiguration]];
 
     XCTestExpectation *registerExpectation = [self expectationWithDescription:@"should try register"];
     XCTestExpectation *loginExpectation = [self expectationWithDescription:@"should try login"];
@@ -400,6 +400,55 @@
 
 }
 
+#pragma mark - Auth Credentials
+
+- (void)testUsernamePasswordCredential {
+    RLMAppCredentials *usernamePasswordCredential = [RLMAppCredentials credentialsWithUsername:@"test@mongodb.com" password:@"apassword"];
+    XCTAssertEqualObjects(usernamePasswordCredential.provider, @"local-userpass");
+}
+
+- (void)testJWTCredential {
+    RLMAppCredentials *jwtCredential = [RLMAppCredentials credentialsWithJWT:@"sometoken"];
+    XCTAssertEqualObjects(jwtCredential.provider, @"custom-token");
+}
+
+- (void)testAnonymousCredential {
+    RLMAppCredentials *anonymousCredential = [RLMAppCredentials anonymousCredentials];
+    XCTAssertEqualObjects(anonymousCredential.provider, @"anon-user");
+}
+
+- (void)testUserAPIKeyCredential {
+    RLMAppCredentials *userAPICredential = [RLMAppCredentials credentialsWithUserAPIKey:@"apikey"];
+    XCTAssertEqualObjects(userAPICredential.provider, @"api-key");
+}
+
+- (void)testServerAPIKeyCredential {
+    RLMAppCredentials *serverAPICredential = [RLMAppCredentials credentialsWithServerAPIKey:@"apikey"];
+    XCTAssertEqualObjects(serverAPICredential.provider, @"api-key");
+}
+
+- (void)testFacebookCredential {
+    RLMAppCredentials *facebookCredential = [RLMAppCredentials credentialsWithFacebookToken:@"facebook token"];
+    XCTAssertEqualObjects(facebookCredential.provider, @"oauth2-facebook");
+}
+
+- (void)testGoogleCredential {
+    RLMAppCredentials *googleCredential = [RLMAppCredentials credentialsWithGoogleToken:@"google token"];
+    XCTAssertEqualObjects(googleCredential.provider, @"oauth2-google");
+}
+
+- (void)testAppleCredential {
+    RLMAppCredentials *appleCredential = [RLMAppCredentials credentialsWithAppleToken:@"apple token"];
+    XCTAssertEqualObjects(appleCredential.provider, @"oauth2-apple");
+}
+
+- (void)testFunctionCredential {
+    NSError *error;
+    RLMAppCredentials *functionCredential = [RLMAppCredentials credentialsWithFunctionPayload:@{ @"dog" : @{ @"name" : @"fido" } }
+                                                                                        error:&error];
+    XCTAssertEqualObjects(functionCredential.provider, @"custom-function");
+    XCTAssertEqualObjects(error, nil);
+}
 
 #pragma mark - Username Password
 
@@ -459,7 +508,8 @@
         XCTAssertNil(error);
         [expectationA fulfill];
     }];
-    
+    [self waitForExpectationsWithTimeout:2.0 handler:nil];
+
     [[self.app usernamePasswordProviderClient] registerEmail:NSStringFromSelector(_cmd)
                                                     password:@"password"
                                                   completion:^(NSError * error) {
@@ -504,26 +554,27 @@
     RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]];
     RLMSyncUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
 
-    RLMRealm *realm = [self openRealmForPartitionValue:@"foo"
+    NSString *realmId = @"foo";
+    RLMRealm *realm = [self openRealmForPartitionValue:realmId
                                                   user:user];
-    RLMRealm *realm2 = [self openRealmForPartitionValue:@"foo"
+    RLMRealm *realm2 = [self openRealmForPartitionValue:realmId
                                                    user:user2];
     if (self.isParent) {
         CHECK_COUNT(0, Person, realm);
         RLMRunChildAndWait();
         [self waitForDownloadsForUser:user
                                realms:@[realm]
-                      partitionValues:@[@"foo"] expectedCounts:@[@4]];
+                      partitionValues:@[realmId] expectedCounts:@[@4]];
         [self waitForDownloadsForUser:user2
                                realms:@[realm2]
-                      partitionValues:@[@"foo"] expectedCounts:@[@4]];
+                      partitionValues:@[realmId] expectedCounts:@[@4]];
     } else {
         // Add objects.
         [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo],
-                                  [Person george]]];
+                        persons:@[[Person johnWithRealmId:realmId],
+                                  [Person paulWithRealmId:realmId],
+                                  [Person ringoWithRealmId:realmId],
+                                  [Person georgeWithRealmId:realmId]]];
         [self waitForUploadsForRealm:realm];
     }
 }
@@ -531,11 +582,11 @@
 /// If client B deletes objects from a synced Realm, client A should see the effects of that deletion.
 - (void)testDeleteObjects {
     RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:self.isParent]];
+                                                                            register:self.isParent]];
     RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
     if (self.isParent) {
         // Add objects.
-        [self addPersonsToRealm:realm persons:@[[Person john]]];
+        [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:@"foo"]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
         RLMRunChildAndWait();
@@ -575,7 +626,7 @@
                        expectedCounts:@[@1]];
     } else {
         // Add objects.
-        [self addPersonsToRealm:realm persons:@[[Person john]]];
+        [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:@"foo"]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
     }
@@ -621,7 +672,7 @@
                                              encryptionKey:RLMGenerateKey()
                                                 stopPolicy:RLMSyncStopPolicyImmediately
                                           immediatelyBlock:nil];
-        [self addPersonsToRealm:realm persons:@[[Person john]]];
+        [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:@"foo"]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
     }
@@ -698,18 +749,18 @@
     } else {
         // Add objects.
         [self addPersonsToRealm:realmA
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo]]];
+                        persons:@[[Person johnWithRealmId:partitionValueA],
+                                  [Person paulWithRealmId:partitionValueA],
+                                  [Person ringoWithRealmId:partitionValueA]]];
         [self addPersonsToRealm:realmB
-                        persons:@[[Person john],
-                                  [Person paul]]];
+                        persons:@[[Person johnWithRealmId:partitionValueB],
+                                  [Person paulWithRealmId:partitionValueB]]];
         [self addPersonsToRealm:realmC
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo],
-                                  [Person george],
-                                  [Person ringo]]];
+                        persons:@[[Person johnWithRealmId:partitionValueC],
+                                  [Person paulWithRealmId:partitionValueC],
+                                  [Person ringoWithRealmId:partitionValueC],
+                                  [Person georgeWithRealmId:partitionValueC],
+                                  [Person ringoWithRealmId:partitionValueC]]];
         [self waitForUploadsForRealm:realmA];
         [self waitForUploadsForRealm:realmB];
         [self waitForUploadsForRealm:realmC];
@@ -736,19 +787,19 @@
         [self waitForDownloadsForRealm:realmC];
         // Add objects.
         [self addPersonsToRealm:realmA
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo],
-                                  [Person george]]];
+                        persons:@[[Person johnWithRealmId:partitionValueA],
+                                  [Person paulWithRealmId:partitionValueA],
+                                  [Person ringoWithRealmId:partitionValueA],
+                                  [Person georgeWithRealmId:partitionValueA]]];
         [self addPersonsToRealm:realmB
-                        persons:@[[Person john],
-                                  [Person paul],
-                                  [Person ringo],
-                                  [Person george],
-                                  [Person george]]];
+                        persons:@[[Person johnWithRealmId:partitionValueB],
+                                  [Person paulWithRealmId:partitionValueB],
+                                  [Person ringoWithRealmId:partitionValueB],
+                                  [Person georgeWithRealmId:partitionValueB],
+                                  [Person georgeWithRealmId:partitionValueB]]];
         [self addPersonsToRealm:realmC
-                        persons:@[[Person john],
-                                  [Person paul]]];
+                        persons:@[[Person johnWithRealmId:partitionValueC],
+                                  [Person paulWithRealmId:partitionValueC]]];
 
         [self waitForUploadsForRealm:realmA];
         [self waitForUploadsForRealm:realmB];
@@ -802,9 +853,9 @@
         @autoreleasepool {
             RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
             [self addPersonsToRealm:realm
-                            persons:@[[Person john],
-                                      [Person paul],
-                                      [Person ringo]]];
+                            persons:@[[Person johnWithRealmId:@"foo"],
+                                      [Person paulWithRealmId:@"foo"],
+                                      [Person ringoWithRealmId:@"foo"]]];
             CHECK_COUNT(OBJECT_COUNT, Person, realm);
             
             [self waitForUploadsForRealm:realm];
@@ -828,7 +879,7 @@
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
     RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
 
-    [self addPersonsToRealm:realm persons:@[[Person john]]];
+    [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:@"foo"]]];
     CHECK_COUNT(1, Person, realm);
     [self waitForUploadsForRealm:realm];
     // Log out the user.
@@ -836,9 +887,9 @@
     // Log the user back in.
     user = [self logInUserForCredentials:credentials];
     [self addPersonsToRealm:realm
-    persons:@[[Person john],
-              [Person paul],
-              [Person ringo]]];
+    persons:@[[Person johnWithRealmId:@"foo"],
+              [Person paulWithRealmId:@"foo"],
+              [Person ringoWithRealmId:@"foo"]]];
     CHECK_COUNT(4, Person, realm);
 }
 
@@ -969,16 +1020,16 @@
         user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                    register:NO]];
         // Open the Realm (for the first time).
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
         [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul]]];
+                        persons:@[[Person johnWithRealmId:@"foo"],
+                                  [Person paulWithRealmId:@"foo"]]];
         
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
         RLMRunChildAndWait();
     } else {
-        RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
         // Add objects.
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
@@ -1010,8 +1061,8 @@
         // Add objects.
         [self waitForDownloadsForRealm:realm];
         [self addPersonsToRealm:realm
-                        persons:@[[Person john],
-                                  [Person paul]]];
+                        persons:@[[Person johnWithRealmId:@"foo"],
+                                  [Person paulWithRealmId:@"foo"]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
     }
@@ -1216,7 +1267,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
     [realm beginWriteTransaction];
     for (NSInteger i=0; i<NUMBER_OF_BIG_OBJECTS; i++) {
-        [realm addObject:[Person john]];
+        [realm addObject:[Person johnWithRealmId:@"foo"]];
     }
     [realm commitWriteTransaction];
     [self waitForUploadsForRealm:realm];
@@ -1492,7 +1543,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 - (void)testCompactOnLaunch {
     RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                       register:self.isParent];
+                                                           register:self.isParent];
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
 
     NSString *path;
@@ -1501,7 +1552,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     @autoreleasepool {
         RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
         [realm beginWriteTransaction];
-        [realm addObject:[Person john]];
+        [realm addObject:[Person johnWithRealmId:@"foo"]];
         [realm commitWriteTransaction];
         [self waitForUploadsForRealm:realm];
 
@@ -1541,28 +1592,25 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 #pragma mark - Remote Mongo
 
 - (void)testRemoteMongo {
-    RLMApp *app = [RLMApp app:self.appId configuration:[self defaultAppConfiguration]];
-    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
-    __block RLMSyncUser *syncUser;
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
-        XCTAssert(!error);
-        XCTAssert(user);
-        syncUser = user;
-        [expectation fulfill];
-    }];
+//    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+//    __block RLMSyncUser *syncUser;
+//    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+//        XCTAssert(!error);
+//        XCTAssert(user);
+//        syncUser = user;
+//        [expectation fulfill];
+//    }];
+//
+//    [self waitForExpectationsWithTimeout:60.0 handler:nil];
 
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-    RLMSyncUser *currentUser = [app currentUser];
-    XCTAssert([currentUser.identity isEqualToString:syncUser.identity]);
-    XCTAssert([currentUser.refreshToken isEqualToString:syncUser.refreshToken]);
-    XCTAssert([currentUser.accessToken isEqualToString:syncUser.accessToken]);
         
-    RLMMongoClient *client = [app mongoClient:@"BackingDB"];
+    RLMMongoClient *client = [self.app mongoClient:@"BackingDB"];
     RLMMongoDatabase *database = [client database:@"test_data"];
     RLMMongoCollection *collection = [database collection:@"Dog"];
 
-    [collection insertTest:@{}];
+    [collection insertOneDocument:@{@"name": @"fido", @"breed": @"cane corso"} completion:^(RLMObjectId * objectId, NSError * error) {
+        NSLog(@"");
+    }];
     
 }
 

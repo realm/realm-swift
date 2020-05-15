@@ -9,8 +9,8 @@
 #import "RLMMongoCollection.h"
 #import "RLMMongoCollection_Private.hpp"
 #import "RLMApp_Private.hpp"
-//#import "RLMBSON.h"
 #import "RLMBSON_Private.hpp"
+#import "RLMObjectId_Private.hpp"
 
 #import "sync/remote_mongo_database.hpp"
 #import "sync/remote_mongo_collection.hpp"
@@ -23,7 +23,6 @@
         _app = app;
         _serviceName = serviceName;
         _databaseName = serviceName;
-
     }
     return self;
 }
@@ -34,10 +33,11 @@
     .collection(name.UTF8String);
 }
 
-- (void)insertTest:(id<RLMBSON>)bson {
-    [self collection:@"Person"].insert_one(static_cast<bson::BsonDocument>(RLMBSONToBson(bson)),
-                                           [=](util::Optional<ObjectId>, util::Optional<realm::app::AppError>) {
-        NSLog(@"hello");
+- (void)insertOneDocument:(id<RLMBSON>)document completion:(RLMInsertBlock)completion {
+    [self collection:@"Person"].insert_one(static_cast<realm::bson::BsonDocument>(RLMRLMBSONToBson(document)),
+                                           [=](realm::util::Optional<realm::ObjectId> objectId, realm::util::Optional<realm::app::AppError> error) {
+
+        completion([[RLMObjectId alloc] initWithValue:*objectId], RLMAppErrorToNSError(*error));
     });
 }
 

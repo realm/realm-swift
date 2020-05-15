@@ -80,7 +80,12 @@ typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _
 @property (readonly) RLMAppConfiguration *configuration;
 @property (nonatomic, readonly) RLMSyncManager *syncManager;
 
-+ (NSDictionary<NSString *, RLMApp *> *)apps;
+/**
+ Get an application with a given appId and configuration.
+
+ @param appId The unique identifier of your Realm app.
+ */
++ (instancetype)appWithAppId:(NSString *)appId;
 
 /**
  Get an application with a given appId and configuration.
@@ -88,8 +93,8 @@ typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _
  @param appId The unique identifier of your Realm app.
  @param configuration A configuration object to configure this client.
  */
-+ (instancetype)app:(NSString *)appId
-      configuration:(nullable RLMAppConfiguration *)configuration;
++ (instancetype)appWithAppId:(NSString *)appId
+               configuration:(nullable RLMAppConfiguration *)configuration;
 
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers;
 

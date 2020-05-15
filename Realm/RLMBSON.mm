@@ -1,3 +1,21 @@
+////////////////////////////////////////////////////////////////////////////
+//
+// Copyright 2020 Realm Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
+
 #import <Foundation/Foundation.h>
 #import "util/bson/bson.hpp"
 #import "RLMUtil.hpp"
@@ -83,8 +101,8 @@ using namespace bson;
 - (instancetype)initWithBsonArray:(BsonArray)bsonArray {
 
     if ((self = [self init])) {
-        for (auto it = bsonArray.begin(); it != bsonArray.end(); ++it) {
-            [self addObject:BsonToRLMBSON(*it)];
+        for (auto& entry : bsonArray) {
+            [self addObject:RLMBsonToRLMBSON(entry)];
         }
 
         return self;
@@ -100,7 +118,7 @@ using namespace bson;
 - (BsonArray)bsonArrayValue {
     BsonArray bsonArray;
     for (id value in self) {
-        bsonArray.push_back(RLMBSONToBson(value));
+        bsonArray.push_back(RLMRLMBSONToBson(value));
     }
     return bsonArray;
 }
@@ -122,7 +140,7 @@ using namespace bson;
 - (BsonDocument)bsonDocumentValue {
     BsonDocument bsonDocument;
     for (NSString *value in self) {
-        bsonDocument[value.UTF8String] = RLMBSONToBson(self[value]);
+        bsonDocument[value.UTF8String] = RLMRLMBSONToBson(self[value]);
     }
     return bsonDocument;
 }
@@ -131,7 +149,7 @@ using namespace bson;
     if ((self = [self init])) {
         for (auto it = bsonDocument.begin(); it != bsonDocument.end(); ++it) {
             const auto& entry = (*it);
-            [self setObject:BsonToRLMBSON(entry.second) forKey:@(entry.first.data())];
+            [self setObject:RLMBsonToRLMBSON(entry.second) forKey:@(entry.first.data())];
         }
 
         return self;
@@ -151,7 +169,7 @@ using namespace bson;
 - (BsonDocument)bsonDocumentValue {
     BsonDocument bsonDocument;
     for (NSString *value in self) {
-        bsonDocument[value.UTF8String] = RLMBSONToBson(self[value]);
+        bsonDocument[value.UTF8String] = RLMRLMBSONToBson(self[value]);
     }
     return bsonDocument;
 }
@@ -196,14 +214,14 @@ using namespace bson;
 
 - (RegularExpression)regularExpressionValue {
     using Option = RegularExpression::Option;
-    std::stringstream s;
+    std::string s;
 
-    if ((_options & NSRegularExpressionCaseInsensitive) != 0) s << 'i';
-    if ((_options & NSRegularExpressionUseUnixLineSeparators) != 0) s << 'm';
-    if ((_options & NSRegularExpressionDotMatchesLineSeparators) != 0) s << 's';
-    if ((_options & NSRegularExpressionUseUnicodeWordBoundaries) != 0) s << 'x';
+    if ((_options & NSRegularExpressionCaseInsensitive) != 0) s += 'i';
+    if ((_options & NSRegularExpressionUseUnixLineSeparators) != 0) s += 'm';
+    if ((_options & NSRegularExpressionDotMatchesLineSeparators) != 0) s += 's';
+    if ((_options & NSRegularExpressionUseUnicodeWordBoundaries) != 0) s += 'x';
 
-    return RegularExpression(_pattern.UTF8String, s.str());
+    return RegularExpression(_pattern.UTF8String, s);
 }
 
 - (instancetype)initWithRegularExpression:(RegularExpression)regularExpression {
@@ -291,7 +309,7 @@ using namespace bson;
 
 #pragma mark RLMBSONToBson
 
-Bson RLMBSONToBson(id<RLMBSON> b) {
+Bson RLMRLMBSONToBson(id<RLMBSON> b) {
     switch ([b bsonType]) {
         case RLMBSONTypeString:
             return ((NSString *)b).UTF8String;
@@ -330,7 +348,7 @@ Bson RLMBSONToBson(id<RLMBSON> b) {
 
 #pragma mark BsonToRLMBSON
 
-id<RLMBSON> BsonToRLMBSON(const Bson& b) {
+id<RLMBSON> RLMBsonToRLMBSON(const Bson& b) {
     switch (b.type()) {
         case realm::bson::Bson::Type::Null:
             return nil;
