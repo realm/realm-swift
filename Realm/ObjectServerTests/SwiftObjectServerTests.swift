@@ -563,9 +563,56 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             }
         }
     }
-    
     #endif
-    
+
+    // MARK: - App Credentials
+
+    func testUsernamePasswordCredential() {
+        let usernamePasswordCredential = AppCredentials(username: "username", password: "password")
+        XCTAssertEqual(usernamePasswordCredential.provider.rawValue, "local-userpass")
+    }
+
+    func testJWTCredentials() {
+        let jwtCredential = AppCredentials(jwt: "token")
+        XCTAssertEqual(jwtCredential.provider.rawValue, "custom-token")
+    }
+
+    func testAnonymousCredentials() {
+        let anonymousCredential = AppCredentials.anonymous()
+        XCTAssertEqual(anonymousCredential.provider.rawValue, "anon-user")
+    }
+
+    func testUserAPIKeyCredentials() {
+        let userAPIKeyCredential = AppCredentials(userAPIKey: "apikey")
+        XCTAssertEqual(userAPIKeyCredential.provider.rawValue, "api-key")
+    }
+
+    func testServerAPIKeyCredentials() {
+        let serverAPIKeyCredential = AppCredentials(serverAPIKey: "apikey")
+        XCTAssertEqual(serverAPIKeyCredential.provider.rawValue, "api-key")
+    }
+
+    func testFacebookCredentials() {
+        let facebookCredential = AppCredentials(facebookToken: "token")
+        XCTAssertEqual(facebookCredential.provider.rawValue, "oauth2-facebook")
+    }
+
+    func testGoogleCredentials() {
+        let googleCredential = AppCredentials(googleToken: "token")
+        XCTAssertEqual(googleCredential.provider.rawValue, "oauth2-google")
+    }
+
+    func testAppleCredentials() {
+        let appleCredential = AppCredentials(appleToken: "token")
+        XCTAssertEqual(appleCredential.provider.rawValue, "oauth2-apple")
+    }
+
+    func testFunctionCredentials() {
+        var error: NSError!
+        let functionCredential = AppCredentials.init(functionPayload: ["dog": ["name": "fido"]], error: &error)
+        XCTAssertEqual(functionCredential.provider.rawValue, "custom-function")
+    }
+
     // MARK: - Authentication
 
     func testInvalidCredentials() {
