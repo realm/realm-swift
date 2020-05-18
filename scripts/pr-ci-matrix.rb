@@ -31,6 +31,8 @@ targets = {
   'catalyst' => minimum_version(11),
   'catalyst-swift' => minimum_version(11),
 
+  'xcframework' => latest_only,
+
   'cocoapods-osx' => release_only,
   'cocoapods-ios' => oldest_and_latest,
   'cocoapods-ios-dynamic' => oldest_and_latest,
