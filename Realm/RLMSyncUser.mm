@@ -32,6 +32,7 @@
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import "util/bson/bson.hpp"
 #import "sync/sync_manager.hpp"
 #import "sync/sync_session.hpp"
 #import "sync/sync_user.hpp"
@@ -99,19 +100,19 @@ using namespace realm;
     _user = nullptr;
 }
 
-- (NSString *)pathForPartitionValueHash:(NSUInteger)partitionValueHash {
-    return [[NSString alloc] initWithFormat:@"%@/%lu", [self identity], (unsigned long)partitionValueHash];
+- (NSString *)pathForPartitionValue:(id<RLMBSON>)partitionValue {
+    std::stringstream s;
+    s << RLMConvertRLMBSONToBson(partitionValue);
+    NSString *encodedPartitionValue = [@(s.str().c_str()) stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
+    return [[NSString alloc] initWithFormat:@"%@/%@", [self identity], encodedPartitionValue];
 }
 
-- (nullable RLMSyncSession *)sessionForPartitionValue:(NSString *)partitionValue {
-    // FIXME: This step will be encode the partition value as xjson
-    partitionValue = [[NSString alloc] initWithFormat:@"\"%@\"", partitionValue];
-
+- (nullable RLMSyncSession *)sessionForPartitionValue:(id<RLMBSON>)partitionValue {
     if (!_user) {
         return nil;
     }
 
-    auto path = SyncManager::shared().path_for_realm(*_user, [[self pathForPartitionValueHash:[partitionValue hash]] UTF8String]);
+    auto path = SyncManager::shared().path_for_realm(*_user, [[self pathForPartitionValue:partitionValue] UTF8String]);
     if (auto session = _user->session_for_on_disk_path(path)) {
         return [[RLMSyncSession alloc] initWithSyncSession:session];
     }
@@ -192,7 +193,7 @@ using namespace realm;
         return nil;
     }
 
-    return (NSDictionary *)RLMBsonToRLMBSON(*_user->custom_data());
+    return (NSDictionary *)RLMConvertBsonToRLMBSON(*_user->custom_data());
 }
 
 - (std::shared_ptr<SyncUser>)_syncUser {

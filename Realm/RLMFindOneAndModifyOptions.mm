@@ -1,10 +1,20 @@
+////////////////////////////////////////////////////////////////////////////
 //
-//  RLMFindOneAndModifyOptions.m
-//  Realm
+// Copyright 2020 Realm Inc.
 //
-//  Created by Lee Maguire on 15/05/2020.
-//  Copyright © 2020 Realm. All rights reserved.
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
 //
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
 
 #import "RLMFindOneAndModifyOptions.h"
 #import "RLMFindOneAndModifyOptions_Private.hpp"
@@ -25,7 +35,7 @@
     return self;
 }
 
-- (realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions)RLMFindOneAndModifyOptionsToRemoteFindOneAndModifyOptions {
+- (realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions)toRemoteFindOneAndModifyOptions {
     realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions options;
     
     if (self.upsert) {
@@ -35,11 +45,11 @@
         options.return_new_document = true;
     }
     if (self.projectionBson) {
-        auto bson = realm::bson::BsonDocument(RLMRLMBSONToBson(self.projectionBson));
+        auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(self.projectionBson));
         options.projection_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
     }
     if (self.sortBson) {
-        auto bson = realm::bson::BsonDocument(RLMRLMBSONToBson(self.sortBson));
+        auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(self.sortBson));
         options.sort_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
     }
     

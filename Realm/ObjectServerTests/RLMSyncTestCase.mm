@@ -181,14 +181,6 @@ static NSURL *syncDirectoryForChildProcess() {
 
 #pragma mark RealmObjectServer
 
-@interface RealmObjectServer : NSObject
-@property (nonatomic, readonly) NSString *appId;
-+ (instancetype)sharedServer;
-
-- (NSString *)createApp;
-
-@end
-
 @implementation RealmObjectServer {
 }
 

@@ -17,14 +17,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMUpdateResult.h>
+#import "sync/remote_mongo_collection.hpp"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMUpdateResult ()
 
-- (instancetype)initWithMatchedCount:(NSNumber *)matchedCount
-                       modifiedCount:(NSNumber *)modifiedCount
-                            objectId:(RLMObjectId * _Nullable)objectId;
+- (instancetype)initWithRemoteUpdateResult:(realm::app::RemoteMongoCollection::RemoteUpdateResult)remoteUpdateResult;
 
 @end
 

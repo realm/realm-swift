@@ -16,16 +16,19 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-
 #import "RLMMongoDatabase.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class RLMApp;
 
+/// A client responsible for communication with the Realm Cloud API
 @interface RLMMongoClient : NSObject
 
+@property (nonatomic, readonly) NSString *name;
+
+/// Gets a `RLMMongoDatabase` instance for the given database name.
+/// @param name the name of the database to retrieve
 - (RLMMongoDatabase *)database:(NSString *)name;
 
 @end

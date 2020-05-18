@@ -39,6 +39,24 @@
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
 
+@interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
+@end
+
+@implementation AsyncOpenConnectionTimeoutTransport
+
+- (void)sendRequestToServer:(RLMRequest *)request completion:(RLMNetworkTransportCompletionBlock)completionBlock {
+    if ([request.url hasSuffix:@"location"]) {
+        RLMResponse *r = [RLMResponse new];
+        r.httpStatusCode = 200;
+        r.body = @"{\"deployment_model\":\"GLOBAL\",\"location\":\"US-VA\",\"hostname\":\"http://localhost:5678\",\"ws_hostname\":\"ws://localhost:5678\"}";
+        completionBlock(r);
+    } else {
+        [super sendRequestToServer:request completion:completionBlock];
+    }
+}
+
+@end
+
 @implementation RLMObjectServerTests
 
 #pragma mark - App Tests
@@ -456,9 +474,9 @@
 /// same user object.
 - (void)testUsernamePasswordAuthentication {
     RLMSyncUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                            register:YES]];
+                                                                                 register:YES]];
     RLMSyncUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                             register:NO]];
+                                                                                  register:NO]];
     // Two users created with the same credential should resolve to the same actual user.
     XCTAssertTrue([firstUser.identity isEqualToString:secondUser.identity]);
 }
@@ -1213,7 +1231,7 @@
                                                        register:self.isParent];
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
     // Open the Realm
-    [self openRealmForPartitionValue:@"realm_id" user:user];
+    __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
 
     __block NSError *theError = nil;
     XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
@@ -1365,6 +1383,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
               @"Transferred (%@) needs to be greater than or equal to transferrable (%@)",
               @(transferred), @(transferrable));
 }
+
 #endif
 
 #pragma mark - Download Realm
@@ -1508,7 +1527,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 #if 0
 - (void)testAsyncOpenProgressNotifications {
     RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                       register:self.isParent];
+                                                           register:self.isParent];
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
 
     if (!self.isParent) {
@@ -1537,6 +1556,54 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:2.0 handler:nil];
 }
 #endif
+
+- (void)testAsyncOpenConnectionTimeout {
+    [self resetSyncManager];
+
+    NSTask *task = [[NSTask alloc] init];
+    NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
+    task.currentDirectoryPath = directory;
+    task.launchPath = @"/usr/bin/ruby";
+    task.arguments = @[[directory stringByAppendingPathComponent:@"run_baas.rb"], @"start_proxy", @"5678", @"2"];
+    [task launch];
+
+    RLMAppConfiguration *config = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:5678"
+                                                                     transport:[AsyncOpenConnectionTimeoutTransport new]
+                                                                  localAppName:nil
+                                                               localAppVersion:nil
+                                                       defaultRequestTimeoutMS:60];
+    RLMApp *app = [RLMApp appWithAppId:[[RealmObjectServer sharedServer] createApp] configuration:config];
+    __block RLMSyncUser* theUser;
+    XCTestExpectation *expectation = [self expectationWithDescription:@""];
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser *user, NSError *) {
+        theUser = user;
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+
+    RLMRealmConfiguration *c = [theUser configurationWithPartitionValue:@"foo"];
+    RLMSyncConfiguration *syncConfig = c.syncConfiguration;
+    syncConfig.cancelAsyncOpenOnNonFatalErrors = true;
+    c.syncConfiguration = syncConfig;
+
+    RLMSyncTimeoutOptions *timeoutOptions = [RLMSyncTimeoutOptions new];
+    timeoutOptions.connectTimeout = 1000.0;
+    [app syncManager].timeoutOptions = timeoutOptions;
+
+    XCTestExpectation *ex = [self expectationWithDescription:@"async open"];
+    [RLMRealm asyncOpenWithConfiguration:c
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *error) {
+        XCTAssertNotNil(error);
+        XCTAssertEqual(error.code, ETIMEDOUT);
+        XCTAssertEqual(error.domain, NSPOSIXErrorDomain);
+        XCTAssertNil(realm);
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [task terminate];
+    [task waitUntilExit];
+}
 
 #pragma mark - Compact on Launch
 
@@ -1590,7 +1657,19 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 #pragma mark - Remote Mongo
 
-- (void)testRemoteMongo {
+- (void)cleanupRemoteDocuments:(RLMMongoCollection *)collection {
+    XCTestExpectation *deleteManyExpectation = [self expectationWithDescription:@"should delete many documents"];
+    [collection deleteManyDocuments:@{}
+                         completion:^(NSNumber * count, NSError * error) {
+        XCTAssertNotNil(count);
+        XCTAssertNil(error);
+        [deleteManyExpectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
+
+- (void)testRemoteMongoInsert {
     XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
     __block RLMSyncUser *syncUser;
     [self.app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
@@ -1601,12 +1680,13 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }];
 
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
         
     RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
     RLMMongoDatabase *database = [client database:@"test_data"];
     RLMMongoCollection *collection = [database collection:@"Dog"];
 
+    [self cleanupRemoteDocuments:collection];
+    
     XCTestExpectation *insertOneExpectation = [self expectationWithDescription:@"should insert one document"];
     [collection insertOneDocument:@{@"name": @"fido", @"breed": @"cane corso"} completion:^(RLMObjectId * objectId, NSError * error) {
         XCTAssertTrue(![objectId.stringValue isEqualToString:@""]);
@@ -1615,18 +1695,407 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
     
+    XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
+    [collection insertManyDocuments:@[
+        @{@"name": @"fido", @"breed": @"cane corso"},
+        @{@"name": @"fido", @"breed": @"cane corso"},
+        @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
+                         completion:^(NSArray<RLMObjectId *> * objectIds, NSError * error) {
+        XCTAssertTrue(objectIds.count > 0);
+        XCTAssertNil(error);
+        [insertManyExpectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
     XCTestExpectation *findExpectation = [self expectationWithDescription:@"should find documents"];
-    
     RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:nil projectionBson:nil sortBson:nil];
-    
     [collection find:@{@"name": @"fido", @"breed": @"cane corso"}
              options:options
-          completion:^(NSArray<id<RLMBSON>> * documents, NSError * error) {
+          completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
+        XCTAssertEqual((int)documents.count, 3);
         XCTAssertNil(error);
         [findExpectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
 }
+
+- (void)testRemoteMongoFind {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    __block RLMSyncUser *syncUser;
+    [self.app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+        
+    RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
+    RLMMongoDatabase *database = [client database:@"test_data"];
+    RLMMongoCollection *collection = [database collection:@"Dog"];
+
+    [self cleanupRemoteDocuments:collection];
+    
+    XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
+    [collection insertManyDocuments:@[
+        @{@"name": @"fido", @"breed": @"cane corso"},
+        @{@"name": @"fido", @"breed": @"cane corso"},
+        @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
+                         completion:^(NSArray<RLMObjectId *> * objectIds, NSError * error) {
+        XCTAssertTrue(objectIds.count > 0);
+        XCTAssertNil(error);
+        [insertManyExpectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *findExpectation = [self expectationWithDescription:@"should find documents"];
+    RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:nil projectionBson:nil sortBson:nil];
+    [collection find:@{@"name": @"fido", @"breed": @"cane corso"}
+             options:options
+          completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
+        XCTAssertEqual((int)documents.count, 2);
+        XCTAssertNil(error);
+        [findExpectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *findExpectation2 = [self expectationWithDescription:@"should find documents"];
+    [collection find:@{@"name": @"fido", @"breed": @"cane corso"}
+          completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
+        XCTAssertEqual((int)documents.count, 2);
+        XCTAssertNil(error);
+        [findExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *findExpectation3 = [self expectationWithDescription:@"should not find documents"];
+    [collection find:@{@"name": @"should not exist", @"breed": @"should not exist"}
+          completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
+        XCTAssertEqual(documents.count, NSUInteger(0));
+        XCTAssertNil(error);
+        [findExpectation3 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *findExpectation4 = [self expectationWithDescription:@"should not find documents"];
+    [collection find:@{}
+          completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
+        XCTAssertTrue(documents.count > 0);
+        XCTAssertNil(error);
+        [findExpectation4 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *findOneExpectation1 = [self expectationWithDescription:@"should find documents"];
+    [collection findOneDocument:@{@"name": @"fido", @"breed": @"cane corso"}
+          completion:^(NSDictionary * document, NSError * error) {
+        XCTAssertTrue([document[@"name"] isEqualToString:@"fido"]);
+        XCTAssertTrue([document[@"breed"] isEqualToString:@"cane corso"]);
+        XCTAssertNil(error);
+        [findOneExpectation1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *findOneExpectation2 = [self expectationWithDescription:@"should find documents"];
+    [collection findOneDocument:@{@"name": @"fido", @"breed": @"cane corso"}
+                        options:options
+                     completion:^(NSDictionary * document, NSError * error) {
+        XCTAssertTrue([document[@"name"] isEqualToString:@"fido"]);
+        XCTAssertTrue([document[@"breed"] isEqualToString:@"cane corso"]);
+        XCTAssertNil(error);
+        [findOneExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
+- (void)testRemoteMongoAggregateAndCount {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    __block RLMSyncUser *syncUser;
+    [self.app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+        
+    RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
+    RLMMongoDatabase *database = [client database:@"test_data"];
+    RLMMongoCollection *collection = [database collection:@"Dog"];
+
+    [self cleanupRemoteDocuments:collection];
+    
+    XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
+    [collection insertManyDocuments:@[
+        @{@"name": @"fido", @"breed": @"cane corso"},
+        @{@"name": @"fido", @"breed": @"cane corso"},
+        @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
+                         completion:^(NSArray<RLMObjectId *> * objectIds, NSError * error) {
+        XCTAssertTrue(objectIds.count > 0);
+        XCTAssertNil(error);
+        [insertManyExpectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *aggregateExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
+    [collection aggregate:@[@{@"name" : @"fido"}]
+               completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
+        XCTAssertNotNil(error);
+        XCTAssertTrue([error.domain.description isEqualToString:@"realm::app::ServiceError"]);
+        XCTAssertTrue([error.localizedDescription isEqualToString:@"(Location40324) Unrecognized pipeline stage name: 'name'"]);
+        XCTAssertNil(documents);
+        [aggregateExpectation1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *aggregateExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
+    [collection aggregate:@[@{@"$match" : @{@"name" : @"fido"}}, @{@"$group" : @{@"_id" : @"$name"}}]
+               completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
+        XCTAssertNotNil(documents);
+        XCTAssertTrue(documents.count > 0);
+        XCTAssertNil(error);
+        [aggregateExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *countExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
+    [collection count:@{@"name" : @"fido"}
+               completion:^(NSNumber * count, NSError * error) {
+        XCTAssertNotNil(count);
+        XCTAssertTrue(count.intValue > 0);
+        XCTAssertNil(error);
+        [countExpectation1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *countExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
+    [collection count:@{@"name" : @"fido"}
+                limit:@1
+               completion:^(NSNumber * count, NSError * error) {
+        XCTAssertNotNil(count);
+        XCTAssertEqual(count.intValue, 1);
+        XCTAssertNil(error);
+        [countExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
+- (void)testRemoteMongoUpdate {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    __block RLMSyncUser *syncUser;
+    [self.app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+        
+    RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
+    RLMMongoDatabase *database = [client database:@"test_data"];
+    RLMMongoCollection *collection = [database collection:@"Dog"];
+
+    [self cleanupRemoteDocuments:collection];
+    
+    XCTestExpectation *updateExpectation1 = [self expectationWithDescription:@"should update document"];
+    [collection updateOneDocument:@{@"name" : @"scrabby doo"}
+                   updateDocument:@{@"name" : @"scooby"}
+                           upsert:YES
+                       completion:^(RLMUpdateResult * result, NSError * error) {
+        XCTAssertNotNil(result);
+        XCTAssertNotNil(result.objectId);
+        XCTAssertEqual(result.modifiedCount.intValue, 0);
+        XCTAssertEqual(result.matchedCount.intValue, 0);
+        XCTAssertNil(error);
+        [updateExpectation1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *updateExpectation2 = [self expectationWithDescription:@"should update document"];
+    [collection updateOneDocument:@{@"name" : @"scooby"}
+                   updateDocument:@{@"name" : @"fred"}
+                           upsert:NO
+                       completion:^(RLMUpdateResult * result, NSError * error) {
+        XCTAssertNotNil(result);
+        XCTAssertNil(result.objectId);
+        XCTAssertEqual(result.modifiedCount.intValue, 1);
+        XCTAssertEqual(result.matchedCount.intValue, 1);
+        XCTAssertNil(error);
+        [updateExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *updateExpectation3 = [self expectationWithDescription:@"should update document"];
+    [collection updateOneDocument:@{@"name" : @"fred"}
+                   updateDocument:@{@"name" : @"scrabby"}
+                       completion:^(RLMUpdateResult * result, NSError * error) {
+        XCTAssertNotNil(result);
+        XCTAssertNil(result.objectId);
+        XCTAssertEqual(result.modifiedCount.intValue, 1);
+        XCTAssertEqual(result.matchedCount.intValue, 1);
+        XCTAssertNil(error);
+        [updateExpectation3 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *updateManyExpectation1 = [self expectationWithDescription:@"should update many documents"];
+    [collection updateManyDocuments:@{@"name" : @"scrabby"}
+                     updateDocument:@{@"name" : @"fred"}
+                         completion:^(RLMUpdateResult * result, NSError * error) {
+        XCTAssertNotNil(result);
+        XCTAssertNil(result.objectId);
+        XCTAssertEqual(result.modifiedCount.intValue, 1);
+        XCTAssertEqual(result.matchedCount.intValue, 1);
+        XCTAssertNil(error);
+        [updateManyExpectation1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *updateManyExpectation2 = [self expectationWithDescription:@"should update many documents"];
+    [collection updateManyDocuments:@{@"name" : @"john"}
+                     updateDocument:@{@"name" : @"alex"}
+                             upsert:YES
+                         completion:^(RLMUpdateResult * result, NSError * error) {
+        XCTAssertNotNil(result);
+        XCTAssertNotNil(result.objectId);
+        XCTAssertEqual(result.modifiedCount.intValue, 0);
+        XCTAssertEqual(result.matchedCount.intValue, 0);
+        XCTAssertNil(error);
+        [updateManyExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
+- (void)testRemoteMongoFindAndModify {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    __block RLMSyncUser *syncUser;
+    [self.app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+        [expectation fulfill];
+    }];
+
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+        
+    RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
+    RLMMongoDatabase *database = [client database:@"test_data"];
+    RLMMongoCollection *collection = [database collection:@"Dog"];
+
+    [self cleanupRemoteDocuments:collection];
+    
+    RLMFindOneAndModifyOptions *findAndModifyOptions = [[RLMFindOneAndModifyOptions alloc] initWithProjectionBson:@{@"name" : @1, @"breed" : @1}
+                                                                                                         sortBson:@{@"name" : @1, @"breed" : @1}
+                                                                                                           upsert:YES
+                                                                                                returnNewDocument:YES];
+    
+    XCTestExpectation *findOneAndUpdateExpectation1 = [self expectationWithDescription:@"should find one document and update"];
+    [collection findOneAndUpdate:@{@"name" : @"alex"}
+                  updateDocument:@{@"name" : @"max"}
+                         options:findAndModifyOptions
+                      completion:^(NSDictionary * document, NSError * error) {
+        XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
+        XCTAssertNil(error);
+        [findOneAndUpdateExpectation1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *findOneAndUpdateExpectation2 = [self expectationWithDescription:@"should find one document and update"];
+    [collection findOneAndUpdate:@{@"name" : @"max"}
+                  updateDocument:@{@"name" : @"john"}
+                      completion:^(NSDictionary * document, NSError * error) {
+        XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
+        XCTAssertNil(error);
+        [findOneAndUpdateExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *findOneAndReplaceExpectation1 = [self expectationWithDescription:@"should find one document and replace"];
+    [collection findOneAndReplace:@{@"name" : @"alex"}
+              replacementDocument:@{@"name" : @"max"}
+                          options:findAndModifyOptions
+                       completion:^(NSDictionary * document, NSError * error) {
+        XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
+        XCTAssertNil(error);
+        [findOneAndReplaceExpectation1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *findOneAndReplaceExpectation2 = [self expectationWithDescription:@"should find one document and replace"];
+    [collection findOneAndReplace:@{@"name" : @"max"}
+              replacementDocument:@{@"name" : @"john"}
+                       completion:^(NSDictionary * document, NSError * error) {
+        XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
+        XCTAssertNil(error);
+        [findOneAndReplaceExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
+    /*
+    XCTestExpectation *findOneAndDeleteExpectation1 = [self expectationWithDescription:@"should find one and delete"];
+    [collection deleteOneDocument:@{}
+                       completion:^(NSNumber * count, NSError * error) {
+        XCTAssertNotNil(count);
+        XCTAssertTrue(count.intValue == 1);
+        XCTAssertNil(error);
+        [findOneAndDeleteExpectation1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+        
+    XCTestExpectation *deleteOneExpectation1 = [self expectationWithDescription:@"should delete first document in collection"];
+    [collection deleteOneDocument:@{}
+                       completion:^(NSNumber * count, NSError * error) {
+        XCTAssertNotNil(count);
+        XCTAssertTrue(count.intValue == 1);
+        XCTAssertNil(error);
+        [deleteOneExpectation1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *deleteOneExpectation2 = [self expectationWithDescription:@"should delete one document"];
+    [collection deleteOneDocument:@{@"name" : @"fido"}
+               completion:^(NSNumber * count, NSError * error) {
+        XCTAssertNotNil(count);
+        XCTAssertTrue(count.intValue == 1);
+        XCTAssertNil(error);
+        [deleteOneExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *deleteManyExpectation1 = [self expectationWithDescription:@"should delete many documents"];
+    [collection deleteManyDocuments:@{@"breed" : @"tibetan mastiff"}
+                         completion:^(NSNumber * count, NSError * error) {
+        XCTAssertNotNil(count);
+        XCTAssertTrue(count.intValue >= 1);
+        XCTAssertNil(error);
+        [deleteManyExpectation1 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *deleteManyExpectation2 = [self expectationWithDescription:@"should delete many documents"];
+    [collection deleteManyDocuments:@{@"breed" : @"cane corso"}
+                         completion:^(NSNumber * count, NSError * error) {
+        XCTAssertNotNil(count);
+        XCTAssertTrue(count.intValue >= 1);
+        XCTAssertNil(error);
+        [deleteManyExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *deleteManyExpectation3 = [self expectationWithDescription:@"should delete many documents"];
+    [collection deleteManyDocuments:@{@"name" : @"rex"}
+                         completion:^(NSNumber * count, NSError * error) {
+        XCTAssertNotNil(count);
+        XCTAssertTrue(count.intValue == 0);
+        XCTAssertNil(error);
+        [deleteManyExpectation3 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+
+}*/
 
 @end

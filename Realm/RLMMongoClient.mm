@@ -32,14 +32,14 @@
     self = [super init];
     if (self) {
         _app = app;
-        _serviceName = serviceName;
+        _name = serviceName;
     }
     return self;
 }
 
 - (RLMMongoDatabase *)database:(NSString *)name {
     return [[RLMMongoDatabase alloc] initWithApp:self.app
-                                     serviceName:self.serviceName
+                                     serviceName:self.name
                                     databaseName:name];
 }
 

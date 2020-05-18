@@ -16,20 +16,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUpdateResult.h"
-#import "RLMUpdateResult_Private.hpp"
-#import "RLMObjectId.h"
+#import <Realm/RLMUpdateResult_Private.hpp>
+#import "RLMObjectId_Private.hpp"
 
 @implementation RLMUpdateResult
 
-- (instancetype)initWithMatchedCount:(NSNumber *)matchedCount
-                       modifiedCount:(NSNumber *)modifiedCount
-                            objectId:(RLMObjectId * _Nullable)objectId {
+- (instancetype)initWithRemoteUpdateResult:(realm::app::RemoteMongoCollection::RemoteUpdateResult)remoteUpdateResult {
+
     self = [super init];
     if (self) {
-        _matchedCount = matchedCount;
-        _modifiedCount = modifiedCount;
-        _objectId = objectId;
+        _matchedCount = [NSNumber numberWithLong:remoteUpdateResult.matched_count];
+        _modifiedCount = [NSNumber numberWithLong:remoteUpdateResult.modified_count];
+        if (remoteUpdateResult.upserted_id) {
+            _objectId = [[RLMObjectId alloc] initWithValue:*remoteUpdateResult.upserted_id];
+        }
     }
     return self;
 }

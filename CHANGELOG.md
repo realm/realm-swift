@@ -1,3 +1,24 @@
+10.0.0-alpha.5 Release notes (2020-05-15)
+=============================================================
+### Enhancements
+* Add support for custom user data
+* Add BSON support
+* Add `callFunction` support
+* Change `configurationWithPartitionValue` to accept all BSON types
+
+### Breaking Changes
+* None
+  
+  ### Compatibility
+   * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+   * MongoDB Realm: 3.21.0 or later.
+   * APIs are backwards compatible with all previous releases in the 10.x.y series.
+   * Carthage release for Swift is built with Xcode 11.4.1.
+   
+### Internal
+* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.6
+* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.8
+
 10.0.0-alpha.0 Release notes (2020-04-22)
 =============================================================
 ### Enhancements
@@ -31,7 +52,13 @@
   could be created with duplicate primary keys during a migration as long as
   the property was changed to a unique value before the end of the migration,
   but now a unique value must be supplied when creating the object.
-
+  
+  ### Compatibility
+   * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+   * MongoDB Realm: 3.21.0 or later.
+   * APIs are backwards compatible with all previous releases in the 10.x.y series.
+   * Carthage release for Swift is built with Xcode 11.4.1.
+   
 ### Internal
 * Upgraded realm-core from v6.0.3 to v10.0.0-alpha.6
 * Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.8

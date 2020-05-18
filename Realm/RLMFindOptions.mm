@@ -40,11 +40,11 @@
         options.limit = self.limit.longValue;
     }
     if (self.projectionBson) {
-        auto bson = realm::bson::BsonDocument(RLMRLMBSONToBson(self.projectionBson));
+        auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(self.projectionBson));
         options.projection_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
     }
     if (self.sortBson) {
-        auto bson = realm::bson::BsonDocument(RLMRLMBSONToBson(self.sortBson));
+        auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(self.sortBson));
         options.sort_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
     }
     

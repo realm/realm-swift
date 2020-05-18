@@ -36,7 +36,7 @@
     if (self) {
         _app = app;
         _serviceName = serviceName;
-        _databaseName = databaseName;
+        _name = databaseName;
     }
     return self;
 }
@@ -44,7 +44,7 @@
 - (RLMMongoCollection *)collection:(NSString *)name {
     return [[RLMMongoCollection alloc] initWithApp:self.app
                                        serviceName:self.serviceName
-                                      databaseName:self.databaseName
+                                      databaseName:self.name
                                     collectionName:name];
 }
 

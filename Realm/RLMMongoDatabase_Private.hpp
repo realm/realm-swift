@@ -27,7 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMMongoDatabase ()
 
 @property (nonatomic, strong) RLMApp *app;
-@property (nonatomic, strong) NSString *databaseName;
 @property (nonatomic, strong) NSString *serviceName;
 
 - (instancetype)initWithApp:(RLMApp *)app

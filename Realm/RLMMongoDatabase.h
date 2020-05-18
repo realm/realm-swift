@@ -25,6 +25,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMMongoDatabase : NSObject
 
+/// The name of this database
+@property (nonatomic, readonly) NSString *name;
+
+/// Gets a collection.
+/// @param name The name of the collection to return
+/// @returns The collection as json
 - (RLMMongoCollection *)collection:(NSString *)name;
 
 @end

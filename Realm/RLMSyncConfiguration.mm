@@ -105,7 +105,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
 
 - (id<RLMBSON>)partitionValue {
     if (!_config->partition_value.empty()) {
-        return RLMBsonToRLMBSON(realm::bson::parse(_config->partition_value.c_str()));
+        return RLMConvertBsonToRLMBSON(realm::bson::parse(_config->partition_value.c_str()));
     }
     return nil;
 }
@@ -142,7 +142,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     if (self = [super init]) {
         std::stringstream s;
-        s << RLMRLMBSONToBson(partitionValue);
+        s << RLMConvertRLMBSONToBson(partitionValue);
         _config = std::make_unique<SyncConfig>(
             [user _syncUser],
             s.str()

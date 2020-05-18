@@ -18,6 +18,7 @@
 
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMApp.h"
+#import "RLMBSON_Private.hpp"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
@@ -25,6 +26,7 @@
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
+#import "util/bson/bson.hpp"
 #import "sync/sync_config.hpp"
 #import "sync/sync_manager.hpp"
 
@@ -53,8 +55,9 @@
     if (syncConfiguration.customFileURL) {
         self.config.path = syncConfiguration.customFileURL.path.UTF8String;
     } else {
+        RLMConvertBsonToRLMBSON(realm::bson::parse(self.config.sync_config->partition_value));
         self.config.path = SyncManager::shared().path_for_realm(*[user _syncUser],
-                                                                [[user pathForPartitionValueHash:[@(self.config.sync_config->partition_value.c_str()) hash]] UTF8String]);
+                                                                [[user pathForPartitionValue:RLMConvertBsonToRLMBSON(realm::bson::parse(self.config.sync_config->partition_value))] UTF8String]);
     }
 
     if (!self.config.encryption_key.empty()) {

@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol RLMBSON;
 
+/// Options to use when executing a `find` command on a `RLMMongoCollection`.
 @interface RLMFindOptions : NSObject
 
 /// The maximum number of documents to return.

@@ -23,7 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RLMFindOneAndModifyOptions ()
 
-- (realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions)RLMFindOneAndModifyOptionsToRemoteFindOneAndModifyOptions;
+- (realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions)toRemoteFindOneAndModifyOptions;
 
 @end
 

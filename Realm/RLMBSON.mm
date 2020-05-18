@@ -62,29 +62,23 @@ using namespace bson;
 @implementation NSNumber (RLMBSON)
 
 - (RLMBSONType)bsonType {
-    CFNumberType numberType = CFNumberGetType((CFNumberRef)self);
-
-    switch (numberType) {
-        case kCFNumberCharType:
-            return RLMBSONTypeBool;
-        case kCFNumberShortType:
-        case kCFNumberCFIndexType:
-        case kCFNumberNSIntegerType:
-        case kCFNumberIntType:
-        case kCFNumberSInt8Type:
-        case kCFNumberSInt16Type:
-        case kCFNumberSInt32Type:
-            return RLMBSONTypeInt32;
-        case kCFNumberLongType:
-        case kCFNumberLongLongType:
-        case kCFNumberSInt64Type:
-            return RLMBSONTypeInt64;
-        case kCFNumberCGFloatType:
-        case kCFNumberFloatType:
-        case kCFNumberDoubleType:
-        case kCFNumberFloat32Type:
-        case kCFNumberFloat64Type:
-            return RLMBSONTypeDouble;
+    char numberType = [self objCType][0];
+    
+    if (numberType == *@encode(bool) ||
+        numberType == *@encode(char)) {
+        return RLMBSONTypeBool;
+    } else if (numberType == *@encode(int) ||
+               numberType == *@encode(short) ||
+               numberType == *@encode(unsigned short) ||
+               numberType == *@encode(unsigned int)) {
+        return RLMBSONTypeInt32;
+    } else if (numberType == *@encode(long) ||
+               numberType == *@encode(long long) ||
+               numberType == *@encode(unsigned long) ||
+               numberType == *@encode(unsigned long long)) {
+        return RLMBSONTypeInt64;
+    } else {
+        return RLMBSONTypeDouble;
     }
 }
 
@@ -102,7 +96,7 @@ using namespace bson;
 
     if ((self = [self init])) {
         for (auto& entry : bsonArray) {
-            [self addObject:RLMBsonToRLMBSON(entry)];
+            [self addObject:RLMConvertBsonToRLMBSON(entry)];
         }
 
         return self;
@@ -118,7 +112,7 @@ using namespace bson;
 - (BsonArray)bsonArrayValue {
     BsonArray bsonArray;
     for (id value in self) {
-        bsonArray.push_back(RLMRLMBSONToBson(value));
+        bsonArray.push_back(RLMConvertRLMBSONToBson(value));
     }
     return bsonArray;
 }
@@ -140,7 +134,7 @@ using namespace bson;
 - (BsonDocument)bsonDocumentValue {
     BsonDocument bsonDocument;
     for (NSString *value in self) {
-        bsonDocument[value.UTF8String] = RLMRLMBSONToBson(self[value]);
+        bsonDocument[value.UTF8String] = RLMConvertRLMBSONToBson(self[value]);
     }
     return bsonDocument;
 }
@@ -149,7 +143,7 @@ using namespace bson;
     if ((self = [self init])) {
         for (auto it = bsonDocument.begin(); it != bsonDocument.end(); ++it) {
             const auto& entry = (*it);
-            [self setObject:RLMBsonToRLMBSON(entry.second) forKey:@(entry.first.data())];
+            [self setObject:RLMConvertBsonToRLMBSON(entry.second) forKey:@(entry.first.data())];
         }
 
         return self;
@@ -169,7 +163,7 @@ using namespace bson;
 - (BsonDocument)bsonDocumentValue {
     BsonDocument bsonDocument;
     for (NSString *value in self) {
-        bsonDocument[value.UTF8String] = RLMRLMBSONToBson(self[value]);
+        bsonDocument[value.UTF8String] = RLMConvertRLMBSONToBson(self[value]);
     }
     return bsonDocument;
 }
@@ -185,7 +179,7 @@ using namespace bson;
 }
 
 - (instancetype)initWithBsonBinary:(std::vector<char>)bsonBinary {
-    if ((self = [self initWithBytes:bsonBinary.data() length:bsonBinary.size()])) {
+    if ((self = [self initWithBase64EncodedString:@(std::string(bsonBinary.begin(), bsonBinary.end()).c_str()) options:0])) {
         return self;
     }
 
@@ -309,7 +303,7 @@ using namespace bson;
 
 #pragma mark RLMBSONToBson
 
-Bson RLMRLMBSONToBson(id<RLMBSON> b) {
+Bson RLMConvertRLMBSONToBson(id<RLMBSON> b) {
     switch ([b bsonType]) {
         case RLMBSONTypeString:
             return ((NSString *)b).UTF8String;
@@ -348,7 +342,7 @@ Bson RLMRLMBSONToBson(id<RLMBSON> b) {
 
 #pragma mark BsonToRLMBSON
 
-id<RLMBSON> RLMBsonToRLMBSON(const Bson& b) {
+id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
     switch (b.type()) {
         case realm::bson::Bson::Type::Null:
             return nil;
