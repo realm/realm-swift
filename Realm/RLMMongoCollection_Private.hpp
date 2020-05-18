@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 #import <Realm/RLMMongoClient.h>
 #import "sync/remote_mongo_client.hpp"
 
@@ -30,7 +29,10 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) NSString *serviceName;
 @property (nonatomic, strong) NSString *databaseName;
 
-- (instancetype)initWithApp:(RLMApp *)app serviceName:(NSString *)serviceName databaseName:(NSString *)databaseName;
+- (instancetype)initWithApp:(RLMApp *)app
+                serviceName:(NSString *)serviceName
+               databaseName:(NSString *)databaseName
+             collectionName:(NSString *)collectionName;
 
 @end
 

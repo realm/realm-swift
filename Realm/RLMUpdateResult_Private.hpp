@@ -16,27 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import "RLMObjectId.h"
+#import <Realm/RLMUpdateResult.h>
 
 NS_ASSUME_NONNULL_BEGIN
-@protocol RLMBSON;
 
-@class RLMApp, RLMFindOptions, RLMFindOneAndModifyOptions;
+@interface RLMUpdateResult ()
 
-@interface RLMMongoCollection : NSObject
-
-typedef void(^RLMInsertBlock)(RLMObjectId * _Nullable, NSError * _Nullable);
-typedef void(^RLMFindBlock)(NSArray<id<RLMBSON>> * _Nullable, NSError * _Nullable);
-
-@property (nonatomic, readonly) NSString *name;
-
-- (void)insertOneDocument:(id<RLMBSON>)document
-               completion:(RLMInsertBlock)completion;
-
-- (void)find:(id<RLMBSON>)document
-     options:(RLMFindOptions *)options
-  completion:(RLMFindBlock)completion;
+- (instancetype)initWithMatchedCount:(NSNumber *)matchedCount
+                       modifiedCount:(NSNumber *)modifiedCount
+                            objectId:(RLMObjectId * _Nullable)objectId;
 
 @end
 

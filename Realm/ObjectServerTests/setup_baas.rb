@@ -6,7 +6,7 @@ require 'fileutils'
 MONGODB_VERSION='4.4.0-rc5'
 GO_VERSION='1.14.2'
 NODE_VERSION='8.11.2'
-STITCH_VERSION='5c3e2f9e5169d09e52bb608415d620e93262d341'
+STITCH_VERSION='615f219fa62a0bb0b5f540475eed105a1775e7ab'
 
 BASE_DIR = Dir.pwd
 BUILD_DIR = "#{BASE_DIR}/build"
@@ -66,9 +66,9 @@ def setup_stitch
         `git clone git@github.com:10gen/stitch`
     end
 
-    if !File.exists?("#{STITCH_DIR}/.git")
+    if File.exists?("#{STITCH_DIR}/.git")
         puts 'checking out stitch'
-        `git checkout #{STITCH_VERSION}`
+        `cd #{STITCH_DIR} && git pull && git checkout #{STITCH_VERSION}`
     end
 
     dylib_dir = "#{STITCH_DIR}/etc/dylib"
@@ -105,7 +105,8 @@ def setup_stitch
     end
 
     puts 'building transpiler'
-    puts `export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\" && cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
+    puts `export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\" \
+        && cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
 
     if !Dir.exists?('go')
         puts 'downloading go'
@@ -151,6 +152,7 @@ def clean_action
     puts 'cleaning'
     shutdown_mongod
     `rm -rf #{MONGO_DIR}`
+    `cd #{STITCH_DIR} && git rm -rf . && git clean -fxd`
 end
 
 if ARGV.length < 1

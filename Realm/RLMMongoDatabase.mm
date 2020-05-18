@@ -20,6 +20,7 @@
 
 #import "RLMApp_Private.hpp"
 #import "RLMMongoDatabase_Private.hpp"
+#import "RLMMongoCollection_Private.hpp"
 #import "sync/app.hpp"
 #import "sync/remote_mongo_client.hpp"
 #import "sync/remote_mongo_database.hpp"
@@ -41,9 +42,10 @@
 }
 
 - (RLMMongoCollection *)collection:(NSString *)name {
-    auto collection = self.app._realmApp->remote_mongo_client(self.serviceName.UTF8String).db(self.databaseName.UTF8String).collection(name.UTF8String);
-    
-    return nil;
+    return [[RLMMongoCollection alloc] initWithApp:self.app
+                                       serviceName:self.serviceName
+                                      databaseName:self.databaseName
+                                    collectionName:name];
 }
 
 @end

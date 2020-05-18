@@ -57,16 +57,12 @@ RLM_ARRAY_TYPE(Dog)
 
 @end
 
-//@interface SyncObject : RLMObject
-//@property RLMObjectId *_id;
-//@property NSString *stringProp;
-//@end
-//
-//@interface HugeSyncObject : RLMObject
-//@property RLMObjectId *_id;
-//@property NSData *dataProp;
-//+ (instancetype)object;
-//@end
+@interface HugeSyncObject : RLMObject
+@property RLMObjectId *_id;
+@property NSString *realm_id;
+@property NSData *dataProp;
++ (instancetype)objectWithRealmId:(NSString *)realmId;
+@end
 
 @interface RLMSyncTestCase : RLMMultiProcessTestCase
 

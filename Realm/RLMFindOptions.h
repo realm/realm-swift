@@ -17,26 +17,25 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMObjectId.h"
 
 NS_ASSUME_NONNULL_BEGIN
+
 @protocol RLMBSON;
 
-@class RLMApp, RLMFindOptions, RLMFindOneAndModifyOptions;
+@interface RLMFindOptions : NSObject
 
-@interface RLMMongoCollection : NSObject
+/// The maximum number of documents to return.
+@property (nonatomic, nullable) NSNumber *limit;
 
-typedef void(^RLMInsertBlock)(RLMObjectId * _Nullable, NSError * _Nullable);
-typedef void(^RLMFindBlock)(NSArray<id<RLMBSON>> * _Nullable, NSError * _Nullable);
+/// Limits the fields to return for all matching documents.
+@property (nonatomic, nullable) id<RLMBSON> projectionBson;
 
-@property (nonatomic, readonly) NSString *name;
+/// The order in which to return matching documents.
+@property (nonatomic, nullable) id<RLMBSON> sortBson;
 
-- (void)insertOneDocument:(id<RLMBSON>)document
-               completion:(RLMInsertBlock)completion;
-
-- (void)find:(id<RLMBSON>)document
-     options:(RLMFindOptions *)options
-  completion:(RLMFindBlock)completion;
+- (instancetype)initWithLimit:(NSNumber * _Nullable)limit
+               projectionBson:(id<RLMBSON> _Nullable)projectionBson
+                     sortBson:(id<RLMBSON> _Nullable)sortBson;
 
 @end
 

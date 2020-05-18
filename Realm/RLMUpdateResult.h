@@ -17,26 +17,21 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMObjectId.h"
 
 NS_ASSUME_NONNULL_BEGIN
-@protocol RLMBSON;
 
-@class RLMApp, RLMFindOptions, RLMFindOneAndModifyOptions;
+@class RLMObjectId;
 
-@interface RLMMongoCollection : NSObject
+@interface RLMUpdateResult : NSObject
 
-typedef void(^RLMInsertBlock)(RLMObjectId * _Nullable, NSError * _Nullable);
-typedef void(^RLMFindBlock)(NSArray<id<RLMBSON>> * _Nullable, NSError * _Nullable);
+/// The number of documents that matched the filter.
+@property (nonatomic, readonly) NSNumber *matchedCount;
 
-@property (nonatomic, readonly) NSString *name;
+/// The number of documents modified.
+@property (nonatomic, readonly) NSNumber *modifiedCount;
 
-- (void)insertOneDocument:(id<RLMBSON>)document
-               completion:(RLMInsertBlock)completion;
-
-- (void)find:(id<RLMBSON>)document
-     options:(RLMFindOptions *)options
-  completion:(RLMFindBlock)completion;
+/// The identifier of the inserted document if an upsert took place.
+@property (nonatomic, nullable, readonly) RLMObjectId *objectId;
 
 @end
 

@@ -16,27 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
-#import "RLMObjectId.h"
+#import <Realm/RLMFindOneAndModifyOptions.h>
+#import "sync/remote_mongo_collection.hpp"
 
 NS_ASSUME_NONNULL_BEGIN
-@protocol RLMBSON;
 
-@class RLMApp, RLMFindOptions, RLMFindOneAndModifyOptions;
+@interface RLMFindOneAndModifyOptions ()
 
-@interface RLMMongoCollection : NSObject
-
-typedef void(^RLMInsertBlock)(RLMObjectId * _Nullable, NSError * _Nullable);
-typedef void(^RLMFindBlock)(NSArray<id<RLMBSON>> * _Nullable, NSError * _Nullable);
-
-@property (nonatomic, readonly) NSString *name;
-
-- (void)insertOneDocument:(id<RLMBSON>)document
-               completion:(RLMInsertBlock)completion;
-
-- (void)find:(id<RLMBSON>)document
-     options:(RLMFindOptions *)options
-  completion:(RLMFindBlock)completion;
+- (realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions)RLMFindOneAndModifyOptionsToRemoteFindOneAndModifyOptions;
 
 @end
 

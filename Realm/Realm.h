@@ -53,4 +53,7 @@
 #import <Realm/RLMMongoClient.h>
 #import <Realm/RLMMongoDatabase.h>
 #import <Realm/RLMMongoCollection.h>
+#import <Realm/RLMUpdateResult.h>
+#import <Realm/RLMFindOptions.h>
+#import <Realm/RLMFindOneAndModifyOptions.h>
 

@@ -139,8 +139,41 @@ async function create() {
         }
     };
 
+    var hugeSyncObjectRule = {
+        "database": "test_data",
+        "collection": "HugeSyncObject",
+        "roles": [
+            {
+                "name": "default",
+                "apply_when": {},
+                "insert": true,
+                "delete": true,
+                "additional_fields": {}
+            }
+        ],
+        "schema": {
+            "properties": {
+                "_id": {
+                    "bsonType": "objectId"
+                },
+                "dataProp": {
+                    "bsonType": "binData"
+                },
+                "realm_id": {
+                    "bsonType": "string"
+                }
+            },
+            "required": [
+            ],
+            "title": "HugeSyncObject"
+        },
+        "relationships": {
+        }
+    };
+
     await app.services().service(serviceResponse['_id']).rules().create(dogRule);
     await app.services().service(serviceResponse['_id']).rules().create(personRule);
+    await app.services().service(serviceResponse['_id']).rules().create(hugeSyncObjectRule);
 
     personRule.schema.title = "SwiftPerson";
     personRule.collection = "SwiftPerson";
