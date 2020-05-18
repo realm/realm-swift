@@ -12,6 +12,7 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Compatibility
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
+* Realm Studio: 3.11 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.4.1.
 
@@ -24,7 +25,8 @@ x.y.z Release notes (yyyy-MM-dd)
 
 NOTE: This version bumps the Realm file format to version 10. It is not
 possible to downgrade version 9 or earlier. Files created with older versions
-of Realm will be automatically upgraded.
+of Realm will be automatically upgraded. Only Studio 3.11 or later will be able
+to open the new file format.
 
 ### Enhancements
 
@@ -107,6 +109,7 @@ of Realm will be automatically upgraded.
 
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
+* Realm Studio: 3.11 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.4.1.
 
