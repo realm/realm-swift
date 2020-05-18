@@ -24,6 +24,7 @@ target:
  - tvos-swift
  - catalyst
  - catalyst-swift
+ - xcframework
  - cocoapods-osx
  - cocoapods-ios
  - cocoapods-ios-dynamic
@@ -403,6 +404,42 @@ exclude:
 
   - xcode_version: 11.3
     target: catalyst-swift
+    configuration: Debug
+
+  - xcode_version: 10.3
+    target: xcframework
+    configuration: Debug
+
+  - xcode_version: 10.3
+    target: xcframework
+    configuration: Release
+
+  - xcode_version: 11.1
+    target: xcframework
+    configuration: Debug
+
+  - xcode_version: 11.1
+    target: xcframework
+    configuration: Release
+
+  - xcode_version: 11.2.1
+    target: xcframework
+    configuration: Debug
+
+  - xcode_version: 11.2.1
+    target: xcframework
+    configuration: Release
+
+  - xcode_version: 11.3
+    target: xcframework
+    configuration: Debug
+
+  - xcode_version: 11.3
+    target: xcframework
+    configuration: Release
+
+  - xcode_version: 11.4.1
+    target: xcframework
     configuration: Debug
 
   - xcode_version: 10.3

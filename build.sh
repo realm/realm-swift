@@ -686,6 +686,8 @@ case "$COMMAND" in
             bitcode_flag='-fembed-bitcode'
             if [ "$variant" = 'simulator' ]; then
                 bitcode_flag=''
+            elif [ "$variant" = 'maccatalyst' ]; then
+                platform='macos'
             fi
             case "$platform" in
               "macos")   sdk='macosx'; install_name='@rpath/Realm.framework/Versions/A/Realm'; bitcode_flag='';;
@@ -693,8 +695,14 @@ case "$COMMAND" in
               "watchos") sdk="watch$variant";;
               "tvos")    sdk="appletv$variant";;
             esac
-            deployment_target=$(grep -i "$deployment_target_name.*_DEPLOYMENT_TARGET" ../../Configuration/Base.xcconfig \
-                                | sed 's/.*= \(.*\);/\1/')
+            if [ "$variant" = 'maccatalyst' ]; then
+                target='x86_64-apple-ios13.0-macabi'
+            else
+                deployment_target=$(grep -i "$deployment_target_name.*_DEPLOYMENT_TARGET" ../../Configuration/Base.xcconfig \
+                                    | sed 's/.*= \(.*\);/\1/')
+                target="${platform}${deployment_target}"
+            fi
+
             architectures=""
             j=0
             while plist_get Info.plist "AvailableLibraries:$i:SupportedArchitectures:$j" > /dev/null; do
@@ -713,7 +721,7 @@ case "$COMMAND" in
                 # into the shared library.
                 ar -d $realm_lib feature_token.cpp.o 2> /dev/null || true
                 clang++ -shared $architectures \
-                    -target ${platform}${deployment_target} \
+                    -target ${target} \
                     -isysroot $(xcrun --sdk ${sdk} --show-sdk-path) \
                     -install_name "$install_name" \
                     -compatibility_version 1 -current_version 1 \
@@ -1047,6 +1055,11 @@ case "$COMMAND" in
 
     "verify-catalyst-swift")
         sh build.sh test-catalyst-swift
+        exit 0
+        ;;
+
+    "verify-xcframework")
+        sh build.sh xcframework
         exit 0
         ;;
 
