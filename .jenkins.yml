@@ -32,6 +32,7 @@ target:
  - swiftpm
  - swiftpm-address
  - swiftpm-thread
+ - swiftpm-ios
 configuration: 
  - Debug
  - Release
@@ -648,4 +649,40 @@ exclude:
 
   - xcode_version: 11.4.1
     target: swiftpm-thread
+    configuration: Debug
+
+  - xcode_version: 10.3
+    target: swiftpm-ios
+    configuration: Debug
+
+  - xcode_version: 10.3
+    target: swiftpm-ios
+    configuration: Release
+
+  - xcode_version: 11.1
+    target: swiftpm-ios
+    configuration: Debug
+
+  - xcode_version: 11.1
+    target: swiftpm-ios
+    configuration: Release
+
+  - xcode_version: 11.2.1
+    target: swiftpm-ios
+    configuration: Debug
+
+  - xcode_version: 11.2.1
+    target: swiftpm-ios
+    configuration: Release
+
+  - xcode_version: 11.3
+    target: swiftpm-ios
+    configuration: Debug
+
+  - xcode_version: 11.3
+    target: swiftpm-ios
+    configuration: Release
+
+  - xcode_version: 11.4.1
+    target: swiftpm-ios
     configuration: Debug

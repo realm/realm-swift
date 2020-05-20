@@ -847,6 +847,12 @@ case "$COMMAND" in
         exit 0
         ;;
 
+    test-swiftpm-ios)
+        cd examples/installation
+        sh build.sh test-ios-swift-spm
+        exit 0
+        ;;
+
     test-swiftpm*)
         SANITIZER=$(echo $COMMAND | cut -d - -f 3)
         if [ -n "$SANITIZER" ]; then

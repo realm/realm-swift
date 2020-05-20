@@ -4,8 +4,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Fix linker error when building a xcframework for Catalyst.
+  ([#6511](https://github.com/realm/realm-cocoa/issues/6511), since 4.3.1).
+* Fix building for iOS devices when using Swift Package Manager
+  ([#6522](https://github.com/realm/realm-cocoa/issues/6522), since 5.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -105,6 +107,8 @@ to open the new file format.
   Results rather than performing a swap operation before the delete. Note that
   it is still not safe to assume that the order of objects in an unsorted
   Results is the order that the objects were created in.
+* The minimum supported deployment target for iOS when using Swift Package
+  Manager to install Realm is now iOS 11.
 
 ### Compatibility
 
