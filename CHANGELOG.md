@@ -29,13 +29,13 @@ Upgraded realm-sync from ? to ?
 
 ### Breaking Changes
 * We no longer support Realm Cloud (logacy), but instead the new "MongoDB Realm" Cloud.
-  
+
 ### Compatibility
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * MongoDB Realm: 71f9b52e2e or later.
-* APIs are backwards compatible with all previous releases in the 10.x.y series.
+* APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
 * Carthage release for Swift is built with Xcode 11.4.1.
-   
+
 ### Internal
 * Upgraded realm-core from v6.0.3 to v10.0.0-alpha.8
 * Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.11
@@ -43,7 +43,7 @@ Upgraded realm-sync from ? to ?
 10.0.0-alpha.0 Release notes (2020-04-22)
 =============================================================
 ### Enhancements
-* Add support for next generation sync. Support for syncing to MongoDB instead of Realm Object Server. 
+* Add support for next generation sync. Support for syncing to MongoDB instead of Realm Object Server.
 Applications must be created at realm.mongodb.com
 * The memory mapping scheme for Realm files has changed to better support
   opening very large files.
@@ -72,13 +72,13 @@ Applications must be created at realm.mongodb.com
   the property was changed to a unique value before the end of the migration,
   but now a unique value must be supplied when creating the object.
   * Remove support for Realm Object Server.
-  
-  ### Compatibility
-   * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
-   * MongoDB Realm: 71f9b52e2e or later.
-   * APIs are backwards compatible with all previous releases in the 10.x.y series.
-   * Carthage release for Swift is built with Xcode 11.4.1.
-   
+
+### Compatibility
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* MongoDB Realm: 71f9b52e2e or later.
+* APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
+* Carthage release for Swift is built with Xcode 11.4.1.
+
 ### Internal
 * Upgraded realm-core from v6.0.3 to v10.0.0-alpha.6
 * Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.8
