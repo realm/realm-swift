@@ -71,10 +71,11 @@ Applications must be created at realm.mongodb.com
   could be created with duplicate primary keys during a migration as long as
   the property was changed to a unique value before the end of the migration,
   but now a unique value must be supplied when creating the object.
+  * Remove support for Realm Object Server.
   
   ### Compatibility
    * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
-   * MongoDB Realm: 3.21.0 or later.
+   * MongoDB Realm: 71f9b52e2e or later.
    * APIs are backwards compatible with all previous releases in the 10.x.y series.
    * Carthage release for Swift is built with Xcode 11.4.1.
    
