@@ -41,6 +41,7 @@ targets = {
   'swiftpm' => minimum_version(11),
   'swiftpm-address' => latest_only,
   'swiftpm-thread' => latest_only,
+  'swiftpm-ios' => latest_only,
 
   # These are disabled because the machine with the devices attached is currently offline
   # - ios-device-objc-ios8

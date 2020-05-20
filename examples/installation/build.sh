@@ -95,6 +95,10 @@ xctest() {
                 carthage update --platform watchOS
             fi
         )
+    elif [[ $NAME == SwiftPackageManager* ]]; then
+        if [ -n "$sha" ]; then
+            sed -i '' 's@branch = "master"@branch = "'"$sha"'"@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
+        fi
     elif [[ $LANG == swift* ]]; then
         download_zip_if_needed swift
     else
@@ -124,10 +128,16 @@ xctest() {
         xcodebuild "${PROJECT[@]}" -scheme "$NAME" test "${DESTINATION[@]}" CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
     fi
 
-    if [[ $NAME == CocoaPods* ]] && [[ $PLATFORM != osx ]]; then
+    if [[ $PLATFORM != osx ]]; then
         [[ $PLATFORM == 'ios' ]] && SDK=iphoneos || SDK=$PLATFORM
-        [[ $LANG == 'swift' ]] && SCHEME=RealmSwift || SCHEME=Realm
-        xcodebuild "${PROJECT[@]}" -scheme "$SCHEME" -sdk "$SDK" ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= build
+        if [ -d "$WORKSPACE" ]; then
+            [[ $LANG == 'swift' ]] && SCHEME=(-scheme RealmSwift) || SCHEME=(-scheme Realm)
+        else
+            SCHEME=()
+        fi
+        xcodebuild "${PROJECT[@]}" "${SCHEME[@]}" -sdk "$SDK" \
+            ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            build
     fi
 }
 
@@ -178,6 +188,10 @@ case "$COMMAND" in
 
     test-*-*-carthage)
         xctest "$PLATFORM" "$LANGUAGE" CarthageExample
+        ;;
+
+    test-ios-spm)
+        xctest "$PLATFORM" swift SwiftPackageManagerExample
         ;;
 
     test-*-spm)
