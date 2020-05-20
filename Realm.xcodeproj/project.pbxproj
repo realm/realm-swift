@@ -268,7 +268,6 @@
 		498C7F4124479905009DE80A /* remote_mongo_database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3A24479905009DE80A /* remote_mongo_database.cpp */; };
 		498C7F4224479905009DE80A /* remote_mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3B24479905009DE80A /* remote_mongo_collection.cpp */; };
 		498C7F4424479905009DE80A /* remote_mongo_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3D24479905009DE80A /* remote_mongo_client.cpp */; };
-		4992F62124463296005C93EE /* run_baas.sh in Resources */ = {isa = PBXBuildFile; fileRef = 4992F62024463296005C93EE /* run_baas.sh */; };
 		499321FC24129CFD00A0EC8E /* app_credentials.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 499321FA24129CFD00A0EC8E /* app_credentials.cpp */; };
 		499321FD24129CFD00A0EC8E /* app_credentials.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 499321FA24129CFD00A0EC8E /* app_credentials.cpp */; };
 		499321FE24129CFD00A0EC8E /* app.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 499321FB24129CFD00A0EC8E /* app.cpp */; };
@@ -906,7 +905,6 @@
 		498C7F3C24479905009DE80A /* remote_mongo_read_operation.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = remote_mongo_read_operation.hpp; path = sync/remote_mongo_read_operation.hpp; sourceTree = "<group>"; };
 		498C7F3D24479905009DE80A /* remote_mongo_client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = remote_mongo_client.cpp; path = sync/remote_mongo_client.cpp; sourceTree = "<group>"; };
 		498C7F452447990C009DE80A /* app_service_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = app_service_client.hpp; path = sync/app_service_client.hpp; sourceTree = "<group>"; };
-		4992F62024463296005C93EE /* run_baas.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = run_baas.sh; path = Realm/ObjectServerTests/run_baas.sh; sourceTree = "<group>"; };
 		499321FA24129CFD00A0EC8E /* app_credentials.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app_credentials.cpp; path = sync/app_credentials.cpp; sourceTree = "<group>"; };
 		499321FB24129CFD00A0EC8E /* app.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = app.cpp; path = sync/app.cpp; sourceTree = "<group>"; };
 		4993220024129D0700A0EC8E /* app.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = app.hpp; path = sync/app.hpp; sourceTree = "<group>"; };
@@ -932,7 +930,6 @@
 		49AD39F4244E1A370097500E /* datetime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = datetime.cpp; sourceTree = "<group>"; };
 		49AD39F5244E1A370097500E /* max_key.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = max_key.hpp; sourceTree = "<group>"; };
 		49B1965B2448586000B5B852 /* auth_request_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = auth_request_client.hpp; path = sync/auth_request_client.hpp; sourceTree = "<group>"; };
-		49BCDBF824471CD300F53C7B /* setup_baas.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; name = setup_baas.sh; path = Realm/ObjectServerTests/setup_baas.sh; sourceTree = "<group>"; };
 		49D9DFC3246C8E41003AD31D /* run_baas.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; name = run_baas.rb; path = Realm/ObjectServerTests/run_baas.rb; sourceTree = "<group>"; };
 		49D9DFC4246C8E48003AD31D /* setup_baas.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; name = setup_baas.rb; path = Realm/ObjectServerTests/setup_baas.rb; sourceTree = "<group>"; };
 		49E12CEF245DB7CC00359DF1 /* RLMBSON.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMBSON.mm; sourceTree = "<group>"; };
@@ -1672,8 +1669,6 @@
 				494566AA246EF031000FD07F /* proxy.rb */,
 				49D9DFC3246C8E41003AD31D /* run_baas.rb */,
 				49D9DFC4246C8E48003AD31D /* setup_baas.rb */,
-				4992F62024463296005C93EE /* run_baas.sh */,
-				49BCDBF824471CD300F53C7B /* setup_baas.sh */,
 			);
 			name = "Object Server Tests";
 			sourceTree = "<group>";
@@ -2391,7 +2386,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4992F62124463296005C93EE /* run_baas.sh in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

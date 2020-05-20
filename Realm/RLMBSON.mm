@@ -179,7 +179,9 @@ using namespace bson;
 }
 
 - (instancetype)initWithBsonBinary:(std::vector<char>)bsonBinary {
-    if ((self = [self initWithBase64EncodedString:@(std::string(bsonBinary.begin(), bsonBinary.end()).c_str()) options:0])) {
+    if ((self = [self initWithBase64EncodedData:[NSData dataWithBytesNoCopy:bsonBinary.data()
+                                                                     length:bsonBinary.size()
+                                                               freeWhenDone:NO] options:0])) {
         return self;
     }
 
@@ -250,13 +252,7 @@ using namespace bson;
 @implementation RLMMaxKey
 
 - (BOOL)isEqual:(id)other {
-    if (other == self) {
-        return YES;
-    } else if ([self class] == [other class]) {
-        return YES;
-    } else {
-        return NO;
-    }
+    return other == self || ([other class] == [self class]);
 }
 
 - (NSUInteger)hash {
@@ -270,13 +266,7 @@ using namespace bson;
 @implementation RLMMinKey
 
 - (BOOL)isEqual:(id)other {
-    if (other == self) {
-        return YES;
-    } else if ([self class] == [other class]) {
-        return YES;
-    } else {
-        return NO;
-    }
+    return other == self || ([other class] == [self class]);
 }
 
 - (NSUInteger)hash {
@@ -355,7 +345,7 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
         case realm::bson::Bson::Type::Double:
             return @(static_cast<double>(b));
         case realm::bson::Bson::Type::String:
-            return RLMStringDataToNSString(StringData(static_cast<std::string>(b).data()));
+            return @(static_cast<std::string>(b).c_str());
         case realm::bson::Bson::Type::Binary:
             return [[NSData alloc] initWithBsonBinary:static_cast<std::vector<char>>(b)];
         case realm::bson::Bson::Type::Timestamp:

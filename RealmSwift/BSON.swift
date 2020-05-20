@@ -53,7 +53,9 @@ extension Decimal128 : BSON {
 extension ObjectId : BSON {
 }
 
+/// A Dictionary object representing a `BSON` document.
 public typealias Document = Dictionary<String, AnyBSON>
+
 extension Dictionary : BSON where Key == String, Value == AnyBSON {
 }
 
@@ -63,11 +65,13 @@ extension Array : BSON where Element == AnyBSON {
 extension NSRegularExpression : BSON {
 }
 
+/// An object representing a `BSON` max key type.
 public typealias MaxKey = RLMMaxKey
 
 extension MaxKey : BSON {
 }
 
+/// An object representing a `BSON` min key type.
 public typealias MinKey = RLMMinKey
 
 extension MinKey : BSON {
@@ -139,6 +143,8 @@ public enum AnyBSON : BSON {
         }
     }
 
+    /// Initialize a `BSON` from a type `T`. If this is not a valid `BSON` type,
+    /// if will be consider `BSON` nil.
     public init<T: BSON>(_ bson: T) {
         switch bson {
         case let val as Int:
@@ -356,6 +362,7 @@ public enum AnyBSON : BSON {
         }
     }
 
+    /// Return this BSON as a `T` if possible, otherwise nil.
     public func value<T: BSON>() -> T? {
         switch self {
         case .int32(let val):

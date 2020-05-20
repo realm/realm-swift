@@ -639,10 +639,10 @@ static NSURL *syncDirectoryForChildProcess() {
 
     if (self.isParent) {
         _appId = [RealmObjectServer.sharedServer createApp];
-        _app = [RLMApp appWithAppId:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
+        _app = [RLMApp appWithId:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
     } else {
         _appId = [RealmObjectServer.sharedServer lastApp];
-        _app = [RLMApp appWithAppId:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
+        _app = [RLMApp appWithId:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
     }
 
     RLMSyncManager *syncManager = [[self app] syncManager];

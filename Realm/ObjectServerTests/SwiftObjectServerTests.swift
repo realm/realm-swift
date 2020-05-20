@@ -685,10 +685,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testRealmAppInit() {
-        let appWithNoConfig = RealmApp(appId: appName)
+        let appWithNoConfig = RealmApp(id: appName)
         XCTAssertEqual(appWithNoConfig.allUsers().count, 0)
 
-        let appWithConfig = RealmApp(appId: appName, configuration: realmAppConfig())
+        let appWithConfig = RealmApp(id: appName, configuration: realmAppConfig())
         XCTAssertEqual(appWithConfig.allUsers().count, 0)
     }
 

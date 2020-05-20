@@ -19,11 +19,12 @@
 #import "RLMApp_Private.hpp"
 
 #import "RLMAppCredentials_Private.hpp"
+#import "RLMBSON_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMUsernamePasswordProviderClient.h"
 #import "RLMUserAPIKeyProviderClient.h"
-#import "RLMBSON_Private.hpp"
+#import "RLMUtil.hpp"
 
 using namespace realm;
 
@@ -84,35 +85,35 @@ namespace {
          defaultRequestTimeoutMS:6000];
 }
 
-- (instancetype)initWithBaseURL:(nullable NSString *) baseURL
+- (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(NSString *)localAppName
                 localAppVersion:(nullable NSString *)localAppVersion
         defaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS {
     if (self = [super init]) {
-        self.baseURL = baseURL;
-        self.transport = transport;
-        self.localAppName = localAppName;
-        self.localAppVersion = localAppVersion;
-        self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
-
         _config.transport_generator = []{
             return std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
         };
 
         if (baseURL) {
-            _config.base_url = util::Optional<std::string>(baseURL.UTF8String);
+            std::string base_url;
+            RLMNSStringToStdString(base_url, baseURL);
+            _config.base_url = base_url;
         }
         if (transport) {
-            _config.transport_generator = [self]{
-                return std::make_unique<CocoaNetworkTransport>(self.transport);
+            _config.transport_generator = [transport]{
+                return std::make_unique<CocoaNetworkTransport>(transport);
             };
         }
         if (localAppName) {
-            _config.local_app_name = std::string(localAppName.UTF8String);
+            std::string local_app_name;
+            RLMNSStringToStdString(local_app_name, localAppName);
+            _config.local_app_name = local_app_name;
         }
         if (localAppVersion) {
-            _config.local_app_version = std::string(localAppVersion.UTF8String);
+            std::string local_app_version;
+            RLMNSStringToStdString(local_app_version, localAppName);
+            _config.local_app_version = local_app_version;
         }
         _config.default_request_timeout_ms = (uint64_t)defaultRequestTimeoutMS;
         return self;
@@ -126,6 +127,38 @@ namespace {
 
 - (void)setAppId:(NSString *)appId {
     _config.app_id = appId.UTF8String;
+}
+
+- (NSString *)baseURL {
+    if (_config.base_url) {
+        return @((*_config.base_url).c_str());
+    }
+
+    return nil;
+}
+
+- (NSString *)localAppName {
+    if (_config.local_app_name) {
+        return @((*_config.base_url).c_str());
+    }
+
+    return nil;
+}
+
+- (NSString *)localAppVersion {
+    if (_config.local_app_version) {
+        return @((*_config.base_url).c_str());
+    }
+
+    return nil;
+}
+
+- (NSUInteger)defaultRequestTimeoutMS {
+    if (_config.default_request_timeout_ms) {
+        return *_config.default_request_timeout_ms;
+    };
+
+    return 6000;
 }
 
 @end
@@ -147,11 +180,9 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 @implementation RLMApp : NSObject
 
-static NSMutableDictionary *s_apps = [NSMutableDictionary new];
-
-- (instancetype)initWithAppId:(NSString *)appId
-                configuration:(RLMAppConfiguration *)configuration
-                rootDirectory:(NSURL *)rootDirectory {
+- (instancetype)initWithId:(NSString *)appId
+             configuration:(RLMAppConfiguration *)configuration
+             rootDirectory:(NSURL *)rootDirectory {
     if (self = [super init]) {
         _configuration = configuration;
         [_configuration setAppId:appId];
@@ -164,9 +195,10 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
     return nil;
 }
 
-+ (instancetype)appWithAppId:(NSString *)appId
-               configuration:(RLMAppConfiguration *)configuration
-               rootDirectory:(NSURL *)rootDirectory {
++ (instancetype)appWithId:(NSString *)appId
+            configuration:(RLMAppConfiguration *)configuration
+            rootDirectory:(NSURL *)rootDirectory {
+    static NSMutableDictionary *s_apps = [NSMutableDictionary new];
     // protects the app cache
     static std::mutex& initLock = *new std::mutex();
     std::lock_guard<std::mutex> lock(initLock);
@@ -175,17 +207,17 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
         return app;
     }
 
-    RLMApp *app = [[RLMApp alloc] initWithAppId:appId configuration:configuration rootDirectory:rootDirectory];
+    RLMApp *app = [[RLMApp alloc] initWithId:appId configuration:configuration rootDirectory:rootDirectory];
     s_apps[appId] = app;
     return app;
 }
 
-+ (instancetype)appWithAppId:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
-    return [self appWithAppId:appId configuration:configuration rootDirectory:nil];
++ (instancetype)appWithId:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
+    return [self appWithId:appId configuration:configuration rootDirectory:nil];
 }
 
-+ (instancetype)appWithAppId:(NSString *)appId {
-    return [self appWithAppId:appId configuration:nil];
++ (instancetype)appWithId:(NSString *)appId {
+    return [self appWithId:appId configuration:nil];
 }
 
 - (std::shared_ptr<realm::app::App>)_realmApp {
@@ -195,10 +227,8 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers {
     NSMutableDictionary *buffer = [NSMutableDictionary new];
     for (auto user : SyncManager::shared().all_users()) {
-        if (user) {
-            std::string identity(user->identity());
-            buffer[std::move(@(identity.c_str()))] = [[RLMSyncUser alloc] initWithSyncUser:std::move(user) app:self];
-        }
+        std::string identity(user->identity());
+        buffer[@(identity.c_str())] = [[RLMSyncUser alloc] initWithSyncUser:std::move(user) app:self];
     }
     return buffer;
 }
@@ -272,9 +302,9 @@ static NSMutableDictionary *s_apps = [NSMutableDictionary new];
     completion(nil);
 }
 
-- (void)callFunctionWithName:(NSString *)name
-                   arguments:(NSArray<id<RLMBSON>> *)arguments
-             completionBlock:(RLMCallFunctionCompletionBlock)completionBlock {
+- (void)callFunctionNamed:(NSString *)name
+                arguments:(NSArray<id<RLMBSON>> *)arguments
+          completionBlock:(RLMCallFunctionCompletionBlock)completionBlock {
     bson::BsonArray args;
 
     for (id<RLMBSON> argument in arguments) {
