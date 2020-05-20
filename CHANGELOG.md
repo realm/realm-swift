@@ -43,6 +43,8 @@ Upgraded realm-sync from ? to ?
 10.0.0-alpha.0 Release notes (2020-04-22)
 =============================================================
 ### Enhancements
+* Add support for next generation sync. Support for syncing to MongoDB instead of Realm Object Server. 
+Applications must be created at realm.mongodb.com
 * The memory mapping scheme for Realm files has changed to better support
   opening very large files.
 * Add support for the ObjectId data type. This is an automatically-generated
@@ -55,10 +57,6 @@ Upgraded realm-sync from ? to ?
   owned by a single parent object, and are deleted when that parent object is
   deleted. They are defined by subclassing `EmbeddedObject` /
 	`RLMEmbeddedObject` rather than `Object` / `RLMObject`.
-* Add support for next generation sync. Next generation sync includes the
-  ability to use partition keys. Applications must be created at
-  realm.mongodb.com.
-
 
 ### Breaking Changes
 * Remove support for Query-based sync, including the configuration parameters
@@ -75,7 +73,7 @@ Upgraded realm-sync from ? to ?
   but now a unique value must be supplied when creating the object.
   
   ### Compatibility
-   * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
+   * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
    * MongoDB Realm: 3.21.0 or later.
    * APIs are backwards compatible with all previous releases in the 10.x.y series.
    * Carthage release for Swift is built with Xcode 11.4.1.
