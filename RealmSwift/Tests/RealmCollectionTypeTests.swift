@@ -472,7 +472,6 @@ class RealmCollectionTypeTests: TestCase {
 
     func observeOnQueue<Collection: RealmCollection>(_ collection: Collection) where Collection.Element: Object {
         let sema = DispatchSemaphore(value: 0)
-        let queue = DispatchQueue(label: "background queue")
         let token = collection.observe(on: queue) { (changes: RealmCollectionChange) in
             switch changes {
             case .initial(let collection):

@@ -724,6 +724,7 @@ class ObjectTests: TestCase {
 
         sema.wait()
         token.invalidate()
+        queue.sync { }
     }
 
     func testInvalidateObserverOnDifferentQueueBeforeRegistration() {
@@ -757,6 +758,7 @@ class ObjectTests: TestCase {
         }
         sema.wait()
         token2.invalidate()
+        queue.sync { }
     }
 
     func testEqualityForObjectTypeWithPrimaryKey() {

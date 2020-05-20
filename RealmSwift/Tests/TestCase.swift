@@ -61,6 +61,7 @@ class TestCase: RLMTestCaseBase {
 
         exceptionThrown = false
         autoreleasepool { super.invokeTest() }
+        queue.sync { }
 
         if !exceptionThrown {
             XCTAssertFalse(RLMHasCachedRealmForPath(defaultRealmURL().path))
