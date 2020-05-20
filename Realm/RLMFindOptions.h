@@ -26,17 +26,18 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMFindOptions : NSObject
 
 /// The maximum number of documents to return.
-@property (nonatomic, nullable) NSNumber *limit;
+@property (nonatomic, nullable) NSNumber *limit NS_REFINED_FOR_SWIFT;
 
 /// Limits the fields to return for all matching documents.
-@property (nonatomic, nullable) id<RLMBSON> projectionBson;
+@property (nonatomic, nullable) id<RLMBSON> projectionBson NS_REFINED_FOR_SWIFT;
 
 /// The order in which to return matching documents.
-@property (nonatomic, nullable) id<RLMBSON> sortBson;
+@property (nonatomic, nullable) id<RLMBSON> sortBson NS_REFINED_FOR_SWIFT;
 
 - (instancetype)initWithLimit:(NSNumber * _Nullable)limit
                projectionBson:(id<RLMBSON> _Nullable)projectionBson
-                     sortBson:(id<RLMBSON> _Nullable)sortBson;
+                     sortBson:(id<RLMBSON> _Nullable)sortBson
+NS_SWIFT_UNAVAILABLE("Use FindOptions(_ limit: uint64?, _ projectedBSON: Document?, _ sortBSON: Document?) instead");
 
 @end
 

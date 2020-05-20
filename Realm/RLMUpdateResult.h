@@ -22,6 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMObjectId;
 
+/// The result of an `updateOne` or `updateMany` operation a `RLMMongoCollection`.
 @interface RLMUpdateResult : NSObject
 
 /// The number of documents that matched the filter.

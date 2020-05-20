@@ -115,4 +115,5 @@ public extension RealmApp {
     var functions: Functions {
         Functions(app: self)
     }
+    
 }

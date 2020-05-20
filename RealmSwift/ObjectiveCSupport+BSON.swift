@@ -42,9 +42,11 @@ public extension ObjectiveCSupport {
         case .objectId(let val):
             return val as RLMObjectId
         case .document(let val):
-            return val as NSDictionary
+            let keyValues = val.map { (NSString(string:  $0), convert(object: $1)) }
+            let convertedDictionary = Dictionary(uniqueKeysWithValues: keyValues)
+            return convertedDictionary as NSDictionary
         case .array(let val):
-            return val as NSArray
+            return val.map {convert(object: $0)} as NSArray
         case .maxKey:
             return MaxKey()
         case .minKey:

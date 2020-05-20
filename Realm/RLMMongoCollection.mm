@@ -283,30 +283,4 @@
                 completion:completion];
 }
 
-/*
-/// Removes a single document from a collection based on a query filter and
-/// returns a document with the same form as the document immediately before
-/// it was deleted. Unlike `delete_one`, this action allows you to atomically
-/// find and delete a document with the same command. This avoids the risk of
-/// other update operations changing the document between separate find and
-/// delete operations.
-/// @param filter_bson  A `Document` that should match the query.
-/// @param options Optional `RemoteFindOneAndModifyOptions` to use when executing the command.
-/// @param completion_block The result of the attempt to delete a document.
-void find_one_and_delete(const bson::BsonDocument& filter_bson,
-                         RemoteFindOneAndModifyOptions options,
-                         std::function<void(util::Optional<AppError>)> completion_block);
-
-/// Removes a single document from a collection based on a query filter and
-/// returns a document with the same form as the document immediately before
-/// it was deleted. Unlike `delete_one`, this action allows you to atomically
-/// find and delete a document with the same command. This avoids the risk of
-/// other update operations changing the document between separate find and
-/// delete operations.
-/// @param filter_bson  A `Document` that should match the query.
-/// @param completion_block The result of the attempt to delete a document.
-void find_one_and_delete(const bson::BsonDocument& filter_bson,
-                         std::function<void(util::Optional<AppError>)> completion_block);
-
-*/
 @end

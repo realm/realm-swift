@@ -1655,19 +1655,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertLessThanOrEqual(finalSize, usedSize + 4096U);
 }
 
-#pragma mark - Remote Mongo
-
-- (void)cleanupRemoteDocuments:(RLMMongoCollection *)collection {
-    XCTestExpectation *deleteManyExpectation = [self expectationWithDescription:@"should delete many documents"];
-    [collection deleteManyDocuments:@{}
-                         completion:^(NSNumber * count, NSError * error) {
-        XCTAssertNotNil(count);
-        XCTAssertNil(error);
-        [deleteManyExpectation fulfill];
-    }];
-    [self waitForExpectationsWithTimeout:60.0 handler:nil];
-}
-
+#pragma mark - Mongo Client
 
 - (void)testRemoteMongoInsert {
     XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
@@ -1844,7 +1832,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
         XCTAssertNotNil(error);
         XCTAssertTrue([error.domain.description isEqualToString:@"realm::app::ServiceError"]);
-        XCTAssertTrue([error.localizedDescription isEqualToString:@"(Location40324) Unrecognized pipeline stage name: 'name'"]);
         XCTAssertNil(documents);
         [aggregateExpectation1 fulfill];
     }];
@@ -2035,19 +2022,42 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 }
 
-    /*
-    XCTestExpectation *findOneAndDeleteExpectation1 = [self expectationWithDescription:@"should find one and delete"];
-    [collection deleteOneDocument:@{}
-                       completion:^(NSNumber * count, NSError * error) {
-        XCTAssertNotNil(count);
-        XCTAssertTrue(count.intValue == 1);
-        XCTAssertNil(error);
-        [findOneAndDeleteExpectation1 fulfill];
+- (void)testRemoteMongoDelete {
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    __block RLMSyncUser *syncUser;
+    [self.app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+        [expectation fulfill];
     }];
+
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
         
+    RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
+    RLMMongoDatabase *database = [client database:@"test_data"];
+    RLMMongoCollection *collection = [database collection:@"Dog"];
+
+    [self cleanupRemoteDocuments:collection];
+    __block RLMObjectId * fidoObjectId;
+    __block RLMObjectId * rexObjectId;
+    
+    XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
+    [collection insertManyDocuments:@[
+        @{@"name": @"fido", @"breed": @"cane corso"},
+        @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
+                         completion:^(NSArray<RLMObjectId *> * objectIds, NSError * error) {
+        XCTAssertTrue(objectIds.count > 0);
+        XCTAssertNil(error);
+        fidoObjectId = objectIds[0];
+        rexObjectId = objectIds[1];
+        [insertManyExpectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
     XCTestExpectation *deleteOneExpectation1 = [self expectationWithDescription:@"should delete first document in collection"];
-    [collection deleteOneDocument:@{}
+    [collection deleteOneDocument:@{@"_id" : rexObjectId}
                        completion:^(NSNumber * count, NSError * error) {
         XCTAssertNotNil(count);
         XCTAssertTrue(count.intValue == 1);
@@ -2056,13 +2066,13 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
     
-    XCTestExpectation *deleteOneExpectation2 = [self expectationWithDescription:@"should delete one document"];
-    [collection deleteOneDocument:@{@"name" : @"fido"}
-               completion:^(NSNumber * count, NSError * error) {
-        XCTAssertNotNil(count);
-        XCTAssertTrue(count.intValue == 1);
+    XCTestExpectation *findExpectation1 = [self expectationWithDescription:@"should find documents"];
+    [collection find:@{}
+          completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
+        XCTAssertEqual((int)documents.count, 1);
+        XCTAssertTrue([documents[0][@"name"] isEqualToString:@"fido"]);
         XCTAssertNil(error);
-        [deleteOneExpectation2 fulfill];
+        [findExpectation1 fulfill];
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
     
@@ -2070,7 +2080,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [collection deleteManyDocuments:@{@"breed" : @"tibetan mastiff"}
                          completion:^(NSNumber * count, NSError * error) {
         XCTAssertNotNil(count);
-        XCTAssertTrue(count.intValue >= 1);
+        XCTAssertTrue(count.intValue == 0);
         XCTAssertNil(error);
         [deleteManyExpectation1 fulfill];
     }];
@@ -2080,22 +2090,20 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [collection deleteManyDocuments:@{@"breed" : @"cane corso"}
                          completion:^(NSNumber * count, NSError * error) {
         XCTAssertNotNil(count);
-        XCTAssertTrue(count.intValue >= 1);
+        XCTAssertTrue(count.intValue == 1);
         XCTAssertNil(error);
         [deleteManyExpectation2 fulfill];
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
-    
-    XCTestExpectation *deleteManyExpectation3 = [self expectationWithDescription:@"should delete many documents"];
-    [collection deleteManyDocuments:@{@"name" : @"rex"}
-                         completion:^(NSNumber * count, NSError * error) {
-        XCTAssertNotNil(count);
-        XCTAssertTrue(count.intValue == 0);
+
+    XCTestExpectation *findOneAndDeleteExpectation1 = [self expectationWithDescription:@"should find one and delete"];
+    [collection findOneAndDelete:@{@"_id": rexObjectId}
+                      completion:^(NSError * error) {
         XCTAssertNil(error);
-        [deleteManyExpectation3 fulfill];
+        [findOneAndDeleteExpectation1 fulfill];
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 
-}*/
+}
 
 @end

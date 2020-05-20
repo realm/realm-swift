@@ -525,6 +525,7 @@
 		CFCA6F0A246EE8ED008F72C2 /* RLMFindOptions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CFCA6F00246EDF87008F72C2 /* RLMFindOptions_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		CFCA6F0E2472BBD4008F72C2 /* RLMUpdateResult_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CFCA6EFF246ED949008F72C2 /* RLMUpdateResult_Private.hpp */; };
 		CFCA6F0F2472BBD4008F72C2 /* RLMUpdateResult_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CFCA6EFF246ED949008F72C2 /* RLMUpdateResult_Private.hpp */; };
+		CFCA6F11247407B6008F72C2 /* MongoClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFCA6F10247407B6008F72C2 /* MongoClient.swift */; };
 		CFE12489246D7E0300ED3D03 /* RLMMongoClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFE12487246D7E0300ED3D03 /* RLMMongoClient.mm */; };
 		CFE1248A246D7E0300ED3D03 /* RLMMongoClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CFE12488246D7E0300ED3D03 /* RLMMongoClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFE1248B246D7E7700ED3D03 /* RLMMongoClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFE12487246D7E0300ED3D03 /* RLMMongoClient.mm */; };
@@ -1080,6 +1081,7 @@
 		CFCA6EFF246ED949008F72C2 /* RLMUpdateResult_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMUpdateResult_Private.hpp; sourceTree = "<group>"; };
 		CFCA6F00246EDF87008F72C2 /* RLMFindOptions_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMFindOptions_Private.hpp; sourceTree = "<group>"; };
 		CFCA6F0B246EF304008F72C2 /* RLMFindOneAndModifyOptions_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMFindOneAndModifyOptions_Private.hpp; sourceTree = "<group>"; };
+		CFCA6F10247407B6008F72C2 /* MongoClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MongoClient.swift; sourceTree = "<group>"; };
 		CFE12487246D7E0300ED3D03 /* RLMMongoClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMMongoClient.mm; sourceTree = "<group>"; };
 		CFE12488246D7E0300ED3D03 /* RLMMongoClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMMongoClient.h; sourceTree = "<group>"; };
 		E81A1F621955FC9300FDED82 /* Realm-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "Realm-Info.plist"; sourceTree = "<group>"; };
@@ -1546,6 +1548,7 @@
 				3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */,
 				5D660FF01BE98D670021E04F /* Util.swift */,
 				CFB43139243DF87100471C18 /* RealmApp.swift */,
+				CFCA6F10247407B6008F72C2 /* MongoClient.swift */,
 			);
 			path = RealmSwift;
 			sourceTree = "<group>";
@@ -2803,6 +2806,7 @@
 				494566A9246E8C59000FD07F /* ObjectiveCSupport+BSON.swift in Sources */,
 				5D660FF81BE98D670021E04F /* Realm.swift in Sources */,
 				1AB605D31D495927007F53DE /* RealmCollection.swift in Sources */,
+				CFCA6F11247407B6008F72C2 /* MongoClient.swift in Sources */,
 				5D660FFA1BE98D670021E04F /* RealmConfiguration.swift in Sources */,
 				5D660FFB1BE98D670021E04F /* Results.swift in Sources */,
 				5D660FFC1BE98D670021E04F /* Schema.swift in Sources */,
