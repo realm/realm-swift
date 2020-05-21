@@ -68,7 +68,7 @@ public extension ObjectiveCSupport {
             return nil
         }
 
-        switch (bson.__bsonType) {
+        switch bson.__bsonType {
         case .null:
             return nil
         case .int32:

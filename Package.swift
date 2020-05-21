@@ -74,6 +74,7 @@ let package = Package(
                 "Realm/RLMAccessor.mm",
                 "Realm/RLMAnalytics.mm",
                 "Realm/RLMArray.mm",
+		"Realm/RLMBSON.mm",
                 "Realm/RLMClassInfo.mm",
                 "Realm/RLMCollection.mm",
                 "Realm/RLMConstants.m",

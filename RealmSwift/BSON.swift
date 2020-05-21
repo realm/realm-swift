@@ -20,7 +20,7 @@ import Realm
 
 /// Protocol representing a BSON value.
 /// - SeeAlso: bsonspec.org
-public protocol BSON : Equatable {
+public protocol BSON: Equatable {
 }
 
 extension Int: BSON {
@@ -32,54 +32,54 @@ extension Int32: BSON {
 extension Int64: BSON {
 }
 
-extension Bool : BSON {
+extension Bool: BSON {
 }
 
-extension Double : BSON {
+extension Double: BSON {
 }
 
-extension String : BSON {
+extension String: BSON {
 }
 
-extension Data : BSON {
+extension Data: BSON {
 }
 
-extension Date : BSON {
+extension Date: BSON {
 }
 
-extension Decimal128 : BSON {
+extension Decimal128: BSON {
 }
 
-extension ObjectId : BSON {
+extension ObjectId: BSON {
 }
 
 /// A Dictionary object representing a `BSON` document.
 public typealias Document = Dictionary<String, AnyBSON>
 
-extension Dictionary : BSON where Key == String, Value == AnyBSON {
+extension Dictionary: BSON where Key == String, Value == AnyBSON {
 }
 
-extension Array : BSON where Element == AnyBSON {
+extension Array: BSON where Element == AnyBSON {
 }
 
-extension NSRegularExpression : BSON {
+extension NSRegularExpression: BSON {
 }
 
 /// An object representing a `BSON` max key type.
 public typealias MaxKey = RLMMaxKey
 
-extension MaxKey : BSON {
+extension MaxKey: BSON {
 }
 
 /// An object representing a `BSON` min key type.
 public typealias MinKey = RLMMinKey
 
-extension MinKey : BSON {
+extension MinKey: BSON {
 }
 
 /// Enum representing a BSON value.
 /// - SeeAlso: bsonspec.org
-public enum AnyBSON : BSON {
+public enum AnyBSON: BSON {
     /// A BSON double.
     case double(Double)
 

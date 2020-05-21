@@ -259,7 +259,7 @@ extension SyncUser {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    public func configuration<T : BSON>(partitionValue: T) -> Realm.Configuration {
+    public func configuration<T: BSON>(partitionValue: T) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
         return ObjectiveCSupport.convert(object: config)
     }
@@ -276,8 +276,8 @@ extension SyncUser {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    public func configuration<T : BSON>(partitionValue: T,
-                                        cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
+    public func configuration<T: BSON>(partitionValue: T,
+                                       cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
         let syncConfig = config.syncConfiguration!
         syncConfig.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors

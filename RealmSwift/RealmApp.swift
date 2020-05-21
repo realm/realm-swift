@@ -73,7 +73,7 @@ public typealias AppCredentials = RLMAppCredentials
 @dynamicMemberLookup
 public struct Functions {
     weak var app: RealmApp?
-    
+
     fileprivate init(app: RealmApp) {
         self.app = app
     }
@@ -90,7 +90,7 @@ public struct Functions {
             self.app?.__callFunctionNamed(string,
                                           arguments: arguments.map(ObjectiveCSupport.convert) as! [RLMBSON]) {
                                         (bson: RLMBSON?, error: Error?) in
-                completionHandler(ObjectiveCSupport.convert(object:bson), error)
+                completionHandler(ObjectiveCSupport.convert(object: bson), error)
             }
         }
     }
