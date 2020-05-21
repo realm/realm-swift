@@ -134,24 +134,24 @@ public extension ObjectiveCSupport {
         case .minKey:
             return .minKey
         case .document:
-            guard let val = bson as? Dictionary<String, RLMBSON> else {
+            guard let val = bson as? Dictionary<String, RLMBSON?> else {
                 return nil
             }
-            let keyValues = val.map { (key: String, value: RLMBSON) -> (String, AnyBSON) in
+            let keyValues = val.map { (key: String, value: RLMBSON?) -> (String, AnyBSON) in
                 guard let val = convert(object: value) else {
-                    fatalError("Could not convert RLMBSON to AnyBSON")
+                    return (key, .null)
                 }
                 return (key, val)
             }
             let convertedDictionary = Dictionary(uniqueKeysWithValues: keyValues)
             return .document(convertedDictionary)
         case .array:
-            guard let val = bson as? Array<RLMBSON> else {
+            guard let val = bson as? Array<RLMBSON?> else {
                 return nil
             }
             let convertedArray = val.map { (rlmBSON) -> AnyBSON in
                 guard let val = convert(object: rlmBSON) else {
-                    fatalError("Could not convert RLMBSON to AnyBSON")
+                    return .null
                 }
                 return val
             }

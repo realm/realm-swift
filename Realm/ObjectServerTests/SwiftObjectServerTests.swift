@@ -1116,7 +1116,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         collection.find(document3, findOptions) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
-            XCTAssertEqual(result?.count, 0)
+            XCTAssertEqual(result?.count, 1)
             findEx3.fulfill()
         }
         wait(for: [findEx3], timeout: 4.0)
