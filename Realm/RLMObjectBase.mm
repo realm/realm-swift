@@ -469,6 +469,7 @@ id RLMObjectFreeze(RLMObjectBase *obj) {
     RLMRealm *frozenRealm = [obj->_realm freeze];
     RLMObjectBase *frozen = RLMCreateManagedAccessor(obj.class, &frozenRealm->_info[obj->_info->rlmObjectSchema.className]);
     frozen->_row = frozenRealm->_realm->import_copy_of(obj->_row);
+    RLMInitializeSwiftAccessorGenerics(frozen);
     return frozen;
 }
 

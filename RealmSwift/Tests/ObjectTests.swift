@@ -892,4 +892,105 @@ class ObjectTests: TestCase {
         XCTAssertTrue(obj.dynamicList("arrayCol").isFrozen)
         XCTAssertTrue(obj.dynamicList("arrayCol").first!.isFrozen)
     }
+
+    func testFreezeAllPropertyTypes() {
+        let realm = try! Realm()
+        let (obj, optObj, listObj) = try! realm.write {
+            return (
+                realm.create(SwiftObject.self, value: [
+                    "boolCol": true,
+                    "intCol": 456,
+                    "floatCol": 4.56 as Float,
+                    "doubleCol": 45.6,
+                    "stringCol": "b",
+                    "binaryCol": "b".data(using: String.Encoding.utf8)!,
+                    "dateCol": Date(timeIntervalSince1970: 2),
+                    "objectCol": [true]
+                ]),
+                realm.create(SwiftOptionalObject.self, value: [
+                    "optNSStringCol": "NSString",
+                    "optStringCol": "String",
+                    "optBinaryCol": Data(),
+                    "optDateCol": Date(),
+                    "optIntCol": 1,
+                    "optInt8Col": 2,
+                    "optInt16Col": 3,
+                    "optInt32Col": 4,
+                    "optInt64Col": 5,
+                    "optFloatCol": 6.1,
+                    "optDoubleCol": 7.2,
+                    "optBoolCol": true
+                ]),
+                realm.create(SwiftListObject.self, value: [
+                    "int": [1],
+                    "int8": [2],
+                    "int16": [3],
+                    "int32": [4],
+                    "int64": [5],
+                    "float": [6.6 as Float],
+                    "double": [7.7],
+                    "string": ["8"],
+                    "data": ["9".data(using: String.Encoding.utf8)!],
+                    "date": [Date(timeIntervalSince1970: 10)],
+                    "intOpt": [11, nil],
+                    "int8Opt": [12, nil],
+                    "int16Opt": [13, nil],
+                    "int32Opt": [14, nil],
+                    "int64Opt": [15, nil],
+                    "floatOpt": [16.16, nil],
+                    "doubleOpt": [17.17, nil],
+                    "stringOpt": ["18", nil],
+                    "dataOpt": ["19".data(using: String.Encoding.utf8)!, nil],
+                    "dateOpt": [Date(timeIntervalSince1970: 20), nil]
+                ])
+            )
+        }
+
+        let frozenObj = obj.freeze()
+        XCTAssertEqual(obj.boolCol, frozenObj.boolCol)
+        XCTAssertEqual(obj.intCol, frozenObj.intCol)
+        XCTAssertEqual(obj.floatCol, frozenObj.floatCol)
+        XCTAssertEqual(obj.doubleCol, frozenObj.doubleCol)
+        XCTAssertEqual(obj.stringCol, frozenObj.stringCol)
+        XCTAssertEqual(obj.binaryCol, frozenObj.binaryCol)
+        XCTAssertEqual(obj.dateCol, frozenObj.dateCol)
+        XCTAssertEqual(obj.objectCol?.boolCol, frozenObj.objectCol?.boolCol)
+
+        let frozenOptObj = optObj.freeze()
+        XCTAssertEqual(optObj.optNSStringCol, frozenOptObj.optNSStringCol)
+        XCTAssertEqual(optObj.optStringCol, frozenOptObj.optStringCol)
+        XCTAssertEqual(optObj.optBinaryCol, frozenOptObj.optBinaryCol)
+        XCTAssertEqual(optObj.optDateCol, frozenOptObj.optDateCol)
+        XCTAssertEqual(optObj.optIntCol.value, frozenOptObj.optIntCol.value)
+        XCTAssertEqual(optObj.optInt8Col.value, frozenOptObj.optInt8Col.value)
+        XCTAssertEqual(optObj.optInt16Col.value, frozenOptObj.optInt16Col.value)
+        XCTAssertEqual(optObj.optInt32Col.value, frozenOptObj.optInt32Col.value)
+        XCTAssertEqual(optObj.optInt64Col.value, frozenOptObj.optInt64Col.value)
+        XCTAssertEqual(optObj.optFloatCol.value, frozenOptObj.optFloatCol.value)
+        XCTAssertEqual(optObj.optDoubleCol.value, frozenOptObj.optDoubleCol.value)
+        XCTAssertEqual(optObj.optBoolCol.value, frozenOptObj.optBoolCol.value)
+        XCTAssertEqual(optObj.optEnumCol.value, frozenOptObj.optEnumCol.value)
+
+        let frozenListObj = listObj.freeze()
+        XCTAssertEqual(Array(listObj.int), Array(frozenListObj.int))
+        XCTAssertEqual(Array(listObj.int8), Array(frozenListObj.int8))
+        XCTAssertEqual(Array(listObj.int16), Array(frozenListObj.int16))
+        XCTAssertEqual(Array(listObj.int32), Array(frozenListObj.int32))
+        XCTAssertEqual(Array(listObj.int64), Array(frozenListObj.int64))
+        XCTAssertEqual(Array(listObj.float), Array(frozenListObj.float))
+        XCTAssertEqual(Array(listObj.double), Array(frozenListObj.double))
+        XCTAssertEqual(Array(listObj.string), Array(frozenListObj.string))
+        XCTAssertEqual(Array(listObj.data), Array(frozenListObj.data))
+        XCTAssertEqual(Array(listObj.date), Array(frozenListObj.date))
+        XCTAssertEqual(Array(listObj.intOpt), Array(frozenListObj.intOpt))
+        XCTAssertEqual(Array(listObj.int8Opt), Array(frozenListObj.int8Opt))
+        XCTAssertEqual(Array(listObj.int16Opt), Array(frozenListObj.int16Opt))
+        XCTAssertEqual(Array(listObj.int32Opt), Array(frozenListObj.int32Opt))
+        XCTAssertEqual(Array(listObj.int64Opt), Array(frozenListObj.int64Opt))
+        XCTAssertEqual(Array(listObj.floatOpt), Array(frozenListObj.floatOpt))
+        XCTAssertEqual(Array(listObj.doubleOpt), Array(frozenListObj.doubleOpt))
+        XCTAssertEqual(Array(listObj.stringOpt), Array(frozenListObj.stringOpt))
+        XCTAssertEqual(Array(listObj.dataOpt), Array(frozenListObj.dataOpt))
+        XCTAssertEqual(Array(listObj.dateOpt), Array(frozenListObj.dateOpt))
+    }
 }
