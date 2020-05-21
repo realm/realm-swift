@@ -42,7 +42,7 @@ public extension ObjectiveCSupport {
         case .objectId(let val):
             return val as RLMObjectId
         case .document(let val):
-            let keyValues = val.map { (NSString(string:  $0), convert(object: $1)) }
+            let keyValues = val.map { (NSString(string: $0), convert(object: $1)) }
             let convertedDictionary = Dictionary(uniqueKeysWithValues: keyValues)
             return convertedDictionary as NSDictionary
         case .array(let val):
@@ -133,14 +133,24 @@ public extension ObjectiveCSupport {
             guard let val = bson as? Dictionary<String, RLMBSON> else {
                 return nil
             }
-            let keyValues = val.map { ($0, convert(object: $1)!) }
+            let keyValues = val.map { (key: String, value: RLMBSON) -> (String, AnyBSON) in
+                guard let val = convert(object: value) else {
+                    fatalError("Could not convert RLMBSON to AnyBSON")
+                }
+                return (key, val)
+            }
             let convertedDictionary = Dictionary(uniqueKeysWithValues: keyValues)
             return .document(convertedDictionary)
         case .array:
             guard let val = bson as? Array<RLMBSON> else {
                 return nil
             }
-            let convertedArray = val.map { convert(object: $0)! }
+            let convertedArray = val.map { (rlmBSON) -> AnyBSON in
+                guard let val = convert(object: rlmBSON) else {
+                    fatalError("Could not convert RLMBSON to AnyBSON")
+                }
+                return val
+            }
             return .array(convertedArray)
         default:
             return nil

@@ -1670,8 +1670,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
         
     RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-    RLMMongoDatabase *database = [client database:@"test_data"];
-    RLMMongoCollection *collection = [database collection:@"Dog"];
+    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
     [self cleanupRemoteDocuments:collection];
     
@@ -1720,8 +1720,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
         
     RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-    RLMMongoDatabase *database = [client database:@"test_data"];
-    RLMMongoCollection *collection = [database collection:@"Dog"];
+    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
     [self cleanupRemoteDocuments:collection];
     
@@ -1810,8 +1810,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
         
     RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-    RLMMongoDatabase *database = [client database:@"test_data"];
-    RLMMongoCollection *collection = [database collection:@"Dog"];
+    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
     [self cleanupRemoteDocuments:collection];
     
@@ -1882,8 +1882,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
         
     RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-    RLMMongoDatabase *database = [client database:@"test_data"];
-    RLMMongoCollection *collection = [database collection:@"Dog"];
+    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
     [self cleanupRemoteDocuments:collection];
     
@@ -1969,8 +1969,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
         
     RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-    RLMMongoDatabase *database = [client database:@"test_data"];
-    RLMMongoCollection *collection = [database collection:@"Dog"];
+    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
     [self cleanupRemoteDocuments:collection];
     
@@ -2036,8 +2036,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
         
     RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-    RLMMongoDatabase *database = [client database:@"test_data"];
-    RLMMongoCollection *collection = [database collection:@"Dog"];
+    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
     [self cleanupRemoteDocuments:collection];
     __block RLMObjectId * fidoObjectId;

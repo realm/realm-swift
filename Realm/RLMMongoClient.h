@@ -41,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Gets a `RLMMongoDatabase` instance for the given database name.
 /// @param name the name of the database to retrieve
-- (RLMMongoDatabase *)database:(NSString *)name;//withName
+- (RLMMongoDatabase *)databaseWithName:(NSString *)name;
 
 @end
 

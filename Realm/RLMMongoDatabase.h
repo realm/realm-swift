@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// Gets a collection.
 /// @param name The name of the collection to return
 /// @returns The collection
-- (RLMMongoCollection *)collection:(NSString *)name;
+- (RLMMongoCollection *)collectionWithName:(NSString *)name;
 
 @end
 

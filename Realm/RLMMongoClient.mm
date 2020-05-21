@@ -37,7 +37,7 @@
     return self;
 }
 
-- (RLMMongoDatabase *)database:(NSString *)name {
+- (RLMMongoDatabase *)databaseWithName:(NSString *)name {
     return [[RLMMongoDatabase alloc] initWithApp:self.app
                                      serviceName:self.name
                                     databaseName:name];

@@ -72,6 +72,7 @@ public typealias FindOptions = RLMFindOptions
 
 extension FindOptions {
 
+    /// The maximum number of documents to return.
     public var limit: uint64? {
         get {
             guard let value = __limit else {
@@ -86,6 +87,7 @@ extension FindOptions {
         }
     }
     
+    /// Limits the fields to return for all matching documents.
     public var projectedBSON: Document? {
         get {
             guard let value = ObjectiveCSupport.convert(object: __projectionBson) else {
@@ -99,7 +101,8 @@ extension FindOptions {
             }
         }
     }
-    
+
+    /// The order in which to return matching documents.
     public var sortBSON: Document? {
         get {
             guard let value = ObjectiveCSupport.convert(object: __sortBson) else {
@@ -113,10 +116,10 @@ extension FindOptions {
             }
         }
     }
-    
+
     public convenience init(_ limit: uint64?, _ projectedBSON: Document?, _ sortBSON: Document?) {
         self.init()
-        self.limit = limit;
+        self.limit = limit
         self.projectedBSON = projectedBSON
         self.sortBSON = sortBSON
     }
@@ -128,6 +131,8 @@ extension FindOptions {
 public typealias FindOneAndModifyOptions = RLMFindOneAndModifyOptions
 
 extension FindOneAndModifyOptions {
+
+    /// Limits the fields to return for all matching documents.
     public var projectedBSON: Document? {
         get {
             guard let value = ObjectiveCSupport.convert(object: __projectionBson) else {
@@ -141,7 +146,8 @@ extension FindOneAndModifyOptions {
             }
         }
     }
-    
+
+    /// The order in which to return matching documents.
     public var sortBSON: Document? {
         get {
             guard let value = ObjectiveCSupport.convert(object: __sortBson) else {
@@ -155,7 +161,7 @@ extension FindOneAndModifyOptions {
             }
         }
     }
-    
+
     public convenience init(_ projectedBSON: Document?,
                             _ sortBSON: Document?,
                             _ upsert: Bool=false,
@@ -175,18 +181,18 @@ extension UpdateResult {
     /// The number of matching documents
     public var matchedCount: UInt64 {
         return __matchedCount.uint64Value
-    };
+    }
     
     /// The number of documents modified.
     public var modifiedCount: UInt64 {
         return __modifiedCount.uint64Value
-    };
+    }
     /// The identifier of the inserted document if an upsert took place.
     public var objectId: ObjectId? {
         guard let objId = __objectId else {
             return nil
         }
-        
+
         return try? ObjectId(string: objId.stringValue)
     }
 }
@@ -200,7 +206,7 @@ public typealias UpdateBlock = (UpdateResult?, Error?) -> Void
 public typealias DeleteBlock = RLMDeleteBlock
 
 extension MongoCollection {
-    
+
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
     /// generated for it.
     /// - Parameters:
@@ -209,7 +215,7 @@ extension MongoCollection {
     public func insertOne(_ document: Document, _ completion: @escaping InsertBlock) {
         self.__insertOneDocument(toRLMBSON(document), completion: completion)
     }
-    
+
     /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
     /// they will be generated.
     /// - Parameters:
@@ -218,7 +224,7 @@ extension MongoCollection {
     public func insertMany(_ documents: [Document], _ completion: @escaping InsertManyBlock) {
         self.__insertManyDocuments(toRLMBSONArray(documents), completion: completion)
     }
-    
+
     /// Finds the documents in this collection which match the provided filter.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
@@ -227,7 +233,7 @@ extension MongoCollection {
     public func find(_ filter: Document, _ options: FindOptions, _ completion: @escaping FindBlock) {
         self.__find(toRLMBSON(filter), options: options, completion: completion)
     }
-    
+
     /// Finds the documents in this collection which match the provided filter.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
@@ -236,7 +242,7 @@ extension MongoCollection {
     public func find(_ filter: Document, _ completion: @escaping FindBlock) {
         self.__find(toRLMBSON(filter), completion: completion)
     }
-    
+
     /// Returns one document from a collection or view which matches the
     /// provided filter. If multiple documents satisfy the query, this method
     /// returns the first document according to the query's sort order or natural
@@ -248,7 +254,7 @@ extension MongoCollection {
     public func findOneDocument(_ filter: Document, _ options: FindOptions, _ completion: @escaping FindOneBlock) {
         self.__findOneDocument(toRLMBSON(filter), options: options, completion: completion)
     }
-    
+
     /// Returns one document from a collection or view which matches the
     /// provided filter. If multiple documents satisfy the query, this method
     /// returns the first document according to the query's sort order or natural
@@ -259,7 +265,7 @@ extension MongoCollection {
     public func findOneDocument(_ filter: Document, _ completion: @escaping FindOneBlock) {
         self.__findOneDocument(toRLMBSON(filter), completion: completion)
     }
-    
+
     /// Runs an aggregation framework pipeline against this collection.
     /// - Parameters:
     ///   - pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
@@ -267,7 +273,7 @@ extension MongoCollection {
     public func aggregate(_ pipeline: [Document], _ completion: @escaping FindBlock) {
         self.__aggregate(toRLMBSONArray(pipeline), completion: completion)
     }
-    
+
     /// Counts the number of documents in this collection matching the provided filter.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
@@ -276,7 +282,7 @@ extension MongoCollection {
     public func count(_ filter: Document, _ limit: uint64, _ completion: @escaping CountBlock) {
         self.__count(toRLMBSON(filter), limit: NSNumber(value: limit), completion: completion)
     }
-    
+
     /// Counts the number of documents in this collection matching the provided filter.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
@@ -284,7 +290,7 @@ extension MongoCollection {
     public func count(_ filter: Document, _ completion: @escaping CountBlock) {
         self.__count(toRLMBSON(filter), completion: completion)
     }
-    
+
     /// Deletes a single matching document from the collection.
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
@@ -292,8 +298,7 @@ extension MongoCollection {
     public func deleteOneDocument(_ filter: Document, _ completion: @escaping CountBlock) {
         self.__deleteOneDocument(toRLMBSON(filter), completion: completion)
     }
-    
-    
+
     /// Deletes multiple documents
     /// - Parameters:
     ///   - filter: Document representing the match criteria
@@ -301,7 +306,7 @@ extension MongoCollection {
     public func deleteManyDocuments(_ filter: Document, _ completion: @escaping CountBlock) {
         self.__deleteManyDocuments(toRLMBSON(filter), completion: completion)
     }
-    
+
     /// Updates a single document matching the provided filter in this collection.
     /// - Parameters:
     ///   - filter: A bson `Document` representing the match criteria.
@@ -317,7 +322,7 @@ extension MongoCollection {
                                  upsert: upsert,
                                  completion: completion)
     }
-    
+
     /// Updates a single document matching the provided filter in this collection.
     /// - Parameters:
     ///   - filter: A bson `Document` representing the match criteria.
@@ -330,7 +335,7 @@ extension MongoCollection {
                                  updateDocument: toRLMBSON(update),
                                  completion: completion)
     }
-    
+
     /// Updates multiple documents matching the provided filter in this collection.
     /// - Parameters:
     ///   - filter: A bson `Document` representing the match criteria.
@@ -338,28 +343,28 @@ extension MongoCollection {
     ///   - upsert: When true, creates a new document if no document matches the query.
     ///   - completion: The result of the attempt to update a document.
     public func updateManyDocuments(_ filter: Document,
-                                   _ update: Document,
-                                   _ upsert: Bool,
-                                   _ completion: @escaping UpdateBlock) {
+                                    _ update: Document,
+                                    _ upsert: Bool,
+                                    _ completion: @escaping UpdateBlock) {
         self.__updateManyDocuments(toRLMBSON(filter),
                                    updateDocument: toRLMBSON(update),
                                    upsert: upsert,
                                    completion: completion)
     }
-    
+
     /// Updates multiple documents matching the provided filter in this collection.
     /// - Parameters:
     ///   - filter: A bson `Document` representing the match criteria.
     ///   - update: A bson `Document` representing the update to be applied to a matching document.
     ///   - completion: The result of the attempt to update a document.
     public func updateManyDocuments(_ filter: Document,
-                                   _ update: Document,
-                                   _ completion: @escaping UpdateBlock) {
+                                    _ update: Document,
+                                    _ completion: @escaping UpdateBlock) {
         self.__updateManyDocuments(toRLMBSON(filter),
                                    updateDocument: toRLMBSON(update),
                                    completion: completion)
     }
-    
+
     /// Updates a single document in a collection based on a query filter and
     /// returns the document in either its pre-update or post-update form. Unlike
     /// `updateOneDocument`, this action allows you to atomically find, update, and
@@ -380,7 +385,7 @@ extension MongoCollection {
                                 options: options,
                                 completion: completion)
     }
-    
+
     /// Updates a single document in a collection based on a query filter and
     /// returns the document in either its pre-update or post-update form. Unlike
     /// `updateOneDocument`, this action allows you to atomically find, update, and
@@ -398,7 +403,7 @@ extension MongoCollection {
                                 updateDocument: toRLMBSON(update),
                                 completion: completion)
     }
-    
+
     /// Overwrites a single document in a collection based on a query filter and
     /// returns the document in either its pre-replacement or post-replacement
     /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
@@ -419,7 +424,7 @@ extension MongoCollection {
                                 options: options,
                                 completion: completion)
     }
-    
+
     /// Overwrites a single document in a collection based on a query filter and
     /// returns the document in either its pre-replacement or post-replacement
     /// form. Unlike `updateOneDocument`, this action allows you to atomically find,
@@ -438,7 +443,7 @@ extension MongoCollection {
                                 replacementDocument: toRLMBSON(replacement),
                                 completion: completion)
     }
-    
+
     /// Removes a single document from a collection based on a query filter and
     /// returns a document with the same form as the document immediately before
     /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
@@ -456,7 +461,7 @@ extension MongoCollection {
                                 options: options,
                                 completion: completion)
     }
-    
+
     /// Removes a single document from a collection based on a query filter and
     /// returns a document with the same form as the document immediately before
     /// it was deleted. Unlike `deleteOneDocument`, this action allows you to atomically
@@ -471,14 +476,14 @@ extension MongoCollection {
         self.__findOneAndDelete(toRLMBSON(filter),
                                 completion: completion)
     }
-    
+
     private func toRLMBSON(_ document: Document) -> RLMBSON {
         guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(document)) else {
             fatalError("Could not cast Document to RLMBSON")
         }
         return rlmBSON
     }
-    
+
     private func toRLMBSONArray(_ documents: [Document]) -> [RLMBSON] {
         let convertedDocuments = documents.map { (document: Document) -> RLMBSON in
             guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(document)) else {
@@ -488,5 +493,5 @@ extension MongoCollection {
         }
         return convertedDocuments
     }
-    
+
 }

@@ -37,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype)initWithLimit:(NSNumber * _Nullable)limit
                projectionBson:(id<RLMBSON> _Nullable)projectionBson
                      sortBson:(id<RLMBSON> _Nullable)sortBson
-NS_SWIFT_UNAVAILABLE("Use FindOptions(_ limit: uint64?, _ projectedBSON: Document?, _ sortBSON: Document?) instead");
+NS_SWIFT_UNAVAILABLE("Please see FindOption");
 
 @end
 

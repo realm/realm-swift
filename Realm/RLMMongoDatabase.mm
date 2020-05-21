@@ -41,7 +41,7 @@
     return self;
 }
 
-- (RLMMongoCollection *)collection:(NSString *)name {
+- (RLMMongoCollection *)collectionWithName:(NSString *)name {
     return [[RLMMongoCollection alloc] initWithApp:self.app
                                        serviceName:self.serviceName
                                       databaseName:self.name
