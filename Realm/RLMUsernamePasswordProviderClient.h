@@ -18,6 +18,9 @@
 
 #import <Realm/RLMProviderClient.h>
 
+/// A block type used to report an error
+typedef void(^RLMUsernamePasswordProviderClientOptionalErrorBlock)(NSError * _Nullable);
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -38,7 +41,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)registerEmail:(NSString *)email
              password:(NSString *)password
-           completion:(RLMOptionalErrorBlock)completionHandler;
+           completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
 
 /**
  Confirms an email identity with the username/password provider.
@@ -49,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 */
 - (void)confirmUser:(NSString *)token
             tokenId:(NSString *)tokenId
-         completion:(RLMOptionalErrorBlock)completionHandler;
+         completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
 
 /**
  Re-sends a confirmation email to a user that has registered but
@@ -59,7 +62,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param completionHandler A callback to be invoked once the call is complete.
 */
 - (void)resendConfirmationEmail:(NSString *)email
-                     completion:(RLMOptionalErrorBlock)completionHandler;
+                     completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
 
 /**
  Sends a password reset email to the given email address.
@@ -68,7 +71,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param completionHandler A callback to be invoked once the call is complete.
 */
 - (void)sendResetPasswordEmail:(NSString *)email
-                    completion:(RLMOptionalErrorBlock)completionHandler;
+                    completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
 
 /**
  Resets the password of an email identity using the
@@ -82,7 +85,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetPasswordTo:(NSString *)password
                   token:(NSString *)token
                 tokenId:(NSString *)tokenId
-      completion:(RLMOptionalErrorBlock)completionHandler;
+      completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
 
 /**
  Resets the password of an email identity using the
@@ -99,7 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)callResetPasswordFunction:(NSString *)email
                          password:(NSString *)password
                              args:(NSString *)args
-                       completion:(RLMOptionalErrorBlock)completionHandler;
+                       completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
 
 @end
 

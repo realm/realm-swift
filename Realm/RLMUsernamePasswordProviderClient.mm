@@ -29,7 +29,7 @@
 
 - (void)registerEmail:(NSString *)email
              password:(NSString *)password
-           completion:(RLMOptionalErrorBlock)completion {
+           completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
     self.client.register_email(email.UTF8String, password.UTF8String, ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
@@ -37,21 +37,21 @@
 
 - (void)confirmUser:(NSString *)token
             tokenId:(NSString *)tokenId
-         completion:(RLMOptionalErrorBlock)completion {
+         completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
     self.client.confirm_user(token.UTF8String, tokenId.UTF8String, ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
 
 - (void)resendConfirmationEmail:(NSString *)email
-                     completion:(RLMOptionalErrorBlock)completion {
+                     completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
     self.client.resend_confirmation_email(email.UTF8String, ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
 
 - (void)sendResetPasswordEmail:(NSString *)email
-                    completion:(RLMOptionalErrorBlock)completion {
+                    completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
     self.client.send_reset_password_email(email.UTF8String, ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
@@ -60,7 +60,7 @@
 - (void)resetPasswordTo:(NSString *)password
                   token:(NSString *)token
                 tokenId:(NSString *)tokenId
-             completion:(RLMOptionalErrorBlock)completion {
+             completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
     self.client.reset_password(password.UTF8String, token.UTF8String, tokenId.UTF8String, ^(Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
@@ -69,7 +69,7 @@
 - (void)callResetPasswordFunction:(NSString *)email
                          password:(NSString *)password
                              args:(NSString *)args
-                       completion:(RLMOptionalErrorBlock)completion {
+                       completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
     if (!args.length) {
         args = @"{}";
     }
