@@ -74,8 +74,8 @@ class ObjectiveCSupportTests: TestCase {
                        "Configuration.inMemoryIdentifier must be equal to RLMConfiguration.inMemoryIdentifier")
 
         #if !SWIFT_PACKAGE
-        XCTAssertEqual(realm.configuration.syncConfiguration?.realmURL,
-                       ObjectiveCSupport.convert(object: realm.configuration).syncConfiguration?.realmURL,
+        XCTAssertEqual(realm.configuration.syncConfiguration?.partitionValue,
+                       ObjectiveCSupport.convert(object: ObjectiveCSupport.convert(object: realm.configuration).syncConfiguration?.partitionValue),
                        "Configuration.syncConfiguration must be equal to RLMConfiguration.syncConfiguration")
         #endif
 
