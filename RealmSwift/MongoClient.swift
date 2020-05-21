@@ -50,23 +50,6 @@ public typealias MongoClient = RLMMongoClient
 */
 public typealias MongoDatabase = RLMMongoDatabase
 
-/**
-* The `MongoCollection` represents a MongoDB collection.
-*
-* You can get an instance from a `MongoDatabase`.
-*
-* Create, read, update, and delete methods are available.
-*
-* Operations against the Realm Cloud server are performed asynchronously.
-*
-* - Note:
-* Before you can read or write data, a user must log in.
-*
-* - SeeAlso:
-* `MongoClient`, `MongoDatabase`
-*/
-public typealias MongoCollection = RLMMongoCollection
-
 /// Options to use when executing a `find` command on a `MongoCollection`.
 public typealias FindOptions = RLMFindOptions
 
@@ -86,7 +69,7 @@ extension FindOptions {
             }
         }
     }
-    
+
     /// Limits the fields to return for all matching documents.
     public var projectedBSON: Document? {
         get {
@@ -182,7 +165,7 @@ extension UpdateResult {
     public var matchedCount: UInt64 {
         return __matchedCount.uint64Value
     }
-    
+
     /// The number of documents modified.
     public var modifiedCount: UInt64 {
         return __modifiedCount.uint64Value
@@ -204,6 +187,23 @@ public typealias FindOneBlock = RLMFindOneBlock
 public typealias CountBlock = RLMCountBlock
 public typealias UpdateBlock = (UpdateResult?, Error?) -> Void
 public typealias DeleteBlock = RLMDeleteBlock
+
+/**
+* The `MongoCollection` represents a MongoDB collection.
+*
+* You can get an instance from a `MongoDatabase`.
+*
+* Create, read, update, and delete methods are available.
+*
+* Operations against the Realm Cloud server are performed asynchronously.
+*
+* - Note:
+* Before you can read or write data, a user must log in.
+*
+* - SeeAlso:
+* `MongoClient`, `MongoDatabase`
+*/
+public typealias MongoCollection = RLMMongoCollection
 
 extension MongoCollection {
 

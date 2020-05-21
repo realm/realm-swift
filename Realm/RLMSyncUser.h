@@ -36,17 +36,6 @@ typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
     RLMSyncUserStateRemoved,
 };
 
-/// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
-typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
-
-/// A block type used to report the status of a password change operation.
-/// If the `NSError` argument is nil, the operation succeeded.
-typedef void(^RLMPasswordChangeStatusBlock)(NSError * _Nullable);
-
-/// A block type used to asynchronously report results of a user info retrieval.
-/// Exactly one of the two arguments will be populated.
-typedef void(^RLMRetrieveUserBlock)(RLMSyncUserInfo * _Nullable, NSError * _Nullable);
-
 /// A block type used to report an error related to a specific user.
 typedef void(^RLMUserErrorReportingBlock)(RLMSyncUser * _Nonnull, NSError * _Nonnull);
 

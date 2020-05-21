@@ -19,11 +19,11 @@
 import XCTest
 import RealmSwift
 
-class SwiftBSONTests : XCTestCase {
+class SwiftBSONTests: XCTestCase {
     private func testBSONRoundTrip<T>(_ value: T,
                                       funcName: String = #function,
                                       line: Int = #line,
-                                      column: Int = #column) where T : BSON {
+                                      column: Int = #column) where T: BSON {
         let rlmBSON: RLMBSON? = ObjectiveCSupport.convert(object: AnyBSON(value))
 
         XCTAssertEqual(rlmBSON as? T, value)
@@ -105,7 +105,7 @@ class SwiftBSONTests : XCTestCase {
             "regex": .regex(try NSRegularExpression(pattern: "^abc", options: [])),
             "array1": [1, 2],
             "array2": ["string1", "string2"],
-            "null": .null,
+            "null": .null
         ])
     }
 
@@ -128,7 +128,7 @@ class SwiftBSONTests : XCTestCase {
             .regex(try NSRegularExpression(pattern: "^abc", options: [])),
             [1, 2],
             ["string1", "string2"],
-            .null,
+            .null
         ])
-    }   
+    }
 }

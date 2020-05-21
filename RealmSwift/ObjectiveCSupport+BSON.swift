@@ -24,6 +24,10 @@ import Realm
 public extension ObjectiveCSupport {
     /// Convert an `AnyBSON` to a `RLMBSON`.
     static func convert(object: AnyBSON?) -> RLMBSON? {
+        guard let object = object else {
+            return nil
+        }
+
         switch object {
         case .int32(let val):
             return val as NSNumber
@@ -66,7 +70,7 @@ public extension ObjectiveCSupport {
             return nil
         }
 
-        switch (bson.__bsonType) {
+        switch bson.__bsonType {
         case .null:
             return nil
         case .int32:

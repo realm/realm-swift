@@ -86,7 +86,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
             theError = error
             ex.fulfill()
         })
-        
+
         waitForExpectations(timeout: 10, handler: nil)
         XCTAssertNotNil(theUser, file: file, line: line)
         XCTAssertEqual(theUser?.state, .loggedIn,

@@ -130,7 +130,7 @@ class CodableTests: TestCase {
         XCTAssertEqual("2.2", decode(Decimal128.self, "[2.2]"))
         XCTAssertEqual("1234567890e123", decode(Decimal128.self, "[\"1234567890e123\"]"))
         XCTAssertEqual(nil, decode(Decimal128?.self, "[null]"))
-        XCTAssertEqual("[\"1234567890E123\"]", encode("1234567890e123" as Decimal128))
+        XCTAssertEqual("[\"1.234567890E132\"]", encode("1234567890e123" as Decimal128))
     }
 
     func testObject() {
@@ -252,7 +252,7 @@ class CodableTests: TestCase {
         XCTAssertEqual(obj.decimalOptList.first, "1.5e2")
         XCTAssertEqual(obj.objectIdOptList.first, ObjectId("1234567890abcdef12345678"))
 
-        let expected = "{\"int64Opt\":123,\"int\":123,\"intOptList\":[123],\"boolList\":[true],\"doubleList\":[2.5],\"dateList\":[2.5],\"int32OptList\":[123],\"decimalList\":[\"15E1\"],\"dateOptList\":[2.5],\"int64OptList\":[123],\"doubleOptList\":[2.5],\"decimalOpt\":\"15E1\",\"int64List\":[123],\"objectIdList\":[\"1234567890abcdef12345678\"],\"int8List\":[123],\"string\":\"abc\",\"objectId\":\"1234567890abcdef12345678\",\"dataOptList\":[\"ZGVm\"],\"intOpt\":123,\"double\":2.5,\"float\":2.5,\"decimal\":\"15E1\",\"dateOpt\":2.5,\"boolOpt\":true,\"int32Opt\":123,\"int16Opt\":123,\"stringList\":[\"abc\"],\"dataList\":[\"ZGVm\"],\"boolOptList\":[true],\"date\":2.5,\"int16\":123,\"data\":\"ZGVm\",\"stringOpt\":\"abc\",\"int32\":123,\"int16List\":[123],\"stringOptList\":[\"abc\"],\"objectIdOptList\":[\"1234567890abcdef12345678\"],\"dataOpt\":\"ZGVm\",\"int8OptList\":[123],\"int32List\":[123],\"decimalOptList\":[\"15E1\"],\"int8\":123,\"int16OptList\":[123],\"intList\":[123],\"int8Opt\":123,\"floatOptList\":[2.5],\"floatOpt\":2.5,\"doubleOpt\":2.5,\"objectIdOpt\":\"1234567890abcdef12345678\",\"bool\":true,\"floatList\":[2.5],\"int64\":123}"
+        let expected = "{\"int64Opt\":123,\"int\":123,\"intOptList\":[123],\"boolList\":[true],\"doubleList\":[2.5],\"dateList\":[2.5],\"int32OptList\":[123],\"decimalList\":[\"1.5E2\"],\"dateOptList\":[2.5],\"int64OptList\":[123],\"doubleOptList\":[2.5],\"decimalOpt\":\"1.5E2\",\"int64List\":[123],\"objectIdList\":[\"1234567890abcdef12345678\"],\"int8List\":[123],\"string\":\"abc\",\"objectId\":\"1234567890abcdef12345678\",\"dataOptList\":[\"ZGVm\"],\"intOpt\":123,\"double\":2.5,\"float\":2.5,\"decimal\":\"1.5E2\",\"dateOpt\":2.5,\"boolOpt\":true,\"int32Opt\":123,\"int16Opt\":123,\"stringList\":[\"abc\"],\"dataList\":[\"ZGVm\"],\"boolOptList\":[true],\"date\":2.5,\"int16\":123,\"data\":\"ZGVm\",\"stringOpt\":\"abc\",\"int32\":123,\"int16List\":[123],\"stringOptList\":[\"abc\"],\"objectIdOptList\":[\"1234567890abcdef12345678\"],\"dataOpt\":\"ZGVm\",\"int8OptList\":[123],\"int32List\":[123],\"decimalOptList\":[\"1.5E2\"],\"int8\":123,\"int16OptList\":[123],\"intList\":[123],\"int8Opt\":123,\"floatOptList\":[2.5],\"floatOpt\":2.5,\"doubleOpt\":2.5,\"objectIdOpt\":\"1234567890abcdef12345678\",\"bool\":true,\"floatList\":[2.5],\"int64\":123}"
         let encoder = JSONEncoder()
         XCTAssertEqual(try! String(data: encoder.encode(obj), encoding: .utf8), expected)
     }

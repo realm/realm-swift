@@ -73,6 +73,7 @@ public typealias AppCredentials = RLMAppCredentials
 @dynamicMemberLookup
 public struct Functions {
     weak var app: RealmApp?
+
     fileprivate init(app: RealmApp) {
         self.app = app
     }
@@ -89,7 +90,7 @@ public struct Functions {
             self.app?.__callFunctionNamed(string,
                                           arguments: arguments.map(ObjectiveCSupport.convert) as! [RLMBSON]) {
                                         (bson: RLMBSON?, error: Error?) in
-                completionHandler(ObjectiveCSupport.convert(object:bson), error)
+                completionHandler(ObjectiveCSupport.convert(object: bson), error)
             }
         }
     }
@@ -117,7 +118,7 @@ public extension RealmApp {
     /// The second and final argument is the completion handler to call when the function call is complete.
     /// This handler is executed on a non-main global `DispatchQueue`.
     var functions: Functions {
-        Functions(app: self)
+        return Functions(app: self)
     }
 
 }
