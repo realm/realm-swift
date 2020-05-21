@@ -180,13 +180,13 @@ extension UpdateResult {
     }
 }
 
-public typealias InsertBlock = RLMInsertBlock
-public typealias InsertManyBlock = RLMInsertManyBlock
-public typealias FindBlock = RLMFindBlock
-public typealias FindOneBlock = RLMFindOneBlock
-public typealias CountBlock = RLMCountBlock
-public typealias UpdateBlock = (UpdateResult?, Error?) -> Void
-public typealias DeleteBlock = RLMDeleteBlock
+public typealias MongoInsertBlock = RLMMongoInsertBlock
+public typealias MongoInsertManyBlock = RLMMongoInsertManyBlock
+public typealias MongoFindBlock = RLMMongoFindBlock
+public typealias MongoFindOneBlock = RLMMongoFindOneBlock
+public typealias MongoCountBlock = RLMMongoCountBlock
+public typealias MongoUpdateBlock = (UpdateResult?, Error?) -> Void
+public typealias MongoDeleteBlock = RLMMongoDeleteBlock
 
 /**
 * The `MongoCollection` represents a MongoDB collection.
@@ -212,7 +212,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - document: document  A `Document` value to insert.
     ///   - completion: The result of attempting to perform the insert. An Id will be returned for the inserted object on sucess
-    public func insertOne(_ document: Document, _ completion: @escaping InsertBlock) {
+    public func insertOne(_ document: Document, _ completion: @escaping MongoInsertBlock) {
         self.__insertOneDocument(toRLMBSON(document), completion: completion)
     }
 
@@ -221,7 +221,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - documents: The `Document` values in a bson array to insert.
     ///   - completion: The result of the insert, returns an array inserted document ids in order.
-    public func insertMany(_ documents: [Document], _ completion: @escaping InsertManyBlock) {
+    public func insertMany(_ documents: [Document], _ completion: @escaping MongoInsertManyBlock) {
         self.__insertManyDocuments(toRLMBSONArray(documents), completion: completion)
     }
 
@@ -230,7 +230,7 @@ extension MongoCollection {
     ///   - filter: A `Document` as bson that should match the query.
     ///   - options: `FindOptions` to use when executing the command.
     ///   - completion: The resulting bson array of documents or error if one occurs
-    public func find(_ filter: Document, _ options: FindOptions, _ completion: @escaping FindBlock) {
+    public func find(_ filter: Document, _ options: FindOptions, _ completion: @escaping MongoFindBlock) {
         self.__find(toRLMBSON(filter), options: options, completion: completion)
     }
 
@@ -239,7 +239,7 @@ extension MongoCollection {
     ///   - filter: A `Document` as bson that should match the query.
     ///   - options: `FindOptions` to use when executing the command.
     ///   - completion: The resulting bson array of documents or error if one occurs
-    public func find(_ filter: Document, _ completion: @escaping FindBlock) {
+    public func find(_ filter: Document, _ completion: @escaping MongoFindBlock) {
         self.__find(toRLMBSON(filter), completion: completion)
     }
 
@@ -251,7 +251,7 @@ extension MongoCollection {
     ///   - filter: A `Document` as bson that should match the query.
     ///   - options: `FindOptions` to use when executing the command.
     ///   - completion: The resulting bson or error if one occurs
-    public func findOneDocument(_ filter: Document, _ options: FindOptions, _ completion: @escaping FindOneBlock) {
+    public func findOneDocument(_ filter: Document, _ options: FindOptions, _ completion: @escaping MongoFindOneBlock) {
         self.__findOneDocument(toRLMBSON(filter), options: options, completion: completion)
     }
 
@@ -262,7 +262,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
     ///   - completion: The resulting bson or error if one occurs
-    public func findOneDocument(_ filter: Document, _ completion: @escaping FindOneBlock) {
+    public func findOneDocument(_ filter: Document, _ completion: @escaping MongoFindOneBlock) {
         self.__findOneDocument(toRLMBSON(filter), completion: completion)
     }
 
@@ -270,7 +270,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - pipeline: A bson array made up of `Documents` containing the pipeline of aggregation operations to perform.
     ///   - completion: The resulting bson array of documents or error if one occurs
-    public func aggregate(_ pipeline: [Document], _ completion: @escaping FindBlock) {
+    public func aggregate(_ pipeline: [Document], _ completion: @escaping MongoFindBlock) {
         self.__aggregate(toRLMBSONArray(pipeline), completion: completion)
     }
 
@@ -279,7 +279,7 @@ extension MongoCollection {
     ///   - filter: A `Document` as bson that should match the query.
     ///   - limit: The max amount of documents to count
     ///   - completion: Returns the count of the documents that matched the filter.
-    public func count(_ filter: Document, _ limit: uint64, _ completion: @escaping CountBlock) {
+    public func count(_ filter: Document, _ limit: uint64, _ completion: @escaping MongoCountBlock) {
         self.__count(toRLMBSON(filter), limit: NSNumber(value: limit), completion: completion)
     }
 
@@ -287,7 +287,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
     ///   - completion: Returns the count of the documents that matched the filter.
-    public func count(_ filter: Document, _ completion: @escaping CountBlock) {
+    public func count(_ filter: Document, _ completion: @escaping MongoCountBlock) {
         self.__count(toRLMBSON(filter), completion: completion)
     }
 
@@ -295,7 +295,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - filter: A `Document` as bson that should match the query.
     ///   - completion: The result of performing the deletion. Returns the count of deleted objects
-    public func deleteOneDocument(_ filter: Document, _ completion: @escaping CountBlock) {
+    public func deleteOneDocument(_ filter: Document, _ completion: @escaping MongoCountBlock) {
         self.__deleteOneDocument(toRLMBSON(filter), completion: completion)
     }
 
@@ -303,7 +303,7 @@ extension MongoCollection {
     /// - Parameters:
     ///   - filter: Document representing the match criteria
     ///   - completion: The result of performing the deletion. Returns the count of the deletion
-    public func deleteManyDocuments(_ filter: Document, _ completion: @escaping CountBlock) {
+    public func deleteManyDocuments(_ filter: Document, _ completion: @escaping MongoCountBlock) {
         self.__deleteManyDocuments(toRLMBSON(filter), completion: completion)
     }
 
@@ -316,7 +316,7 @@ extension MongoCollection {
     public func updateOneDocument(_ filter: Document,
                                   _ update: Document,
                                   _ upsert: Bool,
-                                  _ completion: @escaping UpdateBlock) {
+                                  _ completion: @escaping MongoUpdateBlock) {
         self.__updateOneDocument(toRLMBSON(filter),
                                  updateDocument: toRLMBSON(update),
                                  upsert: upsert,
@@ -330,7 +330,7 @@ extension MongoCollection {
     ///   - completion: The result of the attempt to update a document.
     public func updateOneDocument(_ filter: Document,
                                   _ update: Document,
-                                  _ completion: @escaping UpdateBlock) {
+                                  _ completion: @escaping MongoUpdateBlock) {
         self.__updateOneDocument(toRLMBSON(filter),
                                  updateDocument: toRLMBSON(update),
                                  completion: completion)
@@ -345,7 +345,7 @@ extension MongoCollection {
     public func updateManyDocuments(_ filter: Document,
                                     _ update: Document,
                                     _ upsert: Bool,
-                                    _ completion: @escaping UpdateBlock) {
+                                    _ completion: @escaping MongoUpdateBlock) {
         self.__updateManyDocuments(toRLMBSON(filter),
                                    updateDocument: toRLMBSON(update),
                                    upsert: upsert,
@@ -359,7 +359,7 @@ extension MongoCollection {
     ///   - completion: The result of the attempt to update a document.
     public func updateManyDocuments(_ filter: Document,
                                     _ update: Document,
-                                    _ completion: @escaping UpdateBlock) {
+                                    _ completion: @escaping MongoUpdateBlock) {
         self.__updateManyDocuments(toRLMBSON(filter),
                                    updateDocument: toRLMBSON(update),
                                    completion: completion)
@@ -379,7 +379,7 @@ extension MongoCollection {
     public func findOneAndUpdate(_ filter: Document,
                                  _ update: Document,
                                  _ options: FindOneAndModifyOptions,
-                                 _ completion: @escaping FindOneBlock) {
+                                 _ completion: @escaping MongoFindOneBlock) {
         self.__findOneAndUpdate(toRLMBSON(filter),
                                 updateDocument: toRLMBSON(update),
                                 options: options,
@@ -398,7 +398,7 @@ extension MongoCollection {
     ///   - completion: The result of the attempt to update a document.
     public func findOneAndUpdate(_ filter: Document,
                                  _ update: Document,
-                                 _ completion: @escaping FindOneBlock) {
+                                 _ completion: @escaping MongoFindOneBlock) {
         self.__findOneAndUpdate(toRLMBSON(filter),
                                 updateDocument: toRLMBSON(update),
                                 completion: completion)
@@ -418,7 +418,7 @@ extension MongoCollection {
     public func findOneAndReplace(_ filter: Document,
                                   _ replacement: Document,
                                   _ options: FindOneAndModifyOptions,
-                                  _ completion: @escaping FindOneBlock) {
+                                  _ completion: @escaping MongoFindOneBlock) {
         self.__findOneAndReplace(toRLMBSON(filter),
                                 replacementDocument: toRLMBSON(replacement),
                                 options: options,
@@ -438,7 +438,7 @@ extension MongoCollection {
     ///   - completion: The result of the attempt to replace a document.
     public func findOneAndReplace(_ filter: Document,
                                   _ replacement: Document,
-                                  _ completion: @escaping FindOneBlock) {
+                                  _ completion: @escaping MongoFindOneBlock) {
         self.__findOneAndReplace(toRLMBSON(filter),
                                 replacementDocument: toRLMBSON(replacement),
                                 completion: completion)
@@ -456,7 +456,7 @@ extension MongoCollection {
     ///   - completion: The result of the attempt to delete a document.
     public func findOneAndDelete(_ filter: Document,
                                  _ options: FindOneAndModifyOptions,
-                                 _ completion: @escaping DeleteBlock) {
+                                 _ completion: @escaping MongoDeleteBlock) {
         self.__findOneAndDelete(toRLMBSON(filter),
                                 options: options,
                                 completion: completion)
@@ -472,7 +472,7 @@ extension MongoCollection {
     ///   - filter: A `Document` that should match the query.
     ///   - completion: The result of the attempt to delete a document.
     public func findOneAndDelete(_ filter: Document,
-                                 _ completion: @escaping DeleteBlock) {
+                                 _ completion: @escaping MongoDeleteBlock) {
         self.__findOneAndDelete(toRLMBSON(filter),
                                 completion: completion)
     }
