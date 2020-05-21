@@ -8,6 +8,9 @@ x.y.z Release notes (yyyy-MM-dd)
   ([#6511](https://github.com/realm/realm-cocoa/issues/6511), since 4.3.1).
 * Fix building for iOS devices when using Swift Package Manager
   ([#6522](https://github.com/realm/realm-cocoa/issues/6522), since 5.0.0).
+* `List` and `RealmOptional` properties on frozen objects were not initialized
+  correctly and would always report `nil` or an empty list.
+  ([#6527](https://github.com/realm/realm-cocoa/issues/6527), since 5.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
