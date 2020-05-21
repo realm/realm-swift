@@ -130,15 +130,18 @@ public extension ObjectiveCSupport {
         case .minKey:
             return .minKey
         case .document:
-            guard let val = bson as? Document else {
+            guard let val = bson as? Dictionary<String, RLMBSON> else {
                 return nil
             }
-            return .document(val)
+            let keyValues = val.map { ($0, convert(object: $1)!) }
+            let convertedDictionary = Dictionary(uniqueKeysWithValues: keyValues)
+            return .document(convertedDictionary)
         case .array:
-            guard let val = bson as? Array<AnyBSON> else {
+            guard let val = bson as? Array<RLMBSON> else {
                 return nil
             }
-            return .array(val)
+            let convertedArray = val.map { convert(object: $0)! }
+            return .array(convertedArray)
         default:
             return nil
         }

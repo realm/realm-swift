@@ -1021,10 +1021,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         
         let findOptions = FindOptions(5, nil, nil)
         let findOptions1 = FindOptions(5, ["name" : 1], ["_id" : 1])
+        let findOptions2 = FindOptions(5, ["names" : ["fido", "bob", "rex"]], ["_id" : 1])
+
+        XCTAssertEqual(findOptions.limit, 5)
+        XCTAssertEqual(findOptions.projectedBSON, nil)
+        XCTAssertEqual(findOptions.sortBSON, nil)
 
         XCTAssertEqual(findOptions1.limit, 5)
         XCTAssertEqual(findOptions1.projectedBSON, ["name" : 1])
         XCTAssertEqual(findOptions1.sortBSON, ["_id" : 1])
+        XCTAssertEqual(findOptions2.projectedBSON, ["names" : ["fido", "bob", "rex"]])
 
         collection.find(document3) { (result, error) in
             XCTAssertNotNil(result)
@@ -1051,9 +1057,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 //            XCTAssertNil(error)
 //        }
 
-        
-        
-        
     }
 
     /*
