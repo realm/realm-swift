@@ -1,27 +1,50 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* MongoDB Realm: 71f9b52e2e or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 11.4.1.
+
+### Internal
+Upgraded realm-core from ? to ?
+Upgraded realm-sync from ? to ?
+
 10.0.0-alpha.5 Release notes (2020-05-15)
 =============================================================
 ### Enhancements
-* Add support for custom user data
-* Add BSON support
-* Add `callFunction` support
-* Change `configurationWithPartitionValue` to accept all BSON types
+* Add `RLMSyncUser#customData`.  Custom data is a can be configured in your MongoDB Realm App.
+* Add `RLMApp#callFunctionNamed:arguments`. This is the entry point for calling Remote MongoDB Realm functions.
+* Add `RealmApp#functions`. This is the swift entry pint for calling Remote MongoDB Realm functions.
+* Change `RLMSyncUser#configurationWithPartitionValue` to accept all BSON types.
 
 ### Breaking Changes
-* None
-  
-  ### Compatibility
-   * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
-   * MongoDB Realm: 3.21.0 or later.
-   * APIs are backwards compatible with all previous releases in the 10.x.y series.
-   * Carthage release for Swift is built with Xcode 11.4.1.
-   
+* We no longer support Realm Cloud (logacy), but instead the new "MongoDB Realm" Cloud.
+
+### Compatibility
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* MongoDB Realm: 71f9b52e2e or later.
+* APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
+* Carthage release for Swift is built with Xcode 11.4.1.
+
 ### Internal
-* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.6
-* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.8
+* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.8
+* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.11
 
 10.0.0-alpha.0 Release notes (2020-04-22)
 =============================================================
 ### Enhancements
+* Add support for next generation sync. Support for syncing to MongoDB instead of Realm Object Server.
+Applications must be created at realm.mongodb.com
 * The memory mapping scheme for Realm files has changed to better support
   opening very large files.
 * Add support for the ObjectId data type. This is an automatically-generated
@@ -34,10 +57,6 @@
   owned by a single parent object, and are deleted when that parent object is
   deleted. They are defined by subclassing `EmbeddedObject` /
 	`RLMEmbeddedObject` rather than `Object` / `RLMObject`.
-* Add support for next generation sync. Next generation sync includes the
-  ability to use partition keys. Applications must be created at
-  realm.mongodb.com.
-
 
 ### Breaking Changes
 * Remove support for Query-based sync, including the configuration parameters
@@ -52,13 +71,14 @@
   could be created with duplicate primary keys during a migration as long as
   the property was changed to a unique value before the end of the migration,
   but now a unique value must be supplied when creating the object.
-  
-  ### Compatibility
-   * File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
-   * MongoDB Realm: 3.21.0 or later.
-   * APIs are backwards compatible with all previous releases in the 10.x.y series.
-   * Carthage release for Swift is built with Xcode 11.4.1.
-   
+  * Remove support for Realm Object Server.
+
+### Compatibility
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* MongoDB Realm: 71f9b52e2e or later.
+* APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
+* Carthage release for Swift is built with Xcode 11.4.1.
+
 ### Internal
 * Upgraded realm-core from v6.0.3 to v10.0.0-alpha.6
 * Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.8

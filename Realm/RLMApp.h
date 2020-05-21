@@ -42,9 +42,6 @@ typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _
 /// A custom base URL to request against.
 @property (nonatomic, strong, nullable) NSString* baseURL;
 
-/// A transport for customizing network handling.
-@property (nonatomic, strong, nullable) id <RLMNetworkTransport> transport;
-
 /// A custom app name.
 @property (nonatomic, strong, nullable) NSString *localAppName;
 
@@ -54,11 +51,28 @@ typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _
 /// The default timeout for network requests.
 @property (nonatomic, assign) NSUInteger defaultRequestTimeoutMS;
 
+/**
+Create a new Realm App configuration.
+
+@param baseURL A custom base URL to request against.
+@param transport A custom network transport.
+@param localAppName A custom app name.
+@param localAppVersion A custom app version.
+*/
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(nullable NSString *) localAppName
                 localAppVersion:(nullable NSString *)localAppVersion;
 
+/**
+ Create a new Realm App configuration.
+
+ @param baseURL A custom base URL to request against.
+ @param transport A custom network transport.
+ @param localAppName A custom app name.
+ @param localAppVersion A custom app version.
+ @param defaultRequestTimeoutMS A custom default timeout for network requests.
+ */
 - (instancetype)initWithBaseURL:(nullable NSString *) baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(nullable NSString *) localAppName
@@ -85,7 +99,7 @@ typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _
 
  @param appId The unique identifier of your Realm app.
  */
-+ (instancetype)appWithAppId:(NSString *)appId;
++ (instancetype)appWithId:(NSString *)appId;
 
 /**
  Get an application with a given appId and configuration.
@@ -93,11 +107,17 @@ typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _
  @param appId The unique identifier of your Realm app.
  @param configuration A configuration object to configure this client.
  */
-+ (instancetype)appWithAppId:(NSString *)appId
-               configuration:(nullable RLMAppConfiguration *)configuration;
++ (instancetype)appWithId:(NSString *)appId
+            configuration:(nullable RLMAppConfiguration *)configuration;
 
+/**
+ Get a dictionary keyed on id for all users of the Realm app
+ */
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers;
 
+/**
+ Get the current user logged into the Realm app.
+ */
 - (nullable RLMSyncUser *)currentUser;
 
 /**
@@ -195,9 +215,25 @@ typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _
  @param completionBlock The completion handler to call when the function call is complete.
                         This handler is executed on a non-main global `DispatchQueue`.
 */
-- (void)callFunctionWithName:(NSString *)name
-                   arguments:(NSArray<id<RLMBSON>> *)arguments
-             completionBlock:(RLMCallFunctionCompletionBlock)completionBlock NS_REFINED_FOR_SWIFT;
+- (void)callFunctionNamed:(NSString *)name
+                arguments:(NSArray<id<RLMBSON>> *)arguments
+          completionBlock:(RLMCallFunctionCompletionBlock)completionBlock NS_REFINED_FOR_SWIFT;
+
+/**
+ RLMApp instances are cached internally by Realm and cannot be created directly.
+
+ Use `+[RLMRealm appWithId]` or `+[RLMRealm appWithId:configuration:]`
+ to obtain a reference to an RLMApp.
+ */
+- (instancetype)init __attribute__((unavailable("Use +appWithId or appWithId:configuration:.")));
+
+/**
+RLMApp instances are cached internally by Realm and cannot be created directly.
+
+Use `+[RLMRealm appWithId]` or `+[RLMRealm appWithId:configuration:]`
+to obtain a reference to an RLMApp.
+*/
++ (instancetype)new __attribute__((unavailable("Use +appWithId or appWithId:configuration:.")));
 
 @end
 

@@ -685,10 +685,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testRealmAppInit() {
-        let appWithNoConfig = RealmApp(appId: appName)
+        let appWithNoConfig = RealmApp(id: appName)
         XCTAssertEqual(appWithNoConfig.allUsers().count, 0)
 
-        let appWithConfig = RealmApp(appId: appName, configuration: realmAppConfig())
+        let appWithConfig = RealmApp(id: appName, configuration: realmAppConfig())
         XCTAssertEqual(appWithConfig.allUsers().count, 0)
     }
 
@@ -998,32 +998,31 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(collection.name, "dogs")
     }
     
-    func testMongoInsert() {
+    func removeAllFromCollection(_ collection: MongoCollection) {
+        let deleteEx = expectation(description: "Delete all from Mongo collection")
+        collection.deleteManyDocuments([:]) { (count, error) in
+            XCTAssertNotNil(count)
+            XCTAssertNil(error)
+            deleteEx.fulfill()
+        }
+        wait(for: [deleteEx], timeout: 4.0)
+    }
+    
+    func setupMongoCollection(_ name: String) -> MongoCollection {
         _ = try? synchronouslyLogInUser(for: basicCredentials())
         let mongoClient = app.mongoClient("mongodb1")
         let database = mongoClient.database("test_data")
-        let collection = database.collection("dogs")
-        
-        let document: Document = ["name": "fido", "breed": "cane corso"]
-        let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
-        let document3: Document = ["name": "rex", "breed": "tibetan mastiff", "coat" : ["fawn", "brown", "white"]]
-
-        collection.insertOne(document) { (objectId, error) in
-            XCTAssertNotNil(objectId)
-            XCTAssertNil(error)
-        }
-        
-        collection.insertMany([document, document2]) { (objectIds, error) in
-            XCTAssertNotNil(objectIds)
-            XCTAssertEqual(objectIds?.count, 2)
-            XCTAssertNil(error)
-        }
-        
-        let findOptions = FindOptions(5, nil, nil)
+        let collection = database.collection(name)
+        removeAllFromCollection(collection)
+        return collection
+    }
+    
+    func testMongoOptions() {
+        let findOptions = FindOptions(1, nil, nil)
         let findOptions1 = FindOptions(5, ["name" : 1], ["_id" : 1])
         let findOptions2 = FindOptions(5, ["names" : ["fido", "bob", "rex"]], ["_id" : 1])
 
-        XCTAssertEqual(findOptions.limit, 5)
+        XCTAssertEqual(findOptions.limit, 1)
         XCTAssertEqual(findOptions.projectedBSON, nil)
         XCTAssertEqual(findOptions.sortBSON, nil)
 
@@ -1031,505 +1030,366 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(findOptions1.projectedBSON, ["name" : 1])
         XCTAssertEqual(findOptions1.sortBSON, ["_id" : 1])
         XCTAssertEqual(findOptions2.projectedBSON, ["names" : ["fido", "bob", "rex"]])
+        
+        let findModifyOptions = FindOneAndModifyOptions(["name" : 1], ["_id" : 1], true, true)
+        XCTAssertEqual(findModifyOptions.projectedBSON, ["name" : 1])
+        XCTAssertEqual(findModifyOptions.sortBSON, ["_id" : 1])
+        XCTAssertTrue(findModifyOptions.upsert)
+        XCTAssertTrue(findModifyOptions.returnNewDocument)
+    }
+    
+    func testMongoInsert() {
+        let collection = setupMongoCollection("Dogs")
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
 
-        collection.find(document3) { (result, error) in
+        let insertOneEx1 = expectation(description: "Insert one document")
+        collection.insertOne(document) { (objectId, error) in
+            XCTAssertNotNil(objectId)
+            XCTAssertNil(error)
+            insertOneEx1.fulfill()
+        }
+        wait(for: [insertOneEx1], timeout: 4.0)
+
+        let insertManyEx1 = expectation(description: "Insert many documents")
+        collection.insertMany([document, document2]) { (objectIds, error) in
+            XCTAssertNotNil(objectIds)
+            XCTAssertEqual(objectIds?.count, 2)
+            XCTAssertNil(error)
+            insertManyEx1.fulfill()
+        }
+        wait(for: [insertManyEx1], timeout: 4.0)
+        
+        let findEx1 = expectation(description: "Find documents")
+        collection.find([:]) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
+            XCTAssertEqual(result?.count, 3)
+            XCTAssertEqual(result![0]["name"] as! String, "fido")
+            XCTAssertEqual(result![1]["name"] as! String, "fido")
+            XCTAssertEqual(result![2]["name"] as! String, "rex")
+            findEx1.fulfill()
         }
+        wait(for: [findEx1], timeout: 4.0)
+    }
+    
+    func testMongoFind() {
+        let collection = setupMongoCollection("Dogs")
+
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
+        let document3: Document = ["name": "rex", "breed": "tibetan mastiff", "coat" : ["fawn", "brown", "white"]]
+        let findOptions = FindOptions(1, nil, nil)
         
+        let insertManyEx1 = expectation(description: "Insert many documents")
+        collection.insertMany([document, document2]) { (objectIds, error) in
+            XCTAssertNotNil(objectIds)
+            XCTAssertEqual(objectIds?.count, 2)
+            XCTAssertNil(error)
+            insertManyEx1.fulfill()
+        }
+        wait(for: [insertManyEx1], timeout: 4.0)
+        
+        let findEx1 = expectation(description: "Find documents")
+        collection.find([:]) { (result, error) in
+            XCTAssertNotNil(result)
+            XCTAssertNil(error)
+            XCTAssertEqual(result?.count, 3)
+            XCTAssertEqual(result![0]["name"] as! String, "fido")
+            XCTAssertEqual(result![1]["name"] as! String, "fido")
+            XCTAssertEqual(result![2]["name"] as! String, "rex")
+            findEx1.fulfill()
+        }
+        wait(for: [findEx1], timeout: 4.0)
+
+        let findEx2 = expectation(description: "Find documents")
+        collection.find([:], findOptions) { (result, error) in
+            XCTAssertNotNil(result)
+            XCTAssertNil(error)
+            XCTAssertEqual(result?.count, 1)
+            XCTAssertEqual(result![0]["name"] as! String, "fido")
+            findEx2.fulfill()
+        }
+        wait(for: [findEx2], timeout: 4.0)
+
+        let findEx3 = expectation(description: "Find documents")
         collection.find(document3, findOptions) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
+            XCTAssertEqual(result?.count, 0)
+            findEx3.fulfill()
         }
-        
+        wait(for: [findEx3], timeout: 4.0)
+
+        let findOneEx1 = expectation(description: "Find one document")
         collection.findOneDocument(document) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
+            findOneEx1.fulfill()
         }
-        
+        wait(for: [findOneEx1], timeout: 4.0)
+
+        let findOneEx2 = expectation(description: "Find one document")
         collection.findOneDocument(document, findOptions) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
+            findOneEx2.fulfill()
         }
-                
-//        collection.aggregate([["$match" : ["name" : "fido"]], ["$group" : ["_id" : "$name"]]]) { (result, error) in
-//            XCTAssertNotNil(result)
-//            XCTAssertNil(error)
-//        }
-
+        wait(for: [findOneEx2], timeout: 4.0)
     }
-
-    /*
-
-     #pragma mark - Remote Mongo
-
-     - (void)cleanupRemoteDocuments:(RLMMongoCollection *)collection {
-         XCTestExpectation *deleteManyExpectation = [self expectationWithDescription:@"should delete many documents"];
-         [collection deleteManyDocuments:@{}
-                              completion:^(NSNumber * count, NSError * error) {
-             XCTAssertNotNil(count);
-             XCTAssertNil(error);
-             [deleteManyExpectation fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-     }
-
-
-     - (void)testRemoteMongoInsert {
-         XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
-         __block RLMSyncUser *syncUser;
-         [self.app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
-             XCTAssert(!error);
-             XCTAssert(user);
-             syncUser = user;
-             [expectation fulfill];
-         }];
-
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-             
-         RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-         RLMMongoDatabase *database = [client database:@"test_data"];
-         RLMMongoCollection *collection = [database collection:@"Dog"];
-
-         [self cleanupRemoteDocuments:collection];
-         
-         XCTestExpectation *insertOneExpectation = [self expectationWithDescription:@"should insert one document"];
-         [collection insertOneDocument:@{@"name": @"fido", @"breed": @"cane corso"} completion:^(RLMObjectId * objectId, NSError * error) {
-             XCTAssertTrue(![objectId.stringValue isEqualToString:@""]);
-             XCTAssertNil(error);
-             [insertOneExpectation fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
-         [collection insertManyDocuments:@[
-             @{@"name": @"fido", @"breed": @"cane corso"},
-             @{@"name": @"fido", @"breed": @"cane corso"},
-             @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
-                              completion:^(NSArray<RLMObjectId *> * objectIds, NSError * error) {
-             XCTAssertTrue(objectIds.count > 0);
-             XCTAssertNil(error);
-             [insertManyExpectation fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *findExpectation = [self expectationWithDescription:@"should find documents"];
-         RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:nil projectionBson:nil sortBson:nil];
-         [collection find:@{@"name": @"fido", @"breed": @"cane corso"}
-                  options:options
-               completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
-             XCTAssertEqual((int)documents.count, 3);
-             XCTAssertNil(error);
-             [findExpectation fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-     }
-
-     - (void)testRemoteMongoFind {
-         XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
-         __block RLMSyncUser *syncUser;
-         [self.app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
-             XCTAssert(!error);
-             XCTAssert(user);
-             syncUser = user;
-             [expectation fulfill];
-         }];
-
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-             
-         RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-         RLMMongoDatabase *database = [client database:@"test_data"];
-         RLMMongoCollection *collection = [database collection:@"Dog"];
-
-         [self cleanupRemoteDocuments:collection];
-         
-         XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
-         [collection insertManyDocuments:@[
-             @{@"name": @"fido", @"breed": @"cane corso"},
-             @{@"name": @"fido", @"breed": @"cane corso"},
-             @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
-                              completion:^(NSArray<RLMObjectId *> * objectIds, NSError * error) {
-             XCTAssertTrue(objectIds.count > 0);
-             XCTAssertNil(error);
-             [insertManyExpectation fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *findExpectation = [self expectationWithDescription:@"should find documents"];
-         RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:nil projectionBson:nil sortBson:nil];
-         [collection find:@{@"name": @"fido", @"breed": @"cane corso"}
-                  options:options
-               completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
-             XCTAssertEqual((int)documents.count, 2);
-             XCTAssertNil(error);
-             [findExpectation fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *findExpectation2 = [self expectationWithDescription:@"should find documents"];
-         [collection find:@{@"name": @"fido", @"breed": @"cane corso"}
-               completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
-             XCTAssertEqual((int)documents.count, 2);
-             XCTAssertNil(error);
-             [findExpectation2 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *findExpectation3 = [self expectationWithDescription:@"should not find documents"];
-         [collection find:@{@"name": @"should not exist", @"breed": @"should not exist"}
-               completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
-             XCTAssertEqual(documents.count, NSUInteger(0));
-             XCTAssertNil(error);
-             [findExpectation3 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *findExpectation4 = [self expectationWithDescription:@"should not find documents"];
-         [collection find:@{}
-               completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
-             XCTAssertTrue(documents.count > 0);
-             XCTAssertNil(error);
-             [findExpectation4 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *findOneExpectation1 = [self expectationWithDescription:@"should find documents"];
-         [collection findOneDocument:@{@"name": @"fido", @"breed": @"cane corso"}
-               completion:^(NSDictionary * document, NSError * error) {
-             XCTAssertTrue([document[@"name"] isEqualToString:@"fido"]);
-             XCTAssertTrue([document[@"breed"] isEqualToString:@"cane corso"]);
-             XCTAssertNil(error);
-             [findOneExpectation1 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *findOneExpectation2 = [self expectationWithDescription:@"should find documents"];
-         [collection findOneDocument:@{@"name": @"fido", @"breed": @"cane corso"}
-                             options:options
-                          completion:^(NSDictionary * document, NSError * error) {
-             XCTAssertTrue([document[@"name"] isEqualToString:@"fido"]);
-             XCTAssertTrue([document[@"breed"] isEqualToString:@"cane corso"]);
-             XCTAssertNil(error);
-             [findOneExpectation2 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-     }
-
-     - (void)testRemoteMongoAggregateAndCount {
-         XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
-         __block RLMSyncUser *syncUser;
-         [self.app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
-             XCTAssert(!error);
-             XCTAssert(user);
-             syncUser = user;
-             [expectation fulfill];
-         }];
-
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-             
-         RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-         RLMMongoDatabase *database = [client database:@"test_data"];
-         RLMMongoCollection *collection = [database collection:@"Dog"];
-
-         [self cleanupRemoteDocuments:collection];
-         
-         XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
-         [collection insertManyDocuments:@[
-             @{@"name": @"fido", @"breed": @"cane corso"},
-             @{@"name": @"fido", @"breed": @"cane corso"},
-             @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
-                              completion:^(NSArray<RLMObjectId *> * objectIds, NSError * error) {
-             XCTAssertTrue(objectIds.count > 0);
-             XCTAssertNil(error);
-             [insertManyExpectation fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *aggregateExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
-         [collection aggregate:@[@{@"name" : @"fido"}]
-                    completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
-             XCTAssertNotNil(error);
-             XCTAssertTrue([error.domain.description isEqualToString:@"realm::app::ServiceError"]);
-             XCTAssertTrue([error.localizedDescription isEqualToString:@"(Location40324) Unrecognized pipeline stage name: 'name'"]);
-             XCTAssertNil(documents);
-             [aggregateExpectation1 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *aggregateExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
-         [collection aggregate:@[@{@"$match" : @{@"name" : @"fido"}}, @{@"$group" : @{@"_id" : @"$name"}}]
-                    completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
-             XCTAssertNotNil(documents);
-             XCTAssertTrue(documents.count > 0);
-             XCTAssertNil(error);
-             [aggregateExpectation2 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *countExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
-         [collection count:@{@"name" : @"fido"}
-                    completion:^(NSNumber * count, NSError * error) {
-             XCTAssertNotNil(count);
-             XCTAssertTrue(count.intValue > 0);
-             XCTAssertNil(error);
-             [countExpectation1 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *countExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
-         [collection count:@{@"name" : @"fido"}
-                     limit:@1
-                    completion:^(NSNumber * count, NSError * error) {
-             XCTAssertNotNil(count);
-             XCTAssertEqual(count.intValue, 1);
-             XCTAssertNil(error);
-             [countExpectation2 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-     }
-
-     - (void)testRemoteMongoUpdate {
-         XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
-         __block RLMSyncUser *syncUser;
-         [self.app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
-             XCTAssert(!error);
-             XCTAssert(user);
-             syncUser = user;
-             [expectation fulfill];
-         }];
-
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-             
-         RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-         RLMMongoDatabase *database = [client database:@"test_data"];
-         RLMMongoCollection *collection = [database collection:@"Dog"];
-
-         [self cleanupRemoteDocuments:collection];
-         
-         XCTestExpectation *updateExpectation1 = [self expectationWithDescription:@"should update document"];
-         [collection updateOneDocument:@{@"name" : @"scrabby doo"}
-                        updateDocument:@{@"name" : @"scooby"}
-                                upsert:YES
-                            completion:^(RLMUpdateResult * result, NSError * error) {
-             XCTAssertNotNil(result);
-             XCTAssertNotNil(result.objectId);
-             XCTAssertEqual(result.modifiedCount.intValue, 0);
-             XCTAssertEqual(result.matchedCount.intValue, 0);
-             XCTAssertNil(error);
-             [updateExpectation1 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *updateExpectation2 = [self expectationWithDescription:@"should update document"];
-         [collection updateOneDocument:@{@"name" : @"scooby"}
-                        updateDocument:@{@"name" : @"fred"}
-                                upsert:NO
-                            completion:^(RLMUpdateResult * result, NSError * error) {
-             XCTAssertNotNil(result);
-             XCTAssertNil(result.objectId);
-             XCTAssertEqual(result.modifiedCount.intValue, 1);
-             XCTAssertEqual(result.matchedCount.intValue, 1);
-             XCTAssertNil(error);
-             [updateExpectation2 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *updateExpectation3 = [self expectationWithDescription:@"should update document"];
-         [collection updateOneDocument:@{@"name" : @"fred"}
-                        updateDocument:@{@"name" : @"scrabby"}
-                            completion:^(RLMUpdateResult * result, NSError * error) {
-             XCTAssertNotNil(result);
-             XCTAssertNil(result.objectId);
-             XCTAssertEqual(result.modifiedCount.intValue, 1);
-             XCTAssertEqual(result.matchedCount.intValue, 1);
-             XCTAssertNil(error);
-             [updateExpectation3 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *updateManyExpectation1 = [self expectationWithDescription:@"should update many documents"];
-         [collection updateManyDocuments:@{@"name" : @"scrabby"}
-                          updateDocument:@{@"name" : @"fred"}
-                              completion:^(RLMUpdateResult * result, NSError * error) {
-             XCTAssertNotNil(result);
-             XCTAssertNil(result.objectId);
-             XCTAssertEqual(result.modifiedCount.intValue, 1);
-             XCTAssertEqual(result.matchedCount.intValue, 1);
-             XCTAssertNil(error);
-             [updateManyExpectation1 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *updateManyExpectation2 = [self expectationWithDescription:@"should update many documents"];
-         [collection updateManyDocuments:@{@"name" : @"john"}
-                          updateDocument:@{@"name" : @"alex"}
-                                  upsert:YES
-                              completion:^(RLMUpdateResult * result, NSError * error) {
-             XCTAssertNotNil(result);
-             XCTAssertNotNil(result.objectId);
-             XCTAssertEqual(result.modifiedCount.intValue, 0);
-             XCTAssertEqual(result.matchedCount.intValue, 0);
-             XCTAssertNil(error);
-             [updateManyExpectation2 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-     }
-
-     - (void)testRemoteMongoFindAndModify {
-         XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
-         __block RLMSyncUser *syncUser;
-         [self.app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
-             XCTAssert(!error);
-             XCTAssert(user);
-             syncUser = user;
-             [expectation fulfill];
-         }];
-
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-             
-         RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-         RLMMongoDatabase *database = [client database:@"test_data"];
-         RLMMongoCollection *collection = [database collection:@"Dog"];
-
-         [self cleanupRemoteDocuments:collection];
-         
-         RLMFindOneAndModifyOptions *findAndModifyOptions = [[RLMFindOneAndModifyOptions alloc] initWithProjectionBson:@{@"name" : @1, @"breed" : @1}
-                                                                                                              sortBson:@{@"name" : @1, @"breed" : @1}
-                                                                                                                upsert:YES
-                                                                                                     returnNewDocument:YES];
-         
-         XCTestExpectation *findOneAndUpdateExpectation1 = [self expectationWithDescription:@"should find one document and update"];
-         [collection findOneAndUpdate:@{@"name" : @"alex"}
-                       updateDocument:@{@"name" : @"max"}
-                              options:findAndModifyOptions
-                           completion:^(NSDictionary * document, NSError * error) {
-             XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
-             XCTAssertNil(error);
-             [findOneAndUpdateExpectation1 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *findOneAndUpdateExpectation2 = [self expectationWithDescription:@"should find one document and update"];
-         [collection findOneAndUpdate:@{@"name" : @"max"}
-                       updateDocument:@{@"name" : @"john"}
-                           completion:^(NSDictionary * document, NSError * error) {
-             XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
-             XCTAssertNil(error);
-             [findOneAndUpdateExpectation2 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *findOneAndReplaceExpectation1 = [self expectationWithDescription:@"should find one document and replace"];
-         [collection findOneAndReplace:@{@"name" : @"alex"}
-                   replacementDocument:@{@"name" : @"max"}
-                               options:findAndModifyOptions
-                            completion:^(NSDictionary * document, NSError * error) {
-             XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
-             XCTAssertNil(error);
-             [findOneAndReplaceExpectation1 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *findOneAndReplaceExpectation2 = [self expectationWithDescription:@"should find one document and replace"];
-         [collection findOneAndReplace:@{@"name" : @"max"}
-                   replacementDocument:@{@"name" : @"john"}
-                            completion:^(NSDictionary * document, NSError * error) {
-             XCTAssertTrue([document[@"name"] isEqualToString:@"max"]);
-             XCTAssertNil(error);
-             [findOneAndReplaceExpectation2 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-     }
-
-     - (void)testRemoteMongoDelete {
-
-         XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
-         __block RLMSyncUser *syncUser;
-         [self.app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
-             XCTAssert(!error);
-             XCTAssert(user);
-             syncUser = user;
-             [expectation fulfill];
-         }];
-
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-             
-         RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-         RLMMongoDatabase *database = [client database:@"test_data"];
-         RLMMongoCollection *collection = [database collection:@"Dog"];
-
-         [self cleanupRemoteDocuments:collection];
-         __block RLMObjectId * fidoObjectId;
-         __block RLMObjectId * rexObjectId;
-         
-         XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
-         [collection insertManyDocuments:@[
-             @{@"name": @"fido", @"breed": @"cane corso"},
-             @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
-                              completion:^(NSArray<RLMObjectId *> * objectIds, NSError * error) {
-             XCTAssertTrue(objectIds.count > 0);
-             XCTAssertNil(error);
-             fidoObjectId = objectIds[0];
-             rexObjectId = objectIds[1];
-             [insertManyExpectation fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *deleteOneExpectation1 = [self expectationWithDescription:@"should delete first document in collection"];
-         [collection deleteOneDocument:@{@"_id" : rexObjectId}
-                            completion:^(NSNumber * count, NSError * error) {
-             XCTAssertNotNil(count);
-             XCTAssertTrue(count.intValue == 1);
-             XCTAssertNil(error);
-             [deleteOneExpectation1 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *findExpectation1 = [self expectationWithDescription:@"should find documents"];
-         [collection find:@{}
-               completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
-             XCTAssertEqual((int)documents.count, 1);
-             XCTAssertTrue([documents[0][@"name"] isEqualToString:@"fido"]);
-             XCTAssertNil(error);
-             [findExpectation1 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *deleteManyExpectation1 = [self expectationWithDescription:@"should delete many documents"];
-         [collection deleteManyDocuments:@{@"breed" : @"tibetan mastiff"}
-                              completion:^(NSNumber * count, NSError * error) {
-             XCTAssertNotNil(count);
-             XCTAssertTrue(count.intValue == 0);
-             XCTAssertNil(error);
-             [deleteManyExpectation1 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-         
-         XCTestExpectation *deleteManyExpectation2 = [self expectationWithDescription:@"should delete many documents"];
-         [collection deleteManyDocuments:@{@"breed" : @"cane corso"}
-                              completion:^(NSNumber * count, NSError * error) {
-             XCTAssertNotNil(count);
-             XCTAssertTrue(count.intValue == 1);
-             XCTAssertNil(error);
-             [deleteManyExpectation2 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-         XCTestExpectation *findOneAndDeleteExpectation1 = [self expectationWithDescription:@"should find one and delete"];
-         [collection findOneAndDelete:@{@"_id": rexObjectId}
-                           completion:^(NSError * error) {
-             XCTAssertNil(error);
-             [findOneAndDeleteExpectation1 fulfill];
-         }];
-         [self waitForExpectationsWithTimeout:60.0 handler:nil];
-
-     }
-
-     */
     
+    func testMongoFindAndReplace() {
+        let collection = setupMongoCollection("Dogs")
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+
+        let findOneReplaceEx1 = expectation(description: "Find one document and replace")
+        collection.findOneAndReplace(document, document2) { (result, error) in
+            // no doc found, both should be nil
+            XCTAssertNil(result)
+            XCTAssertNil(error)
+            findOneReplaceEx1.fulfill()
+        }
+        wait(for: [findOneReplaceEx1], timeout: 4.0)
+        
+        let options1 = FindOneAndModifyOptions(["name" : 1], ["_id" : 1], true, true)
+        let findOneReplaceEx2 = expectation(description: "Find one document and replace")
+        collection.findOneAndReplace(document2, document3, options1) { (result, error) in
+            XCTAssertNotNil(result)
+            XCTAssertNil(error)
+            XCTAssertEqual(result!["name"] as! String, "john")
+            findOneReplaceEx2.fulfill()
+        }
+        wait(for: [findOneReplaceEx2], timeout: 4.0)
+        
+        let options2 = FindOneAndModifyOptions(["name" : 1], ["_id" : 1])
+        let findOneReplaceEx3 = expectation(description: "Find one document and replace")
+        collection.findOneAndReplace(document, document2, options2) { (result, error) in
+            XCTAssertNotNil(result)
+            XCTAssertNil(error)
+            XCTAssertEqual(result!["name"] as! String, "john")
+            findOneReplaceEx3.fulfill()
+        }
+        wait(for: [findOneReplaceEx3], timeout: 4.0)
+    }
     
+    func testMongoFindAndUpdate() {
+        let collection = setupMongoCollection("Dogs")
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+
+        let findOneUpdateEx1 = expectation(description: "Find one document and update")
+        collection.findOneAndUpdate(document, document2) { (result, error) in
+            // no doc found, both should be nil
+            XCTAssertNil(result)
+            XCTAssertNil(error)
+            findOneUpdateEx1.fulfill()
+        }
+        wait(for: [findOneUpdateEx1], timeout: 4.0)
+        
+        let options1 = FindOneAndModifyOptions(["name" : 1], ["_id" : 1], true, true)
+        let findOneUpdateEx2 = expectation(description: "Find one document and update")
+        collection.findOneAndUpdate(document2, document3, options1) { (result, error) in
+            XCTAssertNotNil(result)
+            XCTAssertNil(error)
+            XCTAssertEqual(result!["name"] as! String, "john")
+            findOneUpdateEx2.fulfill()
+        }
+        wait(for: [findOneUpdateEx2], timeout: 4.0)
+        
+        let options2 = FindOneAndModifyOptions(["name" : 1], ["_id" : 1])
+        let findOneUpdateEx3 = expectation(description: "Find one document and update")
+        collection.findOneAndUpdate(document, document2, options2) { (result, error) in
+            XCTAssertNotNil(result)
+            XCTAssertNil(error)
+            XCTAssertEqual(result!["name"] as! String, "john")
+            findOneUpdateEx3.fulfill()
+        }
+        wait(for: [findOneUpdateEx3], timeout: 4.0)
+    }
     
+    func testMongoFindAndDelete() {
+        let collection = setupMongoCollection("Dogs")
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+
+        let findOneDeleteEx1 = expectation(description: "Find one document and delete")
+        collection.findOneAndDelete(document) { (error) in
+            XCTAssertNil(error)
+            findOneDeleteEx1.fulfill()
+        }
+        wait(for: [findOneDeleteEx1], timeout: 4.0)
+        
+        let options1 = FindOneAndModifyOptions(["name" : 1], ["_id" : 1], true, true)
+        let findOneDeleteEx2 = expectation(description: "Find one document and delete")
+        collection.findOneAndDelete(document, options1) { (error) in
+            XCTAssertNil(error)
+            findOneDeleteEx2.fulfill()
+        }
+        wait(for: [findOneDeleteEx2], timeout: 4.0)
+        
+        let options2 = FindOneAndModifyOptions(["name" : 1], ["_id" : 1])
+        let findOneDeleteEx3 = expectation(description: "Find one document and delete")
+        collection.findOneAndDelete(document, options2) { (error) in
+            XCTAssertNil(error)
+            findOneDeleteEx3.fulfill()
+        }
+        wait(for: [findOneDeleteEx3], timeout: 4.0)
+        
+        let findEx = expectation(description: "Find documents")
+        collection.find([:]) { (result, error) in
+            XCTAssertNotNil(result)
+            XCTAssertNil(error)
+            XCTAssertEqual(result?.count, 0)
+            findEx.fulfill()
+        }
+        wait(for: [findEx], timeout: 4.0)
+    }
     
+    func testMongoUpdateOne() {
+        let collection = setupMongoCollection("Dogs")
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+        let document4: Document = ["breed": "bullmastiff"]
+        let document5: Document = ["name": "bill", "breed": "great dane"]
+
+        let insertManyEx = expectation(description: "Insert many documents")
+        collection.insertMany([document, document2, document3, document4]) { (objectIds, error) in
+            XCTAssertNotNil(objectIds)
+            XCTAssertEqual(objectIds?.count, 4)
+            XCTAssertNil(error)
+            insertManyEx.fulfill()
+        }
+        wait(for: [insertManyEx], timeout: 4.0)
+        
+        let updateEx1 = expectation(description: "Update one document")
+        collection.updateOneDocument(document, document2) { (updateResult, error) in
+            XCTAssertEqual(updateResult?.matchedCount, 1)
+            XCTAssertEqual(updateResult?.modifiedCount, 1)
+            XCTAssertNil(updateResult?.objectId)
+            XCTAssertNil(error)
+            updateEx1.fulfill()
+        }
+        wait(for: [updateEx1], timeout: 4.0)
+        
+        let updateEx2 = expectation(description: "Update one document")
+        collection.updateOneDocument(document5, document2, true) { (updateResult, error) in
+            XCTAssertEqual(updateResult?.matchedCount, 0)
+            XCTAssertEqual(updateResult?.modifiedCount, 0)
+            XCTAssertNotNil(updateResult?.objectId)
+            XCTAssertNil(error)
+            updateEx2.fulfill()
+        }
+        wait(for: [updateEx2], timeout: 4.0)
+    }
     
+    func testMongoUpdateMany() {
+        let collection = setupMongoCollection("Dogs")
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        let document3: Document = ["name": "john", "breed": "cane corso"]
+        let document4: Document = ["breed": "bullmastiff"]
+        let document5: Document = ["name": "bill", "breed": "great dane"]
+
+        let insertManyEx = expectation(description: "Insert many documents")
+        collection.insertMany([document, document2, document3, document4]) { (objectIds, error) in
+            XCTAssertNotNil(objectIds)
+            XCTAssertEqual(objectIds?.count, 4)
+            XCTAssertNil(error)
+            insertManyEx.fulfill()
+        }
+        wait(for: [insertManyEx], timeout: 4.0)
+        
+        let updateEx1 = expectation(description: "Update one document")
+        collection.updateManyDocuments(document, document2) { (updateResult, error) in
+            XCTAssertEqual(updateResult?.matchedCount, 1)
+            XCTAssertEqual(updateResult?.modifiedCount, 1)
+            XCTAssertNil(updateResult?.objectId)
+            XCTAssertNil(error)
+            updateEx1.fulfill()
+        }
+        wait(for: [updateEx1], timeout: 4.0)
+        
+        let updateEx2 = expectation(description: "Update one document")
+        collection.updateManyDocuments(document5, document2, true) { (updateResult, error) in
+            XCTAssertEqual(updateResult?.matchedCount, 0)
+            XCTAssertEqual(updateResult?.modifiedCount, 0)
+            XCTAssertNotNil(updateResult?.objectId)
+            XCTAssertNil(error)
+            updateEx2.fulfill()
+        }
+        wait(for: [updateEx2], timeout: 4.0)
+    }
+    
+    func testMongoDeleteOne() {
+        let collection = setupMongoCollection("Dogs")
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        let document2: Document = ["name": "rex", "breed": "cane corso"]
+        
+        let deleteEx1 = expectation(description: "Delete 0 documents")
+        collection.deleteOneDocument(document) { (count, error) in
+            XCTAssertEqual(count, 0)
+            XCTAssertNil(error)
+            deleteEx1.fulfill()
+        }
+        wait(for: [deleteEx1], timeout: 4.0)
+        
+        let insertManyEx = expectation(description: "Insert many documents")
+        collection.insertMany([document, document2]) { (objectIds, error) in
+            XCTAssertNotNil(objectIds)
+            XCTAssertEqual(objectIds?.count, 4)
+            XCTAssertNil(error)
+            insertManyEx.fulfill()
+        }
+        wait(for: [insertManyEx], timeout: 4.0)
+        
+        let deleteEx2 = expectation(description: "Delete one document")
+        collection.deleteOneDocument(document) { (count, error) in
+            XCTAssertEqual(count, 1)
+            XCTAssertNil(error)
+            deleteEx2.fulfill()
+        }
+        wait(for: [deleteEx2], timeout: 4.0)
+    }
+    
+    //deletemany, deleteone
+    
+    func testMongoCountAndAggregate() {
+        let collection = setupMongoCollection("Dogs")
+        let document: Document = ["name": "fido", "breed": "cane corso"]
+        
+        let insertManyEx1 = expectation(description: "Insert many documents")
+        collection.insertMany([document]) { (objectIds, error) in
+            XCTAssertNotNil(objectIds)
+            XCTAssertEqual(objectIds?.count, 1)
+            XCTAssertNil(error)
+            insertManyEx1.fulfill()
+        }
+        wait(for: [insertManyEx1], timeout: 4.0)
+        
+        collection.aggregate([["$match" : ["name" : "fido"]], ["$group" : ["_id" : "$name"]]]) { (result, error) in
+            XCTAssertNotNil(result)
+            XCTAssertNil(error)
+        }
+        
+        let countEx1 = expectation(description: "Count documents")
+        collection.count(document) { (count, error) in
+            XCTAssertNotNil(count)
+            XCTAssertNil(error)
+            countEx1.fulfill()
+        }
+        wait(for: [countEx1], timeout: 4.0)
+        
+        let countEx2 = expectation(description: "Count documents")
+        collection.count(document, 1) { (count, error) in
+            XCTAssertNotNil(count)
+            XCTAssertNil(error)
+            XCTAssertEqual(count, 1)
+            countEx2.fulfill()
+        }
+        wait(for: [countEx2], timeout: 4.0)
+    }
     
 }

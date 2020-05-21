@@ -77,13 +77,17 @@ public struct Functions {
         self.app = app
     }
 
+    /// A closure type for receiving the completion of a remote function call.
     public typealias FunctionCompletionHandler = (AnyBSON?, Error?) -> Void
+
+    /// A closure type for the dynamic remote function type.
     public typealias Function = ([AnyBSON], @escaping FunctionCompletionHandler) -> Void
 
+    /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
     public subscript(dynamicMember string: String) -> Function {
         return { (arguments: [AnyBSON], completionHandler: @escaping FunctionCompletionHandler) in
-            self.app?.__callFunction(withName: string,
-                                     arguments: arguments.map(ObjectiveCSupport.convert) as! [RLMBSON]) {
+            self.app?.__callFunctionNamed(string,
+                                          arguments: arguments.map(ObjectiveCSupport.convert) as! [RLMBSON]) {
                                         (bson: RLMBSON?, error: Error?) in
                 completionHandler(ObjectiveCSupport.convert(object:bson), error)
             }

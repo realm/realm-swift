@@ -127,15 +127,76 @@ extension FindOptions {
 /// or `findOneAndDelete` command on a `MongoCollection`.
 public typealias FindOneAndModifyOptions = RLMFindOneAndModifyOptions
 
+extension FindOneAndModifyOptions {
+    public var projectedBSON: Document? {
+        get {
+            guard let value = ObjectiveCSupport.convert(object: __projectionBson) else {
+                return nil
+            }
+            return value.documentValue
+        }
+        set {
+            if let value = newValue {
+                __projectionBson = ObjectiveCSupport.convert(object: AnyBSON(value))
+            }
+        }
+    }
+    
+    public var sortBSON: Document? {
+        get {
+            guard let value = ObjectiveCSupport.convert(object: __sortBson) else {
+                return nil
+            }
+            return value.documentValue
+        }
+        set {
+            if let value = newValue {
+                __sortBson = ObjectiveCSupport.convert(object: AnyBSON(value))
+            }
+        }
+    }
+    
+    public convenience init(_ projectedBSON: Document?,
+                            _ sortBSON: Document?,
+                            _ upsert: Bool=false,
+                            _ returnNewDocument: Bool=false) {
+        self.init()
+        self.projectedBSON = projectedBSON
+        self.sortBSON = sortBSON
+        self.upsert = upsert
+        self.returnNewDocument = returnNewDocument
+    }
+}
+
 /// The result of an `updateOne` or `updateMany` operation a `MongoCollection`.
 public typealias UpdateResult = RLMUpdateResult
+
+extension UpdateResult {
+    /// The number of matching documents
+    public var matchedCount: UInt64 {
+        return __matchedCount.uint64Value
+    };
+    
+    /// The number of documents modified.
+    public var modifiedCount: UInt64 {
+        return __modifiedCount.uint64Value
+    };
+    /// The identifier of the inserted document if an upsert took place.
+    public var objectId: ObjectId? {
+        guard let objId = __objectId else {
+            return nil
+        }
+        
+        return try? ObjectId(string: objId.stringValue)
+    }
+}
 
 public typealias InsertBlock = RLMInsertBlock
 public typealias InsertManyBlock = RLMInsertManyBlock
 public typealias FindBlock = RLMFindBlock
 public typealias FindOneBlock = RLMFindOneBlock
 public typealias CountBlock = RLMCountBlock
-public typealias UpdateBlock = RLMUpdateBlock
+public typealias UpdateBlock = (UpdateResult?, Error?) -> Void
 public typealias DeleteBlock = RLMDeleteBlock
 
 extension MongoCollection {
@@ -251,7 +312,10 @@ extension MongoCollection {
                                   _ update: Document,
                                   _ upsert: Bool,
                                   _ completion: @escaping UpdateBlock) {
-        self.__updateOneDocument(toRLMBSON(filter), updateDocument: toRLMBSON(update), upsert: upsert, completion: completion)
+        self.__updateOneDocument(toRLMBSON(filter),
+                                 updateDocument: toRLMBSON(update),
+                                 upsert: upsert,
+                                 completion: completion)
     }
     
     /// Updates a single document matching the provided filter in this collection.
@@ -262,7 +326,9 @@ extension MongoCollection {
     public func updateOneDocument(_ filter: Document,
                                   _ update: Document,
                                   _ completion: @escaping UpdateBlock) {
-        self.__updateOneDocument(toRLMBSON(filter), updateDocument: toRLMBSON(update), completion: completion)
+        self.__updateOneDocument(toRLMBSON(filter),
+                                 updateDocument: toRLMBSON(update),
+                                 completion: completion)
     }
     
     /// Updates multiple documents matching the provided filter in this collection.

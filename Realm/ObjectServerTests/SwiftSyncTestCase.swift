@@ -31,10 +31,6 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return URL(string: "realm://127.0.0.1:9080/~/\(customName ?? UUID().uuidString)")!
     }
 
-//    override var app: RealmApp {
-//        return RealmApp(appId, configuration: defaultAppConfiguration())
-//    }
-
     func executeChild(file: StaticString = #file, line: UInt = #line) {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
@@ -115,7 +111,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         waitForExpectations(timeout: 10, handler: nil)
         XCTAssertEqual(user.state, .loggedOut,
                        "User should have been valid, but wasn't. (error: "
-                        + "\(theError != nil ? String(describing: theError!) : "n/a"))",
+                        + "\(theError?.localizedDescription ?? "nil"))",
             file: file,
             line: line)
     }

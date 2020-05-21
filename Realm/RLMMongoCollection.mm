@@ -226,7 +226,12 @@
         if (error) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
-        completion((NSDictionary *)RLMConvertBsonToRLMBSON(*document), nil);
+        
+        if (document) {
+            return completion((NSDictionary *)RLMConvertBsonToRLMBSON(*document), nil);
+        }
+        // no docs where found
+        completion(nil, nil);
     });
 }
 
@@ -250,7 +255,12 @@
         if (error) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
-        completion((NSDictionary *)RLMConvertBsonToRLMBSON(*document), nil);
+        
+        if (document) {
+            return completion((NSDictionary *)RLMConvertBsonToRLMBSON(*document), nil);
+        }
+        // no docs where found
+        completion(nil, nil);
     });
 }
 

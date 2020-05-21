@@ -34,9 +34,9 @@
 - (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
             completion:(nonnull RLMOptionalErrorBlock)completion;
 
-+ (nonnull instancetype)appWithAppId:(nonnull NSString *)appId
-                       configuration:(nonnull RLMAppConfiguration *)configuration
-                       rootDirectory:(nullable NSURL *)rootDirectory;
++ (nonnull instancetype)appWithId:(nonnull NSString *)appId
+                    configuration:(nonnull RLMAppConfiguration *)configuration
+                    rootDirectory:(nullable NSURL *)rootDirectory;
 @end
 
 NSError * _Nonnull RLMAppErrorToNSError(realm::app::AppError const& appError);
