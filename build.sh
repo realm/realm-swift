@@ -965,7 +965,8 @@ case "$COMMAND" in
         ;;
 
     "verify-osx")
-        sh build.sh test-osx
+        REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/osx/objc/RealmExamples.xcworkspace" \
+            sh build.sh test-osx
         sh build.sh examples-osx
 
         (
@@ -1023,13 +1024,15 @@ case "$COMMAND" in
         ;;
 
     "verify-tvos")
-        sh build.sh test-tvos
+        REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/tvos/objc/RealmExamples.xcworkspace" \
+            sh build.sh test-tvos
         sh build.sh examples-tvos
         exit 0
         ;;
 
     "verify-tvos-swift")
-        sh build.sh test-tvos-swift
+        REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/tvos/swift/RealmExamples.xcworkspace" \
+            sh build.sh test-tvos-swift
         sh build.sh examples-tvos-swift
         exit 0
         ;;
