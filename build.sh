@@ -1313,8 +1313,10 @@ EOM
                 sh build.sh prelaunch-simulator
             fi
 
-            source $(brew --prefix nvm)/nvm.sh --no-use
-            export REALM_NODE_PATH="$(nvm which 8)"
+            if [[ "$target" = *"server"* ]]; then
+                source $(brew --prefix nvm)/nvm.sh --no-use
+                export REALM_NODE_PATH="$(nvm which 8)"
+            fi
 
             # Reset CoreSimulator.log
             mkdir -p ~/Library/Logs/CoreSimulator
