@@ -483,7 +483,7 @@ case "$COMMAND" in
 
     "prelaunch-simulator")
         if [ -z "$REALM_SKIP_PRELAUNCH" ]; then
-            sh ${source_root}/scripts/reset-simulators.sh
+            sh ${source_root}/scripts/reset-simulators.sh "$1"
         fi
         ;;
 
@@ -1316,7 +1316,7 @@ EOM
             export CONFIGURATION=$configuration
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
             if [[ "$target" = *ios* ]] || [[ "$target" = *tvos* ]] || [[ "$target" = *watchos* ]]; then
-                sh build.sh prelaunch-simulator
+                sh build.sh prelaunch-simulator "$target"
             fi
             export REALM_SKIP_PRELAUNCH=1
 
