@@ -1,5 +1,5 @@
 platform :ios, '7.0'
 
 target 'RACTableView' do
-  pod 'ReactiveCocoa'
+  pod 'ReactiveCocoa', :inhibit_warnings => true
 end
