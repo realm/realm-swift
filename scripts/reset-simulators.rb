@@ -125,6 +125,12 @@ begin
   system("xcrun simctl boot 'iPhone 8'") or raise "Failed to boot iPhone 8 simulator"
   puts ' done!'
 
+  print 'Waiting for dyld shared cache to update...'
+  while system('pgrep -q update_dyld_sim_shared_cache')
+    sleep 15
+  end
+  puts ' done!'
+
 rescue => e
   if (attempts += 1) < 5
     puts ''
