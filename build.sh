@@ -1322,7 +1322,7 @@ EOM
 
             if [[ "$target" = *"server"* ]]; then
                 source $(brew --prefix nvm)/nvm.sh --no-use
-                export REALM_NODE_PATH="$(nvm which 8)"
+                export REALM_NODE_PATH="$(nvm which 10)"
             fi
 
             # Reset CoreSimulator.log
