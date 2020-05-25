@@ -69,7 +69,7 @@ Pod::Spec.new do |s|
                               # Realm.Private module
   private_header_files      = 'include/**/RLMAccessor.h',
                               'include/**/RLMArray_Private.h',
-                              'include/**/RLMBSON_Private.h'
+                              'include/**/RLMBSON_Private.h',
                               'include/**/RLMCollection_Private.h',
                               'include/**/RLMListBase.h',
                               'include/**/RLMObjectBase_Private.h',
@@ -83,7 +83,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMResults_Private.h',
                               'include/**/RLMSchema_Private.h',
                               'include/**/RLMSyncConfiguration_Private.h',
-                              'include/**/RLMSyncUtil_Private.h',
+                              'include/**/RLMSyncUtil_Private.h'
   
   source_files              = 'Realm/*.{m,mm}',
                               'Realm/ObjectStore/src/*.cpp',
