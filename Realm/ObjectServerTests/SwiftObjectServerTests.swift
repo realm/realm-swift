@@ -38,7 +38,7 @@ class SwiftPerson: Object {
     }
 
     override class func primaryKey() -> String? {
-        "_id"
+        return "_id"
     }
 }
 
@@ -976,12 +976,18 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let callFunctionEx = expectation(description: "Call function")
         app.functions.sum([1, 2, 3, 4, 5]) { bson, error in
-            guard case let .int64(bson) = bson else {
+            guard let bson = bson else {
                 XCTFail(error!.localizedDescription)
                 return
             }
+
+            guard case let .int64(sum) = bson else {
+                XCTFail(error!.localizedDescription)
+                return
+            }
+
             XCTAssertNil(error)
-            XCTAssertEqual(bson, 15)
+            XCTAssertEqual(sum, 15)
             callFunctionEx.fulfill()
         }
         wait(for: [callFunctionEx], timeout: 4.0)

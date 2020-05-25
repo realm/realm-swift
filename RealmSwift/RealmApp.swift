@@ -87,9 +87,8 @@ public struct Functions {
     /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
     public subscript(dynamicMember string: String) -> Function {
         return { (arguments: [AnyBSON], completionHandler: @escaping FunctionCompletionHandler) in
-            self.app?.__callFunctionNamed(string,
-                                          arguments: arguments.map(ObjectiveCSupport.convert) as! [RLMBSON]) {
-                                        (bson: RLMBSON?, error: Error?) in
+            let objcArgs = arguments.map(ObjectiveCSupport.convert) as! [RLMBSON]
+            self.app?.__callFunctionNamed(string, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
                 completionHandler(ObjectiveCSupport.convert(object: bson), error)
             }
         }
