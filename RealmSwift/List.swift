@@ -436,6 +436,14 @@ public final class List<Element: RealmCollectionValue>: ListBase {
     @objc class func _unmanagedArray() -> RLMArray<AnyObject> {
         return Element._rlmArray()
     }
+    
+    public override func isEqual(_ object: Any?) -> Bool {
+        guard let other = object as? List<Element> else { return false }
+        guard self.count == other.count else { return false }
+        
+        return zip(self, other)
+            .reduce(true) { $0 && ($1.0 == $1.1) }
+    }
 }
 
 extension List where Element: MinMaxType {
