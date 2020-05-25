@@ -28,7 +28,7 @@ Upgraded realm-sync from ? to ?
 * Change `RLMSyncUser#configurationWithPartitionValue` to accept all BSON types.
 
 ### Breaking Changes
-* We no longer support Realm Cloud (logacy), but instead the new "MongoDB Realm" Cloud.
+* We no longer support Realm Cloud (legacy), but instead the new "MongoDB Realm" Cloud.
 
 ### Compatibility
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
