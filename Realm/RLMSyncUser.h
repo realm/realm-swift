@@ -182,6 +182,11 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) NSString *identity;
 
+/**
+ Initialize a sync user for the given identity and provider type.
+ @param providerType the provider type of the user
+ @param identity the identity of the user
+ */
 - (instancetype)initSyncUserIdentityWithProviderType:(NSString *)providerType
                                             identity:(NSString *)identity;
 

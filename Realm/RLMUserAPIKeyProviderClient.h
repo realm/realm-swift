@@ -22,6 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// Provider client for user API keys.
 @interface RLMUserAPIKeyProviderClient : RLMProviderClient
 
 /// A block type used to report an error

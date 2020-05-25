@@ -51,8 +51,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)resetForTesting;
 
-- (RLMNetworkRequestOptions *)networkRequestOptions;
-
 NS_ASSUME_NONNULL_END
 
 @end

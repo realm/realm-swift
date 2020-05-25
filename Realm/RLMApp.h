@@ -91,7 +91,10 @@ Create a new Realm App configuration.
  */
 @interface RLMApp : NSObject
 
-@property (readonly) RLMAppConfiguration *configuration;
+/// The configuration for this Realm app.
+@property (nonatomic, readonly) RLMAppConfiguration *configuration;
+
+/// The `RLMSyncManager` for this Realm app.
 @property (nonatomic, readonly) RLMSyncManager *syncManager;
 
 /**
