@@ -144,7 +144,7 @@ public enum AnyBSON: BSON {
     }
 
     /// Initialize a `BSON` from a type `T`. If this is not a valid `BSON` type,
-    /// if will be consider `BSON` nil.
+    /// if will be considered `BSON` null type and will return `nil`.
     public init?<T: BSON>(_ bson: T) {
         switch bson {
         case let val as Int:
