@@ -167,7 +167,7 @@ public enum AnyBSON: BSON {
             self = .objectId(val)
         case let val as Document:
             self = .document(val)
-        case let val as Array<AnyBSON>:
+        case let val as Array<AnyBSON?>:
             self = .array(val)
         case let val as Bool:
             self = .bool(val)
