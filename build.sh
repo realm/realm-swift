@@ -957,7 +957,6 @@ case "$COMMAND" in
         # https://github.com/CocoaPods/CocoaPods/issues/7708
         export EXPANDED_CODE_SIGN_IDENTITY=''
         cd examples/installation
-        sh build.sh test-$PLATFORM-objc-cocoapods
         sh build.sh test-$PLATFORM-swift-cocoapods
         ;;
 
