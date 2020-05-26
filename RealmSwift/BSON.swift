@@ -432,13 +432,13 @@ extension AnyBSON: ExpressibleByIntegerLiteral {
 }
 
 extension AnyBSON: ExpressibleByDictionaryLiteral {
-    public init(dictionaryLiteral elements: (String, AnyBSON)...) {
+    public init(dictionaryLiteral elements: (String, AnyBSON?)...) {
         self = .document(Document(uniqueKeysWithValues: elements))
     }
 }
 
 extension AnyBSON: ExpressibleByArrayLiteral {
-    public init(arrayLiteral elements: AnyBSON...) {
+    public init(arrayLiteral elements: AnyBSON?...) {
         self = .array(elements)
     }
 }
