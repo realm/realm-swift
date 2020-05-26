@@ -27,6 +27,16 @@
 using namespace realm;
 using namespace bson;
 
+#pragma mark NSNull
+
+@implementation NSNull (RLMBSON)
+
+- (RLMBSONType)bsonType {
+    return RLMBSONTypeNull;
+}
+
+@end
+
 #pragma mark RLMObjectId
 
 @implementation RLMObjectId (RLMBSON)

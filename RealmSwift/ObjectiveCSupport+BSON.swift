@@ -46,9 +46,22 @@ public extension ObjectiveCSupport {
         case .objectId(let val):
             return val as RLMObjectId
         case .document(let val):
-            return val as NSDictionary
+            return val.reduce(into: NSMutableDictionary()) { (result: inout NSMutableDictionary, kvp) in
+                let (key, value) = kvp
+                guard let val = convert(object: value) else {
+                    result[key] = NSNull()
+                    return
+                }
+                result[key] = val
+            }
         case .array(let val):
-            return val as NSArray
+            return val.reduce(into: NSMutableArray()) { (result: inout NSMutableArray, val) in
+                guard let val = convert(object: val) else {
+                    result.add(NSNull())
+                    return
+                }
+                result.add(val)
+            }
         case .maxKey:
             return MaxKey()
         case .minKey:
@@ -135,9 +148,9 @@ public extension ObjectiveCSupport {
             guard let val = bson as? Dictionary<String, RLMBSON?> else {
                 return nil
             }
-            let keyValues = val.map { (key: String, value: RLMBSON?) -> (String, AnyBSON) in
+            let keyValues = val.map { (key: String, value: RLMBSON?) -> (String, AnyBSON?) in
                 guard let val = convert(object: value) else {
-                    return (key, .null)
+                    return (key, nil)
                 }
                 return (key, val)
             }
@@ -147,9 +160,9 @@ public extension ObjectiveCSupport {
             guard let val = bson as? Array<RLMBSON?> else {
                 return nil
             }
-            let convertedArray = val.map { (rlmBSON) -> AnyBSON in
+            let convertedArray = val.map { (rlmBSON) -> AnyBSON? in
                 guard let val = convert(object: rlmBSON) else {
-                    return .null
+                    return nil
                 }
                 return val
             }

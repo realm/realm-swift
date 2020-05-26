@@ -83,6 +83,12 @@ typedef NS_ENUM(NSUInteger, RLMBSONType) {
 @end
 
 /**
+`RLMBSON` category for `RLMBSONTypeNull`.
+*/
+@interface NSNull (RLMBSON)<RLMBSON>
+@end
+
+/**
  `RLMBSON` category for `RLMBSONTypeInt32`, `RLMBSONTypeInt64`, `RLMBSONTypeBool`,
  and `RLMBSONTypeDouble` conformance.
  */

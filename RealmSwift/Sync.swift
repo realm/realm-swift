@@ -233,7 +233,7 @@ public struct SyncConfiguration {
     internal init(config: RLMSyncConfiguration) {
         self.user = config.user
         self.stopPolicy = config.stopPolicy
-        self.partitionValue = ObjectiveCSupport.convert(object: config.partitionValue) ?? .null
+        self.partitionValue = ObjectiveCSupport.convert(object: config.partitionValue)!
         self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
     }
 

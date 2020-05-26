@@ -23,6 +23,9 @@ import Realm
 public protocol BSON: Equatable {
 }
 
+extension NSNull: BSON {
+}
+
 extension Int: BSON {
 }
 
@@ -54,12 +57,12 @@ extension ObjectId: BSON {
 }
 
 /// A Dictionary object representing a `BSON` document.
-public typealias Document = Dictionary<String, AnyBSON>
+public typealias Document = Dictionary<String, AnyBSON?>
 
-extension Dictionary: BSON where Key == String, Value == AnyBSON {
+extension Dictionary: BSON where Key == String, Value == AnyBSON? {
 }
 
-extension Array: BSON where Element == AnyBSON {
+extension Array: BSON where Element == AnyBSON? {
 }
 
 extension NSRegularExpression: BSON {
@@ -91,7 +94,7 @@ public enum AnyBSON: BSON {
     case document(Document)
 
     /// A BSON array.
-    indirect case array([AnyBSON])
+    indirect case array([AnyBSON?])
 
     /// A BSON binary.
     case binary(Data)
@@ -106,9 +109,6 @@ public enum AnyBSON: BSON {
     /// A BSON UTC datetime.
     /// - SeeAlso: https://docs.mongodb.com/manual/reference/bson-types/#date
     case datetime(Date)
-
-    /// A BSON null.
-    case null
 
     /// A BSON regular expression.
     case regex(NSRegularExpression)
@@ -145,7 +145,7 @@ public enum AnyBSON: BSON {
 
     /// Initialize a `BSON` from a type `T`. If this is not a valid `BSON` type,
     /// if will be consider `BSON` nil.
-    public init<T: BSON>(_ bson: T) {
+    public init?<T: BSON>(_ bson: T) {
         switch bson {
         case let val as Int:
             self = .int64(Int64(val))
@@ -178,7 +178,7 @@ public enum AnyBSON: BSON {
         case let val as NSRegularExpression:
             self = .regex(val)
         default:
-            self = .null
+            return nil
         }
     }
 
@@ -223,7 +223,7 @@ public enum AnyBSON: BSON {
     }
 
     /// If this `BSON` is an `.array`, return it as an `[BSON]`. Otherwise, return nil.
-    public var arrayValue: [AnyBSON]? {
+    public var arrayValue: [AnyBSON?]? {
         guard case let .array(a) = self else {
             return nil
         }
