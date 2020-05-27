@@ -238,6 +238,9 @@ typedef void(^RLMSyncErrorReportingBlock)(NSError *, RLMSyncSession * _Nullable)
 /// Defaults to 1 minute.
 @property (nonatomic) NSUInteger fastReconnectLimit;
 
+/// The app configuration that has initialized this SyncManager.
+/// This can be set multiple times. This gives the SyncManager
+/// access to necessary app functionality.
 @property (nonatomic, readonly) RLMAppConfiguration *appConfiguration;
 @end
 

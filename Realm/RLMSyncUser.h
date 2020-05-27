@@ -170,6 +170,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/// An identity of a user. A user can have multiple identities, usually associated with multiple providers.
 @interface RLMSyncUserIdentity : NSObject
 
 /**
