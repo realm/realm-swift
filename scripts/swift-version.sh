@@ -8,6 +8,10 @@ get_xcode_version() {
     "$1" -version 2>/dev/null | sed -ne 's/^Xcode \([^\b ]*\).*/\1/p'
 }
 
+is_xcode_version() {
+    test "$(get_xcode_version "$1")" = "$2"
+}
+
 find_xcode_with_version() {
     local path required_version
 
@@ -18,14 +22,23 @@ find_xcode_with_version() {
     required_version=$1
 
     # First check if the currently active one is fine, unless we are in a CI run
-    if [ -z "$JENKINS_HOME" ] && [[ $(get_xcode_version xcodebuild) = "$required_version" ]]; then
+    if [ -z "$JENKINS_HOME" ] && is_xcode_version xcodebuild "$required_version"; then
         DEVELOPER_DIR=$(xcode-select -p)
         return 0
     fi
 
+    # Check the spot where we install it on CI machines
+    path="/Applications/Xcode-${required_version}.app/Contents/Developer"
+    if [ -d "$path" ]; then
+        if is_xcode_version "$path/usr/bin/xcodebuild" "$required_version"; then
+            DEVELOPER_DIR=$path
+            return 0
+        fi
+    fi
+
     # Check all of the items in /Applications that look promising per #4534
     for path in /Applications/Xcode*.app/Contents/Developer; do
-        if [ $(get_xcode_version "$path/usr/bin/xcodebuild") = "$required_version" ]; then
+        if is_xcode_version "$path/usr/bin/xcodebuild" "$required_version"; then
             DEVELOPER_DIR=$path
             return 0
         fi
@@ -37,7 +50,7 @@ find_xcode_with_version() {
         if [ ! -d "$path" ]; then
             continue
         fi
-        if [ $(get_xcode_version "$path/usr/bin/xcodebuild") = "$required_version" ]; then
+        if is_xcode_version "$path/usr/bin/xcodebuild" "$required_version"; then
             DEVELOPER_DIR=$path
             return 0
         fi
@@ -56,7 +69,7 @@ test_xcode_for_swift_version() {
     local required_version=$2
 
     for swift in "$path"/Toolchains/*.xctoolchain/usr/bin/swift; do
-        if [ $(get_swift_version "$swift") = "$required_version" ]; then
+        if [ "$(get_swift_version "$swift")" = "$required_version" ]; then
             return 0
         fi
     done
@@ -118,7 +131,7 @@ find_default_xcode_version() {
     newest_xcode_version=0
     for path in $(/usr/bin/mdfind "kMDItemCFBundleIdentifier == 'com.apple.dt.Xcode'" 2>/dev/null); do
         xcode_version=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$path/Contents/Info.plist")
-        if echo $xcode_version $newest_xcode_version | awk '{exit !( $1 > $2)}'; then
+        if echo "$xcode_version" "$newest_xcode_version" | awk '{exit !( $1 > $2)}'; then
             newest_xcode_version="$xcode_version"
             newest_xcode_path="$path"
         fi
@@ -134,20 +147,20 @@ find_default_xcode_version() {
 
 set_xcode_and_swift_versions() {
     if [ -n "$REALM_XCODE_VERSION" ]; then
-        find_xcode_with_version $REALM_XCODE_VERSION
+        find_xcode_with_version "$REALM_XCODE_VERSION"
 
         if [ -n "$REALM_SWIFT_VERSION" ] && ! test_xcode_for_swift_version "$DEVELOPER_DIR" "$REALM_SWIFT_VERSION"; then
             echo "The version of Xcode specified ($REALM_XCODE_VERSION) does not support the Swift version required: $REALM_SWIFT_VERSION"
             exit 1
         fi
     elif [ -n "$REALM_SWIFT_VERSION" ]; then
-        find_xcode_for_swift $REALM_SWIFT_VERSION
+        find_xcode_for_swift "$REALM_SWIFT_VERSION"
     elif [ -z "$DEVELOPER_DIR" ]; then
         find_default_xcode_version
     fi
     export DEVELOPER_DIR
 
-    REALM_XCODE_VERSION=$(get_xcode_version "$DEVELOPER_DIR/usr/bin/xcodebuild")
+    REALM_XCODE_VERSION="$(get_xcode_version "$DEVELOPER_DIR/usr/bin/xcodebuild")"
     export REALM_XCODE_VERSION
 
     if [ -z "$REALM_SWIFT_VERSION" ]; then

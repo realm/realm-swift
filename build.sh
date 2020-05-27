@@ -147,17 +147,13 @@ build_combined() {
     local version_suffix="$6"
     local config="$CONFIGURATION"
 
-    local destination=""
     local os_name=""
     if [[ "$os" == "iphoneos" ]]; then
         os_name="ios"
-        destination="iPhone 8"
     elif [[ "$os" == "watchos"  ]]; then
         os_name="$os"
-        destination="Apple Watch Series 4 - 40mm"
     elif [[ "$os" == "appletvos"  ]]; then
         os_name="tvos"
-        destination="Apple TV"
     fi
 
     # Derive build paths
@@ -170,8 +166,8 @@ build_combined() {
     local out_path="build/$os_name$scope_suffix$version_suffix"
 
     # Build for each platform
-    xc "-scheme '$scheme' -configuration $config -sdk $os"
-    xc "-scheme '$scheme' -configuration $config -sdk $simulator -destination 'name=$destination' ONLY_ACTIVE_ARCH=NO"
+    xc "-scheme '$scheme' -configuration $config -sdk $os build"
+    xc "-scheme '$scheme' -configuration $config -sdk $simulator build ONLY_ACTIVE_ARCH=NO"
 
     # Combine .swiftmodule
     if [ -d $simulator_path/Modules/$module_name.swiftmodule ]; then
@@ -197,7 +193,7 @@ build_combined() {
 
     # Verify that the combined library has bitcode and we didn't accidentally
     # remove it somewhere along the line
-    if [[ "$destination" != "" && "$config" == "Release" ]]; then
+    if [[ "$config" == "Release" ]]; then
         sh build.sh binary-has-bitcode "$LIPO_OUTPUT"
     fi
 }
@@ -482,7 +478,9 @@ case "$COMMAND" in
         ;;
 
     "prelaunch-simulator")
-        sh ${source_root}/scripts/reset-simulators.sh
+        if [ -z "$REALM_SKIP_PRELAUNCH" ]; then
+            sh ${source_root}/scripts/reset-simulators.sh "$1"
+        fi
         ;;
 
     ######################################
@@ -955,7 +953,6 @@ case "$COMMAND" in
         # https://github.com/CocoaPods/CocoaPods/issues/7708
         export EXPANDED_CODE_SIGN_IDENTITY=''
         cd examples/installation
-        sh build.sh test-$PLATFORM-objc-cocoapods
         sh build.sh test-$PLATFORM-swift-cocoapods
         ;;
 
@@ -965,7 +962,8 @@ case "$COMMAND" in
         ;;
 
     "verify-osx")
-        sh build.sh test-osx
+        REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/osx/objc/RealmExamples.xcworkspace" \
+            sh build.sh test-osx
         sh build.sh examples-osx
 
         (
@@ -981,7 +979,8 @@ case "$COMMAND" in
         ;;
 
     "verify-ios-static")
-        REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/objc/RealmExamples.xcworkspace" sh build.sh test-ios-static
+        REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/objc/RealmExamples.xcworkspace" \
+            sh build.sh test-ios-static
         sh build.sh examples-ios
         ;;
 
@@ -990,7 +989,8 @@ case "$COMMAND" in
         ;;
 
     "verify-ios-swift")
-        REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/swift/RealmExamples.xcworkspace" sh build.sh test-ios-swift
+        REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/ios/swift/RealmExamples.xcworkspace" \
+            sh build.sh test-ios-swift
         sh build.sh examples-ios-swift
         ;;
 
@@ -1023,13 +1023,15 @@ case "$COMMAND" in
         ;;
 
     "verify-tvos")
-        sh build.sh test-tvos
+        REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/tvos/objc/RealmExamples.xcworkspace" \
+            sh build.sh test-tvos
         sh build.sh examples-tvos
         exit 0
         ;;
 
     "verify-tvos-swift")
-        sh build.sh test-tvos-swift
+        REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS -workspace examples/tvos/swift/RealmExamples.xcworkspace" \
+            sh build.sh test-tvos-swift
         sh build.sh examples-tvos-swift
         exit 0
         ;;
@@ -1083,6 +1085,8 @@ case "$COMMAND" in
     ######################################
     "examples")
         sh build.sh clean
+        sh build.sh prelaunch-simulator
+        export REALM_SKIP_PRELAUNCH=1
         sh build.sh examples-ios
         sh build.sh examples-ios-swift
         sh build.sh examples-osx
@@ -1092,38 +1096,30 @@ case "$COMMAND" in
         ;;
 
     "examples-ios")
-        sh build.sh prelaunch-simulator
         workspace="examples/ios/objc/RealmExamples.xcworkspace"
         pod install --project-directory="$workspace/.." --no-repo-update
-        xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Migration -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Backlink -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme GroupedTableView -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme RACTableView -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Encryption -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Draw -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-
+        examples="Simple TableView Migration Backlink GroupedTableView RACTableView Encryption Draw"
+        for example in $examples; do
+            xc "-workspace $workspace -scheme $example -configuration $CONFIGURATION -sdk iphonesimulator build ARCHS=x86_64 ${CODESIGN_PARAMS}"
+        done
         if [ ! -z "${JENKINS_HOME}" ]; then
-            xc "-workspace $workspace -scheme Extension -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+            xc "-workspace $workspace -scheme Extension -configuration $CONFIGURATION -sdk iphonesimulator build ARCHS=x86_64 ${CODESIGN_PARAMS}"
         fi
 
         exit 0
         ;;
 
     "examples-ios-swift")
-        sh build.sh prelaunch-simulator
         workspace="examples/ios/swift/RealmExamples.xcworkspace"
         if [[ ! -d "$workspace" ]]; then
             workspace="${workspace/swift/swift-$REALM_XCODE_VERSION}"
         fi
 
-        xc "-workspace $workspace -scheme Simple -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme TableView -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Migration -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Encryption -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme Backlink -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme GroupedTableView -configuration $CONFIGURATION -destination 'name=iPhone 8' build ${CODESIGN_PARAMS}"
+        examples="Simple TableView Migration Backlink GroupedTableView Encryption"
+        for example in $examples; do
+            xc "-workspace $workspace -scheme $example -configuration $CONFIGURATION -sdk iphonesimulator build ARCHS=x86_64 ${CODESIGN_PARAMS}"
+        done
+
         exit 0
         ;;
 
@@ -1133,10 +1129,11 @@ case "$COMMAND" in
 
     "examples-tvos")
         workspace="examples/tvos/objc/RealmExamples.xcworkspace"
-        destination="Apple TV"
+        examples="DownloadCache PreloadedData"
+        for example in $examples; do
+            xc "-workspace $workspace -scheme $example -configuration $CONFIGURATION -sdk appletvsimulator build ARCHS=x86_64 ${CODESIGN_PARAMS}"
+        done
 
-        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
@@ -1145,10 +1142,11 @@ case "$COMMAND" in
         if [[ ! -d "$workspace" ]]; then
             workspace="${workspace/swift/swift-$REALM_XCODE_VERSION}"
         fi
+        examples="DownloadCache PreloadedData"
+        for example in $examples; do
+            xc "-workspace $workspace -scheme $example -configuration $CONFIGURATION -sdk appletvsimulator build ARCHS=x86_64 ${CODESIGN_PARAMS}"
+        done
 
-        destination="Apple TV"
-        xc "-workspace $workspace -scheme DownloadCache -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
-        xc "-workspace $workspace -scheme PreloadedData -configuration $CONFIGURATION -destination 'name=$destination' build ${CODESIGN_PARAMS}"
         exit 0
         ;;
 
@@ -1306,12 +1304,15 @@ EOM
             export sha=$GITHUB_PR_SOURCE_BRANCH
             export CONFIGURATION=$configuration
             export REALM_EXTRA_BUILD_ARGUMENTS='GCC_GENERATE_DEBUGGING_SYMBOLS=NO -allowProvisioningUpdates'
-            if [[ ${target} != *"osx"* ]];then
-                sh build.sh prelaunch-simulator
+            if [[ "$target" = *ios* ]] || [[ "$target" = *tvos* ]] || [[ "$target" = *watchos* ]]; then
+                sh build.sh prelaunch-simulator "$target"
             fi
+            export REALM_SKIP_PRELAUNCH=1
 
-            source $(brew --prefix nvm)/nvm.sh --no-use
-            export REALM_NODE_PATH="$(nvm which 8)"
+            if [[ "$target" = *"server"* ]]; then
+                source $(brew --prefix nvm)/nvm.sh --no-use
+                export REALM_NODE_PATH="$(nvm which 10)"
+            fi
 
             # Reset CoreSimulator.log
             mkdir -p ~/Library/Logs/CoreSimulator
@@ -1567,7 +1568,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.11 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
-* Carthage release for Swift is built with Xcode 11.4.1.
+* Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
 * Upgraded realm-core from ? to ?

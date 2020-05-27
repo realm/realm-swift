@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # A script to generate the .jenkins.yml file for the CI pull request job
-XCODE_VERSIONS = %w(10.3 11.1 11.2.1 11.3 11.4.1)
+XCODE_VERSIONS = %w(10.3 11.1 11.2.1 11.3 11.4.1 11.5)
 CONFIGURATIONS = %w(Debug Release)
 
 release_only = ->(v, c) { c == 'Release' }
