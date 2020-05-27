@@ -173,6 +173,9 @@ static inline NSUInteger RLMConvertNotFound(size_t index) {
 }
 
 static inline void RLMNSStringToStdString(std::string &out, NSString *in) {
+    if (!in)
+        return;
+    
     out.resize([in maximumLengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
     if (out.empty()) {
         return;

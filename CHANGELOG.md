@@ -22,13 +22,21 @@ Upgraded realm-sync from ? to ?
 10.0.0-alpha.5 Release notes (2020-05-15)
 =============================================================
 ### Enhancements
-* Add `RLMSyncUser#customData`.  Custom data is a can be configured in your MongoDB Realm App.
-* Add `RLMApp#callFunctionNamed:arguments`. This is the entry point for calling Remote MongoDB Realm functions.
-* Add `RealmApp#functions`. This is the swift entry pint for calling Remote MongoDB Realm functions.
-* Change `RLMSyncUser#configurationWithPartitionValue` to accept all BSON types.
+* Add `-[RLMSyncUser customData]`/`SyncUser.customData`.  Custom data is a can be configured in your MongoDB Realm App.
+* Add `-[RLMApp callFunctionNamed:arguments]`/`RealmApp.functions`. This is the entry point for calling Remote MongoDB Realm functions.
+ Functions allow you to define and execute server-side logic for your application. Functions are written in modern JavaScript (ES6+) and execute in a 
+ serverless manner. When you call a function, you can dynamically access components of the current application as well as 
+ information about the request to execute the function and the logged in user that sent the request.
+ * Change `[RLMSyncUser configurationWithPartitionValue:]`/`SyncUser.configuration(with:)` to accept all BSON types.
+ Partition values can currently be of types String, Int, or ObjectId. 
+Opening a realm by partition value is the equivalent of previously opening a realm by URL. In this case,
+partitions are meant to be more closely associated with your data. E.g., if you are running a `Dog` kennel, and have a field
+`breed` that acts as your partition key, you could open up realms based on the breed of the dogs. 
 
 ### Breaking Changes
-* We no longer support Realm Cloud (legacy), but instead the new "MongoDB Realm" Cloud.
+* We no longer support Realm Cloud (legacy), but instead the new "MongoDB Realm" Cloud. MongoDB Realm is a serverless platform
+that enables developers to quickly build applications without having to set up server infrastructure.
+MongoDB Realm is built on top of MongoDB Atlas, automatically integrating the connection to your database.
 
 ### Compatibility
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)

@@ -62,7 +62,25 @@ typedef NS_ENUM(NSUInteger, RLMBSONType) {
 #pragma mark RLMBSON
 
 /**
- Protocol representing a BSON value.
+ Protocol representing a BSON value. BSON is a computer data interchange format.
+ The name "BSON" is based on the term JSON and stands for "Binary JSON".
+ 
+ The following types conform to RLMBSON:
+ 
+ `NSNull`
+ `NSNumber`
+ `NSString`
+ `NSData`
+ `NSDateInterval`
+ `NSDate`
+ `RLMObjectId`
+ `RLMDecimal128`
+ `NSRegularExpression`
+ `RLMMaxKey`
+ `RLMMinKey`
+ `NSDictionary`
+ `NSArray`
+ 
  @see RLMBSONType
  @see bsonspec.org
  */
@@ -82,58 +100,39 @@ typedef NS_ENUM(NSUInteger, RLMBSONType) {
 
 @end
 
-/**
-`RLMBSON` category for `RLMBSONTypeNull`.
-*/
+/// :nodoc:
 @interface NSNull (RLMBSON)<RLMBSON>
 @end
 
-/**
- `RLMBSON` category for `RLMBSONTypeInt32`, `RLMBSONTypeInt64`, `RLMBSONTypeBool`,
- and `RLMBSONTypeDouble` conformance.
- */
+/// :nodoc:
 @interface NSNumber (RLMBSON)<RLMBSON>
 @end
 
-/**
- `RLMBSON` category for `RLMBSONTypeString` conformance.
- */
+/// :nodoc:
 @interface NSString (RLMBSON)<RLMBSON>
 @end
 
-/**
- `RLMBSON` category for `RLMBSONTypeBinary` conformance.
- */
+/// :nodoc:
 @interface NSData (RLMBSON)<RLMBSON>
 @end
 
-/**
- `RLMBSON` category for  `RLMBSONTypeTimestamp` conformance.
- */
+/// :nodoc:
 @interface NSDateInterval (RLMBSON)<RLMBSON>
 @end
 
-/**
- `RLMBSON` category for `RLMBSONTypeDatetime` conformance.
- */
+/// :nodoc:
 @interface NSDate (RLMBSON)<RLMBSON>
 @end
 
-/**
-`RLMBSON` category for `RLMBSONTypeObjectId` conformance.
-*/
+/// :nodoc:
 @interface RLMObjectId (RLMBSON)<RLMBSON>
 @end
 
-/**
-`RLMBSON` category for `RLMBSONTypeDecimal128` conformance.
-*/
+/// :nodoc:
 @interface RLMDecimal128 (RLMBSON)<RLMBSON>
 @end
 
-/**
-`RLMBSON` category for `RLMBSONTypeRegularExpression` conformance.
-*/
+/// :nodoc:
 @interface NSRegularExpression (RLMBSON)<RLMBSON>
 @end
 
@@ -145,32 +144,22 @@ typedef NS_ENUM(NSUInteger, RLMBSONType) {
 @interface RLMMinKey : NSObject
 @end
 
-/**
-`RLMBSON` category for `RLMBSONTypeMaxKey` conformance.
-*/
+/// :nodoc:
 @interface RLMMaxKey (RLMBSON)<RLMBSON>
 @end
 
-/**
-`RLMBSON` category for `RLMBSONTypeMinKey` conformance.
-*/
+/// :nodoc:
 @interface RLMMinKey (RLMBSON)<RLMBSON>
 @end
 
-/**
-`RLMBSON` category for `RLMBSONTypeDocument` conformance.
-*/
+/// :nodoc:
 @interface NSDictionary (RLMBSON)<RLMBSON>
 @end
 
-/**
-`RLMBSON` category for `RLMBSONTypeArray` conformance.
-*/
+/// :nodoc:
 @interface NSMutableArray (RLMBSON)<RLMBSON>
 @end
 
-/**
-`RLMBSON` category for `RLMBSONTypeArray` conformance.
-*/
+/// :nodoc:
 @interface NSArray (RLMBSON)<RLMBSON>
 @end

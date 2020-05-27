@@ -68,13 +68,13 @@ extension Array: BSON where Element == AnyBSON? {
 extension NSRegularExpression: BSON {
 }
 
-/// An object representing a `BSON` max key type.
+/// MaxKey will always be the greatest value when comparing to other BSON types
 public typealias MaxKey = RLMMaxKey
 
 extension MaxKey: BSON {
 }
 
-/// An object representing a `BSON` min key type.
+/// MinKey will always be the smallest value when comparing to other BSON types
 public typealias MinKey = RLMMinKey
 
 extension MinKey: BSON {

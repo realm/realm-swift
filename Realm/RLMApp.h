@@ -42,6 +42,9 @@ typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _
 /// A custom base URL to request against.
 @property (nonatomic, strong, nullable) NSString* baseURL;
 
+/// The custom transport for network calls to the server.
+@property (nonatomic, strong, nullable) id<RLMNetworkTransport> transport;
+
 /// A custom app name.
 @property (nonatomic, strong, nullable) NSString *localAppName;
 
@@ -114,7 +117,7 @@ Create a new Realm App configuration.
             configuration:(nullable RLMAppConfiguration *)configuration;
 
 /**
- Get a dictionary keyed on id for all users of the Realm app
+ Get a dictionary containing all users keyed on id.
  */
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers;
 

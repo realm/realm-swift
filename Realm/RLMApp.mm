@@ -65,6 +65,10 @@ namespace {
                 });
             }];
         }
+        
+        id<RLMNetworkTransport> transport() const {
+            return m_transport;
+        }
     private:
         id<RLMNetworkTransport> m_transport;
     };
@@ -91,20 +95,8 @@ namespace {
                 localAppVersion:(nullable NSString *)localAppVersion
         defaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS {
     if (self = [super init]) {
-        _config.transport_generator = []{
-            return std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
-        };
-
-        if (baseURL) {
-            std::string base_url;
-            RLMNSStringToStdString(base_url, baseURL);
-            _config.base_url = base_url;
-        }
-        if (transport) {
-            _config.transport_generator = [transport]{
-                return std::make_unique<CocoaNetworkTransport>(transport);
-            };
-        }
+        self.baseURL = baseURL;
+        self.transport = transport;
         if (localAppName) {
             std::string local_app_name;
             RLMNSStringToStdString(local_app_name, localAppName);
@@ -126,39 +118,72 @@ namespace {
 }
 
 - (void)setAppId:(NSString *)appId {
-    _config.app_id = appId.UTF8String;
+    RLMNSStringToStdString(_config.app_id, appId);
 }
 
 - (NSString *)baseURL {
     if (_config.base_url) {
-        return @((*_config.base_url).c_str());
+        return @(_config.base_url->c_str());
     }
 
     return nil;
+}
+
+- (void)setBaseURL:(nullable NSString *)baseURL {
+    std::string base_url;
+    RLMNSStringToStdString(base_url, baseURL);
+    _config.base_url = base_url.empty() ? util::none : util::Optional(base_url);
+    return;
+}
+
+- (id<RLMNetworkTransport>)transport {
+    return static_cast<CocoaNetworkTransport*>(_config.transport_generator().get())->transport();
+}
+
+- (void)setTransport:(id<RLMNetworkTransport>)transport {
+    if (transport) {
+        _config.transport_generator = [transport]{
+            return std::make_unique<CocoaNetworkTransport>(transport);
+        };
+    } else {
+        _config.transport_generator = []{
+            return std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
+        };
+    }
 }
 
 - (NSString *)localAppName {
     if (_config.local_app_name) {
-        return @((*_config.base_url).c_str());
+        return @((_config.base_url)->c_str());
     }
 
     return nil;
+}
+
+- (void)setLocalAppName:(nullable NSString *)localAppName {
+    std::string local_app_name;
+    RLMNSStringToStdString(local_app_name, localAppName);
+    _config.local_app_name = local_app_name.empty() ? util::none : util::Optional(local_app_name);
+    return;
 }
 
 - (NSString *)localAppVersion {
     if (_config.local_app_version) {
-        return @((*_config.base_url).c_str());
+        return @((_config.base_url)->c_str());
     }
 
     return nil;
 }
 
-- (NSUInteger)defaultRequestTimeoutMS {
-    if (_config.default_request_timeout_ms) {
-        return *_config.default_request_timeout_ms;
-    };
+- (void)setLocalAppVersion:(nullable NSString *)localAppVersion {
+    std::string local_app_version;
+    RLMNSStringToStdString(local_app_version, localAppVersion);
+    _config.local_app_version = local_app_version.empty() ? util::none : util::Optional(local_app_version);
+    return;
+}
 
-    return 6000;
+- (NSUInteger)defaultRequestTimeoutMS {
+    return _config.default_request_timeout_ms.value_or(6000);
 }
 
 @end

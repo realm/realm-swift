@@ -46,22 +46,11 @@ public extension ObjectiveCSupport {
         case .objectId(let val):
             return val as RLMObjectId
         case .document(let val):
-            return val.reduce(into: NSMutableDictionary()) { (result: inout NSMutableDictionary, kvp) in
-                let (key, value) = kvp
-                guard let val = convert(object: value) else {
-                    result[key] = NSNull()
-                    return
-                }
-                result[key] = val
-            }
+            return val.reduce(into: Dictionary<String, RLMBSON?>()) { (result: inout [String: RLMBSON?], kvp) in
+                result[kvp.key] = convert(object: kvp.value) ?? NSNull()
+            } as NSDictionary
         case .array(let val):
-            return val.reduce(into: NSMutableArray()) { (result: inout NSMutableArray, val) in
-                guard let val = convert(object: val) else {
-                    result.add(NSNull())
-                    return
-                }
-                result.add(val)
-            }
+            return val.map(convert) as NSArray
         case .maxKey:
             return MaxKey()
         case .minKey:
