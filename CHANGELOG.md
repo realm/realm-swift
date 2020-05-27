@@ -1,9 +1,12 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.0.1 Release notes (2020-05-27)
 =============================================================
+
 ### Enhancements
+
 * Add prebuilt binary for Xcode 11.5 to the release package.
 
 ### Fixed
+
 * Fix linker error when building a xcframework for Catalyst.
   ([#6511](https://github.com/realm/realm-cocoa/issues/6511), since 4.3.1).
 * Fix building for iOS devices when using Swift Package Manager
@@ -12,18 +15,13 @@ x.y.z Release notes (yyyy-MM-dd)
   correctly and would always report `nil` or an empty list.
   ([#6527](https://github.com/realm/realm-cocoa/issues/6527), since 5.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.11 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.5.
-
-### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
 
 5.0.0 Release notes (2020-05-15)
 =============================================================
