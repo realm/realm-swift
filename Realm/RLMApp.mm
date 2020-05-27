@@ -97,17 +97,9 @@ namespace {
     if (self = [super init]) {
         self.baseURL = baseURL;
         self.transport = transport;
-        if (localAppName) {
-            std::string local_app_name;
-            RLMNSStringToStdString(local_app_name, localAppName);
-            _config.local_app_name = local_app_name;
-        }
-        if (localAppVersion) {
-            std::string local_app_version;
-            RLMNSStringToStdString(local_app_version, localAppName);
-            _config.local_app_version = local_app_version;
-        }
-        _config.default_request_timeout_ms = (uint64_t)defaultRequestTimeoutMS;
+        self.localAppName = localAppName;
+        self.localAppVersion = localAppVersion;
+        self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
         return self;
     }
     return nil;
@@ -184,6 +176,10 @@ namespace {
 
 - (NSUInteger)defaultRequestTimeoutMS {
     return _config.default_request_timeout_ms.value_or(6000);
+}
+
+- (void)setDefaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS {
+    _config.default_request_timeout_ms = (uint64_t)defaultRequestTimeoutMS;
 }
 
 @end
