@@ -992,7 +992,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [callFunctionEx], timeout: 4.0)
     }
-    
+
     func testCustomUserData() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
@@ -1019,14 +1019,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             userDataEx.fulfill()
         }
         wait(for: [userDataEx], timeout: 4.0)
-        
+
         let refreshDataEx = expectation(description: "Refresh user data")
         app.currentUser()?.refreshCustomData { error in
             XCTAssertNil(error)
             refreshDataEx.fulfill()
         }
         wait(for: [refreshDataEx], timeout: 4.0)
-        
+
         XCTAssertEqual(app.currentUser()?.customData?["favourite_colour"], .string("green"))
         XCTAssertEqual(app.currentUser()?.customData?["apples"], .int64(10))
     }
