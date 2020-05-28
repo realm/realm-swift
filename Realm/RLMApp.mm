@@ -25,6 +25,7 @@
 #import "RLMUsernamePasswordProviderClient.h"
 #import "RLMUserAPIKeyProviderClient.h"
 #import "RLMUtil.hpp"
+#import "RLMVersion.h"
 
 using namespace realm;
 
@@ -104,9 +105,12 @@ namespace {
         _config.platform = "Realm Cocoa";
         
         NSOperatingSystemVersion operatingSystemVersion = [[NSProcessInfo processInfo] operatingSystemVersion];
-        RLMNSStringToStdString(_config.platform_version,
-                               [[NSString alloc] initWithFormat:@"%d.%d.%d", (int)operatingSystemVersion.majorVersion, (int)operatingSystemVersion.minorVersion, (int)operatingSystemVersion.patchVersion]);
-        _config.sdk_version = "10.0.0-alpha.5";
+        _config.platform_version = realm::util::format("%1.%2.%2",
+                                                       operatingSystemVersion.majorVersion,
+                                                       operatingSystemVersion.minorVersion,
+                                                       operatingSystemVersion.patchVersion);
+        
+        RLMNSStringToStdString(_config.sdk_version, REALM_COCOA_VERSION);
         return self;
     }
     return nil;
