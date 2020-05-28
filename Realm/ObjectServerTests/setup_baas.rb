@@ -105,8 +105,9 @@ def setup_stitch
     end
 
     puts 'building transpiler'
-    puts `#{exports.length() == 0 ? "" : exports.join(' && ')} \
-        && cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
+    puts exports
+    puts `#{exports.length() == 0 ? "" : exports.join(' && ') + ' &&'} \
+        cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
 
     if !Dir.exists?('go')
         puts 'downloading go'
