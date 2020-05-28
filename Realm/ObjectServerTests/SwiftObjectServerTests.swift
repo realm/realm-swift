@@ -1014,7 +1014,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [loginEx], timeout: 4.0)
 
         let userDataEx = expectation(description: "Update user data")
-        app.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _,error  in
+        app.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
             XCTAssertNil(error)
             userDataEx.fulfill()
         }
