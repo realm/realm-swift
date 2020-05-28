@@ -111,9 +111,16 @@ def doBuild() {
           . ./scripts/swift-version.sh
           set_xcode_and_swift_versions
 
-          if [ "${platform}" != osx ]; then
-            ./scripts/reset-simulators.rb
-          fi
+          # Carthage scans every xcodeproj in the directory looking for
+          # targets. This can be very slow and even spuriously time out, so
+          # remove the ones we don't want it to build.
+          rm -r examples plugin
+
+          # For whatever reason 'xcodebuild -list' is very slow sometimes which
+          # makes Carthage time out, but it's a lot faster if no simulators
+          # exist, so delete them all first and only create a single simulator
+          # for each platform.
+          ./scripts/reset-simulators.rb -firstOnly
 
           carthage build --no-skip-current --platform ${platform}
           carthage archive --output Carthage-${platform}.framework.zip
