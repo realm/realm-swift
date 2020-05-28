@@ -285,6 +285,10 @@ extension SyncUser {
         return ObjectiveCSupport.convert(object: config)
     }
 
+    /**
+     The custom data of the user.
+     This is configured in your MongoDB Realm App.
+    */
     public var customData: Document? {
         guard let rlmCustomData = self.__customData as RLMBSON?,
             let anyBSON = ObjectiveCSupport.convert(object: rlmCustomData),
