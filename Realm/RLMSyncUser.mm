@@ -18,6 +18,7 @@
 
 #import "RLMSyncUser_Private.hpp"
 
+#import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
 #import "RLMJSONModels.h"
 #import "RLMNetworkTransport.h"
@@ -164,6 +165,16 @@ using namespace realm;
         case SyncUser::State::Removed:
             return RLMSyncUserStateRemoved;
     }
+}
+
+- (void)refreshCustomData:(RLMUserUserOptionalErrorBlock)completionBlock {
+    [_app _realmApp]->refresh_custom_data(_user, [completionBlock](util::Optional<app::AppError> error){
+        if (!error) {
+            return completionBlock(nil);
+        }
+        
+        completionBlock(RLMAppErrorToNSError(*error));
+    });
 }
 
 #pragma mark - Private API

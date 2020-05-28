@@ -284,6 +284,15 @@ extension SyncUser {
         config.syncConfiguration = syncConfig
         return ObjectiveCSupport.convert(object: config)
     }
+    
+    public var customData: Document? {
+        guard let rlmCustomData = self.__customData as RLMBSON?,
+            case let .document(customData) = ObjectiveCSupport.convert(object: rlmCustomData) else {
+            return nil
+        }
+
+        return customData
+    }
 }
 
 public extension SyncSession {

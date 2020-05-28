@@ -263,7 +263,6 @@
 		49101A1F246C38550022BB0B /* scheduler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49101A1D246C38550022BB0B /* scheduler.cpp */; };
 		492F5CB2244F48D800ACEBC0 /* regular_expression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F0244E1A370097500E /* regular_expression.cpp */; };
 		492F5CB3244F48D800ACEBC0 /* bson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F2244E1A370097500E /* bson.cpp */; };
-		492F5CB4244F48D800ACEBC0 /* datetime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F4244E1A370097500E /* datetime.cpp */; };
 		494566A9246E8C59000FD07F /* ObjectiveCSupport+BSON.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494566A8246E8C59000FD07F /* ObjectiveCSupport+BSON.swift */; };
 		498C7F4124479905009DE80A /* remote_mongo_database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3A24479905009DE80A /* remote_mongo_database.cpp */; };
 		498C7F4224479905009DE80A /* remote_mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3B24479905009DE80A /* remote_mongo_collection.cpp */; };
@@ -294,6 +293,12 @@
 		49E12CF3245DB7E800359DF1 /* RLMBSON.h in Headers */ = {isa = PBXBuildFile; fileRef = 49E12CF1245DB7E800359DF1 /* RLMBSON.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		49E12CF5245DBF8A00359DF1 /* RLMBSON_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 49E12CF4245DBF8A00359DF1 /* RLMBSON_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		49E12CF6245DBF8A00359DF1 /* RLMBSON_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 49E12CF4245DBF8A00359DF1 /* RLMBSON_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
+		534402CA247FCB9D00866F32 /* min_key.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 49AD39EE244E1A370097500E /* min_key.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		534402CB247FCBA400866F32 /* max_key.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 49AD39F5244E1A370097500E /* max_key.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
+		534402CE247FCBE100866F32 /* regular_expression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F0244E1A370097500E /* regular_expression.cpp */; };
+		534402D0247FCBFE00866F32 /* mongo_timestamp.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 534402CF247FCBFD00866F32 /* mongo_timestamp.hpp */; };
+		534402D1247FCBFE00866F32 /* mongo_timestamp.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 534402CF247FCBFD00866F32 /* mongo_timestamp.hpp */; };
+		534402D2247FCCA300866F32 /* bson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 49AD39F2244E1A370097500E /* bson.cpp */; };
 		5B77EACE1DCC5614006AB51D /* ObjectiveCSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */; };
 		5D03FB1F1E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
 		5D03FB201E0DAFBA007D53EA /* PredicateUtilTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */; };
@@ -471,24 +476,6 @@
 		CF6E048B242A4B6F00DB7F14 /* RLMProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0484242A321200DB7F14 /* RLMProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF6E048C242A4B7100DB7F14 /* RLMUsernamePasswordProviderClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */; };
 		CF6E048D242A4B7400DB7F14 /* RLMUsernamePasswordProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0480242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CF8004C124504B75001C8E9C /* datetime.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AC24504A85001C8E9C /* datetime.hpp */; };
-		CF8004C224504B75001C8E9C /* min_key.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AD24504A85001C8E9C /* min_key.hpp */; };
-		CF8004C324504B75001C8E9C /* bson.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AE24504A85001C8E9C /* bson.hpp */; };
-		CF8004C424504B75001C8E9C /* regular_expression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AF24504A85001C8E9C /* regular_expression.cpp */; };
-		CF8004C524504B75001C8E9C /* indexed_map.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B024504A85001C8E9C /* indexed_map.hpp */; };
-		CF8004C624504B75001C8E9C /* bson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B124504A85001C8E9C /* bson.cpp */; };
-		CF8004C724504B75001C8E9C /* regular_expression.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B224504A85001C8E9C /* regular_expression.hpp */; };
-		CF8004C824504B75001C8E9C /* datetime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B324504A85001C8E9C /* datetime.cpp */; };
-		CF8004C924504B75001C8E9C /* max_key.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B424504A85001C8E9C /* max_key.hpp */; };
-		CF8004CA24504B86001C8E9C /* datetime.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AC24504A85001C8E9C /* datetime.hpp */; };
-		CF8004CB24504B86001C8E9C /* min_key.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AD24504A85001C8E9C /* min_key.hpp */; };
-		CF8004CC24504B86001C8E9C /* bson.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AE24504A85001C8E9C /* bson.hpp */; };
-		CF8004CD24504B86001C8E9C /* regular_expression.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004AF24504A85001C8E9C /* regular_expression.cpp */; };
-		CF8004CE24504B86001C8E9C /* indexed_map.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B024504A85001C8E9C /* indexed_map.hpp */; };
-		CF8004CF24504B86001C8E9C /* bson.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B124504A85001C8E9C /* bson.cpp */; };
-		CF8004D024504B86001C8E9C /* regular_expression.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B224504A85001C8E9C /* regular_expression.hpp */; };
-		CF8004D124504B86001C8E9C /* datetime.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B324504A85001C8E9C /* datetime.cpp */; };
-		CF8004D224504B86001C8E9C /* max_key.hpp in Sources */ = {isa = PBXBuildFile; fileRef = CF8004B424504A85001C8E9C /* max_key.hpp */; };
 		CFAEF761242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF75F242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFAEF762242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFAEF760242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.mm */; };
 		CFAEF765242B672700EAF721 /* RLMUserAPIKey.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -920,14 +907,12 @@
 		4993221B2412A07F00A0EC8E /* generic_network_transport.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = generic_network_transport.hpp; path = sync/generic_network_transport.hpp; sourceTree = "<group>"; };
 		4996EA9D2465BB8A003A1F51 /* BSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BSON.swift; sourceTree = "<group>"; };
 		4996EA9F2465C44E003A1F51 /* SwiftBSONTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SwiftBSONTests.swift; path = Realm/ObjectServerTests/SwiftBSONTests.swift; sourceTree = "<group>"; };
-		49AD39ED244E1A370097500E /* datetime.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = datetime.hpp; sourceTree = "<group>"; };
 		49AD39EE244E1A370097500E /* min_key.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = min_key.hpp; sourceTree = "<group>"; };
 		49AD39EF244E1A370097500E /* bson.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = bson.hpp; sourceTree = "<group>"; };
 		49AD39F0244E1A370097500E /* regular_expression.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = regular_expression.cpp; sourceTree = "<group>"; };
 		49AD39F1244E1A370097500E /* indexed_map.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = indexed_map.hpp; sourceTree = "<group>"; };
 		49AD39F2244E1A370097500E /* bson.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bson.cpp; sourceTree = "<group>"; };
 		49AD39F3244E1A370097500E /* regular_expression.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = regular_expression.hpp; sourceTree = "<group>"; };
-		49AD39F4244E1A370097500E /* datetime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = datetime.cpp; sourceTree = "<group>"; };
 		49AD39F5244E1A370097500E /* max_key.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = max_key.hpp; sourceTree = "<group>"; };
 		49B1965B2448586000B5B852 /* auth_request_client.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = auth_request_client.hpp; path = sync/auth_request_client.hpp; sourceTree = "<group>"; };
 		49D9DFC3246C8E41003AD31D /* run_baas.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; name = run_baas.rb; path = Realm/ObjectServerTests/run_baas.rb; sourceTree = "<group>"; };
@@ -935,6 +920,7 @@
 		49E12CEF245DB7CC00359DF1 /* RLMBSON.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMBSON.mm; sourceTree = "<group>"; };
 		49E12CF1245DB7E800359DF1 /* RLMBSON.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMBSON.h; sourceTree = "<group>"; };
 		49E12CF4245DBF8A00359DF1 /* RLMBSON_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMBSON_Private.hpp; sourceTree = "<group>"; };
+		534402CF247FCBFD00866F32 /* mongo_timestamp.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mongo_timestamp.hpp; sourceTree = "<group>"; };
 		5B77EACD1DCC5614006AB51D /* ObjectiveCSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupport.swift; sourceTree = "<group>"; };
 		5BC537151DD5B8D70055C524 /* ObjectiveCSupportTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectiveCSupportTests.swift; sourceTree = "<group>"; };
 		5D03FB1E1E0DAFBA007D53EA /* PredicateUtilTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PredicateUtilTests.mm; sourceTree = "<group>"; };
@@ -1013,15 +999,6 @@
 		CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUsernamePasswordProviderClient.mm; sourceTree = "<group>"; };
 		CF6E0484242A321200DB7F14 /* RLMProviderClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMProviderClient.h; sourceTree = "<group>"; };
 		CF6E0485242A321200DB7F14 /* RLMProviderClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMProviderClient.mm; sourceTree = "<group>"; };
-		CF8004AC24504A85001C8E9C /* datetime.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = datetime.hpp; sourceTree = "<group>"; };
-		CF8004AD24504A85001C8E9C /* min_key.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = min_key.hpp; sourceTree = "<group>"; };
-		CF8004AE24504A85001C8E9C /* bson.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = bson.hpp; sourceTree = "<group>"; };
-		CF8004AF24504A85001C8E9C /* regular_expression.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = regular_expression.cpp; sourceTree = "<group>"; };
-		CF8004B024504A85001C8E9C /* indexed_map.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = indexed_map.hpp; sourceTree = "<group>"; };
-		CF8004B124504A85001C8E9C /* bson.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bson.cpp; sourceTree = "<group>"; };
-		CF8004B224504A85001C8E9C /* regular_expression.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = regular_expression.hpp; sourceTree = "<group>"; };
-		CF8004B324504A85001C8E9C /* datetime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = datetime.cpp; sourceTree = "<group>"; };
-		CF8004B424504A85001C8E9C /* max_key.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = max_key.hpp; sourceTree = "<group>"; };
 		CFAEF75F242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMUserAPIKeyProviderClient.h; sourceTree = "<group>"; };
 		CFAEF760242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUserAPIKeyProviderClient.mm; sourceTree = "<group>"; };
 		CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMUserAPIKey.h; sourceTree = "<group>"; };
@@ -1405,14 +1382,13 @@
 		49AD39EC244E1A370097500E /* bson */ = {
 			isa = PBXGroup;
 			children = (
-				49AD39ED244E1A370097500E /* datetime.hpp */,
+				534402CF247FCBFD00866F32 /* mongo_timestamp.hpp */,
 				49AD39EE244E1A370097500E /* min_key.hpp */,
 				49AD39EF244E1A370097500E /* bson.hpp */,
 				49AD39F0244E1A370097500E /* regular_expression.cpp */,
 				49AD39F1244E1A370097500E /* indexed_map.hpp */,
 				49AD39F2244E1A370097500E /* bson.cpp */,
 				49AD39F3244E1A370097500E /* regular_expression.hpp */,
-				49AD39F4244E1A370097500E /* datetime.cpp */,
 				49AD39F5244E1A370097500E /* max_key.hpp */,
 			);
 			path = bson;
@@ -1539,7 +1515,6 @@
 		5DB591A51D063DE5001D8F93 /* util */ = {
 			isa = PBXGroup;
 			children = (
-				CF8004AB24504A85001C8E9C /* bson */,
 				5D274C511D6D16BA006FEBB1 /* apple */,
 				49AD39EC244E1A370097500E /* bson */,
 				3F92F62A222F311C008B2333 /* aligned_union.hpp */,
@@ -1580,22 +1555,6 @@
 				CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */,
 			);
 			name = ProviderClients;
-			sourceTree = "<group>";
-		};
-		CF8004AB24504A85001C8E9C /* bson */ = {
-			isa = PBXGroup;
-			children = (
-				CF8004AC24504A85001C8E9C /* datetime.hpp */,
-				CF8004AD24504A85001C8E9C /* min_key.hpp */,
-				CF8004AE24504A85001C8E9C /* bson.hpp */,
-				CF8004AF24504A85001C8E9C /* regular_expression.cpp */,
-				CF8004B024504A85001C8E9C /* indexed_map.hpp */,
-				CF8004B124504A85001C8E9C /* bson.cpp */,
-				CF8004B224504A85001C8E9C /* regular_expression.hpp */,
-				CF8004B324504A85001C8E9C /* datetime.cpp */,
-				CF8004B424504A85001C8E9C /* max_key.hpp */,
-			);
-			path = bson;
 			sourceTree = "<group>";
 		};
 		E81A1FC81955FE0100FDED82 /* Swift */ = {
@@ -1898,6 +1857,7 @@
 				5D659EB41BE04556006515A0 /* RLMObjectBase_Dynamic.h in Headers */,
 				E8F992BE1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */,
 				3F4F3AD723F71C790048DB43 /* RLMObjectId.h in Headers */,
+				534402D0247FCBFE00866F32 /* mongo_timestamp.hpp in Headers */,
 				5D659EB51BE04556006515A0 /* RLMObjectSchema.h in Headers */,
 				5D659EB61BE04556006515A0 /* RLMObjectSchema_Private.h in Headers */,
 				5D659EB81BE04556006515A0 /* RLMObjectStore.h in Headers */,
@@ -1909,6 +1869,8 @@
 				5D659EBF1BE04556006515A0 /* RLMRealm.h in Headers */,
 				5D659EC01BE04556006515A0 /* RLMRealm_Dynamic.h in Headers */,
 				5D659EC11BE04556006515A0 /* RLMRealm_Private.h in Headers */,
+				534402CA247FCB9D00866F32 /* min_key.hpp in Headers */,
+				534402CB247FCBA400866F32 /* max_key.hpp in Headers */,
 				1ABF256F1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.h in Headers */,
 				5D659EC21BE04556006515A0 /* RLMRealmConfiguration.h in Headers */,
 				5D659EC31BE04556006515A0 /* RLMRealmConfiguration_Private.h in Headers */,
@@ -1977,6 +1939,7 @@
 				CF6E048B242A4B6F00DB7F14 /* RLMProviderClient.h in Headers */,
 				1AD397D01F72FFCC002AA897 /* RLMRealm+Sync.h in Headers */,
 				5DD755BD1BE056DE002800DA /* RLMRealm.h in Headers */,
+				534402D1247FCBFE00866F32 /* mongo_timestamp.hpp in Headers */,
 				5DD755BE1BE056DE002800DA /* RLMRealm_Dynamic.h in Headers */,
 				5DD755BF1BE056DE002800DA /* RLMRealm_Private.h in Headers */,
 				1AFEF8421D52CD8F00495005 /* RLMRealmConfiguration+Sync.h in Headers */,
@@ -2573,6 +2536,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				534402D2247FCCA300866F32 /* bson.cpp in Sources */,
 				499321FE24129CFD00A0EC8E /* app.cpp in Sources */,
 				499321FC24129CFD00A0EC8E /* app_credentials.cpp in Sources */,
 				3F558C7922BC023A002F0F30 /* async_open_task.cpp in Sources */,
@@ -2658,15 +2622,7 @@
 				5D659E9E1BE04556006515A0 /* transact_log_handler.cpp in Sources */,
 				1AABD4021E9552BA00115A75 /* uuid.cpp in Sources */,
 				5D274C4D1D6D15D2006FEBB1 /* weak_realm_notifier.cpp in Sources */,
-				CF8004C124504B75001C8E9C /* datetime.hpp in Sources */,
-				CF8004C224504B75001C8E9C /* min_key.hpp in Sources */,
-				CF8004C324504B75001C8E9C /* bson.hpp in Sources */,
-				CF8004C424504B75001C8E9C /* regular_expression.cpp in Sources */,
-				CF8004C524504B75001C8E9C /* indexed_map.hpp in Sources */,
-				CF8004C624504B75001C8E9C /* bson.cpp in Sources */,
-				CF8004C724504B75001C8E9C /* regular_expression.hpp in Sources */,
-				CF8004C824504B75001C8E9C /* datetime.cpp in Sources */,
-				CF8004C924504B75001C8E9C /* max_key.hpp in Sources */,
+				534402CE247FCBE100866F32 /* regular_expression.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2748,7 +2704,6 @@
 				499321FF24129CFE00A0EC8E /* app.cpp in Sources */,
 				492F5CB2244F48D800ACEBC0 /* regular_expression.cpp in Sources */,
 				492F5CB3244F48D800ACEBC0 /* bson.cpp in Sources */,
-				492F5CB4244F48D800ACEBC0 /* datetime.cpp in Sources */,
 				499321FD24129CFD00A0EC8E /* app_credentials.cpp in Sources */,
 				3F558C7A22BC023B002F0F30 /* async_open_task.cpp in Sources */,
 				3F5B5D321E84230E00953B33 /* binding_callback_thread_observer.cpp in Sources */,
@@ -2829,15 +2784,6 @@
 				5DD7559C1BE056DE002800DA /* transact_log_handler.cpp in Sources */,
 				1AABD4041E9552C200115A75 /* uuid.cpp in Sources */,
 				5D274C4E1D6D15FD006FEBB1 /* weak_realm_notifier.cpp in Sources */,
-				CF8004CA24504B86001C8E9C /* datetime.hpp in Sources */,
-				CF8004CB24504B86001C8E9C /* min_key.hpp in Sources */,
-				CF8004CC24504B86001C8E9C /* bson.hpp in Sources */,
-				CF8004CD24504B86001C8E9C /* regular_expression.cpp in Sources */,
-				CF8004CE24504B86001C8E9C /* indexed_map.hpp in Sources */,
-				CF8004CF24504B86001C8E9C /* bson.cpp in Sources */,
-				CF8004D024504B86001C8E9C /* regular_expression.hpp in Sources */,
-				CF8004D124504B86001C8E9C /* datetime.cpp in Sources */,
-				CF8004D224504B86001C8E9C /* max_key.hpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

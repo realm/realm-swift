@@ -137,25 +137,14 @@ public extension ObjectiveCSupport {
             guard let val = bson as? Dictionary<String, RLMBSON?> else {
                 return nil
             }
-            let keyValues = val.map { (key: String, value: RLMBSON?) -> (String, AnyBSON?) in
-                guard let val = convert(object: value) else {
-                    return (key, nil)
-                }
-                return (key, val)
-            }
-            let convertedDictionary = Dictionary(uniqueKeysWithValues: keyValues)
-            return .document(convertedDictionary)
+            return .document(val.reduce(into: Dictionary<String, AnyBSON?>()) { (result: inout [String: AnyBSON?], kvp) in
+                result[kvp.key] = convert(object: kvp.value)
+            })
         case .array:
             guard let val = bson as? Array<RLMBSON?> else {
                 return nil
             }
-            let convertedArray = val.map { (rlmBSON) -> AnyBSON? in
-                guard let val = convert(object: rlmBSON) else {
-                    return nil
-                }
-                return val
-            }
-            return .array(convertedArray)
+            return .array(val.map(convert))
         default:
             return nil
         }

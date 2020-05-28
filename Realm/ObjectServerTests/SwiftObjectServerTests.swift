@@ -992,4 +992,42 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [callFunctionEx], timeout: 4.0)
     }
+    
+    func testCustomUserData() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "Register user")
+
+        app.usernamePasswordProviderClient().registerEmail(email, password: password) { (error) in
+            XCTAssertNil(error)
+            registerUserEx.fulfill()
+        }
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "Login user")
+        let credentials = AppCredentials(username: email, password: password)
+        app.login(withCredential: credentials) { (_, error) in
+            XCTAssertNil(error)
+            loginEx.fulfill()
+        }
+        wait(for: [loginEx], timeout: 4.0)
+
+        let userDataEx = expectation(description: "Update user data")
+        app.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _,error  in
+            XCTAssertNil(error)
+            userDataEx.fulfill()
+        }
+        wait(for: [userDataEx], timeout: 4.0)
+        
+        let refreshDataEx = expectation(description: "Refresh user data")
+        app.currentUser()?.refreshCustomData { error in
+            XCTAssertNil(error)
+            refreshDataEx.fulfill()
+        }
+        wait(for: [refreshDataEx], timeout: 4.0)
+        
+        XCTAssertEqual(app.currentUser()?.customData?["favourite_colour"], .string("green"))
+        XCTAssertEqual(app.currentUser()?.customData?["apples"], .int64(10))
+    }
 }

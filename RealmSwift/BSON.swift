@@ -91,7 +91,7 @@ public enum AnyBSON: BSON {
     case string(String)
 
     /// A BSON document.
-    case document(Document)
+    indirect case document(Document)
 
     /// A BSON array.
     indirect case array([AnyBSON?])

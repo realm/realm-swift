@@ -100,6 +100,13 @@ namespace {
         self.localAppName = localAppName;
         self.localAppVersion = localAppVersion;
         self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
+        
+        _config.platform = "Realm Cocoa";
+        
+        NSOperatingSystemVersion operatingSystemVersion = [[NSProcessInfo processInfo] operatingSystemVersion];
+        RLMNSStringToStdString(_config.platform_version,
+                               [[NSString alloc] initWithFormat:@"%d.%d.%d", (int)operatingSystemVersion.majorVersion, (int)operatingSystemVersion.minorVersion, (int)operatingSystemVersion.patchVersion]);
+        _config.sdk_version = "10.0.0-alpha.5";
         return self;
     }
     return nil;

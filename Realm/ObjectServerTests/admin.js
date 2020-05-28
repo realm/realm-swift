@@ -191,10 +191,38 @@ async function create() {
         "can_evaluate": {},
         "source": `
         exports = function(...args) {
-            return parseInt(args.reduce((a,b) => a + b, 0));
+          return parseInt(args.reduce((a,b) => a + b, 0));
         };
         `
     });
+    
+    await app.functions().create({
+        "name": "updateUserData",
+        "private": false,
+        "can_evaluate": {},
+        "source": `
+        exports = async function(data) {
+          const user = context.user;
+          const mongodb = context.services.get("mongodb1");
+          const userDataCollection = mongodb.db("test_data").collection("UserData");
+          await userDataCollection.updateOne(
+            { "user_id": user.id },
+            { "$set": data },
+            { "upsert": true }
+          );
+          return true;
+        };
+        `
+    });
+    
+    await app.customUserData().update({
+        "mongo_service_id": serviceResponse['_id'],
+        "enabled": true,
+        "database_name": "test_data",
+        "collection_name": "UserData",
+        "user_id_field": "user_id"
+    });
+    
     process.stdout.write(appResponse['client_app_id']);
 }
 

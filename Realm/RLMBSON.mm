@@ -324,7 +324,7 @@ Bson RLMConvertRLMBSONToBson(id<RLMBSON> b) {
         case RLMBSONTypeTimestamp:
             return RLMTimestampForNSDate((NSDate *)b);
         case RLMBSONTypeDatetime:
-            return Datetime(((NSDate *)b).timeIntervalSince1970);
+            return MongoTimestamp(((NSDate *)b).timeIntervalSince1970, 0);
         case RLMBSONTypeDecimal128:
             return [((RLMDecimal128 *)b) decimal128Value];
         case RLMBSONTypeRegularExpression:
@@ -355,13 +355,13 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
         case realm::bson::Bson::Type::Double:
             return @(static_cast<double>(b));
         case realm::bson::Bson::Type::String:
-            return @(static_cast<std::string>(b).c_str());
+            return RLMStringDataToNSString(static_cast<std::string>(b).c_str());
         case realm::bson::Bson::Type::Binary:
             return [[NSData alloc] initWithBsonBinary:static_cast<std::vector<char>>(b)];
         case realm::bson::Bson::Type::Timestamp:
             return RLMTimestampToNSDate(static_cast<Timestamp>(b));
         case realm::bson::Bson::Type::Datetime:
-            return [[NSDate alloc] initWithTimeIntervalSince1970:static_cast<Datetime>(b).seconds_since_epoch];
+            return [[NSDate alloc] initWithTimeIntervalSince1970:static_cast<MongoTimestamp>(b).seconds];
         case realm::bson::Bson::Type::ObjectId:
             return [[RLMObjectId alloc] initWithValue:static_cast<ObjectId>(b)];
         case realm::bson::Bson::Type::Decimal128:

@@ -39,6 +39,10 @@ typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
 /// A block type used to report an error related to a specific user.
 typedef void(^RLMUserErrorReportingBlock)(RLMSyncUser * _Nonnull, NSError * _Nonnull);
 
+/// A block type used to report an error on a network request from the user.
+typedef void(^RLMUserUserOptionalErrorBlock)(NSError * _Nullable);
+
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -85,12 +89,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RLMSyncUserState state;
 
-/**
- The custom data of the user.
- This is configured in your MongoDB Realm App.
- */
-@property (nullable, nonatomic, readonly) NSDictionary *customData NS_REFINED_FOR_SWIFT;
-
 #pragma mark - Lifecycle
 
 /**
@@ -113,6 +111,19 @@ NS_ASSUME_NONNULL_BEGIN
  Retrieve all the valid sessions belonging to this user.
  */
 - (NSArray<RLMSyncSession *> *)allSessions;
+
+#pragma mark - Custom Data
+
+/**
+ The custom data of the user.
+ This is configured in your MongoDB Realm App.
+ */
+@property (nullable, nonatomic, readonly) NSDictionary *customData NS_REFINED_FOR_SWIFT;
+
+/**
+ Refresh a user's custom data. This will, in effect, refresh the user's auth session.
+ */
+- (void)refreshCustomData:(RLMUserUserOptionalErrorBlock)completionBlock;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));

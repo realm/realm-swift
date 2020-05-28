@@ -84,7 +84,7 @@ typedef NS_ENUM(NSUInteger, RLMBSONType) {
  @see RLMBSONType
  @see bsonspec.org
  */
-@protocol RLMBSON <NSObject>
+@protocol RLMBSON
 
 /**
  The BSON type for the conforming interface.
