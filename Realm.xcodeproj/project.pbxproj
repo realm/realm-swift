@@ -502,6 +502,7 @@
 		CF76F7C324813D3800890DD2 /* RLMUpdateResult_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7B024813CCB00890DD2 /* RLMUpdateResult_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		CF76F7C424813D4000890DD2 /* RLMUpdateResult.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7AF24813CCB00890DD2 /* RLMUpdateResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF76F7C524813D4800890DD2 /* RLMUpdateResult.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF76F7AE24813CCB00890DD2 /* RLMUpdateResult.mm */; };
+		CF76F7C7248143F800890DD2 /* MongoClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF76F7C6248143F800890DD2 /* MongoClient.swift */; };
 		CFAEF761242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF75F242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFAEF762242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFAEF760242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.mm */; };
 		CFAEF765242B672700EAF721 /* RLMUserAPIKey.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1043,6 +1044,7 @@
 		CF76F7AE24813CCB00890DD2 /* RLMUpdateResult.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUpdateResult.mm; sourceTree = "<group>"; };
 		CF76F7AF24813CCB00890DD2 /* RLMUpdateResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMUpdateResult.h; sourceTree = "<group>"; };
 		CF76F7B024813CCB00890DD2 /* RLMUpdateResult_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMUpdateResult_Private.hpp; sourceTree = "<group>"; };
+		CF76F7C6248143F800890DD2 /* MongoClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MongoClient.swift; sourceTree = "<group>"; };
 		CFAEF75F242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMUserAPIKeyProviderClient.h; sourceTree = "<group>"; };
 		CFAEF760242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUserAPIKeyProviderClient.mm; sourceTree = "<group>"; };
 		CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMUserAPIKey.h; sourceTree = "<group>"; };
@@ -1512,6 +1514,7 @@
 				3F222C4D1E26F51300CA0713 /* ThreadSafeReference.swift */,
 				5D660FF01BE98D670021E04F /* Util.swift */,
 				CFB43139243DF87100471C18 /* RealmApp.swift */,
+				CF76F7C6248143F800890DD2 /* MongoClient.swift */,
 			);
 			path = RealmSwift;
 			sourceTree = "<group>";
@@ -2739,6 +2742,7 @@
 				494566A9246E8C59000FD07F /* ObjectiveCSupport+BSON.swift in Sources */,
 				5D660FF81BE98D670021E04F /* Realm.swift in Sources */,
 				1AB605D31D495927007F53DE /* RealmCollection.swift in Sources */,
+				CF76F7C7248143F800890DD2 /* MongoClient.swift in Sources */,
 				5D660FFA1BE98D670021E04F /* RealmConfiguration.swift in Sources */,
 				5D660FFB1BE98D670021E04F /* Results.swift in Sources */,
 				5D660FFC1BE98D670021E04F /* Schema.swift in Sources */,
