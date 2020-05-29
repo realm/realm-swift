@@ -38,7 +38,7 @@ class SwiftPerson: Object {
     }
 
     override class func primaryKey() -> String? {
-        "_id"
+        return "_id"
     }
 }
 
@@ -976,449 +976,58 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let callFunctionEx = expectation(description: "Call function")
         app.functions.sum([1, 2, 3, 4, 5]) { bson, error in
-            guard case let .int64(bson) = bson else {
+            guard let bson = bson else {
                 XCTFail(error!.localizedDescription)
                 return
             }
+
+            guard case let .int64(sum) = bson else {
+                XCTFail(error!.localizedDescription)
+                return
+            }
+
             XCTAssertNil(error)
-            XCTAssertEqual(bson, 15)
+            XCTAssertEqual(sum, 15)
             callFunctionEx.fulfill()
         }
         wait(for: [callFunctionEx], timeout: 4.0)
     }
 
-    // MARK: - Mongo Client
+    func testCustomUserData() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
 
-    func testMongoClient() {
-        let mongoClient = app.mongoClient("mongodb1")
-        XCTAssertEqual(mongoClient.name, "mongodb1")
-        let database = mongoClient.database(withName: "test_data")
-        XCTAssertEqual(database.name, "test_data")
-        let collection = database.collection(withName: "dogs")
-        XCTAssertEqual(collection.name, "dogs")
+        let registerUserEx = expectation(description: "Register user")
+
+        app.usernamePasswordProviderClient().registerEmail(email, password: password) { (error) in
+            XCTAssertNil(error)
+            registerUserEx.fulfill()
+        }
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "Login user")
+        let credentials = AppCredentials(username: email, password: password)
+        app.login(withCredential: credentials) { (_, error) in
+            XCTAssertNil(error)
+            loginEx.fulfill()
+        }
+        wait(for: [loginEx], timeout: 4.0)
+
+        let userDataEx = expectation(description: "Update user data")
+        app.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
+            XCTAssertNil(error)
+            userDataEx.fulfill()
+        }
+        wait(for: [userDataEx], timeout: 4.0)
+
+        let refreshDataEx = expectation(description: "Refresh user data")
+        app.currentUser()?.refreshCustomData { error in
+            XCTAssertNil(error)
+            refreshDataEx.fulfill()
+        }
+        wait(for: [refreshDataEx], timeout: 4.0)
+
+        XCTAssertEqual(app.currentUser()?.customData?["favourite_colour"], .string("green"))
+        XCTAssertEqual(app.currentUser()?.customData?["apples"], .int64(10))
     }
-
-    func removeAllFromCollection(_ collection: MongoCollection) {
-        let deleteEx = expectation(description: "Delete all from Mongo collection")
-        collection.deleteManyDocuments([:]) { (count, error) in
-            XCTAssertNotNil(count)
-            XCTAssertNil(error)
-            deleteEx.fulfill()
-        }
-        wait(for: [deleteEx], timeout: 4.0)
-    }
-
-    func setupMongoCollection(_ name: String) -> MongoCollection {
-        _ = try? synchronouslyLogInUser(for: basicCredentials())
-        let mongoClient = app.mongoClient("mongodb1")
-        let database = mongoClient.database(withName: "test_data")
-        let collection = database.collection(withName: name)
-        removeAllFromCollection(collection)
-        return collection
-    }
-
-    func testMongoOptions() {
-        let findOptions = FindOptions(1, nil, nil)
-        let findOptions1 = FindOptions(5, ["name": 1], ["_id": 1])
-        let findOptions2 = FindOptions(5, ["names": ["fido", "bob", "rex"]], ["_id": 1])
-
-        XCTAssertEqual(findOptions.limit, 1)
-        XCTAssertEqual(findOptions.projectedBSON, nil)
-        XCTAssertEqual(findOptions.sortBSON, nil)
-
-        XCTAssertEqual(findOptions1.limit, 5)
-        XCTAssertEqual(findOptions1.projectedBSON, ["name": 1])
-        XCTAssertEqual(findOptions1.sortBSON, ["_id": 1])
-        XCTAssertEqual(findOptions2.projectedBSON, ["names": ["fido", "bob", "rex"]])
-
-        let findModifyOptions = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
-        XCTAssertEqual(findModifyOptions.projectedBSON, ["name": 1])
-        XCTAssertEqual(findModifyOptions.sortBSON, ["_id": 1])
-        XCTAssertTrue(findModifyOptions.upsert)
-        XCTAssertTrue(findModifyOptions.returnNewDocument)
-    }
-
-    func testMongoInsert() {
-        let collection = setupMongoCollection("Dogs")
-        let document: Document = ["name": "fido", "breed": "cane corso"]
-        let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
-
-        let insertOneEx1 = expectation(description: "Insert one document")
-        collection.insertOne(document) { (objectId, error) in
-            XCTAssertNotNil(objectId)
-            XCTAssertNil(error)
-            insertOneEx1.fulfill()
-        }
-        wait(for: [insertOneEx1], timeout: 4.0)
-
-        let insertManyEx1 = expectation(description: "Insert many documents")
-        collection.insertMany([document, document2]) { (objectIds, error) in
-            XCTAssertNotNil(objectIds)
-            XCTAssertEqual(objectIds?.count, 2)
-            XCTAssertNil(error)
-            insertManyEx1.fulfill()
-        }
-        wait(for: [insertManyEx1], timeout: 4.0)
-
-        let findEx1 = expectation(description: "Find documents")
-        collection.find([:]) { (result, error) in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-            XCTAssertEqual(result?.count, 3)
-            XCTAssertEqual(result![0]["name"] as! String, "fido")
-            XCTAssertEqual(result![1]["name"] as! String, "fido")
-            XCTAssertEqual(result![2]["name"] as! String, "rex")
-            findEx1.fulfill()
-        }
-        wait(for: [findEx1], timeout: 4.0)
-    }
-
-    func testMongoFind() {
-        let collection = setupMongoCollection("Dogs")
-
-        let document: Document = ["name": "fido", "breed": "cane corso"]
-        let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
-        let document3: Document = ["name": "rex", "breed": "tibetan mastiff", "coat": ["fawn", "brown", "white"]]
-        let findOptions = FindOptions(1, nil, nil)
-
-        let insertManyEx1 = expectation(description: "Insert many documents")
-        collection.insertMany([document, document2, document3]) { (objectIds, error) in
-            XCTAssertNotNil(objectIds)
-            XCTAssertEqual(objectIds?.count, 3)
-            XCTAssertNil(error)
-            insertManyEx1.fulfill()
-        }
-        wait(for: [insertManyEx1], timeout: 4.0)
-
-        let findEx1 = expectation(description: "Find documents")
-        collection.find([:]) { (result, error) in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-            XCTAssertEqual(result?.count, 3)
-            XCTAssertEqual(result![0]["name"] as! String, "fido")
-            XCTAssertEqual(result![1]["name"] as! String, "rex")
-            XCTAssertEqual(result![2]["name"] as! String, "rex")
-            findEx1.fulfill()
-        }
-        wait(for: [findEx1], timeout: 4.0)
-
-        let findEx2 = expectation(description: "Find documents")
-        collection.find([:], findOptions) { (result, error) in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-            XCTAssertEqual(result?.count, 1)
-            XCTAssertEqual(result![0]["name"] as! String, "fido")
-            findEx2.fulfill()
-        }
-        wait(for: [findEx2], timeout: 4.0)
-
-        let findEx3 = expectation(description: "Find documents")
-        collection.find(document3, findOptions) { (result, error) in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-            XCTAssertEqual(result?.count, 1)
-            findEx3.fulfill()
-        }
-        wait(for: [findEx3], timeout: 4.0)
-
-        let findOneEx1 = expectation(description: "Find one document")
-        collection.findOneDocument(document) { (result, error) in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-            findOneEx1.fulfill()
-        }
-        wait(for: [findOneEx1], timeout: 4.0)
-
-        let findOneEx2 = expectation(description: "Find one document")
-        collection.findOneDocument(document, findOptions) { (result, error) in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-            findOneEx2.fulfill()
-        }
-        wait(for: [findOneEx2], timeout: 4.0)
-    }
-
-    func testMongoFindAndReplace() {
-        let collection = setupMongoCollection("Dogs")
-        let document: Document = ["name": "fido", "breed": "cane corso"]
-        let document2: Document = ["name": "rex", "breed": "cane corso"]
-        let document3: Document = ["name": "john", "breed": "cane corso"]
-
-        let findOneReplaceEx1 = expectation(description: "Find one document and replace")
-        collection.findOneAndReplace(document, document2) { (result, error) in
-            // no doc found, both should be nil
-            XCTAssertNil(result)
-            XCTAssertNil(error)
-            findOneReplaceEx1.fulfill()
-        }
-        wait(for: [findOneReplaceEx1], timeout: 4.0)
-
-        let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
-        let findOneReplaceEx2 = expectation(description: "Find one document and replace")
-        collection.findOneAndReplace(document2, document3, options1) { (result, error) in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-            XCTAssertEqual(result!["name"] as! String, "john")
-            findOneReplaceEx2.fulfill()
-        }
-        wait(for: [findOneReplaceEx2], timeout: 4.0)
-
-        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
-        let findOneReplaceEx3 = expectation(description: "Find one document and replace")
-        collection.findOneAndReplace(document, document2, options2) { (result, error) in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-            XCTAssertEqual(result!["name"] as! String, "john")
-            findOneReplaceEx3.fulfill()
-        }
-        wait(for: [findOneReplaceEx3], timeout: 4.0)
-    }
-
-    func testMongoFindAndUpdate() {
-        let collection = setupMongoCollection("Dogs")
-        let document: Document = ["name": "fido", "breed": "cane corso"]
-        let document2: Document = ["name": "rex", "breed": "cane corso"]
-        let document3: Document = ["name": "john", "breed": "cane corso"]
-
-        let findOneUpdateEx1 = expectation(description: "Find one document and update")
-        collection.findOneAndUpdate(document, document2) { (result, error) in
-            // no doc found, both should be nil
-            XCTAssertNil(result)
-            XCTAssertNil(error)
-            findOneUpdateEx1.fulfill()
-        }
-        wait(for: [findOneUpdateEx1], timeout: 4.0)
-
-        let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
-        let findOneUpdateEx2 = expectation(description: "Find one document and update")
-        collection.findOneAndUpdate(document2, document3, options1) { (result, error) in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-            XCTAssertEqual(result!["name"] as! String, "john")
-            findOneUpdateEx2.fulfill()
-        }
-        wait(for: [findOneUpdateEx2], timeout: 4.0)
-
-        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
-        let findOneUpdateEx3 = expectation(description: "Find one document and update")
-        collection.findOneAndUpdate(document, document2, options2) { (result, error) in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-            XCTAssertEqual(result!["name"] as! String, "john")
-            findOneUpdateEx3.fulfill()
-        }
-        wait(for: [findOneUpdateEx3], timeout: 4.0)
-    }
-
-    func testMongoFindAndDelete() {
-        let collection = setupMongoCollection("Dogs")
-        let document: Document = ["name": "fido", "breed": "cane corso"]
-
-        let findOneDeleteEx1 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(document) { (error) in
-            XCTAssertNil(error)
-            findOneDeleteEx1.fulfill()
-        }
-        wait(for: [findOneDeleteEx1], timeout: 4.0)
-
-        let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
-        let findOneDeleteEx2 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(document, options1) { (error) in
-            XCTAssertNil(error)
-            findOneDeleteEx2.fulfill()
-        }
-        wait(for: [findOneDeleteEx2], timeout: 4.0)
-
-        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
-        let findOneDeleteEx3 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(document, options2) { (error) in
-            XCTAssertNil(error)
-            findOneDeleteEx3.fulfill()
-        }
-        wait(for: [findOneDeleteEx3], timeout: 4.0)
-
-        let findEx = expectation(description: "Find documents")
-        collection.find([:]) { (result, error) in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-            XCTAssertEqual(result?.count, 0)
-            findEx.fulfill()
-        }
-        wait(for: [findEx], timeout: 4.0)
-    }
-
-    func testMongoUpdateOne() {
-        let collection = setupMongoCollection("Dogs")
-        let document: Document = ["name": "fido", "breed": "cane corso"]
-        let document2: Document = ["name": "rex", "breed": "cane corso"]
-        let document3: Document = ["name": "john", "breed": "cane corso"]
-        let document4: Document = ["breed": "bullmastiff"]
-        let document5: Document = ["name": "bill", "breed": "great dane"]
-
-        let insertManyEx = expectation(description: "Insert many documents")
-        collection.insertMany([document, document2, document3, document4]) { (objectIds, error) in
-            XCTAssertNotNil(objectIds)
-            XCTAssertEqual(objectIds?.count, 4)
-            XCTAssertNil(error)
-            insertManyEx.fulfill()
-        }
-        wait(for: [insertManyEx], timeout: 4.0)
-
-        let updateEx1 = expectation(description: "Update one document")
-        collection.updateOneDocument(document, document2) { (updateResult, error) in
-            XCTAssertEqual(updateResult?.matchedCount, 1)
-            XCTAssertEqual(updateResult?.modifiedCount, 1)
-            XCTAssertNil(updateResult?.objectId)
-            XCTAssertNil(error)
-            updateEx1.fulfill()
-        }
-        wait(for: [updateEx1], timeout: 4.0)
-
-        let updateEx2 = expectation(description: "Update one document")
-        collection.updateOneDocument(document5, document2, true) { (updateResult, error) in
-            XCTAssertEqual(updateResult?.matchedCount, 0)
-            XCTAssertEqual(updateResult?.modifiedCount, 0)
-            XCTAssertNotNil(updateResult?.objectId)
-            XCTAssertNil(error)
-            updateEx2.fulfill()
-        }
-        wait(for: [updateEx2], timeout: 4.0)
-    }
-
-    func testMongoUpdateMany() {
-        let collection = setupMongoCollection("Dogs")
-        let document: Document = ["name": "fido", "breed": "cane corso"]
-        let document2: Document = ["name": "rex", "breed": "cane corso"]
-        let document3: Document = ["name": "john", "breed": "cane corso"]
-        let document4: Document = ["breed": "bullmastiff"]
-        let document5: Document = ["name": "bill", "breed": "great dane"]
-
-        let insertManyEx = expectation(description: "Insert many documents")
-        collection.insertMany([document, document2, document3, document4]) { (objectIds, error) in
-            XCTAssertNotNil(objectIds)
-            XCTAssertEqual(objectIds?.count, 4)
-            XCTAssertNil(error)
-            insertManyEx.fulfill()
-        }
-        wait(for: [insertManyEx], timeout: 4.0)
-
-        let updateEx1 = expectation(description: "Update one document")
-        collection.updateManyDocuments(document, document2) { (updateResult, error) in
-            XCTAssertEqual(updateResult?.matchedCount, 1)
-            XCTAssertEqual(updateResult?.modifiedCount, 1)
-            XCTAssertNil(updateResult?.objectId)
-            XCTAssertNil(error)
-            updateEx1.fulfill()
-        }
-        wait(for: [updateEx1], timeout: 4.0)
-
-        let updateEx2 = expectation(description: "Update one document")
-        collection.updateManyDocuments(document5, document2, true) { (updateResult, error) in
-            XCTAssertEqual(updateResult?.matchedCount, 0)
-            XCTAssertEqual(updateResult?.modifiedCount, 0)
-            XCTAssertNotNil(updateResult?.objectId)
-            XCTAssertNil(error)
-            updateEx2.fulfill()
-        }
-        wait(for: [updateEx2], timeout: 4.0)
-    }
-
-    func testMongoDeleteOne() {
-        let collection = setupMongoCollection("Dogs")
-        let document: Document = ["name": "fido", "breed": "cane corso"]
-        let document2: Document = ["name": "rex", "breed": "cane corso"]
-
-        let deleteEx1 = expectation(description: "Delete 0 documents")
-        collection.deleteOneDocument(document) { (count, error) in
-            XCTAssertEqual(count, 0)
-            XCTAssertNil(error)
-            deleteEx1.fulfill()
-        }
-        wait(for: [deleteEx1], timeout: 4.0)
-
-        let insertManyEx = expectation(description: "Insert many documents")
-        collection.insertMany([document, document2]) { (objectIds, error) in
-            XCTAssertNotNil(objectIds)
-            XCTAssertEqual(objectIds?.count, 2)
-            XCTAssertNil(error)
-            insertManyEx.fulfill()
-        }
-        wait(for: [insertManyEx], timeout: 4.0)
-
-        let deleteEx2 = expectation(description: "Delete one document")
-        collection.deleteOneDocument(document) { (count, error) in
-            XCTAssertEqual(count, 1)
-            XCTAssertNil(error)
-            deleteEx2.fulfill()
-        }
-        wait(for: [deleteEx2], timeout: 4.0)
-    }
-
-    func testMongoDeleteMany() {
-        let collection = setupMongoCollection("Dogs")
-        let document: Document = ["name": "fido", "breed": "cane corso"]
-        let document2: Document = ["name": "rex", "breed": "cane corso"]
-
-        let deleteEx1 = expectation(description: "Delete 0 documents")
-        collection.deleteManyDocuments(document) { (count, error) in
-            XCTAssertEqual(count, 0)
-            XCTAssertNil(error)
-            deleteEx1.fulfill()
-        }
-        wait(for: [deleteEx1], timeout: 4.0)
-
-        let insertManyEx = expectation(description: "Insert many documents")
-        collection.insertMany([document, document2]) { (objectIds, error) in
-            XCTAssertNotNil(objectIds)
-            XCTAssertEqual(objectIds?.count, 2)
-            XCTAssertNil(error)
-            insertManyEx.fulfill()
-        }
-        wait(for: [insertManyEx], timeout: 4.0)
-
-        let deleteEx2 = expectation(description: "Delete one document")
-        collection.deleteManyDocuments(["breed": "cane corso"]) { (count, error) in
-            XCTAssertEqual(count, 2)
-            XCTAssertNil(error)
-            deleteEx2.fulfill()
-        }
-        wait(for: [deleteEx2], timeout: 4.0)
-    }
-
-    func testMongoCountAndAggregate() {
-        let collection = setupMongoCollection("Dogs")
-        let document: Document = ["name": "fido", "breed": "cane corso"]
-
-        let insertManyEx1 = expectation(description: "Insert many documents")
-        collection.insertMany([document]) { (objectIds, error) in
-            XCTAssertNotNil(objectIds)
-            XCTAssertEqual(objectIds?.count, 1)
-            XCTAssertNil(error)
-            insertManyEx1.fulfill()
-        }
-        wait(for: [insertManyEx1], timeout: 4.0)
-
-        collection.aggregate([["$match": ["name": "fido"]], ["$group": ["_id": "$name"]]]) { (result, error) in
-            XCTAssertNotNil(result)
-            XCTAssertNil(error)
-        }
-
-        let countEx1 = expectation(description: "Count documents")
-        collection.count(document) { (count, error) in
-            XCTAssertNotNil(count)
-            XCTAssertNil(error)
-            countEx1.fulfill()
-        }
-        wait(for: [countEx1], timeout: 4.0)
-
-        let countEx2 = expectation(description: "Count documents")
-        collection.count(document, 1) { (count, error) in
-            XCTAssertNotNil(count)
-            XCTAssertNil(error)
-            XCTAssertEqual(count, 1)
-            countEx2.fulfill()
-        }
-        wait(for: [countEx2], timeout: 4.0)
-    }
-
 }

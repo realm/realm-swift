@@ -23,6 +23,9 @@ import Realm
 public protocol BSON: Equatable {
 }
 
+extension NSNull: BSON {
+}
+
 extension Int: BSON {
 }
 
@@ -54,24 +57,24 @@ extension ObjectId: BSON {
 }
 
 /// A Dictionary object representing a `BSON` document.
-public typealias Document = Dictionary<String, AnyBSON>
+public typealias Document = Dictionary<String, AnyBSON?>
 
-extension Dictionary: BSON where Key == String, Value == AnyBSON {
+extension Dictionary: BSON where Key == String, Value == AnyBSON? {
 }
 
-extension Array: BSON where Element == AnyBSON {
+extension Array: BSON where Element == AnyBSON? {
 }
 
 extension NSRegularExpression: BSON {
 }
 
-/// An object representing a `BSON` max key type.
+/// MaxKey will always be the greatest value when comparing to other BSON types
 public typealias MaxKey = RLMMaxKey
 
 extension MaxKey: BSON {
 }
 
-/// An object representing a `BSON` min key type.
+/// MinKey will always be the smallest value when comparing to other BSON types
 public typealias MinKey = RLMMinKey
 
 extension MinKey: BSON {
@@ -88,10 +91,10 @@ public enum AnyBSON: BSON {
     case string(String)
 
     /// A BSON document.
-    case document(Document)
+    indirect case document(Document)
 
     /// A BSON array.
-    indirect case array([AnyBSON])
+    indirect case array([AnyBSON?])
 
     /// A BSON binary.
     case binary(Data)
@@ -106,9 +109,6 @@ public enum AnyBSON: BSON {
     /// A BSON UTC datetime.
     /// - SeeAlso: https://docs.mongodb.com/manual/reference/bson-types/#date
     case datetime(Date)
-
-    /// A BSON null.
-    case null
 
     /// A BSON regular expression.
     case regex(NSRegularExpression)
@@ -144,8 +144,8 @@ public enum AnyBSON: BSON {
     }
 
     /// Initialize a `BSON` from a type `T`. If this is not a valid `BSON` type,
-    /// if will be consider `BSON` nil.
-    public init<T: BSON>(_ bson: T) {
+    /// if will be considered `BSON` null type and will return `nil`.
+    public init?<T: BSON>(_ bson: T) {
         switch bson {
         case let val as Int:
             self = .int64(Int64(val))
@@ -167,7 +167,7 @@ public enum AnyBSON: BSON {
             self = .objectId(val)
         case let val as Document:
             self = .document(val)
-        case let val as Array<AnyBSON>:
+        case let val as Array<AnyBSON?>:
             self = .array(val)
         case let val as Bool:
             self = .bool(val)
@@ -178,7 +178,7 @@ public enum AnyBSON: BSON {
         case let val as NSRegularExpression:
             self = .regex(val)
         default:
-            self = .null
+            return nil
         }
     }
 
@@ -223,7 +223,7 @@ public enum AnyBSON: BSON {
     }
 
     /// If this `BSON` is an `.array`, return it as an `[BSON]`. Otherwise, return nil.
-    public var arrayValue: [AnyBSON]? {
+    public var arrayValue: [AnyBSON?]? {
         guard case let .array(a) = self else {
             return nil
         }
@@ -432,13 +432,13 @@ extension AnyBSON: ExpressibleByIntegerLiteral {
 }
 
 extension AnyBSON: ExpressibleByDictionaryLiteral {
-    public init(dictionaryLiteral elements: (String, AnyBSON)...) {
+    public init(dictionaryLiteral elements: (String, AnyBSON?)...) {
         self = .document(Document(uniqueKeysWithValues: elements))
     }
 }
 
 extension AnyBSON: ExpressibleByArrayLiteral {
-    public init(arrayLiteral elements: AnyBSON...) {
+    public init(arrayLiteral elements: AnyBSON?...) {
         self = .array(elements)
     }
 }

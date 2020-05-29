@@ -20,17 +20,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMNetworkRequestOptions : NSObject
-@property (nonatomic, copy, nullable) NSString *authorizationHeaderName;
-@property (nonatomic, copy, nullable) NSDictionary<NSString *, NSString *> *customHeaders;
-@property (nullable, nonatomic, copy) NSDictionary<NSString *, NSURL *> *pinnedCertificatePaths;
-@end
-
+/// Allowed HTTP methods to be used with `RLMNetworkTransport`.
 typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
+    /// GET is used to request data from a specified resource.
     RLMHTTPMethodGET    = 0,
+    /// POST is used to send data to a server to create/update a resource.
     RLMHTTPMethodPOST   = 1,
+    /// PATCH is used to send data to a server to update a resource.
     RLMHTTPMethodPATCH  = 2,
+    /// PUT is used to send data to a server to create/update a resource.
     RLMHTTPMethodPUT    = 3,
+    /// The DELETE method deletes the specified resource.
     RLMHTTPMethodDELETE = 4
 };
 
@@ -72,6 +72,7 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
 
 @end
 
+/// A block for receiving an `RLMResponse` from the `RLMNetworkTransport`.
 typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
 
 /// Transporting protocol for foreign interfaces. Allows for custom
@@ -89,8 +90,16 @@ typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
 
 @end
 
+/// Transporting protocol for foreign interfaces. Allows for custom
+/// request/response handling.
 @interface RLMNetworkTransport : NSObject<RLMNetworkTransport>
 
+/**
+ Sends a request to a given endpoint.
+
+ @param request The request to send.
+ @param completionBlock A callback invoked on completion of the request.
+*/
 - (void)sendRequestToServer:(RLMRequest *) request
                  completion:(RLMNetworkTransportCompletionBlock)completionBlock;
 

@@ -343,7 +343,7 @@
     }];
     XCTAssertFalse(fileExists());
     assertNoCachedRealm();
-    [self waitForExpectationsWithTimeout:1 handler:nil];
+    [self waitForExpectationsWithTimeout:5 handler:nil];
     XCTAssertFalse(fileExists());
     assertNoCachedRealm();
 

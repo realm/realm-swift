@@ -233,7 +233,7 @@ public struct SyncConfiguration {
     internal init(config: RLMSyncConfiguration) {
         self.user = config.user
         self.stopPolicy = config.stopPolicy
-        self.partitionValue = ObjectiveCSupport.convert(object: config.partitionValue) ?? .null
+        self.partitionValue = ObjectiveCSupport.convert(object: config.partitionValue)!
         self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
     }
 
@@ -283,6 +283,20 @@ extension SyncUser {
         syncConfig.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         config.syncConfiguration = syncConfig
         return ObjectiveCSupport.convert(object: config)
+    }
+
+    /**
+     The custom data of the user.
+     This is configured in your MongoDB Realm App.
+    */
+    public var customData: Document? {
+        guard let rlmCustomData = self.__customData as RLMBSON?,
+            let anyBSON = ObjectiveCSupport.convert(object: rlmCustomData),
+            case let .document(customData) = anyBSON else {
+            return nil
+        }
+
+        return customData
     }
 }
 

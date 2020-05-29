@@ -31,13 +31,20 @@ def run_mongod
 end
 
 def clean_mongo_test_data
-    puts `#{MONGO_DIR}/bin/mongo --port 26000 test_data --eval "db.dropDatabase()"`
+    puts '🧹 cleaning mongo test data'
+    begin
+        puts `#{MONGO_DIR}/bin/mongo --port 26000 test_data --eval "db.dropDatabase()"`
+    rescue => exception
+    end
 end
 
 def shutdown_mongod
-    puts 'shutting down mongod'
-    `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.adminCommand({replSetStepDown: 0, secondaryCatchUpPeriodSecs: 0, force: true})"`
-    `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.shutdownServer({force: true})"`
+    puts '🍂 shutting down mongod'
+    begin
+        puts `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.adminCommand({replSetStepDown: 0, secondaryCatchUpPeriodSecs: 0, force: true})"`
+        puts `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.shutdownServer({force: true})"`
+    rescue => exception
+    end
 end
 
 def run_stitch
@@ -83,7 +90,6 @@ end
 def shutdown_stitch
     puts 'shutting down baas'
     `pkill -f stitch`
-    `pkill -f ruby`
 end
 
 def start

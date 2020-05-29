@@ -87,7 +87,7 @@ class SwiftBSONTests: XCTestCase {
     }
 
     func testDocumentRoundTrip() throws {
-        testBSONRoundTrip([
+        let swiftDocument: Document =  [
             "string": "test string",
             "true": true,
             "false": false,
@@ -105,12 +105,30 @@ class SwiftBSONTests: XCTestCase {
             "regex": .regex(try NSRegularExpression(pattern: "^abc", options: [])),
             "array1": [1, 2],
             "array2": ["string1", "string2"],
-            "null": .null
-        ])
+            "null": nil
+        ]
+
+        let rlmBSON: RLMBSON? = ObjectiveCSupport.convert(object: .document(swiftDocument))
+        guard let dictionary = rlmBSON as? NSDictionary else {
+            XCTFail("RLMBSON was not of type NSDictionary")
+            return
+        }
+
+        XCTAssertEqual(dictionary.count, swiftDocument.count)
+        dictionary.forEach { (arg0) in
+            guard let key = arg0.key as? String,
+                let value = arg0.value as? RLMBSON else {
+                    XCTFail("RLMBSON Document has illegal types")
+                return
+            }
+            XCTAssertEqual(swiftDocument[key], ObjectiveCSupport.convert(object: value))
+        }
+        let bson: AnyBSON? = ObjectiveCSupport.convert(object: rlmBSON)
+        XCTAssertEqual(bson?.value(), swiftDocument)
     }
 
     func testArrayRoundTrip() throws {
-        testBSONRoundTrip([
+        let swiftArray: Array<AnyBSON?> = [
             "test string",
             true,
             false,
@@ -128,7 +146,24 @@ class SwiftBSONTests: XCTestCase {
             .regex(try NSRegularExpression(pattern: "^abc", options: [])),
             [1, 2],
             ["string1", "string2"],
-            .null
-        ])
+            nil
+        ]
+
+        let rlmBSON: RLMBSON? = ObjectiveCSupport.convert(object: .array(swiftArray))
+        guard let array = rlmBSON as? NSArray else {
+            XCTFail("RLMBSON was not of type NSDictionary")
+            return
+        }
+
+        XCTAssertEqual(array.count, swiftArray.count)
+        for idx in 0..<array.count {
+            guard let value = array[idx] as? RLMBSON else {
+                    XCTFail("RLMBSON Document has illegal types")
+                return
+            }
+            XCTAssertEqual(swiftArray[idx], ObjectiveCSupport.convert(object: value))
+        }
+        let bson: AnyBSON? = ObjectiveCSupport.convert(object: rlmBSON)
+        XCTAssertEqual(bson?.value(), swiftArray)
     }
 }

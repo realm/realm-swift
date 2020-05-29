@@ -46,11 +46,11 @@ public extension ObjectiveCSupport {
         case .objectId(let val):
             return val as RLMObjectId
         case .document(let val):
-            let keyValues = val.map { (NSString(string: $0), convert(object: $1)) }
-            let convertedDictionary = Dictionary(uniqueKeysWithValues: keyValues)
-            return convertedDictionary as NSDictionary
+            return val.reduce(into: Dictionary<String, RLMBSON?>()) { (result: inout [String: RLMBSON?], kvp) in
+                result[kvp.key] = convert(object: kvp.value) ?? NSNull()
+            } as NSDictionary
         case .array(let val):
-            return val.map {convert(object: $0)} as NSArray
+            return val.map(convert) as NSArray
         case .maxKey:
             return MaxKey()
         case .minKey:
@@ -137,25 +137,14 @@ public extension ObjectiveCSupport {
             guard let val = bson as? Dictionary<String, RLMBSON?> else {
                 return nil
             }
-            let keyValues = val.map { (key: String, value: RLMBSON?) -> (String, AnyBSON) in
-                guard let val = convert(object: value) else {
-                    return (key, .null)
-                }
-                return (key, val)
-            }
-            let convertedDictionary = Dictionary(uniqueKeysWithValues: keyValues)
-            return .document(convertedDictionary)
+            return .document(val.reduce(into: Dictionary<String, AnyBSON?>()) { (result: inout [String: AnyBSON?], kvp) in
+                result[kvp.key] = convert(object: kvp.value)
+            })
         case .array:
             guard let val = bson as? Array<RLMBSON?> else {
                 return nil
             }
-            let convertedArray = val.map { (rlmBSON) -> AnyBSON in
-                guard let val = convert(object: rlmBSON) else {
-                    return .null
-                }
-                return val
-            }
-            return .array(convertedArray)
+            return .array(val.map(convert))
         default:
             return nil
         }

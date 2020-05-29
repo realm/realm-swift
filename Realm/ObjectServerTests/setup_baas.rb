@@ -94,19 +94,20 @@ def setup_stitch
 
     if `which node`.empty?
         puts "downloading node 🚀"
-        `curl -O "https://nodejs.org/dist/v8.11.2/node-v$node_version-darwin-x64.tar.gz" | tar xvfz -C #{STITCH_DIR}/node-v8.11.2-darwin-x64.tar.gz`
+        puts `cd #{STITCH_DIR} && curl -O "https://nodejs.org/dist/v#{NODE_VERSION}/node-v#{NODE_VERSION}-darwin-x64.tar.gz" | tar xzf node-v#{NODE_VERSION}-darwin-x64.tar.gz`
         exports << "export PATH=\"#{STITCH_DIR}/node-v8.11.2-darwin-x64/bin/:$PATH\""
     end
 
     if `which yarn`.empty?
         `rm -rf "$HOME/.yarn"`
-        `curl -o- -L https://yarnpkg.com/install.sh | bash`
+        `export PATH=\"#{STITCH_DIR}/node-v#{NODE_VERSION}-darwin-x64/bin/:$PATH\" && curl -o- -L https://yarnpkg.com/install.sh | bash`
         exports << "export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\""
     end
 
     puts 'building transpiler'
-    puts `export PATH=\"$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH\" \
-        && cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
+    puts exports
+    puts `#{exports.length() == 0 ? "" : exports.join(' && ') + ' &&'} \
+        cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
 
     if !Dir.exists?('go')
         puts 'downloading go'

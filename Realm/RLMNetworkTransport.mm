@@ -208,6 +208,3 @@ didCompleteWithError:(NSError *)error
 }
 
 @end
-
-@implementation RLMNetworkRequestOptions
-@end
