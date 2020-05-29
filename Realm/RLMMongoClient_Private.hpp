@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
 #import <Realm/RLMMongoClient.h>
 #import "sync/remote_mongo_client.hpp"
 
