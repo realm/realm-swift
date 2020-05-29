@@ -1030,7 +1030,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(app.currentUser()?.customData?["favourite_colour"], .string("green"))
         XCTAssertEqual(app.currentUser()?.customData?["apples"], .int64(10))
     }
-    
+
     // MARK: - Mongo Client
 
     func testMongoClient() {
@@ -1074,7 +1074,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(findOptions1.projectedBSON, ["name": 1])
         XCTAssertEqual(findOptions1.sortBSON, ["_id": 1])
         XCTAssertEqual(findOptions2.projectedBSON, ["names": ["fido", "bob", "rex"]])
-        
+
         let findModifyOptions = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
         XCTAssertEqual(findModifyOptions.projectedBSON, ["name": 1])
         XCTAssertEqual(findModifyOptions.sortBSON, ["_id": 1])
