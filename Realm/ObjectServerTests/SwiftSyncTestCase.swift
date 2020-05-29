@@ -19,62 +19,11 @@
 import XCTest
 import RealmSwift
 
-class SwiftSyncObject: Object {
-    @objc dynamic var stringProp: String = ""
-}
-
-class SwiftHugeSyncObject: Object {
-    @objc dynamic var dataProp: NSData?
-
-    required init() {
-        super.init()
-        let size = 1000000
-        let ptr = malloc(size)
-        dataProp = NSData(bytes: ptr, length: size)
-        free(ptr)
-    }
-
-    required init(realm: RLMRealm, schema: RLMObjectSchema) {
-        fatalError("init(realm:schema:) has not been implemented")
-    }
-    required init(value: Any, schema: RLMSchema) {
-        fatalError("init(value:schema:) has not been implemented")
-    }
-}
-
-class SwiftPartialSyncObjectA: Object {
-    @objc dynamic var number: Int = 0
-    @objc dynamic var string: String = ""
-
-    convenience init(number: Int, string: String) {
-        self.init()
-        self.number = number
-        self.string = string
-    }
-}
-
-class SwiftPartialSyncObjectB: Object {
-    @objc dynamic var number: Int = 0
-    @objc dynamic var firstString: String = ""
-    @objc dynamic var secondString: String = ""
-
-    convenience init(number: Int, firstString: String, secondString: String) {
-        self.init()
-        self.number = number
-        self.firstString = firstString
-        self.secondString = secondString
-    }
-}
-
 // MARK: Test case
 
 class SwiftSyncTestCase: RLMSyncTestCase {
 
     var task: Process?
-
-    let authURL: URL = URL(string: "http://127.0.0.1:9080")!
-    let slowConnectAuthURL: URL = URL(string: "http://127.0.0.1:9083")!
-    let realmURL: URL = URL(string: "realm://127.0.0.1:9080/~/testBasicSync")!
 
     /// For testing, make a unique Realm URL of the form "realm://127.0.0.1:9080/~/X",
     /// where X is either a custom string passed as an argument, or an UUID string.
@@ -86,50 +35,58 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
 
-    func basicCredentials(register: Bool = true,
-                          usernameSuffix: String = "",
-                          file: StaticString = #file,
-                          line: UInt = #line) -> AppCredentials {
-        let filename = URL(fileURLWithPath: String(describing: file)).deletingPathExtension().lastPathComponent
-        return .init(username: "\(filename)\(line)\(usernameSuffix)", password: "a")
+    func randomString(_ length: Int) -> String {
+      let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+      return String((0..<length).map { _ in letters.randomElement()! })
     }
 
-    func synchronouslyOpenRealm(url: URL, user: SyncUser, file: StaticString = #file, line: UInt = #line) throws -> Realm {
-        let config = user.configuration(realmURL: url, fullSynchronization: true)
+    func basicCredentials(usernameSuffix: String = "",
+                          file: StaticString = #file,
+                          line: UInt = #line) -> AppCredentials {
+        let username = "\(randomString(10))\(usernameSuffix)"
+        let password = "abcdef"
+        let credentials = AppCredentials(username: username, password: password)
+        let ex = expectation(description: "Should register in the user properly")
+        app.usernamePasswordProviderClient().registerEmail(username, password: password, completion: { error in
+            XCTAssertNil(error)
+            ex.fulfill()
+        })
+        waitForExpectations(timeout: 4, handler: nil)
+        return credentials
+    }
+
+    func synchronouslyOpenRealm(partitionValue: String,
+                                user: SyncUser,
+                                file: StaticString = #file,
+                                line: UInt = #line) throws -> Realm {
+        let config = user.configuration(partitionValue: partitionValue)
         return try synchronouslyOpenRealm(configuration: config)
     }
 
-    func synchronouslyOpenRealm(configuration: Realm.Configuration, file: StaticString = #file, line: UInt = #line) throws -> Realm {
-        let semaphore = DispatchSemaphore(value: 0)
-        let basicBlock = { (error: Error?) in
-            if let error = error {
-                let process = self.isParent ? "parent" : "child"
-                XCTFail("Received an asynchronous error: \(error) (process: \(process))", file: file, line: line)
-            }
-            semaphore.signal()
-        }
-        SyncManager.shared.setSessionCompletionNotifier(basicBlock)
-        let realm = try Realm(configuration: configuration)
-        let result = semaphore.wait(timeout: .now() + DispatchTimeInterval.seconds(20))
-        SyncManager.shared.setSessionCompletionNotifier(nil)
-        XCTAssertEqual(result, .success)
-        return realm
+    func synchronouslyOpenRealm(configuration: Realm.Configuration,
+                                file: StaticString = #file,
+                                line: UInt = #line) throws -> Realm {
+        return try Realm(configuration: configuration)
     }
 
-    func immediatelyOpenRealm(url: URL, user: SyncUser) throws -> Realm {
-        return try Realm(configuration: user.configuration(realmURL: url, fullSynchronization: true))
+    func immediatelyOpenRealm(partitionValue: String, user: SyncUser) throws -> Realm {
+        return try Realm(configuration: user.configuration(partitionValue: partitionValue))
     }
 
     func synchronouslyLogInUser(for credentials: AppCredentials,
-                                server url: URL,
                                 file: StaticString = #file,
                                 line: UInt = #line) throws -> SyncUser {
         let process = isParent ? "parent" : "child"
         var theUser: SyncUser?
         var theError: Error?
         let ex = expectation(description: "Should log in the user properly")
-        // FIXME: [realmapp] This should use the new login
-        fatalError("test not implemented")
+
+        self.app.login(withCredential: credentials, completion: { user, error in
+            theUser = user
+            theError = error
+            ex.fulfill()
+        })
+
         waitForExpectations(timeout: 10, handler: nil)
         XCTAssertNotNil(theUser, file: file, line: line)
         XCTAssertEqual(theUser?.state, .loggedIn,
@@ -138,6 +95,25 @@ class SwiftSyncTestCase: RLMSyncTestCase {
                        file: file,
                        line: line)
         return theUser!
+    }
+
+    func synchronouslyLogOutUser(_ user: SyncUser,
+                                 file: StaticString = #file,
+                                 line: UInt = #line) throws {
+        var theError: Error?
+        let ex = expectation(description: "Should log out the user properly")
+
+        self.app.logOut(user) { (error) in
+            theError = error
+            ex.fulfill()
+        }
+
+        waitForExpectations(timeout: 10, handler: nil)
+        XCTAssertEqual(user.state, .loggedOut,
+                       "User should have been valid, but wasn't. (error: "
+                        + "\(theError?.localizedDescription ?? "nil"))",
+            file: file,
+            line: line)
     }
 
     func waitForUploads(for realm: Realm) {

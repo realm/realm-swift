@@ -1,6 +1,58 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
+* None.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* MongoDB Realm: 71f9b52e2e or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 11.4.1.
+
+### Internal
+Upgraded realm-core from ? to ?
+Upgraded realm-sync from ? to ?
+
+10.0.0-alpha.5 Release notes (2020-05-15)
+=============================================================
+### Enhancements
+* Add `-[RLMSyncUser customData]`/`SyncUser.customData`.  Custom data is a can be configured in your MongoDB Realm App.
+* Add `-[RLMApp callFunctionNamed:arguments]`/`RealmApp.functions`. This is the entry point for calling Remote MongoDB Realm functions.
+ Functions allow you to define and execute server-side logic for your application. Functions are written in modern JavaScript (ES6+) and execute in a 
+ serverless manner. When you call a function, you can dynamically access components of the current application as well as 
+ information about the request to execute the function and the logged in user that sent the request.
+ * Change `[RLMSyncUser configurationWithPartitionValue:]`/`SyncUser.configuration(with:)` to accept all BSON types.
+ Partition values can currently be of types String, Int, or ObjectId. 
+Opening a realm by partition value is the equivalent of previously opening a realm by URL. In this case,
+partitions are meant to be more closely associated with your data. E.g., if you are running a `Dog` kennel, and have a field
+`breed` that acts as your partition key, you could open up realms based on the breed of the dogs. 
+
+### Breaking Changes
+* We no longer support Realm Cloud (legacy), but instead the new "MongoDB Realm" Cloud. MongoDB Realm is a serverless platform
+that enables developers to quickly build applications without having to set up server infrastructure.
+MongoDB Realm is built on top of MongoDB Atlas, automatically integrating the connection to your database.
+
+### Compatibility
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* MongoDB Realm: 71f9b52e2e or later.
+* APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
+* Carthage release for Swift is built with Xcode 11.4.1.
+
+### Internal
+* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.8
+* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.11
+
+10.0.0-alpha.0 Release notes (2020-04-22)
+=============================================================
+### Enhancements
+* Add support for next generation sync. Support for syncing to MongoDB instead of Realm Object Server.
+Applications must be created at realm.mongodb.com
 * The memory mapping scheme for Realm files has changed to better support
   opening very large files.
 * Add support for the ObjectId data type. This is an automatically-generated
@@ -12,11 +64,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Add support for embedded objects. Embedded objects are objects which are
   owned by a single parent object, and are deleted when that parent object is
   deleted. They are defined by subclassing `EmbeddedObject` /
-  `RLMEmbeddedObject` rather than `Object` / `RLMObject`.
-
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-js/issues/????), since v?.?.?)
-* None.
+	`RLMEmbeddedObject` rather than `Object` / `RLMObject`.
 
 ### Breaking Changes
 * Remove support for Query-based sync, including the configuration parameters
@@ -31,16 +79,17 @@ x.y.z Release notes (yyyy-MM-dd)
   could be created with duplicate primary keys during a migration as long as
   the property was changed to a unique value before the end of the migration,
   but now a unique value must be supplied when creating the object.
+  * Remove support for Realm Object Server.
 
 ### Compatibility
-* File format: Generates Realms with format v9 (Reads and upgrades all previous formats)
-* Realm Object Server: 3.21.0 or later.
-* APIs are backwards compatible with all previous releases in the 4.x.y series.
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* MongoDB Realm: 71f9b52e2e or later.
+* APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
 * Carthage release for Swift is built with Xcode 11.4.1.
 
 ### Internal
-* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.3
-* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.5
+* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.6
+* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.8
 
 5.0.0-beta.3 Release notes (2020-02-26)
 =============================================================

@@ -20,15 +20,15 @@ import Realm
 import Realm.Private
 
 /**
- An object representing a Realm Object Server user.
+ An object representing a MongoDB Realm user.
 
  - see: `RLMSyncUser`
  */
 public typealias SyncUser = RLMSyncUser
 
 /**
- An immutable data object representing information retrieved from the Realm Object
- Server about a particular user.
+ An immutable data object representing information retrieved from MongoDB
+ Realm about a particular user.
 
  - see: `RLMSyncUserInfo`
  */
@@ -42,19 +42,12 @@ public typealias SyncUserInfo = RLMSyncUserInfo
 public typealias SyncUserAccountInfo = RLMSyncUserAccountInfo
 
 /**
- A singleton which configures and manages the Realm Object Server synchronization-related
+ A singleton which configures and manages MongoDB Realm synchronization-related
  functionality.
 
  - see: `RLMSyncManager`
  */
 public typealias SyncManager = RLMSyncManager
-
-extension SyncManager {
-    /// The sole instance of the singleton.
-    public static var shared: SyncManager {
-        return __shared()
-    }
-}
 
 /**
  Options for configuring timeouts and intervals in the sync client.
@@ -170,7 +163,7 @@ public typealias SyncLogLevel = RLMSyncLogLevel
 
 /**
  A data type whose values represent different authentication providers that can be used with
- the Realm Object Server.
+ MongoDB Realm.
 
  - see: `RLMIdentityProvider`
  */
@@ -179,7 +172,7 @@ public typealias Provider = RLMIdentityProvider
 /**
  * How the Realm client should validate the identity of the server for secure connections.
  *
- * By default, when connecting to the Realm Object Server over HTTPS, Realm will
+ * By default, when connecting to MongoDB Realm over HTTPS, Realm will
  * validate the server's HTTPS certificate using the system trust store and root
  * certificates. For additional protection against man-in-the-middle (MITM)
  * attacks and similar vulnerabilities, you can pin a certificate or public key,
@@ -210,45 +203,24 @@ public enum ServerValidationPolicy {
 
 /**
  A `SyncConfiguration` represents configuration parameters for Realms intended to sync with
- a Realm Object Server.
+ MongoDB Realm.
  */
 public struct SyncConfiguration {
     /// The `SyncUser` who owns the Realm that this configuration should open.
     public let user: SyncUser
 
     /**
-     The URL of the Realm on the Realm Object Server that this configuration should open.
-
-     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
-                `.realm`, `.realm.lock` or `.realm.management`.
+     The value this Realm is partitioned on. The partition key is a property defined in
+     MongoDB Realm. All classes with a property with this value will be synchronized to the
+     Realm.
      */
-    public let realmURL: URL
+    public let partitionValue: AnyBSON
 
     /**
      A policy that determines what should happen when all references to Realms opened by this
      configuration go out of scope.
      */
     internal let stopPolicy: RLMSyncStopPolicy
-
-    /**
-     How the SSL certificate of the Realm Object Server should be validated.
-     */
-    public let serverValidationPolicy: ServerValidationPolicy
-
-    /// :nodoc:
-    @available(*, unavailable, message: "Use serverValidationPolicy instead")
-    public var enableSSLValidation: Bool {
-        fatalError()
-    }
-
-    /**
-     The prefix that is prepended to the path in the HTTP request
-     that initiates a sync connection. The value specified must match with the server's expectation.
-     Changing the value of `urlPrefix` should be matched with a corresponding
-     change of the server's configuration.
-     If no value is specified here then the default `/realm-sync` path is used.
-     */
-    public let urlPrefix: String?
 
     /**
      By default, Realm.asyncOpen() swallows non-fatal connection errors such as
@@ -260,82 +232,21 @@ public struct SyncConfiguration {
 
     internal init(config: RLMSyncConfiguration) {
         self.user = config.user
-        self.realmURL = config.realmURL
         self.stopPolicy = config.stopPolicy
-        if let certificateURL = config.pinnedCertificateURL {
-            self.serverValidationPolicy = .pinCertificate(path: certificateURL)
-        } else {
-            self.serverValidationPolicy = config.enableSSLValidation ? .system : .none
-        }
-        self.urlPrefix = config.urlPrefix
+        self.partitionValue = ObjectiveCSupport.convert(object: config.partitionValue)!
         self.cancelAsyncOpenOnNonFatalErrors = config.cancelAsyncOpenOnNonFatalErrors
     }
 
     func asConfig() -> RLMSyncConfiguration {
-        var validateSSL = true
-        var certificate: URL?
-        switch serverValidationPolicy {
-        case .none:
-            validateSSL = false
-        case .system:
-            break
-        case .pinCertificate(let path):
-            certificate = path
-        }
-        let c = RLMSyncConfiguration(user: user, realmURL: realmURL,
-                                     urlPrefix: urlPrefix,
-                                     stopPolicy: stopPolicy,
-                                     enableSSLValidation: validateSSL,
-                                     certificatePath: certificate)
+        let c = RLMSyncConfiguration(user: user,
+                                     partitionValue: ObjectiveCSupport.convert(object: partitionValue)!,
+                                     stopPolicy: stopPolicy)
         c.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
         return c
-    }
-
-    /// :nodoc:
-    @available(*, unavailable, message: "Use SyncUser.configuration() instead")
-    public init(user: SyncUser, realmURL: URL, enableSSLValidation: Bool = true, isPartial: Bool = false, urlPrefix: String? = nil) {
-        fatalError()
-    }
-
-    /// :nodoc:
-    @available(*, unavailable, message: "Use SyncUser.configuration() instead")
-    public static func automatic() -> Realm.Configuration {
-        fatalError()
-    }
-
-    /// :nodoc:
-    @available(*, unavailable, message: "Use SyncUser.configuration() instead")
-    public static func automatic(user: SyncUser) -> Realm.Configuration {
-        fatalError()
     }
 }
 
 extension SyncUser {
-    /**
-     An optional error handler which can be set to notify the host application when
-     the user encounters an error.
-
-     - note: Check for `.invalidAccessToken` to see if the user has been remotely logged
-             out because its refresh token expired, or because the third party authentication
-             service providing the user's identity has logged the user out.
-
-     - warning: Regardless of whether an error handler is defined, certain user errors
-                will automatically cause the user to enter the logged out state.
-     */
-    @nonobjc public var errorHandler: ((SyncUser, SyncAuthError) -> Void)? {
-        get {
-            return __errorHandler
-        }
-        set {
-            if let newValue = newValue {
-                __errorHandler = { (user, error) in
-                    newValue(user, error as! SyncAuthError)
-                }
-            } else {
-                __errorHandler = nil
-            }
-        }
-    }
 
     /**
      Create a sync configuration instance.
@@ -346,36 +257,17 @@ extension SyncUser {
      `enableSSLValidation` is true by default. It can be disabled for debugging
      purposes.
 
-     - warning: The URL must be absolute (e.g. `realms://example.com/~/foo`), and cannot end with
-     `.realm`, `.realm.lock` or `.realm.management`.
-
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    public func configuration(realmURL: URL? = nil,
-                              enableSSLValidation: Bool, urlPrefix: String? = nil) -> Realm.Configuration {
-        let config = self.__configuration(with: realmURL,
-                                          enableSSLValidation: enableSSLValidation,
-                                          urlPrefix: urlPrefix)
+    public func configuration<T: BSON>(partitionValue: T) -> Realm.Configuration {
+        let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
         return ObjectiveCSupport.convert(object: config)
     }
 
     /**
      Create a sync configuration instance.
 
-     - parameter realmURL: The URL to connect to. If not set, the default Realm
-     derived from the authentication URL is used. The URL must be absolute (e.g.
-     `realms://example.com/~/foo`), and cannot end with `.realm`, `.realm.lock`
-     or `.realm.management`.
-     - parameter serverValidationPolicy: How the SSL certificate of the Realm Object
-     Server should be validated. By default the system SSL validation is used,
-     but it can be set to `.pinCertificate` to pin a specific SSL certificate,
-     or `.none` for debugging.
-     - parameter fullSynchronization: Whether this Realm should be a fully
-     synchronized or a query-based Realm.
-     - parameter urlPrefix: The prefix that is prepended to the path in the HTTP
-     request that initiates a sync connection. The value specified must match
-     with the server's expectation, and this parameter only needs to be set if
-     you have changed the configuration of the server.
+     - parameter partitionValue: FIXME
      - parameter cancelAsyncOpenOnNonFatalErrors: By default, Realm.asyncOpen()
      swallows non-fatal connection errors such as a connection attempt timing
      out and simply retries until it succeeds. If this is set to `true`, instead
@@ -384,24 +276,27 @@ extension SyncUser {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    public func configuration(realmURL: URL? = nil, fullSynchronization: Bool = false,
-                              serverValidationPolicy: ServerValidationPolicy = .system,
-                              urlPrefix: String? = nil,
-                              cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
-        let config = self.__configuration(with: realmURL)
+    public func configuration<T: BSON>(partitionValue: T,
+                                       cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
+        let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
         let syncConfig = config.syncConfiguration!
-        syncConfig.urlPrefix = urlPrefix
         syncConfig.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
-        switch serverValidationPolicy {
-        case .none:
-            syncConfig.enableSSLValidation = false
-        case .system:
-            break
-        case .pinCertificate(let path):
-            syncConfig.pinnedCertificateURL = path
-        }
         config.syncConfiguration = syncConfig
         return ObjectiveCSupport.convert(object: config)
+    }
+
+    /**
+     The custom data of the user.
+     This is configured in your MongoDB Realm App.
+    */
+    public var customData: Document? {
+        guard let rlmCustomData = self.__customData as RLMBSON?,
+            let anyBSON = ObjectiveCSupport.convert(object: rlmCustomData),
+            case let .document(customData) = anyBSON else {
+            return nil
+        }
+
+        return customData
     }
 }
 

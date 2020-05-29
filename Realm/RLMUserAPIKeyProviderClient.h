@@ -22,10 +22,16 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// Provider client for user API keys.
 @interface RLMUserAPIKeyProviderClient : RLMProviderClient
 
+/// A block type used to report an error
+typedef void(^RLMUserAPIKeyProviderClientOptionalErrorBlock)(NSError * _Nullable);
+
+/// A block type used to return an `RLMUserAPIKey` on success, or an `NSError` on failure
 typedef void(^RLMOptionalUserAPIKeyBlock)(RLMUserAPIKey * _Nullable, NSError * _Nullable);
 
+/// A block type used to return an array of `RLMUserAPIKey` on success, or an `NSError` on failure
 typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSError * _Nullable);
 
 /**
@@ -60,7 +66,7 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
   @param completion A callback to be invoked once the call is complete.
  */
 - (void)deleteApiKey:(RLMObjectId *)objectId
-          completion:(RLMOptionalErrorBlock)completion;
+          completion:(RLMUserAPIKeyProviderClientOptionalErrorBlock)completion;
 
 /**
   Enables a user API key associated with the current user.
@@ -69,7 +75,7 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
   @param completion A callback to be invoked once the call is complete.
  */
 - (void)enableApiKey:(RLMObjectId *)objectId
-          completion:(RLMOptionalErrorBlock)completion;
+          completion:(RLMUserAPIKeyProviderClientOptionalErrorBlock)completion;
 
 /**
   Disables a user API key associated with the current user.
@@ -78,7 +84,7 @@ typedef void(^RLMUserAPIKeysBlock)(NSArray<RLMUserAPIKey *> *  _Nullable, NSErro
   @param completion A callback to be invoked once the call is complete.
  */
 - (void)disableApiKey:(RLMObjectId *)objectId
-           completion:(RLMOptionalErrorBlock)completion;
+           completion:(RLMUserAPIKeyProviderClientOptionalErrorBlock)completion;
 
 @end
 

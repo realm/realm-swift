@@ -16,27 +16,40 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncSessionRefreshHandle.h"
+#import <Realm/RLMSyncManager.h>
 
 #import "RLMSyncUtil_Private.h"
-
+#import "RLMNetworkTransport.h"
 #import <memory>
 
 namespace realm {
-class SyncSession;
-class SyncUser;
+namespace app {
+class App;
+}
 }
 
-@class RLMSyncUser;
+@class RLMAppConfiguration, RLMSyncUser, RLMSyncConfiguration;
 
-@interface RLMSyncSessionRefreshHandle ()
+// All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
+// called very infrequently, this should pose no issues.
 
 NS_ASSUME_NONNULL_BEGIN
 
-- (instancetype)initWithRealmURL:(NSURL *)realmURL
-                            user:(std::shared_ptr<realm::SyncUser>)user
-                         session:(std::shared_ptr<realm::SyncSession>)session
-                 completionBlock:(nullable RLMSyncBasicErrorReportingBlock)completionBlock;
+@interface RLMSyncManager ()
+
+@property (nullable, nonatomic, copy) RLMSyncBasicErrorReportingBlock sessionCompletionNotifier;
+
+- (std::shared_ptr<realm::app::App>)app;
+
+- (instancetype)initWithAppConfiguration:(RLMAppConfiguration *)appConfiguration
+                           rootDirectory:(NSURL *)rootDirectory;
+
+- (void)configureWithRootDirectory:(nullable NSURL *)rootDirectory
+                  appConfiguration:(nullable RLMAppConfiguration *)appConfiguration;
+
+- (void)_fireError:(NSError *)error;
+
+- (void)resetForTesting;
 
 NS_ASSUME_NONNULL_END
 

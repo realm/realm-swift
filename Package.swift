@@ -3,8 +3,8 @@
 import PackageDescription
 import Foundation
 
-let coreVersionStr = "10.0.0-alpha.6"
-let cocoaVersionStr = "4.4.0"
+let coreVersionStr = "10.0.0-alpha.8"
+let cocoaVersionStr = "10.0.0-alpha.5"
 
 let coreVersionPieces = coreVersionStr.split(separator: ".")
 let coreVersionExtra = coreVersionPieces[2].split(separator: "-")
@@ -71,6 +71,7 @@ let package = Package(
                 "Realm/ObjectStore/src/shared_realm.cpp",
                 "Realm/ObjectStore/src/thread_safe_reference.cpp",
                 "Realm/ObjectStore/src/util/uuid.cpp",
+                "Realm/ObjectStore/src/util/scheduler.cpp",
                 "Realm/RLMAccessor.mm",
                 "Realm/RLMAnalytics.mm",
                 "Realm/RLMArray.mm",
@@ -111,7 +112,10 @@ let package = Package(
             path: "RealmSwift",
             exclude: [
                 "Sync.swift",
+                "BSON.swift",
+                "RealmApp.swift",
                 "ObjectiveCSupport+Sync.swift",
+                "ObjectiveCSupport+BSON.swift",
                 "Tests",
             ]
         ),

@@ -21,19 +21,20 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// UserAPIKey model for APIKeys recevied from the server.
 @interface RLMUserAPIKey : NSObject
 
-// Indicates if the API key is disabled or not
+/// Indicates if the API key is disabled or not
 @property (nonatomic, readonly) BOOL disabled;
 
-// The name of the key.
+/// The name of the key.
 @property (nonatomic, readonly) NSString *name;
 
-// The actual key. Will only be included in
-// the response when an API key is first created.
+/// The actual key. Will only be included in
+/// the response when an API key is first created.
 @property (nonatomic, readonly, nullable) NSString *key;
 
-// The ObjectId of the user
+/// The ObjectId of the user
 @property (nonatomic, readonly) RLMObjectId *objectId;
 
 @end

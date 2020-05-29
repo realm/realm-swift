@@ -22,48 +22,59 @@ import RealmSwift
 // Used by testOfflineClientReset
 // The naming here is nonstandard as the sync-1.x.realm test file comes from the .NET unit tests.
 // swiftlint:disable identifier_name
-@objc(Person)
-class Person: Object {
-    @objc dynamic var FirstName: String?
-    @objc dynamic var LastName: String?
 
-    override class func shouldIncludeInDefaultSchema() -> Bool { return false }
+class SwiftPerson: Object {
+    @objc dynamic var _id: ObjectId = ObjectId.generate()
+    @objc dynamic var firstName: String = ""
+    @objc dynamic var lastName: String = ""
+    @objc dynamic var age: Int = 30
+    @objc dynamic var realm_id: String? = ""
+
+    convenience init(firstName: String, lastName: String, realm_id: String) {
+        self.init()
+        self.firstName = firstName
+        self.lastName = lastName
+        self.realm_id = realm_id
+    }
+
+    override class func primaryKey() -> String? {
+        return "_id"
+    }
 }
 
-#if (false)
 class SwiftObjectServerTests: SwiftSyncTestCase {
     /// It should be possible to successfully open a Realm configured for sync.
     func testBasicSwiftSync() {
-        let url = URL(string: "realm://127.0.0.1:9080/~/testBasicSync")!
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials(register: true), server: authURL)
-            let realm = try synchronouslyOpenRealm(url: url, user: user)
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
             XCTAssert(realm.isEmpty, "Freshly synced Realm was not empty...")
         } catch {
             XCTFail("Got an error: \(error)")
         }
     }
 
+
     /// If client B adds objects to a Realm, client A should see those new objects.
     func testSwiftAddObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
-            let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
-            if isParent {
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
+            if !isParent {
                 waitForDownloads(for: realm)
-                checkCount(expected: 0, realm, SwiftSyncObject.self)
+                checkCount(expected: 0, realm, SwiftPerson.self)
                 executeChild()
                 waitForDownloads(for: realm)
-                checkCount(expected: 3, realm, SwiftSyncObject.self)
+                checkCount(expected: 3, realm, SwiftPerson.self)
             } else {
                 // Add objects
                 try realm.write {
-                    realm.add(SwiftSyncObject(value: ["child-1"]))
-                    realm.add(SwiftSyncObject(value: ["child-2"]))
-                    realm.add(SwiftSyncObject(value: ["child-3"]))
+                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr", realm_id: "foo"))
+                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: "foo"))
+                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: "foo"))
                 }
                 waitForUploads(for: realm)
-                checkCount(expected: 3, realm, SwiftSyncObject.self)
+                checkCount(expected: 3, realm, SwiftPerson.self)
             }
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
@@ -73,67 +84,139 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     /// If client B removes objects from a Realm, client A should see those changes.
     func testSwiftDeleteObjects() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
-            let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
             if isParent {
                 try realm.write {
-                    realm.add(SwiftSyncObject(value: ["child-1"]))
-                    realm.add(SwiftSyncObject(value: ["child-2"]))
-                    realm.add(SwiftSyncObject(value: ["child-3"]))
+                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr", realm_id: "foo"))
+                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: "foo"))
+                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: "foo"))
                 }
                 waitForUploads(for: realm)
-                checkCount(expected: 3, realm, SwiftSyncObject.self)
+                checkCount(expected: 3, realm, SwiftPerson.self)
                 executeChild()
-                waitForDownloads(for: realm)
-                checkCount(expected: 0, realm, SwiftSyncObject.self)
             } else {
+                checkCount(expected: 0, realm, SwiftPerson.self)
+                waitForDownloads(for: realm)
+                checkCount(expected: 3, realm, SwiftPerson.self)
                 try realm.write {
                     realm.deleteAll()
                 }
                 waitForUploads(for: realm)
-                checkCount(expected: 0, realm, SwiftSyncObject.self)
+                checkCount(expected: 0, realm, SwiftPerson.self)
             }
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
     }
 
-    func testConnectionState() {
-        let user = try! synchronouslyLogInUser(for: basicCredentials(register: true), server: authURL)
-        let realm = try! synchronouslyOpenRealm(url: realmURL, user: user)
-        let session = realm.syncSession!
+    /// A client should be able to open multiple Realms and add objects to each of them.
+    func testMultipleRealmsAddObjects() {
+        let partitionValueA = "foo"
+        let partitionValueB = "bar"
+        let partitionValueC = "baz"
 
-        func wait(forState desiredState: SyncSession.ConnectionState) {
-            let ex = expectation(description: "Wait for connection state: \(desiredState)")
-            let token = session.observe(\SyncSession.connectionState, options: .initial) { s, _ in
-                if s.connectionState == desiredState {
-                    ex.fulfill()
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+
+            let realmA = try Realm(configuration: user.configuration(partitionValue: partitionValueA))
+            let realmB = try Realm(configuration: user.configuration(partitionValue: partitionValueB))
+            let realmC = try Realm(configuration: user.configuration(partitionValue: partitionValueC))
+
+            if self.isParent {
+                waitForDownloads(for: realmA)
+                waitForDownloads(for: realmB)
+                waitForDownloads(for: realmC)
+
+                checkCount(expected: 0, realmA, SwiftPerson.self)
+                checkCount(expected: 0, realmB, SwiftPerson.self)
+                checkCount(expected: 0, realmC, SwiftPerson.self)
+                executeChild()
+
+                waitForDownloads(for: realmA)
+                waitForDownloads(for: realmB)
+                waitForDownloads(for: realmC)
+
+                checkCount(expected: 3, realmA, SwiftPerson.self)
+                checkCount(expected: 2, realmB, SwiftPerson.self)
+                checkCount(expected: 5, realmC, SwiftPerson.self)
+
+                XCTAssertEqual(realmA.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count,
+                               1)
+                XCTAssertEqual(realmB.objects(SwiftPerson.self).filter("firstName == %@", "Ringo").count,
+                               0)
+            } else {
+                // Add objects.
+                try realmA.write {
+                    realmA.add(SwiftPerson(firstName: "Ringo", lastName: "Starr", realm_id: partitionValueA))
+                    realmA.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: partitionValueA))
+                    realmA.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: partitionValueA))
                 }
+                try realmB.write {
+                    realmB.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: partitionValueB))
+                    realmB.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: partitionValueB))
+                }
+                try realmC.write {
+                    realmC.add(SwiftPerson(firstName: "Ringo", lastName: "Starr", realm_id: partitionValueC))
+                    realmC.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: partitionValueC))
+                    realmC.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: partitionValueC))
+                    realmC.add(SwiftPerson(firstName: "George", lastName: "Harrison", realm_id: partitionValueC))
+                    realmC.add(SwiftPerson(firstName: "Pete", lastName: "Best", realm_id: partitionValueC))
+                }
+
+                waitForUploads(for: realmA)
+                waitForUploads(for: realmB)
+                waitForUploads(for: realmC)
+
+                checkCount(expected: 3, realmA, SwiftPerson.self)
+                checkCount(expected: 2, realmB, SwiftPerson.self)
+                checkCount(expected: 5, realmC, SwiftPerson.self)
             }
-            waitForExpectations(timeout: 2.0)
-            token.invalidate()
+        } catch {
+            XCTFail(error.localizedDescription)
         }
+    }
 
-        wait(forState: .connected)
+    func testConnectionState() {
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
+            let session = realm.syncSession!
 
-        session.suspend()
-        wait(forState: .disconnected)
+            func wait(forState desiredState: SyncSession.ConnectionState) {
+                let ex = expectation(description: "Wait for connection state: \(desiredState)")
+                let token = session.observe(\SyncSession.connectionState, options: .initial) { s, _ in
+                    if s.connectionState == desiredState {
+                        ex.fulfill()
+                    }
+                }
+                waitForExpectations(timeout: 5.0)
+                token.invalidate()
+            }
 
-        session.resume()
-        wait(forState: .connecting)
-        wait(forState: .connected)
+            wait(forState: .connected)
+
+            session.suspend()
+            wait(forState: .disconnected)
+
+            session.resume()
+            wait(forState: .connecting)
+            wait(forState: .connected)
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
     }
 
     // MARK: - Client reset
 
     func testClientReset() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
-            let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
 
             var theError: SyncError?
             let ex = expectation(description: "Waiting for error handler to be called...")
-            SyncManager.shared.errorHandler = { (error, session) in
+            app.syncManager.errorHandler = { (error, session) in
                 if let error = error as? SyncError {
                     theError = error
                 } else {
@@ -141,7 +224,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 }
                 ex.fulfill()
             }
-            user.simulateClientResetError(forSession: realmURL)
+            user.simulateClientResetError(forSession: "foo")
             waitForExpectations(timeout: 10, handler: nil)
             XCTAssertNotNil(theError)
             XCTAssertTrue(theError!.code == SyncError.Code.clientResetError)
@@ -156,13 +239,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testClientResetManualInitiation() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredentials())
             var theError: SyncError?
 
             try autoreleasepool {
-                let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
+                let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
                 let ex = expectation(description: "Waiting for error handler to be called...")
-                SyncManager.shared.errorHandler = { (error, session) in
+                app.syncManager.errorHandler = { (error, session) in
                     if let error = error as? SyncError {
                         theError = error
                     } else {
@@ -170,7 +253,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                     }
                     ex.fulfill()
                 }
-                user.simulateClientResetError(forSession: realmURL)
+                user.simulateClientResetError(forSession: "foo")
                 waitForExpectations(timeout: 10, handler: nil)
                 XCTAssertNotNil(theError)
                 XCTAssertNotNil(realm)
@@ -184,64 +267,81 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
+
     // MARK: - Progress notifiers
 
     let bigObjectCount = 2
 
-    func populateRealm(user: SyncUser, url: URL) {
-        let realm = try! synchronouslyOpenRealm(url: realmURL, user: user)
-        try! realm.write {
-            for _ in 0..<bigObjectCount {
-                realm.add(SwiftHugeSyncObject())
+    func populateRealm(user: SyncUser, partitionValue: String) {
+        do {
+
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let realm = try synchronouslyOpenRealm(partitionValue: partitionValue, user: user)
+            try! realm.write {
+                for _ in 0..<bigObjectCount {
+                    realm.add(SwiftPerson(firstName: "Arthur",
+                                          lastName: "Jones",
+                                          realm_id: partitionValue))
+                }
             }
+            waitForUploads(for: realm)
+            checkCount(expected: bigObjectCount, realm, SwiftPerson.self)
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
-        waitForUploads(for: realm)
-        checkCount(expected: bigObjectCount, realm, SwiftHugeSyncObject.self)
     }
 
+    // FIXME: Dependancy on Stitch deployment
+    #if false
     func testStreamingDownloadNotifier() {
-        let user = try! synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
-        if !isParent {
-            populateRealm(user: user, url: realmURL)
-            return
-        }
-
-        var callCount = 0
-        var transferred = 0
-        var transferrable = 0
-        let realm = try! synchronouslyOpenRealm(url: realmURL, user: user)
-
-        let session = realm.syncSession
-        XCTAssertNotNil(session)
-        let ex = expectation(description: "streaming-downloads-expectation")
-        var hasBeenFulfilled = false
-        let token = session!.addProgressNotification(for: .download, mode: .reportIndefinitely) { p in
-            callCount += 1
-            XCTAssert(p.transferredBytes >= transferred)
-            XCTAssert(p.transferrableBytes >= transferrable)
-            transferred = p.transferredBytes
-            transferrable = p.transferrableBytes
-            if p.transferredBytes > 0 && p.isTransferComplete && !hasBeenFulfilled {
-                ex.fulfill()
-                hasBeenFulfilled = true
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            if !isParent {
+                populateRealm(user: user, partitionKey: "realm_id")
+                //return
             }
+
+            var callCount = 0
+            var transferred = 0
+            var transferrable = 0
+            let realm = try synchronouslyOpenRealm(partitionValue: "realm_id", user: user)
+
+            let session = realm.syncSession
+            XCTAssertNotNil(session)
+            let ex = expectation(description: "streaming-downloads-expectation")
+            var hasBeenFulfilled = false
+
+            let token = session!.addProgressNotification(for: .download, mode: .forCurrentlyOutstandingWork) { p in
+                callCount += 1
+                XCTAssert(p.transferredBytes >= transferred)
+                XCTAssert(p.transferrableBytes >= transferrable)
+                transferred = p.transferredBytes
+                transferrable = p.transferrableBytes
+                if p.transferredBytes > 0 && p.isTransferComplete && !hasBeenFulfilled {
+                    ex.fulfill()
+                    hasBeenFulfilled = true
+                }
+            }
+
+            // Wait for the child process to upload all the data.
+            executeChild()
+
+            waitForExpectations(timeout: 60.0, handler: nil)
+            token!.invalidate()
+            XCTAssert(callCount > 1)
+            XCTAssert(transferred >= transferrable)
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
-
-        // Wait for the child process to upload all the data.
-        executeChild()
-
-        waitForExpectations(timeout: 10.0, handler: nil)
-        token!.invalidate()
-        XCTAssert(callCount > 1)
-        XCTAssert(transferred >= transferrable)
     }
+    #endif
 
     func testStreamingUploadNotifier() {
         do {
             var transferred = 0
             var transferrable = 0
-            let user = try synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
-            let realm = try synchronouslyOpenRealm(url: realmURL, user: user)
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
             let session = realm.syncSession
             XCTAssertNotNil(session)
             var ex = expectation(description: "initial upload")
@@ -258,7 +358,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             ex = expectation(description: "write transaction upload")
             try realm.write {
                 for _ in 0..<bigObjectCount {
-                    realm.add(SwiftHugeSyncObject())
+                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: "foo"))
                 }
             }
             waitForExpectations(timeout: 10.0, handler: nil)
@@ -272,140 +372,167 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     // MARK: - Download Realm
 
     func testDownloadRealm() {
-        let user = try! synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
-        if !isParent {
-            populateRealm(user: user, url: realmURL)
-            return
-        }
-
-        // Wait for the child process to upload everything.
-        executeChild()
-
-        let ex = expectation(description: "download-realm")
-        let config = user.configuration(realmURL: realmURL, fullSynchronization: true)
-        let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
-        XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
-        Realm.asyncOpen(configuration: config) { realm, error in
-            XCTAssertNil(error)
-            self.checkCount(expected: self.bigObjectCount, realm!, SwiftHugeSyncObject.self)
-            ex.fulfill()
-        }
-        func fileSize(path: String) -> Int {
-            if let attr = try? FileManager.default.attributesOfItem(atPath: path) {
-                return attr[.size] as! Int
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            if !isParent {
+                populateRealm(user: user, partitionValue: "foo")
+                return
             }
-            return 0
+
+            // Wait for the child process to upload everything.
+            executeChild()
+
+            let ex = expectation(description: "download-realm")
+            let config = user.configuration(partitionValue: "foo")
+            let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
+            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
+            Realm.asyncOpen(configuration: config) { realm, error in
+                XCTAssertNil(error)
+                guard let realm = realm else {
+                    XCTFail("No realm on async open")
+                    ex.fulfill()
+                    return
+                }
+                self.checkCount(expected: self.bigObjectCount, realm, SwiftPerson.self)
+                ex.fulfill()
+            }
+            func fileSize(path: String) -> Int {
+                if let attr = try? FileManager.default.attributesOfItem(atPath: path) {
+                    return attr[.size] as! Int
+                }
+                return 0
+            }
+            XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
+            waitForExpectations(timeout: 10.0, handler: nil)
+            XCTAssertGreaterThan(fileSize(path: pathOnDisk), 0)
+            XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
-        XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
-        waitForExpectations(timeout: 10.0, handler: nil)
-        XCTAssertGreaterThan(fileSize(path: pathOnDisk), 0)
-        XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
     }
 
     func testDownloadRealmToCustomPath() {
-        let user = try! synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
-        if !isParent {
-            populateRealm(user: user, url: realmURL)
-            return
-        }
-
-        // Wait for the child process to upload everything.
-        executeChild()
-
-        let ex = expectation(description: "download-realm")
-        let customFileURL = realmURLForFile("copy")
-        var config = user.configuration(realmURL: realmURL, fullSynchronization: true)
-        config.fileURL = customFileURL
-        let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
-        XCTAssertEqual(pathOnDisk, customFileURL.path)
-        XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
-        Realm.asyncOpen(configuration: config) { realm, error in
-            XCTAssertNil(error)
-            self.checkCount(expected: self.bigObjectCount, realm!, SwiftHugeSyncObject.self)
-            ex.fulfill()
-        }
-        func fileSize(path: String) -> Int {
-            if let attr = try? FileManager.default.attributesOfItem(atPath: path) {
-                return attr[.size] as! Int
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            if !isParent {
+                populateRealm(user: user, partitionValue: "foo")
+                return
             }
-            return 0
-        }
-        XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
-        waitForExpectations(timeout: 10.0, handler: nil)
-        XCTAssertGreaterThan(fileSize(path: pathOnDisk), 0)
-        XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
-    }
 
+            // Wait for the child process to upload everything.
+            executeChild()
+
+            let ex = expectation(description: "download-realm")
+            let customFileURL = realmURLForFile("copy")
+            var config = user.configuration(partitionValue: "foo")
+            config.fileURL = customFileURL
+            let pathOnDisk = ObjectiveCSupport.convert(object: config).pathOnDisk
+            XCTAssertEqual(pathOnDisk, customFileURL.path)
+            XCTAssertFalse(FileManager.default.fileExists(atPath: pathOnDisk))
+            Realm.asyncOpen(configuration: config) { realm, error in
+                XCTAssertNil(error)
+                self.checkCount(expected: self.bigObjectCount, realm!, SwiftPerson.self)
+                ex.fulfill()
+            }
+            func fileSize(path: String) -> Int {
+                if let attr = try? FileManager.default.attributesOfItem(atPath: path) {
+                    return attr[.size] as! Int
+                }
+                return 0
+            }
+            XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
+            waitForExpectations(timeout: 10.0, handler: nil)
+            XCTAssertGreaterThan(fileSize(path: pathOnDisk), 0)
+            XCTAssertFalse(RLMHasCachedRealmForPath(pathOnDisk))
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
+        }
+    }
 
     func testCancelDownloadRealm() {
-        let user = try! synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
-        if !isParent {
-            populateRealm(user: user, url: realmURL)
-            return
-        }
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            if !isParent {
+                populateRealm(user: user, partitionValue: "foo")
+                return
+            }
 
-        // Wait for the child process to upload everything.
-        executeChild()
+            // Wait for the child process to upload everything.
+            executeChild()
 
-        // Use a serial queue for asyncOpen to ensure that the first one adds
-        // the completion block before the second one cancels it
-        RLMSetAsyncOpenQueue(DispatchQueue(label: "io.realm.asyncOpen"))
+            // Use a serial queue for asyncOpen to ensure that the first one adds
+            // the completion block before the second one cancels it
+            RLMSetAsyncOpenQueue(DispatchQueue(label: "io.realm.asyncOpen"))
 
-        let ex = expectation(description: "async open")
-        let config = user.configuration(realmURL: realmURL, fullSynchronization: true)
-        Realm.asyncOpen(configuration: config) { _, error in
-            XCTAssertNotNil(error)
-            ex.fulfill()
+            let ex = expectation(description: "async open")
+            let config = user.configuration(partitionValue: "foo")
+            Realm.asyncOpen(configuration: config) { _, error in
+                XCTAssertNotNil(error)
+                ex.fulfill()
+            }
+            let task = Realm.asyncOpen(configuration: config) { _, _ in
+                XCTFail("Cancelled completion handler was called")
+            }
+            task.cancel()
+            waitForExpectations(timeout: 10.0, handler: nil)
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
-        let task = Realm.asyncOpen(configuration: config) { _, _ in
-            XCTFail("Cancelled completion handler was called")
-        }
-        task.cancel()
-        waitForExpectations(timeout: 10.0, handler: nil)
     }
 
+    // FIXME: Dependancy on Stitch deployment
+    #if false
     func testAsyncOpenProgress() {
-        let user = try! synchronouslyLogInUser(for: basicCredentials(register: isParent), server: authURL)
-        if !isParent {
-            populateRealm(user: user, url: realmURL)
-            return
-        }
-
-        // Wait for the child process to upload everything.
-        executeChild()
-
-        let ex1 = expectation(description: "async open")
-        let ex2 = expectation(description: "download progress")
-        let config = user.configuration(realmURL: realmURL, fullSynchronization: true)
-        let task = Realm.asyncOpen(configuration: config) { _, error in
-            XCTAssertNil(error)
-            ex1.fulfill()
-        }
-        task.addProgressNotification { progress in
-            if progress.isTransferComplete {
-                ex2.fulfill()
+        app().sharedManager().logLevel = .all
+        do {
+            let user = try synchronouslyLogInUser(for: basicCredentials())
+            if !isParent {
+                populateRealm(user: user, partitionKey: "realm_id")
+                return
             }
+
+            // Wait for the child process to upload everything.
+            executeChild()
+            let ex1 = expectation(description: "async open")
+            let ex2 = expectation(description: "download progress")
+            let config = user.configuration(partitionValue: "realm_id")
+            let task = Realm.asyncOpen(configuration: config) { _, error in
+                XCTAssertNil(error)
+                ex1.fulfill()
+            }
+
+            task.addProgressNotification { progress in
+                if progress.isTransferComplete {
+                    ex2.fulfill()
+                }
+            }
+
+            waitForExpectations(timeout: 10.0, handler: nil)
+        } catch {
+            XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
-        waitForExpectations(timeout: 10.0, handler: nil)
     }
 
     func testAsyncOpenTimeout() {
         let syncTimeoutOptions = SyncTimeoutOptions()
         syncTimeoutOptions.connectTimeout = 3000
-        SyncManager.shared.timeoutOptions = syncTimeoutOptions
+        app().sharedManager().timeoutOptions = syncTimeoutOptions
 
         // The server proxy adds a 2 second delay, so a 3 second timeout should succeed
         autoreleasepool {
-            let user = try! synchronouslyLogInUser(for: basicCredentials(register: true), server: slowConnectAuthURL)
-            let config = user.configuration(cancelAsyncOpenOnNonFatalErrors: true)
-            let ex = expectation(description: "async open")
-            Realm.asyncOpen(configuration: config) { _, error in
-                XCTAssertNil(error)
-                ex.fulfill()
+            do {
+                let user = try synchronouslyLogInUser(for: basicCredentials())
+                let config = user.configuration(partitionValue: "realm_id")
+                let ex = expectation(description: "async open")
+                Realm.asyncOpen(configuration: config) { _, error in
+                    XCTAssertNil(error)
+                    ex.fulfill()
+                }
+                waitForExpectations(timeout: 10.0, handler: nil)
+                try synchronouslyLogOutUser(user)
+            } catch {
+                XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
             }
-            waitForExpectations(timeout: 10.0, handler: nil)
-            // FIXME: [realmapp] add logout
-            // user.logOut()
         }
 
         self.resetSyncManager()
@@ -413,24 +540,30 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         // and a 1 second timeout should fail
         autoreleasepool {
-            let user = try! synchronouslyLogInUser(for: basicCredentials(register: true), server: slowConnectAuthURL)
-            let config = user.configuration(cancelAsyncOpenOnNonFatalErrors: true)
+            do {
+                let user = try synchronouslyLogInUser(for: basicCredentials())
+                let config = user.configuration(partitionValue: "realm_id")
 
-            syncTimeoutOptions.connectTimeout = 1000
-            SyncManager.shared.timeoutOptions = syncTimeoutOptions
+                syncTimeoutOptions.connectTimeout = 1000
+                app().sharedManager().timeoutOptions = syncTimeoutOptions
 
-            let ex = expectation(description: "async open")
-            Realm.asyncOpen(configuration: config) { _, error in
-                XCTAssertNotNil(error)
-                if let error = error as NSError? {
-                    XCTAssertEqual(error.code, Int(ETIMEDOUT))
-                    XCTAssertEqual(error.domain, NSPOSIXErrorDomain)
+                let ex = expectation(description: "async open")
+                Realm.asyncOpen(configuration: config) { _, error in
+                    XCTAssertNotNil(error)
+                    if let error = error as NSError? {
+                        XCTAssertEqual(error.code, Int(ETIMEDOUT))
+                        XCTAssertEqual(error.domain, NSPOSIXErrorDomain)
+                    }
+                    ex.fulfill()
                 }
-                ex.fulfill()
+                waitForExpectations(timeout: 4.0, handler: nil)
+                try synchronouslyLogOutUser(user)
+            } catch {
+                XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
             }
-            waitForExpectations(timeout: 4.0, handler: nil)
         }
     }
+    #endif
 
     // MARK: - App Credentials
 
@@ -485,16 +618,21 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func testInvalidCredentials() {
         do {
             let username = "testInvalidCredentialsUsername"
-            let credentials = AppCredentials(username: username,
-                                                               password: "THIS_IS_A_PASSWORD")
-            _ = try synchronouslyLogInUser(for: credentials, server: authURL)
-            // Now log in the same user, but with a bad password.
-            let ex = expectation(description: "wait for user login")
-            let credentials2 = AppCredentials(username: username, password: "NOT_A_VALID_PASSWORD")
+            let credentials = basicCredentials()
+            let user = try synchronouslyLogInUser(for: credentials)
+            XCTAssertEqual(user.state, .loggedIn)
 
-            // FIXME: [realmapp] This should call the new login method with invalid credentials
-            fatalError("test not implemented")
-            waitForExpectations(timeout: 2.0, handler: nil)
+            let credentials2 = AppCredentials(username: username, password: "NOT_A_VALID_PASSWORD")
+            let ex = expectation(description: "Should log in the user properly")
+
+            self.app.login(withCredential: credentials2, completion: { user2, error in
+                XCTAssertNil(user2)
+                XCTAssertNotNil(error)
+                ex.fulfill()
+            })
+
+            waitForExpectations(timeout: 10, handler: nil)
+
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
@@ -504,92 +642,28 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func testUserExpirationCallback() {
         do {
-            let user = try synchronouslyLogInUser(for: basicCredentials(), server: authURL)
+            let user = try synchronouslyLogInUser(for: basicCredentials())
 
             // Set a callback on the user
             var blockCalled = false
             let ex = expectation(description: "Error callback should fire upon receiving an error")
-            user.errorHandler = { (u, error) in
-                XCTAssertEqual(u.identity, user.identity)
-                XCTAssertEqual(error.code, .accessDeniedOrInvalidPath)
+            app.syncManager.errorHandler = { (error, _) in
+                XCTAssertNotNil(error)
                 blockCalled = true
                 ex.fulfill()
             }
 
             // Screw up the token on the user.
-            manuallySetRefreshToken(for: user, value: "not-a-real-token")
+            manuallySetAccessToken(for: user, value: badAccessToken())
 
             // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
             XCTAssertFalse(blockCalled)
-            _ = try immediatelyOpenRealm(url: realmURL, user: user)
+            _ = try immediatelyOpenRealm(partitionValue: "realm_id", user: user)
+
             waitForExpectations(timeout: 10.0, handler: nil)
-            XCTAssertEqual(user.state, .loggedOut)
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
-    }
-
-    // MARK: - Certificate Pinning
-
-    func testSecureConnectionToLocalhostWithDefaultSecurity() {
-        let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
-        let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
-                                        serverValidationPolicy: .system)
-
-        let ex = expectation(description: "Waiting for error handler to be called")
-        SyncManager.shared.errorHandler = { (error, session) in
-            ex.fulfill()
-        }
-
-        _ = try! Realm(configuration: config)
-        self.waitForExpectations(timeout: 4.0)
-    }
-
-    func testSecureConnectionToLocalhostWithValidationDisabled() {
-        let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
-        let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
-                                        serverValidationPolicy: .none)
-        SyncManager.shared.errorHandler = { (error, session) in
-            XCTFail("Unexpected connection failure: \(error)")
-        }
-
-        let realm = try! Realm(configuration: config)
-        self.waitForUploads(for: realm)
-    }
-
-    func testSecureConnectionToLocalhostWithPinnedCertificate() {
-        let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
-        let certURL = URL(string: #file)!
-            .deletingLastPathComponent()
-            .appendingPathComponent("certificates")
-            .appendingPathComponent("localhost.cer")
-
-        let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
-                                        serverValidationPolicy: .pinCertificate(path: certURL))
-        SyncManager.shared.errorHandler = { (error, session) in
-            XCTFail("Unexpected connection failure: \(error)")
-        }
-
-        let realm = try! Realm(configuration: config)
-        self.waitForUploads(for: realm)
-    }
-
-    func testSecureConnectionToLocalhostWithIncorrectPinnedCertificate() {
-        let user = try! synchronouslyLogInUser(for: basicCredentials(), server: authURL)
-        let certURL = URL(string: #file)!
-            .deletingLastPathComponent()
-            .appendingPathComponent("certificates")
-            .appendingPathComponent("localhost-other.cer")
-        let config = user.configuration(realmURL: URL(string: "realms://localhost:9443/~/default"),
-                                        serverValidationPolicy: .pinCertificate(path: certURL))
-
-        let ex = expectation(description: "Waiting for error handler to be called")
-        SyncManager.shared.errorHandler = { (error, session) in
-            ex.fulfill()
-        }
-
-        _ = try! Realm(configuration: config)
-        self.waitForExpectations(timeout: 4.0)
     }
 
     private func realmURLForFile(_ fileName: String) -> URL {
@@ -599,11 +673,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     // MARK: - RealmApp tests
-
-    private func randomString(length: Int) -> String {
-      let letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-      return String((0..<length).map { _ in letters.randomElement()! })
-    }
 
     let appName = "translate-utwuv"
 
@@ -616,18 +685,17 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testRealmAppInit() {
-        let appWithNoConfig = RealmApp(appName, configuration: nil)
+        let appWithNoConfig = RealmApp(id: appName)
         XCTAssertEqual(appWithNoConfig.allUsers().count, 0)
 
-        let appWithConfig = RealmApp(appName, configuration: realmAppConfig())
+        let appWithConfig = RealmApp(id: appName, configuration: realmAppConfig())
         XCTAssertEqual(appWithConfig.allUsers().count, 0)
     }
 
     func testRealmAppLogin() {
-        let app = RealmApp(appName, configuration: nil)
 
-        let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
-        let password = randomString(length: 10)
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
 
         let registerUserEx = expectation(description: "Register user")
 
@@ -648,17 +716,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [loginEx], timeout: 4.0)
 
-        XCTAssertTrue(syncUser?.identity == app.currentUser()?.identity)
-        XCTAssertTrue(app.allUsers().count == 1)
+        XCTAssertEqual(syncUser?.identity, app.currentUser()?.identity)
+        XCTAssertEqual(app.allUsers().count, 1)
     }
 
     func testRealmAppSwitchAndRemove() {
-        let app = RealmApp(appName, configuration: nil)
 
-        let email1 = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
-        let password1 = randomString(length: 10)
-        let email2 = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
-        let password2 = randomString(length: 10)
+        let email1 = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password1 = randomString(10)
+        let email2 = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password2 = randomString(10)
 
         let registerUser1Ex = expectation(description: "Register user 1")
         let registerUser2Ex = expectation(description: "Register user 2")
@@ -718,10 +785,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testRealmAppLinkUser() {
-        let app = RealmApp(appName, configuration: nil)
 
-        let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
-        let password = randomString(length: 10)
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
 
         let registerUserEx = expectation(description: "Register user")
 
@@ -761,10 +827,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     // MARK: - Provider Clients
 
     func testUsernamePasswordProviderClient() {
-        let app = RealmApp(appName, configuration: nil)
 
-        let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
-        let password = randomString(length: 10)
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
 
         let registerUserEx = expectation(description: "Register user")
 
@@ -806,20 +871,19 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [resetPasswordEx], timeout: 4.0)
 
-        let callResetFunctionEx = expectation(description: "Reset password function")
-
-        app.usernamePasswordProviderClient().callResetPasswordFunction(email, password: password, args: "") { (error) in
-            XCTAssertNotNil(error)
-            callResetFunctionEx.fulfill()
-        }
-        wait(for: [callResetFunctionEx], timeout: 4.0)
+//        let callResetFunctionEx = expectation(description: "Reset password function")
+        //FIXME: Needs BSON
+//        app().usernamePasswordProviderClient().callResetPasswordFunction(email, password: password, args: "") { (error) in
+//            XCTAssertNotNil(error)
+//            callResetFunctionEx.fulfill()
+//        }
+//        wait(for: [callResetFunctionEx], timeout: 4.0)
     }
 
     func testUserAPIKeyProviderClient() {
-        let app = RealmApp(appName, configuration: nil)
 
-        let email = "realm_tests_do_autoverify\(randomString(length: 7))@\(randomString(length: 7)).com"
-        let password = randomString(length: 10)
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
 
         let registerUserEx = expectation(description: "Register user")
 
@@ -888,5 +952,82 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [deleteKeyEx], timeout: 4.0)
     }
+
+    func testCallFunction() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "Register user")
+
+        app.usernamePasswordProviderClient().registerEmail(email, password: password) { (error) in
+            XCTAssertNil(error)
+            registerUserEx.fulfill()
+        }
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "Login user")
+
+        let credentials = AppCredentials(username: email, password: password)
+        app.login(withCredential: credentials) { (_, error) in
+            XCTAssertNil(error)
+            loginEx.fulfill()
+        }
+        wait(for: [loginEx], timeout: 4.0)
+
+        let callFunctionEx = expectation(description: "Call function")
+        app.functions.sum([1, 2, 3, 4, 5]) { bson, error in
+            guard let bson = bson else {
+                XCTFail(error!.localizedDescription)
+                return
+            }
+
+            guard case let .int64(sum) = bson else {
+                XCTFail(error!.localizedDescription)
+                return
+            }
+
+            XCTAssertNil(error)
+            XCTAssertEqual(sum, 15)
+            callFunctionEx.fulfill()
+        }
+        wait(for: [callFunctionEx], timeout: 4.0)
+    }
+
+    func testCustomUserData() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "Register user")
+
+        app.usernamePasswordProviderClient().registerEmail(email, password: password) { (error) in
+            XCTAssertNil(error)
+            registerUserEx.fulfill()
+        }
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginEx = expectation(description: "Login user")
+        let credentials = AppCredentials(username: email, password: password)
+        app.login(withCredential: credentials) { (_, error) in
+            XCTAssertNil(error)
+            loginEx.fulfill()
+        }
+        wait(for: [loginEx], timeout: 4.0)
+
+        let userDataEx = expectation(description: "Update user data")
+        app.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
+            XCTAssertNil(error)
+            userDataEx.fulfill()
+        }
+        wait(for: [userDataEx], timeout: 4.0)
+
+        let refreshDataEx = expectation(description: "Refresh user data")
+        app.currentUser()?.refreshCustomData { error in
+            XCTAssertNil(error)
+            refreshDataEx.fulfill()
+        }
+        wait(for: [refreshDataEx], timeout: 4.0)
+
+        XCTAssertEqual(app.currentUser()?.customData?["favourite_colour"], .string("green"))
+        XCTAssertEqual(app.currentUser()?.customData?["apples"], .int64(10))
+    }
 }
-#endif

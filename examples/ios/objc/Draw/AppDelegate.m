@@ -37,16 +37,16 @@ static RLMApp *app;
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.rootViewController = [[UIViewController alloc] init];
 
-    // Setup Global Error Handler
-    [RLMSyncManager sharedManager].errorHandler = ^(NSError *error, RLMSyncSession *session) {
+
+    app = [RLMApp appWithId:@"realm-draw"];
+
+    // Setup Error Handler
+    [app syncManager].errorHandler = ^(NSError *error, RLMSyncSession *session) {
         NSLog(@"A global error has occurred! %@", error);
     };
 
-    app = [RLMApp app:@"realm-draw" configuration:nil];
-
     if (app.currentUser) {
-        NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", kIPAddress]];
-        RLMRealmConfiguration.defaultConfiguration = [app.currentUser configurationWithURL:syncURL];
+        RLMRealmConfiguration.defaultConfiguration = [app.currentUser configurationWithPartitionValue:@"foo"];
         self.window.rootViewController.view = [DrawView new];
     }
     else {
@@ -62,7 +62,6 @@ static RLMApp *app;
 {
     // The base server path
     // Set to connect to local or online host
-//    NSURL *authURL = [NSURL URLWithString:[NSString stringWithFormat:@"http://%@:9080", kIPAddress]];
 
     // Creating a debug credential since this demo is just using the generated access token
     // produced when running the Realm Object Server via the `start-object-server.command`
@@ -82,11 +81,7 @@ static RLMApp *app;
             [self.window.rootViewController presentViewController:alertController animated:YES completion:nil];
         }
         else { // Logged in setup the default Realm
-            // The Realm virtual path on the server.
-            // The `~` represents the Realm user ID. Since the user ID is not known until you
-            // log in, the ~ is used as short-hand to represent this.
-            NSURL *syncURL = [NSURL URLWithString:[NSString stringWithFormat:@"realm://%@:9080/~/Draw", kIPAddress]];
-            RLMRealmConfiguration.defaultConfiguration = [app.currentUser configurationWithURL:syncURL];
+            RLMRealmConfiguration.defaultConfiguration = [app.currentUser configurationWithPartitionValue:@"foo"];
 
             self.window.rootViewController.view = [DrawView new];
         }

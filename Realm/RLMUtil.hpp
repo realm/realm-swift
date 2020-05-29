@@ -172,6 +172,24 @@ static inline NSUInteger RLMConvertNotFound(size_t index) {
     return index == realm::not_found ? NSNotFound : index;
 }
 
+static inline void RLMNSStringToStdString(std::string &out, NSString *in) {
+    if (!in)
+        return;
+    
+    out.resize([in maximumLengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+    if (out.empty()) {
+        return;
+    }
+
+    NSUInteger size = out.size();
+    [in getBytes:&out[0]
+       maxLength:size
+      usedLength:&size
+        encoding:NSUTF8StringEncoding
+         options:0 range:{0, in.length} remainingRange:nullptr];
+    out.resize(size);
+}
+
 id RLMMixedToObjc(realm::Mixed const& value);
 realm::Decimal128 RLMObjcToDecimal128(id value);
 

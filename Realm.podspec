@@ -46,6 +46,7 @@ Pod::Spec.new do |s|
                               'include/**/NSError+RLMSync.h',
                               'include/**/RLMApp.h',
                               'include/**/RLMAppCredentials.h',
+                              'include/**/RLMBSON.h',
                               'include/**/RLMNetworkTransport.h',
                               'include/**/RLMProviderClient.h',
                               'include/**/RLMRealm+Sync.h',
@@ -53,7 +54,6 @@ Pod::Spec.new do |s|
                               'include/**/RLMSyncConfiguration.h',
                               'include/**/RLMSyncCredentials.h',
                               'include/**/RLMSyncManager.h',
-                              'include/**/RLMSyncPermission.h',
                               'include/**/RLMSyncSession.h',
                               'include/**/RLMSyncUser.h',
                               'include/**/RLMSyncUtil.h',
@@ -68,6 +68,7 @@ Pod::Spec.new do |s|
                               # Realm.Private module
   private_header_files      = 'include/**/RLMAccessor.h',
                               'include/**/RLMArray_Private.h',
+                              'include/**/RLMBSON_Private.h',
                               'include/**/RLMCollection_Private.h',
                               'include/**/RLMListBase.h',
                               'include/**/RLMObjectBase_Private.h',

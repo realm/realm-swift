@@ -20,15 +20,18 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol RLMNetworkTransport;
+@protocol RLMNetworkTransport, RLMBSON;
 
-@class RLMSyncUser, RLMAppCredentials, RLMUsernamePasswordProviderClient, RLMUserAPIKeyProviderClient;
+@class RLMSyncUser, RLMAppCredentials, RLMUsernamePasswordProviderClient, RLMUserAPIKeyProviderClient, RLMSyncManager;
 
 /// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
 
 /// A block type used to report an error
 typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
+
+/// A block type for returning from function calls.
+typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _Nullable);
 
 #pragma mark RLMAppConfiguration
 
@@ -39,8 +42,8 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 /// A custom base URL to request against.
 @property (nonatomic, strong, nullable) NSString* baseURL;
 
-/// A transport for customizing network handling.
-@property (nonatomic, strong, nullable) id <RLMNetworkTransport> transport;
+/// The custom transport for network calls to the server.
+@property (nonatomic, strong, nullable) id<RLMNetworkTransport> transport;
 
 /// A custom app name.
 @property (nonatomic, strong, nullable) NSString *localAppName;
@@ -51,11 +54,28 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 /// The default timeout for network requests.
 @property (nonatomic, assign) NSUInteger defaultRequestTimeoutMS;
 
+/**
+Create a new Realm App configuration.
+
+@param baseURL A custom base URL to request against.
+@param transport A custom network transport.
+@param localAppName A custom app name.
+@param localAppVersion A custom app version.
+*/
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(nullable NSString *) localAppName
                 localAppVersion:(nullable NSString *)localAppVersion;
 
+/**
+ Create a new Realm App configuration.
+
+ @param baseURL A custom base URL to request against.
+ @param transport A custom network transport.
+ @param localAppName A custom app name.
+ @param localAppVersion A custom app version.
+ @param defaultRequestTimeoutMS A custom default timeout for network requests.
+ */
 - (instancetype)initWithBaseURL:(nullable NSString *) baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(nullable NSString *) localAppName
@@ -74,17 +94,36 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
  */
 @interface RLMApp : NSObject
 
+/// The configuration for this Realm app.
+@property (nonatomic, readonly) RLMAppConfiguration *configuration;
+
+/// The `RLMSyncManager` for this Realm app.
+@property (nonatomic, readonly) RLMSyncManager *syncManager;
+
+/**
+ Get an application with a given appId and configuration.
+
+ @param appId The unique identifier of your Realm app.
+ */
++ (instancetype)appWithId:(NSString *)appId;
+
 /**
  Get an application with a given appId and configuration.
 
  @param appId The unique identifier of your Realm app.
  @param configuration A configuration object to configure this client.
  */
-+ (instancetype)app:(NSString *)appId
-      configuration:(nullable RLMAppConfiguration *)configuration;
++ (instancetype)appWithId:(NSString *)appId
+            configuration:(nullable RLMAppConfiguration *)configuration;
 
+/**
+ Get a dictionary containing all users keyed on id.
+ */
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers;
 
+/**
+ Get the current user logged into the Realm app.
+ */
 - (nullable RLMSyncUser *)currentUser;
 
 /**
@@ -171,6 +210,34 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
   This client should only be used by an authenticated user.
 */
 - (RLMUserAPIKeyProviderClient *)userAPIKeyProviderClient;
+
+/**
+ Calls the MongoDB Realm function with the provided name and arguments.
+
+ @param name The name of the MongoDB Realm function to be called.
+ @param arguments The `BSONArray` of arguments to be provided to the function.
+ @param completionBlock The completion handler to call when the function call is complete.
+                        This handler is executed on a non-main global `DispatchQueue`.
+*/
+- (void)callFunctionNamed:(NSString *)name
+                arguments:(NSArray<id<RLMBSON>> *)arguments
+          completionBlock:(RLMCallFunctionCompletionBlock)completionBlock NS_REFINED_FOR_SWIFT;
+
+/**
+ RLMApp instances are cached internally by Realm and cannot be created directly.
+
+ Use `+[RLMRealm appWithId]` or `+[RLMRealm appWithId:configuration:]`
+ to obtain a reference to an RLMApp.
+ */
+- (instancetype)init __attribute__((unavailable("Use +appWithId or appWithId:configuration:.")));
+
+/**
+RLMApp instances are cached internally by Realm and cannot be created directly.
+
+Use `+[RLMRealm appWithId]` or `+[RLMRealm appWithId:configuration:]`
+to obtain a reference to an RLMApp.
+*/
++ (instancetype)new __attribute__((unavailable("Use +appWithId or appWithId:configuration:.")));
 
 @end
 

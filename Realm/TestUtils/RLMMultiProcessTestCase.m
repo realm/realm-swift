@@ -161,7 +161,6 @@
     task.standardError = pipe;
     [task launch];
     [task waitUntilExit];
-
     return task.terminationStatus;
 }
 #else

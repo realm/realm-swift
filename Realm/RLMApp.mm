@@ -19,11 +19,13 @@
 #import "RLMApp_Private.hpp"
 
 #import "RLMAppCredentials_Private.hpp"
+#import "RLMBSON_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 #import "RLMUsernamePasswordProviderClient.h"
 #import "RLMUserAPIKeyProviderClient.h"
-#import "sync/app.hpp"
+#import "RLMUtil.hpp"
+#import "RLMVersion.h"
 
 using namespace realm;
 
@@ -64,12 +66,18 @@ namespace {
                 });
             }];
         }
+        
+        id<RLMNetworkTransport> transport() const {
+            return m_transport;
+        }
     private:
         id<RLMNetworkTransport> m_transport;
     };
 }
 
-@implementation RLMAppConfiguration
+@implementation RLMAppConfiguration {
+    realm::app::App::Config _config;
+}
 
 - (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
@@ -82,7 +90,7 @@ namespace {
          defaultRequestTimeoutMS:6000];
 }
 
-- (instancetype)initWithBaseURL:(nullable NSString *) baseURL
+- (instancetype)initWithBaseURL:(nullable NSString *)baseURL
                       transport:(nullable id<RLMNetworkTransport>)transport
                    localAppName:(NSString *)localAppName
                 localAppVersion:(nullable NSString *)localAppVersion
@@ -93,105 +101,206 @@ namespace {
         self.localAppName = localAppName;
         self.localAppVersion = localAppVersion;
         self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
+        
+        _config.platform = "Realm Cocoa";
+        
+        NSOperatingSystemVersion operatingSystemVersion = [[NSProcessInfo processInfo] operatingSystemVersion];
+        _config.platform_version = realm::util::format("%1.%2.%2",
+                                                       operatingSystemVersion.majorVersion,
+                                                       operatingSystemVersion.minorVersion,
+                                                       operatingSystemVersion.patchVersion);
+        
+        RLMNSStringToStdString(_config.sdk_version, REALM_COCOA_VERSION);
         return self;
     }
     return nil;
 }
+
+- (realm::app::App::Config&)config {
+    return _config;
+}
+
+- (void)setAppId:(NSString *)appId {
+    RLMNSStringToStdString(_config.app_id, appId);
+}
+
+- (NSString *)baseURL {
+    if (_config.base_url) {
+        return @(_config.base_url->c_str());
+    }
+
+    return nil;
+}
+
+- (void)setBaseURL:(nullable NSString *)baseURL {
+    std::string base_url;
+    RLMNSStringToStdString(base_url, baseURL);
+    _config.base_url = base_url.empty() ? util::none : util::Optional(base_url);
+    return;
+}
+
+- (id<RLMNetworkTransport>)transport {
+    return static_cast<CocoaNetworkTransport*>(_config.transport_generator().get())->transport();
+}
+
+- (void)setTransport:(id<RLMNetworkTransport>)transport {
+    if (transport) {
+        _config.transport_generator = [transport]{
+            return std::make_unique<CocoaNetworkTransport>(transport);
+        };
+    } else {
+        _config.transport_generator = []{
+            return std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
+        };
+    }
+}
+
+- (NSString *)localAppName {
+    if (_config.local_app_name) {
+        return @((_config.base_url)->c_str());
+    }
+
+    return nil;
+}
+
+- (void)setLocalAppName:(nullable NSString *)localAppName {
+    std::string local_app_name;
+    RLMNSStringToStdString(local_app_name, localAppName);
+    _config.local_app_name = local_app_name.empty() ? util::none : util::Optional(local_app_name);
+    return;
+}
+
+- (NSString *)localAppVersion {
+    if (_config.local_app_version) {
+        return @((_config.base_url)->c_str());
+    }
+
+    return nil;
+}
+
+- (void)setLocalAppVersion:(nullable NSString *)localAppVersion {
+    std::string local_app_version;
+    RLMNSStringToStdString(local_app_version, localAppVersion);
+    _config.local_app_version = local_app_version.empty() ? util::none : util::Optional(local_app_version);
+    return;
+}
+
+- (NSUInteger)defaultRequestTimeoutMS {
+    return _config.default_request_timeout_ms.value_or(6000);
+}
+
+- (void)setDefaultRequestTimeoutMS:(NSUInteger)defaultRequestTimeoutMS {
+    _config.default_request_timeout_ms = (uint64_t)defaultRequestTimeoutMS;
+}
+
 @end
 
 NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     return [[NSError alloc] initWithDomain:@(appError.error_code.category().name())
                                       code:appError.error_code.value()
                                   userInfo:@{
-                                      @(appError.error_code.category().name()) : @(appError.error_code.message().data())
+                                      @(appError.error_code.category().name()) : @(appError.error_code.message().data()),
+                                      NSLocalizedDescriptionKey : @(appError.message.c_str())
                                   }];
 }
 
 @interface RLMApp() {
-    realm::app::App _app;
+    std::shared_ptr<realm::app::App> _app;
 }
+
 @end
 
 @implementation RLMApp : NSObject
 
-- (instancetype)initWithAppId:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
+- (instancetype)initWithId:(NSString *)appId
+             configuration:(RLMAppConfiguration *)configuration
+             rootDirectory:(NSURL *)rootDirectory {
     if (self = [super init]) {
-        app::App::Config boundConfiguration = {
-            .app_id = appId.UTF8String
-        };
-        boundConfiguration.transport_generator = [configuration]{
-            return std::make_unique<CocoaNetworkTransport>([RLMNetworkTransport new]);
-        };
-        if (configuration) {
-            if (configuration.baseURL) {
-                boundConfiguration.base_url = util::Optional<std::string>(configuration.baseURL.UTF8String);
-            }
-            if (configuration.transport) {
-                boundConfiguration.transport_generator = [configuration]{
-                    return std::make_unique<CocoaNetworkTransport>(configuration.transport);
-                };
-            }
-            if (configuration.localAppName) {
-                boundConfiguration.local_app_name = std::string(configuration.localAppName.UTF8String);
-            }
-            if (configuration.localAppVersion) {
-                boundConfiguration.local_app_version = std::string(configuration.localAppVersion.UTF8String);
-            }
-            boundConfiguration.default_request_timeout_ms = (uint64_t)configuration.defaultRequestTimeoutMS;
-        }
-        _app = realm::app::App(boundConfiguration);
+        _configuration = configuration;
+        [_configuration setAppId:appId];
+
+        _syncManager = [[RLMSyncManager alloc] initWithAppConfiguration:configuration rootDirectory:rootDirectory];
+        _app = [_syncManager app];
+
         return self;
     }
     return nil;
 }
 
-+ (instancetype)app:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
-    return [[RLMApp alloc] initWithAppId:appId configuration:configuration];
++ (instancetype)appWithId:(NSString *)appId
+            configuration:(RLMAppConfiguration *)configuration
+            rootDirectory:(NSURL *)rootDirectory {
+    static NSMutableDictionary *s_apps = [NSMutableDictionary new];
+    // protects the app cache
+    static std::mutex& initLock = *new std::mutex();
+    std::lock_guard<std::mutex> lock(initLock);
+
+    if (RLMApp *app = s_apps[appId]) {
+        return app;
+    }
+
+    RLMApp *app = [[RLMApp alloc] initWithId:appId configuration:configuration rootDirectory:rootDirectory];
+    s_apps[appId] = app;
+    return app;
 }
 
-- (realm::app::App&)_realmApp {
++ (instancetype)appWithId:(NSString *)appId configuration:(RLMAppConfiguration *)configuration {
+    return [self appWithId:appId configuration:configuration rootDirectory:nil];
+}
+
++ (instancetype)appWithId:(NSString *)appId {
+    return [self appWithId:appId configuration:nil];
+}
+
+- (std::shared_ptr<realm::app::App>)_realmApp {
     return _app;
 }
 
 - (NSDictionary<NSString *, RLMSyncUser *> *)allUsers {
-    NSArray *allUsers = [[RLMSyncManager sharedManager] _allUsers];
-    return [NSDictionary dictionaryWithObjects:allUsers
-                                       forKeys:[allUsers valueForKey:@"identity"]];
+    NSMutableDictionary *buffer = [NSMutableDictionary new];
+    for (auto user : SyncManager::shared().all_users()) {
+        std::string identity(user->identity());
+        buffer[@(identity.c_str())] = [[RLMSyncUser alloc] initWithSyncUser:std::move(user) app:self];
+    }
+    return buffer;
 }
 
 - (RLMSyncUser *)currentUser {
-    return [[RLMSyncManager sharedManager] _currentUser];
+    if (auto user = SyncManager::shared().get_current_user()) {
+        return [[RLMSyncUser alloc] initWithSyncUser:user app:self];
+    }
+    return nil;
 }
 
 - (void)loginWithCredential:(RLMAppCredentials *)credentials
           completion:(RLMUserCompletionBlock)completionHandler {
-    _app.log_in_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
+    _app->log_in_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
             return completionHandler(nil, RLMAppErrorToNSError(*error));
         }
 
-        completionHandler([[RLMSyncUser alloc] initWithSyncUser:user], nil);
+        completionHandler([[RLMSyncUser alloc] initWithSyncUser:user app:self], nil);
     });
 }
 
 - (RLMSyncUser *)switchToUser:(RLMSyncUser *)syncUser {
-    return [[RLMSyncUser alloc] initWithSyncUser:_app.switch_user(syncUser._syncUser)];
+    return [[RLMSyncUser alloc] initWithSyncUser:_app->switch_user(syncUser._syncUser) app:self];
 }
 
 - (void)removeUser:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app.remove_user(syncUser._syncUser, ^(Optional<app::AppError> error) {
+    _app->remove_user(syncUser._syncUser, ^(Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
-    _app.log_out(^(Optional<app::AppError> error) {
+    _app->log_out(^(Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (void)logOut:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app.log_out(syncUser._syncUser, ^(Optional<app::AppError> error) {
+    _app->log_out(syncUser._syncUser, ^(Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
@@ -199,13 +308,13 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 - (void)linkUser:(RLMSyncUser *)syncUser
      credentials:(RLMAppCredentials *)credentials
       completion:(RLMUserCompletionBlock)completion {
-    _app.link_user(syncUser._syncUser, credentials.appCredentials,
+    _app->link_user(syncUser._syncUser, credentials.appCredentials,
                    ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
         
-        completion([[RLMSyncUser alloc] initWithSyncUser:user], nil);
+        completion([[RLMSyncUser alloc] initWithSyncUser:user app:self], nil);
     });
 }
 
@@ -223,6 +332,27 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
         return completion(RLMAppErrorToNSError(*error));
     }
     completion(nil);
+}
+
+- (void)callFunctionNamed:(NSString *)name
+                arguments:(NSArray<id<RLMBSON>> *)arguments
+          completionBlock:(RLMCallFunctionCompletionBlock)completionBlock {
+    bson::BsonArray args;
+
+    for (id<RLMBSON> argument in arguments) {
+        args.push_back(RLMConvertRLMBSONToBson(argument));
+    }
+
+    _app->call_function(SyncManager::shared().get_current_user(),
+                        std::string(name.UTF8String),
+                        args, [completionBlock](util::Optional<app::AppError> error,
+                                                util::Optional<bson::Bson> response) {
+        if (error) {
+            return completionBlock(nil, RLMAppErrorToNSError(*error));
+        }
+
+        completionBlock(RLMConvertBsonToRLMBSON(*response), nil);
+    });
 }
 
 @end

@@ -22,13 +22,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMApp;
 
+/// Base provider client interface.
 @interface RLMProviderClient : NSObject
 
-/// A block type used to report an error
-typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
-
+/// The app associated with this provider client.
 @property (nonatomic, strong) RLMApp *app;
 
+/**
+ Initialize a provider client with a given app.
+ @param app The app for this provider client.
+ */
 - (instancetype)initWithApp:(RLMApp *)app;
 
 @end

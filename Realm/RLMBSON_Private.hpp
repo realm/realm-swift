@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2017 Realm Inc.
+// Copyright 2020 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,13 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncSessionRefreshHandle.h"
+#import "RLMBSON.h"
 
-@interface RLMSyncSessionRefreshHandle (ObjectServerTests)
+namespace realm {
+namespace bson {
+    class Bson;
+}
+}
 
-+ (void)calculateFireDateUsingTestLogic:(BOOL)forTest blockOnRefreshCompletion:(void(^)(BOOL))block;
-
-@end
+realm::bson::Bson RLMConvertRLMBSONToBson(id<RLMBSON> b);
+id<RLMBSON> RLMConvertBsonToRLMBSON(const realm::bson::Bson& b);

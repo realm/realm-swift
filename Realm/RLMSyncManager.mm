@@ -16,8 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncManager_Private.h"
+#import "RLMSyncManager_Private.hpp"
 
+#import "RLMApp_Private.hpp"
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
@@ -34,6 +35,7 @@
 #endif
 
 using namespace realm;
+
 using Level = realm::util::Logger::Level;
 
 namespace {
@@ -120,26 +122,16 @@ struct CallbackLoggerFactory : public realm::SyncLoggerFactory {
 
 static RLMSyncManager *s_sharedManager = nil;
 
-- (instancetype)initPrivate {
+- (instancetype)initWithAppConfiguration:(RLMAppConfiguration *)appConfiguration
+                           rootDirectory:(NSURL *)rootDirectory {
+    if (self = [super init]) {
+        [RLMSyncUser _setUpBindingContextFactory];
+        [self configureWithRootDirectory:rootDirectory appConfiguration:appConfiguration];
+    }
     return self = [super init];
 }
 
-+ (instancetype)sharedManager {
-    static std::once_flag flag;
-    std::call_once(flag, [] {
-        try {
-            [RLMSyncUser _setUpBindingContextFactory];
-            s_sharedManager = [[RLMSyncManager alloc] initPrivate];
-            [s_sharedManager configureWithRootDirectory:nil];
-        }
-        catch (std::exception const& e) {
-            @throw RLMException(e);
-        }
-    });
-    return s_sharedManager;
-}
-
-- (void)configureWithRootDirectory:(NSURL *)rootDirectory {
+- (void)configureWithRootDirectory:(NSURL *)rootDirectory appConfiguration:(RLMAppConfiguration *)appConfiguration {
     SyncClientConfig config;
     bool should_encrypt = !getenv("REALM_DISABLE_METADATA_ENCRYPTION") && !RLMIsRunningInPlayground();
     config.logger_factory = &s_syncLoggerFactory;
@@ -155,7 +147,16 @@ static RLMSyncManager *s_sharedManager = nil;
                          RLMStringDataWithNSString(REALM_COCOA_VERSION));
         config.user_agent_application_info = RLMStringDataWithNSString(self.appID);
     }
-    SyncManager::shared().configure(config);
+
+    if (appConfiguration) {
+        SyncManager::shared().configure(config, [appConfiguration config]);
+    } else {
+        SyncManager::shared().configure(config, realm::util::none);
+    }
+}
+
+- (std::shared_ptr<realm::app::App>)app {
+    return SyncManager::shared().app();
 }
 
 - (NSString *)appID {
@@ -222,38 +223,16 @@ static RLMSyncManager *s_sharedManager = nil;
     });
 }
 
-- (NSArray<RLMSyncUser *> *)_allUsers {
-    NSMutableArray<RLMSyncUser *> *buffer = [NSMutableArray array];
-    for (auto user : SyncManager::shared().all_users()) {
-        [buffer addObject:[[RLMSyncUser alloc] initWithSyncUser:std::move(user)]];
-    }
-    return buffer;
-}
-
-- (RLMSyncUser *)_currentUser {
-    return [[RLMSyncUser alloc] initWithSyncUser:SyncManager::shared().get_current_user()];
-}
-
-+ (void)resetForTesting {
-    RLMSyncManager *manager = self.sharedManager;
-    manager->_errorHandler = nil;
-    manager->_appID = nil;
-    manager->_userAgent = nil;
-    manager->_logger = nil;
-    manager->_authorizationHeaderName = nil;
-    manager->_customRequestHeaders = nil;
-    manager->_pinnedCertificatePaths = nil;
-    manager->_timeoutOptions = nil;
-
+- (void)resetForTesting {
+    _errorHandler = nil;
+    _appID = nil;
+    _userAgent = nil;
+    _logger = nil;
+    _authorizationHeaderName = nil;
+    _customRequestHeaders = nil;
+    _pinnedCertificatePaths = nil;
+    _timeoutOptions = nil;
     SyncManager::shared().reset_for_testing();
-}
-
-- (RLMNetworkRequestOptions *)networkRequestOptions {
-    RLMNetworkRequestOptions *options = [[RLMNetworkRequestOptions alloc] init];
-    options.authorizationHeaderName = self.authorizationHeaderName;
-    options.customHeaders = self.customRequestHeaders;
-    options.pinnedCertificatePaths = self.pinnedCertificatePaths;
-    return options;
 }
 
 @end
