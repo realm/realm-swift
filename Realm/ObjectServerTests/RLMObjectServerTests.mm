@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncTestCase.h"
-//#import "RLMTestUtils.h"
 #import "RLMSyncUser+ObjectServerTests.h"
+#import "RLMSyncUser_Private.hpp"
 
 #import "RLMAppCredentials.h"
 #import "RLMRealm+Sync.h"
@@ -571,6 +571,42 @@
     RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]];
     RLMSyncUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
 
+//    [user _syncUser]->update_access_token(self.badAccessToken.UTF8String);
+    
+    
+    NSString *realmId = @"foo";
+    RLMRealm *realm = [self openRealmForPartitionValue:realmId
+                                                  user:user];
+    RLMRealm *realm2 = [self openRealmForPartitionValue:realmId
+                                                   user:user2];
+    if (self.isParent) {
+        CHECK_COUNT(0, Person, realm);
+        RLMRunChildAndWait();
+        [self waitForDownloadsForUser:user
+                               realms:@[realm]
+                      partitionValues:@[realmId] expectedCounts:@[@4]];
+        [self waitForDownloadsForUser:user2
+                               realms:@[realm2]
+                      partitionValues:@[realmId] expectedCounts:@[@4]];
+    } else {
+        // Add objects.
+        [self addPersonsToRealm:realm
+                        persons:@[[Person johnWithRealmId:realmId],
+                                  [Person paulWithRealmId:realmId],
+                                  [Person ringoWithRealmId:realmId],
+                                  [Person georgeWithRealmId:realmId]]];
+        [self waitForUploadsForRealm:realm];
+    }
+}
+
+/// If client B adds objects to a synced Realm, client A should see those objects.
+- (void)testSessionRefresh {
+    RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]];
+    RLMSyncUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
+
+    [user _syncUser]->update_access_token(self.badAccessToken.UTF8String);
+    
+    
     NSString *realmId = @"foo";
     RLMRealm *realm = [self openRealmForPartitionValue:realmId
                                                   user:user];
