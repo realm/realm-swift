@@ -878,7 +878,6 @@
 		3FE79FF719BA6A5900780C9A /* RLMSwiftSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMSwiftSupport.h; sourceTree = "<group>"; };
 		3FEB383C1E70AC6900F22712 /* ObjectCreationTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ObjectCreationTests.mm; sourceTree = "<group>"; };
 		3FEC4A3D1BBB188B00F009C3 /* SwiftSchemaTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftSchemaTests.swift; sourceTree = "<group>"; };
-		49101A1D246C38550022BB0B /* scheduler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scheduler.cpp; sourceTree = "<group>"; };
 		494566A8246E8C59000FD07F /* ObjectiveCSupport+BSON.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ObjectiveCSupport+BSON.swift"; sourceTree = "<group>"; };
 		494566AA246EF031000FD07F /* proxy.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; name = proxy.rb; path = Realm/ObjectServerTests/proxy.rb; sourceTree = "<group>"; };
 		498C7F3724479904009DE80A /* remote_mongo_database.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = remote_mongo_database.hpp; path = sync/remote_mongo_database.hpp; sourceTree = "<group>"; };
@@ -1389,14 +1388,6 @@
 			path = bson;
 			sourceTree = "<group>";
 		};
-		53DAA68A248185BA00E5C6AD /* Recovered References */ = {
-			isa = PBXGroup;
-			children = (
-				49101A1D246C38550022BB0B /* scheduler.cpp */,
-			);
-			name = "Recovered References";
-			sourceTree = "<group>";
-		};
 		5D274C511D6D16BA006FEBB1 /* apple */ = {
 			isa = PBXGroup;
 			children = (
@@ -1661,7 +1652,6 @@
 				5D660FD91BE98C7C0021E04F /* RealmSwift Tests */,
 				3F558C7D22C299DB002F0F30 /* Test Utils */,
 				E81A1FB31955FCE000FDED82 /* CHANGELOG.md */,
-				53DAA68A248185BA00E5C6AD /* Recovered References */,
 			);
 			indentWidth = 4;
 			sourceTree = "<group>";
