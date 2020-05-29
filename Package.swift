@@ -30,6 +30,12 @@ let cxxSettings: [CXXSetting] = [
 
 let package = Package(
     name: "Realm",
+    platforms: [
+        .macOS(.v10_10),
+        .iOS(.v11),
+        .tvOS(.v9),
+        .watchOS(.v2)
+    ],
     products: [
         .library(
             name: "Realm",
@@ -70,6 +76,7 @@ let package = Package(
                 "Realm/ObjectStore/src/schema.cpp",
                 "Realm/ObjectStore/src/shared_realm.cpp",
                 "Realm/ObjectStore/src/thread_safe_reference.cpp",
+                "Realm/ObjectStore/src/util/scheduler.cpp",
                 "Realm/ObjectStore/src/util/uuid.cpp",
                 "Realm/ObjectStore/src/util/scheduler.cpp",
                 "Realm/RLMAccessor.mm",

@@ -207,12 +207,14 @@ open class EmbeddedObject: RLMObjectBase, RealmCollectionValue {
 
      - warning: This method cannot be called during a write transaction, or when
                 the containing Realm is read-only.
-
+     - parameter queue: The serial dispatch queue to receive notification on. If
+                        `nil`, notifications are delivered to the current thread.
      - parameter block: The block to call with information about changes to the object.
      - returns: A token which must be held for as long as you want updates to be delivered.
      */
-    public func observe(_ block: @escaping (ObjectChange) -> Void) -> NotificationToken {
-        return RLMObjectBaseAddNotificationBlock(self, { names, oldValues, newValues, error in
+    public func observe<T: RLMObjectBase>(on queue: DispatchQueue? = nil,
+                                          _ block: @escaping (ObjectChange<T>) -> Void) -> NotificationToken {
+        return RLMObjectBaseAddNotificationBlock(self, queue, { object, names, oldValues, newValues, error in
             if let error = error {
                 block(.error(error as NSError))
                 return
@@ -222,7 +224,7 @@ open class EmbeddedObject: RLMObjectBase, RealmCollectionValue {
                 return
             }
 
-            block(.change((0..<newValues.count).map { i in
+            block(.change(object as! T, (0..<newValues.count).map { i in
                 PropertyChange(name: names[i], oldValue: oldValues?[i], newValue: newValues[i])
             }))
         })

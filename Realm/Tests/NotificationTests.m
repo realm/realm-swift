@@ -1078,6 +1078,9 @@ static void ExpectChange(id self, NSArray *deletions, NSArray *insertions,
         XCTFail(@"notification block for wrong object called");
     }];
 
+    // Ensure initial notification is processed so that the change can report previousValue
+    [_obj.realm transactionWithBlock:^{}];
+
     [self dispatchAsync:^{
         RLMRealm *realm = [RLMRealm defaultRealm];
         AllTypesObject *obj = [[AllTypesObject allObjectsInRealm:realm] firstObject];

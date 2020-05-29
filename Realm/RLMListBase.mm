@@ -108,14 +108,19 @@
     return self;
 }
 
+- (instancetype)initWithLinkingObjects:(RLMResults *)linkingObjects {
+    if (!(self = [super init])) {
+        return nil;
+    }
+    _realm = linkingObjects.realm;
+    _results = linkingObjects;
+
+    return self;
+}
+
 - (instancetype)freeze {
     RLMLinkingObjectsHandle *frozen = [[self.class alloc] init];
-    frozen->_tableKey = _tableKey;
-    frozen->_objKey = _objKey;
-    frozen->_info = _info;
-    frozen->_realm = _realm;
-    frozen->_property = _property;
-    frozen->_results = [[self results] freeze];
+    frozen->_results = [self.results freeze];
     return frozen;
 }
 
@@ -138,11 +143,5 @@
     _results = [RLMLinkingObjects resultsWithObjectInfo:objectInfo results:std::move(results)];
     _realm = nil;
     return _results;
-}
-
-- (RLMObjectBase *)parent {
-    RLMObjectBase *obj = RLMCreateManagedAccessor(_info->rlmObjectSchema.accessorClass, _info);
-    obj->_row = _info->realm.group.get_table(_tableKey)->get_object(_objKey);
-    return obj;
 }
 @end

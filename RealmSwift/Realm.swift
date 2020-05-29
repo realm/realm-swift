@@ -33,10 +33,14 @@ import Realm.Private
  the code which uses the Realm within an `autoreleasepool {}` and ensure you have no other strong
  references to it.
 
- - warning: Non-frozen `Realm` instances are thread confined and cannot be shared across threads or
- dispatch queues. You must construct a new instance for each thread in which a Realm will be
- accessed. For dispatch queues, this means that you must construct a new instance in each block
- which is dispatched, as a queue is not guaranteed to run all of its blocks on the same thread.
+ - warning Non-frozen `RLMRealm` instances are thread-confined and cannot be
+ shared across threads or dispatch queues. Trying to do so will cause an
+ exception to be thrown. You must obtain an instance of `RLMRealm` on each
+ thread or queue you want to interact with the Realm on. Realms can be confined
+ to a dispatch queue rather than the thread they are opened on by explicitly
+ passing in the queue when obtaining the `RLMRealm` instance. If this is not
+ done, trying to use the same instance in multiple blocks dispatch to the same
+ queue may fail as queues are not always run on the same thread.
  */
 public struct Realm {
 
@@ -62,10 +66,14 @@ public struct Realm {
      The default Realm is created using the default `Configuration`, which can be changed by setting the
      `Realm.Configuration.defaultConfiguration` property to a new value.
 
+     - parameter queue: An optional dispatch queue to confine the Realm to. If
+                        given, this Realm instance can be used from within
+                        blocks dispatched to the given queue rather than on the
+                        current thread.
      - throws: An `NSError` if the Realm could not be initialized.
      */
-    public init() throws {
-        let rlmRealm = try RLMRealm(configuration: RLMRealmConfiguration.default())
+    public init(queue: DispatchQueue? = nil) throws {
+        let rlmRealm = try RLMRealm(configuration: RLMRealmConfiguration.rawDefault(), queue: queue)
         self.init(rlmRealm)
     }
 
@@ -73,11 +81,15 @@ public struct Realm {
      Obtains a `Realm` instance with the given configuration.
 
      - parameter configuration: A configuration value to use when creating the Realm.
+     - parameter queue: An optional dispatch queue to confine the Realm to. If
+                        given, this Realm instance can be used from within
+                        blocks dispatched to the given queue rather than on the
+                        current thread.
 
      - throws: An `NSError` if the Realm could not be initialized.
      */
-    public init(configuration: Configuration) throws {
-        let rlmRealm = try RLMRealm(configuration: configuration.rlmConfiguration)
+    public init(configuration: Configuration, queue: DispatchQueue? = nil) throws {
+        let rlmRealm = try RLMRealm(configuration: configuration.rlmConfiguration, queue: queue)
         self.init(rlmRealm)
     }
 
@@ -105,6 +117,9 @@ public struct Realm {
      synchronized Realms wait for all remote content available at the time the
      operation began to be downloaded and available locally.
 
+     The Realm passed to the callback function is confined to the callback
+     queue as if `Realm(configuration:queue:)` was used.
+
      - parameter configuration: A configuration object to use when opening the Realm.
      - parameter callbackQueue: The dispatch queue on which the callback should be run.
      - parameter callback:      A callback block. If the Realm was successfully opened, an
@@ -112,11 +127,6 @@ public struct Realm {
                                 Otherwise, a `Swift.Error` describing what went wrong will be
                                 passed to the block instead.
      - returns: A task object which can be used to observe or cancel the async open.
-
-     - note: The returned Realm is confined to the thread on which it was created.
-             Because GCD does not guarantee that queues will always use the same
-             thread, accessing the returned Realm outside the callback block (even if
-             accessed from `callbackQueue`) is unsafe.
      */
     @discardableResult
     public static func asyncOpen(configuration: Realm.Configuration = .defaultConfiguration,

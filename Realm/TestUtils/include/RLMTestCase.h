@@ -55,6 +55,8 @@ NSData *RLMGenerateKey(void);
 - (void)dispatchAsync:(dispatch_block_t)block;
 - (void)dispatchAsyncAndWait:(dispatch_block_t)block;
 
+@property (nonatomic, readonly) dispatch_queue_t bgQueue;
+
 @end
 
 NS_ASSUME_NONNULL_END
