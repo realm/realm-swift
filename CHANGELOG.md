@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add `RLMMongoClient`. This provides interaction with a remote MongoDB database & collection.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -24,11 +24,11 @@ Upgraded realm-sync from ? to ?
 ### Enhancements
 * Add `RLMSyncUser#customData`.  Custom data is a can be configured in your MongoDB Realm App.
 * Add `RLMApp#callFunctionNamed:arguments`. This is the entry point for calling Remote MongoDB Realm functions.
-* Add `RealmApp#functions`. This is the swift entry pint for calling Remote MongoDB Realm functions.
+* Add `RealmApp#functions`. This is the swift entry point for calling Remote MongoDB Realm functions.
 * Change `RLMSyncUser#configurationWithPartitionValue` to accept all BSON types.
 
 ### Breaking Changes
-* We no longer support Realm Cloud (logacy), but instead the new "MongoDB Realm" Cloud.
+* We no longer support Realm Cloud (legacy), but instead the new "MongoDB Realm" Cloud.
 * Add `-[RLMSyncUser customData]`/`SyncUser.customData`.  Custom data is a can be configured in your MongoDB Realm App.
 * Add `-[RLMApp callFunctionNamed:arguments]`/`RealmApp.functions`. This is the entry point for calling Remote MongoDB Realm functions.
  Functions allow you to define and execute server-side logic for your application. Functions are written in modern JavaScript (ES6+) and execute in a 
