@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol RLMNetworkTransport, RLMBSON;
 
-@class RLMSyncUser, RLMAppCredentials, RLMUsernamePasswordProviderClient, RLMUserAPIKeyProviderClient, RLMSyncManager;
+@class RLMSyncUser, RLMAppCredentials, RLMUsernamePasswordProviderClient, RLMUserAPIKeyProviderClient, RLMSyncManager, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection;
 
 /// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
@@ -210,6 +210,10 @@ Create a new Realm App configuration.
   This client should only be used by an authenticated user.
 */
 - (RLMUserAPIKeyProviderClient *)userAPIKeyProviderClient;
+
+/// A client for interacting with a remote MongoDB instance
+/// @param serviceName The name of the MongoDB service
+- (RLMMongoClient *)mongoClient:(NSString *)serviceName;
 
 /**
  Calls the MongoDB Realm function with the provided name and arguments.

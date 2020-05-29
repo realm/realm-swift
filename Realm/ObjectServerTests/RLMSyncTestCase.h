@@ -158,6 +158,8 @@ RLM_ARRAY_TYPE(Dog)
 
 - (NSString *)badAccessToken;
 
+- (void)cleanupRemoteDocuments:(RLMMongoCollection *)collection;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -25,6 +25,7 @@
 #import "RLMUsernamePasswordProviderClient.h"
 #import "RLMUserAPIKeyProviderClient.h"
 #import "RLMUtil.hpp"
+#import "RLMMongoClient_Private.hpp"
 
 #if !defined(REALM_COCOA_VERSION)
 #import "RLMVersion.h"
@@ -327,6 +328,10 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 - (RLMUserAPIKeyProviderClient *)userAPIKeyProviderClient {
     return [[RLMUserAPIKeyProviderClient alloc] initWithApp: self];
+}
+
+- (RLMMongoClient *)mongoClient:(NSString *)serviceName {
+    return [[RLMMongoClient alloc] initWithApp:self serviceName:serviceName];
 }
 
 - (void)handleResponse:(Optional<realm::app::AppError>)error
