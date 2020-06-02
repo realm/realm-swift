@@ -4,8 +4,23 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Fix errSecDuplicateItem (-25299) errors when opening a synchronized Realm
+  when upgrading from pre-5.0 versions of Realm.
+  ([#6538](https://github.com/realm/realm-cocoa/issues/6538), [#6494](https://github.com/realm/realm-cocoa/issues/6494), since 5.0.0).
+* Opening Realms stored on filesystems which do not support preallocation (such
+  as ExFAT) would give "Operation not supported" exceptions.
+  ([#6508](https://github.com/realm/realm-cocoa/issues/6508), since 3.2.0).
+* 'NoSuchTable' exceptions would sometimes be thrown after upgrading a Relam
+  file to the v10 format. ([Core #3701](https://github.com/realm/realm-core/issues/3701), since 5.0.0)
+* If the upgrade process was interrupted/killed for various reasons, the
+  following run could stop with some assertions failing. No instances of this
+  happening were reported to us. (Since 5.0.0).
+* Queries filtering a `List` where the query was on an indexed property over a
+  link would sometimes give incomplete results.
+  ([#6540](https://github.com/realm/realm-cocoa/issues/6540), since 4.1.0 but
+  more common since 5.0.0)
+* Opening a file in read-only mode would attempt to make a spurious write to
+  the file, causing errors if the file was in read-only storage (since 5.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -17,8 +32,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v6.0.4 to v6.0.6
+* Upgraded realm-sync from v5.0.3 to v5.0.5
 
 5.0.1 Release notes (2020-05-27)
 =============================================================
