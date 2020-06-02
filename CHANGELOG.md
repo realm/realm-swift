@@ -1,9 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.0.2 Release notes (2020-06-02)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
+
 * Fix errSecDuplicateItem (-25299) errors when opening a synchronized Realm
   when upgrading from pre-5.0 versions of Realm.
   ([#6538](https://github.com/realm/realm-cocoa/issues/6538), [#6494](https://github.com/realm/realm-cocoa/issues/6494), since 5.0.0).
@@ -22,9 +21,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Opening a file in read-only mode would attempt to make a spurious write to
   the file, causing errors if the file was in read-only storage (since 5.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.11 or later.
@@ -32,6 +30,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
+
 * Upgraded realm-core from v6.0.4 to v6.0.6
 * Upgraded realm-sync from v5.0.3 to v5.0.5
 
