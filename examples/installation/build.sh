@@ -74,7 +74,7 @@ xctest() {
     if [[ ! -d "$DIRECTORY" ]]; then
         DIRECTORY="${DIRECTORY/swift/swift-$REALM_SWIFT_VERSION}"
     fi
-    if [[ $PLATFORM == ios ]]; then
+    if [[ $PLATFORM == ios ]] && [[ $NAME != Carthage* ]]; then
         sh "$(dirname "$0")/../../scripts/reset-simulators.sh"
     fi
     if [[ $NAME == CocoaPods* ]]; then
