@@ -679,7 +679,7 @@ static NSURL *syncDirectoryForChildProcess() {
 
 - (void)cleanupRemoteDocuments:(RLMMongoCollection *)collection {
     XCTestExpectation *deleteManyExpectation = [self expectationWithDescription:@"should delete many documents"];
-    [collection deleteManyDocuments:@{}
+    [collection deleteManyDocumentsWhere:@{}
                          completion:^(NSNumber * count, NSError * error) {
         XCTAssertNotNil(count);
         XCTAssertNil(error);

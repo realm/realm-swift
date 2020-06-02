@@ -1044,7 +1044,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
     func removeAllFromCollection(_ collection: MongoCollection) {
         let deleteEx = expectation(description: "Delete all from Mongo collection")
-        collection.deleteManyDocuments([:]) { (count, error) in
+        collection.deleteManyDocuments(filter: [:]) { (count, error) in
             XCTAssertNotNil(count)
             XCTAssertNil(error)
             deleteEx.fulfill()
@@ -1105,7 +1105,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [insertManyEx1], timeout: 4.0)
 
         let findEx1 = expectation(description: "Find documents")
-        collection.find([:]) { (result, error) in
+        collection.find(filter: [:]) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             XCTAssertEqual(result?.count, 3)
@@ -1135,7 +1135,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [insertManyEx1], timeout: 4.0)
 
         let findEx1 = expectation(description: "Find documents")
-        collection.find([:]) { (result, error) in
+        collection.find(filter: [:]) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             XCTAssertEqual(result?.count, 3)
@@ -1147,7 +1147,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [findEx1], timeout: 4.0)
 
         let findEx2 = expectation(description: "Find documents")
-        collection.find([:], findOptions) { (result, error) in
+        collection.find(filter: [:], options: findOptions) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             XCTAssertEqual(result?.count, 1)
@@ -1157,7 +1157,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [findEx2], timeout: 4.0)
 
         let findEx3 = expectation(description: "Find documents")
-        collection.find(document3, findOptions) { (result, error) in
+        collection.find(filter: document3, options: findOptions) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             XCTAssertEqual(result?.count, 1)
@@ -1166,7 +1166,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [findEx3], timeout: 4.0)
 
         let findOneEx1 = expectation(description: "Find one document")
-        collection.findOneDocument(document) { (result, error) in
+        collection.findOneDocument(filter: document) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             findOneEx1.fulfill()
@@ -1174,7 +1174,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [findOneEx1], timeout: 4.0)
 
         let findOneEx2 = expectation(description: "Find one document")
-        collection.findOneDocument(document, findOptions) { (result, error) in
+        collection.findOneDocument(filter: document, options: findOptions) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             findOneEx2.fulfill()
@@ -1189,7 +1189,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let document3: Document = ["name": "john", "breed": "cane corso"]
 
         let findOneReplaceEx1 = expectation(description: "Find one document and replace")
-        collection.findOneAndReplace(document, document2) { (result, error) in
+        collection.findOneAndReplace(filter: document, replacement: document2) { (result, error) in
             // no doc found, both should be nil
             XCTAssertNil(result)
             XCTAssertNil(error)
@@ -1199,7 +1199,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
         let findOneReplaceEx2 = expectation(description: "Find one document and replace")
-        collection.findOneAndReplace(document2, document3, options1) { (result, error) in
+        collection.findOneAndReplace(filter: document2, replacement: document3, options: options1) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             XCTAssertEqual(result!["name"] as! String, "john")
@@ -1209,7 +1209,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
         let findOneReplaceEx3 = expectation(description: "Find one document and replace")
-        collection.findOneAndReplace(document, document2, options2) { (result, error) in
+        collection.findOneAndReplace(filter: document, replacement: document2, options: options2) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             XCTAssertEqual(result!["name"] as! String, "john")
@@ -1225,7 +1225,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let document3: Document = ["name": "john", "breed": "cane corso"]
 
         let findOneUpdateEx1 = expectation(description: "Find one document and update")
-        collection.findOneAndUpdate(document, document2) { (result, error) in
+        collection.findOneAndUpdate(filter: document, update: document2) { (result, error) in
             // no doc found, both should be nil
             XCTAssertNil(result)
             XCTAssertNil(error)
@@ -1235,7 +1235,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
         let findOneUpdateEx2 = expectation(description: "Find one document and update")
-        collection.findOneAndUpdate(document2, document3, options1) { (result, error) in
+        collection.findOneAndUpdate(filter: document2, update: document3, options: options1) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             XCTAssertEqual(result!["name"] as! String, "john")
@@ -1245,7 +1245,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
         let findOneUpdateEx3 = expectation(description: "Find one document and update")
-        collection.findOneAndUpdate(document, document2, options2) { (result, error) in
+        collection.findOneAndUpdate(filter: document, update: document2, options: options2) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             XCTAssertEqual(result!["name"] as! String, "john")
@@ -1259,7 +1259,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
         let findOneDeleteEx1 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(document) { (error) in
+        collection.findOneAndDelete(filter: document) { (document, error) in
+            XCTAssertNotNil(document)
             XCTAssertNil(error)
             findOneDeleteEx1.fulfill()
         }
@@ -1267,7 +1268,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
         let findOneDeleteEx2 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(document, options1) { (error) in
+        collection.findOneAndDelete(filter: document, options: options1) { (document, error) in
+            XCTAssertNotNil(document)
             XCTAssertNil(error)
             findOneDeleteEx2.fulfill()
         }
@@ -1275,14 +1277,15 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
         let findOneDeleteEx3 = expectation(description: "Find one document and delete")
-        collection.findOneAndDelete(document, options2) { (error) in
+        collection.findOneAndDelete(filter: document, options: options2) { (document, error) in
+            XCTAssertNotNil(document)
             XCTAssertNil(error)
             findOneDeleteEx3.fulfill()
         }
         wait(for: [findOneDeleteEx3], timeout: 4.0)
 
         let findEx = expectation(description: "Find documents")
-        collection.find([:]) { (result, error) in
+        collection.find(filter: [:]) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
             XCTAssertEqual(result?.count, 0)
@@ -1309,7 +1312,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [insertManyEx], timeout: 4.0)
 
         let updateEx1 = expectation(description: "Update one document")
-        collection.updateOneDocument(document, document2) { (updateResult, error) in
+        collection.updateOneDocument(filter: document, update: document2) { (updateResult, error) in
             XCTAssertEqual(updateResult?.matchedCount, 1)
             XCTAssertEqual(updateResult?.modifiedCount, 1)
             XCTAssertNil(updateResult?.objectId)
@@ -1319,7 +1322,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [updateEx1], timeout: 4.0)
 
         let updateEx2 = expectation(description: "Update one document")
-        collection.updateOneDocument(document5, document2, true) { (updateResult, error) in
+        collection.updateOneDocument(filter: document5, update: document2, upsert: true) { (updateResult, error) in
             XCTAssertEqual(updateResult?.matchedCount, 0)
             XCTAssertEqual(updateResult?.modifiedCount, 0)
             XCTAssertNotNil(updateResult?.objectId)
@@ -1347,7 +1350,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [insertManyEx], timeout: 4.0)
 
         let updateEx1 = expectation(description: "Update one document")
-        collection.updateManyDocuments(document, document2) { (updateResult, error) in
+        collection.updateManyDocuments(filter: document, update: document2) { (updateResult, error) in
             XCTAssertEqual(updateResult?.matchedCount, 1)
             XCTAssertEqual(updateResult?.modifiedCount, 1)
             XCTAssertNil(updateResult?.objectId)
@@ -1357,7 +1360,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [updateEx1], timeout: 4.0)
 
         let updateEx2 = expectation(description: "Update one document")
-        collection.updateManyDocuments(document5, document2, true) { (updateResult, error) in
+        collection.updateManyDocuments(filter: document5, update: document2, upsert: true) { (updateResult, error) in
             XCTAssertEqual(updateResult?.matchedCount, 0)
             XCTAssertEqual(updateResult?.modifiedCount, 0)
             XCTAssertNotNil(updateResult?.objectId)
@@ -1373,7 +1376,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let document2: Document = ["name": "rex", "breed": "cane corso"]
 
         let deleteEx1 = expectation(description: "Delete 0 documents")
-        collection.deleteOneDocument(document) { (count, error) in
+        collection.deleteOneDocument(filter: document) { (count, error) in
             XCTAssertEqual(count, 0)
             XCTAssertNil(error)
             deleteEx1.fulfill()
@@ -1390,7 +1393,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [insertManyEx], timeout: 4.0)
 
         let deleteEx2 = expectation(description: "Delete one document")
-        collection.deleteOneDocument(document) { (count, error) in
+        collection.deleteOneDocument(filter: document) { (count, error) in
             XCTAssertEqual(count, 1)
             XCTAssertNil(error)
             deleteEx2.fulfill()
@@ -1404,7 +1407,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let document2: Document = ["name": "rex", "breed": "cane corso"]
 
         let deleteEx1 = expectation(description: "Delete 0 documents")
-        collection.deleteManyDocuments(document) { (count, error) in
+        collection.deleteManyDocuments(filter: document) { (count, error) in
             XCTAssertEqual(count, 0)
             XCTAssertNil(error)
             deleteEx1.fulfill()
@@ -1421,7 +1424,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [insertManyEx], timeout: 4.0)
 
         let deleteEx2 = expectation(description: "Delete one document")
-        collection.deleteManyDocuments(["breed": "cane corso"]) { (count, error) in
+        collection.deleteManyDocuments(filter: ["breed": "cane corso"]) { (count, error) in
             XCTAssertEqual(count, 2)
             XCTAssertNil(error)
             deleteEx2.fulfill()
@@ -1442,13 +1445,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [insertManyEx1], timeout: 4.0)
 
-        collection.aggregate([["$match": ["name": "fido"]], ["$group": ["_id": "$name"]]]) { (result, error) in
+        collection.aggregate(pipeline: [["$match": ["name": "fido"]], ["$group": ["_id": "$name"]]]) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
         }
 
         let countEx1 = expectation(description: "Count documents")
-        collection.count(document) { (count, error) in
+        collection.count(filter: document) { (count, error) in
             XCTAssertNotNil(count)
             XCTAssertNil(error)
             countEx1.fulfill()
@@ -1456,7 +1459,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [countEx1], timeout: 4.0)
 
         let countEx2 = expectation(description: "Count documents")
-        collection.count(document, 1) { (count, error) in
+        collection.count(filter: document, limit: 1) { (count, error) in
             XCTAssertNotNil(count)
             XCTAssertNil(error)
             XCTAssertEqual(count, 1)
