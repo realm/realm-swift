@@ -18,6 +18,8 @@
 
 #import <Realm/RLMProviderClient.h>
 
+@protocol RLMBSON;
+
 /// A block type used to report an error
 typedef void(^RLMUsernamePasswordProviderClientOptionalErrorBlock)(NSError * _Nullable);
 
@@ -96,12 +98,12 @@ NS_ASSUME_NONNULL_BEGIN
  
  @param email  The email address of the user.
  @param password The desired new password.
- @param args A pre-serialized list of arguments. Must be a JSON array.
+ @param args A pre-serialized list of arguments passed in as a BSON array.
  @param completionHandler A callback to be invoked once the call is complete.
 */
 - (void)callResetPasswordFunction:(NSString *)email
                          password:(NSString *)password
-                             args:(NSString *)args
+                             args:(NSArray<NSDictionary<NSString *, id<RLMBSON>> *> *)args
                        completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
 
 @end

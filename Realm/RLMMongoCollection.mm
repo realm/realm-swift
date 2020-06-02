@@ -61,7 +61,7 @@
         if (error) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
-        completion((NSArray<id> *)RLMConvertBsonToRLMBSON(*documents), nil);
+        completion((NSArray<NSDictionary<NSString *, id<RLMBSON>> *> *)RLMConvertBsonToRLMBSON(*documents), nil);
     });
 }
 
@@ -79,7 +79,7 @@
         if (error) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
-        completion((NSDictionary *)RLMConvertBsonToRLMBSON(*document), nil);
+        completion((NSDictionary<NSString *, id<RLMBSON>> *)RLMConvertBsonToRLMBSON(*document), nil);
     });
 }
 
@@ -221,7 +221,7 @@
         if (error) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
-        
+
         if (document) {
             return completion((NSDictionary *)RLMConvertBsonToRLMBSON(*document), nil);
         }
@@ -250,7 +250,7 @@
         if (error) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
-        
+
         if (document) {
             return completion((NSDictionary *)RLMConvertBsonToRLMBSON(*document), nil);
         }
@@ -273,10 +273,16 @@
                    completion:(RLMMongoDeleteBlock)completion {
     [self collection:self.name].find_one_and_delete(static_cast<realm::bson::BsonDocument>(RLMConvertRLMBSONToBson(filterDocument)),
                                                     [options toRemoteFindOneAndModifyOptions],
-                                                    [=](realm::util::Optional<realm::app::AppError> error) {
+                                                    [=](realm::util::Optional<realm::bson::BsonDocument> document,
+                                                        realm::util::Optional<realm::app::AppError> error) {
         if (error) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
+
+        if (document) {
+            return completion((NSDictionary *)RLMConvertBsonToRLMBSON(*document), nil);
+        }
+        // no docs where found
         completion(nil, nil);
     });
 }
