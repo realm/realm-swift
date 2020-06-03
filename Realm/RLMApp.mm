@@ -330,7 +330,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     return [[RLMUserAPIKeyProviderClient alloc] initWithApp: self];
 }
 
-- (RLMMongoClient *)mongoClient:(NSString *)serviceName {
+- (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName {
     return [[RLMMongoClient alloc] initWithApp:self serviceName:serviceName];
 }
 

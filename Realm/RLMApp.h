@@ -213,7 +213,7 @@ Create a new Realm App configuration.
 
 /// A client for interacting with a remote MongoDB instance
 /// @param serviceName The name of the MongoDB service
-- (RLMMongoClient *)mongoClient:(NSString *)serviceName;
+- (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName NS_REFINED_FOR_SWIFT;
 
 /**
  Calls the MongoDB Realm function with the provided name and arguments.

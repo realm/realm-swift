@@ -119,4 +119,8 @@ public extension RealmApp {
     var functions: Functions {
         return Functions(app: self)
     }
+    
+    func mongoClient(_ serviceName: String) -> MongoClient {
+        self.__mongoClient(withServiceName: serviceName)
+    }
 }

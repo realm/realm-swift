@@ -1207,12 +1207,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [findOneReplaceEx2], timeout: 4.0)
 
-        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
+        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, false)
         let findOneReplaceEx3 = expectation(description: "Find one document and replace")
         collection.findOneAndReplace(filter: document, replacement: document2, options: options2) { (result, error) in
-            XCTAssertNotNil(result)
+            // upsert but do not return document
+            XCTAssertNil(result)
             XCTAssertNil(error)
-            XCTAssertEqual(result!["name"] as! String, "john")
             findOneReplaceEx3.fulfill()
         }
         wait(for: [findOneReplaceEx3], timeout: 4.0)
