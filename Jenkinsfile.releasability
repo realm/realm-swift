@@ -17,6 +17,7 @@ def installationTest(platform, test, language) {
       }
 
       sh """
+      hostname
       export REALM_XCODE_VERSION=${carthageXcodeVersion}
       if [ "${platform}" != osx ]; then
         ./scripts/reset-simulators.sh -firstOnly
@@ -64,6 +65,7 @@ def doBuild() {
           deleteDir()
           unstash 'source'
           sh """
+          hostname
           export REALM_SWIFT_VERSION=${docsSwiftVersion}
           export PATH='/Users/realm/.rbenv/bin:/Users/realm/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/realm/.gems/bin'
           ./scripts/reset-simulators.sh
@@ -107,6 +109,7 @@ def doBuild() {
           deleteDir()
           unstash 'source'
           sh """
+          hostname
           export REALM_XCODE_VERSION=${carthageXcodeVersion}
           . ./scripts/swift-version.sh
           set_xcode_and_swift_versions
@@ -227,6 +230,7 @@ def doBuild() {
 
           def sha = params.sha
           sh """
+          hostname
           curl -O https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/build.sh
           mkdir -p scripts
           curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/swift-version.sh -o scripts/swift-version.sh
@@ -247,6 +251,7 @@ def doBuild() {
 
           def sha = params.sha
           sh """
+          hostname
           curl -O https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/build.sh
           mkdir -p scripts
           curl https://raw.githubusercontent.com/realm/realm-cocoa/${sha}/scripts/swift-version.sh -o scripts/swift-version.sh
