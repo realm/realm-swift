@@ -220,10 +220,17 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
              configuration:(RLMAppConfiguration *)configuration
              rootDirectory:(NSURL *)rootDirectory {
     if (self = [super init]) {
+        if (!configuration) {
+            configuration = [[RLMAppConfiguration alloc] initWithBaseURL:nil
+                                                               transport:nil
+                                                            localAppName:nil
+                                                         localAppVersion:nil];
+        }
         _configuration = configuration;
         [_configuration setAppId:appId];
 
-        _syncManager = [[RLMSyncManager alloc] initWithAppConfiguration:configuration rootDirectory:rootDirectory];
+        _syncManager = [[RLMSyncManager alloc] initWithAppConfiguration:configuration
+                                                          rootDirectory:rootDirectory];
         _app = [_syncManager app];
 
         return self;

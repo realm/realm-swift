@@ -62,7 +62,11 @@
 }
 
 - (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block {
-    return RLMObjectAddNotificationBlock(self, block);
+    return RLMObjectAddNotificationBlock(self, block, nil);
+}
+
+- (RLMNotificationToken *)addNotificationBlock:(RLMObjectChangeBlock)block queue:(dispatch_queue_t)queue {
+    return RLMObjectAddNotificationBlock(self, block, queue);
 }
 
 + (NSString *)className {

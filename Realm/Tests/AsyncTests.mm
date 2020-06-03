@@ -841,6 +841,18 @@
     }];
 }
 
+- (void)testAddNotificationBlockFromWrongQueue {
+    auto queue = dispatch_queue_create("background queue", DISPATCH_QUEUE_SERIAL);
+    __block RLMResults *results;
+    dispatch_sync(queue, ^{
+        RLMRealm *realm = [RLMRealm defaultRealmForQueue:queue];
+        results = [IntObject allObjectsInRealm:realm];
+    });
+    XCTAssertThrows([results addNotificationBlock:^(RLMResults *results, RLMCollectionChange *change, NSError *error) {
+        XCTFail(@"should not be called");
+    }]);
+}
+
 - (void)testRemoveNotificationBlockFromWrongThread {
     // Unlike adding this is allowed, because it can happen due to capturing
     // tokens in blocks and users are very confused by errors from deallocation
@@ -978,6 +990,28 @@
 
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
     CFRunLoopRun();
+    [token invalidate];
+}
+
+- (void)testNotificationDeliveryToQueue {
+    RLMRealm *realm = [RLMRealm defaultRealm];
+    __block RLMNotificationToken *token;
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+
+    [self dispatchAsync:^{
+        RLMRealm *bgRealm = [RLMRealm defaultRealmForQueue:self.bgQueue];
+        token = [[IntObject allObjectsInRealm:bgRealm] addNotificationBlock:^(RLMResults *results, RLMCollectionChange *, NSError *) {
+            XCTAssertNotNil(results);
+            XCTAssertNoThrow(results.count);
+            dispatch_semaphore_signal(sema);
+        }];
+    }];
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+
+    [realm transactionWithBlock:^{
+        [IntObject createInRealm:realm withValue:@[@1]];
+    }];
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
     [token invalidate];
 }
 

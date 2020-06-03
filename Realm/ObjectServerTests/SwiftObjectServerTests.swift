@@ -54,7 +54,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
     }
 
-
     /// If client B adds objects to a Realm, client A should see those new objects.
     func testSwiftAddObjects() {
         do {
