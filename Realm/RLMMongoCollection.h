@@ -60,6 +60,7 @@ typedef void(^RLMMongoUpdateBlock)(RLMUpdateResult * _Nullable, NSError * _Nulla
 /// Block which returns the deleted Document on a successful delete operation, or an error should one occur.
 typedef void(^RLMMongoDeleteBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Nullable, NSError * _Nullable);
 
+/// The name of this mongodb collection.
 @property (nonatomic, readonly) NSString *name;
 
 /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be

@@ -492,8 +492,6 @@
 		CF76F7F424816AAB00890DD2 /* RLMFindOneAndModifyOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D624816AAA00890DD2 /* RLMFindOneAndModifyOptions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF76F7F524816AAB00890DD2 /* RLMFindOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D724816AAA00890DD2 /* RLMFindOptions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF76F7F624816AAB00890DD2 /* RLMFindOptions.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D724816AAA00890DD2 /* RLMFindOptions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CF76F7F724816AAB00890DD2 /* RLMFindOneAndModifyOptions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D824816AAB00890DD2 /* RLMFindOneAndModifyOptions_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		CF76F7F824816AAB00890DD2 /* RLMFindOneAndModifyOptions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D824816AAB00890DD2 /* RLMFindOneAndModifyOptions_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		CF76F7F924816AAB00890DD2 /* RLMMongoDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D924816AAB00890DD2 /* RLMMongoDatabase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF76F7FA24816AAB00890DD2 /* RLMMongoDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D924816AAB00890DD2 /* RLMMongoDatabase.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF76F7FB24816AAB00890DD2 /* RLMMongoClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7DA24816AAB00890DD2 /* RLMMongoClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1937,7 +1935,6 @@
 				5D659EB61BE04556006515A0 /* RLMObjectSchema_Private.h in Headers */,
 				5D659EB81BE04556006515A0 /* RLMObjectStore.h in Headers */,
 				CF76F7EB24816AAB00890DD2 /* RLMMongoCollection_Private.hpp in Headers */,
-				CF76F7F724816AAB00890DD2 /* RLMFindOneAndModifyOptions_Private.hpp in Headers */,
 				5D659EBA1BE04556006515A0 /* RLMOptionalBase.h in Headers */,
 				5D659EBC1BE04556006515A0 /* RLMProperty.h in Headers */,
 				5D659EBD1BE04556006515A0 /* RLMProperty_Private.h in Headers */,
@@ -1997,7 +1994,6 @@
 				5DD755A91BE056DE002800DA /* RLMCollection.h in Headers */,
 				5D1BF2001EF987AE00B7DC87 /* RLMCollection_Private.h in Headers */,
 				5DD755AA1BE056DE002800DA /* RLMConstants.h in Headers */,
-				CF76F7F824816AAB00890DD2 /* RLMFindOneAndModifyOptions_Private.hpp in Headers */,
 				3F4F3ADE23F71C790048DB43 /* RLMDecimal128.h in Headers */,
 				CF76F7E024816AAB00890DD2 /* RLMUpdateResult.h in Headers */,
 				3FC3F913241808B400E27322 /* RLMEmbeddedObject.h in Headers */,

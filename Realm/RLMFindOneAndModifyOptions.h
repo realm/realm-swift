@@ -26,10 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMFindOneAndModifyOptions : NSObject
 
 /// Limits the fields to return for all matching documents.
-@property (nonatomic, nullable) id<RLMBSON> projectionBson NS_REFINED_FOR_SWIFT;
+@property (nonatomic, nullable) id<RLMBSON> projection NS_REFINED_FOR_SWIFT;
 
 /// The order in which to return matching documents.
-@property (nonatomic, nullable) id<RLMBSON> sortBson NS_REFINED_FOR_SWIFT;
+@property (nonatomic, nullable) id<RLMBSON> sort NS_REFINED_FOR_SWIFT;
 
 /// Whether or not to perform an upsert, default is false
 /// (only available for find_one_and_replace and find_one_and_update)
@@ -40,10 +40,10 @@ NS_ASSUME_NONNULL_BEGIN
 /// (only available for find_one_and_replace and find_one_and_update)
 @property (nonatomic) BOOL returnNewDocument;
 
-- (instancetype)initWithProjectionBson:(id<RLMBSON> _Nullable)projectionBson
-                              sortBson:(id<RLMBSON> _Nullable)sortBson
-                                upsert:(BOOL)upsert
-                     returnNewDocument:(BOOL)returnNewDocument NS_SWIFT_UNAVAILABLE("Please see FindOneAndModifyOptions");
+- (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
+                              sort:(id<RLMBSON> _Nullable)sort
+                            upsert:(BOOL)upsert
+                 returnNewDocument:(BOOL)returnNewDocument NS_SWIFT_UNAVAILABLE("Please see FindOneAndModifyOptions");
 
 @end
 

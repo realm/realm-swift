@@ -20,40 +20,74 @@
 #import "RLMFindOneAndModifyOptions_Private.hpp"
 #import "RLMBSON_Private.hpp"
 
+@interface RLMFindOneAndModifyOptions() {
+    realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions _options;
+};
+@end
+
 @implementation RLMFindOneAndModifyOptions
 
-- (instancetype)initWithProjectionBson:(id<RLMBSON> _Nullable)projectionBson
-                              sortBson:(id<RLMBSON> _Nullable)sortBson
-                                upsert:(BOOL)upsert
-                     returnNewDocument:(BOOL)returnNewDocument {
-    if (self) {
-        _upsert = upsert;
-        _returnNewDocument = returnNewDocument;
-        _projectionBson = projectionBson;
-        _sortBson = sortBson;
+- (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
+                              sort:(id<RLMBSON> _Nullable)sort
+                            upsert:(BOOL)upsert
+                 returnNewDocument:(BOOL)returnNewDocument {
+    if (self = [super init]) {
+        [self setUpsert: upsert];
+        [self setReturnNewDocument: returnNewDocument];
+        [self setProjection:projection];
+        [self setSort:sort];
     }
     return self;
 }
 
-- (realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions)toRemoteFindOneAndModifyOptions {
-    realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions options;
-    
-    if (self.upsert) {
-        options.upsert = true;
-    }
-    if (self.returnNewDocument) {
-        options.return_new_document = true;
-    }
-    if (self.projectionBson) {
-        auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(self.projectionBson));
-        options.projection_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
-    }
-    if (self.sortBson) {
-        auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(self.sortBson));
-        options.sort_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
+- (realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions)_findOneAndModifyOptions {
+    return _options;
+}
+
+- (id<RLMBSON>)projection {
+    if (_options.projection_bson) {
+        return RLMConvertBsonToRLMBSON(*_options.projection_bson);
     }
     
-    return options;
+    return nil;
+}
+
+- (id<RLMBSON>)sort {
+    if (_options.sort_bson) {
+        return RLMConvertBsonToRLMBSON(*_options.sort_bson);
+    }
+    
+    return nil;
+}
+
+- (BOOL)upsert {
+    return _options.upsert;
+}
+
+- (BOOL)returnNewDocument {
+    return _options.return_new_document;
+}
+
+- (void)setProjection:(id<RLMBSON>)projection {
+    if (projection) {
+        auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(projection));
+        _options.projection_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
+    }
+}
+
+- (void)setSort:(id<RLMBSON>)sort {
+    if (sort) {
+        auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(sort));
+        _options.sort_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
+    }
+}
+
+- (void)setUpsert:(BOOL)upsert {
+    _options.upsert = upsert;
+}
+
+- (void)setReturnNewDocument:(BOOL)returnNewDocument {
+    _options.return_new_document = returnNewDocument;
 }
 
 @end

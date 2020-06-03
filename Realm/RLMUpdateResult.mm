@@ -22,11 +22,9 @@
 @implementation RLMUpdateResult
 
 - (instancetype)initWithRemoteUpdateResult:(realm::app::RemoteMongoCollection::RemoteUpdateResult)remoteUpdateResult {
-
-    self = [super init];
-    if (self) {
-        _matchedCount = [NSNumber numberWithLong:remoteUpdateResult.matched_count];
-        _modifiedCount = [NSNumber numberWithLong:remoteUpdateResult.modified_count];
+    if (self = [super init]) {
+        _matchedCount = remoteUpdateResult.matched_count;
+        _modifiedCount = remoteUpdateResult.modified_count;
         if (remoteUpdateResult.upserted_id) {
             _objectId = [[RLMObjectId alloc] initWithValue:*remoteUpdateResult.upserted_id];
         }

@@ -1652,6 +1652,92 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 #pragma mark - Mongo Client
 
+- (void)testFindOneAndModifyOptions {
+    NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
+    NSDictionary<NSString *, id<RLMBSON>> *sort = @{@"age" : @1, @"coat" : @1};
+
+    RLMFindOneAndModifyOptions *findOneAndModifyOptions1 = [[RLMFindOneAndModifyOptions alloc] init];
+    XCTAssertNil(findOneAndModifyOptions1.projection);
+    XCTAssertNil(findOneAndModifyOptions1.sort);
+    XCTAssertFalse(findOneAndModifyOptions1.returnNewDocument);
+    XCTAssertFalse(findOneAndModifyOptions1.upsert);
+    
+    RLMFindOneAndModifyOptions *findOneAndModifyOptions2 = [[RLMFindOneAndModifyOptions alloc] init];
+    findOneAndModifyOptions2.projection = projection;
+    findOneAndModifyOptions2.sort = sort;
+    XCTAssertNotNil(findOneAndModifyOptions2.projection);
+    XCTAssertNotNil(findOneAndModifyOptions2.sort);
+    findOneAndModifyOptions2.returnNewDocument = YES;
+    findOneAndModifyOptions2.upsert = YES;
+    XCTAssertTrue(findOneAndModifyOptions2.returnNewDocument);
+    XCTAssertTrue(findOneAndModifyOptions2.upsert);
+    
+    XCTAssertFalse([findOneAndModifyOptions2.projection isEqual:@{}]);
+    XCTAssertTrue([findOneAndModifyOptions2.projection isEqual:projection]);
+    XCTAssertFalse([findOneAndModifyOptions2.sort isEqual:@{}]);
+    XCTAssertTrue([findOneAndModifyOptions2.sort isEqual:sort]);
+    
+    RLMFindOneAndModifyOptions *findOneAndModifyOptions3 = [[RLMFindOneAndModifyOptions alloc]
+                                                            initWithProjection:projection
+                                                            sort:sort
+                                                            upsert:YES
+                                                            returnNewDocument:YES];
+    
+    XCTAssertNotNil(findOneAndModifyOptions3.projection);
+    XCTAssertNotNil(findOneAndModifyOptions3.sort);
+    XCTAssertTrue(findOneAndModifyOptions3.returnNewDocument);
+    XCTAssertTrue(findOneAndModifyOptions3.upsert);
+    XCTAssertFalse([findOneAndModifyOptions3.projection isEqual:@{}]);
+    XCTAssertTrue([findOneAndModifyOptions3.projection isEqual:projection]);
+    XCTAssertFalse([findOneAndModifyOptions3.sort isEqual:@{}]);
+    XCTAssertTrue([findOneAndModifyOptions3.sort isEqual:sort]);
+    
+    RLMFindOneAndModifyOptions *findOneAndModifyOptions4 = [[RLMFindOneAndModifyOptions alloc]
+                                                            initWithProjection:nil
+                                                            sort:nil
+                                                            upsert:NO
+                                                            returnNewDocument:NO];
+    
+    XCTAssertNil(findOneAndModifyOptions4.projection);
+    XCTAssertNil(findOneAndModifyOptions4.sort);
+    XCTAssertFalse(findOneAndModifyOptions4.upsert);
+    XCTAssertFalse(findOneAndModifyOptions4.returnNewDocument);
+}
+
+- (void)testFindOptions {
+    NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
+    NSDictionary<NSString *, id<RLMBSON>> *sort = @{@"age" : @1, @"coat" : @1};
+    
+    RLMFindOptions *findOptions1 = [[RLMFindOptions alloc] init];
+    findOptions1.limit = 37;
+    XCTAssertNil(findOptions1.projection);
+    findOptions1.projection = projection;
+    XCTAssertTrue([findOptions1.projection isEqual:projection]);
+    XCTAssertNil(findOptions1.sort);
+    findOptions1.sort = sort;
+    XCTAssertTrue([findOptions1.sort isEqual:sort]);
+    XCTAssertEqual(findOptions1.limit, (unsigned long)37);
+    
+    RLMFindOptions *findOptions2 = [[RLMFindOptions alloc] initWithProjection:projection
+                                                                         sort:sort];
+    XCTAssertTrue([findOptions2.projection isEqual:projection]);
+    XCTAssertTrue([findOptions2.sort isEqual:sort]);
+    XCTAssertEqual(findOptions2.limit, (unsigned long)0);
+    
+    RLMFindOptions *findOptions3 = [[RLMFindOptions alloc] initWithLimit:37
+                                                              projection:projection
+                                                                    sort:sort];
+    XCTAssertTrue([findOptions3.projection isEqual:projection]);
+    XCTAssertTrue([findOptions3.sort isEqual:sort]);
+    XCTAssertEqual(findOptions3.limit, (unsigned long)37);
+    
+    RLMFindOptions *findOptions4 = [[RLMFindOptions alloc] initWithProjection:nil
+                                                                         sort:nil];
+    XCTAssertNil(findOptions4.projection);
+    XCTAssertNil(findOptions4.sort);
+    XCTAssertEqual(findOptions4.limit, (unsigned long)0);
+}
+
 - (void)testRemoteMongoInsert {
     XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
     __block RLMSyncUser *syncUser;
@@ -1691,7 +1777,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 
     XCTestExpectation *findExpectation = [self expectationWithDescription:@"should find documents"];
-    RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:nil projectionBson:nil sortBson:nil];
+    RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:0 projection:nil sort:nil];
     [collection findWhere:@{@"name": @"fido", @"breed": @"cane corso"}
                   options:options
                completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
@@ -1733,7 +1819,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 
     XCTestExpectation *findExpectation = [self expectationWithDescription:@"should find documents"];
-    RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:nil projectionBson:nil sortBson:nil];
+    RLMFindOptions *options = [[RLMFindOptions alloc] initWithLimit:0 projection:nil sort:nil];
     [collection findWhere:@{@"name": @"fido", @"breed": @"cane corso"}
                   options:options
                completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
@@ -1889,8 +1975,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                             completion:^(RLMUpdateResult * result, NSError * error) {
         XCTAssertNotNil(result);
         XCTAssertNotNil(result.objectId);
-        XCTAssertEqual(result.modifiedCount.intValue, 0);
-        XCTAssertEqual(result.matchedCount.intValue, 0);
+        XCTAssertEqual(result.modifiedCount, (NSUInteger)0);
+        XCTAssertEqual(result.matchedCount, (NSUInteger)0);
         XCTAssertNil(error);
         [updateExpectation1 fulfill];
     }];
@@ -1903,8 +1989,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                             completion:^(RLMUpdateResult * result, NSError * error) {
         XCTAssertNotNil(result);
         XCTAssertNil(result.objectId);
-        XCTAssertEqual(result.modifiedCount.intValue, 1);
-        XCTAssertEqual(result.matchedCount.intValue, 1);
+        XCTAssertEqual(result.modifiedCount, (NSUInteger)1);
+        XCTAssertEqual(result.matchedCount, (NSUInteger)1);
         XCTAssertNil(error);
         [updateExpectation2 fulfill];
     }];
@@ -1916,8 +2002,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                             completion:^(RLMUpdateResult * result, NSError * error) {
         XCTAssertNotNil(result);
         XCTAssertNil(result.objectId);
-        XCTAssertEqual(result.modifiedCount.intValue, 1);
-        XCTAssertEqual(result.matchedCount.intValue, 1);
+        XCTAssertEqual(result.modifiedCount, (NSUInteger)1);
+        XCTAssertEqual(result.matchedCount, (NSUInteger)1);
         XCTAssertNil(error);
         [updateExpectation3 fulfill];
     }];
@@ -1929,8 +2015,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                               completion:^(RLMUpdateResult * result, NSError * error) {
         XCTAssertNotNil(result);
         XCTAssertNil(result.objectId);
-        XCTAssertEqual(result.modifiedCount.intValue, 1);
-        XCTAssertEqual(result.matchedCount.intValue, 1);
+        XCTAssertEqual(result.modifiedCount, (NSUInteger)1);
+        XCTAssertEqual(result.matchedCount, (NSUInteger)1);
         XCTAssertNil(error);
         [updateManyExpectation1 fulfill];
     }];
@@ -1943,8 +2029,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                               completion:^(RLMUpdateResult * result, NSError * error) {
         XCTAssertNotNil(result);
         XCTAssertNotNil(result.objectId);
-        XCTAssertEqual(result.modifiedCount.intValue, 0);
-        XCTAssertEqual(result.matchedCount.intValue, 0);
+        XCTAssertEqual(result.modifiedCount, (NSUInteger)0);
+        XCTAssertEqual(result.matchedCount, (NSUInteger)0);
         XCTAssertNil(error);
         [updateManyExpectation2 fulfill];
     }];
@@ -1969,8 +2055,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     [self cleanupRemoteDocuments:collection];
 
-    RLMFindOneAndModifyOptions *findAndModifyOptions = [[RLMFindOneAndModifyOptions alloc] initWithProjectionBson:@{@"name" : @1, @"breed" : @1}
-                                                                                                         sortBson:@{@"name" : @1, @"breed" : @1}
+    RLMFindOneAndModifyOptions *findAndModifyOptions = [[RLMFindOneAndModifyOptions alloc] initWithProjection:@{@"name" : @1, @"breed" : @1}
+                                                                                                         sort:@{@"name" : @1, @"breed" : @1}
                                                                                                            upsert:YES
                                                                                                 returnNewDocument:YES];
 

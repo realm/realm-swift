@@ -1067,17 +1067,17 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let findOptions2 = FindOptions(5, ["names": ["fido", "bob", "rex"]], ["_id": 1])
 
         XCTAssertEqual(findOptions.limit, 1)
-        XCTAssertEqual(findOptions.projectedBSON, nil)
-        XCTAssertEqual(findOptions.sortBSON, nil)
+        XCTAssertEqual(findOptions.projected, nil)
+        XCTAssertEqual(findOptions.sort, nil)
 
         XCTAssertEqual(findOptions1.limit, 5)
-        XCTAssertEqual(findOptions1.projectedBSON, ["name": 1])
-        XCTAssertEqual(findOptions1.sortBSON, ["_id": 1])
-        XCTAssertEqual(findOptions2.projectedBSON, ["names": ["fido", "bob", "rex"]])
+        XCTAssertEqual(findOptions1.projected, ["name": 1])
+        XCTAssertEqual(findOptions1.sort, ["_id": 1])
+        XCTAssertEqual(findOptions2.projected, ["names": ["fido", "bob", "rex"]])
 
         let findModifyOptions = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
-        XCTAssertEqual(findModifyOptions.projectedBSON, ["name": 1])
-        XCTAssertEqual(findModifyOptions.sortBSON, ["_id": 1])
+        XCTAssertEqual(findModifyOptions.projection, ["name": 1])
+        XCTAssertEqual(findModifyOptions.sort, ["_id": 1])
         XCTAssertTrue(findModifyOptions.upsert)
         XCTAssertTrue(findModifyOptions.returnNewDocument)
     }
@@ -1243,12 +1243,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [findOneUpdateEx2], timeout: 4.0)
 
-        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
+        let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
         let findOneUpdateEx3 = expectation(description: "Find one document and update")
         collection.findOneAndUpdate(filter: document, update: document2, options: options2) { (result, error) in
             XCTAssertNotNil(result)
             XCTAssertNil(error)
-            XCTAssertEqual(result!["name"] as! String, "john")
+            XCTAssertEqual(result!["name"] as! String, "rex")
             findOneUpdateEx3.fulfill()
         }
         wait(for: [findOneUpdateEx3], timeout: 4.0)
@@ -1260,7 +1260,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let findOneDeleteEx1 = expectation(description: "Find one document and delete")
         collection.findOneAndDelete(filter: document) { (document, error) in
-            XCTAssertNotNil(document)
+            // Document does not exist, but should not return an error because of that
+            XCTAssertNil(document)
             XCTAssertNil(error)
             findOneDeleteEx1.fulfill()
         }
@@ -1269,16 +1270,27 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
         let findOneDeleteEx2 = expectation(description: "Find one document and delete")
         collection.findOneAndDelete(filter: document, options: options1) { (document, error) in
-            XCTAssertNotNil(document)
+            // Document does not exist, but should not return an error because of that
+            XCTAssertNil(document)
             XCTAssertNil(error)
             findOneDeleteEx2.fulfill()
         }
         wait(for: [findOneDeleteEx2], timeout: 4.0)
+        
+        let insertManyEx = expectation(description: "Insert many documents")
+        collection.insertMany([document]) { (objectIds, error) in
+            XCTAssertNotNil(objectIds)
+            XCTAssertEqual(objectIds?.count, 3)
+            XCTAssertNil(error)
+            insertManyEx.fulfill()
+        }
+        wait(for: [insertManyEx], timeout: 4.0)
 
         let options2 = FindOneAndModifyOptions(["name": 1], ["_id": 1])
         let findOneDeleteEx3 = expectation(description: "Find one document and delete")
         collection.findOneAndDelete(filter: document, options: options2) { (document, error) in
             XCTAssertNotNil(document)
+            XCTAssertEqual(document!["name"] as! String, "fido")
             XCTAssertNil(error)
             findOneDeleteEx3.fulfill()
         }

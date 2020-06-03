@@ -26,13 +26,13 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMUpdateResult : NSObject
 
 /// The number of documents that matched the filter.
-@property (nonatomic, readonly) NSNumber *matchedCount NS_REFINED_FOR_SWIFT;
+@property (nonatomic, readonly) NSUInteger matchedCount;
 
 /// The number of documents modified.
-@property (nonatomic, readonly) NSNumber *modifiedCount NS_REFINED_FOR_SWIFT;
+@property (nonatomic, readonly) NSUInteger modifiedCount;
 
 /// The identifier of the inserted document if an upsert took place.
-@property (nonatomic, nullable, readonly) RLMObjectId *objectId NS_REFINED_FOR_SWIFT;
+@property (nonatomic, nullable, readonly) RLMObjectId *objectId;
 
 @end
 

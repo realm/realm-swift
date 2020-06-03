@@ -25,18 +25,22 @@ NS_ASSUME_NONNULL_BEGIN
 /// Options to use when executing a `find` command on a `RLMMongoCollection`.
 @interface RLMFindOptions : NSObject
 
-/// The maximum number of documents to return.
-@property (nonatomic, nullable) NSNumber *limit NS_REFINED_FOR_SWIFT;
+/// The maximum number of documents to return. Specifying 0 will return all documents.
+@property (nonatomic) NSUInteger limit;
 
 /// Limits the fields to return for all matching documents.
-@property (nonatomic, nullable) id<RLMBSON> projectionBson NS_REFINED_FOR_SWIFT;
+@property (nonatomic, nullable) id<RLMBSON> projection NS_REFINED_FOR_SWIFT;
 
 /// The order in which to return matching documents.
-@property (nonatomic, nullable) id<RLMBSON> sortBson NS_REFINED_FOR_SWIFT;
+@property (nonatomic, nullable) id<RLMBSON> sort NS_REFINED_FOR_SWIFT;
 
-- (instancetype)initWithLimit:(NSNumber * _Nullable)limit
-               projectionBson:(id<RLMBSON> _Nullable)projectionBson
-                     sortBson:(id<RLMBSON> _Nullable)sortBson
+- (instancetype)initWithLimit:(NSUInteger)limit
+                   projection:(id<RLMBSON> _Nullable)projection
+                         sort:(id<RLMBSON> _Nullable)sort
+NS_SWIFT_UNAVAILABLE("Please see FindOption");
+
+- (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
+                              sort:(id<RLMBSON> _Nullable)sort
 NS_SWIFT_UNAVAILABLE("Please see FindOption");
 
 @end

@@ -20,35 +20,77 @@
 #import "RLMFindOptions_Private.hpp"
 #import "RLMBSON_Private.hpp"
 
+@interface RLMFindOptions() {
+    realm::app::RemoteMongoCollection::RemoteFindOptions _options;
+};
+@end
+
 @implementation RLMFindOptions
 
-- (instancetype)initWithLimit:(NSNumber * _Nullable)limit
-               projectionBson:(id<RLMBSON> _Nullable)projectionBson
-                     sortBson:(id<RLMBSON> _Nullable)sortBson {
-    self = [super init];
-    if (self) {
-        _limit = limit;
-        _projectionBson = projectionBson;
-        _sortBson = sortBson;
+- (instancetype)initWithLimit:(NSUInteger)limit
+                   projection:(id<RLMBSON> _Nullable)projection
+                         sort:(id<RLMBSON> _Nullable)sort {
+    if (self = [super init]) {
+        [self setProjection:projection];
+        [self setSort:sort];
+        [self setLimit:limit];
     }
     return self;
 }
 
-- (realm::app::RemoteMongoCollection::RemoteFindOptions)toRemoteFindOptions {
-    realm::app::RemoteMongoCollection::RemoteFindOptions options;
-    if (self.limit) {
-        options.limit = self.limit.longValue;
+- (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
+                              sort:(id<RLMBSON> _Nullable)sort {
+    if (self = [super init]) {
+        [self setProjection:projection];
+        [self setSort:sort];
     }
-    if (self.projectionBson) {
-        auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(self.projectionBson));
-        options.projection_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
-    }
-    if (self.sortBson) {
-        auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(self.sortBson));
-        options.sort_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
+    return self;
+}
+
+- (realm::app::RemoteMongoCollection::RemoteFindOptions)_findOptions {
+    return _options;
+}
+
+- (id<RLMBSON>)projection {
+    if (_options.projection_bson) {
+        return RLMConvertBsonToRLMBSON(*_options.projection_bson);
     }
     
-    return options;
+    return nil;
+}
+
+- (id<RLMBSON>)sort {
+    if (_options.sort_bson) {
+        return RLMConvertBsonToRLMBSON(*_options.sort_bson);
+    }
+    
+    return nil;
+}
+
+- (void)setProjection:(id<RLMBSON>)projection {
+    if (projection) {
+        auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(projection));
+        _options.projection_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
+    }
+}
+
+- (void)setSort:(id<RLMBSON>)sort {
+    if (sort) {
+        auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(sort));
+        _options.sort_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
+    }
+}
+
+- (NSUInteger)limit {
+    if (_options.limit) {
+        return *_options.limit;
+    }
+    
+    return 0;
+}
+
+- (void)setLimit:(NSUInteger)limit {
+    _options.limit = realm::util::Optional<int64_t>(limit);
 }
 
 @end

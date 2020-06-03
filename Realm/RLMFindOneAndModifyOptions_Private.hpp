@@ -19,12 +19,8 @@
 #import <Realm/RLMFindOneAndModifyOptions.h>
 #import "sync/remote_mongo_collection.hpp"
 
-NS_ASSUME_NONNULL_BEGIN
-
 @interface RLMFindOneAndModifyOptions ()
 
-- (realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions)toRemoteFindOneAndModifyOptions;
+- (realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions)_findOneAndModifyOptions;
 
 @end
-
-NS_ASSUME_NONNULL_END

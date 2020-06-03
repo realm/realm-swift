@@ -55,56 +55,41 @@ public typealias FindOptions = RLMFindOptions
 
 extension FindOptions {
     
-    /// The maximum number of documents to return.
-    public var limit: uint64? {
-        get {
-            guard let value = __limit else {
-                return nil
-            }
-            return value.uint64Value
-        }
-        set {
-            if let value = newValue {
-                __limit = NSNumber(value: value)
-            }
-        }
-    }
-    
     /// Limits the fields to return for all matching documents.
-    public var projectedBSON: Document? {
+    public var projected: Document? {
         get {
-            guard let value = ObjectiveCSupport.convert(object: __projectionBson) else {
+            guard let value = ObjectiveCSupport.convert(object: __projection) else {
                 return nil
             }
             return value.documentValue
         }
         set {
             if let value = newValue {
-                __projectionBson = ObjectiveCSupport.convert(object: AnyBSON(value))
+                __projection = ObjectiveCSupport.convert(object: AnyBSON(value))
             }
         }
     }
     
     /// The order in which to return matching documents.
-    public var sortBSON: Document? {
+    public var sort: Document? {
         get {
-            guard let value = ObjectiveCSupport.convert(object: __sortBson) else {
+            guard let value = ObjectiveCSupport.convert(object: __sort) else {
                 return nil
             }
             return value.documentValue
         }
         set {
             if let value = newValue {
-                __sortBson = ObjectiveCSupport.convert(object: AnyBSON(value))
+                __sort = ObjectiveCSupport.convert(object: AnyBSON(value))
             }
         }
     }
     
     public convenience init(_ limit: uint64?, _ projectedBSON: Document?, _ sortBSON: Document?) {
         self.init()
-        self.limit = limit
-        self.projectedBSON = projectedBSON
-        self.sortBSON = sortBSON
+        self.limit = UInt(limit ?? 0)
+        self.projected = projectedBSON
+        self.sort = sortBSON
     }
 }
 
@@ -116,42 +101,42 @@ public typealias FindOneAndModifyOptions = RLMFindOneAndModifyOptions
 extension FindOneAndModifyOptions {
     
     /// Limits the fields to return for all matching documents.
-    public var projectedBSON: Document? {
+    public var projection: Document? {
         get {
-            guard let value = ObjectiveCSupport.convert(object: __projectionBson) else {
+            guard let value = ObjectiveCSupport.convert(object: __projection) else {
                 return nil
             }
             return value.documentValue
         }
         set {
             if let value = newValue {
-                __projectionBson = ObjectiveCSupport.convert(object: AnyBSON(value))
+                __projection = ObjectiveCSupport.convert(object: AnyBSON(value))
             }
         }
     }
     
     /// The order in which to return matching documents.
-    public var sortBSON: Document? {
+    public var sort: Document? {
         get {
-            guard let value = ObjectiveCSupport.convert(object: __sortBson) else {
+            guard let value = ObjectiveCSupport.convert(object: __sort) else {
                 return nil
             }
             return value.documentValue
         }
         set {
             if let value = newValue {
-                __sortBson = ObjectiveCSupport.convert(object: AnyBSON(value))
+                __sort = ObjectiveCSupport.convert(object: AnyBSON(value))
             }
         }
     }
     
-    public convenience init(_ projectedBSON: Document?,
-                            _ sortBSON: Document?,
+    public convenience init(_ projection: Document?,
+                            _ sort: Document?,
                             _ upsert: Bool=false,
                             _ returnNewDocument: Bool=false) {
         self.init()
-        self.projectedBSON = projectedBSON
-        self.sortBSON = sortBSON
+        self.projection = projection
+        self.sort = sort
         self.upsert = upsert
         self.returnNewDocument = returnNewDocument
     }
@@ -160,32 +145,19 @@ extension FindOneAndModifyOptions {
 /// The result of an `updateOne` or `updateMany` operation a `MongoCollection`.
 public typealias UpdateResult = RLMUpdateResult
 
-extension UpdateResult {
-    /// The number of matching documents
-    public var matchedCount: UInt64 {
-        return __matchedCount.uint64Value
-    }
-    
-    /// The number of documents modified.
-    public var modifiedCount: UInt64 {
-        return __modifiedCount.uint64Value
-    }
-    /// The identifier of the inserted document if an upsert took place.
-    public var objectId: ObjectId? {
-        guard let objId = __objectId else {
-            return nil
-        }
-        
-        return try? ObjectId(string: objId.stringValue)
-    }
-}
-
+/// Block which returns an RLMObjectId on a successful insert, or an error should one occur.
 public typealias MongoInsertBlock = RLMMongoInsertBlock
+/// Block which returns an array of RLMObjectId's on a successful insertMany, or an error should one occur.
 public typealias MongoInsertManyBlock = RLMMongoInsertManyBlock
+/// Block which returns an array of Documents on a successful find operation, or an error should one occur.
 public typealias MongoFindBlock = RLMMongoFindBlock
+/// Block which returns a Document on a successful findOne operation, or an error should one occur.
 public typealias MongoFindOneBlock = RLMMongoFindOneBlock
+/// Block which returns the number of Documents in a collection on a successful count operation, or an error should one occur.
 public typealias MongoCountBlock = RLMMongoCountBlock
+/// Block which returns an RLMUpdateResult on a successful update operation, or an error should one occur.
 public typealias MongoUpdateBlock = (UpdateResult?, Error?) -> Void
+/// Block which returns the deleted Document on a successful delete operation, or an error should one occur.
 public typealias MongoDeleteBlock = RLMMongoDeleteBlock
 
 /**
