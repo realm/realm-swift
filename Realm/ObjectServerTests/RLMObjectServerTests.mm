@@ -375,7 +375,7 @@
 
 }
 
-#pragma mark - Link user
+#pragma mark - Link user -
 
 - (void)testLinkUser {
     RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
@@ -418,7 +418,7 @@
 
 }
 
-#pragma mark - Auth Credentials
+#pragma mark - Auth Credentials -
 
 - (void)testUsernamePasswordCredential {
     RLMAppCredentials *usernamePasswordCredential = [RLMAppCredentials credentialsWithUsername:@"test@mongodb.com" password:@"apassword"];
@@ -570,9 +570,6 @@
 - (void)testAddObjects {
     RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]];
     RLMSyncUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
-
-//    [user _syncUser]->update_access_token(self.badAccessToken.UTF8String);
-    
     
     NSString *realmId = @"foo";
     RLMRealm *realm = [self openRealmForPartitionValue:realmId
@@ -605,7 +602,6 @@
     RLMSyncUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
 
     [user _syncUser]->update_access_token(self.badAccessToken.UTF8String);
-    
     
     NSString *realmId = @"foo";
     RLMRealm *realm = [self openRealmForPartitionValue:realmId
@@ -656,7 +652,7 @@
     }
 }
 
-#pragma mark - Encryption
+#pragma mark - Encryption -
 
 /// If client B encrypts its synced Realm, client A should be able to access that Realm with a different encryption key.
 - (void)testEncryptedSyncedRealm {
