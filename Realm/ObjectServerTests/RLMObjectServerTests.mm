@@ -20,6 +20,8 @@
 //#import "RLMTestUtils.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 
+#import "RLMPushClient.h"
+
 #import "RLMAppCredentials.h"
 #import "RLMRealm+Sync.h"
 #import "RLMRealmConfiguration_Private.h"
@@ -214,6 +216,33 @@
     }];
 
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
+}
+
+- (void)testRegisterDevice {
+    RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
+    
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    
+    __block RLMSyncUser *syncUser;
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssert(!error);
+        XCTAssert(user);
+        syncUser = user;
+        [expectation fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    RLMPushClient *client = [app pushClientWithServiceName:@"service-name"];
+    XCTAssert(client);
+    
+    __block bool processed;
+    [client registerDeviceWithToken:@"hello" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
+        XCTAssert(!error);
+        processed = true;
+    }];
+    XCTAssert(processed);
+    
 }
 
 #pragma mark - RLMUsernamePasswordProviderClient
