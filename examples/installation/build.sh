@@ -74,15 +74,24 @@ xctest() {
     if [[ ! -d "$DIRECTORY" ]]; then
         DIRECTORY="${DIRECTORY/swift/swift-$REALM_SWIFT_VERSION}"
     fi
-    if [[ $PLATFORM == ios ]] && [[ $NAME != Carthage* ]]; then
-        sh "$(dirname "$0")/../../scripts/reset-simulators.sh"
+    if [[ $PLATFORM != osx ]]; then
+        if [[ $NAME == Carthage* ]]; then
+            # Building for Carthage requires that a simulator exist but not any
+            # particular one, and having more than one makes xcodebuild
+            # significantly slower and some of Carthage's operations time out.
+            sh "$(dirname "$0")/../../scripts/reset-simulators.sh" -firstOnly
+        else
+            # The other installation methods depend on some specific simulators
+            # existing so just create all of them to be safe.
+            sh "$(dirname "$0")/../../scripts/reset-simulators.sh"
+        fi
     fi
     if [[ $NAME == CocoaPods* ]]; then
         pod install --project-directory="$DIRECTORY"
     elif [[ $NAME == Carthage* ]]; then
         (
             cd "$DIRECTORY"
-            if [ -n "$REALM_BUILD_USING_LATEST_RELEASE" ]; then
+            if [ -n "${REALM_BUILD_USING_LATEST_RELEASE:-}" ]; then
                 echo "github \"realm/realm-cocoa\"" > Cartfile
             else
                 echo "github \"realm/realm-cocoa\" \"${sha:-master}\"" > Cartfile
@@ -104,40 +113,39 @@ xctest() {
     else
         download_zip_if_needed "$LANG"
     fi
-    local DESTINATION=()
+    local destination=()
     if [[ $PLATFORM == ios ]]; then
         simulator_id="$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
         xcrun simctl boot "$simulator_id"
-        DESTINATION=(-destination "id=$simulator_id")
+        destination=(-destination "id=$simulator_id")
     elif [[ $PLATFORM == watchos ]]; then
-        if xcrun simctl list devicetypes | grep -q 'iPhone 11 Pro Max'; then
-            DESTINATION=(-destination "id=$(xcrun simctl list devices | grep -v unavailable | grep 'iPhone 11 Pro Max' | grep -m 1 -o '[0-9A-F\-]\{36\}')")
-        elif xcrun simctl list devicetypes | grep -q 'iPhone Xs'; then
-            DESTINATION=(-destination "id=$(xcrun simctl list devices | grep -v unavailable | grep 'iPhone Xs' | grep -m 1 -o '[0-9A-F\-]\{36\}')")
-        fi
+        destination=(-sdk watchsimulator)
     fi
 
-    local PROJECT=(-project "$DIRECTORY/$NAME.xcodeproj")
-    local WORKSPACE="$DIRECTORY/$NAME.xcworkspace"
-    if [ -d "$WORKSPACE" ]; then
-        PROJECT=(-workspace "$WORKSPACE")
+    local project=(-project "$DIRECTORY/$NAME.xcodeproj")
+    local workspace="$DIRECTORY/$NAME.xcworkspace"
+    if [ -d "$workspace" ]; then
+        project=(-workspace "$workspace")
     fi
-    sed -i '' 's@/swift-[0-9.]*@/swift-11.4.1@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
-    xcodebuild "${PROJECT[@]}" -scheme "$NAME" clean build "${DESTINATION[@]}" CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
+    local code_signing_flags=(CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO AD_HOC_CODE_SIGNING_ALLOWED=YES)
+    local scheme=(-scheme "$NAME")
+
+    # Ensure that dynamic framework tests try to use the correct version of the prebuilt libraries.
+    sed -i '' 's@/swift-[0-9.]*@/swift-'${REALM_XCODE_VERSION}'@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
+
+    xcodebuild "${project[@]}" "${scheme[@]}" clean build "${destination[@]}" "${code_signing_flags[@]}"
     if [[ $PLATFORM != watchos ]]; then
-        xcodebuild "${PROJECT[@]}" -scheme "$NAME" test "${DESTINATION[@]}" CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
+        xcodebuild "${project[@]}" "${scheme[@]}" test "${destination[@]}" "${code_signing_flags[@]}"
     fi
 
     if [[ $PLATFORM != osx ]]; then
         [[ $PLATFORM == 'ios' ]] && SDK=iphoneos || SDK=$PLATFORM
-        if [ -d "$WORKSPACE" ]; then
-            [[ $LANG == 'swift' ]] && SCHEME=(-scheme RealmSwift) || SCHEME=(-scheme Realm)
+        if [ -d "$workspace" ]; then
+            [[ $LANG == 'swift' ]] && scheme=(-scheme RealmSwift) || scheme=(-scheme Realm)
         else
-            SCHEME=()
+            scheme=()
         fi
-        xcodebuild "${PROJECT[@]}" "${SCHEME[@]}" -sdk "$SDK" \
-            ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= AD_HOC_CODE_SIGNING_ALLOWED=YES \
-            build
+        xcodebuild "${project[@]}" "${scheme[@]}" -sdk "$SDK" build "${code_signing_flags[@]}"
     fi
 }
 

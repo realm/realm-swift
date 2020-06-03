@@ -19,9 +19,6 @@ def installationTest(platform, test, language) {
       sh """
       hostname
       export REALM_XCODE_VERSION=${carthageXcodeVersion}
-      if [ "${platform}" != osx ]; then
-        ./scripts/reset-simulators.sh -firstOnly
-      fi
       cd examples/installation
 
       archive=\$(echo \$PWD/realm-${language}-*.zip)
