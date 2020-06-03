@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+: "${REALM_XCODE_VERSION:=}"
+: "${REALM_SWIFT_VERSION:=}"
+: "${DEVELOPER_DIR:=}"
+
 get_swift_version() {
     "$1" --version 2>/dev/null | sed -ne 's/^Apple Swift version \([^\b ]*\).*/\1/p'
 }
