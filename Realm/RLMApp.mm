@@ -20,6 +20,7 @@
 
 #import "RLMAppCredentials_Private.hpp"
 #import "RLMBSON_Private.hpp"
+#import "RLMPushClient_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMUsernamePasswordProviderClient.h"
@@ -363,6 +364,10 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
         completionBlock(RLMConvertBsonToRLMBSON(*response), nil);
     });
+}
+
+- (RLMPushClient *)pushClientWithServiceName:(NSString *)serviceName {
+    return [[RLMPushClient alloc] initWithPushClient:_app->push_notification_client(serviceName.UTF8String)];
 }
 
 @end

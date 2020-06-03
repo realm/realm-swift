@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol RLMNetworkTransport, RLMBSON;
 
-@class RLMSyncUser, RLMAppCredentials, RLMUsernamePasswordProviderClient, RLMUserAPIKeyProviderClient, RLMSyncManager;
+@class RLMSyncUser, RLMAppCredentials, RLMUsernamePasswordProviderClient, RLMUserAPIKeyProviderClient, RLMSyncManager, RLMPushClient;
 
 /// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
 typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
@@ -222,6 +222,8 @@ Create a new Realm App configuration.
 - (void)callFunctionNamed:(NSString *)name
                 arguments:(NSArray<id<RLMBSON>> *)arguments
           completionBlock:(RLMCallFunctionCompletionBlock)completionBlock NS_REFINED_FOR_SWIFT;
+
+- (RLMPushClient *)pushClientWithServiceName:(NSString *)serviceName;
 
 /**
  RLMApp instances are cached internally by Realm and cannot be created directly.
