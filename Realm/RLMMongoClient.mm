@@ -29,8 +29,7 @@
 @implementation RLMMongoClient
 
 - (instancetype)initWithApp:(RLMApp *)app serviceName:(NSString *)serviceName {
-    self = [super init];
-    if (self) {
+    if (self = [super init]) {
         _app = app;
         _name = serviceName;
     }

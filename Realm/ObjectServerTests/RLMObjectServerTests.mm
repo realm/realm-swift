@@ -2188,6 +2188,25 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         [findOneAndDeleteExpectation1 fulfill];
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
+    
+    XCTestExpectation *findOneAndDeleteExpectation2 = [self expectationWithDescription:@"should find one and delete"];
+    
+    NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
+    NSDictionary<NSString *, id<RLMBSON>> *sort = @{@"_id": @1};
+    RLMFindOneAndModifyOptions *findOneAndModifyOptions = [[RLMFindOneAndModifyOptions alloc]
+                                                            initWithProjection:projection
+                                                            sort:sort
+                                                            upsert:YES
+                                                            returnNewDocument:YES];
+    
+    [collection findOneAndDeleteWhere:@{@"name": @"john"}
+                              options:findOneAndModifyOptions
+                           completion:^(NSDictionary<NSString *, id<RLMBSON>> * document, NSError * error) {
+        XCTAssertNil(document);
+        XCTAssertNil(error);
+        [findOneAndDeleteExpectation2 fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:60.0 handler:nil];
 }
 
 @end

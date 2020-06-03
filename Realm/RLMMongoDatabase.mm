@@ -32,8 +32,7 @@
 - (instancetype)initWithApp:(RLMApp *)app
                 serviceName:(NSString *)serviceName
                databaseName:(NSString *)databaseName {
-    self = [super init];
-    if (self) {
+    if (self = [super init]) {
         _app = app;
         _serviceName = serviceName;
         _name = databaseName;

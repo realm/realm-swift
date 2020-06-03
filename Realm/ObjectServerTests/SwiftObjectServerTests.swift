@@ -1266,7 +1266,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [findOneDeleteEx1], timeout: 4.0)
 
-        let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
+        let options1 = FindOneAndModifyOptions(["name": 1], ["_id": 1], false, false)
         let findOneDeleteEx2 = expectation(description: "Find one document and delete")
         collection.findOneAndDelete(filter: document, options: options1) { (document, error) in
             // Document does not exist, but should not return an error because of that
