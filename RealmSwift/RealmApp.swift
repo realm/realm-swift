@@ -42,6 +42,31 @@ Realm Cloud user registration & password functions
 - see: `RLMUsernamePasswordProviderClient`
 */
 public typealias UsernamePasswordProviderClient = RLMUsernamePasswordProviderClient
+/// A block type used to report an error
+public typealias UsernamePasswordProviderClientErrorBlock = RLMUsernamePasswordProviderClientOptionalErrorBlock
+extension UsernamePasswordProviderClient {
+
+    /// Resets the password of an email identity using the
+    /// password reset function set up in the application.
+    /// - Parameters:
+    ///   - email: The email address of the user.
+    ///   - password: The desired new password.
+    ///   - args: A list of arguments passed in as a BSON array.
+    ///   - completion: A callback to be invoked once the call is complete.
+    public func callResetPasswordFunction(email: String,
+                                          password: String,
+                                          args: [AnyBSON],
+                                          _ completion: @escaping UsernamePasswordProviderClientOptionalErrorBlock) {
+        do {
+            guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(args)) as? [RLMBSON] else {
+                throw BSONError.swiftToObjCConversion
+            }
+            self.__callResetPasswordFunction(email, password: password, args: rlmBSON, completion: completion)
+        } catch let error {
+            return completion(error)
+        }
+    }
+}
 
 /**
 An object which is used within UserAPIKeyProviderClient

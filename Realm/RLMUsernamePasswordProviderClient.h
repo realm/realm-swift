@@ -92,19 +92,16 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Resets the password of an email identity using the
  password reset function set up in the application.
- 
- TODO: Add an overloaded version of this method that takes
- TODO: raw, non-serialized args.
- 
+
  @param email  The email address of the user.
  @param password The desired new password.
- @param args A pre-serialized list of arguments passed in as a BSON array.
+ @param args A list of arguments passed in as a BSON array.
  @param completionHandler A callback to be invoked once the call is complete.
 */
 - (void)callResetPasswordFunction:(NSString *)email
                          password:(NSString *)password
-                             args:(NSArray<NSDictionary<NSString *, id<RLMBSON>> *> *)args
-                       completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
+                             args:(NSArray<id<RLMBSON>> *)args
+                       completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler NS_REFINED_FOR_SWIFT;
 
 @end
 

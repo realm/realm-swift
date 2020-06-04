@@ -68,7 +68,7 @@
 
 - (void)callResetPasswordFunction:(NSString *)email
                          password:(NSString *)password
-                             args:(NSArray<NSDictionary<NSString *, id<RLMBSON>> *> *)args
+                             args:(NSArray<id<RLMBSON>> *)args
                        completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
     self.client.call_reset_password_function(email.UTF8String,
                                              password.UTF8String,

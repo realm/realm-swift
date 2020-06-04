@@ -223,7 +223,6 @@ extension MongoCollection {
         } catch let error {
             return completion(nil, error)
         }
-
     }
 
     /// Finds the documents in this collection which match the provided filter.

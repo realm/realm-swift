@@ -870,13 +870,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [resetPasswordEx], timeout: 4.0)
 
-//        let callResetFunctionEx = expectation(description: "Reset password function")
-        //FIXME: Needs BSON
-//        app().usernamePasswordProviderClient().callResetPasswordFunction(email, password: password, args: "") { (error) in
-//            XCTAssertNotNil(error)
-//            callResetFunctionEx.fulfill()
-//        }
-//        wait(for: [callResetFunctionEx], timeout: 4.0)
+        let callResetFunctionEx = expectation(description: "Reset password function")
+        app.usernamePasswordProviderClient().callResetPasswordFunction(email: email,
+                                                                       password: randomString(10),
+                                                                       args: [[:]]) { (error) in
+            XCTAssertNotNil(error)
+            callResetFunctionEx.fulfill()
+        }
+        wait(for: [callResetFunctionEx], timeout: 4.0)
     }
 
     func testUserAPIKeyProviderClient() {
