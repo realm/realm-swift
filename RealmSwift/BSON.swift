@@ -446,16 +446,3 @@ extension AnyBSON: ExpressibleByArrayLiteral {
 extension AnyBSON: Equatable {}
 
 extension AnyBSON: Hashable {}
-
-public enum BSONError: Error {
-    case swiftToObjCConversion
-}
-
-extension BSONError: LocalizedError {
-    public var errorDescription: String? {
-        switch self {
-        case .swiftToObjCConversion:
-            return NSLocalizedString("Error occured converting AnyBSON to RLMBSON", comment: "swiftToObjC conversion error.")
-        }
-    }
-}

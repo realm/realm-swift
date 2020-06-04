@@ -57,14 +57,8 @@ extension UsernamePasswordProviderClient {
                                           password: String,
                                           args: [AnyBSON],
                                           _ completion: @escaping UsernamePasswordProviderClientErrorBlock) {
-        do {
-            guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(args)) as? [RLMBSON] else {
-                throw BSONError.swiftToObjCConversion
-            }
-            self.__callResetPasswordFunction(email, password: password, args: rlmBSON, completion: completion)
-        } catch let error {
-            return completion(error)
-        }
+        let bson = ObjectiveCSupport.convert(object: .array(args))
+        self.__callResetPasswordFunction(email, password: password, args: bson as! [RLMBSON], completion: completion)
     }
 }
 

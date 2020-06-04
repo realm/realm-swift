@@ -200,10 +200,8 @@ extension MongoCollection {
     ///   - document: document  A `Document` value to insert.
     ///   - completion: The result of attempting to perform the insert. An Id will be returned for the inserted object on sucess
     public func insertOne(_ document: Document, _ completion: @escaping MongoInsertBlock) {
-        guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(document)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__insertOneDocument(rlmBSON, completion: completion)
+        let bson = ObjectiveCSupport.convert(object: .document(document))
+        self.__insertOneDocument(bson as! [String: RLMBSON], completion: completion)
     }
 
     /// Encodes the provided values to BSON and inserts them. If any values are missing identifiers,
@@ -212,17 +210,8 @@ extension MongoCollection {
     ///   - documents: The `Document` values in a bson array to insert.
     ///   - completion: The result of the insert, returns an array inserted document ids in order.
     public func insertMany(_ documents: [Document], _ completion: @escaping MongoInsertManyBlock) {
-        do {
-            let convertedDocuments = try documents.map { (document: Document) -> [String: RLMBSON] in
-                guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(document)) as? [String: RLMBSON] else {
-                    throw BSONError.swiftToObjCConversion
-                }
-                return rlmBSON
-            }
-            self.__insertManyDocuments(convertedDocuments, completion: completion)
-        } catch let error {
-            return completion(nil, error)
-        }
+        let bson = ObjectiveCSupport.convert(object: .array(documents.map {.document($0)}))
+        self.__insertManyDocuments(bson as! [[String: RLMBSON]], completion: completion)
     }
 
     /// Finds the documents in this collection which match the provided filter.
@@ -233,10 +222,8 @@ extension MongoCollection {
     public func find(filter: Document,
                      options: FindOptions,
                      _ completion: @escaping MongoFindBlock) {
-        guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__findWhere(rlmBSON, options: options, completion: completion)
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__findWhere(bson as! [String: RLMBSON], options: options, completion: completion)
     }
 
     /// Finds the documents in this collection which match the provided filter.
@@ -245,10 +232,8 @@ extension MongoCollection {
     ///   - completion: The resulting bson array of documents or error if one occurs
     public func find(filter: Document,
                      _ completion: @escaping MongoFindBlock) {
-        guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__findWhere(rlmBSON, completion: completion)
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__findWhere(bson as! [String: RLMBSON], completion: completion)
     }
 
     /// Returns one document from a collection or view which matches the
@@ -262,10 +247,8 @@ extension MongoCollection {
     public func findOneDocument(filter: Document,
                                 options: FindOptions,
                                 _ completion: @escaping MongoFindOneBlock) {
-        guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__findOneDocumentWhere(rlmBSON, options: options, completion: completion)
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__findOneDocumentWhere(bson as! [String: RLMBSON], options: options, completion: completion)
     }
 
     /// Returns one document from a collection or view which matches the
@@ -277,10 +260,8 @@ extension MongoCollection {
     ///   - completion: The resulting bson or error if one occurs
     public func findOneDocument(filter: Document,
                                 _ completion: @escaping MongoFindOneBlock) {
-        guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__findOneDocumentWhere(rlmBSON, completion: completion)
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__findOneDocumentWhere(bson as! [String: RLMBSON], completion: completion)
     }
 
     /// Runs an aggregation framework pipeline against this collection.
@@ -289,17 +270,8 @@ extension MongoCollection {
     ///   - completion: The resulting bson array of documents or error if one occurs
     public func aggregate(pipeline: [Document],
                           _ completion: @escaping MongoFindBlock) {
-        do {
-            let convertedDocuments = try pipeline.map { (document: Document) -> [String: RLMBSON] in
-                guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(document)) as? [String: RLMBSON] else {
-                    throw BSONError.swiftToObjCConversion
-                }
-                return rlmBSON
-            }
-            self.__aggregate(withPipeline: convertedDocuments, completion: completion)
-        } catch let error {
-            completion(nil, error)
-        }
+        let bson = ObjectiveCSupport.convert(object: .array(pipeline.map {.document($0)}))
+        self.__aggregate(withPipeline: bson as! [[String: RLMBSON]], completion: completion)
     }
 
     /// Counts the number of documents in this collection matching the provided filter.
@@ -310,10 +282,8 @@ extension MongoCollection {
     public func count(filter: Document,
                       limit: Int,
                       _ completion: @escaping MongoCountBlock) {
-        guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(0, BSONError.swiftToObjCConversion)
-        }
-        self.__countWhere(rlmBSON, limit: limit, completion: completion)
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__countWhere(bson as! [String: RLMBSON], limit: limit, completion: completion)
     }
 
     /// Counts the number of documents in this collection matching the provided filter.
@@ -322,10 +292,8 @@ extension MongoCollection {
     ///   - completion: Returns the count of the documents that matched the filter.
     public func count(filter: Document,
                       _ completion: @escaping MongoCountBlock) {
-        guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(0, BSONError.swiftToObjCConversion)
-        }
-        self.__countWhere(rlmBSON, completion: completion)
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__countWhere(bson as! [String: RLMBSON], completion: completion)
     }
 
     /// Deletes a single matching document from the collection.
@@ -334,10 +302,8 @@ extension MongoCollection {
     ///   - completion: The result of performing the deletion. Returns the count of deleted objects
     public func deleteOneDocument(filter: Document,
                                   _ completion: @escaping MongoCountBlock) {
-        guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(0, BSONError.swiftToObjCConversion)
-        }
-        self.__deleteOneDocumentWhere(rlmBSON, completion: completion)
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__deleteOneDocumentWhere(bson as! [String: RLMBSON], completion: completion)
     }
 
     /// Deletes multiple documents
@@ -346,10 +312,8 @@ extension MongoCollection {
     ///   - completion: The result of performing the deletion. Returns the count of the deletion
     public func deleteManyDocuments(filter: Document,
                                     _ completion: @escaping MongoCountBlock) {
-        guard let rlmBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(0, BSONError.swiftToObjCConversion)
-        }
-        self.__deleteManyDocumentsWhere(rlmBSON, completion: completion)
+        let bson = ObjectiveCSupport.convert(object: .document(filter))
+        self.__deleteManyDocumentsWhere(bson as! [String: RLMBSON], completion: completion)
     }
 
     /// Updates a single document matching the provided filter in this collection.
@@ -362,15 +326,10 @@ extension MongoCollection {
                                   update: Document,
                                   upsert: Bool,
                                   _ completion: @escaping MongoUpdateBlock) {
-        guard let filterBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-
-        guard let updateBSON = ObjectiveCSupport.convert(object: AnyBSON(update)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__updateOneDocumentWhere(filterBSON,
-                                      updateDocument: updateBSON,
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
+        self.__updateOneDocumentWhere(filterBSON as! [String: RLMBSON],
+                                      updateDocument: updateBSON as! [String: RLMBSON],
                                       upsert: upsert,
                                       completion: completion)
     }
@@ -383,15 +342,10 @@ extension MongoCollection {
     public func updateOneDocument(filter: Document,
                                   update: Document,
                                   _ completion: @escaping MongoUpdateBlock) {
-        guard let filterBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-
-        guard let updateBSON = ObjectiveCSupport.convert(object: AnyBSON(update)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__updateOneDocumentWhere(filterBSON,
-                                      updateDocument: updateBSON,
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
+        self.__updateOneDocumentWhere(filterBSON as! [String: RLMBSON],
+                                      updateDocument: updateBSON as! [String: RLMBSON],
                                       completion: completion)
     }
 
@@ -405,15 +359,10 @@ extension MongoCollection {
                                     update: Document,
                                     upsert: Bool,
                                     _ completion: @escaping MongoUpdateBlock) {
-        guard let filterBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-
-        guard let updateBSON = ObjectiveCSupport.convert(object: AnyBSON(update)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__updateManyDocumentsWhere(filterBSON,
-                                        updateDocument: updateBSON,
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
+        self.__updateManyDocumentsWhere(filterBSON as! [String: RLMBSON],
+                                        updateDocument: updateBSON as! [String: RLMBSON],
                                         upsert: upsert,
                                         completion: completion)
     }
@@ -426,15 +375,10 @@ extension MongoCollection {
     public func updateManyDocuments(filter: Document,
                                     update: Document,
                                     _ completion: @escaping MongoUpdateBlock) {
-        guard let filterBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-
-        guard let updateBSON = ObjectiveCSupport.convert(object: AnyBSON(update)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__updateManyDocumentsWhere(filterBSON,
-                                        updateDocument: updateBSON,
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
+        self.__updateManyDocumentsWhere(filterBSON as! [String: RLMBSON],
+                                        updateDocument: updateBSON as! [String: RLMBSON],
                                         completion: completion)
     }
 
@@ -453,15 +397,10 @@ extension MongoCollection {
                                  update: Document,
                                  options: FindOneAndModifyOptions,
                                  _ completion: @escaping MongoFindOneBlock) {
-        guard let filterBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-
-        guard let updateBSON = ObjectiveCSupport.convert(object: AnyBSON(update)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__findOneAndUpdateWhere(filterBSON,
-                                     updateDocument: updateBSON,
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
+        self.__findOneAndUpdateWhere(filterBSON as! [String: RLMBSON],
+                                     updateDocument: updateBSON as! [String: RLMBSON],
                                      options: options,
                                      completion: completion)
     }
@@ -479,15 +418,10 @@ extension MongoCollection {
     public func findOneAndUpdate(filter: Document,
                                  update: Document,
                                  _ completion: @escaping MongoFindOneBlock) {
-        guard let filterBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-
-        guard let updateBSON = ObjectiveCSupport.convert(object: AnyBSON(update)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__findOneAndUpdateWhere(filterBSON,
-                                     updateDocument: updateBSON,
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let updateBSON = ObjectiveCSupport.convert(object: .document(update))
+        self.__findOneAndUpdateWhere(filterBSON as! [String: RLMBSON],
+                                     updateDocument: updateBSON as! [String: RLMBSON],
                                      completion: completion)
     }
 
@@ -506,15 +440,10 @@ extension MongoCollection {
                                   replacement: Document,
                                   options: FindOneAndModifyOptions,
                                   _ completion: @escaping MongoFindOneBlock) {
-        guard let filterBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-
-        guard let replacementBSON = ObjectiveCSupport.convert(object: AnyBSON(replacement)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__findOneAndReplaceWhere(filterBSON,
-                                      replacementDocument: replacementBSON,
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let replacementBSON = ObjectiveCSupport.convert(object: .document(replacement))
+        self.__findOneAndReplaceWhere(filterBSON as! [String: RLMBSON],
+                                      replacementDocument: replacementBSON as! [String: RLMBSON],
                                       options: options,
                                       completion: completion)
     }
@@ -533,15 +462,10 @@ extension MongoCollection {
     public func findOneAndReplace(filter: Document,
                                   replacement: Document,
                                   _ completion: @escaping MongoFindOneBlock) {
-        guard let filterBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-
-        guard let replacementBSON = ObjectiveCSupport.convert(object: AnyBSON(replacement)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__findOneAndReplaceWhere(filterBSON,
-                                      replacementDocument: replacementBSON,
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        let replacementBSON = ObjectiveCSupport.convert(object: .document(replacement))
+        self.__findOneAndReplaceWhere(filterBSON as! [String: RLMBSON],
+                                      replacementDocument: replacementBSON as! [String: RLMBSON],
                                       completion: completion)
     }
 
@@ -558,10 +482,8 @@ extension MongoCollection {
     public func findOneAndDelete(filter: Document,
                                  options: FindOneAndModifyOptions,
                                  _ completion: @escaping MongoDeleteBlock) {
-        guard let filterBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__findOneAndDeleteWhere(filterBSON,
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        self.__findOneAndDeleteWhere(filterBSON as! [String: RLMBSON],
                                      options: options,
                                      completion: completion)
     }
@@ -577,10 +499,8 @@ extension MongoCollection {
     ///   - completion: The result of the attempt to delete a document.
     public func findOneAndDelete(filter: Document,
                                  _ completion: @escaping MongoDeleteBlock) {
-        guard let filterBSON = ObjectiveCSupport.convert(object: AnyBSON(filter)) as? [String: RLMBSON] else {
-            return completion(nil, BSONError.swiftToObjCConversion)
-        }
-        self.__findOneAndDeleteWhere(filterBSON,
+        let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
+        self.__findOneAndDeleteWhere(filterBSON as! [String: RLMBSON],
                                      completion: completion)
     }
 }
