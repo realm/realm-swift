@@ -139,7 +139,7 @@
         if (error) {
             return completion(0, RLMAppErrorToNSError(*error));
         }
-        completion(count, nil);
+        completion((int)count, nil);
     });
 }
 
@@ -156,7 +156,7 @@
         if (error) {
             return completion(0, RLMAppErrorToNSError(*error));
         }
-        completion(count, nil);
+        completion((int)count, nil);
     });
 }
 
@@ -168,7 +168,7 @@
         if (error) {
             return completion(0, RLMAppErrorToNSError(*error));
         }
-        completion(count, nil);
+        completion((int)count, nil);
     });
 }
 

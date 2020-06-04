@@ -87,7 +87,7 @@
 
 - (NSInteger)limit {
     if (_options.limit) {
-        return *_options.limit;
+        return (int)*_options.limit;
     }
     
     return 0;
