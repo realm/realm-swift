@@ -130,22 +130,22 @@
 }
 
 - (void)countWhere:(NSDictionary<NSString *, id<RLMBSON>> *)document
-             limit:(NSNumber *)limit
+             limit:(NSInteger)limit
         completion:(RLMMongoCountBlock)completion {
     [self collection:self.name].count(static_cast<realm::bson::BsonDocument>(RLMConvertRLMBSONToBson(document)),
-                                      limit.longLongValue,
+                                      limit,
                                       [completion](uint64_t count,
                                                    realm::util::Optional<realm::app::AppError> error) {
         if (error) {
             return completion(0, RLMAppErrorToNSError(*error));
         }
-        completion([NSNumber numberWithUnsignedLongLong:count], nil);
+        completion(count, nil);
     });
 }
 
 - (void)countWhere:(NSDictionary<NSString *, id<RLMBSON>> *)document
         completion:(RLMMongoCountBlock)completion {
-    [self countWhere:document limit:@0 completion:completion];
+    [self countWhere:document limit:0 completion:completion];
 }
 
 - (void)deleteOneDocumentWhere:(NSDictionary<NSString *, id<RLMBSON>> *)document
@@ -156,7 +156,7 @@
         if (error) {
             return completion(0, RLMAppErrorToNSError(*error));
         }
-        completion([NSNumber numberWithUnsignedLongLong:count], nil);
+        completion(count, nil);
     });
 }
 
@@ -168,7 +168,7 @@
         if (error) {
             return completion(0, RLMAppErrorToNSError(*error));
         }
-        completion([NSNumber numberWithUnsignedLongLong:count], nil);
+        completion(count, nil);
     });
 }
 

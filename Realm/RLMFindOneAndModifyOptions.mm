@@ -30,10 +30,10 @@
 - (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
                               sort:(id<RLMBSON> _Nullable)sort
                             upsert:(BOOL)upsert
-                 returnNewDocument:(BOOL)returnNewDocument {
+           shouldReturnNewDocument:(BOOL)shouldReturnNewDocument {
     if (self = [super init]) {
         [self setUpsert: upsert];
-        [self setReturnNewDocument: returnNewDocument];
+        [self setShouldReturnNewDocument: shouldReturnNewDocument];
         [self setProjection:projection];
         [self setSort:sort];
     }
@@ -64,7 +64,7 @@
     return _options.upsert;
 }
 
-- (BOOL)returnNewDocument {
+- (BOOL)shouldReturnNewDocument {
     return _options.return_new_document;
 }
 
@@ -72,6 +72,8 @@
     if (projection) {
         auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(projection));
         _options.projection_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
+    } else {
+        _options.projection_bson = realm::util::none;
     }
 }
 
@@ -79,6 +81,8 @@
     if (sort) {
         auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(sort));
         _options.sort_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
+    } else {
+        _options.sort_bson = realm::util::none;
     }
 }
 
@@ -86,7 +90,7 @@
     _options.upsert = upsert;
 }
 
-- (void)setReturnNewDocument:(BOOL)returnNewDocument {
+- (void)setShouldReturnNewDocument:(BOOL)returnNewDocument {
     _options.return_new_document = returnNewDocument;
 }
 

@@ -27,7 +27,7 @@
 
 @implementation RLMFindOptions
 
-- (instancetype)initWithLimit:(NSUInteger)limit
+- (instancetype)initWithLimit:(NSInteger)limit
                    projection:(id<RLMBSON> _Nullable)projection
                          sort:(id<RLMBSON> _Nullable)sort {
     if (self = [super init]) {
@@ -71,6 +71,8 @@
     if (projection) {
         auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(projection));
         _options.projection_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
+    } else {
+        _options.projection_bson = realm::util::none;
     }
 }
 
@@ -78,10 +80,12 @@
     if (sort) {
         auto bson = realm::bson::BsonDocument(RLMConvertRLMBSONToBson(sort));
         _options.sort_bson = realm::util::Optional<realm::bson::BsonDocument>(bson);
+    } else {
+        _options.sort_bson = realm::util::none;
     }
 }
 
-- (NSUInteger)limit {
+- (NSInteger)limit {
     if (_options.limit) {
         return *_options.limit;
     }
@@ -89,7 +93,7 @@
     return 0;
 }
 
-- (void)setLimit:(NSUInteger)limit {
+- (void)setLimit:(NSInteger)limit {
     _options.limit = realm::util::Optional<int64_t>(limit);
 }
 

@@ -119,7 +119,10 @@ public extension RealmApp {
     var functions: Functions {
         return Functions(app: self)
     }
-    
+
+    /// A client for interacting with a remote MongoDB instance
+    /// - Parameter serviceName:  The name of the MongoDB service
+    /// - Returns: A `MongoClient` which is used for interacting with a remote MongoDB service
     func mongoClient(_ serviceName: String) -> MongoClient {
         self.__mongoClient(withServiceName: serviceName)
     }

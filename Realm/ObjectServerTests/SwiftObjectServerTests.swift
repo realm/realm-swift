@@ -1078,7 +1078,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(findModifyOptions.projection, ["name": 1])
         XCTAssertEqual(findModifyOptions.sort, ["_id": 1])
         XCTAssertTrue(findModifyOptions.upsert)
-        XCTAssertTrue(findModifyOptions.returnNewDocument)
+        XCTAssertTrue(findModifyOptions.shouldReturnNewDocument)
     }
 
     func testMongoInsert() {
@@ -1275,7 +1275,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             findOneDeleteEx2.fulfill()
         }
         wait(for: [findOneDeleteEx2], timeout: 4.0)
-        
+
         let insertManyEx = expectation(description: "Insert many documents")
         collection.insertMany([document]) { (objectIds, error) in
             XCTAssertNotNil(objectIds)

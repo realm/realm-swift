@@ -1659,7 +1659,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMFindOneAndModifyOptions *findOneAndModifyOptions1 = [[RLMFindOneAndModifyOptions alloc] init];
     XCTAssertNil(findOneAndModifyOptions1.projection);
     XCTAssertNil(findOneAndModifyOptions1.sort);
-    XCTAssertFalse(findOneAndModifyOptions1.returnNewDocument);
+    XCTAssertFalse(findOneAndModifyOptions1.shouldReturnNewDocument);
     XCTAssertFalse(findOneAndModifyOptions1.upsert);
     
     RLMFindOneAndModifyOptions *findOneAndModifyOptions2 = [[RLMFindOneAndModifyOptions alloc] init];
@@ -1667,9 +1667,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     findOneAndModifyOptions2.sort = sort;
     XCTAssertNotNil(findOneAndModifyOptions2.projection);
     XCTAssertNotNil(findOneAndModifyOptions2.sort);
-    findOneAndModifyOptions2.returnNewDocument = YES;
+    findOneAndModifyOptions2.shouldReturnNewDocument = YES;
     findOneAndModifyOptions2.upsert = YES;
-    XCTAssertTrue(findOneAndModifyOptions2.returnNewDocument);
+    XCTAssertTrue(findOneAndModifyOptions2.shouldReturnNewDocument);
     XCTAssertTrue(findOneAndModifyOptions2.upsert);
     
     XCTAssertFalse([findOneAndModifyOptions2.projection isEqual:@{}]);
@@ -1681,27 +1681,32 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                             initWithProjection:projection
                                                             sort:sort
                                                             upsert:YES
-                                                            returnNewDocument:YES];
+                                                            shouldReturnNewDocument:YES];
     
     XCTAssertNotNil(findOneAndModifyOptions3.projection);
     XCTAssertNotNil(findOneAndModifyOptions3.sort);
-    XCTAssertTrue(findOneAndModifyOptions3.returnNewDocument);
+    XCTAssertTrue(findOneAndModifyOptions3.shouldReturnNewDocument);
     XCTAssertTrue(findOneAndModifyOptions3.upsert);
     XCTAssertFalse([findOneAndModifyOptions3.projection isEqual:@{}]);
     XCTAssertTrue([findOneAndModifyOptions3.projection isEqual:projection]);
     XCTAssertFalse([findOneAndModifyOptions3.sort isEqual:@{}]);
     XCTAssertTrue([findOneAndModifyOptions3.sort isEqual:sort]);
     
+    findOneAndModifyOptions3.projection = nil;
+    findOneAndModifyOptions3.sort = nil;
+    XCTAssertNil(findOneAndModifyOptions3.projection);
+    XCTAssertNil(findOneAndModifyOptions3.sort);
+    
     RLMFindOneAndModifyOptions *findOneAndModifyOptions4 = [[RLMFindOneAndModifyOptions alloc]
                                                             initWithProjection:nil
                                                             sort:nil
                                                             upsert:NO
-                                                            returnNewDocument:NO];
+                                                            shouldReturnNewDocument:NO];
     
     XCTAssertNil(findOneAndModifyOptions4.projection);
     XCTAssertNil(findOneAndModifyOptions4.sort);
     XCTAssertFalse(findOneAndModifyOptions4.upsert);
-    XCTAssertFalse(findOneAndModifyOptions4.returnNewDocument);
+    XCTAssertFalse(findOneAndModifyOptions4.shouldReturnNewDocument);
 }
 
 - (void)testFindOptions {
@@ -1716,26 +1721,31 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertNil(findOptions1.sort);
     findOptions1.sort = sort;
     XCTAssertTrue([findOptions1.sort isEqual:sort]);
-    XCTAssertEqual(findOptions1.limit, (unsigned long)37);
+    XCTAssertEqual(findOptions1.limit, 37);
     
     RLMFindOptions *findOptions2 = [[RLMFindOptions alloc] initWithProjection:projection
                                                                          sort:sort];
     XCTAssertTrue([findOptions2.projection isEqual:projection]);
     XCTAssertTrue([findOptions2.sort isEqual:sort]);
-    XCTAssertEqual(findOptions2.limit, (unsigned long)0);
+    XCTAssertEqual(findOptions2.limit, 0);
     
     RLMFindOptions *findOptions3 = [[RLMFindOptions alloc] initWithLimit:37
                                                               projection:projection
                                                                     sort:sort];
     XCTAssertTrue([findOptions3.projection isEqual:projection]);
     XCTAssertTrue([findOptions3.sort isEqual:sort]);
-    XCTAssertEqual(findOptions3.limit, (unsigned long)37);
+    XCTAssertEqual(findOptions3.limit, 37);
+    
+    findOptions3.projection = nil;
+    findOptions3.sort = nil;
+    XCTAssertNil(findOptions3.projection);
+    XCTAssertNil(findOptions3.sort);
     
     RLMFindOptions *findOptions4 = [[RLMFindOptions alloc] initWithProjection:nil
                                                                          sort:nil];
     XCTAssertNil(findOptions4.projection);
     XCTAssertNil(findOptions4.sort);
-    XCTAssertEqual(findOptions4.limit, (unsigned long)0);
+    XCTAssertEqual(findOptions4.limit, 0);
 }
 
 - (void)testRemoteMongoInsert {
@@ -1930,9 +1940,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *countExpectation1 = [self expectationWithDescription:@"should aggregate documents"];
     [collection countWhere:@{@"name" : @"fido"}
-                completion:^(NSNumber * count, NSError * error) {
-        XCTAssertNotNil(count);
-        XCTAssertTrue(count.intValue > 0);
+                completion:^(NSInteger count, NSError * error) {
+        XCTAssertTrue(count > 0);
         XCTAssertNil(error);
         [countExpectation1 fulfill];
     }];
@@ -1940,10 +1949,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *countExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
     [collection countWhere:@{@"name" : @"fido"}
-                     limit:@1
-                completion:^(NSNumber * count, NSError * error) {
-        XCTAssertNotNil(count);
-        XCTAssertEqual(count.intValue, 1);
+                     limit:1
+                completion:^(NSInteger count, NSError * error) {
+        XCTAssertEqual(count, 1);
         XCTAssertNil(error);
         [countExpectation2 fulfill];
     }];
@@ -2057,8 +2065,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     RLMFindOneAndModifyOptions *findAndModifyOptions = [[RLMFindOneAndModifyOptions alloc] initWithProjection:@{@"name" : @1, @"breed" : @1}
                                                                                                          sort:@{@"name" : @1, @"breed" : @1}
-                                                                                                           upsert:YES
-                                                                                                returnNewDocument:YES];
+                                                                                                       upsert:YES
+                                                                                      shouldReturnNewDocument:YES];
 
     XCTestExpectation *findOneAndUpdateExpectation1 = [self expectationWithDescription:@"should find one document and update"];
     [collection findOneAndUpdateWhere:@{@"name" : @"alex"}
@@ -2140,9 +2148,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *deleteOneExpectation1 = [self expectationWithDescription:@"should delete first document in collection"];
     [collection deleteOneDocumentWhere:@{@"_id" : rexObjectId}
-                            completion:^(NSNumber * count, NSError * error) {
-        XCTAssertNotNil(count);
-        XCTAssertTrue(count.intValue == 1);
+                            completion:^(NSInteger count, NSError * error) {
+        XCTAssertTrue(count == 1);
         XCTAssertNil(error);
         [deleteOneExpectation1 fulfill];
     }];
@@ -2160,9 +2167,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *deleteManyExpectation1 = [self expectationWithDescription:@"should delete many documents"];
     [collection deleteManyDocumentsWhere:@{@"name" : @"rex"}
-                              completion:^(NSNumber * count, NSError * error) {
-        XCTAssertNotNil(count);
-        XCTAssertTrue(count.intValue == 0);
+                              completion:^(NSInteger count, NSError * error) {
+        XCTAssertTrue(count == 0);
         XCTAssertNil(error);
         [deleteManyExpectation1 fulfill];
     }];
@@ -2170,9 +2176,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     XCTestExpectation *deleteManyExpectation2 = [self expectationWithDescription:@"should delete many documents"];
     [collection deleteManyDocumentsWhere:@{@"breed" : @"cane corso"}
-                              completion:^(NSNumber * count, NSError * error) {
-        XCTAssertNotNil(count);
-        XCTAssertTrue(count.intValue == 1);
+                              completion:^(NSInteger count, NSError * error) {
+        XCTAssertTrue(count == 1);
         XCTAssertNil(error);
         [deleteManyExpectation2 fulfill];
     }];
@@ -2192,12 +2197,12 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTestExpectation *findOneAndDeleteExpectation2 = [self expectationWithDescription:@"should find one and delete"];
     
     NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
-    NSDictionary<NSString *, id<RLMBSON>> *sort = @{@"_id": @1};
+    NSDictionary<NSString *, id<RLMBSON>> *sort = @{@"_id" : @1, @"breed" : @1};
     RLMFindOneAndModifyOptions *findOneAndModifyOptions = [[RLMFindOneAndModifyOptions alloc]
-                                                            initWithProjection:projection
-                                                            sort:sort
-                                                            upsert:YES
-                                                            returnNewDocument:YES];
+                                                           initWithProjection:projection
+                                                           sort:sort
+                                                           upsert:YES
+                                                           shouldReturnNewDocument:YES];
     
     [collection findOneAndDeleteWhere:@{@"name": @"john"}
                               options:findOneAndModifyOptions

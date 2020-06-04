@@ -35,15 +35,15 @@ NS_ASSUME_NONNULL_BEGIN
 /// (only available for find_one_and_replace and find_one_and_update)
 @property (nonatomic) BOOL upsert;
 
-/// If this is true then the new document is returned,
+/// When true then the new document is returned,
 /// Otherwise the old document is returned (default)
-/// (only available for find_one_and_replace and find_one_and_update)
-@property (nonatomic) BOOL returnNewDocument;
+/// (only available for findOneAndReplace and findOneAndUpdate)
+@property (nonatomic) BOOL shouldReturnNewDocument;
 
 - (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
                               sort:(id<RLMBSON> _Nullable)sort
                             upsert:(BOOL)upsert
-                 returnNewDocument:(BOOL)returnNewDocument NS_SWIFT_UNAVAILABLE("Please see FindOneAndModifyOptions");
+           shouldReturnNewDocument:(BOOL)shouldReturnNewDocument NS_SWIFT_UNAVAILABLE("Please see FindOneAndModifyOptions");
 
 @end
 

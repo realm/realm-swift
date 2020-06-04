@@ -54,7 +54,7 @@ typedef void(^RLMMongoFindBlock)(NSArray<NSDictionary<NSString *, id<RLMBSON>> *
 /// Block which returns a Document on a successful findOne operation, or an error should one occur.
 typedef void(^RLMMongoFindOneBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Nullable, NSError * _Nullable);
 /// Block which returns the number of Documents in a collection on a successful count operation, or an error should one occur.
-typedef void(^RLMMongoCountBlock)(NSNumber * _Nullable, NSError * _Nullable);
+typedef void(^RLMMongoCountBlock)(NSInteger, NSError * _Nullable);
 /// Block which returns an RLMUpdateResult on a successful update operation, or an error should one occur.
 typedef void(^RLMMongoUpdateBlock)(RLMUpdateResult * _Nullable, NSError * _Nullable);
 /// Block which returns the deleted Document on a successful delete operation, or an error should one occur.
@@ -122,7 +122,7 @@ typedef void(^RLMMongoDeleteBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Null
 /// @param limit The max amount of documents to count
 /// @param completion Returns the count of the documents that matched the filter.
 - (void)countWhere:(NSDictionary<NSString *, id<RLMBSON>> *)filterDocument
-             limit:(NSNumber *)limit
+             limit:(NSInteger)limit
         completion:(RLMMongoCountBlock)completion NS_REFINED_FOR_SWIFT;
 
 /// Counts the number of documents in this collection matching the provided filter.
