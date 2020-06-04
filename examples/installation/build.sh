@@ -54,11 +54,11 @@ export EXPANDED_CODE_SIGN_IDENTITY=''
 download_zip_if_needed() {
     LANG="$1"
     local DIRECTORY=realm-$LANG-latest
-    if [ ! -d $DIRECTORY ]; then
-        curl -o $DIRECTORY.zip -L https://static.realm.io/downloads/$LANG/latest
-        unzip $DIRECTORY.zip
-        rm $DIRECTORY.zip
-        mv realm-$LANG-* $DIRECTORY
+    if [ ! -d "$DIRECTORY" ]; then
+        curl -o "$DIRECTORY".zip -L https://static.realm.io/downloads/"$LANG"/latest
+        unzip "$DIRECTORY".zip
+        rm "$DIRECTORY".zip
+        mv realm-"$LANG"-* "$DIRECTORY"
     fi
 }
 
@@ -95,38 +95,49 @@ xctest() {
                 carthage update --platform watchOS
             fi
         )
+    elif [[ $NAME == SwiftPackageManager* ]]; then
+        if [ -n "$sha" ]; then
+            sed -i '' 's@branch = "master"@branch = "'"$sha"'"@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
+        fi
     elif [[ $LANG == swift* ]]; then
         download_zip_if_needed swift
     else
-        download_zip_if_needed $LANG
+        download_zip_if_needed "$LANG"
     fi
-    local DESTINATION=""
+    local DESTINATION=()
     if [[ $PLATFORM == ios ]]; then
         simulator_id="$(xcrun simctl list devices | grep -v unavailable | grep -m 1 -o '[0-9A-F\-]\{36\}')"
-        xcrun simctl boot $simulator_id
-        DESTINATION="-destination id=$simulator_id"
+        xcrun simctl boot "$simulator_id"
+        DESTINATION=(-destination "id=$simulator_id")
     elif [[ $PLATFORM == watchos ]]; then
         if xcrun simctl list devicetypes | grep -q 'iPhone 11 Pro Max'; then
-            DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep 'iPhone 11 Pro Max' | grep -m 1 -o '[0-9A-F\-]\{36\}')"
+            DESTINATION=(-destination "id=$(xcrun simctl list devices | grep -v unavailable | grep 'iPhone 11 Pro Max' | grep -m 1 -o '[0-9A-F\-]\{36\}')")
         elif xcrun simctl list devicetypes | grep -q 'iPhone Xs'; then
-            DESTINATION="-destination id=$(xcrun simctl list devices | grep -v unavailable | grep 'iPhone Xs' | grep -m 1 -o '[0-9A-F\-]\{36\}')"
+            DESTINATION=(-destination "id=$(xcrun simctl list devices | grep -v unavailable | grep 'iPhone Xs' | grep -m 1 -o '[0-9A-F\-]\{36\}')")
         fi
     fi
 
-    local PROJECT="-project $DIRECTORY/$NAME.xcodeproj"
+    local PROJECT=(-project "$DIRECTORY/$NAME.xcodeproj")
     local WORKSPACE="$DIRECTORY/$NAME.xcworkspace"
-    if [ -d $WORKSPACE ]; then
-        PROJECT="-workspace $WORKSPACE"
+    if [ -d "$WORKSPACE" ]; then
+        PROJECT=(-workspace "$WORKSPACE")
     fi
-    xcodebuild $PROJECT -scheme $NAME clean build $DESTINATION CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
+    sed -i '' 's@/swift-[0-9.]*@/swift-11.4.1@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
+    xcodebuild "${PROJECT[@]}" -scheme "$NAME" clean build "${DESTINATION[@]}" CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
     if [[ $PLATFORM != watchos ]]; then
-        xcodebuild $PROJECT -scheme $NAME test $DESTINATION CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
+        xcodebuild "${PROJECT[@]}" -scheme "$NAME" test "${DESTINATION[@]}" CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO
     fi
 
-    if [[ $NAME == CocoaPods* ]] && [[ $PLATFORM != osx ]]; then
+    if [[ $PLATFORM != osx ]]; then
         [[ $PLATFORM == 'ios' ]] && SDK=iphoneos || SDK=$PLATFORM
-        [[ $LANG == 'swift' ]] && SCHEME=RealmSwift || SCHEME=Realm
-        xcodebuild $PROJECT -scheme $SCHEME -sdk $SDK ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= build
+        if [ -d "$WORKSPACE" ]; then
+            [[ $LANG == 'swift' ]] && SCHEME=(-scheme RealmSwift) || SCHEME=(-scheme Realm)
+        else
+            SCHEME=()
+        fi
+        xcodebuild "${PROJECT[@]}" "${SCHEME[@]}" -sdk "$SDK" \
+            ONLY_ACTIVE_ARCH=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY= AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            build
     fi
 }
 
@@ -136,11 +147,12 @@ swiftpm() {
     xcrun swift build
 }
 
+# shellcheck source=../../scripts/swift-version.sh
 source "$(dirname "$0")/../../scripts/swift-version.sh"
 set_xcode_and_swift_versions # exports REALM_SWIFT_VERSION, REALM_XCODE_VERSION, and DEVELOPER_DIR variables if not already set
 
-PLATFORM=$(echo $COMMAND | cut -d - -f 2)
-LANGUAGE=$(echo $COMMAND | cut -d - -f 3)
+PLATFORM=$(echo "$COMMAND" | cut -d - -f 2)
+LANGUAGE=$(echo "$COMMAND" | cut -d - -f 3)
 
 case "$COMMAND" in
     "test-all")
@@ -154,32 +166,36 @@ case "$COMMAND" in
         fi
         ;;
 
-    test-*-*-static)
-        xctest $PLATFORM $LANGUAGE StaticExample
-        ;;
-
-    test-*-*-dynamic)
-        xctest $PLATFORM $LANGUAGE DynamicExample
-        ;;
-
-    test-*-*-xcframework)
-        xctest $PLATFORM $LANGUAGE XCFrameworkExample
-        ;;
-
     test-*-*-cocoapods)
-        xctest $PLATFORM $LANGUAGE CocoaPodsExample
+        xctest "$PLATFORM" "$LANGUAGE" CocoaPodsExample
         ;;
 
     test-*-*-cocoapods-dynamic)
-        xctest $PLATFORM $LANGUAGE CocoaPodsDynamicExample
+        xctest "$PLATFORM" "$LANGUAGE" CocoaPodsDynamicExample
+        ;;
+
+    test-*-*-static)
+        xctest "$PLATFORM" "$LANGUAGE" StaticExample
+        ;;
+
+    test-*-*-dynamic)
+        xctest "$PLATFORM" "$LANGUAGE" DynamicExample
+        ;;
+
+    test-*-*-xcframework)
+        xctest "$PLATFORM" "$LANGUAGE" XCFrameworkExample
         ;;
 
     test-*-*-carthage)
-        xctest $PLATFORM $LANGUAGE CarthageExample
+        xctest "$PLATFORM" "$LANGUAGE" CarthageExample
+        ;;
+
+    test-ios-spm)
+        xctest "$PLATFORM" swift SwiftPackageManagerExample
         ;;
 
     test-*-spm)
-        swiftpm $PLATFORM
+        swiftpm "$PLATFORM"
         ;;
 
     *)

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # A script to generate the .jenkins.yml file for the CI pull request job
-XCODE_VERSIONS = %w(10.3 11.1 11.2.1 11.3 11.4.1)
+XCODE_VERSIONS = %w(10.3 11.1 11.2.1 11.3 11.4.1 11.5)
 CONFIGURATIONS = %w(Debug Release)
 
 release_only = ->(v, c) { c == 'Release' }
@@ -31,6 +31,8 @@ targets = {
   'catalyst' => minimum_version(11),
   'catalyst-swift' => minimum_version(11),
 
+  'xcframework' => latest_only,
+
   'cocoapods-osx' => release_only,
   'cocoapods-ios' => oldest_and_latest,
   'cocoapods-ios-dynamic' => oldest_and_latest,
@@ -39,6 +41,7 @@ targets = {
   'swiftpm' => minimum_version(11),
   'swiftpm-address' => latest_only,
   'swiftpm-thread' => latest_only,
+  'swiftpm-ios' => latest_only,
 
   # These are disabled because the machine with the devices attached is currently offline
   # - ios-device-objc-ios8

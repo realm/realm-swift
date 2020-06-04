@@ -1415,6 +1415,7 @@
 
     RLMAssertThrowsWithReason([realm addOrUpdateObject:[DogObject new]],
                               @"'DogObject' does not have a primary key");
+    [realm cancelWriteTransaction];
 }
 
 - (void)testAddOrUpdateUpdatesExistingItemWithSamePK {
