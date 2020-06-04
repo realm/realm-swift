@@ -141,7 +141,7 @@ extension FindOneAndModifyOptions {
     ///   - projection: Limits the fields to return for all matching documents.
     ///   - sort: The order in which to return matching documents.
     ///   - upsert: Whether or not to perform an upsert, default is false
-    ///   (only available for find_one_and_replace and find_one_and_update)
+    ///   (only available for findOneAndReplace and findOneAndUpdate)
     ///   - shouldReturnNewDocument: When true then the new document is returned,
     ///   Otherwise the old document is returned (default)
     ///   (only available for findOneAndReplace and findOneAndUpdate)
