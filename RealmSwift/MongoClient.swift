@@ -56,7 +56,7 @@ public typealias FindOptions = RLMFindOptions
 extension FindOptions {
 
     /// Limits the fields to return for all matching documents.
-    public var projected: Document? {
+    public var projection: Document? {
         get {
             guard let value = ObjectiveCSupport.convert(object: __projection) else {
                 return nil
@@ -90,10 +90,10 @@ extension FindOptions {
     ///   - limit: The maximum number of documents to return. Specifying 0 will return all documents.
     ///   - projected: Limits the fields to return for all matching documents.
     ///   - sort: The order in which to return matching documents.
-    public convenience init(_ limit: Int?, _ projected: Document?, _ sort: Document?) {
+    public convenience init(_ limit: Int?, _ projection: Document?, _ sort: Document?) {
         self.init()
         self.limit = limit ?? 0
-        self.projected = projected
+        self.projection = projection
         self.sort = sort
     }
 }

@@ -1067,13 +1067,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let findOptions2 = FindOptions(5, ["names": ["fido", "bob", "rex"]], ["_id": 1])
 
         XCTAssertEqual(findOptions.limit, 1)
-        XCTAssertEqual(findOptions.projected, nil)
+        XCTAssertEqual(findOptions.projection, nil)
         XCTAssertEqual(findOptions.sort, nil)
 
         XCTAssertEqual(findOptions1.limit, 5)
-        XCTAssertEqual(findOptions1.projected, ["name": 1])
+        XCTAssertEqual(findOptions1.projection, ["name": 1])
         XCTAssertEqual(findOptions1.sort, ["_id": 1])
-        XCTAssertEqual(findOptions2.projected, ["names": ["fido", "bob", "rex"]])
+        XCTAssertEqual(findOptions2.projection, ["names": ["fido", "bob", "rex"]])
 
         let findModifyOptions = FindOneAndModifyOptions(["name": 1], ["_id": 1], true, true)
         XCTAssertEqual(findModifyOptions.projection, ["name": 1])
