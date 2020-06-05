@@ -223,6 +223,23 @@ async function create() {
         "user_id_field": "user_id"
     });
     
+    await app.secrets().create({
+        name: "gcm",
+        value: "gcm"
+    });
+    
+    await app.services().create({
+        "name": "gcm",
+        "type": "gcm",
+        "config": {
+            "senderId": "gcm"
+        },
+        "secret_config": {
+            "apiKey": "gcm"
+        },
+        "version": 1
+    });
+    
     process.stdout.write(appResponse['client_app_id']);
 }
 
