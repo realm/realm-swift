@@ -73,7 +73,7 @@
     self.client.call_reset_password_function(email.UTF8String,
                                              password.UTF8String,
                                              static_cast<realm::bson::BsonArray>(RLMConvertRLMBSONToBson(args)),
-                                                                                 ^(Optional<realm::app::AppError> error) {
+                                                                                 ^(realm::util::Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }

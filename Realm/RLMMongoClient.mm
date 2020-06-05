@@ -17,8 +17,10 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMMongoClient.h"
+#import "RLMMongoDatabase.h"
 #import "RLMMongoClient_Private.hpp"
 #import "RLMMongoDatabase_Private.hpp"
+#import "RLMMongoCollection_Private.hpp"
 #import "RLMApp_Private.hpp"
 
 #import "sync/remote_mongo_client.hpp"
@@ -40,6 +42,28 @@
     return [[RLMMongoDatabase alloc] initWithApp:self.app
                                      serviceName:self.name
                                     databaseName:name];
+}
+
+@end
+
+@implementation RLMMongoDatabase
+
+- (instancetype)initWithApp:(RLMApp *)app
+                serviceName:(NSString *)serviceName
+               databaseName:(NSString *)databaseName {
+    if (self = [super init]) {
+        _app = app;
+        _serviceName = serviceName;
+        _name = databaseName;
+    }
+    return self;
+}
+
+- (RLMMongoCollection *)collectionWithName:(NSString *)name {
+    return [[RLMMongoCollection alloc] initWithApp:self.app
+                                       serviceName:self.serviceName
+                                      databaseName:self.name
+                                    collectionName:name];
 }
 
 @end

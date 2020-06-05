@@ -464,18 +464,6 @@
 		CF56B09B24894E7F0001251D /* remote_mongo_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3D24479905009DE80A /* remote_mongo_client.cpp */; };
 		CF56B09C24894E7F0001251D /* remote_mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3B24479905009DE80A /* remote_mongo_collection.cpp */; };
 		CF56B09D24894E7F0001251D /* remote_mongo_database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3A24479905009DE80A /* remote_mongo_database.cpp */; };
-		CF56B0A2248950890001251D /* RLMUpdateResult_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7CE24816AA900890DD2 /* RLMUpdateResult_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		CF56B0A3248A8AB70001251D /* RLMUpdateResult_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7CE24816AA900890DD2 /* RLMUpdateResult_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		CF56B0A4248A8ACE0001251D /* RLMMongoDatabase_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7DC24816AAB00890DD2 /* RLMMongoDatabase_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		CF56B0A5248A8ACE0001251D /* RLMMongoDatabase_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7DC24816AAB00890DD2 /* RLMMongoDatabase_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		CF56B0A6248A8AD40001251D /* RLMMongoCollection_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D224816AAA00890DD2 /* RLMMongoCollection_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		CF56B0A7248A8AD40001251D /* RLMMongoCollection_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D224816AAA00890DD2 /* RLMMongoCollection_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		CF56B0A8248A8ADA0001251D /* RLMMongoClient_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D324816AAA00890DD2 /* RLMMongoClient_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		CF56B0A9248A8ADB0001251D /* RLMMongoClient_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D324816AAA00890DD2 /* RLMMongoClient_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		CF56B0AA248A8AE00001251D /* RLMFindOptions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D424816AAA00890DD2 /* RLMFindOptions_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		CF56B0AB248A8AE00001251D /* RLMFindOptions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D424816AAA00890DD2 /* RLMFindOptions_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		CF56B0AC248A8AE40001251D /* RLMFindOneAndModifyOptions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D824816AAB00890DD2 /* RLMFindOneAndModifyOptions_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		CF56B0AD248A8AE40001251D /* RLMFindOneAndModifyOptions_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7D824816AAB00890DD2 /* RLMFindOneAndModifyOptions_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		CF6E0482242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0480242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF6E0483242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */; };
 		CF6E0486242A321200DB7F14 /* RLMProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0484242A321200DB7F14 /* RLMProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -488,8 +476,6 @@
 		CF76F7DE24816AAB00890DD2 /* RLMUpdateResult.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF76F7CB24816AA800890DD2 /* RLMUpdateResult.mm */; };
 		CF76F7DF24816AAB00890DD2 /* RLMUpdateResult.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7CC24816AA800890DD2 /* RLMUpdateResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF76F7E024816AAB00890DD2 /* RLMUpdateResult.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7CC24816AA800890DD2 /* RLMUpdateResult.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		CF76F7E124816AAB00890DD2 /* RLMMongoDatabase.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF76F7CD24816AA900890DD2 /* RLMMongoDatabase.mm */; };
-		CF76F7E224816AAB00890DD2 /* RLMMongoDatabase.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF76F7CD24816AA900890DD2 /* RLMMongoDatabase.mm */; };
 		CF76F7E524816AAB00890DD2 /* RLMMongoCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7CF24816AA900890DD2 /* RLMMongoCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF76F7E624816AAB00890DD2 /* RLMMongoCollection.h in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7CF24816AA900890DD2 /* RLMMongoCollection.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF76F7E724816AAB00890DD2 /* RLMFindOptions.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF76F7D024816AAA00890DD2 /* RLMFindOptions.mm */; };
@@ -1038,7 +1024,6 @@
 		CF6E0485242A321200DB7F14 /* RLMProviderClient.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMProviderClient.mm; sourceTree = "<group>"; };
 		CF76F7CB24816AA800890DD2 /* RLMUpdateResult.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMUpdateResult.mm; sourceTree = "<group>"; };
 		CF76F7CC24816AA800890DD2 /* RLMUpdateResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMUpdateResult.h; sourceTree = "<group>"; };
-		CF76F7CD24816AA900890DD2 /* RLMMongoDatabase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMMongoDatabase.mm; sourceTree = "<group>"; };
 		CF76F7CE24816AA900890DD2 /* RLMUpdateResult_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMUpdateResult_Private.hpp; sourceTree = "<group>"; };
 		CF76F7CF24816AA900890DD2 /* RLMMongoCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RLMMongoCollection.h; sourceTree = "<group>"; };
 		CF76F7D024816AAA00890DD2 /* RLMFindOptions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMFindOptions.mm; sourceTree = "<group>"; };
@@ -1635,7 +1620,6 @@
 				CF76F7D124816AAA00890DD2 /* RLMMongoCollection.mm */,
 				CF76F7DC24816AAB00890DD2 /* RLMMongoDatabase_Private.hpp */,
 				CF76F7D924816AAB00890DD2 /* RLMMongoDatabase.h */,
-				CF76F7CD24816AA900890DD2 /* RLMMongoDatabase.mm */,
 				CF76F7CE24816AA900890DD2 /* RLMUpdateResult_Private.hpp */,
 				CF76F7CC24816AA800890DD2 /* RLMUpdateResult.h */,
 				CF76F7CB24816AA800890DD2 /* RLMUpdateResult.mm */,
@@ -1940,7 +1924,6 @@
 				5D659EB01BE04556006515A0 /* RLMMigration_Private.h in Headers */,
 				4993221824129E6600A0EC8E /* RLMNetworkTransport.h in Headers */,
 				5D659EB11BE04556006515A0 /* RLMObject.h in Headers */,
-				CF56B0A9248A8ADB0001251D /* RLMMongoClient_Private.hpp in Headers */,
 				5D659EB21BE04556006515A0 /* RLMObject_Private.h in Headers */,
 				5D659EB31BE04556006515A0 /* RLMObjectBase.h in Headers */,
 				5D659EB41BE04556006515A0 /* RLMObjectBase_Dynamic.h in Headers */,
@@ -1959,16 +1942,13 @@
 				5D659EC11BE04556006515A0 /* RLMRealm_Private.h in Headers */,
 				1ABF256F1D52AB6200BAC441 /* RLMRealmConfiguration+Sync.h in Headers */,
 				CF76F7F924816AAB00890DD2 /* RLMMongoDatabase.h in Headers */,
-				CF56B0A5248A8ACE0001251D /* RLMMongoDatabase_Private.hpp in Headers */,
 				5D659EC21BE04556006515A0 /* RLMRealmConfiguration.h in Headers */,
 				5D659EC31BE04556006515A0 /* RLMRealmConfiguration_Private.h in Headers */,
 				5D659EC51BE04556006515A0 /* RLMResults.h in Headers */,
-				CF56B0AB248A8AE00001251D /* RLMFindOptions_Private.hpp in Headers */,
 				5D659EC61BE04556006515A0 /* RLMResults_Private.h in Headers */,
 				5D659EC71BE04556006515A0 /* RLMSchema.h in Headers */,
 				5D659EC81BE04556006515A0 /* RLMSchema_Private.h in Headers */,
 				5D659EC91BE04556006515A0 /* RLMSwiftSupport.h in Headers */,
-				CF56B0A6248A8AD40001251D /* RLMMongoCollection_Private.hpp in Headers */,
 				1A0512771D8746CD00806AEC /* RLMSyncConfiguration.h in Headers */,
 				3F336E8B1DA2FA15006CB5A0 /* RLMSyncConfiguration_Private.h in Headers */,
 				1AF7EA961D340AF70001A9B5 /* RLMSyncManager.h in Headers */,
@@ -1982,8 +1962,6 @@
 				CF76F7F324816AAB00890DD2 /* RLMFindOneAndModifyOptions.h in Headers */,
 				3F67DB3C1E26D69C0024533D /* RLMThreadSafeReference.h in Headers */,
 				CFAEF765242B672700EAF721 /* RLMUserAPIKey.h in Headers */,
-				CF56B0A3248A8AB70001251D /* RLMUpdateResult_Private.hpp in Headers */,
-				CF56B0AC248A8AE40001251D /* RLMFindOneAndModifyOptions_Private.hpp in Headers */,
 				CFAEF761242B5F9A00EAF721 /* RLMUserAPIKeyProviderClient.h in Headers */,
 				CF6E0482242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h in Headers */,
 			);
@@ -2005,7 +1983,6 @@
 				5DD755A31BE056DE002800DA /* Realm.h in Headers */,
 				5DD755A51BE056DE002800DA /* RLMAccessor.h in Headers */,
 				4993221324129DCE00A0EC8E /* RLMApp.h in Headers */,
-				CF56B0A7248A8AD40001251D /* RLMMongoCollection_Private.hpp in Headers */,
 				4993220B24129DCE00A0EC8E /* RLMAppCredentials.h in Headers */,
 				5DD755A71BE056DE002800DA /* RLMArray.h in Headers */,
 				5DD755A81BE056DE002800DA /* RLMArray_Private.h in Headers */,
@@ -2015,7 +1992,6 @@
 				3F4F3ADE23F71C790048DB43 /* RLMDecimal128.h in Headers */,
 				CF76F7E024816AAB00890DD2 /* RLMUpdateResult.h in Headers */,
 				3FC3F913241808B400E27322 /* RLMEmbeddedObject.h in Headers */,
-				CF56B0A8248A8ADA0001251D /* RLMMongoClient_Private.hpp in Headers */,
 				5DD755AC1BE056DE002800DA /* RLMListBase.h in Headers */,
 				5DD755AD1BE056DE002800DA /* RLMMigration.h in Headers */,
 				5DD755AE1BE056DE002800DA /* RLMMigration_Private.h in Headers */,
@@ -2028,7 +2004,6 @@
 				5DD755B21BE056DE002800DA /* RLMObjectBase_Dynamic.h in Headers */,
 				E8F992BF1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */,
 				CF76F7FA24816AAB00890DD2 /* RLMMongoDatabase.h in Headers */,
-				CF56B0A4248A8ACE0001251D /* RLMMongoDatabase_Private.hpp in Headers */,
 				CF76F7E624816AAB00890DD2 /* RLMMongoCollection.h in Headers */,
 				3F4F3AD823F71C790048DB43 /* RLMObjectId.h in Headers */,
 				5DD755B31BE056DE002800DA /* RLMObjectSchema.h in Headers */,
@@ -2050,7 +2025,6 @@
 				5DD755C11BE056DE002800DA /* RLMRealmConfiguration_Private.h in Headers */,
 				5DD755C31BE056DE002800DA /* RLMResults.h in Headers */,
 				5DD755C41BE056DE002800DA /* RLMResults_Private.h in Headers */,
-				CF56B0AD248A8AE40001251D /* RLMFindOneAndModifyOptions_Private.hpp in Headers */,
 				5DD755C51BE056DE002800DA /* RLMSchema.h in Headers */,
 				5DD755C61BE056DE002800DA /* RLMSchema_Private.h in Headers */,
 				5DD755C71BE056DE002800DA /* RLMSwiftSupport.h in Headers */,
@@ -2061,11 +2035,9 @@
 				1ABDCDB11D793012003489E3 /* RLMSyncUser.h in Headers */,
 				1A7DE70B1D3847670029F0AE /* RLMSyncUtil.h in Headers */,
 				E8C6EAF41DD66C0C00EC1A03 /* RLMSyncUtil_Private.h in Headers */,
-				CF56B0AA248A8AE00001251D /* RLMFindOptions_Private.hpp in Headers */,
 				3F67DB401E26D6A20024533D /* RLMThreadSafeReference.h in Headers */,
 				3F275EC02433AB3300161E7F /* RLMUserAPIKey.h in Headers */,
 				3F275EC12433AB3900161E7F /* RLMUserAPIKeyProviderClient.h in Headers */,
-				CF56B0A2248950890001251D /* RLMUpdateResult_Private.hpp in Headers */,
 				CF6E048D242A4B7400DB7F14 /* RLMUsernamePasswordProviderClient.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2680,7 +2652,6 @@
 				5D659E881BE04556006515A0 /* RLMManagedArray.mm in Sources */,
 				CF76F7E724816AAB00890DD2 /* RLMFindOptions.mm in Sources */,
 				5D659E8B1BE04556006515A0 /* RLMMigration.mm in Sources */,
-				CF76F7E124816AAB00890DD2 /* RLMMongoDatabase.mm in Sources */,
 				4993221624129E6600A0EC8E /* RLMNetworkTransport.mm in Sources */,
 				5D659E8C1BE04556006515A0 /* RLMObject.mm in Sources */,
 				5D659E8D1BE04556006515A0 /* RLMObjectBase.mm in Sources */,
@@ -2851,7 +2822,6 @@
 				5DD755871BE056DE002800DA /* RLMConstants.m in Sources */,
 				3F4F3AD623F71C790048DB43 /* RLMDecimal128.mm in Sources */,
 				3FC3F915241808B400E27322 /* RLMEmbeddedObject.mm in Sources */,
-				CF76F7E224816AAB00890DD2 /* RLMMongoDatabase.mm in Sources */,
 				17051FCF1D93E05D00EF8E67 /* RLMJSONModels.m in Sources */,
 				5DD755881BE056DE002800DA /* RLMListBase.mm in Sources */,
 				5DD755861BE056DE002800DA /* RLMManagedArray.mm in Sources */,
