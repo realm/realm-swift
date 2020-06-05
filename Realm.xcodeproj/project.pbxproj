@@ -463,9 +463,6 @@
 		CF56B09B24894E7F0001251D /* remote_mongo_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3D24479905009DE80A /* remote_mongo_client.cpp */; };
 		CF56B09C24894E7F0001251D /* remote_mongo_collection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3B24479905009DE80A /* remote_mongo_collection.cpp */; };
 		CF56B09D24894E7F0001251D /* remote_mongo_database.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 498C7F3A24479905009DE80A /* remote_mongo_database.cpp */; };
-		CF56B09E24894EB60001251D /* remote_mongo_client.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 498C7F3824479904009DE80A /* remote_mongo_client.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
-		CF56B09F24894EB60001251D /* remote_mongo_collection.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 498C7F3924479904009DE80A /* remote_mongo_collection.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
-		CF56B0A024894EB60001251D /* remote_mongo_database.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 498C7F3724479904009DE80A /* remote_mongo_database.hpp */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF56B0A2248950890001251D /* RLMUpdateResult_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CF76F7CE24816AA900890DD2 /* RLMUpdateResult_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
 		CF6E0482242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = CF6E0480242A141200DB7F14 /* RLMUsernamePasswordProviderClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CF6E0483242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF6E0481242A141200DB7F14 /* RLMUsernamePasswordProviderClient.mm */; };
@@ -2010,9 +2007,6 @@
 				E8F992BF1F1401C100F634B5 /* RLMObjectBase_Private.h in Headers */,
 				CF76F7FA24816AAB00890DD2 /* RLMMongoDatabase.h in Headers */,
 				CF76F7E624816AAB00890DD2 /* RLMMongoCollection.h in Headers */,
-				CF56B09E24894EB60001251D /* remote_mongo_client.hpp in Headers */,
-				CF56B09F24894EB60001251D /* remote_mongo_collection.hpp in Headers */,
-				CF56B0A024894EB60001251D /* remote_mongo_database.hpp in Headers */,
 				3F4F3AD823F71C790048DB43 /* RLMObjectId.h in Headers */,
 				5DD755B31BE056DE002800DA /* RLMObjectSchema.h in Headers */,
 				5DD755B41BE056DE002800DA /* RLMObjectSchema_Private.h in Headers */,
