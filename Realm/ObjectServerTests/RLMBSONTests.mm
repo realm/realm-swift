@@ -112,7 +112,7 @@ using namespace realm::bson;
         @"maxkey": [RLMMaxKey new],
         @"date": [[NSDate alloc] initWithTimeIntervalSince1970: 500],
         @"nestedarray": @[@[@1, @2], @[@3, @4]],
-        @"nesteddoc": @{@"a": @1, @"b": @2, @"c": @NO, @"d": @[@3, @4]},
+        @"nesteddoc": @{@"a": @1, @"b": @2, @"c": @NO, @"d": @[@3, @4], @"e" : @{@"f": @"g"}},
         @"oid": [[RLMObjectId alloc] initWithString:@"507f1f77bcf86cd799439011" error:nil],
         @"regex": [[NSRegularExpression alloc] initWithPattern:@"^abc" options:0 error:nil],
         @"array1": @[@1, @2],
