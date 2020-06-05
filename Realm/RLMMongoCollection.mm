@@ -34,11 +34,10 @@
                 serviceName:(NSString *)serviceName
                databaseName:(NSString *)databaseName
              collectionName:(NSString *)collectionName {
-    self = [super init];
-    if (self) {
+    if (self = [super init]) {
         _app = app;
         _serviceName = serviceName;
-        _databaseName = serviceName;
+        _databaseName = databaseName;
         _name = collectionName;
     }
     return self;
