@@ -6,7 +6,7 @@ require 'fileutils'
 MONGODB_VERSION='4.4.0-rc5'
 GO_VERSION='1.14.2'
 NODE_VERSION='8.11.2'
-STITCH_VERSION='615f219fa62a0bb0b5f540475eed105a1775e7ab'
+STITCH_VERSION='408c7ebe70f0c4ddba01c082ed83ac9ab2c8412a'
 
 BASE_DIR = Dir.pwd
 BUILD_DIR = "#{BASE_DIR}/build"
@@ -66,10 +66,9 @@ def setup_stitch
         `git clone git@github.com:10gen/stitch`
     end
 
-    if File.exists?("#{STITCH_DIR}/.git")
-        puts 'checking out stitch'
-        `cd #{STITCH_DIR} && git pull && git checkout #{STITCH_VERSION}`
-    end
+    puts 'checking out stitch'
+    `cd #{STITCH_DIR} && git pull`
+    `cd #{STITCH_DIR} && git checkout #{STITCH_VERSION}`
 
     dylib_dir = "#{STITCH_DIR}/etc/dylib"
     if !Dir.exists?(dylib_dir)
