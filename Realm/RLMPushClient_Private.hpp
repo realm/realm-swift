@@ -16,7 +16,6 @@ class PushClient;
 
 @interface RLMPushClient ()
 
-- (instancetype)initWithPushClient:(realm::app::PushClient)pushClient;
-- (realm::app::PushClient*)_pushClient;
+- (instancetype)initWithPushClient:(realm::app::PushClient&&)pushClient;
 
 @end
