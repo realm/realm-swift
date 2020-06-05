@@ -371,7 +371,6 @@ download_core() {
 
 download_sync() {
     download_common "sync"
-    mv core/include/realm/mpark core/include/
 }
 
 ######################################
