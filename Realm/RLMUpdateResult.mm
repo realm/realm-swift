@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Realm/RLMUpdateResult_Private.hpp>
+#import "RLMUpdateResult_Private.hpp"
 #import "RLMObjectId_Private.hpp"
 
 @implementation RLMUpdateResult
