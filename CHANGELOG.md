@@ -1,7 +1,12 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Allow opening full-sync Realms in read-only mode. This disables local schema
+  initialization, which makes it possible to open a Realm which the user does
+  not have write access to without using asyncOpen. In addition, it will report
+  errors immediately when an operation would require writing to the Realm
+  rather than reporting it via the sync error handler only after the server
+  rejects the write.
 
 ### Fixed
 * Opening a Realm using a configuration object read from an existing Realm

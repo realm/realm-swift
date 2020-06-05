@@ -21,12 +21,15 @@
 #import "RLMSyncSessionRefreshHandle+ObjectServerTests.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 
+#import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm+Sync.h"
 #import "RLMRealmConfiguration_Private.h"
 #import "RLMRealmUtil.hpp"
 #import "RLMRealm_Dynamic.h"
 #import "RLMRealm_Private.hpp"
+#import "RLMSchema_Private.h"
 #import "RLMSyncUtil_Private.h"
+
 #import "shared_realm.hpp"
 
 #pragma mark - Test objects
@@ -2349,6 +2352,100 @@ static NSURL *certificateURL(NSString *filename) {
                                             expectedValue:@(RLMSyncConnectionStateDisconnected)];
     RLMSyncManager.sharedManager.customRequestHeaders = @{@"X-Other-Header": @"true"};
     [self waitForExpectations:@[ex3, ex4] timeout:4.0];
+}
+
+#pragma mark - Read Only
+
+- (RLMSyncUser *)userForTest:(SEL)sel {
+    return [self logInUserForCredentials:[RLMObjectServerTests basicCredentialsWithName:NSStringFromSelector(sel)
+                                                                               register:self.isParent]
+                                  server:[RLMObjectServerTests authServerURL]];
+}
+
+- (void)testPartialSyncCannotBeReadOnly {
+    RLMSyncUser *user = [self userForTest:_cmd];
+    RLMRealmConfiguration *config = [user configurationWithURL:nil fullSynchronization:NO];
+    RLMAssertThrowsWithReason(config.readOnly = true,
+                              @"Read-only mode is not supported for query-based sync.");
+}
+
+- (void)testOpenSynchronouslyInReadOnlyBeforeRemoteSchemaIsInitialized {
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self userForTest:_cmd];
+
+    if (self.isParent) {
+        RLMRealmConfiguration *config = [user configurationWithURL:url fullSynchronization:YES];
+        config.readOnly = true;
+        RLMRealm *realm = [RLMRealm realmWithConfiguration:config error:nil];
+        CHECK_COUNT(0, SyncObject, realm);
+        RLMRunChildAndWait();
+        [self waitForDownloadsForUser:user realms:@[realm] realmURLs:@[url] expectedCounts:@[@3]];
+    } else {
+        RLMRealm *realm = [self openRealmForURL:url user:user];
+        [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+        [self waitForUploadsForRealm:realm];
+        CHECK_COUNT(3, SyncObject, realm);
+    }
+}
+
+- (void)testAddPropertyToReadOnlyRealmWithExistingLocalCopy {
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self userForTest:_cmd];
+
+    if (!self.isParent) {
+        RLMRealm *realm = [self openRealmForURL:url user:user];
+        [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+        [self waitForUploadsForRealm:realm];
+        return;
+    }
+    RLMRunChildAndWait();
+
+    RLMRealmConfiguration *config = [user configurationWithURL:url fullSynchronization:YES];
+    config.readOnly = true;
+    @autoreleasepool {
+        (void)[self asyncOpenRealmWithConfiguration:config];
+    }
+
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:SyncObject.class];
+    objectSchema.properties = [RLMObjectSchema schemaForObjectClass:HugeSyncObject.class].properties;
+    config.customSchema = [[RLMSchema alloc] init];
+    config.customSchema.objectSchema = @[objectSchema];
+
+    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
+                              @"Property 'SyncObject.dataProp' has been added.");
+
+    @autoreleasepool {
+        NSError *error = [self asyncOpenErrorWithConfiguration:config];
+        XCTAssertNotEqual([error.localizedDescription rangeOfString:@"Property 'SyncObject.dataProp' has been added."].location,
+                          NSNotFound);
+    }
+}
+
+- (void)testAddPropertyToReadOnlyRealmWithAsyncOpen {
+    NSURL *url = REALM_URL();
+    RLMSyncUser *user = [self userForTest:_cmd];
+
+    if (!self.isParent) {
+        RLMRealm *realm = [self openRealmForURL:url user:user];
+        [self addSyncObjectsToRealm:realm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+        [self waitForUploadsForRealm:realm];
+        return;
+    }
+    RLMRunChildAndWait();
+
+    RLMRealmConfiguration *config = [user configurationWithURL:url fullSynchronization:YES];
+    config.readOnly = true;
+
+    RLMObjectSchema *objectSchema = [RLMObjectSchema schemaForObjectClass:SyncObject.class];
+    objectSchema.properties = [RLMObjectSchema schemaForObjectClass:HugeSyncObject.class].properties;
+    config.customSchema = [[RLMSchema alloc] init];
+    config.customSchema.objectSchema = @[objectSchema];
+
+    @autoreleasepool {
+        NSError *error = [self asyncOpenErrorWithConfiguration:config];
+        XCTAssertNotEqual([error.localizedDescription rangeOfString:@"Property 'SyncObject.dataProp' has been added."].location,
+                          NSNotFound);
+    }
 }
 
 @end
