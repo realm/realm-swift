@@ -3277,8 +3277,6 @@
 					core/include,
 					"-isystem",
 					Realm/ObjectStore/external/json,
-					"-isystem",
-					core/include/realm,
 				);
 			};
 			name = Debug;
@@ -3293,8 +3291,6 @@
 					core/include,
 					"-isystem",
 					Realm/ObjectStore/external/json,
-					"-isystem",
-					core/include/realm,
 				);
 			};
 			name = Release;
