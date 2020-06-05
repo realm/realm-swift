@@ -39,12 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-RLM_ARRAY_TYPE(Dog)
 @interface Person : RLMObject
 
 @property RLMObjectId *_id;
 @property NSInteger age;
-@property RLMArray<Dog *><Dog> *dogs;
 @property NSString *firstName;
 @property NSString *lastName;
 // FIXME: Remove this once REALMC-5426 is fixed
