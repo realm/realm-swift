@@ -3118,8 +3118,6 @@
 					core/include,
 					"-isystem",
 					Realm/ObjectStore/external/json,
-					"-isystem",
-					core/include/realm/mpark,
 				);
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -3138,8 +3136,6 @@
 					core/include,
 					"-isystem",
 					Realm/ObjectStore/external/json,
-					"-isystem",
-					core/include/realm/mpark,
 				);
 			};
 			name = Release;
