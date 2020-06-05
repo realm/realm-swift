@@ -78,7 +78,7 @@ static NSString *nodePath() {
 }
 
 + (NSArray *)requiredProperties {
-    return @[@"_id", @"name"];
+    return @[@"name"];
 }
 
 + (NSDictionary *)defaultPropertyValues {
@@ -100,7 +100,7 @@ static NSString *nodePath() {
 }
 
 + (NSArray *)requiredProperties {
-    return @[@"_id", @"firstName", @"lastName", @"age"];
+    return @[@"firstName", @"lastName", @"age"];
 }
 
 + (instancetype)johnWithRealmId:(NSString *)realmId {
@@ -577,6 +577,10 @@ static NSURL *syncDirectoryForChildProcess() {
     [user _syncUser]->update_access_token(tokenValue.UTF8String);
 }
 
+- (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue {
+    [user _syncUser]->update_refresh_token(tokenValue.UTF8String);
+}
+
 // FIXME: remove this API once the new token system is implemented.
 - (void)primeSyncManagerWithSemaphore:(dispatch_semaphore_t)semaphore {
     if (semaphore == nil) {
@@ -656,8 +660,7 @@ static NSURL *syncDirectoryForChildProcess() {
         [self.app.allUsers enumerateKeysAndObjectsUsingBlock:^(NSString *, RLMSyncUser *user, BOOL *) {
             XCTestExpectation *ex = [self expectationWithDescription:@"Wait for logout"];
             [exs addObject:ex];
-            [self.app logOut:user completion:^(NSError *error) {
-                XCTAssertNil(error);
+            [self.app logOut:user completion:^(NSError *) {
                 [ex fulfill];
             }];
         }];

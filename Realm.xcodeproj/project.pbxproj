@@ -3112,6 +3112,15 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(inherited)",
+					"-isystem",
+					core/include,
+					"-isystem",
+					Realm/ObjectStore/external/json,
+					"-isystem",
+					core/include/realm/mpark,
+				);
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -3123,6 +3132,15 @@
 				CLANG_ENABLE_MODULES = YES;
 				DEFINES_MODULE = YES;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(inherited)",
+					"-isystem",
+					core/include,
+					"-isystem",
+					Realm/ObjectStore/external/json,
+					"-isystem",
+					core/include/realm/mpark,
+				);
 			};
 			name = Release;
 		};
@@ -3253,6 +3271,15 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E6E1BE0398E006515A0 /* Debug.xcconfig */;
 			buildSettings = {
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(inherited)",
+					"-isystem",
+					core/include,
+					"-isystem",
+					Realm/ObjectStore/external/json,
+					"-isystem",
+					core/include/realm,
+				);
 			};
 			name = Debug;
 		};
@@ -3260,6 +3287,15 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5D659E6F1BE0398E006515A0 /* Release.xcconfig */;
 			buildSettings = {
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(inherited)",
+					"-isystem",
+					core/include,
+					"-isystem",
+					Realm/ObjectStore/external/json,
+					"-isystem",
+					core/include/realm,
+				);
 			};
 			name = Release;
 		};

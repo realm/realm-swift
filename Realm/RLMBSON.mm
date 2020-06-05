@@ -189,9 +189,7 @@ using namespace bson;
 }
 
 - (instancetype)initWithBsonBinary:(std::vector<char>)bsonBinary {
-    if ((self = [NSData dataWithBytes:bsonBinary.data()
-                                     length:bsonBinary.size()
-                               ])) {
+    if ((self = [NSData dataWithBytes:bsonBinary.data() length:bsonBinary.size()])) {
         return self;
     }
 

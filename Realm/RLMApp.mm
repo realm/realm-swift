@@ -298,19 +298,19 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 }
 
 - (void)removeUser:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app->remove_user(syncUser._syncUser, ^(Optional<app::AppError> error) {
+    _app->remove_user(syncUser._syncUser, ^(realm::util::Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
-    _app->log_out(^(Optional<app::AppError> error) {
+    _app->log_out(^(realm::util::Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (void)logOut:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app->log_out(syncUser._syncUser, ^(Optional<app::AppError> error) {
+    _app->log_out(syncUser._syncUser, ^(realm::util::Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
@@ -336,7 +336,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     return [[RLMUserAPIKeyProviderClient alloc] initWithApp: self];
 }
 
-- (void)handleResponse:(Optional<realm::app::AppError>)error
+- (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
             completion:(RLMOptionalErrorBlock)completion {
     if (error && error->error_code) {
         return completion(RLMAppErrorToNSError(*error));

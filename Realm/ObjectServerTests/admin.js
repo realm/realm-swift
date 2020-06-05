@@ -132,8 +132,8 @@ async function create() {
         },
         "relationships": {
           "dogs": {
-            "foreign_key": "_id",
             "ref": "#/stitch/mongodb1/test_data/Dog",
+            "foreign_key": "_id",
             "is_list": true
           }
         }
@@ -171,10 +171,29 @@ async function create() {
         }
     };
 
+    var userDataRule = {
+        "database": "test_data",
+        "collection": "UserData",
+        "roles": [
+            {
+                "name": "default",
+                "apply_when": {},
+                "insert": true,
+                "delete": true,
+                "additional_fields": {}
+            }
+        ],
+        "schema": {
+        },
+        "relationships": {
+        }
+    };
+    
     await app.services().service(serviceResponse['_id']).rules().create(dogRule);
     await app.services().service(serviceResponse['_id']).rules().create(personRule);
     await app.services().service(serviceResponse['_id']).rules().create(hugeSyncObjectRule);
-
+    await app.services().service(serviceResponse['_id']).rules().create(userDataRule);
+    
     personRule.schema.title = "SwiftPerson";
     personRule.collection = "SwiftPerson";
     personRule.relationships = {};

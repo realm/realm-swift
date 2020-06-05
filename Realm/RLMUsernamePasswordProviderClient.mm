@@ -30,7 +30,7 @@
 - (void)registerEmail:(NSString *)email
              password:(NSString *)password
            completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
-    self.client.register_email(email.UTF8String, password.UTF8String, ^(Optional<realm::app::AppError> error) {
+    self.client.register_email(email.UTF8String, password.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
@@ -38,21 +38,21 @@
 - (void)confirmUser:(NSString *)token
             tokenId:(NSString *)tokenId
          completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
-    self.client.confirm_user(token.UTF8String, tokenId.UTF8String, ^(Optional<realm::app::AppError> error) {
+    self.client.confirm_user(token.UTF8String, tokenId.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
 
 - (void)resendConfirmationEmail:(NSString *)email
                      completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
-    self.client.resend_confirmation_email(email.UTF8String, ^(Optional<realm::app::AppError> error) {
+    self.client.resend_confirmation_email(email.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
 
 - (void)sendResetPasswordEmail:(NSString *)email
                     completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
-    self.client.send_reset_password_email(email.UTF8String, ^(Optional<realm::app::AppError> error) {
+    self.client.send_reset_password_email(email.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
@@ -61,7 +61,7 @@
                   token:(NSString *)token
                 tokenId:(NSString *)tokenId
              completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
-    self.client.reset_password(password.UTF8String, token.UTF8String, tokenId.UTF8String, ^(Optional<realm::app::AppError> error) {
+    self.client.reset_password(password.UTF8String, token.UTF8String, tokenId.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
