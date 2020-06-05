@@ -189,9 +189,7 @@ using namespace bson;
 }
 
 - (instancetype)initWithBsonBinary:(std::vector<char>)bsonBinary {
-    if ((self = [self initWithBase64EncodedData:[NSData dataWithBytesNoCopy:bsonBinary.data()
-                                                                     length:bsonBinary.size()
-                                                               freeWhenDone:NO] options:0])) {
+    if ((self = [NSData dataWithBytes:bsonBinary.data() length:bsonBinary.size()])) {
         return self;
     }
 
@@ -250,6 +248,7 @@ using namespace bson;
                 _options = NSRegularExpressionUseUnicodeWordBoundaries;
                 break;
         }
+        return self;
     }
 
     return nil;
@@ -316,11 +315,12 @@ Bson RLMConvertRLMBSONToBson(id<RLMBSON> b) {
         case RLMBSONTypeNull:
             return util::none;
         case RLMBSONTypeBool:
-            return ((NSNumber *)b).boolValue;
+            return (bool)((NSNumber *)b).boolValue;
         case RLMBSONTypeDouble:
             return ((NSNumber *)b).doubleValue;
         case RLMBSONTypeBinary:
-            return (char**)((NSData *)b).bytes;
+            return std::vector<char>((char*)((NSData *)b).bytes,
+                                     ((char*)((NSData *)b).bytes) + (int)((NSData *)b).length);
         case RLMBSONTypeTimestamp:
             return RLMTimestampForNSDate((NSDate *)b);
         case RLMBSONTypeDatetime:
@@ -359,9 +359,9 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
         case realm::bson::Bson::Type::Binary:
             return [[NSData alloc] initWithBsonBinary:static_cast<std::vector<char>>(b)];
         case realm::bson::Bson::Type::Timestamp:
-            return RLMTimestampToNSDate(static_cast<Timestamp>(b));
-        case realm::bson::Bson::Type::Datetime:
             return [[NSDate alloc] initWithTimeIntervalSince1970:static_cast<MongoTimestamp>(b).seconds];
+        case realm::bson::Bson::Type::Datetime:
+            return [[NSDate alloc] initWithTimeIntervalSince1970:static_cast<Timestamp>(b).get_seconds()];
         case realm::bson::Bson::Type::ObjectId:
             return [[RLMObjectId alloc] initWithValue:static_cast<ObjectId>(b)];
         case realm::bson::Bson::Type::Decimal128:

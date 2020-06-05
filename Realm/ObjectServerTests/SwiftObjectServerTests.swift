@@ -24,7 +24,7 @@ import RealmSwift
 // swiftlint:disable identifier_name
 
 class SwiftPerson: Object {
-    @objc dynamic var _id: ObjectId = ObjectId.generate()
+    @objc dynamic var _id: ObjectId? = ObjectId.generate()
     @objc dynamic var firstName: String = ""
     @objc dynamic var lastName: String = ""
     @objc dynamic var age: Int = 30
@@ -654,7 +654,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
             // Screw up the token on the user.
             manuallySetAccessToken(for: user, value: badAccessToken())
-
+            manuallySetRefreshToken(for: user, value: badAccessToken())
             // Try to open a Realm with the user; this will cause our errorHandler block defined above to be fired.
             XCTAssertFalse(blockCalled)
             _ = try immediatelyOpenRealm(partitionValue: "realm_id", user: user)

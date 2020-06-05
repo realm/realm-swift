@@ -39,12 +39,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-RLM_ARRAY_TYPE(Dog)
 @interface Person : RLMObject
 
 @property RLMObjectId *_id;
 @property NSInteger age;
-@property RLMArray<Dog *><Dog> *dogs;
 @property NSString *firstName;
 @property NSString *lastName;
 // FIXME: Remove this once REALMC-5426 is fixed
@@ -150,8 +148,11 @@ RLM_ARRAY_TYPE(Dog)
                     expectation:(nullable XCTestExpectation *)expectation
                           error:(NSError **)error;
 
-/// Manually set the refresh token for a user. Used for testing invalid token conditions.
+/// Manually set the access token for a user. Used for testing invalid token conditions.
 - (void)manuallySetAccessTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue;
+
+/// Manually set the refresh token for a user. Used for testing invalid token conditions.
+- (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue;
 
 - (void)setupSyncManager;
 - (void)resetSyncManager;

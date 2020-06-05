@@ -17,8 +17,8 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncTestCase.h"
-//#import "RLMTestUtils.h"
 #import "RLMSyncUser+ObjectServerTests.h"
+#import "RLMSyncUser_Private.hpp"
 
 #import "RLMAppCredentials.h"
 #import "RLMRealm+Sync.h"
@@ -179,37 +179,20 @@
 
 - (void)testRemoveUser {
     RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
-    XCTestExpectation *loginExpectationA = [self expectationWithDescription:@"should login user A"];
-    XCTestExpectation *loginExpectationB = [self expectationWithDescription:@"should login user B"];
+    
+    RLMSyncUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                                                 register:YES]];
+    RLMSyncUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test@10gen.com"
+                                                                                  register:YES]];
+    
+    XCTAssert([[app currentUser].identity isEqualToString:secondUser.identity]);
+    
     XCTestExpectation *removeUserExpectation = [self expectationWithDescription:@"should remove user"];
-
-    __block RLMSyncUser *syncUserA;
-    __block RLMSyncUser *syncUserB;
-
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
-        XCTAssert(!error);
-        XCTAssert(user);
-        syncUserA = user;
-        [loginExpectationA fulfill];
-    }];
-
-    [self waitForExpectations:@[loginExpectationA] timeout:60.0];
-
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable error) {
-        XCTAssert(!error);
-        XCTAssert(user);
-        syncUserB = user;
-        [loginExpectationB fulfill];
-    }];
-
-    [self waitForExpectations:@[loginExpectationB] timeout:60.0];
-
-    XCTAssert([[app currentUser].identity isEqualToString:syncUserB.identity]);
-
-    [app removeUser:syncUserB completion:^(NSError * _Nullable error) {
+    
+    [app removeUser:secondUser completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert([app allUsers].count == 1);
-        XCTAssert([[app currentUser].identity isEqualToString:syncUserA.identity]);
+        XCTAssert([[app currentUser].identity isEqualToString:firstUser.identity]);
         [removeUserExpectation fulfill];
     }];
 
@@ -376,7 +359,7 @@
 
 }
 
-#pragma mark - Link user
+#pragma mark - Link user -
 
 - (void)testLinkUser {
     RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
@@ -418,7 +401,7 @@
     [self waitForExpectations:@[linkExpectation] timeout:60.0];
 }
 
-#pragma mark - Auth Credentials
+#pragma mark - Auth Credentials -
 
 - (void)testUsernamePasswordCredential {
     RLMAppCredentials *usernamePasswordCredential = [RLMAppCredentials credentialsWithUsername:@"test@mongodb.com" password:@"apassword"];
@@ -551,7 +534,8 @@
     };
 
     [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
-
+    [self manuallySetRefreshTokenForUser:user value:[self badAccessToken]];
+    
     [self openRealmForPartitionValue:@"foo" user:user];
 
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
@@ -570,7 +554,39 @@
 - (void)testAddObjects {
     RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]];
     RLMSyncUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
+    
+    NSString *realmId = @"foo";
+    RLMRealm *realm = [self openRealmForPartitionValue:realmId
+                                                  user:user];
+    RLMRealm *realm2 = [self openRealmForPartitionValue:realmId
+                                                   user:user2];
+    if (self.isParent) {
+        CHECK_COUNT(0, Person, realm);
+        RLMRunChildAndWait();
+        [self waitForDownloadsForUser:user
+                               realms:@[realm]
+                      partitionValues:@[realmId] expectedCounts:@[@4]];
+        [self waitForDownloadsForUser:user2
+                               realms:@[realm2]
+                      partitionValues:@[realmId] expectedCounts:@[@4]];
+    } else {
+        // Add objects.
+        [self addPersonsToRealm:realm
+                        persons:@[[Person johnWithRealmId:realmId],
+                                  [Person paulWithRealmId:realmId],
+                                  [Person ringoWithRealmId:realmId],
+                                  [Person georgeWithRealmId:realmId]]];
+        [self waitForUploadsForRealm:realm];
+    }
+}
 
+/// If client B adds objects to a synced Realm, client A should see those objects.
+- (void)testSessionRefresh {
+    RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]];
+    RLMSyncUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
+
+    [user _syncUser]->update_access_token(self.badAccessToken.UTF8String);
+    
     NSString *realmId = @"foo";
     RLMRealm *realm = [self openRealmForPartitionValue:realmId
                                                   user:user];
@@ -620,7 +636,7 @@
     }
 }
 
-#pragma mark - Encryption
+#pragma mark - Encryption -
 
 /// If client B encrypts its synced Realm, client A should be able to access that Realm with a different encryption key.
 - (void)testEncryptedSyncedRealm {
@@ -1472,6 +1488,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                            register:self.isParent];
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
     [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
+    [self manuallySetRefreshTokenForUser:user value:[self badAccessToken]];
     auto ex = [self expectationWithDescription:@"async open"];
     auto c = [user configurationWithPartitionValue:@"foo"];
     [RLMRealm asyncOpenWithConfiguration:c callbackQueue:dispatch_get_main_queue()
@@ -1570,11 +1587,12 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMApp *app = [RLMApp appWithId:[[RealmObjectServer sharedServer] createApp] configuration:config];
     __block RLMSyncUser* theUser;
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser *user, NSError *) {
+    [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser *user, NSError *error) {
+        XCTAssertNil(error);
         theUser = user;
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectationsWithTimeout:20.0 handler:nil];
 
     RLMRealmConfiguration *c = [theUser configurationWithPartitionValue:@"foo"];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
