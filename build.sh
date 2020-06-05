@@ -1410,7 +1410,6 @@ EOM
         if [[ "$PLATFORM" = "catalyst" ]] && (( $(xcode_version_major) < 11 )); then
             mkdir -p build/catalyst/swift-$REALM_XCODE_VERSION
         else
-            sh build.sh prelaunch-simulator
             sh build.sh $PLATFORM-swift
         fi
 
