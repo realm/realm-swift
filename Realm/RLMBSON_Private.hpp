@@ -17,12 +17,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMBSON.h"
-
-namespace realm {
-namespace bson {
-    class Bson;
-}
-}
+#import "util/bson/bson.hpp"
+#import <realm/util/optional.hpp>
 
 realm::bson::Bson RLMConvertRLMBSONToBson(id<RLMBSON> b);
 id<RLMBSON> RLMConvertBsonToRLMBSON(const realm::bson::Bson& b);
+id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(realm::util::Optional<realm::bson::BsonDocument> b);

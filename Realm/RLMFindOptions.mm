@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMFindOptions.h"
 #import "RLMFindOptions_Private.hpp"
 #import "RLMBSON_Private.hpp"
 
@@ -31,9 +30,9 @@
                    projection:(id<RLMBSON> _Nullable)projection
                          sort:(id<RLMBSON> _Nullable)sort {
     if (self = [super init]) {
-        [self setProjection:projection];
-        [self setSort:sort];
-        [self setLimit:limit];
+        self.projection = projection;
+        self.sort = sort;
+        self.limit = limit;
     }
     return self;
 }
@@ -41,8 +40,8 @@
 - (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
                               sort:(id<RLMBSON> _Nullable)sort {
     if (self = [super init]) {
-        [self setProjection:projection];
-        [self setSort:sort];
+        self.projection = projection;
+        self.sort = sort;
     }
     return self;
 }
@@ -52,19 +51,11 @@
 }
 
 - (id<RLMBSON>)projection {
-    if (_options.projection_bson) {
-        return RLMConvertBsonToRLMBSON(*_options.projection_bson);
-    }
-    
-    return nil;
+    return RLMConvertBsonDocumentToRLMBSON(_options.projection_bson);
 }
 
 - (id<RLMBSON>)sort {
-    if (_options.sort_bson) {
-        return RLMConvertBsonToRLMBSON(*_options.sort_bson);
-    }
-    
-    return nil;
+    return RLMConvertBsonDocumentToRLMBSON(_options.sort_bson);
 }
 
 - (void)setProjection:(id<RLMBSON>)projection {
@@ -86,11 +77,7 @@
 }
 
 - (NSInteger)limit {
-    if (_options.limit) {
-        return (int)*_options.limit;
-    }
-    
-    return 0;
+    return static_cast<NSInteger>(_options.limit.value_or(0));
 }
 
 - (void)setLimit:(NSInteger)limit {

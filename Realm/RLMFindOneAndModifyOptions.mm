@@ -16,7 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMFindOneAndModifyOptions.h"
 #import "RLMFindOneAndModifyOptions_Private.hpp"
 #import "RLMBSON_Private.hpp"
 
@@ -32,10 +31,10 @@
                             upsert:(BOOL)upsert
            shouldReturnNewDocument:(BOOL)shouldReturnNewDocument {
     if (self = [super init]) {
-        [self setUpsert: upsert];
-        [self setShouldReturnNewDocument: shouldReturnNewDocument];
-        [self setProjection:projection];
-        [self setSort:sort];
+        self.upsert = upsert;
+        self.shouldReturnNewDocument = shouldReturnNewDocument;
+        self.projection = projection;
+        self.sort = sort;
     }
     return self;
 }
@@ -45,19 +44,11 @@
 }
 
 - (id<RLMBSON>)projection {
-    if (_options.projection_bson) {
-        return RLMConvertBsonToRLMBSON(*_options.projection_bson);
-    }
-    
-    return nil;
+    return RLMConvertBsonDocumentToRLMBSON(_options.projection_bson);
 }
 
 - (id<RLMBSON>)sort {
-    if (_options.sort_bson) {
-        return RLMConvertBsonToRLMBSON(*_options.sort_bson);
-    }
-    
-    return nil;
+    return RLMConvertBsonDocumentToRLMBSON(_options.sort_bson);
 }
 
 - (BOOL)upsert {

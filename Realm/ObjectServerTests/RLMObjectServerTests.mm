@@ -81,7 +81,7 @@
         syncUser = user;
         [expectation fulfill];
     }];
-    
+
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
     
     RLMSyncUser *currentUser = [app currentUser];
@@ -356,7 +356,6 @@
     }];
 
     [self waitForExpectations:@[deleteAPIKeyExpectation] timeout:60.0];
-
 }
 
 #pragma mark - Link user -

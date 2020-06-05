@@ -16,17 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMMongoCollection.h"
 #import "RLMMongoCollection_Private.hpp"
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
 #import "RLMObjectId_Private.hpp"
-#import "RLMFindOptions.h"
 #import "RLMFindOptions_Private.hpp"
-#import "RLMFindOneAndModifyOptions.h"
 #import "RLMFindOneAndModifyOptions_Private.hpp"
 #import "RLMUpdateResult_Private.hpp"
 #import "RLMBSON_Private.hpp"
+
 #import "sync/remote_mongo_database.hpp"
 #import "sync/remote_mongo_collection.hpp"
 
@@ -109,7 +107,7 @@
         if (error) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
-        NSMutableArray *insertedArr = [[NSMutableArray alloc]  init];
+        NSMutableArray *insertedArr = [[NSMutableArray alloc] initWithCapacity:insertedIds.size()];
         for (auto& objectId : insertedIds) {
             [insertedArr addObject:[[RLMObjectId alloc] initWithValue:objectId]];
         }
@@ -139,7 +137,7 @@
         if (error) {
             return completion(0, RLMAppErrorToNSError(*error));
         }
-        completion((int)count, nil);
+        completion(static_cast<NSInteger>(count), nil);
     });
 }
 
@@ -156,7 +154,7 @@
         if (error) {
             return completion(0, RLMAppErrorToNSError(*error));
         }
-        completion((int)count, nil);
+        completion(static_cast<NSInteger>(count), nil);
     });
 }
 
@@ -168,7 +166,7 @@
         if (error) {
             return completion(0, RLMAppErrorToNSError(*error));
         }
-        completion((int)count, nil);
+        completion(static_cast<NSInteger>(count), nil);
     });
 }
 
@@ -232,11 +230,7 @@
             return completion(nil, RLMAppErrorToNSError(*error));
         }
 
-        if (document) {
-            return completion((NSDictionary *)RLMConvertBsonToRLMBSON(*document), nil);
-        }
-        // no docs where found
-        completion(nil, nil);
+        return completion((NSDictionary *)RLMConvertBsonDocumentToRLMBSON(document), nil);
     });
 }
 
@@ -261,11 +255,7 @@
             return completion(nil, RLMAppErrorToNSError(*error));
         }
 
-        if (document) {
-            return completion((NSDictionary *)RLMConvertBsonToRLMBSON(*document), nil);
-        }
-        // no docs where found
-        completion(nil, nil);
+        return completion((NSDictionary *)RLMConvertBsonDocumentToRLMBSON(document), nil);
     });
 }
 
@@ -289,11 +279,7 @@
             return completion(nil, RLMAppErrorToNSError(*error));
         }
 
-        if (document) {
-            return completion((NSDictionary *)RLMConvertBsonToRLMBSON(*document), nil);
-        }
-        // no docs where found
-        completion(nil, nil);
+        return completion((NSDictionary *)RLMConvertBsonDocumentToRLMBSON(document), nil);
     });
 }
 

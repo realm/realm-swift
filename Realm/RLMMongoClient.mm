@@ -16,8 +16,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMMongoClient.h"
-#import "RLMMongoDatabase.h"
 #import "RLMMongoClient_Private.hpp"
 #import "RLMMongoDatabase_Private.hpp"
 #import "RLMMongoCollection_Private.hpp"

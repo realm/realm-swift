@@ -23,20 +23,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMApp;
 
-/**
-* The `RLMMongoDatabase` represents a MongoDB database, which holds a group
-* of collections that contain your data.
-*
-* It can be retrieved from the `RLMMongoClient`.
-*
-* Use it to get `RLMMongoCollection`s for reading and writing data.
-*
-* - Note:
-* Before you can read or write data, a user must log in`.
-*
-* - SeeAlso:
-* `RLMMongoClient`, `RLMMongoCollection`
-*/
+/// The `RLMMongoDatabase` represents a MongoDB database, which holds a group
+/// of collections that contain your data.
+///
+/// It can be retrieved from the `RLMMongoClient`.
+///
+/// Use it to get `RLMMongoCollection`s for reading and writing data.
+///
+/// - Note:
+/// Before you can read or write data, a user must log in`.
+///
+/// - SeeAlso:
+/// `RLMMongoClient`, `RLMMongoCollection`
 @interface RLMMongoDatabase : NSObject
 
 /// The name of this database

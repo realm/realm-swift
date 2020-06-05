@@ -24,26 +24,24 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMApp, RLMFindOptions, RLMFindOneAndModifyOptions, RLMUpdateResult;
 
-/**
-* The `RLMMongoCollection` represents a MongoDB collection.
-*
-* You can get an instance from a `RLMMongoDatabase`.
-*
-* Create, read, update, and delete methods are available.
-*
-* Operations against the Realm Cloud server are performed asynchronously.
-*
-* - Note:
-* Before you can read or write data, a user must log in.
-* - Usage:
-* RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
-* RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-* RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-* [collection insertOneDocument:@{@"name": @"fido", @"breed": @"cane corso"} completion:...];
-*
-* - SeeAlso:
-* `RLMMongoClient`, `RLMMongoDatabase`
-*/
+/// The `RLMMongoCollection` represents a MongoDB collection.
+///
+/// You can get an instance from a `RLMMongoDatabase`.
+///
+/// Create, read, update, and delete methods are available.
+///
+/// Operations against the Realm Cloud server are performed asynchronously.
+///
+/// - Note:
+/// Before you can read or write data, a user must log in.
+/// - Usage:
+/// RLMMongoClient *client = [self.app mongoClient:@"mongodb1"];
+/// RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+/// RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
+/// [collection insertOneDocument:@{@"name": @"fido", @"breed": @"cane corso"} completion:...];
+///
+/// - SeeAlso:
+/// `RLMMongoClient`, `RLMMongoDatabase`
 @interface RLMMongoCollection : NSObject
 /// Block which returns an RLMObjectId on a successful insert, or an error should one occur.
 typedef void(^RLMMongoInsertBlock)(RLMObjectId * _Nullable, NSError * _Nullable);

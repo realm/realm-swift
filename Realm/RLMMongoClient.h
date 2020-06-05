@@ -22,18 +22,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMApp;
 
-/**
-* The `RLMMongoClient` enables reading and writing on a MongoDB database via the Realm Cloud service.
-*
-* It provides access to instances of `RLMMongoDatabase`, which in turn provide access to specific
-* `RLMMongoCollection`s that hold your data.
-*
-* - Note:
-* Before you can read or write data, a user must log in.
-*
-* - SeeAlso:
-* `RLMApp`, `RLMMongoDatabase`, `RLMMongoCollection`
-*/
+/// The `RLMMongoClient` enables reading and writing on a MongoDB database via the Realm Cloud service.
+///
+/// It provides access to instances of `RLMMongoDatabase`, which in turn provide access to specific
+/// `RLMMongoCollection`s that hold your data.
+///
+/// - Note:
+/// Before you can read or write data, a user must log in.
+///
+/// - SeeAlso:
+/// `RLMApp`, `RLMMongoDatabase`, `RLMMongoCollection`
 @interface RLMMongoClient : NSObject
 
 /// The name of the client

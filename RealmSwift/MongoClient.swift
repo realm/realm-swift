@@ -58,30 +58,20 @@ extension FindOptions {
     /// Limits the fields to return for all matching documents.
     public var projection: Document? {
         get {
-            guard let value = ObjectiveCSupport.convert(object: __projection) else {
-                return nil
-            }
-            return value.documentValue
+            return ObjectiveCSupport.convert(object: __projection)?.documentValue
         }
         set {
-            if let value = newValue {
-                __projection = ObjectiveCSupport.convert(object: AnyBSON(value))
-            }
+            __projection = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convert) as? RLMBSON
         }
     }
 
     /// The order in which to return matching documents.
     public var sort: Document? {
         get {
-            guard let value = ObjectiveCSupport.convert(object: __sort) else {
-                return nil
-            }
-            return value.documentValue
+            return ObjectiveCSupport.convert(object: __sort)?.documentValue
         }
         set {
-            if let value = newValue {
-                __sort = ObjectiveCSupport.convert(object: AnyBSON(value))
-            }
+            __sort = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convert) as? RLMBSON
         }
     }
 
@@ -108,30 +98,20 @@ extension FindOneAndModifyOptions {
     /// Limits the fields to return for all matching documents.
     public var projection: Document? {
         get {
-            guard let value = ObjectiveCSupport.convert(object: __projection) else {
-                return nil
-            }
-            return value.documentValue
+            return ObjectiveCSupport.convert(object: __projection)?.documentValue
         }
         set {
-            if let value = newValue {
-                __projection = ObjectiveCSupport.convert(object: AnyBSON(value))
-            }
+            __projection = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convert) as? RLMBSON
         }
     }
 
     /// The order in which to return matching documents.
     public var sort: Document? {
         get {
-            guard let value = ObjectiveCSupport.convert(object: __sort) else {
-                return nil
-            }
-            return value.documentValue
+            return ObjectiveCSupport.convert(object: __sort)?.documentValue
         }
         set {
-            if let value = newValue {
-                __sort = ObjectiveCSupport.convert(object: AnyBSON(value))
-            }
+            __sort = newValue.map(AnyBSON.init).map(ObjectiveCSupport.convert) as? RLMBSON
         }
     }
 

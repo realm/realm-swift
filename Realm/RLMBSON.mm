@@ -17,7 +17,6 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "util/bson/bson.hpp"
 #import "RLMUtil.hpp"
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
@@ -378,4 +377,8 @@ id<RLMBSON> RLMConvertBsonToRLMBSON(const Bson& b) {
             return [[NSMutableArray alloc] initWithBsonArray:static_cast<BsonArray>(b)];
     }
     return nil;
+}
+
+id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(realm::util::Optional<BsonDocument> b) {
+    return RLMConvertBsonToRLMBSON(b.value_or(Bson()));
 }
