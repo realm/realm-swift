@@ -66,11 +66,9 @@ def setup_stitch
         `git clone git@github.com:10gen/stitch`
     end
 
-    if File.exists?("#{STITCH_DIR}/.git")
-        puts 'checking out stitch'
-        `cd #{STITCH_DIR} && git pull`
-        `cd #{STITCH_DIR} && git checkout #{STITCH_VERSION}`
-    end
+    puts 'checking out stitch'
+    `cd #{STITCH_DIR} && git pull`
+    `cd #{STITCH_DIR} && git checkout #{STITCH_VERSION}`
 
     dylib_dir = "#{STITCH_DIR}/etc/dylib"
     if !Dir.exists?(dylib_dir)
