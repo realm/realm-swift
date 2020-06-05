@@ -40,6 +40,15 @@ NS_ASSUME_NONNULL_BEGIN
 /// (only available for findOneAndReplace and findOneAndUpdate)
 @property (nonatomic) BOOL shouldReturnNewDocument;
 
+/// Options to use when executing a `findOneAndUpdate`, `findOneAndReplace`,
+/// or `findOneAndDelete` command on a `RLMMongoCollection`.
+/// @param projection Limits the fields to return for all matching documents.
+/// @param sort The order in which to return matching documents.
+/// @param upsert Whether or not to perform an upsert, default is false
+/// (only available for findOneAndReplace and findOneAndUpdate)
+/// @param shouldReturnNewDocument When true then the new document is returned,
+/// Otherwise the old document is returned (default),
+/// (only available for findOneAndReplace and findOneAndUpdate)
 - (instancetype)initWithProjection:(id<RLMBSON> _Nullable)projection
                               sort:(id<RLMBSON> _Nullable)sort
                             upsert:(BOOL)upsert
