@@ -83,7 +83,7 @@
     }];
 
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
-    
+
     RLMSyncUser *currentUser = [app currentUser];
     XCTAssert([currentUser.identity isEqualToString:syncUser.identity]);
     XCTAssert([currentUser.refreshToken isEqualToString:syncUser.refreshToken]);
@@ -100,7 +100,7 @@
         syncUser = user;
         [expectation fulfill];
     }];
-    
+
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
     [app callFunctionNamed:@"sum"
                  arguments:@[@1, @2, @3, @4, @5]
@@ -118,7 +118,7 @@
         XCTAssert(!error);
         XCTAssert(user);
         syncUser = user;
-        
+
         [app logOutWithCompletion:^(NSError * _Nullable error) {
             XCTAssert(!error);
             XCTAssert(syncUser.state == RLMSyncUserStateRemoved);
@@ -137,7 +137,7 @@
         XCTAssert(!error);
         XCTAssert(user);
         syncUser = user;
-        
+
         [app logOut:syncUser completion:^(NSError * _Nullable) {
             XCTAssert(!error);
             XCTAssert(syncUser.state == RLMSyncUserStateRemoved);
@@ -188,7 +188,7 @@
     XCTAssert([[app currentUser].identity isEqualToString:secondUser.identity]);
     
     XCTestExpectation *removeUserExpectation = [self expectationWithDescription:@"should remove user"];
-    
+
     [app removeUser:secondUser completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
         XCTAssert([app allUsers].count == 1);
@@ -553,7 +553,7 @@
 - (void)testAddObjects {
     RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]];
     RLMSyncUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
-    
+
     NSString *realmId = @"foo";
     RLMRealm *realm = [self openRealmForPartitionValue:realmId
                                                   user:user];
@@ -585,7 +585,7 @@
     RLMSyncUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
 
     [user _syncUser]->update_access_token(self.badAccessToken.UTF8String);
-    
+
     NSString *realmId = @"foo";
     RLMRealm *realm = [self openRealmForPartitionValue:realmId
                                                   user:user];
@@ -685,7 +685,7 @@
                           partitionValues:@[@"foo"]
                            expectedCounts:@[@1]];
         }
-        
+
         RLMRealmConfiguration *c = [RLMRealmConfiguration defaultConfiguration];
         c.fileURL = [NSURL fileURLWithPath:path];
         RLMAssertThrowsWithError([RLMRealm realmWithConfiguration:c error:nil],
@@ -1242,7 +1242,7 @@
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
     // Open the Realm
     __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
-    
+
     __block NSError *theError = nil;
     XCTestExpectation *ex = [self expectationWithDescription:@"Waiting for error handler to be called..."];
     [self.app syncManager].errorHandler = ^void(NSError *error, RLMSyncSession *) {
@@ -1478,7 +1478,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertGreaterThan(fileSize(c.pathOnDisk), sizeBefore);
     XCTAssertNotNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
     CHECK_COUNT(NUMBER_OF_BIG_OBJECTS, HugeSyncObject, realm);
-    
+
     (void)[realm configuration];
 }
 
@@ -1511,14 +1511,14 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     // Wait for the child process to upload everything.
     RLMRunChildAndWait();
-    
+
     // Use a serial queue for asyncOpen to ensure that the first one adds
     // the completion block before the second one cancels it
     RLMSetAsyncOpenQueue(dispatch_queue_create("io.realm.asyncOpen", 0));
-    
+
     XCTestExpectation *ex = [self expectationWithDescription:@"download-realm"];
     RLMRealmConfiguration *c = [user configurationWithPartitionValue:@"foo"];
-    
+
     [RLMRealm asyncOpenWithConfiguration:c
                            callbackQueue:dispatch_get_main_queue()
                                 callback:^(RLMRealm *realm, NSError *error) {
@@ -1678,7 +1678,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertNil(findOneAndModifyOptions1.sort);
     XCTAssertFalse(findOneAndModifyOptions1.shouldReturnNewDocument);
     XCTAssertFalse(findOneAndModifyOptions1.upsert);
-    
+
     RLMFindOneAndModifyOptions *findOneAndModifyOptions2 = [[RLMFindOneAndModifyOptions alloc] init];
     findOneAndModifyOptions2.projection = projection;
     findOneAndModifyOptions2.sort = sort;
@@ -1688,12 +1688,12 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     findOneAndModifyOptions2.upsert = YES;
     XCTAssertTrue(findOneAndModifyOptions2.shouldReturnNewDocument);
     XCTAssertTrue(findOneAndModifyOptions2.upsert);
-    
+
     XCTAssertFalse([findOneAndModifyOptions2.projection isEqual:@{}]);
     XCTAssertTrue([findOneAndModifyOptions2.projection isEqual:projection]);
     XCTAssertFalse([findOneAndModifyOptions2.sort isEqual:@{}]);
     XCTAssertTrue([findOneAndModifyOptions2.sort isEqual:sort]);
-    
+
     RLMFindOneAndModifyOptions *findOneAndModifyOptions3 = [[RLMFindOneAndModifyOptions alloc]
                                                             initWithProjection:projection
                                                             sort:sort
@@ -1708,7 +1708,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertTrue([findOneAndModifyOptions3.projection isEqual:projection]);
     XCTAssertFalse([findOneAndModifyOptions3.sort isEqual:@{}]);
     XCTAssertTrue([findOneAndModifyOptions3.sort isEqual:sort]);
-    
+
     findOneAndModifyOptions3.projection = nil;
     findOneAndModifyOptions3.sort = nil;
     XCTAssertNil(findOneAndModifyOptions3.projection);
@@ -1719,7 +1719,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                             sort:nil
                                                             upsert:NO
                                                             shouldReturnNewDocument:NO];
-    
+
     XCTAssertNil(findOneAndModifyOptions4.projection);
     XCTAssertNil(findOneAndModifyOptions4.sort);
     XCTAssertFalse(findOneAndModifyOptions4.upsert);
@@ -1729,7 +1729,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 - (void)testFindOptions {
     NSDictionary<NSString *, id<RLMBSON>> *projection = @{@"name": @1, @"breed": @1};
     NSDictionary<NSString *, id<RLMBSON>> *sort = @{@"age" : @1, @"coat" : @1};
-    
+
     RLMFindOptions *findOptions1 = [[RLMFindOptions alloc] init];
     findOptions1.limit = 37;
     XCTAssertNil(findOptions1.projection);
@@ -1739,7 +1739,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     findOptions1.sort = sort;
     XCTAssertTrue([findOptions1.sort isEqual:sort]);
     XCTAssertEqual(findOptions1.limit, 37);
-    
+
     RLMFindOptions *findOptions2 = [[RLMFindOptions alloc] initWithProjection:projection
                                                                          sort:sort];
     XCTAssertTrue([findOptions2.projection isEqual:projection]);
@@ -1752,12 +1752,12 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertTrue([findOptions3.projection isEqual:projection]);
     XCTAssertTrue([findOptions3.sort isEqual:sort]);
     XCTAssertEqual(findOptions3.limit, 37);
-    
+
     findOptions3.projection = nil;
     findOptions3.sort = nil;
     XCTAssertNil(findOptions3.projection);
     XCTAssertNil(findOptions3.sort);
-    
+
     RLMFindOptions *findOptions4 = [[RLMFindOptions alloc] initWithProjection:nil
                                                                          sort:nil];
     XCTAssertNil(findOptions4.projection);
@@ -2210,7 +2210,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         [findOneAndDeleteExpectation1 fulfill];
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
-    
+
     // FIXME: It seems there is a possible server bug that does not handle
     // `projection` in `RLMFindOneAndModifyOptions` correctly. The returned error is:
     // "expected pre-image to match projection matcher"
