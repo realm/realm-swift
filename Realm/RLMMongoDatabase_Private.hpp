@@ -16,10 +16,22 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMBSON.h"
-#import "util/bson/bson.hpp"
-#import <realm/util/optional.hpp>
+#import <Realm/RLMMongoClient.h>
+#import "sync/remote_mongo_client.hpp"
 
-realm::bson::Bson RLMConvertRLMBSONToBson(id<RLMBSON> b);
-id<RLMBSON> RLMConvertBsonToRLMBSON(const realm::bson::Bson& b);
-id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(realm::util::Optional<realm::bson::BsonDocument> b);
+NS_ASSUME_NONNULL_BEGIN
+
+@class RLMApp;
+
+@interface RLMMongoDatabase ()
+
+@property (nonatomic, strong) RLMApp *app;
+@property (nonatomic, strong) NSString *serviceName;
+
+- (instancetype)initWithApp:(RLMApp *)app
+                serviceName:(NSString *)serviceName
+               databaseName:(NSString *)databaseName;
+
+@end
+
+NS_ASSUME_NONNULL_END

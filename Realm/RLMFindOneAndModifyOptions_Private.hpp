@@ -16,10 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMBSON.h"
-#import "util/bson/bson.hpp"
-#import <realm/util/optional.hpp>
+#import <Realm/RLMFindOneAndModifyOptions.h>
+#import "sync/remote_mongo_collection.hpp"
 
-realm::bson::Bson RLMConvertRLMBSONToBson(id<RLMBSON> b);
-id<RLMBSON> RLMConvertBsonToRLMBSON(const realm::bson::Bson& b);
-id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(realm::util::Optional<realm::bson::BsonDocument> b);
+@interface RLMFindOneAndModifyOptions ()
+
+- (realm::app::RemoteMongoCollection::RemoteFindOneAndModifyOptions)_findOneAndModifyOptions;
+
+@end

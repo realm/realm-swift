@@ -60,6 +60,12 @@ Pod::Spec.new do |s|
                               'include/**/RLMUserAPIKey.h',
                               'include/**/RLMUserAPIKeyProviderClient.h',
                               'include/**/RLMUsernamePasswordProviderClient.h',
+                              'include/**/RLMFindOneAndModifyOptions.h',
+                              'include/**/RLMFindOptions.h',
+                              'include/**/RLMMongoClient.h',
+                              'include/**/RLMMongoCollection.h',
+                              'include/**/RLMMongoDatabase.h',
+                              'include/**/RLMUpdateResult.h',
 
                               # Realm.Dynamic module
                               'include/**/RLMRealm_Dynamic.h',
@@ -82,7 +88,14 @@ Pod::Spec.new do |s|
                               'include/**/RLMResults_Private.h',
                               'include/**/RLMSchema_Private.h',
                               'include/**/RLMSyncConfiguration_Private.h',
-                              'include/**/RLMSyncUtil_Private.h'
+                              'include/**/RLMSyncUtil_Private.h',
+                              'include/**/RLMFindOneAndModifyOptions_Private.h',
+                              'include/**/RLMFindOptions_Private.h',
+                              'include/**/RLMMongoClient_Private.h',
+                              'include/**/RLMMongoCollection_Private.h',
+                              'include/**/RLMMongoDatabase_Private.h',
+                              'include/**/RLMUpdateResult_Private.h'
+
 
   source_files              = 'Realm/*.{m,mm}',
                               'Realm/ObjectStore/src/*.cpp',

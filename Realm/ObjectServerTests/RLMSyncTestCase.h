@@ -159,6 +159,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSString *)badAccessToken;
 
+- (void)cleanupRemoteDocuments:(RLMMongoCollection *)collection;
+
 @end
 
 NS_ASSUME_NONNULL_END

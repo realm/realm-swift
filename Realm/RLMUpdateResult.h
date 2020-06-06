@@ -16,10 +16,24 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMBSON.h"
-#import "util/bson/bson.hpp"
-#import <realm/util/optional.hpp>
+#import <Foundation/Foundation.h>
 
-realm::bson::Bson RLMConvertRLMBSONToBson(id<RLMBSON> b);
-id<RLMBSON> RLMConvertBsonToRLMBSON(const realm::bson::Bson& b);
-id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(realm::util::Optional<realm::bson::BsonDocument> b);
+NS_ASSUME_NONNULL_BEGIN
+
+@class RLMObjectId;
+
+/// The result of an `updateOne` or `updateMany` operation a `RLMMongoCollection`.
+@interface RLMUpdateResult : NSObject
+
+/// The number of documents that matched the filter.
+@property (nonatomic, readonly) NSUInteger matchedCount;
+
+/// The number of documents modified.
+@property (nonatomic, readonly) NSUInteger modifiedCount;
+
+/// The identifier of the inserted document if an upsert took place.
+@property (nonatomic, nullable, readonly) RLMObjectId *objectId;
+
+@end
+
+NS_ASSUME_NONNULL_END

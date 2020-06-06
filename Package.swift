@@ -121,6 +121,7 @@ let package = Package(
                 "Sync.swift",
                 "BSON.swift",
                 "RealmApp.swift",
+                "MongoClient.swift",
                 "ObjectiveCSupport+Sync.swift",
                 "ObjectiveCSupport+BSON.swift",
                 "Tests",

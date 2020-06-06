@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMUsernamePasswordProviderClient.h"
-
+#import "RLMBSON_Private.hpp"
 #import "RLMApp_Private.hpp"
 #import "sync/app.hpp"
 
@@ -68,14 +68,14 @@
 
 - (void)callResetPasswordFunction:(NSString *)email
                          password:(NSString *)password
-                             args:(NSString *)args
+                             args:(NSArray<id<RLMBSON>> *)args
                        completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
-    if (!args.length) {
-        args = @"{}";
-    }
-//    self.client.call_reset_password_function(email.UTF8String, password.UTF8String, args.UTF8String, ^(Optional<realm::app::AppError> error) {
-//        [self.app handleResponse:error completion:completion];
-//    });
+    self.client.call_reset_password_function(email.UTF8String,
+                                             password.UTF8String,
+                                             static_cast<realm::bson::BsonArray>(RLMConvertRLMBSONToBson(args)),
+                                                                                 ^(realm::util::Optional<realm::app::AppError> error) {
+        [self.app handleResponse:error completion:completion];
+    });
 }
 
 @end

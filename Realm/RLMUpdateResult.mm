@@ -16,10 +16,20 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMBSON.h"
-#import "util/bson/bson.hpp"
-#import <realm/util/optional.hpp>
+#import "RLMUpdateResult_Private.hpp"
+#import "RLMObjectId_Private.hpp"
 
-realm::bson::Bson RLMConvertRLMBSONToBson(id<RLMBSON> b);
-id<RLMBSON> RLMConvertBsonToRLMBSON(const realm::bson::Bson& b);
-id<RLMBSON> RLMConvertBsonDocumentToRLMBSON(realm::util::Optional<realm::bson::BsonDocument> b);
+@implementation RLMUpdateResult
+
+- (instancetype)initWithRemoteUpdateResult:(realm::app::RemoteMongoCollection::RemoteUpdateResult)remoteUpdateResult {
+    if (self = [super init]) {
+        _matchedCount = remoteUpdateResult.matched_count;
+        _modifiedCount = remoteUpdateResult.modified_count;
+        if (remoteUpdateResult.upserted_id) {
+            _objectId = [[RLMObjectId alloc] initWithValue:*remoteUpdateResult.upserted_id];
+        }
+    }
+    return self;
+}
+
+@end
