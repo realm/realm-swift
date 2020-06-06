@@ -65,7 +65,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMMongoClient.h',
                               'include/**/RLMMongoCollection.h',
                               'include/**/RLMMongoDatabase.h',
-                              'include/**/RLMUpdateResult.h'
+                              'include/**/RLMUpdateResult.h',
 
                               # Realm.Dynamic module
                               'include/**/RLMRealm_Dynamic.h',
