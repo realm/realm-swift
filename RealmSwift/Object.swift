@@ -126,8 +126,8 @@ open class Object: RLMObjectBase, RealmCollectionValue {
     /// Indicates if the object can no longer be accessed because it is now invalid.
     ///
     /// An object can no longer be accessed if the object has been deleted from the Realm that manages it, or if
-    /// `invalidate()` is called on that Realm.
-    public override final var isInvalidated: Bool { return super.isInvalidated }
+    /// `invalidate()` is called on that Realm. This property is key-value observable.
+    @objc dynamic open override var isInvalidated: Bool { return super.isInvalidated }
 
     /// A human-readable description of the object.
     open override var description: String { return super.description }

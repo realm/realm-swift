@@ -11,6 +11,9 @@ x.y.z Release notes (yyyy-MM-dd)
 * The schema for frozen Realms was not properly initialized, leading to crashes
   when accessing a RLMLinkingObjects property.
   ([#6568](https://github.com/realm/realm-cocoa/issues/6568), since 5.0.0).
+* Observing `Object.isInvalidated` via a keypath literal would produce a
+  warning in Swift 5.2 due to the property not being marked as @objc.
+  ([#6554](https://github.com/realm/realm-cocoa/issues/6554))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
