@@ -273,6 +273,29 @@ class KVOTests: TestCase {
     func testTypedObservation() {
         let (obj, obs) = getObject(SwiftKVOObject())
 
+        // Swift 5.2+ warns when a literal keypath to a non-@objc property is
+        // passed to observe(). This only works when it's passed directly and
+        // not via a helper, so make sure we aren't triggering this warning on
+        // any property types.
+        _ = obs.observe(\.boolCol) { _, _ in }
+        _ = obs.observe(\.int8Col) { _, _ in }
+        _ = obs.observe(\.int16Col) { _, _ in }
+        _ = obs.observe(\.int32Col) { _, _ in }
+        _ = obs.observe(\.int64Col) { _, _ in }
+        _ = obs.observe(\.floatCol) { _, _ in }
+        _ = obs.observe(\.doubleCol) { _, _ in }
+        _ = obs.observe(\.stringCol) { _, _ in }
+        _ = obs.observe(\.binaryCol) { _, _ in }
+        _ = obs.observe(\.dateCol) { _, _ in }
+        _ = obs.observe(\.objectCol) { _, _ in }
+        _ = obs.observe(\.optStringCol) { _, _ in }
+        _ = obs.observe(\.optBinaryCol) { _, _ in }
+        _ = obs.observe(\.optDateCol) { _, _ in }
+        _ = obs.observe(\.optStringCol) { _, _ in }
+        _ = obs.observe(\.optBinaryCol) { _, _ in }
+        _ = obs.observe(\.optDateCol) { _, _ in }
+        _ = obs.observe(\.isInvalidated) { _, _ in }
+
         observeChange(obs, \.boolCol, false, true) { obj.boolCol = true }
 
         observeChange(obs, \.int8Col, 1 as Int8, 10 as Int8) { obj.int8Col = 10 }
