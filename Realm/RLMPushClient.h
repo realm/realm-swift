@@ -32,7 +32,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 
 - (void)registerDeviceWithToken:(NSString *)token
                        syncUser:(RLMSyncUser *)syncUser
-                     completion:(RLMOptionalErrorBlock)completion; // Optional block? vs. specific typedef block?
+                     completion:(RLMOptionalErrorBlock)completion;
 
 - (void)deregisterDeviceWithToken:(NSString *)token
                          syncUser:(RLMSyncUser *)syncUser
