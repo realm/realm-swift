@@ -28,13 +28,11 @@ class SwiftPerson: Object {
     @objc dynamic var firstName: String = ""
     @objc dynamic var lastName: String = ""
     @objc dynamic var age: Int = 30
-    @objc dynamic var realm_id: String? = ""
 
-    convenience init(firstName: String, lastName: String, realm_id: String) {
+    convenience init(firstName: String, lastName: String) {
         self.init()
         self.firstName = firstName
         self.lastName = lastName
-        self.realm_id = realm_id
     }
 
     override class func primaryKey() -> String? {
@@ -59,7 +57,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
             let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
-            if !isParent {
+            if isParent {
                 waitForDownloads(for: realm)
                 checkCount(expected: 0, realm, SwiftPerson.self)
                 executeChild()
@@ -68,9 +66,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             } else {
                 // Add objects
                 try realm.write {
-                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr", realm_id: "foo"))
-                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: "foo"))
-                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: "foo"))
+                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
+                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
                 }
                 waitForUploads(for: realm)
                 checkCount(expected: 3, realm, SwiftPerson.self)
@@ -87,9 +85,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
             if isParent {
                 try realm.write {
-                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr", realm_id: "foo"))
-                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: "foo"))
-                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: "foo"))
+                    realm.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
+                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                    realm.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
                 }
                 waitForUploads(for: realm)
                 checkCount(expected: 3, realm, SwiftPerson.self)
@@ -147,20 +145,20 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             } else {
                 // Add objects.
                 try realmA.write {
-                    realmA.add(SwiftPerson(firstName: "Ringo", lastName: "Starr", realm_id: partitionValueA))
-                    realmA.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: partitionValueA))
-                    realmA.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: partitionValueA))
+                    realmA.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
+                    realmA.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                    realmA.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
                 }
                 try realmB.write {
-                    realmB.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: partitionValueB))
-                    realmB.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: partitionValueB))
+                    realmB.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                    realmB.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
                 }
                 try realmC.write {
-                    realmC.add(SwiftPerson(firstName: "Ringo", lastName: "Starr", realm_id: partitionValueC))
-                    realmC.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: partitionValueC))
-                    realmC.add(SwiftPerson(firstName: "Paul", lastName: "McCartney", realm_id: partitionValueC))
-                    realmC.add(SwiftPerson(firstName: "George", lastName: "Harrison", realm_id: partitionValueC))
-                    realmC.add(SwiftPerson(firstName: "Pete", lastName: "Best", realm_id: partitionValueC))
+                    realmC.add(SwiftPerson(firstName: "Ringo", lastName: "Starr"))
+                    realmC.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
+                    realmC.add(SwiftPerson(firstName: "Paul", lastName: "McCartney"))
+                    realmC.add(SwiftPerson(firstName: "George", lastName: "Harrison"))
+                    realmC.add(SwiftPerson(firstName: "Pete", lastName: "Best"))
                 }
 
                 waitForUploads(for: realmA)
@@ -279,8 +277,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             try! realm.write {
                 for _ in 0..<bigObjectCount {
                     realm.add(SwiftPerson(firstName: "Arthur",
-                                          lastName: "Jones",
-                                          realm_id: partitionValue))
+                                          lastName: "Jones"))
                 }
             }
             waitForUploads(for: realm)
@@ -357,7 +354,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             ex = expectation(description: "write transaction upload")
             try realm.write {
                 for _ in 0..<bigObjectCount {
-                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon", realm_id: "foo"))
+                    realm.add(SwiftPerson(firstName: "John", lastName: "Lennon"))
                 }
             }
             waitForExpectations(timeout: 10.0, handler: nil)
@@ -1038,8 +1035,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(mongoClient.name, "mongodb1")
         let database = mongoClient.database(withName: "test_data")
         XCTAssertEqual(database.name, "test_data")
-        let collection = database.collection(withName: "dogs")
-        XCTAssertEqual(collection.name, "dogs")
+        let collection = database.collection(withName: "Dog")
+        XCTAssertEqual(collection.name, "Dog")
     }
 
     func removeAllFromCollection(_ collection: MongoCollection) {
@@ -1052,11 +1049,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [deleteEx], timeout: 4.0)
     }
 
-    func setupMongoCollection(_ name: String) -> MongoCollection {
+    func setupMongoCollection() -> MongoCollection {
         _ = try? synchronouslyLogInUser(for: basicCredentials())
         let mongoClient = app.mongoClient("mongodb1")
         let database = mongoClient.database(withName: "test_data")
-        let collection = database.collection(withName: name)
+        let collection = database.collection(withName: "Dog")
         removeAllFromCollection(collection)
         return collection
     }
@@ -1083,7 +1080,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoInsert() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
 
@@ -1118,7 +1115,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoFind() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
 
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
@@ -1183,7 +1180,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoFindAndReplace() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
         let document3: Document = ["name": "john", "breed": "cane corso"]
@@ -1219,7 +1216,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoFindAndUpdate() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
         let document3: Document = ["name": "john", "breed": "cane corso"]
@@ -1255,7 +1252,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoFindAndDelete() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
         let insertManyEx = expectation(description: "Insert many documents")
@@ -1317,11 +1314,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoUpdateOne() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
         let document3: Document = ["name": "john", "breed": "cane corso"]
-        let document4: Document = ["breed": "bullmastiff"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
         let document5: Document = ["name": "bill", "breed": "great dane"]
 
         let insertManyEx = expectation(description: "Insert many documents")
@@ -1355,11 +1352,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoUpdateMany() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
         let document3: Document = ["name": "john", "breed": "cane corso"]
-        let document4: Document = ["breed": "bullmastiff"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
         let document5: Document = ["name": "bill", "breed": "great dane"]
 
         let insertManyEx = expectation(description: "Insert many documents")
@@ -1393,7 +1390,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoDeleteOne() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
 
@@ -1424,7 +1421,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoDeleteMany() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
 
@@ -1455,7 +1452,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoCountAndAggregate() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
         let insertManyEx1 = expectation(description: "Insert many documents")

@@ -107,13 +107,8 @@ namespace {
         self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
         
         _config.platform = "Realm Cocoa";
-        
-        NSOperatingSystemVersion operatingSystemVersion = [[NSProcessInfo processInfo] operatingSystemVersion];
-        _config.platform_version = realm::util::format("%1.%2.%2",
-                                                       operatingSystemVersion.majorVersion,
-                                                       operatingSystemVersion.minorVersion,
-                                                       operatingSystemVersion.patchVersion);
-        
+
+        RLMNSStringToStdString(_config.platform_version, [[NSProcessInfo processInfo] operatingSystemVersionString]);
         RLMNSStringToStdString(_config.sdk_version, REALM_COCOA_VERSION);
         return self;
     }

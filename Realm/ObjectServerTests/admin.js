@@ -15,13 +15,13 @@ async function create() {
     
     await app.authProviders().create({type: 'anon-user'});
     await app.authProviders().create({
-    type: 'local-userpass',
-    config: {
-    emailConfirmationUrl: 'http://foo.com',
-    resetPasswordUrl: 'http://foo.com',
-    confirmEmailSubject: 'Hi',
-    resetPasswordSubject: 'Bye',
-    autoConfirm: true
+        type: 'local-userpass',
+        config: {
+        emailConfirmationUrl: 'http://foo.com',
+        resetPasswordUrl: 'http://foo.com',
+        confirmEmailSubject: 'Hi',
+        resetPasswordSubject: 'Bye',
+        autoConfirm: true
     }});
     const authProviders = await app.authProviders().list();
     for (const i in authProviders) {
@@ -32,8 +32,8 @@ async function create() {
     }
     
     await app.secrets().create({
-    name: "BackingDB_uri",
-    value: "mongodb://localhost:26000"
+        name: "BackingDB_uri",
+        value: "mongodb://localhost:26000"
     });
     
     const serviceResponse = await app.services().create({
@@ -46,6 +46,7 @@ async function create() {
                 "database_name": "test_data",
                 "partition": {
                     "key": "realm_id",
+                    "type": "string",
                     "permissions": {
                         "read": true,
                         "write": true
@@ -58,15 +59,13 @@ async function create() {
     var dogRule = {
         "database": "test_data",
         "collection": "Dog",
-        "roles": [
-                  {
+        "roles": [{
             "name": "default",
             "apply_when": {},
             "insert": true,
             "delete": true,
             "additional_fields": {}
-        }
-                  ],
+        }],
         "schema": {
             "properties": {
                 "_id": {
@@ -82,9 +81,7 @@ async function create() {
                     "bsonType": "string"
                 }
             },
-            "required": [
-                         "name"
-                         ],
+            "required": ["name"],
             "title": "Dog"
         }
     };
@@ -97,6 +94,7 @@ async function create() {
         "roles": [{
             "name": "default",
             "apply_when": {},
+            "write": true,
             "insert": true,
             "delete": true,
             "additional_fields": {}
@@ -276,14 +274,17 @@ async function last() {
 }
 
 async function clean() {
-    const admin = await stitch.StitchAdminClientFactory.create("http://localhost:9090");
-    
-    await admin.login("unique_user@domain.com", "password");
-    const profile = await admin.userProfile();
-    const groupId = profile.roles[0].group_id;
-    const apps = await admin.apps(groupId).list();
-    for (app in apps) {
-        await admin.apps(groupId).app(app['_id']).remove();
+    try {
+        const admin = await stitch.StitchAdminClientFactory.create("http://localhost:9090");
+        
+        await admin.login("unique_user@domain.com", "password");
+        const profile = await admin.userProfile();
+        const groupId = profile.roles[0].group_id;
+        const apps = await admin.apps(groupId).list();
+        for (app in apps) {
+            await admin.apps(groupId).app(app['_id']).remove();
+        }
+    } catch (error) {
     }
 }
 
