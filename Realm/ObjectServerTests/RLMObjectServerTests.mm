@@ -552,20 +552,14 @@
 /// If client B adds objects to a synced Realm, client A should see those objects.
 - (void)testAddObjects {
     RLMSyncUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:self.isParent]];
-    RLMSyncUser *user2 = [self logInUserForCredentials:[self basicCredentialsWithName:@"lmao@10gen.com" register:self.isParent]];
-
-    NSString *realmId = @"foo";
+    NSString *realmId = self.appId;
     RLMRealm *realm = [self openRealmForPartitionValue:realmId
                                                   user:user];
-    RLMRealm *realm2 = [self openRealmForPartitionValue:realmId
-                                                   user:user2];
     if (self.isParent) {
         CHECK_COUNT(0, Person, realm);
         RLMRunChildAndWait();
         [self waitForDownloadsForRealm:realm];
         CHECK_COUNT(4, Person, realm);
-        [self waitForDownloadsForRealm:realm2];
-        CHECK_COUNT(4, Person, realm2);
     } else {
         // Add objects.
         [self addPersonsToRealm:realm

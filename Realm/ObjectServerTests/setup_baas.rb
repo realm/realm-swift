@@ -40,7 +40,7 @@ def run_mongod
     rescue => exception
         sleep(1)
         retries += 1
-        if retries == 5
+        if retries == 20
             abort('could not connect to mongod')
         end
     end
@@ -91,10 +91,12 @@ def setup_stitch
         puts `chmod +x #{assisted_agg_filepath}`
     end
 
-    puts "downloading node 🚀"
-    puts `cd #{STITCH_DIR} && curl -O "https://nodejs.org/dist/v#{NODE_VERSION}/node-v#{NODE_VERSION}-darwin-x64.tar.gz" | tar xzf node-v#{NODE_VERSION}-darwin-x64.tar.gz`
-    exports << "export PATH=\"#{STITCH_DIR}/node-v8.11.2-darwin-x64/bin/:$PATH\""
-
+    if `which node`.empty?
+        puts "downloading node 🚀"
+        puts `cd #{STITCH_DIR} && curl -O "https://nodejs.org/dist/v#{NODE_VERSION}/node-v#{NODE_VERSION}-darwin-x64.tar.gz" | tar xzf node-v#{NODE_VERSION}-darwin-x64.tar.gz`
+        exports << "export PATH=\"#{STITCH_DIR}/node-v8.11.2-darwin-x64/bin/:$PATH\""
+    end
+    
     if `which yarn`.empty?
         `rm -rf "$HOME/.yarn"`
         `export PATH=\"#{STITCH_DIR}/node-v#{NODE_VERSION}-darwin-x64/bin/:$PATH\" && curl -o- -L https://yarnpkg.com/install.sh | bash`
@@ -102,7 +104,6 @@ def setup_stitch
     end
 
     puts 'building transpiler'
-    puts exports
     puts `#{exports.length() == 0 ? "" : exports.join(' && ') + ' &&'} \
         cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
 

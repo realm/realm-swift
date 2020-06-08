@@ -45,8 +45,6 @@ def shutdown_mongod
     begin
         puts `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.adminCommand({replSetStepDown: 0, secondaryCatchUpPeriodSecs: 0, force: true})"`
         puts `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.shutdownServer({force: true})"`
-        `rm -rf #{MONGO_DIR}/db_files`
-        `cd #{MONGO_DIR} && mkdir db_files`
     rescue => exception
     end
 end
@@ -71,18 +69,9 @@ def run_stitch
 
     puts exports
     pid = Process.fork {
-        puts `#{MONGO_DIR}/bin/mongo --port 26000 --eval 'rs.initiate()'`
-        puts `#{exports.join(' && ')} && \
-        cd #{stitch_path} && \
-        go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" cmd/auth/user.go addUser \
-            -domainID 000000000000000000000000 \
-            -mongoURI mongodb://localhost:26000 \
-            -salt 'DQOWene1723baqD!_@#' \
-            -id "unique_user@domain.com" \
-            -password "password"`
-        `cd #{stitch_path} && \
+        puts `cd #{stitch_path} && \
         #{exports.join(' && ')} && \
-        go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" #{stitch_path}/cmd/server/main.go --configFile "#{stitch_path}/etc/configs/test_config.json" >> output.log`
+        go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" #{stitch_path}/cmd/server/main.go --configFile "#{stitch_path}/etc/configs/test_config.json"`
     }
     Process.detach(pid)
     retries = 0
@@ -107,8 +96,6 @@ end
 
 def start
     run_mongod
-    # clean any old state
-    clean_mongo_test_data
     run_stitch
 end
 
@@ -127,8 +114,10 @@ when "start_proxy"
     Proxy.new.run(ARGV[1].to_i, ARGV[2].to_i)
 when "shutdown"
     shutdown_stitch
-    clean_mongo_test_data
+    # TODO: Understand why cleaning doesn't work properly
+    # clean_mongo_test_data
     shutdown_mongod
 when "clean"
-    clean_mongo_test_data
+    # TODO: Understand why cleaning doesn't work properly
+    # clean_mongo_test_data
 end
