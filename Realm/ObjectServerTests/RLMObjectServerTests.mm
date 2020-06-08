@@ -1616,14 +1616,14 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                            register:self.isParent];
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
-
+    NSString *partitionValue = self.appId;
     NSString *path;
     // Create a large object and then delete it in the next transaction so that
     // the file is bloated
     @autoreleasepool {
-        RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
+        RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
         [realm beginWriteTransaction];
-        [realm addObject:[HugeSyncObject objectWithRealmId:@"foo"]];
+        [realm addObject:[HugeSyncObject objectWithRealmId:partitionValue]];
         [realm commitWriteTransaction];
         [self waitForUploadsForRealm:realm];
 
@@ -1641,7 +1641,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     // Reopen the file with a shouldCompactOnLaunch block and verify that it is
     // actually compacted
-    auto config = [user configurationWithPartitionValue:@"foo"];
+    auto config = [user configurationWithPartitionValue:partitionValue];
     __block bool blockCalled = false;
     __block NSUInteger usedSize = 0;
     config.shouldCompactOnLaunch = ^(NSUInteger, NSUInteger used) {
