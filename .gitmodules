@@ -1,4 +1,4 @@
 [submodule "Realm/ObjectStore"]
 	path = Realm/ObjectStore
 	url = https://github.com/realm/realm-object-store.git
-	branch = jf/strong_to_weak_refresh
+	branch = v10

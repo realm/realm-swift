@@ -34,6 +34,7 @@ def clean_mongo_test_data
     puts '🧹 cleaning mongo test data'
     begin
         puts `#{MONGO_DIR}/bin/mongo --port 26000 test_data --eval "db.dropDatabase()"`
+        puts `#{MONGO_DIR}/bin/mongo --port 26000 __realm_sync --eval "db.dropDatabase()"`
     rescue => exception
     end
 end
@@ -94,6 +95,8 @@ end
 
 def start
     run_mongod
+    # clean any old state
+    clean_mongo_test_data
     run_stitch
 end
 

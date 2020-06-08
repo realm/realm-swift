@@ -59,7 +59,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         do {
             let user = try synchronouslyLogInUser(for: basicCredentials())
             let realm = try synchronouslyOpenRealm(partitionValue: "foo", user: user)
-            if !isParent {
+            if isParent {
                 waitForDownloads(for: realm)
                 checkCount(expected: 0, realm, SwiftPerson.self)
                 executeChild()
@@ -1038,8 +1038,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         XCTAssertEqual(mongoClient.name, "mongodb1")
         let database = mongoClient.database(withName: "test_data")
         XCTAssertEqual(database.name, "test_data")
-        let collection = database.collection(withName: "dogs")
-        XCTAssertEqual(collection.name, "dogs")
+        let collection = database.collection(withName: "Dog")
+        XCTAssertEqual(collection.name, "Dog")
     }
 
     func removeAllFromCollection(_ collection: MongoCollection) {
@@ -1052,11 +1052,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [deleteEx], timeout: 4.0)
     }
 
-    func setupMongoCollection(_ name: String) -> MongoCollection {
+    func setupMongoCollection() -> MongoCollection {
         _ = try? synchronouslyLogInUser(for: basicCredentials())
         let mongoClient = app.mongoClient("mongodb1")
         let database = mongoClient.database(withName: "test_data")
-        let collection = database.collection(withName: name)
+        let collection = database.collection(withName: "Dog")
         removeAllFromCollection(collection)
         return collection
     }
@@ -1083,7 +1083,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoInsert() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
 
@@ -1118,7 +1118,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoFind() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
 
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "tibetan mastiff"]
@@ -1183,7 +1183,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoFindAndReplace() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
         let document3: Document = ["name": "john", "breed": "cane corso"]
@@ -1219,7 +1219,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoFindAndUpdate() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
         let document3: Document = ["name": "john", "breed": "cane corso"]
@@ -1255,7 +1255,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoFindAndDelete() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
         let insertManyEx = expectation(description: "Insert many documents")
@@ -1317,11 +1317,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoUpdateOne() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
         let document3: Document = ["name": "john", "breed": "cane corso"]
-        let document4: Document = ["breed": "bullmastiff"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
         let document5: Document = ["name": "bill", "breed": "great dane"]
 
         let insertManyEx = expectation(description: "Insert many documents")
@@ -1355,11 +1355,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoUpdateMany() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
         let document3: Document = ["name": "john", "breed": "cane corso"]
-        let document4: Document = ["breed": "bullmastiff"]
+        let document4: Document = ["name": "ted", "breed": "bullmastiff"]
         let document5: Document = ["name": "bill", "breed": "great dane"]
 
         let insertManyEx = expectation(description: "Insert many documents")
@@ -1393,7 +1393,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoDeleteOne() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
 
@@ -1424,7 +1424,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoDeleteMany() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
 
@@ -1455,7 +1455,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func testMongoCountAndAggregate() {
-        let collection = setupMongoCollection("Dogs")
+        let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
         let insertManyEx1 = expectation(description: "Insert many documents")
