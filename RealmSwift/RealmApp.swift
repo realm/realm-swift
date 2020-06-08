@@ -55,6 +55,9 @@ A `AppCredentials` represents data that uniquely identifies a Realm Object Serve
 */
 public typealias AppCredentials = RLMAppCredentials
 
+// QQ: comment adding, where to add alias
+public typealias PushClient = RLMPushClient
+
 /// Structure providing an interface to call a MongoDB Realm function with the provided name and arguments.
 ///
 ///     let app = RealmApp(appId: "my-app-id")
