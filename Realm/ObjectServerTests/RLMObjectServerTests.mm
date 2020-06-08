@@ -562,12 +562,10 @@
     if (self.isParent) {
         CHECK_COUNT(0, Person, realm);
         RLMRunChildAndWait();
-        [self waitForDownloadsForUser:user
-                               realms:@[realm]
-                      partitionValues:@[realmId] expectedCounts:@[@4]];
-        [self waitForDownloadsForUser:user2
-                               realms:@[realm2]
-                      partitionValues:@[realmId] expectedCounts:@[@4]];
+        [self waitForDownloadsForRealm:realm];
+        CHECK_COUNT(4, Person, realm);
+        [self waitForDownloadsForRealm:realm2];
+        CHECK_COUNT(4, Person, realm2);
     } else {
         // Add objects.
         [self addPersonsToRealm:realm
@@ -576,6 +574,7 @@
                                   [Person ringoWithRealmId:realmId],
                                   [Person georgeWithRealmId:realmId]]];
         [self waitForUploadsForRealm:realm];
+        CHECK_COUNT(4, Person, realm);
     }
 }
 

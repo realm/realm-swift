@@ -36,6 +36,7 @@ def clean_mongo_test_data
         puts `#{MONGO_DIR}/bin/mongo --port 26000 test_data --eval "db.dropDatabase()"`
         puts `#{MONGO_DIR}/bin/mongo --port 26000 __realm_sync --eval "db.dropDatabase()"`
     rescue => exception
+        puts('🔴 error: #{exception}')
     end
 end
 
@@ -44,6 +45,8 @@ def shutdown_mongod
     begin
         puts `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.adminCommand({replSetStepDown: 0, secondaryCatchUpPeriodSecs: 0, force: true})"`
         puts `#{MONGO_DIR}/bin/mongo --port 26000 admin --eval "db.shutdownServer({force: true})"`
+        `rm -rf #{MONGO_DIR}/db_files`
+        `cd #{MONGO_DIR} && mkdir db_files`
     rescue => exception
     end
 end
@@ -68,6 +71,15 @@ def run_stitch
 
     puts exports
     pid = Process.fork {
+        puts `#{MONGO_DIR}/bin/mongo --port 26000 --eval 'rs.initiate()'`
+        puts `#{exports.join(' && ')} && \
+        cd #{stitch_path} && \
+        go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" cmd/auth/user.go addUser \
+            -domainID 000000000000000000000000 \
+            -mongoURI mongodb://localhost:26000 \
+            -salt 'DQOWene1723baqD!_@#' \
+            -id "unique_user@domain.com" \
+            -password "password"`
         `cd #{stitch_path} && \
         #{exports.join(' && ')} && \
         go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" #{stitch_path}/cmd/server/main.go --configFile "#{stitch_path}/etc/configs/test_config.json" >> output.log`
@@ -89,7 +101,7 @@ def run_stitch
 end
 
 def shutdown_stitch
-    puts 'shutting down baas'
+    puts '🍂 shutting down baas'
     `pkill -f stitch`
 end
 
@@ -98,11 +110,6 @@ def start
     # clean any old state
     clean_mongo_test_data
     run_stitch
-end
-
-def shutdown
-    shutdown_stitch
-    shutdown_mongod
 end
 
 if ARGV.length < 1
@@ -119,8 +126,9 @@ when "start_proxy"
     require_relative 'proxy.rb'
     Proxy.new.run(ARGV[1].to_i, ARGV[2].to_i)
 when "shutdown"
+    shutdown_stitch
     clean_mongo_test_data
-    shutdown
+    shutdown_mongod
 when "clean"
     clean_mongo_test_data
 end

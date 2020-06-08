@@ -91,11 +91,9 @@ def setup_stitch
         puts `chmod +x #{assisted_agg_filepath}`
     end
 
-    if `which node`.empty?
-        puts "downloading node 🚀"
-        puts `cd #{STITCH_DIR} && curl -O "https://nodejs.org/dist/v#{NODE_VERSION}/node-v#{NODE_VERSION}-darwin-x64.tar.gz" | tar xzf node-v#{NODE_VERSION}-darwin-x64.tar.gz`
-        exports << "export PATH=\"#{STITCH_DIR}/node-v8.11.2-darwin-x64/bin/:$PATH\""
-    end
+    puts "downloading node 🚀"
+    puts `cd #{STITCH_DIR} && curl -O "https://nodejs.org/dist/v#{NODE_VERSION}/node-v#{NODE_VERSION}-darwin-x64.tar.gz" | tar xzf node-v#{NODE_VERSION}-darwin-x64.tar.gz`
+    exports << "export PATH=\"#{STITCH_DIR}/node-v8.11.2-darwin-x64/bin/:$PATH\""
 
     if `which yarn`.empty?
         `rm -rf "$HOME/.yarn"`
