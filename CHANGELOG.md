@@ -1,33 +1,4 @@
-10.0.0-alpha.6 Release notes (2020-05-31)
-=============================================================
-### Enhancements
-* Add `-[RLMSyncUser customData]`/`SyncUser.customData`.  Custom data is a can be configured in your MongoDB Realm App.
-* Add `-[RLMApp callFunctionNamed:arguments]`/`RealmApp.functions`. This is the entry point for calling Remote MongoDB Realm functions.
- Functions allow you to define and execute server-side logic for your application. Functions are written in modern JavaScript (ES6+) and execute in a 
- serverless manner. When you call a function, you can dynamically access components of the current application as well as 
- information about the request to execute the function and the logged in user that sent the request.
- * Change `[RLMSyncUser configurationWithPartitionValue:]`/`SyncUser.configuration(with:)` to accept all BSON types.
- Partition values can currently be of types String, Int, or ObjectId. 
-Opening a realm by partition value is the equivalent of previously opening a realm by URL. In this case,
-partitions are meant to be more closely associated with your data. E.g., if you are running a `Dog` kennel, and have a field
-`breed` that acts as your partition key, you could open up realms based on the breed of the dogs. 
-
-### Breaking Changes
-* We no longer support Realm Cloud (legacy), but instead the new "MongoDB Realm" Cloud. MongoDB Realm is a serverless platform
-that enables developers to quickly build applications without having to set up server infrastructure.
-MongoDB Realm is built on top of MongoDB Atlas, automatically integrating the connection to your database.
-
-### Compatibility
-* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
-* MongoDB Realm: 71f9b52e2e or later.
-* APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
-* Carthage release for Swift is built with Xcode 11.4.1.
-
-### Internal
-* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.8
-* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.11
-
-10.0.0-alpha.0 Release notes (2020-04-22)
+10.0.0-beta.1 Release notes (2020-06-08)
 =============================================================
 ### Enhancements
 * Add support for next generation sync. Support for syncing to MongoDB instead of Realm Object Server.
@@ -44,8 +15,29 @@ Applications must be created at realm.mongodb.com
   owned by a single parent object, and are deleted when that parent object is
   deleted. They are defined by subclassing `EmbeddedObject` /
     `RLMEmbeddedObject` rather than `Object` / `RLMObject`.
+* Add `-[RLMSyncUser customData]`/`SyncUser.customData`.  Custom data is a can be configured in your MongoDB Realm App.
+* Add `-[RLMApp callFunctionNamed:arguments]`/`RealmApp.functions`. This is the entry point for calling Remote MongoDB Realm functions.
+ Functions allow you to define and execute server-side logic for your application. Functions are written in modern JavaScript (ES6+) and execute in a 
+ serverless manner. When you call a function, you can dynamically access components of the current application as well as 
+ information about the request to execute the function and the logged in user that sent the request.
+ * Add `-[RLMApp mongoClientWithServiceName]`/`RealmApp.mongoClient`. This is the entry point for calling your Remote MongoDB Service.
+ The read operations are `-[RLMMongoCollection findWhere:completion:]`, `-[RLMMongoCollection countWhere:completion:]`
+ and `-[RLMMongoCollection aggregateWithPipeline:completion:]`.
+ The write operations are `-[RLMMongoCollection insertOneDocument:completion:]`, `-[RLMMongoCollection insertManyDocuments:completion:]`,
+ `-[RLMMongoCollection updateOneDocument:completion:]`, `-[RLMMongoCollection updateManyDocuments:completion:]`,
+ `-[RLMMongoCollection deleteOneDocument:completion:]`, and `-[RLMMongoCollection deleteManyDocuments:completion:]`.
+ If you are already familiar with MongoDB drivers, it is important to understand that the remote MongoCollection only
+ provides access to the operations available in MongoDB Realm.
+ * Change `[RLMSyncUser configurationWithPartitionValue:]`/`SyncUser.configuration(with:)` to accept all BSON types.
+ Partition values can currently be of types `String`, `Int`, or `ObjectId`. 
+Opening a realm by partition value is the equivalent of previously opening a realm by URL. In this case,
+partitions are meant to be more closely associated with your data. E.g., if you are running a `Dog` kennel, and have a field
+`breed` that acts as your partition key, you could open up realms based on the breed of the dogs. 
 
 ### Breaking Changes
+* We no longer support Realm Cloud (legacy), but instead the new "MongoDB Realm" Cloud. MongoDB Realm is a serverless platform
+that enables developers to quickly build applications without having to set up server infrastructure.
+MongoDB Realm is built on top of MongoDB Atlas, automatically integrating the connection to your database.
 * Remove support for Query-based sync, including the configuration parameters
   and the `RLMSyncSubscription` and `SyncSubscription` types ([#6437](https://github.com/realm/realm-cocoa/pull/6437)).
 * Primary key properties are no longer marked as being indexed. This reflects
@@ -58,17 +50,17 @@ Applications must be created at realm.mongodb.com
   could be created with duplicate primary keys during a migration as long as
   the property was changed to a unique value before the end of the migration,
   but now a unique value must be supplied when creating the object.
-  * Remove support for Realm Object Server.
-
+* Remove support for Realm Object Server.
+  
 ### Compatibility
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
-* MongoDB Realm: 71f9b52e2e or later.
+* MongoDB Realm: 84893c5 or later.
 * APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
 * Carthage release for Swift is built with Xcode 11.4.1.
 
 ### Internal
-* Upgraded realm-core from v6.0.3 to v10.0.0-alpha.6
-* Upgraded realm-sync from v5.0.1 to v10.0.0-alpha.8
+* Upgraded realm-core from v6.0.3 to v10.0.0-beta.1
+* Upgraded realm-sync from v5.0.1 to v10.0.0-beta.2
 
 5.0.1 Release notes (2020-05-27)
 =============================================================
