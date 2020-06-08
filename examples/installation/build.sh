@@ -127,11 +127,11 @@ xctest() {
     if [ -d "$workspace" ]; then
         project=(-workspace "$workspace")
     fi
-    local code_signing_flags=(CODE_SIGN_IDENTITY= CODE_SIGNING_REQUIRED=NO AD_HOC_CODE_SIGNING_ALLOWED=YES)
+    local code_signing_flags=('CODE_SIGN_IDENTITY=' 'CODE_SIGNING_REQUIRED=NO' 'AD_HOC_CODE_SIGNING_ALLOWED=YES')
     local scheme=(-scheme "$NAME")
 
     # Ensure that dynamic framework tests try to use the correct version of the prebuilt libraries.
-    sed -i '' 's@/swift-[0-9.]*@/swift-'${REALM_XCODE_VERSION}'@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
+    sed -i '' 's@/swift-[0-9.]*@/swift-'"${REALM_XCODE_VERSION}"'@' "$DIRECTORY/$NAME.xcodeproj/project.pbxproj"
 
     xcodebuild "${project[@]}" "${scheme[@]}" clean build "${destination[@]}" "${code_signing_flags[@]}"
     if [[ $PLATFORM != watchos ]]; then
