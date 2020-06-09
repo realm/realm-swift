@@ -5,6 +5,9 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * `-[RLMObject isFrozen]` always returned false. ([#6568](https://github.com/realm/realm-cocoa/issues/6568), since 5.0.0).
+* Freezing an object within the write transaction that the object was created
+  in now throws an exception rather than crashing when the object is first
+  used.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 

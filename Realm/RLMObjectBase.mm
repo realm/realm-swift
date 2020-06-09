@@ -469,6 +469,9 @@ id RLMObjectFreeze(RLMObjectBase *obj) {
     RLMRealm *frozenRealm = [obj->_realm freeze];
     RLMObjectBase *frozen = RLMCreateManagedAccessor(obj.class, &frozenRealm->_info[obj->_info->rlmObjectSchema.className]);
     frozen->_row = frozenRealm->_realm->import_copy_of(obj->_row);
+    if (!frozen->_row.is_valid()) {
+        @throw RLMException(@"Cannot freeze an object in the same write transaction as it was created in.");
+    }
     RLMInitializeSwiftAccessorGenerics(frozen);
     return frozen;
 }

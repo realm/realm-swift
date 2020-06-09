@@ -1455,4 +1455,18 @@ static IntObject *managedObject() {
     }
 }
 
+- (void)testFreezeInsideWriteTransaction {
+    RLMRealm *realm = RLMRealm.defaultRealm;
+    [realm beginWriteTransaction];
+    IntObject *obj = [IntObject createInRealm:realm withValue:@[@1]];
+    RLMAssertThrowsWithReason([obj freeze], @"Cannot freeze an object in the same write transaction as it was created in.");
+    [realm commitWriteTransaction];
+
+    [realm beginWriteTransaction];
+    obj.intCol = 2;
+    // Frozen objects have the value of the object at the start of the transaction
+    XCTAssertEqual(obj.freeze.intCol, 1);
+    [realm cancelWriteTransaction];
+}
+
 @end
