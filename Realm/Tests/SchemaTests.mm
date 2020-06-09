@@ -213,16 +213,16 @@ RLM_ARRAY_TYPE(NonDefaultObject);
 @implementation MixedProperty
 @end
 
-@interface InvalidLinkFromEmbeddedToTopLevel : FakeEmbeddedObject
+@interface LinkFromEmbeddedToTopLevel : FakeEmbeddedObject
 @property IntObject *link;
 @end
-@implementation InvalidLinkFromEmbeddedToTopLevel
+@implementation LinkFromEmbeddedToTopLevel
 @end
 
-@interface InvalidArrayFromEmbeddedToTopLevel : FakeEmbeddedObject
+@interface ArrayFromEmbeddedToTopLevel : FakeEmbeddedObject
 @property RLMArray<IntObject> *array;
 @end
-@implementation InvalidArrayFromEmbeddedToTopLevel
+@implementation ArrayFromEmbeddedToTopLevel
 @end
 
 @interface EmbeddedObjectWithPrimaryKey : FakeEmbeddedObject
@@ -767,12 +767,10 @@ RLM_ARRAY_TYPE(NotARealClass)
 
 - (void)testEmebeddedLinkingToNonEmbedded {
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
-    config.objectClasses = @[[InvalidLinkFromEmbeddedToTopLevel class], [IntObject class]];
-    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
-                              @"Property 'InvalidLinkFromEmbeddedToTopLevel.link' of type 'object' cannot link to top-level object type 'IntObject'");
-    config.objectClasses = @[[InvalidArrayFromEmbeddedToTopLevel class], [IntObject class]];
-    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
-                              @"Property 'InvalidArrayFromEmbeddedToTopLevel.array' of type 'array' cannot link to top-level object type 'IntObject'");
+    config.objectClasses = @[[LinkFromEmbeddedToTopLevel class], [IntObject class]];
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
+    config.objectClasses = @[[ArrayFromEmbeddedToTopLevel class], [IntObject class]];
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
 }
 
 - (void)testEmbeddedWithPrimaryKey {
