@@ -24,6 +24,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMApp, RLMFindOptions, RLMFindOneAndModifyOptions, RLMUpdateResult;
 
+@interface RLMChangeEvent : NSObject
+
+/// STUB
+
+@end
+
+@protocol RLMChangeEventDelegate
+
+- (void)didOpen;
+- (void)didClose;
+- (void)didReceiveError:(NSError *)error;
+- (void)didReceiveChangeEvent:(RLMChangeEvent *)changeEvent;
+
+@end
+
 /// The `RLMMongoCollection` represents a MongoDB collection.
 ///
 /// You can get an instance from a `RLMMongoDatabase`.
@@ -256,6 +271,9 @@ typedef void(^RLMMongoDeleteBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Null
 /// @param completion The result of the attempt to delete a document.
 - (void)findOneAndDeleteWhere:(NSDictionary<NSString *, id<RLMBSON>> *)filterDocument
                    completion:(RLMMongoDeleteBlock)completion NS_REFINED_FOR_SWIFT;
+
+- (void)watchWhere:(NSDictionary<NSString *, id<RLMBSON>> *)filterDocument
+          delegate:(id<RLMChangeEventDelegate>)delegate;
 
 @end
 

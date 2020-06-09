@@ -18,6 +18,7 @@
 
 #import "RLMApp_Private.hpp"
 
+#import "RLMNetworkTransport_Private.hpp"
 #import "RLMAppCredentials_Private.hpp"
 #import "RLMBSON_Private.hpp"
 #import "RLMSyncUser_Private.hpp"
@@ -69,6 +70,23 @@ namespace {
                     .custom_status_code = static_cast<int>(response.customStatusCode)
                 });
             }];
+        }
+        
+        void do_stream_request(const app::Request &request, realm::app::GenericEventSubscriber &&subscriber) override {
+            // Convert the app::Request to an RLMRequest
+            auto rlmRequest = [RLMRequest new];
+            rlmRequest.url = @(request.url.data());
+            rlmRequest.body = @(request.body.data());
+            NSMutableDictionary *headers = [NSMutableDictionary new];
+            for (auto header : request.headers) {
+                headers[@(header.first.data())] = @(header.second.data());
+            }
+            rlmRequest.headers = headers;
+            rlmRequest.method = static_cast<RLMHTTPMethod>(request.method);
+            rlmRequest.timeout = request.timeout_ms / 1000;
+            
+            [m_transport doStreamRequest:rlmRequest
+                         eventSubscriber:[[RLMEventSubscriber alloc] initWithGenericEventSubscriber:std::move(subscriber)]];
         }
         
         id<RLMNetworkTransport> transport() const {

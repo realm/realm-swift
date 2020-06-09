@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMNetworkTransport.h"
+#import "RLMNetworkTransport_Private.hpp"
 
 #import "RLMApp.h"
 #import "RLMJSONModels.h"
@@ -59,6 +59,71 @@ NSString * const RLMHTTPMethodToNSString[] = {
 @implementation RLMResponse
 @end
 
+struct CocoaEventSubscriber : realm::app::GenericEventSubscriber {
+    CocoaEventSubscriber(realm::app::GenericEventSubscriber&& subscriber)
+    : realm::app::GenericEventSubscriber()
+    , m_subscriber(std::move(subscriber))
+    {
+    }
+    realm::app::GenericEventSubscriber&& m_subscriber;
+    
+    void did_close() override
+    {
+        m_subscriber.did_close();
+    }
+    
+    void did_open(const realm::app::Response &response) override
+    {
+        m_subscriber.did_open(response);
+    }
+    
+    void did_receive(std::error_code error) override
+    {
+        m_subscriber.did_receive(error);
+    }
+    
+    void did_receive(const char *event) override
+    {
+        m_subscriber.did_receive(event);
+    }
+};
+
+@implementation RLMEventSubscriber {
+    std::unique_ptr<CocoaEventSubscriber> _subscriber;
+}
+
+- (instancetype)initWithGenericEventSubscriber:(realm::app::GenericEventSubscriber&&)subscriber {
+    if (self = [super init]) {
+        _subscriber = std::make_unique<CocoaEventSubscriber>(std::move(subscriber));
+        return self;
+    }
+    return nil;
+}
+
+- (void)didClose {
+    _subscriber->did_close();
+}
+
+- (void)didOpen {
+    // TODO: Handle open response
+    _subscriber->did_open({});
+}
+
+- (void)didReceiveError:(nonnull NSError *)error {
+    // TODO: Handle error
+    _subscriber->did_receive({});
+}
+
+- (void)didReceiveEvent:(nonnull NSData *)event {
+    _subscriber->did_receive((const char *)event.bytes);
+}
+
+@end
+
+@interface RLMEventSessionDelegate <NSURLSessionDelegate> : NSObject
++ (instancetype)delegateWithEventSubscriber:(RLMEventSubscriber *)subscriber;
+@end;
+
 @implementation RLMNetworkTransport
 
 - (void)sendRequestToServer:(RLMRequest *) request
@@ -83,6 +148,22 @@ NSString * const RLMHTTPMethodToNSString[] = {
     [[session dataTaskWithRequest:urlRequest] resume];
     // Tell the session to destroy itself once it's done with the request
     [session finishTasksAndInvalidate];
+}
+
+- (void)doStreamRequest:(nonnull RLMRequest *)request eventSubscriber:(nonnull id<RLMEventDelegate>)subscriber {
+    NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+    sessionConfig.timeoutIntervalForRequest = 30;
+    sessionConfig.timeoutIntervalForResource = INT_MAX;
+    sessionConfig.HTTPAdditionalHeaders = @{
+        @"Content-Type": @"text/event-stream",
+        @"Cache": @"no-cache",
+        @"Accept": @"text/event-stream"
+    };
+    id delegate = [RLMEventSessionDelegate delegateWithEventSubscriber:subscriber];
+    auto session = [NSURLSession sessionWithConfiguration:sessionConfig
+                                                 delegate:delegate delegateQueue:nil];
+    NSURL *url = [[NSURL alloc] initWithString:request.url];
+    [[session dataTaskWithURL:url] resume];
 }
 
 @end
@@ -143,6 +224,43 @@ didCompleteWithError:(NSError *)error
         return nil;
     }
     return [[RLMSyncErrorResponseModel alloc] initWithDictionary:json];
+}
+
+@end
+
+@implementation RLMEventSessionDelegate {
+    RLMEventSubscriber *_subscriber;
+}
+
++ (instancetype)delegateWithEventSubscriber:(RLMEventSubscriber *)subscriber {
+    RLMEventSessionDelegate *delegate = [RLMEventSessionDelegate new];
+    delegate->_subscriber = subscriber;
+    return delegate;
+}
+
+- (void)URLSession:(__unused NSURLSession *)session
+          dataTask:(__unused NSURLSessionDataTask *)dataTask
+    didReceiveData:(NSData *)data {
+    [_subscriber didReceiveEvent:data];
+}
+
+- (void)URLSession:(__unused NSURLSession *)session
+              task:(NSURLSessionTask *)task
+didCompleteWithError:(NSError *)error
+{
+    RLMResponse *response = [RLMResponse new];
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) task.response;
+    response.headers = httpResponse.allHeaderFields;
+    response.httpStatusCode = httpResponse.statusCode;
+
+    if (error) {
+        response.body = [error localizedDescription];
+        return [_subscriber didClose];
+    }
+
+//    response.body = [[NSString alloc] initWithData:task . encoding:NSUTF8StringEncoding];
+
+    [_subscriber didOpen];
 }
 
 @end

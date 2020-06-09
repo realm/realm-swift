@@ -72,6 +72,15 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
 
 @end
 
+@protocol RLMEventDelegate <NSObject>
+
+- (void)didReceiveEvent:(NSData *)event;
+- (void)didReceiveError:(NSError *)error;
+- (void)didOpen;
+- (void)didClose;
+
+@end
+
 /// A block for receiving an `RLMResponse` from the `RLMNetworkTransport`.
 typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
 
@@ -85,8 +94,11 @@ typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
  @param request The request to send.
  @param completionBlock A callback invoked on completion of the request.
 */
-- (void)sendRequestToServer:(RLMRequest *) request
+- (void)sendRequestToServer:(RLMRequest *)request
                  completion:(RLMNetworkTransportCompletionBlock)completionBlock;
+
+- (void)doStreamRequest:(RLMRequest *)request
+        eventSubscriber:(id<RLMEventDelegate>)subscriber;
 
 @end
 

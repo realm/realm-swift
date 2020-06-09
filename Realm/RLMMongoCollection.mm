@@ -289,4 +289,40 @@
                      completion:completion];
 }
 
+static RLMChangeEvent* RLMChangeEventToRLMChangeEvent(const realm::app::ChangeEvent& event) {
+    // STUB
+    return [RLMChangeEvent new];
+}
+
+- (void)watchWhere:(NSDictionary<NSString *,id<RLMBSON>> *)filterDocument delegate:(id<RLMChangeEventDelegate>)delegate {
+    struct CES: realm::app::ChangeStreamSubscriber {
+        CES(id<RLMChangeEventDelegate> delegate)
+        : realm::app::ChangeStreamSubscriber()
+        , m_delegate(delegate)
+        {
+        }
+        
+        void did_receive(const realm::app::ChangeEvent& event) {
+            [m_delegate didReceiveChangeEvent:RLMChangeEventToRLMChangeEvent(event)];
+        }
+        
+        void did_receive(const std::error_code stream_error) {
+            // STUB
+        }
+        
+        void did_open() {
+            [m_delegate didOpen];
+        }
+        
+        void did_close() {
+            [m_delegate didClose];
+        }
+    private:
+        id<RLMChangeEventDelegate> m_delegate;
+    } change_event_subscriber(std::move(delegate));
+    
+    [self collection:self.name].watch(static_cast<realm::bson::BsonDocument>(RLMConvertRLMBSONToBson(filterDocument)),
+                                      std::move(change_event_subscriber));
+}
+
 @end
