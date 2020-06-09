@@ -1,23 +1,20 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.0.0-beta.2 Release notes (2020-06-09)
 =============================================================
 ### Enhancements
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* Opening a SyncSession with LOCAL app deployments would not use the correct endpoints.
 
 ### Compatibility
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
-* Realm Studio: 10.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* MongoDB Realm: 84893c5 or later.
+* APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
 * Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v6.0.3 to v10.0.0-beta.1
+* Upgraded realm-sync from v5.0.1 to v10.0.0-beta.2
 
 10.0.0-beta.1 Release notes (2020-06-08)
 =============================================================
