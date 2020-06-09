@@ -44,8 +44,8 @@ later will be able to open the new file format.
   owned by a single parent object, and are deleted when that parent object is
   deleted. They are defined by subclassing `EmbeddedObject` /
   `RLMEmbeddedObject` rather than `Object` / `RLMObject`.
-* Add `-[RLMSyncUser customData]`/`SyncUser.customData`.  Custom data is a can
-  be configured in your MongoDB Realm App.
+* Add `-[RLMSyncUser customData]`/`SyncUser.customData`.  Custom data is 
+  configured in your MongoDB Realm App.
 * Add `-[RLMApp callFunctionNamed:arguments]`/`RealmApp.functions`. This is the
   entry point for calling Remote MongoDB Realm functions. Functions allow you
   to define and execute server-side logic for your application. Functions are
