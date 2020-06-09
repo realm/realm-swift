@@ -1354,7 +1354,7 @@ static IntObject *managedObject() {
     IntObject *frozen = [managed freeze];
     XCTAssertFalse(standalone.isFrozen);
     XCTAssertFalse(managed.isFrozen);
-    XCTAssertFalse(frozen.isFrozen);
+    XCTAssertTrue(frozen.isFrozen);
 }
 
 - (void)testFreezeUnmanagedObject {
