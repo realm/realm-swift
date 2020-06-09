@@ -998,7 +998,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let registerUserEx = expectation(description: "Register user")
 
-        // QQ: Ask about proper instantation of `app` as it relates to good testing practice
         app.usernamePasswordProviderClient().registerEmail(email, password: password) { (error) in
             XCTAssertNil(error)
             registerUserEx.fulfill()
@@ -1016,14 +1015,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         
         let registerDeviceEx = expectation(description: "Register Device")
         let client = app.pushClient(withServiceName: "gcm")
-        client.registerDevice(withToken: "some-token", syncUser: app.currentUser()!) { error in
+        client.registerDevice(forToken: "some-token", syncUser: app.currentUser()!) { error in
             XCTAssert(!(error != nil))
             registerDeviceEx.fulfill()
         }
         wait(for: [registerDeviceEx], timeout: 4.0)
         
         let dergisterDeviceEx = expectation(description: "Deregister Device")
-        client.deregisterDevice(withToken: "some-token", syncUser: app.currentUser()!, completion: { error in
+        client.deregisterDevice(forToken: "some-token", syncUser: app.currentUser()!, completion: { error in
             XCTAssert(!(error != nil))
             dergisterDeviceEx.fulfill()
         })

@@ -20,8 +20,8 @@
 //#import "RLMTestUtils.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 
-// QQ: Properly import through test cases
-#import "RLMPushClient.h"
+//// QQ: Properly import through test cases
+//#import "RLMPushClient.h"
 
 #import "RLMAppCredentials.h"
 #import "RLMRealm+Sync.h"
@@ -219,7 +219,6 @@
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 }
 
-// QQ: Should this have it's own pragma mark? Or is it a part of tokens?
 - (void)testDeviceRegistration {
     // QQ: Find a reusable set up for login in test cases
     RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
@@ -236,7 +235,7 @@
     
     RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
     expectation = [self expectationWithDescription:@"should register device"];
-    [client registerDeviceWithToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client registerDeviceForToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
         [expectation fulfill];
     }];
@@ -244,7 +243,7 @@
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
     
     expectation = [self expectationWithDescription:@"should deregister device"];
-    [client deregisterDeviceWithToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client deregisterDeviceForToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
         [expectation fulfill];
     }];
@@ -267,12 +266,11 @@
     
     RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
     expectation = [self expectationWithDescription:@"should not throw error if device is registered twice"];
-    [client registerDeviceWithToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client registerDeviceForToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
     }];
         
-    // QQ: Should the first register be awaited during testing?
-    [client registerDeviceWithToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client registerDeviceForToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
         [expectation fulfill];
     }];

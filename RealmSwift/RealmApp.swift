@@ -51,11 +51,16 @@ An object which is used within UserAPIKeyProviderClient
 public typealias UserAPIKey = RLMUserAPIKey
 
 /**
-A `AppCredentials` represents data that uniquely identifies a Realm Object Server user.
+`AppCredentials` represents data that uniquely identifies a Realm Object Server user.
 */
 public typealias AppCredentials = RLMAppCredentials
 
-// QQ: comment adding, where to add alias
+/**
+An object representing a client which performs network calls on
+Realm Cloud for registering devices to push notifications
+ 
+- see `RLMPushClient`
+ */
 public typealias PushClient = RLMPushClient
 
 /// Structure providing an interface to call a MongoDB Realm function with the provided name and arguments.
