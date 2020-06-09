@@ -20,9 +20,6 @@
 //#import "RLMTestUtils.h"
 #import "RLMSyncUser+ObjectServerTests.h"
 
-//// QQ: Properly import through test cases
-//#import "RLMPushClient.h"
-
 #import "RLMAppCredentials.h"
 #import "RLMRealm+Sync.h"
 #import "RLMRealmConfiguration_Private.h"
