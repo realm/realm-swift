@@ -217,7 +217,6 @@
 }
 
 - (void)testDeviceRegistration {
-    // QQ: Find a reusable set up for login in test cases
     RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
     XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
     __block RLMSyncUser *syncUser;
