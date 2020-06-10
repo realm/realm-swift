@@ -89,10 +89,29 @@ begin
 
   # Delete all simulators.
   print 'Deleting all simulators...'
-  all_available_devices.each do |device|
-    system("xcrun simctl delete #{device['udid']}") or raise "Failed to delete simulator #{device['udid']}"
+  (0..5).each do |delete_attempt|
+    break if all_available_devices.empty?
+
+    all_available_devices.each do |device|
+      simctl("delete #{device['udid']}")
+    end
+
+    begin
+      devices_json = simctl('list devices -j')[0]
+      all_devices = JSON.parse(devices_json)['devices'].flat_map { |_, devices| devices }
+    rescue JSON::ParserError
+      sleep shutdown_attempt if shutdown_attempt > 0
+      next
+    end
+
+    all_available_devices = all_devices.reject { |device| device['availability'] =~ /unavailable/ }
+    break if all_available_devices.empty?
   end
   puts ' done!'
+
+  if not all_available_devices.empty?
+    raise "Failed to delete devices #{all_available_devices}"
+  end
 
   # Recreate all simulators.
   runtimes = JSON.parse(simctl('list runtimes -j')[0])['runtimes']

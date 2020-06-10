@@ -60,6 +60,12 @@ Pod::Spec.new do |s|
                               'include/**/RLMUserAPIKey.h',
                               'include/**/RLMUserAPIKeyProviderClient.h',
                               'include/**/RLMUsernamePasswordProviderClient.h',
+                              'include/**/RLMFindOneAndModifyOptions.h',
+                              'include/**/RLMFindOptions.h',
+                              'include/**/RLMMongoClient.h',
+                              'include/**/RLMMongoCollection.h',
+                              'include/**/RLMMongoDatabase.h',
+                              'include/**/RLMUpdateResult.h',
 
                               # Realm.Dynamic module
                               'include/**/RLMRealm_Dynamic.h',
@@ -82,7 +88,14 @@ Pod::Spec.new do |s|
                               'include/**/RLMResults_Private.h',
                               'include/**/RLMSchema_Private.h',
                               'include/**/RLMSyncConfiguration_Private.h',
-                              'include/**/RLMSyncUtil_Private.h'
+                              'include/**/RLMSyncUtil_Private.h',
+                              'include/**/RLMFindOneAndModifyOptions_Private.h',
+                              'include/**/RLMFindOptions_Private.h',
+                              'include/**/RLMMongoClient_Private.h',
+                              'include/**/RLMMongoCollection_Private.h',
+                              'include/**/RLMMongoDatabase_Private.h',
+                              'include/**/RLMUpdateResult_Private.h'
+
 
   source_files              = 'Realm/*.{m,mm}',
                               'Realm/ObjectStore/src/*.cpp',
@@ -111,16 +124,16 @@ Pod::Spec.new do |s|
                               }
   s.preserve_paths          = %w(build.sh include)
 
-  s.ios.deployment_target   = '12.0'
+  s.ios.deployment_target   = '8.0'
   s.ios.vendored_library    = 'core/librealmcore-ios.a'
 
-  s.osx.deployment_target   = '10.14'
+  s.osx.deployment_target   = '10.9'
   s.osx.vendored_library    = 'core/librealmcore-macosx.a'
 
-  s.watchos.deployment_target = '5.0'
+  s.watchos.deployment_target = '2.0'
   s.watchos.vendored_library  = 'core/librealmcore-watchos.a'
 
-  s.tvos.deployment_target = '12.0'
+  s.tvos.deployment_target = '9.0'
   s.tvos.vendored_library  = 'core/librealmcore-tvos.a'
 
   s.subspec 'Headers' do |s|

@@ -36,8 +36,8 @@
                   completion:(RLMOptionalUserAPIKeyBlock)completion {
     
     self.client.create_api_key(name.UTF8String, self.currentUser,
-                               ^(Optional<realm::app::App::UserAPIKey> userAPIKey,
-                                 Optional<realm::app::AppError> error) {
+                               ^(realm::util::Optional<realm::app::App::UserAPIKey> userAPIKey,
+                                 realm::util::Optional<realm::app::AppError> error) {
         if (error && error->error_code) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
@@ -54,8 +54,8 @@
          completion:(RLMOptionalUserAPIKeyBlock)completion {
     self.client.fetch_api_key(objectId.value,
                               self.currentUser,
-                              ^(Optional<realm::app::App::UserAPIKey> userAPIKey,
-                                Optional<realm::app::AppError> error) {
+                              ^(realm::util::Optional<realm::app::App::UserAPIKey> userAPIKey,
+                                realm::util::Optional<realm::app::AppError> error) {
         if (error && error->error_code) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
@@ -71,7 +71,7 @@
 - (void)fetchApiKeysWithCompletion:(RLMUserAPIKeysBlock)completion {
     self.client.fetch_api_keys(self.currentUser,
                                ^(const std::vector<realm::app::App::UserAPIKey>& userAPIKeys,
-                                 Optional<realm::app::AppError> error) {
+                                 realm::util::Optional<realm::app::AppError> error) {
         if (error && error->error_code) {
             return completion(nil, RLMAppErrorToNSError(*error));
         }
@@ -89,7 +89,7 @@
           completion:(RLMUserAPIKeyProviderClientOptionalErrorBlock)completion {
     self.client.delete_api_key(objectId.value,
                                self.currentUser,
-                               ^(Optional<realm::app::AppError> error) {
+                               ^(realm::util::Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
@@ -98,7 +98,7 @@
           completion:(RLMUserAPIKeyProviderClientOptionalErrorBlock)completion {
     self.client.enable_api_key(objectId.value,
                                self.currentUser,
-                               ^(Optional<realm::app::AppError> error) {
+                               ^(realm::util::Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }
@@ -107,7 +107,7 @@
            completion:(RLMUserAPIKeyProviderClientOptionalErrorBlock)completion {
     self.client.disable_api_key(objectId.value,
                                 self.currentUser,
-                                ^(Optional<realm::app::AppError> error) {
+                                ^(realm::util::Optional<realm::app::AppError> error) {
         [self.app handleResponse:error completion:completion];
     });
 }

@@ -26,6 +26,7 @@
 #import "RLMUsernamePasswordProviderClient.h"
 #import "RLMUserAPIKeyProviderClient.h"
 #import "RLMUtil.hpp"
+#import "RLMMongoClient_Private.hpp"
 
 #if !defined(REALM_COCOA_VERSION)
 #import "RLMVersion.h"
@@ -107,13 +108,8 @@ namespace {
         self.defaultRequestTimeoutMS = defaultRequestTimeoutMS;
         
         _config.platform = "Realm Cocoa";
-        
-        NSOperatingSystemVersion operatingSystemVersion = [[NSProcessInfo processInfo] operatingSystemVersion];
-        _config.platform_version = realm::util::format("%1.%2.%2",
-                                                       operatingSystemVersion.majorVersion,
-                                                       operatingSystemVersion.minorVersion,
-                                                       operatingSystemVersion.patchVersion);
-        
+
+        RLMNSStringToStdString(_config.platform_version, [[NSProcessInfo processInfo] operatingSystemVersionString]);
         RLMNSStringToStdString(_config.sdk_version, REALM_COCOA_VERSION);
         return self;
     }
@@ -299,19 +295,19 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 }
 
 - (void)removeUser:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app->remove_user(syncUser._syncUser, ^(Optional<app::AppError> error) {
+    _app->remove_user(syncUser._syncUser, ^(realm::util::Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
-    _app->log_out(^(Optional<app::AppError> error) {
+    _app->log_out(^(realm::util::Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
 
 - (void)logOut:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app->log_out(syncUser._syncUser, ^(Optional<app::AppError> error) {
+    _app->log_out(syncUser._syncUser, ^(realm::util::Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
@@ -337,7 +333,11 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     return [[RLMUserAPIKeyProviderClient alloc] initWithApp: self];
 }
 
-- (void)handleResponse:(Optional<realm::app::AppError>)error
+- (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName {
+    return [[RLMMongoClient alloc] initWithApp:self serviceName:serviceName];
+}
+
+- (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
             completion:(RLMOptionalErrorBlock)completion {
     if (error && error->error_code) {
         return completion(RLMAppErrorToNSError(*error));

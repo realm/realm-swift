@@ -34,7 +34,9 @@ def clean_mongo_test_data
     puts '🧹 cleaning mongo test data'
     begin
         puts `#{MONGO_DIR}/bin/mongo --port 26000 test_data --eval "db.dropDatabase()"`
+        puts `#{MONGO_DIR}/bin/mongo --port 26000 __realm_sync --eval "db.dropDatabase()"`
     rescue => exception
+        puts('🔴 error: #{exception}')
     end
 end
 
@@ -67,9 +69,9 @@ def run_stitch
 
     puts exports
     pid = Process.fork {
-        `cd #{stitch_path} && \
+        puts `cd #{stitch_path} && \
         #{exports.join(' && ')} && \
-        go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" #{stitch_path}/cmd/server/main.go --configFile "#{stitch_path}/etc/configs/test_config.json" >> output.log`
+        go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" #{stitch_path}/cmd/server/main.go --configFile "#{stitch_path}/etc/configs/test_config.json"`
     }
     Process.detach(pid)
     retries = 0
@@ -88,18 +90,13 @@ def run_stitch
 end
 
 def shutdown_stitch
-    puts 'shutting down baas'
+    puts '🍂 shutting down baas'
     `pkill -f stitch`
 end
 
 def start
     run_mongod
     run_stitch
-end
-
-def shutdown
-    shutdown_stitch
-    shutdown_mongod
 end
 
 if ARGV.length < 1
@@ -116,8 +113,11 @@ when "start_proxy"
     require_relative 'proxy.rb'
     Proxy.new.run(ARGV[1].to_i, ARGV[2].to_i)
 when "shutdown"
-    clean_mongo_test_data
-    shutdown
+    shutdown_stitch
+    # TODO: Understand why cleaning doesn't work properly
+    # clean_mongo_test_data
+    shutdown_mongod
 when "clean"
-    clean_mongo_test_data
+    # TODO: Understand why cleaning doesn't work properly
+    # clean_mongo_test_data
 end

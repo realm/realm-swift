@@ -6,7 +6,7 @@ require 'fileutils'
 MONGODB_VERSION='4.4.0-rc5'
 GO_VERSION='1.14.2'
 NODE_VERSION='8.11.2'
-STITCH_VERSION='615f219fa62a0bb0b5f540475eed105a1775e7ab'
+STITCH_VERSION='84893c521b3bc1e493b12c967b0d950694333a2a'
 
 BASE_DIR = Dir.pwd
 BUILD_DIR = "#{BASE_DIR}/build"
@@ -40,7 +40,7 @@ def run_mongod
     rescue => exception
         sleep(1)
         retries += 1
-        if retries == 5
+        if retries == 20
             abort('could not connect to mongod')
         end
     end
@@ -66,10 +66,9 @@ def setup_stitch
         `git clone git@github.com:10gen/baas stitch`
     end
 
-    if File.exists?("#{STITCH_DIR}/.git")
-        puts 'checking out stitch'
-        `cd #{STITCH_DIR} && git pull && git checkout #{STITCH_VERSION}`
-    end
+    puts 'checking out stitch'
+    `cd #{STITCH_DIR} && git pull`
+    `cd #{STITCH_DIR} && git checkout #{STITCH_VERSION}`
 
     dylib_dir = "#{STITCH_DIR}/etc/dylib"
     if !Dir.exists?(dylib_dir)
@@ -97,7 +96,7 @@ def setup_stitch
         puts `cd #{STITCH_DIR} && curl -O "https://nodejs.org/dist/v#{NODE_VERSION}/node-v#{NODE_VERSION}-darwin-x64.tar.gz" | tar xzf node-v#{NODE_VERSION}-darwin-x64.tar.gz`
         exports << "export PATH=\"#{STITCH_DIR}/node-v8.11.2-darwin-x64/bin/:$PATH\""
     end
-
+    
     if `which yarn`.empty?
         `rm -rf "$HOME/.yarn"`
         `export PATH=\"#{STITCH_DIR}/node-v#{NODE_VERSION}-darwin-x64/bin/:$PATH\" && curl -o- -L https://yarnpkg.com/install.sh | bash`
@@ -105,7 +104,6 @@ def setup_stitch
     end
 
     puts 'building transpiler'
-    puts exports
     puts `#{exports.length() == 0 ? "" : exports.join(' && ') + ' &&'} \
         cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
 
