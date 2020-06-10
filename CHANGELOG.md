@@ -4,8 +4,13 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* `-[RLMObject isFrozen]` always returned false. ([#6568](https://github.com/realm/realm-cocoa/issues/6568), since 5.0.0).
+* Freezing an object within the write transaction that the object was created
+  in now throws an exception rather than crashing when the object is first
+  used.
+* The schema for frozen Realms was not properly initialized, leading to crashes
+  when accessing a RLMLinkingObjects property.
+  ([#6568](https://github.com/realm/realm-cocoa/issues/6568), since 5.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
