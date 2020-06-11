@@ -1,9 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.0.3 Release notes (2020-06-10)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
+
 * `-[RLMObject isFrozen]` always returned false. ([#6568](https://github.com/realm/realm-cocoa/issues/6568), since 5.0.0).
 * Freezing an object within the write transaction that the object was created
   in now throws an exception rather than crashing when the object is first
@@ -15,18 +14,13 @@ x.y.z Release notes (yyyy-MM-dd)
   warning in Swift 5.2 due to the property not being marked as @objc.
   ([#6554](https://github.com/realm/realm-cocoa/issues/6554))
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.11 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.5.
-
-### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
 
 5.0.2 Release notes (2020-06-02)
 =============================================================
