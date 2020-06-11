@@ -457,7 +457,8 @@
 		6807E64C2487F7220096066F /* RLMPushClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6807E64B2487F7220096066F /* RLMPushClient.mm */; };
 		6807E64D2487F7220096066F /* RLMPushClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = 6807E64B2487F7220096066F /* RLMPushClient.mm */; };
 		6807E64F2487F9210096066F /* RLMPushClient_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6807E64E2487F9210096066F /* RLMPushClient_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
-		6807E6502487F9210096066F /* RLMPushClient_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6807E64E2487F9210096066F /* RLMPushClient_Private.hpp */; };
+		6807E6502487F9210096066F /* RLMPushClient_Private.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 6807E64E2487F9210096066F /* RLMPushClient_Private.hpp */; settings = {ATTRIBUTES = (Private, ); }; };
+		684BE25224927ACA00F122B1 /* RLMPushClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 6807E6492487E8660096066F /* RLMPushClient.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6879E7C72486B1C200A65EF4 /* push_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6879E7C62486B1C200A65EF4 /* push_client.cpp */; };
 		6879E7C82486B1C200A65EF4 /* push_client.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6879E7C62486B1C200A65EF4 /* push_client.cpp */; };
 		C042A48D1B7522A900771ED2 /* RealmConfigurationTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = C042A48C1B7522A900771ED2 /* RealmConfigurationTests.mm */; };
@@ -2018,7 +2019,6 @@
 				4993221924129E6600A0EC8E /* RLMNetworkTransport.h in Headers */,
 				5DD755AF1BE056DE002800DA /* RLMObject.h in Headers */,
 				5DD755B01BE056DE002800DA /* RLMObject_Private.h in Headers */,
-				6807E6502487F9210096066F /* RLMPushClient_Private.hpp in Headers */,
 				CF76F7FC24816AAB00890DD2 /* RLMMongoClient.h in Headers */,
 				CF76F7F424816AAB00890DD2 /* RLMFindOneAndModifyOptions.h in Headers */,
 				5DD755B11BE056DE002800DA /* RLMObjectBase.h in Headers */,
@@ -2031,6 +2031,7 @@
 				5DD755B41BE056DE002800DA /* RLMObjectSchema_Private.h in Headers */,
 				5DD755B61BE056DE002800DA /* RLMObjectStore.h in Headers */,
 				5DD755B81BE056DE002800DA /* RLMOptionalBase.h in Headers */,
+				684BE25224927ACA00F122B1 /* RLMPushClient.h in Headers */,
 				5DD755BA1BE056DE002800DA /* RLMProperty.h in Headers */,
 				5DD755BB1BE056DE002800DA /* RLMProperty_Private.h in Headers */,
 				CF6E048B242A4B6F00DB7F14 /* RLMProviderClient.h in Headers */,
@@ -2044,6 +2045,7 @@
 				CF76F7F624816AAB00890DD2 /* RLMFindOptions.h in Headers */,
 				49E12CF6245DBF8A00359DF1 /* RLMBSON_Private.hpp in Headers */,
 				5DD755C11BE056DE002800DA /* RLMRealmConfiguration_Private.h in Headers */,
+				6807E6502487F9210096066F /* RLMPushClient_Private.hpp in Headers */,
 				5DD755C31BE056DE002800DA /* RLMResults.h in Headers */,
 				5DD755C41BE056DE002800DA /* RLMResults_Private.h in Headers */,
 				5DD755C51BE056DE002800DA /* RLMSchema.h in Headers */,

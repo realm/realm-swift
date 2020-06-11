@@ -28,6 +28,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 /// A client for push notificaton services which can be used to register devices with the server
 @interface RLMPushClient : NSObject
 
+/// The service name the device will be registered with on the server
 @property (nonatomic, readonly, nonnull) NSString *serviceName;
 
 /// Request to registers token string with server
