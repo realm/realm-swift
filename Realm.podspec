@@ -83,7 +83,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMObjectStore.h',
                               'include/**/RLMObject_Private.h',
                               'include/**/RLMOptionalBase.h',
-                              'include/**/RLMPushClient_Private.h'
+                              'include/**/RLMPushClient_Private.h',
                               'include/**/RLMProperty_Private.h',
                               'include/**/RLMRealmConfiguration_Private.h',
                               'include/**/RLMRealm_Private.h',

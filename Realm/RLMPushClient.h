@@ -25,13 +25,13 @@ NS_ASSUME_NONNULL_BEGIN
 /// A block type used to report an error
 typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 
-/// A client for push notificaton services which can be used to register devices with the server
+///  A client which can be used to register devices with the server to receive push notificatons
 @interface RLMPushClient : NSObject
 
-/// The service name the device will be registered with on the server
+/// The push notification service name the device will be registered with on the server
 @property (nonatomic, readonly, nonnull) NSString *serviceName;
 
-/// Request to registers token string with server
+/// Request to register device token with the server
 - (void)registerDeviceForToken:(NSString *)token
                        syncUser:(RLMSyncUser *)syncUser
                      completion:(RLMOptionalErrorBlock)completion;

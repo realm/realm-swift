@@ -227,6 +227,9 @@ Create a new Realm App configuration.
                 arguments:(NSArray<id<RLMBSON>> *)arguments
           completionBlock:(RLMCallFunctionCompletionBlock)completionBlock NS_REFINED_FOR_SWIFT;
 
+/**
+ A client which can be used to register devices with the server to receive push notificatons
+ */
 - (RLMPushClient *)pushClientWithServiceName:(NSString *)serviceName;
 
 /**

@@ -989,7 +989,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [callFunctionEx], timeout: 4.0)
     }
-    
+
     func testPushRegistration() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)
@@ -1001,7 +1001,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             registerUserEx.fulfill()
         }
         wait(for: [registerUserEx], timeout: 4.0)
-        
+
         let loginEx = expectation(description: "Login user")
 
         let credentials = AppCredentials(username: email, password: password)
@@ -1010,7 +1010,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             loginEx.fulfill()
         }
         wait(for: [loginEx], timeout: 4.0)
-        
+
         let registerDeviceEx = expectation(description: "Register Device")
         let client = app.pushClient(withServiceName: "gcm")
         client.registerDevice(forToken: "some-token", syncUser: app.currentUser()!) { error in
@@ -1018,7 +1018,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             registerDeviceEx.fulfill()
         }
         wait(for: [registerDeviceEx], timeout: 4.0)
-        
+
         let dergisterDeviceEx = expectation(description: "Deregister Device")
         client.deregisterDevice(forToken: "some-token", syncUser: app.currentUser()!, completion: { error in
             XCTAssert(!(error != nil))
