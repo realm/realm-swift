@@ -16,14 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMAppCredentials_Private.hpp"
+#import "RLMCredentials_Private.hpp"
 
 #import "RLMSyncUtil_Private.h"
 #import "RLMUtil.hpp"
 
 using namespace realm;
 
-@implementation RLMAppCredentials
+@implementation RLMCredentials
 - (instancetype)initWithAppCredentials:(app::AppCredentials&&)credentials {
     if (self = [super init]) {
         _appCredentials = std::move(credentials);
@@ -81,7 +81,7 @@ using namespace realm;
 }
 
 - (BOOL)isEqual:(id)object {
-    if (auto that = RLMDynamicCast<RLMAppCredentials>(object)) {
+    if (auto that = RLMDynamicCast<RLMCredentials>(object)) {
         return [self.provider isEqualToString:that.provider]
             && self.appCredentials.serialize_as_json() == that.appCredentials.serialize_as_json();
     }

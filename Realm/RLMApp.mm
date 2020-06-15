@@ -18,14 +18,12 @@
 
 #import "RLMApp_Private.hpp"
 
-#import "RLMAppCredentials_Private.hpp"
+#import "RLMCredentials_Private.hpp"
 #import "RLMBSON_Private.hpp"
-#import "RLMSyncUser_Private.hpp"
+#import "RLMUser_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
-#import "RLMUsernamePasswordProviderClient.h"
-#import "RLMUserAPIKeyProviderClient.h"
 #import "RLMUtil.hpp"
-#import "RLMMongoClient_Private.hpp"
+#import "RLMEmailPasswordAuth.h"
 
 #if !defined(REALM_COCOA_VERSION)
 #import "RLMVersion.h"
@@ -262,86 +260,39 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     return _app;
 }
 
-- (NSDictionary<NSString *, RLMSyncUser *> *)allUsers {
+- (NSDictionary<NSString *, RLMUser *> *)allUsers {
     NSMutableDictionary *buffer = [NSMutableDictionary new];
     for (auto user : SyncManager::shared().all_users()) {
         std::string identity(user->identity());
-        buffer[@(identity.c_str())] = [[RLMSyncUser alloc] initWithSyncUser:std::move(user) app:self];
+        buffer[@(identity.c_str())] = [[RLMUser alloc] initWithUser:std::move(user) app:self];
     }
     return buffer;
 }
 
-- (RLMSyncUser *)currentUser {
+- (RLMUser *)currentUser {
     if (auto user = SyncManager::shared().get_current_user()) {
-        return [[RLMSyncUser alloc] initWithSyncUser:user app:self];
+        return [[RLMUser alloc] initWithUser:user app:self];
     }
     return nil;
 }
 
-- (void)loginWithCredential:(RLMAppCredentials *)credentials
+- (RLMEmailPasswordAuth *)emailPasswordAuth {
+    return [[RLMEmailPasswordAuth alloc] initWithApp: self];
+}
+
+- (void)loginWithCredential:(RLMCredentials *)credentials
           completion:(RLMUserCompletionBlock)completionHandler {
     _app->log_in_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
             return completionHandler(nil, RLMAppErrorToNSError(*error));
         }
 
-        completionHandler([[RLMSyncUser alloc] initWithSyncUser:user app:self], nil);
+        completionHandler([[RLMUser alloc] initWithUser:user app:self], nil);
     });
 }
 
-- (RLMSyncUser *)switchToUser:(RLMSyncUser *)syncUser {
-    return [[RLMSyncUser alloc] initWithSyncUser:_app->switch_user(syncUser._syncUser) app:self];
-}
-
-- (void)removeUser:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app->remove_user(syncUser._syncUser, ^(realm::util::Optional<app::AppError> error) {
-        [self handleResponse:error completion:completion];
-    });
-}
-
-- (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
-    _app->log_out(^(realm::util::Optional<app::AppError> error) {
-        [self handleResponse:error completion:completion];
-    });
-}
-
-- (void)logOut:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app->log_out(syncUser._syncUser, ^(realm::util::Optional<app::AppError> error) {
-        [self handleResponse:error completion:completion];
-    });
-}
-
-- (void)linkUser:(RLMSyncUser *)syncUser
-     credentials:(RLMAppCredentials *)credentials
-      completion:(RLMUserCompletionBlock)completion {
-    _app->link_user(syncUser._syncUser, credentials.appCredentials,
-                   ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
-        if (error && error->error_code) {
-            return completion(nil, RLMAppErrorToNSError(*error));
-        }
-        
-        completion([[RLMSyncUser alloc] initWithSyncUser:user app:self], nil);
-    });
-}
-
-- (RLMUsernamePasswordProviderClient *)usernamePasswordProviderClient {
-    return [[RLMUsernamePasswordProviderClient alloc] initWithApp: self];
-}
-
-- (RLMUserAPIKeyProviderClient *)userAPIKeyProviderClient {
-    return [[RLMUserAPIKeyProviderClient alloc] initWithApp: self];
-}
-
-- (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName {
-    return [[RLMMongoClient alloc] initWithApp:self serviceName:serviceName];
-}
-
-- (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
-            completion:(RLMOptionalErrorBlock)completion {
-    if (error && error->error_code) {
-        return completion(RLMAppErrorToNSError(*error));
-    }
-    completion(nil);
+- (RLMUser *)switchToUser:(RLMUser *)syncUser {
+    return [[RLMUser alloc] initWithUser:_app->switch_user(syncUser._syncUser) app:self];
 }
 
 - (void)callFunctionNamed:(NSString *)name

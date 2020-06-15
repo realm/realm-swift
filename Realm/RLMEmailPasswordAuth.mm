@@ -16,12 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUsernamePasswordProviderClient.h"
+#import "RLMEmailPasswordAuth.h"
+#import "RLMProviderClient_Private.hpp"
+
 #import "RLMBSON_Private.hpp"
 #import "RLMApp_Private.hpp"
 #import "sync/app.hpp"
 
-@implementation RLMUsernamePasswordProviderClient
+@implementation RLMEmailPasswordAuth
 
 - (realm::app::App::UsernamePasswordProviderClient)client {
     return self.app._realmApp->provider_client<realm::app::App::UsernamePasswordProviderClient>();
@@ -31,7 +33,7 @@
              password:(NSString *)password
            completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
     self.client.register_email(email.UTF8String, password.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {
-        [self.app handleResponse:error completion:completion];
+        [self handleResponse:error completion:completion];
     });
 }
 
@@ -39,21 +41,21 @@
             tokenId:(NSString *)tokenId
          completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
     self.client.confirm_user(token.UTF8String, tokenId.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {
-        [self.app handleResponse:error completion:completion];
+        [self handleResponse:error completion:completion];
     });
 }
 
 - (void)resendConfirmationEmail:(NSString *)email
                      completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
     self.client.resend_confirmation_email(email.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {
-        [self.app handleResponse:error completion:completion];
+        [self handleResponse:error completion:completion];
     });
 }
 
 - (void)sendResetPasswordEmail:(NSString *)email
                     completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
     self.client.send_reset_password_email(email.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {
-        [self.app handleResponse:error completion:completion];
+        [self handleResponse:error completion:completion];
     });
 }
 
@@ -62,7 +64,7 @@
                 tokenId:(NSString *)tokenId
              completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completion {
     self.client.reset_password(password.UTF8String, token.UTF8String, tokenId.UTF8String, ^(realm::util::Optional<realm::app::AppError> error) {
-        [self.app handleResponse:error completion:completion];
+        [self handleResponse:error completion:completion];
     });
 }
 
@@ -74,7 +76,7 @@
                                              password.UTF8String,
                                              static_cast<realm::bson::BsonArray>(RLMConvertRLMBSONToBson(args)),
                                                                                  ^(realm::util::Optional<realm::app::AppError> error) {
-        [self.app handleResponse:error completion:completion];
+        [self handleResponse:error completion:completion];
     });
 }
 

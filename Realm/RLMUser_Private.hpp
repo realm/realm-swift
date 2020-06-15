@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncUser.h"
+#import "RLMUser.h"
 
 #import "RLMSyncConfiguration.h"
 #import "RLMSyncUtil_Private.h"
@@ -48,8 +48,8 @@ private:
     std::mutex m_mutex;
 };
 
-@interface RLMSyncUser ()
-- (instancetype)initWithSyncUser:(std::shared_ptr<SyncUser>)user app:(RLMApp *)app;
+@interface RLMUser ()
+- (instancetype)initWithUser:(std::shared_ptr<SyncUser>)user app:(RLMApp *)app;
 - (NSString *)pathForPartitionValue:(id<RLMBSON>)partitionValue;
 - (std::shared_ptr<SyncUser>)_syncUser;
 + (void)_setUpBindingContextFactory;

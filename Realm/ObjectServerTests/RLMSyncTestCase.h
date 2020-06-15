@@ -78,25 +78,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) RLMApp *app;
 
-- (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
+- (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
-- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user;
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 - (RLMRealm *)openRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
 
 /// Synchronously open a synced Realm. Also run a block right after the Realm is created.
 - (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
-                                    user:(RLMSyncUser *)user
+                                    user:(RLMUser *)user
                         immediatelyBlock:(nullable void(^)(void))block;
 
 /// Synchronously open a synced Realm with encryption key and stop policy.
 /// Also run a block right after the Realm is created.
 - (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
-                                    user:(RLMSyncUser *)user
+                                    user:(RLMUser *)user
                            encryptionKey:(nullable NSData *)encryptionKey
                               stopPolicy:(RLMSyncStopPolicy)stopPolicy
                         immediatelyBlock:(nullable void(^)(void))block;
@@ -108,24 +108,24 @@ NS_ASSUME_NONNULL_BEGIN
 ;
 
 /// Immediately open a synced Realm.
-- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user;
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user;
 
 /// Immediately open a synced Realm with encryption key and stop policy.
 - (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue
-                                               user:(RLMSyncUser *)user
+                                               user:(RLMUser *)user
                                       encryptionKey:(nullable NSData *)encryptionKey
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy;
 
 /// Synchronously create, log in, and return a user.
-- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials;
+- (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials;
 
 /// Synchronously, log out.
-- (void)logOutUser:(RLMSyncUser *)user;
+- (void)logOutUser:(RLMUser *)user;
 
 - (void)addPersonsToRealm:(RLMRealm *)realm persons:(NSArray<Person *> *)persons;
 
 /// Synchronously wait for downloads to complete for any number of Realms, and then check their `SyncObject` counts.
-- (void)waitForDownloadsForUser:(RLMSyncUser *)user
+- (void)waitForDownloadsForUser:(RLMUser *)user
                          realms:(NSArray<RLMRealm *> *)realms
                       partitionValues:(NSArray<NSString *> *)partitionValues
                  expectedCounts:(NSArray<NSNumber *> *)counts;
@@ -143,16 +143,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)error;
 
 /// Wait for downloads to complete while spinning the runloop. This method uses expectations.
-- (void)waitForDownloadsForUser:(RLMSyncUser *)user
+- (void)waitForDownloadsForUser:(RLMUser *)user
                             partitionValue:(NSString *)partitionValue
                     expectation:(nullable XCTestExpectation *)expectation
                           error:(NSError **)error;
 
 /// Manually set the access token for a user. Used for testing invalid token conditions.
-- (void)manuallySetAccessTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue;
+- (void)manuallySetAccessTokenForUser:(RLMUser *)user value:(NSString *)tokenValue;
 
 /// Manually set the refresh token for a user. Used for testing invalid token conditions.
-- (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue;
+- (void)manuallySetRefreshTokenForUser:(RLMUser *)user value:(NSString *)tokenValue;
 
 - (void)setupSyncManager;
 - (void)resetSyncManager;

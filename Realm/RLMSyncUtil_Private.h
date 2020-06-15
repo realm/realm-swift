@@ -20,7 +20,7 @@
 
 #import <Realm/RLMProperty.h>
 #import <Realm/RLMRealmConfiguration.h>
-#import <Realm/RLMAppCredentials.h>
+#import <Realm/RLMCredentials.h>
 
 typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
     // Specific
@@ -34,7 +34,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
     RLMSyncSystemErrorKindUnknown,
 };
 
-@class RLMSyncUser;
+@class RLMUser;
 
 typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);

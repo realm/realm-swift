@@ -18,7 +18,7 @@
 
 #import "RLMJSONModels.h"
 #import "RLMSyncUtil_Private.h"
-#import "RLMSyncUser.h"
+#import "RLMUser.h"
 
 #pragma mark - Constants
 

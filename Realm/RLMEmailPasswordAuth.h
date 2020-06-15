@@ -30,7 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
   can be used to obtain a credential for logging in,
   and to perform requests specifically related to the username/password provider.
 */
-@interface RLMUsernamePasswordProviderClient : RLMProviderClient
+@interface RLMEmailPasswordAuth : RLMProviderClient
 
 /**
  Registers a new email identity with the username/password provider,

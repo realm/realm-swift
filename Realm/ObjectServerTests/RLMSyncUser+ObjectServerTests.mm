@@ -25,7 +25,7 @@
 
 using namespace realm;
 
-@implementation RLMSyncUser (ObjectServerTests)
+@implementation RLMUser (ObjectServerTests)
 
 - (BOOL)waitForUploadToFinish:(NSString *)partitionValue {
     const NSTimeInterval timeout = 20;

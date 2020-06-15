@@ -16,27 +16,11 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMProviderClient_Private.hpp"
+#import "RLMCredentials.h"
+#import "sync/app_credentials.hpp"
 
-#import "RLMApp_Private.hpp"
-#import "sync/app.hpp"
+@interface RLMCredentials()
 
-#import <realm/util/optional.hpp>
+@property (nonatomic) realm::app::AppCredentials& appCredentials;
 
-@implementation RLMProviderClient
-- (instancetype)initWithApp:(RLMApp *)app {
-    self = [super init];
-    if (self) {
-        _app = app;
-    }
-    return self;
-}
-
-- (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
-            completion:(RLMProviderClientOptionalErrorBlock)completion {
-    if (error && error->error_code) {
-        return completion(RLMAppErrorToNSError(*error));
-    }
-    completion(nil);
-}
 @end

@@ -22,9 +22,9 @@ import Realm.Private
 /**
  An object representing a MongoDB Realm user.
 
- - see: `RLMSyncUser`
+ - see: `RLMUser`
  */
-public typealias SyncUser = RLMSyncUser
+public typealias User = RLMUser
 
 /**
  An immutable data object representing information retrieved from MongoDB
@@ -207,7 +207,7 @@ public enum ServerValidationPolicy {
  */
 public struct SyncConfiguration {
     /// The `SyncUser` who owns the Realm that this configuration should open.
-    public let user: SyncUser
+    public let user: User
 
     /**
      The value this Realm is partitioned on. The partition key is a property defined in
@@ -246,7 +246,7 @@ public struct SyncConfiguration {
     }
 }
 
-extension SyncUser {
+extension User {
 
     /**
      Create a sync configuration instance.
@@ -297,6 +297,13 @@ extension SyncUser {
         }
 
         return customData
+    }
+
+    /// A client for interacting with a remote MongoDB instance
+    /// - Parameter serviceName:  The name of the MongoDB service
+    /// - Returns: A `MongoClient` which is used for interacting with a remote MongoDB service
+    public func mongoClient(_ serviceName: String) -> MongoClient {
+        return self.__mongoClient(withServiceName: serviceName)
     }
 }
 

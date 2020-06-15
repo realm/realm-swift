@@ -16,8 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncUser_Private.hpp"
+#import "RLMUser_Private.hpp"
 
+#import "RLMCredentials_Private.hpp"
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
 #import "RLMJSONModels.h"
@@ -32,6 +33,8 @@
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
+#import "RLMAPIKeyAuth.h"
+#import "RLMMongoClient_Private.hpp"
 
 #import "util/bson/bson.hpp"
 #import "sync/sync_manager.hpp"
@@ -51,17 +54,17 @@ using namespace realm;
 
 @end
 
-@interface RLMSyncUser () {
+@interface RLMUser () {
     std::shared_ptr<SyncUser> _user;
 }
 @end
 
-@implementation RLMSyncUser
+@implementation RLMUser
 
 #pragma mark - API
 
-- (instancetype)initWithSyncUser:(std::shared_ptr<SyncUser>)user
-                             app:(RLMApp *)app {
+- (instancetype)initWithUser:(std::shared_ptr<SyncUser>)user
+                         app:(RLMApp *)app {
     if (self = [super init]) {
         _user = user;
         _app = app;
@@ -71,10 +74,10 @@ using namespace realm;
 }
 
 - (BOOL)isEqual:(id)object {
-    if (![object isKindOfClass:[RLMSyncUser class]]) {
+    if (![object isKindOfClass:[RLMUser class]]) {
         return NO;
     }
-    return _user == ((RLMSyncUser *)object)->_user;
+    return _user == ((RLMUser *)object)->_user;
 }
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(id<RLMBSON>)partitionValue {
@@ -167,14 +170,60 @@ using namespace realm;
     }
 }
 
-- (void)refreshCustomData:(RLMUserUserOptionalErrorBlock)completionBlock {
-    [_app _realmApp]->refresh_custom_data(_user, [completionBlock](util::Optional<app::AppError> error){
+- (void)refreshCustomDataWithCompletion:(RLMUserCustomDataBlock)completion {
+    _user->refresh_custom_data([completion, self](util::Optional<app::AppError> error) {
         if (!error) {
-            return completionBlock(nil);
+            return completion([self customData], nil);
         }
-        
-        completionBlock(RLMAppErrorToNSError(*error));
+
+        completion(nil, RLMAppErrorToNSError(*error));
     });
+}
+
+- (void)linkUserWithCredentials:(RLMCredentials *)credentials
+                     completion:(RLMOptionalUserBlock)completion {
+    _app._realmApp->link_user(_user, credentials.appCredentials,
+                   ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
+        if (error && error->error_code) {
+            return completion(nil, RLMAppErrorToNSError(*error));
+        }
+
+        completion([[RLMUser alloc] initWithUser:user app:_app], nil);
+    });
+}
+
+- (void)removeWithCompletion:(RLMOptionalErrorBlock)completion {
+    _app._realmApp->remove_user(_user, ^(realm::util::Optional<app::AppError> error) {
+        [self handleResponse:error completion:completion];
+    });
+}
+
+- (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
+    _app._realmApp->log_out(^(realm::util::Optional<app::AppError> error) {
+        [self handleResponse:error completion:completion];
+    });
+}
+
+- (void)logOut:(RLMUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
+    _app._realmApp->log_out(syncUser._syncUser, ^(realm::util::Optional<app::AppError> error) {
+        [self handleResponse:error completion:completion];
+    });
+}
+
+- (RLMAPIKeyAuth *)apiKeyAuth {
+    return [[RLMAPIKeyAuth alloc] initWithApp: _app];
+}
+
+- (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName {
+    return [[RLMMongoClient alloc] initWithApp:_app serviceName:serviceName];
+}
+
+- (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
+            completion:(RLMOptionalErrorBlock)completion {
+    if (error && error->error_code) {
+        return completion(RLMAppErrorToNSError(*error));
+    }
+    completion(nil);
 }
 
 #pragma mark - Private API

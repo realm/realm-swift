@@ -22,7 +22,7 @@
 #import "RLMRealmConfiguration+Sync.h"
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
-#import "RLMSyncUser_Private.hpp"
+#import "RLMUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 
@@ -125,7 +125,7 @@ static RLMSyncManager *s_sharedManager = nil;
 - (instancetype)initWithAppConfiguration:(RLMAppConfiguration *)appConfiguration
                            rootDirectory:(NSURL *)rootDirectory {
     if (self = [super init]) {
-        [RLMSyncUser _setUpBindingContextFactory];
+        [RLMUser _setUpBindingContextFactory];
         [self configureWithRootDirectory:rootDirectory appConfiguration:appConfiguration];
     }
     return self = [super init];

@@ -33,7 +33,7 @@ Realm Cloud user api keys
 
 - see: `RLMUserAPIKeyProviderClient`
 */
-public typealias UserAPIKeyProviderClient = RLMUserAPIKeyProviderClient
+public typealias UserAPIKeyProviderClient = RLMAPIKeyAuth
 
 /**
 An object representing a client which performs network calls on
@@ -41,7 +41,7 @@ Realm Cloud user registration & password functions
 
 - see: `RLMUsernamePasswordProviderClient`
 */
-public typealias UsernamePasswordProviderClient = RLMUsernamePasswordProviderClient
+public typealias UsernamePasswordProviderClient = RLMEmailPasswordAuth
 /// A block type used to report an error
 public typealias UsernamePasswordProviderClientErrorBlock = RLMUsernamePasswordProviderClientOptionalErrorBlock
 extension UsernamePasswordProviderClient {
@@ -62,17 +62,11 @@ extension UsernamePasswordProviderClient {
     }
 }
 
-/**
-An object which is used within UserAPIKeyProviderClient
-
-- see: `RLMUserAPIKey`
-*/
+/// An object which is used within UserAPIKeyProviderClient
 public typealias UserAPIKey = RLMUserAPIKey
 
-/**
-A `AppCredentials` represents data that uniquely identifies a Realm Object Server user.
-*/
-public typealias AppCredentials = RLMAppCredentials
+/// A `Credentials` represents data that uniquely identifies a Realm Object Server user.
+public typealias Credentials = RLMCredentials
 
 /// Structure providing an interface to call a MongoDB Realm function with the provided name and arguments.
 ///
@@ -91,9 +85,9 @@ public typealias AppCredentials = RLMAppCredentials
 /// This handler is executed on a non-main global `DispatchQueue`.
 @dynamicMemberLookup
 public struct Functions {
-    weak var app: RealmApp?
+    weak var app: App?
 
-    fileprivate init(app: RealmApp) {
+    fileprivate init(app: App) {
         self.app = app
     }
 
@@ -114,11 +108,11 @@ public struct Functions {
     }
 }
 
-/// The `RealmApp` has the fundamental set of methods for communicating with a Realm
+/// The `App` has the fundamental set of methods for communicating with a Realm
 /// application backend.
 /// This interface provides access to login and authentication.
-public typealias RealmApp = RLMApp
-public extension RealmApp {
+public typealias App = RLMApp
+public extension App {
 
     /// Call a MongoDB Realm function with the provided name and arguments.
     ///
@@ -137,12 +131,5 @@ public extension RealmApp {
     /// This handler is executed on a non-main global `DispatchQueue`.
     var functions: Functions {
         return Functions(app: self)
-    }
-
-    /// A client for interacting with a remote MongoDB instance
-    /// - Parameter serviceName:  The name of the MongoDB service
-    /// - Returns: A `MongoClient` which is used for interacting with a remote MongoDB service
-    func mongoClient(_ serviceName: String) -> MongoClient {
-        return self.__mongoClient(withServiceName: serviceName)
     }
 }

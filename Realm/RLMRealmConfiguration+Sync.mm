@@ -21,7 +21,7 @@
 #import "RLMBSON_Private.hpp"
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncUser_Private.hpp"
+#import "RLMUser_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
@@ -42,7 +42,7 @@
     if (self.config.should_compact_on_launch_function) {
         @throw RLMException(@"Cannot set `syncConfiguration` when `shouldCompactOnLaunch` is set.");
     }
-    RLMSyncUser *user = syncConfiguration.user;
+    RLMUser *user = syncConfiguration.user;
     if (user.state == RLMSyncUserStateRemoved) {
         @throw RLMException(@"Cannot set a sync configuration which has an errored-out user.");
     }

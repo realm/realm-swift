@@ -57,7 +57,7 @@ extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
 /**
  Opaque credentials representing a specific Realm App user.
  */
-@interface RLMAppCredentials : NSObject
+@interface RLMCredentials : NSObject
 
 /// The name of the identity provider which generated the credentials token.
 @property (nonatomic) RLMIdentityProvider provider;

@@ -18,10 +18,10 @@
 
 #import <Foundation/Foundation.h>
 
-#import <Realm/RLMAppCredentials.h>
+#import <Realm/RLMCredentials.h>
 #import <Realm/RLMRealmConfiguration.h>
 
-@class RLMSyncUser, RLMSyncUserInfo, RLMSyncSession, RLMRealm, RLMSyncUserIdentity;
+@class RLMUser, RLMSyncUserInfo, RLMSyncSession, RLMRealm, RLMSyncUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection;
 @protocol RLMBSON;
 
 /**
@@ -37,11 +37,16 @@ typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
 };
 
 /// A block type used to report an error related to a specific user.
-typedef void(^RLMUserErrorReportingBlock)(RLMSyncUser * _Nonnull, NSError * _Nonnull);
+typedef void(^RLMUserErrorReportingBlock)(RLMUser * _Nonnull, NSError * _Nonnull);
+
+/// A block type used to report an error related to a specific user.
+typedef void(^RLMOptionalUserBlock)(RLMUser * _Nullable, NSError * _Nullable);
 
 /// A block type used to report an error on a network request from the user.
-typedef void(^RLMUserUserOptionalErrorBlock)(NSError * _Nullable);
+typedef void(^RLMUserOptionalErrorBlock)(NSError * _Nullable);
 
+/// A block which returns a dictionary should there be any custom data set for a user
+typedef void(^RLMUserCustomDataBlock)(NSDictionary * _Nullable, NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -55,7 +60,7 @@ NS_ASSUME_NONNULL_BEGIN
  Note that user objects are only vended out via SDK APIs, and cannot be directly
  initialized. User objects can be accessed from any thread.
  */
-@interface RLMSyncUser : NSObject
+@interface RLMUser : NSObject
 
 /**
  The unique MongoDB Realm user ID string identifying this user.
@@ -123,7 +128,52 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Refresh a user's custom data. This will, in effect, refresh the user's auth session.
  */
-- (void)refreshCustomData:(RLMUserUserOptionalErrorBlock)completionBlock;
+- (void)refreshCustomDataWithCompletion:(RLMUserCustomDataBlock)completion;
+
+/**
+ Links the currently authenticated user with a new identity, where the identity is defined by the credential
+ specified as a parameter. This will only be successful if this `RLMSyncUser` is the currently authenticated
+ with the client from which it was created. On success a new user will be returned with the new linked credentials.
+
+ @param credentials The `RLMAppCredentials` used to link the user to a new identity.
+ @param completion The completion handler to call when the linking is complete.
+                   If the operation is  successful, the result will contain a new
+                   `RLMSyncUser` object representing the currently logged in user.
+*/
+- (void)linkUserWithCredentials:(RLMCredentials *)credentials
+                     completion:(RLMOptionalUserBlock)completion;
+
+/**
+ Removes the user
+
+ This logs out and destroys the session related to this user. The completion block will return an error
+ if the user is not found or is already removed.
+
+ @param completion A callback invoked on completion
+*/
+- (void)removeWithCompletion:(RLMUserOptionalErrorBlock)completion;
+
+/**
+ Logs out the current user
+
+ The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
+ If the logout request fails, this method will still clear local authentication state.
+
+ @param completion A callback invoked on completion
+*/
+- (void)logOutWithCompletion:(RLMUserOptionalErrorBlock)completion;
+
+/**
+  A client for the user API key authentication provider which
+  can be used to create and modify user API keys.
+
+  This client should only be used by an authenticated user.
+*/
+- (RLMAPIKeyAuth *)apiKeyAuth;
+
+/// A client for interacting with a remote MongoDB instance
+/// @param serviceName The name of the MongoDB service
+- (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName NS_REFINED_FOR_SWIFT;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));
