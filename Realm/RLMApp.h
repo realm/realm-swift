@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMUser, RLMCredentials, RLMSyncManager, RLMEmailPasswordAuth;
 
-/// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
+/// A block type used for APIs which asynchronously vend an `RLMUser`.
 typedef void(^RLMUserCompletionBlock)(RLMUser * _Nullable, NSError * _Nullable);
 
 /// A block type used to report an error

@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncTestCase.h"
-#import "RLMSyncUser+ObjectServerTests.h"
+#import "RLMUser+ObjectServerTests.h"
 #import "RLMUser_Private.hpp"
 
 #import "RLMCredentials.h"
@@ -199,7 +199,7 @@
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 }
 
-#pragma mark - RLMUsernamePasswordProviderClient
+#pragma mark - RLMEmailPasswordAuth
 
 - (void)testRegisterEmailAndPassword {
     RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
@@ -918,9 +918,9 @@
 /// A Realm that was opened before a user logged out should be able to resume downloading if the user logs back in.
 #if 0
 - (void)testLogBackInSameRealmDownload {
-    RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:YES];
-    RLMSyncUser *user = [self logInUserForCredentials:credentials];
+    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:YES];
+    RLMUser *user = [self logInUserForCredentials:credentials];
     RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
 
     [self addPersonsToRealm:realm persons:@[[Person john]]];
@@ -945,9 +945,9 @@
 /// A Realm that was opened while a user was logged out should be able to start uploading if the user logs back in.
 - (void)testLogBackInDeferredRealmUpload {
     // Log in the user.
-    RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:YES];
-    RLMSyncUser *user = [self logInUserForCredentials:credentials];
+    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:YES];
+    RLMUser *user = [self logInUserForCredentials:credentials];
 
     NSError *error = nil;
     if (self.isParent) {
@@ -984,9 +984,9 @@
 /// A Realm that was opened while a user was logged out should be able to start downloading if the user logs back in.
 - (void)testLogBackInDeferredRealmDownload {
 
-    RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:YES];
-    RLMSyncUser *user = [self logInUserForCredentials:credentials];
+    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:YES];
+    RLMUser *user = [self logInUserForCredentials:credentials];
 
     NSError *error = nil;
     if (self.isParent) {
@@ -1092,9 +1092,9 @@
 /// `RLMRealm` that is opened for the same path as a previously-opened Realm.
 - (void)testLogBackInReopenRealmUpload {
     // Log in the user.
-    RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
-    RLMSyncUser *user = [self logInUserForCredentials:credentials];
+    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:self.isParent];
+    RLMUser *user = [self logInUserForCredentials:credentials];
 
     // Open the Realm
     RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
@@ -1128,9 +1128,9 @@
 /// `RLMRealm` that is opened for the same path as a previously-opened Realm.
 - (void)testLogBackInReopenRealmDownload {
     // Log in the user.
-    RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
-    RLMSyncUser *user = [self logInUserForCredentials:credentials];
+    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:self.isParent];
+    RLMUser *user = [self logInUserForCredentials:credentials];
 
     // Open the Realm
     if (self.isParent) {
@@ -1170,9 +1170,9 @@
 
 - (void)testSuspendAndResume {
     
-    RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
-    RLMSyncUser *user = [self logInUserForCredentials:credentials];
+    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:self.isParent];
+    RLMUser *user = [self logInUserForCredentials:credentials];
 
     __attribute__((objc_precise_lifetime)) RLMRealm *realmA = [self openRealmForPartitionValue:@"realm_id" user:user];
     __attribute__((objc_precise_lifetime)) RLMRealm *realmB = [self openRealmForPartitionValue:@"realm_id" user:user];
@@ -1295,9 +1295,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 // FIXME: Dependancy on Stitch deployment
 #if 0
 - (void)testStreamingDownloadNotifier {
-    RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
-    RLMSyncUser *user = [self logInUserForCredentials:credentials];
+    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:self.isParent];
+    RLMUser *user = [self logInUserForCredentials:credentials];
 
     if (!self.isParent) {
         [self populateDataForUser:user partitionValue:@"realm_id"];
@@ -1340,9 +1340,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testStreamingUploadNotifier {
-    RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
-    RLMSyncUser *user = [self logInUserForCredentials:credentials];
+    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:self.isParent];
+    RLMUser *user = [self logInUserForCredentials:credentials];
     __block NSInteger callCount = 0;
     __block NSUInteger transferred = 0;
     __block NSUInteger transferrable = 0;
@@ -1528,9 +1528,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 // FIXME: Dependancy on new stitch deployment
 #if 0
 - (void)testAsyncOpenProgressNotifications {
-    RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
-    RLMSyncUser *user = [self logInUserForCredentials:credentials];
+    RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
+                                                        register:self.isParent];
+    RLMSUser *user = [self logInUserForCredentials:credentials];
 
     if (!self.isParent) {
         [self populateDataForUser:user partitionValue:@"foo"];

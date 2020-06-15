@@ -87,7 +87,7 @@
 }
 
 - (void)deleteApiKey:(RLMObjectId *)objectId
-          completion:(RLMUserAPIKeyProviderClientOptionalErrorBlock)completion {
+          completion:(RLMAPIKeyAuthOptionalErrorBlock)completion {
     self.client.delete_api_key(objectId.value,
                                self.currentUser,
                                ^(realm::util::Optional<realm::app::AppError> error) {
@@ -96,7 +96,7 @@
 }
 
 - (void)enableApiKey:(RLMObjectId *)objectId
-          completion:(RLMUserAPIKeyProviderClientOptionalErrorBlock)completion {
+          completion:(RLMAPIKeyAuthOptionalErrorBlock)completion {
     self.client.enable_api_key(objectId.value,
                                self.currentUser,
                                ^(realm::util::Optional<realm::app::AppError> error) {
@@ -105,7 +105,7 @@
 }
 
 - (void)disableApiKey:(RLMObjectId *)objectId
-           completion:(RLMUserAPIKeyProviderClientOptionalErrorBlock)completion {
+           completion:(RLMAPIKeyAuthOptionalErrorBlock)completion {
     self.client.disable_api_key(objectId.value,
                                 self.currentUser,
                                 ^(realm::util::Optional<realm::app::AppError> error) {

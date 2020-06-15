@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncUser+ObjectServerTests.h"
+#import "RLMUser+ObjectServerTests.h"
 
 #import "RLMSyncSession_Private.hpp"
 #import "RLMRealmUtil.hpp"

@@ -31,9 +31,9 @@ public typealias AppConfiguration = RLMAppConfiguration
 An object representing a client which performs network calls on
 Realm Cloud user api keys
 
-- see: `RLMUserAPIKeyProviderClient`
+- see: `RLMAPIKeyAuth`
 */
-public typealias UserAPIKeyProviderClient = RLMAPIKeyAuth
+public typealias APIKeyAuth = RLMAPIKeyAuth
 
 /**
 An object representing a client which performs network calls on

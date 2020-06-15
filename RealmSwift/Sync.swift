@@ -248,8 +248,7 @@ public struct SyncConfiguration {
 
 /// Structure providing an interface to call a MongoDB Realm function with the provided name and arguments.
 ///
-///     let app = RealmApp(appId: "my-app-id")
-///     app.functions.sum([1, 2, 3, 4, 5]) { sum, error in
+///     user.functions.sum([1, 2, 3, 4, 5]) { sum, error in
 ///         guard case let .int64(value) = sum else {
 ///             print(error?.localizedDescription)
 ///         }
@@ -348,8 +347,7 @@ extension User {
 
     /// Call a MongoDB Realm function with the provided name and arguments.
     ///
-    ///     let app = RealmApp(appId: "my-app-id")
-    ///     app.functions.sum([1, 2, 3, 4, 5]) { sum, error in
+    ///     user.functions.sum([1, 2, 3, 4, 5]) { sum, error in
     ///         guard case let .int64(value) = sum else {
     ///             print(error?.localizedDescription)
     ///         }

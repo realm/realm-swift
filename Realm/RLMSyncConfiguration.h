@@ -52,13 +52,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// :nodoc:
 - (instancetype)initWithUser:(RLMUser *)user
-              partitionValue:(id<RLMBSON>)partitionValue __attribute__((unavailable("Use [RLMSyncUser configurationWithPartitionValue:] instead")));
+              partitionValue:(id<RLMBSON>)partitionValue __attribute__((unavailable("Use [RLMUser configurationWithPartitionValue:] instead")));
 
 /// :nodoc:
-+ (RLMRealmConfiguration *)automaticConfiguration __attribute__((unavailable("Use [RLMSyncUser configuration] instead")));
++ (RLMRealmConfiguration *)automaticConfiguration __attribute__((unavailable("Use [RLMUser configuration] instead")));
 
 /// :nodoc:
-+ (RLMRealmConfiguration *)automaticConfigurationForUser:(RLMUser *)user __attribute__((unavailable("Use [RLMSyncUser configuration] instead")));
++ (RLMRealmConfiguration *)automaticConfigurationForUser:(RLMUser *)user __attribute__((unavailable("Use [RLMUser configuration] instead")));
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly")));

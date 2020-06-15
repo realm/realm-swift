@@ -394,7 +394,7 @@ static NSURL *syncDirectoryForChildProcess() {
         [self waitForExpectationsWithTimeout:4.0 handler:nil];
     }
     return [RLMCredentials credentialsWithUsername:name
-                                             password:@"password"];
+                                          password:@"password"];
 }
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm {

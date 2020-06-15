@@ -33,15 +33,15 @@ using namespace realm;
     return nil;
 }
 
-+ (instancetype)credentialsWithFacebookToken:(RLMAppCredentialsToken)token {
++ (instancetype)credentialsWithFacebookToken:(RLMCredentialsToken)token {
     return [[self alloc] initWithAppCredentials:app::AppCredentials::facebook(token.UTF8String)];
 }
 
-+ (instancetype)credentialsWithGoogleToken:(RLMAppCredentialsToken)token {
++ (instancetype)credentialsWithGoogleToken:(RLMCredentialsToken)token {
     return [[self alloc] initWithAppCredentials:app::AppCredentials::google(token.UTF8String)];
 }
 
-+ (instancetype)credentialsWithAppleToken:(RLMAppCredentialsToken)token {
++ (instancetype)credentialsWithAppleToken:(RLMCredentialsToken)token {
     return [[self alloc] initWithAppCredentials:app::AppCredentials::apple(token.UTF8String)];
 }
 

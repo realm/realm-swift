@@ -54,7 +54,7 @@ typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A `RLMSyncUser` instance represents a single Realm App user account.
+ A `RLMUser` instance represents a single Realm App user account.
 
  A user may have one or more credentials associated with it. These credentials
  uniquely identify the user to the authentication provider, and are used to sign
@@ -135,13 +135,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Links the currently authenticated user with a new identity, where the identity is defined by the credential
- specified as a parameter. This will only be successful if this `RLMSyncUser` is the currently authenticated
+ specified as a parameter. This will only be successful if this `RLMUser` is the currently authenticated
  with the client from which it was created. On success a new user will be returned with the new linked credentials.
 
- @param credentials The `RLMAppCredentials` used to link the user to a new identity.
+ @param credentials The `RLMCredentials` used to link the user to a new identity.
  @param completion The completion handler to call when the linking is complete.
                    If the operation is  successful, the result will contain a new
-                   `RLMSyncUser` object representing the currently logged in user.
+                   `RLMUser` object representing the currently logged in user.
 */
 - (void)linkUserWithCredentials:(RLMCredentials *)credentials
                      completion:(RLMOptionalUserBlock)completion;
@@ -191,9 +191,9 @@ NS_ASSUME_NONNULL_BEGIN
           completionBlock:(RLMCallFunctionCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
 /// :nodoc:
-- (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));
+- (instancetype)init __attribute__((unavailable("RLMUser cannot be created directly")));
 /// :nodoc:
-+ (instancetype)new __attribute__((unavailable("RLMSyncUser cannot be created directly")));
++ (instancetype)new __attribute__((unavailable("RLMUser cannot be created directly")));
 
 @end
 
@@ -213,9 +213,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSString *providerUserIdentity;
 
 /// :nodoc:
-- (instancetype)init __attribute__((unavailable("RLMSyncUserAccountInfo cannot be created directly")));
+- (instancetype)init __attribute__((unavailable("RLMUserAccountInfo cannot be created directly")));
 /// :nodoc:
-+ (instancetype)new __attribute__((unavailable("RLMSyncUserAccountInfo cannot be created directly")));
++ (instancetype)new __attribute__((unavailable("RLMUserAccountInfo cannot be created directly")));
 
 @end
 
@@ -240,9 +240,9 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSDictionary<NSString *, NSString *> *metadata;
 
 /// :nodoc:
-- (instancetype)init __attribute__((unavailable("RLMSyncUserInfo cannot be created directly")));
+- (instancetype)init __attribute__((unavailable("RLMUserInfo cannot be created directly")));
 /// :nodoc:
-+ (instancetype)new __attribute__((unavailable("RLMSyncUserInfo cannot be created directly")));
++ (instancetype)new __attribute__((unavailable("RLMUserInfo cannot be created directly")));
 
 @end
 
