@@ -181,12 +181,12 @@
     RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
     
     RLMUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                 register:YES]];
+                                                                             register:YES]];
     RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test@10gen.com"
-                                                                                  register:YES]];
-    
+                                                                              register:YES]];
+
     XCTAssert([[app currentUser].identity isEqualToString:secondUser.identity]);
-    
+
     XCTestExpectation *removeUserExpectation = [self expectationWithDescription:@"should remove user"];
 
     [secondUser removeWithCompletion:^(NSError * _Nullable error) {
@@ -455,9 +455,9 @@
 /// same user object.
 - (void)testUsernamePasswordAuthentication {
     RLMUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                 register:YES]];
+                                                                             register:YES]];
     RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                                  register:NO]];
+                                                                              register:NO]];
     // Two users created with the same credential should resolve to the same actual user.
     XCTAssertTrue([firstUser.identity isEqualToString:secondUser.identity]);
 }
@@ -467,7 +467,7 @@
     [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd) register:YES]];
 
     RLMCredentials *credentials = [RLMCredentials credentialsWithUsername:NSStringFromSelector(_cmd)
-                                                                       password:@"INVALID_PASSWORD"];
+                                                                 password:@"INVALID_PASSWORD"];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"login should fail"];
 
@@ -606,7 +606,7 @@
 /// If client B deletes objects from a synced Realm, client A should see the effects of that deletion.
 - (void)testDeleteObjects {
     RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                            register:self.isParent]];
+                                                                        register:self.isParent]];
     RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
     if (self.isParent) {
         // Add objects.
@@ -632,7 +632,7 @@
 /// If client B encrypts its synced Realm, client A should be able to access that Realm with a different encryption key.
 - (void)testEncryptedSyncedRealm {
     RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                            register:self.isParent]];
+                                                                        register:self.isParent]];
 
     NSData *key = RLMGenerateKey();
     RLMRealm *realm = [self openRealmForPartitionValue:@"foo"
@@ -659,7 +659,7 @@
 /// If an encrypted synced Realm is re-opened with the wrong key, throw an exception.
 - (void)testEncryptedSyncedRealmWrongKey {
     RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                            register:self.isParent]];
+                                                                        register:self.isParent]];
 
     if (self.isParent) {
         NSString *path;
@@ -709,7 +709,7 @@
     NSString *partitionValueB = @"bar";
     NSString *partitionValueC = @"baz";
     RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                            register:self.isParent]];
+                                                                        register:self.isParent]];
 
     // Open three Realms.
 
@@ -741,7 +741,7 @@
     NSString *partitionValueB = @"bar";
     NSString *partitionValueC = @"baz";
     RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                            register:self.isParent]];
+                                                                        register:self.isParent]];
 
     RLMRealm *realmA = [self openRealmForPartitionValue:partitionValueA user:user];
     RLMRealm *realmB = [self openRealmForPartitionValue:partitionValueB user:user];
@@ -797,7 +797,7 @@
     NSString *partitionValueB = @"bar";
     NSString *partitionValueC = @"baz";
     RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                            register:self.isParent]];
+                                                                        register:self.isParent]];
     RLMRealm *realmA = [self openRealmForPartitionValue:partitionValueA user:user];
     RLMRealm *realmB = [self openRealmForPartitionValue:partitionValueB user:user];
     RLMRealm *realmC = [self openRealmForPartitionValue:partitionValueC user:user];
@@ -867,7 +867,7 @@
     const NSInteger OBJECT_COUNT = 3;
     // Log in the user.
     RLMUser *user = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                                            register:self.isParent]];
+                                                                        register:self.isParent]];
 
     if (self.isParent) {
         // Open the Realm in an autorelease pool so that it is destroyed as soon as possible.
@@ -896,7 +896,7 @@
 /// A Realm that was opened before a user logged out should be able to resume uploading if the user logs back in.
 - (void)testLogBackInSameRealmUpload {
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:YES];
+                                                        register:YES];
     RLMUser *user = [self logInUserForCredentials:credentials];
     RLMRealm *realm = [self openRealmForPartitionValue:@"foo" user:user];
 
@@ -918,7 +918,6 @@
 /// A Realm that was opened before a user logged out should be able to resume downloading if the user logs back in.
 #if 0
 - (void)testLogBackInSameRealmDownload {
-
     RLMAppCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                            register:YES];
     RLMSyncUser *user = [self logInUserForCredentials:credentials];
@@ -1029,7 +1028,7 @@
 /// After logging back in, a Realm whose path has been opened for the first time should properly upload changes.
 - (void)testLogBackInOpenFirstTimePathUpload {
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
+                                                        register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
     // Now run a basic multi-client test.
     if (self.isParent) {
@@ -1230,7 +1229,7 @@
 /// Ensure that a client reset error is propagated up to the binding successfully.
 - (void)testClientReset {
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
+                                                        register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
     // Open the Realm
     __attribute__((objc_precise_lifetime)) RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
@@ -1393,7 +1392,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 - (void)testDownloadRealm {
     const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
+                                                        register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
 
     if (!self.isParent) {
@@ -1431,7 +1430,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 - (void)testDownloadAlreadyOpenRealm {
     const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
+                                                        register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
 
     if (!self.isParent) {
@@ -1476,7 +1475,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 - (void)testDownloadCancelsOnAuthError {
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
+                                                        register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
     [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
     [self manuallySetRefreshTokenForUser:user value:[self badAccessToken]];
@@ -1493,7 +1492,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 - (void)testCancelDownload {
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
+                                                        register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
 
     if (!self.isParent) {
@@ -1613,7 +1612,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
 - (void)testCompactOnLaunch {
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
+                                                        register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
     NSString *partitionValue = self.appId;
     NSString *path;
