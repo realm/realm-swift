@@ -65,12 +65,12 @@ static RLMApp *app;
 
     // Creating a debug credential since this demo is just using the generated access token
     // produced when running the Realm Object Server via the `start-object-server.command`
-    RLMAppCredentials *credential = [RLMAppCredentials credentialsWithUsername:@"demo@realm.io"
-                                                                      password:@"password"];
+    RLMCredentials *credential = [RLMCredentials credentialsWithUsername:@"demo@realm.io"
+                                                                password:@"password"];
 
     // Log the user in (async, the Realm will start syncing once the user is logged in automatically)
     [app loginWithCredential:credential
-                  completion:^(RLMSyncUser *user, NSError *error) {
+                  completion:^(RLMUser *user, NSError *error) {
         if (error) {
             self.activityIndicatorView.hidden = YES;
             UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Login Failed" message:error.localizedDescription preferredStyle:UIAlertControllerStyleAlert];
