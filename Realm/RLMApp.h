@@ -30,9 +30,6 @@ typedef void(^RLMUserCompletionBlock)(RLMUser * _Nullable, NSError * _Nullable);
 /// A block type used to report an error
 typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 
-/// A block type for returning from function calls.
-typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _Nullable);
-
 #pragma mark RLMAppConfiguration
 
 /// Properties representing the configuration of a client
@@ -153,18 +150,6 @@ Create a new Realm App configuration.
  @returns The user you intend to switch to
  */
 - (RLMUser *)switchToUser:(RLMUser *)syncUser;
-
-/**
- Calls the MongoDB Realm function with the provided name and arguments.
-
- @param name The name of the MongoDB Realm function to be called.
- @param arguments The `BSONArray` of arguments to be provided to the function.
- @param completionBlock The completion handler to call when the function call is complete.
-                        This handler is executed on a non-main global `DispatchQueue`.
-*/
-- (void)callFunctionNamed:(NSString *)name
-                arguments:(NSArray<id<RLMBSON>> *)arguments
-          completionBlock:(RLMCallFunctionCompletionBlock)completionBlock NS_REFINED_FOR_SWIFT;
 
 /**
  RLMApp instances are cached internally by Realm and cannot be created directly.

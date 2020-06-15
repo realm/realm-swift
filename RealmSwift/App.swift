@@ -68,68 +68,7 @@ public typealias UserAPIKey = RLMUserAPIKey
 /// A `Credentials` represents data that uniquely identifies a Realm Object Server user.
 public typealias Credentials = RLMCredentials
 
-/// Structure providing an interface to call a MongoDB Realm function with the provided name and arguments.
-///
-///     let app = RealmApp(appId: "my-app-id")
-///     app.functions.sum([1, 2, 3, 4, 5]) { sum, error in
-///         guard case let .int64(value) = sum else {
-///             print(error?.localizedDescription)
-///         }
-///
-///         assert(value == 15)
-///     }
-///
-/// The dynamic member name (`sum` in the above example) is directly associated with the function name.
-/// The first argument is the `BSONArray` of arguments to be provided to the function.
-/// The second and final argument is the completion handler to call when the function call is complete.
-/// This handler is executed on a non-main global `DispatchQueue`.
-@dynamicMemberLookup
-public struct Functions {
-    weak var app: App?
-
-    fileprivate init(app: App) {
-        self.app = app
-    }
-
-    /// A closure type for receiving the completion of a remote function call.
-    public typealias FunctionCompletionHandler = (AnyBSON?, Error?) -> Void
-
-    /// A closure type for the dynamic remote function type.
-    public typealias Function = ([AnyBSON], @escaping FunctionCompletionHandler) -> Void
-
-    /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
-    public subscript(dynamicMember string: String) -> Function {
-        return { (arguments: [AnyBSON], completionHandler: @escaping FunctionCompletionHandler) in
-            let objcArgs = arguments.map(ObjectiveCSupport.convert) as! [RLMBSON]
-            self.app?.__callFunctionNamed(string, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
-                completionHandler(ObjectiveCSupport.convert(object: bson), error)
-            }
-        }
-    }
-}
-
 /// The `App` has the fundamental set of methods for communicating with a Realm
 /// application backend.
 /// This interface provides access to login and authentication.
 public typealias App = RLMApp
-public extension App {
-
-    /// Call a MongoDB Realm function with the provided name and arguments.
-    ///
-    ///     let app = RealmApp(appId: "my-app-id")
-    ///     app.functions.sum([1, 2, 3, 4, 5]) { sum, error in
-    ///         guard case let .int64(value) = sum else {
-    ///             print(error?.localizedDescription)
-    ///         }
-    ///
-    ///         assert(value == 15)
-    ///     }
-    ///
-    /// The dynamic member name (`sum` in the above example) is directly associated with the function name.
-    /// The first argument is the `BSONArray` of arguments to be provided to the function.
-    /// The second and final argument is the completion handler to call when the function call is complete.
-    /// This handler is executed on a non-main global `DispatchQueue`.
-    var functions: Functions {
-        return Functions(app: self)
-    }
-}

@@ -295,27 +295,6 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     return [[RLMUser alloc] initWithUser:_app->switch_user(syncUser._syncUser) app:self];
 }
 
-- (void)callFunctionNamed:(NSString *)name
-                arguments:(NSArray<id<RLMBSON>> *)arguments
-          completionBlock:(RLMCallFunctionCompletionBlock)completionBlock {
-    bson::BsonArray args;
-
-    for (id<RLMBSON> argument in arguments) {
-        args.push_back(RLMConvertRLMBSONToBson(argument));
-    }
-
-    _app->call_function(SyncManager::shared().get_current_user(),
-                        std::string(name.UTF8String),
-                        args, [completionBlock](util::Optional<app::AppError> error,
-                                                util::Optional<bson::Bson> response) {
-        if (error) {
-            return completionBlock(nil, RLMAppErrorToNSError(*error));
-        }
-
-        completionBlock(RLMConvertBsonToRLMBSON(*response), nil);
-    });
-}
-
 @end
 
 

@@ -102,9 +102,9 @@
     }];
 
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
-    [app callFunctionNamed:@"sum"
-                 arguments:@[@1, @2, @3, @4, @5]
-           completionBlock:^(id<RLMBSON> bson, NSError *error) {
+    [syncUser callFunctionNamed:@"sum"
+                      arguments:@[@1, @2, @3, @4, @5]
+                completionBlock:^(id<RLMBSON> bson, NSError *error) {
         XCTAssert(!error);
         XCTAssertEqual([((NSNumber *)bson) intValue], 15);
     }];

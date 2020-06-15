@@ -48,6 +48,9 @@ typedef void(^RLMUserOptionalErrorBlock)(NSError * _Nullable);
 /// A block which returns a dictionary should there be any custom data set for a user
 typedef void(^RLMUserCustomDataBlock)(NSDictionary * _Nullable, NSError * _Nullable);
 
+/// A block type for returning from function calls.
+typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _Nullable);
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -174,6 +177,18 @@ NS_ASSUME_NONNULL_BEGIN
 /// A client for interacting with a remote MongoDB instance
 /// @param serviceName The name of the MongoDB service
 - (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName NS_REFINED_FOR_SWIFT;
+
+/**
+ Calls the MongoDB Realm function with the provided name and arguments.
+
+ @param name The name of the MongoDB Realm function to be called.
+ @param arguments The `BSONArray` of arguments to be provided to the function.
+ @param completion The completion handler to call when the function call is complete.
+ This handler is executed on a non-main global `DispatchQueue`.
+*/
+- (void)callFunctionNamed:(NSString *)name
+                arguments:(NSArray<id<RLMBSON>> *)arguments
+          completionBlock:(RLMCallFunctionCompletionBlock)completion NS_REFINED_FOR_SWIFT;
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("RLMSyncUser cannot be created directly")));

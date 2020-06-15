@@ -218,6 +218,27 @@ using namespace realm;
     return [[RLMMongoClient alloc] initWithApp:_app serviceName:serviceName];
 }
 
+- (void)callFunctionNamed:(NSString *)name
+                arguments:(NSArray<id<RLMBSON>> *)arguments
+          completionBlock:(RLMCallFunctionCompletionBlock)completionBlock {
+    bson::BsonArray args;
+
+    for (id<RLMBSON> argument in arguments) {
+        args.push_back(RLMConvertRLMBSONToBson(argument));
+    }
+
+    _app._realmApp->call_function(_user,
+                        std::string(name.UTF8String),
+                        args, [completionBlock](util::Optional<app::AppError> error,
+                                                util::Optional<bson::Bson> response) {
+        if (error) {
+            return completionBlock(nil, RLMAppErrorToNSError(*error));
+        }
+
+        completionBlock(RLMConvertBsonToRLMBSON(*response), nil);
+    });
+}
+
 - (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
             completion:(RLMOptionalErrorBlock)completion {
     if (error && error->error_code) {

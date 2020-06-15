@@ -967,14 +967,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
 
         let credentials = Credentials(username: email, password: password)
-        app.login(withCredential: credentials) { (_, error) in
+        var syncUser: User?
+        app.login(withCredential: credentials) { (user, error) in
+            syncUser = user
             XCTAssertNil(error)
             loginEx.fulfill()
         }
         wait(for: [loginEx], timeout: 4.0)
 
         let callFunctionEx = expectation(description: "Call function")
-        app.functions.sum([1, 2, 3, 4, 5]) { bson, error in
+        syncUser?.functions.sum([1, 2, 3, 4, 5]) { bson, error in
             guard let bson = bson else {
                 XCTFail(error!.localizedDescription)
                 return
@@ -1006,21 +1008,23 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let loginEx = expectation(description: "Login user")
         let credentials = Credentials(username: email, password: password)
-        app.login(withCredential: credentials) { (_, error) in
+        var syncUser: User?
+        app.login(withCredential: credentials) { (user, error) in
+            syncUser = user
             XCTAssertNil(error)
             loginEx.fulfill()
         }
         wait(for: [loginEx], timeout: 4.0)
 
         let userDataEx = expectation(description: "Update user data")
-        app.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
+        syncUser?.functions.updateUserData([["favourite_colour": "green", "apples": 10]]) { _, error  in
             XCTAssertNil(error)
             userDataEx.fulfill()
         }
         wait(for: [userDataEx], timeout: 4.0)
 
         let refreshDataEx = expectation(description: "Refresh user data")
-        app.currentUser()?.refreshCustomData { customData, error in
+        syncUser?.refreshCustomData { customData, error in
             XCTAssertNil(error)
             XCTAssertNotNil(customData)
             XCTAssertEqual(customData?["apples"] as! Int, 10)
