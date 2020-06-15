@@ -232,35 +232,34 @@
 
 - (void)testMultipleRegisterDevice {
     RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
-    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    XCTestExpectation *loginExpectation = [self expectationWithDescription:@"should login anonymously"];
+    XCTestExpectation *registerExpectation = [self expectationWithDescription:@"should register device"];
+    XCTestExpectation *secondRegisterExpectation = [self expectationWithDescription:@"should not throw error when attempting to register again"];
+
     __block RLMSyncUser *syncUser;
     [app loginWithCredential:[RLMAppCredentials anonymousCredentials] completion:^(RLMSyncUser *user, NSError *error) {
         XCTAssert(!error);
         XCTAssert(user);
         syncUser = user;
-        [expectation fulfill];
+        [loginExpectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectations:@[loginExpectation] timeout:10.0];
     
     RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
-    expectation = [self expectationWithDescription:@"should not throw error if device is registered twice"];
     [client registerDeviceForToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
-        if (error) {
-            NSLog(@"Error is: '%@'", error);
-        }
+        [registerExpectation fulfill];
     }];
+    
+    [self waitForExpectations:@[registerExpectation] timeout:10.0];
         
     [client registerDeviceForToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
-        if (error) {
-            NSLog(@"Error is: '%@'", error);
-        }
-        [expectation fulfill];
+        [secondRegisterExpectation fulfill];
     }];
     
-    [self waitForExpectationsWithTimeout:20.0 handler:nil];
+    [self waitForExpectations:@[secondRegisterExpectation] timeout:10.0];
 }
 
 #pragma mark - RLMUsernamePasswordProviderClient
