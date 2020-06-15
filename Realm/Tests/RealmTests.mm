@@ -1621,6 +1621,27 @@
     });
 }
 
+- (void)testReusingConfigOnMultipleQueues {
+    auto config = [RLMRealmConfiguration defaultConfiguration];
+    auto q1 = dispatch_queue_create("queue 1", DISPATCH_QUEUE_SERIAL);
+    auto q2 = dispatch_queue_create("queue 2", DISPATCH_QUEUE_SERIAL);
+
+    dispatch_sync(q1, ^{
+        XCTAssertNoThrow([RLMRealm realmWithConfiguration:config queue:q1 error:nil]);
+    });
+    dispatch_sync(q2, ^{
+        XCTAssertNoThrow([RLMRealm realmWithConfiguration:config queue:q2 error:nil]);
+    });
+}
+
+- (void)testConfigurationFromExistingRealmOnNewThread {
+    auto r1 = [RLMRealm defaultRealm];
+    [self dispatchAsyncAndWait:^{
+        auto r2 = [RLMRealm realmWithConfiguration:r1.configuration error:nil];
+        XCTAssertNoThrow([r2 refresh]);
+    }];
+}
+
 #pragma mark - In-memory Realms
 
 - (void)testInMemoryRealm {

@@ -4,8 +4,11 @@ x.y.z Release notes (yyyy-MM-dd)
 * None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Opening a Realm using a configuration object read from an existing Realm
+  would incorrectly bind the new Realm to the original Realm's thread/queue,
+  resulting in "Realm accessed from incorrect thread." exceptions.
+  ([#6574](https://github.com/realm/realm-cocoa/issues/6574),
+  [#6559](https://github.com/realm/realm-cocoa/issues/6559), since 5.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
