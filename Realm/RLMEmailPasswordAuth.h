@@ -21,14 +21,14 @@
 @protocol RLMBSON;
 
 /// A block type used to report an error
-typedef void(^RLMUsernamePasswordProviderClientOptionalErrorBlock)(NSError * _Nullable);
+typedef void(^RLMEmailPasswordAuthOptionalErrorBlock)(NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
-  A client for the username/password authentication provider which
+  A client for the email/password authentication provider which
   can be used to obtain a credential for logging in,
-  and to perform requests specifically related to the username/password provider.
+  and to perform requests specifically related to the email/password provider.
 */
 @interface RLMEmailPasswordAuth : RLMProviderClient
 
@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)registerEmail:(NSString *)email
              password:(NSString *)password
-           completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
+           completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
 /**
  Confirms an email identity with the username/password provider.
@@ -54,7 +54,7 @@ NS_ASSUME_NONNULL_BEGIN
 */
 - (void)confirmUser:(NSString *)token
             tokenId:(NSString *)tokenId
-         completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
+         completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
 /**
  Re-sends a confirmation email to a user that has registered but
@@ -64,7 +64,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param completionHandler A callback to be invoked once the call is complete.
 */
 - (void)resendConfirmationEmail:(NSString *)email
-                     completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
+                     completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
 /**
  Sends a password reset email to the given email address.
@@ -73,7 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param completionHandler A callback to be invoked once the call is complete.
 */
 - (void)sendResetPasswordEmail:(NSString *)email
-                    completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
+                    completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
 /**
  Resets the password of an email identity using the
@@ -87,7 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)resetPasswordTo:(NSString *)password
                   token:(NSString *)token
                 tokenId:(NSString *)tokenId
-      completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler;
+      completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler;
 
 /**
  Resets the password of an email identity using the
@@ -101,7 +101,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)callResetPasswordFunction:(NSString *)email
                          password:(NSString *)password
                              args:(NSArray<id<RLMBSON>> *)args
-                       completion:(RLMUsernamePasswordProviderClientOptionalErrorBlock)completionHandler NS_REFINED_FOR_SWIFT;
+                       completion:(RLMEmailPasswordAuthOptionalErrorBlock)completionHandler NS_REFINED_FOR_SWIFT;
 
 @end
 

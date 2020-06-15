@@ -39,12 +39,12 @@ public typealias UserAPIKeyProviderClient = RLMAPIKeyAuth
 An object representing a client which performs network calls on
 Realm Cloud user registration & password functions
 
-- see: `RLMUsernamePasswordProviderClient`
+- see: `RLMEmailPasswordAuth`
 */
-public typealias UsernamePasswordProviderClient = RLMEmailPasswordAuth
+public typealias EmailPasswordAuth = RLMEmailPasswordAuth
 /// A block type used to report an error
-public typealias UsernamePasswordProviderClientErrorBlock = RLMUsernamePasswordProviderClientOptionalErrorBlock
-extension UsernamePasswordProviderClient {
+public typealias EmailPasswordAuthOptionalErrorBlock = RLMEmailPasswordAuthOptionalErrorBlock
+extension EmailPasswordAuth {
 
     /// Resets the password of an email identity using the
     /// password reset function set up in the application.
@@ -56,7 +56,7 @@ extension UsernamePasswordProviderClient {
     public func callResetPasswordFunction(email: String,
                                           password: String,
                                           args: [AnyBSON],
-                                          _ completion: @escaping UsernamePasswordProviderClientErrorBlock) {
+                                          _ completion: @escaping EmailPasswordAuthOptionalErrorBlock) {
         let bson = ObjectiveCSupport.convert(object: .array(args))
         self.__callResetPasswordFunction(email, password: password, args: bson as! [RLMBSON], completion: completion)
     }
