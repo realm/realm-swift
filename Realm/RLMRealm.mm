@@ -450,7 +450,7 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
     }
 
     {
-        Realm::Config& config = configuration.config;
+        Realm::Config const& config = configuration.config;
 
         // try to reuse existing realm first
         if (cache || dynamic) {
@@ -495,6 +495,11 @@ REALM_NOINLINE static void translateSharedGroupOpenException(NSError **error) {
             if (!config.scheduler->is_on_thread()) {
                 throw RLMException(@"Realm opened from incorrect dispatch queue.");
             }
+        }
+        else {
+            // If the source config was read from a Realm it may already have a
+            // scheduler, and we don't want to reuse it.
+            config.scheduler = nullptr;
         }
         realm->_realm = Realm::get_shared_realm(config);
     }
