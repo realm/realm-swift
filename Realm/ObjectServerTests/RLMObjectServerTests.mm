@@ -247,10 +247,16 @@
     expectation = [self expectationWithDescription:@"should not throw error if device is registered twice"];
     [client registerDeviceForToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
+        if (error) {
+            NSLog(@"Error is: '%@'", error);
+        }
     }];
         
     [client registerDeviceForToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
+        if (error) {
+            NSLog(@"Error is: '%@'", error);
+        }
         [expectation fulfill];
     }];
     
