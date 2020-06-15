@@ -52,7 +52,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMRealm+Sync.h',
                               'include/**/RLMRealmConfiguration+Sync.h',
                               'include/**/RLMSyncConfiguration.h',
-                              'include/**/RLMSyncCredentials.h',
+                              'include/**/RLMCredentials.h',
                               'include/**/RLMSyncManager.h',
                               'include/**/RLMSyncSession.h',
                               'include/**/RLMUser.h',
