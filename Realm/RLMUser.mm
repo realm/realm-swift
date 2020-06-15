@@ -43,14 +43,14 @@
 
 using namespace realm;
 
-@interface RLMSyncUserInfo ()
+@interface RLMUserInfo ()
 
 @property (nonatomic, readwrite) NSArray *accounts;
 @property (nonatomic, readwrite) NSDictionary *metadata;
 @property (nonatomic, readwrite) NSString *identity;
 @property (nonatomic, readwrite) BOOL isAdmin;
 
-+ (instancetype)syncUserInfoWithModel:(RLMUserResponseModel *)model;
++ (instancetype)userInfoWithModel:(RLMUserResponseModel *)model;
 
 @end
 
@@ -142,31 +142,31 @@ using namespace realm;
     return @(_user->identity().c_str());
 }
 
-- (NSArray<RLMSyncUserIdentity *> *)identities {
+- (NSArray<RLMUserIdentity *> *)identities {
     if (!_user) {
         return @[];
     }
-    NSMutableArray<RLMSyncUserIdentity *> *buffer = [NSMutableArray array];
+    NSMutableArray<RLMUserIdentity *> *buffer = [NSMutableArray array];
     auto identities = _user->identities();
     for (auto& identity : identities) {
-        [buffer addObject: [[RLMSyncUserIdentity alloc] initSyncUserIdentityWithProviderType:@(identity.provider_type.c_str())
-                                                                                    identity:@(identity.id.c_str())]];
+        [buffer addObject: [[RLMUserIdentity alloc] initUserIdentityWithProviderType:@(identity.provider_type.c_str())
+                                                                            identity:@(identity.id.c_str())]];
     }
 
     return [buffer copy];
 }
 
-- (RLMSyncUserState)state {
+- (RLMUserState)state {
     if (!_user) {
-        return RLMSyncUserStateRemoved;
+        return RLMUserStateRemoved;
     }
     switch (_user->state()) {
         case SyncUser::State::LoggedIn:
-            return RLMSyncUserStateLoggedIn;
+            return RLMUserStateLoggedIn;
         case SyncUser::State::LoggedOut:
-            return RLMSyncUserStateLoggedOut;
+            return RLMUserStateLoggedOut;
         case SyncUser::State::Removed:
-            return RLMSyncUserStateRemoved;
+            return RLMUserStateRemoved;
     }
 }
 
@@ -200,12 +200,6 @@ using namespace realm;
 
 - (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
     _app._realmApp->log_out(^(realm::util::Optional<app::AppError> error) {
-        [self handleResponse:error completion:completion];
-    });
-}
-
-- (void)logOut:(RLMUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app._realmApp->log_out(syncUser._syncUser, ^(realm::util::Optional<app::AppError> error) {
         [self handleResponse:error completion:completion];
     });
 }
@@ -283,16 +277,16 @@ using namespace realm;
 
 @end
 
-#pragma mark - RLMSyncUserInfo
+#pragma mark - RLMUserInfo
 
-@implementation RLMSyncUserInfo
+@implementation RLMUserInfo
 
 - (instancetype)initPrivate {
     return [super init];
 }
 
-+ (instancetype)syncUserInfoWithModel:(RLMUserResponseModel *)model {
-    RLMSyncUserInfo *info = [[RLMSyncUserInfo alloc] initPrivate];
++ (instancetype)userInfoWithModel:(RLMUserResponseModel *)model {
+    RLMUserInfo *info = [[RLMUserInfo alloc] initPrivate];
     info.accounts = model.accounts;
     info.metadata = model.metadata;
     info.isAdmin = model.isAdmin;
@@ -302,12 +296,12 @@ using namespace realm;
 
 @end
 
-#pragma mark - RLMSyncUserIdentity
+#pragma mark - RLMUserIdentity
 
-@implementation RLMSyncUserIdentity
+@implementation RLMUserIdentity
 
-- (instancetype)initSyncUserIdentityWithProviderType:(NSString *)providerType
-                                            identity:(NSString *)identity {
+- (instancetype)initUserIdentityWithProviderType:(NSString *)providerType
+                                        identity:(NSString *)identity {
     if (self = [super init]) {
         _providerType = providerType;
         _identity = identity;

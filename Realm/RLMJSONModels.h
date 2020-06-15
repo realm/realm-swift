@@ -22,7 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMTokenDataModel, RLMSyncUserAccountInfo;
+@class RLMTokenDataModel, RLMUserAccountInfo;
 
 #pragma mark - RLMTokenModel
 
@@ -79,7 +79,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMUserResponseModel : NSObject RLM_SYNC_UNINITIALIZABLE
 
 @property (nonatomic, readonly) NSString *identity;
-@property (nonatomic, readonly) NSArray<RLMSyncUserAccountInfo *> *accounts;
+@property (nonatomic, readonly) NSArray<RLMUserAccountInfo *> *accounts;
 @property (nonatomic, readonly) NSDictionary *metadata;
 @property (nonatomic, readonly) BOOL isAdmin;
 

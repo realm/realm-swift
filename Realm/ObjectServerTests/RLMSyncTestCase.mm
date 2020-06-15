@@ -492,7 +492,7 @@ static NSURL *syncDirectoryForChildProcess() {
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
-    XCTAssertTrue(theUser.state == RLMSyncUserStateLoggedIn, @"User should have been valid, but wasn't");
+    XCTAssertTrue(theUser.state == RLMUserStateLoggedIn, @"User should have been valid, but wasn't");
     return theUser;
 }
 
@@ -503,7 +503,7 @@ static NSURL *syncDirectoryForChildProcess() {
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
-    XCTAssertTrue(user.state == RLMSyncUserStateLoggedOut, @"User should have been logged out, but wasn't");
+    XCTAssertTrue(user.state == RLMUserStateLoggedOut, @"User should have been logged out, but wasn't");
 }
 
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm {

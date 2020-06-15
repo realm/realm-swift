@@ -43,7 +43,7 @@
         @throw RLMException(@"Cannot set `syncConfiguration` when `shouldCompactOnLaunch` is set.");
     }
     RLMUser *user = syncConfiguration.user;
-    if (user.state == RLMSyncUserStateRemoved) {
+    if (user.state == RLMUserStateRemoved) {
         @throw RLMException(@"Cannot set a sync configuration which has an errored-out user.");
     }
 

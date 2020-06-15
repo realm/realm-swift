@@ -21,19 +21,19 @@
 #import <Realm/RLMCredentials.h>
 #import <Realm/RLMRealmConfiguration.h>
 
-@class RLMUser, RLMSyncUserInfo, RLMSyncSession, RLMRealm, RLMSyncUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection;
+@class RLMUser, RLMUserInfo, RLMSyncSession, RLMRealm, RLMUserIdentity, RLMAPIKeyAuth, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection;
 @protocol RLMBSON;
 
 /**
  The state of the user object.
  */
-typedef NS_ENUM(NSUInteger, RLMSyncUserState) {
+typedef NS_ENUM(NSUInteger, RLMUserState) {
     /// The user is logged out. Call `logInWithCredentials:...` with valid credentials to log the user back in.
-    RLMSyncUserStateLoggedOut,
+    RLMUserStateLoggedOut,
     /// The user is logged in, and any Realms associated with it are syncing with MongoDB Realm.
-    RLMSyncUserStateLoggedIn,
+    RLMUserStateLoggedIn,
     /// The user has been removed, and cannot be used.
-    RLMSyncUserStateRemoved,
+    RLMUserStateRemoved,
 };
 
 /// A block type used to report an error related to a specific user.
@@ -73,7 +73,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
     Returns an array of identities currently linked to a user.
 */
-- (NSArray<RLMSyncUserIdentity *> *)identities;
+- (NSArray<RLMUserIdentity *> *)identities;
 
 /**
  The user's refresh token used to access the Realm Applcation.
@@ -95,7 +95,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  The current state of the user.
  */
-@property (nonatomic, readonly) RLMSyncUserState state;
+@property (nonatomic, readonly) RLMUserState state;
 
 #pragma mark - Lifecycle
 
@@ -202,9 +202,9 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  A data object representing a user account associated with a user.
 
- @see `RLMSyncUserInfo`
+ @see `RLMUserInfo`
  */
-@interface RLMSyncUserAccountInfo : NSObject
+@interface RLMUserAccountInfo : NSObject
 
 /// The authentication provider which manages this user account.
 @property (nonatomic, readonly) RLMIdentityProvider provider;
@@ -222,12 +222,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  A data object representing information about a user that was retrieved from a user lookup call.
  */
-@interface RLMSyncUserInfo : NSObject
+@interface RLMUserInfo : NSObject
 
 /**
  An array of all the user accounts associated with this user.
  */
-@property (nonatomic, readonly) NSArray<RLMSyncUserAccountInfo *> *accounts;
+@property (nonatomic, readonly) NSArray<RLMUserAccountInfo *> *accounts;
 
 /**
  The identity issued to this user by MongoDB Realm.
@@ -247,7 +247,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 /// An identity of a user. A user can have multiple identities, usually associated with multiple providers.
-@interface RLMSyncUserIdentity : NSObject
+@interface RLMUserIdentity : NSObject
 
 /**
  The associated provider type of the identity
@@ -264,8 +264,8 @@ NS_ASSUME_NONNULL_BEGIN
  @param providerType the provider type of the user
  @param identity the identity of the user
  */
-- (instancetype)initSyncUserIdentityWithProviderType:(NSString *)providerType
-                                            identity:(NSString *)identity;
+- (instancetype)initUserIdentityWithProviderType:(NSString *)providerType
+                                        identity:(NSString *)identity;
 
 @end
 

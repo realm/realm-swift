@@ -121,7 +121,7 @@
 
         [syncUser logOutWithCompletion:^(NSError * _Nullable error) {
             XCTAssert(!error);
-            XCTAssert(syncUser.state == RLMSyncUserStateRemoved);
+            XCTAssert(syncUser.state == RLMUserStateRemoved);
             [expectation fulfill];
         }];
     }];
@@ -140,7 +140,7 @@
 
         [syncUser logOutWithCompletion:^(NSError * _Nullable) {
             XCTAssert(!error);
-            XCTAssert(syncUser.state == RLMSyncUserStateRemoved);
+            XCTAssert(syncUser.state == RLMUserStateRemoved);
             [expectation fulfill];
         }];
     }];
