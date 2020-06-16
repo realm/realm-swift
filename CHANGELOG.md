@@ -6,29 +6,39 @@
 
 * The following classes & aliases have been renamed:
 
-- Objc: `RLMSyncUser` -> `RLMUser`, Swift: `SyncUser` -> `User`
+`RLMSyncUser` -> `RLMUser`
+`SyncUser` -> `User`
 
-- Objc: `RLMAppCredential` -> `RLMCredential`, Swift: `AppCredential` -> `Credential`
+`RLMAppCredential` -> `RLMCredential`
+`AppCredential` -> `Credential`
 
-- Swift: `RealmApp` -> `App`
+`RealmApp` -> `App`
 
-- Objc: `RLMUserAPIKeyProviderClient` -> `RLMAPIKeyAuth`, Swift: `UserAPIKeyProviderClient` -> `APIKeyAuth`
+`RLMUserAPIKeyProviderClient` -> `RLMAPIKeyAuth`
+`UserAPIKeyProviderClient` -> `APIKeyAuth`
 
-- Objc: `RLMUsernamePasswordProviderClient` -> `RLMEmailPasswordAuth`, Swift: `UsernamePasswordProviderClient` -> `EmailPasswordAuth`
+`RLMUsernamePasswordProviderClient` -> `RLMEmailPasswordAuth`
+`UsernamePasswordProviderClient` -> `EmailPasswordAuth`
 
 * The following functionality has also moved to the User
 
-- Objc: `[RLMApp callFunctionNamed:]` -> `[RLMUser callFunctionNamed:]`, Swift: `App.functions` -> `User.functions`
+`[RLMApp callFunctionNamed:]` -> `[RLMUser callFunctionNamed:]`
+`App.functions` -> `User.functions`
 
-- Objc: `[RLMApp mongoClientWithServiceName:]` - > `[RLMUser mongoClientWithServiceName:]`, Swift: `App.mongoClient(serviceName)` -> `User.mongoClient(serviceName)`
+`[RLMApp mongoClientWithServiceName:]` - > `[RLMUser mongoClientWithServiceName:]`
+`App.mongoClient(serviceName)` -> `User.mongoClient(serviceName)`
 
-- Objc: `[RLMApp userAPIKeyProviderClient]` -> `[RLMUser apiKeyAuth]`, Swift: `App.userAPIKeyProviderClient` -> `App.apiKeyAuth()`
+`[RLMApp userAPIKeyProviderClient]` -> `[RLMUser apiKeyAuth]`
+`App.userAPIKeyProviderClient` -> `App.apiKeyAuth()`
 
-- Objc: `[RLMApp logOut:]` -> `[RLMUser logOut]`, Swift: `App.logOut(user)` -> `User.logOut()`
+`[RLMApp logOut:]` -> `[RLMUser logOut]`
+`App.logOut(user)` -> `User.logOut()`
 
-- Objc: `[RLMApp removeUser:]` -> `[RLMUser remove]`, Swift: `App.remove(user)` -> `User.remove()`
+`[RLMApp removeUser:]` -> `[RLMUser remove]`
+`App.remove(user)` -> `User.remove()`
 
-- Objc: `[RLMApp linkUser:credentials:]` -> `[RLMUser linkWithCredentials:]`, Swift: `App.linkUser(user, credentials)` -> `User.link(credentials)`
+`[RLMApp linkUser:credentials:]` -> `[RLMUser linkWithCredentials:]`
+`App.linkUser(user, credentials)` -> `User.link(credentials)`
   
 * Other enhancements
 
