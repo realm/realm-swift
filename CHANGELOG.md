@@ -1,40 +1,54 @@
-x.y.z Release notes (yyyy-MM-dd)
+10.0.0-beta.3 Release notes (yyyy-MM-dd)
+
 =============================================================
+
 ### Enhancements
+
 * The following classes & aliases have been renamed:
-- RLMSyncUser -> RLMUser
-- RLMAppCredential -> RLMCredential
-- RealmApp -> App
-- RLMUserAPIKeyProviderClient -> RLMAPIKeyAuth
-- RLMUsernamePasswordProviderClient -> RLMEmailPasswordAuth
+
+- Objc: `RLMSyncUser` -> `RLMUser`, Swift: `SyncUser` -> `User`
+
+- Objc: `RLMAppCredential` -> `RLMCredential`, Swift: `AppCredential` -> `Credential`
+
+- Swift: `RealmApp` -> `App`
+
+- Objc: `RLMUserAPIKeyProviderClient` -> `RLMAPIKeyAuth`, Swift: `UserAPIKeyProviderClient` -> `APIKeyAuth`
+
+- Objc: `RLMUsernamePasswordProviderClient` -> `RLMEmailPasswordAuth`, Swift: `UsernamePasswordProviderClient` -> `EmailPasswordAuth`
 
 * The following functionality has also moved to the User
 
-- callFunctionNamed
-- mongoClientWithServiceName
-- apiKeyAuth (previously userAPIKeyProvider)
-- logOut
-- remove (removeUser)
-- linkWithCredentials
+- Objc: `[RLMApp callFunctionNamed:]` -> `[RLMUser callFunctionNamed:]`, Swift: `App.functions` -> `User.functions`
 
+- Objc: `[RLMApp mongoClientWithServiceName:]` - > `[RLMUser mongoClientWithServiceName:]`, Swift: `App.mongoClient(serviceName)` -> `User.mongoClient(serviceName)`
+
+- Objc: `[RLMApp userAPIKeyProviderClient]` -> `[RLMUser apiKeyAuth]`, Swift: `App.userAPIKeyProviderClient` -> `App.apiKeyAuth()`
+
+- Objc: `[RLMApp logOut:]` -> `[RLMUser logOut]`, Swift: `App.logOut(user)` -> `User.logOut()`
+
+- Objc: `[RLMApp removeUser:]` -> `[RLMUser remove]`, Swift: `App.remove(user)` -> `User.remove()`
+
+- Objc: `[RLMApp linkUser:credentials:]` -> `[RLMUser linkWithCredentials:]`, Swift: `App.linkUser(user, credentials)` -> `User.link(credentials)`
+  
 * Other enhancements
-- refreshCustomData on User now returns the custom data on success.
+
+-  `refreshCustomData()` on User now returns the custom data on success.
+
+The purpose of these changes is to align Cocoa with the other Realm SDK's
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * None.
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+* This release introduces breaking changes w.r.t some sync classes and MongoDB Realm Cloud functionality. 
+(See enchancements for full list)
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* None
 
 10.0.0-beta.2 Release notes (2020-06-09)
 =============================================================
