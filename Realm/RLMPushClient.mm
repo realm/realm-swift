@@ -44,8 +44,8 @@
 }
 
 
-- (void)deregisterDeviceForToken:(NSString *)token syncUser:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    self->_pushClient->deregister_device(token.UTF8String, syncUser._syncUser, ^(util::Optional<app::AppError> error) {
+- (void)deregisterDevice:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
+    self->_pushClient->deregister_device(syncUser._syncUser, ^(util::Optional<app::AppError> error) {
         if (error && error->error_code) {
             return completion(RLMAppErrorToNSError(*error));
         }

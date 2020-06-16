@@ -37,8 +37,7 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
                      completion:(RLMOptionalErrorBlock)completion;
 
 /// Request to deregister token string with server
-- (void)deregisterDeviceForToken:(NSString *)token
-                         syncUser:(RLMSyncUser *)syncUser
+- (void)deregisterDevice:(RLMSyncUser *)syncUser
                        completion:(RLMOptionalErrorBlock)completion;
 
 @end

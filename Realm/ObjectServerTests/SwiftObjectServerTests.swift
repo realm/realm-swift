@@ -1020,7 +1020,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [registerDeviceEx], timeout: 4.0)
 
         let dergisterDeviceEx = expectation(description: "Deregister Device")
-        client.deregisterDevice(forToken: "some-token", syncUser: app.currentUser()!, completion: { error in
+        client.deregisterDevice(app.currentUser()!, completion: { error in
             XCTAssert(!(error != nil))
             dergisterDeviceEx.fulfill()
         })

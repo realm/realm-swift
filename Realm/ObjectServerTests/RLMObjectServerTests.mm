@@ -222,7 +222,7 @@
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
     
     expectation = [self expectationWithDescription:@"should deregister device"];
-    [client deregisterDeviceForToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client deregisterDevice:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
         [expectation fulfill];
     }];
