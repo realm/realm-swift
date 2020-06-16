@@ -1,7 +1,24 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* The following classes & aliases have been renamed:
+- RLMSyncUser -> RLMUser
+- RLMAppCredential -> RLMCredential
+- RealmApp -> App
+- RLMUserAPIKeyProviderClient -> RLMAPIKeyAuth
+- RLMUsernamePasswordProviderClient -> RLMEmailPasswordAuth
+
+* The following functionality has also moved to the User
+
+- callFunctionNamed
+- mongoClientWithServiceName
+- apiKeyAuth (previously userAPIKeyProvider)
+- logOut
+- remove (removeUser)
+- linkWithCredentials
+
+* Other enhancements
+- refreshCustomData on User now returns the custom data on success.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
