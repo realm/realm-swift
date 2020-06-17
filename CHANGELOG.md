@@ -1,64 +1,58 @@
-10.0.0-beta.3 Release notes (yyyy-MM-dd)
+x.y.z Release notes (yyyy-MM-dd)
 
 =============================================================
 
-### Enhancements
+### Breaking Changes
 
 * The following classes & aliases have been renamed:
 
-`RLMSyncUser` -> `RLMUser`
-`SyncUser` -> `User`
+* `RLMSyncUser` -> `RLMUser`,
+  Swift: `SyncUser` -> `User`
 
-`RLMAppCredential` -> `RLMCredential`
-`AppCredential` -> `Credential`
+* `RLMAppCredential` -> `RLMCredential`,
+  Swift: `AppCredential` -> `Credential`
 
-`RealmApp` -> `App`
+* `RealmApp` -> `App`
 
-`RLMUserAPIKeyProviderClient` -> `RLMAPIKeyAuth`
-`UserAPIKeyProviderClient` -> `APIKeyAuth`
+* `RLMUserAPIKeyProviderClient` -> `RLMAPIKeyAuth`,
+  Swift: `UserAPIKeyProviderClient` -> `APIKeyAuth`
 
-`RLMUsernamePasswordProviderClient` -> `RLMEmailPasswordAuth`
-`UsernamePasswordProviderClient` -> `EmailPasswordAuth`
+* `RLMUsernamePasswordProviderClient` -> `RLMEmailPasswordAuth`,
+  Swift: `UsernamePasswordProviderClient` -> `EmailPasswordAuth`
 
 * The following functionality has also moved to the User
 
-`[RLMApp callFunctionNamed:]` -> `[RLMUser callFunctionNamed:]`
-`App.functions` -> `User.functions`
+* `[RLMApp callFunctionNamed:]` -> `[RLMUser callFunctionNamed:]`,
+  Swift: `App.functions` -> `User.functions`
 
-`[RLMApp mongoClientWithServiceName:]` - > `[RLMUser mongoClientWithServiceName:]`
-`App.mongoClient(serviceName)` -> `User.mongoClient(serviceName)`
+* `[RLMApp mongoClientWithServiceName:]` - > `[RLMUser mongoClientWithServiceName:]`,
+  Swift: `App.mongoClient(serviceName)` -> `User.mongoClient(serviceName)`
 
-`[RLMApp userAPIKeyProviderClient]` -> `[RLMUser apiKeyAuth]`
-`App.userAPIKeyProviderClient` -> `App.apiKeyAuth()`
+* `[RLMApp userAPIKeyProviderClient]` -> `[RLMUser apiKeyAuth]`,
+  Swift: `App.userAPIKeyProviderClient` -> `App.apiKeyAuth()`
 
-`[RLMApp logOut:]` -> `[RLMUser logOut]`
-`App.logOut(user)` -> `User.logOut()`
+* `[RLMApp logOut:]` -> `[RLMUser logOut]`,
+  Swift: `App.logOut(user)` -> `User.logOut()`
 
-`[RLMApp removeUser:]` -> `[RLMUser remove]`
-`App.remove(user)` -> `User.remove()`
+* `[RLMApp removeUser:]` -> `[RLMUser remove]`,
+  Swift: `App.remove(user)` -> `User.remove()`
 
-`[RLMApp linkUser:credentials:]` -> `[RLMUser linkWithCredentials:]`
-`App.linkUser(user, credentials)` -> `User.link(credentials)`
+* `[RLMApp linkUser:credentials:]` -> `[RLMUser linkWithCredentials:]`,
+  Swift: `App.linkUser(user, credentials)` -> `User.link(credentials)`
   
-* Other enhancements
+* Other breaking changes
 
--  `refreshCustomData()` on User now returns the custom data on success.
+-  `refreshCustomData()` on User now returns void and passes the custom data to the callback on success.
 
-The purpose of these changes is to align Cocoa with the other Realm SDK's
-
-### Fixed
-* None.
+* The purpose of these changes is to align Cocoa with the other Realm SDKs
 
 ### Compatibility
 * This release introduces breaking changes w.r.t some sync classes and MongoDB Realm Cloud functionality. 
-(See enchancements for full list)
+(See the breaking changes section for the full list)
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.5.
-
-### Internal
-* None
 
 10.0.0-beta.2 Release notes (2020-06-09)
 =============================================================
