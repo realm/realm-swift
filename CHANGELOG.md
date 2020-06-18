@@ -6,39 +6,34 @@ x.y.z Release notes (yyyy-MM-dd)
 
 * The following classes & aliases have been renamed:
 
-* `RLMSyncUser` -> `RLMUser`,
-  Swift: `SyncUser` -> `User`
-
-* `RLMAppCredential` -> `RLMCredential`,
-  Swift: `AppCredential` -> `Credential`
-
-* `RealmApp` -> `App`
-
-* `RLMUserAPIKeyProviderClient` -> `RLMAPIKeyAuth`,
-  Swift: `UserAPIKeyProviderClient` -> `APIKeyAuth`
-
-* `RLMUsernamePasswordProviderClient` -> `RLMEmailPasswordAuth`,
-  Swift: `UsernamePasswordProviderClient` -> `EmailPasswordAuth`
+| Old API                                                     | New API                                                        |
+|:------------------------------------------------------------|:---------------------------------------------------------------|
+| `RLMSyncUser`                                               | `RLMUser`                                                      |
+| `SyncUser`                                                  | `User`                                                         |
+| `RLMAppCredential`                                          | `RLMCredential`                                                |
+| `AppCredential`                                             | `Credential`                                                   |
+| `RealmApp`                                                  | `App`                                                          |
+| `RLMUserAPIKeyProviderClient`                               | `RLMAPIKeyAuth`                                                |
+| `RLMUsernamePasswordProviderClient`                         | `RLMEmailPasswordAuth`                                         |
+| `UsernamePasswordProviderClient`                            | `EmailPasswordAuth`                                            |
+| `UserAPIKeyProviderClient`                                  | `APIKeyAuth`                                                   |
 
 * The following functionality has also moved to the User
 
-* `[RLMApp callFunctionNamed:]` -> `[RLMUser callFunctionNamed:]`,
-  Swift: `App.functions` -> `User.functions`
-
-* `[RLMApp mongoClientWithServiceName:]` - > `[RLMUser mongoClientWithServiceName:]`,
-  Swift: `App.mongoClient(serviceName)` -> `User.mongoClient(serviceName)`
-
-* `[RLMApp userAPIKeyProviderClient]` -> `[RLMUser apiKeyAuth]`,
-  Swift: `App.userAPIKeyProviderClient` -> `App.apiKeyAuth()`
-
-* `[RLMApp logOut:]` -> `[RLMUser logOut]`,
-  Swift: `App.logOut(user)` -> `User.logOut()`
-
-* `[RLMApp removeUser:]` -> `[RLMUser remove]`,
-  Swift: `App.remove(user)` -> `User.remove()`
-
-* `[RLMApp linkUser:credentials:]` -> `[RLMUser linkWithCredentials:]`,
-  Swift: `App.linkUser(user, credentials)` -> `User.link(credentials)`
+| Old API                                                      | New API                                                       |
+|:-------------------------------------------------------------|:--------------------------------------------------------------|
+| `[RLMApp callFunctionNamed:]`                                | `[RLMUser callFunctionNamed:]`                                |
+| `App.functions`                                              | `User.functions`                                              |
+| `[RLMApp mongoClientWithServiceName:]`                       | `[RLMUser mongoClientWithServiceName:]`                       |
+| `App.mongoClient(serviceName)`                               | `User.mongoClient(serviceName)`                               |
+| `[RLMApp userAPIKeyProviderClient]`                          | `[RLMUser apiKeyAuth]`                                        |
+| `App.userAPIKeyProviderClient`                               | `App.apiKeyAuth()`                                            |
+| `[RLMApp logOut:]`                                           | `[RLMUser logOut]`                                            |
+| `App.logOut(user)`                                           | `User.logOut()`                                               |
+| `[RLMApp removeUser:]`                                       | `[RLMUser remove]`                                            |
+| `App.remove(user)`                                           | `User.remove()`                                               |
+| `[RLMApp linkUser:credentials:]`                             | `[RLMUser linkWithCredentials:]`                              |
+| `App.linkUser(user, credentials)`                            | `User.link(credentials)`                                      |
   
 * Other breaking changes
 
