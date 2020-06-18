@@ -209,24 +209,21 @@
         syncUser = user;
         [expectation fulfill];
     }];
-    
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
-    
+
     RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
     expectation = [self expectationWithDescription:@"should register device"];
-    [client registerDeviceForToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
         [expectation fulfill];
     }];
-    
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
-    
+
     expectation = [self expectationWithDescription:@"should deregister device"];
-    [client deregisterDevice:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client deregisterDeviceForUser:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
         [expectation fulfill];
     }];
-    
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 }
 
@@ -243,22 +240,19 @@
         syncUser = user;
         [loginExpectation fulfill];
     }];
-    
     [self waitForExpectations:@[loginExpectation] timeout:10.0];
     
     RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
-    [client registerDeviceForToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
         [registerExpectation fulfill];
     }];
-    
     [self waitForExpectations:@[registerExpectation] timeout:10.0];
         
-    [client registerDeviceForToken:@"token" syncUser:[app currentUser] completion:^(NSError * _Nullable error) {
+    [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssert(!error);
         [secondRegisterExpectation fulfill];
     }];
-    
     [self waitForExpectations:@[secondRegisterExpectation] timeout:10.0];
 }
 

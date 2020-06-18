@@ -1002,29 +1002,29 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [registerUserEx], timeout: 4.0)
 
-        let loginEx = expectation(description: "Login user")
+        let loginExpectation = expectation(description: "Login user")
 
         let credentials = AppCredentials(username: email, password: password)
         app.login(withCredential: credentials) { (_, error) in
             XCTAssertNil(error)
-            loginEx.fulfill()
+            loginExpectation.fulfill()
         }
-        wait(for: [loginEx], timeout: 4.0)
+        wait(for: [loginExpectation], timeout: 4.0)
 
-        let registerDeviceEx = expectation(description: "Register Device")
+        let registerDeviceExpectation = expectation(description: "Register Device")
         let client = app.pushClient(withServiceName: "gcm")
-        client.registerDevice(forToken: "some-token", syncUser: app.currentUser()!) { error in
-            XCTAssert(!(error != nil))
-            registerDeviceEx.fulfill()
+        client.registerDevice(token: "some-token", user: app.currentUser()!) { error in
+            XCTAssertNil(error)
+            registerDeviceExpectation.fulfill()
         }
-        wait(for: [registerDeviceEx], timeout: 4.0)
+        wait(for: [registerDeviceExpectation], timeout: 4.0)
 
-        let dergisterDeviceEx = expectation(description: "Deregister Device")
-        client.deregisterDevice(app.currentUser()!, completion: { error in
-            XCTAssert(!(error != nil))
-            dergisterDeviceEx.fulfill()
+        let dergisterDeviceExpectation = expectation(description: "Deregister Device")
+        client.deregisterDevice(user: app.currentUser()!, completion: { error in
+            XCTAssertNil(error)
+            dergisterDeviceExpectation.fulfill()
         })
-        wait(for: [dergisterDeviceEx], timeout: 4.0)
+        wait(for: [dergisterDeviceExpectation], timeout: 4.0)
     }
 
     func testCustomUserData() {

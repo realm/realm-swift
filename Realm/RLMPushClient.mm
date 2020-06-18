@@ -34,8 +34,8 @@
     return nil;
 }
 
-- (void)registerDeviceForToken:(NSString *)token syncUser:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    self->_pushClient->register_device(token.UTF8String, syncUser._syncUser, ^(util::Optional<app::AppError> error) {
+- (void)registerDeviceWithToken:(NSString *)token user:(RLMSyncUser *)user completion:(RLMOptionalErrorBlock)completion {
+    self->_pushClient->register_device(token.UTF8String, user._syncUser, ^(util::Optional<app::AppError> error) {
         if (error && error->error_code) {
             return completion(RLMAppErrorToNSError(*error));
         }
@@ -44,8 +44,8 @@
 }
 
 
-- (void)deregisterDevice:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    self->_pushClient->deregister_device(syncUser._syncUser, ^(util::Optional<app::AppError> error) {
+- (void)deregisterDeviceForUser:(RLMSyncUser *)user completion:(RLMOptionalErrorBlock)completion {
+    self->_pushClient->deregister_device(user._syncUser, ^(util::Optional<app::AppError> error) {
         if (error && error->error_code) {
             return completion(RLMAppErrorToNSError(*error));
         }
