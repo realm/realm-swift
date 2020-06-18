@@ -39,7 +39,6 @@ x.y.z Release notes (yyyy-MM-dd)
 
 -  `refreshCustomData()` on User now returns void and passes the custom data to the callback on success.
 
-* The purpose of these changes is to align Cocoa with the other Realm SDKs
 
 ### Compatibility
 * This release introduces breaking changes w.r.t some sync classes and MongoDB Realm Cloud functionality. 
