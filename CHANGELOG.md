@@ -4,7 +4,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Breaking Changes
 
-* The following classes & aliases have been renamed:
+* The following classes & aliases have been renamed to align Cocoa with the other Realm SDKs:
 
 | Old API                                                     | New API                                                        |
 |:------------------------------------------------------------|:---------------------------------------------------------------|
