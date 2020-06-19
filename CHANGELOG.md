@@ -3,6 +3,8 @@ x.y.z Release notes (yyyy-MM-dd)
 ### Breaking Changes
 * The following classes & aliases have been renamed:
 
+* The following classes & aliases have been renamed to align Cocoa with the other Realm SDKs:
+
 | Old API                                                     | New API                                                        |
 |:------------------------------------------------------------|:---------------------------------------------------------------|
 | `RLMSyncUser`                                               | `RLMUser`                                                      |
@@ -34,7 +36,6 @@ x.y.z Release notes (yyyy-MM-dd)
 
 -  `refreshCustomData()` on User now returns void and passes the custom data to the callback on success.
 
-* The purpose of these changes is to align Cocoa with the other Realm SDKs
 
 ### Compatibility
 * This release introduces breaking changes w.r.t some sync classes and MongoDB Realm Cloud functionality. 
