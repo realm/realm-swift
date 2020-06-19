@@ -1,9 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
-
 =============================================================
-
 ### Breaking Changes
-
 * The following classes & aliases have been renamed:
 
 | Old API                                                     | New API                                                        |
@@ -34,8 +31,6 @@ x.y.z Release notes (yyyy-MM-dd)
 | `App.remove(user)`                                           | `User.remove()`                                               |
 | `[RLMApp linkUser:credentials:]`                             | `[RLMUser linkWithCredentials:]`                              |
 | `App.linkUser(user, credentials)`                            | `User.link(credentials)`                                      |
-  
-* Other breaking changes
 
 -  `refreshCustomData()` on User now returns void and passes the custom data to the callback on success.
 
@@ -46,8 +41,11 @@ x.y.z Release notes (yyyy-MM-dd)
 (See the breaking changes section for the full list)
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.5.
+
+### Internal
+* Upgraded realm-core from ? to ?
+* Upgraded realm-sync from ? to ?
 
 10.0.0-beta.2 Release notes (2020-06-09)
 =============================================================
