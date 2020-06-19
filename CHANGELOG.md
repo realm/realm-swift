@@ -1,8 +1,6 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Breaking Changes
-* The following classes & aliases have been renamed:
-
 * The following classes & aliases have been renamed to align Cocoa with the other Realm SDKs:
 
 | Old API                                                     | New API                                                        |
@@ -35,7 +33,6 @@ x.y.z Release notes (yyyy-MM-dd)
 | `App.linkUser(user, credentials)`                            | `User.link(credentials)`                                      |
 
 -  `refreshCustomData()` on User now returns void and passes the custom data to the callback on success.
-
 
 ### Compatibility
 * This release introduces breaking changes w.r.t some sync classes and MongoDB Realm Cloud functionality. 
