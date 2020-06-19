@@ -555,6 +555,36 @@ static NSURL *makeTildeSubstitutedURL(NSURL *url, RLMSyncUser *user) {
     REVOKE_PERMISSION(p, admin);
 }
 
+- (void)testReadAccessWithClassSuperset {
+    NSString *testName = NSStringFromSelector(_cmd);
+
+    // Create a Realm with only a single object type
+    NSURL *userAURL = makeTestURL(testName, nil);
+    RLMRealmConfiguration *userAConfig = [self.userA configurationWithURL:userAURL fullSynchronization:YES];
+    userAConfig.objectClasses = @[SyncObject.self];
+    RLMRealm *userARealm = [self asyncOpenRealmWithConfiguration:userAConfig];
+    [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-1", @"child-2", @"child-3"]];
+    [self waitForUploadsForRealm:userARealm];
+    CHECK_COUNT(3, SyncObject, userARealm);
+
+    // Give user B read-only permissions to that Realm so that it can't add new object types
+    RLMSyncPermission *p = [[RLMSyncPermission alloc] initWithRealmPath:[userAURL path]
+                                                               identity:self.userB.identity
+                                                            accessLevel:RLMSyncAccessLevelRead];
+    APPLY_PERMISSION(p, self.userA);
+
+    // Open the same Realm s user B without limiting the set of object classes
+    NSURL *userBURL = makeTestURL(testName, self.userA);
+    RLMRealmConfiguration *userBConfig = [self.userB configurationWithURL:userBURL fullSynchronization:YES];
+    userBConfig.readOnly = YES;
+    RLMRealm *userBRealm = [self asyncOpenRealmWithConfiguration:userBConfig];
+    CHECK_COUNT(3, SyncObject, userBRealm);
+
+    // Verify that syncing is actually working and new objects written by A show up in B's Realm
+    [self addSyncObjectsToRealm:userARealm descriptions:@[@"child-4"]];
+    CHECK_COUNT_PENDING_DOWNLOAD(4, SyncObject, userBRealm);
+}
+
 #pragma mark - Permission change API
 
 /// Setting a permission should work, and then that permission should be able to be retrieved.

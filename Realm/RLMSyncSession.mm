@@ -231,6 +231,21 @@ static RLMSyncConnectionState convertConnectionState(SyncSession::ConnectionStat
     return nil;
 }
 
+- (NSString *)description {
+    return [NSString stringWithFormat:
+            @"<RLMSyncSession: %p> {\n"
+            "\tstate = %d;\n"
+            "\tconnectionState = %d;\n"
+            "\trealmURL = %@;\n"
+            "\tuser = %@;\n"
+            "}",
+            (__bridge void *)self,
+            static_cast<int>(self.state),
+            static_cast<int>(self.connectionState),
+            self.realmURL,
+            self.parentUser.identity];
+}
+
 @end
 
 // MARK: - Error action token

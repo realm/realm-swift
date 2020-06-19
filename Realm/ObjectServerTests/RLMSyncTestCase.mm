@@ -349,6 +349,37 @@ static NSURL *syncDirectoryForChildProcess() {
               @"Timed out while trying to asynchronously open Realm for URL: %@", syncConfig.realmURL);
     return realm;
 }
+
+- (RLMRealm *)asyncOpenRealmWithConfiguration:(RLMRealmConfiguration *)config {
+    __block RLMRealm *realm = nil;
+    XCTestExpectation *ex = [self expectationWithDescription:@"Should asynchronously open a Realm"];
+    [RLMRealm asyncOpenWithConfiguration:config
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *r, NSError *err){
+        XCTAssertNil(err);
+        XCTAssertNotNil(r);
+        realm = r;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    return realm;
+}
+
+- (NSError *)asyncOpenErrorWithConfiguration:(RLMRealmConfiguration *)config {
+    __block NSError *error = nil;
+    XCTestExpectation *ex = [self expectationWithDescription:@"Should fail to asynchronously open a Realm"];
+    [RLMRealm asyncOpenWithConfiguration:config
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *r, NSError *err){
+        XCTAssertNotNil(err);
+        XCTAssertNil(r);
+        error = err;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    return error;
+}
+
 - (RLMRealm *)immediatelyOpenRealmForURL:(NSURL *)url user:(RLMSyncUser *)user {
     return [self immediatelyOpenRealmForURL:url
                                        user:user
@@ -542,7 +573,20 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)resetSyncManager {
-    [RLMSyncManager.sharedManager._allUsers makeObjectsPerformSelector:@selector(logOut)];
+    NSMutableArray *expectations = [NSMutableArray new];
+    for (RLMSyncUser *user in RLMSyncManager.sharedManager._allUsers) {
+        [user logOut];
+        // Sessions are removed from the user asynchronously after a logout.
+        // We need to wait for this to happen before calling resetForTesting as
+        // that expects all sessions to be cleaned up first. This doesn't apply
+        // to admin token users, which don't logout at all (and don't have an
+        // auth server).
+        if (user.authenticationServer && user.allSessions.count) {
+            [expectations addObject:[self expectationForPredicate:[NSPredicate predicateWithFormat:@"allSessions.@count == 0"]
+                                              evaluatedWithObject:user handler:nil]];
+        }
+    }
+    [self waitForExpectations:expectations timeout:5.0];
     [RLMSyncManager resetForTesting];
     [RLMSyncSessionRefreshHandle calculateFireDateUsingTestLogic:NO blockOnRefreshCompletion:nil];
 }

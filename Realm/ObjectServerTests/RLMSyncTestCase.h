@@ -58,6 +58,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 - (RLMRealm *)openRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
 
+/// Synchronously open a synced Realm via asyncOpen and return the Realm.
+- (RLMRealm *)asyncOpenRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
+
+/// Synchronously open a synced Realm via asyncOpen and return the expected error.
+- (NSError *)asyncOpenErrorWithConfiguration:(RLMRealmConfiguration *)configuration;
+
 /// Synchronously open a synced Realm. Also run a block right after the Realm is created.
 - (RLMRealm *)openRealmForURL:(NSURL *)url
                          user:(RLMSyncUser *)user
