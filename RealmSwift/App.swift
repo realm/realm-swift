@@ -42,6 +42,7 @@ Realm Cloud user registration & password functions
 - see: `RLMEmailPasswordAuth`
 */
 public typealias EmailPasswordAuth = RLMEmailPasswordAuth
+
 /// A block type used to report an error
 public typealias EmailPasswordAuthOptionalErrorBlock = RLMEmailPasswordAuthOptionalErrorBlock
 extension EmailPasswordAuth {
@@ -61,6 +62,14 @@ extension EmailPasswordAuth {
         self.__callResetPasswordFunction(email, password: password, args: bson as! [RLMBSON], completion: completion)
     }
 }
+
+/**
+An object representing a client which performs network calls on
+Realm Cloud for registering devices to push notifications
+ 
+- see `RLMPushClient`
+ */
+public typealias PushClient = RLMPushClient
 
 /// An object which is used within UserAPIKeyProviderClient
 public typealias UserAPIKey = RLMUserAPIKey
