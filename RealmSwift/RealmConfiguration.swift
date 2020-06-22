@@ -20,14 +20,6 @@ import Foundation
 import Realm
 import Realm.Private
 
-#if !swift(>=4.1)
-fileprivate extension Sequence {
-    func compactMap<T>(_ fn: (Self.Iterator.Element) throws -> T?) rethrows -> [T] {
-        return try flatMap(fn)
-    }
-}
-#endif
-
 extension Realm {
     /**
      A `Configuration` instance describes the different options used to create an instance of a Realm.

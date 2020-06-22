@@ -1,9 +1,9 @@
-xcodeVersions = ['10.3', '11.1', '11.2.1', '11.3', '11.4.1', '11.5']
+xcodeVersions = ['11.3', '11.4.1', '11.5']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']
 carthageXcodeVersion = '11.5'
-objcXcodeVersion = '10.3'
+objcXcodeVersion = '11.3'
 docsSwiftVersion = '5.2.4'
 
 def installationTest(platform, test, language) {
@@ -162,11 +162,6 @@ def doBuild() {
           for (def platform in platforms) {
             unstash "${platform}-${objcXcodeVersion}"
           }
-
-          // The 10.x builds don't actually have a framework for catalyst, so
-          // use the 11.0 version instead
-          unstash 'catalyst-11.1'
-          sh "mv realm-framework-catalyst-11.1.zip realm-framework-catalyst-${objcXcodeVersion}.zip"
 
           unstash 'ios-static'
           unstash 'examples'
