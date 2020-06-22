@@ -22,16 +22,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol RLMNetworkTransport, RLMBSON;
 
-@class RLMSyncUser, RLMAppCredentials, RLMUsernamePasswordProviderClient, RLMUserAPIKeyProviderClient, RLMSyncManager, RLMMongoClient, RLMMongoDatabase, RLMMongoCollection, RLMPushClient;
+@class RLMUser, RLMCredentials, RLMSyncManager, RLMEmailPasswordAuth, RLMPushClient;
 
-/// A block type used for APIs which asynchronously vend an `RLMSyncUser`.
-typedef void(^RLMUserCompletionBlock)(RLMSyncUser * _Nullable, NSError * _Nullable);
+/// A block type used for APIs which asynchronously vend an `RLMUser`.
+typedef void(^RLMUserCompletionBlock)(RLMUser * _Nullable, NSError * _Nullable);
 
 /// A block type used to report an error
 typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
-
-/// A block type for returning from function calls.
-typedef void(^RLMCallFunctionCompletionBlock)(id<RLMBSON> _Nullable, NSError * _Nullable);
 
 #pragma mark RLMAppConfiguration
 
@@ -119,12 +116,20 @@ Create a new Realm App configuration.
 /**
  Get a dictionary containing all users keyed on id.
  */
-- (NSDictionary<NSString *, RLMSyncUser *> *)allUsers;
+- (NSDictionary<NSString *, RLMUser *> *)allUsers;
 
 /**
  Get the current user logged into the Realm app.
  */
-- (nullable RLMSyncUser *)currentUser;
+- (nullable RLMUser *)currentUser;
+
+/**
+  A client for the username/password authentication provider which
+  can be used to obtain a credential for logging in.
+
+  Used to perform requests specifically related to the username/password provider.
+*/
+- (RLMEmailPasswordAuth *)emailPasswordAuth;
 
 /**
  Login to a user for the Realm app.
@@ -132,7 +137,7 @@ Create a new Realm App configuration.
  @param credentials The credentials identifying the user.
  @param completion A callback invoked after completion.
  */
-- (void)loginWithCredential:(RLMAppCredentials *)credentials
+- (void)loginWithCredential:(RLMCredentials *)credentials
                  completion:(RLMUserCompletionBlock)completion;
 
 /**
@@ -144,88 +149,7 @@ Create a new Realm App configuration.
  @param syncUser The user to switch to.
  @returns The user you intend to switch to
  */
-- (RLMSyncUser *)switchToUser:(RLMSyncUser *)syncUser;
-
-/**
- Removes a specified user
- 
- This logs out and destroys the session related to the user. The completion block will return an error
- if the user is not found or is already removed.
-
- @param syncUser The user you would like to remove
- @param completion A callback invoked on completion
-*/
-- (void)removeUser:(RLMSyncUser *)syncUser
-        completion:(RLMOptionalErrorBlock)completion;
-
-/**
- Logs out the current user
- 
- The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
- If the logout request fails, this method will still clear local authentication state.
- 
- @param completion A callback invoked on completion
-*/
-- (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion;
-
-/**
- Logs out a specific user
- 
- The users state will be set to `Removed` is they are an anonymous user or `LoggedOut` if they are authenticated by a username / password or third party auth clients
- If the logout request fails, this method will still clear local authentication state.
- 
- @param syncUser The user to log out
- @param completion A callback invoked on completion
-*/
-- (void)logOut:(RLMSyncUser *)syncUser
-    completion:(RLMOptionalErrorBlock)completion;
-
-/**
- Links the currently authenticated user with a new identity, where the identity is defined by the credential
- specified as a parameter. This will only be successful if this `RLMSyncUser` is the currently authenticated
- with the client from which it was created. On success a new user will be returned with the new linked credentials.
- 
- @param syncUser The user which will have the credentials linked to, the user must be logged in
- @param credentials The `RLMAppCredentials` used to link the user to a new identity.
- @param completion The completion handler to call when the linking is complete.
-                   If the operation is  successful, the result will contain a new
-                   `RLMSyncUser` object representing the currently logged in user.
-*/
-- (void)linkUser:(RLMSyncUser *)syncUser
-     credentials:(RLMAppCredentials *)credentials
-      completion:(RLMUserCompletionBlock)completion;
-
-/**
-  A client for the username/password authentication provider which
-  can be used to obtain a credential for logging in.
- 
-  Used to perform requests specifically related to the username/password provider.
-*/
-- (RLMUsernamePasswordProviderClient *)usernamePasswordProviderClient;
-
-/**
-  A client for the user API key authentication provider which
-  can be used to create and modify user API keys.
- 
-  This client should only be used by an authenticated user.
-*/
-- (RLMUserAPIKeyProviderClient *)userAPIKeyProviderClient;
-
-/// A client for interacting with a remote MongoDB instance
-/// @param serviceName The name of the MongoDB service
-- (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName NS_REFINED_FOR_SWIFT;
-
-/**
- Calls the MongoDB Realm function with the provided name and arguments.
-
- @param name The name of the MongoDB Realm function to be called.
- @param arguments The `BSONArray` of arguments to be provided to the function.
- @param completionBlock The completion handler to call when the function call is complete.
-                        This handler is executed on a non-main global `DispatchQueue`.
-*/
-- (void)callFunctionNamed:(NSString *)name
-                arguments:(NSArray<id<RLMBSON>> *)arguments
-          completionBlock:(RLMCallFunctionCompletionBlock)completionBlock NS_REFINED_FOR_SWIFT;
+- (RLMUser *)switchToUser:(RLMUser *)syncUser;
 
 /**
  A client which can be used to register devices with the server to receive push notificatons

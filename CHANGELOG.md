@@ -1,18 +1,44 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
-### Enhancements
-* None.
+### Breaking Changes
+* The following classes & aliases have been renamed to align Cocoa with the other Realm SDKs:
 
-### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+| Old API                                                     | New API                                                        |
+|:------------------------------------------------------------|:---------------------------------------------------------------|
+| `RLMSyncUser`                                               | `RLMUser`                                                      |
+| `SyncUser`                                                  | `User`                                                         |
+| `RLMAppCredential`                                          | `RLMCredential`                                                |
+| `AppCredential`                                             | `Credential`                                                   |
+| `RealmApp`                                                  | `App`                                                          |
+| `RLMUserAPIKeyProviderClient`                               | `RLMAPIKeyAuth`                                                |
+| `RLMUsernamePasswordProviderClient`                         | `RLMEmailPasswordAuth`                                         |
+| `UsernamePasswordProviderClient`                            | `EmailPasswordAuth`                                            |
+| `UserAPIKeyProviderClient`                                  | `APIKeyAuth`                                                   |
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+* The following functionality has also moved to the User
+
+| Old API                                                      | New API                                                       |
+|:-------------------------------------------------------------|:--------------------------------------------------------------|
+| `[RLMApp callFunctionNamed:]`                                | `[RLMUser callFunctionNamed:]`                                |
+| `App.functions`                                              | `User.functions`                                              |
+| `[RLMApp mongoClientWithServiceName:]`                       | `[RLMUser mongoClientWithServiceName:]`                       |
+| `App.mongoClient(serviceName)`                               | `User.mongoClient(serviceName)`                               |
+| `[RLMApp userAPIKeyProviderClient]`                          | `[RLMUser apiKeyAuth]`                                        |
+| `App.userAPIKeyProviderClient`                               | `App.apiKeyAuth()`                                            |
+| `[RLMApp logOut:]`                                           | `[RLMUser logOut]`                                            |
+| `App.logOut(user)`                                           | `User.logOut()`                                               |
+| `[RLMApp removeUser:]`                                       | `[RLMUser remove]`                                            |
+| `App.remove(user)`                                           | `User.remove()`                                               |
+| `[RLMApp linkUser:credentials:]`                             | `[RLMUser linkWithCredentials:]`                              |
+| `App.linkUser(user, credentials)`                            | `User.link(credentials)`                                      |
+
+-  `refreshCustomData()` on User now returns void and passes the custom data to the callback on success.
 
 ### Compatibility
+* This release introduces breaking changes w.r.t some sync classes and MongoDB Realm Cloud functionality. 
+(See the breaking changes section for the full list)
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
-* APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal

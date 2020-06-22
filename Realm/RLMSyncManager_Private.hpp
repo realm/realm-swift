@@ -28,7 +28,7 @@ class App;
 }
 }
 
-@class RLMAppConfiguration, RLMSyncUser, RLMSyncConfiguration;
+@class RLMAppConfiguration, RLMUser, RLMSyncConfiguration;
 
 // All private API methods are threadsafe and synchronized, unless denoted otherwise. Since they are expected to be
 // called very infrequently, this should pose no issues.

@@ -16,11 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMAppCredentials.h"
-#import "sync/app_credentials.hpp"
+#import <Realm/RLMProviderClient.h>
 
-@interface RLMAppCredentials()
+#import "sync/app.hpp"
 
-@property (nonatomic) realm::app::AppCredentials& appCredentials;
+@interface RLMProviderClient ()
 
+/// A block type used to report an error
+typedef void(^RLMProviderClientOptionalErrorBlock)(NSError * _Nullable);
+
+- (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
+            completion:(nonnull RLMProviderClientOptionalErrorBlock)completion;
 @end

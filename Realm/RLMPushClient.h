@@ -20,7 +20,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@class RLMApp, RLMSyncUser;
+@class RLMApp, RLMUser;
 
 /// A block type used to report an error
 typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
@@ -33,11 +33,11 @@ typedef void(^RLMOptionalErrorBlock)(NSError * _Nullable);
 
 /// Request to register device token to the server
 - (void)registerDeviceWithToken:(NSString *)token
-                           user:(RLMSyncUser *)user
+                           user:(RLMUser *)user
                      completion:(RLMOptionalErrorBlock)completion NS_SWIFT_NAME(registerDevice(token:user:completion:));
 
 /// Request to deregister a device for a user
-- (void)deregisterDeviceForUser:(RLMSyncUser *)user
+- (void)deregisterDeviceForUser:(RLMUser *)user
                      completion:(RLMOptionalErrorBlock)completion NS_SWIFT_NAME(deregisterDevice(user:completion:));
 
 @end

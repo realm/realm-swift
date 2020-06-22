@@ -18,7 +18,7 @@
 
 #import "RLMJSONModels.h"
 #import "RLMSyncUtil_Private.h"
-#import "RLMSyncUser.h"
+#import "RLMUser.h"
 
 #pragma mark - Constants
 
@@ -128,12 +128,12 @@ static const NSString *const kRLMSyncValueKey           = @"value";
 
 #pragma mark - RLMUserInfoResponseModel
 
-@interface RLMSyncUserAccountInfo ()
+@interface RLMUserAccountInfo ()
 @property (nonatomic, readwrite) NSString *provider;
 @property (nonatomic, readwrite) NSString *providerUserIdentity;
 @end
 
-@implementation RLMSyncUserAccountInfo
+@implementation RLMUserAccountInfo
 
 - (instancetype)initWithDictionary:(NSDictionary *)jsonDictionary {
     if (self = [super init]) {
@@ -183,7 +183,7 @@ static const NSString *const kRLMSyncValueKey           = @"value";
         self.isAdmin = NO;
         RLM_SYNC_PARSE_STRING_OR_ABORT(jsonDictionary, kRLMSyncUserIDKey, identity);
         RLM_SYNC_PARSE_OPTIONAL_BOOL(jsonDictionary, kRLMSyncIsAdminKey, isAdmin);
-        RLM_SYNC_PARSE_MODEL_ARRAY_OR_ABORT(jsonDictionary, kRLMSyncAccountsKey, RLMSyncUserAccountInfo, accounts);
+        RLM_SYNC_PARSE_MODEL_ARRAY_OR_ABORT(jsonDictionary, kRLMSyncAccountsKey, RLMUserAccountInfo, accounts);
         [self parseMetadataFromJSON:jsonDictionary];
         return self;
     }

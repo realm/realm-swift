@@ -24,7 +24,7 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncUser_Private.hpp"
+#import "RLMUser_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import "shared_realm.hpp"

@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncUser+ObjectServerTests.h"
+#import "RLMUser+ObjectServerTests.h"
 
 #import "RLMSyncSession_Private.hpp"
 #import "RLMRealmUtil.hpp"
@@ -25,7 +25,7 @@
 
 using namespace realm;
 
-@implementation RLMSyncUser (ObjectServerTests)
+@implementation RLMUser (ObjectServerTests)
 
 - (BOOL)waitForUploadToFinish:(NSString *)partitionValue {
     const NSTimeInterval timeout = 20;

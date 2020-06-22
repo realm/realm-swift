@@ -53,14 +53,14 @@ Pod::Spec.new do |s|
                               'include/**/RLMRealm+Sync.h',
                               'include/**/RLMRealmConfiguration+Sync.h',
                               'include/**/RLMSyncConfiguration.h',
-                              'include/**/RLMSyncCredentials.h',
+                              'include/**/RLMCredentials.h',
                               'include/**/RLMSyncManager.h',
                               'include/**/RLMSyncSession.h',
-                              'include/**/RLMSyncUser.h',
+                              'include/**/RLMUser.h',
                               'include/**/RLMSyncUtil.h',
                               'include/**/RLMUserAPIKey.h',
-                              'include/**/RLMUserAPIKeyProviderClient.h',
-                              'include/**/RLMUsernamePasswordProviderClient.h',
+                              'include/**/RLMAPIKeyAuth.h',
+                              'include/**/RLMEmailPasswordAuth.h',
                               'include/**/RLMFindOneAndModifyOptions.h',
                               'include/**/RLMFindOptions.h',
                               'include/**/RLMMongoClient.h',
@@ -96,7 +96,8 @@ Pod::Spec.new do |s|
                               'include/**/RLMMongoClient_Private.h',
                               'include/**/RLMMongoCollection_Private.h',
                               'include/**/RLMMongoDatabase_Private.h',
-                              'include/**/RLMUpdateResult_Private.h'
+                              'include/**/RLMUpdateResult_Private.h',
+                              'include/**/RLMProviderClient_Private.h'
 
 
   source_files              = 'Realm/*.{m,mm}',

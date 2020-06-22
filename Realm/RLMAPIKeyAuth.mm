@@ -16,13 +16,14 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMUserAPIKeyProviderClient.h"
+#import "RLMAPIKeyAuth.h"
+#import "RLMProviderClient_Private.hpp"
 
 #import "RLMApp_Private.hpp"
 #import "RLMUserAPIKey_Private.hpp"
 #import "RLMObjectId_Private.hpp"
 
-@implementation RLMUserAPIKeyProviderClient
+@implementation RLMAPIKeyAuth
 
 - (realm::app::App::UserAPIKeyProviderClient)client {
     return self.app._realmApp->provider_client<realm::app::App::UserAPIKeyProviderClient>();
@@ -86,29 +87,29 @@
 }
 
 - (void)deleteApiKey:(RLMObjectId *)objectId
-          completion:(RLMUserAPIKeyProviderClientOptionalErrorBlock)completion {
+          completion:(RLMAPIKeyAuthOptionalErrorBlock)completion {
     self.client.delete_api_key(objectId.value,
                                self.currentUser,
                                ^(realm::util::Optional<realm::app::AppError> error) {
-        [self.app handleResponse:error completion:completion];
+        [self handleResponse:error completion:completion];
     });
 }
 
 - (void)enableApiKey:(RLMObjectId *)objectId
-          completion:(RLMUserAPIKeyProviderClientOptionalErrorBlock)completion {
+          completion:(RLMAPIKeyAuthOptionalErrorBlock)completion {
     self.client.enable_api_key(objectId.value,
                                self.currentUser,
                                ^(realm::util::Optional<realm::app::AppError> error) {
-        [self.app handleResponse:error completion:completion];
+        [self handleResponse:error completion:completion];
     });
 }
 
 - (void)disableApiKey:(RLMObjectId *)objectId
-           completion:(RLMUserAPIKeyProviderClientOptionalErrorBlock)completion {
+           completion:(RLMAPIKeyAuthOptionalErrorBlock)completion {
     self.client.disable_api_key(objectId.value,
                                 self.currentUser,
                                 ^(realm::util::Optional<realm::app::AppError> error) {
-        [self.app handleResponse:error completion:completion];
+        [self handleResponse:error completion:completion];
     });
 }
 
