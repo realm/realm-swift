@@ -30,7 +30,7 @@ import Realm.Private
  * Before you can read or write data, a user must log in.
  *
  * - SeeAlso:
- * `RealmApp`, `MongoDatabase`, `MongoCollection`
+ * `App`, `MongoDatabase`, `MongoCollection`
  */
 public typealias MongoClient = RLMMongoClient
 

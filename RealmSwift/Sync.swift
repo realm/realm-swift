@@ -22,24 +22,24 @@ import Realm.Private
 /**
  An object representing a MongoDB Realm user.
 
- - see: `RLMSyncUser`
+ - see: `RLMUser`
  */
-public typealias SyncUser = RLMSyncUser
+public typealias User = RLMUser
 
 /**
  An immutable data object representing information retrieved from MongoDB
  Realm about a particular user.
 
- - see: `RLMSyncUserInfo`
+ - see: `RLMUserInfo`
  */
-public typealias SyncUserInfo = RLMSyncUserInfo
+public typealias UserInfo = RLMUserInfo
 
 /**
  An immutable data object representing an account belonging to a particular user.
 
- - see: `SyncUserInfo`, `RLMSyncUserAccountInfo`
+ - see: `UserInfo`, `RLMUserAccountInfo`
  */
-public typealias SyncUserAccountInfo = RLMSyncUserAccountInfo
+public typealias UserAccountInfo = RLMUserAccountInfo
 
 /**
  A singleton which configures and manages MongoDB Realm synchronization-related
@@ -207,7 +207,7 @@ public enum ServerValidationPolicy {
  */
 public struct SyncConfiguration {
     /// The `SyncUser` who owns the Realm that this configuration should open.
-    public let user: SyncUser
+    public let user: User
 
     /**
      The value this Realm is partitioned on. The partition key is a property defined in
@@ -246,7 +246,46 @@ public struct SyncConfiguration {
     }
 }
 
-extension SyncUser {
+/// Structure providing an interface to call a MongoDB Realm function with the provided name and arguments.
+///
+///     user.functions.sum([1, 2, 3, 4, 5]) { sum, error in
+///         guard case let .int64(value) = sum else {
+///             print(error?.localizedDescription)
+///         }
+///
+///         assert(value == 15)
+///     }
+///
+/// The dynamic member name (`sum` in the above example) is directly associated with the function name.
+/// The first argument is the `BSONArray` of arguments to be provided to the function.
+/// The second and final argument is the completion handler to call when the function call is complete.
+/// This handler is executed on a non-main global `DispatchQueue`.
+@dynamicMemberLookup
+public struct Functions {
+    weak var user: User?
+
+    fileprivate init(user: User) {
+        self.user = user
+    }
+
+    /// A closure type for receiving the completion of a remote function call.
+    public typealias FunctionCompletionHandler = (AnyBSON?, Error?) -> Void
+
+    /// A closure type for the dynamic remote function type.
+    public typealias Function = ([AnyBSON], @escaping FunctionCompletionHandler) -> Void
+
+    /// The implementation of @dynamicMemberLookup that allows for dynamic remote function calls.
+    public subscript(dynamicMember string: String) -> Function {
+        return { (arguments: [AnyBSON], completionHandler: @escaping FunctionCompletionHandler) in
+            let objcArgs = arguments.map(ObjectiveCSupport.convert) as! [RLMBSON]
+            self.user?.__callFunctionNamed(string, arguments: objcArgs) { (bson: RLMBSON?, error: Error?) in
+                completionHandler(ObjectiveCSupport.convert(object: bson), error)
+            }
+        }
+    }
+}
+
+extension User {
 
     /**
      Create a sync configuration instance.
@@ -297,6 +336,31 @@ extension SyncUser {
         }
 
         return customData
+    }
+
+    /// A client for interacting with a remote MongoDB instance
+    /// - Parameter serviceName:  The name of the MongoDB service
+    /// - Returns: A `MongoClient` which is used for interacting with a remote MongoDB service
+    public func mongoClient(_ serviceName: String) -> MongoClient {
+        return self.__mongoClient(withServiceName: serviceName)
+    }
+
+    /// Call a MongoDB Realm function with the provided name and arguments.
+    ///
+    ///     user.functions.sum([1, 2, 3, 4, 5]) { sum, error in
+    ///         guard case let .int64(value) = sum else {
+    ///             print(error?.localizedDescription)
+    ///         }
+    ///
+    ///         assert(value == 15)
+    ///     }
+    ///
+    /// The dynamic member name (`sum` in the above example) is directly associated with the function name.
+    /// The first argument is the `BSONArray` of arguments to be provided to the function.
+    /// The second and final argument is the completion handler to call when the function call is complete.
+    /// This handler is executed on a non-main global `DispatchQueue`.
+    public var functions: Functions {
+        return Functions(user: self)
     }
 }
 

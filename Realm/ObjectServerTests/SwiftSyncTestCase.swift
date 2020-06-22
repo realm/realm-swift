@@ -42,12 +42,12 @@ class SwiftSyncTestCase: RLMSyncTestCase {
 
     func basicCredentials(usernameSuffix: String = "",
                           file: StaticString = #file,
-                          line: UInt = #line) -> AppCredentials {
+                          line: UInt = #line) -> Credentials {
         let username = "\(randomString(10))\(usernameSuffix)"
         let password = "abcdef"
-        let credentials = AppCredentials(username: username, password: password)
+        let credentials = Credentials(username: username, password: password)
         let ex = expectation(description: "Should register in the user properly")
-        app.usernamePasswordProviderClient().registerEmail(username, password: password, completion: { error in
+        app.emailPasswordAuth().registerEmail(username, password: password, completion: { error in
             XCTAssertNil(error)
             ex.fulfill()
         })
@@ -56,7 +56,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
     }
 
     func synchronouslyOpenRealm(partitionValue: String,
-                                user: SyncUser,
+                                user: User,
                                 file: StaticString = #file,
                                 line: UInt = #line) throws -> Realm {
         let config = user.configuration(partitionValue: partitionValue)
@@ -69,15 +69,15 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return try Realm(configuration: configuration)
     }
 
-    func immediatelyOpenRealm(partitionValue: String, user: SyncUser) throws -> Realm {
+    func immediatelyOpenRealm(partitionValue: String, user: User) throws -> Realm {
         return try Realm(configuration: user.configuration(partitionValue: partitionValue))
     }
 
-    func synchronouslyLogInUser(for credentials: AppCredentials,
+    func synchronouslyLogInUser(for credentials: Credentials,
                                 file: StaticString = #file,
-                                line: UInt = #line) throws -> SyncUser {
+                                line: UInt = #line) throws -> User {
         let process = isParent ? "parent" : "child"
-        var theUser: SyncUser?
+        var theUser: User?
         var theError: Error?
         let ex = expectation(description: "Should log in the user properly")
 
@@ -97,13 +97,13 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         return theUser!
     }
 
-    func synchronouslyLogOutUser(_ user: SyncUser,
+    func synchronouslyLogOutUser(_ user: User,
                                  file: StaticString = #file,
                                  line: UInt = #line) throws {
         var theError: Error?
         let ex = expectation(description: "Should log out the user properly")
 
-        self.app.logOut(user) { (error) in
+        user.logOut { (error) in
             theError = error
             ex.fulfill()
         }

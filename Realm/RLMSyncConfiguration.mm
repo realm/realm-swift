@@ -23,7 +23,7 @@
 #import "RLMSyncConfiguration_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMSyncSession_Private.hpp"
-#import "RLMSyncUser_Private.hpp"
+#import "RLMUser_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
 #import "RLMBSON_Private.hpp"
@@ -89,10 +89,10 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     return *_config;
 }
 
-- (RLMSyncUser *)user {
+- (RLMUser *)user {
     auto app = realm::SyncManager::shared().app();
-    return [[RLMSyncUser alloc] initWithSyncUser:_config->user
-                                             app:[RLMApp appWithId:@(app->config().app_id.data())]];
+    return [[RLMUser alloc] initWithUser:_config->user
+                                     app:[RLMApp appWithId:@(app->config().app_id.data())]];
 }
 
 - (RLMSyncStopPolicy)stopPolicy {
@@ -118,7 +118,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     _config->cancel_waits_on_nonfatal_error = cancelAsyncOpenOnNonFatalErrors;
 }
 
-- (instancetype)initWithUser:(RLMSyncUser *)user
+- (instancetype)initWithUser:(RLMUser *)user
               partitionValue:(id<RLMBSON>)partitionValue {
     return [self initWithUser:user
                partitionValue:partitionValue
@@ -126,7 +126,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
                    stopPolicy:RLMSyncStopPolicyAfterChangesUploaded];
 }
 
-- (instancetype)initWithUser:(RLMSyncUser *)user
+- (instancetype)initWithUser:(RLMUser *)user
               partitionValue:(id<RLMBSON>)partitionValue
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy{
     auto config = [self initWithUser:user
@@ -136,7 +136,7 @@ RLMSyncSystemErrorKind errorKindForSyncError(SyncError error) {
     return config;
 }
 
-- (instancetype)initWithUser:(RLMSyncUser *)user
+- (instancetype)initWithUser:(RLMUser *)user
               partitionValue:(id<RLMBSON>)partitionValue
                customFileURL:(nullable NSURL *)customFileURL
                   stopPolicy:(RLMSyncStopPolicy)stopPolicy {

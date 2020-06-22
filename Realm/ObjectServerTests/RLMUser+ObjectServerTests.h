@@ -20,7 +20,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RLMSyncUser (ObjectServerTests)
+@interface RLMUser (ObjectServerTests)
 
 - (BOOL)waitForUploadToFinish:(NSString *)partitionValue;
 - (BOOL)waitForDownloadToFinish:(NSString *)partitionValue;

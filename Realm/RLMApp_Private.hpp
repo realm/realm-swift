@@ -31,9 +31,6 @@
 @interface RLMApp ()
 - (std::shared_ptr<realm::app::App>)_realmApp;
 
-- (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
-            completion:(nonnull RLMOptionalErrorBlock)completion;
-
 + (nonnull instancetype)appWithId:(nonnull NSString *)appId
                     configuration:(nonnull RLMAppConfiguration *)configuration
                     rootDirectory:(nullable NSURL *)rootDirectory;

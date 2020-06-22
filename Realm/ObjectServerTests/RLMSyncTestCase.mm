@@ -53,7 +53,7 @@ static NSString *nodePath() {
 
 @interface RLMSyncManager ()
 + (void)_setCustomBundleID:(NSString *)customBundleID;
-- (NSArray<RLMSyncUser *> *)_allUsers;
+- (NSArray<RLMUser *> *)_allUsers;
 @end
 
 @interface RLMSyncTestCase ()
@@ -65,7 +65,7 @@ static NSString *nodePath() {
 - (BOOL)waitForDownloadCompletionOnQueue:(dispatch_queue_t)queue callback:(void(^)(NSError *))callback;
 @end
 
-@interface RLMSyncUser()
+@interface RLMUser()
 - (std::shared_ptr<realm::SyncUser>)_syncUser;
 @end
 
@@ -384,17 +384,17 @@ static NSURL *syncDirectoryForChildProcess() {
     return NO;
 }
 
-- (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
+- (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister {
     if (shouldRegister) {
         XCTestExpectation *expectation = [self expectationWithDescription:@""];
-        [[[self app] usernamePasswordProviderClient] registerEmail:name password:@"password" completion:^(NSError * _Nullable error) {
+        [[[self app] emailPasswordAuth] registerEmail:name password:@"password" completion:^(NSError * _Nullable error) {
             XCTAssertNil(error);
             [expectation fulfill];
         }];
         [self waitForExpectationsWithTimeout:4.0 handler:nil];
     }
-    return [RLMAppCredentials credentialsWithUsername:name
-                                             password:@"password"];
+    return [RLMCredentials credentialsWithUsername:name
+                                          password:@"password"];
 }
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm {
@@ -415,7 +415,7 @@ static NSURL *syncDirectoryForChildProcess() {
     [realm commitWriteTransaction];
 }
 
-- (void)waitForDownloadsForUser:(RLMSyncUser *)user
+- (void)waitForDownloadsForUser:(RLMUser *)user
                          realms:(NSArray<RLMRealm *> *)realms
                       partitionValues:(NSArray<NSString *> *)partitionValues
                  expectedCounts:(NSArray<NSNumber *> *)counts {
@@ -428,11 +428,11 @@ static NSURL *syncDirectoryForChildProcess() {
     }
 }
 
-- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user {
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user {
     return [self openRealmForPartitionValue:partitionValue user:user immediatelyBlock:nil];
 }
 
-- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user immediatelyBlock:(void(^)(void))block {
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user immediatelyBlock:(void(^)(void))block {
     return [self openRealmForPartitionValue:partitionValue
                                        user:user
                               encryptionKey:nil
@@ -441,7 +441,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
-                                    user:(RLMSyncUser *)user
+                                    user:(RLMUser *)user
                            encryptionKey:(nullable NSData *)encryptionKey
                               stopPolicy:(RLMSyncStopPolicy)stopPolicy
                         immediatelyBlock:(nullable void(^)(void))block {
@@ -464,7 +464,7 @@ static NSURL *syncDirectoryForChildProcess() {
     }
     return realm;
 }
-- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user {
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user {
     return [self immediatelyOpenRealmForPartitionValue:partitionValue
                                                   user:user
                                          encryptionKey:nil
@@ -472,7 +472,7 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue
-                                               user:(RLMSyncUser *)user
+                                               user:(RLMUser *)user
                                       encryptionKey:(NSData *)encryptionKey
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy {
     auto c = [user configurationWithPartitionValue:partitionValue];
@@ -483,28 +483,27 @@ static NSURL *syncDirectoryForChildProcess() {
     return [RLMRealm realmWithConfiguration:c error:nil];
 }
 
-- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials {
+- (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials {
     RLMApp *app = [self app];
-    __block RLMSyncUser* theUser;
+    __block RLMUser* theUser;
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    [app loginWithCredential:credentials completion:^(RLMSyncUser * _Nullable user, NSError * _Nullable) {
+    [app loginWithCredential:credentials completion:^(RLMUser * _Nullable user, NSError * _Nullable) {
         theUser = user;
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
-    XCTAssertTrue(theUser.state == RLMSyncUserStateLoggedIn, @"User should have been valid, but wasn't");
+    XCTAssertTrue(theUser.state == RLMUserStateLoggedIn, @"User should have been valid, but wasn't");
     return theUser;
 }
 
-- (void)logOutUser:(RLMSyncUser *)user {
-    RLMApp *app = [self app];
+- (void)logOutUser:(RLMUser *)user {
     XCTestExpectation *expectation = [self expectationWithDescription:@""];
-    [app logOut:user completion:^(NSError * error) {
+    [user logOutWithCompletion:^(NSError * error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
-    XCTAssertTrue(user.state == RLMSyncUserStateLoggedOut, @"User should have been logged out, but wasn't");
+    XCTAssertTrue(user.state == RLMUserStateLoggedOut, @"User should have been logged out, but wasn't");
 }
 
 - (void)waitForDownloadsForRealm:(RLMRealm *)realm {
@@ -515,7 +514,7 @@ static NSURL *syncDirectoryForChildProcess() {
     [self waitForUploadsForRealm:realm error:nil];
 }
 
-- (void)waitForDownloadsForUser:(RLMSyncUser *)user
+- (void)waitForDownloadsForUser:(RLMUser *)user
                  partitionValue:(NSString *)partitionValue
                     expectation:(XCTestExpectation *)expectation
                           error:(NSError **)error {
@@ -573,11 +572,11 @@ static NSURL *syncDirectoryForChildProcess() {
         *error = completionError;
 }
 
-- (void)manuallySetAccessTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue {
+- (void)manuallySetAccessTokenForUser:(RLMUser *)user value:(NSString *)tokenValue {
     [user _syncUser]->update_access_token(tokenValue.UTF8String);
 }
 
-- (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue {
+- (void)manuallySetRefreshTokenForUser:(RLMUser *)user value:(NSString *)tokenValue {
     [user _syncUser]->update_refresh_token(tokenValue.UTF8String);
 }
 
@@ -657,10 +656,10 @@ static NSURL *syncDirectoryForChildProcess() {
 - (void)resetSyncManager {
     if ([self appId]) {
         NSMutableArray<XCTestExpectation *> *exs = [NSMutableArray new];
-        [self.app.allUsers enumerateKeysAndObjectsUsingBlock:^(NSString *, RLMSyncUser *user, BOOL *) {
+        [self.app.allUsers enumerateKeysAndObjectsUsingBlock:^(NSString *, RLMUser *user, BOOL *) {
             XCTestExpectation *ex = [self expectationWithDescription:@"Wait for logout"];
             [exs addObject:ex];
-            [self.app logOut:user completion:^(NSError *) {
+            [user logOutWithCompletion:^(NSError *) {
                 [ex fulfill];
             }];
         }];

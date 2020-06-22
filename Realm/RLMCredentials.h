@@ -21,7 +21,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /// A token representing an identity provider's credentials.
-typedef NSString *RLMAppCredentialsToken;
+typedef NSString *RLMCredentialsToken;
 
 /// A type representing the unique identifier of a MongoDB Realm identity provider.
 typedef NSString *RLMIdentityProvider NS_EXTENSIBLE_STRING_ENUM;
@@ -57,7 +57,7 @@ extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
 /**
  Opaque credentials representing a specific Realm App user.
  */
-@interface RLMAppCredentials : NSObject
+@interface RLMCredentials : NSObject
 
 /// The name of the identity provider which generated the credentials token.
 @property (nonatomic) RLMIdentityProvider provider;
@@ -65,17 +65,17 @@ extern RLMIdentityProvider const RLMIdentityProviderServerAPIKey;
 /**
  Construct and return credentials from a Facebook account token.
  */
-+ (instancetype)credentialsWithFacebookToken:(RLMAppCredentialsToken)token;
++ (instancetype)credentialsWithFacebookToken:(RLMCredentialsToken)token;
 
 /**
  Construct and return credentials from a Google account token.
  */
-+ (instancetype)credentialsWithGoogleToken:(RLMAppCredentialsToken)token;
++ (instancetype)credentialsWithGoogleToken:(RLMCredentialsToken)token;
 
 /**
  Construct and return credentials from an Apple account token.
  */
-+ (instancetype)credentialsWithAppleToken:(RLMAppCredentialsToken)token;
++ (instancetype)credentialsWithAppleToken:(RLMCredentialsToken)token;
 
 /**
  Construct and return credentials for a MongoDB Realm function using a mongodb document as a json payload.
