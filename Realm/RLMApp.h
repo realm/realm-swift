@@ -139,7 +139,6 @@ Create a new Realm App configuration.
  */
 - (void)loginWithCredential:(RLMCredentials *)credentials
                  completion:(RLMUserCompletionBlock)completion;
-
 /**
  Switches the active user to the specified user.
 
@@ -166,6 +165,47 @@ Use `+[RLMRealm appWithId]` or `+[RLMRealm appWithId:configuration:]`
 to obtain a reference to an RLMApp.
 */
 + (instancetype)new __attribute__((unavailable("Use +appWithId or appWithId:configuration:.")));
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+#pragma mark - Sign In With Apple Extension
+
+#define RLM_APPLE_SIGN_IN_AVAILABLE (defined(__IPHONE_13_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0) || \
+        (defined(MAC_OS_X_VERSION_10_15) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_15) || \
+            (defined(__WATCHOS_6_0) && WATCH_OS_VERSION_MAX_ALLOWED >= __WATCHOS_6_0) || \
+                (defined(__TVOS_13_0) && TV_OS_VERSION_MAX_ALLOWED >= __TVOS_13_0)
+#if defined(RLM_APPLE_SIGN_IN_AVAILABLE)
+#import <AuthenticationServices/AuthenticationServices.h>
+#endif
+
+NS_ASSUME_NONNULL_BEGIN
+
+API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
+@protocol RLMASLoginDelegate
+
+/// Callback that is invoked should the authentication fail.
+/// @param error An error describing the authentication failure.
+- (void)authenticationDidCompleteWithError:(NSError *)error;
+
+/// Callback that is invoked should the authentication succeed.
+/// @param user The newly authenticated user.
+- (void)authenticationDidCompleteWithUser:(RLMUser *)user;
+
+@end
+
+/// Class category extension that deals with Sign In With Apple authentication.
+/// This is only available on OS's that support `AuthenticationServices`
+API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
+@interface RLMApp ()
+
+/// Use this delegate to be provided a callback once authentication has succeed or failed
+@property (nonatomic, weak, nullable) id<RLMASLoginDelegate> authorisationDelegate;
+
+/// Sets the ASAuthorizationControllerDelegate to be handled by `RLMApp`
+/// @param controller The ASAuthorizationController in which you want `RLMApp` to consume its delegate.
+- (void)setASAuthorizationControllerDelegateWithController:(ASAuthorizationController *)controller;
 
 @end
 
