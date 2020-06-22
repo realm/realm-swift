@@ -381,8 +381,8 @@ class PrimitiveListTests<O: ObjectFactory, V: ValueFactory>: PrimitiveListTestsB
         XCTAssertEqual(values[0], array[1])
         XCTAssertEqual(values[2], array[2])
 
-        assertThrows(_ = array.insert(values[0], at: 4))
-        assertThrows(_ = array.insert(values[0], at: -1))
+        assertThrows(array.insert(values[0], at: 4))
+        assertThrows(array.insert(values[0], at: -1))
     }
 
     func testRemove() {

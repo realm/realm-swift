@@ -233,6 +233,7 @@ public:
             XCTFail(@"%@", e.description);
         }
         XCTAssertEqual(0U, _notifications.count);
+        static_cast<void>(self); // Pre-12 versions of Xcode require the self variable but 12 doesn't use it
     }
 
     // record a single notification
@@ -241,6 +242,7 @@ public:
         XCTAssertEqual(obj, _obj);
         XCTAssertEqualObjects(key, _keyPath);
         [_notifications addObject:changeDictionary.copy];
+        static_cast<void>(self); // Pre-12 versions of Xcode require the self variable but 12 doesn't use it
     }
 
     // ensure that the observed object is updated for any changes made to the

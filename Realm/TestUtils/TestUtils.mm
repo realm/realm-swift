@@ -24,6 +24,23 @@
 
 #import "RLMRealmUtil.hpp"
 
+#include <Availability.h>
+
+static void recordFailure(XCTestCase *self, NSString *message, NSString *fileName, NSUInteger lineNumber) {
+#ifndef __MAC_10_16
+    [self recordFailureWithDescription:message inFile:fileName atLine:lineNumber expected:NO];
+#else
+    XCTSourceCodeLocation *loc = [[XCTSourceCodeLocation alloc] initWithFilePath:fileName lineNumber:lineNumber];
+    XCTIssue *issue = [[XCTIssue alloc] initWithType:XCTIssueTypeAssertionFailure
+                                  compactDescription:message
+                                 detailedDescription:nil
+                                   sourceCodeContext:[[XCTSourceCodeContext alloc] initWithLocation:loc]
+                                     associatedError:nil
+                                         attachments:@[]];
+    [self recordIssue:issue];
+#endif
+}
+
 void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
                                             __attribute__((noescape)) dispatch_block_t block,
                                             NSString *regexString, NSString *message,
@@ -39,13 +56,13 @@ void RLMAssertThrowsWithReasonMatchingSwift(XCTestCase *self,
         if ([regex numberOfMatchesInString:reason options:(NSMatchingOptions)0 range:NSMakeRange(0, reason.length)] == 0) {
             NSString *msg = [NSString stringWithFormat:@"The given expression threw an exception with reason '%@', but expected to match '%@'",
                              reason, regexString];
-            [self recordFailureWithDescription:msg inFile:fileName atLine:lineNumber expected:NO];
+            recordFailure(self, msg, fileName, lineNumber);
         }
     }
     if (!didThrow) {
         NSString *prefix = @"The given expression failed to throw an exception";
         message = message ? [NSString stringWithFormat:@"%@ (%@)",  prefix, message] : prefix;
-        [self recordFailureWithDescription:message inFile:fileName atLine:lineNumber expected:NO];
+        recordFailure(self, message, fileName, lineNumber);
     }
 }
 
@@ -56,11 +73,11 @@ static void assertThrows(XCTestCase *self, dispatch_block_t block, NSString *mes
         block();
         NSString *prefix = @"The given expression failed to throw an exception";
         message = message ? [NSString stringWithFormat:@"%@ (%@)",  prefix, message] : prefix;
-        [self recordFailureWithDescription:message inFile:fileName atLine:lineNumber expected:NO];
+        recordFailure(self, message, fileName, lineNumber);
     }
     @catch (NSException *e) {
         if (NSString *failure = condition(e)) {
-            [self recordFailureWithDescription:failure inFile:fileName atLine:lineNumber expected:NO];
+            recordFailure(self, failure, fileName, lineNumber);
         }
     }
 }
@@ -109,7 +126,7 @@ void (RLMAssertMatches)(XCTestCase *self, __attribute__((noescape)) NSString *(^
     if ([regex numberOfMatchesInString:result options:(NSMatchingOptions)0 range:NSMakeRange(0, result.length)] == 0) {
         NSString *msg = [NSString stringWithFormat:@"The given expression '%@' did not match '%@'%@",
                          result, regexString, message ? [NSString stringWithFormat:@": %@", message] : @""];
-        [self recordFailureWithDescription:msg inFile:fileName atLine:lineNumber expected:NO];
+        recordFailure(self, msg, fileName, lineNumber);
     }
 }
 

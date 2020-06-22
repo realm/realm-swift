@@ -107,7 +107,7 @@ class KVOTests: TestCase {
         block()
         obj.removeObserver(self, forKeyPath: key)
 
-        XCTAssert(changeDictionary != nil, "Did not get a notification", file: fileName, line: lineNumber)
+        XCTAssert(changeDictionary != nil, "Did not get a notification", file: (fileName), line: lineNumber)
         guard changeDictionary != nil else { return }
 
         let actualOld = changeDictionary![.oldKey]! as? T
@@ -115,10 +115,10 @@ class KVOTests: TestCase {
 
         XCTAssert(old == actualOld,
                   "Old value: expected \(String(describing: old)), got \(String(describing: actualOld))",
-                  file: fileName, line: lineNumber)
+                  file: (fileName), line: lineNumber)
         XCTAssert(new == actualNew,
                   "New value: expected \(String(describing: new)), got \(String(describing: actualNew))",
-                  file: fileName, line: lineNumber)
+                  file: (fileName), line: lineNumber)
 
         changeDictionary = nil
     }
@@ -128,15 +128,15 @@ class KVOTests: TestCase {
         let kvoOptions: NSKeyValueObservingOptions = [.old, .new]
         var gotNotification = false
         let observation = obj.observe(keyPath, options: kvoOptions) { _, change in
-            XCTAssertEqual(change.oldValue, old, file: fileName, line: lineNumber)
-            XCTAssertEqual(change.newValue, new, file: fileName, line: lineNumber)
+            XCTAssertEqual(change.oldValue, old, file: (fileName), line: lineNumber)
+            XCTAssertEqual(change.newValue, new, file: (fileName), line: lineNumber)
             gotNotification = true
         }
 
         block()
         observation.invalidate()
 
-        XCTAssertTrue(gotNotification, file: fileName, line: lineNumber)
+        XCTAssertTrue(gotNotification, file: (fileName), line: lineNumber)
     }
 
     func observeChange<T: Equatable>(_ obj: SwiftKVOObject, _ keyPath: KeyPath<SwiftKVOObject, T?>, _ old: T?, _ new: T?,
@@ -145,14 +145,14 @@ class KVOTests: TestCase {
         var gotNotification = false
         let observation = obj.observe(keyPath, options: kvoOptions) { _, change in
             if let oldValue = change.oldValue {
-                XCTAssertEqual(oldValue, old, file: fileName, line: lineNumber)
+                XCTAssertEqual(oldValue, old, file: (fileName), line: lineNumber)
             } else {
-                XCTAssertNil(old, file: fileName, line: lineNumber)
+                XCTAssertNil(old, file: (fileName), line: lineNumber)
             }
             if let newValue = change.newValue {
-                XCTAssertEqual(newValue, new, file: fileName, line: lineNumber)
+                XCTAssertEqual(newValue, new, file: (fileName), line: lineNumber)
             } else {
-                XCTAssertNil(new, file: fileName, line: lineNumber)
+                XCTAssertNil(new, file: (fileName), line: lineNumber)
             }
             gotNotification = true
         }
@@ -160,7 +160,7 @@ class KVOTests: TestCase {
         block()
         observation.invalidate()
 
-        XCTAssertTrue(gotNotification, file: fileName, line: lineNumber)
+        XCTAssertTrue(gotNotification, file: (fileName), line: lineNumber)
     }
 
     func observeListChange(_ obj: NSObject, _ key: String, _ kind: NSKeyValueChange, _ indexes: NSIndexSet = NSIndexSet(index: 0),
@@ -168,15 +168,15 @@ class KVOTests: TestCase {
         obj.addObserver(self, forKeyPath: key, options: [.old, .new], context: nil)
         block()
         obj.removeObserver(self, forKeyPath: key)
-        XCTAssert(changeDictionary != nil, "Did not get a notification", file: fileName, line: lineNumber)
+        XCTAssert(changeDictionary != nil, "Did not get a notification", file: (fileName), line: lineNumber)
         guard changeDictionary != nil else { return }
 
         let actualKind = NSKeyValueChange(rawValue: (changeDictionary![NSKeyValueChangeKey.kindKey] as! NSNumber).uintValue)!
         let actualIndexes = changeDictionary![NSKeyValueChangeKey.indexesKey]! as! NSIndexSet
-        XCTAssert(actualKind == kind, "Change kind: expected \(kind), got \(actualKind)", file: fileName,
+        XCTAssert(actualKind == kind, "Change kind: expected \(kind), got \(actualKind)", file: (fileName),
             line: lineNumber)
         XCTAssert(actualIndexes.isEqual(indexes), "Changed indexes: expected \(indexes), got \(actualIndexes)",
-            file: fileName, line: lineNumber)
+                  file: (fileName), line: lineNumber)
 
         changeDictionary = nil
     }

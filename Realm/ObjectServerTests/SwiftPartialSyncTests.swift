@@ -377,7 +377,7 @@ class SwiftPartialSyncTests: SwiftSyncTestCase {
 
         func assertCount(_ filter: String, _ count: Int, fileName: StaticString = #file, lineNumber: UInt = #line) {
             waitForState(objects.filter(filter).subscribe(named: "query", update: true), .complete)
-            XCTAssertEqual(objects.distinct(by: ["number"]).count, count, file: fileName, line: lineNumber)
+            XCTAssertEqual(objects.distinct(by: ["number"]).count, count, file: (fileName), line: lineNumber)
         }
         assertCount("string CONTAINS 'art'", 4)
         assertCount("string CONTAINS 'ART'", 0)
