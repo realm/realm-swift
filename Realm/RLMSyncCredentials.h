@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMSyncUtil.h"
+#import <Realm/RLMSyncUtil.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
