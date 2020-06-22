@@ -72,3 +72,16 @@ public typealias Credentials = RLMCredentials
 /// application backend.
 /// This interface provides access to login and authentication.
 public typealias App = RLMApp
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+/// Use this delegate to be provided a callback once authentication with Apple has succeed or failed
+public typealias ASLoginDelegate = RLMASLoginDelegate
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension App {
+    /// Sets the ASAuthorizationControllerDelegate to be handled by `App`
+    /// - Parameter controller: The ASAuthorizationController in which you want `App` to consume its delegate.
+    public func setASAuthorizationControllerDelegate(controller: ASAuthorizationController) {
+        self.__setASAuthorizationControllerDelegateWith(controller)
+    }
+}

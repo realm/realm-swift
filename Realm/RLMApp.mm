@@ -302,6 +302,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 #pragma mark - Sign In With Apple Extension
 
+#if defined(RLM_APPLE_SIGN_IN_AVAILABLE)
 - (void)setASAuthorizationControllerDelegateWithController:(ASAuthorizationController *)controller API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
     controller.delegate = self;
 }
@@ -330,6 +331,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
         [self.authorisationDelegate authenticationDidCompleteWithError:error];
     }
 }
+#endif
 
 @end
 
