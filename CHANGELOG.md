@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 
-Xcode 11.3 is now the minimum supported version.
+Xcode 11.3 and iOS 9 are now the minimum supported versions.
 
 ### Enhancements
 * None.
