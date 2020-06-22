@@ -19,14 +19,6 @@
 import XCTest
 import RealmSwift
 
-#if !swift(>=4.1)
-extension Sequence {
-    func compactMap<ElementOfResult>(_ transform: (Self.Element) throws -> ElementOfResult?) rethrows -> [ElementOfResult] {
-        return try flatMap(transform)
-    }
-}
-#endif
-
 class ListTests: TestCase {
     var str1: SwiftStringObject?
     var str2: SwiftStringObject?

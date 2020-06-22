@@ -65,7 +65,6 @@ public final class RealmOptional<Value: RealmOptionalType>: RLMOptionalBase {
     }
 }
 
-#if swift(>=4.1)
 extension RealmOptional: Codable where Value: Codable {
     public convenience init(from decoder: Decoder) throws {
         self.init()
@@ -79,7 +78,6 @@ extension RealmOptional: Codable where Value: Codable {
         try self.value.encode(to: encoder)
     }
 }
-#endif
 
 internal protocol RealmOptionalProtocol { }
 extension RealmOptional: RealmOptionalProtocol { }

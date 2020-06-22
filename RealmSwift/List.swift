@@ -527,11 +527,7 @@ extension List: RealmCollection {
 
 // MARK: - MutableCollection conformance, range replaceable collection emulation
 extension List: MutableCollection {
-#if swift(>=4.1)
     public typealias SubSequence = Slice<List>
-#else
-    public typealias SubSequence = RandomAccessSlice<List>
-#endif
 
     /**
      Returns the objects at the given range (get), or replaces the objects at the
@@ -598,7 +594,6 @@ extension List: MutableCollection {
             currentIndex += 1
         }
     }
-    #if swift(>=4.1.50)
     /**
      Removes objects from the list at the given range.
 
@@ -610,69 +605,6 @@ extension List: MutableCollection {
             remove(at: bounds.lowerBound)
         }
     }
-    #else
-    /**
-     Removes objects from the list at the given range.
-
-     - warning: This method may only be called during a write transaction.
-     */
-    public func removeSubrange(_ bounds: Range<Int>) {
-        removeSubrange(bounds.lowerBound..<bounds.upperBound)
-    }
-
-    /// :nodoc:
-    public func removeSubrange(_ bounds: ClosedRange<Int>) {
-        removeSubrange(bounds.lowerBound...bounds.upperBound)
-    }
-
-    /// :nodoc:
-    public func removeSubrange(_ bounds: CountableRange<Int>) {
-        for _ in bounds {
-            remove(at: bounds.lowerBound)
-        }
-    }
-
-    /// :nodoc:
-    public func removeSubrange(_ bounds: CountableClosedRange<Int>) {
-        for _ in bounds {
-            remove(at: bounds.lowerBound)
-        }
-    }
-
-    /// :nodoc:
-    public func removeSubrange(_ bounds: DefaultRandomAccessIndices<List>) {
-        removeSubrange(bounds.startIndex..<bounds.endIndex)
-    }
-
-    /// :nodoc:
-    public func replaceSubrange<C: Collection>(_ subrange: ClosedRange<Int>, with newElements: C)
-        where C.Iterator.Element == Element {
-            removeSubrange(subrange)
-            insert(contentsOf: newElements, at: subrange.lowerBound)
-    }
-
-    /// :nodoc:
-    public func replaceSubrange<C: Collection>(_ subrange: CountableRange<Int>, with newElements: C)
-        where C.Iterator.Element == Element {
-            removeSubrange(subrange)
-            insert(contentsOf: newElements, at: subrange.lowerBound)
-    }
-
-    /// :nodoc:
-    public func replaceSubrange<C: Collection>(_ subrange: CountableClosedRange<Int>, with newElements: C)
-        where C.Iterator.Element == Element {
-            removeSubrange(subrange)
-            insert(contentsOf: newElements, at: subrange.lowerBound)
-    }
-
-
-    /// :nodoc:
-    public func replaceSubrange<C: Collection>(_ subrange: DefaultRandomAccessIndices<List>, with newElements: C)
-        where C.Iterator.Element == Element {
-            removeSubrange(subrange)
-            insert(contentsOf: newElements, at: subrange.startIndex)
-    }
-#endif
     /// :nodoc:
     public func remove(atOffsets offsets: IndexSet) {
         for offset in offsets.reversed() {
@@ -700,7 +632,6 @@ extension List: MutableCollection {
 
 // MARK: - Codable
 
-#if swift(>=4.1)
 extension List: Decodable where Element: Decodable {
     public convenience init(from decoder: Decoder) throws {
         self.init()
@@ -719,7 +650,6 @@ extension List: Encodable where Element: Encodable {
         }
     }
 }
-#endif
 
 // MARK: - AssistedObjectiveCBridgeable
 

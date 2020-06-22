@@ -19,7 +19,6 @@
 import XCTest
 import RealmSwift
 
-#if swift(>=4.1)
 final class CodableObject: Object, Codable {
     @objc dynamic var string: String = ""
     @objc dynamic var data: Data = Data()
@@ -219,4 +218,3 @@ class CodableTests: TestCase {
         XCTAssertEqual(try! String(data: encoder.encode(obj), encoding: .utf8), expected)
     }
 }
-#endif
