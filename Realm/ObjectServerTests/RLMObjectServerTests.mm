@@ -204,7 +204,7 @@
     XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
     __block RLMUser *syncUser;
     [app loginWithCredential:[RLMCredentials anonymousCredentials] completion:^(RLMUser *user, NSError *error) {
-        XCTAssert(!error);
+        XCTAssertNil(error);
         XCTAssert(user);
         syncUser = user;
         [expectation fulfill];
@@ -214,14 +214,14 @@
     RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
     expectation = [self expectationWithDescription:@"should register device"];
     [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
-        XCTAssert(!error);
+        XCTAssertNil(error);
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
 
     expectation = [self expectationWithDescription:@"should deregister device"];
     [client deregisterDeviceForUser:[app currentUser] completion:^(NSError * _Nullable error) {
-        XCTAssert(!error);
+        XCTAssertNil(error);
         [expectation fulfill];
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
@@ -235,7 +235,7 @@
 
     __block RLMUser *syncUser;
     [app loginWithCredential:[RLMCredentials anonymousCredentials] completion:^(RLMUser *user, NSError *error) {
-        XCTAssert(!error);
+        XCTAssertNil(error);
         XCTAssert(user);
         syncUser = user;
         [loginExpectation fulfill];
@@ -244,13 +244,13 @@
     
     RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
     [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
-        XCTAssert(!error);
+        XCTAssertNil(error);
         [registerExpectation fulfill];
     }];
     [self waitForExpectations:@[registerExpectation] timeout:10.0];
         
     [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
-        XCTAssert(!error);
+        XCTAssertNil(error);
         [secondRegisterExpectation fulfill];
     }];
     [self waitForExpectations:@[secondRegisterExpectation] timeout:10.0];
