@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
 
   s.pod_target_xcconfig = { 'APPLICATION_EXTENSION_API_ONLY' => 'YES' }
 
-  s.ios.deployment_target     = '8.0'
+  s.ios.deployment_target     = '9.0'
   s.osx.deployment_target     = '10.9'
   s.watchos.deployment_target = '2.0'
   s.tvos.deployment_target    = '9.0'
