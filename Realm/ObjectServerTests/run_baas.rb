@@ -2,7 +2,7 @@
 
 require 'net/http'
 
-ROOT_DIR="#{Dir.pwd}/../.."
+ROOT_DIR="'#{Dir.pwd}/../..'"
 MONGO_DIR="#{ROOT_DIR}/build/mongodb-*"
 
 def run_mongod
@@ -56,22 +56,22 @@ def run_stitch
 
     exports = []
     if Dir.exist?("#{root_dir}/go")
-        exports << "export GOROOT=#{root_dir}/go"
-        exports << "export PATH=$GOROOT/bin:$PATH"
+        exports << "export GOROOT='#{root_dir}/go'"
+        exports << "export PATH=\"$GOROOT/bin:$PATH\""
     end
 
-    exports << "export STITCH_PATH=\"#{root_dir}/stitch\""
+    exports << "export STITCH_PATH='#{root_dir}/stitch'"
     exports << "export PATH=\"$PATH:$STITCH_PATH\""
     exports << "export PATH=\"$PATH:$STITCH_PATH/etc/transpiler/bin\""
     exports << "export LD_LIBRARY_PATH=\"$STITCH_PATH/etc/dylib/lib\""
-    
+
     puts 'starting stitch'
 
     puts exports
     pid = Process.fork {
-        puts `cd #{stitch_path} && \
+        puts `cd '#{stitch_path}' && \
         #{exports.join(' && ')} && \
-        go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" #{stitch_path}/cmd/server/main.go --configFile "#{stitch_path}/etc/configs/test_config.json"`
+        go run -exec "env LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH\"" '#{stitch_path}/cmd/server/main.go' --configFile '#{stitch_path}/etc/configs/test_config.json'`
     }
     Process.detach(pid)
     retries = 0
