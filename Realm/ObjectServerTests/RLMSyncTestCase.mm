@@ -466,19 +466,24 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (RLMRealm *)asyncOpenRealmWithConfiguration:(RLMRealmConfiguration *)config {
-    __block RLMRealm *realm = nil;
+    __block RLMRealm *r = nil;
     XCTestExpectation *ex = [self expectationWithDescription:@"Should asynchronously open a Realm"];
     [RLMRealm asyncOpenWithConfiguration:config
                            callbackQueue:dispatch_get_main_queue()
-                                callback:^(RLMRealm *r, NSError *err){
+                                callback:^(RLMRealm *realm, NSError *err) {
         XCTAssertNil(err);
-        XCTAssertNotNil(r);
-        realm = r;
+        XCTAssertNotNil(realm);
+        r = realm;
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    // Ensure that the block does not retain the Realm, as it may not be dealloced
+    // immediately and so would extend the lifetime of the Realm an inconsistent amount
+    auto realm = r;
+    r = nil;
     return realm;
 }
+
 
 - (NSError *)asyncOpenErrorWithConfiguration:(RLMRealmConfiguration *)config {
     __block NSError *error = nil;
