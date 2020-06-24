@@ -464,6 +464,37 @@ static NSURL *syncDirectoryForChildProcess() {
     }
     return realm;
 }
+
+- (RLMRealm *)asyncOpenRealmWithConfiguration:(RLMRealmConfiguration *)config {
+    __block RLMRealm *realm = nil;
+    XCTestExpectation *ex = [self expectationWithDescription:@"Should asynchronously open a Realm"];
+    [RLMRealm asyncOpenWithConfiguration:config
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *r, NSError *err){
+        XCTAssertNil(err);
+        XCTAssertNotNil(r);
+        realm = r;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    return realm;
+}
+
+- (NSError *)asyncOpenErrorWithConfiguration:(RLMRealmConfiguration *)config {
+    __block NSError *error = nil;
+    XCTestExpectation *ex = [self expectationWithDescription:@"Should fail to asynchronously open a Realm"];
+    [RLMRealm asyncOpenWithConfiguration:config
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *r, NSError *err){
+        XCTAssertNotNil(err);
+        XCTAssertNil(r);
+        error = err;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    return error;
+}
+
 - (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user {
     return [self immediatelyOpenRealmForPartitionValue:partitionValue
                                                   user:user
@@ -654,19 +685,31 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)resetSyncManager {
-    if ([self appId]) {
-        NSMutableArray<XCTestExpectation *> *exs = [NSMutableArray new];
-        [self.app.allUsers enumerateKeysAndObjectsUsingBlock:^(NSString *, RLMUser *user, BOOL *) {
-            XCTestExpectation *ex = [self expectationWithDescription:@"Wait for logout"];
-            [exs addObject:ex];
-            [user logOutWithCompletion:^(NSError *) {
-                [ex fulfill];
-            }];
-        }];
-        [self waitForExpectations:exs timeout:60.0];
-
-        [[[self app] syncManager] resetForTesting];
+    if (!self.appId) {
+        return;
     }
+
+    NSMutableArray<XCTestExpectation *> *exs = [NSMutableArray new];
+    [self.app.allUsers enumerateKeysAndObjectsUsingBlock:^(NSString *, RLMUser *user, BOOL *) {
+        XCTestExpectation *ex = [self expectationWithDescription:@"Wait for logout"];
+        [exs addObject:ex];
+        [user logOutWithCompletion:^(NSError *) {
+            [ex fulfill];
+        }];
+
+        // Sessions are removed from the user asynchronously after a logout.
+        // We need to wait for this to happen before calling resetForTesting as
+        // that expects all sessions to be cleaned up first.
+        if (user.allSessions.count) {
+            [exs addObject:[self expectationForPredicate:[NSPredicate predicateWithFormat:@"allSessions.@count == 0"]
+                                     evaluatedWithObject:user handler:nil]];
+        }
+    }];
+
+    if (exs.count) {
+        [self waitForExpectations:exs timeout:60.0];
+    }
+    [self.app.syncManager resetForTesting];
 }
 
 - (NSString *)badAccessToken {
