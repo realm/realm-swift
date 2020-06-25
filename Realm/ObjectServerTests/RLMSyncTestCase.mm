@@ -604,8 +604,10 @@ static NSURL *syncDirectoryForChildProcess() {
         return;
     }
     [self waitForExpectations:@[ex] timeout:20.0];
-    if (error)
+    if (error) {
         *error = completionError;
+    }
+    [realm refresh];
 }
 
 - (void)manuallySetAccessTokenForUser:(RLMUser *)user value:(NSString *)tokenValue {

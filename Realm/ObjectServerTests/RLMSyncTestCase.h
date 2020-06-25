@@ -179,9 +179,10 @@ NS_ASSUME_NONNULL_END
 }
 
 #define CHECK_COUNT(d_count, macro_object_type, macro_realm) \
-{                                                                                                       \
-    [macro_realm refresh];                                                                              \
-    NSInteger c = [macro_object_type allObjectsInRealm:macro_realm].count;                              \
-    NSString *w = self.isParent ? @"parent" : @"child";                                                 \
-    XCTAssert(d_count == c, @"Expected %@ items, but actually got %@ (%@)", @(d_count), @(c), w);       \
+{                                                                                                         \
+    [macro_realm refresh];                                                                                \
+    RLMResults *r = [macro_object_type allObjectsInRealm:macro_realm];                                    \
+    NSInteger c = r.count;                                                                                \
+    NSString *w = self.isParent ? @"parent" : @"child";                                                   \
+    XCTAssert(d_count == c, @"Expected %@ items, but actually got %@ (%@) (%@)", @(d_count), @(c), r, w); \
 }

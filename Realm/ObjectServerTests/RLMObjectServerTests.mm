@@ -86,7 +86,7 @@
 
 - (RLMUser *)userForTest:(SEL)sel {
     return [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(sel)
-                                                                             register:self.isParent]];
+                                                               register:self.isParent]];
 }
 
 #pragma mark - Authentication and Tokens
