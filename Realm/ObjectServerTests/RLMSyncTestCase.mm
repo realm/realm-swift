@@ -221,7 +221,7 @@ static NSURL *syncDirectoryForChildProcess() {
             __block dispatch_semaphore_t sema = dispatch_semaphore_create(0);
             [[[NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]]
               dataTaskWithURL:[NSURL URLWithString:@"http://127.0.0.1:9090"]
-              completionHandler:^(NSData * _Nullable, NSURLResponse * _Nullable response, NSError * _Nullable) {
+              completionHandler:^(NSData *, NSURLResponse *response, NSError *) {
                 NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
                 isLive = [urlResponse statusCode] == 200;
                 dispatch_semaphore_signal(sema);
@@ -287,27 +287,6 @@ static NSURL *syncDirectoryForChildProcess() {
     return appId;
 }
 
-- (NSString *)lastApp {
-    // Set up the actual MongoDB Realm last app task
-    NSPipe *pipe = [NSPipe pipe];
-    NSTask *task = [[NSTask alloc] init];
-    task.launchPath = nodePath();
-    NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
-    task.arguments = @[[directory stringByAppendingPathComponent:@"admin.js"], @"last"];
-    task.standardOutput = pipe;
-    [task launch];
-
-    NSData *childStdout = pipe.fileHandleForReading.readDataToEndOfFile;
-    NSString *appId = [[NSString alloc] initWithData:childStdout encoding:NSUTF8StringEncoding];
-
-    if (!appId.length) {
-        abort();
-    }
-
-    return appId;
-}
-
-
 - (NSString *)desiredAdminSDKVersion {
     auto path = [[[[@(__FILE__) stringByDeletingLastPathComponent] // RLMSyncTestCase.mm
                    stringByDeletingLastPathComponent] // ObjectServerTests
@@ -356,7 +335,7 @@ static NSURL *syncDirectoryForChildProcess() {
         return;
     }
 
-    NSLog(@"Installing Realm Cloud %@", desiredVersion);
+    NSLog(@"Installing Stitch admin SDK %@", desiredVersion);
     NSTask *task = [[NSTask alloc] init];
     task.currentDirectoryPath = [@(__FILE__) stringByDeletingLastPathComponent];
     task.launchPath = nodePath();
@@ -678,13 +657,8 @@ static NSURL *syncDirectoryForChildProcess() {
     [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
                            withIntermediateDirectories:YES attributes:nil error:&error];
 
-    if (self.isParent) {
-        _appId = [RealmObjectServer.sharedServer createApp];
-        _app = [RLMApp appWithId:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
-    } else {
-        _appId = [RealmObjectServer.sharedServer lastApp];
-        _app = [RLMApp appWithId:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
-    }
+    _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmObjectServer.sharedServer createApp];
+    _app = [RLMApp appWithId:_appId configuration:self.defaultAppConfiguration rootDirectory:clientDataRoot];
 
     RLMSyncManager *syncManager = [[self app] syncManager];
     syncManager.logLevel = RLMSyncLogLevelTrace;

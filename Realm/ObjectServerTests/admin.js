@@ -4,15 +4,15 @@ const stitch = require('mongodb-stitch');
 
 async function create() {
     const admin = await stitch.StitchAdminClientFactory.create("http://localhost:9090");
-    
+
     await admin.login("unique_user@domain.com", "password");
     const profile = await admin.userProfile();
     const groupId = profile.roles[0].group_id;
     const appResponse = (await admin.apps(groupId).create({name: 'test'}));
     const appId = appResponse['_id'];
-    
+
     const app = admin.apps(groupId).app(appId);
-    
+
     await app.authProviders().create({type: 'anon-user'});
     await app.authProviders().create({
         type: 'local-userpass',
@@ -30,12 +30,12 @@ async function create() {
             break;
         }
     }
-    
+
     await app.secrets().create({
         name: "BackingDB_uri",
         value: "mongodb://localhost:26000"
     });
-    
+
     const serviceResponse = await app.services().create({
         "name": "mongodb1",
         "type": "mongodb",
@@ -55,7 +55,7 @@ async function create() {
             }
         }
     });
-    
+
     var dogRule = {
         "database": "test_data",
         "collection": "Dog",
@@ -85,7 +85,7 @@ async function create() {
             "title": "Dog"
         }
     };
-    
+
     var personRule = {
         "database": "test_data",
         "collection": "Person",
@@ -123,7 +123,7 @@ async function create() {
             "title": "Person"
         }
     };
-    
+
     var hugeSyncObjectRule = {
         "database": "test_data",
         "collection": "HugeSyncObject",
@@ -155,7 +155,7 @@ async function create() {
         "relationships": {
         }
     };
-    
+
     var userDataRule = {
         "database": "test_data",
         "collection": "UserData",
@@ -173,7 +173,7 @@ async function create() {
         "relationships": {
         }
     };
-    
+
     await app.services().service(serviceResponse['_id']).rules().create(dogRule);
     await app.services().service(serviceResponse['_id']).rules().create(personRule);
     await app.services().service(serviceResponse['_id']).rules().create(hugeSyncObjectRule);
@@ -216,11 +216,11 @@ async function create() {
         "relationships": {
         }
     });
-    
+
     await app.sync().config().update({
         "development_mode_enabled": true
     });
-    
+
     await app.functions().create({
         "name": "sum",
         "private": false,
@@ -231,7 +231,7 @@ async function create() {
         };
         `
     });
-    
+
     await app.functions().create({
         "name": "updateUserData",
         "private": false,
@@ -250,7 +250,7 @@ async function create() {
         };
         `
     });
-    
+
     await app.customUserData().update({
         "mongo_service_id": serviceResponse['_id'],
         "enabled": true,
@@ -258,25 +258,14 @@ async function create() {
         "collection_name": "UserData",
         "user_id_field": "user_id"
     });
-    
-    process.stdout.write(appResponse['client_app_id']);
-}
 
-async function last() {
-    const admin = await stitch.StitchAdminClientFactory.create("http://localhost:9090");
-    
-    await admin.login("unique_user@domain.com", "password");
-    const profile = await admin.userProfile();
-    const groupId = profile.roles[0].group_id;
-    const apps = await admin.apps(groupId).list();
-    
-    process.stdout.write(apps[apps.length - 1]['client_app_id']);
+    process.stdout.write(appResponse['client_app_id']);
 }
 
 async function clean() {
     try {
         const admin = await stitch.StitchAdminClientFactory.create("http://localhost:9090");
-        
+
         await admin.login("unique_user@domain.com", "password");
         const profile = await admin.userProfile();
         const groupId = profile.roles[0].group_id;
@@ -296,9 +285,6 @@ switch (args[0]) {
         break;
     case 'clean':
         clean();
-        break;
-    case 'last':
-        last();
         break;
     default:
         process.stderr.write("Invalid arg: " + args[0]);
