@@ -4,7 +4,7 @@ x.y.z Release notes (yyyy-MM-dd)
 Xcode 11.3 and iOS 9 are now the minimum supported versions.
 
 ### Enhancements
-* None.
+* Add support for building with Xcode 12 beta 1, except for watchOS.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
