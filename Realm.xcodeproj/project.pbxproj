@@ -2052,7 +2052,7 @@
 				CLASSPREFIX = RLM;
 				LastSwiftUpdateCheck = 0710;
 				LastTestingUpgradeCheck = 0510;
-				LastUpgradeCheck = 1140;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					3F1A5E711992EB7400F45F4C = {
@@ -2986,7 +2986,6 @@
 		C04B4BD81B55C47600FAE58E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = "";
 			};
@@ -2995,7 +2994,6 @@
 		C04B4BD91B55C47600FAE58E /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = "";
 			};
@@ -3073,6 +3071,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E01BE05C19002800DA /* Tests.xcconfig */;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -3081,6 +3080,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 5DD755E01BE05C19002800DA /* Tests.xcconfig */;
 			buildSettings = {
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

@@ -196,8 +196,8 @@ class ListTests: TestCase {
         assertEqual(str2, array[0])
         assertEqual(str1, array[1])
 
-        assertThrows(_ = array.insert(str2, at: 200))
-        assertThrows(_ = array.insert(str2, at: -200))
+        assertThrows(array.insert(str2, at: 200))
+        assertThrows(array.insert(str2, at: -200))
     }
 
     func testRemoveAtIndex() {
