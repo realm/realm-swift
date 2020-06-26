@@ -1555,7 +1555,10 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     // Create a large object and then delete it in the next transaction so that
     // the file is bloated
     @autoreleasepool {
-        RLMRealm *realm = [self openRealmForPartitionValue:partitionValue user:user];
+        RLMRealm *realm = [self immediatelyOpenRealmForPartitionValue:partitionValue
+                                                                 user:user
+                                                        encryptionKey:nil
+                                                           stopPolicy:RLMSyncStopPolicyImmediately];
         [realm beginWriteTransaction];
         [realm addObject:[HugeSyncObject objectWithRealmId:partitionValue]];
         [realm commitWriteTransaction];
