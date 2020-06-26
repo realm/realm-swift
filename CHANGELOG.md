@@ -4,11 +4,19 @@ x.y.z Release notes (yyyy-MM-dd)
 Xcode 11.3 and iOS 9 are now the minimum supported versions.
 
 ### Enhancements
-* Add support for building with Xcode 12 beta 1, except for watchOS.
+* Add support for building with Xcode 12 beta 1. watchOS currently requires
+  removing x86_64 from the supported architectures. Support for the new 64-bit
+  watch simulator will come in a future release.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Opening a Realm file in file format v6 (created by Realm Cocoa versions
+  between 2.4 and 2.10) would crash. (Since 5.0.0, [Core #3764](https://github.com/realm/realm-core/issues/3764)).
+* Upgrading v9 (pre-5.0) Realm files would create a redundant search index for
+  primary key properties. This index would then be removed the next time the
+  Realm was opened, resulting in some extra i/o in the upgrade process.
+  (Since 5.0.0, [Core #3787](https://github.com/realm/realm-core/issues/3787)).
+* Fixed a performance issue with upgrading v9 files with search indexes on
+  non-primary-key properties. (Since 5.0.0, [Core #3767](https://github.com/realm/realm-core/issues/3767)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -20,8 +28,8 @@ Xcode 11.3 and iOS 9 are now the minimum supported versions.
 * Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v6.0.6 to v6.0.7
+* Upgraded realm-sync from v5.0.5 to v5.0.6
 
 5.1.0 Release notes (2020-06-22)
 =============================================================
