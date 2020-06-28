@@ -50,6 +50,7 @@ static void RLMAssertRealmSchemaMatchesTable(id self, RLMRealm *realm) {
             XCTAssertEqual(indexed, table->has_search_index(column));
         }
     }
+    static_cast<void>(self);
 }
 
 @interface MigrationTestObject : RLMObject

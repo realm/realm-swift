@@ -50,13 +50,24 @@ This release also contains all changes from 5.0.3 and 5.1.0.
 
 10.0.0-beta.2 Release notes (2020-06-09)
 =============================================================
+Xcode 11.3 and iOS 9 are now the minimum supported versions.
 
 ### Enhancements
-* None.
+* Add support for building with Xcode 12 beta 1. watchOS currently requires
+  removing x86_64 from the supported architectures. Support for the new 64-bit
+  watch simulator will come in a future release.
 
 ### Fixed
 * Opening a SyncSession with LOCAL app deployments would not use the correct endpoints.
 * Linking from embedded objects to top-level objects was incorrectly disallowed.
+* Opening a Realm file in file format v6 (created by Realm Cocoa versions
+  between 2.4 and 2.10) would crash. (Since 5.0.0, [Core #3764](https://github.com/realm/realm-core/issues/3764)).
+* Upgrading v9 (pre-5.0) Realm files would create a redundant search index for
+  primary key properties. This index would then be removed the next time the
+  Realm was opened, resulting in some extra i/o in the upgrade process.
+  (Since 5.0.0, [Core #3787](https://github.com/realm/realm-core/issues/3787)).
+* Fixed a performance issue with upgrading v9 files with search indexes on
+  non-primary-key properties. (Since 5.0.0, [Core #3767](https://github.com/realm/realm-core/issues/3767)).
 
 ### Compatibility
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
@@ -156,6 +167,8 @@ later will be able to open the new file format.
 
 * Upgraded realm-core from v6.0.3 to v10.0.0-beta.1
 * Upgraded realm-sync from v5.0.1 to v10.0.0-beta.2
+* Upgraded realm-core from v6.0.6 to v6.0.7
+* Upgraded realm-sync from v5.0.5 to v5.0.6
 
 5.1.0 Release notes (2020-06-22)
 =============================================================

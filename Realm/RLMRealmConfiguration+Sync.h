@@ -18,7 +18,7 @@
 
 #import <Realm/RLMRealmConfiguration.h>
 
-#import "RLMSyncUtil.h"
+#import <Realm/RLMSyncUtil.h>
 
 @class RLMSyncConfiguration;
 
