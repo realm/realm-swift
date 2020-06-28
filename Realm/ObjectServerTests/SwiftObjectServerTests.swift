@@ -628,7 +628,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             })
 
             waitForExpectations(timeout: 10, handler: nil)
-
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }

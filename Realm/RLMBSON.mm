@@ -17,11 +17,13 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <sstream>
+
 #import "RLMUtil.hpp"
 #import "RLMDecimal128_Private.hpp"
 #import "RLMObjectId_Private.hpp"
 #import "RLMBSON_Private.hpp"
-#import <sstream>
+#import "util/bson/bson.hpp"
 
 using namespace realm;
 using namespace bson;

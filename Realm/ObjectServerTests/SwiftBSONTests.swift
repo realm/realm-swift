@@ -59,7 +59,7 @@ class SwiftBSONTests: XCTestCase {
     }
 
     func testBinaryRoundTrip() {
-        testBSONRoundTrip(Data(bytes: [1, 2, 3]) )
+        testBSONRoundTrip(Data([1, 2, 3]))
     }
 
     func testDatetimeRoundTrip() {

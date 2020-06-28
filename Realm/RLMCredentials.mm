@@ -20,6 +20,7 @@
 
 #import "RLMSyncUtil_Private.h"
 #import "RLMUtil.hpp"
+#import <util/bson/bson.hpp>
 
 using namespace realm;
 
@@ -64,8 +65,8 @@ using namespace realm;
         return nil;
     }
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    
-    return [[self alloc] initWithAppCredentials:app::AppCredentials::function(jsonString.UTF8String)];
+
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::function((realm::bson::BsonDocument)realm::bson::parse(jsonString.UTF8String))];
 }
 
 + (instancetype)credentialsWithUserAPIKey:(NSString *)apiKey {
