@@ -1,18 +1,18 @@
-//
-//  AppClipParentApp.swift
-//  AppClipParent
-//
-//  Created by mdb on 6/28/20.
-//  Copyright © 2020 Realm. All rights reserved.
-//
-
+// Add Copyright
 import SwiftUI
+import RealmSwift
 
 @main
-struct AppClipParentApp: App {
+struct AppClipParentApp: SwiftUI.App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(/*state: State(),*/)
         }
+    }
+    
+    private func fetchResults() -> Results<DemoObject> {
+        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.io.realm.app_group")!.appendingPathComponent("default.realm"))
+        let realm = try! Realm(configuration: config)
+        return realm.objects(DemoObject.self)
     }
 }
