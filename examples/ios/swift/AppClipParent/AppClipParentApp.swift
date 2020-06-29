@@ -1,18 +1,56 @@
-// Add Copyright
+////////////////////////////////////////////////////////////////////////////
+//
+// Copyright 2020 Realm Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
+
 import SwiftUI
 import RealmSwift
 
+class DemoObject: Object {
+    @objc dynamic var uuid = UUID().uuidString
+    @objc dynamic var date = NSDate()
+    @objc dynamic var title = ""
+}
+
+final class DemoObjects: Object {
+    @objc var id = 0
+    let demoObjects = RealmSwift.List<DemoObject>()
+    
+    override class func primaryKey() -> String? {
+        "id"
+    }
+}
+
 @main
 struct AppClipParentApp: SwiftUI.App {
+    
     var body: some Scene {
         WindowGroup {
-            ContentView(/*state: State(),*/)
+            ContentView(objects: demoObjects().demoObjects)
         }
     }
     
-    private func fetchResults() -> Results<DemoObject> {
+    private func demoObjects() -> DemoObjects {
         let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.io.realm.app_group")!.appendingPathComponent("default.realm"))
         let realm = try! Realm(configuration: config)
-        return realm.objects(DemoObject.self)
+
+        var demoObjects = realm.object(ofType: DemoObjects.self, forPrimaryKey: 0)
+        if demoObjects == nil {
+            demoObjects = try! realm.write { realm.create(DemoObjects.self, value: []) }
+        }
+        return demoObjects!
     }
 }

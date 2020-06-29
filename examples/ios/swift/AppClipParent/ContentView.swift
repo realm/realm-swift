@@ -1,62 +1,54 @@
-// Add Copyright
+////////////////////////////////////////////////////////////////////////////
+//
+// Copyright 2020 Realm Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+////////////////////////////////////////////////////////////////////////////
+
 import SwiftUI
 import RealmSwift
 
-class DemoObject: Object {
-    @objc dynamic var uuid = UUID().uuidString
-    @objc dynamic var date = NSDate()
-    @objc dynamic var title = ""
-    @objc dynamic var sectionTitle = ""
-}
-
-//final class State: ObservableObject {
-//    @Published var realm: Realm
-//    @Published var results: Results<DemoObject>
-//    @Published var count: Int = 0
-//    
-//    init() {
-//        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.io.realm.app_group")!.appendingPathComponent("default.realm"))
-//        let realm = try! Realm(configuration: config)
-//        results = realm.objects(DemoObject.self)
-//        self.realm = realm
-//    }
-//}
-
 struct ContentView: View {
-//    @ObservedObject var state: State
-    // Add results here
+    @ObservedObject var objects: RealmSwift.List<DemoObject>
 
     var body: some View {
         Section(header: Button("Add Object", action: addObject)) {
             List {
-                ForEach(fetchResults(), id: \.uuid) { object in
-                    Text("\(object.uuid)")
+                ForEach(objects, id: \.uuid) { object in
+                    ContentViewRow(object: object)
                 }
             }
         }
     }
-    
-    private func fetchResults() -> Results<DemoObject> {
-        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.io.realm.app_group")!.appendingPathComponent("default.realm"))
-        let realm = try! Realm(configuration: config)
-        return realm.objects(DemoObject.self)
-    }
-    
+
     private func addObject() {
         let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.io.realm.app_group")!.appendingPathComponent("default.realm"))
         let realm = try! Realm(configuration: config)
         try! realm.write {
-            realm.add(DemoObject())
+            objects.append(DemoObject())
         }
     }
 }
 
-struct ContentRow: View {
-    var body: some View {
-        Text("Content Row not implemented")
-    }
-}
+struct ContentViewRow: View {
+    var object: DemoObject
 
-func results(realm: Realm) -> AnyRealmCollection<DemoObject> {
-    return AnyRealmCollection(realm.objects(DemoObject.self))
+    var body: some View {
+        VStack {
+            Text(verbatim: object.uuid).font(.body)
+            Text(object.date.description).font(.footnote)
+            Spacer()
+        }
+    }
 }
