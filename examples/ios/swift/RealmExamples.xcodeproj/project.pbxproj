@@ -254,6 +254,7 @@
 		6816087E24A91DDA00C6AF2E /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6816088124A91DF500C6AF2E /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6816088524A91DFA00C6AF2E /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		682D921424AA81D1005DAB3A /* AppClipParent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppClipParent.entitlements; sourceTree = "<group>"; };
 		686F530224A8ECD200BA4AC1 /* AppClipParent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppClipParent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		686F530424A8ECD200BA4AC1 /* AppClipParentApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppClipParentApp.swift; sourceTree = "<group>"; };
 		686F530624A8ECD200BA4AC1 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -471,6 +472,7 @@
 		686F530324A8ECD200BA4AC1 /* AppClipParent */ = {
 			isa = PBXGroup;
 			children = (
+				682D921424AA81D1005DAB3A /* AppClipParent.entitlements */,
 				686F530424A8ECD200BA4AC1 /* AppClipParentApp.swift */,
 				686F530624A8ECD200BA4AC1 /* ContentView.swift */,
 				686F530824A8ECD300BA4AC1 /* Assets.xcassets */,
@@ -1168,6 +1170,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = AppClipParent/AppClipParent.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "\"AppClipParent/Preview Content\"";
@@ -1199,6 +1202,7 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = AppClipParent/AppClipParent.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
