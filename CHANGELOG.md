@@ -17,6 +17,12 @@ Xcode 11.3 and iOS 9 are now the minimum supported versions.
   (Since 5.0.0, [Core #3787](https://github.com/realm/realm-core/issues/3787)).
 * Fixed a performance issue with upgrading v9 files with search indexes on
   non-primary-key properties. (Since 5.0.0, [Core #3767](https://github.com/realm/realm-core/issues/3767)).
+* `List.index(of:)` would give incorrect results if it was the very first thing
+  called on that List after a Realm was refreshed following a write which
+  modified the List. (Since 5.0.0, [#6606](https://github.com/realm/realm-cocoa/issues/6606)).
+* If a ThreadSafeReference was the only remaining reference to a Realm,
+  multiple copies of the file could end up mapped into memory at once. This
+  probably did not have any symptoms other than increased memory usage. (Since 5.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -28,8 +34,8 @@ Xcode 11.3 and iOS 9 are now the minimum supported versions.
 * Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
-* Upgraded realm-core from v6.0.6 to v6.0.7
-* Upgraded realm-sync from v5.0.5 to v5.0.6
+* Upgraded realm-core from v6.0.6 to v6.0.8
+* Upgraded realm-sync from v5.0.5 to v5.0.7
 
 5.1.0 Release notes (2020-06-22)
 =============================================================
