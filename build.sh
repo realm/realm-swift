@@ -1209,16 +1209,6 @@ case "$COMMAND" in
     # CocoaPods
     ######################################
     "cocoapods-setup")
-        if [ ! -d core ]; then
-          sh build.sh download-sync
-          rm core
-          mv sync-* core
-          mv core/librealm-ios.a core/librealmcore-ios.a
-          mv core/librealm-macosx.a core/librealmcore-macosx.a
-          mv core/librealm-tvos.a core/librealmcore-tvos.a
-          mv core/librealm-watchos.a core/librealmcore-watchos.a
-        fi
-
         if [[ "$2" != "swift" ]]; then
           if [ ! -d Realm/ObjectStore/src ]; then
             cat >&2 <<EOM
@@ -1232,6 +1222,16 @@ their entries in your Podfile.
 
 EOM
             exit 1
+          fi
+
+          if [ ! -d core ]; then
+            sh build.sh download-sync
+            rm core
+            mv sync-* core
+            mv core/librealm-ios.a core/librealmcore-ios.a
+            mv core/librealm-macosx.a core/librealmcore-macosx.a
+            mv core/librealm-tvos.a core/librealmcore-tvos.a
+            mv core/librealm-watchos.a core/librealmcore-watchos.a
           fi
 
           rm -rf include
