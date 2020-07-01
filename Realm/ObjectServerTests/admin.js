@@ -261,6 +261,23 @@ async function create() {
         "collection_name": "UserData",
         "user_id_field": "user_id"
     }));
+    
+    await app.secrets().create({
+        name: "gcm",
+        value: "gcm"
+    });
+    
+    promises.push(app.services().create({
+        "name": "gcm",
+        "type": "gcm",
+        "config": {
+            "senderId": "gcm"
+        },
+        "secret_config": {
+            "apiKey": "gcm"
+        },
+        "version": 1
+    }));
 
     await Promise.all(promises);
 

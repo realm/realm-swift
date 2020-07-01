@@ -20,6 +20,7 @@
 
 #import "RLMCredentials_Private.hpp"
 #import "RLMBSON_Private.hpp"
+#import "RLMPushClient_Private.hpp"
 #import "RLMUser_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
 #import "RLMUtil.hpp"
@@ -293,6 +294,10 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 - (RLMUser *)switchToUser:(RLMUser *)syncUser {
     return [[RLMUser alloc] initWithUser:_app->switch_user(syncUser._syncUser) app:self];
+}
+
+- (RLMPushClient *)pushClientWithServiceName:(NSString *)serviceName {
+    return [[RLMPushClient alloc] initWithPushClient:_app->push_notification_client(serviceName.UTF8String)];
 }
 
 @end

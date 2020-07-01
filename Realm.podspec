@@ -48,6 +48,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMAppCredentials.h',
                               'include/**/RLMBSON.h',
                               'include/**/RLMNetworkTransport.h',
+                              'include/**/RLMPushClient.h',
                               'include/**/RLMProviderClient.h',
                               'include/**/RLMRealm+Sync.h',
                               'include/**/RLMRealmConfiguration+Sync.h',

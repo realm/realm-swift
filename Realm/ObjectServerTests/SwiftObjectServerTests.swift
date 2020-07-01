@@ -994,6 +994,43 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         wait(for: [callFunctionEx], timeout: 4.0)
     }
 
+    func testPushRegistration() {
+        let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
+        let password = randomString(10)
+
+        let registerUserEx = expectation(description: "Register user")
+
+        app.emailPasswordAuth().registerEmail(email, password: password) { (error) in
+            XCTAssertNil(error)
+            registerUserEx.fulfill()
+        }
+        wait(for: [registerUserEx], timeout: 4.0)
+
+        let loginExpectation = expectation(description: "Login user")
+
+        let credentials = Credentials(username: email, password: password)
+        app.login(withCredential: credentials) { (_, error) in
+            XCTAssertNil(error)
+            loginExpectation.fulfill()
+        }
+        wait(for: [loginExpectation], timeout: 4.0)
+
+        let registerDeviceExpectation = expectation(description: "Register Device")
+        let client = app.pushClient(withServiceName: "gcm")
+        client.registerDevice(token: "some-token", user: app.currentUser()!) { error in
+            XCTAssertNil(error)
+            registerDeviceExpectation.fulfill()
+        }
+        wait(for: [registerDeviceExpectation], timeout: 4.0)
+
+        let dergisterDeviceExpectation = expectation(description: "Deregister Device")
+        client.deregisterDevice(user: app.currentUser()!, completion: { error in
+            XCTAssertNil(error)
+            dergisterDeviceExpectation.fulfill()
+        })
+        wait(for: [dergisterDeviceExpectation], timeout: 4.0)
+    }
+
     func testCustomUserData() {
         let email = "realm_tests_do_autoverify\(randomString(7))@\(randomString(7)).com"
         let password = randomString(10)

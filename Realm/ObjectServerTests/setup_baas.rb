@@ -63,7 +63,7 @@ def setup_stitch
 
     if !Dir.exists?(STITCH_DIR)
         puts 'cloning stitch'
-        `git clone git@github.com:10gen/stitch`
+        `git clone git@github.com:10gen/baas stitch`
     end
 
     puts 'checking out stitch'

@@ -168,6 +168,63 @@
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
 }
 
+- (void)testDeviceRegistration {
+    RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should login anonymously"];
+    __block RLMUser *syncUser;
+    [app loginWithCredential:[RLMCredentials anonymousCredentials] completion:^(RLMUser *user, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssert(user);
+        syncUser = user;
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+
+    RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
+    expectation = [self expectationWithDescription:@"should register device"];
+    [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+
+    expectation = [self expectationWithDescription:@"should deregister device"];
+    [client deregisterDeviceForUser:[app currentUser] completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+}
+
+- (void)testMultipleRegisterDevice {
+    RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
+    XCTestExpectation *loginExpectation = [self expectationWithDescription:@"should login anonymously"];
+    XCTestExpectation *registerExpectation = [self expectationWithDescription:@"should register device"];
+    XCTestExpectation *secondRegisterExpectation = [self expectationWithDescription:@"should not throw error when attempting to register again"];
+
+    __block RLMUser *syncUser;
+    [app loginWithCredential:[RLMCredentials anonymousCredentials] completion:^(RLMUser *user, NSError *error) {
+        XCTAssertNil(error);
+        XCTAssert(user);
+        syncUser = user;
+        [loginExpectation fulfill];
+    }];
+    [self waitForExpectations:@[loginExpectation] timeout:10.0];
+    
+    RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
+    [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [registerExpectation fulfill];
+    }];
+    [self waitForExpectations:@[registerExpectation] timeout:10.0];
+        
+    [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [secondRegisterExpectation fulfill];
+    }];
+    [self waitForExpectations:@[secondRegisterExpectation] timeout:10.0];
+}
+
 #pragma mark - RLMEmailPasswordAuth
 
 - (void)testRegisterEmailAndPassword {

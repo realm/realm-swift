@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol RLMNetworkTransport, RLMBSON;
 
-@class RLMUser, RLMCredentials, RLMSyncManager, RLMEmailPasswordAuth;
+@class RLMUser, RLMCredentials, RLMSyncManager, RLMEmailPasswordAuth, RLMPushClient;
 
 /// A block type used for APIs which asynchronously vend an `RLMUser`.
 typedef void(^RLMUserCompletionBlock)(RLMUser * _Nullable, NSError * _Nullable);
@@ -150,6 +150,11 @@ Create a new Realm App configuration.
  @returns The user you intend to switch to
  */
 - (RLMUser *)switchToUser:(RLMUser *)syncUser;
+
+/**
+ A client which can be used to register devices with the server to receive push notificatons
+ */
+- (RLMPushClient *)pushClientWithServiceName:(NSString *)serviceName;
 
 /**
  RLMApp instances are cached internally by Realm and cannot be created directly.
