@@ -19,38 +19,24 @@
 import SwiftUI
 import RealmSwift
 
-class DemoObject: Object {
-    @objc dynamic var uuid = UUID().uuidString
-    @objc dynamic var date = NSDate()
-    @objc dynamic var title = ""
-}
-
-final class DemoObjects: Object {
-    @objc var id = 0
-    let demoObjects = RealmSwift.List<DemoObject>()
-    
-    override class func primaryKey() -> String? {
-        "id"
-    }
-}
-
 @main
 struct AppClipParentApp: SwiftUI.App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(objects: demoObjects().demoObjects)
+            ContentView(objects: demoObjects().list)
         }
     }
     
     private func demoObjects() -> DemoObjects {
-        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.io.realm.app_group")!.appendingPathComponent("default.realm"))
+        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: entitlementConstants.groupId)!.appendingPathComponent("default.realm"))
         let realm = try! Realm(configuration: config)
-
-        var demoObjects = realm.object(ofType: DemoObjects.self, forPrimaryKey: 0)
-        if demoObjects == nil {
-            demoObjects = try! realm.write { realm.create(DemoObjects.self, value: []) }
+        
+        if let demoObjects = realm.object(ofType: DemoObjects.self, forPrimaryKey: 0) {
+            return demoObjects
         }
-        return demoObjects!
+        else {
+            return try! realm.write { realm.create(DemoObjects.self, value: []) }
+        }
     }
 }

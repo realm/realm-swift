@@ -21,7 +21,7 @@ import RealmSwift
 
 struct ContentView: View {
     @ObservedObject var objects: RealmSwift.List<DemoObject>
-
+    
     var body: some View {
         Section(header: Button("Add Object", action: addObject)) {
             List {
@@ -32,8 +32,9 @@ struct ContentView: View {
         }
     }
 
+    // Add 
     private func addObject() {
-        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.io.realm.app_group")!.appendingPathComponent("default.realm"))
+        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: entitlementConstants.groupId)!.appendingPathComponent("default.realm"))
         let realm = try! Realm(configuration: config)
         try! realm.write {
             objects.append(DemoObject())
@@ -46,9 +47,8 @@ struct ContentViewRow: View {
 
     var body: some View {
         VStack {
-            Text(verbatim: object.uuid).font(.body)
-            Text(object.date.description).font(.footnote)
-            Spacer()
+            Text(verbatim: object.uuid).fixedSize()
+            Text(object.date.description).font(.footnote).frame(alignment: .leading)
         }
     }
 }

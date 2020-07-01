@@ -7,5 +7,9 @@
 		<string>appclips:example.com</string>
 		<string>webcredentials:example.com</string>
 	</array>
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.TEAM_ID.com.domain.APP_GROUP</string>
+	</array>
 </dict>
 </plist>
