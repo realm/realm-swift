@@ -307,6 +307,18 @@ public func changesetPublisher<T: RealmCollection>(_ collection: T) -> Publisher
     Publishers.CollectionChangeset<T>(collection)
 }
 
+// MARK: - Realm
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension Realm {
+    /// A publisher that emits Void each time the object changes.
+    ///
+    /// Despite the name, this actually emits *after* the collection has changed.
+    public var objectWillChange: Publishers.RealmWillChange {
+        return Publishers.RealmWillChange(self)
+    }
+}
+
 // MARK: - Object
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
@@ -447,6 +459,29 @@ public struct ObservationSubscription: Subscription {
 public enum Publishers {
     static private func realm<S: Scheduler>(_ config: RLMRealmConfiguration, _ scheduler: S) -> Realm? {
         try? Realm(RLMRealm(configuration: config, queue: scheduler as? DispatchQueue))
+    }
+
+    /// A publisher which emits Void each time the Realm is refreshed.
+    ///
+    /// Despite the name, this actually emits *after* the Realm is refreshed.
+    public struct RealmWillChange: Publisher {
+        /// This publisher cannot fail.
+        public typealias Failure = Never
+        /// This publisher emits Void.
+        public typealias Output = Void
+
+        private let realm: Realm
+        internal init(_ realm: Realm) {
+            self.realm = realm
+        }
+
+        /// :nodoc:
+        public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
+            let token = self.realm.observe { _, _ in
+                _ = subscriber.receive()
+            }
+            subscriber.receive(subscription: ObservationSubscription(token: token))
+        }
     }
 
     /// A publisher which emits Void each time the object is mutated.

@@ -71,6 +71,34 @@ class CombineTestCase: TestCase {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+class CombineRealmTests: CombineTestCase {
+    func testWillChangeLocalWrite() {
+        var called = false
+        token = realm.objectWillChange.sink {
+            called = true
+        }
+        try! realm.write {
+            realm.create(SwiftIntObject.self, value: [])
+        }
+        XCTAssertTrue(called)
+    }
+
+    func testWillChangeRemoteWrite() {
+        let exp = XCTestExpectation()
+        token = realm.objectWillChange.sink {
+            exp.fulfill()
+        }
+        subscribeOnQueue.async {
+            let backgroundRealm = try! Realm(configuration: self.realm.configuration)
+            try! backgroundRealm.write {
+                backgroundRealm.create(SwiftIntObject.self, value: [])
+            }
+        }
+        wait(for: [exp], timeout: 1)
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class CombineObjectPublisherTests: CombineTestCase {
     var obj: SwiftIntObject!
 

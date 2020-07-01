@@ -1,7 +1,9 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add `Realm.objectWillChange`, which is a Combine publisher that will emit a
+  notification each time the Realm is refreshed or a write transaction is
+  commited.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
