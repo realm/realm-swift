@@ -363,6 +363,13 @@ download_common() {
     rm -rf "${download_type}-${version}" core
     mv "${temp_dir}/${download_type}-${version}" .
     ln -s "${download_type}-${version}" core
+
+    # Xcode 12 beta 1 ships a broken version of __bit_reference which breaks
+    # ABI compatibility with older versions, so grab a fixed version of that
+    # header.
+    if (( $(xcode_version_major) > 11 )); then
+        curl --silent https://raw.githubusercontent.com/llvm/llvm-project/4198874630be5c6126d78944f8a2d89dea90c7c4/libcxx/include/__bit_reference -o core/include/__bit_reference
+    fi
 }
 
 download_core() {
@@ -557,11 +564,6 @@ case "$COMMAND" in
         ;;
 
     "catalyst")
-        if (( $(xcode_version_major) < 11 )); then
-            echo 'Building for Catalyst requires Xcode 11'
-            exit 1
-        fi
-
         xc "-scheme Realm -configuration $CONFIGURATION \
             REALM_CATALYST_FLAGS='-target x86_64-apple-ios13.0-macabi' \
             REALM_PLATFORM_SUFFIX='maccatalyst' \
@@ -570,11 +572,6 @@ case "$COMMAND" in
         ;;
 
     "catalyst-swift")
-        if (( $(xcode_version_major) < 11 )); then
-            echo 'Building for Catalyst requires Xcode 11'
-            exit 1
-        fi
-
         sh build.sh catalyst
         # FIXME: change this to just "-destination variant='Mac Catalyst'" once the CI machines are running 10.15
         xc "-scheme 'RealmSwift' -configuration $CONFIGURATION build \
@@ -590,11 +587,6 @@ case "$COMMAND" in
         ;;
 
     "xcframework")
-        if (( $(xcode_version_major) < 11 )); then
-            echo 'Building a xcframework requires Xcode 11'
-            exit 1
-        fi
-
         export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS BUILD_LIBRARY_FOR_DISTRIBUTION=YES REALM_OBJC_MACH_O_TYPE=staticlib"
 
         # Build all of the requested frameworks
@@ -760,10 +752,8 @@ case "$COMMAND" in
         sh build.sh test-tvos-devices || failed=1
         sh build.sh test-osx || failed=1
         sh build.sh test-osx-swift || failed=1
-        if (( $(xcode_version_major) >= 11 )); then
-            sh build.sh test-catalyst || failed=1
-            sh build.sh test-catalyst-swift || failed=1
-        fi
+        sh build.sh test-catalyst || failed=1
+        sh build.sh test-catalyst-swift || failed=1
         exit $failed
         ;;
 
@@ -902,10 +892,8 @@ case "$COMMAND" in
         sh build.sh verify-swiftlint
         sh build.sh verify-swiftpm
         sh build.sh verify-osx-object-server
-        if (( $(xcode_version_major) >= 11 )); then
-            sh build.sh verify-catalyst
-            sh build.sh verify-catalyst-swift
-        fi
+        sh build.sh verify-catalyst
+        sh build.sh verify-catalyst-swift
         ;;
 
     "verify-cocoapods")
@@ -1409,11 +1397,7 @@ EOM
 
         set_xcode_and_swift_versions
 
-        if [[ "$PLATFORM" = "catalyst" ]] && (( $(xcode_version_major) < 11 )); then
-            mkdir -p build/catalyst/swift-$REALM_XCODE_VERSION
-        else
-            sh build.sh $PLATFORM-swift
-        fi
+        sh build.sh $PLATFORM-swift
 
         cd build/$PLATFORM
         zip --symlinks -r realm-framework-$PLATFORM-$REALM_XCODE_VERSION.zip swift-$REALM_XCODE_VERSION

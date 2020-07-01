@@ -16,11 +16,11 @@ STITCH_DIR = "#{BASE_DIR}/stitch"
 MONGODB_URL="https://fastdl.mongodb.org/osx/mongodb-macos-x86_64-#{MONGODB_VERSION}.tgz"
 TRANSPILER_TARGET='node8-macos'
 SERVER_STITCH_LIB_URL="https://s3.amazonaws.com/mciuploads/mongodb-mongo-master/stitch-support/macos-debug/e791a2ea966bb302ff180dd4538d87c078e74747/stitch-support-4.3.2-721-ge791a2e-patch-5e2a6ad2a4cf473ae2e67b09.tgz"
-MONGO_DIR="#{BUILD_DIR}/mongodb-macos-x86_64-#{MONGODB_VERSION}"
+MONGO_DIR="'#{BUILD_DIR}'/mongodb-macos-x86_64-#{MONGODB_VERSION}"
 
 def setup_mongod
     if !Dir.exists?(MONGO_DIR)
-        `cd #{BUILD_DIR} && curl --silent #{MONGODB_URL} | tar xz && mkdir #{MONGO_DIR}/db_files`
+        `cd '#{BUILD_DIR}' && curl --silent '#{MONGODB_URL}' | tar xz && mkdir #{MONGO_DIR}/db_files`
     end
 end
 
@@ -67,36 +67,35 @@ def setup_stitch
     end
 
     puts 'checking out stitch'
-    `cd #{STITCH_DIR} && git pull`
-    `cd #{STITCH_DIR} && git checkout #{STITCH_VERSION}`
+    `git -C '#{STITCH_DIR}' fetch && git -C '#{STITCH_DIR}' checkout #{STITCH_VERSION}`
 
     dylib_dir = "#{STITCH_DIR}/etc/dylib"
     if !Dir.exists?(dylib_dir)
         puts 'downloading mongodb dylibs'
         Dir.mkdir dylib_dir
-        puts `curl -s "#{SERVER_STITCH_LIB_URL}" | tar xvfz - --strip-components=1 -C #{dylib_dir}`
+        puts `curl -s "#{SERVER_STITCH_LIB_URL}" | tar xvfz - --strip-components=1 -C '#{dylib_dir}'`
     end
 
     update_doc_filepath = "#{STITCH_DIR}/update_doc"
     if !File.exists?(update_doc_filepath)
         puts "downloading update_doc"
-        puts `cd #{STITCH_DIR} && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7a5c9ec4432c400181c_17_10_15_01_19_33/update_doc"`
-        puts `chmod +x #{update_doc_filepath}`
+        puts `cd '#{STITCH_DIR}' && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7a5c9ec4432c400181c_17_10_15_01_19_33/update_doc"`
+        puts `chmod +x '#{update_doc_filepath}'`
     end
 
     assisted_agg_filepath = "#{STITCH_DIR}/assisted_agg"
     if !File.exists?(assisted_agg_filepath)
         puts "downloading assisted_agg"
-        puts `cd #{STITCH_DIR} && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7ab2a60ed5647001827_17_10_15_01_19_39/assisted_agg"`
-        puts `chmod +x #{assisted_agg_filepath}`
+        puts `cd '#{STITCH_DIR}' && curl --silent -O "https://s3.amazonaws.com/stitch-artifacts/stitch-mongo-libs/stitch_mongo_libs_osx_patch_cbcbfd8ebefcca439ff2e4d99b022aedb0d61041_59e2b7ab2a60ed5647001827_17_10_15_01_19_39/assisted_agg"`
+        puts `chmod +x '#{assisted_agg_filepath}'`
     end
 
     if `which node`.empty?
         puts "downloading node 🚀"
-        puts `cd #{STITCH_DIR} && curl -O "https://nodejs.org/dist/v#{NODE_VERSION}/node-v#{NODE_VERSION}-darwin-x64.tar.gz" | tar xzf node-v#{NODE_VERSION}-darwin-x64.tar.gz`
+        puts `cd '#{STITCH_DIR}' && curl -O "https://nodejs.org/dist/v#{NODE_VERSION}/node-v#{NODE_VERSION}-darwin-x64.tar.gz" | tar xzf node-v#{NODE_VERSION}-darwin-x64.tar.gz`
         exports << "export PATH=\"#{STITCH_DIR}/node-v8.11.2-darwin-x64/bin/:$PATH\""
     end
-    
+
     if `which yarn`.empty?
         `rm -rf "$HOME/.yarn"`
         `export PATH=\"#{STITCH_DIR}/node-v#{NODE_VERSION}-darwin-x64/bin/:$PATH\" && curl -o- -L https://yarnpkg.com/install.sh | bash`
@@ -105,7 +104,7 @@ def setup_stitch
 
     puts 'building transpiler'
     puts `#{exports.length() == 0 ? "" : exports.join(' && ') + ' &&'} \
-        cd #{STITCH_DIR}/etc/transpiler && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
+        cd '#{STITCH_DIR}/etc/transpiler' && yarn install && yarn run build -t "#{TRANSPILER_TARGET}"`
 
     if !Dir.exists?('go')
         puts 'downloading go'
@@ -120,10 +119,10 @@ def setup_stitch
     exports << "export LD_LIBRARY_PATH=\"$STITCH_PATH/etc/dylib/lib\""
 
     puts 'running stitch'
-    
+
     puts `#{exports.join(' && ')} && \
-        cd #{STITCH_DIR} && \
-        go run -exec "env LD_LIBRARY_PATH=$LD_LIBRARY_PATH" cmd/auth/user.go addUser \
+        cd '#{STITCH_DIR}' && \
+        go run -exec "env LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH\"" cmd/auth/user.go addUser \
             -domainID 000000000000000000000000 \
             -mongoURI mongodb://localhost:26000 \
             -salt 'DQOWene1723baqD!_@#' \
@@ -159,8 +158,8 @@ if ARGV.length < 1
 end
 
 case ARGV[0]
-when "" 
+when ""
     build_action
-when "clean" 
+when "clean"
     clean_action
 end

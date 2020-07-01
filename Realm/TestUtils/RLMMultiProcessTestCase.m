@@ -28,6 +28,10 @@
 @property (nonatomic, strong) NSString *testsPath;
 @end
 
+@interface RLMMultiProcessTestCase (Sync)
+- (NSString *)appId;
+@end
+
 @implementation RLMMultiProcessTestCase
 // Override all of the methods for creating a XCTestCase object to capture the current test name
 + (id)testCaseWithInvocation:(NSInvocation *)invocation {
@@ -112,6 +116,9 @@
     NSMutableDictionary *env = [NSProcessInfo.processInfo.environment mutableCopy];
     env[@"RLMProcessIsChild"] = @"true";
     env[@"RLMParentProcessBundleID"] = [NSBundle mainBundle].bundleIdentifier;
+    if ([self respondsToSelector:@selector(appId)]) {
+        env[@"RLMParentAppId"] = self.appId;
+    }
 
     // If we're running with address sanitizer or thread sanitizer we need to
     // explicitly tell dyld to inject the appropriate runtime library into
@@ -126,6 +133,8 @@
     // Don't inherit the config file in the subprocess, as multiple XCTest
     // processes talking to a single Xcode instance doesn't work at all
     [env removeObjectForKey:@"XCTestConfigurationFilePath"];
+    [env removeObjectForKey:@"XCTestSessionIdentifier"];
+    [env removeObjectForKey:@"XPC_SERVICE_NAME"];
 
     NSTask *task = [[NSTask alloc] init];
     task.launchPath = self.xctestPath;

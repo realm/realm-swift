@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # A script to generate the .jenkins.yml file for the CI pull request job
-XCODE_VERSIONS = %w(10.3 11.1 11.2.1 11.3 11.4.1 11.5)
+XCODE_VERSIONS = %w(11.3 11.4.1 11.5 12.0)
 CONFIGURATIONS = %w(Debug Release)
 
 release_only = ->(v, c) { c == 'Release' }
@@ -28,8 +28,8 @@ targets = {
   'ios-swift' => oldest_and_latest,
   'tvos-swift' => oldest_and_latest,
 
-  'catalyst' => minimum_version(11),
-  'catalyst-swift' => minimum_version(11),
+  'catalyst' => oldest_and_latest,
+  'catalyst-swift' => oldest_and_latest,
 
   'xcframework' => latest_only,
 
@@ -38,7 +38,7 @@ targets = {
   'cocoapods-ios-dynamic' => oldest_and_latest,
   'cocoapods-watchos' => oldest_and_latest,
 
-  'swiftpm' => minimum_version(11),
+  'swiftpm' => oldest_and_latest,
   'swiftpm-address' => latest_only,
   'swiftpm-thread' => latest_only,
   'swiftpm-ios' => latest_only,
