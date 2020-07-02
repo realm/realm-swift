@@ -41,7 +41,7 @@ public protocol ObjectKeyIdentifiable: Identifiable, Object {
 }
 
 /// :nodoc:
-@available(*, renamed: "ObjectKeyIdentifiable")
+@available(*, deprecated, renamed: "ObjectKeyIdentifiable")
 public typealias ObjectKeyIdentifable = ObjectKeyIdentifiable
 
 extension ObjectKeyIdentifiable {
@@ -55,7 +55,7 @@ extension ObjectKeyIdentifiable {
 
 // MARK: - Combine
 
-/// A type which can be passed to `publisher()` or `changesetPublisher()`.
+/// A type which can be passed to `valuePublisher()` or `changesetPublisher()`.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public protocol RealmSubscribable {
     // swiftlint:disable identifier_name
@@ -260,8 +260,14 @@ extension RealmCollection where Self: RealmSubscribable {
         Publishers.WillChange(self)
     }
 
-    /// A publisher that emits the collection each time the collection changes.
+    /// :nodoc:
+    @available(*, deprecated, renamed: "collectionPublisher")
     public var publisher: Publishers.Value<Self> {
+        Publishers.Value(self)
+    }
+
+    /// A publisher that emits the collection each time the collection changes.
+    public var collectionPublisher: Publishers.Value<Self> {
         Publishers.Value(self)
     }
 

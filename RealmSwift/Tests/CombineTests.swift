@@ -627,7 +627,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
     func testBasic() {
         var exp = XCTestExpectation()
         var calls = 0
-        token = collection.publisher
+        token = collection.collectionPublisher
             .assertNoFailure()
             .sink { c in
                 XCTAssertEqual(c.count, calls)
@@ -681,7 +681,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
     func testSubscribeOn() {
         let sema = DispatchSemaphore(value: 0)
         var calls = 0
-        token = collection.publisher
+        token = collection.collectionPublisher
             .subscribe(on: subscribeOnQueue)
             .assertNoFailure()
             .sink { r in
@@ -700,7 +700,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
     func testReceiveOn() {
         var calls = 0
         var exp = XCTestExpectation(description: "initial")
-        token = collection.publisher
+        token = collection.collectionPublisher
             .receive(on: receiveOnQueue)
             .assertNoFailure()
             .sink { r in
@@ -757,7 +757,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
     func testMakeThreadSafe() {
         var calls = 0
         var exp = XCTestExpectation(description: "initial")
-        token = collection.publisher
+        token = collection.collectionPublisher
             .map { $0 }
             .threadSafeReference()
             .receive(on: receiveOnQueue)
@@ -799,7 +799,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
 
     func testFrozen() {
         let exp = XCTestExpectation()
-        token = collection.publisher
+        token = collection.collectionPublisher
             .freeze()
             .prefix(10)
             .collect()
@@ -888,7 +888,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
 
     func testFrozenMakeThreadSafe() {
         let sema = DispatchSemaphore(value: 0)
-        token = collection.publisher
+        token = collection.collectionPublisher
             .freeze()
             .threadSafeReference()
             .receive(on: receiveOnQueue)

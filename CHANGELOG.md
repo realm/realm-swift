@@ -9,6 +9,10 @@ x.y.z Release notes (yyyy-MM-dd)
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
 * Fix the spelling of `ObjectKeyIdentifiable`. The old spelling is available
   and deprecated for compatiblity.
+* Rename `RealmCollection.publisher` to `RealmCollection.collectionPublisher`.
+  The old name interacted with the `publisher` defined by `Sequence` in very
+  confusing ways, so we need to use a different name. The `publisher` name is
+  still available for compatiblity. ([#6516](https://github.com/realm/realm-cocoa/issues/6516))
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
