@@ -35,12 +35,16 @@ import Realm.Private
 ///
 /// You can also manually conform to `Identifiable` if you wish, but note that
 /// using the object's memory address does *not* work for managed objects.
-public protocol ObjectKeyIdentifable: Identifiable, Object {
+public protocol ObjectKeyIdentifiable: Identifiable, Object {
     /// The stable identity of the entity associated with `self`.
     var id: UInt64 { get }
 }
 
-extension ObjectKeyIdentifable {
+/// :nodoc:
+@available(*, renamed: "ObjectKeyIdentifiable")
+public typealias ObjectKeyIdentifable = ObjectKeyIdentifiable
+
+extension ObjectKeyIdentifiable {
     /// A stable identifier for this object. For managed Realm objects, this
     /// value will be the same for all object instances which refer to the same
     /// object (i.e. for which `Object.isSameObject(as:)` returns true).
