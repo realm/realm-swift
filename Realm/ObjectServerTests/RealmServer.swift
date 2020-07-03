@@ -775,6 +775,23 @@ public class RealmServer: NSObject {
             "user_id_field": "user_id"
         ]) { if let error = $1 { XCTFail(error.localizedDescription) }}
 
+        _ = app.secrets.post([
+            "name": "gcm",
+            "value": "gcm"
+        ])
+
+        app.services.post(on: group, [
+            "name": "gcm",
+            "type": "gcm",
+            "config": [
+                "senderId": "gcm"
+            ],
+            "secret_config": [
+                "apiKey": "gcm"
+            ],
+            "version": 1
+        ]) { if let error = $1 { XCTFail(error.localizedDescription) }}
+
         guard case .success = group.wait(timeout: .now() + 5.0) else {
             throw URLError(.badServerResponse)
         }

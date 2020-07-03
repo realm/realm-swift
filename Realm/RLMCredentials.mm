@@ -20,7 +20,7 @@
 
 #import "RLMSyncUtil_Private.h"
 #import "RLMUtil.hpp"
-#import <util/bson/bson.hpp>
+#import "util/bson/bson.hpp"
 
 using namespace realm;
 
