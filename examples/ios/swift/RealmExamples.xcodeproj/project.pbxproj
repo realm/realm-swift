@@ -258,6 +258,7 @@
 		6816087E24A91DDA00C6AF2E /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6816088124A91DF500C6AF2E /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6816088524A91DFA00C6AF2E /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		682552FE24B4BD95007D75AF /* appclip_ex.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; path = appclip_ex.gif; sourceTree = "<group>"; };
 		682D921424AA81D1005DAB3A /* AppClipParent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppClipParent.entitlements; sourceTree = "<group>"; };
 		686F530224A8ECD200BA4AC1 /* AppClipParent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppClipParent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		686F530424A8ECD200BA4AC1 /* AppClipParentApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppClipParentApp.swift; sourceTree = "<group>"; };
@@ -505,6 +506,7 @@
 				686F531B24A8EF2200BA4AC1 /* Assets.xcassets */,
 				686F532024A8EF2200BA4AC1 /* Info.plist */,
 				686F532124A8EF2200BA4AC1 /* AppClip.entitlements */,
+				682552FE24B4BD95007D75AF /* appclip_ex.gif */,
 				686F531D24A8EF2200BA4AC1 /* Preview Content */,
 			);
 			path = AppClip;
