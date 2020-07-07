@@ -12,6 +12,8 @@
 		<string>$(AppIdentifierPrefix)io.realm.AppClip.AppClipParent</string>
 	</array>
 	<key>com.apple.security.application-groups</key>
-	<array/>
+	<array>
+		<string>group.TEAM_ID.com.domain.APP_GROUP</string>
+	</array>
 </dict>
 </plist>

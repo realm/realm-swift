@@ -32,9 +32,12 @@ struct ContentView: View {
         }
     }
 
-    // Add 
     private func addObject() {
-        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: entitlementConstants.groupId)!.appendingPathComponent("default.realm"))
+        /*
+         The app clip and parent application share data by accessing a common realm file path within an App Group.
+         */
+        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Constants.GROUP_ID)!.appendingPathComponent("default.realm"))
+        
         let realm = try! Realm(configuration: config)
         try! realm.write {
             objects.append(DemoObject())

@@ -20,8 +20,7 @@ import SwiftUI
 import RealmSwift
 
 @main
-struct AppClipParentApp: SwiftUI.App {
-    
+struct AppClipParentApp: SwiftUI.App {    
     var body: some Scene {
         WindowGroup {
             ContentView(objects: demoObjects().list)
@@ -29,7 +28,7 @@ struct AppClipParentApp: SwiftUI.App {
     }
     
     private func demoObjects() -> DemoObjects {
-        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: entitlementConstants.groupId)!.appendingPathComponent("default.realm"))
+        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Constants.GROUP_ID)!.appendingPathComponent("default.realm"))
         let realm = try! Realm(configuration: config)
         
         if let demoObjects = realm.object(ofType: DemoObjects.self, forPrimaryKey: 0) {

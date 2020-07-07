@@ -8,6 +8,9 @@ class DemoObject: Object {
     @objc dynamic var title = ""
 }
 
+/*
+ For a more detailed example of SwiftUI List updating, see the ListSwiftUI example target.
+ */
 final class DemoObjects: Object {
     @objc var id = 0
     let list = RealmSwift.List<DemoObject>()
