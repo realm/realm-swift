@@ -23,7 +23,7 @@ import RealmSwift
 struct AppClipApp: SwiftUI.App {
     var body: some Scene {
         WindowGroup {
-            // This is the shared ContentView.swift from AppClipParent
+            // This is ContentView.swift shared from AppClipParent
             ContentView(objects: demoObjects().list)
         }
     }
