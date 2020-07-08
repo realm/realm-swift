@@ -35,12 +35,16 @@ import Realm.Private
 ///
 /// You can also manually conform to `Identifiable` if you wish, but note that
 /// using the object's memory address does *not* work for managed objects.
-public protocol ObjectKeyIdentifable: Identifiable, Object {
+public protocol ObjectKeyIdentifiable: Identifiable, Object {
     /// The stable identity of the entity associated with `self`.
     var id: UInt64 { get }
 }
 
-extension ObjectKeyIdentifable {
+/// :nodoc:
+@available(*, deprecated, renamed: "ObjectKeyIdentifiable")
+public typealias ObjectKeyIdentifable = ObjectKeyIdentifiable
+
+extension ObjectKeyIdentifiable {
     /// A stable identifier for this object. For managed Realm objects, this
     /// value will be the same for all object instances which refer to the same
     /// object (i.e. for which `Object.isSameObject(as:)` returns true).
@@ -51,7 +55,7 @@ extension ObjectKeyIdentifable {
 
 // MARK: - Combine
 
-/// A type which can be passed to `publisher()` or `changesetPublisher()`.
+/// A type which can be passed to `valuePublisher()` or `changesetPublisher()`.
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public protocol RealmSubscribable {
     // swiftlint:disable identifier_name
@@ -256,8 +260,14 @@ extension RealmCollection where Self: RealmSubscribable {
         Publishers.WillChange(self)
     }
 
-    /// A publisher that emits the collection each time the collection changes.
+    /// :nodoc:
+    @available(*, deprecated, renamed: "collectionPublisher")
     public var publisher: Publishers.Value<Self> {
+        Publishers.Value(self)
+    }
+
+    /// A publisher that emits the collection each time the collection changes.
+    public var collectionPublisher: Publishers.Value<Self> {
         Publishers.Value(self)
     }
 
@@ -305,6 +315,18 @@ public func changesetPublisher<T: Object>(_ object: T) -> Publishers.ObjectChang
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 public func changesetPublisher<T: RealmCollection>(_ collection: T) -> Publishers.CollectionChangeset<T> {
     Publishers.CollectionChangeset<T>(collection)
+}
+
+// MARK: - Realm
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+extension Realm {
+    /// A publisher that emits Void each time the object changes.
+    ///
+    /// Despite the name, this actually emits *after* the collection has changed.
+    public var objectWillChange: Publishers.RealmWillChange {
+        return Publishers.RealmWillChange(self)
+    }
 }
 
 // MARK: - Object
@@ -447,6 +469,29 @@ public struct ObservationSubscription: Subscription {
 public enum Publishers {
     static private func realm<S: Scheduler>(_ config: RLMRealmConfiguration, _ scheduler: S) -> Realm? {
         try? Realm(RLMRealm(configuration: config, queue: scheduler as? DispatchQueue))
+    }
+
+    /// A publisher which emits Void each time the Realm is refreshed.
+    ///
+    /// Despite the name, this actually emits *after* the Realm is refreshed.
+    public struct RealmWillChange: Publisher {
+        /// This publisher cannot fail.
+        public typealias Failure = Never
+        /// This publisher emits Void.
+        public typealias Output = Void
+
+        private let realm: Realm
+        internal init(_ realm: Realm) {
+            self.realm = realm
+        }
+
+        /// :nodoc:
+        public func receive<S>(subscriber: S) where S: Subscriber, S.Failure == Never, Output == S.Input {
+            let token = self.realm.observe { _, _ in
+                _ = subscriber.receive()
+            }
+            subscriber.receive(subscription: ObservationSubscription(token: token))
+        }
     }
 
     /// A publisher which emits Void each time the object is mutated.
