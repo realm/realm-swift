@@ -27,15 +27,14 @@ struct AppClipApp: SwiftUI.App {
             ContentView(objects: demoObjects().list)
         }
     }
-    
+
     private func demoObjects() -> DemoObjects {
-        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Constants.GROUP_ID)!.appendingPathComponent("default.realm"))
+        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Constants.groupId)!.appendingPathComponent("default.realm"))
         let realm = try! Realm(configuration: config)
-        
+
         if let demoObjects = realm.object(ofType: DemoObjects.self, forPrimaryKey: 0) {
             return demoObjects
-        }
-        else {
+        } else {
             return try! realm.write { realm.create(DemoObjects.self, value: []) }
         }
     }

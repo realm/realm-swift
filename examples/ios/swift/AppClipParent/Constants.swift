@@ -17,5 +17,5 @@
 ////////////////////////////////////////////////////////////////////////////
 
 struct Constants {
-    static let GROUP_ID = "group.TEAM_ID.com.domain.APP_GROUP"
+    static let groupId = "group.TEAM_ID.com.domain.APP_GROUP"
 }

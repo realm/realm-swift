@@ -31,7 +31,7 @@ class DemoObject: Object {
 final class DemoObjects: Object {
     @objc var id = 0
     let list = RealmSwift.List<DemoObject>()
-    
+
     override class func primaryKey() -> String? {
         "id"
     }

@@ -21,7 +21,7 @@ import RealmSwift
 
 struct ContentView: View {
     @ObservedObject var objects: RealmSwift.List<DemoObject>
-    
+
     var body: some View {
         Section(header: Button("Add Object", action: addObject)) {
             List {
@@ -36,8 +36,8 @@ struct ContentView: View {
         /*
          The app clip and parent application share data by accessing a common realm file path within an App Group.
          */
-        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Constants.GROUP_ID)!.appendingPathComponent("default.realm"))
-        
+        let config = Realm.Configuration(fileURL: FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: Constants.groupId)!.appendingPathComponent("default.realm"))
+
         let realm = try! Realm(configuration: config)
         try! realm.write {
             objects.append(DemoObject())
