@@ -1,5 +1,8 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+
+This release also contains all changes from 5.0.3 and 5.1.0.
+
 ### Breaking Changes
 * The following classes & aliases have been renamed to align Cocoa with the other Realm SDKs:
 
@@ -32,7 +35,7 @@ x.y.z Release notes (yyyy-MM-dd)
 | `[RLMApp linkUser:credentials:]`                             | `[RLMUser linkWithCredentials:]`                              |
 | `App.linkUser(user, credentials)`                            | `User.link(credentials)`                                      |
 
--  `refreshCustomData()` on User now returns void and passes the custom data to the callback on success.
+*  `refreshCustomData()` on User now returns void and passes the custom data to the callback on success.
 
 ### Compatibility
 * This release introduces breaking changes w.r.t some sync classes and MongoDB Realm Cloud functionality. 
@@ -47,12 +50,24 @@ x.y.z Release notes (yyyy-MM-dd)
 
 10.0.0-beta.2 Release notes (2020-06-09)
 =============================================================
+Xcode 11.3 and iOS 9 are now the minimum supported versions.
+
 ### Enhancements
-* None.
+* Add support for building with Xcode 12 beta 1. watchOS currently requires
+  removing x86_64 from the supported architectures. Support for the new 64-bit
+  watch simulator will come in a future release.
 
 ### Fixed
 * Opening a SyncSession with LOCAL app deployments would not use the correct endpoints.
 * Linking from embedded objects to top-level objects was incorrectly disallowed.
+* Opening a Realm file in file format v6 (created by Realm Cocoa versions
+  between 2.4 and 2.10) would crash. (Since 5.0.0, [Core #3764](https://github.com/realm/realm-core/issues/3764)).
+* Upgrading v9 (pre-5.0) Realm files would create a redundant search index for
+  primary key properties. This index would then be removed the next time the
+  Realm was opened, resulting in some extra i/o in the upgrade process.
+  (Since 5.0.0, [Core #3787](https://github.com/realm/realm-core/issues/3787)).
+* Fixed a performance issue with upgrading v9 files with search indexes on
+  non-primary-key properties. (Since 5.0.0, [Core #3767](https://github.com/realm/realm-core/issues/3767)).
 
 ### Compatibility
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
@@ -152,29 +167,28 @@ later will be able to open the new file format.
 
 * Upgraded realm-core from v6.0.3 to v10.0.0-beta.1
 * Upgraded realm-sync from v5.0.1 to v10.0.0-beta.2
+* Upgraded realm-core from v6.0.6 to v6.0.7
+* Upgraded realm-sync from v5.0.5 to v5.0.6
 
-5.0.2 Release notes (2020-06-02)
+5.1.0 Release notes (2020-06-22)
 =============================================================
+
+### Enhancements
+
+* Allow opening full-sync Realms in read-only mode. This disables local schema
+  initialization, which makes it possible to open a Realm which the user does
+  not have write access to without using asyncOpen. In addition, it will report
+  errors immediately when an operation would require writing to the Realm
+  rather than reporting it via the sync error handler only after the server
+  rejects the write.
 
 ### Fixed
 
-* Fix errSecDuplicateItem (-25299) errors when opening a synchronized Realm
-  when upgrading from pre-5.0 versions of Realm.
-  ([#6538](https://github.com/realm/realm-cocoa/issues/6538), [#6494](https://github.com/realm/realm-cocoa/issues/6494), since 5.0.0).
-* Opening Realms stored on filesystems which do not support preallocation (such
-  as ExFAT) would give "Operation not supported" exceptions.
-  ([#6508](https://github.com/realm/realm-cocoa/issues/6508), since 3.2.0).
-* 'NoSuchTable' exceptions would sometimes be thrown after upgrading a Relam
-  file to the v10 format. ([Core #3701](https://github.com/realm/realm-core/issues/3701), since 5.0.0)
-* If the upgrade process was interrupted/killed for various reasons, the
-  following run could stop with some assertions failing. No instances of this
-  happening were reported to us. (Since 5.0.0).
-* Queries filtering a `List` where the query was on an indexed property over a
-  link would sometimes give incomplete results.
-  ([#6540](https://github.com/realm/realm-cocoa/issues/6540), since 4.1.0 but
-  more common since 5.0.0)
-* Opening a file in read-only mode would attempt to make a spurious write to
-  the file, causing errors if the file was in read-only storage (since 5.0.0).
+* Opening a Realm using a configuration object read from an existing Realm
+  would incorrectly bind the new Realm to the original Realm's thread/queue,
+  resulting in "Realm accessed from incorrect thread." exceptions.
+  ([#6574](https://github.com/realm/realm-cocoa/issues/6574),
+  [#6559](https://github.com/realm/realm-cocoa/issues/6559), since 5.0.0).
 
 ### Compatibility
 
@@ -184,10 +198,29 @@ later will be able to open the new file format.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.5.
 
-### Internal
+5.0.3 Release notes (2020-06-10)
+=============================================================
 
-* Upgraded realm-core from v6.0.4 to v6.0.6
-* Upgraded realm-sync from v5.0.3 to v5.0.5
+### Fixed
+
+* `-[RLMObject isFrozen]` always returned false. ([#6568](https://github.com/realm/realm-cocoa/issues/6568), since 5.0.0).
+* Freezing an object within the write transaction that the object was created
+  in now throws an exception rather than crashing when the object is first
+  used.
+* The schema for frozen Realms was not properly initialized, leading to crashes
+  when accessing a RLMLinkingObjects property.
+  ([#6568](https://github.com/realm/realm-cocoa/issues/6568), since 5.0.0).
+* Observing `Object.isInvalidated` via a keypath literal would produce a
+  warning in Swift 5.2 due to the property not being marked as @objc.
+  ([#6554](https://github.com/realm/realm-cocoa/issues/6554))
+
+### Compatibility
+
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 3.11 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 11.5.
 
 5.0.2 Release notes (2020-06-02)
 =============================================================

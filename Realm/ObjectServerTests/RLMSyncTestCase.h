@@ -88,6 +88,12 @@ NS_ASSUME_NONNULL_BEGIN
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 - (RLMRealm *)openRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
 
+/// Synchronously open a synced Realm via asyncOpen and return the Realm.
+- (RLMRealm *)asyncOpenRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
+
+/// Synchronously open a synced Realm via asyncOpen and return the expected error.
+- (NSError *)asyncOpenErrorWithConfiguration:(RLMRealmConfiguration *)configuration;
+
 /// Synchronously open a synced Realm. Also run a block right after the Realm is created.
 - (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
                                     user:(RLMUser *)user
@@ -173,9 +179,10 @@ NS_ASSUME_NONNULL_END
 }
 
 #define CHECK_COUNT(d_count, macro_object_type, macro_realm) \
-{                                                                                                       \
-    [macro_realm refresh];                                                                              \
-    NSInteger c = [macro_object_type allObjectsInRealm:macro_realm].count;                              \
-    NSString *w = self.isParent ? @"parent" : @"child";                                                 \
-    XCTAssert(d_count == c, @"Expected %@ items, but actually got %@ (%@)", @(d_count), @(c), w);       \
+{                                                                                                         \
+    [macro_realm refresh];                                                                                \
+    RLMResults *r = [macro_object_type allObjectsInRealm:macro_realm];                                    \
+    NSInteger c = r.count;                                                                                \
+    NSString *w = self.isParent ? @"parent" : @"child";                                                   \
+    XCTAssert(d_count == c, @"Expected %@ items, but actually got %@ (%@) (%@)", @(d_count), @(c), r, w); \
 }

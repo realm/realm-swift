@@ -22,4 +22,4 @@ PRINCIPAL_CLASS[sdk=iphone*] = UIApplication;
 PRINCIPAL_CLASS[sdk=appletv*] = UIApplication;
 PRINCIPAL_CLASS[sdk=macosx*] = NSApplication;
 
-IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+IPHONEOS_DEPLOYMENT_TARGET = 9.0;

@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// Copyright 2017 Realm Inc.
+// Copyright 2020 Realm Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,23 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import <Foundation/Foundation.h>
+#import "RLMPushClient.h"
 
-#import <Realm/RLMRealm.h>
+namespace realm {
+namespace app {
+class PushClient;
+}
+}
 
-@class RLMResults, RLMSyncSession;
+@interface RLMPushClient ()
 
-NS_ASSUME_NONNULL_BEGIN
-
-///
-@interface RLMRealm (Sync)
-
-/**
- Get the RLMSyncSession used by this Realm. Will be nil if this is not a
- synchronized Realm.
-*/
-@property (nonatomic, nullable, readonly) RLMSyncSession *syncSession;
+- (instancetype)initWithPushClient:(realm::app::PushClient&&)pushClient;
 
 @end
-
-NS_ASSUME_NONNULL_END

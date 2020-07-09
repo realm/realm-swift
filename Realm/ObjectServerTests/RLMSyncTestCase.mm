@@ -221,7 +221,7 @@ static NSURL *syncDirectoryForChildProcess() {
             __block dispatch_semaphore_t sema = dispatch_semaphore_create(0);
             [[[NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]]
               dataTaskWithURL:[NSURL URLWithString:@"http://127.0.0.1:9090"]
-              completionHandler:^(NSData * _Nullable, NSURLResponse * _Nullable response, NSError * _Nullable) {
+              completionHandler:^(NSData *, NSURLResponse *response, NSError *) {
                 NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
                 isLive = [urlResponse statusCode] == 200;
                 dispatch_semaphore_signal(sema);
@@ -287,27 +287,6 @@ static NSURL *syncDirectoryForChildProcess() {
     return appId;
 }
 
-- (NSString *)lastApp {
-    // Set up the actual MongoDB Realm last app task
-    NSPipe *pipe = [NSPipe pipe];
-    NSTask *task = [[NSTask alloc] init];
-    task.launchPath = nodePath();
-    NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
-    task.arguments = @[[directory stringByAppendingPathComponent:@"admin.js"], @"last"];
-    task.standardOutput = pipe;
-    [task launch];
-
-    NSData *childStdout = pipe.fileHandleForReading.readDataToEndOfFile;
-    NSString *appId = [[NSString alloc] initWithData:childStdout encoding:NSUTF8StringEncoding];
-
-    if (!appId.length) {
-        abort();
-    }
-
-    return appId;
-}
-
-
 - (NSString *)desiredAdminSDKVersion {
     auto path = [[[[@(__FILE__) stringByDeletingLastPathComponent] // RLMSyncTestCase.mm
                    stringByDeletingLastPathComponent] // ObjectServerTests
@@ -356,7 +335,7 @@ static NSURL *syncDirectoryForChildProcess() {
         return;
     }
 
-    NSLog(@"Installing Realm Cloud %@", desiredVersion);
+    NSLog(@"Installing Stitch admin SDK %@", desiredVersion);
     NSTask *task = [[NSTask alloc] init];
     task.currentDirectoryPath = [@(__FILE__) stringByDeletingLastPathComponent];
     task.launchPath = nodePath();
@@ -464,6 +443,42 @@ static NSURL *syncDirectoryForChildProcess() {
     }
     return realm;
 }
+
+- (RLMRealm *)asyncOpenRealmWithConfiguration:(RLMRealmConfiguration *)config {
+    __block RLMRealm *r = nil;
+    XCTestExpectation *ex = [self expectationWithDescription:@"Should asynchronously open a Realm"];
+    [RLMRealm asyncOpenWithConfiguration:config
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *realm, NSError *err) {
+        XCTAssertNil(err);
+        XCTAssertNotNil(realm);
+        r = realm;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    // Ensure that the block does not retain the Realm, as it may not be dealloced
+    // immediately and so would extend the lifetime of the Realm an inconsistent amount
+    auto realm = r;
+    r = nil;
+    return realm;
+}
+
+
+- (NSError *)asyncOpenErrorWithConfiguration:(RLMRealmConfiguration *)config {
+    __block NSError *error = nil;
+    XCTestExpectation *ex = [self expectationWithDescription:@"Should fail to asynchronously open a Realm"];
+    [RLMRealm asyncOpenWithConfiguration:config
+                           callbackQueue:dispatch_get_main_queue()
+                                callback:^(RLMRealm *r, NSError *err){
+        XCTAssertNotNil(err);
+        XCTAssertNil(r);
+        error = err;
+        [ex fulfill];
+    }];
+    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    return error;
+}
+
 - (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user {
     return [self immediatelyOpenRealmForPartitionValue:partitionValue
                                                   user:user
@@ -568,8 +583,10 @@ static NSURL *syncDirectoryForChildProcess() {
         return;
     }
     [self waitForExpectations:@[ex] timeout:20.0];
-    if (error)
+    if (error) {
         *error = completionError;
+    }
+    [realm refresh];
 }
 
 - (void)manuallySetAccessTokenForUser:(RLMUser *)user value:(NSString *)tokenValue {
@@ -640,13 +657,8 @@ static NSURL *syncDirectoryForChildProcess() {
     [NSFileManager.defaultManager createDirectoryAtURL:clientDataRoot
                            withIntermediateDirectories:YES attributes:nil error:&error];
 
-    if (self.isParent) {
-        _appId = [RealmObjectServer.sharedServer createApp];
-        _app = [RLMApp appWithId:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
-    } else {
-        _appId = [RealmObjectServer.sharedServer lastApp];
-        _app = [RLMApp appWithId:_appId configuration:[self defaultAppConfiguration] rootDirectory:clientDataRoot];
-    }
+    _appId = NSProcessInfo.processInfo.environment[@"RLMParentAppId"] ?: [RealmObjectServer.sharedServer createApp];
+    _app = [RLMApp appWithId:_appId configuration:self.defaultAppConfiguration rootDirectory:clientDataRoot];
 
     RLMSyncManager *syncManager = [[self app] syncManager];
     syncManager.logLevel = RLMSyncLogLevelTrace;
@@ -654,19 +666,31 @@ static NSURL *syncDirectoryForChildProcess() {
 }
 
 - (void)resetSyncManager {
-    if ([self appId]) {
-        NSMutableArray<XCTestExpectation *> *exs = [NSMutableArray new];
-        [self.app.allUsers enumerateKeysAndObjectsUsingBlock:^(NSString *, RLMUser *user, BOOL *) {
-            XCTestExpectation *ex = [self expectationWithDescription:@"Wait for logout"];
-            [exs addObject:ex];
-            [user logOutWithCompletion:^(NSError *) {
-                [ex fulfill];
-            }];
-        }];
-        [self waitForExpectations:exs timeout:60.0];
-
-        [[[self app] syncManager] resetForTesting];
+    if (!self.appId) {
+        return;
     }
+
+    NSMutableArray<XCTestExpectation *> *exs = [NSMutableArray new];
+    [self.app.allUsers enumerateKeysAndObjectsUsingBlock:^(NSString *, RLMUser *user, BOOL *) {
+        XCTestExpectation *ex = [self expectationWithDescription:@"Wait for logout"];
+        [exs addObject:ex];
+        [user logOutWithCompletion:^(NSError *) {
+            [ex fulfill];
+        }];
+
+        // Sessions are removed from the user asynchronously after a logout.
+        // We need to wait for this to happen before calling resetForTesting as
+        // that expects all sessions to be cleaned up first.
+        if (user.allSessions.count) {
+            [exs addObject:[self expectationForPredicate:[NSPredicate predicateWithFormat:@"allSessions.@count == 0"]
+                                     evaluatedWithObject:user handler:nil]];
+        }
+    }];
+
+    if (exs.count) {
+        [self waitForExpectations:exs timeout:60.0];
+    }
+    [self.app.syncManager resetForTesting];
 }
 
 - (NSString *)badAccessToken {

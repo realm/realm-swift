@@ -48,6 +48,7 @@ Pod::Spec.new do |s|
                               'include/**/RLMAppCredentials.h',
                               'include/**/RLMBSON.h',
                               'include/**/RLMNetworkTransport.h',
+                              'include/**/RLMPushClient.h',
                               'include/**/RLMProviderClient.h',
                               'include/**/RLMRealm+Sync.h',
                               'include/**/RLMRealmConfiguration+Sync.h',
@@ -125,7 +126,7 @@ Pod::Spec.new do |s|
                               }
   s.preserve_paths          = %w(build.sh include)
 
-  s.ios.deployment_target   = '8.0'
+  s.ios.deployment_target   = '9.0'
   s.ios.vendored_library    = 'core/librealmcore-ios.a'
 
   s.osx.deployment_target   = '10.9'

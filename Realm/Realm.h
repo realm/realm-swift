@@ -38,6 +38,7 @@
 #import <Realm/RLMApp.h>
 #import <Realm/RLMCredentials.h>
 #import <Realm/RLMNetworkTransport.h>
+#import <Realm/RLMPushClient.h>
 #import <Realm/RLMRealm+Sync.h>
 #import <Realm/RLMRealmConfiguration+Sync.h>
 #import <Realm/RLMSyncConfiguration.h>

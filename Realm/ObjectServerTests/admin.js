@@ -4,17 +4,19 @@ const stitch = require('mongodb-stitch');
 
 async function create() {
     const admin = await stitch.StitchAdminClientFactory.create("http://localhost:9090");
-    
+
     await admin.login("unique_user@domain.com", "password");
     const profile = await admin.userProfile();
     const groupId = profile.roles[0].group_id;
     const appResponse = (await admin.apps(groupId).create({name: 'test'}));
     const appId = appResponse['_id'];
-    
+
     const app = admin.apps(groupId).app(appId);
-    
-    await app.authProviders().create({type: 'anon-user'});
-    await app.authProviders().create({
+
+    let promises = []
+
+    promises.push(app.authProviders().create({type: 'anon-user'}));
+    promises.push(app.authProviders().create({
         type: 'local-userpass',
         config: {
         emailConfirmationUrl: 'http://foo.com',
@@ -22,20 +24,20 @@ async function create() {
         confirmEmailSubject: 'Hi',
         resetPasswordSubject: 'Bye',
         autoConfirm: true
-    }});
-    const authProviders = await app.authProviders().list();
-    for (const i in authProviders) {
-        if (authProviders[i].type == 'api-key') {
-            await app.authProviders().authProvider(authProviders[i]._id).enable();
-            break;
+    }}));
+    promises.push(app.authProviders().list().then(authProviders => {
+        for (const provider of authProviders) {
+            if (provider.type == 'api-key') {
+                return app.authProviders().authProvider(provider._id).enable();
+            }
         }
-    }
-    
+    }));
+
     await app.secrets().create({
         name: "BackingDB_uri",
         value: "mongodb://localhost:26000"
     });
-    
+
     const serviceResponse = await app.services().create({
         "name": "mongodb1",
         "type": "mongodb",
@@ -55,8 +57,8 @@ async function create() {
             }
         }
     });
-    
-    var dogRule = {
+
+    const dogRule = {
         "database": "test_data",
         "collection": "Dog",
         "roles": [{
@@ -85,8 +87,8 @@ async function create() {
             "title": "Dog"
         }
     };
-    
-    var personRule = {
+
+    const personRule = {
         "database": "test_data",
         "collection": "Person",
         "relationships": {
@@ -123,8 +125,8 @@ async function create() {
             "title": "Person"
         }
     };
-    
-    var hugeSyncObjectRule = {
+
+    const hugeSyncObjectRule = {
         "database": "test_data",
         "collection": "HugeSyncObject",
         "roles": [
@@ -155,8 +157,8 @@ async function create() {
         "relationships": {
         }
     };
-    
-    var userDataRule = {
+
+    const userDataRule = {
         "database": "test_data",
         "collection": "UserData",
         "roles": [
@@ -173,12 +175,13 @@ async function create() {
         "relationships": {
         }
     };
-    
-    await app.services().service(serviceResponse['_id']).rules().create(dogRule);
-    await app.services().service(serviceResponse['_id']).rules().create(personRule);
-    await app.services().service(serviceResponse['_id']).rules().create(hugeSyncObjectRule);
-    await app.services().service(serviceResponse['_id']).rules().create(userDataRule);
-    await app.services().service(serviceResponse['_id']).rules().create({
+
+    const rules = app.services().service(serviceResponse['_id']).rules();
+    promises.push(rules.create(dogRule));
+    promises.push(rules.create(personRule));
+    promises.push(rules.create(hugeSyncObjectRule));
+    promises.push(rules.create(userDataRule));
+    promises.push(rules.create({
         "database": "test_data",
         "collection": "SwiftPerson",
         "roles": [{
@@ -215,13 +218,13 @@ async function create() {
         },
         "relationships": {
         }
-    });
-    
-    await app.sync().config().update({
+    }));
+
+    promises.push(app.sync().config().update({
         "development_mode_enabled": true
-    });
-    
-    await app.functions().create({
+    }));
+
+    promises.push(app.functions().create({
         "name": "sum",
         "private": false,
         "can_evaluate": {},
@@ -230,9 +233,9 @@ async function create() {
             return parseInt(args.reduce((a,b) => a + b, 0));
         };
         `
-    });
-    
-    await app.functions().create({
+    }));
+
+    promises.push(app.functions().create({
         "name": "updateUserData",
         "private": false,
         "can_evaluate": {},
@@ -249,34 +252,42 @@ async function create() {
             return true;
         };
         `
-    });
-    
-    await app.customUserData().update({
+    }));
+
+    promises.push(app.customUserData().update({
         "mongo_service_id": serviceResponse['_id'],
         "enabled": true,
         "database_name": "test_data",
         "collection_name": "UserData",
         "user_id_field": "user_id"
+    }));
+    
+    await app.secrets().create({
+        name: "gcm",
+        value: "gcm"
     });
     
-    process.stdout.write(appResponse['client_app_id']);
-}
+    promises.push(app.services().create({
+        "name": "gcm",
+        "type": "gcm",
+        "config": {
+            "senderId": "gcm"
+        },
+        "secret_config": {
+            "apiKey": "gcm"
+        },
+        "version": 1
+    }));
 
-async function last() {
-    const admin = await stitch.StitchAdminClientFactory.create("http://localhost:9090");
-    
-    await admin.login("unique_user@domain.com", "password");
-    const profile = await admin.userProfile();
-    const groupId = profile.roles[0].group_id;
-    const apps = await admin.apps(groupId).list();
-    
-    process.stdout.write(apps[apps.length - 1]['client_app_id']);
+    await Promise.all(promises);
+
+    process.stdout.write(appResponse['client_app_id']);
 }
 
 async function clean() {
     try {
         const admin = await stitch.StitchAdminClientFactory.create("http://localhost:9090");
-        
+
         await admin.login("unique_user@domain.com", "password");
         const profile = await admin.userProfile();
         const groupId = profile.roles[0].group_id;
@@ -296,9 +307,6 @@ switch (args[0]) {
         break;
     case 'clean':
         clean();
-        break;
-    case 'last':
-        last();
         break;
     default:
         process.stderr.write("Invalid arg: " + args[0]);

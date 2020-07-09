@@ -395,7 +395,7 @@ extension RealmCollection {
                 case .update(let collection, deletions: _, insertions: _, modifications: _):
                     _ = subscriber.receive(collection)
                 case .error(let error):
-                    _ = subscriber.receive(completion: .failure(error))
+                    subscriber.receive(completion: .failure(error))
                 }
             }
     }
