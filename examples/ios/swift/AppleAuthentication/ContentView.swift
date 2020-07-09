@@ -22,7 +22,7 @@ import AuthenticationServices
 import RealmSwift
 
 /// Your MongoDB Realm App ID
-let appId = "syncapp-wxkyq"
+let appId = "your-app-id"
 
 struct ContentView: View {
 
