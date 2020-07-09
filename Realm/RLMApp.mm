@@ -312,23 +312,17 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
                                              encoding:NSUTF8StringEncoding];
        [self loginWithCredential:[RLMCredentials credentialsWithAppleToken:jwt]
                       completion:^(RLMUser *user, NSError *error) {
-           if (!self.authorisationDelegate) {
-               return;
-           }
-
            if (user) {
-               [self.authorisationDelegate authenticationDidCompleteWithUser:user];
+               [self.authorizationDelegate authenticationDidCompleteWithUser:user];
            } else {
-               [self.authorisationDelegate authenticationDidCompleteWithError:error];
+               [self.authorizationDelegate authenticationDidCompleteWithError:error];
            }
        }];
 }
 
 - (void)authorizationController:(ASAuthorizationController *)controller
            didCompleteWithError:(NSError *)error API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
-    if (self.authorisationDelegate) {
-        [self.authorisationDelegate authenticationDidCompleteWithError:error];
-    }
+    [self.authorizationDelegate authenticationDidCompleteWithError:error];
 }
 
 @end

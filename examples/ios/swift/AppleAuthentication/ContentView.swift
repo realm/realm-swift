@@ -47,7 +47,7 @@ class SignInCoordinator: ASLoginDelegate {
     init(parent: SignInWithAppleView) {
         self.parent = parent
         app = App(id: appId)
-        app.authorisationDelegate = self
+        app.authorizationDelegate = self
     }
 
     @objc func didTapLogin() {
