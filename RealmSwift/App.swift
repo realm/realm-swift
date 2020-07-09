@@ -79,8 +79,21 @@ public typealias ASLoginDelegate = RLMASLoginDelegate
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension App {
-    /// Sets the ASAuthorizationControllerDelegate to be handled by `App`
-    /// - Parameter controller: The ASAuthorizationController in which you want `App` to consume its delegate.
+    /**
+     Sets the ASAuthorizationControllerDelegate to be handled by `App`
+     - Parameter controller: The ASAuthorizationController in which you want `App` to consume its delegate.
+
+     Usage:
+     ```let app = App(id: "my-app-id")
+     let appleIDProvider = ASAuthorizationAppleIDProvider()
+     let request = appleIDProvider.createRequest()
+     request.requestedScopes = [.fullName, .email]
+
+     let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+     app.setASAuthorizationControllerDelegate(controller: authorizationController)
+     authorizationController.presentationContextProvider = self
+     authorizationController.performRequests()```
+    */
     public func setASAuthorizationControllerDelegate(controller: ASAuthorizationController) {
         self.__setASAuthorizationControllerDelegateWith(controller)
     }

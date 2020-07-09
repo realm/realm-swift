@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <AuthenticationServices/AuthenticationServices.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -172,14 +173,6 @@ NS_ASSUME_NONNULL_END
 
 #pragma mark - Sign In With Apple Extension
 
-#define RLM_APPLE_SIGN_IN_AVAILABLE (defined(__IPHONE_13_0) && __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0) || \
-        (defined(MAC_OS_X_VERSION_10_15) && MAC_OS_X_VERSION_MAX_ALLOWED >= MAC_OS_X_VERSION_10_15) || \
-            (defined(__WATCHOS_6_0) && WATCH_OS_VERSION_MAX_ALLOWED >= __WATCHOS_6_0) || \
-                (defined(__TVOS_13_0) && TV_OS_VERSION_MAX_ALLOWED >= __TVOS_13_0)
-#if defined(RLM_APPLE_SIGN_IN_AVAILABLE)
-#import <AuthenticationServices/AuthenticationServices.h>
-#endif
-
 NS_ASSUME_NONNULL_BEGIN
 
 API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
@@ -206,9 +199,7 @@ API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
 
 /// Sets the ASAuthorizationControllerDelegate to be handled by `RLMApp`
 /// @param controller The ASAuthorizationController in which you want `RLMApp` to consume its delegate.
-#if defined(RLM_APPLE_SIGN_IN_AVAILABLE)
 - (void)setASAuthorizationControllerDelegateWithController:(ASAuthorizationController *)controller NS_REFINED_FOR_SWIFT;
-#endif
 
 @end
 
