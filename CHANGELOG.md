@@ -18,7 +18,7 @@ This release also contains all changes from 5.0.3 and 5.1.0.
 | `UsernamePasswordProviderClient`                            | `EmailPasswordAuth`                                            |
 | `UserAPIKeyProviderClient`                                  | `APIKeyAuth`                                                   |
 
-* The following functionality has also moved to the User
+* The following functionality has also moved to the User:
 
 | Old API                                                      | New API                                                       |
 |:-------------------------------------------------------------|:--------------------------------------------------------------|
@@ -35,11 +35,19 @@ This release also contains all changes from 5.0.3 and 5.1.0.
 | `[RLMApp linkUser:credentials:]`                             | `[RLMUser linkWithCredentials:]`                              |
 | `App.linkUser(user, credentials)`                            | `User.link(credentials)`                                      |
 
-*  `refreshCustomData()` on User now returns void and passes the custom data to the callback on success.
+* The argument labels in Swift have changed for several methods:
+| Old API                                                      | New API                                                       |
+|:-------------------------------------------------------------|:--------------------------------------------------------------|
+| `APIKeyAuth.createApiKey(withName:completion:)`              | `APIKeyAuth.createApiKey(named:completion:)`                  |
+| `App.login(withCredential:completion:)                       | `App.login(credentials:completion:)`                          |
+| `App.pushClient(withServiceName:)`                           | `App.pushClient(serviceName:)`                                |
+| `MongoClient.database(withName:)`                            | `MongoClient.database(named:)`                                |
+
+* `refreshCustomData()` on User now returns void and passes the custom data to the callback on success.
 
 ### Compatibility
-* This release introduces breaking changes w.r.t some sync classes and MongoDB Realm Cloud functionality. 
-(See the breaking changes section for the full list)
+* This release introduces breaking changes w.r.t some sync classes and MongoDB Realm Cloud functionality.
+  (See the breaking changes section for the full list)
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
 * Carthage release for Swift is built with Xcode 11.5.
