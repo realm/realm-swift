@@ -81,7 +81,7 @@ class SwiftSyncTestCase: RLMSyncTestCase {
         var theError: Error?
         let ex = expectation(description: "Should log in the user properly")
 
-        self.app.login(withCredential: credentials, completion: { user, error in
+        self.app.login(credentials: credentials, completion: { user, error in
             theUser = user
             theError = error
             ex.fulfill()
