@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMObjectId.h"
+#import <Realm/RLMObjectId.h>
 
 NS_ASSUME_NONNULL_BEGIN
 @protocol RLMBSON;

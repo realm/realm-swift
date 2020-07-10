@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMMongoDatabase.h"
+#import <Realm/RLMMongoDatabase.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

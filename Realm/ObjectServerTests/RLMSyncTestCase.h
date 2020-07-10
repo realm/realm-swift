@@ -17,10 +17,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMMultiProcessTestCase.h"
-#import "RLMSyncConfiguration_Private.h"
 
 @class RLMAppConfiguration;
-
+typedef NS_ENUM(NSUInteger, RLMSyncStopPolicy);
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
@@ -45,13 +44,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSInteger age;
 @property NSString *firstName;
 @property NSString *lastName;
-// FIXME: Remove this once REALMC-5426 is fixed
-@property NSString *realm_id;
 
-+ (instancetype)johnWithRealmId:(NSString *)realmId;
-+ (instancetype)paulWithRealmId:(NSString *)realmId;
-+ (instancetype)ringoWithRealmId:(NSString *)realmId;
-+ (instancetype)georgeWithRealmId:(NSString *)realmId;
++ (instancetype)john;
++ (instancetype)paul;
++ (instancetype)ringo;
++ (instancetype)george;
 
 @end
 
@@ -60,14 +57,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSString *realm_id;
 @property NSData *dataProp;
 + (instancetype)objectWithRealmId:(NSString *)realmId;
-@end
-
-@interface RealmObjectServer : NSObject
-@property (nonatomic, readonly) NSString *appId;
-+ (instancetype)sharedServer;
-
-- (NSString *)createApp;
-
 @end
 
 @interface RLMSyncTestCase : RLMMultiProcessTestCase

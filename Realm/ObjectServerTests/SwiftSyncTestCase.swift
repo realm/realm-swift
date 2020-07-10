@@ -19,18 +19,7 @@
 import XCTest
 import RealmSwift
 
-// MARK: Test case
-
 class SwiftSyncTestCase: RLMSyncTestCase {
-
-    var task: Process?
-
-    /// For testing, make a unique Realm URL of the form "realm://127.0.0.1:9080/~/X",
-    /// where X is either a custom string passed as an argument, or an UUID string.
-    static func uniqueRealmURL(customName: String? = nil) -> URL {
-        return URL(string: "realm://127.0.0.1:9080/~/\(customName ?? UUID().uuidString)")!
-    }
-
     func executeChild(file: StaticString = #file, line: UInt = #line) {
         XCTAssert(0 == runChildAndWait(), "Tests in child process failed", file: file, line: line)
     }
