@@ -155,7 +155,7 @@
 
 - (void)testRemoveUser {
     RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
-    
+
     RLMUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                              register:YES]];
     RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test@10gen.com"
@@ -217,14 +217,14 @@
         [loginExpectation fulfill];
     }];
     [self waitForExpectations:@[loginExpectation] timeout:10.0];
-    
+
     RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
     [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [registerExpectation fulfill];
     }];
     [self waitForExpectations:@[registerExpectation] timeout:10.0];
-        
+
     [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [secondRegisterExpectation fulfill];
@@ -556,7 +556,7 @@
 - (void)testSyncErrorHandlerErrorDomain {
     RLMUser *user = [self userForTest:_cmd];
     XCTAssertNotNil(user);
-    
+
     XCTestExpectation *expectation = [self expectationWithDescription:@"should fail after setting bad token"];
     [self.app syncManager].errorHandler = ^(__unused NSError *error, __unused RLMSyncSession *session) {
         XCTAssertTrue([error.domain isEqualToString:RLMSyncErrorDomain]);
@@ -566,7 +566,7 @@
 
     [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
     [self manuallySetRefreshTokenForUser:user value:[self badAccessToken]];
-    
+
     [self openRealmForPartitionValue:self.appId user:user];
 
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
@@ -982,10 +982,10 @@
         [self primeSyncManagerWithSemaphore:sema];
         RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
         XCTAssertNil(error, @"Error when opening Realm: %@", error);
-        
+
         [self addPersonsToRealm:realm
                         persons:@[[Person john]]];
-        
+
         CHECK_COUNT(1, Person, realm);
         user = [self logInUserForCredentials:credentials];
         // Wait for the Realm's session to be bound.
@@ -1065,7 +1065,7 @@
         [self addPersonsToRealm:realm
                         persons:@[[Person john],
                                   [Person paul]]];
-        
+
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
         RLMRunChildAndWait();
@@ -1201,11 +1201,11 @@
         [self waitForDownloadsForRealm:realmB];
         CHECK_COUNT(0, Person, realmA);
         CHECK_COUNT(0, Person, realmB);
-        
+
         // Suspend the session for realm A and then add an object to each Realm
         RLMSyncSession *sessionA = [RLMSyncSession sessionForRealm:realmA];
         [sessionA suspend];
-        
+
         [self addPersonsToRealm:realmA
                         persons:@[[Person john]]];
 
@@ -1213,7 +1213,7 @@
                         persons:@[[Person ringo]]];
         [self waitForUploadsForRealm:realmB];
         RLMRunChildAndWait();
-        
+
         // A should still be 1 since it's suspended. If it wasn't suspended, it
         // should have downloaded before B due to the ordering in the child.
         [self waitForDownloadsForRealm:realmB];
@@ -1432,7 +1432,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
         if (attributes)
             return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
-        
+
         return 0;
     };
     XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
@@ -1572,7 +1572,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 - (void)testAsyncOpenConnectionTimeout {
     [self resetSyncManager];
 
-    TimeoutProxyServer *proxy = [[TimeoutProxyServer alloc] initWithPort:5678];
+    __attribute__((objc_precise_lifetime)) TimeoutProxyServer *proxy = [[TimeoutProxyServer alloc] initWithPort:5678];
     NSError *error;
     [proxy startAndReturnError:&error];
     XCTAssertNil(error);
@@ -1690,7 +1690,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                             sort:sort
                                                             upsert:YES
                                                             shouldReturnNewDocument:YES];
-    
+
     XCTAssertNotNil(findOneAndModifyOptions3.projection);
     XCTAssertNotNil(findOneAndModifyOptions3.sort);
     XCTAssertTrue(findOneAndModifyOptions3.shouldReturnNewDocument);
@@ -1704,7 +1704,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     findOneAndModifyOptions3.sort = nil;
     XCTAssertNil(findOneAndModifyOptions3.projection);
     XCTAssertNil(findOneAndModifyOptions3.sort);
-    
+
     RLMFindOneAndModifyOptions *findOneAndModifyOptions4 = [[RLMFindOneAndModifyOptions alloc]
                                                             initWithProjection:nil
                                                             sort:nil
@@ -1736,7 +1736,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertTrue([findOptions2.projection isEqual:projection]);
     XCTAssertTrue([findOptions2.sort isEqual:sort]);
     XCTAssertEqual(findOptions2.limit, 0);
-    
+
     RLMFindOptions *findOptions3 = [[RLMFindOptions alloc] initWithLimit:37
                                                               projection:projection
                                                                     sort:sort];
@@ -2147,7 +2147,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                            sort:sort
                                                            upsert:YES
                                                            shouldReturnNewDocument:YES];
-    
+
     [collection findOneAndDeleteWhere:@{@"name": @"john"}
                               options:findOneAndModifyOptions
                            completion:^(NSDictionary<NSString *, id<RLMBSON>> * document, NSError * error) {
