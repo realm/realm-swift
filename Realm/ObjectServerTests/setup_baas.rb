@@ -135,13 +135,13 @@ def setup_stitch
         #{go_root}/bin/go build -o create_user cmd/auth/user.go`
 
     puts 'create_user binary built'
-    
+
     puts 'building server binary'
 
     puts `#{exports.join(' && ')} && \
         cd '#{stitch_dir}' && \
         #{go_root}/bin/go build -o stitch_server cmd/server/main.go`
-        
+
     puts 'server binary built'
 end
 

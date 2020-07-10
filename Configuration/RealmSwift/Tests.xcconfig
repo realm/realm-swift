@@ -16,3 +16,5 @@ EXCLUDED_SOURCE_FILE_NAMES[sdk=macosx*] = build/ios/*;
 TEST_HOST[sdk=iphone*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost;
 TEST_HOST[sdk=appletv*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/TestHost;
 TEST_HOST[sdk=macosx*] = $(BUILT_PRODUCTS_DIR)/TestHost.app/Contents/MacOS/TestHost;
+
+MACOSX_DEPLOYMENT_TARGET = 10.14;
