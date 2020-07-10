@@ -117,3 +117,5 @@ Realm/ObjectServerTests/node_modules
 .swiftpm
 .build
 Package.resolved
+
+examples/installation/ios/swift/SwiftPackageManagerExample/SwiftPackageManagerExample.xcodeproj
