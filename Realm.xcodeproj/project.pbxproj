@@ -2515,6 +2515,10 @@
 			);
 			outputPaths = (
 				"$(SRCROOT)/baas",
+				"$(SRCROOT)/build/go/src/github.com/10gen/stitch/assisted_agg",
+				"$(SRCROOT)/build/go/src/github.com/10gen/stitch/create_user",
+				"$(SRCROOT)/build/go/src/github.com/10gen/stitch/stitch_server",
+				"$(SRCROOT)/build/go/src/github.com/10gen/stitch/update_doc",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
