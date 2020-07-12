@@ -25,7 +25,6 @@ import RealmSwift
 let appId = "your-app-id"
 
 struct ContentView: View {
-
     @State var accessToken: String = ""
     @State var error: String = ""
 
@@ -40,7 +39,6 @@ struct ContentView: View {
 }
 
 class SignInCoordinator: ASLoginDelegate {
-
     var parent: SignInWithAppleView
     var app: App
 
@@ -70,7 +68,6 @@ class SignInCoordinator: ASLoginDelegate {
 }
 
 struct SignInWithAppleView: UIViewRepresentable {
-
     @Binding var accessToken: String
     @Binding var error: String
 
