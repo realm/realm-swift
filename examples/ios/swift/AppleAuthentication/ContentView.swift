@@ -58,11 +58,11 @@ class SignInCoordinator: ASLoginDelegate {
         authorizationController.performRequests()
     }
 
-    func authenticationDidCompleteWithError(_ error: Error) {
+    func authenticationDidComplete(error: Error) {
         parent.error = error.localizedDescription
     }
 
-    func authenticationDidComplete(with user: User) {
+    func authenticationDidComplete(user: User) {
         parent.accessToken = user.accessToken ?? "Could not get access token"
     }
 }
