@@ -54,7 +54,7 @@ class SignInCoordinator: ASLoginDelegate {
         request.requestedScopes = [.fullName, .email]
 
         let authorizationController = ASAuthorizationController(authorizationRequests: [request])
-        app.setASAuthorizationControllerDelegate(controller: authorizationController)
+        app.setASAuthorizationControllerDelegate(for: authorizationController)
         authorizationController.performRequests()
     }
 

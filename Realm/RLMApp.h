@@ -206,7 +206,7 @@ API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
 
 /// Sets the ASAuthorizationControllerDelegate to be handled by `RLMApp`
 /// @param controller The ASAuthorizationController in which you want `RLMApp` to consume its delegate.
-- (void)setASAuthorizationControllerDelegateWithController:(ASAuthorizationController *)controller NS_REFINED_FOR_SWIFT;
+- (void)setASAuthorizationControllerDelegateForController:(ASAuthorizationController *)controller NS_REFINED_FOR_SWIFT;
 
 @end
 

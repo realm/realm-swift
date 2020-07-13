@@ -105,7 +105,7 @@ extension App {
      authorizationController.performRequests()
      ```
     */
-    public func setASAuthorizationControllerDelegate(controller: ASAuthorizationController) {
-        self.__setASAuthorizationControllerDelegateWith(controller)
+    public func setASAuthorizationControllerDelegate(for controller: ASAuthorizationController) {
+        self.__setASAuthorizationControllerDelegateFor(controller)
     }
 }
