@@ -20,6 +20,35 @@ import Foundation
 import RealmSwift
 import XCTest
 
+extension URLSession {
+    fileprivate func resultDataTask(with request: URLRequest, _ completionHandler: @escaping (Result<Data, Error>) -> Void) {
+        URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue()).dataTask(with: request) { (data, response, error) in
+            if let httpResponse = response as? HTTPURLResponse,
+                httpResponse.statusCode >= 200 && httpResponse.statusCode < 300,
+                let data = data {
+                completionHandler(.success(data))
+            } else {
+                completionHandler(.failure(error ?? URLError(.badServerResponse)))
+            }
+        }.resume()
+    }
+
+    // Synchronously perform a data task, returning the data from it
+    fileprivate func resultDataTask(with request: URLRequest) -> Result<Data, Error> {
+        var result: Result<Data, Error>!
+        let group = DispatchGroup()
+        group.enter()
+        resultDataTask(with: request) {
+            result = $0
+            group.leave()
+        }
+        guard case .success = group.wait(timeout: .now() + 10) else {
+            return .failure(URLError(.cannotFindHost))
+        }
+        return result
+    }
+}
+
 // MARK: - AdminProfile
 struct AdminProfile: Codable {
     struct Role: Codable {
@@ -107,7 +136,7 @@ class Admin {
             }
 
             private func request(httpMethod: String, data: Any? = nil,
-                                 completionHandler: @escaping (Any?, Error?) -> Void) {
+                                 completionHandler: @escaping (Result<Any?, Error>) -> Void) {
                 var request = URLRequest(url: url)
                 request.httpMethod = httpMethod
                 request.allHTTPHeaderFields = [
@@ -119,105 +148,78 @@ class Admin {
                     do {
                         request.httpBody = try JSONSerialization.data(withJSONObject: data)
                     } catch {
-                        completionHandler(nil, error)
+                        completionHandler(.failure(error))
                     }
                 }
 
                 URLSession(configuration: URLSessionConfiguration.default,
-                           delegate: nil,
-                           delegateQueue: OperationQueue()).dataTask(with: request) { (data, response, error) in
-                    guard let httpResponse = response as? HTTPURLResponse,
-                          httpResponse.statusCode >= 200 && httpResponse.statusCode < 300,
-                          let data = data else {
-                        return completionHandler(nil, error ?? URLError(.badServerResponse))
-                    }
-
-                    do {
-                        if data.count > 0 {
-                            let json = try JSONSerialization.jsonObject(with: data)
-                            completionHandler(json, nil)
-                        } else {
-                            completionHandler(nil, nil)
-                        }
-                    } catch {
-                        completionHandler(nil, error)
-                    }
-                }.resume()
+                           delegate: nil, delegateQueue: OperationQueue())
+                    .resultDataTask(with: request) { result in
+                        completionHandler(result.flatMap { data in
+                            Result {
+                                data.count > 0 ? try JSONSerialization.jsonObject(with: data) : nil
+                            }
+                        })
+                }
             }
 
-            func get(_ completionHandler: @escaping (Any?, Error?) -> Void) {
-                request(httpMethod: "GET", completionHandler: completionHandler)
-            }
-
-            func get(on group: DispatchGroup, _ completionHandler: @escaping (Any?, Error?) -> Void) {
+            private func request(on group: DispatchGroup, httpMethod: String, data: Any? = nil, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
                 group.enter()
-                get {
-                    completionHandler($0, $1)
+                request(httpMethod: httpMethod, data: data) { result in
+                    completionHandler(result)
                     group.leave()
                 }
             }
 
-            func get() -> (Any?, Error?) {
+            private func request(httpMethod: String, data: Any? = nil) -> Result<Any?, Error> {
                 let group = DispatchGroup()
-                var any: Any?, error: Error?
+                var result: Result<Any?, Error>!
                 group.enter()
-                get {
-                    any = $0
-                    error = $1
+                request(httpMethod: httpMethod, data: data) {
+                    result = $0
                     group.leave()
                 }
                 guard case .success = group.wait(timeout: .now() + 5) else {
-                    return (any, URLError(.badServerResponse))
+                    return .failure(URLError(.badServerResponse))
                 }
-                return (any, error)
+                return result
             }
 
-            func post(_ data: Any, _ completionHandler: @escaping (Any?, Error?) -> Void) {
+            func get(_ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
+                request(httpMethod: "GET", completionHandler: completionHandler)
+            }
+
+            func get(on group: DispatchGroup, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
+                request(on: group, httpMethod: "GET", completionHandler)
+            }
+
+            func get() -> Result<Any?, Error> {
+                request(httpMethod: "GET")
+            }
+
+            func post(_ data: Any, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
                 request(httpMethod: "POST", data: data, completionHandler: completionHandler)
             }
 
             func post(on group: DispatchGroup, _ data: Any,
-                      _ completionHandler: @escaping (Any?, Error?) -> Void) {
-                group.enter()
-                post(data) {
-                    completionHandler($0, $1)
-                    group.leave()
-                }
+                      _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
+                request(on: group, httpMethod: "POST", data: data, completionHandler)
             }
 
-            func post(_ data: Any) -> (Any?, Error?) {
-                var any: Any?, error: Error?
-                let group = DispatchGroup()
-                group.enter()
-                post(data) {
-                    any = $0
-                    error = $1
-                    group.leave()
-                }
-                guard case .success = group.wait(timeout: .now() + 5.0) else {
-                    return (any, URLError(.badServerResponse))
-                }
-                return (any, error)
+            func post(_ data: Any) -> Result<Any?, Error> {
+                request(httpMethod: "POST", data: data)
             }
 
-            func put(_ completionHandler: @escaping (Any?, Error?) -> Void) {
+            func put(_ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
                 request(httpMethod: "PUT", completionHandler: completionHandler)
             }
 
-            func put(on group: DispatchGroup, _ data: Any? = nil, _ completionHandler: @escaping (Any?, Error?) -> Void) {
-                group.enter()
-                request(httpMethod: "PUT", data: data, completionHandler: {
-                    completionHandler($0, $1)
-                    group.leave()
-                })
+            func put(on group: DispatchGroup, data: Any? = nil, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
+                request(on: group, httpMethod: "PUT", data: data, completionHandler)
             }
 
-            func patch(on group: DispatchGroup, _ data: Any, _ completionHandler: @escaping (Any?, Error?) -> Void) {
-                group.enter()
-                request(httpMethod: "PATCH", data: data, completionHandler: {
-                    completionHandler($0, $1)
-                    group.leave()
-                })
+            func patch(on group: DispatchGroup, _ data: Any, _ completionHandler: @escaping (Result<Any?, Error>) -> Void) {
+                request(on: group, httpMethod: "PATCH", data: data, completionHandler)
             }
         }
 
@@ -227,29 +229,17 @@ class Admin {
                                       url: URL(string: "http://localhost:9090/api/admin/v3.0/groups/\(groupId)/apps")!)
     }
 
-    private func userProfile(accessToken: String, _ completionHandler: @escaping (AdminProfile?, Error?) -> Void) {
+    private func userProfile(accessToken: String) -> Result<AdminProfile, Error> {
         var request = URLRequest(url: URL(string: "http://localhost:9090/api/admin/v3.0/auth/profile")!)
         request.allHTTPHeaderFields = [
             "Authorization": "Bearer \(String(describing: accessToken))"
         ]
-        URLSession.shared.dataTask(with: request) { (data, response, error) in
-            guard let httpResponse = response as? HTTPURLResponse,
-                  httpResponse.statusCode >= 200 && httpResponse.statusCode < 300,
-                  let data = data else {
-                if let error = error {
-                    completionHandler(nil, error)
-                } else {
-                    completionHandler(nil, URLError(.badServerResponse))
+        return URLSession.shared.resultDataTask(with: request)
+            .flatMap { data in
+                Result {
+                    try JSONDecoder().decode(AdminProfile.self, from: data)
                 }
-                return
             }
-
-            do {
-                completionHandler(try JSONDecoder().decode(AdminProfile.self, from: data), nil)
-            } catch {
-                completionHandler(nil, error)
-            }
-        }.resume()
     }
 
     /// Synchronously authenticate an admin session
@@ -263,51 +253,22 @@ class Admin {
         loginRequest.httpBody = try! JSONEncoder().encode(["provider": "userpass",
                                                            "username": "unique_user@domain.com",
                                                            "password": "password"])
-        var adminSession: AdminSession?
-        var outError: Error?
-        let group = DispatchGroup()
-        group.enter()
-        URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue()).dataTask(with: loginRequest) { (data, response, error) in
-            guard let httpResponse = response as? HTTPURLResponse,
-                  httpResponse.statusCode >= 200 && httpResponse.statusCode < 300,
-                  let data = data else {
-                if let error = error {
-                    outError = error
-                } else {
-                    outError = URLError(.badServerResponse)
-                }
-                return
-            }
-
-            do {
-                guard let accessToken = try JSONDecoder().decode([String: String].self, from: data)["access_token"] else {
+        return try URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue())
+            .resultDataTask(with: loginRequest)
+            .flatMap { data in
+                return Result {
+                    if let accessToken = try JSONDecoder().decode([String: String].self, from: data)["access_token"] {
+                        return accessToken
+                    }
                     throw URLError(.badServerResponse)
                 }
-                self.userProfile(accessToken: accessToken) { (adminProfile, error) in
-                    guard let adminProfile = adminProfile else {
-                        if let error = error {
-                            outError = error
-                        } else {
-                            outError = URLError(.badServerResponse)
-                        }
-                        return
-                    }
-
-                    adminSession = AdminSession(accessToken: accessToken, groupId: adminProfile.roles[0].groupId)
-                    group.leave()
-                }
-            } catch {
-                outError = error
             }
-        }.resume()
-        guard case .success = group.wait(timeout: .now() + 10) else {
-            outError = URLError(.cannotFindHost)
-            throw outError!
-        }
-        if let outError = outError {
-            throw outError
-        }
-        return adminSession!
+            .flatMap { (accessToken: String) -> Result<AdminSession, Error> in
+                self.userProfile(accessToken: accessToken).map {
+                    AdminSession(accessToken: accessToken, groupId: $0.roles[0].groupId)
+                }
+            }
+            .get()
     }
 }
 
@@ -456,6 +417,8 @@ public class RealmServer: NSObject {
 
         let pipe = Pipe()
         pipe.fileHandleForReading.readabilityHandler = { file in
+            guard file.availableData.count > 0 else { return }
+
             // prettify server output
             let available = String(data: file.availableData, encoding: .utf8)?.split(separator: "\t")
             print(available!.map { part -> String in
@@ -506,57 +469,60 @@ public class RealmServer: NSObject {
 
     typealias AppId = String
 
+    private func failOnError<T>(_ result: Result<T, Error>) {
+        if case .failure(let error) = result {
+            XCTFail(error.localizedDescription)
+        }
+    }
+
     /// Create a new server app
     @objc func createApp() throws -> AppId {
         guard let session = session else {
             throw URLError(.unknown)
         }
 
-        let (info, appCreationError) = session.apps.post(["name": "test"])
+        let info = try session.apps.post(["name": "test"]).get()
         guard let appInfo = info as? [String: Any],
               let clientAppId = appInfo["client_app_id"] as? String,
               let appId = appInfo["_id"] as? String else {
-            throw appCreationError ?? URLError(.badServerResponse)
+            throw URLError(.badServerResponse)
         }
 
         let app = session.apps[appId]
         let group = DispatchGroup()
 
-        app.authProviders.post(on: group, ["type": "anon-user"], { if let error = $1 {
-            XCTFail(error.localizedDescription)
-        }})
-        app.authProviders.post(on: group,
-            [
-                "type": "local-userpass",
-                "config": [
-                    "emailConfirmationUrl": "http://foo.com",
-                    "resetPasswordUrl": "http://foo.com",
-                    "confirmEmailSubject": "Hi",
-                    "resetPasswordSubject": "Bye",
-                    "autoConfirm": true
-                ]
-            ]) { if let error = $1 {
-            XCTFail(error.localizedDescription)
-        }}
+        app.authProviders.post(on: group, ["type": "anon-user"], failOnError)
+        app.authProviders.post(on: group, [
+            "type": "local-userpass",
+            "config": [
+                "emailConfirmationUrl": "http://foo.com",
+                "resetPasswordUrl": "http://foo.com",
+                "confirmEmailSubject": "Hi",
+                "resetPasswordSubject": "Bye",
+                "autoConfirm": true
+            ]
+        ], failOnError)
 
-        app.authProviders.get(on: group) { any, error in
-            guard let authProviders = any as? [[String: Any]] else {
-                return XCTFail("Bad formatting for authProviders")
-            }
-
-            for provider in authProviders where provider["type"] as? String == "api-key" {
-                return app.authProviders[provider["_id"] as! String].enable.put(on: group) { if let error = $1 {
-                    XCTFail(error.localizedDescription)
-                }}
+        app.authProviders.get(on: group) { authProviders in
+            do {
+                guard let authProviders = try authProviders.get() as? [[String: Any]] else {
+                    return XCTFail("Bad formatting for authProviders")
+                }
+                guard let provider = authProviders.first(where: { $0["type"] as? String == "api-key" }) else {
+                    return XCTFail("Did not find api-key provider")
+                }
+                app.authProviders[provider["_id"] as! String].enable.put(on: group, self.failOnError)
+            } catch {
+                XCTFail(error.localizedDescription)
             }
         }
 
-        let (_, _) = app.secrets.post([
+        _ = app.secrets.post([
             "name": "BackingDB_uri",
             "value": "mongodb://localhost:26000"
         ])
 
-        let (serviceResponse, serviceCreationError) = app.services.post([
+        let serviceResponse = app.services.post([
             "name": "mongodb1",
             "type": "mongodb",
             "config": [
@@ -576,9 +542,8 @@ public class RealmServer: NSObject {
             ]
         ])
 
-        guard serviceCreationError == nil,
-              let serviceId = (serviceResponse as? [String: Any])?["_id"] as? String else {
-            throw serviceCreationError ?? URLError(.badServerResponse)
+        guard let serviceId = (try serviceResponse.get() as? [String: Any])?["_id"] as? String else {
+            throw URLError(.badServerResponse)
         }
 
         let dogRule: [String: Any] = [
@@ -691,9 +656,9 @@ public class RealmServer: NSObject {
         ]
 
         let rules = app.services[serviceId].rules
-        rules.post(on: group, dogRule, { if let error = $1 { XCTFail(error.localizedDescription) }})
-        rules.post(on: group, personRule, { if let error = $1 { XCTFail(error.localizedDescription) }})
-        rules.post(on: group, hugeSyncObjectRule, { if let error = $1 { XCTFail(error.localizedDescription) }})
+        rules.post(on: group, dogRule, failOnError)
+        rules.post(on: group, personRule, failOnError)
+        rules.post(on: group, hugeSyncObjectRule, failOnError)
         rules.post(on: group, [
             "database": "test_data",
             "collection": "SwiftPerson",
@@ -730,11 +695,11 @@ public class RealmServer: NSObject {
                 "title": "SwiftPerson"
             ],
                 "relationships": [:]
-        ]) { if let error = $1 { XCTFail(error.localizedDescription) }}
+        ], failOnError)
 
-        app.sync.config.put(on: group, [
+        app.sync.config.put(on: group, data: [
             "development_mode_enabled": true
-        ]) { if let error = $1 { XCTFail(error.localizedDescription) }}
+        ], failOnError)
 
         app.functions.post(on: group, [
             "name": "sum",
@@ -745,7 +710,7 @@ public class RealmServer: NSObject {
                 return parseInt(args.reduce((a,b) => a + b, 0));
             };
             """
-        ]) { if let error = $1 { XCTFail(error.localizedDescription) }}
+        ], failOnError)
 
         app.functions.post(on: group, [
             "name": "updateUserData",
@@ -764,7 +729,7 @@ public class RealmServer: NSObject {
                 return true;
             };
             """
-        ]) { if let error = $1 { XCTFail(error.localizedDescription) }}
+        ], failOnError)
 
         _ = rules.post(userDataRule)
         app.customUserData.patch(on: group, [
@@ -773,7 +738,7 @@ public class RealmServer: NSObject {
             "database_name": "test_data",
             "collection_name": "UserData",
             "user_id_field": "user_id"
-        ]) { if let error = $1 { XCTFail(error.localizedDescription) }}
+        ], failOnError)
 
         _ = app.secrets.post([
             "name": "gcm",
@@ -790,7 +755,7 @@ public class RealmServer: NSObject {
                 "apiKey": "gcm"
             ],
             "version": 1
-        ]) { if let error = $1 { XCTFail(error.localizedDescription) }}
+        ], failOnError)
 
         guard case .success = group.wait(timeout: .now() + 5.0) else {
             throw URLError(.badServerResponse)
