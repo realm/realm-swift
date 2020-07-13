@@ -201,7 +201,7 @@ API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
 API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
 @interface RLMApp ()
 
-/// Use this delegate to be provided a callback once authentication has succeed or failed
+/// Use this delegate to be provided a callback once authentication has succeed or failed.
 @property (nonatomic, weak, nullable) id<RLMASLoginDelegate> authorizationDelegate;
 
 /// Sets the ASAuthorizationControllerDelegate to be handled by `RLMApp`
