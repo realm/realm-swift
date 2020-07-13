@@ -20,6 +20,10 @@
 #import "RLMUser+ObjectServerTests.h"
 #import "RLMUser_Private.hpp"
 
+#import "RLMListBase.h"
+#import <RealmSwift/RealmSwift-Swift.h>
+#import "ObjectServerTests-Swift.h"
+
 #import "RLMCredentials.h"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMRealm+Sync.h"
@@ -29,7 +33,7 @@
 #import "RLMRealm_Private.hpp"
 #import "RLMSchema_Private.h"
 #import "RLMSyncUtil_Private.h"
-
+#import "RLMSyncConfiguration_Private.h"
 #import "shared_realm.hpp"
 
 #ifndef REALM_ENABLE_SYNC_TESTS
@@ -80,7 +84,7 @@
         user = u;
         [expectation fulfill];
     }];
-    [self waitForExpectationsWithTimeout:10.0 handler:nil];
+    [self waitForExpectations:@[expectation] timeout:30.0];
     return user;
 }
 
@@ -102,12 +106,15 @@
 }
 
 - (void)testCallFunction {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"should get sum of arguments from remote function"];
     [self.anonymousUser callFunctionNamed:@"sum"
                                 arguments:@[@1, @2, @3, @4, @5]
                           completionBlock:^(id<RLMBSON> bson, NSError *error) {
         XCTAssert(!error);
         XCTAssertEqual([((NSNumber *)bson) intValue], 15);
+        [expectation fulfill];
     }];
+    [self waitForExpectationsWithTimeout:30.0 handler:nil];
 }
 
 - (void)testLogoutCurrentUser {
@@ -148,7 +155,7 @@
 
 - (void)testRemoveUser {
     RLMApp *app = [RLMApp appWithId:self.appId configuration:[self defaultAppConfiguration]];
-    
+
     RLMUser *firstUser = [self logInUserForCredentials:[self basicCredentialsWithName:NSStringFromSelector(_cmd)
                                                                              register:YES]];
     RLMUser *secondUser = [self logInUserForCredentials:[self basicCredentialsWithName:@"test@10gen.com"
@@ -210,14 +217,14 @@
         [loginExpectation fulfill];
     }];
     [self waitForExpectations:@[loginExpectation] timeout:10.0];
-    
+
     RLMPushClient *client = [app pushClientWithServiceName:@"gcm"];
     [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [registerExpectation fulfill];
     }];
     [self waitForExpectations:@[registerExpectation] timeout:10.0];
-        
+
     [client registerDeviceWithToken:@"token" user:[app currentUser] completion:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [secondRegisterExpectation fulfill];
@@ -549,7 +556,7 @@
 - (void)testSyncErrorHandlerErrorDomain {
     RLMUser *user = [self userForTest:_cmd];
     XCTAssertNotNil(user);
-    
+
     XCTestExpectation *expectation = [self expectationWithDescription:@"should fail after setting bad token"];
     [self.app syncManager].errorHandler = ^(__unused NSError *error, __unused RLMSyncSession *session) {
         XCTAssertTrue([error.domain isEqualToString:RLMSyncErrorDomain]);
@@ -559,7 +566,7 @@
 
     [self manuallySetAccessTokenForUser:user value:[self badAccessToken]];
     [self manuallySetRefreshTokenForUser:user value:[self badAccessToken]];
-    
+
     [self openRealmForPartitionValue:self.appId user:user];
 
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
@@ -588,10 +595,10 @@
     } else {
         // Add objects.
         [self addPersonsToRealm:realm
-                        persons:@[[Person johnWithRealmId:realmId],
-                                  [Person paulWithRealmId:realmId],
-                                  [Person ringoWithRealmId:realmId],
-                                  [Person georgeWithRealmId:realmId]]];
+                        persons:@[[Person john],
+                                  [Person paul],
+                                  [Person ringo],
+                                  [Person george]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(4, Person, realm);
     }
@@ -619,10 +626,10 @@
     } else {
         // Add objects.
         [self addPersonsToRealm:realm
-                        persons:@[[Person johnWithRealmId:realmId],
-                                  [Person paulWithRealmId:realmId],
-                                  [Person ringoWithRealmId:realmId],
-                                  [Person georgeWithRealmId:realmId]]];
+                        persons:@[[Person john],
+                                  [Person paul],
+                                  [Person ringo],
+                                  [Person george]]];
         [self waitForUploadsForRealm:realm];
     }
 }
@@ -633,7 +640,7 @@
     RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
     if (self.isParent) {
         // Add objects.
-        [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:self.appId]]];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
         RLMRunChildAndWait();
@@ -672,7 +679,7 @@
                        expectedCounts:@[@1]];
     } else {
         // Add objects.
-        [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:self.appId]]];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
     }
@@ -716,7 +723,7 @@
                                              encryptionKey:RLMGenerateKey()
                                                 stopPolicy:RLMSyncStopPolicyImmediately
                                           immediatelyBlock:nil];
-        [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:self.appId]]];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
     }
@@ -727,8 +734,8 @@
 /// If a client opens multiple Realms, there should be one session object for each Realm that was opened.
 - (void)testMultipleRealmsSessions {
     NSString *partitionValueA = self.appId;
-    NSString *partitionValueB = @"bar";
-    NSString *partitionValueC = @"baz";
+    NSString *partitionValueB = [self.appId stringByAppendingString:@"bar"];
+    NSString *partitionValueC = [self.appId stringByAppendingString:@"baz"];
     RLMUser *user = [self userForTest:_cmd];
 
     // Open three Realms.
@@ -758,8 +765,8 @@
 /// A client should be able to open multiple Realms and add objects to each of them.
 - (void)testMultipleRealmsAddObjects {
     NSString *partitionValueA = self.appId;
-    NSString *partitionValueB = @"bar";
-    NSString *partitionValueC = @"baz";
+    NSString *partitionValueB = [self.appId stringByAppendingString:@"bar"];
+    NSString *partitionValueC = [self.appId stringByAppendingString:@"baz"];
     RLMUser *user = [self userForTest:_cmd];
 
     RLMRealm *realmA = [self openRealmForPartitionValue:partitionValueA user:user];
@@ -789,18 +796,18 @@
     } else {
         // Add objects.
         [self addPersonsToRealm:realmA
-                        persons:@[[Person johnWithRealmId:partitionValueA],
-                                  [Person paulWithRealmId:partitionValueA],
-                                  [Person ringoWithRealmId:partitionValueA]]];
+                        persons:@[[Person john],
+                                  [Person paul],
+                                  [Person ringo]]];
         [self addPersonsToRealm:realmB
-                        persons:@[[Person johnWithRealmId:partitionValueB],
-                                  [Person paulWithRealmId:partitionValueB]]];
+                        persons:@[[Person john],
+                                  [Person paul]]];
         [self addPersonsToRealm:realmC
-                        persons:@[[Person johnWithRealmId:partitionValueC],
-                                  [Person paulWithRealmId:partitionValueC],
-                                  [Person ringoWithRealmId:partitionValueC],
-                                  [Person georgeWithRealmId:partitionValueC],
-                                  [Person ringoWithRealmId:partitionValueC]]];
+                        persons:@[[Person john],
+                                  [Person paul],
+                                  [Person ringo],
+                                  [Person george],
+                                  [Person ringo]]];
         [self waitForUploadsForRealm:realmA];
         [self waitForUploadsForRealm:realmB];
         [self waitForUploadsForRealm:realmC];
@@ -813,8 +820,8 @@
 /// A client should be able to open multiple Realms and delete objects from each of them.
 - (void)testMultipleRealmsDeleteObjects {
     NSString *partitionValueA = self.appId;
-    NSString *partitionValueB = @"bar";
-    NSString *partitionValueC = @"baz";
+    NSString *partitionValueB = [self.appId stringByAppendingString:@"bar"];
+    NSString *partitionValueC = [self.appId stringByAppendingString:@"baz"];
     RLMUser *user = [self userForTest:_cmd];
     RLMRealm *realmA = [self openRealmForPartitionValue:partitionValueA user:user];
     RLMRealm *realmB = [self openRealmForPartitionValue:partitionValueB user:user];
@@ -826,19 +833,19 @@
         [self waitForDownloadsForRealm:realmC];
         // Add objects.
         [self addPersonsToRealm:realmA
-                        persons:@[[Person johnWithRealmId:partitionValueA],
-                                  [Person paulWithRealmId:partitionValueA],
-                                  [Person ringoWithRealmId:partitionValueA],
-                                  [Person georgeWithRealmId:partitionValueA]]];
+                        persons:@[[Person john],
+                                  [Person paul],
+                                  [Person ringo],
+                                  [Person george]]];
         [self addPersonsToRealm:realmB
-                        persons:@[[Person johnWithRealmId:partitionValueB],
-                                  [Person paulWithRealmId:partitionValueB],
-                                  [Person ringoWithRealmId:partitionValueB],
-                                  [Person georgeWithRealmId:partitionValueB],
-                                  [Person georgeWithRealmId:partitionValueB]]];
+                        persons:@[[Person john],
+                                  [Person paul],
+                                  [Person ringo],
+                                  [Person george],
+                                  [Person george]]];
         [self addPersonsToRealm:realmC
-                        persons:@[[Person johnWithRealmId:partitionValueC],
-                                  [Person paulWithRealmId:partitionValueC]]];
+                        persons:@[[Person john],
+                                  [Person paul]]];
 
         [self waitForUploadsForRealm:realmA];
         [self waitForUploadsForRealm:realmB];
@@ -891,9 +898,9 @@
         @autoreleasepool {
             RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
             [self addPersonsToRealm:realm
-                            persons:@[[Person johnWithRealmId:self.appId],
-                                      [Person paulWithRealmId:self.appId],
-                                      [Person ringoWithRealmId:self.appId]]];
+                            persons:@[[Person john],
+                                      [Person paul],
+                                      [Person ringo]]];
             CHECK_COUNT(OBJECT_COUNT, Person, realm);
 
             [self waitForUploadsForRealm:realm];
@@ -917,7 +924,7 @@
     RLMUser *user = [self logInUserForCredentials:credentials];
     RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
 
-    [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:self.appId]]];
+    [self addPersonsToRealm:realm persons:@[[Person john]]];
     CHECK_COUNT(1, Person, realm);
     [self waitForUploadsForRealm:realm];
     // Log out the user.
@@ -925,9 +932,9 @@
     // Log the user back in.
     user = [self logInUserForCredentials:credentials];
     [self addPersonsToRealm:realm
-                    persons:@[[Person johnWithRealmId:self.appId],
-                              [Person paulWithRealmId:self.appId],
-                              [Person ringoWithRealmId:self.appId]]];
+                    persons:@[[Person john],
+                              [Person paul],
+                              [Person ringo]]];
     CHECK_COUNT(4, Person, realm);
 }
 
@@ -975,10 +982,10 @@
         [self primeSyncManagerWithSemaphore:sema];
         RLMRealm *realm = [self openRealmForPartitionValue:@"realm_id" user:user];
         XCTAssertNil(error, @"Error when opening Realm: %@", error);
-        
+
         [self addPersonsToRealm:realm
                         persons:@[[Person john]]];
-        
+
         CHECK_COUNT(1, Person, realm);
         user = [self logInUserForCredentials:credentials];
         // Wait for the Realm's session to be bound.
@@ -1056,9 +1063,9 @@
         // Open the Realm (for the first time).
         RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
         [self addPersonsToRealm:realm
-                        persons:@[[Person johnWithRealmId:self.appId],
-                                  [Person paulWithRealmId:self.appId]]];
-        
+                        persons:@[[Person john],
+                                  [Person paul]]];
+
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
         RLMRunChildAndWait();
@@ -1074,7 +1081,7 @@
 - (void)testLogBackInOpenFirstTimePathDownload {
     // Log in the user.
     RLMCredentials *credentials = [self basicCredentialsWithName:NSStringFromSelector(_cmd)
-                                                           register:self.isParent];
+                                                        register:self.isParent];
     RLMUser *user = [self logInUserForCredentials:credentials];
 
     // Now run a basic multi-client test.
@@ -1095,8 +1102,8 @@
         // Add objects.
         [self waitForDownloadsForRealm:realm];
         [self addPersonsToRealm:realm
-                        persons:@[[Person johnWithRealmId:self.appId],
-                                  [Person paulWithRealmId:self.appId]]];
+                        persons:@[[Person john],
+                                  [Person paul]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(2, Person, realm);
     }
@@ -1194,11 +1201,11 @@
         [self waitForDownloadsForRealm:realmB];
         CHECK_COUNT(0, Person, realmA);
         CHECK_COUNT(0, Person, realmB);
-        
+
         // Suspend the session for realm A and then add an object to each Realm
         RLMSyncSession *sessionA = [RLMSyncSession sessionForRealm:realmA];
         [sessionA suspend];
-        
+
         [self addPersonsToRealm:realmA
                         persons:@[[Person john]]];
 
@@ -1206,7 +1213,7 @@
                         persons:@[[Person ringo]]];
         [self waitForUploadsForRealm:realmB];
         RLMRunChildAndWait();
-        
+
         // A should still be 1 since it's suspended. If it wasn't suspended, it
         // should have downloaded before B due to the ordering in the child.
         [self waitForDownloadsForRealm:realmB];
@@ -1425,7 +1432,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         NSDictionary *attributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
         if (attributes)
             return [(NSNumber *)attributes[NSFileSize] unsignedLongLongValue];
-        
+
         return 0;
     };
     XCTAssertNil(RLMGetAnyCachedRealmForPath(c.pathOnDisk.UTF8String));
@@ -1565,19 +1572,18 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 - (void)testAsyncOpenConnectionTimeout {
     [self resetSyncManager];
 
-    NSTask *task = [[NSTask alloc] init];
-    NSString *directory = [@(__FILE__) stringByDeletingLastPathComponent];
-    task.currentDirectoryPath = directory;
-    task.launchPath = @"/usr/bin/ruby";
-    task.arguments = @[[directory stringByAppendingPathComponent:@"run_baas.rb"], @"start_proxy", @"5678", @"2"];
-    [task launch];
+    __attribute__((objc_precise_lifetime)) TimeoutProxyServer *proxy = [[TimeoutProxyServer alloc] initWithPort:5678];
+    NSError *error;
+    [proxy startAndReturnError:&error];
+    XCTAssertNil(error);
 
     RLMAppConfiguration *config = [[RLMAppConfiguration alloc] initWithBaseURL:@"http://localhost:5678"
                                                                      transport:[AsyncOpenConnectionTimeoutTransport new]
                                                                   localAppName:nil
                                                                localAppVersion:nil
                                                        defaultRequestTimeoutMS:60];
-    RLMApp *app = [RLMApp appWithId:[[RealmObjectServer sharedServer] createApp] configuration:config];
+    RLMApp *app = [RLMApp appWithId:[RealmServer.shared createAppAndReturnError:nil]
+                      configuration:config];
 
     RLMRealmConfiguration *c = [self.anonymousUser configurationWithPartitionValue:self.appId];
     RLMSyncConfiguration *syncConfig = c.syncConfiguration;
@@ -1599,8 +1605,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         [ex fulfill];
     }];
     [self waitForExpectationsWithTimeout:10.0 handler:nil];
-    [task terminate];
-    [task waitUntilExit];
 }
 
 #pragma mark - Compact on Launch
@@ -1686,7 +1690,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                             sort:sort
                                                             upsert:YES
                                                             shouldReturnNewDocument:YES];
-    
+
     XCTAssertNotNil(findOneAndModifyOptions3.projection);
     XCTAssertNotNil(findOneAndModifyOptions3.sort);
     XCTAssertTrue(findOneAndModifyOptions3.shouldReturnNewDocument);
@@ -1700,7 +1704,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     findOneAndModifyOptions3.sort = nil;
     XCTAssertNil(findOneAndModifyOptions3.projection);
     XCTAssertNil(findOneAndModifyOptions3.sort);
-    
+
     RLMFindOneAndModifyOptions *findOneAndModifyOptions4 = [[RLMFindOneAndModifyOptions alloc]
                                                             initWithProjection:nil
                                                             sort:nil
@@ -1732,7 +1736,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTAssertTrue([findOptions2.projection isEqual:projection]);
     XCTAssertTrue([findOptions2.sort isEqual:sort]);
     XCTAssertEqual(findOptions2.limit, 0);
-    
+
     RLMFindOptions *findOptions3 = [[RLMFindOptions alloc] initWithLimit:37
                                                               projection:projection
                                                                     sort:sort];
@@ -1883,7 +1887,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         @{@"name": @"fido", @"breed": @"cane corso"},
         @{@"name": @"rex", @"breed": @"tibetan mastiff"}]
                          completion:^(NSArray<RLMObjectId *> * objectIds, NSError * error) {
-        XCTAssertTrue(objectIds.count > 0);
+        XCTAssertTrue(objectIds.count == 3);
         XCTAssertNil(error);
         [insertManyExpectation fulfill];
     }];
@@ -1902,9 +1906,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     XCTestExpectation *aggregateExpectation2 = [self expectationWithDescription:@"should aggregate documents"];
     [collection aggregateWithPipeline:@[@{@"$match" : @{@"name" : @"fido"}}, @{@"$group" : @{@"_id" : @"$name"}}]
                            completion:^(NSArray<NSDictionary *> * documents, NSError * error) {
+        XCTAssertNil(error);
         XCTAssertNotNil(documents);
         XCTAssertTrue(documents.count > 0);
-        XCTAssertNil(error);
         [aggregateExpectation2 fulfill];
     }];
     [self waitForExpectationsWithTimeout:60.0 handler:nil];
@@ -2143,7 +2147,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                                            sort:sort
                                                            upsert:YES
                                                            shouldReturnNewDocument:YES];
-    
+
     [collection findOneAndDeleteWhere:@{@"name": @"john"}
                               options:findOneAndModifyOptions
                            completion:^(NSDictionary<NSString *, id<RLMBSON>> * document, NSError * error) {
@@ -2171,7 +2175,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         CHECK_COUNT(1, Person, realm);
     } else {
         RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
-        [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:realmId]]];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
         CHECK_COUNT(1, Person, realm);
     }
@@ -2183,7 +2187,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     if (!self.isParent) {
         RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
-        [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:realmId]]];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
         return;
     }
@@ -2217,7 +2221,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 
     if (!self.isParent) {
         RLMRealm *realm = [self openRealmForPartitionValue:self.appId user:user];
-        [self addPersonsToRealm:realm persons:@[[Person johnWithRealmId:realmId]]];
+        [self addPersonsToRealm:realm persons:@[[Person john]]];
         [self waitForUploadsForRealm:realm];
         return;
     }

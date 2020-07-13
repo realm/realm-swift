@@ -17,8 +17,15 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMBSON.h"
-#import "util/bson/bson.hpp"
 #import <realm/util/optional.hpp>
+
+namespace realm {
+namespace bson {
+class Bson;
+template <typename> class IndexedMap;
+using BsonDocument = IndexedMap<Bson>;
+}
+}
 
 realm::bson::Bson RLMConvertRLMBSONToBson(id<RLMBSON> b);
 id<RLMBSON> RLMConvertBsonToRLMBSON(const realm::bson::Bson& b);

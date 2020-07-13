@@ -282,7 +282,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 }
 
 - (void)loginWithCredential:(RLMCredentials *)credentials
-          completion:(RLMUserCompletionBlock)completionHandler {
+                 completion:(RLMUserCompletionBlock)completionHandler {
     _app->log_in_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
             return completionHandler(nil, RLMAppErrorToNSError(*error));

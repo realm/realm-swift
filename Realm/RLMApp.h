@@ -139,7 +139,8 @@ Create a new Realm App configuration.
  @param completion A callback invoked after completion.
  */
 - (void)loginWithCredential:(RLMCredentials *)credentials
-                 completion:(RLMUserCompletionBlock)completion;
+                 completion:(RLMUserCompletionBlock)completion NS_SWIFT_NAME(login(credentials:completion:));
+
 /**
  Switches the active user to the specified user.
 
@@ -154,7 +155,8 @@ Create a new Realm App configuration.
 /**
  A client which can be used to register devices with the server to receive push notificatons
  */
-- (RLMPushClient *)pushClientWithServiceName:(NSString *)serviceName;
+- (RLMPushClient *)pushClientWithServiceName:(NSString *)serviceName
+    NS_SWIFT_NAME(pushClient(serviceName:));
 
 /**
  RLMApp instances are cached internally by Realm and cannot be created directly.

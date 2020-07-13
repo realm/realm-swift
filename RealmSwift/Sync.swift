@@ -285,7 +285,7 @@ public struct Functions {
     }
 }
 
-extension User {
+public extension User {
 
     /**
      Create a sync configuration instance.
@@ -298,7 +298,7 @@ extension User {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    public func configuration<T: BSON>(partitionValue: T) -> Realm.Configuration {
+    func configuration<T: BSON>(partitionValue: T) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
         return ObjectiveCSupport.convert(object: config)
     }
@@ -315,8 +315,8 @@ extension User {
 
      - warning: NEVER disable SSL validation for a system running in production.
      */
-    public func configuration<T: BSON>(partitionValue: T,
-                                       cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
+    func configuration<T: BSON>(partitionValue: T,
+                                cancelAsyncOpenOnNonFatalErrors: Bool = false) -> Realm.Configuration {
         let config = self.__configuration(withPartitionValue: ObjectiveCSupport.convert(object: AnyBSON(partitionValue))!)
         let syncConfig = config.syncConfiguration!
         syncConfig.cancelAsyncOpenOnNonFatalErrors = cancelAsyncOpenOnNonFatalErrors
@@ -328,7 +328,7 @@ extension User {
      The custom data of the user.
      This is configured in your MongoDB Realm App.
     */
-    public var customData: Document? {
+    var customData: Document? {
         guard let rlmCustomData = self.__customData as RLMBSON?,
             let anyBSON = ObjectiveCSupport.convert(object: rlmCustomData),
             case let .document(customData) = anyBSON else {
@@ -341,7 +341,7 @@ extension User {
     /// A client for interacting with a remote MongoDB instance
     /// - Parameter serviceName:  The name of the MongoDB service
     /// - Returns: A `MongoClient` which is used for interacting with a remote MongoDB service
-    public func mongoClient(_ serviceName: String) -> MongoClient {
+    func mongoClient(_ serviceName: String) -> MongoClient {
         return self.__mongoClient(withServiceName: serviceName)
     }
 
@@ -359,7 +359,7 @@ extension User {
     /// The first argument is the `BSONArray` of arguments to be provided to the function.
     /// The second and final argument is the completion handler to call when the function call is complete.
     /// This handler is executed on a non-main global `DispatchQueue`.
-    public var functions: Functions {
+    var functions: Functions {
         return Functions(user: self)
     }
 }

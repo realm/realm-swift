@@ -17,7 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
-#import "RLMMongoCollection.h"
+#import <Realm/RLMMongoCollection.h>
 
 NS_ASSUME_NONNULL_BEGIN
 

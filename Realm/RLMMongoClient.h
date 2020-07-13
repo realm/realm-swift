@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMMongoDatabase.h"
+#import <Realm/RLMMongoDatabase.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Gets a `RLMMongoDatabase` instance for the given database name.
 /// @param name the name of the database to retrieve
-- (RLMMongoDatabase *)databaseWithName:(NSString *)name;
+- (RLMMongoDatabase *)databaseWithName:(NSString *)name NS_SWIFT_NAME(database(named:));
 
 @end
 

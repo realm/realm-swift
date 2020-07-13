@@ -621,14 +621,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             let credentials2 = Credentials(username: username, password: "NOT_A_VALID_PASSWORD")
             let ex = expectation(description: "Should log in the user properly")
 
-            self.app.login(withCredential: credentials2, completion: { user2, error in
+            self.app.login(credentials: credentials2, completion: { user2, error in
                 XCTAssertNil(user2)
                 XCTAssertNotNil(error)
                 ex.fulfill()
             })
 
             waitForExpectations(timeout: 10, handler: nil)
-
         } catch {
             XCTFail("Got an error: \(error) (process: \(isParent ? "parent" : "child"))")
         }
@@ -704,7 +703,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
         var syncUser: User?
 
-        app.login(withCredential: Credentials(username: email, password: password)) { (user, error) in
+        app.login(credentials: Credentials(username: email, password: password)) { (user, error) in
             XCTAssertNil(error)
             syncUser = user
             loginEx.fulfill()
@@ -744,7 +743,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         var syncUser1: User?
         var syncUser2: User?
 
-        app.login(withCredential: Credentials(username: email1, password: password1)) { (user, error) in
+        app.login(credentials: Credentials(username: email1, password: password1)) { (user, error) in
             XCTAssertNil(error)
             syncUser1 = user
             login1Ex.fulfill()
@@ -752,7 +751,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         wait(for: [login1Ex], timeout: 4.0)
 
-        app.login(withCredential: Credentials(username: email2, password: password2)) { (user, error) in
+        app.login(credentials: Credentials(username: email2, password: password2)) { (user, error) in
             XCTAssertNil(error)
             syncUser2 = user
             login2Ex.fulfill()
@@ -798,7 +797,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let credentials = Credentials(username: email, password: password)
 
-        app.login(withCredential: Credentials.anonymous()) { (user, error) in
+        app.login(credentials: Credentials.anonymous()) { (user, error) in
             XCTAssertNil(error)
             syncUser = user
             loginEx.fulfill()
@@ -894,7 +893,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let credentials = Credentials(username: email, password: password)
 
         var syncUser: User?
-        app.login(withCredential: credentials) { (user, error) in
+        app.login(credentials: credentials) { (user, error) in
             XCTAssertNil(error)
             syncUser = user
             loginEx.fulfill()
@@ -905,7 +904,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let createAPIKeyEx = expectation(description: "Create user api key")
 
         var apiKey: UserAPIKey?
-        syncUser?.apiKeyAuth().createApiKey(withName: "my-api-key") { (key, error) in
+        syncUser?.apiKeyAuth().createApiKey(named: "my-api-key") { (key, error) in
             XCTAssertNotNil(key)
             XCTAssertNil(error)
             apiKey = key
@@ -968,7 +967,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let credentials = Credentials(username: email, password: password)
         var syncUser: User?
-        app.login(withCredential: credentials) { (user, error) in
+        app.login(credentials: credentials) { (user, error) in
             syncUser = user
             XCTAssertNil(error)
             loginEx.fulfill()
@@ -1009,14 +1008,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let loginExpectation = expectation(description: "Login user")
 
         let credentials = Credentials(username: email, password: password)
-        app.login(withCredential: credentials) { (_, error) in
+        app.login(credentials: credentials) { (_, error) in
             XCTAssertNil(error)
             loginExpectation.fulfill()
         }
         wait(for: [loginExpectation], timeout: 4.0)
 
         let registerDeviceExpectation = expectation(description: "Register Device")
-        let client = app.pushClient(withServiceName: "gcm")
+        let client = app.pushClient(serviceName: "gcm")
         client.registerDevice(token: "some-token", user: app.currentUser()!) { error in
             XCTAssertNil(error)
             registerDeviceExpectation.fulfill()
@@ -1046,7 +1045,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let loginEx = expectation(description: "Login user")
         let credentials = Credentials(username: email, password: password)
         var syncUser: User?
-        app.login(withCredential: credentials) { (user, error) in
+        app.login(credentials: credentials) { (user, error) in
             syncUser = user
             XCTAssertNil(error)
             loginEx.fulfill()
@@ -1080,7 +1079,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         let user = try! synchronouslyLogInUser(for: Credentials.anonymous())
         let mongoClient = user.mongoClient("mongodb1")
         XCTAssertEqual(mongoClient.name, "mongodb1")
-        let database = mongoClient.database(withName: "test_data")
+        let database = mongoClient.database(named: "test_data")
         XCTAssertEqual(database.name, "test_data")
         let collection = database.collection(withName: "Dog")
         XCTAssertEqual(collection.name, "Dog")
@@ -1099,7 +1098,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     func setupMongoCollection() -> MongoCollection {
         let user = try! synchronouslyLogInUser(for: basicCredentials())
         let mongoClient = user.mongoClient("mongodb1")
-        let database = mongoClient.database(withName: "test_data")
+        let database = mongoClient.database(named: "test_data")
         let collection = database.collection(withName: "Dog")
         removeAllFromCollection(collection)
         return collection
