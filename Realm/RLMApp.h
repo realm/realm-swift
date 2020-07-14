@@ -196,10 +196,10 @@ API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
 
 @end
 
-/// Class category extension that deals with Sign In With Apple authentication.
+/// Category extension that deals with Sign In With Apple authentication.
 /// This is only available on OS's that support `AuthenticationServices`
 API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
-@interface RLMApp ()
+@interface RLMApp (ASLogin)
 
 /// Use this delegate to be provided a callback once authentication has succeed or failed.
 @property (nonatomic, weak, nullable) id<RLMASLoginDelegate> authorizationDelegate;
