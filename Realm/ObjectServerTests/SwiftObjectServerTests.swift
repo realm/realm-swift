@@ -93,7 +93,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 checkCount(expected: 3, realm, SwiftPerson.self)
                 executeChild()
             } else {
-                checkCount(expected: 0, realm, SwiftPerson.self)
                 waitForDownloads(for: realm)
                 checkCount(expected: 3, realm, SwiftPerson.self)
                 try realm.write {
