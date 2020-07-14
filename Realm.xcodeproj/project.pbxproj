@@ -514,6 +514,7 @@
 		CF76F7FD24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF76F7DB24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm */; };
 		CF76F7FE24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm in Sources */ = {isa = PBXBuildFile; fileRef = CF76F7DB24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm */; };
 		CF76F80224816B3800890DD2 /* MongoClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF76F80124816B3800890DD2 /* MongoClient.swift */; };
+		CFAE926B24A0A7F40033CB31 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFAE926A24A0A7F40033CB31 /* AuthenticationServices.framework */; };
 		CFAEF761242B5F9A00EAF721 /* RLMAPIKeyAuth.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF75F242B5F9A00EAF721 /* RLMAPIKeyAuth.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CFAEF762242B5F9A00EAF721 /* RLMAPIKeyAuth.mm in Sources */ = {isa = PBXBuildFile; fileRef = CFAEF760242B5F9A00EAF721 /* RLMAPIKeyAuth.mm */; };
 		CFAEF765242B672700EAF721 /* RLMUserAPIKey.h in Headers */ = {isa = PBXBuildFile; fileRef = CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -1078,6 +1079,7 @@
 		CF76F7DB24816AAB00890DD2 /* RLMFindOneAndModifyOptions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMFindOneAndModifyOptions.mm; sourceTree = "<group>"; };
 		CF76F7DC24816AAB00890DD2 /* RLMMongoDatabase_Private.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = RLMMongoDatabase_Private.hpp; sourceTree = "<group>"; };
 		CF76F80124816B3800890DD2 /* MongoClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MongoClient.swift; sourceTree = "<group>"; };
+		CFAE926A24A0A7F40033CB31 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = System/Library/Frameworks/AuthenticationServices.framework; sourceTree = SDKROOT; };
 		CFAEF75F242B5F9A00EAF721 /* RLMAPIKeyAuth.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMAPIKeyAuth.h; sourceTree = "<group>"; };
 		CFAEF760242B5F9A00EAF721 /* RLMAPIKeyAuth.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMAPIKeyAuth.mm; sourceTree = "<group>"; };
 		CFAEF763242B672700EAF721 /* RLMUserAPIKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMUserAPIKey.h; sourceTree = "<group>"; };
@@ -1159,6 +1161,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFAE926B24A0A7F40033CB31 /* AuthenticationServices.framework in Frameworks */,
 				1A7B823A1D51259F00750296 /* libz.tbd in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1327,6 +1330,7 @@
 		1A7B82361D51254600750296 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CFAE926A24A0A7F40033CB31 /* AuthenticationServices.framework */,
 				3F9816292317763000C3543D /* libc++.tbd */,
 				1A7B82391D51259F00750296 /* libz.tbd */,
 			);

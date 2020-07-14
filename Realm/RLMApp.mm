@@ -202,7 +202,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
                                   }];
 }
 
-@interface RLMApp() {
+@interface RLMApp() <ASAuthorizationControllerDelegate> {
     std::shared_ptr<realm::app::App> _app;
 }
 
@@ -298,6 +298,31 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 - (RLMPushClient *)pushClientWithServiceName:(NSString *)serviceName {
     return [[RLMPushClient alloc] initWithPushClient:_app->push_notification_client(serviceName.UTF8String)];
+}
+
+#pragma mark - Sign In With Apple Extension
+
+- (void)setASAuthorizationControllerDelegateForController:(ASAuthorizationController *)controller API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
+    controller.delegate = self;
+}
+
+- (void)authorizationController:(ASAuthorizationController *)controller
+   didCompleteWithAuthorization:(ASAuthorization *)authorization API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
+    NSString *jwt = [[NSString alloc] initWithData:((ASAuthorizationAppleIDCredential *)authorization.credential).identityToken
+                                             encoding:NSUTF8StringEncoding];
+       [self loginWithCredential:[RLMCredentials credentialsWithAppleToken:jwt]
+                      completion:^(RLMUser *user, NSError *error) {
+           if (user) {
+               [self.authorizationDelegate authenticationDidCompleteWithUser:user];
+           } else {
+               [self.authorizationDelegate authenticationDidCompleteWithError:error];
+           }
+       }];
+}
+
+- (void)authorizationController:(ASAuthorizationController *)controller
+           didCompleteWithError:(NSError *)error API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
+    [self.authorizationDelegate authenticationDidCompleteWithError:error];
 }
 
 @end

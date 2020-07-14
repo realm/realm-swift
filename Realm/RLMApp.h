@@ -17,6 +17,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <AuthenticationServices/AuthenticationServices.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -172,6 +173,40 @@ Use `+[RLMRealm appWithId]` or `+[RLMRealm appWithId:configuration:]`
 to obtain a reference to an RLMApp.
 */
 + (instancetype)new __attribute__((unavailable("Use +appWithId or appWithId:configuration:.")));
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+#pragma mark - Sign In With Apple Extension
+
+NS_ASSUME_NONNULL_BEGIN
+
+API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
+/// Use this delegate to be provided a callback once authentication has succeed or failed
+@protocol RLMASLoginDelegate
+
+/// Callback that is invoked should the authentication fail.
+/// @param error An error describing the authentication failure.
+- (void)authenticationDidCompleteWithError:(NSError *)error NS_SWIFT_NAME(authenticationDidComplete(error:));
+
+/// Callback that is invoked should the authentication succeed.
+/// @param user The newly authenticated user.
+- (void)authenticationDidCompleteWithUser:(RLMUser *)user NS_SWIFT_NAME(authenticationDidComplete(user:));
+
+@end
+
+API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0))
+/// Category extension that deals with Sign In With Apple authentication.
+/// This is only available on OS's that support `AuthenticationServices`
+@interface RLMApp (ASLogin)
+
+/// Use this delegate to be provided a callback once authentication has succeed or failed.
+@property (nonatomic, weak, nullable) id<RLMASLoginDelegate> authorizationDelegate;
+
+/// Sets the ASAuthorizationControllerDelegate to be handled by `RLMApp`
+/// @param controller The ASAuthorizationController in which you want `RLMApp` to consume its delegate.
+- (void)setASAuthorizationControllerDelegateForController:(ASAuthorizationController *)controller NS_REFINED_FOR_SWIFT;
 
 @end
 
