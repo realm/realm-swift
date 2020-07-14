@@ -16,6 +16,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Work around "xcodebuild timed out while trying to read
   SwiftPackageManagerExample.xcodeproj" errors when installing Realm via
   Carthage. ([#6549](https://github.com/realm/realm-cocoa/issues/6549)).
+* Fix a performance regression when using change notifications. (Since 5.0.0,
+  [#6629](https://github.com/realm/realm-cocoa/issues/6629)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -27,8 +29,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v6.0.8 to v6.0.9
+* Upgraded realm-sync from v5.0.7 to v5.0.8
 
 5.2.0 Release notes (2020-06-30)
 =============================================================
