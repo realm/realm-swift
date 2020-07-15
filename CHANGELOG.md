@@ -1,12 +1,14 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.3.0 Release notes (2020-07-14)
 =============================================================
+
 ### Enhancements
+
 * Add `Realm.objectWillChange`, which is a Combine publisher that will emit a
   notification each time the Realm is refreshed or a write transaction is
   commited.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+
 * Fix the spelling of `ObjectKeyIdentifiable`. The old spelling is available
   and deprecated for compatiblity.
 * Rename `RealmCollection.publisher` to `RealmCollection.collectionPublisher`.
@@ -19,9 +21,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fix a performance regression when using change notifications. (Since 5.0.0,
   [#6629](https://github.com/realm/realm-cocoa/issues/6629)).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.11 or later.
@@ -29,6 +30,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
+
 * Upgraded realm-core from v6.0.8 to v6.0.9
 * Upgraded realm-sync from v5.0.7 to v5.0.8
 
