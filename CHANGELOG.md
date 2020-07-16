@@ -5,6 +5,14 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* Creating an object inside migration which changed that object type's primary
+  key would hit an assertion failure mentioning primary_key_col
+  ([#6613](https://github.com/realm/realm-cocoa/issues/6613), since 5.0.0).
+* Modifying the value of a string primary key property inside a migration with
+  a Realm file which was upgraded from pre-5.0 would corrupt the property's
+  index, typically resulting in crashes. ([Core #3765](https://github.com/realm/realm-core/issues/3765), since 5.0.0).
+* Some Realm files which hit assertion failures when upgrading from the pre-5.0
+  file format should now upgrade correctly (Since 5.0.0).
 * None.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
@@ -17,8 +25,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v6.0.9 to v6.0.10
+* Upgraded realm-sync from v5.0.8 to v5.0.9
 
 5.3.0 Release notes (2020-07-14)
 =============================================================
