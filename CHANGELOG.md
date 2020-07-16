@@ -1,7 +1,7 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
-* None.
+* Add prebuilt binary for Xcode 11.6 to the release package.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -14,7 +14,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.11 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
-* Carthage release for Swift is built with Xcode 11.5.
+* Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
 * Upgraded realm-core from ? to ?
