@@ -88,6 +88,24 @@ This simple app shows how to use an encrypted realm.
 
 This simple app demonstrates how to define models with inverse relationships using `linkingObjectsOfClass(_:forProperty:)`.
 
+### AppClip / AppClipParent
+
+These two targets demonstrate how to use Realm to persist data between an App Clip and its parent.
+
+**Note:** This is only supported for non-synchronized realms.
+
+#### Example Usage
+
+For the purpose of this example, the app clip invocation and parent application download is simulated by running each target.
+
+For more information on complete App Clip flow see: [Responding to invocations](https://developer.apple.com/documentation/app_clips/responding_to_invocations) and [Launch Experience](https://developer.apple.com/documentation/app_clips/testing_your_app_clip_s_launch_experience).
+
+![alt text](https://github.com/realm/realm-cocoa/blob/em/appclip_ex/examples/ios/swift/AppClip/appclip_ex.gif?raw=true)
+
+**Note:** When testing App Group Entitlements on MacOS (including the iOS simulator), `containerURL(forSecurityApplicationGroupIdentifier:)` will always return the shared directory URL, even when the group identifier is invalid.  Be sure to test on physical devices with non-simulated iOS for expected security behavior. See [Return Value](https://developer.apple.com/documentation/foundation/filemanager/1412643-containerurl).
+
+
+
 ## iOS (RubyMotion)
 
 ***RubyMotion support is experimental. We make no claims towards stability and/or performance when using Realm in RubyMotion.***
