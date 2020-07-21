@@ -302,6 +302,14 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 #pragma mark - Sign In With Apple Extension
 
+- (void)setAuthorizationDelegate:(id<RLMASLoginDelegate>)authorizationDelegate API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
+    objc_setAssociatedObject(self, @selector(authorizationDelegate), authorizationDelegate, OBJC_ASSOCIATION_ASSIGN);
+}
+
+- (id<RLMASLoginDelegate>)authorizationDelegate API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
+    return objc_getAssociatedObject(self, @selector(authorizationDelegate));
+}
+
 - (void)setASAuthorizationControllerDelegateForController:(ASAuthorizationController *)controller API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
     controller.delegate = self;
 }
