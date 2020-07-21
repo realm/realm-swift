@@ -1,3 +1,33 @@
+x.y.z Release notes (yyyy-MM-dd)
+=============================================================
+### Enhancements
+* None.
+
+### Fixed
+* Fix a file format upgrade bug when opening older Realm files.. Could cause
+  assertions like "Assertion failed: ref != 0" during opning of a Realm.
+  ([Core #6644](https://github.com/realm/realm-cocoa/issues/6644), since 5.2.0)
+* A use-after-free would occur if a Realm was compacted, opened on multiple
+  threads prior to the first write, then written to while reads were happening
+  on other threads. This could result in a variety of crashes, often inside
+  realm::util::EncryptedFileMapping::read_barrier.
+  (Since v5.0.0, [#6626](https://github.com/realm/realm-cocoa/issues/6626),
+  [#6628](https://github.com/realm/realm-cocoa/issues/6628),
+  [#6652](https://github.com/realm/realm-cocoa/issues/6652),
+  [#6655](https://github.com/realm/realm-cocoa/issues/6555),
+  [#6656](https://github.com/realm/realm-cocoa/issues/6656)).
+
+### Compatibility
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 3.11 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 11.6.
+
+### Internal
+* Upgraded realm-core from v6.0.11 to v6.0.12
+* Upgraded realm-sync from v5.0.11 to v5.0.12
+
 5.3.1 Release notes (2020-07-17)
 =============================================================
 
