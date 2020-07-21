@@ -204,6 +204,7 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 
 @interface RLMApp() <ASAuthorizationControllerDelegate> {
     std::shared_ptr<realm::app::App> _app;
+    __weak id<RLMASLoginDelegate> _authorizationDelegate API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0));
 }
 
 @end
@@ -303,11 +304,11 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
 #pragma mark - Sign In With Apple Extension
 
 - (void)setAuthorizationDelegate:(id<RLMASLoginDelegate>)authorizationDelegate API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
-    objc_setAssociatedObject(self, @selector(authorizationDelegate), authorizationDelegate, OBJC_ASSOCIATION_ASSIGN);
+    _authorizationDelegate = authorizationDelegate;
 }
 
 - (id<RLMASLoginDelegate>)authorizationDelegate API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
-    return objc_getAssociatedObject(self, @selector(authorizationDelegate));
+    return _authorizationDelegate;
 }
 
 - (void)setASAuthorizationControllerDelegateForController:(ASAuthorizationController *)controller API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
