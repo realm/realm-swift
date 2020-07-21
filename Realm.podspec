@@ -93,19 +93,24 @@ Pod::Spec.new do |s|
                                 'OTHER_CPLUSPLUSFLAGS[arch=armv7]' => '-isystem "${PODS_ROOT}/Realm/include/core" -fvisibility-inlines-hidden -fno-aligned-new',
                                 'USER_HEADER_SEARCH_PATHS' => '"${PODS_ROOT}/Realm/include" "${PODS_ROOT}/Realm/include/Realm"',
                               }
-  s.preserve_paths          = %w(build.sh include)
+  # s.vendored_frameworks  = 'realm-sync.xcframework' FIXME: There is a bug in Cocoapods which does not let an xcframework which is embedded in a framework link correctly. See =>
+  # https://github.com/CocoaPods/CocoaPods/issues/9525
+  s.xcconfig = { 
+    'LIBRARY_SEARCH_PATHS' => '${PODS_ROOT}/Realm/realm-sync.xcframework/**',
+    "OTHER_LDFLAGS[sdk=iphoneos*]" => '$(inherited) -l"c++" "-lrealm-iphone-device" -l"z" "-framework" "Security"',
+    "OTHER_LDFLAGS[sdk=iphonesimulator*]" => '$(inherited) -l"c++" "-lrealm-iphone-simulator" -l"z" "-framework" "Security"',
+    "OTHER_LDFLAGS[sdk=watchos*]" => '$(inherited) -l"c++" "-lrealm-watch-simulator" -l"z" "-framework" "Security"',
+    "OTHER_LDFLAGS[sdk=watchsimulator*]" => '$(inherited) -l"c++" "-lrealm-watch-simulator" -l"z" "-framework" "Security"',
+    "OTHER_LDFLAGS[sdk=appletvos*]" => '$(inherited) -l"c++" "-lrealm-appletv-simulator" -l"z" "-framework" "Security"',
+    "OTHER_LDFLAGS[sdk=appletvsimulator*]" => '$(inherited) -l"c++" "-lrealm-appletv-simulator" -l"z" "-framework" "Security"',
+    "OTHER_LDFLAGS[sdk=macosx*]" => '$(inherited) -l"c++" "-lrealm-maccatalyst" -l"z" "-framework" "Security"'
+  }
+  s.preserve_paths          = %w(build.sh include realm-sync.xcframework)
 
   s.ios.deployment_target   = '9.0'
-  s.ios.vendored_library    = 'core/librealmcore-ios.a'
-
   s.osx.deployment_target   = '10.9'
-  s.osx.vendored_library    = 'core/librealmcore-macosx.a'
-
   s.watchos.deployment_target = '2.0'
-  s.watchos.vendored_library  = 'core/librealmcore-watchos.a'
-
   s.tvos.deployment_target = '9.0'
-  s.tvos.vendored_library  = 'core/librealmcore-tvos.a'
 
   s.subspec 'Headers' do |s|
     s.source_files          = public_header_files

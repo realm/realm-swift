@@ -45,6 +45,7 @@ command:
   clean:                clean up/remove all generated files
   download-core:        downloads core library (binary version)
   download-sync:        downloads sync library (binary version, core+sync)
+  download-sync-xcframework: downloads sync library (binary version, core+sync) as an xcframework
   build:                builds all iOS and macOS frameworks
   ios-static:           builds fat iOS static framework
   ios-dynamic:          builds iOS dynamic frameworks
@@ -325,6 +326,9 @@ download_common() {
     elif [ "$download_type" == "sync" ]; then
         version=$REALM_SYNC_VERSION
         url="${REALM_BASE_URL}/sync/realm-sync-cocoa-${version}.tar.xz"
+    elif [ "$download_type" == "sync-xcframework" ]; then
+        version=$REALM_SYNC_VERSION
+        url="${REALM_BASE_URL}/sync/realm-sync-xcframework-${version}.tar.xz"
     else
         echo "Unknown dowload_type: $download_type"
         exit 1
@@ -353,16 +357,25 @@ download_common() {
         exit 1
     fi
 
-    (
-        cd "$temp_dir"
-        rm -rf "$download_type"
-        tar xf "$tar_path" --xz
-        mv core "${download_type}-${version}"
-    )
+    if [ "$download_type" == "sync-xcframework" ]; then
+        (
+            cd "$temp_dir"
+            tar xf "$tar_path" --xz
+        )
+        rm -rf "realm-sync.xcframework"
+        mv "${temp_dir}/realm-sync.xcframework" .
+    else
+        (
+            cd "$temp_dir"
+            rm -rf "$download_type"
+            tar xf "$tar_path" --xz
+            mv core "${download_type}-${version}"
+        )
 
-    rm -rf "${download_type}-${version}" core
-    mv "${temp_dir}/${download_type}-${version}" .
-    ln -s "${download_type}-${version}" core
+        rm -rf "${download_type}-${version}" core
+        mv "${temp_dir}/${download_type}-${version}" .
+        ln -s "${download_type}-${version}" core
+    fi
 
     # Xcode 12 beta 1 ships a broken version of __bit_reference which breaks
     # ABI compatibility with older versions, so grab a fixed version of that
@@ -378,6 +391,10 @@ download_core() {
 
 download_sync() {
     download_common "sync"
+}
+
+download_xcframework() {
+    download_common "sync-xcframework"
 }
 
 ######################################
@@ -465,6 +482,19 @@ case "$COMMAND" in
             download_sync
         else
             echo "The core library seems to be up to date."
+        fi
+        exit 0
+        ;;
+
+    ######################################
+    # XCFramework
+    ######################################
+    "download-sync-xcframework")
+        if [ "$REALM_XCFRAMEWORK_VERSION" = "current" ]; then
+            echo "Using version of xcframework already in realm-sync.xcframework directory"
+            exit 0
+        else
+            download_xcframework
         fi
         exit 0
         ;;
@@ -1224,19 +1254,11 @@ EOM
             exit 1
           fi
 
-          if [ ! -d core ]; then
-            sh build.sh download-sync
-            rm core
-            mv sync-* core
-            mv core/librealm-ios.a core/librealmcore-ios.a
-            mv core/librealm-macosx.a core/librealmcore-macosx.a
-            mv core/librealm-tvos.a core/librealmcore-tvos.a
-            mv core/librealm-watchos.a core/librealmcore-watchos.a
-          fi
+          sh build.sh download-sync-xcframework
 
           rm -rf include
           mkdir -p include
-          mv core/include include/core
+          cp -R realm-sync.xcframework/ios-armv7_arm64/Headers include/core
 
           mkdir -p include/impl/apple include/util/apple include/sync/impl/apple
           cp Realm/*.hpp include
