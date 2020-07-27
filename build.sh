@@ -317,14 +317,20 @@ fi
 ######################################
 
 download_common() {
-    local download_type=$1 tries_left=3 version url error temp_dir temp_path tar_path
+    local download_type="$1" tries_left=3 version url error temp_dir temp_path tar_path kind
+
+    if [ "$2" = "xcframework" ]; then
+        kind="-xcframework"
+    else
+        kind="-cocoa"
+    fi
 
     if [ "$download_type" == "core" ]; then
         version=$REALM_CORE_VERSION
-        url="${REALM_BASE_URL}/core/realm-core-${version}.tar.xz"
+        url="${REALM_BASE_URL}/core/realm-core${kind}-${version}.tar.xz"
     elif [ "$download_type" == "sync" ]; then
         version=$REALM_SYNC_VERSION
-        url="${REALM_BASE_URL}/sync/realm-sync-cocoa-${version}.tar.xz"
+        url="${REALM_BASE_URL}/sync/realm-sync${kind}-${version}.tar.xz"
     else
         echo "Unknown dowload_type: $download_type"
         exit 1
@@ -357,6 +363,9 @@ download_common() {
         cd "$temp_dir"
         rm -rf "$download_type"
         tar xf "$tar_path" --xz
+        if [ ! -f core/version.txt ]; then
+            printf %s "${version}" > core/version.txt
+        fi
         mv core "${download_type}-${version}"
     )
 
@@ -366,11 +375,11 @@ download_common() {
 }
 
 download_core() {
-    download_common "core"
+    download_common "core" "$1"
 }
 
 download_sync() {
-    download_common "sync"
+    download_common "sync" "$1"
 }
 
 ######################################
@@ -433,7 +442,7 @@ case "$COMMAND" in
         # line so that checking out an older commit will download the
         # appropriate version of core if the already-present version is too new
         elif ! $(grep -m 1 . core/release_notes.txt | grep -i "${REALM_CORE_VERSION} RELEASE NOTES" >/dev/null); then
-            download_core
+            download_core "$2"
         else
             echo "The core library seems to be up to date."
         fi
@@ -455,7 +464,7 @@ case "$COMMAND" in
             rm -rf core
             download_sync
         elif [[ "$(cat core/version.txt)" != "$REALM_SYNC_VERSION" ]]; then
-            download_sync
+            download_sync "$2"
         else
             echo "The core library seems to be up to date."
         fi

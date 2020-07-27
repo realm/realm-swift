@@ -51,8 +51,8 @@ OTHER_CFLAGS[arch=armv7] = -fvisibility-inlines-hidden -fno-aligned-new $(REALM_
 OTHER_LDFLAGS = $(REALM_CATALYST_FLAGS);
 OTHER_SWIFT_FLAGS = $(REALM_CATALYST_FLAGS);
 
-OTHER_CPLUSPLUSFLAGS = $(inherited) -isystem core/include;
 HEADER_SEARCH_PATHS = $(inherited) Realm/ObjectStore/src;
+REALM_CORE_FRAMEWORK = core/realm-sync$(REALM_LIBRARY_SUFFIX).xcframework;
 
 CODE_SIGN_IDENTITY[sdk=iphone*] = iPhone Developer;
 CODE_SIGNING_REQUIRED[sdk=macosx] = NO;
