@@ -363,13 +363,6 @@ download_common() {
     rm -rf "${download_type}-${version}" core
     mv "${temp_dir}/${download_type}-${version}" .
     ln -s "${download_type}-${version}" core
-
-    # Xcode 12 beta 1 ships a broken version of __bit_reference which breaks
-    # ABI compatibility with older versions, so grab a fixed version of that
-    # header.
-    if (( $(xcode_version_major) > 11 )); then
-        curl --silent https://raw.githubusercontent.com/llvm/llvm-project/4198874630be5c6126d78944f8a2d89dea90c7c4/libcxx/include/__bit_reference -o core/include/__bit_reference
-    fi
 }
 
 download_core() {
