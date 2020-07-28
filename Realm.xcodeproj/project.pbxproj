@@ -2295,7 +2295,6 @@
 			);
 			name = "Download Core and Sync";
 			outputPaths = (
-				"$(SRCROOT)/core",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
