@@ -316,13 +316,26 @@ fi
 # Downloading
 ######################################
 
-download_common() {
-    local download_type="$1" tries_left=3 version url error temp_dir temp_path tar_path kind
-
-    if [ "$2" = "xcframework" ]; then
-        kind="-xcframework"
+copy_core() {
+    local src="$1"
+    if [ -d .git ]; then
+        git clean -xfdq core
     else
-        kind="-cocoa"
+        rm -r core
+        mkdir core
+    fi
+    ditto "$src" core
+}
+
+download_common() {
+    local download_type="$1" tries_left=3 version url error kind suffix
+
+    if [ "$2" = xcframework ]; then
+        kind='-xcframework'
+        suffix='-xcframework'
+    else
+        kind='-cocoa'
+        suffix=''
     fi
 
     if [ "$download_type" == "core" ]; then
@@ -336,15 +349,39 @@ download_common() {
         exit 1
     fi
 
+    # First check if we need to do anything
+    if [ -e core/version.txt ]; then
+        if [ "$(cat core/version.txt)" == "$version" ]; then
+            echo "Version ${version} already present"
+            exit 0
+        else
+            echo "Switching from version $(cat core/version.txt) to ${version}"
+        fi
+    else
+        if [ "$(find core -name librealm.a)" ]; then
+            echo 'Using existing custom core build without checking version'
+            exit 0
+        fi
+    fi
+
+    # We may already have this version downloaded and just need to set it as
+    # the active one
+    local versioned_dir="${download_type}-${version}${suffix}"
+    if [ -e "$versioned_dir/version.txt" ]; then
+        echo "Setting ${version} as the active version"
+        copy_core "$versioned_dir${suffix}"
+        exit 0
+    fi
+
     echo "Downloading dependency: ${download_type} ${version} from ${url}"
 
     if [ -z "$TMPDIR" ]; then
         TMPDIR='/tmp'
     fi
-    temp_dir=$(dirname "$TMPDIR/waste")/${download_type}_bin
+    local temp_dir=$(dirname "$TMPDIR/waste")/realm-${download_type}-tmp
     mkdir -p "$temp_dir"
-    tar_path="${temp_dir}/${download_type}-${version}.tar.xz"
-    temp_path="${tar_path}.tmp"
+    local tar_path="${temp_dir}/${versioned_dir}.tar.xz"
+    local temp_path="${tar_path}.tmp"
 
     while [ 0 -lt $tries_left ] && [ ! -f "$tar_path" ]; do
         if ! error=$(/usr/bin/curl --fail --silent --show-error --location "$url" --output "$temp_path" 2>&1); then
@@ -366,20 +403,12 @@ download_common() {
         if [ ! -f core/version.txt ]; then
             printf %s "${version}" > core/version.txt
         fi
-        mv core "${download_type}-${version}"
+        mv core "${versioned_dir}"
     )
 
-    rm -rf "${download_type}-${version}" core
-    mv "${temp_dir}/${download_type}-${version}" .
-    ln -s "${download_type}-${version}" core
-}
-
-download_core() {
-    download_common "core" "$1"
-}
-
-download_sync() {
-    download_common "sync" "$1"
+    rm -rf "${versioned_dir}"
+    mv "${temp_dir}/${versioned_dir}" .
+    copy_core "$versioned_dir"
 }
 
 ######################################
@@ -421,31 +450,7 @@ case "$COMMAND" in
     # Core
     ######################################
     "download-core")
-        if [ "$REALM_CORE_VERSION" = "current" ]; then
-            echo "Using version of core already in core/ directory"
-            exit 0
-        fi
-        if [ -d core -a -d ../realm-core -a ! -L core ]; then
-          # Allow newer versions than expected for local builds as testing
-          # with unreleased versions is one of the reasons to use a local build
-          if ! $(grep -i "${REALM_CORE_VERSION} Release notes" core/release_notes.txt >/dev/null); then
-              echo "Local build of core is out of date."
-              exit 1
-          else
-              echo "The core library seems to be up to date."
-          fi
-        elif ! [ -L core ]; then
-            echo "core is not a symlink. Deleting..."
-            rm -rf core
-            download_core
-        # With a prebuilt version we only want to check the first non-empty
-        # line so that checking out an older commit will download the
-        # appropriate version of core if the already-present version is too new
-        elif ! $(grep -m 1 . core/release_notes.txt | grep -i "${REALM_CORE_VERSION} RELEASE NOTES" >/dev/null); then
-            download_core "$2"
-        else
-            echo "The core library seems to be up to date."
-        fi
+        download_common "core" "$2"
         exit 0
         ;;
 
@@ -453,21 +458,7 @@ case "$COMMAND" in
     # Sync
     ######################################
     "download-sync")
-        if [ "$REALM_SYNC_VERSION" = "current" ]; then
-            echo "Using version of core already in core/ directory"
-            exit 0
-        fi
-        if [ -d core -a -d ../realm-core -a -d ../realm-sync -a ! -L core ]; then
-          echo "Using version of core already in core/ directory"
-        elif ! [ -L core ]; then
-            echo "core is not a symlink. Deleting..."
-            rm -rf core
-            download_sync
-        elif [[ "$(cat core/version.txt)" != "$REALM_SYNC_VERSION" ]]; then
-            download_sync "$2"
-        else
-            echo "The core library seems to be up to date."
-        fi
+        download_common "sync" "$2"
         exit 0
         ;;
 
@@ -1226,14 +1217,13 @@ EOM
             exit 1
           fi
 
-          if [ ! -d core ]; then
+          if [ ! -f core/version.txt ]; then
             sh build.sh download-sync
-            rm core
-            mv sync-* core
             mv core/librealm-ios.a core/librealmcore-ios.a
             mv core/librealm-macosx.a core/librealmcore-macosx.a
             mv core/librealm-tvos.a core/librealmcore-tvos.a
             mv core/librealm-watchos.a core/librealmcore-watchos.a
+            rm core/librealm*-dbg.a
           fi
 
           rm -rf include
@@ -1252,18 +1242,7 @@ EOM
           cp Realm/ObjectStore/src/util/apple/*.hpp include/util/apple
 
           echo '' > Realm/RLMPlatform.h
-          if [ -n "$COCOAPODS_VERSION" ]; then
-            # This variable is set for the prepare_command available
-            # from the 1.0 prereleases, which requires a different
-            # header layout within the header_mappings_dir.
-            cp Realm/*.h include
-          else
-            # For CocoaPods < 1.0, we need to scope the headers within
-            # the header_mappings_dir by another subdirectory to avoid
-            # Clang from complaining about non-modular headers.
-            mkdir -p include/Realm
-            cp Realm/*.h include/Realm
-          fi
+          cp Realm/*.h include
         else
           sh build.sh set-swift-version
         fi
