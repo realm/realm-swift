@@ -557,26 +557,17 @@ case "$COMMAND" in
         ;;
 
     "catalyst")
-        xc "-scheme Realm -configuration $CONFIGURATION \
-            REALM_CATALYST_FLAGS='-target x86_64-apple-ios13.0-macabi' \
-            REALM_PLATFORM_SUFFIX='maccatalyst' \
-            IS_MACCATALYST=YES"
-        clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/Realm.framework" "build/catalyst" "Realm.framework"
+        export REALM_SDKROOT=iphoneos
+        xc "-scheme Realm -configuration $CONFIGURATION -destination variant='Mac Catalyst'"
+        clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION-maccatalyst/Realm.framework" "build/catalyst" "Realm.framework"
         ;;
 
     "catalyst-swift")
         sh build.sh catalyst
-        # FIXME: change this to just "-destination variant='Mac Catalyst'" once the CI machines are running 10.15
-        xc "-scheme 'RealmSwift' -configuration $CONFIGURATION build \
-            REALM_CATALYST_FLAGS='-target x86_64-apple-ios13.0-macabi' \
-            REALM_PLATFORM_SUFFIX='maccatalyst' \
-            SWIFT_DEPLOYMENT_TARGET='13.0-macabi' \
-            SWIFT_PLATFORM_TARGET_PREFIX='ios' \
-            IS_MACCATALYST=YES"
+        export REALM_SDKROOT=iphoneos
+        xc "-scheme 'RealmSwift' -configuration $CONFIGURATION -destination variant='Mac Catalyst' build"
         destination="build/catalyst/swift-$REALM_XCODE_VERSION"
-        clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION/RealmSwift.framework" "$destination" "RealmSwift.framework"
-        rm -rf "$destination/Realm.framework"
-        cp -R build/catalyst/Realm.framework "$destination"
+        clean_retrieve "build/DerivedData/Realm/Build/Products/$CONFIGURATION-maccatalyst/RealmSwift.framework" "$destination" "RealmSwift.framework"
         ;;
 
     "xcframework")
