@@ -1,10 +1,12 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.3.3 Release notes (2020-07-30)
 =============================================================
+
 ### Enhancements
+
 * Add support for the x86_64 watchOS simulator added in Xcode 12.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+
 * (RLM)Results objects would incorrectly pin old read transaction versions
   until they were accessed after a Realm was refreshed, resulting in the Realm
   file growing to large sizes if a Results was retained but not accessed after
@@ -12,9 +14,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Fix linker errors when using SwiftUI previews with Xcode 12 when Realm was
   installed via Swift Package Manager. ([#6625](https://github.com/realm/realm-cocoa/issues/6625))
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.11 or later.
@@ -22,6 +23,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
+
 * Upgraded realm-core from v6.0.12 to v6.0.14
 * Upgraded realm-sync from v5.0.12 to v5.0.14
 
@@ -30,7 +32,7 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 
-* Fix a file format upgrade bug when opening older Realm files.. Could cause
+* Fix a file format upgrade bug when opening older Realm files. Could cause
   assertions like "Assertion failed: ref != 0" during opning of a Realm.
   ([Core #6644](https://github.com/realm/realm-cocoa/issues/6644), since 5.2.0)
 * A use-after-free would occur if a Realm was compacted, opened on multiple
