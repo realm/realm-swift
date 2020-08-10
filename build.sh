@@ -580,7 +580,7 @@ case "$COMMAND" in
         ;;
 
     "xcframework")
-        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS BUILD_LIBRARY_FOR_DISTRIBUTION=YES REALM_OBJC_MACH_O_TYPE=staticlib"
+        export REALM_EXTRA_BUILD_ARGUMENTS="$REALM_EXTRA_BUILD_ARGUMENTS BUILD_LIBRARY_FOR_DISTRIBUTION=YES REALM_OBJC_MACH_O_TYPE=staticlib OTHER_LDFLAGS=-ObjC"
 
         # Build all of the requested frameworks
         shift
