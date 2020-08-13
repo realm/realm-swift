@@ -61,7 +61,9 @@
             _watchStream.feed_buffer(str);
             break;
         case realm::app::WatchStream::State::HAVE_EVENT:
-            [_subscriber didReceiveChangeEvent:RLMConvertBsonToRLMBSON(_watchStream.next_event())];
+            while (_watchStream.state() == realm::app::WatchStream::State::HAVE_EVENT) {
+                [_subscriber didReceiveChangeEvent:RLMConvertBsonToRLMBSON(_watchStream.next_event())];
+            }
             _watchStream.feed_buffer(str);
             break;
         case realm::app::WatchStream::State::HAVE_ERROR:
@@ -338,68 +340,43 @@
 //    return [RLMChangeEvent new];
 //}
 
-
-/**
-* Simplifies the handling the stream for collection.watch() API.
-*
-* General pattern for languages with pull-based async generators (preferred):
-*    auto request = app.make_streaming_request("watch", ...);
-*    auto reply = await doHttpRequestUsingNativeLibs(request);
-*    if (reply.error)
-*        throw reply.error;
-*    auto ws = WatchStream();
-*    for await (chunk : reply.body) {
-*        ws.feedBuffer(chunk);
-*        while (ws.state == WatchStream::HAVE_EVENT) {
-*            yield ws.nextEvent();
-*        }
-*        if (ws.state == WatchStream::HAVE_ERROR)
-*            throw ws.error;
-*    }
-*
-* General pattern for languages with only push-based streams:
-*    auto request = app.make_streaming_request("watch", ...);
-*    doHttpRequestUsingNativeLibs(request, {
-*        .onError = [downstream](error) { downstream.onError(error); },
-*        .onHeadersDone = [downstream](reply) {
-*            if (reply.error)
-*                downstream.onError(error);
-*        },
-*        .onBodyChunk = [downstream, ws = WatchStream()](chunk) {
-*            ws.feedBuffer(chunk);
-*            while (ws.state == WatchStream::HAVE_EVENT) {
-*                downstream.nextEvent(ws.nextEvent());
-*            }
-*            if (ws.state == WatchStream::HAVE_ERROR)
-*                downstream.onError(ws.error);
-*        }
-*    });
-*/
-
-//
-//* SDKs should also support a watch method with the following 3 overloads:
-//*      watch()
-//*      watch(ids: List<Bson>)
-//*      watch(filter: BsonDocument)
 - (void)watchWithDelegate:(id<RLMChangeEventDelegate>)delegate {
-    [self watchWithBsonFilter:nil delegate:delegate];
+    [self watchWithDocumentFilter:nil
+                         idFilter:nil
+                         delegate:delegate];
 }
 
-- (void)watchWithFilterIds:(NSArray<NSDictionary<NSString *,id<RLMBSON>> *> *)filterIds delegate:(id<RLMChangeEventDelegate>)delegate {
-    [self watchWithBsonFilter:filterIds delegate:delegate];
+- (void)watchWithFilterIds:(NSArray<id<RLMBSON>> *)filterIds delegate:(id<RLMChangeEventDelegate>)delegate {
+    [self watchWithDocumentFilter:nil
+                         idFilter:filterIds
+                         delegate:delegate];
 }
 
 - (void)watchWithFilterDocument:(NSDictionary<NSString *,id<RLMBSON>> *)filterDocument delegate:(id<RLMChangeEventDelegate>)delegate {
-    [self watchWithBsonFilter:filterDocument delegate:delegate];
+    [self watchWithDocumentFilter:filterDocument
+                         idFilter:nil
+                         delegate:delegate];
 }
 
-- (void)watchWithBsonFilter:(nullable id<RLMBSON>)bsonFilter delegate:(id<RLMChangeEventDelegate>)delegate {
-    auto args = realm::bson::BsonArray {
-        RLMConvertRLMBSONToBson(@{@"database": self.databaseName, @"collection": self.name}),
+- (void)watchWithDocumentFilter:(nullable id<RLMBSON>)documentFilter
+                       idFilter:(nullable id<RLMBSON>)idFilter
+                       delegate:(id<RLMChangeEventDelegate>)delegate {
+
+    realm::bson::BsonDocument baseArgs = {
+        {"database", self.databaseName.UTF8String},
+        {"collection", self.name.UTF8String}
     };
-    if (bsonFilter) {
-        args.push_back(RLMConvertRLMBSONToBson(bsonFilter));
+
+    if (documentFilter) {
+        baseArgs["filter"] = RLMConvertRLMBSONToBson(documentFilter);
     }
+    if (idFilter) {
+        baseArgs["ids"] = RLMConvertRLMBSONToBson(idFilter);
+    }
+    auto args = realm::bson::BsonArray {
+        baseArgs
+    };
+
     auto request = self.app._realmApp->make_streaming_request(self.app._realmApp->current_user(),
                                                               "watch",
                                                               args,

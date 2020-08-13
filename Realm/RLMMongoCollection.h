@@ -37,6 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Acts as a middleman and processes events with WatchStream
 @interface RLMWatchStream : NSObject <RLMEventDelegate>
 - (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
 @end
 
 /// The `RLMMongoCollection` represents a MongoDB collection.
@@ -276,7 +277,7 @@ typedef void(^RLMMongoDeleteBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Null
 
 - (void)watchWithDelegate:(id<RLMChangeEventDelegate>)delegate;
 
-- (void)watchWithFilterIds:(NSArray<NSDictionary<NSString *,id<RLMBSON>> *> *)filterIds
+- (void)watchWithFilterIds:(NSArray<id<RLMBSON>> *)filterIds
           delegate:(id<RLMChangeEventDelegate>)delegate;
 
 - (void)watchWithFilterDocument:(NSDictionary<NSString *, id<RLMBSON>> *)filterDocument

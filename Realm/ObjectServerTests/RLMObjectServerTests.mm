@@ -35,63 +35,13 @@
 #import "RLMSyncUtil_Private.h"
 #import "RLMSyncConfiguration_Private.h"
 #import "shared_realm.hpp"
-#import <Realm/RLMNetworkTransport.h>
+#import "RLMWatchTestUtility.h"
 
 #ifndef REALM_ENABLE_SYNC_TESTS
 #define REALM_ENABLE_SYNC_TESTS 0
 #endif
 
 #pragma mark - Test objects
-
-/// Used to process watch change events and assert tests.
-@interface RLMWatchTestDelegate: NSObject <RLMChangeEventDelegate>
-
-typedef void (^RLMWatchTestDelegateBlock)(NSError * _Nullable);
-
-
-/// Sets up an object that subscribes to the RLMChangeEventDelegate
-/// @param changeEventCount The target amount of change events for the test to succeed
-/// @param completion Block which is invoked when target amount of change events has been hit, or an error has occured.
-- (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
-                              completion:(RLMWatchTestDelegateBlock)completion;
-
-@end
-
-@implementation RLMWatchTestDelegate {
-    NSUInteger _targetChangeEventCount;
-    NSUInteger _currentChangeEventCount;
-    __weak RLMWatchTestDelegateBlock _completion;
-}
-
-- (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
-                              completion:(RLMWatchTestDelegateBlock)completion {
-    if (self = [super init]) {
-        _completion = completion;
-        _targetChangeEventCount = changeEventCount;
-        return self;
-    }
-
-    return nil;
-}
-
-- (void)didClose {
-}
-
-- (void)didOpen {
-}
-
-- (void)didReceiveChangeEvent:(nonnull id<RLMBSON>)changeEvent {
-    _currentChangeEventCount++;
-    if (_currentChangeEventCount == _targetChangeEventCount) {
-        _completion(nil);
-    }
-}
-
-- (void)didReceiveError:(nonnull NSError *)error {
-    _completion(error);
-}
-
-@end
 
 @interface RLMObjectServerTests : RLMSyncTestCase
 @end
@@ -117,31 +67,6 @@ typedef void (^RLMWatchTestDelegateBlock)(NSError * _Nullable);
 @implementation RLMObjectServerTests
 
 #pragma mark - App Tests
-
-- (void)testWatch {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
-
-    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
-    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
-
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (int i=0; i<5; i++) {
-            [collection insertOneDocument:@{@"name": @"fido"} completion:^(RLMObjectId * objectId, NSError * error) {
-                XCTAssertNil(error);
-                XCTAssertNotNil(objectId);
-            }];
-            [NSThread sleepForTimeInterval:2];
-        }
-    });
-
-    RLMWatchTestDelegate *test = [[RLMWatchTestDelegate alloc] initWithChangeEventCount:5 completion:^(NSError * error) {
-        XCTAssertNil(error);
-        [expectation fulfill];
-    }];
-    [collection watchWithDelegate:test];
-    [self waitForExpectations:@[expectation] timeout:60.0];
-}
 
 - (NSString *)generateRandomString:(int)num {
     NSMutableString *string = [NSMutableString stringWithCapacity:num];
@@ -2316,6 +2241,110 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         XCTAssertNotEqual([error.localizedDescription rangeOfString:@"Property 'Person.dataProp' has been added."].location,
                           NSNotFound);
     }
+}
+
+#pragma mark - Watch
+
+- (void)testWatch {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
+
+    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
+    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+    __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
+
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        for (int i=0; i<5; i++) {
+            [collection insertOneDocument:@{@"name": @"fido"} completion:^(RLMObjectId * objectId, NSError * error) {
+                XCTAssertNil(error);
+                XCTAssertNotNil(objectId);
+            }];
+            [NSThread sleepForTimeInterval:2];
+        }
+    });
+
+    RLMWatchTestUtility *testUtility = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5 completion:^(NSError * error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [collection watchWithDelegate:testUtility];
+    [self waitForExpectations:@[expectation] timeout:60.0];
+}
+
+- (void)testWatchWithFilterDocument {
+    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
+
+    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
+    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+    __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
+
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        for (int i=0; i<5; i++) {
+            [collection insertOneDocument:@{@"name": @"fido"} completion:^(RLMObjectId * objectId, NSError * error) {
+                XCTAssertNil(error);
+                XCTAssertNotNil(objectId);
+            }];
+            [collection insertOneDocument:@{@"name": @"john"} completion:^(RLMObjectId * objectId, NSError * error) {
+                XCTAssertNil(error);
+                XCTAssertNotNil(objectId);
+            }];
+            [NSThread sleepForTimeInterval:2];
+        }
+    });
+
+    RLMWatchTestUtility *testUtility = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5 completion:^(NSError * error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [collection watchWithFilterDocument:@{@"name": @"john"} delegate:testUtility];
+    [self waitForExpectations:@[expectation] timeout:60.0];
+}
+
+- (void)testWatchWithFilterIds {
+    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
+    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+    __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
+
+    __block NSArray<RLMObjectId *> * objectIds;
+
+    XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
+    [collection insertManyDocuments:@[
+        @{@"name": @"fido", @"breed": @"cane corso"},
+        @{@"name": @"rex", @"breed": @"tibetan mastiff"},
+        @{@"name": @"john", @"breed": @"tibetan mastiff"}]
+                         completion:^(NSArray<RLMObjectId *> * ids, NSError * error) {
+        XCTAssertEqual((int)ids.count, 3);
+        XCTAssertNil(error);
+        objectIds = ids;
+        [insertManyExpectation fulfill];
+    }];
+    [self waitForExpectations:@[insertManyExpectation] timeout:60.0];
+
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
+
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        for (int i=0; i<5; i++) {
+            [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
+                                updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
+                                    completion:^(RLMUpdateResult * _Nullable, NSError * error) {
+                XCTAssertNil(error);
+            }];
+
+            [collection updateOneDocumentWhere:@{@"_id": objectIds[1]}
+                                updateDocument:@{@"breed": @"french bulldog", @"name": [NSString stringWithFormat:@"fido-%d", i]}
+                                    completion:^(RLMUpdateResult * _Nullable, NSError * error) {
+                XCTAssertNil(error);
+            }];
+            [NSThread sleepForTimeInterval:2];
+        }
+    });
+
+    RLMWatchTestUtility *testUtility = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5 completion:^(NSError * error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [collection watchWithFilterIds:@[objectIds[0]] delegate:testUtility];
+    [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
 @end
