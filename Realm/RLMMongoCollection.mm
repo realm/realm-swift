@@ -28,6 +28,54 @@
 #import "sync/remote_mongo_database.hpp"
 #import "sync/remote_mongo_collection.hpp"
 
+@implementation RLMWatchStream {
+    realm::app::WatchStream _watchStream;
+    id<RLMEventDelegate> _eventSubscriber;
+}
+- (instancetype)initWithEventSubscriber:(id<RLMEventDelegate>)eventSubscriber {
+    if (self = [super init]) {
+        _watchStream = realm::app::WatchStream();
+        _eventSubscriber = eventSubscriber;
+        return self;
+    }
+    return nil;
+}
+
+- (void)didClose {
+    [_eventSubscriber didClose];
+}
+
+- (void)didOpen {
+    [_eventSubscriber didOpen];
+}
+
+- (void)didReceiveError:(nonnull NSError *)error {
+    [_eventSubscriber didReceiveError:error];
+}
+
+- (void)didReceiveEvent:(nonnull NSData *)event {
+    auto str = [[NSString alloc] initWithData:event encoding:NSUTF8StringEncoding].UTF8String;
+    switch (_watchStream.state()) {
+        case realm::app::WatchStream::State::NEED_DATA:
+            _watchStream.feed_buffer(str);
+            break;
+        case realm::app::WatchStream::State::HAVE_EVENT:
+            RLMConvertBsonToRLMBSON(_watchStream.next_event());
+            _watchStream.feed_buffer(str);
+            [self didReceiveEvent:<#(nonnull NSData *)#>]
+            break;
+        case realm::app::WatchStream::State::HAVE_ERROR:
+            [self didReceiveError:RLMAppErrorToNSError(_watchStream.error())];
+            break;
+    }
+}
+
+@end
+
+@implementation RLMChangeEvent
+
+@end
+
 @implementation RLMMongoCollection
 
 - (instancetype)initWithApp:(RLMApp *)app
@@ -289,40 +337,76 @@
                      completion:completion];
 }
 
-static RLMChangeEvent* RLMChangeEventToRLMChangeEvent(const realm::app::ChangeEvent& event) {
-    // STUB
-    return [RLMChangeEvent new];
-}
+//static RLMChangeEvent* RLMChangeEventToRLMChangeEvent(const realm::app::ChangeEvent& event) {
+//    // STUB
+//    return [RLMChangeEvent new];
+//}
 
-- (void)watchWhere:(NSDictionary<NSString *,id<RLMBSON>> *)filterDocument delegate:(id<RLMChangeEventDelegate>)delegate {
-    struct CES: realm::app::ChangeStreamSubscriber {
-        CES(id<RLMChangeEventDelegate> delegate)
-        : realm::app::ChangeStreamSubscriber()
-        , m_delegate(delegate)
-        {
-        }
-        
-        void did_receive(const realm::app::ChangeEvent& event) {
-            [m_delegate didReceiveChangeEvent:RLMChangeEventToRLMChangeEvent(event)];
-        }
-        
-        void did_receive(const std::error_code stream_error) {
-            // STUB
-        }
-        
-        void did_open() {
-            [m_delegate didOpen];
-        }
-        
-        void did_close() {
-            [m_delegate didClose];
-        }
-    private:
-        id<RLMChangeEventDelegate> m_delegate;
-    } change_event_subscriber(std::move(delegate));
-    
-    [self collection:self.name].watch(static_cast<realm::bson::BsonDocument>(RLMConvertRLMBSONToBson(filterDocument)),
-                                      std::move(change_event_subscriber));
+
+/**
+* Simplifies the handling the stream for collection.watch() API.
+*
+* General pattern for languages with pull-based async generators (preferred):
+*    auto request = app.make_streaming_request("watch", ...);
+*    auto reply = await doHttpRequestUsingNativeLibs(request);
+*    if (reply.error)
+*        throw reply.error;
+*    auto ws = WatchStream();
+*    for await (chunk : reply.body) {
+*        ws.feedBuffer(chunk);
+*        while (ws.state == WatchStream::HAVE_EVENT) {
+*            yield ws.nextEvent();
+*        }
+*        if (ws.state == WatchStream::HAVE_ERROR)
+*            throw ws.error;
+*    }
+*
+* General pattern for languages with only push-based streams:
+*    auto request = app.make_streaming_request("watch", ...);
+*    doHttpRequestUsingNativeLibs(request, {
+*        .onError = [downstream](error) { downstream.onError(error); },
+*        .onHeadersDone = [downstream](reply) {
+*            if (reply.error)
+*                downstream.onError(error);
+*        },
+*        .onBodyChunk = [downstream, ws = WatchStream()](chunk) {
+*            ws.feedBuffer(chunk);
+*            while (ws.state == WatchStream::HAVE_EVENT) {
+*                downstream.nextEvent(ws.nextEvent());
+*            }
+*            if (ws.state == WatchStream::HAVE_ERROR)
+*                downstream.onError(ws.error);
+*        }
+*    });
+*/
+
+//
+//* SDKs should also support a watch method with the following 3 overloads:
+//*      watch()
+//*      watch(ids: List<Bson>)
+//*      watch(filter: BsonDocument)
+
+- (void)watchWhere:(NSDictionary<NSString *,id<RLMBSON>> *)filterDocument delegate:(id<RLMEventDelegate>)delegate {
+    auto args = realm::bson::BsonArray{ RLMConvertRLMBSONToBson(filterDocument) };
+    auto request = self.app._realmApp->make_streaming_request(self.app._realmApp->current_user(),
+                                                              "watch",
+                                                              args,
+                                                              realm::util::Optional<std::string>(self.serviceName.UTF8String));
+
+    RLMRequest *rlmRequest = [RLMRequest new];
+    NSMutableDictionary<NSString *, NSString*> *headersDict = [NSMutableDictionary new];
+    for(auto &header : request.headers) {
+        [headersDict setValue:@(header.first.c_str()) forKey:@(header.second.c_str())];
+    }
+    rlmRequest.headers = headersDict;
+    rlmRequest.method = RLMHTTPMethodGET;
+    rlmRequest.timeout = request.timeout_ms;
+    rlmRequest.url = @(request.url.c_str());
+    NSLog(@"%@", rlmRequest.url);
+
+    RLMWatchStream *watchStream = [[RLMWatchStream alloc] initWithEventSubscriber:delegate];
+    [[self.app.configuration transport] doStreamRequest:rlmRequest eventSubscriber:watchStream];
+
 }
 
 @end

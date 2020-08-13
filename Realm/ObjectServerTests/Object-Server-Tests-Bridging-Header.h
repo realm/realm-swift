@@ -17,4 +17,4 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMSyncTestCase.h"
-#import "RLMSyncUser+ObjectServerTests.h"
+#import "RLMUser+ObjectServerTests.h"

@@ -19,7 +19,7 @@
 #import <Foundation/Foundation.h>
 
 @class RLMRealmConfiguration;
-@class RLMSyncUser;
+@class RLMUser;
 @class RLMApp;
 @protocol RLMBSON;
 
@@ -32,7 +32,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RLMSyncConfiguration : NSObject
 
 /// The user to which the remote Realm belongs.
-@property (nonatomic, readonly) RLMSyncUser *user;
+@property (nonatomic, readonly) RLMUser *user;
 
 /**
  The value this Realm is partitioned on. The partition key is a property defined in
@@ -51,14 +51,14 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) bool cancelAsyncOpenOnNonFatalErrors;
 
 /// :nodoc:
-- (instancetype)initWithUser:(RLMSyncUser *)user
-              partitionValue:(id<RLMBSON>)partitionValue __attribute__((unavailable("Use [RLMSyncUser configurationWithPartitionValue:] instead")));
+- (instancetype)initWithUser:(RLMUser *)user
+              partitionValue:(id<RLMBSON>)partitionValue __attribute__((unavailable("Use [RLMUser configurationWithPartitionValue:] instead")));
 
 /// :nodoc:
-+ (RLMRealmConfiguration *)automaticConfiguration __attribute__((unavailable("Use [RLMSyncUser configuration] instead")));
++ (RLMRealmConfiguration *)automaticConfiguration __attribute__((unavailable("Use [RLMUser configuration] instead")));
 
 /// :nodoc:
-+ (RLMRealmConfiguration *)automaticConfigurationForUser:(RLMSyncUser *)user __attribute__((unavailable("Use [RLMSyncUser configuration] instead")));
++ (RLMRealmConfiguration *)automaticConfigurationForUser:(RLMUser *)user __attribute__((unavailable("Use [RLMUser configuration] instead")));
 
 /// :nodoc:
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly")));

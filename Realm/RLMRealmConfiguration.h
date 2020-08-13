@@ -79,13 +79,23 @@ typedef BOOL (^RLMShouldCompactOnLaunchBlock)(NSUInteger totalBytes, NSUInteger 
 
 /// Whether to open the Realm in read-only mode.
 ///
-/// This is required to be able to open Realm files which are not writeable or
-/// are in a directory which is not writeable. This should only be used on files
-/// which will not be modified by anyone while they are open, and not just to
-/// get a read-only view of a file which may be written to by another thread or
-/// process. Opening in read-only mode requires disabling Realm's reader/writer
-/// coordination, so committing a write transaction from another process will
-/// result in crashes.
+/// For non-synchronized Realms, this is required to be able to open Realm
+/// files which are not writeable or are in a directory which is not writeable.
+/// This should only be used on files which will not be modified by anyone
+/// while they are open, and not just to get a read-only view of a file which
+/// may be written to by another thread or process. Opening in read-only mode
+/// requires disabling Realm's reader/writer coordination, so committing a
+/// write transaction from another process will result in crashes.
+///
+/// Syncronized Realms must always be writeable (as otherwise no
+/// synchronization could happen), and this instead merely disallows performing
+/// write transactions on the Realm. In addition, it will skip some automatic
+/// writes made to the Realm, such as to initialize the Realm's schema. Setting
+/// `readOnly = YES` is not strictly required for Realms which the sync user
+/// does not have write access to, but is highly recommended as it will improve
+/// error reporting and catch some errors earlier.
+///
+/// Realms using query-based sync cannot be opened in read-only mode.
 @property (nonatomic) BOOL readOnly;
 
 /// The current schema version.

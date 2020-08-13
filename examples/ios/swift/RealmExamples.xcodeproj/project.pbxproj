@@ -43,6 +43,16 @@
 		C07E5D831B15005300ED625C /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C07E5D841B15005500ED625C /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; };
 		C07E5D851B15005500ED625C /* Realm.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = C07E5D791B15001500ED625C /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CFEDF00A24B72622007FF10A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFEDF00924B72622007FF10A /* AppDelegate.swift */; };
+		CFEDF00C24B72622007FF10A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFEDF00B24B72622007FF10A /* SceneDelegate.swift */; };
+		CFEDF00E24B72622007FF10A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFEDF00D24B72622007FF10A /* ContentView.swift */; };
+		CFEDF01024B72625007FF10A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CFEDF00F24B72625007FF10A /* Assets.xcassets */; };
+		CFEDF01324B72625007FF10A /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CFEDF01224B72625007FF10A /* Preview Assets.xcassets */; };
+		CFEDF01624B72625007FF10A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CFEDF01424B72625007FF10A /* LaunchScreen.storyboard */; };
+		CFF1724B24B7310E00A16A59 /* Realm.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFF1724924B7310D00A16A59 /* Realm.framework */; };
+		CFF1724C24B7310E00A16A59 /* Realm.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CFF1724924B7310D00A16A59 /* Realm.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CFF1724D24B7310E00A16A59 /* RealmSwift.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFF1724A24B7310E00A16A59 /* RealmSwift.framework */; };
+		CFF1724E24B7310E00A16A59 /* RealmSwift.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CFF1724A24B7310E00A16A59 /* RealmSwift.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		E886FB671A12A73E00CB2D0B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E886FB631A12A73E00CB2D0B /* AppDelegate.swift */; };
 		E886FB681A12A73E00CB2D0B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E886FB641A12A73E00CB2D0B /* Images.xcassets */; };
 		E886FB6A1A12A73E00CB2D0B /* TableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = E886FB661A12A73E00CB2D0B /* TableViewController.swift */; };
@@ -154,6 +164,18 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CFF1724F24B7310E00A16A59 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CFF1724E24B7310E00A16A59 /* RealmSwift.framework in Embed Frameworks */,
+				CFF1724C24B7310E00A16A59 /* Realm.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		E8F14D141CF900E500564AF5 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -191,6 +213,20 @@
 		9C318E8C1CA42C7800879076 /* GettingStarted.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = GettingStarted.playground; sourceTree = "<group>"; };
 		C07E5D791B15001500ED625C /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C09C490F1A605A4800638C9F /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CFEDF00724B72622007FF10A /* AppleAuthentication.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AppleAuthentication.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CFEDF00924B72622007FF10A /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		CFEDF00B24B72622007FF10A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		CFEDF00D24B72622007FF10A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		CFEDF00F24B72625007FF10A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CFEDF01224B72625007FF10A /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		CFEDF01524B72625007FF10A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		CFEDF01724B72625007FF10A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CFEDF01B24B7275D007FF10A /* AppleAuthentication.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = AppleAuthentication.entitlements; sourceTree = "<group>"; };
+		CFEDF01C24B72883007FF10A /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		CFEDF01D24B72B67007FF10A /* Realm.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Realm.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CFEDF02124B72B6B007FF10A /* RealmSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = RealmSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		CFF1724924B7310D00A16A59 /* Realm.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Realm.framework; path = ../../../../../Desktop/Realm.framework; sourceTree = "<group>"; };
+		CFF1724A24B7310E00A16A59 /* RealmSwift.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = RealmSwift.framework; path = ../../../../../Desktop/RealmSwift.framework; sourceTree = "<group>"; };
 		E886FB601A12A6FC00CB2D0B /* GroupedTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GroupedTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E886FB631A12A73E00CB2D0B /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		E886FB641A12A73E00CB2D0B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -228,6 +264,15 @@
 			files = (
 				493759BA230D9F9A0078C28E /* Realm.framework in Frameworks */,
 				493759BE230D9F9D0078C28E /* RealmSwift.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CFEDF00424B72622007FF10A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CFF1724D24B7310E00A16A59 /* RealmSwift.framework in Frameworks */,
+				CFF1724B24B7310E00A16A59 /* Realm.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -340,6 +385,10 @@
 		493759B8230D9F9A0078C28E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CFF1724924B7310D00A16A59 /* Realm.framework */,
+				CFF1724A24B7310E00A16A59 /* RealmSwift.framework */,
+				CFEDF01D24B72B67007FF10A /* Realm.framework */,
+				CFEDF02124B72B6B007FF10A /* RealmSwift.framework */,
 				493759B9230D9F9A0078C28E /* Realm.framework */,
 				493759BD230D9F9D0078C28E /* RealmSwift.framework */,
 			);
@@ -368,12 +417,37 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		CFEDF00824B72622007FF10A /* AppleAuthentication */ = {
+			isa = PBXGroup;
+			children = (
+				CFEDF01B24B7275D007FF10A /* AppleAuthentication.entitlements */,
+				CFEDF00924B72622007FF10A /* AppDelegate.swift */,
+				CFEDF00B24B72622007FF10A /* SceneDelegate.swift */,
+				CFEDF00D24B72622007FF10A /* ContentView.swift */,
+				CFEDF00F24B72625007FF10A /* Assets.xcassets */,
+				CFEDF01424B72625007FF10A /* LaunchScreen.storyboard */,
+				CFEDF01724B72625007FF10A /* Info.plist */,
+				CFEDF01124B72625007FF10A /* Preview Content */,
+				CFEDF01C24B72883007FF10A /* README.md */,
+			);
+			path = AppleAuthentication;
+			sourceTree = "<group>";
+		};
+		CFEDF01124B72625007FF10A /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				CFEDF01224B72625007FF10A /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
 		E805758C19BA55E600376620 = {
 			isa = PBXGroup;
 			children = (
 				E8D3F2751A11766A00620884 /* Backlink */,
 				227D20F01CB609A1008F641B /* Common */,
 				E8CB087F19BA6AEE0018434A /* Encryption */,
+				CFEDF00824B72622007FF10A /* AppleAuthentication */,
 				493759B8230D9F9A0078C28E /* Frameworks */,
 				E886FB621A12A73E00CB2D0B /* GroupedTableView */,
 				493759A5230D8CA60078C28E /* ListSwiftUI */,
@@ -399,6 +473,7 @@
 				E8F14D0A1CF8FD0C00564AF5 /* PlaygroundFrameworkWrapper.framework */,
 				E8CB085E19BA6ACA0018434A /* Simple.app */,
 				E8CB083919BA6AC60018434A /* TableView.app */,
+				CFEDF00724B72622007FF10A /* AppleAuthentication.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -493,6 +568,24 @@
 			name = ListSwiftUI;
 			productName = ListSwiftUI;
 			productReference = 493759A4230D8CA60078C28E /* ListSwiftUI.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CFEDF00624B72622007FF10A /* AppleAuthentication */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CFEDF01A24B72625007FF10A /* Build configuration list for PBXNativeTarget "AppleAuthentication" */;
+			buildPhases = (
+				CFEDF00324B72622007FF10A /* Sources */,
+				CFEDF00424B72622007FF10A /* Frameworks */,
+				CFEDF00524B72622007FF10A /* Resources */,
+				CFF1724F24B7310E00A16A59 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AppleAuthentication;
+			productName = AppleAuthentication;
+			productReference = CFEDF00724B72622007FF10A /* AppleAuthentication.app */;
 			productType = "com.apple.product-type.application";
 		};
 		E886FB511A12A6FC00CB2D0B /* GroupedTableView */ = {
@@ -632,13 +725,18 @@
 		E805758D19BA55E600376620 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1100;
+				LastSwiftUpdateCheck = 1150;
 				LastUpgradeCheck = 1030;
 				ORGANIZATIONNAME = Realm;
 				TargetAttributes = {
 					493759A3230D8CA60078C28E = {
 						CreatedOnToolsVersion = 11.0;
 						DevelopmentTeam = 2Z8M9MTEVV;
+						ProvisioningStyle = Automatic;
+					};
+					CFEDF00624B72622007FF10A = {
+						CreatedOnToolsVersion = 11.5;
+						DevelopmentTeam = YYB57M5EKY;
 						ProvisioningStyle = Automatic;
 					};
 					E8CB07EE19BA6AB60018434A = {
@@ -683,6 +781,7 @@
 				E8CB083819BA6AC60018434A /* TableView */,
 				E8F14D091CF8FD0C00564AF5 /* PlaygroundFrameworkWrapper */,
 				493759A3230D8CA60078C28E /* ListSwiftUI */,
+				CFEDF00624B72622007FF10A /* AppleAuthentication */,
 			);
 		};
 /* End PBXProject section */
@@ -719,6 +818,16 @@
 				493759AD230D8CAA0078C28E /* Assets.xcassets in Resources */,
 				493759B3230D8CAA0078C28E /* LaunchScreen.storyboard in Resources */,
 				493759B0230D8CAA0078C28E /* Preview Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CFEDF00524B72622007FF10A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CFEDF01624B72625007FF10A /* LaunchScreen.storyboard in Resources */,
+				CFEDF01324B72625007FF10A /* Preview Assets.xcassets in Resources */,
+				CFEDF01024B72625007FF10A /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -786,6 +895,16 @@
 				493759A9230D8CA60078C28E /* SceneDelegate.swift in Sources */,
 				49F64C5B231D80FD0014E813 /* SearchBar.swift in Sources */,
 				49B527712315567300131B4A /* URLImage.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CFEDF00324B72622007FF10A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CFEDF00A24B72622007FF10A /* AppDelegate.swift in Sources */,
+				CFEDF00C24B72622007FF10A /* SceneDelegate.swift in Sources */,
+				CFEDF00E24B72622007FF10A /* ContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -859,6 +978,14 @@
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
 		};
+		CFEDF01424B72625007FF10A /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CFEDF01524B72625007FF10A /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
@@ -919,6 +1046,65 @@
 			};
 			name = Release;
 		};
+		CFEDF01824B72625007FF10A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = AppleAuthentication/AppleAuthentication.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_ASSET_PATHS = "\"AppleAuthentication/Preview Content\"";
+				DEVELOPMENT_TEAM = YYB57M5EKY;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = AppleAuthentication/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.AppleAuthentication;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CFEDF01924B72625007FF10A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = AppleAuthentication/AppleAuthentication.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_ASSET_PATHS = "\"AppleAuthentication/Preview Content\"";
+				DEVELOPMENT_TEAM = YYB57M5EKY;
+				ENABLE_PREVIEWS = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = AppleAuthentication/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = io.realm.AppleAuthentication;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		E80575AF19BA55E700376620 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -965,7 +1151,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -1014,7 +1200,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -1175,7 +1361,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = Backlink/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1187,7 +1373,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = Backlink/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "io.realm.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1250,6 +1436,15 @@
 			buildConfigurations = (
 				493759B5230D8CAA0078C28E /* Debug */,
 				493759B6230D8CAA0078C28E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CFEDF01A24B72625007FF10A /* Build configuration list for PBXNativeTarget "AppleAuthentication" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CFEDF01824B72625007FF10A /* Debug */,
+				CFEDF01924B72625007FF10A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

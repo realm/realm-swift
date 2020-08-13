@@ -16,11 +16,16 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMAppCredentials.h"
-#import "sync/app_credentials.hpp"
+#import "RLMPushClient.h"
 
-@interface RLMAppCredentials()
+namespace realm {
+namespace app {
+class PushClient;
+}
+}
 
-@property (nonatomic) realm::app::AppCredentials& appCredentials;
+@interface RLMPushClient ()
+
+- (instancetype)initWithPushClient:(realm::app::PushClient&&)pushClient;
 
 @end

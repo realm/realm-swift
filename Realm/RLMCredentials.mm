@@ -16,14 +16,15 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMAppCredentials_Private.hpp"
+#import "RLMCredentials_Private.hpp"
 
 #import "RLMSyncUtil_Private.h"
 #import "RLMUtil.hpp"
+#import "util/bson/bson.hpp"
 
 using namespace realm;
 
-@implementation RLMAppCredentials
+@implementation RLMCredentials
 - (instancetype)initWithAppCredentials:(app::AppCredentials&&)credentials {
     if (self = [super init]) {
         _appCredentials = std::move(credentials);
@@ -33,15 +34,15 @@ using namespace realm;
     return nil;
 }
 
-+ (instancetype)credentialsWithFacebookToken:(RLMAppCredentialsToken)token {
++ (instancetype)credentialsWithFacebookToken:(RLMCredentialsToken)token {
     return [[self alloc] initWithAppCredentials:app::AppCredentials::facebook(token.UTF8String)];
 }
 
-+ (instancetype)credentialsWithGoogleToken:(RLMAppCredentialsToken)token {
++ (instancetype)credentialsWithGoogleToken:(RLMCredentialsToken)token {
     return [[self alloc] initWithAppCredentials:app::AppCredentials::google(token.UTF8String)];
 }
 
-+ (instancetype)credentialsWithAppleToken:(RLMAppCredentialsToken)token {
++ (instancetype)credentialsWithAppleToken:(RLMCredentialsToken)token {
     return [[self alloc] initWithAppCredentials:app::AppCredentials::apple(token.UTF8String)];
 }
 
@@ -64,8 +65,8 @@ using namespace realm;
         return nil;
     }
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    
-    return [[self alloc] initWithAppCredentials:app::AppCredentials::function(jsonString.UTF8String)];
+
+    return [[self alloc] initWithAppCredentials:app::AppCredentials::function((realm::bson::BsonDocument)realm::bson::parse(jsonString.UTF8String))];
 }
 
 + (instancetype)credentialsWithUserAPIKey:(NSString *)apiKey {
@@ -81,7 +82,7 @@ using namespace realm;
 }
 
 - (BOOL)isEqual:(id)object {
-    if (auto that = RLMDynamicCast<RLMAppCredentials>(object)) {
+    if (auto that = RLMDynamicCast<RLMCredentials>(object)) {
         return [self.provider isEqualToString:that.provider]
             && self.appCredentials.serialize_as_json() == that.appCredentials.serialize_as_json();
     }

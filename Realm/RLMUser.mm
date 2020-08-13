@@ -16,8 +16,9 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMSyncUser_Private.hpp"
+#import "RLMUser_Private.hpp"
 
+#import "RLMCredentials_Private.hpp"
 #import "RLMApp_Private.hpp"
 #import "RLMBSON_Private.hpp"
 #import "RLMJSONModels.h"
@@ -32,6 +33,8 @@
 #import "RLMSyncSession_Private.hpp"
 #import "RLMSyncUtil_Private.hpp"
 #import "RLMUtil.hpp"
+#import "RLMAPIKeyAuth.h"
+#import "RLMMongoClient_Private.hpp"
 
 #import "util/bson/bson.hpp"
 #import "sync/sync_manager.hpp"
@@ -40,28 +43,28 @@
 
 using namespace realm;
 
-@interface RLMSyncUserInfo ()
+@interface RLMUserInfo ()
 
 @property (nonatomic, readwrite) NSArray *accounts;
 @property (nonatomic, readwrite) NSDictionary *metadata;
 @property (nonatomic, readwrite) NSString *identity;
 @property (nonatomic, readwrite) BOOL isAdmin;
 
-+ (instancetype)syncUserInfoWithModel:(RLMUserResponseModel *)model;
++ (instancetype)userInfoWithModel:(RLMUserResponseModel *)model;
 
 @end
 
-@interface RLMSyncUser () {
+@interface RLMUser () {
     std::shared_ptr<SyncUser> _user;
 }
 @end
 
-@implementation RLMSyncUser
+@implementation RLMUser
 
 #pragma mark - API
 
-- (instancetype)initWithSyncUser:(std::shared_ptr<SyncUser>)user
-                             app:(RLMApp *)app {
+- (instancetype)initWithUser:(std::shared_ptr<SyncUser>)user
+                         app:(RLMApp *)app {
     if (self = [super init]) {
         _user = user;
         _app = app;
@@ -71,10 +74,10 @@ using namespace realm;
 }
 
 - (BOOL)isEqual:(id)object {
-    if (![object isKindOfClass:[RLMSyncUser class]]) {
+    if (![object isKindOfClass:[RLMUser class]]) {
         return NO;
     }
-    return _user == ((RLMSyncUser *)object)->_user;
+    return _user == ((RLMUser *)object)->_user;
 }
 
 - (RLMRealmConfiguration *)configurationWithPartitionValue:(id<RLMBSON>)partitionValue {
@@ -139,42 +142,103 @@ using namespace realm;
     return @(_user->identity().c_str());
 }
 
-- (NSArray<RLMSyncUserIdentity *> *)identities {
+- (NSArray<RLMUserIdentity *> *)identities {
     if (!_user) {
         return @[];
     }
-    NSMutableArray<RLMSyncUserIdentity *> *buffer = [NSMutableArray array];
+    NSMutableArray<RLMUserIdentity *> *buffer = [NSMutableArray array];
     auto identities = _user->identities();
     for (auto& identity : identities) {
-        [buffer addObject: [[RLMSyncUserIdentity alloc] initSyncUserIdentityWithProviderType:@(identity.provider_type.c_str())
-                                                                                    identity:@(identity.id.c_str())]];
+        [buffer addObject: [[RLMUserIdentity alloc] initUserIdentityWithProviderType:@(identity.provider_type.c_str())
+                                                                            identity:@(identity.id.c_str())]];
     }
 
     return [buffer copy];
 }
 
-- (RLMSyncUserState)state {
+- (RLMUserState)state {
     if (!_user) {
-        return RLMSyncUserStateRemoved;
+        return RLMUserStateRemoved;
     }
     switch (_user->state()) {
         case SyncUser::State::LoggedIn:
-            return RLMSyncUserStateLoggedIn;
+            return RLMUserStateLoggedIn;
         case SyncUser::State::LoggedOut:
-            return RLMSyncUserStateLoggedOut;
+            return RLMUserStateLoggedOut;
         case SyncUser::State::Removed:
-            return RLMSyncUserStateRemoved;
+            return RLMUserStateRemoved;
     }
 }
 
-- (void)refreshCustomData:(RLMUserUserOptionalErrorBlock)completionBlock {
-    [_app _realmApp]->refresh_custom_data(_user, [completionBlock](util::Optional<app::AppError> error){
+- (void)refreshCustomDataWithCompletion:(RLMUserCustomDataBlock)completion {
+    _user->refresh_custom_data([completion, self](util::Optional<app::AppError> error) {
         if (!error) {
-            return completionBlock(nil);
+            return completion([self customData], nil);
         }
-        
-        completionBlock(RLMAppErrorToNSError(*error));
+
+        completion(nil, RLMAppErrorToNSError(*error));
     });
+}
+
+- (void)linkUserWithCredentials:(RLMCredentials *)credentials
+                     completion:(RLMOptionalUserBlock)completion {
+    _app._realmApp->link_user(_user, credentials.appCredentials,
+                   ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
+        if (error && error->error_code) {
+            return completion(nil, RLMAppErrorToNSError(*error));
+        }
+
+        completion([[RLMUser alloc] initWithUser:user app:_app], nil);
+    });
+}
+
+- (void)removeWithCompletion:(RLMOptionalErrorBlock)completion {
+    _app._realmApp->remove_user(_user, ^(realm::util::Optional<app::AppError> error) {
+        [self handleResponse:error completion:completion];
+    });
+}
+
+- (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
+    _app._realmApp->log_out(^(realm::util::Optional<app::AppError> error) {
+        [self handleResponse:error completion:completion];
+    });
+}
+
+- (RLMAPIKeyAuth *)apiKeyAuth {
+    return [[RLMAPIKeyAuth alloc] initWithApp: _app];
+}
+
+- (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName {
+    return [[RLMMongoClient alloc] initWithApp:_app serviceName:serviceName];
+}
+
+- (void)callFunctionNamed:(NSString *)name
+                arguments:(NSArray<id<RLMBSON>> *)arguments
+          completionBlock:(RLMCallFunctionCompletionBlock)completionBlock {
+    bson::BsonArray args;
+
+    for (id<RLMBSON> argument in arguments) {
+        args.push_back(RLMConvertRLMBSONToBson(argument));
+    }
+
+    _app._realmApp->call_function(_user,
+                        std::string(name.UTF8String),
+                        args, [completionBlock](util::Optional<app::AppError> error,
+                                                util::Optional<bson::Bson> response) {
+        if (error) {
+            return completionBlock(nil, RLMAppErrorToNSError(*error));
+        }
+
+        completionBlock(RLMConvertBsonToRLMBSON(*response), nil);
+    });
+}
+
+- (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
+            completion:(RLMOptionalErrorBlock)completion {
+    if (error && error->error_code) {
+        return completion(RLMAppErrorToNSError(*error));
+    }
+    completion(nil);
 }
 
 #pragma mark - Private API
@@ -213,16 +277,16 @@ using namespace realm;
 
 @end
 
-#pragma mark - RLMSyncUserInfo
+#pragma mark - RLMUserInfo
 
-@implementation RLMSyncUserInfo
+@implementation RLMUserInfo
 
 - (instancetype)initPrivate {
     return [super init];
 }
 
-+ (instancetype)syncUserInfoWithModel:(RLMUserResponseModel *)model {
-    RLMSyncUserInfo *info = [[RLMSyncUserInfo alloc] initPrivate];
++ (instancetype)userInfoWithModel:(RLMUserResponseModel *)model {
+    RLMUserInfo *info = [[RLMUserInfo alloc] initPrivate];
     info.accounts = model.accounts;
     info.metadata = model.metadata;
     info.isAdmin = model.isAdmin;
@@ -232,12 +296,12 @@ using namespace realm;
 
 @end
 
-#pragma mark - RLMSyncUserIdentity
+#pragma mark - RLMUserIdentity
 
-@implementation RLMSyncUserIdentity
+@implementation RLMUserIdentity
 
-- (instancetype)initSyncUserIdentityWithProviderType:(NSString *)providerType
-                                            identity:(NSString *)identity {
+- (instancetype)initUserIdentityWithProviderType:(NSString *)providerType
+                                        identity:(NSString *)identity {
     if (self = [super init]) {
         _providerType = providerType;
         _identity = identity;

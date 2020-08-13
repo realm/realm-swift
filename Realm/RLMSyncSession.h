@@ -18,7 +18,7 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RLMRealm.h"
+#import <Realm/RLMRealm.h>
 
 /**
  The current state of the session represented by a session object.
@@ -90,7 +90,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncProgressMode) {
     RLMSyncProgressModeForCurrentlyOutstandingWork,
 };
 
-@class RLMSyncUser, RLMSyncConfiguration, RLMSyncErrorActionToken;
+@class RLMUser, RLMSyncConfiguration, RLMSyncErrorActionToken;
 
 /**
  The type of a progress notification block intended for reporting a session's network
@@ -136,7 +136,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (atomic, readonly) RLMSyncConnectionState connectionState;
 
 /// The user that owns this session.
-- (nullable RLMSyncUser *)parentUser;
+- (nullable RLMUser *)parentUser;
 
 /**
  If the session is valid, return a sync configuration that can be used to open the Realm

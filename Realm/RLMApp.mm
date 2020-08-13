@@ -19,14 +19,13 @@
 #import "RLMApp_Private.hpp"
 
 #import "RLMNetworkTransport_Private.hpp"
-#import "RLMAppCredentials_Private.hpp"
+#import "RLMCredentials_Private.hpp"
 #import "RLMBSON_Private.hpp"
-#import "RLMSyncUser_Private.hpp"
+#import "RLMPushClient_Private.hpp"
+#import "RLMUser_Private.hpp"
 #import "RLMSyncManager_Private.hpp"
-#import "RLMUsernamePasswordProviderClient.h"
-#import "RLMUserAPIKeyProviderClient.h"
 #import "RLMUtil.hpp"
-#import "RLMMongoClient_Private.hpp"
+#import "RLMEmailPasswordAuth.h"
 
 #if !defined(REALM_COCOA_VERSION)
 #import "RLMVersion.h"
@@ -72,7 +71,7 @@ namespace {
             }];
         }
         
-        void do_stream_request(const app::Request &request, realm::app::GenericEventSubscriber &&subscriber) override {
+        void do_stream_request(const app::Request &request, realm::app::GenericEventSubscriber &&subscriber) {
             // Convert the app::Request to an RLMRequest
             auto rlmRequest = [RLMRequest new];
             rlmRequest.url = @(request.url.data());
@@ -221,8 +220,9 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
                                   }];
 }
 
-@interface RLMApp() {
+@interface RLMApp() <ASAuthorizationControllerDelegate> {
     std::shared_ptr<realm::app::App> _app;
+    __weak id<RLMASLoginDelegate> _authorizationDelegate API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0));
 }
 
 @end
@@ -280,107 +280,76 @@ NSError *RLMAppErrorToNSError(realm::app::AppError const& appError) {
     return _app;
 }
 
-- (NSDictionary<NSString *, RLMSyncUser *> *)allUsers {
+- (NSDictionary<NSString *, RLMUser *> *)allUsers {
     NSMutableDictionary *buffer = [NSMutableDictionary new];
     for (auto user : SyncManager::shared().all_users()) {
         std::string identity(user->identity());
-        buffer[@(identity.c_str())] = [[RLMSyncUser alloc] initWithSyncUser:std::move(user) app:self];
+        buffer[@(identity.c_str())] = [[RLMUser alloc] initWithUser:std::move(user) app:self];
     }
     return buffer;
 }
 
-- (RLMSyncUser *)currentUser {
+- (RLMUser *)currentUser {
     if (auto user = SyncManager::shared().get_current_user()) {
-        return [[RLMSyncUser alloc] initWithSyncUser:user app:self];
+        return [[RLMUser alloc] initWithUser:user app:self];
     }
     return nil;
 }
 
-- (void)loginWithCredential:(RLMAppCredentials *)credentials
-          completion:(RLMUserCompletionBlock)completionHandler {
+- (RLMEmailPasswordAuth *)emailPasswordAuth {
+    return [[RLMEmailPasswordAuth alloc] initWithApp: self];
+}
+
+- (void)loginWithCredential:(RLMCredentials *)credentials
+                 completion:(RLMUserCompletionBlock)completionHandler {
     _app->log_in_with_credentials(credentials.appCredentials, ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
         if (error && error->error_code) {
             return completionHandler(nil, RLMAppErrorToNSError(*error));
         }
 
-        completionHandler([[RLMSyncUser alloc] initWithSyncUser:user app:self], nil);
+        completionHandler([[RLMUser alloc] initWithUser:user app:self], nil);
     });
 }
 
-- (RLMSyncUser *)switchToUser:(RLMSyncUser *)syncUser {
-    return [[RLMSyncUser alloc] initWithSyncUser:_app->switch_user(syncUser._syncUser) app:self];
+- (RLMUser *)switchToUser:(RLMUser *)syncUser {
+    return [[RLMUser alloc] initWithUser:_app->switch_user(syncUser._syncUser) app:self];
 }
 
-- (void)removeUser:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app->remove_user(syncUser._syncUser, ^(realm::util::Optional<app::AppError> error) {
-        [self handleResponse:error completion:completion];
-    });
+- (RLMPushClient *)pushClientWithServiceName:(NSString *)serviceName {
+    return [[RLMPushClient alloc] initWithPushClient:_app->push_notification_client(serviceName.UTF8String)];
 }
 
-- (void)logOutWithCompletion:(RLMOptionalErrorBlock)completion {
-    _app->log_out(^(realm::util::Optional<app::AppError> error) {
-        [self handleResponse:error completion:completion];
-    });
+#pragma mark - Sign In With Apple Extension
+
+- (void)setAuthorizationDelegate:(id<RLMASLoginDelegate>)authorizationDelegate API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
+    _authorizationDelegate = authorizationDelegate;
 }
 
-- (void)logOut:(RLMSyncUser *)syncUser completion:(RLMOptionalErrorBlock)completion {
-    _app->log_out(syncUser._syncUser, ^(realm::util::Optional<app::AppError> error) {
-        [self handleResponse:error completion:completion];
-    });
+- (id<RLMASLoginDelegate>)authorizationDelegate API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
+    return _authorizationDelegate;
 }
 
-- (void)linkUser:(RLMSyncUser *)syncUser
-     credentials:(RLMAppCredentials *)credentials
-      completion:(RLMUserCompletionBlock)completion {
-    _app->link_user(syncUser._syncUser, credentials.appCredentials,
-                   ^(std::shared_ptr<SyncUser> user, util::Optional<app::AppError> error) {
-        if (error && error->error_code) {
-            return completion(nil, RLMAppErrorToNSError(*error));
-        }
-        
-        completion([[RLMSyncUser alloc] initWithSyncUser:user app:self], nil);
-    });
+- (void)setASAuthorizationControllerDelegateForController:(ASAuthorizationController *)controller API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
+    controller.delegate = self;
 }
 
-- (RLMUsernamePasswordProviderClient *)usernamePasswordProviderClient {
-    return [[RLMUsernamePasswordProviderClient alloc] initWithApp: self];
+- (void)authorizationController:(ASAuthorizationController *)controller
+   didCompleteWithAuthorization:(ASAuthorization *)authorization API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
+    NSString *jwt = [[NSString alloc] initWithData:((ASAuthorizationAppleIDCredential *)authorization.credential).identityToken
+                                             encoding:NSUTF8StringEncoding];
+       [self loginWithCredential:[RLMCredentials credentialsWithAppleToken:jwt]
+                      completion:^(RLMUser *user, NSError *error) {
+           if (user) {
+               [self.authorizationDelegate authenticationDidCompleteWithUser:user];
+           } else {
+               [self.authorizationDelegate authenticationDidCompleteWithError:error];
+           }
+       }];
 }
 
-- (RLMUserAPIKeyProviderClient *)userAPIKeyProviderClient {
-    return [[RLMUserAPIKeyProviderClient alloc] initWithApp: self];
-}
-
-- (RLMMongoClient *)mongoClientWithServiceName:(NSString *)serviceName {
-    return [[RLMMongoClient alloc] initWithApp:self serviceName:serviceName];
-}
-
-- (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
-            completion:(RLMOptionalErrorBlock)completion {
-    if (error && error->error_code) {
-        return completion(RLMAppErrorToNSError(*error));
-    }
-    completion(nil);
-}
-
-- (void)callFunctionNamed:(NSString *)name
-                arguments:(NSArray<id<RLMBSON>> *)arguments
-          completionBlock:(RLMCallFunctionCompletionBlock)completionBlock {
-    bson::BsonArray args;
-
-    for (id<RLMBSON> argument in arguments) {
-        args.push_back(RLMConvertRLMBSONToBson(argument));
-    }
-
-    _app->call_function(SyncManager::shared().get_current_user(),
-                        std::string(name.UTF8String),
-                        args, [completionBlock](util::Optional<app::AppError> error,
-                                                util::Optional<bson::Bson> response) {
-        if (error) {
-            return completionBlock(nil, RLMAppErrorToNSError(*error));
-        }
-
-        completionBlock(RLMConvertBsonToRLMBSON(*response), nil);
-    });
+- (void)authorizationController:(ASAuthorizationController *)controller
+           didCompleteWithError:(NSError *)error API_AVAILABLE(ios(13.0), macos(10.15), tvos(13.0), watchos(6.0)) {
+    [self.authorizationDelegate authenticationDidCompleteWithError:error];
 }
 
 @end

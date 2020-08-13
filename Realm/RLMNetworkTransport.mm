@@ -59,67 +59,6 @@ NSString * const RLMHTTPMethodToNSString[] = {
 @implementation RLMResponse
 @end
 
-struct CocoaEventSubscriber : realm::app::GenericEventSubscriber {
-    CocoaEventSubscriber(realm::app::GenericEventSubscriber&& subscriber)
-    : realm::app::GenericEventSubscriber()
-    , m_subscriber(std::move(subscriber))
-    {
-    }
-    realm::app::GenericEventSubscriber&& m_subscriber;
-    
-    void did_close() override
-    {
-        m_subscriber.did_close();
-    }
-    
-    void did_open(const realm::app::Response &response) override
-    {
-        m_subscriber.did_open(response);
-    }
-    
-    void did_receive(std::error_code error) override
-    {
-        m_subscriber.did_receive(error);
-    }
-    
-    void did_receive(const char *event) override
-    {
-        m_subscriber.did_receive(event);
-    }
-};
-
-@implementation RLMEventSubscriber {
-    std::unique_ptr<CocoaEventSubscriber> _subscriber;
-}
-
-- (instancetype)initWithGenericEventSubscriber:(realm::app::GenericEventSubscriber&&)subscriber {
-    if (self = [super init]) {
-        _subscriber = std::make_unique<CocoaEventSubscriber>(std::move(subscriber));
-        return self;
-    }
-    return nil;
-}
-
-- (void)didClose {
-    _subscriber->did_close();
-}
-
-- (void)didOpen {
-    // TODO: Handle open response
-    _subscriber->did_open({});
-}
-
-- (void)didReceiveError:(nonnull NSError *)error {
-    // TODO: Handle error
-    _subscriber->did_receive({});
-}
-
-- (void)didReceiveEvent:(nonnull NSData *)event {
-    _subscriber->did_receive((const char *)event.bytes);
-}
-
-@end
-
 @interface RLMEventSessionDelegate <NSURLSessionDelegate> : NSObject
 + (instancetype)delegateWithEventSubscriber:(RLMEventSubscriber *)subscriber;
 @end;
@@ -241,6 +180,10 @@ didCompleteWithError:(NSError *)error
 - (void)URLSession:(__unused NSURLSession *)session
           dataTask:(__unused NSURLSessionDataTask *)dataTask
     didReceiveData:(NSData *)data {
+    NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) dataTask.response;
+    if (httpResponse.statusCode != 200) {
+        return [_subscriber didClose];
+    }
     [_subscriber didReceiveEvent:data];
 }
 
@@ -258,7 +201,9 @@ didCompleteWithError:(NSError *)error
         return [_subscriber didClose];
     }
 
-//    response.body = [[NSString alloc] initWithData:task . encoding:NSUTF8StringEncoding];
+    if (response.httpStatusCode == 404) {
+        return [_subscriber didClose];
+    }
 
     [_subscriber didOpen];
 }

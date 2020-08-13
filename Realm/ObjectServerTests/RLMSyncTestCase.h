@@ -17,10 +17,9 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import "RLMMultiProcessTestCase.h"
-#import "RLMSyncConfiguration_Private.h"
 
 @class RLMAppConfiguration;
-
+typedef NS_ENUM(NSUInteger, RLMSyncStopPolicy);
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
 
 NS_ASSUME_NONNULL_BEGIN
@@ -45,13 +44,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property NSInteger age;
 @property NSString *firstName;
 @property NSString *lastName;
-// FIXME: Remove this once REALMC-5426 is fixed
-@property NSString *realm_id;
 
-+ (instancetype)johnWithRealmId:(NSString *)realmId;
-+ (instancetype)paulWithRealmId:(NSString *)realmId;
-+ (instancetype)ringoWithRealmId:(NSString *)realmId;
-+ (instancetype)georgeWithRealmId:(NSString *)realmId;
++ (instancetype)john;
++ (instancetype)paul;
++ (instancetype)ringo;
++ (instancetype)george;
 
 @end
 
@@ -62,14 +59,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (instancetype)objectWithRealmId:(NSString *)realmId;
 @end
 
-@interface RealmObjectServer : NSObject
-@property (nonatomic, readonly) NSString *appId;
-+ (instancetype)sharedServer;
-
-- (NSString *)createApp;
-
-@end
-
 @interface RLMSyncTestCase : RLMMultiProcessTestCase
 
 @property (nonatomic, readonly) NSString *appId;
@@ -78,25 +67,31 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) RLMApp *app;
 
-- (RLMAppCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
+- (RLMCredentials *)basicCredentialsWithName:(NSString *)name register:(BOOL)shouldRegister;
 
 + (NSURL *)onDiskPathForSyncedRealm:(RLMRealm *)realm;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
-- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user;
+- (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user;
 
 /// Synchronously open a synced Realm and wait until the binding process has completed or failed.
 - (RLMRealm *)openRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
 
+/// Synchronously open a synced Realm via asyncOpen and return the Realm.
+- (RLMRealm *)asyncOpenRealmWithConfiguration:(RLMRealmConfiguration *)configuration;
+
+/// Synchronously open a synced Realm via asyncOpen and return the expected error.
+- (NSError *)asyncOpenErrorWithConfiguration:(RLMRealmConfiguration *)configuration;
+
 /// Synchronously open a synced Realm. Also run a block right after the Realm is created.
 - (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
-                                    user:(RLMSyncUser *)user
+                                    user:(RLMUser *)user
                         immediatelyBlock:(nullable void(^)(void))block;
 
 /// Synchronously open a synced Realm with encryption key and stop policy.
 /// Also run a block right after the Realm is created.
 - (RLMRealm *)openRealmForPartitionValue:(NSString *)partitionValue
-                                    user:(RLMSyncUser *)user
+                                    user:(RLMUser *)user
                            encryptionKey:(nullable NSData *)encryptionKey
                               stopPolicy:(RLMSyncStopPolicy)stopPolicy
                         immediatelyBlock:(nullable void(^)(void))block;
@@ -108,24 +103,24 @@ NS_ASSUME_NONNULL_BEGIN
 ;
 
 /// Immediately open a synced Realm.
-- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMSyncUser *)user;
+- (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue user:(RLMUser *)user;
 
 /// Immediately open a synced Realm with encryption key and stop policy.
 - (RLMRealm *)immediatelyOpenRealmForPartitionValue:(NSString *)partitionValue
-                                               user:(RLMSyncUser *)user
+                                               user:(RLMUser *)user
                                       encryptionKey:(nullable NSData *)encryptionKey
                                          stopPolicy:(RLMSyncStopPolicy)stopPolicy;
 
 /// Synchronously create, log in, and return a user.
-- (RLMSyncUser *)logInUserForCredentials:(RLMAppCredentials *)credentials;
+- (RLMUser *)logInUserForCredentials:(RLMCredentials *)credentials;
 
 /// Synchronously, log out.
-- (void)logOutUser:(RLMSyncUser *)user;
+- (void)logOutUser:(RLMUser *)user;
 
 - (void)addPersonsToRealm:(RLMRealm *)realm persons:(NSArray<Person *> *)persons;
 
 /// Synchronously wait for downloads to complete for any number of Realms, and then check their `SyncObject` counts.
-- (void)waitForDownloadsForUser:(RLMSyncUser *)user
+- (void)waitForDownloadsForUser:(RLMUser *)user
                          realms:(NSArray<RLMRealm *> *)realms
                       partitionValues:(NSArray<NSString *> *)partitionValues
                  expectedCounts:(NSArray<NSNumber *> *)counts;
@@ -143,16 +138,16 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)waitForUploadsForRealm:(RLMRealm *)realm error:(NSError **)error;
 
 /// Wait for downloads to complete while spinning the runloop. This method uses expectations.
-- (void)waitForDownloadsForUser:(RLMSyncUser *)user
+- (void)waitForDownloadsForUser:(RLMUser *)user
                             partitionValue:(NSString *)partitionValue
                     expectation:(nullable XCTestExpectation *)expectation
                           error:(NSError **)error;
 
 /// Manually set the access token for a user. Used for testing invalid token conditions.
-- (void)manuallySetAccessTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue;
+- (void)manuallySetAccessTokenForUser:(RLMUser *)user value:(NSString *)tokenValue;
 
 /// Manually set the refresh token for a user. Used for testing invalid token conditions.
-- (void)manuallySetRefreshTokenForUser:(RLMSyncUser *)user value:(NSString *)tokenValue;
+- (void)manuallySetRefreshTokenForUser:(RLMUser *)user value:(NSString *)tokenValue;
 
 - (void)setupSyncManager;
 - (void)resetSyncManager;
@@ -173,9 +168,10 @@ NS_ASSUME_NONNULL_END
 }
 
 #define CHECK_COUNT(d_count, macro_object_type, macro_realm) \
-{                                                                                                       \
-    [macro_realm refresh];                                                                              \
-    NSInteger c = [macro_object_type allObjectsInRealm:macro_realm].count;                              \
-    NSString *w = self.isParent ? @"parent" : @"child";                                                 \
-    XCTAssert(d_count == c, @"Expected %@ items, but actually got %@ (%@)", @(d_count), @(c), w);       \
+{                                                                                                         \
+    [macro_realm refresh];                                                                                \
+    RLMResults *r = [macro_object_type allObjectsInRealm:macro_realm];                                    \
+    NSInteger c = r.count;                                                                                \
+    NSString *w = self.isParent ? @"parent" : @"child";                                                   \
+    XCTAssert(d_count == c, @"Expected %@ items, but actually got %@ (%@) (%@)", @(d_count), @(c), r, w); \
 }

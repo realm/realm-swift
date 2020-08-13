@@ -48,18 +48,19 @@ Pod::Spec.new do |s|
                               'include/**/RLMAppCredentials.h',
                               'include/**/RLMBSON.h',
                               'include/**/RLMNetworkTransport.h',
+                              'include/**/RLMPushClient.h',
                               'include/**/RLMProviderClient.h',
                               'include/**/RLMRealm+Sync.h',
                               'include/**/RLMRealmConfiguration+Sync.h',
                               'include/**/RLMSyncConfiguration.h',
-                              'include/**/RLMSyncCredentials.h',
+                              'include/**/RLMCredentials.h',
                               'include/**/RLMSyncManager.h',
                               'include/**/RLMSyncSession.h',
-                              'include/**/RLMSyncUser.h',
+                              'include/**/RLMUser.h',
                               'include/**/RLMSyncUtil.h',
                               'include/**/RLMUserAPIKey.h',
-                              'include/**/RLMUserAPIKeyProviderClient.h',
-                              'include/**/RLMUsernamePasswordProviderClient.h',
+                              'include/**/RLMAPIKeyAuth.h',
+                              'include/**/RLMEmailPasswordAuth.h',
                               'include/**/RLMFindOneAndModifyOptions.h',
                               'include/**/RLMFindOptions.h',
                               'include/**/RLMMongoClient.h',
@@ -94,7 +95,8 @@ Pod::Spec.new do |s|
                               'include/**/RLMMongoClient_Private.h',
                               'include/**/RLMMongoCollection_Private.h',
                               'include/**/RLMMongoDatabase_Private.h',
-                              'include/**/RLMUpdateResult_Private.h'
+                              'include/**/RLMUpdateResult_Private.h',
+                              'include/**/RLMProviderClient_Private.h'
 
 
   source_files              = 'Realm/*.{m,mm}',
@@ -124,7 +126,7 @@ Pod::Spec.new do |s|
                               }
   s.preserve_paths          = %w(build.sh include)
 
-  s.ios.deployment_target   = '8.0'
+  s.ios.deployment_target   = '9.0'
   s.ios.vendored_library    = 'core/librealmcore-ios.a'
 
   s.osx.deployment_target   = '10.9'

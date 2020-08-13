@@ -415,7 +415,6 @@ extension Results: AssistedObjectiveCBridgeable {
 
 // MARK: - Codable
 
-#if swift(>=4.1)
 extension Results: Encodable where Element: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.unkeyedContainer()
@@ -424,4 +423,3 @@ extension Results: Encodable where Element: Encodable {
         }
     }
 }
-#endif

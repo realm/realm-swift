@@ -16,7 +16,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 
-#import "RLMProviderClient.h"
+#import "RLMProviderClient_Private.hpp"
 
 #import "RLMApp_Private.hpp"
 #import "sync/app.hpp"
@@ -33,7 +33,7 @@
 }
 
 - (void)handleResponse:(realm::util::Optional<realm::app::AppError>)error
-            completion:(RLMOptionalErrorBlock)completion {
+            completion:(RLMProviderClientOptionalErrorBlock)completion {
     if (error && error->error_code) {
         return completion(RLMAppErrorToNSError(*error));
     }

@@ -36,18 +36,19 @@
 #import <Realm/RLMSchema.h>
 
 #import <Realm/RLMApp.h>
-#import <Realm/RLMAppCredentials.h>
+#import <Realm/RLMCredentials.h>
 #import <Realm/RLMNetworkTransport.h>
+#import <Realm/RLMPushClient.h>
 #import <Realm/RLMRealm+Sync.h>
 #import <Realm/RLMRealmConfiguration+Sync.h>
 #import <Realm/RLMSyncConfiguration.h>
 #import <Realm/RLMSyncManager.h>
 #import <Realm/RLMSyncSession.h>
-#import <Realm/RLMSyncUser.h>
+#import <Realm/RLMUser.h>
 #import <Realm/RLMSyncUtil.h>
 #import <Realm/RLMUserAPIKey.h>
-#import <Realm/RLMUserAPIKeyProviderClient.h>
-#import <Realm/RLMUsernamePasswordProviderClient.h>
+#import <Realm/RLMAPIKeyAuth.h>
+#import <Realm/RLMEmailPasswordAuth.h>
 #import <Realm/NSError+RLMSync.h>
 #import <Realm/RLMBSON.h>
 #import <Realm/RLMMongoClient.h>

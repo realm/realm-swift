@@ -87,6 +87,39 @@
                               @"Linking objects notifications are only supported on managed objects.");
 }
 
+- (void)testLinkingObjectsOnFrozenObject {
+    NSArray *(^asArray)(id) = ^(id arrayLike) {
+        return [arrayLike valueForKeyPath:@"self"];
+    };
+
+    RLMRealm *realm = [self realmWithTestPath];
+    [realm beginWriteTransaction];
+    PersonObject *hannah = [PersonObject createInRealm:realm withValue:@[@"Hannah", @0]];
+    PersonObject *mark   = [PersonObject createInRealm:realm withValue:@[@"Mark",  @30, @[hannah]]];
+    [realm commitWriteTransaction];
+
+    PersonObject *frozenHannah = hannah.freeze;
+    PersonObject *frozenMark = mark.freeze;
+    XCTAssertEqualObjects(asArray(frozenHannah.parents), (@[frozenMark]));
+
+    [realm beginWriteTransaction];
+    PersonObject *diane = [PersonObject createInRealm:realm withValue:@[@"Diane", @29, @[hannah]]];
+    [realm commitWriteTransaction];
+
+    PersonObject *frozenHannah2 = hannah.freeze;
+    PersonObject *frozenMark2 = mark.freeze;
+    PersonObject *frozenDiane = diane.freeze;
+    XCTAssertEqualObjects(asArray(frozenHannah.parents), (@[frozenMark]));
+    XCTAssertEqualObjects(asArray(frozenHannah2.parents), (@[frozenMark2, frozenDiane]));
+
+    [realm beginWriteTransaction];
+    [realm deleteObject:hannah];
+    [realm commitWriteTransaction];
+
+    XCTAssertEqualObjects(asArray(frozenHannah.parents), (@[frozenMark]));
+    XCTAssertEqualObjects(asArray(frozenHannah2.parents), (@[frozenMark2, frozenDiane]));
+}
+
 - (void)testFilteredLinkingObjects {
     NSArray *(^asArray)(id) = ^(id arrayLike) {
         return [arrayLike valueForKeyPath:@"self"];

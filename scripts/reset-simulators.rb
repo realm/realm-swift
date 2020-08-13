@@ -141,9 +141,11 @@ begin
         end
       end
 
-      # Error code 161-163 indicate that the given device is not supported by the runtime, such as the iPad 2 and
-      # iPhone 4s not being supported by the iOS 10 simulator runtime.
-      next if output =~ /(domain=com.apple.CoreSimulator.SimError, code=16[123])/
+      # Not all runtime and device pairs are valid as newer simulator runtimes
+      # don't support older devices. The exact error code for this changes
+      # every few versions of Xcode, so this just lists all the ones we've
+      # seen.
+      next if /domain=com.apple.CoreSimulator.SimError, code=(?<code>\d+)/ =~ output and [161, 162, 163, 403].include? code.to_i
 
       puts "Failed to create device of type #{device_type['identifier']} with runtime #{runtime['identifier']}:"
       output.each_line do |line|
