@@ -24,33 +24,34 @@
 #import "RLMFindOneAndModifyOptions_Private.hpp"
 #import "RLMUpdateResult_Private.hpp"
 #import "RLMBSON_Private.hpp"
+#import "RLMNetworkTransport_Private.hpp"
 
 #import "sync/remote_mongo_database.hpp"
 #import "sync/remote_mongo_collection.hpp"
 
 @implementation RLMWatchStream {
     realm::app::WatchStream _watchStream;
-    id<RLMEventDelegate> _eventSubscriber;
+    id<RLMChangeEventDelegate> _subscriber;
 }
-- (instancetype)initWithEventSubscriber:(id<RLMEventDelegate>)eventSubscriber {
+- (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber {
     if (self = [super init]) {
         _watchStream = realm::app::WatchStream();
-        _eventSubscriber = eventSubscriber;
+        _subscriber = subscriber;
         return self;
     }
     return nil;
 }
 
 - (void)didClose {
-    [_eventSubscriber didClose];
+    [_subscriber didClose];
 }
 
 - (void)didOpen {
-    [_eventSubscriber didOpen];
+    [_subscriber didOpen];
 }
 
 - (void)didReceiveError:(nonnull NSError *)error {
-    [_eventSubscriber didReceiveError:error];
+    [_subscriber didReceiveError:error];
 }
 
 - (void)didReceiveEvent:(nonnull NSData *)event {
@@ -60,19 +61,14 @@
             _watchStream.feed_buffer(str);
             break;
         case realm::app::WatchStream::State::HAVE_EVENT:
-            RLMConvertBsonToRLMBSON(_watchStream.next_event());
+            [_subscriber didReceiveChangeEvent:RLMConvertBsonToRLMBSON(_watchStream.next_event())];
             _watchStream.feed_buffer(str);
-            [self didReceiveEvent:<#(nonnull NSData *)#>]
             break;
         case realm::app::WatchStream::State::HAVE_ERROR:
             [self didReceiveError:RLMAppErrorToNSError(_watchStream.error())];
             break;
     }
 }
-
-@end
-
-@implementation RLMChangeEvent
 
 @end
 
@@ -385,28 +381,35 @@
 //*      watch()
 //*      watch(ids: List<Bson>)
 //*      watch(filter: BsonDocument)
+- (void)watchWithDelegate:(id<RLMChangeEventDelegate>)delegate {
+    [self watchWithBsonFilter:nil delegate:delegate];
+}
 
-- (void)watchWhere:(NSDictionary<NSString *,id<RLMBSON>> *)filterDocument delegate:(id<RLMEventDelegate>)delegate {
-    auto args = realm::bson::BsonArray{ RLMConvertRLMBSONToBson(filterDocument) };
+- (void)watchWithFilterIds:(NSArray<NSDictionary<NSString *,id<RLMBSON>> *> *)filterIds delegate:(id<RLMChangeEventDelegate>)delegate {
+    [self watchWithBsonFilter:filterIds delegate:delegate];
+}
+
+- (void)watchWithFilterDocument:(NSDictionary<NSString *,id<RLMBSON>> *)filterDocument delegate:(id<RLMChangeEventDelegate>)delegate {
+    [self watchWithBsonFilter:filterDocument delegate:delegate];
+}
+
+- (void)watchWithBsonFilter:(nullable id<RLMBSON>)bsonFilter delegate:(id<RLMChangeEventDelegate>)delegate {
+    auto args = realm::bson::BsonArray {
+        RLMConvertRLMBSONToBson(@{@"database": self.databaseName, @"collection": self.name}),
+    };
+    if (bsonFilter) {
+        args.push_back(RLMConvertRLMBSONToBson(bsonFilter));
+    }
     auto request = self.app._realmApp->make_streaming_request(self.app._realmApp->current_user(),
                                                               "watch",
                                                               args,
                                                               realm::util::Optional<std::string>(self.serviceName.UTF8String));
 
-    RLMRequest *rlmRequest = [RLMRequest new];
-    NSMutableDictionary<NSString *, NSString*> *headersDict = [NSMutableDictionary new];
-    for(auto &header : request.headers) {
-        [headersDict setValue:@(header.first.c_str()) forKey:@(header.second.c_str())];
-    }
-    rlmRequest.headers = headersDict;
-    rlmRequest.method = RLMHTTPMethodGET;
-    rlmRequest.timeout = request.timeout_ms;
-    rlmRequest.url = @(request.url.c_str());
-    NSLog(@"%@", rlmRequest.url);
-
-    RLMWatchStream *watchStream = [[RLMWatchStream alloc] initWithEventSubscriber:delegate];
-    [[self.app.configuration transport] doStreamRequest:rlmRequest eventSubscriber:watchStream];
-
+    RLMWatchStream *watchStream = [[RLMWatchStream alloc] initWithChangeEventSubscriber:delegate];
+    RLMNetworkTransport *transport = self.app.configuration.transport;
+    RLMRequest *rlmRequest = [transport RLMRequestFromRequest:request];
+    [[self.app.configuration transport] doStreamRequest:rlmRequest
+                                        eventSubscriber:watchStream];
 }
 
 @end

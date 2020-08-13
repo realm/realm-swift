@@ -105,6 +105,20 @@ NSString * const RLMHTTPMethodToNSString[] = {
     [[session dataTaskWithURL:url] resume];
 }
 
+- (RLMRequest *)RLMRequestFromRequest:(realm::app::Request)request {
+    RLMRequest *rlmRequest = [RLMRequest new];
+    NSMutableDictionary<NSString *, NSString*> *headersDict = [NSMutableDictionary new];
+    for(auto &header : request.headers) {
+        [headersDict setValue:@(header.first.c_str()) forKey:@(header.second.c_str())];
+    }
+    rlmRequest.headers = headersDict;
+    rlmRequest.method = static_cast<RLMHTTPMethod>(request.method);
+    rlmRequest.timeout = request.timeout_ms;
+    rlmRequest.url = @(request.url.c_str());
+    rlmRequest.body = @(request.body.c_str());
+    return rlmRequest;
+}
+
 @end
 
 #pragma mark RLMSessionDelegate

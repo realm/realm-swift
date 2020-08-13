@@ -1,4 +1,5 @@
 #import "RLMNetworkTransport.h"
+#import "sync/generic_network_transport.hpp"
 
 namespace realm {
 namespace app {
@@ -13,6 +14,12 @@ struct GenericEventSubscriber;
 - (void)didReceiveError:(NSError *)error;
 - (void)didOpen;
 - (void)didClose;
+
+@end
+
+@interface RLMNetworkTransport()
+
+- (RLMRequest *)RLMRequestFromRequest:(realm::app::Request)request;
 
 @end
 

@@ -43,7 +43,57 @@
 
 #pragma mark - Test objects
 
-@interface RLMObjectServerTests : RLMSyncTestCase <RLMEventDelegate>
+/// Used to process watch change events and assert tests.
+@interface RLMWatchTestDelegate: NSObject <RLMChangeEventDelegate>
+
+typedef void (^RLMWatchTestDelegateBlock)(NSError * _Nullable);
+
+
+/// Sets up an object that subscribes to the RLMChangeEventDelegate
+/// @param changeEventCount The target amount of change events for the test to succeed
+/// @param completion Block which is invoked when target amount of change events has been hit, or an error has occured.
+- (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
+                              completion:(RLMWatchTestDelegateBlock)completion;
+
+@end
+
+@implementation RLMWatchTestDelegate {
+    NSUInteger _targetChangeEventCount;
+    NSUInteger _currentChangeEventCount;
+    __weak RLMWatchTestDelegateBlock _completion;
+}
+
+- (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
+                              completion:(RLMWatchTestDelegateBlock)completion {
+    if (self = [super init]) {
+        _completion = completion;
+        _targetChangeEventCount = changeEventCount;
+        return self;
+    }
+
+    return nil;
+}
+
+- (void)didClose {
+}
+
+- (void)didOpen {
+}
+
+- (void)didReceiveChangeEvent:(nonnull id<RLMBSON>)changeEvent {
+    _currentChangeEventCount++;
+    if (_currentChangeEventCount == _targetChangeEventCount) {
+        _completion(nil);
+    }
+}
+
+- (void)didReceiveError:(nonnull NSError *)error {
+    _completion(error);
+}
+
+@end
+
+@interface RLMObjectServerTests : RLMSyncTestCase
 @end
 
 @interface AsyncOpenConnectionTimeoutTransport : RLMNetworkTransport
@@ -69,42 +119,28 @@
 #pragma mark - App Tests
 
 - (void)testWatch {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"watch"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
+
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
-    RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
+    __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (int i=0; i<100; i++) {
-            [collection insertOneDocument:@{@"name": @"fido"} completion:^(RLMObjectId * _Nullable, NSError * _Nullable) {
-                NSLog(@"INSERTED DOCUMENT");
+        for (int i=0; i<5; i++) {
+            [collection insertOneDocument:@{@"name": @"fido"} completion:^(RLMObjectId * objectId, NSError * error) {
+                XCTAssertNil(error);
+                XCTAssertNotNil(objectId);
             }];
-            [NSThread sleepForTimeInterval:5];
+            [NSThread sleepForTimeInterval:2];
         }
     });
 
-
-    [collection watchWhere:@{@"database": @"test_data", @"collection": @"Dog"} delegate:self];
-
-    [self waitForExpectations:@[expectation] timeout:6000.0];
-
-}
-
-- (void)didClose {
-    NSLog(@"DID CLOSe");
-}
-
-- (void)didOpen {
-    NSLog(@"DID OPEN");
-}
-
-- (void)didReceiveError:(nonnull NSError *)error {
-    NSLog(@"GOT ERROR");
-}
-
-- (void)didReceiveEvent:(nonnull NSData *)event {
-    NSString *str = [[NSString alloc] initWithData:event encoding:NSUTF8StringEncoding];
-    NSLog(@"GOT EVENT: %@", str);
+    RLMWatchTestDelegate *test = [[RLMWatchTestDelegate alloc] initWithChangeEventCount:5 completion:^(NSError * error) {
+        XCTAssertNil(error);
+        [expectation fulfill];
+    }];
+    [collection watchWithDelegate:test];
+    [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
 - (NSString *)generateRandomString:(int)num {

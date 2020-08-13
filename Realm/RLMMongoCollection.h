@@ -25,25 +25,19 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMApp, RLMFindOptions, RLMFindOneAndModifyOptions, RLMUpdateResult;
 
+@protocol RLMChangeEventDelegate
+
+- (void)didOpen;
+- (void)didClose;
+- (void)didReceiveError:(NSError *)error;
+- (void)didReceiveChangeEvent:(id<RLMBSON>)changeEvent;
+
+@end
+
 // Acts as a middleman and processes events with WatchStream
 @interface RLMWatchStream : NSObject <RLMEventDelegate>
-- (instancetype)initWithEventSubscriber:(id<RLMEventDelegate>)eventSubscriber;
+- (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber NS_DESIGNATED_INITIALIZER;
 @end
-
-@interface RLMChangeEvent : NSObject
-
-/// STUB
-
-@end
-
-//@protocol RLMChangeEventDelegate
-//
-//- (void)didOpen;
-//- (void)didClose;
-//- (void)didReceiveError:(NSError *)error;
-//- (void)didReceiveChangeEvent:(RLMChangeEvent *)changeEvent;
-//
-//@end
 
 /// The `RLMMongoCollection` represents a MongoDB collection.
 ///
@@ -278,8 +272,15 @@ typedef void(^RLMMongoDeleteBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Null
 - (void)findOneAndDeleteWhere:(NSDictionary<NSString *, id<RLMBSON>> *)filterDocument
                    completion:(RLMMongoDeleteBlock)completion NS_REFINED_FOR_SWIFT;
 
-- (void)watchWhere:(NSDictionary<NSString *, id<RLMBSON>> *)filterDocument
-          delegate:(id<RLMEventDelegate>)delegate;
+
+
+- (void)watchWithDelegate:(id<RLMChangeEventDelegate>)delegate;
+
+- (void)watchWithFilterIds:(NSArray<NSDictionary<NSString *,id<RLMBSON>> *> *)filterIds
+          delegate:(id<RLMChangeEventDelegate>)delegate;
+
+- (void)watchWithFilterDocument:(NSDictionary<NSString *, id<RLMBSON>> *)filterDocument
+          delegate:(id<RLMChangeEventDelegate>)delegate;
 
 @end
 
