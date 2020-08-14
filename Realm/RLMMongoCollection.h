@@ -282,7 +282,6 @@ typedef void(^RLMMongoDeleteBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Null
 - (void)watchWithFilterIds:(NSArray<id<RLMBSON>> *)filterIds
                   delegate:(id<RLMChangeEventDelegate>)delegate;
 
-
 /// Opens a MongoDB change stream against the collection to watch for changes. The provided BSON document will be
 /// used as a match expression filter on the change events coming from the stream.
 ///
@@ -295,6 +294,9 @@ typedef void(^RLMMongoDeleteBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Null
 /// @param delegate The delegate that will react to events and errors from the resulting change stream.
 - (void)watchWithMatchFilter:(NSDictionary<NSString *, id<RLMBSON>> *)matchFilter
                     delegate:(id<RLMChangeEventDelegate>)delegate;
+
+/// Tears down all active watch streams.
+- (void)closeAllWatchStreams;
 
 @end
 

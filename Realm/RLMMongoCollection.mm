@@ -31,7 +31,7 @@
 
 @implementation RLMWatchStream {
     realm::app::WatchStream _watchStream;
-    id<RLMChangeEventDelegate> _subscriber;
+    __weak id<RLMChangeEventDelegate> _subscriber;
 }
 - (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber {
     if (self = [super init]) {
@@ -382,8 +382,23 @@
     RLMWatchStream *watchStream = [[RLMWatchStream alloc] initWithChangeEventSubscriber:delegate];
     RLMNetworkTransport *transport = self.app.configuration.transport;
     RLMRequest *rlmRequest = [transport RLMRequestFromRequest:request];
-    [[self.app.configuration transport] doStreamRequest:rlmRequest
-                                        eventSubscriber:watchStream];
+    NSURLSession *watchSession = [transport doStreamRequest:rlmRequest
+                                            eventSubscriber:watchStream];
+    if (!self.watchSessions) {
+        self.watchSessions = [NSMutableArray arrayWithObject:watchSession];
+    } else {
+        [self.watchSessions addObject:watchSession];
+    }
+}
+
+- (void)closeAllWatchStreams {
+    if (!self.watchSessions) {
+        return;
+    }
+
+    for (NSURLSession *session in self.watchSessions) {
+        [session invalidateAndCancel];
+    }
 }
 
 @end

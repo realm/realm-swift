@@ -23,6 +23,7 @@
     NSUInteger _targetChangeEventCount;
     NSUInteger _currentChangeEventCount;
     RLMObjectId *_matchingObjectId;
+    BOOL _didOpenWasCalled;
     __weak RLMWatchTestUtilityBlock _completion;
 }
 
@@ -49,9 +50,13 @@
 }
 
 - (void)didClose {
+    if ((_currentChangeEventCount == _targetChangeEventCount) && _didOpenWasCalled) {
+        return _completion(nil);
+    }
 }
 
 - (void)didOpen {
+    _didOpenWasCalled = YES;
 }
 
 - (void)didReceiveChangeEvent:(nonnull id<RLMBSON>)changeEvent {
@@ -62,10 +67,6 @@
         if (![objectId.stringValue isEqualToString:_matchingObjectId.stringValue]) {
             return _completion([NSError new]);
         }
-    }
-
-    if (_currentChangeEventCount == _targetChangeEventCount) {
-        return _completion(nil);
     }
 }
 

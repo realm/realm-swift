@@ -2259,18 +2259,25 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                 XCTAssertNotNil(objectId);
             }];
             [NSThread sleepForTimeInterval:2];
+            if (i==4) {
+                [NSThread sleepForTimeInterval:10];
+                [collection closeAllWatchStreams];
+            }
         }
     });
 
-    RLMWatchTestUtility *testUtility = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5 completion:^(NSError * error) {
+    RLMWatchTestUtility *testUtility = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5
+                                                                                  completion:^(NSError * error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
+    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
+    Dispatch
     [collection watchWithDelegate:testUtility];
     [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
-- (void)testWatchWithFilterDocument {
+- (void)testWatchWithMatchFilter {
 
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
@@ -2314,6 +2321,10 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                 XCTAssertNil(error);
             }];
             [NSThread sleepForTimeInterval:2];
+            if (i==4) {
+                [NSThread sleepForTimeInterval:10];
+                [collection closeAllWatchStreams];
+            }
         }
     });
     [self waitForExpectations:@[expectation] timeout:30.0];
@@ -2363,6 +2374,10 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                 XCTAssertNil(error);
             }];
             [NSThread sleepForTimeInterval:2];
+            if (i==4) {
+                [NSThread sleepForTimeInterval:10];
+                [collection closeAllWatchStreams];
+            }
         }
     });
 

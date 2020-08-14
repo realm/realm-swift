@@ -89,7 +89,8 @@ NSString * const RLMHTTPMethodToNSString[] = {
     [session finishTasksAndInvalidate];
 }
 
-- (void)doStreamRequest:(nonnull RLMRequest *)request eventSubscriber:(nonnull id<RLMEventDelegate>)subscriber {
+- (NSURLSession *)doStreamRequest:(nonnull RLMRequest *)request
+                  eventSubscriber:(nonnull id<RLMEventDelegate>)subscriber {
     NSURLSessionConfiguration *sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
     sessionConfig.timeoutIntervalForRequest = 30;
     sessionConfig.timeoutIntervalForResource = INT_MAX;
@@ -100,9 +101,12 @@ NSString * const RLMHTTPMethodToNSString[] = {
     };
     id delegate = [RLMEventSessionDelegate delegateWithEventSubscriber:subscriber];
     auto session = [NSURLSession sessionWithConfiguration:sessionConfig
-                                                 delegate:delegate delegateQueue:nil];
+                                                 delegate:delegate
+                                            delegateQueue:nil];
     NSURL *url = [[NSURL alloc] initWithString:request.url];
     [[session dataTaskWithURL:url] resume];
+    [subscriber didOpen];
+    return session;
 }
 
 - (RLMRequest *)RLMRequestFromRequest:(realm::app::Request)request {
@@ -218,8 +222,6 @@ didCompleteWithError:(NSError *)error
     if (response.httpStatusCode != 200) {
         return [_subscriber didClose];
     }
-
-    [_subscriber didOpen];
 }
 
 @end

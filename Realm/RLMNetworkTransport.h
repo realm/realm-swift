@@ -97,8 +97,8 @@ typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
 - (void)sendRequestToServer:(RLMRequest *)request
                  completion:(RLMNetworkTransportCompletionBlock)completionBlock;
 
-- (void)doStreamRequest:(RLMRequest *)request
-        eventSubscriber:(id<RLMEventDelegate>)subscriber;
+- (NSURLSession *)doStreamRequest:(RLMRequest *)request
+                  eventSubscriber:(id<RLMEventDelegate>)subscriber;
 
 @end
 

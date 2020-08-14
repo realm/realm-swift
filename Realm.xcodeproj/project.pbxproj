@@ -1059,8 +1059,8 @@
 		C2CAAE751E9BB5760025454C /* system_configuration.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = system_configuration.cpp; sourceTree = "<group>"; };
 		C2CAAE761E9BB5760025454C /* system_configuration.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = system_configuration.hpp; sourceTree = "<group>"; };
 		CF330BBB24E56E3A00F07EE2 /* RLMNetworkTransport_Private.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RLMNetworkTransport_Private.hpp; sourceTree = "<group>"; };
-		CF330BBC24E57D5F00F07EE2 /* RLMWatchTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMWatchTestUtility.h; sourceTree = "<group>"; };
-		CF330BBD24E57D5F00F07EE2 /* RLMWatchTestUtility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RLMWatchTestUtility.m; sourceTree = "<group>"; };
+		CF330BBC24E57D5F00F07EE2 /* RLMWatchTestUtility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RLMWatchTestUtility.h; path = Realm/ObjectServerTests/RLMWatchTestUtility.h; sourceTree = "<group>"; };
+		CF330BBD24E57D5F00F07EE2 /* RLMWatchTestUtility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RLMWatchTestUtility.m; path = Realm/ObjectServerTests/RLMWatchTestUtility.m; sourceTree = "<group>"; };
 		CF6E0480242A141200DB7F14 /* RLMEmailPasswordAuth.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMEmailPasswordAuth.h; sourceTree = "<group>"; };
 		CF6E0481242A141200DB7F14 /* RLMEmailPasswordAuth.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = RLMEmailPasswordAuth.mm; sourceTree = "<group>"; };
 		CF6E0484242A321200DB7F14 /* RLMProviderClient.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RLMProviderClient.h; sourceTree = "<group>"; };
