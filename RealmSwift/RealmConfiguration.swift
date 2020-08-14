@@ -72,7 +72,7 @@ extension Realm {
 
                                             Return `true ` to indicate that an attempt to compact the file should be made.
                                             The compaction will be skipped if another process is accessing it.
-         - parameter objectTypes:        The subset of `Object` subclasses persisted in the Realm.
+         - parameter objectTypes:        The subset of `Object` and `EmbeddedObject` subclasses persisted in the Realm. 
         */
         public init(fileURL: URL? = URL(fileURLWithPath: RLMRealmPathForFile("default.realm"), isDirectory: false),
                     inMemoryIdentifier: String? = nil,
@@ -83,7 +83,7 @@ extension Realm {
                     migrationBlock: MigrationBlock? = nil,
                     deleteRealmIfMigrationNeeded: Bool = false,
                     shouldCompactOnLaunch: ((Int, Int) -> Bool)? = nil,
-                    objectTypes: [Object.Type]? = nil) {
+                    objectTypes: [ObjectBase.Type]? = nil) {
                 self.fileURL = fileURL
                 if let inMemoryIdentifier = inMemoryIdentifier {
                     self.inMemoryIdentifier = inMemoryIdentifier
@@ -198,7 +198,7 @@ extension Realm {
         public var shouldCompactOnLaunch: ((Int, Int) -> Bool)?
 
         /// The classes managed by the Realm.
-        public var objectTypes: [Object.Type]? {
+        public var objectTypes: [ObjectBase.Type]? {
             set {
                 self.customSchema = newValue.map { RLMSchema(objectClasses: $0) }
             }
