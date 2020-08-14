@@ -23,6 +23,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMApp;
 
+// Acts as a middleman and processes events with WatchStream
+@interface RLMWatchStream : NSObject <RLMEventDelegate>
+- (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
+@end
+
 @interface RLMMongoCollection ()
 
 @property (nonatomic, strong) RLMApp *app;

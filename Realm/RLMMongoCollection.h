@@ -34,12 +34,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
-// Acts as a middleman and processes events with WatchStream
-@interface RLMWatchStream : NSObject <RLMEventDelegate>
-- (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber NS_DESIGNATED_INITIALIZER;
-- (instancetype)init NS_UNAVAILABLE;
-@end
-
 /// The `RLMMongoCollection` represents a MongoDB collection.
 ///
 /// You can get an instance from a `RLMMongoDatabase`.

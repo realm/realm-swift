@@ -109,7 +109,7 @@ NSString * const RLMHTTPMethodToNSString[] = {
     RLMRequest *rlmRequest = [RLMRequest new];
     NSMutableDictionary<NSString *, NSString*> *headersDict = [NSMutableDictionary new];
     for(auto &header : request.headers) {
-        [headersDict setValue:@(header.first.c_str()) forKey:@(header.second.c_str())];
+        [headersDict setValue:@(header.second.c_str()) forKey:@(header.first.c_str())];
     }
     rlmRequest.headers = headersDict;
     rlmRequest.method = static_cast<RLMHTTPMethod>(request.method);
@@ -215,7 +215,7 @@ didCompleteWithError:(NSError *)error
         return [_subscriber didClose];
     }
 
-    if (response.httpStatusCode == 404) {
+    if (response.httpStatusCode != 200) {
         return [_subscriber didClose];
     }
 

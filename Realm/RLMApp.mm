@@ -71,23 +71,6 @@ namespace {
             }];
         }
         
-        void do_stream_request(const app::Request &request, realm::app::GenericEventSubscriber &&subscriber) {
-            // Convert the app::Request to an RLMRequest
-            auto rlmRequest = [RLMRequest new];
-            rlmRequest.url = @(request.url.data());
-            rlmRequest.body = @(request.body.data());
-            NSMutableDictionary *headers = [NSMutableDictionary new];
-            for (auto header : request.headers) {
-                headers[@(header.first.data())] = @(header.second.data());
-            }
-            rlmRequest.headers = headers;
-            rlmRequest.method = static_cast<RLMHTTPMethod>(request.method);
-            rlmRequest.timeout = request.timeout_ms / 1000;
-            
-            [m_transport doStreamRequest:rlmRequest
-                         eventSubscriber:[[RLMEventSubscriber alloc] initWithGenericEventSubscriber:std::move(subscriber)]];
-        }
-        
         id<RLMNetworkTransport> transport() const {
             return m_transport;
         }
