@@ -32,5 +32,13 @@ typedef void (^RLMWatchTestUtilityBlock)(NSError * _Nullable);
 - (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
                               completion:(RLMWatchTestUtilityBlock)completion;
 
+/// Sets up an object that subscribes to the RLMChangeEventDelegate
+/// @param changeEventCount The target amount of change events for the test to succeed
+/// @param matchingObjectId An objectId that the change event must match.
+/// @param completion Block which is invoked when target amount of change events has been hit, or an error has occured.
+- (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
+                        matchingObjectId:(RLMObjectId *)matchingObjectId
+                              completion:(RLMWatchTestUtilityBlock)completion;
+
 @end
 NS_ASSUME_NONNULL_END

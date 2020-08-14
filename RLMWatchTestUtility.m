@@ -22,6 +22,7 @@
 @implementation RLMWatchTestUtility {
     NSUInteger _targetChangeEventCount;
     NSUInteger _currentChangeEventCount;
+    RLMObjectId *_matchingObjectId;
     __weak RLMWatchTestUtilityBlock _completion;
 }
 
@@ -32,7 +33,18 @@
         _targetChangeEventCount = changeEventCount;
         return self;
     }
+    return nil;
+}
 
+- (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
+                        matchingObjectId:(RLMObjectId *)matchingObjectId
+                              completion:(RLMWatchTestUtilityBlock)completion {
+    if (self = [super init]) {
+        _completion = completion;
+        _targetChangeEventCount = changeEventCount;
+        _matchingObjectId = matchingObjectId;
+        return self;
+    }
     return nil;
 }
 
@@ -44,13 +56,21 @@
 
 - (void)didReceiveChangeEvent:(nonnull id<RLMBSON>)changeEvent {
     _currentChangeEventCount++;
+
+    if (_matchingObjectId) {
+        RLMObjectId *objectId = ((NSDictionary *)changeEvent)[@"fullDocument"][@"_id"];
+        if (![objectId.stringValue isEqualToString:_matchingObjectId.stringValue]) {
+            return _completion([NSError new]);
+        }
+    }
+
     if (_currentChangeEventCount == _targetChangeEventCount) {
-        _completion(nil);
+        return _completion(nil);
     }
 }
 
 - (void)didReceiveError:(nonnull NSError *)error {
-    _completion(error);
+    return _completion(error);
 }
 
 @end
