@@ -1616,3 +1616,32 @@ extension List where Element == Permission {
         return RLMPermissionForRole(_rlmArray, role) as! Permission
     }
 }
+
+#if canImport(Combine)
+import Combine
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, macCatalyst 13.0, macCatalystApplicationExtension 13.0, *)
+extension SyncUser {
+    public static func logInPublisher(with credentials: SyncCredentials,
+                                      server authServerURL: URL,
+                                      timeout: TimeInterval = 30,
+                                      callbackQueue queue: DispatchQueue = DispatchQueue.main) -> Future<SyncUser, Error> {
+        return Future { promise in
+            SyncUser.__logIn(with: RLMSyncCredentials(credentials),
+                             authServerURL: authServerURL,
+                             timeout: timeout,
+                             callbackQueue: queue) { syncUser, error in
+                if let syncUser = syncUser {
+                    promise(.success(syncUser))
+                }
+                else if let error = error {
+                    promise(.failure(error))
+                }
+                else {
+                    #warning("Undefined error")
+                }
+            }
+        }
+    }
+}
+#endif
