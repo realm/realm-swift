@@ -335,29 +335,36 @@
                      completion:completion];
 }
 
-- (void)watchWithDelegate:(id<RLMChangeEventDelegate>)delegate {
+- (void)watchWithDelegate:(id<RLMChangeEventDelegate>)delegate
+            delegateQueue:(nullable dispatch_queue_t)delegateQueue {
     [self watchWithMatchFilter:nil
                       idFilter:nil
-                      delegate:delegate];
+                      delegate:delegate
+                 delegateQueue:delegateQueue];
 }
 
 - (void)watchWithFilterIds:(NSArray<id<RLMBSON>> *)filterIds
-                  delegate:(id<RLMChangeEventDelegate>)delegate {
+                  delegate:(id<RLMChangeEventDelegate>)delegate
+             delegateQueue:(nullable dispatch_queue_t)delegateQueue {
     [self watchWithMatchFilter:nil
                       idFilter:filterIds
-                      delegate:delegate];
+                      delegate:delegate
+                 delegateQueue:delegateQueue];
 }
 
 - (void)watchWithMatchFilter:(NSDictionary<NSString *, id<RLMBSON>> *)matchFilter
-                    delegate:(id<RLMChangeEventDelegate>)delegate {
+                    delegate:(id<RLMChangeEventDelegate>)delegate
+               delegateQueue:(nullable dispatch_queue_t)delegateQueue {
     [self watchWithMatchFilter:matchFilter
                       idFilter:nil
-                      delegate:delegate];
+                      delegate:delegate
+                 delegateQueue:delegateQueue];
 }
 
 - (void)watchWithMatchFilter:(nullable id<RLMBSON>)matchFilter
                     idFilter:(nullable id<RLMBSON>)idFilter
-                    delegate:(id<RLMChangeEventDelegate>)delegate {
+                    delegate:(id<RLMChangeEventDelegate>)delegate
+               delegateQueue:(nullable dispatch_queue_t)delegateQueue {
 
     realm::bson::BsonDocument baseArgs = {
         {"database", self.databaseName.UTF8String},
@@ -378,17 +385,18 @@
                                                               "watch",
                                                               args,
                                                               realm::util::Optional<std::string>(self.serviceName.UTF8String));
-
-    RLMWatchStream *watchStream = [[RLMWatchStream alloc] initWithChangeEventSubscriber:delegate];
-    RLMNetworkTransport *transport = self.app.configuration.transport;
-    RLMRequest *rlmRequest = [transport RLMRequestFromRequest:request];
-    NSURLSession *watchSession = [transport doStreamRequest:rlmRequest
-                                            eventSubscriber:watchStream];
-    if (!self.watchSessions) {
-        self.watchSessions = [NSMutableArray arrayWithObject:watchSession];
-    } else {
-        [self.watchSessions addObject:watchSession];
-    }
+    dispatch_async(delegateQueue == nil ? dispatch_get_main_queue() : delegateQueue, ^{
+        RLMWatchStream *watchStream = [[RLMWatchStream alloc] initWithChangeEventSubscriber:delegate];
+        RLMNetworkTransport *transport = self.app.configuration.transport;
+        RLMRequest *rlmRequest = [transport RLMRequestFromRequest:request];
+        NSURLSession *watchSession = [transport doStreamRequest:rlmRequest
+                                                eventSubscriber:watchStream];
+        if (!self.watchSessions) {
+            self.watchSessions = [NSMutableArray arrayWithObject:watchSession];
+        } else {
+            [self.watchSessions addObject:watchSession];
+        }
+    });
 }
 
 - (void)closeAllWatchStreams {
@@ -399,6 +407,7 @@
     for (NSURLSession *session in self.watchSessions) {
         [session invalidateAndCancel];
     }
+    [self.watchSessions removeAllObjects];
 }
 
 @end

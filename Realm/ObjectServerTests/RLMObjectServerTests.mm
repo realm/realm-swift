@@ -2246,6 +2246,15 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 #pragma mark - Watch
 
 - (void)testWatch {
+    [self performWatchTest:nil];
+}
+
+- (void)testWatchAsync {
+    auto asyncQueue = dispatch_queue_create("io.realm.watchQueue", DISPATCH_QUEUE_CONCURRENT);
+    [self performWatchTest:asyncQueue];
+}
+
+- (void)performWatchTest:(nullable dispatch_queue_t)delegateQueue {
     XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
 
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
@@ -2271,13 +2280,21 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    NSOperationQueue *queue = [[NSOperationQueue alloc] init];
-    Dispatch
-    [collection watchWithDelegate:testUtility];
+
+    [collection watchWithDelegate:testUtility delegateQueue:delegateQueue];
     [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
 - (void)testWatchWithMatchFilter {
+    [self performWatchWithMatchFilterTest:nil];
+}
+
+- (void)testWatchWithMatchFilterAsync {
+    auto asyncQueue = dispatch_queue_create("io.realm.watchQueue", DISPATCH_QUEUE_CONCURRENT);
+    [self performWatchWithMatchFilterTest:asyncQueue];
+}
+
+- (void)performWatchWithMatchFilterTest:(nullable dispatch_queue_t)delegateQueue {
 
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
@@ -2305,7 +2322,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [collection watchWithMatchFilter:@{@"fullDocument._id": objectIds[0]} delegate:testUtility];
+    [collection watchWithMatchFilter:@{@"fullDocument._id": objectIds[0]}
+                            delegate:testUtility
+                       delegateQueue:delegateQueue];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         for (int i=0; i<5; i++) {
@@ -2331,6 +2350,15 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)testWatchWithFilterIds {
+    [self performWatchWithFilterIdsTest:nil];
+}
+
+- (void)testWatchWithFilterIdsAsync {
+    auto asyncQueue = dispatch_queue_create("io.realm.watchQueue", DISPATCH_QUEUE_CONCURRENT);
+    [self performWatchWithFilterIdsTest:asyncQueue];
+}
+
+- (void)performWatchWithFilterIdsTest:(nullable dispatch_queue_t)delegateQueue {
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
@@ -2349,7 +2377,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }];
     [self waitForExpectations:@[insertManyExpectation] timeout:60.0];
 
-
     XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
 
     RLMWatchTestUtility *testUtility = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5
@@ -2358,7 +2385,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [collection watchWithFilterIds:@[objectIds[0]] delegate:testUtility];
+    [collection watchWithFilterIds:@[objectIds[0]]
+                          delegate:testUtility
+                     delegateQueue:delegateQueue];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         for (int i=0; i<5; i++) {
@@ -2382,6 +2411,87 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     });
 
     [self waitForExpectations:@[expectation] timeout:60.0];
+}
+
+- (void)testMultipleWatchStreams {
+    auto asyncQueue = dispatch_queue_create("io.realm.watchQueue", DISPATCH_QUEUE_CONCURRENT);
+    [self performMultipleWatchStreamsTest:asyncQueue];
+}
+
+- (void)testMultipleWatchStreamsAsync {
+    [self performMultipleWatchStreamsTest:nil];
+}
+
+- (void)performMultipleWatchStreamsTest:(nullable dispatch_queue_t)delegateQueue {
+    RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
+    RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
+    __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
+
+    __block NSArray<RLMObjectId *> * objectIds;
+    XCTestExpectation *insertManyExpectation = [self expectationWithDescription:@"should insert one document"];
+    [collection insertManyDocuments:@[
+        @{@"name": @"fido", @"breed": @"cane corso"},
+        @{@"name": @"rex", @"breed": @"tibetan mastiff"},
+        @{@"name": @"john", @"breed": @"tibetan mastiff"}]
+                         completion:^(NSArray<RLMObjectId *> * ids, NSError * error) {
+        XCTAssertEqual((int)ids.count, 3);
+        XCTAssertNil(error);
+        objectIds = ids;
+        [insertManyExpectation fulfill];
+    }];
+    [self waitForExpectations:@[insertManyExpectation] timeout:60.0];
+
+    XCTestExpectation *expectation1 = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
+    XCTestExpectation *expectation2 = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
+
+    RLMWatchTestUtility *testUtility1 = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5
+                                                                             matchingObjectId:objectIds[0]
+                                                                                   completion:^(NSError * error) {
+        XCTAssertNil(error);
+        [expectation1 fulfill];
+    }];
+    RLMWatchTestUtility *testUtility2 = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5
+                                                                             matchingObjectId:objectIds[1]
+                                                                                   completion:^(NSError * error) {
+        XCTAssertNil(error);
+        [expectation2 fulfill];
+    }];
+    [collection watchWithFilterIds:@[objectIds[0]]
+                          delegate:testUtility1
+                     delegateQueue:nil];
+
+    [collection watchWithFilterIds:@[objectIds[1]]
+                          delegate:testUtility2
+                     delegateQueue:nil];
+
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        for (int i=0; i<5; i++) {
+            [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
+                                updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
+                                    completion:^(RLMUpdateResult * _Nullable, NSError * error) {
+                XCTAssertNil(error);
+            }];
+
+            [collection updateOneDocumentWhere:@{@"_id": objectIds[1]}
+                                updateDocument:@{@"breed": @"french bulldog", @"name": [NSString stringWithFormat:@"fido-%d", i]}
+                                    completion:^(RLMUpdateResult * _Nullable, NSError * error) {
+                XCTAssertNil(error);
+            }];
+
+            [collection updateOneDocumentWhere:@{@"_id": objectIds[2]}
+                                updateDocument:@{@"breed": @"german shepard", @"name": [NSString stringWithFormat:@"fido-%d", i]}
+                                    completion:^(RLMUpdateResult * _Nullable, NSError * error) {
+                XCTAssertNil(error);
+            }];
+            [NSThread sleepForTimeInterval:2];
+            if (i==4) {
+                [NSThread sleepForTimeInterval:10];
+                [collection closeAllWatchStreams];
+            }
+        }
+    });
+
+    [self waitForExpectations:@[expectation1, expectation2] timeout:60.0];
 }
 
 @end
