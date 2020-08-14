@@ -9,7 +9,6 @@ struct GenericEventSubscriber;
 
 @interface RLMEventSubscriber : NSObject<RLMEventDelegate>
 
-- (instancetype)initWithGenericEventSubscriber:(realm::app::GenericEventSubscriber&&)subscriber;
 - (void)didReceiveEvent:(NSData *)event;
 - (void)didReceiveError:(NSError *)error;
 - (void)didOpen;
