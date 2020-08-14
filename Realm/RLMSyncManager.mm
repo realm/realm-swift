@@ -150,9 +150,6 @@ static RLMSyncManager *s_sharedManager = nil;
 
     if (appConfiguration) {
         SyncManager::shared().configure(config, [appConfiguration config]);
-    } else {
-        //FIXME: why has this call changed?
-        //SyncManager::shared().configure(config, realm::util::none);
     }
 }
 
