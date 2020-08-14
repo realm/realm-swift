@@ -2298,7 +2298,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [collection watchWithFilterDocument:@{@"fullDocument._id": objectIds[0]} delegate:testUtility];
+    [collection watchWithMatchFilter:@{@"fullDocument._id": objectIds[0]} delegate:testUtility];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         for (int i=0; i<5; i++) {

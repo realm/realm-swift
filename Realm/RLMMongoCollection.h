@@ -268,14 +268,33 @@ typedef void(^RLMMongoDeleteBlock)(NSDictionary<NSString *, id<RLMBSON>> * _Null
                    completion:(RLMMongoDeleteBlock)completion NS_REFINED_FOR_SWIFT;
 
 
-
+/// Opens a MongoDB change stream against the collection to watch for changes. The resulting stream will be notified
+/// of all events on this collection that the active user is authorized to see based on the configured MongoDB
+/// rules.
+/// @param delegate The delegate that will react to events and errors from the resulting change stream.
 - (void)watchWithDelegate:(id<RLMChangeEventDelegate>)delegate;
 
+/// Opens a MongoDB change stream against the collection to watch for changes
+/// made to specific documents. The documents to watch must be explicitly
+/// specified by their _id.
+/// @param filterIds The list of _ids in the collection to watch.
+/// @param delegate The delegate that will react to events and errors from the resulting change stream.
 - (void)watchWithFilterIds:(NSArray<id<RLMBSON>> *)filterIds
-          delegate:(id<RLMChangeEventDelegate>)delegate;
+                  delegate:(id<RLMChangeEventDelegate>)delegate;
 
-- (void)watchWithFilterDocument:(NSDictionary<NSString *, id<RLMBSON>> *)filterDocument
-          delegate:(id<RLMChangeEventDelegate>)delegate;
+
+/// Opens a MongoDB change stream against the collection to watch for changes. The provided BSON document will be
+/// used as a match expression filter on the change events coming from the stream.
+///
+/// See https://docs.mongodb.com/manual/reference/operator/aggregation/match/ for documentation around how to define
+/// a match filter.
+///
+/// Defining the match expression to filter ChangeEvents is similar to defining the match expression for triggers:
+/// https://docs.mongodb.com/stitch/triggers/database-triggers/
+/// @param matchFilter The $match filter to apply to incoming change events
+/// @param delegate The delegate that will react to events and errors from the resulting change stream.
+- (void)watchWithMatchFilter:(NSDictionary<NSString *, id<RLMBSON>> *)matchFilter
+                    delegate:(id<RLMChangeEventDelegate>)delegate;
 
 @end
 

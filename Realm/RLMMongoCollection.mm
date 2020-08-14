@@ -335,40 +335,37 @@
                      completion:completion];
 }
 
-//static RLMChangeEvent* RLMChangeEventToRLMChangeEvent(const realm::app::ChangeEvent& event) {
-//    // STUB
-//    return [RLMChangeEvent new];
-//}
-
 - (void)watchWithDelegate:(id<RLMChangeEventDelegate>)delegate {
-    [self watchWithDocumentFilter:nil
-                         idFilter:nil
-                         delegate:delegate];
+    [self watchWithMatchFilter:nil
+                      idFilter:nil
+                      delegate:delegate];
 }
 
-- (void)watchWithFilterIds:(NSArray<id<RLMBSON>> *)filterIds delegate:(id<RLMChangeEventDelegate>)delegate {
-    [self watchWithDocumentFilter:nil
-                         idFilter:filterIds
-                         delegate:delegate];
+- (void)watchWithFilterIds:(NSArray<id<RLMBSON>> *)filterIds
+                  delegate:(id<RLMChangeEventDelegate>)delegate {
+    [self watchWithMatchFilter:nil
+                      idFilter:filterIds
+                      delegate:delegate];
 }
 
-- (void)watchWithFilterDocument:(NSDictionary<NSString *,id<RLMBSON>> *)filterDocument delegate:(id<RLMChangeEventDelegate>)delegate {
-    [self watchWithDocumentFilter:filterDocument
-                         idFilter:nil
-                         delegate:delegate];
+- (void)watchWithMatchFilter:(NSDictionary<NSString *, id<RLMBSON>> *)matchFilter
+                    delegate:(id<RLMChangeEventDelegate>)delegate {
+    [self watchWithMatchFilter:matchFilter
+                      idFilter:nil
+                      delegate:delegate];
 }
 
-- (void)watchWithDocumentFilter:(nullable id<RLMBSON>)documentFilter
-                       idFilter:(nullable id<RLMBSON>)idFilter
-                       delegate:(id<RLMChangeEventDelegate>)delegate {
+- (void)watchWithMatchFilter:(nullable id<RLMBSON>)matchFilter
+                    idFilter:(nullable id<RLMBSON>)idFilter
+                    delegate:(id<RLMChangeEventDelegate>)delegate {
 
     realm::bson::BsonDocument baseArgs = {
         {"database", self.databaseName.UTF8String},
         {"collection", self.name.UTF8String}
     };
 
-    if (documentFilter) {
-        baseArgs["filter"] = RLMConvertRLMBSONToBson(documentFilter);
+    if (matchFilter) {
+        baseArgs["filter"] = RLMConvertRLMBSONToBson(matchFilter);
     }
     if (idFilter) {
         baseArgs["ids"] = RLMConvertRLMBSONToBson(idFilter);
