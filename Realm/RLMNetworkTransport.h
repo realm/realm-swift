@@ -103,6 +103,9 @@ typedef void(^RLMNetworkTransportCompletionBlock)(RLMResponse *);
 - (void)sendRequestToServer:(RLMRequest *)request
                  completion:(RLMNetworkTransportCompletionBlock)completionBlock;
 
+/// Starts an event stream request.
+/// @param request The RLMRequest to start.
+/// @param subscriber The RLMEventDelegate which will subscribe to changes from the server.
 - (NSURLSession *)doStreamRequest:(RLMRequest *)request
                   eventSubscriber:(id<RLMEventDelegate>)subscriber;
 
