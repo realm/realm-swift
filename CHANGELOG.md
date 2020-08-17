@@ -20,6 +20,178 @@ x.y.z Release notes (yyyy-MM-dd)
 * Upgraded realm-core from v6.0.12 to v6.0.13
 * Upgraded realm-sync from v5.0.12 to v5.0.13
 
+10.0.0-beta.3 Release notes (2020-08-17)
+=============================================================
+
+This release also contains all changes from 5.3.2.
+
+### Breaking Changes
+* The following classes & aliases have been renamed to align Cocoa with the other Realm SDKs:
+
+| Old API                                                     | New API                                                        |
+|:------------------------------------------------------------|:---------------------------------------------------------------|
+| `RLMSyncUser`                                               | `RLMUser`                                                      |
+| `SyncUser`                                                  | `User`                                                         |
+| `RLMAppCredential`                                          | `RLMCredential`                                                |
+| `AppCredential`                                             | `Credential`                                                   |
+| `RealmApp`                                                  | `App`                                                          |
+| `RLMUserAPIKeyProviderClient`                               | `RLMAPIKeyAuth`                                                |
+| `RLMUsernamePasswordProviderClient`                         | `RLMEmailPasswordAuth`                                         |
+| `UsernamePasswordProviderClient`                            | `EmailPasswordAuth`                                            |
+| `UserAPIKeyProviderClient`                                  | `APIKeyAuth`                                                   |
+
+* The following functionality has also moved to the User
+
+| Old API                                                      | New API                                                       |
+|:-------------------------------------------------------------|:--------------------------------------------------------------|
+| `[RLMApp callFunctionNamed:]`                                | `[RLMUser callFunctionNamed:]`                                |
+| `App.functions`                                              | `User.functions`                                              |
+| `[RLMApp mongoClientWithServiceName:]`                       | `[RLMUser mongoClientWithServiceName:]`                       |
+| `App.mongoClient(serviceName)`                               | `User.mongoClient(serviceName)`                               |
+| `[RLMApp userAPIKeyProviderClient]`                          | `[RLMUser apiKeyAuth]`                                        |
+| `App.userAPIKeyProviderClient`                               | `App.apiKeyAuth()`                                            |
+| `[RLMApp logOut:]`                                           | `[RLMUser logOut]`                                            |
+| `App.logOut(user)`                                           | `User.logOut()`                                               |
+| `[RLMApp removeUser:]`                                       | `[RLMUser remove]`                                            |
+| `App.remove(user)`                                           | `User.remove()`                                               |
+| `[RLMApp linkUser:credentials:]`                             | `[RLMUser linkWithCredentials:]`                              |
+| `App.linkUser(user, credentials)`                            | `User.link(credentials)`                                      |
+
+*  `refreshCustomData()` on User now returns void and passes the custom data to the callback on success.
+
+### Compatibility
+* This release introduces breaking changes w.r.t some sync classes and MongoDB Realm Cloud functionality.
+(See the breaking changes section for the full list)
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* Realm Studio: 10.0.0 or later.
+* Carthage release for Swift is built with Xcode 11.5.
+
+### Internal
+* Upgraded realm-core from ? to ?
+* Upgraded realm-sync from ? to ?
+
+10.0.0-beta.2 Release notes (2020-06-09)
+=============================================================
+Xcode 11.3 and iOS 9 are now the minimum supported versions.
+
+### Enhancements
+* Add support for building with Xcode 12 beta 1. watchOS currently requires
+  removing x86_64 from the supported architectures. Support for the new 64-bit
+  watch simulator will come in a future release.
+
+### Fixed
+* Opening a SyncSession with LOCAL app deployments would not use the correct endpoints.
+* Linking from embedded objects to top-level objects was incorrectly disallowed.
+* Opening a Realm file in file format v6 (created by Realm Cocoa versions
+  between 2.4 and 2.10) would crash. (Since 5.0.0, [Core #3764](https://github.com/realm/realm-core/issues/3764)).
+* Upgrading v9 (pre-5.0) Realm files would create a redundant search index for
+  primary key properties. This index would then be removed the next time the
+  Realm was opened, resulting in some extra i/o in the upgrade process.
+  (Since 5.0.0, [Core #3787](https://github.com/realm/realm-core/issues/3787)).
+* Fixed a performance issue with upgrading v9 files with search indexes on
+  non-primary-key properties. (Since 5.0.0, [Core #3767](https://github.com/realm/realm-core/issues/3767)).
+
+### Compatibility
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* MongoDB Realm: 84893c5 or later.
+* APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
+* Carthage release for Swift is built with Xcode 11.5.
+
+### Internal
+* Upgraded realm-core from v6.0.3 to v10.0.0-beta.1
+* Upgraded realm-sync from v5.0.1 to v10.0.0-beta.2
+
+10.0.0-beta.1 Release notes (2020-06-08)
+=============================================================
+
+NOTE: This version bumps the Realm file format to version 11. It is not
+possible to downgrade to earlier versions. Older files will automatically be
+upgraded to the new file format. Only [Realm Studio
+10.0.0](https://github.com/realm/realm-studio/releases/tag/v10.0.0-beta.1) or
+later will be able to open the new file format.
+
+### Enhancements
+
+* Add support for next generation sync. Support for syncing to MongoDB instead
+  of Realm Object Server. Applications must be created at realm.mongodb.com
+* The memory mapping scheme for Realm files has changed to better support
+  opening very large files.
+* Add support for the ObjectId data type. This is an automatically-generated
+  unique identifier similar to a GUID or a UUID.
+  ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
+* Add support for the Decimal128 data type. This is a 128-bit IEEE 754 decimal
+  floating point number similar to NSDecimalNumber.
+  ([PR #6450](https://github.com/realm/realm-cocoa/pull/6450)).
+* Add support for embedded objects. Embedded objects are objects which are
+  owned by a single parent object, and are deleted when that parent object is
+  deleted. They are defined by subclassing `EmbeddedObject` /
+  `RLMEmbeddedObject` rather than `Object` / `RLMObject`.
+* Add `-[RLMSyncUser customData]`/`SyncUser.customData`.  Custom data is 
+  configured in your MongoDB Realm App.
+* Add `-[RLMApp callFunctionNamed:arguments]`/`RealmApp.functions`. This is the
+  entry point for calling Remote MongoDB Realm functions. Functions allow you
+  to define and execute server-side logic for your application. Functions are
+  written in modern JavaScript (ES6+) and execute in a serverless manner. When
+  you call a function, you can dynamically access components of the current
+  application as well as information about the request to execute the function
+  and the logged in user that sent the request.
+* Add `-[RLMApp mongoClientWithServiceName]`/`RealmApp.mongoClient`. This is
+  the entry point for calling your Remote MongoDB Service. The read operations
+  are `-[RLMMongoCollection findWhere:completion:]`, `-[RLMMongoCollection
+  countWhere:completion:]`and `-[RLMMongoCollection
+  aggregateWithPipeline:completion:]`. The write operations are
+  `-[RLMMongoCollection insertOneDocument:completion:]`, `-[RLMMongoCollection
+  insertManyDocuments:completion:]`, `-[RLMMongoCollection
+  updateOneDocument:completion:]`, `-[RLMMongoCollection
+  updateManyDocuments:completion:]`, `-[RLMMongoCollection
+  deleteOneDocument:completion:]`, and `-[RLMMongoCollection
+  deleteManyDocuments:completion:]`. If you are already familiar with MongoDB
+  drivers, it is important to understand that the remote MongoCollection only
+  provides access to the operations available in MongoDB Realm.
+* Change `[RLMSyncUser
+  configurationWithPartitionValue:]`/`SyncUser.configuration(with:)` to accept
+  all BSON types. Partition values can currently be of types `String`, `Int`,
+  or `ObjectId`. Opening a realm by partition value is the equivalent of
+  previously opening a realm by URL. In this case, partitions are meant to be
+  more closely associated with your data. E.g., if you are running a `Dog`
+  kennel, and have a field `breed` that acts as your partition key, you could
+  open up realms based on the breed of the dogs.
+
+### Breaking Changes
+
+* We no longer support Realm Cloud (legacy), but instead the new "MongoDB
+  Realm" Cloud. MongoDB Realm is a serverless platform that enables developers
+  to quickly build applications without having to set up server infrastructure.
+  MongoDB Realm is built on top of MongoDB Atlas, automatically integrating the
+  connection to your database.
+* Remove support for Query-based sync, including the configuration parameters
+  and the `RLMSyncSubscription` and `SyncSubscription` types ([#6437](https://github.com/realm/realm-cocoa/pull/6437)).
+* Primary key properties are no longer marked as being indexed. This reflects
+  an internal change to how primary keys are handled that should not have any
+  other visible effects. ([#6440](https://github.com/realm/realm-cocoa/pull/6440)).
+* Remove everything related to sync permissions, including both the path-based
+  permission system and the object-level privileges for query-based sync. ([#6445](https://github.com/realm/realm-cocoa/pulls/6445))
+* Primary key uniqueness is now enforced when creating new objects during
+  migrations, rather than only at the end of migrations. Previously new objects
+  could be created with duplicate primary keys during a migration as long as
+  the property was changed to a unique value before the end of the migration,
+  but now a unique value must be supplied when creating the object.
+* Remove support for Realm Object Server.
+
+### Compatibility
+
+* File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
+* MongoDB Realm: 84893c5 or later.
+* APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
+* Carthage release for Swift is built with Xcode 11.5.
+
+### Internal
+
+* Upgraded realm-core from v6.0.3 to v10.0.0-beta.1
+* Upgraded realm-sync from v5.0.1 to v10.0.0-beta.2
+* Upgraded realm-core from v6.0.6 to v6.0.7
+* Upgraded realm-sync from v5.0.5 to v5.0.6
+
 5.3.2 Release notes (2020-07-21)
 =============================================================
 

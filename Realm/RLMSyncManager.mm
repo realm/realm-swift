@@ -148,11 +148,7 @@ static RLMSyncManager *s_sharedManager = nil;
         config.user_agent_application_info = RLMStringDataWithNSString(self.appID);
     }
 
-    if (appConfiguration) {
-        SyncManager::shared().configure(config, [appConfiguration config]);
-    } else {
-        SyncManager::shared().configure(config, realm::util::none);
-    }
+    SyncManager::shared().configure(config, [appConfiguration config]);
 }
 
 - (std::shared_ptr<realm::app::App>)app {
