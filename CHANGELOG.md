@@ -1,5 +1,125 @@
 x.y.z Release notes (yyyy-MM-dd)
 =============================================================
+### Enhancements
+* Add support for the 64-bit watchOS simulator added in Xcode 12.
+
+### Fixed
+* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+* None.
+
+<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+
+### Compatibility
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 3.11 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 11.6.
+
+### Internal
+* Upgraded realm-core from v6.0.12 to v6.0.13
+* Upgraded realm-sync from v5.0.12 to v5.0.13
+
+5.3.2 Release notes (2020-07-21)
+=============================================================
+
+### Fixed
+
+* Fix a file format upgrade bug when opening older Realm files.. Could cause
+  assertions like "Assertion failed: ref != 0" during opning of a Realm.
+  ([Core #6644](https://github.com/realm/realm-cocoa/issues/6644), since 5.2.0)
+* A use-after-free would occur if a Realm was compacted, opened on multiple
+  threads prior to the first write, then written to while reads were happening
+  on other threads. This could result in a variety of crashes, often inside
+  realm::util::EncryptedFileMapping::read_barrier.
+  (Since v5.0.0, [#6626](https://github.com/realm/realm-cocoa/issues/6626),
+  [#6628](https://github.com/realm/realm-cocoa/issues/6628),
+  [#6652](https://github.com/realm/realm-cocoa/issues/6652),
+  [#6655](https://github.com/realm/realm-cocoa/issues/6555),
+  [#6656](https://github.com/realm/realm-cocoa/issues/6656)).
+
+### Compatibility
+
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 3.11 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 11.6.
+
+### Internal
+
+* Upgraded realm-core from v6.0.11 to v6.0.12
+* Upgraded realm-sync from v5.0.11 to v5.0.12
+
+5.3.1 Release notes (2020-07-17)
+=============================================================
+
+### Enhancements
+
+* Add prebuilt binary for Xcode 11.6 to the release package.
+
+### Fixed
+
+* Creating an object inside migration which changed that object type's primary
+  key would hit an assertion failure mentioning primary_key_col
+  ([#6613](https://github.com/realm/realm-cocoa/issues/6613), since 5.0.0).
+* Modifying the value of a string primary key property inside a migration with
+  a Realm file which was upgraded from pre-5.0 would corrupt the property's
+  index, typically resulting in crashes. ([Core #3765](https://github.com/realm/realm-core/issues/3765), since 5.0.0).
+* Some Realm files which hit assertion failures when upgrading from the pre-5.0
+  file format should now upgrade correctly (Since 5.0.0).
+
+### Compatibility
+
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 3.11 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 11.6.
+
+### Internal
+
+* Upgraded realm-core from v6.0.9 to v6.0.11
+* Upgraded realm-sync from v5.0.8 to v5.0.11
+
+5.3.0 Release notes (2020-07-14)
+=============================================================
+
+### Enhancements
+
+* Add `Realm.objectWillChange`, which is a Combine publisher that will emit a
+  notification each time the Realm is refreshed or a write transaction is
+  commited.
+
+### Fixed
+
+* Fix the spelling of `ObjectKeyIdentifiable`. The old spelling is available
+  and deprecated for compatiblity.
+* Rename `RealmCollection.publisher` to `RealmCollection.collectionPublisher`.
+  The old name interacted with the `publisher` defined by `Sequence` in very
+  confusing ways, so we need to use a different name. The `publisher` name is
+  still available for compatiblity. ([#6516](https://github.com/realm/realm-cocoa/issues/6516))
+* Work around "xcodebuild timed out while trying to read
+  SwiftPackageManagerExample.xcodeproj" errors when installing Realm via
+  Carthage. ([#6549](https://github.com/realm/realm-cocoa/issues/6549)).
+* Fix a performance regression when using change notifications. (Since 5.0.0,
+  [#6629](https://github.com/realm/realm-cocoa/issues/6629)).
+
+### Compatibility
+
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 3.11 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
+* Carthage release for Swift is built with Xcode 11.5.
+
+### Internal
+
+* Upgraded realm-core from v6.0.8 to v6.0.9
+* Upgraded realm-sync from v5.0.7 to v5.0.8
+
+5.2.0 Release notes (2020-06-30)
+=============================================================
 
 This release also contains all changes from 5.0.3 and 5.1.0.
 
@@ -61,6 +181,7 @@ This release also contains all changes from 5.0.3 and 5.1.0.
 Xcode 11.3 and iOS 9 are now the minimum supported versions.
 
 ### Enhancements
+
 * Add support for building with Xcode 12 beta 1. watchOS currently requires
   removing x86_64 from the supported architectures. Support for the new 64-bit
   watch simulator will come in a future release.
@@ -68,6 +189,7 @@ Xcode 11.3 and iOS 9 are now the minimum supported versions.
 ### Fixed
 * Opening a SyncSession with LOCAL app deployments would not use the correct endpoints.
 * Linking from embedded objects to top-level objects was incorrectly disallowed.
+
 * Opening a Realm file in file format v6 (created by Realm Cocoa versions
   between 2.4 and 2.10) would crash. (Since 5.0.0, [Core #3764](https://github.com/realm/realm-core/issues/3764)).
 * Upgrading v9 (pre-5.0) Realm files would create a redundant search index for
@@ -169,6 +291,19 @@ later will be able to open the new file format.
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * MongoDB Realm: 84893c5 or later.
 * APIs are backwards compatible with all previous releases in the 10.0.0-alpha series.
+* `List.index(of:)` would give incorrect results if it was the very first thing
+  called on that List after a Realm was refreshed following a write which
+  modified the List. (Since 5.0.0, [#6606](https://github.com/realm/realm-cocoa/issues/6606)).
+* If a ThreadSafeReference was the only remaining reference to a Realm,
+  multiple copies of the file could end up mapped into memory at once. This
+  probably did not have any symptoms other than increased memory usage. (Since 5.0.0).
+
+### Compatibility
+
+* File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
+* Realm Object Server: 3.21.0 or later.
+* Realm Studio: 3.11 or later.
+* APIs are backwards compatible with all previous releases in the 5.x.y series.
 * Carthage release for Swift is built with Xcode 11.5.
 
 ### Internal
@@ -177,6 +312,8 @@ later will be able to open the new file format.
 * Upgraded realm-sync from v5.0.1 to v10.0.0-beta.2
 * Upgraded realm-core from v6.0.6 to v6.0.7
 * Upgraded realm-sync from v5.0.5 to v5.0.6
+* Upgraded realm-core from v6.0.6 to v6.0.8
+* Upgraded realm-sync from v5.0.5 to v5.0.7
 
 5.1.0 Release notes (2020-06-22)
 =============================================================

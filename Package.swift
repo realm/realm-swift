@@ -3,6 +3,7 @@
 import PackageDescription
 import Foundation
 
+
 let coreVersionStr = "10.0.0-beta.1"
 let cocoaVersionStr = "10.0.0-beta.2"
 

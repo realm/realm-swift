@@ -363,13 +363,6 @@ download_common() {
     rm -rf "${download_type}-${version}" core
     mv "${temp_dir}/${download_type}-${version}" .
     ln -s "${download_type}-${version}" core
-
-    # Xcode 12 beta 1 ships a broken version of __bit_reference which breaks
-    # ABI compatibility with older versions, so grab a fixed version of that
-    # header.
-    if (( $(xcode_version_major) > 11 )); then
-        curl --silent https://raw.githubusercontent.com/llvm/llvm-project/4198874630be5c6126d78944f8a2d89dea90c7c4/libcxx/include/__bit_reference -o core/include/__bit_reference
-    fi
 }
 
 download_core() {
@@ -1209,16 +1202,6 @@ case "$COMMAND" in
     # CocoaPods
     ######################################
     "cocoapods-setup")
-        if [ ! -d core ]; then
-          sh build.sh download-sync
-          rm core
-          mv sync-* core
-          mv core/librealm-ios.a core/librealmcore-ios.a
-          mv core/librealm-macosx.a core/librealmcore-macosx.a
-          mv core/librealm-tvos.a core/librealmcore-tvos.a
-          mv core/librealm-watchos.a core/librealmcore-watchos.a
-        fi
-
         if [[ "$2" != "swift" ]]; then
           if [ ! -d Realm/ObjectStore/src ]; then
             cat >&2 <<EOM
@@ -1232,6 +1215,16 @@ their entries in your Podfile.
 
 EOM
             exit 1
+          fi
+
+          if [ ! -d core ]; then
+            sh build.sh download-sync
+            rm core
+            mv sync-* core
+            mv core/librealm-ios.a core/librealmcore-ios.a
+            mv core/librealm-macosx.a core/librealmcore-macosx.a
+            mv core/librealm-tvos.a core/librealmcore-tvos.a
+            mv core/librealm-watchos.a core/librealmcore-watchos.a
           fi
 
           rm -rf include
@@ -1552,7 +1545,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * File format: Generates Realms with format v11 (Reads and upgrades all previous formats)
 * Realm Studio: 10.0.0 or later.
 * APIs are backwards compatible with all previous releases in the 5.x.y series.
-* Carthage release for Swift is built with Xcode 11.5.
+* Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
 * Upgraded realm-core from ? to ?

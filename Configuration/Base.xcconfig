@@ -62,7 +62,15 @@ IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 WATCHOS_DEPLOYMENT_TARGET = 2.0;
 TVOS_DEPLOYMENT_TARGET = 9.0;
 
-VALID_ARCHS[sdk=watchsimulator*] = i386;
+// Xcode 11 "helpfully" "corrects" arm64 to x86_64 when you try to exclude
+// arm64 on platforms that it doesn't support building for arm64 on.
+REALM_ARM_ARCHS_1200 = arm64 arm64e;
+REALM_ARM_ARCHS = $(REALM_ARM_ARCHS_$(XCODE_VERSION_MAJOR))
+
+EXCLUDED_ARCHS[sdk=macosx*] = $(REALM_ARM_ARCHS);
+EXCLUDED_ARCHS[sdk=watchsimulator*] = $(REALM_ARM_ARCHS);
+EXCLUDED_ARCHS[sdk=iphonesimulator*] = $(REALM_ARM_ARCHS);
+EXCLUDED_ARCHS[sdk=appletvsimulator*] = $(REALM_ARM_ARCHS);
 
 SWIFT_VERSION = 5.0;
 TARGETED_DEVICE_FAMILY = 1,2,3,4;

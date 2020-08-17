@@ -23,8 +23,8 @@ and the steps you have taken to reproduce it in as many details as possible.
 e.g. the stack trace of a crash
 -->
 
-## Steps to Reproduce
-<!--- What are steps we can follow to reproduce this issue? -->
+## Steps for others to Reproduce
+<!--- What are steps OTHERS can follow to reproduce this issue? -->
 
 ## Code Sample
 <!---
