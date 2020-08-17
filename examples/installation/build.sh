@@ -40,9 +40,6 @@ command:
   test-watchos-swift-xcframework:  tests watchOS Swift xcframework example.
   test-watchos-swift-cocoapods:    tests watchOS Swift CocoaPods example.
   test-watchos-swift-carthage:     tests watchOS Swift Carthage example.
-  test-watchos-spm:                tests watchOS Swift Package Manager example.
-
-  test-tvos-spm:                   tests tvOS Swift Package Manager example.
 EOF
 }
 
@@ -167,11 +164,9 @@ case "$COMMAND" in
         for target in ios-swift-dynamic ios-swift-cocoapods osx-swift-dynamic ios-swift-carthage osx-swift-carthage; do
             ./build.sh test-$target || exit 1
         done
-        if (( $(xcode_version_major) >= 11 )); then
-            for target in ios osx watchos tvos; do
-                ./build.sh test-$target-spm || exit 1
-            done
-        fi
+        for target in ios osx; do
+            ./build.sh test-$target-spm || exit 1
+        done
         ;;
 
     test-*-*-cocoapods)
@@ -199,6 +194,13 @@ case "$COMMAND" in
         ;;
 
     test-ios-spm)
+        # We have to "hide" the spm example from carthage because otherwise
+        # it'll fetch the example's package dependencies as part of deciding
+        # what to build from this repo.
+        if ! [ -L ios/swift/SwiftPackageManagerExample/SwiftPackageManagerExample.xcodeproj/project.pbxproj ]; then
+            mkdir -p ios/swift/SwiftPackageManagerExample/SwiftPackageManagerExample.xcodeproj
+            ln -s ../project.pbxproj ios/swift/SwiftPackageManagerExample/SwiftPackageManagerExample.xcodeproj
+        fi
         xctest "$PLATFORM" swift SwiftPackageManagerExample
         ;;
 
