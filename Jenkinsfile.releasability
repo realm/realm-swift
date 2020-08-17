@@ -1,4 +1,4 @@
-xcodeVersions = ['11.3', '11.4.1', '11.5']
+xcodeVersions = ['11.3', '11.4.1', '11.5', '11.6']
 platforms = ['osx', 'ios', 'watchos', 'tvos', 'catalyst']
 carthagePlatforms = ['osx', 'ios', 'watchos', 'tvos']
 platformNames = ['osx': 'macOS', 'ios': 'iOS', 'watchos': 'watchOS', 'tvos': 'tvOS', 'catalyst': 'Catalyst']

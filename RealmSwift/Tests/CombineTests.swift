@@ -71,6 +71,34 @@ class CombineTestCase: TestCase {
 }
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
+class CombineRealmTests: CombineTestCase {
+    func testWillChangeLocalWrite() {
+        var called = false
+        token = realm.objectWillChange.sink {
+            called = true
+        }
+        try! realm.write {
+            realm.create(SwiftIntObject.self, value: [])
+        }
+        XCTAssertTrue(called)
+    }
+
+    func testWillChangeRemoteWrite() {
+        let exp = XCTestExpectation()
+        token = realm.objectWillChange.sink {
+            exp.fulfill()
+        }
+        subscribeOnQueue.async {
+            let backgroundRealm = try! Realm(configuration: self.realm.configuration)
+            try! backgroundRealm.write {
+                backgroundRealm.create(SwiftIntObject.self, value: [])
+            }
+        }
+        wait(for: [exp], timeout: 1)
+    }
+}
+
+@available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 class CombineObjectPublisherTests: CombineTestCase {
     var obj: SwiftIntObject!
 
@@ -599,7 +627,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
     func testBasic() {
         var exp = XCTestExpectation()
         var calls = 0
-        token = collection.publisher
+        token = collection.collectionPublisher
             .assertNoFailure()
             .sink { c in
                 XCTAssertEqual(c.count, calls)
@@ -653,7 +681,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
     func testSubscribeOn() {
         let sema = DispatchSemaphore(value: 0)
         var calls = 0
-        token = collection.publisher
+        token = collection.collectionPublisher
             .subscribe(on: subscribeOnQueue)
             .assertNoFailure()
             .sink { r in
@@ -672,7 +700,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
     func testReceiveOn() {
         var calls = 0
         var exp = XCTestExpectation(description: "initial")
-        token = collection.publisher
+        token = collection.collectionPublisher
             .receive(on: receiveOnQueue)
             .assertNoFailure()
             .sink { r in
@@ -729,7 +757,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
     func testMakeThreadSafe() {
         var calls = 0
         var exp = XCTestExpectation(description: "initial")
-        token = collection.publisher
+        token = collection.collectionPublisher
             .map { $0 }
             .threadSafeReference()
             .receive(on: receiveOnQueue)
@@ -771,7 +799,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
 
     func testFrozen() {
         let exp = XCTestExpectation()
-        token = collection.publisher
+        token = collection.collectionPublisher
             .freeze()
             .prefix(10)
             .collect()
@@ -860,7 +888,7 @@ private class CombineCollectionPublisherTests<Collection: RealmCollection>: Comb
 
     func testFrozenMakeThreadSafe() {
         let sema = DispatchSemaphore(value: 0)
-        token = collection.publisher
+        token = collection.collectionPublisher
             .freeze()
             .threadSafeReference()
             .receive(on: receiveOnQueue)
