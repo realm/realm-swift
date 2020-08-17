@@ -375,6 +375,7 @@ download_common() {
     rm -rf "${download_type}-${version}" core
     mv "${temp_dir}/${download_type}-${version}" .
     ln -s "${download_type}-${version}" core
+    
 }
 
 download_core() {
