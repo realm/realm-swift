@@ -1,13 +1,12 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.3.4 Release notes (2020-08-17)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+
 * Accessing a Realm after calling `deleteAll()` would sometimes throw an
   exception with the reason 'ConstIterator copy failed'. ([#6597](https://github.com/realm/realm-cocoa/issues/6597), since 5.0.0).
-* Fix an assertion failure inside the `migrate_links()` function when upgrading a pre-5.0 Realm file.
+* Fix an assertion failure inside the `migrate_links()` function when upgrading
+  a pre-5.0 Realm file.
 * Fix a bug in memory mapping management. This bug could result in multiple
   different asserts as well as segfaults. In many cases stack backtraces would
   include members of the EncyptedFileMapping near the top - even if encryption
@@ -15,9 +14,8 @@ x.y.z Release notes (yyyy-MM-dd)
   reading an array header or array element. In all cases the application would
   terminate immediately. ([Core #3838](https://github.com/realm/realm-core/pull/3838), since v5.0.0).
 
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
-
 ### Compatibility
+
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.11 or later.
@@ -25,6 +23,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
+
 * Upgraded realm-core from v6.0.14 to v6.0.18
 * Upgraded realm-sync from v5.0.14 to v5.0.15
 
