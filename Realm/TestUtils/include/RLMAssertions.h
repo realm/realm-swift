@@ -47,6 +47,11 @@ void RLMAssertThrowsWithReason(XCTestCase *self,
                                NSString *regexString, NSString *message,
                                NSString *fileName, NSUInteger lineNumber);
 
+FOUNDATION_EXTERN
+void RLMAssertExceptionReason(XCTestCase *self,
+                              NSException *exception, NSString *expected, NSString *expression,
+                              NSString *fileName, NSUInteger lineNumber);
+
 FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
 
 #define RLMAssertThrows(expression, ...) \
@@ -88,17 +93,10 @@ FOUNDATION_EXTERN bool RLMHasCachedRealmForPath(NSString *path);
     exception; \
 })
 
-#define RLMAssertThrowsWithReason(expression, expected, ...) \
+#define RLMAssertThrowsWithReason(expression, expected) \
 ({ \
     NSException *exception = RLMAssertThrows(expression); \
-    if (exception) { \
-        if ([exception.reason rangeOfString:(expected)].location == NSNotFound) { \
-            _XCTRegisterFailure(self, \
-                                [_XCTFailureDescription(_XCTAssertion_True, 0, @#expression " (EXPR_STRING) contains " #expected) \
-                                 stringByReplacingOccurrencesOfString:@"EXPR_STRING" \
-                                                           withString:exception.reason ?: @"<nil>"]); \
-        } \
-    } \
+    RLMAssertExceptionReason(self, exception, expected, @#expression, @"" __FILE__, __LINE__); \
     exception; \
 })
 

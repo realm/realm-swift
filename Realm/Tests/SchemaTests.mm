@@ -210,8 +210,28 @@ RLM_ARRAY_TYPE(NonDefaultObject);
 @interface MixedProperty : FakeObject
 @property id mixed;
 @end
-
 @implementation MixedProperty
+@end
+
+@interface LinkFromEmbeddedToTopLevel : FakeEmbeddedObject
+@property IntObject *link;
+@end
+@implementation LinkFromEmbeddedToTopLevel
+@end
+
+@interface ArrayFromEmbeddedToTopLevel : FakeEmbeddedObject
+@property RLMArray<IntObject> *array;
+@end
+@implementation ArrayFromEmbeddedToTopLevel
+@end
+
+@interface EmbeddedObjectWithPrimaryKey : FakeEmbeddedObject
+@property int pk;
+@end
+@implementation EmbeddedObjectWithPrimaryKey
++ (NSString *)primaryKey {
+    return @"pk";
+}
 @end
 
 RLM_ARRAY_TYPE(SchemaTestsLinkSource)
@@ -516,8 +536,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\tAllTypesObject {\n"
                                               @"\t\tboolCol {\n"
                                               @"\t\t\ttype = bool;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
@@ -525,8 +543,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t}\n"
                                               @"\t\tintCol {\n"
                                               @"\t\t\ttype = int;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
@@ -534,8 +550,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t}\n"
                                               @"\t\tfloatCol {\n"
                                               @"\t\t\ttype = float;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
@@ -543,8 +557,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t}\n"
                                               @"\t\tdoubleCol {\n"
                                               @"\t\t\ttype = double;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
@@ -552,8 +564,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t}\n"
                                               @"\t\tstringCol {\n"
                                               @"\t\t\ttype = string;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
@@ -561,8 +571,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t}\n"
                                               @"\t\tbinaryCol {\n"
                                               @"\t\t\ttype = data;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
@@ -570,8 +578,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t}\n"
                                               @"\t\tdateCol {\n"
                                               @"\t\t\ttype = date;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
@@ -579,8 +585,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t}\n"
                                               @"\t\tcBoolCol {\n"
                                               @"\t\t\ttype = bool;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
@@ -588,8 +592,20 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\t\t}\n"
                                               @"\t\tlongCol {\n"
                                               @"\t\t\ttype = int;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
+                                              @"\t\t\toptional = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tdecimalCol {\n"
+                                              @"\t\t\ttype = decimal128;\n"
+                                              @"\t\t\tindexed = NO;\n"
+                                              @"\t\t\tisPrimary = NO;\n"
+                                              @"\t\t\tarray = NO;\n"
+                                              @"\t\t\toptional = NO;\n"
+                                              @"\t\t}\n"
+                                              @"\t\tobjectIdCol {\n"
+                                              @"\t\t\ttype = object id;\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
@@ -617,8 +633,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\tIntObject {\n"
                                               @"\t\tintCol {\n"
                                               @"\t\t\ttype = int;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
@@ -628,8 +642,6 @@ RLM_ARRAY_TYPE(NotARealClass)
                                               @"\tStringObject {\n"
                                               @"\t\tstringCol {\n"
                                               @"\t\t\ttype = string;\n"
-                                              @"\t\t\tobjectClassName = (null);\n"
-                                              @"\t\t\tlinkOriginPropertyName = (null);\n"
                                               @"\t\t\tindexed = NO;\n"
                                               @"\t\t\tisPrimary = NO;\n"
                                               @"\t\t\tarray = NO;\n"
@@ -751,6 +763,22 @@ RLM_ARRAY_TYPE(NotARealClass)
     RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
     RLMAssertThrowsWithReasonMatching(config.objectClasses = @[[MixedProperty class]],
                                       @"Property 'mixed' is declared as 'id'.*");
+}
+
+- (void)testEmebeddedLinkingToNonEmbedded {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[[LinkFromEmbeddedToTopLevel class], [IntObject class]];
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
+    config.objectClasses = @[[ArrayFromEmbeddedToTopLevel class], [IntObject class]];
+    XCTAssertNoThrow([RLMRealm realmWithConfiguration:config error:nil]);
+}
+
+- (void)testEmbeddedWithPrimaryKey {
+    RLMRealmConfiguration *config = [RLMRealmConfiguration defaultConfiguration];
+    config.objectClasses = @[[EmbeddedObjectWithPrimaryKey class]];
+    RLMAssertThrowsWithReason([RLMRealm realmWithConfiguration:config error:nil],
+                              @"Embedded object type 'EmbeddedObjectWithPrimaryKey' cannot have a primary key.");
+
 }
 
 // Can't spawn child processes on iOS

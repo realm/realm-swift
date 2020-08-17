@@ -50,6 +50,10 @@ static inline NSString *RLMTypeToString(RLMPropertyType type) {
             return @"object";
         case RLMPropertyTypeLinkingObjects:
             return @"linking objects";
+        case RLMPropertyTypeDecimal128:
+            return @"decimal128";
+        case RLMPropertyTypeObjectId:
+            return @"object id";
     }
     return @"Unknown";
 }

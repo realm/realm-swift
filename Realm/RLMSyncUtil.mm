@@ -24,7 +24,7 @@
 #import "RLMRealmConfiguration_Private.hpp"
 #import "RLMRealm_Private.hpp"
 #import "RLMSyncConfiguration_Private.hpp"
-#import "RLMSyncUser_Private.hpp"
+#import "RLMUser_Private.hpp"
 #import "RLMUtil.hpp"
 
 #import "shared_realm.hpp"
@@ -35,7 +35,7 @@ RLMIdentityProvider const RLMIdentityProviderAccessToken = @"_access_token";
 
 NSString *const RLMSyncErrorDomain = @"io.realm.sync";
 NSString *const RLMSyncAuthErrorDomain = @"io.realm.sync.auth";
-NSString *const RLMSyncPermissionErrorDomain = @"io.realm.sync.permission";
+NSString *const RLMAppErrorDomain = @"io.realm.app";
 
 NSString *const kRLMSyncPathOfRealmBackupCopyKey            = @"recovered_realm_location_path";
 NSString *const kRLMSyncErrorActionTokenKey                 = @"error_action_token";
@@ -55,20 +55,6 @@ NSString *const kRLMSyncRegisterKey             = @"register";
 NSString *const kRLMSyncTokenKey                = @"token";
 NSString *const kRLMSyncUnderlyingErrorKey      = @"underlying_error";
 NSString *const kRLMSyncUserIDKey               = @"user_id";
-
-uint8_t RLMGetComputedPermissions(RLMRealm *realm, id _Nullable object) {
-    if (!object) {
-        return static_cast<unsigned char>(realm->_realm->get_privileges());
-    }
-    if ([object isKindOfClass:[NSString class]]) {
-        return static_cast<unsigned char>(realm->_realm->get_privileges([object UTF8String]));
-    }
-    if (auto obj = RLMDynamicCast<RLMObjectBase>(object)) {
-        RLMVerifyAttached(obj);
-        return static_cast<unsigned char>(realm->_realm->get_privileges(obj->_row));
-    }
-    return 0;
-}
 
 #pragma mark - C++ APIs
 
@@ -94,7 +80,7 @@ std::shared_ptr<SyncSession> sync_session_for_realm(RLMRealm *realm) {
     Realm::Config realmConfig = realm.configuration.config;
     if (auto config = realmConfig.sync_config) {
         std::shared_ptr<SyncUser> user = config->user;
-        if (user && user->state() != SyncUser::State::Error) {
+        if (user && user->state() != SyncUser::State::Removed) {
             return user->session_for_on_disk_path(realmConfig.path);
         }
     }

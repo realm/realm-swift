@@ -1,3 +1,4 @@
+# coding: utf-8
 Pod::Spec.new do |s|
   s.name                    = 'Realm'
   version                   = `sh build.sh get-version`
@@ -18,34 +19,54 @@ Pod::Spec.new do |s|
   s.documentation_url       = "https://realm.io/docs/objc/#{has_versioned_docs ? s.version : 'latest'}"
   s.license                 = { :type => 'Apache 2.0', :file => 'LICENSE' }
 
-  public_header_files       = 'include/**/RLMArray.h',
+  public_header_files       = 'include/**/Realm.h',
+
+                              # Realm module
+                              'include/**/RLMArray.h',
                               'include/**/RLMCollection.h',
                               'include/**/RLMConstants.h',
+                              'include/**/RLMDecimal128.h',
+                              'include/**/RLMEmbeddedObject.h',
                               'include/**/RLMListBase.h',
                               'include/**/RLMMigration.h',
                               'include/**/RLMObject.h',
                               'include/**/RLMObjectBase.h',
+                              'include/**/RLMObjectId.h',
                               'include/**/RLMObjectSchema.h',
                               'include/**/RLMOptionalBase.h',
                               'include/**/RLMPlatform.h',
                               'include/**/RLMProperty.h',
                               'include/**/RLMRealm.h',
-                              'include/**/RLMRealm+Sync.h',
-                              'include/**/RLMRealmConfiguration+Sync.h',
                               'include/**/RLMRealmConfiguration.h',
                               'include/**/RLMResults.h',
                               'include/**/RLMSchema.h',
-                              'include/**/RLMSyncConfiguration.h',
-                              'include/**/RLMSyncCredentials.h',
-                              'include/**/RLMSyncManager.h',
-                              'include/**/RLMSyncPermission.h',
-                              'include/**/RLMSyncSession.h',
-                              'include/**/RLMSyncSubscription.h',
-                              'include/**/RLMSyncUser.h',
-                              'include/**/RLMSyncUtil.h',
                               'include/**/RLMThreadSafeReference.h',
+
+                              # Sync
                               'include/**/NSError+RLMSync.h',
-                              'include/**/Realm.h',
+                              'include/**/RLMApp.h',
+                              'include/**/RLMAppCredentials.h',
+                              'include/**/RLMBSON.h',
+                              'include/**/RLMNetworkTransport.h',
+                              'include/**/RLMPushClient.h',
+                              'include/**/RLMProviderClient.h',
+                              'include/**/RLMRealm+Sync.h',
+                              'include/**/RLMRealmConfiguration+Sync.h',
+                              'include/**/RLMSyncConfiguration.h',
+                              'include/**/RLMCredentials.h',
+                              'include/**/RLMSyncManager.h',
+                              'include/**/RLMSyncSession.h',
+                              'include/**/RLMUser.h',
+                              'include/**/RLMSyncUtil.h',
+                              'include/**/RLMUserAPIKey.h',
+                              'include/**/RLMAPIKeyAuth.h',
+                              'include/**/RLMEmailPasswordAuth.h',
+                              'include/**/RLMFindOneAndModifyOptions.h',
+                              'include/**/RLMFindOptions.h',
+                              'include/**/RLMMongoClient.h',
+                              'include/**/RLMMongoCollection.h',
+                              'include/**/RLMMongoDatabase.h',
+                              'include/**/RLMUpdateResult.h',
 
                               # Realm.Dynamic module
                               'include/**/RLMRealm_Dynamic.h',
@@ -54,6 +75,7 @@ Pod::Spec.new do |s|
                               # Realm.Private module
   private_header_files      = 'include/**/RLMAccessor.h',
                               'include/**/RLMArray_Private.h',
+                              'include/**/RLMBSON_Private.h',
                               'include/**/RLMCollection_Private.h',
                               'include/**/RLMListBase.h',
                               'include/**/RLMObjectBase_Private.h',
@@ -67,7 +89,15 @@ Pod::Spec.new do |s|
                               'include/**/RLMResults_Private.h',
                               'include/**/RLMSchema_Private.h',
                               'include/**/RLMSyncConfiguration_Private.h',
-                              'include/**/RLMSyncUtil_Private.h'
+                              'include/**/RLMSyncUtil_Private.h',
+                              'include/**/RLMFindOneAndModifyOptions_Private.h',
+                              'include/**/RLMFindOptions_Private.h',
+                              'include/**/RLMMongoClient_Private.h',
+                              'include/**/RLMMongoCollection_Private.h',
+                              'include/**/RLMMongoDatabase_Private.h',
+                              'include/**/RLMUpdateResult_Private.h',
+                              'include/**/RLMProviderClient_Private.h'
+
 
   source_files              = 'Realm/*.{m,mm}',
                               'Realm/ObjectStore/src/*.cpp',
@@ -77,7 +107,8 @@ Pod::Spec.new do |s|
                               'Realm/ObjectStore/src/impl/*.cpp',
                               'Realm/ObjectStore/src/impl/apple/*.cpp',
                               'Realm/ObjectStore/src/util/*.cpp',
-                              'Realm/ObjectStore/src/util/apple/*.cpp'
+                              'Realm/ObjectStore/src/util/apple/*.cpp',
+                              'Realm/ObjectStore/src/util/bson/*.cpp'
 
   s.frameworks              = 'Security'
   s.module_map              = 'Realm/Realm.modulemap'

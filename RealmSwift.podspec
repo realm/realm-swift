@@ -1,3 +1,4 @@
+# coding: utf-8
 Pod::Spec.new do |s|
   s.name                      = 'RealmSwift'
   version                     = `sh build.sh get-version`

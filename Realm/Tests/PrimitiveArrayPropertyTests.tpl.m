@@ -18,6 +18,46 @@
 
 #import "RLMTestCase.h"
 
+static NSDate *date(int i) {
+    return [NSDate dateWithTimeIntervalSince1970:i];
+}
+static NSData *data(int i) {
+    return [NSData dataWithBytesNoCopy:calloc(i, 1) length:i freeWhenDone:YES];
+}
+static RLMDecimal128 *decimal128(int i) {
+    return [RLMDecimal128 decimalWithNumber:@(i)];
+}
+static NSMutableArray *objectIds;
+static RLMObjectId *objectId(NSUInteger i) {
+    if (!objectIds) {
+        objectIds = [NSMutableArray new];
+    }
+    while (i >= objectIds.count) {
+        [objectIds addObject:RLMObjectId.objectId];
+    }
+    return objectIds[i];
+}
+static void count(NSArray *values, double *sum, NSUInteger *count) {
+    for (id value in values) {
+        if (value != NSNull.null) {
+            ++*count;
+            *sum += [value doubleValue];
+        }
+    }
+}
+static double sum(NSArray *values) {
+    double sum = 0;
+    NSUInteger c = 0;
+    count(values, &sum, &c);
+    return sum;
+}
+static double average(NSArray *values) {
+    double sum = 0;
+    NSUInteger c = 0;
+    count(values, &sum, &c);
+    return sum / c;
+}
+
 @interface PrimitiveArrayPropertyTests : RLMTestCase
 @end
 
@@ -27,6 +67,7 @@
     AllOptionalPrimitiveArrays *optUnmanaged;
     AllOptionalPrimitiveArrays *optManaged;
     RLMRealm *realm;
+    NSArray<RLMArray *> *allArrays;
 }
 
 - (void)setUp {
@@ -36,12 +77,19 @@
     [realm beginWriteTransaction];
     managed = [AllPrimitiveArrays createInRealm:realm withValue:@[]];
     optManaged = [AllOptionalPrimitiveArrays createInRealm:realm withValue:@[]];
+    allArrays = @[
+        $array,
+    ];
 }
 
 - (void)tearDown {
     if (realm.inWriteTransaction) {
         [realm cancelWriteTransaction];
     }
+}
+
+- (void)addObjects {
+    [$array addObjects:$values];
 }
 
 - (void)testCount {
@@ -129,14 +177,7 @@
 }
 
 - (void)testDeleteObjectsInRealm {
-    RLMAssertThrowsWithReason([realm deleteObjects:$array], @"Cannot delete objects from RLMArray");
-}
-
-static NSDate *date(int i) {
-    return [NSDate dateWithTimeIntervalSince1970:i];
-}
-static NSData *data(int i) {
-    return [NSData dataWithBytesNoCopy:calloc(i, 1) length:i freeWhenDone:YES];
+    RLMAssertThrowsWithReason([realm deleteObjects:$allArrays], @"Cannot delete objects from RLMArray");
 }
 
 - (void)testObjectAtIndex {
@@ -148,27 +189,25 @@ static NSData *data(int i) {
 }
 
 - (void)testFirstObject {
-    XCTAssertNil($array.firstObject);
+    XCTAssertNil($allArrays.firstObject);
 
-    %r [$array addObjects:$values];
-    %r XCTAssertEqualObjects($array.firstObject, $first);
+    [self addObjects];
+    XCTAssertEqualObjects($array.firstObject, $first);
+
+    [$allArrays removeAllObjects];
 
     %o [$array addObject:NSNull.null];
     %o XCTAssertEqualObjects($array.firstObject, NSNull.null);
-
-    %o [$array removeAllObjects];
-
-    %o [$array addObjects:$values];
-    %o XCTAssertEqualObjects($array.firstObject, $first);
 }
 
 - (void)testLastObject {
-    XCTAssertNil($array.lastObject);
+    XCTAssertNil($allArrays.lastObject);
 
-    [$array addObjects:$values];
+    [self addObjects];
+
     XCTAssertEqualObjects($array.lastObject, $last);
 
-    %o [$array removeLastObject];
+    [$allArrays removeLastObject];
     %o XCTAssertEqualObjects($array.lastObject, $v1);
 }
 
@@ -187,7 +226,7 @@ static NSData *data(int i) {
     RLMAssertThrowsWithReason([$array addObjects:@[$wrong]], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
     %r RLMAssertThrowsWithReason([$array addObjects:@[NSNull.null]], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
-    [$array addObjects:$values];
+    [self addObjects];
     XCTAssertEqualObjects($array[0], $v0);
     XCTAssertEqualObjects($array[1], $v1);
     %o XCTAssertEqualObjects($array[2], NSNull.null);
@@ -212,16 +251,16 @@ static NSData *data(int i) {
 }
 
 - (void)testRemoveObject {
-    RLMAssertThrowsWithReason([$array removeObjectAtIndex:0], ^n @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([$allArrays removeObjectAtIndex:0], ^n @"Index 0 is out of bounds (must be less than 0).");
 
-    [$array addObjects:$values];
+    [self addObjects];
     %r XCTAssertEqual($array.count, 2U);
     %o XCTAssertEqual($array.count, 3U);
 
     %r RLMAssertThrowsWithReason([$array removeObjectAtIndex:2], ^n @"Index 2 is out of bounds (must be less than 2).");
     %o RLMAssertThrowsWithReason([$array removeObjectAtIndex:3], ^n @"Index 3 is out of bounds (must be less than 3).");
 
-    [$array removeObjectAtIndex:0];
+    [$allArrays removeObjectAtIndex:0];
     %r XCTAssertEqual($array.count, 1U);
     %o XCTAssertEqual($array.count, 2U);
 
@@ -230,13 +269,13 @@ static NSData *data(int i) {
 }
 
 - (void)testRemoveLastObject {
-    XCTAssertNoThrow([$array removeLastObject]);
+    XCTAssertNoThrow([$allArrays removeLastObject]);
 
-    [$array addObjects:$values];
+    [self addObjects];
     %r XCTAssertEqual($array.count, 2U);
     %o XCTAssertEqual($array.count, 3U);
 
-    [$array removeLastObject];
+    [$allArrays removeLastObject];
     %r XCTAssertEqual($array.count, 1U);
     %o XCTAssertEqual($array.count, 2U);
 
@@ -256,23 +295,23 @@ static NSData *data(int i) {
 }
 
 - (void)testMove {
-    RLMAssertThrowsWithReason([$array moveObjectAtIndex:0 toIndex:1], ^n @"Index 0 is out of bounds (must be less than 0).");
-    RLMAssertThrowsWithReason([$array moveObjectAtIndex:1 toIndex:0], ^n @"Index 1 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([$allArrays moveObjectAtIndex:0 toIndex:1], ^n @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([$allArrays moveObjectAtIndex:1 toIndex:0], ^n @"Index 1 is out of bounds (must be less than 0).");
 
     [$array addObjects:@[$v0, $v1, $v0, $v1]];
 
-    [$array moveObjectAtIndex:2 toIndex:0];
+    [$allArrays moveObjectAtIndex:2 toIndex:0];
 
     XCTAssertEqualObjects([$array valueForKey:@"self"], ^n (@[$v0, $v0, $v1, $v1]));
 }
 
 - (void)testExchange {
-    RLMAssertThrowsWithReason([$array exchangeObjectAtIndex:0 withObjectAtIndex:1], ^n @"Index 0 is out of bounds (must be less than 0).");
-    RLMAssertThrowsWithReason([$array exchangeObjectAtIndex:1 withObjectAtIndex:0], ^n @"Index 1 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([$allArrays exchangeObjectAtIndex:0 withObjectAtIndex:1], ^n @"Index 0 is out of bounds (must be less than 0).");
+    RLMAssertThrowsWithReason([$allArrays exchangeObjectAtIndex:1 withObjectAtIndex:0], ^n @"Index 1 is out of bounds (must be less than 0).");
 
     [$array addObjects:@[$v0, $v1, $v0, $v1]];
 
-    [$array exchangeObjectAtIndex:2 withObjectAtIndex:1];
+    [$allArrays exchangeObjectAtIndex:2 withObjectAtIndex:1];
 
     XCTAssertEqualObjects([$array valueForKey:@"self"], ^n (@[$v0, $v0, $v1, $v1]));
 }
@@ -285,7 +324,7 @@ static NSData *data(int i) {
     %r RLMAssertThrowsWithReason([$array indexOfObject:NSNull.null], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
     %o XCTAssertEqual(NSNotFound, [$array indexOfObject:NSNull.null]);
 
-    [$array addObjects:$values];
+    [self addObjects];
 
     XCTAssertEqual(1U, [$array indexOfObject:$v1]);
 }
@@ -320,7 +359,7 @@ static NSData *data(int i) {
 
     %unman XCTAssertEqual(NSNotFound, [$array indexOfObjectWhere:@"TRUEPREDICATE"]);
 
-    %unman [$array addObjects:$values];
+    [self addObjects];
 
     %unman XCTAssertEqual(0U, [$array indexOfObjectWhere:@"TRUEPREDICATE"]);
     %unman XCTAssertEqual(NSNotFound, [$array indexOfObjectWhere:@"FALSEPREDICATE"]);
@@ -332,7 +371,7 @@ static NSData *data(int i) {
 
     %unman XCTAssertEqual(NSNotFound, [$array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
 
-    %unman [$array addObjects:$values];
+    [self addObjects];
 
     %unman XCTAssertEqual(0U, [$array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:YES]]);
     %unman XCTAssertEqual(NSNotFound, [$array indexOfObjectWithPredicate:[NSPredicate predicateWithValue:NO]]);
@@ -377,7 +416,7 @@ static NSData *data(int i) {
 
     %minmax XCTAssertNil([$array minOfProperty:@"self"]);
 
-    %minmax [$array addObjects:$values];
+    [self addObjects];
 
     %minmax XCTAssertEqualObjects([$array minOfProperty:@"self"], $v0);
 }
@@ -388,7 +427,7 @@ static NSData *data(int i) {
 
     %minmax XCTAssertNil([$array maxOfProperty:@"self"]);
 
-    %minmax [$array addObjects:$values];
+    [self addObjects];
 
     %minmax XCTAssertEqualObjects([$array maxOfProperty:@"self"], $v1);
 }
@@ -399,9 +438,9 @@ static NSData *data(int i) {
 
     %sum XCTAssertEqualObjects([$array sumOfProperty:@"self"], @0);
 
-    %sum [$array addObjects:$values];
+    [self addObjects];
 
-    %sum XCTAssertEqualObjects([$array sumOfProperty:@"self"], @($s0 + $s1));
+    %sum XCTAssertEqualWithAccuracy([$array sumOfProperty:@"self"].doubleValue, sum($values), .001);
 }
 
 - (void)testAverage {
@@ -410,23 +449,23 @@ static NSData *data(int i) {
 
     %avg XCTAssertNil([$array averageOfProperty:@"self"]);
 
-    %avg [$array addObjects:$values];
+    [self addObjects];
 
-    %avg XCTAssertEqualWithAccuracy([$array averageOfProperty:@"self"].doubleValue, ($s0 + $s1) / 2.0, .001);
+    %avg XCTAssertEqualWithAccuracy([$array averageOfProperty:@"self"].doubleValue, average($values), .001);
 }
 
 - (void)testFastEnumeration {
     for (int i = 0; i < 10; ++i) {
-        [$array addObjects:$values];
+        [self addObjects];
     }
 
     { ^nl NSUInteger i = 0; ^nl NSArray *values = $values; ^nl for (id value in $array) { ^nl XCTAssertEqualObjects(values[i++ % values.count], value); ^nl } ^nl XCTAssertEqual(i, $array.count); ^nl } ^nl 
 }
 
 - (void)testValueForKeySelf {
-    XCTAssertEqualObjects([$array valueForKey:@"self"], @[]);
+    XCTAssertEqualObjects([$allArrays valueForKey:@"self"], @[]);
 
-    [$array addObjects:$values];
+    [self addObjects];
 
     XCTAssertEqualObjects([$array valueForKey:@"self"], ($values));
 }
@@ -437,18 +476,18 @@ static NSData *data(int i) {
     %sum XCTAssertEqualObjects([$array valueForKeyPath:@"@sum.self"], @0);
     %avg XCTAssertNil([$array valueForKeyPath:@"@avg.self"]);
 
-    [$array addObjects:$values];
+    [self addObjects];
 
     %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@min.self"], $v0);
     %minmax XCTAssertEqualObjects([$array valueForKeyPath:@"@max.self"], $v1);
-    %sum XCTAssertEqualObjects([$array valueForKeyPath:@"@sum.self"], @($s0 + $s1));
-    %avg XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@avg.self"] doubleValue], ($s0 + $s1) / 2.0, .001);
+    %sum XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@sum.self"] doubleValue], sum($values), .001);
+    %avg XCTAssertEqualWithAccuracy([[$array valueForKeyPath:@"@avg.self"] doubleValue], average($values), .001);
 }
 
 - (void)testValueForKeyLength {
-    XCTAssertEqualObjects([$array valueForKey:@"length"], @[]);
+    XCTAssertEqualObjects([$allArrays valueForKey:@"length"], @[]);
 
-    %string [$array addObjects:$values];
+    [self addObjects];
 
     %string XCTAssertEqualObjects([$array valueForKey:@"length"], ([$values valueForKey:@"length"]));
 }
@@ -481,15 +520,22 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
                     return result < 0 ? -1 : 1;
                 }
 
+                if ([a isKindOfClass:[RLMObjectId class]]) {
+                    int64_t idx1 = [objectIds indexOfObject:a];
+                    int64_t idx2 = [objectIds indexOfObject:b];
+                    return idx1 - idx2;
+                }
+
                 return [a compare:b];
             }];
 }
 
 - (void)testUnionOfObjects {
-    XCTAssertEqualObjects([$array valueForKeyPath:@"@unionOfObjects.self"], @[]);
-    XCTAssertEqualObjects([$array valueForKeyPath:@"@distinctUnionOfObjects.self"], @[]);
+    XCTAssertEqualObjects([$allArrays valueForKeyPath:@"@unionOfObjects.self"], @[]);
+    XCTAssertEqualObjects([$allArrays valueForKeyPath:@"@distinctUnionOfObjects.self"], @[]);
 
-    [$array addObjects:$values2];
+    [self addObjects];
+    [self addObjects];
 
     XCTAssertEqualObjects([$array valueForKeyPath:@"@unionOfObjects.self"], ^n ($values2));
     XCTAssertEqualObjects(sortedDistinctUnion($array, @"Objects", @"self"), ^n ($values));
@@ -504,7 +550,7 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
     %man %r XCTAssertEqualObjects([allRequired valueForKeyPath:@"@distinctUnionOfArrays.$prop"], @[]);
     %man %o XCTAssertEqualObjects([allOptional valueForKeyPath:@"@distinctUnionOfArrays.$prop"], @[]);
 
-    [$array addObjects:$values];
+    [self addObjects];
 
     [AllPrimitiveArrays createInRealm:realm withValue:managed];
     [AllOptionalPrimitiveArrays createInRealm:realm withValue:optManaged];
@@ -516,11 +562,11 @@ static NSArray *sortedDistinctUnion(id array, NSString *type, NSString *prop) {
 }
 
 - (void)testSetValueForKey {
-    RLMAssertThrowsWithReason([$array setValue:@0 forKey:@"not self"], ^n @"this class is not key value coding-compliant for the key not self.");
+    RLMAssertThrowsWithReason([$allArrays setValue:@0 forKey:@"not self"], ^n @"this class is not key value coding-compliant for the key not self.");
     RLMAssertThrowsWithReason([$array setValue:$wrong forKey:@"self"], ^n @"Invalid value '$wdesc' of type '$wtype' for expected type '$type'");
     %r RLMAssertThrowsWithReason([$array setValue:NSNull.null forKey:@"self"], ^n @"Invalid value '<null>' of type 'NSNull' for expected type '$type'");
 
-    [$array addObjects:$values];
+    [self addObjects];
 
     [$array setValue:$v0 forKey:@"self"];
 

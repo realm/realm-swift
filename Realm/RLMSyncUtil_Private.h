@@ -20,7 +20,7 @@
 
 #import <Realm/RLMProperty.h>
 #import <Realm/RLMRealmConfiguration.h>
-#import <Realm/RLMSyncCredentials.h>
+#import <Realm/RLMCredentials.h>
 
 typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
     // Specific
@@ -34,7 +34,7 @@ typedef NS_ENUM(NSUInteger, RLMSyncSystemErrorKind) {
     RLMSyncSystemErrorKindUnknown,
 };
 
-@class RLMSyncUser;
+@class RLMUser;
 
 typedef void(^RLMSyncCompletionBlock)(NSError * _Nullable, NSDictionary * _Nullable);
 typedef void(^RLMSyncBasicErrorReportingBlock)(NSError * _Nullable);
@@ -62,8 +62,6 @@ extern NSString *const kRLMSyncProviderIDKey;
 extern NSString *const kRLMSyncRegisterKey;
 extern NSString *const kRLMSyncUnderlyingErrorKey;
 extern NSString *const kRLMSyncUserIDKey;
-
-FOUNDATION_EXTERN uint8_t RLMGetComputedPermissions(RLMRealm *realm, id _Nullable object);
 
 #define RLM_SYNC_UNINITIALIZABLE \
 - (instancetype)init __attribute__((unavailable("This type cannot be created directly"))); \

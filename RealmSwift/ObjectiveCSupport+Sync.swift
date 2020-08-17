@@ -22,16 +22,6 @@ import Realm
  :nodoc:
  **/
 public extension ObjectiveCSupport {
-    /// Convert a `SyncCredentials` to a `RLMSyncCredentials`.
-    static func convert(object: SyncCredentials) -> RLMSyncCredentials {
-        return RLMSyncCredentials(object)
-    }
-
-    /// Convert a `RLMSyncCredentials` to a `SyncCredentials`.
-    static func convert(object: RLMSyncCredentials) -> SyncCredentials {
-        return SyncCredentials(object)
-    }
-
     /// Convert a `SyncConfiguration` to a `RLMSyncConfiguration`.
     static func convert(object: SyncConfiguration) -> RLMSyncConfiguration {
         return object.asConfig()
@@ -40,10 +30,5 @@ public extension ObjectiveCSupport {
     /// Convert a `RLMSyncConfiguration` to a `SyncConfiguration`.
     static func convert(object: RLMSyncConfiguration) -> SyncConfiguration {
         return SyncConfiguration(config: object)
-    }
-
-    /// Convert a `RLMSyncSubscription` to a `SyncSubscription`.
-    static func convert(object: RLMSyncSubscription) -> SyncSubscription {
-        return SyncSubscription(object)
     }
 }

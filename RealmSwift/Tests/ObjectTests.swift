@@ -72,7 +72,9 @@ class ObjectTests: TestCase {
         XCTAssert(schema.properties as AnyObject is [Property])
         XCTAssertEqual(schema.className, "SwiftObject")
         XCTAssertEqual(schema.properties.map { $0.name },
-            ["boolCol", "intCol", "intEnumCol", "floatCol", "doubleCol", "stringCol", "binaryCol", "dateCol", "objectCol", "arrayCol"]
+                       ["boolCol", "intCol", "intEnumCol", "floatCol", "doubleCol",
+                        "stringCol", "binaryCol", "dateCol", "decimalCol",
+                        "objectIdCol", "objectCol", "arrayCol"]
         )
     }
 
@@ -114,8 +116,9 @@ class ObjectTests: TestCase {
 
     func testDescription() {
         let object = SwiftObject()
+
         // swiftlint:disable line_length
-        assertMatches(object.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
+        assertMatches(object.description, "SwiftObject \\{\n\tboolCol = 0;\n\tintCol = 123;\n\tintEnumCol = 1;\n\tfloatCol = 1\\.23;\n\tdoubleCol = 12\\.3;\n\tstringCol = a;\n\tbinaryCol = <.*61.*>;\n\tdateCol = 1970-01-01 00:00:01 \\+0000;\n\tdecimalCol = 1.23E6;\n\tobjectIdCol = 1234567890ab1234567890ab;\n\tobjectCol = SwiftBoolObject \\{\n\t\tboolCol = 0;\n\t\\};\n\tarrayCol = List<SwiftBoolObject> <0x[0-9a-f]+> \\(\n\t\n\t\\);\n\\}")
 
         let recursiveObject = SwiftRecursiveObject()
         recursiveObject.objects.append(recursiveObject)
@@ -304,6 +307,8 @@ class ObjectTests: TestCase {
             XCTAssertNil((object.value(forKey: "string") as! List<String>).first)
             XCTAssertNil((object.value(forKey: "data") as! List<Data>).first)
             XCTAssertNil((object.value(forKey: "date") as! List<Date>).first)
+            XCTAssertNil((object.value(forKey: "decimal") as! List<Decimal128>).first)
+            XCTAssertNil((object.value(forKey: "objectId") as! List<ObjectId>).first)
 
             // The `as Any?` casts below are only to silence the warning about it
             // happening implicitly and are not functionally required
@@ -317,6 +322,8 @@ class ObjectTests: TestCase {
             XCTAssertNil((object.value(forKey: "stringOpt") as! List<String?>).first as Any?)
             XCTAssertNil((object.value(forKey: "dataOpt") as! List<Data?>).first as Any?)
             XCTAssertNil((object.value(forKey: "dateOpt") as! List<Date?>).first as Any?)
+            XCTAssertNil((object.value(forKey: "decimalOpt") as! List<Decimal128?>).first as Any?)
+            XCTAssertNil((object.value(forKey: "objectIdOpt") as! List<ObjectId?>).first as Any?)
         }
 
         test(SwiftListObject())

@@ -35,7 +35,7 @@ FOUNDATION_EXTERN void RLMInitializeWithValue(RLMObjectBase *, id, RLMSchema *);
 // shared schema for this class
 + (nullable RLMObjectSchema *)sharedSchema;
 
-+ (nullable NSArray<RLMProperty *> *)_getPropertiesWithInstance:(id)obj;
++ (nullable NSArray<RLMProperty *> *)_getProperties;
 + (bool)_realmIgnoreClass;
 
 @end
@@ -55,6 +55,7 @@ typedef void (^RLMObjectNotificationCallback)(RLMObjectBase *_Nullable object,
                                               NSArray *_Nullable oldValues,
                                               NSArray *_Nullable newValues,
                                               NSError *_Nullable error);
+
 FOUNDATION_EXTERN RLMNotificationToken *RLMObjectBaseAddNotificationBlock(RLMObjectBase *obj,
                                                                           dispatch_queue_t _Nullable queue,
                                                                           RLMObjectNotificationCallback block);

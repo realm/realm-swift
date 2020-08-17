@@ -471,7 +471,7 @@
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:unmanaged]);
     RLMAssertThrowsWithReasonMatching([results indexOfObject:so], @"StringObject.*EmployeeObject");
-    RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been invalidated");
+    RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been deleted or invalidated");
 
     [results lastObject]; // Force to tableview mode
     XCTAssertEqual(0U, [results indexOfObject:po1]);
@@ -479,7 +479,7 @@
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:unmanaged]);
     RLMAssertThrowsWithReasonMatching([results indexOfObject:so], @"StringObject.*EmployeeObject");
-    RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been invalidated");
+    RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been deleted or invalidated");
 
     // reverse order from sort
     results = [[EmployeeObject objectsWhere:@"hired = YES"] sortedResultsUsingKeyPath:@"age" ascending:YES];
@@ -488,7 +488,7 @@
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:po2]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:unmanaged]);
     RLMAssertThrowsWithReasonMatching([results indexOfObject:so], @"StringObject.*EmployeeObject");
-    RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been invalidated");
+    RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been deleted or invalidated");
 
     results = [EmployeeObject allObjects];
     XCTAssertEqual(0U, [results indexOfObject:po1]);
@@ -496,7 +496,7 @@
     XCTAssertEqual(2U, [results indexOfObject:po3]);
     XCTAssertEqual((NSUInteger)NSNotFound, [results indexOfObject:unmanaged]);
     RLMAssertThrowsWithReasonMatching([results indexOfObject:so], @"StringObject.*EmployeeObject");
-    RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been invalidated");
+    RLMAssertThrowsWithReasonMatching([results indexOfObject:deletedObject], @"Object has been deleted or invalidated");
 }
 
 - (void)testIndexOfObjectWhere

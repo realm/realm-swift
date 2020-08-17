@@ -19,7 +19,9 @@
 #import "RLMUtil.hpp"
 
 #import "RLMArray_Private.hpp"
+#import "RLMDecimal128_Private.hpp"
 #import "RLMListBase.h"
+#import "RLMObjectId_Private.hpp"
 #import "RLMObjectSchema_Private.hpp"
 #import "RLMObjectStore.h"
 #import "RLMObject_Private.hpp"
@@ -126,6 +128,12 @@ id<NSFastEnumeration> RLMAsFastEnumeration(__unsafe_unretained id obj) {
     return nil;
 }
 
+bool RLMIsSwiftObjectClass(Class cls) {
+    static Class s_swiftObjectClass = NSClassFromString(@"RealmSwiftObject");
+    static Class s_swiftEmbeddedObjectClass = NSClassFromString(@"RealmSwiftEmbeddedObject");
+    return [cls isSubclassOfClass:s_swiftObjectClass] || [cls isSubclassOfClass:s_swiftEmbeddedObjectClass];
+}
+
 BOOL RLMValidateValue(__unsafe_unretained id const value,
                       RLMPropertyType type, bool optional, bool array,
                       __unsafe_unretained NSString *const objectClassName) {
@@ -188,6 +196,12 @@ BOOL RLMValidateValue(__unsafe_unretained id const value,
             RLMObjectBase *objBase = RLMDynamicCast<RLMObjectBase>(value);
             return objBase && [objBase->_objectSchema.className isEqualToString:objectClassName];
         }
+        case RLMPropertyTypeObjectId:
+            return [value isKindOfClass:[RLMObjectId class]];
+        case RLMPropertyTypeDecimal128:
+            return [value isKindOfClass:[NSNumber class]]
+                || [value isKindOfClass:[RLMDecimal128 class]]
+                || ([value isKindOfClass:[NSString class]] && realm::Decimal128::is_valid_str([value UTF8String]));
     }
     @throw RLMException(@"Invalid RLMPropertyType specified");
 }
@@ -406,11 +420,53 @@ id RLMMixedToObjc(realm::Mixed const& mixed) {
             return RLMTimestampToNSDate(mixed.get_timestamp());
         case realm::type_Binary:
             return RLMBinaryDataToNSData(mixed.get<realm::BinaryData>());
+        case realm::type_Decimal:
+            return [[RLMDecimal128 alloc] initWithDecimal128:mixed.get<realm::Decimal128>()];
+        case realm::type_ObjectId:
+            return [[RLMObjectId alloc] initWithValue:mixed.get<realm::ObjectId>()];
         case realm::type_Link:
         case realm::type_LinkList:
+        case realm::type_OldMixed:
+        case realm::type_OldTable:
+        case realm::type_OldDateTime:
+            REALM_UNREACHABLE();
         default:
             @throw RLMException(@"Invalid data type for RLMPropertyTypeAny property.");
     }
+}
+
+realm::Decimal128 RLMObjcToDecimal128(__unsafe_unretained id const value) {
+    try {
+        if (!value || value == NSNull.null) {
+            return realm::Decimal128(realm::null());
+        }
+        if (auto decimal = RLMDynamicCast<RLMDecimal128>(value)) {
+            return decimal.decimal128Value;
+        }
+        if (auto string = RLMDynamicCast<NSString>(value)) {
+            return realm::Decimal128(string.UTF8String);
+        }
+        if (auto decimal = RLMDynamicCast<NSDecimalNumber>(value)) {
+            return realm::Decimal128(decimal.stringValue.UTF8String);
+        }
+        if (auto number = RLMDynamicCast<NSNumber>(value)) {
+            auto type = number.objCType[0];
+            if (type == *@encode(double) || type == *@encode(float)) {
+                return realm::Decimal128(number.doubleValue);
+            }
+            else if (std::isupper(type)) {
+                return realm::Decimal128(number.unsignedLongLongValue);
+            }
+            else {
+                return realm::Decimal128(number.longLongValue);
+            }
+        }
+    }
+    catch (std::exception const& e) {
+        @throw RLMException(@"Cannot convert value '%@' of type '%@' to decimal128: %s",
+                            value, [value class], e.what());
+    }
+    @throw RLMException(@"Cannot convert value '%@' of type '%@' to decimal128", value, [value class]);
 }
 
 NSString *RLMDefaultDirectoryForBundleIdentifier(NSString *bundleIdentifier) {

@@ -532,6 +532,8 @@ class RealmTests: TestCase {
         XCTAssertEqual(object["optNSStringCol"] as! String?, dictionary["optNSStringCol"] as! String?)
         XCTAssertEqual(object["optBinaryCol"] as! NSData?, dictionary["optBinaryCol"] as! NSData?)
         XCTAssertEqual(object["optDateCol"] as! Date?, dictionary["optDateCol"] as! Date?)
+        XCTAssertEqual(object["optDecimalCol"] as! Decimal128?, dictionary["optDecimalCol"] as! Decimal128?)
+        XCTAssertEqual(object["optObjectIdCol"] as! ObjectId?, dictionary["optObjectIdCol"] as! ObjectId?)
         XCTAssertEqual((object["optObjectCol"] as? SwiftBoolObject)?.boolCol, true)
     }
 

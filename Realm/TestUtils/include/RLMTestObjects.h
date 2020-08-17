@@ -80,6 +80,10 @@
 
 @end
 
+@interface DecimalObject : RLMObject
+@property RLMDecimal128 *decimalCol;
+@end
+
 @interface UTF8Object : RLMObject
 @property NSString *柱колоéнǢкƱаم;
 @end
@@ -110,6 +114,17 @@ RLM_ARRAY_TYPE(IntObject)
 @property NSURL *url;
 @end
 
+@interface EmbeddedIntObject : RLMEmbeddedObject
+@property int intCol;
+@end
+RLM_ARRAY_TYPE(EmbeddedIntObject)
+
+@interface EmbeddedIntParentObject : RLMObject
+@property int pk;
+@property EmbeddedIntObject *object;
+@property RLMArray<EmbeddedIntObject> *array;
+@end
+
 #pragma mark AllTypesObject
 
 @interface AllTypesObject : RLMObject
@@ -122,9 +137,13 @@ RLM_ARRAY_TYPE(IntObject)
 @property NSData       *binaryCol;
 @property NSDate       *dateCol;
 @property bool          cBoolCol;
-@property int64_t     longCol;
+@property int64_t       longCol;
+@property RLMDecimal128 *decimalCol;
+@property RLMObjectId  *objectIdCol;
 @property StringObject *objectCol;
 @property (readonly) RLMLinkingObjects *linkingObjectsCol;
+
++ (NSDictionary *)values:(int)i stringObject:(StringObject *)so;
 
 @end
 
@@ -146,6 +165,8 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property NSString *string;
 @property NSData *data;
 @property NSDate *date;
+@property RLMDecimal128 *decimal;
+@property RLMObjectId *objectId;
 @end
 
 @interface AllOptionalTypesPK : RLMObject
@@ -158,6 +179,8 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property NSString *string;
 @property NSData *data;
 @property NSDate *date;
+@property RLMDecimal128 *decimal;
+@property RLMObjectId *objectId;
 @end
 
 @interface AllPrimitiveArrays : RLMObject
@@ -168,6 +191,8 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMArray<RLMString> *stringObj;
 @property RLMArray<RLMDate> *dateObj;
 @property RLMArray<RLMData> *dataObj;
+@property RLMArray<RLMDecimal128> *decimalObj;
+@property RLMArray<RLMObjectId> *objectIdObj;
 @end
 
 @interface AllOptionalPrimitiveArrays : RLMObject
@@ -178,6 +203,8 @@ RLM_ARRAY_TYPE(AllTypesObject)
 @property RLMArray<RLMString> *stringObj;
 @property RLMArray<RLMDate> *dateObj;
 @property RLMArray<RLMData> *dataObj;
+@property RLMArray<RLMDecimal128> *decimalObj;
+@property RLMArray<RLMObjectId> *objectIdObj;
 @end
 
 #pragma mark - Real Life Objects
@@ -460,4 +487,7 @@ RLM_ARRAY_TYPE(RenamedProperties2)
 #pragma mark FakeObject
 
 @interface FakeObject : RLMObject
+@end
+
+@interface FakeEmbeddedObject : RLMEmbeddedObject
 @end
