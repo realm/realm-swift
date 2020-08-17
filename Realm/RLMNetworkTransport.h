@@ -72,11 +72,17 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
 
 @end
 
+/// Delegate which is used for subscribing to changes.
 @protocol RLMEventDelegate <NSObject>
-
+/// Invoked when a change event has been received.
+/// @param event The change event encoded as NSData
 - (void)didReceiveEvent:(NSData *)event;
+/// A error has occured while subscribing to changes.
+/// @param error The error that has occured.
 - (void)didReceiveError:(NSError *)error;
+/// The stream was opened.
 - (void)didOpen;
+/// The stream has been closed.
 - (void)didClose;
 
 @end
