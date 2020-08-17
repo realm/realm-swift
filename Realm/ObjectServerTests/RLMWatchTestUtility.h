@@ -22,7 +22,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /// Used to process watch change events and assert tests.
-@interface RLMWatchTestUtility: NSObject <RLMChangeEventDelegate>
+@interface RLMWatchTestUtility : NSObject <RLMChangeEventDelegate>
 
 typedef void (^RLMWatchTestUtilityBlock)(NSError * _Nullable);
 

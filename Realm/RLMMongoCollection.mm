@@ -343,7 +343,7 @@
                  delegateQueue:delegateQueue];
 }
 
-- (void)watchWithFilterIds:(NSArray<id<RLMBSON>> *)filterIds
+- (void)watchWithFilterIds:(NSArray<RLMObjectId *> *)filterIds
                   delegate:(id<RLMChangeEventDelegate>)delegate
              delegateQueue:(nullable dispatch_queue_t)delegateQueue {
     [self watchWithMatchFilter:nil

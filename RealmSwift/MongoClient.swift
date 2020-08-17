@@ -172,6 +172,9 @@ public typealias MongoDeleteBlock = RLMMongoDeleteBlock
  */
 public typealias MongoCollection = RLMMongoCollection
 
+/// Delegate which is used for subscribing to changes a  `watch` stream.
+public typealias ChangeEventDelegate = RLMChangeEventDelegate
+
 extension MongoCollection {
 
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
@@ -482,5 +485,44 @@ extension MongoCollection {
         let filterBSON = ObjectiveCSupport.convert(object: .document(filter))
         self.__findOneAndDeleteWhere(filterBSON as! [String: RLMBSON],
                                      completion: completion)
+    }
+
+    /// Opens a MongoDB change stream against the collection to watch for changes. The resulting stream will be notified
+    /// of all events on this collection that the active user is authorized to see based on the configured MongoDB
+    /// rules.
+    /// - Parameters:
+    ///   - delegate: delegate The delegate that will react to events and errors from the resulting change stream.
+    ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
+    public func watch(delegate: ChangeEventDelegate, queue: DispatchQueue = .main) {
+        self.__watch(with: delegate, delegateQueue: queue)
+    }
+
+    /// Opens a MongoDB change stream against the collection to watch for changes. The provided BSON document will be
+    /// used as a match expression filter on the change events coming from the stream.
+    ///
+    /// See https://docs.mongodb.com/manual/reference/operator/aggregation/match/ for documentation around how to define
+    /// a match filter.
+    ///
+    /// Defining the match expression to filter ChangeEvents is similar to defining the match expression for triggers:
+    /// https://docs.mongodb.com/realm/triggers/database-triggers/
+    /// - Parameters:
+    ///   - matchFilter: The $match filter to apply to incoming change events
+    ///   - delegate: The delegate that will react to events and errors from the resulting change stream.
+    ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
+    public func watch(matchFilter: Document, delegate: ChangeEventDelegate, queue: DispatchQueue = .main) {
+        let filterBSON = ObjectiveCSupport.convert(object: .document(matchFilter)) as! [String: RLMBSON]
+        self.__watch(withMatchFilter: filterBSON, delegate: delegate, delegateQueue: queue)
+    }
+
+    /// Opens a MongoDB change stream against the collection to watch for changes
+    /// made to specific documents. The documents to watch must be explicitly
+    /// specified by their _id.
+    /// - Parameters:
+    ///   - filterIds: The list of _ids in the collection to watch.
+    ///   - delegate: The delegate that will react to events and errors from the resulting change stream.
+    ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
+    public func watch(filterIds: [ObjectId], delegate: ChangeEventDelegate, queue: DispatchQueue = .main) {
+        let filterBSON = ObjectiveCSupport.convert(object: .array(filterIds.map {AnyBSON($0)})) as! [RLMObjectId]
+        self.__watch(withFilterIds: filterBSON, delegate: delegate, delegateQueue: queue)
     }
 }

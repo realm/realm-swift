@@ -24,7 +24,7 @@
     NSUInteger _currentChangeEventCount;
     RLMObjectId *_matchingObjectId;
     BOOL _didOpenWasCalled;
-    __weak RLMWatchTestUtilityBlock _completion;
+    RLMWatchTestUtilityBlock _completion;
 }
 
 - (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount

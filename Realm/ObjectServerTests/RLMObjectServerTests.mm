@@ -2441,20 +2441,19 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }];
     [self waitForExpectations:@[insertManyExpectation] timeout:60.0];
 
-    XCTestExpectation *expectation1 = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
-    XCTestExpectation *expectation2 = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
-
+    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
+    expectation.expectedFulfillmentCount = 2;
     RLMWatchTestUtility *testUtility1 = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5
                                                                              matchingObjectId:objectIds[0]
                                                                                    completion:^(NSError * error) {
         XCTAssertNil(error);
-        [expectation1 fulfill];
+        [expectation fulfill];
     }];
     RLMWatchTestUtility *testUtility2 = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5
                                                                              matchingObjectId:objectIds[1]
                                                                                    completion:^(NSError * error) {
         XCTAssertNil(error);
-        [expectation2 fulfill];
+        [expectation fulfill];
     }];
     [collection watchWithFilterIds:@[objectIds[0]]
                           delegate:testUtility1
@@ -2491,7 +2490,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         }
     });
 
-    [self waitForExpectations:@[expectation1, expectation2] timeout:60.0];
+    [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
 @end
