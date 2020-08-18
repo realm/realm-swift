@@ -200,7 +200,12 @@ didCompleteWithError:(NSError *)error
     didReceiveData:(NSData *)data {
     NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *) dataTask.response;
     if (httpResponse.statusCode != 200) {
-        return [_subscriber didClose];
+        NSString *errorStatus = [NSString stringWithFormat:@"URLSession HTTP error code: %ld",
+                                 (long)httpResponse.statusCode];
+        NSError *error = [NSError errorWithDomain:RLMErrorDomain
+                                             code:0
+                                         userInfo:@{NSLocalizedDescriptionKey: errorStatus}];
+        return [_subscriber didCloseWithError:error];
     }
     [_subscriber didReceiveEvent:data];
 }
@@ -214,13 +219,21 @@ didCompleteWithError:(NSError *)error
     response.headers = httpResponse.allHeaderFields;
     response.httpStatusCode = httpResponse.statusCode;
 
-    if (error) {
+    // -999 indicates that the session was cancelled.
+    if (error && (error.code != -999)) {
         response.body = [error localizedDescription];
-        return [_subscriber didClose];
+        return [_subscriber didCloseWithError:error];
+    } else if (error && (error.code == -999)) {
+        return [_subscriber didCloseWithError:nil];
     }
 
     if (response.httpStatusCode != 200) {
-        return [_subscriber didClose];
+        NSString *errorStatus = [NSString stringWithFormat:@"URLSession HTTP error code: %ld",
+                                 (long)httpResponse.statusCode];
+        NSError *error = [NSError errorWithDomain:RLMErrorDomain
+                                             code:0
+                                         userInfo:@{NSLocalizedDescriptionKey: errorStatus}];
+        return [_subscriber didCloseWithError:error];
     }
 }
 

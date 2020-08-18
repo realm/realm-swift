@@ -2261,27 +2261,27 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (int i=0; i<5; i++) {
-            [collection insertOneDocument:@{@"name": @"fido"} completion:^(RLMObjectId * objectId, NSError * error) {
-                XCTAssertNil(error);
-                XCTAssertNotNil(objectId);
-            }];
-            [NSThread sleepForTimeInterval:2];
-            if (i==4) {
-                [NSThread sleepForTimeInterval:10];
-                [collection closeAllWatchStreams];
-            }
-        }
-    });
-
     RLMWatchTestUtility *testUtility = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5
                                                                                   completion:^(NSError * error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
+    __block RLMChangeStream *changeStream = [collection watchWithDelegate:testUtility delegateQueue:delegateQueue];
 
-    [collection watchWithDelegate:testUtility delegateQueue:delegateQueue];
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        for (int i = 0; i < 5; i++) {
+            [collection insertOneDocument:@{@"name": @"fido"} completion:^(RLMObjectId * objectId, NSError * error) {
+                XCTAssertNil(error);
+                XCTAssertNotNil(objectId);
+            }];
+            [NSThread sleepForTimeInterval:2];
+            if (i == 4) {
+                [NSThread sleepForTimeInterval:10];
+                [changeStream close];
+            }
+        }
+    });
+
     [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
@@ -2295,7 +2295,6 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)performWatchWithMatchFilterTest:(nullable dispatch_queue_t)delegateQueue {
-
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
@@ -2322,12 +2321,12 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [collection watchWithMatchFilter:@{@"fullDocument._id": objectIds[0]}
-                            delegate:testUtility
-                       delegateQueue:delegateQueue];
+    __block RLMChangeStream *changeStream = [collection watchWithMatchFilter:@{@"fullDocument._id": objectIds[0]}
+                                                                    delegate:testUtility
+                                                               delegateQueue:delegateQueue];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (int i=0; i<5; i++) {
+        for (int i = 0; i < 5; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
                                     completion:^(RLMUpdateResult * _Nullable, NSError * error) {
@@ -2340,9 +2339,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                 XCTAssertNil(error);
             }];
             [NSThread sleepForTimeInterval:2];
-            if (i==4) {
+            if (i == 4) {
                 [NSThread sleepForTimeInterval:10];
-                [collection closeAllWatchStreams];
+                [changeStream close];
             }
         }
     });
@@ -2385,12 +2384,12 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [collection watchWithFilterIds:@[objectIds[0]]
-                          delegate:testUtility
-                     delegateQueue:delegateQueue];
+    __block RLMChangeStream *changeStream = [collection watchWithFilterIds:@[objectIds[0]]
+                                                                  delegate:testUtility
+                                                             delegateQueue:delegateQueue];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (int i=0; i<5; i++) {
+        for (int i = 0; i < 5; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
                                     completion:^(RLMUpdateResult * _Nullable, NSError * error) {
@@ -2403,9 +2402,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                 XCTAssertNil(error);
             }];
             [NSThread sleepForTimeInterval:2];
-            if (i==4) {
+            if (i == 4) {
                 [NSThread sleepForTimeInterval:10];
-                [collection closeAllWatchStreams];
+                [changeStream close];
             }
         }
     });
@@ -2455,16 +2454,16 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    [collection watchWithFilterIds:@[objectIds[0]]
+    __block RLMChangeStream *changeStream1 = [collection watchWithFilterIds:@[objectIds[0]]
                           delegate:testUtility1
                      delegateQueue:nil];
 
-    [collection watchWithFilterIds:@[objectIds[1]]
+    __block RLMChangeStream *changeStream2 = [collection watchWithFilterIds:@[objectIds[1]]
                           delegate:testUtility2
                      delegateQueue:nil];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (int i=0; i<5; i++) {
+        for (int i = 0; i < 5; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
                                     completion:^(RLMUpdateResult * _Nullable, NSError * error) {
@@ -2483,9 +2482,10 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                 XCTAssertNil(error);
             }];
             [NSThread sleepForTimeInterval:2];
-            if (i==4) {
+            if (i == 4) {
                 [NSThread sleepForTimeInterval:10];
-                [collection closeAllWatchStreams];
+                [changeStream1 close];
+                [changeStream2 close];
             }
         }
     });

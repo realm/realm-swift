@@ -8,11 +8,10 @@ struct GenericEventSubscriber;
 }
 
 @interface RLMEventSubscriber : NSObject<RLMEventDelegate>
-
 - (void)didReceiveEvent:(NSData *)event;
 - (void)didReceiveError:(NSError *)error;
 - (void)didOpen;
-- (void)didClose;
+- (void)didCloseWithError:(NSError *)error;
 
 @end
 

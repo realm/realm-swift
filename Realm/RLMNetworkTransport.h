@@ -83,7 +83,8 @@ typedef RLM_CLOSED_ENUM(int32_t, RLMHTTPMethod) {
 /// The stream was opened.
 - (void)didOpen;
 /// The stream has been closed.
-- (void)didClose;
+/// @param error The error that has occured.
+- (void)didCloseWithError:(NSError *)error;
 
 @end
 

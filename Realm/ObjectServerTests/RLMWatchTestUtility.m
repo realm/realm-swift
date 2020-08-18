@@ -49,17 +49,21 @@
     return nil;
 }
 
-- (void)didClose {
+- (void)changeStreamDidCloseWithError:(nullable NSError *)error {
+    if (error) {
+        return _completion(error);
+    }
+
     if ((_currentChangeEventCount == _targetChangeEventCount) && _didOpenWasCalled) {
         return _completion(nil);
     }
 }
 
-- (void)didOpen {
+- (void)changeStreamDidOpen:(nonnull RLMChangeStream *)changeStream {
     _didOpenWasCalled = YES;
 }
 
-- (void)didReceiveChangeEvent:(nonnull id<RLMBSON>)changeEvent {
+- (void)changeStreamDidReceiveChangeEvent:(nonnull id<RLMBSON>)changeEvent {
     _currentChangeEventCount++;
 
     if (_matchingObjectId) {
@@ -70,7 +74,7 @@
     }
 }
 
-- (void)didReceiveError:(nonnull NSError *)error {
+- (void)changeStreamDidReceiveError:(nonnull NSError *)error {
     return _completion(error);
 }
 

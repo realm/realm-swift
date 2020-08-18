@@ -17,16 +17,17 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #import <Realm/RLMMongoClient.h>
+#import "RLMNetworkTransport_Private.hpp"
 #import "sync/remote_mongo_client.hpp"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @class RLMApp;
 
-// Acts as a middleman and processes events with WatchStream
-@interface RLMWatchStream: NSObject <RLMEventDelegate>
+@interface RLMChangeStream()
 - (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber NS_DESIGNATED_INITIALIZER;
 - (instancetype)init NS_UNAVAILABLE;
+- (void)attachURLSession:(NSURLSession *)urlSession;
 @end
 
 @interface RLMMongoCollection ()
@@ -34,7 +35,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) RLMApp *app;
 @property (nonatomic, strong) NSString *serviceName;
 @property (nonatomic, strong) NSString *databaseName;
-@property (nonatomic, strong) NSMutableArray<NSURLSession *> *watchSessions;
 
 - (instancetype)initWithApp:(RLMApp *)app
                 serviceName:(NSString *)serviceName

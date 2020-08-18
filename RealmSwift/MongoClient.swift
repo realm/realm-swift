@@ -175,6 +175,9 @@ public typealias MongoCollection = RLMMongoCollection
 /// Delegate which is used for subscribing to changes a  `watch` stream.
 public typealias ChangeEventDelegate = RLMChangeEventDelegate
 
+// Acts as a middleman and processes events with WatchStream
+public typealias ChangeStream = RLMChangeStream
+
 extension MongoCollection {
 
     /// Encodes the provided value to BSON and inserts it. If the value is missing an identifier, one will be
@@ -493,8 +496,9 @@ extension MongoCollection {
     /// - Parameters:
     ///   - delegate: delegate The delegate that will react to events and errors from the resulting change stream.
     ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
-    public func watch(delegate: ChangeEventDelegate, queue: DispatchQueue = .main) {
-        self.__watch(with: delegate, delegateQueue: queue)
+    /// - Returns: A ChangeStream which will manage the streaming events.
+    public func watch(delegate: ChangeEventDelegate, queue: DispatchQueue = .main) -> ChangeStream {
+        return self.__watch(with: delegate, delegateQueue: queue)
     }
 
     /// Opens a MongoDB change stream against the collection to watch for changes. The provided BSON document will be
@@ -509,9 +513,10 @@ extension MongoCollection {
     ///   - matchFilter: The $match filter to apply to incoming change events
     ///   - delegate: The delegate that will react to events and errors from the resulting change stream.
     ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
-    public func watch(matchFilter: Document, delegate: ChangeEventDelegate, queue: DispatchQueue = .main) {
+    /// - Returns: A ChangeStream which will manage the streaming events.
+    public func watch(matchFilter: Document, delegate: ChangeEventDelegate, queue: DispatchQueue = .main) -> ChangeStream {
         let filterBSON = ObjectiveCSupport.convert(object: .document(matchFilter)) as! [String: RLMBSON]
-        self.__watch(withMatchFilter: filterBSON, delegate: delegate, delegateQueue: queue)
+        return self.__watch(withMatchFilter: filterBSON, delegate: delegate, delegateQueue: queue)
     }
 
     /// Opens a MongoDB change stream against the collection to watch for changes
@@ -521,8 +526,9 @@ extension MongoCollection {
     ///   - filterIds: The list of _ids in the collection to watch.
     ///   - delegate: The delegate that will react to events and errors from the resulting change stream.
     ///   - queue: Dispatches streaming events to an optional queue, if no queue is provided the main queue is used
-    public func watch(filterIds: [ObjectId], delegate: ChangeEventDelegate, queue: DispatchQueue = .main) {
+    /// - Returns: A ChangeStream which will manage the streaming events.
+    public func watch(filterIds: [ObjectId], delegate: ChangeEventDelegate, queue: DispatchQueue = .main) -> ChangeStream {
         let filterBSON = ObjectiveCSupport.convert(object: .array(filterIds.map {AnyBSON($0)})) as! [RLMObjectId]
-        self.__watch(withFilterIds: filterBSON, delegate: delegate, delegateQueue: queue)
+        return self.__watch(withFilterIds: filterBSON, delegate: delegate, delegateQueue: queue)
     }
 }

@@ -1551,6 +1551,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             watchEx.fulfill()
         }
 
+        let changeStream: ChangeStream?
+        if let queue = queue {
+            changeStream = collection.watch(delegate: watchTestUtility, queue: queue)
+        } else {
+            changeStream = collection.watch(delegate: watchTestUtility)
+        }
+
         DispatchQueue.global().async {
             for i in 0..<5 {
                 collection.insertOne(document) { (_, error) in
@@ -1559,16 +1566,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 Thread.sleep(forTimeInterval: 2)
                 if i == 4 {
                     Thread.sleep(forTimeInterval: 10)
-                    collection.closeAllWatchStreams()
+                    changeStream?.close()
                 }
             }
         }
 
-        if let queue = queue {
-            collection.watch(delegate: watchTestUtility, queue: queue)
-        } else {
-            collection.watch(delegate: watchTestUtility)
-        }
+
 
         wait(for: [watchEx], timeout: 60.0)
     }
@@ -1605,6 +1608,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             watchEx.fulfill()
         }
 
+        let changeStream: ChangeStream?
+        if let queue = queue {
+            changeStream = collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])],
+                                            delegate: watchTestUtility,
+                                            queue: queue)
+        } else {
+            changeStream = collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])],
+                                            delegate: watchTestUtility)
+        }
+
         DispatchQueue.global().async {
             for i in 0..<5 {
                 let name: AnyBSON = .string("fido-\(i)")
@@ -1619,16 +1632,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 Thread.sleep(forTimeInterval: 2)
                 if i == 4 {
                     Thread.sleep(forTimeInterval: 10)
-                    collection.closeAllWatchStreams()
+                    changeStream?.close()
                 }
             }
         }
 
-        if let queue = queue {
-            collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])], delegate: watchTestUtility, queue: queue)
-        } else {
-            collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])], delegate: watchTestUtility)
-        }
+
 
         wait(for: [watchEx], timeout: 60.0)
     }
@@ -1666,6 +1675,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             watchEx.fulfill()
         }
 
+        let changeStream: ChangeStream?
+        if let queue = queue {
+            changeStream = collection.watch(filterIds: [objectIds[0]], delegate: watchTestUtility, queue: queue)
+        } else {
+            changeStream = collection.watch(filterIds: [objectIds[0]], delegate: watchTestUtility)
+        }
+
         DispatchQueue.global().async {
             for i in 0..<5 {
                 let name: AnyBSON = .string("fido-\(i)")
@@ -1680,16 +1696,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 Thread.sleep(forTimeInterval: 2)
                 if i == 4 {
                     Thread.sleep(forTimeInterval: 10)
-                    collection.closeAllWatchStreams()
+                    changeStream?.close()
                 }
             }
         }
 
-        if let queue = queue {
-            collection.watch(filterIds: [objectIds[0]], delegate: watchTestUtility, queue: queue)
-        } else {
-            collection.watch(delegate: watchTestUtility)
-        }
+
 
         wait(for: [watchEx], timeout: 60.0)
     }
@@ -1732,6 +1744,17 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
             watchEx.fulfill()
         }
 
+        let changeStream1: ChangeStream?
+        let changeStream2: ChangeStream?
+
+        if let queue = queue {
+            changeStream1 = collection.watch(filterIds: [objectIds[0]], delegate: watchTestUtility1, queue: queue)
+            changeStream2 = collection.watch(filterIds: [objectIds[1]], delegate: watchTestUtility2, queue: queue)
+        } else {
+            changeStream1 = collection.watch(filterIds: [objectIds[0]], delegate: watchTestUtility1)
+            changeStream2 = collection.watch(filterIds: [objectIds[1]], delegate: watchTestUtility2)
+        }
+
         DispatchQueue.global().async {
             for i in 0..<5 {
                 let name: AnyBSON = .string("fido-\(i)")
@@ -1746,18 +1769,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                 Thread.sleep(forTimeInterval: 2)
                 if i == 4 {
                     Thread.sleep(forTimeInterval: 10)
-                    collection.closeAllWatchStreams()
+                    changeStream1?.close()
+                    changeStream2?.close()
                 }
             }
         }
 
-        if let queue = queue {
-            collection.watch(filterIds: [objectIds[0]], delegate: watchTestUtility1, queue: queue)
-            collection.watch(filterIds: [objectIds[1]], delegate: watchTestUtility2, queue: queue)
-        } else {
-            collection.watch(filterIds: [objectIds[0]], delegate: watchTestUtility1)
-            collection.watch(filterIds: [objectIds[1]], delegate: watchTestUtility2)
-        }
+
 
         wait(for: [watchEx], timeout: 60.0)
     }

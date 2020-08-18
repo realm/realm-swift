@@ -24,14 +24,14 @@
 #import "RLMFindOneAndModifyOptions_Private.hpp"
 #import "RLMUpdateResult_Private.hpp"
 #import "RLMBSON_Private.hpp"
-#import "RLMNetworkTransport_Private.hpp"
 
 #import "sync/remote_mongo_database.hpp"
 #import "sync/remote_mongo_collection.hpp"
 
-@implementation RLMWatchStream {
+@implementation RLMChangeStream {
     realm::app::WatchStream _watchStream;
     __weak id<RLMChangeEventDelegate> _subscriber;
+    NSURLSession *_session;
 }
 - (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber {
     if (self = [super init]) {
@@ -42,16 +42,16 @@
     return nil;
 }
 
-- (void)didClose {
-    [_subscriber didClose];
+- (void)didCloseWithError:(NSError *)error {
+    [_subscriber changeStreamDidCloseWithError:error];
 }
 
 - (void)didOpen {
-    [_subscriber didOpen];
+    [_subscriber changeStreamDidOpen:self];
 }
 
 - (void)didReceiveError:(nonnull NSError *)error {
-    [_subscriber didReceiveError:error];
+    [_subscriber changeStreamDidReceiveError:error];
 }
 
 - (void)didReceiveEvent:(nonnull NSData *)event {
@@ -62,7 +62,7 @@
             break;
         case realm::app::WatchStream::State::HAVE_EVENT:
             while (_watchStream.state() == realm::app::WatchStream::State::HAVE_EVENT) {
-                [_subscriber didReceiveChangeEvent:RLMConvertBsonToRLMBSON(_watchStream.next_event())];
+                [_subscriber changeStreamDidReceiveChangeEvent:RLMConvertBsonToRLMBSON(_watchStream.next_event())];
             }
             _watchStream.feed_buffer(str);
             break;
@@ -70,6 +70,14 @@
             [self didReceiveError:RLMAppErrorToNSError(_watchStream.error())];
             break;
     }
+}
+
+- (void)attachURLSession:(NSURLSession *)urlSession {
+    _session = urlSession;
+}
+
+- (void)close {
+    [_session invalidateAndCancel];
 }
 
 @end
@@ -335,33 +343,33 @@
                      completion:completion];
 }
 
-- (void)watchWithDelegate:(id<RLMChangeEventDelegate>)delegate
-            delegateQueue:(nullable dispatch_queue_t)delegateQueue {
-    [self watchWithMatchFilter:nil
-                      idFilter:nil
-                      delegate:delegate
-                 delegateQueue:delegateQueue];
+- (RLMChangeStream *)watchWithDelegate:(id<RLMChangeEventDelegate>)delegate
+                         delegateQueue:(nullable dispatch_queue_t)delegateQueue {
+    return [self watchWithMatchFilter:nil
+                             idFilter:nil
+                             delegate:delegate
+                        delegateQueue:delegateQueue];
 }
 
-- (void)watchWithFilterIds:(NSArray<RLMObjectId *> *)filterIds
-                  delegate:(id<RLMChangeEventDelegate>)delegate
-             delegateQueue:(nullable dispatch_queue_t)delegateQueue {
-    [self watchWithMatchFilter:nil
-                      idFilter:filterIds
-                      delegate:delegate
-                 delegateQueue:delegateQueue];
+- (RLMChangeStream *)watchWithFilterIds:(NSArray<RLMObjectId *> *)filterIds
+                               delegate:(id<RLMChangeEventDelegate>)delegate
+                          delegateQueue:(nullable dispatch_queue_t)delegateQueue {
+    return [self watchWithMatchFilter:nil
+                             idFilter:filterIds
+                             delegate:delegate
+                        delegateQueue:delegateQueue];
 }
 
-- (void)watchWithMatchFilter:(NSDictionary<NSString *, id<RLMBSON>> *)matchFilter
-                    delegate:(id<RLMChangeEventDelegate>)delegate
-               delegateQueue:(nullable dispatch_queue_t)delegateQueue {
-    [self watchWithMatchFilter:matchFilter
-                      idFilter:nil
-                      delegate:delegate
-                 delegateQueue:delegateQueue];
+- (RLMChangeStream *)watchWithMatchFilter:(NSDictionary<NSString *, id<RLMBSON>> *)matchFilter
+                                 delegate:(id<RLMChangeEventDelegate>)delegate
+                            delegateQueue:(nullable dispatch_queue_t)delegateQueue {
+    return [self watchWithMatchFilter:matchFilter
+                             idFilter:nil
+                             delegate:delegate
+                        delegateQueue:delegateQueue];
 }
 
-- (void)watchWithMatchFilter:(nullable id<RLMBSON>)matchFilter
+- (RLMChangeStream *)watchWithMatchFilter:(nullable id<RLMBSON>)matchFilter
                     idFilter:(nullable id<RLMBSON>)idFilter
                     delegate:(id<RLMChangeEventDelegate>)delegate
                delegateQueue:(nullable dispatch_queue_t)delegateQueue {
@@ -385,29 +393,15 @@
                                                               "watch",
                                                               args,
                                                               realm::util::Optional<std::string>(self.serviceName.UTF8String));
+    RLMChangeStream *changeStream = [[RLMChangeStream alloc] initWithChangeEventSubscriber:delegate];
     dispatch_async(delegateQueue == nil ? dispatch_get_main_queue() : delegateQueue, ^{
-        RLMWatchStream *watchStream = [[RLMWatchStream alloc] initWithChangeEventSubscriber:delegate];
         RLMNetworkTransport *transport = self.app.configuration.transport;
         RLMRequest *rlmRequest = [transport RLMRequestFromRequest:request];
         NSURLSession *watchSession = [transport doStreamRequest:rlmRequest
-                                                eventSubscriber:watchStream];
-        if (!self.watchSessions) {
-            self.watchSessions = [NSMutableArray arrayWithObject:watchSession];
-        } else {
-            [self.watchSessions addObject:watchSession];
-        }
+                                                eventSubscriber:changeStream];
+        [changeStream attachURLSession:watchSession];
     });
-}
-
-- (void)closeAllWatchStreams {
-    if (!self.watchSessions) {
-        return;
-    }
-
-    for (NSURLSession *session in self.watchSessions) {
-        [session invalidateAndCancel];
-    }
-    [self.watchSessions removeAllObjects];
+    return changeStream;
 }
 
 @end
