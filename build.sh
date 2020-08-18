@@ -1214,7 +1214,9 @@ EOM
 
           rm -rf include
           mkdir -p include
-          cp -R core/realm-sync.xcframework/ios-armv7_arm64/Headers include/core
+          # copy xcframework folder because pods requires the lib name to match the folder name.
+          cp -R core/realm-sync.xcframework core/realm.xcframework
+          cp -R core/realm.xcframework/ios-armv7_arm64/Headers include/core
 
           mkdir -p include/impl/apple include/util/apple include/sync/impl/apple
           cp Realm/*.hpp include

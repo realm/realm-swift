@@ -100,7 +100,7 @@ Pod::Spec.new do |s|
   s.watchos.deployment_target = '2.0'
   s.tvos.deployment_target = '9.0'
 
-  s.vendored_frameworks  = 'core/realm-sync.xcframework'
+  s.vendored_frameworks  = 'core/realm.xcframework'
 
   s.subspec 'Headers' do |s|
     s.source_files          = public_header_files
