@@ -369,7 +369,7 @@ download_common() {
     local versioned_dir="${download_type}-${version}${suffix}"
     if [ -e "$versioned_dir/version.txt" ]; then
         echo "Setting ${version} as the active version"
-        copy_core "$versioned_dir${suffix}"
+        copy_core "$versioned_dir"
         exit 0
     fi
 
@@ -1208,18 +1208,13 @@ EOM
             exit 1
           fi
 
-          if [ ! -f core/version.txt ]; then
-            sh build.sh download-sync
-            mv core/librealm-ios.a core/librealmcore-ios.a
-            mv core/librealm-macosx.a core/librealmcore-macosx.a
-            mv core/librealm-tvos.a core/librealmcore-tvos.a
-            mv core/librealm-watchos.a core/librealmcore-watchos.a
-            rm core/librealm*-dbg.a
-          fi
+        #   if [ ! -f core/version.txt ]; then
+            sh build.sh download-sync xcframework
+        #   fi
 
           rm -rf include
           mkdir -p include
-          mv core/include include/core
+          cp -R core/realm-sync.xcframework/ios-armv7_arm64/Headers include/core
 
           mkdir -p include/impl/apple include/util/apple include/sync/impl/apple
           cp Realm/*.hpp include
