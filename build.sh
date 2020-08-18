@@ -1208,9 +1208,9 @@ EOM
             exit 1
           fi
 
-        #   if [ ! -f core/version.txt ]; then
+          if [ ! -f core/version.txt ]; then
             sh build.sh download-sync xcframework
-        #   fi
+          fi
 
           rm -rf include
           mkdir -p include
