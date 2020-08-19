@@ -1,7 +1,8 @@
-10.0.0-beta.2 Release notes (2020-06-09)
+x.y.z Release notes (yyyy-MM-dd)
 =============================================================
 ### Enhancements
 * Add support for the 64-bit watchOS simulator added in Xcode 12.
+* Add ability to stream change events on a remote MongoDB collection with `[RLMMongoCollection watch:delegate:delegateQueue]`, `MongoCollection.watch(delegate)`. When calling `watch(delegate)` you will be given a `RLMChangeStream` (`ChangeStream`), this will be used to invalidate and stop the streaming session by calling `[RLMChangeStream close]` (`ChangeStream,close()`) when needed.
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
@@ -17,8 +18,8 @@
 * Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
-* Upgraded realm-core from v6.0.12 to v6.0.13
-* Upgraded realm-sync from v5.0.12 to v5.0.13
+* Upgraded realm-core from ? to ?
+* Upgraded realm-sync from ? to ?
 
 10.0.0-beta.3 Release notes (2020-08-17)
 =============================================================
