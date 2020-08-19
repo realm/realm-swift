@@ -175,7 +175,7 @@ public typealias MongoCollection = RLMMongoCollection
 /// Delegate which is used for subscribing to changes a  `watch` stream.
 public typealias ChangeEventDelegate = RLMChangeEventDelegate
 
-// Acts as a middleman and processes events with WatchStream
+/// Acts as a middleman and processes events with WatchStream
 public typealias ChangeStream = RLMChangeStream
 
 extension MongoCollection {
