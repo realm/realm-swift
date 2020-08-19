@@ -41,8 +41,9 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)changeStreamDidReceiveChangeEvent:(id<RLMBSON>)changeEvent;
 @end
 
-// Acts as a middleman and processes events with WatchStream
+/// Acts as a middleman and processes events with WatchStream
 @interface RLMChangeStream : NSObject<RLMEventDelegate>
+/// Stops a watch streaming session.
 - (void)close;
 @end
 

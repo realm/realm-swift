@@ -31,7 +31,7 @@
 @implementation RLMChangeStream {
     realm::app::WatchStream _watchStream;
     __weak id<RLMChangeEventDelegate> _subscriber;
-    NSURLSession *_session;
+    __weak NSURLSession *_session;
 }
 - (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber {
     if (self = [super init]) {
