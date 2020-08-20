@@ -11,6 +11,12 @@ x.y.z Release notes (yyyy-MM-dd)
   ([#6659](https://github.com/realm/realm-cocoa/issues/6659),
   [#6689](https://github.com/realm/realm-cocoa/issues/6689),
   [#6712](https://github.com/realm/realm-cocoa/issues/6712), since 5.0.0).
+* Upgrading a table with incoming links but no properties would crash. This was
+  probably not possible to hit in practice as we reject object types with no
+  properties.
+* Upgrading a non-nullable List which nonetheless contained null values would
+  crash. This was possible due to missing error-checking in some older versions
+* of Realm.
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -22,8 +28,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v6.0.18 to v6.0.19
+* Upgraded realm-sync from v5.0.15 to v5.0.16
 
 5.3.4 Release notes (2020-08-17)
 =============================================================
