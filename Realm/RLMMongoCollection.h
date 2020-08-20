@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class RLMApp, RLMFindOptions, RLMFindOneAndModifyOptions, RLMUpdateResult, RLMChangeStream;
 
-/// Delegate which is used for subscribing to changes on a  `[RLMMongoCollection watch]` stream.
+/// Delegate which is used for subscribing to changes on a `[RLMMongoCollection watch]` stream.
 @protocol RLMChangeEventDelegate
 /// The stream was opened.
 /// @param changeStream The RLMChangeStream subscribing to the stream changes.
