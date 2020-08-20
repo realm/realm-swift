@@ -5,7 +5,12 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Opening Realms on background threads could produce spurious Incorrect Thread
+  exceptions when a cached Realm existed for a previously existing thread with
+  the same thread ID as the current thread.
+  ([#6659](https://github.com/realm/realm-cocoa/issues/6659),
+  [#6689](https://github.com/realm/realm-cocoa/issues/6689),
+  [#6712](https://github.com/realm/realm-cocoa/issues/6712), since 5.0.0).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
