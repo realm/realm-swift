@@ -29,6 +29,7 @@
 #import <mach/vm_map.h>
 #import <sys/resource.h>
 #import <thread>
+#import <unordered_set>
 
 #import <realm/util/file.hpp>
 #import <realm/db_options.hpp>
@@ -1561,17 +1562,31 @@
         @autoreleasepool {
             RLMRealm *backgroundThreadRealm = [RLMRealm defaultRealm];
             RLMRealm *q1Realm3 = [RLMRealm defaultRealmForQueue:q1];
-            RLMRealm *q2Realm3 = [RLMRealm defaultRealmForQueue:q2];
+            XCTAssertThrows([RLMRealm defaultRealmForQueue:q2]);
 
             XCTAssertNotEqual(backgroundThreadRealm, mainThreadRealm1);
             XCTAssertNotEqual(backgroundThreadRealm, mainQueueRealm1);
             XCTAssertNotEqual(backgroundThreadRealm, q1Realm1);
             XCTAssertNotEqual(backgroundThreadRealm, q1Realm2);
             XCTAssertEqual(q1Realm1, q1Realm3);
-            XCTAssertEqual(q2Realm2, q2Realm3);
         }
     });
     dispatch_sync(q1, ^{});
+
+    dispatch_async(q2, ^{
+        @autoreleasepool {
+            RLMRealm *backgroundThreadRealm = [RLMRealm defaultRealm];
+            XCTAssertThrows([RLMRealm defaultRealmForQueue:q1]);
+            RLMRealm *q2Realm3 = [RLMRealm defaultRealmForQueue:q2];
+
+            XCTAssertNotEqual(backgroundThreadRealm, mainThreadRealm1);
+            XCTAssertNotEqual(backgroundThreadRealm, mainQueueRealm1);
+            XCTAssertNotEqual(backgroundThreadRealm, q1Realm1);
+            XCTAssertNotEqual(backgroundThreadRealm, q1Realm2);
+            XCTAssertEqual(q2Realm2, q2Realm3);
+        }
+    });
+    dispatch_sync(q2, ^{});
 }
 
 - (void)testQueueValidation {
@@ -2083,6 +2098,26 @@
         [expectation fulfill];
     });
     [self waitForExpectationsWithTimeout:1 handler:nil];
+}
+
+- (void)testThreadIDReuse {
+    // Open Realms on new threads until we get repeated thread IDs, while
+    // retaining each Realm opened. This verifies that we don't get a Realm from
+    // an old thread that no longer exists from the cache.
+    NSMutableArray *realms = [NSMutableArray array];
+    std::unordered_set<pthread_t> threadIds;
+    bool done = false;
+    while (!done) {
+        std::thread([&] {
+            RLMRealm *realm = [RLMRealm defaultRealm];
+            [realms addObject:realm];
+            (void)[IntObject allObjectsInRealm:realm].count;
+            [realm refresh];
+            if (!threadIds.insert(pthread_self()).second) {
+                done = true;
+            }
+        }).join();
+    }
 }
 
 - (void)testAuxiliaryFilesAreExcludedFromBackup {
