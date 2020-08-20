@@ -1,10 +1,8 @@
-x.y.z Release notes (yyyy-MM-dd)
+5.3.5 Release notes (2020-08-20)
 =============================================================
-### Enhancements
-* None.
 
 ### Fixed
-* <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
+
 * Opening Realms on background threads could produce spurious Incorrect Thread
   exceptions when a cached Realm existed for a previously existing thread with
   the same thread ID as the current thread.
@@ -16,11 +14,10 @@ x.y.z Release notes (yyyy-MM-dd)
   properties.
 * Upgrading a non-nullable List which nonetheless contained null values would
   crash. This was possible due to missing error-checking in some older versions
-* of Realm.
-
-<!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
+  of Realm.
 
 ### Compatibility
+
 * File format: Generates Realms with format v10 (Reads and upgrades all previous formats)
 * Realm Object Server: 3.21.0 or later.
 * Realm Studio: 3.11 or later.
@@ -28,6 +25,7 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
+
 * Upgraded realm-core from v6.0.18 to v6.0.19
 * Upgraded realm-sync from v5.0.15 to v5.0.16
 
