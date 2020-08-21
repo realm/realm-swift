@@ -59,7 +59,7 @@
     }
 }
 
-- (void)changeStreamDidOpen:(nonnull RLMChangeStream *)changeStream {
+- (void)changeStreamDidOpen:(nonnull __unused RLMChangeStream *)changeStream {
     _didOpenWasCalled = YES;
 }
 
