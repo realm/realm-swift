@@ -2255,28 +2255,33 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)performWatchTest:(nullable dispatch_queue_t)delegateQueue {
-    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 3 times"];
 
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
 
-    RLMWatchTestUtility *testUtility = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5
-                                                                                  completion:^(NSError * error) {
+    RLMWatchTestUtility *testUtility =
+    [[RLMWatchTestUtility alloc] initWithChangeEventCount:3
+                                            eventReceived:^(NSError * error) {
+        XCTAssertNil(error);
+        dispatch_semaphore_signal(sema);
+    }
+                                               completion:^(NSError * error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
     __block RLMChangeStream *changeStream = [collection watchWithDelegate:testUtility delegateQueue:delegateQueue];
 
-    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (int i = 0; i < 5; i++) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        for (int i = 0; i < 3; i++) {
             [collection insertOneDocument:@{@"name": @"fido"} completion:^(RLMObjectId * objectId, NSError * error) {
                 XCTAssertNil(error);
                 XCTAssertNotNil(objectId);
             }];
-            [NSThread sleepForTimeInterval:2];
-            if (i == 4) {
-                [NSThread sleepForTimeInterval:10];
+            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+            if (i == 2) {
                 [changeStream close];
             }
         }
@@ -2295,6 +2300,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)performWatchWithMatchFilterTest:(nullable dispatch_queue_t)delegateQueue {
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
@@ -2313,20 +2319,26 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }];
     [self waitForExpectations:@[insertManyExpectation] timeout:60.0];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 3 times"];
 
-    RLMWatchTestUtility *testUtility = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5
-                                                                            matchingObjectId:objectIds[0]
-                                                                                  completion:^(NSError * error) {
+    RLMWatchTestUtility *testUtility =
+    [[RLMWatchTestUtility alloc] initWithChangeEventCount:3
+                                         matchingObjectId:objectIds[0]
+                                            eventReceived:^(NSError * error) {
+        XCTAssertNil(error);
+        dispatch_semaphore_signal(sema);
+    }
+                                               completion:^(NSError * error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
+
     __block RLMChangeStream *changeStream = [collection watchWithMatchFilter:@{@"fullDocument._id": objectIds[0]}
                                                                     delegate:testUtility
                                                                delegateQueue:delegateQueue];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 3; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
                                     completion:^(RLMUpdateResult * _Nullable, NSError * error) {
@@ -2338,14 +2350,13 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                     completion:^(RLMUpdateResult * _Nullable, NSError * error) {
                 XCTAssertNil(error);
             }];
-            [NSThread sleepForTimeInterval:2];
-            if (i == 4) {
-                [NSThread sleepForTimeInterval:10];
+            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+            if (i == 2) {
                 [changeStream close];
             }
         }
     });
-    [self waitForExpectations:@[expectation] timeout:30.0];
+    [self waitForExpectations:@[expectation] timeout:60.0];
 }
 
 - (void)testWatchWithFilterIds {
@@ -2358,6 +2369,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)performWatchWithFilterIdsTest:(nullable dispatch_queue_t)delegateQueue {
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
@@ -2376,20 +2388,26 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }];
     [self waitForExpectations:@[insertManyExpectation] timeout:60.0];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 3 times"];
 
-    RLMWatchTestUtility *testUtility = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5
-                                                                            matchingObjectId:objectIds[0]
-                                                                                  completion:^(NSError * error) {
+    RLMWatchTestUtility *testUtility =
+    [[RLMWatchTestUtility alloc] initWithChangeEventCount:3
+                                         matchingObjectId:objectIds[0]
+                                            eventReceived:^(NSError * error) {
+        XCTAssertNil(error);
+        dispatch_semaphore_signal(sema);
+    }
+                                               completion:^(NSError * error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
+
     __block RLMChangeStream *changeStream = [collection watchWithFilterIds:@[objectIds[0]]
                                                                   delegate:testUtility
                                                              delegateQueue:delegateQueue];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 3; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
                                     completion:^(RLMUpdateResult * _Nullable, NSError * error) {
@@ -2401,9 +2419,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                     completion:^(RLMUpdateResult * _Nullable, NSError * error) {
                 XCTAssertNil(error);
             }];
-            [NSThread sleepForTimeInterval:2];
-            if (i == 4) {
-                [NSThread sleepForTimeInterval:10];
+            dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+            if (i == 2) {
                 [changeStream close];
             }
         }
@@ -2422,6 +2439,8 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
 }
 
 - (void)performMultipleWatchStreamsTest:(nullable dispatch_queue_t)delegateQueue {
+    dispatch_semaphore_t sema1 = dispatch_semaphore_create(0);
+    dispatch_semaphore_t sema2 = dispatch_semaphore_create(0);
     RLMMongoClient *client = [self.anonymousUser mongoClientWithServiceName:@"mongodb1"];
     RLMMongoDatabase *database = [client databaseWithName:@"test_data"];
     __block RLMMongoCollection *collection = [database collectionWithName:@"Dog"];
@@ -2440,20 +2459,33 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
     }];
     [self waitForExpectations:@[insertManyExpectation] timeout:60.0];
 
-    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 5 times"];
+    XCTestExpectation *expectation = [self expectationWithDescription:@"watch collection and receive change event 3 times"];
     expectation.expectedFulfillmentCount = 2;
-    RLMWatchTestUtility *testUtility1 = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5
-                                                                             matchingObjectId:objectIds[0]
-                                                                                   completion:^(NSError * error) {
+
+    RLMWatchTestUtility *testUtility1 =
+    [[RLMWatchTestUtility alloc] initWithChangeEventCount:3
+                                         matchingObjectId:objectIds[0]
+                                            eventReceived:^(NSError * error) {
+        XCTAssertNil(error);
+        dispatch_semaphore_signal(sema1);
+    }
+                                               completion:^(NSError * error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
-    RLMWatchTestUtility *testUtility2 = [[RLMWatchTestUtility alloc] initWithChangeEventCount:5
-                                                                             matchingObjectId:objectIds[1]
-                                                                                   completion:^(NSError * error) {
+
+    RLMWatchTestUtility *testUtility2 =
+    [[RLMWatchTestUtility alloc] initWithChangeEventCount:3
+                                         matchingObjectId:objectIds[1]
+                                            eventReceived:^(NSError * error) {
+        XCTAssertNil(error);
+        dispatch_semaphore_signal(sema2);
+    }
+                                               completion:^(NSError * error) {
         XCTAssertNil(error);
         [expectation fulfill];
     }];
+
     __block RLMChangeStream *changeStream1 = [collection watchWithFilterIds:@[objectIds[0]]
                           delegate:testUtility1
                      delegateQueue:nil];
@@ -2463,7 +2495,7 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                      delegateQueue:nil];
 
     dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 3; i++) {
             [collection updateOneDocumentWhere:@{@"_id": objectIds[0]}
                                 updateDocument:@{@"breed": @"king charles", @"name": [NSString stringWithFormat:@"fido-%d", i]}
                                     completion:^(RLMUpdateResult * _Nullable, NSError * error) {
@@ -2481,9 +2513,9 @@ static const NSInteger NUMBER_OF_BIG_OBJECTS = 2;
                                     completion:^(RLMUpdateResult * _Nullable, NSError * error) {
                 XCTAssertNil(error);
             }];
-            [NSThread sleepForTimeInterval:2];
-            if (i == 4) {
-                [NSThread sleepForTimeInterval:10];
+            dispatch_semaphore_wait(sema1, DISPATCH_TIME_FOREVER);
+            dispatch_semaphore_wait(sema2, DISPATCH_TIME_FOREVER);
+            if (i == 2) {
                 [changeStream1 close];
                 [changeStream2 close];
             }

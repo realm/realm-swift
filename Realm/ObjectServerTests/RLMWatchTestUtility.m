@@ -25,13 +25,16 @@
     RLMObjectId *_matchingObjectId;
     BOOL _didOpenWasCalled;
     RLMWatchTestUtilityBlock _completion;
+    RLMWatchTestUtilityBlock _eventReceived;
 }
 
 - (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
+                           eventReceived:(RLMWatchTestUtilityBlock)eventReceived
                               completion:(RLMWatchTestUtilityBlock)completion {
     if (self = [super init]) {
         _completion = completion;
         _targetChangeEventCount = changeEventCount;
+        _eventReceived = eventReceived;
         return self;
     }
     return nil;
@@ -39,11 +42,13 @@
 
 - (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
                         matchingObjectId:(RLMObjectId *)matchingObjectId
+                           eventReceived:(RLMWatchTestUtilityBlock)eventReceived
                               completion:(RLMWatchTestUtilityBlock)completion {
     if (self = [super init]) {
         _completion = completion;
         _targetChangeEventCount = changeEventCount;
         _matchingObjectId = matchingObjectId;
+        _eventReceived = eventReceived;
         return self;
     }
     return nil;
@@ -70,7 +75,11 @@
         RLMObjectId *objectId = ((NSDictionary *)changeEvent)[@"fullDocument"][@"_id"];
         if (![objectId.stringValue isEqualToString:_matchingObjectId.stringValue]) {
             return _completion([NSError new]);
+        } else {
+            return _eventReceived(nil);
         }
+    } else {
+        return _eventReceived(nil);
     }
 }
 
