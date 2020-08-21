@@ -589,22 +589,20 @@ extension Publishers {
         private var changeStream: ChangeStream?
         private var subscriber: S?
 
-        init(collection: MongoCollection, subscriber: S, queue: DispatchQueue = .main) {
+        init(collection: MongoCollection, subscriber: S,
+             queue: DispatchQueue = .main,
+             filterIds: [ObjectId]? = nil,
+             matchFilter: Document? = nil) {
             self.collection = collection
             self.subscriber = subscriber
-            setup(queue: queue)
-        }
 
-        init(collection: MongoCollection, subscriber: S, filterIds: [ObjectId], queue: DispatchQueue = .main) {
-            self.collection = collection
-            self.subscriber = subscriber
-            setup(with: filterIds, queue: queue)
-        }
-
-        init(collection: MongoCollection, subscriber: S, matchFilter: Document, queue: DispatchQueue = .main) {
-            self.collection = collection
-            self.subscriber = subscriber
-            setup(with: matchFilter, queue: queue)
+            if let matchFilter = matchFilter {
+                setup(with: matchFilter, queue: queue)
+            } else if let filterIds = filterIds {
+                setup(with: filterIds, queue: queue)
+            } else {
+                setup(queue: queue)
+            }
         }
 
         func request(_ demand: Subscribers.Demand) { }
@@ -664,25 +662,13 @@ extension Publishers {
         }
 
         /// :nodoc:
-        public func receive<S: Subscriber>(subscriber: S) where
-            Self.Failure == S.Failure, Self.Output == S.Input {
-                let subscription: Subscription
-                if let filterIds = filterIds {
-                    subscription = WatchSubscription(collection: collection,
-                                                     subscriber: subscriber,
-                                                     filterIds: filterIds,
-                                                     queue: queue)
-                } else if let matchFilter = matchFilter {
-                    subscription = WatchSubscription(collection: collection,
-                                                     subscriber: subscriber,
-                                                     matchFilter: matchFilter,
-                                                     queue: queue)
-                } else {
-                    subscription = WatchSubscription(collection: collection,
-                                                     subscriber: subscriber,
-                                                     queue: queue)
-                }
-                subscriber.receive(subscription: subscription)
+        public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
+            let subscription = WatchSubscription(collection: collection,
+                                                 subscriber: subscriber,
+                                                 queue: queue,
+                                                 filterIds: filterIds,
+                                                 matchFilter: matchFilter)
+            subscriber.receive(subscription: subscription)
         }
 
         /// Specifies the scheduler on which to perform subscribe, cancel, and request operations.

@@ -18,7 +18,6 @@
 
 #import "RLMApp_Private.hpp"
 
-#import "RLMNetworkTransport_Private.hpp"
 #import "RLMCredentials_Private.hpp"
 #import "RLMBSON_Private.hpp"
 #import "RLMPushClient_Private.hpp"

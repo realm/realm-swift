@@ -35,7 +35,6 @@
 }
 - (instancetype)initWithChangeEventSubscriber:(id<RLMChangeEventDelegate>)subscriber {
     if (self = [super init]) {
-        _watchStream = realm::app::WatchStream();
         _subscriber = subscriber;
         return self;
     }
@@ -55,7 +54,7 @@
 }
 
 - (void)didReceiveEvent:(nonnull NSData *)event {
-    auto str = [[NSString alloc] initWithData:event encoding:NSUTF8StringEncoding].UTF8String;
+    std::string_view str = [[NSString alloc] initWithData:event encoding:NSUTF8StringEncoding].UTF8String;
     switch (_watchStream.state()) {
         case realm::app::WatchStream::State::NEED_DATA:
             _watchStream.feed_buffer(str);

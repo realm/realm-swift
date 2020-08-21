@@ -109,11 +109,11 @@ NSString * const RLMHTTPMethodToNSString[] = {
     return session;
 }
 
-- (RLMRequest *)RLMRequestFromRequest:(realm::app::Request)request {
+- (RLMRequest *)RLMRequestFromRequest:(const realm::app::Request)request {
     RLMRequest *rlmRequest = [RLMRequest new];
     NSMutableDictionary<NSString *, NSString*> *headersDict = [NSMutableDictionary new];
-    for(auto &header : request.headers) {
-        [headersDict setValue:@(header.second.c_str()) forKey:@(header.first.c_str())];
+    for(auto &[key, value] : request.headers) {
+        [headersDict setValue:@(value.c_str()) forKey:@(key.c_str())];
     }
     rlmRequest.headers = headersDict;
     rlmRequest.method = static_cast<RLMHTTPMethod>(request.method);
