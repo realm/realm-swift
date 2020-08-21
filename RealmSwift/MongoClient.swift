@@ -645,6 +645,7 @@ extension Publishers {
         }
     }
 
+    /// A publisher that emits a change event each time the remote MongoDB collection changes.
     public struct WatchPublisher: Publisher {
         public typealias Output = AnyBSON
         public typealias Failure = Error

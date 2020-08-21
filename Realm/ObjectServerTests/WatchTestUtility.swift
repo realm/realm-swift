@@ -23,14 +23,16 @@ class WatchTestUtility: ChangeEventDelegate {
 
     typealias WatchTestUtilityBlock = ((Error?) -> Void)
     private var completion: WatchTestUtilityBlock
+    private var eventReceived: WatchTestUtilityBlock
     private var targetEventCount: Int
     private var changeEventCount = 0
     private var didOpenWasCalled = false
     private var matchingObjectId: ObjectId?
 
-    init(targetEventCount: Int, matchingObjectId: ObjectId? = nil, completion: @escaping WatchTestUtilityBlock) {
+    init(targetEventCount: Int, matchingObjectId: ObjectId? = nil, eventReceived: @escaping WatchTestUtilityBlock, completion: @escaping WatchTestUtilityBlock) {
         self.targetEventCount = targetEventCount
         self.completion = completion
+        self.eventReceived = eventReceived
         self.matchingObjectId = matchingObjectId
     }
 
@@ -54,13 +56,18 @@ class WatchTestUtility: ChangeEventDelegate {
 
     func changeStreamDidReceive(changeEvent: AnyBSON?) {
         changeEventCount+=1
+        guard let changeEvent = changeEvent else {
+            completion(NSError())
+            return
+        }
 
-        guard let document = changeEvent?.documentValue else {
+        guard let document = changeEvent.documentValue else {
             completion(NSError())
             return
         }
 
         guard let matchingObjectId = matchingObjectId else {
+            eventReceived(nil)
             return
         }
 
@@ -68,6 +75,8 @@ class WatchTestUtility: ChangeEventDelegate {
 
         if objectId != matchingObjectId {
             completion(NSError())
+        } else {
+            eventReceived(nil)
         }
     }
 }

@@ -1542,11 +1542,14 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func performWatchTest(_ queue: DispatchQueue?) {
+        let sema = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
-        let watchEx = expectation(description: "Watch 5 document events")
-        let watchTestUtility = WatchTestUtility(targetEventCount: 5) { (error) in
+        let watchEx = expectation(description: "Watch 3 document events")
+        let watchTestUtility = WatchTestUtility(targetEventCount: 3, eventReceived: { (_) in
+            sema.signal()
+        }) { (error) in
             XCTAssertNil(error)
             watchEx.fulfill()
         }
@@ -1559,13 +1562,12 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
-            for i in 0..<5 {
+            for i in 0..<3 {
                 collection.insertOne(document) { (_, error) in
                     XCTAssertNil(error)
                 }
-                Thread.sleep(forTimeInterval: 2)
-                if i == 4 {
-                    Thread.sleep(forTimeInterval: 10)
+                sema.wait()
+                if i == 2 {
                     changeStream?.close()
                 }
             }
@@ -1583,6 +1585,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func performWatchWithMatchFilterTest(_ queue: DispatchQueue?) {
+        let sema = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -1599,8 +1602,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [insertManyEx], timeout: 4.0)
 
-        let watchEx = expectation(description: "Watch 5 document events")
-        let watchTestUtility = WatchTestUtility(targetEventCount: 5, matchingObjectId: objectIds.first!) { (error) in
+        let watchEx = expectation(description: "Watch 3 document events")
+        let watchTestUtility = WatchTestUtility(targetEventCount: 3, matchingObjectId: objectIds.first!, eventReceived: { (_) in
+            sema.signal()
+        }) { (error) in
             XCTAssertNil(error)
             watchEx.fulfill()
         }
@@ -1616,7 +1621,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
-            for i in 0..<5 {
+            for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
                                              update: ["name": name, "breed": "king charles"]) { (_, error) in
@@ -1626,9 +1631,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                              update: ["name": name, "breed": "king charles"]) { (_, error) in
                     XCTAssertNil(error)
                 }
-                Thread.sleep(forTimeInterval: 2)
-                if i == 4 {
-                    Thread.sleep(forTimeInterval: 10)
+                sema.wait()
+                if i == 2 {
                     changeStream?.close()
                 }
             }
@@ -1646,6 +1650,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func performWatchWithFilterIdsTest(_ queue: DispatchQueue?) {
+        let sema = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -1663,8 +1668,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [insertManyEx], timeout: 4.0)
 
-        let watchEx = expectation(description: "Watch 5 document events")
-        let watchTestUtility = WatchTestUtility(targetEventCount: 5, matchingObjectId: objectIds.first!) { (error) in
+        let watchEx = expectation(description: "Watch 3 document events")
+        let watchTestUtility = WatchTestUtility(targetEventCount: 3, matchingObjectId: objectIds.first!, eventReceived: { (_) in
+            sema.signal()
+        }) { (error) in
             XCTAssertNil(error)
             watchEx.fulfill()
         }
@@ -1677,7 +1684,7 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
-            for i in 0..<5 {
+            for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
                                              update: ["name": name, "breed": "king charles"]) { (_, error) in
@@ -1687,9 +1694,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                              update: ["name": name, "breed": "king charles"]) { (_, error) in
                     XCTAssertNil(error)
                 }
-                Thread.sleep(forTimeInterval: 2)
-                if i == 4 {
-                    Thread.sleep(forTimeInterval: 10)
+                sema.wait()
+                if i == 2 {
                     changeStream?.close()
                 }
             }
@@ -1707,6 +1713,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func performMultipleWatchStreamsTest(_ queue: DispatchQueue?) {
+        let sema1 = DispatchSemaphore(value: 0)
+        let sema2 = DispatchSemaphore(value: 0)
+
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -1726,11 +1735,17 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
 
         let watchEx = expectation(description: "Watch 5 document events")
         watchEx.expectedFulfillmentCount = 2
-        let watchTestUtility1 = WatchTestUtility(targetEventCount: 5, matchingObjectId: objectIds[0]) { (error) in
+
+        let watchTestUtility1 = WatchTestUtility(targetEventCount: 3, matchingObjectId: objectIds[0], eventReceived: { (_) in
+            sema1.signal()
+        }) { (error) in
             XCTAssertNil(error)
             watchEx.fulfill()
         }
-        let watchTestUtility2 = WatchTestUtility(targetEventCount: 5, matchingObjectId: objectIds[1]) { (error) in
+
+        let watchTestUtility2 = WatchTestUtility(targetEventCount: 3, matchingObjectId: objectIds[1], eventReceived: { (_) in
+            sema2.signal()
+        }) { (error) in
             XCTAssertNil(error)
             watchEx.fulfill()
         }
@@ -1757,9 +1772,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                              update: ["name": name, "breed": "king charles"]) { (_, error) in
                     XCTAssertNil(error)
                 }
-                Thread.sleep(forTimeInterval: 2)
-                if i == 4 {
-                    Thread.sleep(forTimeInterval: 10)
+                sema1.wait()
+                sema2.wait()
+                if i == 2 {
                     changeStream1?.close()
                     changeStream2?.close()
                 }
@@ -1777,13 +1792,14 @@ extension SwiftObjectServerTests {
 
     // swiftlint:disable multiple_closures_with_trailing_closure
     func testWatchCombine() {
+        let sema = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
-        let watchEx1 = expectation(description: "Watch 5 document events")
-        watchEx1.expectedFulfillmentCount = 5
-        let watchEx2 = expectation(description: "Watch 5 document events")
-        watchEx2.expectedFulfillmentCount = 5
+        let watchEx1 = expectation(description: "Watch 3 document events")
+        watchEx1.expectedFulfillmentCount = 3
+        let watchEx2 = expectation(description: "Watch 3 document events")
+        watchEx2.expectedFulfillmentCount = 3
 
         var subscriptions: Set<AnyCancellable> = []
 
@@ -1793,6 +1809,7 @@ extension SwiftObjectServerTests {
             .sink(receiveCompletion: { _ in }) { _ in
                 watchEx1.fulfill()
                 XCTAssertFalse(Thread.isMainThread)
+                sema.signal()
         }.store(in: &subscriptions)
 
         collection.watch()
@@ -1804,14 +1821,13 @@ extension SwiftObjectServerTests {
         }.store(in: &subscriptions)
 
         DispatchQueue.global().async {
-            for i in 0..<5 {
+            for i in 0..<3 {
                 collection.insertOne(document) { (_, error) in
                     XCTAssertNil(error)
                 }
-                Thread.sleep(forTimeInterval: 2)
-                if i == 4 {
-                    Thread.sleep(forTimeInterval: 10)
-                    subscriptions.forEach {$0.cancel()}
+                sema.wait()
+                if i == 2 {
+                    subscriptions.forEach { $0.cancel() }
                 }
             }
         }
@@ -1819,6 +1835,8 @@ extension SwiftObjectServerTests {
     }
 
     func testWatchCombineWithFilterIds() {
+        let sema1 = DispatchSemaphore(value: 0)
+        let sema2 = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -1836,10 +1854,10 @@ extension SwiftObjectServerTests {
         }
         wait(for: [insertManyEx], timeout: 4.0)
 
-        let watchEx1 = expectation(description: "Watch 5 document events")
-        watchEx1.expectedFulfillmentCount = 5
-        let watchEx2 = expectation(description: "Watch 5 document events")
-        watchEx2.expectedFulfillmentCount = 5
+        let watchEx1 = expectation(description: "Watch 3 document events")
+        watchEx1.expectedFulfillmentCount = 3
+        let watchEx2 = expectation(description: "Watch 3 document events")
+        watchEx2.expectedFulfillmentCount = 3
         var subscriptions: Set<AnyCancellable> = []
 
         collection.watch(filterIds: [objectIds[0]])
@@ -1854,10 +1872,11 @@ extension SwiftObjectServerTests {
                 let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
                 if objectId == objectIds[0] {
                     watchEx1.fulfill()
+                    sema1.signal()
                 }
         }.store(in: &subscriptions)
 
-        collection.watch(filterIds: [objectIds[0]])
+        collection.watch(filterIds: [objectIds[1]])
             .subscribe(on: DispatchQueue.global())
             .receive(on: DispatchQueue.global())
             .sink(receiveCompletion: { _ in }) { (changeEvent) in
@@ -1867,13 +1886,14 @@ extension SwiftObjectServerTests {
                 }
 
                 let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
-                if objectId == objectIds[0] {
+                if objectId == objectIds[1] {
                     watchEx2.fulfill()
+                    sema2.signal()
                 }
         }.store(in: &subscriptions)
 
         DispatchQueue.global().async {
-            for i in 0..<5 {
+            for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
                                              update: ["name": name, "breed": "king charles"]) { (_, error) in
@@ -1883,10 +1903,10 @@ extension SwiftObjectServerTests {
                                              update: ["name": name, "breed": "king charles"]) { (_, error) in
                     XCTAssertNil(error)
                 }
-                Thread.sleep(forTimeInterval: 2)
-                if i == 4 {
-                    Thread.sleep(forTimeInterval: 10)
-                    subscriptions.forEach {$0.cancel()}
+                sema1.wait()
+                sema2.wait()
+                if i == 2 {
+                    subscriptions.forEach { $0.cancel() }
                 }
             }
         }
@@ -1894,6 +1914,8 @@ extension SwiftObjectServerTests {
     }
 
     func testWatchCombineWithMatchFilter() {
+        let sema1 = DispatchSemaphore(value: 0)
+        let sema2 = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -1911,10 +1933,10 @@ extension SwiftObjectServerTests {
         }
         wait(for: [insertManyEx], timeout: 4.0)
 
-        let watchEx1 = expectation(description: "Watch 5 document events")
-        watchEx1.expectedFulfillmentCount = 5
-        let watchEx2 = expectation(description: "Watch 5 document events")
-        watchEx2.expectedFulfillmentCount = 5
+        let watchEx1 = expectation(description: "Watch 3 document events")
+        watchEx1.expectedFulfillmentCount = 3
+        let watchEx2 = expectation(description: "Watch 3 document events")
+        watchEx2.expectedFulfillmentCount = 3
         var subscriptions: Set<AnyCancellable> = []
 
         collection.watch(matchFilter: ["fullDocument._id": AnyBSON.objectId(objectIds[0])])
@@ -1929,6 +1951,7 @@ extension SwiftObjectServerTests {
                 let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
                 if objectId == objectIds[0] {
                     watchEx1.fulfill()
+                    sema1.signal()
                 }
         }.store(in: &subscriptions)
 
@@ -1944,11 +1967,12 @@ extension SwiftObjectServerTests {
                 let objectId = doc["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
                 if objectId == objectIds[1] {
                     watchEx2.fulfill()
+                    sema2.signal()
                 }
         }.store(in: &subscriptions)
 
         DispatchQueue.global().async {
-            for i in 0..<5 {
+            for i in 0..<3 {
                 let name: AnyBSON = .string("fido-\(i)")
                 collection.updateOneDocument(filter: ["_id": AnyBSON.objectId(objectIds[0])],
                                              update: ["name": name, "breed": "king charles"]) { (_, error) in
@@ -1958,10 +1982,10 @@ extension SwiftObjectServerTests {
                                              update: ["name": name, "breed": "king charles"]) { (_, error) in
                     XCTAssertNil(error)
                 }
-                Thread.sleep(forTimeInterval: 2)
-                if i == 4 {
-                    Thread.sleep(forTimeInterval: 10)
-                    subscriptions.forEach {$0.cancel()}
+                sema1.wait()
+                sema2.wait()
+                if i == 2 {
+                    subscriptions.forEach { $0.cancel() }
                 }
             }
         }
