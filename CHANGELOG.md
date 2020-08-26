@@ -5,7 +5,15 @@ x.y.z Release notes (yyyy-MM-dd)
 
 ### Fixed
 * <How to hit and notice issue? what was the impact?> ([#????](https://github.com/realm/realm-cocoa/issues/????), since v?.?.?)
-* None.
+* Work around iOS 14 no longer allowing the use of file locks in shared
+  containers, which resulted in the OS killing an app which entered the
+  background while a Realm was open ([#6671](https://github.com/realm/realm-cocoa/issues/6671)).
+* If an attempt to upgrade a realm has ended with a crash with "migrate_links()"
+  in the call stack, the realm was left in an invalid state. The migration
+  logic now handles this state and can complete upgrading files which were
+  incompletely upgraded by pre-5.3.4 versions.
+* Fix deadlocks when writing to a Realm file on an exFAT partition from macOS.
+  ([#6691](https://github.com/realm/realm-cocoa/issues/6691)).
 
 <!-- ### Breaking Changes - ONLY INCLUDE FOR NEW MAJOR version -->
 
@@ -17,8 +25,8 @@ x.y.z Release notes (yyyy-MM-dd)
 * Carthage release for Swift is built with Xcode 11.6.
 
 ### Internal
-* Upgraded realm-core from ? to ?
-* Upgraded realm-sync from ? to ?
+* Upgraded realm-core from v6.0.19 to v6.0.23
+* Upgraded realm-sync from v5.0.16 to v5.0.20
 
 5.3.5 Release notes (2020-08-20)
 =============================================================

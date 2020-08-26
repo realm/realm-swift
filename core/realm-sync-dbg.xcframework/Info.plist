@@ -8,33 +8,13 @@
 			<key>HeadersPath</key>
 			<string>Headers</string>
 			<key>LibraryIdentifier</key>
-			<string>watchos-armv7k_arm64_32</string>
+			<string>macos-x86_64</string>
 			<key>LibraryPath</key>
-			<string>librealm.a</string>
+			<string>librealm-sync-dbg.a</string>
 			<key>SupportedArchitectures</key>
-			<array>
-				<string>armv7k</string>
-				<string>arm64_32</string>
-			</array>
+			<array><string>x86_64</string></array>
 			<key>SupportedPlatform</key>
-			<string>watchos</string>
-		</dict>
-		<dict>
-			<key>HeadersPath</key>
-			<string>Headers</string>
-			<key>LibraryIdentifier</key>
-			<string>watchos-i386_x86_64-simulator</string>
-			<key>LibraryPath</key>
-			<string>librealm.a</string>
-			<key>SupportedArchitectures</key>
-			<array>
-				<string>i386</string>
-				<string>x86_64</string>
-			</array>
-			<key>SupportedPlatform</key>
-			<string>watchos</string>
-			<key>SupportedPlatformVariant</key>
-			<string>simulator</string>
+			<string>macos</string>
 		</dict>
 		<dict>
 			<key>HeadersPath</key>
@@ -42,12 +22,10 @@
 			<key>LibraryIdentifier</key>
 			<string>ios-armv7_arm64</string>
 			<key>LibraryPath</key>
-			<string>librealm.a</string>
+			<string>librealm-sync-dbg.a</string>
 			<key>SupportedArchitectures</key>
-			<array>
-				<string>armv7</string>
-				<string>arm64</string>
-			</array>
+			<array><string>armv7</string>
+<string>arm64</string></array>
 			<key>SupportedPlatform</key>
 			<string>ios</string>
 		</dict>
@@ -55,14 +33,13 @@
 			<key>HeadersPath</key>
 			<string>Headers</string>
 			<key>LibraryIdentifier</key>
-			<string>ios-i386_x86_64-simulator</string>
+			<string>ios-arm64_i386_x86_64-simulator</string>
 			<key>LibraryPath</key>
-			<string>librealm.a</string>
+			<string>librealm-sync-dbg.a</string>
 			<key>SupportedArchitectures</key>
-			<array>
-				<string>i386</string>
-				<string>x86_64</string>
-			</array>
+			<array><string>arm64</string>
+<string>i386</string>
+<string>x86_64</string></array>
 			<key>SupportedPlatform</key>
 			<string>ios</string>
 			<key>SupportedPlatformVariant</key>
@@ -74,11 +51,9 @@
 			<key>LibraryIdentifier</key>
 			<string>ios-x86_64-maccatalyst</string>
 			<key>LibraryPath</key>
-			<string>librealm.a</string>
+			<string>librealm-sync-dbg.a</string>
 			<key>SupportedArchitectures</key>
-			<array>
-				<string>x86_64</string>
-			</array>
+			<array><string>x86_64</string></array>
 			<key>SupportedPlatform</key>
 			<string>ios</string>
 			<key>SupportedPlatformVariant</key>
@@ -88,15 +63,28 @@
 			<key>HeadersPath</key>
 			<string>Headers</string>
 			<key>LibraryIdentifier</key>
-			<string>tvos-x86_64-simulator</string>
+			<string>watchos-armv7k_arm64_32</string>
 			<key>LibraryPath</key>
-			<string>librealm.a</string>
+			<string>librealm-sync-dbg.a</string>
 			<key>SupportedArchitectures</key>
-			<array>
-				<string>x86_64</string>
-			</array>
+			<array><string>armv7k</string>
+<string>arm64_32</string></array>
 			<key>SupportedPlatform</key>
-			<string>tvos</string>
+			<string>watchos</string>
+		</dict>
+		<dict>
+			<key>HeadersPath</key>
+			<string>Headers</string>
+			<key>LibraryIdentifier</key>
+			<string>watchos-arm64_i386_x86_64-simulator</string>
+			<key>LibraryPath</key>
+			<string>librealm-sync-dbg.a</string>
+			<key>SupportedArchitectures</key>
+			<array><string>arm64</string>
+<string>i386</string>
+<string>x86_64</string></array>
+			<key>SupportedPlatform</key>
+			<string>watchos</string>
 			<key>SupportedPlatformVariant</key>
 			<string>simulator</string>
 		</dict>
@@ -106,11 +94,9 @@
 			<key>LibraryIdentifier</key>
 			<string>tvos-arm64</string>
 			<key>LibraryPath</key>
-			<string>librealm.a</string>
+			<string>librealm-sync-dbg.a</string>
 			<key>SupportedArchitectures</key>
-			<array>
-				<string>arm64</string>
-			</array>
+			<array><string>arm64</string></array>
 			<key>SupportedPlatform</key>
 			<string>tvos</string>
 		</dict>
@@ -118,15 +104,16 @@
 			<key>HeadersPath</key>
 			<string>Headers</string>
 			<key>LibraryIdentifier</key>
-			<string>macos-x86_64</string>
+			<string>tvos-arm64_x86_64-simulator</string>
 			<key>LibraryPath</key>
-			<string>librealm.a</string>
+			<string>librealm-sync-dbg.a</string>
 			<key>SupportedArchitectures</key>
-			<array>
-				<string>x86_64</string>
-			</array>
+			<array><string>arm64</string>
+<string>x86_64</string></array>
 			<key>SupportedPlatform</key>
-			<string>macos</string>
+			<string>tvos</string>
+			<key>SupportedPlatformVariant</key>
+			<string>simulator</string>
 		</dict>
 	</array>
 	<key>CFBundlePackageType</key>
