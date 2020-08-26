@@ -20,20 +20,18 @@ import Foundation
 import RealmSwift
 
 class WatchTestUtility: ChangeEventDelegate {
-
-    typealias WatchTestUtilityBlock = ((Error?) -> Void)
-    private var completion: WatchTestUtilityBlock
-    private var eventReceived: WatchTestUtilityBlock
+    var semaphore: DispatchSemaphore
     private var targetEventCount: Int
     private var changeEventCount = 0
     private var didOpenWasCalled = false
     private var matchingObjectId: ObjectId?
+    private weak var expectation: XCTestExpectation?
 
-    init(targetEventCount: Int, matchingObjectId: ObjectId? = nil, eventReceived: @escaping WatchTestUtilityBlock, completion: @escaping WatchTestUtilityBlock) {
+    init(targetEventCount: Int, matchingObjectId: ObjectId? = nil, expectation: inout XCTestExpectation) {
         self.targetEventCount = targetEventCount
-        self.completion = completion
-        self.eventReceived = eventReceived
         self.matchingObjectId = matchingObjectId
+        self.expectation = expectation
+        semaphore = DispatchSemaphore(value: 0)
     }
 
     func changeStreamDidOpen(_ changeStream: ChangeStream) {
@@ -41,42 +39,34 @@ class WatchTestUtility: ChangeEventDelegate {
     }
 
     func changeStreamDidClose(with error: Error?) {
-        guard let error = error else {
-            if (changeEventCount == targetEventCount) && didOpenWasCalled {
-                completion(nil)
-            }
-            return
-        }
-        completion(error)
+        XCTAssertNil(error)
+        XCTAssertTrue(didOpenWasCalled)
+        XCTAssertEqual(changeEventCount, targetEventCount)
+        expectation?.fulfill()
     }
 
     func changeStreamDidReceive(error: Error) {
-        completion(error)
+        XCTAssertNil(error)
     }
 
     func changeStreamDidReceive(changeEvent: AnyBSON?) {
         changeEventCount+=1
+        XCTAssertNotNil(changeEvent)
         guard let changeEvent = changeEvent else {
-            completion(NSError())
             return
         }
 
         guard let document = changeEvent.documentValue else {
-            completion(NSError())
             return
         }
 
         guard let matchingObjectId = matchingObjectId else {
-            eventReceived(nil)
+            semaphore.signal()
             return
         }
 
         let objectId = document["fullDocument"]??.documentValue!["_id"]??.objectIdValue!
-
-        if objectId != matchingObjectId {
-            completion(NSError())
-        } else {
-            eventReceived(nil)
-        }
+        XCTAssertEqual(objectId, matchingObjectId)
+        semaphore.signal()
     }
 }

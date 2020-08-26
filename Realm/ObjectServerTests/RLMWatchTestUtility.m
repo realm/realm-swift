@@ -24,17 +24,15 @@
     NSUInteger _currentChangeEventCount;
     RLMObjectId *_matchingObjectId;
     BOOL _didOpenWasCalled;
-    RLMWatchTestUtilityBlock _completion;
-    RLMWatchTestUtilityBlock _eventReceived;
+    __weak XCTestExpectation *_expectation;
 }
 
 - (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
-                           eventReceived:(RLMWatchTestUtilityBlock)eventReceived
-                              completion:(RLMWatchTestUtilityBlock)completion {
+                             expectation:(XCTestExpectation *)expectation {
     if (self = [super init]) {
-        _completion = completion;
         _targetChangeEventCount = changeEventCount;
-        _eventReceived = eventReceived;
+        _semaphore = dispatch_semaphore_create(0);
+        _expectation = expectation;
         return self;
     }
     return nil;
@@ -42,26 +40,22 @@
 
 - (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
                         matchingObjectId:(RLMObjectId *)matchingObjectId
-                           eventReceived:(RLMWatchTestUtilityBlock)eventReceived
-                              completion:(RLMWatchTestUtilityBlock)completion {
+                             expectation:(XCTestExpectation *)expectation {
     if (self = [super init]) {
-        _completion = completion;
         _targetChangeEventCount = changeEventCount;
+        _semaphore = dispatch_semaphore_create(0);
         _matchingObjectId = matchingObjectId;
-        _eventReceived = eventReceived;
+        _expectation = expectation;
         return self;
     }
     return nil;
 }
 
 - (void)changeStreamDidCloseWithError:(nullable NSError *)error {
-    if (error) {
-        return _completion(error);
-    }
-
-    if ((_currentChangeEventCount == _targetChangeEventCount) && _didOpenWasCalled) {
-        return _completion(nil);
-    }
+    XCTAssertNil(error);
+    XCTAssertTrue(_didOpenWasCalled);
+    XCTAssertEqual(_currentChangeEventCount, _targetChangeEventCount);
+    [_expectation fulfill];
 }
 
 - (void)changeStreamDidOpen:(nonnull __unused RLMChangeStream *)changeStream {
@@ -70,21 +64,17 @@
 
 - (void)changeStreamDidReceiveChangeEvent:(nonnull id<RLMBSON>)changeEvent {
     _currentChangeEventCount++;
-
     if (_matchingObjectId) {
         RLMObjectId *objectId = ((NSDictionary *)changeEvent)[@"fullDocument"][@"_id"];
-        if (![objectId.stringValue isEqualToString:_matchingObjectId.stringValue]) {
-            return _completion([NSError new]);
-        } else {
-            return _eventReceived(nil);
-        }
+        XCTAssertTrue([objectId.stringValue isEqualToString:_matchingObjectId.stringValue]);
+        dispatch_semaphore_signal(self.semaphore);
     } else {
-        return _eventReceived(nil);
+        dispatch_semaphore_signal(self.semaphore);
     }
 }
 
 - (void)changeStreamDidReceiveError:(nonnull NSError *)error {
-    return _completion(error);
+    XCTAssertNil(error);
 }
 
 @end

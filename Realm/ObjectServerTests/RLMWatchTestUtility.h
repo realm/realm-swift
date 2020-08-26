@@ -18,31 +18,29 @@
 
 #import <Foundation/Foundation.h>
 #import <Realm/RLMMongoCollection.h>
+#import <XCTest/XCTest.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 /// Used to process watch change events and assert tests.
-@interface RLMWatchTestUtility : NSObject <RLMChangeEventDelegate>
+@interface RLMWatchTestUtility : XCTestCase <RLMChangeEventDelegate>
 
-typedef void (^RLMWatchTestUtilityBlock)(NSError * _Nullable);
+@property (nonatomic, strong) dispatch_semaphore_t semaphore;
 
 /// Sets up an object that subscribes to the RLMChangeEventDelegate
 /// @param changeEventCount The target amount of change events for the test to succeed
-/// @param eventReceived Block which is invoked when a change event is received.
-/// @param completion Block which is invoked when target amount of change events has been hit, or an error has occured.
+/// @param expectation The expectation for the test to fulfil.
 - (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
-                           eventReceived:(RLMWatchTestUtilityBlock)eventReceived
-                              completion:(RLMWatchTestUtilityBlock)completion;
+                             expectation:(XCTestExpectation *)expectation;
 
 /// Sets up an object that subscribes to the RLMChangeEventDelegate
 /// @param changeEventCount The target amount of change events for the test to succeed
 /// @param matchingObjectId An objectId that the change event must match.
-/// /// @param eventReceived Block which is invoked when a change event is received.
-/// @param completion Block which is invoked when target amount of change events has been hit, or an error has occured.
+/// @param expectation The expectation for the test to fulfil.
 - (instancetype)initWithChangeEventCount:(NSUInteger)changeEventCount
                         matchingObjectId:(RLMObjectId *)matchingObjectId
-                           eventReceived:(RLMWatchTestUtilityBlock)eventReceived
-                              completion:(RLMWatchTestUtilityBlock)completion;
+                             expectation:(XCTestExpectation *)expectation;
+
 
 @end
 NS_ASSUME_NONNULL_END

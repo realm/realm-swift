@@ -584,12 +584,12 @@ import Combine
 extension Publishers {
 
     class WatchSubscription<S: Subscriber>: ChangeEventDelegate, Subscription where S.Input == AnyBSON, S.Failure == Error {
-
         private let collection: MongoCollection
         private var changeStream: ChangeStream?
         private var subscriber: S?
 
-        init(collection: MongoCollection, subscriber: S,
+        init(collection: MongoCollection,
+             subscriber: S,
              queue: DispatchQueue = .main,
              filterIds: [ObjectId]? = nil,
              matchFilter: Document? = nil) {
@@ -597,11 +597,16 @@ extension Publishers {
             self.subscriber = subscriber
 
             if let matchFilter = matchFilter {
-                setup(with: matchFilter, queue: queue)
+                changeStream = collection.watch(matchFilter: matchFilter,
+                                                delegate: self,
+                                                queue: queue)
             } else if let filterIds = filterIds {
-                setup(with: filterIds, queue: queue)
+                changeStream = collection.watch(filterIds: filterIds,
+                                                delegate: self,
+                                                queue: queue)
             } else {
-                setup(queue: queue)
+                changeStream = collection.watch(delegate: self,
+                                                queue: queue)
             }
         }
 
@@ -609,18 +614,6 @@ extension Publishers {
 
         func cancel() {
             changeStream?.close()
-        }
-
-        private func setup(queue: DispatchQueue) {
-            changeStream = collection.watch(delegate: self, queue: queue)
-        }
-
-        private func setup(with filterIds: [ObjectId], queue: DispatchQueue) {
-            changeStream = collection.watch(filterIds: filterIds, delegate: self, queue: queue)
-        }
-
-        private func setup(with matchFilter: Document, queue: DispatchQueue) {
-            changeStream = collection.watch(matchFilter: matchFilter, delegate: self, queue: queue)
         }
 
         func changeStreamDidOpen(_ changeStream: RLMChangeStream) { }
@@ -690,14 +683,12 @@ extension Publishers {
 
 @available(OSX 10.15, watchOS 6.0, iOS 13.0, iOSApplicationExtension 13.0, OSXApplicationExtension 10.15, tvOS 13.0, *)
 extension MongoCollection {
-
     /// Creates a publisher that emits a AnyBSON change event each time the MongoDB collection changes.
     ///
     /// - returns: A publisher that emits the AnyBSON change event each time the collection changes.
     public func watch() -> Publishers.WatchPublisher {
         return Publishers.WatchPublisher(collection: self, queue: .main)
     }
-
     /// Creates a publisher that emits a AnyBSON change event each time the MongoDB collection changes.
     ///
     /// - Parameter filterIds: The list of _ids in the collection to watch.
@@ -705,7 +696,6 @@ extension MongoCollection {
     public func watch(filterIds: [ObjectId]) -> Publishers.WatchPublisher {
         return Publishers.WatchPublisher(collection: self, queue: .main, filterIds: filterIds)
     }
-
     /// Creates a publisher that emits a AnyBSON change event each time the MongoDB collection changes.
     ///
     /// - Parameter matchFilter: The $match filter to apply to incoming change events.

@@ -1542,17 +1542,11 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func performWatchTest(_ queue: DispatchQueue?) {
-        let sema = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
 
-        let watchEx = expectation(description: "Watch 3 document events")
-        let watchTestUtility = WatchTestUtility(targetEventCount: 3, eventReceived: { (_) in
-            sema.signal()
-        }) { (error) in
-            XCTAssertNil(error)
-            watchEx.fulfill()
-        }
+        var watchEx = expectation(description: "Watch 3 document events")
+        let watchTestUtility = WatchTestUtility(targetEventCount: 3, expectation: &watchEx)
 
         let changeStream: ChangeStream?
         if let queue = queue {
@@ -1562,15 +1556,13 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
 
         DispatchQueue.global().async {
-            for i in 0..<3 {
+            for _ in 0..<3 {
                 collection.insertOne(document) { (_, error) in
                     XCTAssertNil(error)
                 }
-                sema.wait()
-                if i == 2 {
-                    changeStream?.close()
-                }
+                watchTestUtility.semaphore.wait()
             }
+            changeStream?.close()
         }
         wait(for: [watchEx], timeout: 60.0)
     }
@@ -1585,7 +1577,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func performWatchWithMatchFilterTest(_ queue: DispatchQueue?) {
-        let sema = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -1602,13 +1593,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [insertManyEx], timeout: 4.0)
 
-        let watchEx = expectation(description: "Watch 3 document events")
-        let watchTestUtility = WatchTestUtility(targetEventCount: 3, matchingObjectId: objectIds.first!, eventReceived: { (_) in
-            sema.signal()
-        }) { (error) in
-            XCTAssertNil(error)
-            watchEx.fulfill()
-        }
+        var watchEx = expectation(description: "Watch 3 document events")
+        let watchTestUtility = WatchTestUtility(targetEventCount: 3, matchingObjectId: objectIds.first!, expectation: &watchEx)
 
         let changeStream: ChangeStream?
         if let queue = queue {
@@ -1631,11 +1617,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                              update: ["name": name, "breed": "king charles"]) { (_, error) in
                     XCTAssertNil(error)
                 }
-                sema.wait()
-                if i == 2 {
-                    changeStream?.close()
-                }
+                watchTestUtility.semaphore.wait()
             }
+            changeStream?.close()
         }
         wait(for: [watchEx], timeout: 60.0)
     }
@@ -1650,7 +1634,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func performWatchWithFilterIdsTest(_ queue: DispatchQueue?) {
-        let sema = DispatchSemaphore(value: 0)
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -1668,14 +1651,10 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [insertManyEx], timeout: 4.0)
 
-        let watchEx = expectation(description: "Watch 3 document events")
-        let watchTestUtility = WatchTestUtility(targetEventCount: 3, matchingObjectId: objectIds.first!, eventReceived: { (_) in
-            sema.signal()
-        }) { (error) in
-            XCTAssertNil(error)
-            watchEx.fulfill()
-        }
-
+        var watchEx = expectation(description: "Watch 3 document events")
+        let watchTestUtility = WatchTestUtility(targetEventCount: 3,
+                                                matchingObjectId: objectIds.first!,
+                                                expectation: &watchEx)
         let changeStream: ChangeStream?
         if let queue = queue {
             changeStream = collection.watch(filterIds: [objectIds[0]], delegate: watchTestUtility, queue: queue)
@@ -1694,11 +1673,9 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                              update: ["name": name, "breed": "king charles"]) { (_, error) in
                     XCTAssertNil(error)
                 }
-                sema.wait()
-                if i == 2 {
-                    changeStream?.close()
-                }
+                watchTestUtility.semaphore.wait()
             }
+            changeStream?.close()
         }
         wait(for: [watchEx], timeout: 60.0)
     }
@@ -1713,9 +1690,6 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
     }
 
     func performMultipleWatchStreamsTest(_ queue: DispatchQueue?) {
-        let sema1 = DispatchSemaphore(value: 0)
-        let sema2 = DispatchSemaphore(value: 0)
-
         let collection = setupMongoCollection()
         let document: Document = ["name": "fido", "breed": "cane corso"]
         let document2: Document = ["name": "rex", "breed": "cane corso"]
@@ -1733,22 +1707,16 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
         }
         wait(for: [insertManyEx], timeout: 4.0)
 
-        let watchEx = expectation(description: "Watch 5 document events")
+        var watchEx = expectation(description: "Watch 5 document events")
         watchEx.expectedFulfillmentCount = 2
 
-        let watchTestUtility1 = WatchTestUtility(targetEventCount: 3, matchingObjectId: objectIds[0], eventReceived: { (_) in
-            sema1.signal()
-        }) { (error) in
-            XCTAssertNil(error)
-            watchEx.fulfill()
-        }
+        let watchTestUtility1 = WatchTestUtility(targetEventCount: 3,
+                                                 matchingObjectId: objectIds[0],
+                                                 expectation: &watchEx)
 
-        let watchTestUtility2 = WatchTestUtility(targetEventCount: 3, matchingObjectId: objectIds[1], eventReceived: { (_) in
-            sema2.signal()
-        }) { (error) in
-            XCTAssertNil(error)
-            watchEx.fulfill()
-        }
+        let watchTestUtility2 = WatchTestUtility(targetEventCount: 3,
+                                                 matchingObjectId: objectIds[1],
+                                                 expectation: &watchEx)
 
         let changeStream1: ChangeStream?
         let changeStream2: ChangeStream?
@@ -1772,8 +1740,8 @@ class SwiftObjectServerTests: SwiftSyncTestCase {
                                              update: ["name": name, "breed": "king charles"]) { (_, error) in
                     XCTAssertNil(error)
                 }
-                sema1.wait()
-                sema2.wait()
+                watchTestUtility1.semaphore.wait()
+                watchTestUtility2.semaphore.wait()
                 if i == 2 {
                     changeStream1?.close()
                     changeStream2?.close()
